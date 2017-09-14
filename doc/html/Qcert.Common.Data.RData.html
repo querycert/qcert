@@ -136,8 +136,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">f6</span> : <span class="kwd">forall</span> <span class="id">b</span> <span class="id">d</span>, <span class="id"><a href="Qcert.Common.Data.RData.html#P">P</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#d">d</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RData.html#P">P</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dbrand">dbrand</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#d">d</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">fforeign</span> : <span class="kwd">forall</span> <span class="id">fd</span>, <span class="id"><a href="Qcert.Common.Data.RData.html#P">P</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dforeign">dforeign</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#fd">fd</a></span>)):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">d</span>, <span class="id"><a href="Qcert.Common.Data.RData.html#P">P</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof857')">Proof.</div>
-<div class="proofscript" id="proof857">
+<div class="toggleproof" onclick="toggleDisplay('proof859')">Proof.</div>
+<div class="proofscript" id="proof859">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RData.html#data_ind">data_ind</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intros</span>. <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
@@ -148,15 +148,15 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_eq_dec">brand_eq_dec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof858')">Proof.</div>
-<div class="proofscript" id="proof858">
+<div class="toggleproof" onclick="toggleDisplay('proof860')">Proof.</div>
+<div class="proofscript" id="proof860">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>. <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 &nbsp;&nbsp;<br/>
 <div class="doc">Equality is decidable for data </div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_eq_dec">data_eq_dec</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>, {<span class="id"><a href="Qcert.Common.Data.RData.html#x">x</a></span>=<span class="id"><a href="Qcert.Common.Data.RData.html#y">y</a></span>}+{<span class="id"><a href="Qcert.Common.Data.RData.html#x">x</a></span>&lt;&gt;<span class="id"><a href="Qcert.Common.Data.RData.html#y">y</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof859')">Proof.</div>
-<div class="proofscript" id="proof859">
+<div class="toggleproof" onclick="toggleDisplay('proof861')">Proof.</div>
+<div class="proofscript" id="proof861">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span>[<span class="id">right</span>; <span class="tactic">inversion</span> 1].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith_dec.html#Z_eq_dec">Z_eq_dec</a></span> <span class="id">n</span> <span class="id">z</span>).<br/>
@@ -196,8 +196,8 @@
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="data_eqdec">data_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> := <span class="id"><a href="Qcert.Common.Data.RData.html#data_eq_dec">data_eq_dec</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rec_eq_dec">rec_eq_dec</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>), {<span class="id"><a href="Qcert.Common.Data.RData.html#x">x</a></span>=<span class="id"><a href="Qcert.Common.Data.RData.html#y">y</a></span>}+{<span class="id"><a href="Qcert.Common.Data.RData.html#x">x</a></span>&lt;&gt;<span class="id"><a href="Qcert.Common.Data.RData.html#y">y</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof860')">Proof.</div>
-<div class="proofscript" id="proof860">
+<div class="toggleproof" onclick="toggleDisplay('proof862')">Proof.</div>
+<div class="proofscript" id="proof862">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#list_Forallt_eq_dec">list_Forallt_eq_dec</a></span> <span class="id">x</span> <span class="id">y</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#forallt_weaken">forallt_weaken</a></span>.<br/>

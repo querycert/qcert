@@ -14,7 +14,7 @@
 <h1 class="title">Module Qcert.NRA.Optim.NRARewrite</h1>
 <div class="coq">
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="ROptim">ROptim</a></span>.<br/>
+<span class="kwd">Section</span> <span class="id"><a name="NRARewrite">NRARewrite</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
@@ -30,8 +30,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="and_comm">and_comm</a></span> (<span class="id">p1</span> <span class="id">p2</span>: <span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> ∧ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ≡ₐ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ∧ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1639')">Proof.</div>
-<div class="proofscript" id="proof1639">
+<div class="toggleproof" onclick="toggleDisplay('proof1664')">Proof.</div>
+<div class="proofscript" id="proof1664">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p1</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p2</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">destruct</span> <span class="id">o0</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -43,8 +43,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="union_assoc">union_assoc</a></span> (<span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span>: <span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span>) ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p3">p3</a></span> ≡ₐ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ⋃ (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p3">p3</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1640')">Proof.</div>
-<div class="proofscript" id="proof1640">
+<div class="toggleproof" onclick="toggleDisplay('proof1665')">Proof.</div>
+<div class="proofscript" id="proof1665">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p1</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>) <span class="kwd">as</span> <span class="id">d1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p2</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>) <span class="kwd">as</span> <span class="id">d2</span>.<br/>
@@ -62,8 +62,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="union_select_distr">union_select_distr</a></span> (<span class="id">p</span> <span class="id">p1</span> <span class="id">p2</span>: <span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> ⟩(<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span>) ≡ₐ σ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> ⟩(<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>) ⋃ σ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> ⟩(<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1641')">Proof.</div>
-<div class="proofscript" id="proof1641">
+<div class="toggleproof" onclick="toggleDisplay('proof1666')">Proof.</div>
+<div class="proofscript" id="proof1666">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p1</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>) <span class="kwd">as</span> <span class="id">d1</span>.<br/>
@@ -112,8 +112,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_singleton">map_singleton</a></span> (<span class="id">p1</span> <span class="id">p2</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ⟩( ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> |} ) ≡ₐ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1642')">Proof.</div>
-<div class="proofscript" id="proof1642">
+<div class="toggleproof" onclick="toggleDisplay('proof1667')">Proof.</div>
+<div class="proofscript" id="proof1667">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p2</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -124,8 +124,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compose_rec_id">compose_rec_id</a></span> <span class="id">s</span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s">s</a></span>, <span class="id">ID</span>) |] ◯ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> ≡ₐ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span>) |].<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1643')">Proof.</div>
-<div class="proofscript" id="proof1643">
+<div class="toggleproof" onclick="toggleDisplay('proof1668')">Proof.</div>
+<div class="proofscript" id="proof1668">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -133,8 +133,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flatten_map_coll">flatten_map_coll</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(χ⟨ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> |} ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> )) ≡ₐ χ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1644')">Proof.</div>
-<div class="proofscript" id="proof1644">
+<div class="toggleproof" onclick="toggleDisplay('proof1669')">Proof.</div>
+<div class="proofscript" id="proof1669">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> <span class="id">h</span> <span class="id">c</span> <span class="id">_</span> <span class="id">x</span> <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p2</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p2</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -178,8 +178,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dot_from_duplicate_r">dot_from_duplicate_r</a></span> <span class="id">s1</span> <span class="id">s2</span> <span class="id">p1</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>) |])·<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s2">s2</a></span> ≡ₐ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1645')">Proof.</div>
-<div class="proofscript" id="proof1645">
+<div class="toggleproof" onclick="toggleDisplay('proof1670')">Proof.</div>
+<div class="proofscript" id="proof1670">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> <span class="id">x</span> <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p1</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">clear</span> <span class="id">p1</span> <span class="id">x</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -199,8 +199,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dot_from_duplicate_l">dot_from_duplicate_l</a></span> <span class="id">s1</span> <span class="id">s2</span> <span class="id">p1</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>) |])·<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s1">s1</a></span> ≡ₐ <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1646')">Proof.</div>
-<div class="proofscript" id="proof1646">
+<div class="toggleproof" onclick="toggleDisplay('proof1671')">Proof.</div>
+<div class="proofscript" id="proof1671">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> <span class="id">x</span> <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p1</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">clear</span> <span class="id">p1</span> <span class="id">x</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -221,8 +221,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_into_singleton">map_into_singleton</a></span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ ‵{| <span class="id">ID</span> |} ⟩(‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> |}) ≡ₐ ‵{|‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> |}|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1647')">Proof.</div>
-<div class="proofscript" id="proof1647">
+<div class="toggleproof" onclick="toggleDisplay('proof1672')">Proof.</div>
+<div class="proofscript" id="proof1672">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> <span class="id">x</span> <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -231,8 +231,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flatten_over_map_into_singleton">flatten_over_map_into_singleton</a></span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>( χ⟨ ‵{|‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> |}|} ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> ) ) ≡ₐ χ⟨ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span> |} ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1648')">Proof.</div>
-<div class="proofscript" id="proof1648">
+<div class="toggleproof" onclick="toggleDisplay('proof1673')">Proof.</div>
+<div class="proofscript" id="proof1673">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p2</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">clear</span> <span class="id">p2</span> <span class="id">x</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -285,16 +285,16 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_singleton_rec">map_singleton_rec</a></span> <span class="id">s1</span> <span class="id">s2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s1">s1</a></span>, <span class="id">ID</span>) |] ⟩( ‵{|(<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s2">s2</a></span> |}) ≡ₐ ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s1">s1</a></span>, (<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s2">s2</a></span>) |] |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1649')">Proof.</div>
-<div class="proofscript" id="proof1649">
+<div class="toggleproof" onclick="toggleDisplay('proof1674')">Proof.</div>
+<div class="proofscript" id="proof1674">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#map_singleton">map_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_dot_singleton">map_dot_singleton</a></span> <span class="id">s</span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ (<span class="id">ID</span>)·<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s">s</a></span> ⟩( ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> |} ) ≡ₐ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span>·<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s">s</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1650')">Proof.</div>
-<div class="proofscript" id="proof1650">
+<div class="toggleproof" onclick="toggleDisplay('proof1675')">Proof.</div>
+<div class="proofscript" id="proof1675">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#map_singleton">map_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -305,8 +305,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋈ᵈ⟨ χ⟨ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s2">s2</a></span>,<span class="id">ID</span>) |] ⟩((<span class="id">ID</span>)·<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s1">s1</a></span>) ⟩( ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s3">s3</a></span>,<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s1">s1</a></span>,‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span> |}) |]|} )<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₐ ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s3">s3</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p2">p2</a></span>) |]|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1651')">Proof.</div>
-<div class="proofscript" id="proof1651">
+<div class="toggleproof" onclick="toggleDisplay('proof1676')">Proof.</div>
+<div class="proofscript" id="proof1676">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">clear</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">clear</span> <span class="id">H0</span>; <span class="tactic">intros</span>.<br/>
@@ -317,7 +317,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o0</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id">s3</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -381,7 +381,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id">s3</span> <span class="id">s2</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id">s1</span> <span class="id">s3</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s3</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
@@ -395,7 +395,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s3</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s2</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rremove">rremove</a></span>; <span class="tactic">simpl</span>.<br/>
@@ -410,7 +410,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.eq">StringOrder.eq</a></span> <span class="id">s1</span> <span class="id">s3</span>) <span class="tactic">by</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#lt_contr1">lt_contr1</a></span>; <span class="tactic">assumption</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
@@ -450,8 +450,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="substitute_in_bindings">substitute_in_bindings</a></span> (<span class="id">p</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ (‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PDATA</span>"·"<span class="id">WORLD</span>") |])·"<span class="id">PDATA</span>" ⟩( ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span> |} )<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₐ ‵{|(‵[| ("<span class="id">PBIND</span>", <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#p">p</a></span>·"<span class="id">PDATA</span>"·"<span class="id">WORLD</span>") |])·"<span class="id">PDATA</span>" |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1652')">Proof.</div>
-<div class="proofscript" id="proof1652">
+<div class="toggleproof" onclick="toggleDisplay('proof1677')">Proof.</div>
+<div class="proofscript" id="proof1677">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ <span class="id">p</span> @ₐ <span class="id">x</span> ⊣ <span class="id">c</span>); <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">p</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -486,19 +486,19 @@
 <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dot_from_duplicate_bind_r">dot_from_duplicate_bind_r</a></span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>)) |] ⊕ ‵[| ("<span class="id">PDATA</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>)) |])·"<span class="id">PDATA</span>" ≡ₐ (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1653')">Proof.</div>
-<div class="proofscript" id="proof1653">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#dot_from_duplicate_r">dot_from_duplicate_r</a></span> "<span class="id">PBIND</span>" "<span class="id">PDATA</span>" (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>)) |] ⊕ ‵[| ("<span class="id">PDATA</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>)) |])·"<span class="id">PDATA</span>" ≡ₐ (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1678')">Proof.</div>
+<div class="proofscript" id="proof1678">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#dot_from_duplicate_r">dot_from_duplicate_r</a></span> "<span class="id">PBIND</span>" "<span class="id">PDATA</span>" (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dot_from_duplicate_bind_l">dot_from_duplicate_bind_l</a></span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>)) |] ⊕ ‵[| ("<span class="id">PDATA</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>)) |])·"<span class="id">PBIND</span>" ≡ₐ (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1654')">Proof.</div>
-<div class="proofscript" id="proof1654">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#dot_from_duplicate_l">dot_from_duplicate_l</a></span> "<span class="id">PBIND</span>" "<span class="id">PDATA</span>" (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>)) |] ⊕ ‵[| ("<span class="id">PDATA</span>", (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>)) |])·"<span class="id">PBIND</span>" ≡ₐ (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1679')">Proof.</div>
+<div class="proofscript" id="proof1679">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#dot_from_duplicate_l">dot_from_duplicate_l</a></span> "<span class="id">PBIND</span>" "<span class="id">PDATA</span>" (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAUnop">NRAUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#NRAID">NRAID</a></span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -506,8 +506,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dot_dot_from_duplicate_bind">dot_dot_from_duplicate_bind</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>"·"<span class="id">WORLD</span>") |])·"<span class="id">PDATA</span>"<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₐ <span class="id">ID</span>·"<span class="id">PBIND</span>"·"<span class="id">WORLD</span>".<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1655')">Proof.</div>
-<div class="proofscript" id="proof1655">
+<div class="toggleproof" onclick="toggleDisplay('proof1680')">Proof.</div>
+<div class="proofscript" id="proof1680">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="id">l</span> "<span class="id">PBIND</span>"); <span class="tactic">clear</span> <span class="id">l</span>; <span class="tactic">intros</span>.<br/>
@@ -524,8 +524,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;χ⟨(‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PDATA</span>"·"<span class="id">e</span>") |])·"<span class="id">PDATA</span>"<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟩( ‵{|‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>· "<span class="id">PBIND</span>") |] |}))|]<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₐ ‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">a1</span>", ‵{| <span class="id">ID</span>·"<span class="id">PBIND</span>"·"<span class="id">e</span>" |}) |].<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1656')">Proof.</div>
-<div class="proofscript" id="proof1656">
+<div class="toggleproof" onclick="toggleDisplay('proof1681')">Proof.</div>
+<div class="proofscript" id="proof1681">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="id">l</span> "<span class="id">PBIND</span>"); <span class="tactic">intros</span>.<br/>
@@ -536,7 +536,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
-<span class="kwd">End</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#ROptim">ROptim</a></span>.<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#NRARewrite">NRARewrite</a></span>.<br/>
 <br/>
 
 </div>

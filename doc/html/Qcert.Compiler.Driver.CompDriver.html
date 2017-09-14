@@ -237,12 +237,12 @@
 <br/>
 <div class="doc">DNNRC translations </div>
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="dnnrc_to_dnnrc_typed">dnnrc_to_dnnrc_typed</a></span> (<span class="id">q</span>: <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#dnnrc">dnnrc</a></span>) (<span class="id">tdenv</span>: <span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="dnnrc_to_dnnrc_typed">dnnrc_to_dnnrc_typed</a></span> (<span class="id">q</span>: <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#dnnrc">dnnrc</a></span>) (<span class="id">tdenv</span>: <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings">tdbindings</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#dnnrc_typed">dnnrc_typed</a></span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.DNNRCtotDNNRC.html#dnnrc_to_dnnrc_typed_top">dnnrc_to_dnnrc_typed_top</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#tdenv">tdenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#q">q</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="dnnrc_typed_to_spark_df">dnnrc_typed_to_spark_df</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">tenv</span>:<span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span>) (<span class="id">name</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#dnnrc_typed">dnnrc_typed</a></span>) : <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#spark_df">spark_df</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">tenv</span>:<span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings">tdbindings</a></span>) (<span class="id">name</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#dnnrc_typed">dnnrc_typed</a></span>) : <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#spark_df">spark_df</a></span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Translation.tDNNRCtoSparkDF.html#dnnrc_typed_to_spark_df_top">dnnrc_typed_to_spark_df_top</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#CompDriver.bm">bm</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#unit">unit</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#tenv">tenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#name">name</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#q">q</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#CompDriver.translations">translations</a></span>.<br/>
@@ -288,12 +288,12 @@
 &nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="dnnrc_typed_driver">dnnrc_typed_driver</a></span> : <span class="kwd">Set</span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="Dv_dnnrc_typed_stop">Dv_dnnrc_typed_stop</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_typed_driver">dnnrc_typed_driver</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="Dv_dnnrc_typed_optim">Dv_dnnrc_typed_optim</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_typed_driver">dnnrc_typed_driver</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_typed_driver">dnnrc_typed_driver</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="Dv_dnnrc_typed_to_spark_df">Dv_dnnrc_typed_to_spark_df</a></span> : <span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#spark_df_driver">spark_df_driver</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_typed_driver">dnnrc_typed_driver</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="Dv_dnnrc_typed_to_spark_df">Dv_dnnrc_typed_to_spark_df</a></span> : <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings">tdbindings</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#spark_df_driver">spark_df_driver</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_typed_driver">dnnrc_typed_driver</a></span><br/>
 &nbsp;&nbsp;.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="dnnrc_driver">dnnrc_driver</a></span> : <span class="kwd">Set</span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="Dv_dnnrc_stop">Dv_dnnrc_stop</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_driver">dnnrc_driver</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="Dv_dnnrc_to_dnnrc_typed">Dv_dnnrc_to_dnnrc_typed</a></span> : <span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_typed_driver">dnnrc_typed_driver</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_driver">dnnrc_driver</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="Dv_dnnrc_to_dnnrc_typed">Dv_dnnrc_to_dnnrc_typed</a></span> : <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings">tdbindings</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_typed_driver">dnnrc_typed_driver</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dnnrc_driver">dnnrc_driver</a></span><br/>
 &nbsp;&nbsp;.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="camp_driver">camp_driver</a></span> : <span class="kwd">Set</span> :=<br/>
@@ -1528,14 +1528,14 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> <span class="id">dv</span>' <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv_plus_one">dv_plus_one</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="is_postfix_driver_refl">is_postfix_driver_refl</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Reflexive">Reflexive</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3165')">Proof.</div>
-<div class="proofscript" id="proof3165">
+<div class="toggleproof" onclick="toggleDisplay('proof3189')">Proof.</div>
+<div class="proofscript" id="proof3189">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="is_postfix_driver_trans">is_postfix_driver_trans</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Transitive">Transitive</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3166')">Proof.</div>
-<div class="proofscript" id="proof3166">
+<div class="toggleproof" onclick="toggleDisplay('proof3190')">Proof.</div>
+<div class="proofscript" id="proof3190">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Transitive">Transitive</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dv</span>'' <span class="id">dv</span>' <span class="id">dv</span> <span class="id">H_dv</span>''<span class="id">_dv</span>' <span class="id">H_dv</span>'<span class="id">_dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> 0.<br/>
@@ -1581,8 +1581,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> <span class="id">dv</span>' <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_driver_config">is_driver_config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_driver_config">is_driver_config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id">dv</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3167')">Proof.</div>
-<div class="proofscript" id="proof3167">
+<div class="toggleproof" onclick="toggleDisplay('proof3191')">Proof.</div>
+<div class="proofscript" id="proof3191">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">config</span> <span class="id">dv</span> <span class="id">dv</span>' <span class="id">H_is_postfix_dv</span>' <span class="id">H_is_driver_config_dv</span>'.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_driver_config">is_driver_config</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dv</span>'' <span class="id">H_is_postfix_dv</span>''.<br/>
@@ -1656,8 +1656,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pop_transition_lt_len">pop_transition_lt_len</a></span> <span class="id">dv</span> <span class="id">lang</span> <span class="id">dv</span>' :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#pop_transition">pop_transition</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> = (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#lang">lang</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">dv</span>') -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_length">driver_length</a></span> <span class="id">dv</span>' &lt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_length">driver_length</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3168')">Proof.</div>
-<div class="proofscript" id="proof3168">
+<div class="toggleproof" onclick="toggleDisplay('proof3192')">Proof.</div>
+<div class="proofscript" id="proof3192">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="id">match_destr</span>; <span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="tactic">simpl</span>; <span class="tactic">auto</span> 2 | <span class="tactic">inversion</span> 1].<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1667,56 +1667,56 @@
 &nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">lang</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>) =&gt; <span class="id">lang</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">_</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">dv</span>) =&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3169')">Proof.</div>
-<div class="proofscript" id="proof3169">
+<div class="toggleproof" onclick="toggleDisplay('proof3193')">Proof.</div>
+<div class="proofscript" id="proof3193">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#pop_transition_lt_len">pop_transition_lt_len</a></span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_javascript">target_language_of_driver_is_postfix_javascript</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_javascript">Dv_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_javascript">Dv_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3170')">Proof.</div>
-<div class="proofscript" id="proof3170">
+<div class="toggleproof" onclick="toggleDisplay('proof3194')">Proof.</div>
+<div class="proofscript" id="proof3194">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_java">target_language_of_driver_is_postfix_java</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_java">Dv_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_java">Dv_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3171')">Proof.</div>
-<div class="proofscript" id="proof3171">
+<div class="toggleproof" onclick="toggleDisplay('proof3195')">Proof.</div>
+<div class="proofscript" id="proof3195">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_spark_rdd">target_language_of_driver_is_postfix_spark_rdd</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_rdd">Dv_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_rdd">Dv_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3172')">Proof.</div>
-<div class="proofscript" id="proof3172">
+<div class="toggleproof" onclick="toggleDisplay('proof3196')">Proof.</div>
+<div class="proofscript" id="proof3196">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_spark_df">target_language_of_driver_is_postfix_spark_df</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_df">Dv_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_df">Dv_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3173')">Proof.</div>
-<div class="proofscript" id="proof3173">
+<div class="toggleproof" onclick="toggleDisplay('proof3197')">Proof.</div>
+<div class="proofscript" id="proof3197">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_cloudant">target_language_of_driver_is_postfix_cloudant</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cloudant">Dv_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cloudant">Dv_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3174')">Proof.</div>
-<div class="proofscript" id="proof3174">
+<div class="toggleproof" onclick="toggleDisplay('proof3198')">Proof.</div>
+<div class="proofscript" id="proof3198">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_cldmr">target_language_of_driver_is_postfix_cldmr</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cldmr">Dv_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cldmr">Dv_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3175')">Proof.</div>
-<div class="proofscript" id="proof3175">
+<div class="toggleproof" onclick="toggleDisplay('proof3199')">Proof.</div>
+<div class="proofscript" id="proof3199">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
@@ -1737,8 +1737,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_dnnrc_typed">target_language_of_driver_is_postfix_dnnrc_typed</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc_typed">Dv_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc_typed">Dv_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3176')">Proof.</div>
-<div class="proofscript" id="proof3176">
+<div class="toggleproof" onclick="toggleDisplay('proof3200')">Proof.</div>
+<div class="proofscript" id="proof3200">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">dv</span>; <span class="tactic">simpl</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
@@ -1763,8 +1763,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_dnnrc">target_language_of_driver_is_postfix_dnnrc</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc">Dv_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc">Dv_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3177')">Proof.</div>
-<div class="proofscript" id="proof3177">
+<div class="toggleproof" onclick="toggleDisplay('proof3201')">Proof.</div>
+<div class="proofscript" id="proof3201">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
@@ -1784,10 +1784,10 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pick_tdbindings_from_vdbindings">pick_tdbindings_from_vdbindings</a></span> (<span class="id">v</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#vdbindings">vdbindings</a></span>):<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">tdb</span>:<span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span>,<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Typing.TDBindings.html#vdbindings_of_tdbindings">vdbindings_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#tdb">tdb</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#v">v</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3178')">Proof.</div>
-<div class="proofscript" id="proof3178">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">tdb</span>:<span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings">tdbindings</a></span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#vdbindings_of_tdbindings">vdbindings_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#tdb">tdb</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#v">v</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3202')">Proof.</div>
+<div class="proofscript" id="proof3202">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">v</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">v</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">exists</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1818,8 +1818,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;/\  (<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3179')">Proof.</div>
-<div class="proofscript" id="proof3179">
+<div class="toggleproof" onclick="toggleDisplay('proof3203')">Proof.</div>
+<div class="proofscript" id="proof3203">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#cnd_combined_ind">cnd_combined_ind</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">intros</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
@@ -1962,57 +1962,57 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_camp">target_language_of_driver_is_postfix_camp</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp">Dv_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp">Dv_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3180')">Proof.</div>
-<div class="proofscript" id="proof3180">
+<div class="toggleproof" onclick="toggleDisplay('proof3204')">Proof.</div>
+<div class="proofscript" id="proof3204">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_is_postfix_cnd">target_language_of_driver_is_postfix_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_nra">target_language_of_driver_is_postfix_nra</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nra">Dv_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nra">Dv_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3181')">Proof.</div>
-<div class="proofscript" id="proof3181">
+<div class="toggleproof" onclick="toggleDisplay('proof3205')">Proof.</div>
+<div class="proofscript" id="proof3205">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_is_postfix_cnd">target_language_of_driver_is_postfix_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_nraenv_core">target_language_of_driver_is_postfix_nraenv_core</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv_core">Dv_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv_core">Dv_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3182')">Proof.</div>
-<div class="proofscript" id="proof3182">
+<div class="toggleproof" onclick="toggleDisplay('proof3206')">Proof.</div>
+<div class="proofscript" id="proof3206">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_is_postfix_cnd">target_language_of_driver_is_postfix_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_nraenv">target_language_of_driver_is_postfix_nraenv</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv">Dv_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv">Dv_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3183')">Proof.</div>
-<div class="proofscript" id="proof3183">
+<div class="toggleproof" onclick="toggleDisplay('proof3207')">Proof.</div>
+<div class="proofscript" id="proof3207">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_is_postfix_cnd">target_language_of_driver_is_postfix_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_nnrc_core">target_language_of_driver_is_postfix_nnrc_core</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc_core">Dv_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc_core">Dv_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3184')">Proof.</div>
-<div class="proofscript" id="proof3184">
+<div class="toggleproof" onclick="toggleDisplay('proof3208')">Proof.</div>
+<div class="proofscript" id="proof3208">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_is_postfix_cnd">target_language_of_driver_is_postfix_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_nnrc">target_language_of_driver_is_postfix_nnrc</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3185')">Proof.</div>
-<div class="proofscript" id="proof3185">
+<div class="toggleproof" onclick="toggleDisplay('proof3209')">Proof.</div>
+<div class="proofscript" id="proof3209">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_is_postfix_cnd">target_language_of_driver_is_postfix_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_nnrcmr">target_language_of_driver_is_postfix_nnrcmr</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3186')">Proof.</div>
-<div class="proofscript" id="proof3186">
+<div class="toggleproof" onclick="toggleDisplay('proof3210')">Proof.</div>
+<div class="proofscript" id="proof3210">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_is_postfix_cnd">target_language_of_driver_is_postfix_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_camp_rule">target_language_of_driver_is_postfix_camp_rule</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp_rule">Dv_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp_rule">Dv_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3187')">Proof.</div>
-<div class="proofscript" id="proof3187">
+<div class="toggleproof" onclick="toggleDisplay('proof3211')">Proof.</div>
+<div class="proofscript" id="proof3211">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span><br/>
@@ -2023,8 +2023,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_tech_rule">target_language_of_driver_is_postfix_tech_rule</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_tech_rule">Dv_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_tech_rule">Dv_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3188')">Proof.</div>
-<div class="proofscript" id="proof3188">
+<div class="toggleproof" onclick="toggleDisplay('proof3212')">Proof.</div>
+<div class="proofscript" id="proof3212">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>.<br/>
@@ -2035,8 +2035,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_designer_rule">target_language_of_driver_is_postfix_designer_rule</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_designer_rule">Dv_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_designer_rule">Dv_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3189')">Proof.</div>
-<div class="proofscript" id="proof3189">
+<div class="toggleproof" onclick="toggleDisplay('proof3213')">Proof.</div>
+<div class="proofscript" id="proof3213">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>.<br/>
@@ -2047,8 +2047,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_sql">target_language_of_driver_is_postfix_sql</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">o</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sql">Dv_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#o">o</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sql">Dv_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#o">o</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3190')">Proof.</div>
-<div class="proofscript" id="proof3190">
+<div class="toggleproof" onclick="toggleDisplay('proof3214')">Proof.</div>
+<div class="proofscript" id="proof3214">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>.<br/>
@@ -2059,8 +2059,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_sqlpp">target_language_of_driver_is_postfix_sqlpp</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">o</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sqlpp">Dv_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#o">o</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sqlpp">Dv_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#o">o</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3191')">Proof.</div>
-<div class="proofscript" id="proof3191">
+<div class="toggleproof" onclick="toggleDisplay('proof3215')">Proof.</div>
+<div class="proofscript" id="proof3215">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>.<br/>
@@ -2071,8 +2071,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_oql">target_language_of_driver_is_postfix_oql</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_oql">Dv_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_oql">Dv_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3192')">Proof.</div>
-<div class="proofscript" id="proof3192">
+<div class="toggleproof" onclick="toggleDisplay('proof3216')">Proof.</div>
+<div class="proofscript" id="proof3216">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>.<br/>
@@ -2083,8 +2083,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="target_language_of_driver_is_postfix_lambda_nra">target_language_of_driver_is_postfix_lambda_nra</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_lambda_nra">Dv_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_lambda_nra">Dv_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3193')">Proof.</div>
-<div class="proofscript" id="proof3193">
+<div class="toggleproof" onclick="toggleDisplay('proof3217')">Proof.</div>
+<div class="proofscript" id="proof3217">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver_equation">target_language_of_driver_equation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>.<br/>
@@ -2098,8 +2098,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#no_dv_error">no_dv_error</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">target</span> := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target">target</a></span>) <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3194')">Proof.</div>
-<div class="proofscript" id="proof3194">
+<div class="toggleproof" onclick="toggleDisplay('proof3218')">Proof.</div>
+<div class="proofscript" id="proof3218">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">target_language_of_driver_is_postfix_javascript</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">target_language_of_driver_is_postfix_java</span><br/>
@@ -2134,8 +2134,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">dv</span>' := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#push_translation">push_translation</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#lang">lang</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#no_dv_error">no_dv_error</a></span> <span class="id">dv</span>' -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> <span class="id">dv</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3195')">Proof.</div>
-<div class="proofscript" id="proof3195">
+<div class="toggleproof" onclick="toggleDisplay('proof3219')">Proof.</div>
+<div class="proofscript" id="proof3219">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">config</span> <span class="id">lang</span> <span class="id">dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_plus_one">is_postfix_plus_one</a></span> <span class="id">dv</span> <span class="id">dv</span> <span class="id">config</span> <span class="id">lang</span>);<br/>
@@ -2145,8 +2145,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="driver_of_rev_path_app">driver_of_rev_path_app</a></span> <span class="id">config</span> <span class="id">dv</span> <span class="id">rev_path1</span> <span class="id">rev_path2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_rev_path">driver_of_rev_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#rev_path1">rev_path1</a></span> ++ <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#rev_path2">rev_path2</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_rev_path">driver_of_rev_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_rev_path">driver_of_rev_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#rev_path1">rev_path1</a></span>) <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#rev_path2">rev_path2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3196')">Proof.</div>
-<div class="proofscript" id="proof3196">
+<div class="toggleproof" onclick="toggleDisplay('proof3220')">Proof.</div>
+<div class="proofscript" id="proof3220">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">rev_path2</span> <span class="id">dv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">rev_path1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -2158,8 +2158,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> <span class="id">dv</span>' <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">rev_path</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_rev_path">driver_of_rev_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id">dv</span>' <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#rev_path">rev_path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3197')">Proof.</div>
-<div class="proofscript" id="proof3197">
+<div class="toggleproof" onclick="toggleDisplay('proof3221')">Proof.</div>
+<div class="proofscript" id="proof3221">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dv</span> <span class="id">dv</span>' <span class="id">config</span> <span class="id">H_config</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> 1.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">subst</span>. <span class="id">exists</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -2215,8 +2215,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_driver_config">is_driver_config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">path</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_path">driver_of_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#config">config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3198')">Proof.</div>
-<div class="proofscript" id="proof3198">
+<div class="toggleproof" onclick="toggleDisplay('proof3222')">Proof.</div>
+<div class="proofscript" id="proof3222">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dv</span> <span class="id">config</span> <span class="id">H_no_dv_error</span> <span class="id">H_dv_config</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_path">driver_of_path</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#is_postfix_driver">is_postfix_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#driver_of_language">driver_of_language</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> <span class="id">dv</span>)) <span class="id">dv</span>) <span class="kwd">as</span> <span class="id">Hpost</span>;<br/>
@@ -4033,8 +4033,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3199')">Proof.</div>
-<div class="proofscript" id="proof3199">
+<div class="toggleproof" onclick="toggleDisplay('proof3223')">Proof.</div>
+<div class="proofscript" id="proof3223">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">source</span>; <span class="tactic">destruct</span> <span class="id">target</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">try</span> <span class="id">solve</span> [ <span class="tactic">simpl</span>; <span class="tactic">split</span>; <span class="tactic">reflexivity</span> ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -4055,8 +4055,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">source</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#no_L_error">no_L_error</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#source">source</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#source">source</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#source">source</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3200')">Proof.</div>
-<div class="proofscript" id="proof3200">
+<div class="toggleproof" onclick="toggleDisplay('proof3224')">Proof.</div>
+<div class="proofscript" id="proof3224">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">source</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -4066,8 +4066,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#source">source</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#middle">middle</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#middle">middle</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target">target</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#source">source</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target">target</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3201')">Proof.</div>
-<div class="proofscript" id="proof3201">
+<div class="toggleproof" onclick="toggleDisplay('proof3225')">Proof.</div>
+<div class="proofscript" id="proof3225">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> <span class="id">source</span>; <span class="id">case_eq</span> <span class="id">target</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id">case_eq</span> <span class="id">middle</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">tauto</span>.<br/>
@@ -4075,8 +4075,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id">exists_path_from_source_target_trans</span>' :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Transitive">Transitive</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3202')">Proof.</div>
-<div class="proofscript" id="proof3202">
+<div class="toggleproof" onclick="toggleDisplay('proof3226')">Proof.</div>
+<div class="proofscript" id="proof3226">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_trans">exists_path_from_source_target_trans</a></span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -4084,8 +4084,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_javascript">exists_path_from_source_target_completeness_javascript</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_javascript">L_javascript</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_javascript">Dv_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3203')">Proof.</div>
-<div class="proofscript" id="proof3203">
+<div class="toggleproof" onclick="toggleDisplay('proof3227')">Proof.</div>
+<div class="proofscript" id="proof3227">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -4095,8 +4095,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_java">exists_path_from_source_target_completeness_java</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_java">L_java</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_java">Dv_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3204')">Proof.</div>
-<div class="proofscript" id="proof3204">
+<div class="toggleproof" onclick="toggleDisplay('proof3228')">Proof.</div>
+<div class="proofscript" id="proof3228">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -4113,8 +4113,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_cloudant">exists_path_from_source_target_completeness_cloudant</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_cloudant">L_cloudant</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cloudant">Dv_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3205')">Proof.</div>
-<div class="proofscript" id="proof3205">
+<div class="toggleproof" onclick="toggleDisplay('proof3229')">Proof.</div>
+<div class="proofscript" id="proof3229">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4123,8 +4123,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_cldmr">exists_path_from_source_target_completeness_cldmr</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_cldmr">L_cldmr</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cldmr">Dv_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3206')">Proof.</div>
-<div class="proofscript" id="proof3206">
+<div class="toggleproof" onclick="toggleDisplay('proof3230')">Proof.</div>
+<div class="proofscript" id="proof3230">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4133,8 +4133,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_spark_df">exists_path_from_source_target_completeness_spark_df</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_spark_df">L_spark_df</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_df">Dv_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3207')">Proof.</div>
-<div class="proofscript" id="proof3207">
+<div class="toggleproof" onclick="toggleDisplay('proof3231')">Proof.</div>
+<div class="proofscript" id="proof3231">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4143,8 +4143,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_dnnrc_typed">exists_path_from_source_target_completeness_dnnrc_typed</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_dnnrc_typed">L_dnnrc_typed</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc_typed">Dv_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3208')">Proof.</div>
-<div class="proofscript" id="proof3208">
+<div class="toggleproof" onclick="toggleDisplay('proof3232')">Proof.</div>
+<div class="proofscript" id="proof3232">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4153,8 +4153,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_dnnrc">exists_path_from_source_target_completeness_dnnrc</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_dnnrc">L_dnnrc</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc">Dv_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3209')">Proof.</div>
-<div class="proofscript" id="proof3209">
+<div class="toggleproof" onclick="toggleDisplay('proof3233')">Proof.</div>
+<div class="proofscript" id="proof3233">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4163,8 +4163,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_spark_rdd">exists_path_from_source_target_completeness_spark_rdd</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_spark_rdd">L_spark_rdd</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_rdd">Dv_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3210')">Proof.</div>
-<div class="proofscript" id="proof3210">
+<div class="toggleproof" onclick="toggleDisplay('proof3234')">Proof.</div>
+<div class="proofscript" id="proof3234">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4191,58 +4191,58 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrcmr">L_nnrcmr</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3211')">Proof.</div>
-<div class="proofscript" id="proof3211">
+<div class="toggleproof" onclick="toggleDisplay('proof3235')">Proof.</div>
+<div class="proofscript" id="proof3235">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#cnd_combined_ind">cnd_combined_ind</a></span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_camp">exists_path_from_source_target_completeness_camp</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_camp">L_camp</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp">Dv_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3212')">Proof.</div>
-<div class="proofscript" id="proof3212">
+<div class="toggleproof" onclick="toggleDisplay('proof3236')">Proof.</div>
+<div class="proofscript" id="proof3236">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_completeness_cnd">exists_path_from_source_target_completeness_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_nra">exists_path_from_source_target_completeness_nra</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nra">L_nra</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nra">Dv_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3213')">Proof.</div>
-<div class="proofscript" id="proof3213">
+<div class="toggleproof" onclick="toggleDisplay('proof3237')">Proof.</div>
+<div class="proofscript" id="proof3237">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_completeness_cnd">exists_path_from_source_target_completeness_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_nraenv_core">exists_path_from_source_target_completeness_nraenv_core</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nraenv_core">L_nraenv_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv_core">Dv_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3214')">Proof.</div>
-<div class="proofscript" id="proof3214">
+<div class="toggleproof" onclick="toggleDisplay('proof3238')">Proof.</div>
+<div class="proofscript" id="proof3238">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_completeness_cnd">exists_path_from_source_target_completeness_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_nraenv">exists_path_from_source_target_completeness_nraenv</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nraenv">L_nraenv</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv">Dv_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3215')">Proof.</div>
-<div class="proofscript" id="proof3215">
+<div class="toggleproof" onclick="toggleDisplay('proof3239')">Proof.</div>
+<div class="proofscript" id="proof3239">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_completeness_cnd">exists_path_from_source_target_completeness_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_nnrc_core">exists_path_from_source_target_completeness_nnrc_core</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrc_core">L_nnrc_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc_core">Dv_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3216')">Proof.</div>
-<div class="proofscript" id="proof3216">
+<div class="toggleproof" onclick="toggleDisplay('proof3240')">Proof.</div>
+<div class="proofscript" id="proof3240">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_completeness_cnd">exists_path_from_source_target_completeness_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_nnrc">exists_path_from_source_target_completeness_nnrc</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrc">L_nnrc</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3217')">Proof.</div>
-<div class="proofscript" id="proof3217">
+<div class="toggleproof" onclick="toggleDisplay('proof3241')">Proof.</div>
+<div class="proofscript" id="proof3241">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_completeness_cnd">exists_path_from_source_target_completeness_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_nnrcmr">exists_path_from_source_target_completeness_nnrcmr</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrcmr">L_nnrcmr</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3218')">Proof.</div>
-<div class="proofscript" id="proof3218">
+<div class="toggleproof" onclick="toggleDisplay('proof3242')">Proof.</div>
+<div class="proofscript" id="proof3242">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target_completeness_cnd">exists_path_from_source_target_completeness_cnd</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4257,8 +4257,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_camp_rule">exists_path_from_source_target_completeness_camp_rule</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_camp_rule">L_camp_rule</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp_rule">Dv_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3219')">Proof.</div>
-<div class="proofscript" id="proof3219">
+<div class="toggleproof" onclick="toggleDisplay('proof3243')">Proof.</div>
+<div class="proofscript" id="proof3243">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4267,8 +4267,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_tech_rule">exists_path_from_source_target_completeness_tech_rule</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_tech_rule">L_tech_rule</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_tech_rule">Dv_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3220')">Proof.</div>
-<div class="proofscript" id="proof3220">
+<div class="toggleproof" onclick="toggleDisplay('proof3244')">Proof.</div>
+<div class="proofscript" id="proof3244">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4277,8 +4277,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_designer_rule">exists_path_from_source_target_completeness_designer_rule</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_designer_rule">L_designer_rule</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_designer_rule">Dv_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3221')">Proof.</div>
-<div class="proofscript" id="proof3221">
+<div class="toggleproof" onclick="toggleDisplay('proof3245')">Proof.</div>
+<div class="proofscript" id="proof3245">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4287,8 +4287,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_oql">exists_path_from_source_target_completeness_oql</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_oql">L_oql</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_oql">Dv_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3222')">Proof.</div>
-<div class="proofscript" id="proof3222">
+<div class="toggleproof" onclick="toggleDisplay('proof3246')">Proof.</div>
+<div class="proofscript" id="proof3246">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4297,8 +4297,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_sql">exists_path_from_source_target_completeness_sql</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_sql">L_sql</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sql">Dv_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3223')">Proof.</div>
-<div class="proofscript" id="proof3223">
+<div class="toggleproof" onclick="toggleDisplay('proof3247')">Proof.</div>
+<div class="proofscript" id="proof3247">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4307,8 +4307,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_sqlpp">exists_path_from_source_target_completeness_sqlpp</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_sqlpp">L_sqlpp</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sqlpp">Dv_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3224')">Proof.</div>
-<div class="proofscript" id="proof3224">
+<div class="toggleproof" onclick="toggleDisplay('proof3248')">Proof.</div>
+<div class="proofscript" id="proof3248">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4317,8 +4317,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_path_from_source_target_completeness_lambda_nra">exists_path_from_source_target_completeness_lambda_nra</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">dv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_lambda_nra">L_lambda_nra</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_lambda_nra">Dv_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3225')">Proof.</div>
-<div class="proofscript" id="proof3225">
+<div class="toggleproof" onclick="toggleDisplay('proof3249')">Proof.</div>
+<div class="proofscript" id="proof3249">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="id">prove_exists_path_complete</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4330,8 +4330,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">source</span> := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#language_of_driver">language_of_driver</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">target</span> := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target_language_of_driver">target_language_of_driver</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#dv">dv</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#exists_path_from_source_target">exists_path_from_source_target</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#source">source</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#target">target</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3226')">Proof.</div>
-<div class="proofscript" id="proof3226">
+<div class="toggleproof" onclick="toggleDisplay('proof3250')">Proof.</div>
+<div class="proofscript" id="proof3250">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">simpl</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;;  <span class="tactic">auto</span> <span class="kwd">with</span> <span class="id">exists_path_hints</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -4389,8 +4389,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="get_source_target_from_path_rev">get_source_target_from_path_rev</a></span> <span class="id">path</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_from_path">get_source_from_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#rev">List.rev</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3227')">Proof.</div>
-<div class="proofscript" id="proof3227">
+<div class="toggleproof" onclick="toggleDisplay('proof3251')">Proof.</div>
+<div class="proofscript" id="proof3251">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#rev_involutive">List.rev_involutive</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -4398,8 +4398,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="get_target_source_from_path_rev">get_target_source_from_path_rev</a></span> <span class="id">path</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_from_path">get_source_from_path</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#rev">List.rev</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3228')">Proof.</div>
-<div class="proofscript" id="proof3228">
+<div class="toggleproof" onclick="toggleDisplay('proof3252')">Proof.</div>
+<div class="proofscript" id="proof3252">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -4431,8 +4431,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">path</span>' := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#remove_source_optim">remove_source_optim</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_from_path">get_source_from_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_from_path">get_source_from_path</a></span> <span class="id">path</span>' /\<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span> <span class="id">path</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3229')">Proof.</div>
-<div class="proofscript" id="proof3229">
+<div class="toggleproof" onclick="toggleDisplay('proof3253')">Proof.</div>
+<div class="proofscript" id="proof3253">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span>;<br/>
@@ -4451,8 +4451,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">path</span>' := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#remove_target_optim">remove_target_optim</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_from_path">get_source_from_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_from_path">get_source_from_path</a></span> <span class="id">path</span>' /\<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#path">path</a></span> = <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_target_from_path">get_target_from_path</a></span> <span class="id">path</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3230')">Proof.</div>
-<div class="proofscript" id="proof3230">
+<div class="toggleproof" onclick="toggleDisplay('proof3254')">Proof.</div>
+<div class="proofscript" id="proof3254">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_target_from_path_rev">get_source_target_from_path_rev</a></span> <span class="id">path</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#get_source_target_from_path_rev">get_source_target_from_path_rev</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#remove_target_optim">remove_target_optim</a></span> <span class="id">path</span>)).<br/>

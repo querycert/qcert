@@ -14,8 +14,10 @@
 <h1 class="title">Module Qcert.Common.ForeignTyping</h1>
 <div class="coq">
 <br/>
-<span class="kwd">Require</span> <span class="kwd">Export</span> <span class="kwd">Types</span> <span class="id"><a href="Qcert.Common.ForeignRuntime.html">ForeignRuntime</a></span>.<br/>
-<span class="kwd">Require</span> <span class="kwd">Export</span> <span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html">ForeignDataTyping</a></span> <span class="id"><a href="Qcert.Common.Typing.ForeignOpsTyping.html">ForeignOpsTyping</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Export</span> <span class="kwd">Types</span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Export</span> <span class="id"><a href="Qcert.Common.ForeignRuntime.html">ForeignRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Export</span> <span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html">ForeignDataTyping</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Export</span> <span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html">ForeignOperatorsTyping</a></span>.<br/>
 <br/>
 <span class="kwd">Class</span> <span class="id"><a name="foreign_typing">foreign_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}<br/>
@@ -23,9 +25,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">model</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>}<br/>
 &nbsp;&nbsp;: <span class="kwd">Type</span><br/>
 &nbsp;&nbsp;:= <span class="id"><a name="mk_foreign_typing">mk_foreign_typing</a></span> {<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="foreign_typing_data">foreign_typing_data</a></span> :&gt; <span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_typing_unary_op">foreign_typing_unary_op</a></span> :&gt; <span class="id"><a href="Qcert.Common.Typing.ForeignOpsTyping.html#foreign_unary_op_typing">foreign_unary_op_typing</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_typing_binary_op">foreign_typing_binary_op</a></span> :&gt; <span class="id"><a href="Qcert.Common.Typing.ForeignOpsTyping.html#foreign_binary_op_typing">foreign_binary_op_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="foreign_typing_data">foreign_typing_data</a></span> :&gt; <span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_typing_unary_op">foreign_typing_unary_op</a></span> :&gt; <span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#foreign_unary_op_typing">foreign_unary_op_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_typing_binary_op">foreign_typing_binary_op</a></span> :&gt; <span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#foreign_binary_op_typing">foreign_binary_op_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
 <br/>
 

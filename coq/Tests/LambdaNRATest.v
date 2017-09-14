@@ -53,12 +53,12 @@ Section LambdaNRATests.
   (* T1 : P.map{p => p.addr}.map{a => a.city} == P.map{p => p.addr.city} *)
   (** The original version of T1 *)
   Definition T1l P :=
-    LNRAMap (LNRALambda "a" (LNRAUnop (ADot "city") (LNRAVar "a")))
-            (LNRAMap (LNRALambda "p" (LNRAUnop (ADot "addr") (LNRAVar "p"))) P).
+    LNRAMap (LNRALambda "a" (LNRAUnop (OpDot "city") (LNRAVar "a")))
+            (LNRAMap (LNRALambda "p" (LNRAUnop (OpDot "addr") (LNRAVar "p"))) P).
 
   (** The simplified version of T1 *)
   Definition T1r P :=
-    LNRAMap (LNRALambda "p" (LNRAUnop (ADot "city") (LNRAUnop (ADot "addr") (LNRAVar "p")))) P.
+    LNRAMap (LNRALambda "p" (LNRAUnop (OpDot "city") (LNRAUnop (OpDot "addr") (LNRAVar "p")))) P.
 
 
 Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra'.
@@ -96,7 +96,7 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
                         (prod string
                            (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime)))))))
             (@LNRAUnop TrivialModel.trivial_foreign_runtime
-               (@ADot TrivialModel.trivial_foreign_data
+               (@OpDot TrivialModel.trivial_foreign_data
                   (@TrivialModel.trivial_foreign_unary_op TrivialModel.trivial_foreign_data)
                   (String (Ascii.Ascii true false false false false true true false)
                      (String (Ascii.Ascii false false true false false true true false)
@@ -123,7 +123,7 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
                        (String (Ascii.Ascii true false false false false true true false)
                           EmptyString)
                        (@LNRAUnop TrivialModel.trivial_foreign_runtime
-                          (@ADot TrivialModel.trivial_foreign_data
+                          (@OpDot TrivialModel.trivial_foreign_data
                              (@TrivialModel.trivial_foreign_unary_op
                                 TrivialModel.trivial_foreign_data)
                              (String
@@ -172,16 +172,16 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
 
   (* T2 : P.filter{p => p.age > 25}.map{x => x.age} == P.map{p => p.age}.filter{a => a > 25} *)
   Definition T2l P :=
-    LNRAMap (LNRALambda "x" (LNRAUnop (ADot "age") (LNRAVar "x")))
-            (LNRAFilter (LNRALambda "p" (LNRABinop ALt
+    LNRAMap (LNRALambda "x" (LNRAUnop (OpDot "age") (LNRAVar "x")))
+            (LNRAFilter (LNRALambda "p" (LNRABinop OpLt
                                                    (LNRAConst (dnat 25))
-                                                   (LNRAUnop (ADot "age") (LNRAVar "p")))) P).
+                                                   (LNRAUnop (OpDot "age") (LNRAVar "p")))) P).
   
   Definition T2r P :=
-    LNRAFilter (LNRALambda "a" (LNRABinop ALt
+    LNRAFilter (LNRALambda "a" (LNRABinop OpLt
                                           (LNRAConst (dnat 25))
                                           (LNRAVar "a")))
-               (LNRAMap (LNRALambda "p" (LNRAUnop (ADot "age") (LNRAVar "p"))) P).
+               (LNRAMap (LNRALambda "p" (LNRAUnop (OpDot "age") (LNRAVar "p"))) P).
 
   
 (*  Eval vm_compute in (eval_q h T2l db2). *)
@@ -194,14 +194,14 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
   Definition A3 P :=
     LNRAMap
       (LNRALambda "p"
-                  (LNRABinop AConcat (LNRAUnop (ARec "person") (LNRAVar "p"))
-                             (LNRAUnop (ARec "kids")
+                  (LNRABinop OpRecConcat (LNRAUnop (OpRec "person") (LNRAVar "p"))
+                             (LNRAUnop (OpRec "kids")
                                        (LNRAFilter
                                           (LNRALambda "c"
-                                                      (LNRABinop ALt
+                                                      (LNRABinop OpLt
                                                                  (LNRAConst (dnat 25))
-                                                                 (LNRAUnop (ADot "age") (LNRAVar "c"))))
-                                          (LNRAUnop (ADot "child") (LNRAVar "p")))))) P.
+                                                                 (LNRAUnop (OpDot "age") (LNRAVar "c"))))
+                                          (LNRAUnop (OpDot "child") (LNRAVar "p")))))) P.
 
   (* Eval vm_compute in (eval_q h A3 db2). *)
   (* Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda A3)) db2). *)
@@ -211,14 +211,14 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
   Definition A4 P :=
     LNRAMap
       (LNRALambda "p"
-                  (LNRABinop AConcat (LNRAUnop (ARec "person") (LNRAVar "p"))
-                             (LNRAUnop (ARec "kids")
+                  (LNRABinop OpRecConcat (LNRAUnop (OpRec "person") (LNRAVar "p"))
+                             (LNRAUnop (OpRec "kids")
                                        (LNRAFilter
                                           (LNRALambda "c"
-                                                      (LNRABinop ALt
+                                                      (LNRABinop OpLt
                                                                  (LNRAConst (dnat 25))
-                                                                 (LNRAUnop (ADot "age") (LNRAVar "p"))))
-                                          (LNRAUnop (ADot "child") (LNRAVar "p")))))) P.
+                                                                 (LNRAUnop (OpDot "age") (LNRAVar "p"))))
+                                          (LNRAUnop (OpDot "child") (LNRAVar "p")))))) P.
 
   (* Eval vm_compute in (eval_q h A4 db2). *)
   (* Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda A4)) db2). *)
@@ -230,21 +230,21 @@ Section LambdaNRALinq.
   Definition linq_example Persons
     := LNRAMap
          (LNRALambda "p"
-                     (LNRAUnop (ADot "name") (LNRAVar "p")))
+                     (LNRAUnop (OpDot "name") (LNRAVar "p")))
          (LNRAFilter 
             (LNRALambda "p"
-                        (LNRABinop ALt
-                                   (LNRAUnop (ADot "name") (LNRAVar "p"))
+                        (LNRABinop OpLt
+                                   (LNRAUnop (OpDot "name") (LNRAVar "p"))
                                    (LNRAConst (dnat 30))))
             Persons).
                
   Definition demo_example :=
     LNRAFilter
          (LNRALambda "p"
-                     (LNRABinop ALt
-                                (LNRAUnop (ADot "age") (LNRAVar "p"))
+                     (LNRABinop OpLt
+                                (LNRAUnop (OpDot "age") (LNRAVar "p"))
                                 (LNRAConst (dnat 30))))
-         (LNRABinop AUnion (LNRATable "Persons1")
+         (LNRABinop OpBagUnion (LNRATable "Persons1")
                     (LNRATable "Persons2")).
 
 End LambdaNRALinq.

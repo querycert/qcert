@@ -127,10 +127,10 @@ Section cNRAEnvEq.
 
   (* ANBinOp *)
     
-  Global Instance anbinop_proper : Proper (binop_eq ==> nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANBinop.
+  Global Instance anbinary_op_proper : Proper (binary_op_eq ==> nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANBinop.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
-    generalize abinop_proper.
+    generalize proper_NRABinop.
     unfold Proper, respectful, nraenv_core_eq, nra_eq; intros; simpl.
     specialize (H2 x y H).
     rewrite H0 by trivial; rewrite H1 by trivial.
@@ -158,20 +158,20 @@ Section cNRAEnvEq.
     eauto.
   Qed.
 
-  Global Instance anbinopeq_proper : Proper (binop_eq ==> nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANBinop.
+  Global Instance anbinary_opeq_proper : Proper (binary_op_eq ==> nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANBinop.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anbinop_proper;
+    rewrite <- nra_eqenv_same; apply anbinary_op_proper;
     try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   (* ANUnop *)
-  Global Instance anunop_proper : Proper (unaryop_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANUnop.
+  Global Instance anunary_op_proper : Proper (unary_op_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANUnop.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H0 by trivial.
     rewrite unfold_env_nra_sort by trivial; simpl.
-    generalize (aunop_proper).
+    generalize (proper_NRAUnop).
     unfold Proper, respectful, nraenv_core_eq, nra_eq; simpl; intros.
     specialize (H1 x y H).
     specialize (H1 (nra_of_nraenv_core y0) (nra_of_nraenv_core y0)).
@@ -189,10 +189,10 @@ Section cNRAEnvEq.
 
   Hint Resolve data_normalized_dcoll_in.
 
-  Global Instance anunopeq_proper : Proper (unaryop_eq ==> nra_eqenv ==> nra_eqenv) ANUnop.
+  Global Instance anunary_opeq_proper : Proper (unary_op_eq ==> nra_eqenv ==> nra_eqenv) ANUnop.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anunop_proper;
+    rewrite <- nra_eqenv_same; apply anunary_op_proper;
     try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
@@ -215,19 +215,19 @@ Section cNRAEnvEq.
     try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
-  (* ANMapConcat *)
-  Global Instance anmapconcat_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANMapConcat.
+  (* ANMapProduct *)
+  Global Instance anmapconcat_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANMapProduct.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H0 by trivial.
     case_eq (h ⊢ₑ y0 @ₑ x1 ⊣ c;env); try reflexivity; simpl.
     destruct d; try reflexivity; simpl; intros.
     f_equal.
-    apply rmap_concat_ext; intros.
+    apply rmap_product_ext; intros.
     apply H; eauto.
   Qed.
 
-  Global Instance anmapconcateq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANMapConcat.
+  Global Instance anmapconcateq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANMapProduct.
   Proof.
     unfold Proper, respectful; intros.
     rewrite <- nra_eqenv_same; apply anmapconcat_proper;
@@ -241,7 +241,7 @@ Section cNRAEnvEq.
     rewrite H by trivial; rewrite H0 by trivial.
     rewrite unfold_env_nra_sort by trivial; simpl.
     rewrite unfold_env_nra_sort by trivial; simpl.
-    generalize aproduct_proper.
+    generalize proper_NRAProduct.
     unfold Proper, respectful, nra_eq; simpl; intros.
     specialize (H1 (nra_of_nraenv_core y) (nra_of_nraenv_core y)).
     assert ((forall (h0 : list (string * string)) (c : list (string * data)),
@@ -293,7 +293,7 @@ Section cNRAEnvEq.
     rewrite H by trivial; rewrite H0 by trivial.
     rewrite unfold_env_nra_sort by trivial; simpl.
     rewrite unfold_env_nra_sort by trivial; simpl.
-    generalize adefault_proper.
+    generalize proper_NRADefault.
     unfold Proper, respectful, nraenv_core_eq, nra_eq; simpl; intros.
     specialize (H1 (nra_of_nraenv_core y) (nra_of_nraenv_core y)).
     assert ((forall (h0 : list (string * string)) (c : list (string * data)),

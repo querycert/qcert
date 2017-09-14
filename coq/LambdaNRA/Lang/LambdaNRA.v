@@ -33,10 +33,10 @@ Section LambdaNRA.
   | LNRAVar : string -> lambda_nra (* Variable access *)
   | LNRATable : string -> lambda_nra
   | LNRAConst : data -> lambda_nra
-  | LNRABinop : binOp -> lambda_nra -> lambda_nra -> lambda_nra
-  | LNRAUnop : unaryOp -> lambda_nra -> lambda_nra
+  | LNRABinop : binary_op -> lambda_nra -> lambda_nra -> lambda_nra
+  | LNRAUnop : unary_op -> lambda_nra -> lambda_nra
   | LNRAMap : lnra_lambda -> lambda_nra -> lambda_nra (* 'dependent operators' use lambdas *)
-  | LNRAMapConcat : lnra_lambda -> lambda_nra -> lambda_nra
+  | LNRAMapProduct : lnra_lambda -> lambda_nra -> lambda_nra
   | LNRAProduct : lambda_nra -> lambda_nra -> lambda_nra
   | LNRAFilter : lnra_lambda -> lambda_nra -> lambda_nra
   with lnra_lambda : Set :=
@@ -51,7 +51,7 @@ Section LambdaNRA.
   | Case_aux c "LNRABinop"%string
   | Case_aux c "LNRAUnop"%string
   | Case_aux c "LNRAMap"%string
-  | Case_aux c "LNRAMapConcat"%string
+  | Case_aux c "LNRAMapProduct"%string
   | Case_aux c "LNRAProduct"%string
   | Case_aux c "LNRAFilter"%string
   ].
@@ -65,10 +65,10 @@ Section LambdaNRA.
               (fvar : forall s : string, P (LNRAVar s))
               (ftable : forall t : string, P (LNRATable t))
               (fconst : forall d : data, P (LNRAConst d))
-              (fbinop : forall (b : binOp) (l0 l1: lambda_nra), P l0 -> P l1 -> P (LNRABinop b l0 l1))
-              (funop : forall (u : unaryOp) (l : lambda_nra), P l -> P (LNRAUnop u l))
+              (fbinop : forall (b : binary_op) (l0 l1: lambda_nra), P l0 -> P l1 -> P (LNRABinop b l0 l1))
+              (funop : forall (u : unary_op) (l : lambda_nra), P l -> P (LNRAUnop u l))
               (fmap : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAMap (LNRALambda s l0) l1))
-              (fmapconcat : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAMapConcat (LNRALambda s l0) l1))
+              (fmapconcat : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAMapProduct (LNRALambda s l0) l1))
               (fproduct : forall l : lambda_nra, P l -> forall l0 : lambda_nra, P l0 -> P (LNRAProduct l l0))
               (ffilter : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAFilter (LNRALambda s l0) l1)) :
     forall l, P l
@@ -81,7 +81,7 @@ Section LambdaNRA.
         | LNRABinop b l0 l1 => fbinop b l0 l1 (F l0) (F l1)
         | LNRAUnop u l0 => funop u l0 (F l0)
         | LNRAMap (LNRALambda s l0) l1 => fmap s l0 l1 (F l0) (F l1)
-        | LNRAMapConcat (LNRALambda s l0) l1 => fmapconcat s l0 l1 (F l0) (F l1)
+        | LNRAMapProduct (LNRALambda s l0) l1 => fmapconcat s l0 l1 (F l0) (F l1)
         | LNRAProduct l0 l1 => fproduct l0 (F l0) l1 (F l1)
         | LNRAFilter (LNRALambda s l0) l1 => ffilter s l0 l1 (F l0) (F l1)
         end.
@@ -101,21 +101,21 @@ Section LambdaNRA.
       | LNRATable t => edot global_env t
       | LNRAConst d => Some (normalize_data h d)
       | LNRABinop b op1 op2 =>
-        olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2)
+        olift2 (fun d1 d2 => binary_op_eval h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2)
       | LNRAUnop u op1 =>
-        olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1)
+        olift (fun d1 => unary_op_eval h u d1) (lambda_nra_eval env op1)
       | LNRAMap lop1 op2 =>
         let aux_map d :=
             lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
         in olift aux_map (lambda_nra_eval env op2)
-      | LNRAMapConcat lop1 op2 =>
+      | LNRAMapProduct lop1 op2 =>
         let aux_mapconcat d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (rmap_product (lnra_lambda_eval env lop1) c1)) d
         in olift aux_mapconcat (lambda_nra_eval env op2)
       | LNRAProduct op1 op2 =>
         (* Note: it's even clearer from this formulation that both branches take the same environment *)
         let aux_product d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lambda_nra_eval env op2) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (rmap_product (fun _ => lambda_nra_eval env op2) c1)) d
         in olift aux_product (lambda_nra_eval env op1)
       | LNRAFilter lop1 op2 =>
         let pred x' :=
@@ -165,16 +165,16 @@ Section LambdaNRA.
       reflexivity.
     Qed.
 
-    Lemma lambda_nra_eval_binop_eq env b op1 op2 :
+    Lemma lambda_nra_eval_binary_op_eq env b op1 op2 :
       lambda_nra_eval env (LNRABinop b op1 op2) = 
-      olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
+      olift2 (fun d1 d2 => binary_op_eval h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
     Proof.
       reflexivity.
     Qed.
 
     Lemma lambda_nra_eval_unop_eq env u op1 :
       lambda_nra_eval env (LNRAUnop u op1) = 
-      olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1).
+      olift (fun d1 => unary_op_eval h u d1) (lambda_nra_eval env op1).
     Proof.
       reflexivity.
     Qed.
@@ -189,9 +189,9 @@ Section LambdaNRA.
     Qed.
 
     Lemma lambda_nra_eval_map_concat_eq env lop1 op2 :
-      lambda_nra_eval env (LNRAMapConcat lop1 op2) = 
+      lambda_nra_eval env (LNRAMapProduct lop1 op2) = 
       let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
+          lift_oncoll (fun c1 => lift dcoll (rmap_product (lnra_lambda_eval env lop1) c1)) d
       in olift aux_mapconcat (lambda_nra_eval env op2).
     Proof.
       reflexivity.
@@ -200,7 +200,7 @@ Section LambdaNRA.
     Lemma lambda_nra_eval_product_eq env op1 op2 :
       lambda_nra_eval env (LNRAProduct op1 op2) = 
       let aux_product d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lambda_nra_eval env op2) c1)) d
+          lift_oncoll (fun c1 => lift dcoll (rmap_product (fun _ => lambda_nra_eval env op2) c1)) d
       in olift aux_product (lambda_nra_eval env op1).
     Proof.
       reflexivity.
@@ -252,11 +252,11 @@ Section LambdaNRA.
         unfold olift2 in H.
         match_case_in H; intros; rewrite H2 in H; try discriminate.
         match_case_in H; intros; rewrite H3 in H; try discriminate.
-        eapply fun_of_binop_normalized; eauto.
+        eapply binary_op_eval_normalized; eauto.
       - Case "LNRAUnop"%string.
         unfold olift in H.
         match_case_in H; intros; rewrite H2 in H; try discriminate.
-        eapply fun_of_unaryop_normalized; eauto.
+        eapply unary_op_eval_normalized; eauto.
       - Case "LNRAMap"%string.
         unfold olift in H.
         match_case_in H; intros; rewrite H2 in H; try discriminate.
@@ -272,7 +272,7 @@ Section LambdaNRA.
         + intros. eapply IHop1; eauto.
           apply Forall_sorted.
           apply Forall_app; auto.
-      - Case "LNRAMapConcat"%string.
+      - Case "LNRAMapProduct"%string.
         unfold olift in H.
         match_case_in H; intros; rewrite H2 in H; try discriminate.
         specialize (IHop2 _ _ H2 H0 H1).
@@ -282,7 +282,7 @@ Section LambdaNRA.
         destruct H as [? ? ?]; subst.
         constructor.
         invcs IHop2.
-        unfold rmap_concat in e.
+        unfold rmap_product in e.
         eapply (oflat_map_Forall e).
         + apply H3.
         + intros.
@@ -322,7 +322,7 @@ Section LambdaNRA.
         destruct H as [? ? ?]; subst.
         constructor.
         invcs IHop1.
-        unfold rmap_concat in e.
+        unfold rmap_product in e.
         eapply (oflat_map_Forall e).
         + apply H3.
         + intros.
@@ -376,7 +376,7 @@ Section LambdaNRA.
       | LNRAUnop uop e1 => lambda_nra_free_vars e1
       | LNRAMap (LNRALambda x e1) e2 =>
         (remove string_eqdec x (lambda_nra_free_vars e1)) ++ (lambda_nra_free_vars e2)
-      | LNRAMapConcat (LNRALambda x e1) e2 =>
+      | LNRAMapProduct (LNRALambda x e1) e2 =>
         (remove string_eqdec x (lambda_nra_free_vars e1)) ++ (lambda_nra_free_vars e2)
       | LNRAProduct e1 e2 =>
         (lambda_nra_free_vars e1) ++ (lambda_nra_free_vars e2)
@@ -398,10 +398,10 @@ Section LambdaNRA.
         if (y == x)
         then LNRAMap (LNRALambda y e1) (lambda_nra_subst e2 x e')
         else LNRAMap (LNRALambda y (lambda_nra_subst e1 x e')) (lambda_nra_subst e2 x e')
-      | LNRAMapConcat (LNRALambda y e1) e2 =>
+      | LNRAMapProduct (LNRALambda y e1) e2 =>
         if (y == x)
-        then LNRAMapConcat (LNRALambda y e1) (lambda_nra_subst e2 x e')
-        else LNRAMapConcat (LNRALambda y (lambda_nra_subst e1 x e')) (lambda_nra_subst e2 x e')
+        then LNRAMapProduct (LNRALambda y e1) (lambda_nra_subst e2 x e')
+        else LNRAMapProduct (LNRALambda y (lambda_nra_subst e1 x e')) (lambda_nra_subst e2 x e')
       | LNRAProduct e1 e2 =>
         LNRAProduct (lambda_nra_subst e1 x e') (lambda_nra_subst e2 x e')
       | LNRAFilter (LNRALambda y e1) e2 =>
@@ -416,7 +416,7 @@ Section LambdaNRA.
   Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_binop_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
@@ -445,7 +445,7 @@ Section LambdaNRA.
     - apply olift_ext; intros.
       apply lift_oncoll_ext; intros.
       f_equal.
-      apply rmap_concat_ext; intros.
+      apply rmap_product_ext; intros.
       simpl.
       apply IHe1.
       rewrite enveq; reflexivity.
@@ -479,7 +479,7 @@ Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_binop_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
@@ -494,7 +494,7 @@ Tactic Notation "lambda_nra_cases" tactic(first) ident(c) :=
   | Case_aux c "LNRABinop"%string
   | Case_aux c "LNRAUnop"%string
   | Case_aux c "LNRAMap"%string
-  | Case_aux c "LNRAMapConcat"%string
+  | Case_aux c "LNRAMapProduct"%string
   | Case_aux c "LNRAProduct"%string
   | Case_aux c "LNRAFilter"%string
   ].

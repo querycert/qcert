@@ -40,58 +40,58 @@ Section CAMPtoNRA.
 
   Fixpoint nra_of_camp (p:camp) : nra :=
     match p with
-      | pconst d' => nra_match (AConst d')
-      | punop uop p₁ => AMap (AUnop uop AID) (nra_of_camp p₁)
-      | pbinop bop p₁ p₂ =>
-        AMap (ABinop bop (AUnop (ADot "a1") AID) (AUnop (ADot "a2") AID))
-             (AProduct (AMap (AUnop (ARec "a1") AID) (nra_of_camp p₁))
-                       (AMap (AUnop (ARec "a2") AID) (nra_of_camp p₂)))
-      | pmap p₁ =>
-        nra_match
-          (AUnop AFlatten
-                 (AMap
+    | pconst d' => nra_match (NRAConst d')
+    | punop uop p₁ => NRAMap (NRAUnop uop NRAID) (nra_of_camp p₁)
+    | pbinop bop p₁ p₂ =>
+      NRAMap (NRABinop bop (NRAUnop (OpDot "a1") NRAID) (NRAUnop (OpDot "a2") NRAID))
+             (NRAProduct (NRAMap (NRAUnop (OpRec "a1") NRAID) (nra_of_camp p₁))
+                         (NRAMap (NRAUnop (OpRec "a2") NRAID) (nra_of_camp p₂)))
+    | pmap p₁ =>
+      nra_match
+        (NRAUnop OpFlatten
+                 (NRAMap
                     (nra_of_camp p₁)
                     (unnest_two
                        "a1"
                        "PDATA"
-                       (AUnop AColl (nra_wrap_a1 (AUnop (ADot "PDATA") AID))))))
-      | passert p₁ => AMap (AConst (drec nil)) (ASelect AID (nra_of_camp p₁))
-      | porElse p₁ p₂ => ADefault (nra_of_camp p₁) (nra_of_camp p₂)
-      | pit => nra_match nra_data
-      | pletIt p₁ p₂ =>
-        AUnop AFlatten
-              (AMap (nra_of_camp p₂)
-                    (unnest_two
-                       "a1"
-                       "PDATA"
-                       (AUnop AColl
-                              (nra_wrap_a1 (nra_of_camp p₁)))))
-      | pgetConstant s => nra_match (AGetConstant s)
-      | penv => nra_match nra_bind
-      | pletEnv p₁ p₂ =>
-        AUnop AFlatten
-              (AMap
+                       (NRAUnop OpBag (nra_wrap_a1 (NRAUnop (OpDot "PDATA") NRAID))))))
+    | passert p₁ => NRAMap (NRAConst (drec nil)) (NRASelect NRAID (nra_of_camp p₁))
+    | porElse p₁ p₂ => NRADefault (nra_of_camp p₁) (nra_of_camp p₂)
+    | pit => nra_match nra_data
+    | pletIt p₁ p₂ =>
+      NRAUnop OpFlatten
+              (NRAMap (nra_of_camp p₂)
+                      (unnest_two
+                         "a1"
+                         "PDATA"
+                         (NRAUnop OpBag
+                                  (nra_wrap_a1 (nra_of_camp p₁)))))
+    | pgetConstant s => nra_match (NRAGetConstant s)
+    | penv => nra_match nra_bind
+    | pletEnv p₁ p₂ =>
+      NRAUnop OpFlatten
+              (NRAMap
                  (nra_of_camp p₂)
                  (unnest_two (* Needed because MergeConcat may fail so is a
                                 collection which must be unnested *)
                     "PBIND1"
                     "PBIND"
-                    (AMap (ABinop AConcat
-                                  (AUnop (ARec "PDATA") (AUnop (ADot "PDATA") AID))
-                                  (AUnop (ARec "PBIND1") (ABinop AMergeConcat
-                                                                 (AUnop (ADot "PBIND") AID)
-                                                                 (AUnop (ADot "PBIND1") AID))))
-                          (unnest_two
-                             "a1"
-                             "PBIND1"
-                             (AUnop AColl
-                                    (ABinop AConcat
-                                            AID
-                                            (AUnop (ARec "a1") (nra_of_camp p₁))))))))
-      | pleft =>
-        AApp (AEither (nra_match AID) (nra_fail)) nra_data
-      | pright =>
-        AApp (AEither (nra_fail) (nra_match AID)) nra_data
+                    (NRAMap (NRABinop OpRecConcat
+                                      (NRAUnop (OpRec "PDATA") (NRAUnop (OpDot "PDATA") NRAID))
+                                      (NRAUnop (OpRec "PBIND1") (NRABinop OpRecMerge
+                                                                          (NRAUnop (OpDot "PBIND") NRAID)
+                                                                          (NRAUnop (OpDot "PBIND1") NRAID))))
+                            (unnest_two
+                               "a1"
+                               "PBIND1"
+                               (NRAUnop OpBag
+                                        (NRABinop OpRecConcat
+                                                  NRAID
+                                                  (NRAUnop (OpRec "a1") (nra_of_camp p₁))))))))
+    | pleft =>
+      NRAApp (NRAEither (nra_match NRAID) (nra_fail)) nra_data
+    | pright =>
+      NRAApp (NRAEither (nra_fail) (nra_match NRAID)) nra_data
     end.
 
   (** top level version sets up the appropriate input 
@@ -99,10 +99,10 @@ Section CAMPtoNRA.
   *)
 
   Definition nra_of_camp_top p :=
-    AUnop AFlatten
-          (AMap (nra_of_camp p)
-                (AUnop AColl
-                       (nra_context (AConst (drec nil)) AID))).
+    NRAUnop OpFlatten
+          (NRAMap (nra_of_camp p)
+                (NRAUnop OpBag
+                       (nra_context (NRAConst (drec nil)) NRAID))).
 
   (** Auxiliary lemmas -- all used inside pmap proof *)
 
@@ -203,15 +203,15 @@ Section CAMPtoNRA.
     - Case "punop"%string.
       rewrite <- IHp; clear IHp; simpl.
       destruct (camp_eval h c p bind d); try reflexivity.
-      simpl; destruct (fun_of_unaryop h u res); reflexivity.
+      simpl; destruct (unary_op_eval h u res); reflexivity.
     - Case "pbinop"%string.
       rewrite <- IHp1; rewrite <- IHp2; clear IHp1 IHp2.
       destruct (camp_eval h c p1 bind d); try reflexivity.
       destruct (camp_eval h c p2 bind d); try reflexivity.
-      simpl; destruct (fun_of_binop h b res res0); reflexivity.
+      simpl; destruct (binary_op_eval h b res res0); reflexivity.
     - Case "pmap"%string.
       destruct d; try reflexivity.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *; simpl.
       rewrite rmap_lift; simpl.
       unfold omap_concat in *; simpl.
@@ -429,7 +429,7 @@ Section CAMPtoNRA.
     Context (h:brand_relation_t).
 
     Definition camp_to_nra_top (q:camp) : nra :=
-      AApp (nra_of_camp q) (nra_context (AConst (drec nil)) (AConst dunit)).
+      NRAApp (nra_of_camp q) (nra_context (NRAConst (drec nil)) (NRAConst dunit)).
 
     Theorem camp_to_nra_top_correct :
       forall q:camp, forall global_env:bindings,

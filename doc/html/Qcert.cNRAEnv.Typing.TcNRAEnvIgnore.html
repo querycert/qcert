@@ -33,8 +33,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_env">nraenv_core_ignores_env</a></span> <span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvIgnore.html#e">e</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> τ<span class="id">c</span> (τ<span class="kwd">in</span> τ<span class="id">out</span> τ<span class="id">env</span>₁ τ<span class="id">env</span>₂:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvIgnore.html#e">e</a></span> ▷ τ<span class="kwd">in</span> &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">c</span>;τ<span class="id">env</span>₁ -&gt; <span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvIgnore.html#e">e</a></span> ▷ τ<span class="kwd">in</span> &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">c</span>;τ<span class="id">env</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1793')">Proof.</div>
-<div class="proofscript" id="proof1793">
+<div class="toggleproof" onclick="toggleDisplay('proof1818')">Proof.</div>
+<div class="proofscript" id="proof1818">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">e</span> ; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">try</span> <span class="id">contradiction</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">inversion</span> <span class="id">H0</span>; <span class="tactic">clear</span> <span class="id">H0</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
@@ -80,8 +80,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_id">nraenv_core_ignores_id</a></span> <span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvIgnore.html#e">e</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> τ<span class="id">c</span> (τ<span class="kwd">in</span>₁ τ<span class="kwd">in</span>₂ τ<span class="id">out</span> τ<span class="id">env</span>:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvIgnore.html#e">e</a></span> ▷ τ<span class="kwd">in</span>₁ &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">c</span>;τ<span class="id">env</span> -&gt; <span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvIgnore.html#e">e</a></span> ▷ τ<span class="kwd">in</span>₂ &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">c</span>;τ<span class="id">env</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1794')">Proof.</div>
-<div class="proofscript" id="proof1794">
+<div class="toggleproof" onclick="toggleDisplay('proof1819')">Proof.</div>
+<div class="proofscript" id="proof1819">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">e</span> ; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">try</span> <span class="id">contradiction</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">inversion</span> <span class="id">H0</span>; <span class="tactic">clear</span> <span class="id">H0</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>

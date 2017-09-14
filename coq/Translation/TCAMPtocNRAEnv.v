@@ -28,7 +28,7 @@ Section TCAMPtocNRAEnv.
   Local Open Scope list_scope.
   Local Open Scope camp_scope.
 
-  Hint Constructors nraenv_core_type unaryOp_type binOp_type.
+  Hint Constructors nraenv_core_type unary_op_type binary_op_type.
 
   Context {m:basic_model}.
 

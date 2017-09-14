@@ -33,7 +33,7 @@ Section CAMPtocNRAEnv.
   (* Java equivalent: CampToNra.nraenv_fail *)
   Definition nraenv_fail := ANConst (dcoll nil).
   (* Java equivalent: CampToNra.nraenv_match *)
-  Definition nraenv_match op := ANUnop AColl op.
+  Definition nraenv_match op := ANUnop OpBag op.
 
   (** Translation from CAMP to EnvNRA *)
 
@@ -43,12 +43,12 @@ Section CAMPtocNRAEnv.
       | pconst d' => nraenv_match (ANConst d')
       | punop uop p₁ => ANMap (ANUnop uop ANID) (nraenv_core_of_camp p₁)
       | pbinop bop p₁ p₂ =>
-        ANMap (ANBinop bop (ANUnop (ADot "a1") ANID) (ANUnop (ADot "a2") ANID))
-              (ANProduct (ANMap (ANUnop (ARec "a1") ANID) (nraenv_core_of_camp p₁))
-                         (ANMap (ANUnop (ARec "a2") ANID) (nraenv_core_of_camp p₂)))
+        ANMap (ANBinop bop (ANUnop (OpDot "a1") ANID) (ANUnop (OpDot "a2") ANID))
+              (ANProduct (ANMap (ANUnop (OpRec "a1") ANID) (nraenv_core_of_camp p₁))
+                         (ANMap (ANUnop (OpRec "a2") ANID) (nraenv_core_of_camp p₂)))
       | pmap p₁ =>
         nraenv_match
-          (ANUnop AFlatten
+          (ANUnop OpFlatten
                   (ANMap
                      (nraenv_core_of_camp p₁) ANID))
       | passert p₁ =>
@@ -56,17 +56,17 @@ Section CAMPtocNRAEnv.
       | porElse p₁ p₂ => ANDefault (nraenv_core_of_camp p₁) (nraenv_core_of_camp p₂)
       | pit => nraenv_match ANID
       | pletIt p₁ p₂ =>
-        ANUnop AFlatten
+        ANUnop OpFlatten
                (ANMap (nraenv_core_of_camp p₂)
                       (nraenv_core_of_camp p₁))
       | pgetConstant s => nraenv_match (ANGetConstant s)
       | penv => nraenv_match ANEnv
       | pletEnv p₁ p₂ =>
-        ANUnop AFlatten
+        ANUnop OpFlatten
                (ANAppEnv
                   (ANMapEnv (nraenv_core_of_camp p₂))
-                  (ANUnop AFlatten
-                          (ANMap (ANBinop AMergeConcat ANEnv ANID) (nraenv_core_of_camp p₁))))
+                  (ANUnop OpFlatten
+                          (ANMap (ANBinop OpRecMerge ANEnv ANID) (nraenv_core_of_camp p₁))))
       | pleft =>
         ANEither (nraenv_match ANID) (nraenv_fail)
       | pright =>
@@ -86,15 +86,15 @@ Section CAMPtocNRAEnv.
     (* punop *)
     - rewrite <- IHq; clear IHq; simpl.
       destruct (camp_eval h c q env d); try reflexivity.
-      simpl; destruct (fun_of_unaryop h u res); reflexivity.
+      simpl; destruct (unary_op_eval h u res); reflexivity.
     (* pbinop *)
     - rewrite <- IHq1; rewrite <- IHq2; clear IHq1 IHq2.
       destruct (camp_eval h c q1 env d); try reflexivity.
       destruct (camp_eval h c q2 env d); try reflexivity.
-      simpl; destruct (fun_of_binop h b res res0); reflexivity.
+      simpl; destruct (binary_op_eval h b res res0); reflexivity.
     (* pmap *)
     - destruct d; try reflexivity.
-      unfold rmap_concat in *; simpl in *.
+      unfold rmap_product in *; simpl in *.
       unfold olift, liftpr ; simpl.
       induction l; try reflexivity; simpl.
       unfold lift_failure in *.
@@ -173,8 +173,8 @@ Section CAMPtocNRAEnv.
   *)
 
   Definition nraenv_core_of_camp_top p :=
-    ANUnop AFlatten
-           (ANMap (nraenv_core_of_camp p) (ANUnop AColl ANID)).
+    ANUnop OpFlatten
+           (ANMap (nraenv_core_of_camp p) (ANUnop OpBag ANID)).
   
   Lemma nraenv_core_of_camp_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
@@ -237,10 +237,10 @@ Section CAMPtocNRAEnv.
       nraenv_core_of_camp (pand p1 p2).
 
     Definition nraenv_core_for_pand (q1 q2: nraenv_core) : nraenv_core :=
-      ANUnop AFlatten
+      ANUnop OpFlatten
              (ANAppEnv (ANMapEnv q2)
-                       (ANUnop AFlatten
-                               (ANMap (ANBinop AMergeConcat ANEnv ANID)
+                       (ANUnop OpFlatten
+                               (ANMap (ANBinop OpRecMerge ANEnv ANID)
                                       (ANMap (ANConst (drec nil))
                                              (ANSelect ANID q1))))).
   

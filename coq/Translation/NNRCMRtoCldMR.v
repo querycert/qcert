@@ -61,7 +61,7 @@ Section NNRCMRToCldMR.
     let v_red := fst r in
     let f_red := snd r in
     (* Deals with Cloudant's implicit mapping of results into 'key'/'value' records *)
-    let pushed_map := MRtoMapCld (MapScalar (v_red,NNRCUnop AColl f_red)) true 0 in
+    let pushed_map := MRtoMapCld (MapScalar (v_red,NNRCUnop OpBag f_red)) true 0 in
     (pushed_reduce, (fresh_outputdb, pushed_map)).
 
   (* Java equivalent: NrcmrtoCldmr.pushMR *)
@@ -73,7 +73,7 @@ Section NNRCMRToCldMR.
 
   Definition minMap :=
     let x := "x"%string in
-    let map_fun := (x, NNRCUnop (ADot "min") (NNRCVar x)) in
+    let map_fun := (x, NNRCUnop (OpDot "min") (NNRCVar x)) in
     mkMapCld (CldMapId map_fun) (CldEmitCollect O).
 
   Definition minMR (stats_v out_v: var) :=
@@ -84,7 +84,7 @@ Section NNRCMRToCldMR.
 
   Definition maxMap :=
     let x := "x"%string in
-    let map_fun := (x, NNRCUnop (ADot "max") (NNRCVar x)) in
+    let map_fun := (x, NNRCUnop (OpDot "max") (NNRCVar x)) in
     mkMapCld (CldMapId map_fun) (CldEmitCollect O).
 
   Definition maxMR (stats_v out_v: var) :=
@@ -336,7 +336,7 @@ Section NNRCMRToCldMR.
                NNRCLet fv (NNRCVar fv) k
              | Some Vlocal =>
                NNRCLet fv
-                      (NNRCEither (NNRCUnop ASingleton (NNRCVar fv))
+                      (NNRCEither (NNRCUnop OpSingleton (NNRCVar fv))
                                  fv (NNRCVar fv)
                                  fv (NNRCConst dunit)) (* must not be executed *)
                       k

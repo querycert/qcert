@@ -40,64 +40,64 @@
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_data">trivial_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Data.ForeignData.html#mk_foreign_data">mk_foreign_data</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3106')">Next Obligation.</div>
-<div class="proofscript" id="proof3106">
+<div class="toggleproof" onclick="toggleDisplay('proof3130')">Next Obligation.</div>
+<div class="proofscript" id="proof3130">
 &nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3107')">Next Obligation.</div>
-<div class="proofscript" id="proof3107">
+<div class="toggleproof" onclick="toggleDisplay('proof3131')">Next Obligation.</div>
+<div class="proofscript" id="proof3131">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3108')">Next Obligation.</div>
-<div class="proofscript" id="proof3108">
+<div class="toggleproof" onclick="toggleDisplay('proof3132')">Next Obligation.</div>
+<div class="proofscript" id="proof3132">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3109')">Next Obligation.</div>
-<div class="proofscript" id="proof3109">
+<div class="toggleproof" onclick="toggleDisplay('proof3133')">Next Obligation.</div>
+<div class="proofscript" id="proof3133">
 &nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">intros</span> [].<br/>
 Defined.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_unary_op">trivial_foreign_unary_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">fdata</span>:<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span>}:<br/>
-&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_unary_op">foreign_unary_op</a></span><br/>
-&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#mk_foreign_unary_op">mk_foreign_unary_op</a></span> <span class="id">fdata</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3110')">Next Obligation.</div>
-<div class="proofscript" id="proof3110">
+&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#foreign_unary_op">foreign_unary_op</a></span><br/>
+&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#mk_foreign_unary_op">mk_foreign_unary_op</a></span> <span class="id">fdata</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3134')">Next Obligation.</div>
+<div class="proofscript" id="proof3134">
 &nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3111')">Next Obligation.</div>
-<div class="proofscript" id="proof3111">
+<div class="toggleproof" onclick="toggleDisplay('proof3135')">Next Obligation.</div>
+<div class="proofscript" id="proof3135">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3112')">Next Obligation.</div>
-<div class="proofscript" id="proof3112">
+<div class="toggleproof" onclick="toggleDisplay('proof3136')">Next Obligation.</div>
+<div class="proofscript" id="proof3136">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>. <br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3113')">Next Obligation.</div>
-<div class="proofscript" id="proof3113">
+<div class="toggleproof" onclick="toggleDisplay('proof3137')">Next Obligation.</div>
+<div class="proofscript" id="proof3137">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>. <br/>
 Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_binary_op">trivial_foreign_binary_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">fdata</span>:<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span>}:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_binary_op">foreign_binary_op</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#mk_foreign_binary_op">mk_foreign_binary_op</a></span> <span class="id">fdata</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3114')">Next Obligation.</div>
-<div class="proofscript" id="proof3114">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#foreign_binary_op">foreign_binary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#mk_foreign_binary_op">mk_foreign_binary_op</a></span> <span class="id">fdata</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3138')">Next Obligation.</div>
+<div class="proofscript" id="proof3138">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3115')">Next Obligation.</div>
-<div class="proofscript" id="proof3115">
+<div class="toggleproof" onclick="toggleDisplay('proof3139')">Next Obligation.</div>
+<div class="proofscript" id="proof3139">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3116')">Next Obligation.</div>
-<div class="proofscript" id="proof3116">
+<div class="toggleproof" onclick="toggleDisplay('proof3140')">Next Obligation.</div>
+<div class="proofscript" id="proof3140">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>. <br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3117')">Next Obligation.</div>
-<div class="proofscript" id="proof3117">
+<div class="toggleproof" onclick="toggleDisplay('proof3141')">Next Obligation.</div>
+<div class="proofscript" id="proof3141">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>. <br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -110,146 +110,146 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_type">trivial_foreign_type</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#mk_foreign_type">mk_foreign_type</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3118')">Next Obligation.</div>
-<div class="proofscript" id="proof3118">
+<div class="toggleproof" onclick="toggleDisplay('proof3142')">Next Obligation.</div>
+<div class="proofscript" id="proof3142">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3119')">Next Obligation.</div>
-<div class="proofscript" id="proof3119">
+<div class="toggleproof" onclick="toggleDisplay('proof3143')">Next Obligation.</div>
+<div class="proofscript" id="proof3143">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> [].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Grab</span> <span class="id">Existential</span> <span class="kwd">Variables</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">solve</span> [<span class="tactic">intros</span> []].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">solve</span> [<span class="tactic">intros</span> []].<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3120')">Next Obligation.</div>
-<div class="proofscript" id="proof3120">
+<div class="toggleproof" onclick="toggleDisplay('proof3144')">Next Obligation.</div>
+<div class="proofscript" id="proof3144">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3121')">Next Obligation.</div>
-<div class="proofscript" id="proof3121">
+<div class="toggleproof" onclick="toggleDisplay('proof3145')">Next Obligation.</div>
+<div class="proofscript" id="proof3145">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3122')">Next Obligation.</div>
-<div class="proofscript" id="proof3122">
+<div class="toggleproof" onclick="toggleDisplay('proof3146')">Next Obligation.</div>
+<div class="proofscript" id="proof3146">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> [].<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3123')">Next Obligation.</div>
-<div class="proofscript" id="proof3123">
+<div class="toggleproof" onclick="toggleDisplay('proof3147')">Next Obligation.</div>
+<div class="proofscript" id="proof3147">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> [].<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3124')">Next Obligation.</div>
-<div class="proofscript" id="proof3124">
+<div class="toggleproof" onclick="toggleDisplay('proof3148')">Next Obligation.</div>
+<div class="proofscript" id="proof3148">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> [].<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_data_typing">trivial_foreign_data_typing</a></span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data">trivial_foreign_data</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_type">trivial_foreign_type</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html#mk_foreign_data_typing">mk_foreign_data_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data">trivial_foreign_data</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_type">trivial_foreign_type</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html#mk_foreign_data_typing">mk_foreign_data_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data">trivial_foreign_data</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_type">trivial_foreign_type</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3125')">Next Obligation.</div>
-<div class="proofscript" id="proof3125">
+<div class="toggleproof" onclick="toggleDisplay('proof3149')">Next Obligation.</div>
+<div class="proofscript" id="proof3149">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3126')">Next Obligation.</div>
-<div class="proofscript" id="proof3126">
+<div class="toggleproof" onclick="toggleDisplay('proof3150')">Next Obligation.</div>
+<div class="proofscript" id="proof3150">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3127')">Next Obligation.</div>
-<div class="proofscript" id="proof3127">
+<div class="toggleproof" onclick="toggleDisplay('proof3151')">Next Obligation.</div>
+<div class="proofscript" id="proof3151">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3128')">Next Obligation.</div>
-<div class="proofscript" id="proof3128">
+<div class="toggleproof" onclick="toggleDisplay('proof3152')">Next Obligation.</div>
+<div class="proofscript" id="proof3152">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3129')">Next Obligation.</div>
-<div class="proofscript" id="proof3129">
+<div class="toggleproof" onclick="toggleDisplay('proof3153')">Next Obligation.</div>
+<div class="proofscript" id="proof3153">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_unary_op_typing">trivial_foreign_unary_op_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">model</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>} :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.Typing.ForeignOpsTyping.html#foreign_unary_op_typing">foreign_unary_op_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#foreign_unary_op_typing">foreign_unary_op_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data">trivial_foreign_data</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_unary_op">trivial_foreign_unary_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_type">trivial_foreign_type</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data_typing">trivial_foreign_data_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#model">model</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Typing.ForeignOpsTyping.html#mk_foreign_unary_op_typing">mk_foreign_unary_op_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#mk_foreign_unary_op_typing">mk_foreign_unary_op_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3130')">Next Obligation.</div>
-<div class="proofscript" id="proof3130">
+<div class="toggleproof" onclick="toggleDisplay('proof3154')">Next Obligation.</div>
+<div class="proofscript" id="proof3154">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3131')">Next Obligation.</div>
-<div class="proofscript" id="proof3131">
+<div class="toggleproof" onclick="toggleDisplay('proof3155')">Next Obligation.</div>
+<div class="proofscript" id="proof3155">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3132')">Next Obligation.</div>
-<div class="proofscript" id="proof3132">
+<div class="toggleproof" onclick="toggleDisplay('proof3156')">Next Obligation.</div>
+<div class="proofscript" id="proof3156">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3133')">Next Obligation.</div>
-<div class="proofscript" id="proof3133">
+<div class="toggleproof" onclick="toggleDisplay('proof3157')">Next Obligation.</div>
+<div class="proofscript" id="proof3157">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3134')">Next Obligation.</div>
-<div class="proofscript" id="proof3134">
+<div class="toggleproof" onclick="toggleDisplay('proof3158')">Next Obligation.</div>
+<div class="proofscript" id="proof3158">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3135')">Next Obligation.</div>
-<div class="proofscript" id="proof3135">
+<div class="toggleproof" onclick="toggleDisplay('proof3159')">Next Obligation.</div>
+<div class="proofscript" id="proof3159">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3136')">Next Obligation.</div>
-<div class="proofscript" id="proof3136">
+<div class="toggleproof" onclick="toggleDisplay('proof3160')">Next Obligation.</div>
+<div class="proofscript" id="proof3160">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 &nbsp;&nbsp;<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_binary_op_typing">trivial_foreign_binary_op_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">model</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>} :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.Typing.ForeignOpsTyping.html#foreign_binary_op_typing">foreign_binary_op_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#foreign_binary_op_typing">foreign_binary_op_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data">trivial_foreign_data</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_binary_op">trivial_foreign_binary_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_type">trivial_foreign_type</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data_typing">trivial_foreign_data_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#model">model</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Typing.ForeignOpsTyping.html#mk_foreign_binary_op_typing">mk_foreign_binary_op_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#mk_foreign_binary_op_typing">mk_foreign_binary_op_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3137')">Next Obligation.</div>
-<div class="proofscript" id="proof3137">
+<div class="toggleproof" onclick="toggleDisplay('proof3161')">Next Obligation.</div>
+<div class="proofscript" id="proof3161">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3138')">Next Obligation.</div>
-<div class="proofscript" id="proof3138">
+<div class="toggleproof" onclick="toggleDisplay('proof3162')">Next Obligation.</div>
+<div class="proofscript" id="proof3162">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3139')">Next Obligation.</div>
-<div class="proofscript" id="proof3139">
+<div class="toggleproof" onclick="toggleDisplay('proof3163')">Next Obligation.</div>
+<div class="proofscript" id="proof3163">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3140')">Next Obligation.</div>
-<div class="proofscript" id="proof3140">
+<div class="toggleproof" onclick="toggleDisplay('proof3164')">Next Obligation.</div>
+<div class="proofscript" id="proof3164">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3141')">Next Obligation.</div>
-<div class="proofscript" id="proof3141">
+<div class="toggleproof" onclick="toggleDisplay('proof3165')">Next Obligation.</div>
+<div class="proofscript" id="proof3165">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3142')">Next Obligation.</div>
-<div class="proofscript" id="proof3142">
+<div class="toggleproof" onclick="toggleDisplay('proof3166')">Next Obligation.</div>
+<div class="proofscript" id="proof3166">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3143')">Next Obligation.</div>
-<div class="proofscript" id="proof3143">
+<div class="toggleproof" onclick="toggleDisplay('proof3167')">Next Obligation.</div>
+<div class="proofscript" id="proof3167">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -279,8 +279,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Translation.ForeignToJava.html#mk_foreign_to_java">mk_foreign_to_java</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_runtime">trivial_foreign_runtime</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3144')">Next Obligation.</div>
-<div class="proofscript" id="proof3144">
+<div class="toggleproof" onclick="toggleDisplay('proof3168')">Next Obligation.</div>
+<div class="proofscript" id="proof3168">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fd</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -295,30 +295,30 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Translation.ForeignToScala.html#mk_foreign_to_scala">mk_foreign_to_scala</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_runtime">trivial_foreign_runtime</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_type">trivial_foreign_type</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3145')">Next Obligation.</div>
-<div class="proofscript" id="proof3145">
+<div class="toggleproof" onclick="toggleDisplay('proof3169')">Next Obligation.</div>
+<div class="proofscript" id="proof3169">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">exact</span> "<span class="id">TRIVIAL</span> <span class="id">MODEL</span> <span class="id">DOES</span> <span class="id">NOT</span> <span class="id">SUPPORT</span> <span class="id">FOREIGN</span> <span class="id">TYPES</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_to_JSON">trivial_foreign_to_JSON</a></span> : <span class="id"><a href="Qcert.Common.JSON.ForeignToJSON.html#foreign_to_JSON">foreign_to_JSON</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.JSON.ForeignToJSON.html#mk_foreign_to_JSON">mk_foreign_to_JSON</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data">trivial_foreign_data</a></span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3146')">Next Obligation.</div>
-<div class="proofscript" id="proof3146">
+<div class="toggleproof" onclick="toggleDisplay('proof3170')">Next Obligation.</div>
+<div class="proofscript" id="proof3170">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3147')">Next Obligation.</div>
-<div class="proofscript" id="proof3147">
+<div class="toggleproof" onclick="toggleDisplay('proof3171')">Next Obligation.</div>
+<div class="proofscript" id="proof3171">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fd</span>. <br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_type_to_JSON">trivial_foreign_type_to_JSON</a></span> : <span class="id"><a href="Qcert.Common.JSON.ForeignTypeToJSON.html#foreign_type_to_JSON">foreign_type_to_JSON</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.JSON.ForeignTypeToJSON.html#mk_foreign_type_to_JSON">mk_foreign_type_to_JSON</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_type">trivial_foreign_type</a></span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3148')">Next Obligation.</div>
-<div class="proofscript" id="proof3148">
+<div class="toggleproof" onclick="toggleDisplay('proof3172')">Next Obligation.</div>
+<div class="proofscript" id="proof3172">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3149')">Next Obligation.</div>
-<div class="proofscript" id="proof3149">
+<div class="toggleproof" onclick="toggleDisplay('proof3173')">Next Obligation.</div>
+<div class="proofscript" id="proof3173">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fd</span>. <br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -326,33 +326,33 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">fdata</span>:<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span>}:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.ForeignReduceOps.html#foreign_reduce_op">foreign_reduce_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.NNRCMR.Lang.ForeignReduceOps.html#mk_foreign_reduce_op">mk_foreign_reduce_op</a></span> <span class="id">fdata</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3150')">Next Obligation.</div>
-<div class="proofscript" id="proof3150">
+<div class="toggleproof" onclick="toggleDisplay('proof3174')">Next Obligation.</div>
+<div class="proofscript" id="proof3174">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3151')">Next Obligation.</div>
-<div class="proofscript" id="proof3151">
+<div class="toggleproof" onclick="toggleDisplay('proof3175')">Next Obligation.</div>
+<div class="proofscript" id="proof3175">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> []. <br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3152')">Next Obligation.</div>
-<div class="proofscript" id="proof3152">
+<div class="toggleproof" onclick="toggleDisplay('proof3176')">Next Obligation.</div>
+<div class="proofscript" id="proof3176">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>. <br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3153')">Next Obligation.</div>
-<div class="proofscript" id="proof3153">
+<div class="toggleproof" onclick="toggleDisplay('proof3177')">Next Obligation.</div>
+<div class="proofscript" id="proof3177">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>. <br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_to_reduce_op">trivial_foreign_to_reduce_op</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.ForeignToReduceOps.html#foreign_to_reduce_op">foreign_to_reduce_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Translation.ForeignToReduceOps.html#mk_foreign_to_reduce_op">mk_foreign_to_reduce_op</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_runtime">trivial_foreign_runtime</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_reduce_op">trivial_foreign_reduce_op</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3154')">Next Obligation.</div>
-<div class="proofscript" id="proof3154">
+<div class="toggleproof" onclick="toggleDisplay('proof3178')">Next Obligation.</div>
+<div class="proofscript" id="proof3178">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3155')">Next Obligation.</div>
-<div class="proofscript" id="proof3155">
+<div class="toggleproof" onclick="toggleDisplay('proof3179')">Next Obligation.</div>
+<div class="proofscript" id="proof3179">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -361,25 +361,25 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_to_cloudant">trivial_foreign_to_cloudant</a></span> : <span class="id"><a href="Qcert.Translation.ForeignToCloudant.html#foreign_to_cloudant">foreign_to_cloudant</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Translation.ForeignToCloudant.html#mk_foreign_to_cloudant">mk_foreign_to_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_runtime">trivial_foreign_runtime</a></span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_reduce_op">trivial_foreign_reduce_op</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3156')">Next Obligation.</div>
-<div class="proofscript" id="proof3156">
+<div class="toggleproof" onclick="toggleDisplay('proof3180')">Next Obligation.</div>
+<div class="proofscript" id="proof3180">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">rop</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3157')">Next Obligation.</div>
-<div class="proofscript" id="proof3157">
+<div class="toggleproof" onclick="toggleDisplay('proof3181')">Next Obligation.</div>
+<div class="proofscript" id="proof3181">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
 &nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3158')">Next Obligation.</div>
-<div class="proofscript" id="proof3158">
+<div class="toggleproof" onclick="toggleDisplay('proof3182')">Next Obligation.</div>
+<div class="proofscript" id="proof3182">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">compute</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 <span class="kwd">Instance</span> <span class="id"><a name="trivial_foreign_cloudant">trivial_foreign_cloudant</a></span> : <span class="id"><a href="Qcert.CldMR.Lang.ForeignCloudant.html#foreign_cloudant">foreign_cloudant</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.CldMR.Lang.ForeignCloudant.html#mk_foreign_cloudant">mk_foreign_cloudant</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_runtime">trivial_foreign_runtime</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ASum">ASum</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ANumMin">ANumMin</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ANumMax">ANumMax</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpSum">OpSum</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpNumMin">OpNumMin</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpNumMax">OpNumMax</a></span>.<br/>
 <br/>
 <span class="id">Existing</span> <span class="kwd">Instance</span> <span class="id">silent_optimizer_logger</span>.<br/>
 <br/>
@@ -414,7 +414,7 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#silent_optimizer_logger">silent_optimizer_logger</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc">nnrc</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="TrivialRuntime.compiler_dnnrc_optimizer_logger">compiler_dnnrc_optimizer_logger</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>}: <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optimizer_logger">optimizer_logger</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> (@<span class="id"><a href="Qcert.DNNRC.Lang.DNNRCBase.html#dnnrc_base">dnnrc_base</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#type_annotation">type_annotation</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#unit">unit</a></span>) <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#dataframe">dataframe</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#silent_optimizer_logger">silent_optimizer_logger</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> (@<span class="id"><a href="Qcert.DNNRC.Lang.DNNRCBase.html#dnnrc_base">dnnrc_base</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#type_annotation">type_annotation</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#unit">unit</a></span>) <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#dataframe">dataframe</a></span>).<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="TrivialRuntime.compiler_foreign_data_typing">compiler_foreign_data_typing</a></span> : <span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="TrivialRuntime.compiler_foreign_data_typing">compiler_foreign_data_typing</a></span> : <span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data_typing">trivial_foreign_data_typing</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#TrivialRuntime">TrivialRuntime</a></span>.<br/>
@@ -455,7 +455,7 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#silent_optimizer_logger">silent_optimizer_logger</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc">nnrc</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="TrivialModel.compiler_model_dnnrc_optimizer_logger">compiler_model_dnnrc_optimizer_logger</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>}: <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optimizer_logger">optimizer_logger</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> (@<span class="id"><a href="Qcert.DNNRC.Lang.DNNRCBase.html#dnnrc_base">dnnrc_base</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#type_annotation">type_annotation</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#unit">unit</a></span>) <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#dataframe">dataframe</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#silent_optimizer_logger">silent_optimizer_logger</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> (@<span class="id"><a href="Qcert.DNNRC.Lang.DNNRCBase.html#dnnrc_base">dnnrc_base</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#type_annotation">type_annotation</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#unit">unit</a></span>) <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#dataframe">dataframe</a></span>).<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="TrivialModel.compiler_model_foreign_data_typing">compiler_model_foreign_data_typing</a></span> : <span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="TrivialModel.compiler_model_foreign_data_typing">compiler_model_foreign_data_typing</a></span> : <span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#trivial_foreign_data_typing">trivial_foreign_data_typing</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#TrivialModel">TrivialModel</a></span>.<br/>
 <br/>

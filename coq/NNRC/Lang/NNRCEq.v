@@ -57,22 +57,21 @@ Section NNRCEq.
   (* all the nnrc constructors are proper wrt. equivalence *)
 
   (* NNRCGetConstant *)
-  Global Instance get_constant_ext_proper : Proper (eq ==> nnrc_eq) NNRCGetConstant.
+  Global Instance proper_NNRCGetConstant : Proper (eq ==> nnrc_eq) NNRCGetConstant.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; rewrite H; reflexivity.
   Qed.
 
   (* NNRCVar *)
-  Global Instance var_ext_proper : Proper (eq ==> nnrc_eq) NNRCVar.
+  Global Instance proper_NNRCVar : Proper (eq ==> nnrc_eq) NNRCVar.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; rewrite H; reflexivity.
   Qed.
 
   (* NNRCConst *)
-  
-  Global Instance const_ext_proper : Proper (eq ==> nnrc_eq) NNRCConst.
+  Global Instance proper_NNRCConst : Proper (eq ==> nnrc_eq) NNRCConst.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; rewrite H; reflexivity.
@@ -80,61 +79,59 @@ Section NNRCEq.
 
   (* NNRCBinop *)
   
-  Global Instance binop_ext_proper : Proper (binop_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCBinop.
+  Global Instance proper_NNRCBinop : Proper (binary_op_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCBinop.
   Proof.
-    generalize binop_proper; intros Hnnrc_core_prop.
+    generalize proper_cNNRCBinop; intros Hnnrc_core_prop.
     unfold Proper, respectful, nnrc_eq, nnrc_eval; intros.
     apply Hnnrc_core_prop; auto.
   Qed.
 
   (* NNRCUnnop *)
-  
-  Global Instance unop_ext_proper : Proper (unaryop_eq ==> nnrc_eq ==> nnrc_eq) NNRCUnop.
+
+  Global Instance proper_NNRCUnnop : Proper (unary_op_eq ==> nnrc_eq ==> nnrc_eq) NNRCUnop.
   Proof.
-    generalize unop_proper; intros Hnnrc_core_prop.
+    generalize proper_cNNRCUnop; intros Hnnrc_core_prop.
     unfold Proper, respectful, nnrc_eq, nnrc_eval; intros.
     apply Hnnrc_core_prop; auto.
   Qed.
     
   (* NNRCLet *)
   
-  Global Instance let_ext_proper : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCLet.
+  Global Instance proper_NNRCLet : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCLet.
   Proof.
-    generalize let_proper; intros Hnnrc_core_prop.
+    generalize proper_cNNRCLet; intros Hnnrc_core_prop.
     unfold Proper, respectful, nnrc_eq, nnrc_eval; intros.
     apply Hnnrc_core_prop; auto.
   Qed.
-    
+
   (* NNRCFor *)
 
-  Global Instance for_ext_proper : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCFor.
+  Global Instance proper_NNRCFor : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCFor.
   Proof.
-    generalize for_proper; intros Hnnrc_core_prop.
+    generalize proper_cNNRCFor; intros Hnnrc_core_prop.
     unfold Proper, respectful, nnrc_eq, nnrc_eval; intros.
     apply Hnnrc_core_prop; auto.
   Qed.
 
   (* NNRCIf *)
   
-  Global Instance if_ext_proper : Proper (nnrc_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCIf.
+  Global Instance proper_NNRCIf : Proper (nnrc_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCIf.
   Proof.
-    generalize if_proper; intros Hnnrc_core_prop.
+    generalize proper_cNNRCIf; intros Hnnrc_core_prop.
     unfold Proper, respectful, nnrc_eq, nnrc_eval; intros.
     apply Hnnrc_core_prop; auto.
   Qed.
 
   (* NNRCEither *)
-  Global Instance either_ext_proper : Proper (nnrc_eq ==> eq ==> nnrc_eq ==> eq ==> nnrc_eq ==> nnrc_eq) NNRCEither.
+  Global Instance proper_NNRCEither : Proper (nnrc_eq ==> eq ==> nnrc_eq ==> eq ==> nnrc_eq ==> nnrc_eq) NNRCEither.
   Proof.
-    generalize either_proper; intros Hnnrc_core_prop.
+    generalize proper_cNNRCEither; intros Hnnrc_core_prop.
     unfold Proper, respectful, nnrc_eq, nnrc_eval; intros.
     apply Hnnrc_core_prop; auto.
   Qed.
 
   (* NNRCGroupBy *)
-  (* Fails for core *)
-
-  Global Instance group_by_ext_proper : Proper (eq ==> eq ==> nnrc_eq ==> nnrc_eq) NNRCGroupBy.
+  Global Instance proper_NNRCGroupBy : Proper (eq ==> eq ==> nnrc_eq ==> nnrc_eq) NNRCGroupBy.
   Proof.
     unfold Proper, respectful; intros.
     unfold nnrc_eq in *.

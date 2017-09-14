@@ -15,7 +15,7 @@
 <div class="coq">
 <br/>
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="ROptimContext">ROptimContext</a></span>.<br/>
+<span class="kwd">Section</span> <span class="id"><a name="NRARewriteContext">NRARewriteContext</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html">Equivalence</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html">Morphisms</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Setoids.Setoid.html">Setoid</a></span>.<br/>
@@ -49,15 +49,15 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lt_nat_compat">lt_nat_compat</a></span> (<span class="id">x</span> <span class="id">y</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) : ~ <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#x">x</a></span> &lt; <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#y">y</a></span> -&gt; ~ <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#y">y</a></span> &lt; <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#x">x</a></span> -&gt; <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#x">x</a></span> = <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#y">y</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1657')">Proof.</div>
-<div class="proofscript" id="proof1657">
+<div class="toggleproof" onclick="toggleDisplay('proof1682')">Proof.</div>
+<div class="proofscript" id="proof1682">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="insertion_sort_equivlist_nat">insertion_sort_equivlist_nat</a></span> <span class="id">l</span> <span class="id">l</span>':<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist">equivlist</a></span> <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#l">l</a></span> <span class="id">l</span>' -&gt; <span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort">insertion_sort</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html#lt_dec">lt_dec</a></span> <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#l">l</a></span> = <span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort">insertion_sort</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html#lt_dec">lt_dec</a></span> <span class="id">l</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1658')">Proof.</div>
-<div class="proofscript" id="proof1658">
+<div class="toggleproof" onclick="toggleDisplay('proof1683')">Proof.</div>
+<div class="proofscript" id="proof1683">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.Utils.Sublist.html#insertion_sort_equivlist">insertion_sort_equivlist</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Peano.html#lt">lt</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html#lt_dec">lt_dec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#eq_equivalence">eq_equivalence</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#nat_eq_eqdec">nat_eq_eqdec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.Natural.Peano.NPeano.html#Nat.lt_strorder">Nat.lt_strorder</a></span> <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#lt_nat_compat">lt_nat_compat</a></span>).<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -76,8 +76,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ctxt_and_comm_ctxt">ctxt_and_comm_ctxt</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;$2 ∧ $1 ≡ₐ $1 ∧ $2.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1659')">Proof.</div>
-<div class="proofscript" id="proof1659">
+<div class="toggleproof" onclick="toggleDisplay('proof1684')">Proof.</div>
+<div class="proofscript" id="proof1684">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl_ctxt_equiv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#and_comm">and_comm</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -88,8 +88,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟩( ⋈ᵈ⟨χ⟨‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#s2">s2</a></span>, <span class="id">ID</span>)|] ⟩( (<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#s1">s1</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟩( ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#s3">s3</a></span>, $1)|] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#s1">s1</a></span>, ‵{| $2|})|]|}))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₐ ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#s3">s3</a></span>, $1)|] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#s2">s2</a></span>, $2)|]|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1660')">Proof.</div>
-<div class="proofscript" id="proof1660">
+<div class="toggleproof" onclick="toggleDisplay('proof1685')">Proof.</div>
+<div class="proofscript" id="proof1685">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl_ctxt_equiv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#unnest_singleton">unnest_singleton</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -97,14 +97,14 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ctxt_select_union_distr">ctxt_select_union_distr</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ $0 ⟩($1 ⋃ $2) ≡ₐ σ⟨ $0 ⟩($1) ⋃ σ⟨ $0 ⟩($2).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1661')">Proof.</div>
-<div class="proofscript" id="proof1661">
+<div class="toggleproof" onclick="toggleDisplay('proof1686')">Proof.</div>
+<div class="proofscript" id="proof1686">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl_ctxt_equiv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#union_select_distr">union_select_distr</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#ROptimContext">ROptimContext</a></span>.<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#NRARewriteContext">NRARewriteContext</a></span>.<br/>
 &nbsp;&nbsp;<br/>
 
 </div>

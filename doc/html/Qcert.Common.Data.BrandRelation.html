@@ -49,8 +49,8 @@
 <span class="kwd">Lemma</span> <span class="id"><a name="brand_relation_trans_dec">brand_relation_trans_dec</a></span> :<br/>
 &nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans_t">brand_relation_trans_t</a></span>}<br/>
 &nbsp;&nbsp;+  {~ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans_t">brand_relation_trans_t</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof753')">Proof.</div>
-<div class="proofscript" id="proof753">
+<div class="toggleproof" onclick="toggleDisplay('proof755')">Proof.</div>
+<div class="proofscript" id="proof755">
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans_t">brand_relation_trans_t</a></span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb">forallb</a></span> (<span class="kwd">fun</span> <span class="id">ab</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb">forallb</a></span> (<span class="kwd">fun</span> <span class="id">bc</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">if</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#ab">ab</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#bc">bc</a></span>)<br/>
@@ -80,8 +80,8 @@ Defined.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="brand_relation_assym_dec">brand_relation_assym_dec</a></span> :<br/>
 &nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_assym_t">brand_relation_assym_t</a></span>}<br/>
 &nbsp;&nbsp;+  {~ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_assym_t">brand_relation_assym_t</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof754')">Proof.</div>
-<div class="proofscript" id="proof754">
+<div class="toggleproof" onclick="toggleDisplay('proof756')">Proof.</div>
+<div class="proofscript" id="proof756">
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_assym_t">brand_relation_assym_t</a></span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb">forallb</a></span> (<span class="kwd">fun</span> <span class="id">ab</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#negb">negb</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.ListSet.html#set_mem">set_mem</a></span> (<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#pair_eqdec">pair_eqdec</a></span>) ((<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#ab">ab</a></span>), (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#ab">ab</a></span>)) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_types.brand_relation_brands">brand_relation_brands</a></span>)) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_types.brand_relation_brands">brand_relation_brands</a></span>).<br/>
@@ -118,23 +118,23 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_relation_trans">brand_relation_trans</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans_t">brand_relation_trans_t</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof755')">Proof.</div>
-<div class="proofscript" id="proof755">
+<div class="toggleproof" onclick="toggleDisplay('proof757')">Proof.</div>
+<div class="proofscript" id="proof757">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans_b">brand_relation_trans_b</a></span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#holds">holds</a></span>, <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#is_true">is_true</a></span>; <span class="id">match_destr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_relation_assym">brand_relation_assym</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_assym_t">brand_relation_assym_t</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof756')">Proof.</div>
-<div class="proofscript" id="proof756">
+<div class="toggleproof" onclick="toggleDisplay('proof758')">Proof.</div>
+<div class="proofscript" id="proof758">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_assym_b">brand_relation_assym_b</a></span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#holds">holds</a></span>, <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#is_true">is_true</a></span>; <span class="id">match_destr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_relation_irrefl">brand_relation_irrefl</a></span> <span class="id">a</span> : ~ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>,<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof757')">Proof.</div>
-<div class="proofscript" id="proof757">
+<div class="toggleproof" onclick="toggleDisplay('proof759')">Proof.</div>
+<div class="proofscript" id="proof759">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">inn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_assym">brand_relation_assym</a></span> <span class="id">a</span> <span class="id">a</span>); <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -143,8 +143,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_relation_ext">brand_relation_ext</a></span> <span class="id">b</span> <span class="id">pf1</span> <span class="id">pf2</span> <span class="id">pf1</span>' <span class="id">pf2</span>' :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#mkBrand_relation">mkBrand_relation</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#pf1">pf1</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#pf2">pf2</a></span>  = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#mkBrand_relation">mkBrand_relation</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id">pf1</span>' <span class="id">pf2</span>' .<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof758')">Proof.</div>
-<div class="proofscript" id="proof758">
+<div class="toggleproof" onclick="toggleDisplay('proof760')">Proof.</div>
+<div class="proofscript" id="proof760">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">f_equal</span>; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Logic.Eqdep_dec.html#UIP_dec">UIP_dec</a></span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#bool_dec">bool_dec</a></span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> (<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>).<br/>
 &nbsp;&nbsp;Defined.</div>
@@ -152,8 +152,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_relation_fequal">brand_relation_fequal</a></span> {<span class="id">br</span>₁ <span class="id">br</span>₂}:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">br</span>₁ = @<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">br</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">br</span>₁ = <span class="id">br</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof759')">Proof.</div>
-<div class="proofscript" id="proof759">
+<div class="toggleproof" onclick="toggleDisplay('proof761')">Proof.</div>
+<div class="proofscript" id="proof761">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">br</span>₁; <span class="tactic">destruct</span> <span class="id">br</span>₂; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_ext">brand_relation_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -164,8 +164,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> \/ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>,<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#h">h</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sub_brand_dec">sub_brand_dec</a></span> <span class="id">br</span> <span class="id">a</span> <span class="id">b</span> : {<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#br">br</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#br">br</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof760')">Proof.</div>
-<div class="proofscript" id="proof760">
+<div class="toggleproof" onclick="toggleDisplay('proof762')">Proof.</div>
+<div class="proofscript" id="proof762">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">a</span> == <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>; <span class="tactic">intuition</span>.<br/>
@@ -175,22 +175,22 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="sub_brand_refl">sub_brand_refl</a></span> <span class="id">br</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Reflexive">Reflexive</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#br">br</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof761')">Proof.</div>
-<div class="proofscript" id="proof761">
+<div class="toggleproof" onclick="toggleDisplay('proof763')">Proof.</div>
+<div class="proofscript" id="proof763">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="sub_brand_pre">sub_brand_pre</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof762')">Proof.</div>
-<div class="proofscript" id="proof762">
+<div class="toggleproof" onclick="toggleDisplay('proof764')">Proof.</div>
+<div class="proofscript" id="proof764">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>; <span class="tactic">intuition</span>; <span class="tactic">subst</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans">brand_relation_trans</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">H2</span> <span class="id">H0</span>); <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="sub_brand_part">sub_brand_part</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof763')">Proof.</div>
-<div class="proofscript" id="proof763">
+<div class="toggleproof" onclick="toggleDisplay('proof765')">Proof.</div>
+<div class="proofscript" id="proof765">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#relation_equivalence">relation_equivalence</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#relation_conjunction">relation_conjunction</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#predicate_equivalence">predicate_equivalence</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#predicate_intersection">predicate_intersection</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#flip">Basics.flip</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">split</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">intuition</span>; <span class="tactic">subst</span>; <span class="tactic">trivial</span>.<br/>
@@ -201,8 +201,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#z">z</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#z">z</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof764')">Proof.</div>
-<div class="proofscript" id="proof764">
+<div class="toggleproof" onclick="toggleDisplay('proof766')">Proof.</div>
+<div class="proofscript" id="proof766">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> [?|?] ?; <span class="tactic">subst</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans">brand_relation_trans</a></span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -211,8 +211,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#z">z</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#z">z</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof765')">Proof.</div>
-<div class="proofscript" id="proof765">
+<div class="toggleproof" onclick="toggleDisplay('proof767')">Proof.</div>
+<div class="proofscript" id="proof767">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> ? [?|?]; <span class="tactic">subst</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_trans">brand_relation_trans</a></span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -222,16 +222,16 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sub_brands_dec">sub_brands_dec</a></span> <span class="id">br</span> <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#br">br</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#br">br</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof766')">Proof.</div>
-<div class="proofscript" id="proof766">
+<div class="toggleproof" onclick="toggleDisplay('proof768')">Proof.</div>
+<div class="proofscript" id="proof768">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#forall_in_dec">forall_in_dec</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#exists_in_dec">exists_in_dec</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand_dec">sub_brand_dec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="sub_brands_pre">sub_brands_pre</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof767')">Proof.</div>
-<div class="proofscript" id="proof767">
+<div class="toggleproof" onclick="toggleDisplay('proof769')">Proof.</div>
+<div class="proofscript" id="proof769">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">exists</span> <span class="id">y</span>; <span class="tactic">intuition</span>.<br/>
@@ -244,8 +244,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="incl_sub_brands">incl_sub_brands</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof768')">Proof.</div>
-<div class="proofscript" id="proof768">
+<div class="toggleproof" onclick="toggleDisplay('proof770')">Proof.</div>
+<div class="proofscript" id="proof770">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">y</span>; <span class="tactic">intuition</span>.<br/>
@@ -256,24 +256,24 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="equiv_brands_sub_subr">equiv_brands_sub_subr</a></span>  (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#subrelation">subrelation</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>) (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof769')">Proof.</div>
-<div class="proofscript" id="proof769">
+<div class="toggleproof" onclick="toggleDisplay('proof771')">Proof.</div>
+<div class="proofscript" id="proof771">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="equiv_brands_sub_flip_subr">equiv_brands_sub_flip_subr</a></span>  (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#subrelation">subrelation</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#flip">flip</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof770')">Proof.</div>
-<div class="proofscript" id="proof770">
+<div class="toggleproof" onclick="toggleDisplay('proof772')">Proof.</div>
+<div class="proofscript" id="proof772">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="equiv_brands_dec">equiv_brands_dec</a></span> <span class="id">br</span> <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#br">br</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#br">br</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof771')">Proof.</div>
-<div class="proofscript" id="proof771">
+<div class="toggleproof" onclick="toggleDisplay('proof773')">Proof.</div>
+<div class="proofscript" id="proof773">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands_dec">sub_brands_dec</a></span> <span class="id">br</span> <span class="id">a</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands_dec">sub_brands_dec</a></span> <span class="id">br</span> <span class="id">b</span> <span class="id">a</span>).<br/>
@@ -284,8 +284,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="equiv_brands_equiv">equiv_brands_equiv</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof772')">Proof.</div>
-<div class="proofscript" id="proof772">
+<div class="toggleproof" onclick="toggleDisplay('proof774')">Proof.</div>
+<div class="proofscript" id="proof774">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intuition</span>.<br/>
@@ -295,16 +295,16 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="equiv_brands_eqdec">equiv_brands_eqdec</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof773')">Proof.</div>
-<div class="proofscript" id="proof773">
+<div class="toggleproof" onclick="toggleDisplay('proof775')">Proof.</div>
+<div class="proofscript" id="proof775">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands_dec">equiv_brands_dec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="equivlist_equiv_brands">equivlist_equiv_brands</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#subrelation">subrelation</a></span> <span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist">equivlist</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof774')">Proof.</div>
-<div class="proofscript" id="proof774">
+<div class="toggleproof" onclick="toggleDisplay('proof776')">Proof.</div>
+<div class="proofscript" id="proof776">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#incl_sub_brands">incl_sub_brands</a></span>;<br/>
@@ -313,8 +313,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="sub_brands_part">sub_brands_part</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>) (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof775')">Proof.</div>
-<div class="proofscript" id="proof775">
+<div class="toggleproof" onclick="toggleDisplay('proof777')">Proof.</div>
+<div class="proofscript" id="proof777">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#relation_equivalence">relation_equivalence</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#predicate_equivalence">predicate_equivalence</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#relation_conjunction">relation_conjunction</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#predicate_intersection">predicate_intersection</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#flip">Basics.flip</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>. <span class="tactic">intuition</span>.<br/>
@@ -325,8 +325,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> ==&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#app">app</a></span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof776')">Proof.</div>
-<div class="proofscript" id="proof776">
+<div class="toggleproof" onclick="toggleDisplay('proof778')">Proof.</div>
+<div class="proofscript" id="proof778">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="kwd">in</span> *; <span class="tactic">intros</span> <span class="id">a</span> <span class="id">ain</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_app_iff">in_app_iff</a></span> <span class="kwd">in</span> <span class="id">ain</span>.<br/>
@@ -342,21 +342,21 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> ==&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#app">app</a></span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof777')">Proof.</div>
-<div class="proofscript" id="proof777">
+<div class="toggleproof" onclick="toggleDisplay('proof779')">Proof.</div>
+<div class="proofscript" id="proof779">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands_app_proper">sub_brands_app_proper</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="sub_brands_any">sub_brands_any</a></span> <span class="id">hs</span> <span class="id">b</span> : <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#any">any</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof778')">Proof.</div>
-<div class="proofscript" id="proof778">
+<div class="toggleproof" onclick="toggleDisplay('proof780')">Proof.</div>
+<div class="proofscript" id="proof780">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="any_sub_brands">any_sub_brands</a></span> <span class="id">hs</span> <span class="id">b</span> : <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#any">any</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#any">any</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof779')">Proof.</div>
-<div class="proofscript" id="proof779">
+<div class="toggleproof" onclick="toggleDisplay('proof781')">Proof.</div>
+<div class="proofscript" id="proof781">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#any">any</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">trivial</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">H</span> <span class="id">b</span>); <span class="tactic">simpl</span>; <span class="tactic">intuition</span>.<br/>
@@ -372,8 +372,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="parents_In">parents_In</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">s</span> <span class="id">a</span>:<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#s">s</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#parents">parents</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) &lt;-&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>,<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#s">s</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof780')">Proof.</div>
-<div class="proofscript" id="proof780">
+<div class="toggleproof" onclick="toggleDisplay('proof782')">Proof.</div>
+<div class="proofscript" id="proof782">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#parents">parents</a></span>. <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intros</span> <span class="id">inn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_map_iff">in_map_iff</a></span> <span class="kwd">in</span> <span class="id">inn</span>.<br/>
@@ -393,8 +393,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="parents_and_self_In">parents_and_self_In</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">s</span>:<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#s">s</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#parents_and_self">parents_and_self</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) &lt;-&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof781')">Proof.</div>
-<div class="proofscript" id="proof781">
+<div class="toggleproof" onclick="toggleDisplay('proof783')">Proof.</div>
+<div class="proofscript" id="proof783">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#parents_and_self">parents_and_self</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">split</span>; <span class="tactic">intuition</span>; <span class="id">right</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#parents_In">parents_In</a></span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -404,8 +404,8 @@ Defined.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="incl_explode_brands">incl_explode_brands</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof782')">Proof.</div>
-<div class="proofscript" id="proof782">
+<div class="toggleproof" onclick="toggleDisplay('proof784')">Proof.</div>
+<div class="proofscript" id="proof784">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">inn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_flat_map">in_flat_map</a></span>; <span class="tactic">simpl</span>; <span class="tactic">eauto</span>.<br/>
@@ -414,8 +414,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="sub_explode_brands">sub_explode_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof783')">Proof.</div>
-<div class="proofscript" id="proof783">
+<div class="toggleproof" onclick="toggleDisplay('proof785')">Proof.</div>
+<div class="proofscript" id="proof785">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#incl_sub_brands">incl_sub_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#incl_explode_brands">incl_explode_brands</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -423,8 +423,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="explode_brands_sub">explode_brands_sub</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof784')">Proof.</div>
-<div class="proofscript" id="proof784">
+<div class="toggleproof" onclick="toggleDisplay('proof786')">Proof.</div>
+<div class="proofscript" id="proof786">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">inn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_flat_map">in_flat_map</a></span> <span class="kwd">in</span> <span class="id">inn</span>.<br/>
@@ -436,8 +436,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="explode_brands_equivbrands">explode_brands_equivbrands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof785')">Proof.</div>
-<div class="proofscript" id="proof785">
+<div class="toggleproof" onclick="toggleDisplay('proof787')">Proof.</div>
+<div class="proofscript" id="proof787">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>; <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_explode_brands">sub_explode_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands_sub">explode_brands_sub</a></span>.<br/>
@@ -445,8 +445,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="explode_brands_proper">explode_brands_proper</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> ==&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>) (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof786')">Proof.</div>
-<div class="proofscript" id="proof786">
+<div class="toggleproof" onclick="toggleDisplay('proof788')">Proof.</div>
+<div class="proofscript" id="proof788">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands_equivbrands">explode_brands_equivbrands</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -458,16 +458,16 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof787')">Proof.</div>
-<div class="proofscript" id="proof787">
+<div class="toggleproof" onclick="toggleDisplay('proof789')">Proof.</div>
+<div class="proofscript" id="proof789">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands_equivbrands">explode_brands_equivbrands</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="explode_brands_incl">explode_brands_incl</a></span> <span class="id">hs</span> <span class="id">b</span> <span class="id">a</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof788')">Proof.</div>
-<div class="proofscript" id="proof788">
+<div class="toggleproof" onclick="toggleDisplay('proof790')">Proof.</div>
+<div class="proofscript" id="proof790">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span>. <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_flat_map">in_flat_map</a></span>.<br/>
@@ -479,8 +479,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="explode_brands_properequiv">explode_brands_properequiv</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist">equivlist</a></span>) (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof789')">Proof.</div>
-<div class="proofscript" id="proof789">
+<div class="toggleproof" onclick="toggleDisplay('proof791')">Proof.</div>
+<div class="proofscript" id="proof791">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist_incls">equivlist_incls</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">H0</span>.<br/>
@@ -494,8 +494,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof790')">Proof.</div>
-<div class="proofscript" id="proof790">
+<div class="toggleproof" onclick="toggleDisplay('proof792')">Proof.</div>
+<div class="proofscript" id="proof792">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist_incls">equivlist_incls</a></span>; <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands_incl">explode_brands_incl</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">transitivity</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">a</span>);<br/>
@@ -506,8 +506,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="explode_brands_app_incl">explode_brands_app_incl</a></span> <span class="id">hs</span> <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>++<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof791')">Proof.</div>
-<div class="proofscript" id="proof791">
+<div class="toggleproof" onclick="toggleDisplay('proof793')">Proof.</div>
+<div class="proofscript" id="proof793">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">xin</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_flat_map">in_flat_map</a></span> <span class="kwd">in</span> <span class="id">xin</span>.<br/>
@@ -527,16 +527,16 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="collapse_brands_sublist">collapse_brands_sublist</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof792')">Proof.</div>
-<div class="proofscript" id="proof792">
+<div class="toggleproof" onclick="toggleDisplay('proof794')">Proof.</div>
+<div class="proofscript" id="proof794">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Sublist.html#filter_sublist">filter_sublist</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="collapse_brands_incl">collapse_brands_incl</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof793')">Proof.</div>
-<div class="proofscript" id="proof793">
+<div class="toggleproof" onclick="toggleDisplay('proof795')">Proof.</div>
+<div class="proofscript" id="proof795">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Sublist.html#sublist_incl_sub">sublist_incl_sub</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands_sublist">collapse_brands_sublist</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -545,8 +545,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l1">l1</a></span> ++ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> ||<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l2">l2</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof794')">Proof.</div>
-<div class="proofscript" id="proof794">
+<div class="toggleproof" onclick="toggleDisplay('proof796')">Proof.</div>
+<div class="proofscript" id="proof796">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#existsb_app">existsb_app</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -554,8 +554,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nosub_collapse_brands">nosub_collapse_brands</a></span> <span class="id">hs</span> <span class="id">a</span> : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt; ~ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof795')">Proof.</div>
-<div class="proofscript" id="proof795">
+<div class="toggleproof" onclick="toggleDisplay('proof797')">Proof.</div>
+<div class="proofscript" id="proof797">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#true_filter">true_filter</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span>; <span class="tactic">intros</span>.<br/>
@@ -567,8 +567,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="collapse_brands_nosub">collapse_brands_nosub</a></span> <span class="id">hs</span> <span class="id">a</span> : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt; ~ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof796')">Proof.</div>
-<div class="proofscript" id="proof796">
+<div class="toggleproof" onclick="toggleDisplay('proof798')">Proof.</div>
+<div class="proofscript" id="proof798">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#filter_id_implies_pred">filter_id_implies_pred</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">H</span> <span class="id">_</span> <span class="id">H1</span>); <span class="tactic">intros</span> <span class="id">fall</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="kwd">in</span> <span class="id">fall</span>.<br/>
@@ -579,16 +579,16 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="has_subtype_in_single">has_subtype_in_single</a></span> <span class="id">hs</span> <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> = <span class="kwd">if</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_dec">in_dec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>,<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="kwd">then</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> <span class="kwd">else</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof797')">Proof.</div>
-<div class="proofscript" id="proof797">
+<div class="toggleproof" onclick="toggleDisplay('proof799')">Proof.</div>
+<div class="proofscript" id="proof799">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#orb_comm">orb_comm</a></span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="has_subtype_in_not_self">has_subtype_in_not_self</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof798')">Proof.</div>
-<div class="proofscript" id="proof798">
+<div class="toggleproof" onclick="toggleDisplay('proof800')">Proof.</div>
+<div class="proofscript" id="proof800">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in_single">has_subtype_in_single</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_irrefl">brand_relation_irrefl</a></span> <span class="kwd">in</span> <span class="id">i</span>.<br/>
@@ -597,8 +597,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="collapse_brands_singleton">collapse_brands_singleton</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">bb</span>:<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#bb">bb</a></span>) = <span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#bb">bb</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof799')">Proof.</div>
-<div class="proofscript" id="proof799">
+<div class="toggleproof" onclick="toggleDisplay('proof801')">Proof.</div>
+<div class="proofscript" id="proof801">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#true_filter">true_filter</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -612,8 +612,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="has_subtype_in_cons_self">has_subtype_in_cons_self</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> <span class="id">l</span> : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> :: <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l">l</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l">l</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof800')">Proof.</div>
-<div class="proofscript" id="proof800">
+<div class="toggleproof" onclick="toggleDisplay('proof802')">Proof.</div>
+<div class="proofscript" id="proof802">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">replace</span> (<span class="id">a</span>::<span class="id">l</span>) <span class="kwd">with</span> ((<span class="id">a</span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)++<span class="id">l</span>) <span class="tactic">by</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in_app">has_subtype_in_app</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in_not_self">has_subtype_in_not_self</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -625,8 +625,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id">y</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brand">sub_brand</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">y</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id">y</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof801')">Proof.</div>
-<div class="proofscript" id="proof801">
+<div class="toggleproof" onclick="toggleDisplay('proof803')">Proof.</div>
+<div class="proofscript" id="proof803">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_dec">in_dec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">x</span> <span class="id">a0</span>).<br/>
@@ -679,8 +679,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof802')">Proof.</div>
-<div class="proofscript" id="proof802">
+<div class="toggleproof" onclick="toggleDisplay('proof804')">Proof.</div>
+<div class="proofscript" id="proof804">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in_least">has_subtype_in_least</a></span> <span class="id">H0</span>) <span class="kwd">as</span> [<span class="id">x</span> [<span class="id">innx</span> [<span class="id">subx</span> <span class="id">nsubx</span>]]].<br/>
@@ -695,8 +695,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="collapse_brands_sub">collapse_brands_sub</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof803')">Proof.</div>
-<div class="proofscript" id="proof803">
+<div class="toggleproof" onclick="toggleDisplay('proof805')">Proof.</div>
+<div class="proofscript" id="proof805">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#incl_sub_brands">incl_sub_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands_incl">collapse_brands_incl</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;Qed.</div>
@@ -706,8 +706,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof804')">Proof.</div>
-<div class="proofscript" id="proof804">
+<div class="toggleproof" onclick="toggleDisplay('proof806')">Proof.</div>
+<div class="proofscript" id="proof806">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span>; <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_collapse_brands">sub_collapse_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands_sub">collapse_brands_sub</a></span>.<br/>
@@ -718,8 +718,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#x">x</a></span>,<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#y">y</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof805')">Proof.</div>
-<div class="proofscript" id="proof805">
+<div class="toggleproof" onclick="toggleDisplay('proof807')">Proof.</div>
+<div class="proofscript" id="proof807">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span>. <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter_In">filter_In</a></span> <span class="kwd">in</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">H1</span> <span class="kwd">as</span> [<span class="id">iny</span> <span class="id">nhasy</span>].<br/>
@@ -730,8 +730,8 @@ Defined.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="collapse_brands_proper">collapse_brands_proper</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> ==&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>) (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof806')">Proof.</div>
-<div class="proofscript" id="proof806">
+<div class="toggleproof" onclick="toggleDisplay('proof808')">Proof.</div>
+<div class="proofscript" id="proof808">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands_equivbrands">collapse_brands_equivbrands</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -743,15 +743,15 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof807')">Proof.</div>
-<div class="proofscript" id="proof807">
+<div class="toggleproof" onclick="toggleDisplay('proof809')">Proof.</div>
+<div class="proofscript" id="proof809">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands_equivbrands">collapse_brands_equivbrands</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="existsb_app">existsb_app</a></span> {<span class="id">A</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#A">A</a></span>-&gt;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>) <span class="id">l1</span> <span class="id">l2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#existsb">existsb</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#f">f</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l1">l1</a></span> ++ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l2">l2</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#existsb">existsb</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#f">f</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l1">l1</a></span> || <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#existsb">existsb</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#f">f</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#l2">l2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof808')">Proof.</div>
-<div class="proofscript" id="proof808">
+<div class="toggleproof" onclick="toggleDisplay('proof810')">Proof.</div>
+<div class="proofscript" id="proof810">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHl1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#orb_assoc">orb_assoc</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -760,8 +760,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="collapse_brands_idempotent">collapse_brands_idempotent</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof809')">Proof.</div>
-<div class="proofscript" id="proof809">
+<div class="toggleproof" onclick="toggleDisplay('proof811')">Proof.</div>
+<div class="proofscript" id="proof811">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#true_filter">true_filter</a></span>; <span class="tactic">intros</span> <span class="id">x</span> <span class="id">inn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter_In">filter_In</a></span> <span class="kwd">in</span> <span class="id">inn</span>.<br/>
@@ -779,8 +779,8 @@ Defined.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="sort_brands_equiv">sort_brands_equiv</a></span> <span class="id">hs</span> <span class="id">a</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort">insertion_sort</a></span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof810')">Proof.</div>
-<div class="proofscript" id="proof810">
+<div class="toggleproof" onclick="toggleDisplay('proof812')">Proof.</div>
+<div class="proofscript" id="proof812">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equivlist_equiv_brands">equivlist_equiv_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort_trich_equiv">insertion_sort_trich_equiv</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.trichotemy">StringOrder.trichotemy</a></span>.<br/>
@@ -791,8 +791,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="canon_brands_singleton">canon_brands_singleton</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">bb</span>:<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#bb">bb</a></span>) = <span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#bb">bb</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof811')">Proof.</div>
-<div class="proofscript" id="proof811">
+<div class="toggleproof" onclick="toggleDisplay('proof813')">Proof.</div>
+<div class="proofscript" id="proof813">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands_singleton">collapse_brands_singleton</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -803,8 +803,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof812')">Proof.</div>
-<div class="proofscript" id="proof812">
+<div class="toggleproof" onclick="toggleDisplay('proof814')">Proof.</div>
+<div class="proofscript" id="proof814">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sort_brands_equiv">sort_brands_equiv</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands_equivbrands">collapse_brands_equivbrands</a></span>.<br/>
@@ -812,8 +812,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="has_subtype_in_proper_equivlist">has_subtype_in_proper_equivlist</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist">equivlist</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof813')">Proof.</div>
-<div class="proofscript" id="proof813">
+<div class="toggleproof" onclick="toggleDisplay('proof815')">Proof.</div>
+<div class="proofscript" id="proof815">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#has_subtype_in">has_subtype_in</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">goal</span> <span class="kwd">with</span><br/>
@@ -832,8 +832,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="collapse_sort_brands_commute">collapse_sort_brands_commute</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>)<br/>
 &nbsp;&nbsp;: <span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort">insertion_sort</a></span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort">insertion_sort</a></span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof814')">Proof.</div>
-<div class="proofscript" id="proof814">
+<div class="toggleproof" onclick="toggleDisplay('proof816')">Proof.</div>
+<div class="proofscript" id="proof816">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_brands">collapse_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#sort_filter_commute">sort_filter_commute</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">f_equal</span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#filter_eq">filter_eq</a></span>; <span class="tactic">intros</span>.<br/>
@@ -845,8 +845,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="canon_brands_incl">canon_brands_incl</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#incl">incl</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof815')">Proof.</div>
-<div class="proofscript" id="proof815">
+<div class="toggleproof" onclick="toggleDisplay('proof817')">Proof.</div>
+<div class="proofscript" id="proof817">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> ? <span class="id">xin</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#in_insertion_sort">in_insertion_sort</a></span> <span class="kwd">in</span> <span class="id">xin</span>.<br/>
@@ -861,8 +861,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="canon_brands_is_canon_brands">canon_brands_is_canon_brands</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof816')">Proof.</div>
-<div class="proofscript" id="proof816">
+<div class="toggleproof" onclick="toggleDisplay('proof818')">Proof.</div>
+<div class="proofscript" id="proof818">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span>. <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted_Sorted_iff">is_list_sorted_Sorted_iff</a></span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort_Sorted">insertion_sort_Sorted</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_sort_brands_commute">collapse_sort_brands_commute</a></span>.<br/>
@@ -880,8 +880,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span> <span class="id">hs</span> <span class="id">a</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof817')">Proof.</div>
-<div class="proofscript" id="proof817">
+<div class="toggleproof" onclick="toggleDisplay('proof819')">Proof.</div>
+<div class="proofscript" id="proof819">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span>. <span class="tactic">intros</span> [<span class="id">issort</span> <span class="id">nin</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_sort_brands_commute">collapse_sort_brands_commute</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort_sorted_is_id">insertion_sort_sorted_is_id</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -891,16 +891,16 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="canon_brands_idempotent">canon_brands_idempotent</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof818')">Proof.</div>
-<div class="proofscript" id="proof818">
+<div class="toggleproof" onclick="toggleDisplay('proof820')">Proof.</div>
+<div class="proofscript" id="proof820">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_is_canon_brands">canon_brands_is_canon_brands</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="is_canon_brands_dec">is_canon_brands_dec</a></span> (<span class="id">hs</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>} + {~ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof819')">Proof.</div>
-<div class="proofscript" id="proof819">
+<div class="toggleproof" onclick="toggleDisplay('proof821')">Proof.</div>
+<div class="proofscript" id="proof821">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#list_eqdec">list_eqdec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id">hs</span> <span class="id">a</span>) <span class="id">a</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>. <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">e</span>.  <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_is_canon_brands">canon_brands_is_canon_brands</a></span>.<br/>
@@ -912,8 +912,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="is_canon_brands_singleton">is_canon_brands_singleton</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">bb</span>:<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#brand">brand</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#bb">bb</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof820')">Proof.</div>
-<div class="proofscript" id="proof820">
+<div class="toggleproof" onclick="toggleDisplay('proof822')">Proof.</div>
+<div class="proofscript" id="proof822">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_singleton">canon_brands_singleton</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_is_canon_brands">canon_brands_is_canon_brands</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -922,8 +922,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof821')">Proof.</div>
-<div class="proofscript" id="proof821">
+<div class="toggleproof" onclick="toggleDisplay('proof823')">Proof.</div>
+<div class="proofscript" id="proof823">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Sublist.html#insertion_sort_equivlist">insertion_sort_equivlist</a></span>; [<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#lt_contr1">lt_contr1</a></span> | ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">a</span> <span class="id">b</span> <span class="id">H0</span>.<br/>
@@ -993,8 +993,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="canon_proper">canon_proper</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>) (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof822')">Proof.</div>
-<div class="proofscript" id="proof822">
+<div class="toggleproof" onclick="toggleDisplay('proof824')">Proof.</div>
+<div class="proofscript" id="proof824">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_equiv">canon_equiv</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1004,8 +1004,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof823')">Proof.</div>
-<div class="proofscript" id="proof823">
+<div class="toggleproof" onclick="toggleDisplay('proof825')">Proof.</div>
+<div class="proofscript" id="proof825">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">can</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">can</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_equiv">canon_equiv</a></span>.<br/>
@@ -1016,8 +1016,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="equiv_brands_dec_alt">equiv_brands_dec_alt</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>}<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;+ {~<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof824')">Proof.</div>
-<div class="proofscript" id="proof824">
+<div class="toggleproof" onclick="toggleDisplay('proof826')">Proof.</div>
+<div class="proofscript" id="proof826">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#list_eqdec">list_eqdec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">a</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">b</span>)).<br/>
@@ -1029,8 +1029,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist">equivlist</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof825')">Proof.</div>
-<div class="proofscript" id="proof825">
+<div class="toggleproof" onclick="toggleDisplay('proof827')">Proof.</div>
+<div class="proofscript" id="proof827">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_equiv">canon_brands_equiv</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1039,8 +1039,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> ++ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> ++ <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof826')">Proof.</div>
-<div class="proofscript" id="proof826">
+<div class="toggleproof" onclick="toggleDisplay('proof828')">Proof.</div>
+<div class="proofscript" id="proof828">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_equiv">canon_equiv</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_equiv">canon_brands_equiv</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -1057,8 +1057,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_join_is_canon">brand_join_is_canon</a></span> <span class="id">hs</span> <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof827')">Proof.</div>
-<div class="proofscript" id="proof827">
+<div class="toggleproof" onclick="toggleDisplay('proof829')">Proof.</div>
+<div class="proofscript" id="proof829">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_is_canon_brands">canon_brands_is_canon_brands</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1066,8 +1066,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_join_canon_l">brand_join_canon_l</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof828')">Proof.</div>
-<div class="proofscript" id="proof828">
+<div class="toggleproof" onclick="toggleDisplay('proof830')">Proof.</div>
+<div class="proofscript" id="proof830">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_canon_explode">explode_canon_explode</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1075,8 +1075,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_join_canon_r">brand_join_canon_r</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof829')">Proof.</div>
-<div class="proofscript" id="proof829">
+<div class="toggleproof" onclick="toggleDisplay('proof831')">Proof.</div>
+<div class="proofscript" id="proof831">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_canon_explode">explode_canon_explode</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1084,8 +1084,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="brand_join_idempotent">brand_join_idempotent</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof830')">Proof.</div>
-<div class="proofscript" id="proof830">
+<div class="toggleproof" onclick="toggleDisplay('proof832')">Proof.</div>
+<div class="proofscript" id="proof832">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#set_inter_idempotent">set_inter_idempotent</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands_equivbrands">explode_brands_equivbrands</a></span>.<br/>
@@ -1095,8 +1095,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_join_idempotent_can">brand_join_idempotent_can</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof831')">Proof.</div>
-<div class="proofscript" id="proof831">
+<div class="toggleproof" onclick="toggleDisplay('proof833')">Proof.</div>
+<div class="proofscript" id="proof833">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join_idempotent">brand_join_idempotent</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -1104,8 +1104,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="brand_join_commutative">brand_join_commutative</a></span> <span class="id">hs</span> <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof832')">Proof.</div>
-<div class="proofscript" id="proof832">
+<div class="toggleproof" onclick="toggleDisplay('proof834')">Proof.</div>
+<div class="proofscript" id="proof834">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#collapse_sort_brands_commute">collapse_sort_brands_commute</a></span>.<br/>
@@ -1123,8 +1123,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.ListSet.html#set_inter">set_inter</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof833')">Proof.</div>
-<div class="proofscript" id="proof833">
+<div class="toggleproof" onclick="toggleDisplay('proof835')">Proof.</div>
+<div class="proofscript" id="proof835">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist_incls">equivlist_incls</a></span>; <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intros</span> <span class="id">x</span> <span class="id">xin</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_brands">explode_brands</a></span> <span class="kwd">in</span> *.<br/>
@@ -1154,8 +1154,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#c">c</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof834')">Proof.</div>
-<div class="proofscript" id="proof834">
+<div class="toggleproof" onclick="toggleDisplay('proof836')">Proof.</div>
+<div class="proofscript" id="proof836">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_canon_explode">explode_canon_explode</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#set_inter_preserves_explode_brands">set_inter_preserves_explode_brands</a></span>.<br/>
@@ -1167,8 +1167,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof835')">Proof.</div>
-<div class="proofscript" id="proof835">
+<div class="toggleproof" onclick="toggleDisplay('proof837')">Proof.</div>
+<div class="proofscript" id="proof837">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_equiv">canon_equiv</a></span>.<br/>
@@ -1194,8 +1194,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof836')">Proof.</div>
-<div class="proofscript" id="proof836">
+<div class="toggleproof" onclick="toggleDisplay('proof838')">Proof.</div>
+<div class="proofscript" id="proof838">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqq</span> <span class="id">y</span> <span class="id">iny</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_equiv">canon_equiv</a></span> <span class="kwd">in</span> <span class="id">eqq</span>.<br/>
@@ -1217,8 +1217,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> &lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof837')">Proof.</div>
-<div class="proofscript" id="proof837">
+<div class="toggleproof" onclick="toggleDisplay('proof839')">Proof.</div>
+<div class="proofscript" id="proof839">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join_consistent1">brand_join_consistent1</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join_consistent2">brand_join_consistent2</a></span>.<br/>
@@ -1228,8 +1228,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> &lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof838')">Proof.</div>
-<div class="proofscript" id="proof838">
+<div class="toggleproof" onclick="toggleDisplay('proof840')">Proof.</div>
+<div class="proofscript" id="proof840">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join_consistent">brand_join_consistent</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -1245,8 +1245,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_meet_is_canon">brand_meet_is_canon</a></span> <span class="id">hs</span> <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#hs">hs</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof839')">Proof.</div>
-<div class="proofscript" id="proof839">
+<div class="toggleproof" onclick="toggleDisplay('proof841')">Proof.</div>
+<div class="proofscript" id="proof841">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_is_canon_brands">canon_brands_is_canon_brands</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1254,8 +1254,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_meet_canon_l">brand_meet_canon_l</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>) <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof840')">Proof.</div>
-<div class="proofscript" id="proof840">
+<div class="toggleproof" onclick="toggleDisplay('proof842')">Proof.</div>
+<div class="proofscript" id="proof842">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_canon_brands_app1">canon_brands_canon_brands_app1</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1263,8 +1263,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_meet_canon_r">brand_meet_canon_r</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof841')">Proof.</div>
-<div class="proofscript" id="proof841">
+<div class="toggleproof" onclick="toggleDisplay('proof843')">Proof.</div>
+<div class="proofscript" id="proof843">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#app_commutative_equivlist">app_commutative_equivlist</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_canon_brands_app1">canon_brands_canon_brands_app1</a></span>.<br/>
@@ -1274,8 +1274,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="brand_meet_idempotent">brand_meet_idempotent</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof842')">Proof.</div>
-<div class="proofscript" id="proof842">
+<div class="toggleproof" onclick="toggleDisplay('proof844')">Proof.</div>
+<div class="proofscript" id="proof844">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#app_idempotent_equivlist">app_idempotent_equivlist</a></span>.<br/>
@@ -1285,8 +1285,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="brand_meet_idempotent_can">brand_meet_idempotent_can</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} <span class="id">a</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof843')">Proof.</div>
-<div class="proofscript" id="proof843">
+<div class="toggleproof" onclick="toggleDisplay('proof845')">Proof.</div>
+<div class="proofscript" id="proof845">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet_idempotent">brand_meet_idempotent</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -1294,8 +1294,8 @@ Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="brand_meet_commutative">brand_meet_commutative</a></span> `{<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>}  <span class="id">a</span> <span class="id">b</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof844')">Proof.</div>
-<div class="proofscript" id="proof844">
+<div class="toggleproof" onclick="toggleDisplay('proof846')">Proof.</div>
+<div class="proofscript" id="proof846">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#app_commutative_equivlist">app_commutative_equivlist</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
@@ -1307,8 +1307,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#c">c</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof845')">Proof.</div>
-<div class="proofscript" id="proof845">
+<div class="toggleproof" onclick="toggleDisplay('proof847')">Proof.</div>
+<div class="proofscript" id="proof847">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.                  <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#app_commutative_equivlist">app_commutative_equivlist</a></span> <span class="id">a</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id">b</span> ++ <span class="id">c</span>))).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_canon_brands_app1">canon_brands_canon_brands_app1</a></span>.<br/>
@@ -1321,8 +1321,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof846')">Proof.</div>
-<div class="proofscript" id="proof846">
+<div class="toggleproof" onclick="toggleDisplay('proof848')">Proof.</div>
+<div class="proofscript" id="proof848">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_equiv">canon_equiv</a></span>.<br/>
@@ -1337,8 +1337,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof847')">Proof.</div>
-<div class="proofscript" id="proof847">
+<div class="toggleproof" onclick="toggleDisplay('proof849')">Proof.</div>
+<div class="proofscript" id="proof849">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqq</span> <span class="id">y</span> <span class="id">iny</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_equiv">canon_equiv</a></span> <span class="kwd">in</span> <span class="id">eqq</span>.<br/>
@@ -1353,8 +1353,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> &lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof848')">Proof.</div>
-<div class="proofscript" id="proof848">
+<div class="toggleproof" onclick="toggleDisplay('proof850')">Proof.</div>
+<div class="proofscript" id="proof850">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet_consistent1">brand_meet_consistent1</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet_consistent2">brand_meet_consistent2</a></span>.<br/>
@@ -1364,8 +1364,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands">is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> &lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b2">b2</a></span> = <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof849')">Proof.</div>
-<div class="proofscript" id="proof849">
+<div class="toggleproof" onclick="toggleDisplay('proof851')">Proof.</div>
+<div class="proofscript" id="proof851">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet_consistent">brand_meet_consistent</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -1381,8 +1381,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof850')">Proof.</div>
-<div class="proofscript" id="proof850">
+<div class="toggleproof" onclick="toggleDisplay('proof852')">Proof.</div>
+<div class="proofscript" id="proof852">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#explode_canon_explode">explode_canon_explode</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#set_inter_contained">set_inter_contained</a></span>.<br/>
@@ -1397,8 +1397,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof851')">Proof.</div>
-<div class="proofscript" id="proof851">
+<div class="toggleproof" onclick="toggleDisplay('proof853')">Proof.</div>
+<div class="proofscript" id="proof853">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join_absorptive">brand_join_absorptive</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -1407,8 +1407,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof852')">Proof.</div>
-<div class="proofscript" id="proof852">
+<div class="toggleproof" onclick="toggleDisplay('proof854')">Proof.</div>
+<div class="proofscript" id="proof854">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">replace</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">a</span> ++<br/>
@@ -1438,8 +1438,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#b">b</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof853')">Proof.</div>
-<div class="proofscript" id="proof853">
+<div class="toggleproof" onclick="toggleDisplay('proof855')">Proof.</div>
+<div class="proofscript" id="proof855">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet_absorptive">brand_meet_absorptive</a></span>, <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_canon_brands">is_canon_brands_canon_brands</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -1453,8 +1453,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;:= { <span class="id"><a href="Qcert.Utils.Lattice.html#meet">meet</a></span>:=<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lattice.html#join">join</a></span>:=<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof854')">Proof.</div>
-<div class="proofscript" id="proof854">
+<div class="toggleproof" onclick="toggleDisplay('proof856')">Proof.</div>
+<div class="proofscript" id="proof856">
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H</span>, <span class="id">H0</span>.<br/>
@@ -1480,8 +1480,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="brands_olattice">brands_olattice</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lattice.html#OLattice">OLattice</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#equiv_brands">equiv_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>) (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#sub_brands">sub_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof855')">Proof.</div>
-<div class="proofscript" id="proof855">
+<div class="toggleproof" onclick="toggleDisplay('proof857')">Proof.</div>
+<div class="proofscript" id="proof857">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lattice.html#part_le">part_le</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet_consistent">brand_meet_consistent</a></span>.<br/>
@@ -1498,8 +1498,8 @@ Defined.</div>
 &nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands_lattice">brands_lattice</a></span>.<br/>
 &nbsp;&nbsp;<br/>
 &nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="brand_relation_eqdec">brand_relation_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof856')">Proof.</div>
-<div class="proofscript" id="proof856">
+<div class="toggleproof" onclick="toggleDisplay('proof858')">Proof.</div>
+<div class="proofscript" id="proof858">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (@<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">x</span> == @<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">y</span>).<br/>

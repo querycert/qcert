@@ -37,31 +37,31 @@
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_join_open_l">record_kind_rtype_join_open_l</a></span> {<span class="id">B</span>} <span class="id">k</span> <span class="id">l</span>₁ <span class="id">l</span>₂:<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="kwd">Open</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂ = <span class="kwd">Open</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1140')">Proof.</div>
-<div class="proofscript" id="proof1140">
+<div class="toggleproof" onclick="toggleDisplay('proof1154')">Proof.</div>
+<div class="proofscript" id="proof1154">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_join_open_r">record_kind_rtype_join_open_r</a></span> {<span class="id">B</span>} <span class="id">k</span> <span class="id">l</span>₁ <span class="id">l</span>₂:<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="kwd">Open</span> <span class="id">l</span>₁ <span class="id">l</span>₂ = <span class="kwd">Open</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1141')">Proof.</div>
-<div class="proofscript" id="proof1141">
+<div class="toggleproof" onclick="toggleDisplay('proof1155')">Proof.</div>
+<div class="proofscript" id="proof1155">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_join_closed_inv">record_kind_rtype_join_closed_inv</a></span> {<span class="id">B</span>} <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂:<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">k</span>₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> /\ <span class="id">k</span>₂ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> /\ <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁ = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1142')">Proof.</div>
-<div class="proofscript" id="proof1142">
+<div class="toggleproof" onclick="toggleDisplay('proof1156')">Proof.</div>
+<div class="proofscript" id="proof1156">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂)); <span class="tactic">intuition</span> <span class="tactic">congruence</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_join_idempotent">record_kind_rtype_join_idempotent</a></span> {<span class="id">B</span>} <span class="id">k</span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l">l</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l">l</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1143')">Proof.</div>
-<div class="proofscript" id="proof1143">
+<div class="toggleproof" onclick="toggleDisplay('proof1157')">Proof.</div>
+<div class="proofscript" id="proof1157">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> ((<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>) == (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>));<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
@@ -70,16 +70,16 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_join_comm_kind">record_kind_rtype_join_comm_kind</a></span> {<span class="id">B</span>} <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂ :<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂ =<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id">k</span>₂ <span class="id">k</span>₁ <span class="id">l</span>₁ <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1144')">Proof.</div>
-<div class="proofscript" id="proof1144">
+<div class="toggleproof" onclick="toggleDisplay('proof1158')">Proof.</div>
+<div class="proofscript" id="proof1158">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_join_comm_list">record_kind_rtype_join_comm_list</a></span> {<span class="id">B</span>} <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂ :<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂ =<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₂ <span class="id">l</span>₁.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1145')">Proof.</div>
-<div class="proofscript" id="proof1145">
+<div class="toggleproof" onclick="toggleDisplay('proof1159')">Proof.</div>
+<div class="proofscript" id="proof1159">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> ((<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁) == (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂));<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> ((<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂) == (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁));<br/>
@@ -89,8 +89,8 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_join_comm">record_kind_rtype_join_comm</a></span> {<span class="id">B</span>} <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂ :<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂ =<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id">k</span>₂ <span class="id">k</span>₁ <span class="id">l</span>₂ <span class="id">l</span>₁.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1146')">Proof.</div>
-<div class="proofscript" id="proof1146">
+<div class="toggleproof" onclick="toggleDisplay('proof1160')">Proof.</div>
+<div class="proofscript" id="proof1160">
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join_comm_kind">record_kind_rtype_join_comm_kind</a></span>;<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join_comm_list">record_kind_rtype_join_comm_list</a></span>;<br/>
 &nbsp;&nbsp;<span class="tactic">trivial</span>.  <br/>
@@ -109,8 +109,8 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_compatible_records_dec">rtype_meet_compatible_records_dec</a></span> {<span class="id">A</span> <span class="id">B</span>} (<span class="id">k</span>₁ <span class="id">k</span>₂:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#record_kind">record_kind</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">l</span>₁:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#A">A</a></span>)) (<span class="id">l</span>₂:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂}  + {~ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1147')">Proof.</div>
-<div class="proofscript" id="proof1147">
+<div class="toggleproof" onclick="toggleDisplay('proof1161')">Proof.</div>
+<div class="proofscript" id="proof1161">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂.<br/>
 &nbsp;&nbsp;- <span class="id">left</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Sublist.html#sublist_dec">sublist_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂)).<br/>
@@ -134,28 +134,28 @@ Defined.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_compatible_records_idempotent">rtype_meet_compatible_records_idempotent</a></span> {<span class="id">B</span>} <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">r</span> :<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1148')">Proof.</div>
-<div class="proofscript" id="proof1148">
+<div class="toggleproof" onclick="toggleDisplay('proof1162')">Proof.</div>
+<div class="proofscript" id="proof1162">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_meet_idempotent">record_kind_rtype_meet_idempotent</a></span> <span class="id">k</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1149')">Proof.</div>
-<div class="proofscript" id="proof1149">
+<div class="toggleproof" onclick="toggleDisplay('proof1163')">Proof.</div>
+<div class="proofscript" id="proof1163">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>; <span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_compatible_records_commutative">rtype_meet_compatible_records_commutative</a></span> {<span class="id">A</span> <span class="id">B</span>} <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">r</span>₁ <span class="id">r</span>₂:<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#A">A</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">r</span>₁ <span class="id">r</span>₂ -&gt;<br/>
 &nbsp;&nbsp;@<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#B">B</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#A">A</a></span> <span class="id">k</span>₂ <span class="id">k</span>₁ <span class="id">r</span>₂ <span class="id">r</span>₁.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1150')">Proof.</div>
-<div class="proofscript" id="proof1150">
+<div class="toggleproof" onclick="toggleDisplay('proof1164')">Proof.</div>
+<div class="proofscript" id="proof1164">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_meet_commutative">record_kind_rtype_meet_commutative</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> <span class="id">k</span>₂ <span class="id">k</span>₁.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1151')">Proof.</div>
-<div class="proofscript" id="proof1151">
+<div class="toggleproof" onclick="toggleDisplay('proof1165')">Proof.</div>
+<div class="proofscript" id="proof1165">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
@@ -164,8 +164,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁ = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁' -&gt;<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂<br/>
 &nbsp;&nbsp;=  <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁' <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1152')">Proof.</div>
-<div class="proofscript" id="proof1152">
+<div class="toggleproof" onclick="toggleDisplay('proof1166')">Proof.</div>
+<div class="proofscript" id="proof1166">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">congruence</span>.<br/>
 Qed.</div>
 <br/>
@@ -174,8 +174,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂ = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂' -&gt;<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂<br/>
 &nbsp;&nbsp;=  <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records">rtype_meet_compatible_records</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₁ <span class="id">l</span>₂'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1153')">Proof.</div>
-<div class="proofscript" id="proof1153">
+<div class="toggleproof" onclick="toggleDisplay('proof1167')">Proof.</div>
+<div class="proofscript" id="proof1167">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>₁; <span class="tactic">destruct</span> <span class="id">k</span>₂; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">congruence</span>.<br/>
 Qed.</div>
 <br/>
@@ -183,8 +183,8 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="record_kind_rtype_meet_associative">record_kind_rtype_meet_associative</a></span> <span class="id">k</span> <span class="id">k0</span> <span class="id">k1</span> :<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k0">k0</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k1">k1</a></span><br/>
 &nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k0">k0</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k1">k1</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1154')">Proof.</div>
-<div class="proofscript" id="proof1154">
+<div class="toggleproof" onclick="toggleDisplay('proof1168')">Proof.</div>
+<div class="proofscript" id="proof1168">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>; <span class="tactic">destruct</span> <span class="id">k0</span>; <span class="tactic">destruct</span> <span class="id">k1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
@@ -257,8 +257,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>))) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span>) /\ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1155')">Proof.</div>
-<div class="proofscript" id="proof1155">
+<div class="toggleproof" onclick="toggleDisplay('proof1169')">Proof.</div>
+<div class="proofscript" id="proof1169">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>; <span class="tactic">simpl</span>; [<span class="tactic">intuition</span>|].<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">srl</span> <span class="id">s</span>); [<span class="tactic">intros</span> <span class="id">t</span> <span class="id">teq</span>|<span class="tactic">intuition</span>].<br/>
@@ -278,8 +278,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1156')">Proof.</div>
-<div class="proofscript" id="proof1156">
+<div class="toggleproof" onclick="toggleDisplay('proof1170')">Proof.</div>
+<div class="proofscript" id="proof1170">
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">srl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>; <span class="tactic">simpl</span>; [<span class="tactic">intuition</span>|].<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
@@ -301,8 +301,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">r</span>₁ <span class="id">r</span>₂)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id">rtype_join</span>₀ τ₁ τ₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1157')">Proof.</div>
-<div class="proofscript" id="proof1157">
+<div class="toggleproof" onclick="toggleDisplay('proof1171')">Proof.</div>
+<div class="proofscript" id="proof1171">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>₁; <span class="tactic">simpl</span>; <span class="tactic">auto</span>; <span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>); <span class="tactic">intros</span> <span class="id">lr2</span>.<br/>
@@ -326,8 +326,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">r</span>₁ <span class="id">r</span>₂)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1158')">Proof.</div>
-<div class="proofscript" id="proof1158">
+<div class="toggleproof" onclick="toggleDisplay('proof1172')">Proof.</div>
+<div class="proofscript" id="proof1172">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>₁; <span class="tactic">simpl</span>; <span class="tactic">auto</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
@@ -349,8 +349,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>))) = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1159')">Proof.</div>
-<div class="proofscript" id="proof1159">
+<div class="toggleproof" onclick="toggleDisplay('proof1173')">Proof.</div>
+<div class="proofscript" id="proof1173">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>; <span class="tactic">simpl</span>; [<span class="tactic">intuition</span>|].<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">srl</span> <span class="id">s</span>); [<span class="tactic">intros</span> <span class="id">t</span> <span class="id">teq</span>|<span class="tactic">intuition</span>]; <span class="tactic">simpl</span>;<br/>
@@ -370,8 +370,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span>, <span class="id">r</span>)::<span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">r</span>₁ <span class="id">r</span>₂)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id">rtype_meet</span>₀ τ₁ τ₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1160')">Proof.</div>
-<div class="proofscript" id="proof1160">
+<div class="toggleproof" onclick="toggleDisplay('proof1174')">Proof.</div>
+<div class="proofscript" id="proof1174">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>₁; <span class="tactic">simpl</span>; <span class="tactic">auto</span>; <span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>); <span class="tactic">intros</span> <span class="id">lr2</span>.<br/>
@@ -397,8 +397,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span>, <span class="id">r</span>)::<span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">r</span>₁ <span class="id">r</span>₂)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ₁.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1161')">Proof.</div>
-<div class="proofscript" id="proof1161">
+<div class="toggleproof" onclick="toggleDisplay('proof1175')">Proof.</div>
+<div class="proofscript" id="proof1175">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>₁; <span class="tactic">simpl</span>; <span class="tactic">auto</span>; <span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>); <span class="tactic">intros</span> <span class="id">lr2</span>.<br/>
@@ -423,8 +423,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span>, <span class="id">r</span>)::<span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">r</span>₁ <span class="id">r</span>₂)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1162')">Proof.</div>
-<div class="proofscript" id="proof1162">
+<div class="toggleproof" onclick="toggleDisplay('proof1176')">Proof.</div>
+<div class="proofscript" id="proof1176">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Assoc.html#lookup_nin_none">lookup_nin_none</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">map_rtype_meet</span>₀<span class="id">_domain</span>.<br/>
@@ -450,8 +450,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">r</span>' =&gt; (<span class="id">s</span>,<span class="id">rtype_meet</span>₀ <span class="id">r</span> <span class="id">r</span>')::(<span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">r</span>₁ <span class="id">r</span>₂)) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup_diff">lookup_diff</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">r</span>₂ <span class="id">r</span>₁)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1163')">Proof.</div>
-<div class="proofscript" id="proof1163">
+<div class="toggleproof" onclick="toggleDisplay('proof1177')">Proof.</div>
+<div class="proofscript" id="proof1177">
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">map_rtype_meet</span>₀<span class="id">_domain</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">symmetry</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Assoc.html#lookup_diff_disjoint">lookup_diff_disjoint</a></span>.<br/>
@@ -470,8 +470,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">r</span>' =&gt; (<span class="id">s</span>,<span class="id">rtype_meet</span>₀ <span class="id">r</span> <span class="id">r</span>')::(<span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">r</span>₁ <span class="id">r</span>₂) ++ (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup_diff">lookup_diff</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">r</span>₂ <span class="id">r</span>₁))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1164')">Proof.</div>
-<div class="proofscript" id="proof1164">
+<div class="toggleproof" onclick="toggleDisplay('proof1178')">Proof.</div>
+<div class="proofscript" id="proof1178">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Assoc.html#domain_app">domain_app</a></span>, <span class="id">map_rtype_meet</span>₀<span class="id">_domain</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#NoDup_app">NoDup_app</a></span>; <span class="tactic">auto</span>.<br/>
@@ -502,8 +502,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; (<span class="id">s</span>, <span class="id">r</span>) :: <span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1165')">Proof.</div>
-<div class="proofscript" id="proof1165">
+<div class="toggleproof" onclick="toggleDisplay('proof1179')">Proof.</div>
+<div class="proofscript" id="proof1179">
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">l2</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="tactic">intuition</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">a1</span> <span class="id">a</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
@@ -515,8 +515,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ τ₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ (<span class="id">rtype_join</span>₀ τ₁ τ₂) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span><br/>
 /\ <span class="id">wf_rtype</span>₀ (<span class="id">rtype_meet</span>₀ τ₁ τ₂) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1166')">Proof.</div>
-<div class="proofscript" id="proof1166">
+<div class="toggleproof" onclick="toggleDisplay('proof1180')">Proof.</div>
+<div class="proofscript" id="proof1180">
 &nbsp;&nbsp;<span class="id">revert</span> τ₂.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> τ₁; <span class="tactic">destruct</span> τ₂; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">tauto</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">eauto</span>.<br/>
@@ -716,8 +716,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ τ₁ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ τ₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ (<span class="id">rtype_join</span>₀ τ₁ τ₂) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1167')">Proof.</div>
-<div class="proofscript" id="proof1167">
+<div class="toggleproof" onclick="toggleDisplay('proof1181')">Proof.</div>
+<div class="proofscript" id="proof1181">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_wf</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
@@ -726,8 +726,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ τ₁ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ τ₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ (<span class="id">rtype_meet</span>₀ τ₁ τ₂) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1168')">Proof.</div>
-<div class="proofscript" id="proof1168">
+<div class="toggleproof" onclick="toggleDisplay('proof1182')">Proof.</div>
+<div class="proofscript" id="proof1182">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_wf</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
@@ -762,8 +762,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1169')">Proof.</div>
-<div class="proofscript" id="proof1169">
+<div class="toggleproof" onclick="toggleDisplay('proof1183')">Proof.</div>
+<div class="proofscript" id="proof1183">
 &nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">nin</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">nin</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
@@ -790,8 +790,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1170')">Proof.</div>
-<div class="proofscript" id="proof1170">
+<div class="toggleproof" onclick="toggleDisplay('proof1184')">Proof.</div>
+<div class="proofscript" id="proof1184">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">trivial</span>; <span class="tactic">intros</span> <span class="id">nin</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>);<br/>
@@ -827,8 +827,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1171')">Proof.</div>
-<div class="proofscript" id="proof1171">
+<div class="toggleproof" onclick="toggleDisplay('proof1185')">Proof.</div>
+<div class="proofscript" id="proof1185">
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">l</span>₂. <span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>); [<span class="tactic">intros</span> <span class="id">eq</span> <span class="id">eqpf</span>; <span class="tactic">subst</span>|<span class="tactic">intros</span> <span class="id">neq</span> <span class="id">eqpf</span>];<br/>
@@ -880,8 +880,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1172')">Proof.</div>
-<div class="proofscript" id="proof1172">
+<div class="toggleproof" onclick="toggleDisplay('proof1186')">Proof.</div>
+<div class="proofscript" id="proof1186">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">rl1</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">wf1</span> <span class="id">subH</span>. <span class="tactic">generalize</span> <span class="id">wf1</span>; <span class="tactic">intros</span> <span class="id">wf1</span>'; <span class="tactic">unfold</span> <span class="id">wf_rtype</span>₀ <span class="kwd">in</span> <span class="id">wf1</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#andb_true_iff">andb_true_iff</a></span> <span class="kwd">in</span> <span class="id">wf1</span>.<br/>
@@ -906,8 +906,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span><br/>
 &nbsp;&nbsp;/\ <span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1173')">Proof.</div>
-<div class="proofscript" id="proof1173">
+<div class="toggleproof" onclick="toggleDisplay('proof1187')">Proof.</div>
+<div class="proofscript" id="proof1187">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">awf</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">congruence</span>.<br/>
@@ -967,8 +967,8 @@ Qed.</div>
 <span class="kwd">Corollary</span> <span class="id">rtype_join</span>₀<span class="id">_idempotent</span> <span class="id">a</span>:<br/>
 &nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">awf</span>:<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1174')">Proof.</div>
-<div class="proofscript" id="proof1174">
+<div class="toggleproof" onclick="toggleDisplay('proof1188')">Proof.</div>
+<div class="proofscript" id="proof1188">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_idempotent</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
@@ -976,23 +976,23 @@ Qed.</div>
 <span class="kwd">Corollary</span> <span class="id">rtype_meet</span>₀<span class="id">_idempotent</span> <span class="id">a</span>:<br/>
 &nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">awf</span>:<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1175')">Proof.</div>
-<div class="proofscript" id="proof1175">
+<div class="toggleproof" onclick="toggleDisplay('proof1189')">Proof.</div>
+<div class="proofscript" id="proof1189">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_idempotent</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_join_idempotent">rtype_join_idempotent</a></span>: <span class="kwd">forall</span> <span class="id">a</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1176')">Proof.</div>
-<div class="proofscript" id="proof1176">
+<div class="toggleproof" onclick="toggleDisplay('proof1190')">Proof.</div>
+<div class="proofscript" id="proof1190">
 &nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>]; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_idempotent</span>; <span class="tactic">auto</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_meet_idempotent">rtype_meet_idempotent</a></span> <span class="id">a</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1177')">Proof.</div>
-<div class="proofscript" id="proof1177">
+<div class="toggleproof" onclick="toggleDisplay('proof1191')">Proof.</div>
+<div class="proofscript" id="proof1191">
 &nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>]; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_meet</span>₀<span class="id">_idempotent</span>; <span class="tactic">trivial</span>.<br/>
@@ -1011,8 +1011,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1178')">Proof.</div>
-<div class="proofscript" id="proof1178">
+<div class="toggleproof" onclick="toggleDisplay('proof1192')">Proof.</div>
+<div class="proofscript" id="proof1192">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">rtype_join</span>₀<span class="id">_idempotent</span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#Forallt">Forallt</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> (<span class="id">map_rtype_join</span>₀<span class="id">_idempotent</span>' <span class="id">k</span>); <span class="tactic">auto</span>.<br/>
@@ -1048,8 +1048,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl2">rl2</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1179')">Proof.</div>
-<div class="proofscript" id="proof1179">
+<div class="toggleproof" onclick="toggleDisplay('proof1193')">Proof.</div>
+<div class="proofscript" id="proof1193">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">wf1</span> <span class="id">wf2</span> <span class="id">subH</span>.<br/>
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">wf1</span> <span class="id">subH</span> <span class="id">rl2</span> <span class="id">wf2</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">rl1</span>; <span class="tactic">intros</span>.<br/>
@@ -1106,8 +1106,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1180')">Proof.</div>
-<div class="proofscript" id="proof1180">
+<div class="toggleproof" onclick="toggleDisplay('proof1194')">Proof.</div>
+<div class="proofscript" id="proof1194">
 &nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">nin</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">nin</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
@@ -1134,8 +1134,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1181')">Proof.</div>
-<div class="proofscript" id="proof1181">
+<div class="toggleproof" onclick="toggleDisplay('proof1195')">Proof.</div>
+<div class="proofscript" id="proof1195">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">trivial</span>; <span class="tactic">intros</span> <span class="id">nin</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>);<br/>
@@ -1171,8 +1171,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1182')">Proof.</div>
-<div class="proofscript" id="proof1182">
+<div class="toggleproof" onclick="toggleDisplay('proof1196')">Proof.</div>
+<div class="proofscript" id="proof1196">
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">l</span>₂. <span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>); [<span class="tactic">intros</span> <span class="id">eq</span> <span class="id">eqpf</span>; <span class="tactic">subst</span>|<span class="tactic">intros</span> <span class="id">neq</span> <span class="id">eqpf</span>];<br/>
@@ -1214,8 +1214,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">bwf</span> : <span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;/\ <span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1183')">Proof.</div>
-<div class="proofscript" id="proof1183">
+<div class="toggleproof" onclick="toggleDisplay('proof1197')">Proof.</div>
+<div class="proofscript" id="proof1197">
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">b</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">try</span> <span class="id">solve</span>[<span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">simpl</span>; <span class="tactic">tauto</span>].<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">tauto</span>; <span class="tactic">intros</span>.<br/>
@@ -1360,8 +1360,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">awf</span> : <span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">bwf</span> : <span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1184')">Proof.</div>
-<div class="proofscript" id="proof1184">
+<div class="toggleproof" onclick="toggleDisplay('proof1198')">Proof.</div>
+<div class="proofscript" id="proof1198">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_commutative</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
@@ -1369,22 +1369,22 @@ Qed.</div>
 &nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">awf</span> : <span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">bwf</span> : <span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1185')">Proof.</div>
-<div class="proofscript" id="proof1185">
+<div class="toggleproof" onclick="toggleDisplay('proof1199')">Proof.</div>
+<div class="proofscript" id="proof1199">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_commutative</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_join_commutative">rtype_join_commutative</a></span>: <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1186')">Proof.</div>
-<div class="proofscript" id="proof1186">
+<div class="toggleproof" onclick="toggleDisplay('proof1200')">Proof.</div>
+<div class="proofscript" id="proof1200">
 &nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>]; <span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">bwf</span>]; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_commutative</span>; <span class="tactic">auto</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_meet_commutative">rtype_meet_commutative</a></span>: <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1187')">Proof.</div>
-<div class="proofscript" id="proof1187">
+<div class="toggleproof" onclick="toggleDisplay('proof1201')">Proof.</div>
+<div class="proofscript" id="proof1201">
 &nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>]; <span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">bwf</span>]; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">rtype_meet</span>₀<span class="id">_commutative</span>; <span class="tactic">auto</span>.<br/>
@@ -1413,8 +1413,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl2">rl2</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl1">rl1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1188')">Proof.</div>
-<div class="proofscript" id="proof1188">
+<div class="toggleproof" onclick="toggleDisplay('proof1202')">Proof.</div>
+<div class="proofscript" id="proof1202">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">rtype_join</span>₀<span class="id">_commutative</span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#Forallt">Forallt</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> (@<span class="id">map_rtype_join</span>₀<span class="id">_commutative</span>' <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span>); <span class="tactic">auto</span>.<br/>
@@ -1436,8 +1436,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id">rtype_join</span>₀ τ₁ τ₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1189')">Proof.</div>
-<div class="proofscript" id="proof1189">
+<div class="toggleproof" onclick="toggleDisplay('proof1203')">Proof.</div>
+<div class="proofscript" id="proof1203">
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">l</span>₂.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">simpl</span>; [<span class="tactic">discriminate</span>|].<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
@@ -1462,8 +1462,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1190')">Proof.</div>
-<div class="proofscript" id="proof1190">
+<div class="toggleproof" onclick="toggleDisplay('proof1204')">Proof.</div>
+<div class="proofscript" id="proof1204">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">map_rtype_join</span>₀<span class="id">_domain_subset</span> <span class="id">l</span>₁ <span class="id">l</span>₂ <span class="id">s</span>).<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span><br/>
@@ -1495,8 +1495,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id">l</span>₂)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1191')">Proof.</div>
-<div class="proofscript" id="proof1191">
+<div class="toggleproof" onclick="toggleDisplay('proof1205')">Proof.</div>
+<div class="proofscript" id="proof1205">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">map_rtype_join</span>₀<span class="id">_domain_subset</span> <span class="id">l</span>₁ <span class="id">l</span>₂ <span class="id">s</span>).<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span><br/>
@@ -1526,8 +1526,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>)) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1192')">Proof.</div>
-<div class="proofscript" id="proof1192">
+<div class="toggleproof" onclick="toggleDisplay('proof1206')">Proof.</div>
+<div class="proofscript" id="proof1206">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">simpl</span>; <span class="tactic">auto</span> 1.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>. <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">b</span> <span class="id">s</span>); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Sublist.html#sublist_cons">sublist_cons</a></span>; <span class="tactic">auto</span>.<br/>
@@ -1546,8 +1546,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1193')">Proof.</div>
-<div class="proofscript" id="proof1193">
+<div class="toggleproof" onclick="toggleDisplay('proof1207')">Proof.</div>
+<div class="proofscript" id="proof1207">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">s1</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id"><a href="Qcert.Utils.Sublist.html#is_list_sorted_sublist">is_list_sorted_sublist</a></span> <span class="id">s1</span>).<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">map_rtype_join</span>₀<span class="id">_domain_sublist</span>.<br/>
@@ -1567,8 +1567,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1194')">Proof.</div>
-<div class="proofscript" id="proof1194">
+<div class="toggleproof" onclick="toggleDisplay('proof1208')">Proof.</div>
+<div class="proofscript" id="proof1208">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Sublist.html#Sorted_incl_both_eq">Sorted_incl_both_eq</a></span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">eapply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted_Sorted_iff">is_list_sorted_Sorted_iff</a></span>.<br/>
@@ -1606,8 +1606,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1195')">Proof.</div>
-<div class="proofscript" id="proof1195">
+<div class="toggleproof" onclick="toggleDisplay('proof1209')">Proof.</div>
+<div class="proofscript" id="proof1209">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k0</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -1641,8 +1641,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>) (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup_diff">lookup_diff</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span>)) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1196')">Proof.</div>
-<div class="proofscript" id="proof1196">
+<div class="toggleproof" onclick="toggleDisplay('proof1210')">Proof.</div>
+<div class="proofscript" id="proof1210">
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bindings.html#domain_rec_sort">domain_rec_sort</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Sublist.html#insertion_sort_equivlist">insertion_sort_equivlist</a></span>; [<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#lt_contr1">lt_contr1</a></span> | ].<br/>
@@ -1674,8 +1674,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>') -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#A">A</a></span>, <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#dec">dec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l">l</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#dec">dec</a></span> <span class="id">l</span>' <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation">Permutation</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l">l</a></span> <span class="id">l</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1197')">Proof.</div>
-<div class="proofscript" id="proof1197">
+<div class="toggleproof" onclick="toggleDisplay('proof1211')">Proof.</div>
+<div class="proofscript" id="proof1211">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#NoDup_Permutation">NoDup_Permutation</a></span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Assoc.html#NoDup_domain_NoDup">NoDup_domain_NoDup</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -1691,8 +1691,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l">l</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation">Permutation</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l">l</a></span> <span class="id">l</span>' -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#dec">dec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l">l</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> = <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#dec">dec</a></span> <span class="id">l</span>' <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1198')">Proof.</div>
-<div class="proofscript" id="proof1198">
+<div class="toggleproof" onclick="toggleDisplay('proof1212')">Proof.</div>
+<div class="proofscript" id="proof1212">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id">dec</span> <span class="id">l</span> <span class="id">a</span>); <span class="tactic">intros</span>; <span class="tactic">symmetry</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">eapply</span> <span class="id"><a href="Qcert.Utils.Assoc.html#lookup_some_nodup_perm">lookup_some_nodup_perm</a></span>; <span class="tactic">eauto</span>.<br/>
@@ -1722,8 +1722,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; (<span class="id">s0</span>, <span class="id">r0</span>) :: <span class="id">map_rtype_meet</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>) ++ (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup_diff">lookup_diff</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span>)) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1199')">Proof.</div>
-<div class="proofscript" id="proof1199">
+<div class="toggleproof" onclick="toggleDisplay('proof1213')">Proof.</div>
+<div class="proofscript" id="proof1213">
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#lookup_nodup_perm">lookup_nodup_perm</a></span>.<br/>
@@ -1746,8 +1746,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;<span class="id">wf_rtype</span>₀ (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k1">k1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_join</span>₀ (<span class="id">rtype_join</span>₀ (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>) (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k0">k0</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>)) (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k1">k1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_join</span>₀ (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span>) (<span class="id">rtype_join</span>₀ (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k0">k0</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k1">k1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1200')">Proof.</div>
-<div class="proofscript" id="proof1200">
+<div class="toggleproof" onclick="toggleDisplay('proof1214')">Proof.</div>
+<div class="proofscript" id="proof1214">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">X</span> <span class="id">awf</span> <span class="id">bwf</span> <span class="id">cwf</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">simpl</span>. <span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join_associative">record_kind_rtype_join_associative</a></span>; <span class="tactic">auto</span>.<br/>
@@ -1790,8 +1790,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">rtype_join</span>₀ (<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> (<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;/\ <span class="id">rtype_meet</span>₀ (<span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> (<span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1201')">Proof.</div>
-<div class="proofscript" id="proof1201">
+<div class="toggleproof" onclick="toggleDisplay('proof1215')">Proof.</div>
+<div class="proofscript" id="proof1215">
 &nbsp;&nbsp;<span class="id">revert</span> <span class="id">b</span> <span class="id">c</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">simpl</span>. <br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">destruct</span> <span class="id">c</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">tauto</span>. <br/>
@@ -2168,8 +2168,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">rtype_join</span>₀ (<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> (<span class="id">rtype_join</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1202')">Proof.</div>
-<div class="proofscript" id="proof1202">
+<div class="toggleproof" onclick="toggleDisplay('proof1216')">Proof.</div>
+<div class="proofscript" id="proof1216">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_associative</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
@@ -2178,15 +2178,15 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">wf_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">rtype_meet</span>₀ (<span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> (<span class="id">rtype_meet</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1203')">Proof.</div>
-<div class="proofscript" id="proof1203">
+<div class="toggleproof" onclick="toggleDisplay('proof1217')">Proof.</div>
+<div class="proofscript" id="proof1217">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id">rtype_join</span>₀<span class="id">_meet</span>₀<span class="id">_associative</span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_join_associative">rtype_join_associative</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1204')">Proof.</div>
-<div class="proofscript" id="proof1204">
+<div class="toggleproof" onclick="toggleDisplay('proof1218')">Proof.</div>
+<div class="proofscript" id="proof1218">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>];<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">bwf</span>];<br/>
@@ -2196,8 +2196,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_meet_associative">rtype_meet_associative</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1205')">Proof.</div>
-<div class="proofscript" id="proof1205">
+<div class="toggleproof" onclick="toggleDisplay('proof1219')">Proof.</div>
+<div class="proofscript" id="proof1219">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>];<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">bwf</span>];<br/>
@@ -2216,8 +2216,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id">map_rtype_join</span>₀ <span class="id">srs</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#l2">l2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id">l</span>₁ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1206')">Proof.</div>
-<div class="proofscript" id="proof1206">
+<div class="toggleproof" onclick="toggleDisplay('proof1220')">Proof.</div>
+<div class="proofscript" id="proof1220">
 <span class="tactic">generalize</span> (<span class="id">map_rtype_join</span>₀<span class="id">_domain_subset</span> <span class="id">l</span>₁ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
 <span class="id">case_eq</span> ( ((<span class="id">fix</span> <span class="id">map_rtype_join</span>₀ (<span class="id">l1</span> <span class="id">l2</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id">rtype</span>₀)) {<span class="kwd">struct</span> <span class="id">l1</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id">rtype</span>₀) :=<br/>
@@ -2243,8 +2243,8 @@ Qed.</div>
 </div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_nequal">rtype_nequal</a></span> {<span class="id">ftype</span>:<span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span>} {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} {τ₁ τ₂:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} : τ₁ &lt;&gt; τ₂ -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> τ₁ &lt;&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> τ₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1207')">Proof.</div>
-<div class="proofscript" id="proof1207">
+<div class="toggleproof" onclick="toggleDisplay('proof1221')">Proof.</div>
+<div class="proofscript" id="proof1221">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">a</span> <span class="id">b</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">a</span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
@@ -2269,118 +2269,118 @@ Qed.</div>
 <span class="kwd">Context</span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>}.<br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Top_l">rtype_join_Top_l</a></span> τ :<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> ⊤ τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1208')">Proof.</div>
-<div class="proofscript" id="proof1208">
+<div class="toggleproof" onclick="toggleDisplay('proof1222')">Proof.</div>
+<div class="proofscript" id="proof1222">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Top_r">rtype_join_Top_r</a></span> τ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ ⊤ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1209')">Proof.</div>
-<div class="proofscript" id="proof1209">
+<div class="toggleproof" onclick="toggleDisplay('proof1223')">Proof.</div>
+<div class="proofscript" id="proof1223">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Bottom_r">rtype_join_Bottom_r</a></span> τ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ ⊥ = τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1210')">Proof.</div>
-<div class="proofscript" id="proof1210">
+<div class="toggleproof" onclick="toggleDisplay('proof1224')">Proof.</div>
+<div class="proofscript" id="proof1224">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Bottom_l">rtype_join_Bottom_l</a></span> τ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> ⊥ τ = τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1211')">Proof.</div>
-<div class="proofscript" id="proof1211">
+<div class="toggleproof" onclick="toggleDisplay('proof1225')">Proof.</div>
+<div class="proofscript" id="proof1225">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Unit_eq">rtype_join_Unit_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1212')">Proof.</div>
-<div class="proofscript" id="proof1212">
+<div class="toggleproof" onclick="toggleDisplay('proof1226')">Proof.</div>
+<div class="proofscript" id="proof1226">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Unit_neq_l">rtype_join_Unit_neq_l</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1213')">Proof.</div>
-<div class="proofscript" id="proof1213">
+<div class="toggleproof" onclick="toggleDisplay('proof1227')">Proof.</div>
+<div class="proofscript" id="proof1227">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Unit_neq_r">rtype_join_Unit_neq_r</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1214')">Proof.</div>
-<div class="proofscript" id="proof1214">
+<div class="toggleproof" onclick="toggleDisplay('proof1228')">Proof.</div>
+<div class="proofscript" id="proof1228">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Nat_eq">rtype_join_Nat_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1215')">Proof.</div>
-<div class="proofscript" id="proof1215">
+<div class="toggleproof" onclick="toggleDisplay('proof1229')">Proof.</div>
+<div class="proofscript" id="proof1229">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Nat_neq_l">rtype_join_Nat_neq_l</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1216')">Proof.</div>
-<div class="proofscript" id="proof1216">
+<div class="toggleproof" onclick="toggleDisplay('proof1230')">Proof.</div>
+<div class="proofscript" id="proof1230">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Nat_neq_r">rtype_join_Nat_neq_r</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1217')">Proof.</div>
-<div class="proofscript" id="proof1217">
+<div class="toggleproof" onclick="toggleDisplay('proof1231')">Proof.</div>
+<div class="proofscript" id="proof1231">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Bool_eq">rtype_join_Bool_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1218')">Proof.</div>
-<div class="proofscript" id="proof1218">
+<div class="toggleproof" onclick="toggleDisplay('proof1232')">Proof.</div>
+<div class="proofscript" id="proof1232">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Bool_neq_l">rtype_join_Bool_neq_l</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1219')">Proof.</div>
-<div class="proofscript" id="proof1219">
+<div class="toggleproof" onclick="toggleDisplay('proof1233')">Proof.</div>
+<div class="proofscript" id="proof1233">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Bool_neq_r">rtype_join_Bool_neq_r</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1220')">Proof.</div>
-<div class="proofscript" id="proof1220">
+<div class="toggleproof" onclick="toggleDisplay('proof1234')">Proof.</div>
+<div class="proofscript" id="proof1234">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_String_eq">rtype_join_String_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1221')">Proof.</div>
-<div class="proofscript" id="proof1221">
+<div class="toggleproof" onclick="toggleDisplay('proof1235')">Proof.</div>
+<div class="proofscript" id="proof1235">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_String_neq_l">rtype_join_String_neq_l</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1222')">Proof.</div>
-<div class="proofscript" id="proof1222">
+<div class="toggleproof" onclick="toggleDisplay('proof1236')">Proof.</div>
+<div class="proofscript" id="proof1236">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_String_neq_r">rtype_join_String_neq_r</a></span> τ: τ &lt;&gt; ⊥ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1223')">Proof.</div>
-<div class="proofscript" id="proof1223">
+<div class="toggleproof" onclick="toggleDisplay('proof1237')">Proof.</div>
+<div class="proofscript" id="proof1237">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Coll_eq">rtype_join_Coll_eq</a></span> τ₁ τ₂ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₁) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₂) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ₁ τ₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1224')">Proof.</div>
-<div class="proofscript" id="proof1224">
+<div class="toggleproof" onclick="toggleDisplay('proof1238')">Proof.</div>
+<div class="proofscript" id="proof1238">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Coll_neq_l">rtype_join_Coll_neq_l</a></span> τ τ₃: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> τ₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₃) τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1225')">Proof.</div>
-<div class="proofscript" id="proof1225">
+<div class="toggleproof" onclick="toggleDisplay('proof1239')">Proof.</div>
+<div class="proofscript" id="proof1239">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> τ' <span class="id">pf</span>')); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Coll_neq_r">rtype_join_Coll_neq_r</a></span> τ τ₃: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> τ₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₃) = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1226')">Proof.</div>
-<div class="proofscript" id="proof1226">
+<div class="toggleproof" onclick="toggleDisplay('proof1240')">Proof.</div>
+<div class="proofscript" id="proof1240">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> τ' <span class="id">pf</span>')); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -2397,8 +2397,8 @@ Qed.</div>
 <br/>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="map_rtype_join_sublist_l">map_rtype_join_sublist_l</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂ : <span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_join">map_rtype_join</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂)) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1227')">Proof.</div>
-<div class="proofscript" id="proof1227">
+<div class="toggleproof" onclick="toggleDisplay('proof1241')">Proof.</div>
+<div class="proofscript" id="proof1241">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#sublist">sublist</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">simpl</span>; <span class="tactic">auto</span> 1.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
@@ -2408,8 +2408,8 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="map_rtype_join_is_sorted">map_rtype_join_is_sorted</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂ :<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted">is_list_sorted</a></span> <span class="id"><a href="Qcert.Utils.Bindings.html#ODT_lt_dec">ODT_lt_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span><br/>
 &nbsp;&nbsp;-&gt; <span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted">is_list_sorted</a></span> <span class="id"><a href="Qcert.Utils.Bindings.html#ODT_lt_dec">ODT_lt_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_join">map_rtype_join</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1228')">Proof.</div>
-<div class="proofscript" id="proof1228">
+<div class="toggleproof" onclick="toggleDisplay('proof1242')">Proof.</div>
+<div class="proofscript" id="proof1242">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#StronglySorted">StronglySorted</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#sorted_StronglySorted">sorted_StronglySorted</a></span> <span class="tactic">by</span> <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_strorder">StringOrder.lt_strorder</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -2430,8 +2430,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₁ <span class="id">rl</span>₁ <span class="id">pf</span>₁) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂) =<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_join">record_kind_rtype_join</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">rl</span>₁ <span class="id">rl</span>₂)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_join">map_rtype_join</a></span> <span class="id">rl</span>₁ <span class="id">rl</span>₂) (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_join_is_sorted">map_rtype_join_is_sorted</a></span> <span class="id">rl</span>₁ <span class="id">rl</span>₂ <span class="id">pf</span>₁).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1229')">Proof.</div>
-<div class="proofscript" id="proof1229">
+<div class="toggleproof" onclick="toggleDisplay('proof1243')">Proof.</div>
+<div class="proofscript" id="proof1243">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id">rtype_join</span>₀. <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="id">fold</span> <span class="id">rtype_join</span>₀.<br/>
@@ -2453,8 +2453,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Rec_neq_l">rtype_join_Rec_neq_l</a></span> τ <span class="id">k</span> <span class="id">rl</span> <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl">rl</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#pf">pf</a></span>) τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1230')">Proof.</div>
-<div class="proofscript" id="proof1230">
+<div class="toggleproof" onclick="toggleDisplay('proof1244')">Proof.</div>
+<div class="proofscript" id="proof1244">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">from_Rec</span>₀ <span class="id">srl</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">srl</span>' [<span class="id">srl</span>'<span class="id">pf</span> [<span class="id">srl</span>'<span class="id">eq</span> <span class="id">srl</span>'<span class="id">receq</span>]]].<br/>
 &nbsp;&nbsp;<span class="tactic">symmetry</span> <span class="kwd">in</span> <span class="id">srl</span>'<span class="id">receq</span>.<br/>
@@ -2463,8 +2463,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Rec_neq_r">rtype_join_Rec_neq_r</a></span> τ <span class="id">k</span> <span class="id">rl</span> <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl">rl</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#pf">pf</a></span>) = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1231')">Proof.</div>
-<div class="proofscript" id="proof1231">
+<div class="toggleproof" onclick="toggleDisplay('proof1245')">Proof.</div>
+<div class="proofscript" id="proof1245">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">from_Rec</span>₀ <span class="id">srl</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">srl</span>' [<span class="id">srl</span>'<span class="id">pf</span> [<span class="id">srl</span>'<span class="id">eq</span> <span class="id">srl</span>'<span class="id">receq</span>]]].<br/>
 &nbsp;&nbsp;<span class="tactic">symmetry</span> <span class="kwd">in</span> <span class="id">srl</span>'<span class="id">receq</span>.<br/>
@@ -2472,14 +2472,14 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Either_eq">rtype_join_Either_eq</a></span> τ<span class="id">l</span>₁ τ<span class="id">r</span>₁ τ<span class="id">l</span>₂ τ<span class="id">r</span>₂ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₁ τ<span class="id">r</span>₁) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ<span class="id">l</span>₁ τ<span class="id">l</span>₂) (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ<span class="id">r</span>₁ τ<span class="id">r</span>₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1232')">Proof.</div>
-<div class="proofscript" id="proof1232">
+<div class="toggleproof" onclick="toggleDisplay('proof1246')">Proof.</div>
+<div class="proofscript" id="proof1246">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Either_neq_l">rtype_join_Either_neq_l</a></span> τ τ<span class="id">l</span> τ<span class="id">r</span>: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span> τ<span class="id">r</span>) τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1233')">Proof.</div>
-<div class="proofscript" id="proof1233">
+<div class="toggleproof" onclick="toggleDisplay('proof1247')">Proof.</div>
+<div class="proofscript" id="proof1247">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">Either</span>₀<span class="id">_wf_inv</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">pfl</span> <span class="id">pfr</span>].<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfl</span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfr</span>)).<br/>
@@ -2487,8 +2487,8 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Either_neq_r">rtype_join_Either_neq_r</a></span> τ τ<span class="id">l</span> τ<span class="id">r</span>: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span> τ<span class="id">r</span>) = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1234')">Proof.</div>
-<div class="proofscript" id="proof1234">
+<div class="toggleproof" onclick="toggleDisplay('proof1248')">Proof.</div>
+<div class="proofscript" id="proof1248">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">Either</span>₀<span class="id">_wf_inv</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">pfl</span> <span class="id">pfr</span>].<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfl</span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfr</span>)).<br/>
@@ -2496,8 +2496,8 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Brand_eq">rtype_join_Brand_eq</a></span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_join">brand_join</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1235')">Proof.</div>
-<div class="proofscript" id="proof1235">
+<div class="toggleproof" onclick="toggleDisplay('proof1249')">Proof.</div>
+<div class="proofscript" id="proof1249">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id">rtype_join</span>₀.<br/>
 &nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -2510,8 +2510,8 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Brand_neq_l">rtype_join_Brand_neq_l</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1236')">Proof.</div>
-<div class="proofscript" id="proof1236">
+<div class="toggleproof" onclick="toggleDisplay('proof1250')">Proof.</div>
+<div class="proofscript" id="proof1250">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
@@ -2520,8 +2520,8 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Brand_neq_r">rtype_join_Brand_neq_r</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1237')">Proof.</div>
-<div class="proofscript" id="proof1237">
+<div class="toggleproof" onclick="toggleDisplay('proof1251')">Proof.</div>
+<div class="proofscript" id="proof1251">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
@@ -2530,22 +2530,22 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 &nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Foreign_eq">rtype_join_Foreign_eq</a></span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> (<span class="id"><a href="Qcert.Utils.Lattice.html#join">join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1238')">Proof.</div>
-<div class="proofscript" id="proof1238">
+<div class="toggleproof" onclick="toggleDisplay('proof1252')">Proof.</div>
+<div class="proofscript" id="proof1252">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Foreign_neq_l">rtype_join_Foreign_neq_l</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) τ = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1239')">Proof.</div>
-<div class="proofscript" id="proof1239">
+<div class="toggleproof" onclick="toggleDisplay('proof1253')">Proof.</div>
+<div class="proofscript" id="proof1253">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">ft</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_join_Foreign_neq_r">rtype_join_Foreign_neq_r</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊥ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1240')">Proof.</div>
-<div class="proofscript" id="proof1240">
+<div class="toggleproof" onclick="toggleDisplay('proof1254')">Proof.</div>
+<div class="proofscript" id="proof1254">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">ft</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
@@ -2579,118 +2579,118 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Top_l">rtype_meet_Top_l</a></span> τ :<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> ⊤ τ = τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1241')">Proof.</div>
-<div class="proofscript" id="proof1241">
+<div class="toggleproof" onclick="toggleDisplay('proof1255')">Proof.</div>
+<div class="proofscript" id="proof1255">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Top_r">rtype_meet_Top_r</a></span> τ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ ⊤ = τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1242')">Proof.</div>
-<div class="proofscript" id="proof1242">
+<div class="toggleproof" onclick="toggleDisplay('proof1256')">Proof.</div>
+<div class="proofscript" id="proof1256">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Bottom_r">rtype_meet_Bottom_r</a></span> τ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ ⊥ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1243')">Proof.</div>
-<div class="proofscript" id="proof1243">
+<div class="toggleproof" onclick="toggleDisplay('proof1257')">Proof.</div>
+<div class="proofscript" id="proof1257">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Bottom_l">rtype_meet_Bottom_l</a></span> τ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> ⊥ τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1244')">Proof.</div>
-<div class="proofscript" id="proof1244">
+<div class="toggleproof" onclick="toggleDisplay('proof1258')">Proof.</div>
+<div class="proofscript" id="proof1258">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Unit_eq">rtype_meet_Unit_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1245')">Proof.</div>
-<div class="proofscript" id="proof1245">
+<div class="toggleproof" onclick="toggleDisplay('proof1259')">Proof.</div>
+<div class="proofscript" id="proof1259">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Unit_neq_l">rtype_meet_Unit_neq_l</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1246')">Proof.</div>
-<div class="proofscript" id="proof1246">
+<div class="toggleproof" onclick="toggleDisplay('proof1260')">Proof.</div>
+<div class="proofscript" id="proof1260">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Unit_neq_r">rtype_meet_Unit_neq_r</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span> = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1247')">Proof.</div>
-<div class="proofscript" id="proof1247">
+<div class="toggleproof" onclick="toggleDisplay('proof1261')">Proof.</div>
+<div class="proofscript" id="proof1261">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Nat_eq">rtype_meet_Nat_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1248')">Proof.</div>
-<div class="proofscript" id="proof1248">
+<div class="toggleproof" onclick="toggleDisplay('proof1262')">Proof.</div>
+<div class="proofscript" id="proof1262">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Nat_neq_l">rtype_meet_Nat_neq_l</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1249')">Proof.</div>
-<div class="proofscript" id="proof1249">
+<div class="toggleproof" onclick="toggleDisplay('proof1263')">Proof.</div>
+<div class="proofscript" id="proof1263">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Nat_neq_r">rtype_meet_Nat_neq_r</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span> = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1250')">Proof.</div>
-<div class="proofscript" id="proof1250">
+<div class="toggleproof" onclick="toggleDisplay('proof1264')">Proof.</div>
+<div class="proofscript" id="proof1264">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Bool_eq">rtype_meet_Bool_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1251')">Proof.</div>
-<div class="proofscript" id="proof1251">
+<div class="toggleproof" onclick="toggleDisplay('proof1265')">Proof.</div>
+<div class="proofscript" id="proof1265">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Bool_neq_l">rtype_meet_Bool_neq_l</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1252')">Proof.</div>
-<div class="proofscript" id="proof1252">
+<div class="toggleproof" onclick="toggleDisplay('proof1266')">Proof.</div>
+<div class="proofscript" id="proof1266">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Bool_neq_r">rtype_meet_Bool_neq_r</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1253')">Proof.</div>
-<div class="proofscript" id="proof1253">
+<div class="toggleproof" onclick="toggleDisplay('proof1267')">Proof.</div>
+<div class="proofscript" id="proof1267">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_String_eq">rtype_meet_String_eq</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1254')">Proof.</div>
-<div class="proofscript" id="proof1254">
+<div class="toggleproof" onclick="toggleDisplay('proof1268')">Proof.</div>
+<div class="proofscript" id="proof1268">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_String_neq_l">rtype_meet_String_neq_l</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1255')">Proof.</div>
-<div class="proofscript" id="proof1255">
+<div class="toggleproof" onclick="toggleDisplay('proof1269')">Proof.</div>
+<div class="proofscript" id="proof1269">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_String_neq_r">rtype_meet_String_neq_r</a></span> τ: τ &lt;&gt; ⊤ -&gt; τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span> = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1256')">Proof.</div>
-<div class="proofscript" id="proof1256">
+<div class="toggleproof" onclick="toggleDisplay('proof1270')">Proof.</div>
+<div class="proofscript" id="proof1270">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Coll_eq">rtype_meet_Coll_eq</a></span> τ₁ τ₂ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₁) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₂) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ₁ τ₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1257')">Proof.</div>
-<div class="proofscript" id="proof1257">
+<div class="toggleproof" onclick="toggleDisplay('proof1271')">Proof.</div>
+<div class="proofscript" id="proof1271">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Coll_neq_l">rtype_meet_Coll_neq_l</a></span> τ τ₃: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> τ₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₃) τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1258')">Proof.</div>
-<div class="proofscript" id="proof1258">
+<div class="toggleproof" onclick="toggleDisplay('proof1272')">Proof.</div>
+<div class="proofscript" id="proof1272">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> τ' <span class="id">pf</span>')); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Coll_neq_r">rtype_meet_Coll_neq_r</a></span> τ τ₃: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> τ₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₃) = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1259')">Proof.</div>
-<div class="proofscript" id="proof1259">
+<div class="toggleproof" onclick="toggleDisplay('proof1273')">Proof.</div>
+<div class="proofscript" id="proof1273">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> τ' <span class="id">pf</span>')); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -2707,8 +2707,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="map_rtype_meet_domain">map_rtype_meet_domain</a></span> <span class="id">r</span> <span class="id">srl</span>:<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_meet">map_rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#srl">srl</a></span>) = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#r">r</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1260')">Proof.</div>
-<div class="proofscript" id="proof1260">
+<div class="toggleproof" onclick="toggleDisplay('proof1274')">Proof.</div>
+<div class="proofscript" id="proof1274">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>; <span class="tactic">simpl</span>; [<span class="tactic">intuition</span>|].<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">srl</span> <span class="id">s</span>); [<span class="tactic">intros</span> <span class="id">t</span> <span class="id">teq</span>|<span class="tactic">intuition</span>]; <span class="tactic">simpl</span>;<br/>
@@ -2720,8 +2720,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">r</span>₂) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_meet">map_rtype_meet</a></span> <span class="id">r</span>₁ <span class="id">r</span>₂) ++ (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup_diff">lookup_diff</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">r</span>₂ <span class="id">r</span>₁))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1261')">Proof.</div>
-<div class="proofscript" id="proof1261">
+<div class="toggleproof" onclick="toggleDisplay('proof1275')">Proof.</div>
+<div class="proofscript" id="proof1275">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Assoc.html#domain_app">domain_app</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_meet_domain">map_rtype_meet_domain</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#NoDup_app">NoDup_app</a></span>; <span class="tactic">auto</span>.<br/>
@@ -2730,8 +2730,8 @@ Qed.</div>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_rtype_meet_sublist_l">map_rtype_meet_sublist_l</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂ : <span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_meet">map_rtype_meet</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂)) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1262')">Proof.</div>
-<div class="proofscript" id="proof1262">
+<div class="toggleproof" onclick="toggleDisplay('proof1276')">Proof.</div>
+<div class="proofscript" id="proof1276">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#sublist">sublist</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>₁; <span class="tactic">simpl</span>; <span class="tactic">auto</span> 1.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
@@ -2759,8 +2759,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">x</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * {τ₀ : <span class="id">rtype</span>₀ | <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>} =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>))) (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_meet">map_rtype_meet</a></span> <span class="id">rl</span>₁ <span class="id">rl</span>₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1263')">Proof.</div>
-<div class="proofscript" id="proof1263">
+<div class="toggleproof" onclick="toggleDisplay('proof1277')">Proof.</div>
+<div class="proofscript" id="proof1277">
 &nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">rl</span>₁; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHrl</span>₁.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -2779,8 +2779,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#record_kind_rtype_meet">record_kind_rtype_meet</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#map_rtype_meet">map_rtype_meet</a></span> <span class="id">rl</span>₁ <span class="id">rl</span>₂) (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup_diff">lookup_diff</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">rl</span>₂ <span class="id">rl</span>₁)) (<span class="id"><a href="Qcert.Utils.Bindings.html#drec_concat_sort_sorted">drec_concat_sort_sorted</a></span> <span class="id">_</span> <span class="id">_</span>)<br/>
 &nbsp;&nbsp;&nbsp;<span class="kwd">else</span> ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1264')">Proof.</div>
-<div class="proofscript" id="proof1264">
+<div class="toggleproof" onclick="toggleDisplay('proof1278')">Proof.</div>
+<div class="proofscript" id="proof1278">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id">rtype_meet</span>₀; <span class="tactic">simpl</span>; <span class="id">fold</span> <span class="id">rtype_meet</span>₀.<br/>
 <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_compatible_records_dec">rtype_meet_compatible_records_dec</a></span> <span class="id">k</span>₁ <span class="id">k</span>₂<br/>
@@ -2819,8 +2819,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Rec_neq_l">rtype_meet_Rec_neq_l</a></span> τ <span class="id">k</span> <span class="id">rl</span> <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl">rl</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#pf">pf</a></span>) τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1265')">Proof.</div>
-<div class="proofscript" id="proof1265">
+<div class="toggleproof" onclick="toggleDisplay('proof1279')">Proof.</div>
+<div class="proofscript" id="proof1279">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">from_Rec</span>₀ <span class="id">srl</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">srl</span>' [<span class="id">srl</span>'<span class="id">pf</span> [<span class="id">srl</span>'<span class="id">eq</span> <span class="id">srl</span>'<span class="id">receq</span>]]].<br/>
 &nbsp;&nbsp;<span class="tactic">symmetry</span> <span class="kwd">in</span> <span class="id">srl</span>'<span class="id">receq</span>.<br/>
@@ -2829,8 +2829,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Rec_neq_r">rtype_meet_Rec_neq_r</a></span> τ <span class="id">k</span> <span class="id">rl</span> <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₂ <span class="id">rl</span>₂ <span class="id">pf</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#k">k</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rl">rl</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#pf">pf</a></span>) = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1266')">Proof.</div>
-<div class="proofscript" id="proof1266">
+<div class="toggleproof" onclick="toggleDisplay('proof1280')">Proof.</div>
+<div class="proofscript" id="proof1280">
 &nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">from_Rec</span>₀ <span class="id">srl</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">srl</span>' [<span class="id">srl</span>'<span class="id">pf</span> [<span class="id">srl</span>'<span class="id">eq</span> <span class="id">srl</span>'<span class="id">receq</span>]]].<br/>
 &nbsp;&nbsp;<span class="tactic">symmetry</span> <span class="kwd">in</span> <span class="id">srl</span>'<span class="id">receq</span>.<br/>
@@ -2838,14 +2838,14 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Either_eq">rtype_meet_Either_eq</a></span> τ<span class="id">l</span>₁ τ<span class="id">r</span>₁ τ<span class="id">l</span>₂ τ<span class="id">r</span>₂ : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₁ τ<span class="id">r</span>₁) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ<span class="id">l</span>₁ τ<span class="id">l</span>₂) (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ<span class="id">r</span>₁ τ<span class="id">r</span>₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1267')">Proof.</div>
-<div class="proofscript" id="proof1267">
+<div class="toggleproof" onclick="toggleDisplay('proof1281')">Proof.</div>
+<div class="proofscript" id="proof1281">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Either_neq_l">rtype_meet_Either_neq_l</a></span> τ τ<span class="id">l</span> τ<span class="id">r</span>: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span> τ<span class="id">r</span>) τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1268')">Proof.</div>
-<div class="proofscript" id="proof1268">
+<div class="toggleproof" onclick="toggleDisplay('proof1282')">Proof.</div>
+<div class="proofscript" id="proof1282">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">Either</span>₀<span class="id">_wf_inv</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">pfl</span> <span class="id">pfr</span>].<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfl</span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfr</span>)).<br/>
@@ -2853,8 +2853,8 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Either_neq_r">rtype_meet_Either_neq_r</a></span> τ τ<span class="id">l</span> τ<span class="id">r</span>: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span>₂ τ<span class="id">r</span>₂) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Either">Either</a></span> τ<span class="id">l</span> τ<span class="id">r</span>) = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1269')">Proof.</div>
-<div class="proofscript" id="proof1269">
+<div class="toggleproof" onclick="toggleDisplay('proof1283')">Proof.</div>
+<div class="proofscript" id="proof1283">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">Either</span>₀<span class="id">_wf_inv</span> <span class="id">pf</span>') <span class="kwd">as</span> [<span class="id">pfl</span> <span class="id">pfr</span>].<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfl</span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">pfr</span>)).<br/>
@@ -2862,8 +2862,8 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Brand_eq">rtype_meet_Brand_eq</a></span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_meet">brand_meet</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1270')">Proof.</div>
-<div class="proofscript" id="proof1270">
+<div class="toggleproof" onclick="toggleDisplay('proof1284')">Proof.</div>
+<div class="proofscript" id="proof1284">
 &nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id">rtype_meet</span>₀; <span class="tactic">simpl</span>; <span class="id">fold</span> <span class="id">rtype_meet</span>₀.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span><br/>
@@ -2874,8 +2874,8 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Brand_neq_l">rtype_meet_Brand_neq_l</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1271')">Proof.</div>
-<div class="proofscript" id="proof1271">
+<div class="toggleproof" onclick="toggleDisplay('proof1285')">Proof.</div>
+<div class="proofscript" id="proof1285">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
@@ -2884,8 +2884,8 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Brand_neq_r">rtype_meet_Brand_neq_r</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1272')">Proof.</div>
-<div class="proofscript" id="proof1272">
+<div class="toggleproof" onclick="toggleDisplay('proof1286')">Proof.</div>
+<div class="proofscript" id="proof1286">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
@@ -2894,22 +2894,22 @@ Qed.</div>
 &nbsp;Qed.</div>
 <br/>
 &nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Foreign_eq">rtype_meet_Foreign_eq</a></span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> (<span class="id"><a href="Qcert.Utils.Lattice.html#meet">meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1273')">Proof.</div>
-<div class="proofscript" id="proof1273">
+<div class="toggleproof" onclick="toggleDisplay('proof1287')">Proof.</div>
+<div class="proofscript" id="proof1287">
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Foreign_neq_l">rtype_meet_Foreign_neq_l</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) τ = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1274')">Proof.</div>
-<div class="proofscript" id="proof1274">
+<div class="toggleproof" onclick="toggleDisplay('proof1288')">Proof.</div>
+<div class="proofscript" id="proof1288">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">ft</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>
 &nbsp;Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="rtype_meet_Foreign_neq_r">rtype_meet_Foreign_neq_r</a></span> τ <span class="id">y</span>: τ &lt;&gt; ⊤ -&gt; (<span class="kwd">forall</span> <span class="id">x</span>, τ &lt;&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#x">x</a></span>) -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> τ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#y">y</a></span>) = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1275')">Proof.</div>
-<div class="proofscript" id="proof1275">
+<div class="toggleproof" onclick="toggleDisplay('proof1289')">Proof.</div>
+<div class="proofscript" id="proof1289">
 &nbsp;&nbsp;&nbsp;<span class="id">prover1</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id">H0</span> <span class="id">ft</span>).<br/>
 &nbsp;&nbsp;&nbsp;<span class="id">prover0</span>.<br/>

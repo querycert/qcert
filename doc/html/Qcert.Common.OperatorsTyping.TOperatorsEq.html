@@ -1,0 +1,111 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Common.OperatorsTyping.TOperatorsEq</title>
+<meta name="description" content="Documentation of Coq module Qcert.Common.OperatorsTyping.TOperatorsEq" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Common.OperatorsTyping.TOperatorsEq</h1>
+<div class="coq">
+<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="TOperatorsEq">TOperatorsEq</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html">Equivalence</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html">Morphisms</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Setoids.Setoid.html">Setoid</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="kwd">Program</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="kwd">Types</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html">ForeignDataTyping</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html">ForeignOperatorsTyping</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.DataTyping.TData.html">TData</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TUnaryOperators.html">TUnaryOperators</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TBinaryOperators.html">TBinaryOperators</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fdata</span>:<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fuop</span>:<span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#foreign_unary_op">foreign_unary_op</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fbop</span>:<span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#foreign_binary_op">foreign_binary_op</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ftype</span>:<span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fdtyping</span>:<span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fuoptyping</span>:<span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#foreign_unary_op_typing">foreign_unary_op_typing</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fboptyping</span>:<span class="id"><a href="Qcert.Common.OperatorsTyping.ForeignOperatorsTyping.html#foreign_binary_op_typing">foreign_binary_op_typing</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="typed_unary_op">typed_unary_op</a></span> τ<span class="kwd">in</span> τ<span class="id">out</span> := {<span class="id">u</span>:<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>|<span class="id"><a href="Qcert.Common.OperatorsTyping.TUnaryOperators.html#unary_op_type">unary_op_type</a></span> <span class="id">u</span> τ<span class="kwd">in</span> τ<span class="id">out</span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tunary_op_eq">tunary_op_eq</a></span> {τ<span class="kwd">in</span> τ<span class="id">out</span>} (<span class="id">uop1</span> <span class="id">uop2</span>:<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#typed_unary_op">typed_unary_op</a></span> τ<span class="kwd">in</span> τ<span class="id">out</span>) : <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x">x</a></span> τ<span class="kwd">in</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#unary_op_eval">unary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (`<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#uop1">uop1</a></span>)) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x">x</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (<span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#unary_op_eval">unary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (`<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#uop2">uop2</a></span>)) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x">x</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tunary_op_equiv">tunary_op_equiv</a></span> {τ<span class="kwd">in</span> τ<span class="id">out</span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> (@<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tunary_op_eq">tunary_op_eq</a></span> τ<span class="kwd">in</span> τ<span class="id">out</span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1484')">Proof.</div>
+<div class="proofscript" id="proof1484">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Reflexive">Reflexive</a></span>, <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tunary_op_eq">tunary_op_eq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Symmetric">Symmetric</a></span>, <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tunary_op_eq">tunary_op_eq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">rewrite</span> (<span class="id">H</span> <span class="id">x0</span>); [<span class="tactic">reflexivity</span>|<span class="tactic">assumption</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Transitive">Transitive</a></span>, <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tunary_op_eq">tunary_op_eq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H</span> <span class="id">x0</span>); <span class="tactic">try</span> <span class="tactic">assumption</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H0</span> <span class="id">x0</span>); [<span class="tactic">reflexivity</span>|<span class="tactic">assumption</span>].<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tunary_op_rewrites_to">tunary_op_rewrites_to</a></span> {τ₁ τ₂} (<span class="id">u1</span> <span class="id">u2</span>:<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.OperatorsTyping.TUnaryOperators.html#unary_op_type">unary_op_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#u1">u1</a></span> τ₁ τ₂ -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.OperatorsTyping.TUnaryOperators.html#unary_op_type">unary_op_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#u2">u2</a></span> τ₁ τ₂ -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x">x</a></span> τ₁ -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#unary_op_eval">unary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#u1">u1</a></span>) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x">x</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (<span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#unary_op_eval">unary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#u2">u2</a></span>) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x">x</a></span>).<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="typed_binary_op">typed_binary_op</a></span> τ₁ τ₂ τ<span class="id">out</span> := {<span class="id">b</span>:<span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#binary_op">binary_op</a></span>|<span class="id"><a href="Qcert.Common.OperatorsTyping.TBinaryOperators.html#binary_op_type">binary_op_type</a></span> <span class="id">b</span> τ₁ τ₂ τ<span class="id">out</span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tbinary_op_eq">tbinary_op_eq</a></span> {τ₁ τ₂ τ<span class="id">out</span>} (<span class="id">bop1</span> <span class="id">bop2</span>:<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#typed_binary_op">typed_binary_op</a></span> τ₁ τ₂ τ<span class="id">out</span>) : <span class="kwd">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x1</span> <span class="id">x2</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x1">x1</a></span> τ₁ -&gt; <span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x2">x2</a></span> τ₂ -&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Operators.BinaryOperatorsSem.html#binary_op_eval">binary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (`<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#bop1">bop1</a></span>)) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x1">x1</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x2">x2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (<span class="id"><a href="Qcert.Common.Operators.BinaryOperatorsSem.html#binary_op_eval">binary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (`<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#bop2">bop2</a></span>)) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x1">x1</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x2">x2</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tbinary_op_equiv">tbinary_op_equiv</a></span> {τ₁ τ₂ τ<span class="id">out</span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> (@<span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tbinary_op_eq">tbinary_op_eq</a></span> τ₁ τ₂ τ<span class="id">out</span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1485')">Proof.</div>
+<div class="proofscript" id="proof1485">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Reflexive">Reflexive</a></span>, <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tbinary_op_eq">tbinary_op_eq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Symmetric">Symmetric</a></span>, <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tbinary_op_eq">tbinary_op_eq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">rewrite</span> (<span class="id">H</span> <span class="id">x1</span> <span class="id">x2</span>); <span class="tactic">try</span> <span class="tactic">assumption</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Transitive">Transitive</a></span>, <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#tbinary_op_eq">tbinary_op_eq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H</span> <span class="id">x1</span> <span class="id">x2</span>); <span class="tactic">try</span> <span class="tactic">assumption</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H0</span> <span class="id">x1</span> <span class="id">x2</span>); <span class="tactic">try</span> <span class="tactic">assumption</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tbinary_op_rewrites_to">tbinary_op_rewrites_to</a></span> {τ₁ τ₂ τ₃} (<span class="id">b1</span> <span class="id">b2</span>:<span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#binary_op">binary_op</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.OperatorsTyping.TBinaryOperators.html#binary_op_type">binary_op_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#b1">b1</a></span> τ₁ τ₂ τ₃ -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.OperatorsTyping.TBinaryOperators.html#binary_op_type">binary_op_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#b2">b2</a></span> τ₁ τ₂ τ₃ /\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> (<span class="id">x1</span> <span class="id">x2</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x1">x1</a></span> τ₁ -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x2">x2</a></span> τ₂ -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Operators.BinaryOperatorsSem.html#binary_op_eval">binary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#b1">b1</a></span>) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x1">x1</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x2">x2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (<span class="id"><a href="Qcert.Common.Operators.BinaryOperatorsSem.html#binary_op_eval">binary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#b2">b2</a></span>) <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x1">x1</a></span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#x2">x2</a></span>).<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.OperatorsTyping.TOperatorsEq.html#TOperatorsEq">TOperatorsEq</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

@@ -293,8 +293,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="error_msg_to_false">error_msg_to_false</a></span> <span class="id">s1</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">s</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>, <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_error">Q_error</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#s1">s1</a></span> :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> &lt;&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_error">Q_error</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#s">s</a></span> :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#False">False</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3231')">Proof.</div>
-<div class="proofscript" id="proof3231">
+<div class="toggleproof" onclick="toggleDisplay('proof3255')">Proof.</div>
+<div class="proofscript" id="proof3255">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">s1</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
@@ -432,8 +432,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ (<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; (<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrcmr">Q_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3232')">Proof.</div>
-<div class="proofscript" id="proof3232">
+<div class="toggleproof" onclick="toggleDisplay('proof3256')">Proof.</div>
+<div class="proofscript" id="proof3256">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#cnd_combined_ind">cnd_combined_ind</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">intros</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span><br/>
@@ -494,8 +494,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp_rule">Dv_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp_rule">Dv_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp_rule">Q_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3233')">Proof.</div>
-<div class="proofscript" id="proof3233">
+<div class="toggleproof" onclick="toggleDisplay('proof3257')">Proof.</div>
+<div class="proofscript" id="proof3257">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -512,8 +512,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_tech_rule">Dv_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_tech_rule">Dv_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_tech_rule">Q_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3234')">Proof.</div>
-<div class="proofscript" id="proof3234">
+<div class="toggleproof" onclick="toggleDisplay('proof3258')">Proof.</div>
+<div class="proofscript" id="proof3258">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -527,8 +527,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_designer_rule">Dv_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_designer_rule">Dv_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_designer_rule">Q_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3235')">Proof.</div>
-<div class="proofscript" id="proof3235">
+<div class="toggleproof" onclick="toggleDisplay('proof3259')">Proof.</div>
+<div class="proofscript" id="proof3259">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -542,8 +542,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp">Dv_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp">Dv_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp">Q_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3236')">Proof.</div>
-<div class="proofscript" id="proof3236">
+<div class="toggleproof" onclick="toggleDisplay('proof3260')">Proof.</div>
+<div class="proofscript" id="proof3260">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_cnd">correct_driver_succeeds_cnd</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H2</span>.<br/>
@@ -556,8 +556,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv">Dv_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv">Dv_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3237')">Proof.</div>
-<div class="proofscript" id="proof3237">
+<div class="toggleproof" onclick="toggleDisplay('proof3261')">Proof.</div>
+<div class="proofscript" id="proof3261">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_cnd">correct_driver_succeeds_cnd</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
@@ -573,8 +573,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv_core">Dv_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv_core">Dv_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3238')">Proof.</div>
-<div class="proofscript" id="proof3238">
+<div class="toggleproof" onclick="toggleDisplay('proof3262')">Proof.</div>
+<div class="proofscript" id="proof3262">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_cnd">correct_driver_succeeds_cnd</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
@@ -589,8 +589,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc_core">Dv_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc_core">Dv_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc_core">Q_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3239')">Proof.</div>
-<div class="proofscript" id="proof3239">
+<div class="toggleproof" onclick="toggleDisplay('proof3263')">Proof.</div>
+<div class="proofscript" id="proof3263">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_cnd">correct_driver_succeeds_cnd</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
@@ -607,8 +607,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc">Q_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3240')">Proof.</div>
-<div class="proofscript" id="proof3240">
+<div class="toggleproof" onclick="toggleDisplay('proof3264')">Proof.</div>
+<div class="proofscript" id="proof3264">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_cnd">correct_driver_succeeds_cnd</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
@@ -626,8 +626,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrcmr">Q_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3241')">Proof.</div>
-<div class="proofscript" id="proof3241">
+<div class="toggleproof" onclick="toggleDisplay('proof3265')">Proof.</div>
+<div class="proofscript" id="proof3265">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_cnd">correct_driver_succeeds_cnd</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
@@ -645,8 +645,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nra">Dv_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nra">Dv_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nra">Q_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3242')">Proof.</div>
-<div class="proofscript" id="proof3242">
+<div class="toggleproof" onclick="toggleDisplay('proof3266')">Proof.</div>
+<div class="proofscript" id="proof3266">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_cnd">correct_driver_succeeds_cnd</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
@@ -661,8 +661,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_oql">Dv_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_oql">Dv_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_oql">Q_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3243')">Proof.</div>
-<div class="proofscript" id="proof3243">
+<div class="toggleproof" onclick="toggleDisplay('proof3267')">Proof.</div>
+<div class="proofscript" id="proof3267">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -681,8 +681,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sql">Dv_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sql">Dv_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_sql">Q_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3244')">Proof.</div>
-<div class="proofscript" id="proof3244">
+<div class="toggleproof" onclick="toggleDisplay('proof3268')">Proof.</div>
+<div class="proofscript" id="proof3268">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -701,8 +701,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sqlpp">Dv_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sqlpp">Dv_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_sqlpp">Q_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3245')">Proof.</div>
-<div class="proofscript" id="proof3245">
+<div class="toggleproof" onclick="toggleDisplay('proof3269')">Proof.</div>
+<div class="proofscript" id="proof3269">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -721,8 +721,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_lambda_nra">Dv_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_lambda_nra">Dv_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_lambda_nra">Q_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3246')">Proof.</div>
-<div class="proofscript" id="proof3246">
+<div class="toggleproof" onclick="toggleDisplay('proof3270')">Proof.</div>
+<div class="proofscript" id="proof3270">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -741,8 +741,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cldmr">Dv_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cldmr">Dv_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_cldmr">Q_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3247')">Proof.</div>
-<div class="proofscript" id="proof3247">
+<div class="toggleproof" onclick="toggleDisplay('proof3271')">Proof.</div>
+<div class="proofscript" id="proof3271">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -756,8 +756,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_javascript">Dv_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_javascript">Dv_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_javascript">Q_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3248')">Proof.</div>
-<div class="proofscript" id="proof3248">
+<div class="toggleproof" onclick="toggleDisplay('proof3272')">Proof.</div>
+<div class="proofscript" id="proof3272">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -769,8 +769,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_java">Dv_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_java">Dv_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_java">Q_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3249')">Proof.</div>
-<div class="proofscript" id="proof3249">
+<div class="toggleproof" onclick="toggleDisplay('proof3273')">Proof.</div>
+<div class="proofscript" id="proof3273">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -782,8 +782,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_rdd">Dv_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_rdd">Dv_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_spark_rdd">Q_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3250')">Proof.</div>
-<div class="proofscript" id="proof3250">
+<div class="toggleproof" onclick="toggleDisplay('proof3274')">Proof.</div>
+<div class="proofscript" id="proof3274">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -795,8 +795,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_df">Dv_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_df">Dv_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_spark_df">Q_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3251')">Proof.</div>
-<div class="proofscript" id="proof3251">
+<div class="toggleproof" onclick="toggleDisplay('proof3275')">Proof.</div>
+<div class="proofscript" id="proof3275">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -808,8 +808,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cloudant">Dv_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cloudant">Dv_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_cloudant">Q_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3252')">Proof.</div>
-<div class="proofscript" id="proof3252">
+<div class="toggleproof" onclick="toggleDisplay('proof3276')">Proof.</div>
+<div class="proofscript" id="proof3276">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -821,8 +821,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc">Dv_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc">Dv_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_dnnrc">Q_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3253')">Proof.</div>
-<div class="proofscript" id="proof3253">
+<div class="toggleproof" onclick="toggleDisplay('proof3277')">Proof.</div>
+<div class="proofscript" id="proof3277">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -836,8 +836,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc_typed">Dv_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc_typed">Dv_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_dnnrc_typed">Q_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3254')">Proof.</div>
-<div class="proofscript" id="proof3254">
+<div class="toggleproof" onclick="toggleDisplay('proof3278')">Proof.</div>
+<div class="proofscript" id="proof3278">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -855,8 +855,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_matches_query">driver_matches_query</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_not_error">query_not_error</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3255')">Proof.</div>
-<div class="proofscript" id="proof3255">
+<div class="toggleproof" onclick="toggleDisplay('proof3279')">Proof.</div>
+<div class="proofscript" id="proof3279">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">destruct</span> <span class="id">q</span>; <span class="tactic">try</span> <span class="id">contradiction</span>; <span class="tactic">clear</span> <span class="id">H0</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_succeeds_camp_rule">correct_driver_succeeds_camp_rule</a></span>; <span class="tactic">auto</span>.<br/>
@@ -890,8 +890,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>; <span class="id">prove_same_outputs</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="query_equiv">query_equiv</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3256')">Proof.</div>
-<div class="proofscript" id="proof3256">
+<div class="toggleproof" onclick="toggleDisplay('proof3280')">Proof.</div>
+<div class="proofscript" id="proof3280">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Reflexive">Reflexive</a></span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
@@ -926,8 +926,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_rule_to_camp_preserves_eval">camp_rule_to_camp_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp_rule">camp_rule</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp_rule">Q_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp">Q_camp</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_rule_to_camp">camp_rule_to_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3257')">Proof.</div>
-<div class="proofscript" id="proof3257">
+<div class="toggleproof" onclick="toggleDisplay('proof3281')">Proof.</div>
+<div class="proofscript" id="proof3281">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_camp_rule">eval_camp_rule</a></span>.<br/>
@@ -939,8 +939,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_to_nraenv_core_preserves_eval">camp_to_nraenv_core_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp">camp</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp">Q_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv_core">camp_to_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3258')">Proof.</div>
-<div class="proofscript" id="proof3258">
+<div class="toggleproof" onclick="toggleDisplay('proof3282')">Proof.</div>
+<div class="proofscript" id="proof3282">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_camp">eval_camp</a></span>.<br/>
@@ -952,8 +952,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_to_nraenv_preserves_eval">camp_to_nraenv_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp">camp</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp">Q_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv">camp_to_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3259')">Proof.</div>
-<div class="proofscript" id="proof3259">
+<div class="toggleproof" onclick="toggleDisplay('proof3283')">Proof.</div>
+<div class="proofscript" id="proof3283">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_camp">eval_camp</a></span>.<br/>
@@ -965,8 +965,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_to_nra_preserves_eval">camp_to_nra_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp">camp</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp">Q_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nra">Q_nra</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nra">camp_to_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3260')">Proof.</div>
-<div class="proofscript" id="proof3260">
+<div class="toggleproof" onclick="toggleDisplay('proof3284')">Proof.</div>
+<div class="proofscript" id="proof3284">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_camp">eval_camp</a></span>.<br/>
@@ -978,8 +978,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nra_to_nnrc_core_preserves_eval">nra_to_nnrc_core_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nra">nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nra">Q_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc_core">Q_nnrc_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nra_to_nnrc_core">nra_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3261')">Proof.</div>
-<div class="proofscript" id="proof3261">
+<div class="toggleproof" onclick="toggleDisplay('proof3285')">Proof.</div>
+<div class="proofscript" id="proof3285">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nra">eval_nra</a></span>.<br/>
@@ -991,8 +991,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nra_to_nraenv_core_preserves_eval">nra_to_nraenv_core_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nra">nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nra">Q_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nra_to_nraenv_core">nra_to_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3262')">Proof.</div>
-<div class="proofscript" id="proof3262">
+<div class="toggleproof" onclick="toggleDisplay('proof3286')">Proof.</div>
+<div class="proofscript" id="proof3286">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nra">eval_nra</a></span>.<br/>
@@ -1004,8 +1004,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_core_to_nraenv_preserves_eval">nraenv_core_to_nraenv_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_core_to_nraenv">nraenv_core_to_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3263')">Proof.</div>
-<div class="proofscript" id="proof3263">
+<div class="toggleproof" onclick="toggleDisplay('proof3287')">Proof.</div>
+<div class="proofscript" id="proof3287">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nraenv_core">eval_nraenv_core</a></span>.<br/>
@@ -1017,8 +1017,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_core_to_nnrc_core_preserves_eval">nraenv_core_to_nnrc_core_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc_core">Q_nnrc_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_core_to_nnrc_core">nraenv_core_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3264')">Proof.</div>
-<div class="proofscript" id="proof3264">
+<div class="toggleproof" onclick="toggleDisplay('proof3288')">Proof.</div>
+<div class="proofscript" id="proof3288">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nraenv_core">eval_nraenv_core</a></span>.<br/>
@@ -1030,8 +1030,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_core_to_nra_preserves_eval">nraenv_core_to_nra_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nra">Q_nra</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_core_to_nra">nraenv_core_to_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3265')">Proof.</div>
-<div class="proofscript" id="proof3265">
+<div class="toggleproof" onclick="toggleDisplay('proof3289')">Proof.</div>
+<div class="proofscript" id="proof3289">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nraenv_core">eval_nraenv_core</a></span>.<br/>
@@ -1043,8 +1043,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_to_nnrc_preserves_eval">nraenv_to_nnrc_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv">nraenv</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc">Q_nnrc</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_to_nnrc">nraenv_to_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3266')">Proof.</div>
-<div class="proofscript" id="proof3266">
+<div class="toggleproof" onclick="toggleDisplay('proof3290')">Proof.</div>
+<div class="proofscript" id="proof3290">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nraenv">eval_nraenv</a></span>.<br/>
@@ -1056,8 +1056,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_to_nraenv_core_preserves_eval">nraenv_to_nraenv_core_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv">nraenv</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_to_nraenv_core">nraenv_to_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3267')">Proof.</div>
-<div class="proofscript" id="proof3267">
+<div class="toggleproof" onclick="toggleDisplay('proof3291')">Proof.</div>
+<div class="proofscript" id="proof3291">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nraenv">eval_nraenv</a></span>.<br/>
@@ -1069,8 +1069,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrc_core_to_nnrc_preserves_eval">nnrc_core_to_nnrc_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nnrc_core">nnrc_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc_core">Q_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc">Q_nnrc</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nnrc_core_to_nnrc">nnrc_core_to_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3268')">Proof.</div>
-<div class="proofscript" id="proof3268">
+<div class="toggleproof" onclick="toggleDisplay('proof3292')">Proof.</div>
+<div class="proofscript" id="proof3292">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nnrc_core">eval_nnrc_core</a></span>.<br/>
@@ -1084,8 +1084,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrc_to_nnrc_core_preserves_eval">nnrc_to_nnrc_core_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc">Q_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc_core">Q_nnrc_core</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nnrc_to_nnrc_core">nnrc_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3269')">Proof.</div>
-<div class="proofscript" id="proof3269">
+<div class="toggleproof" onclick="toggleDisplay('proof3293')">Proof.</div>
+<div class="proofscript" id="proof3293">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_nnrc">eval_nnrc</a></span>.<br/>
@@ -1098,8 +1098,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="oql_to_nraenv_preserves_eval">oql_to_nraenv_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#oql">oql</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_oql">Q_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#oql_to_nraenv">oql_to_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3270')">Proof.</div>
-<div class="proofscript" id="proof3270">
+<div class="toggleproof" onclick="toggleDisplay('proof3294')">Proof.</div>
+<div class="proofscript" id="proof3294">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_oql">eval_oql</a></span>.<br/>
@@ -1111,8 +1111,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lambda_nra_to_nraenv_preserves_eval">lambda_nra_to_nraenv_preserves_eval</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#lambda_nra">lambda_nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_lambda_nra">Q_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3271')">Proof.</div>
-<div class="proofscript" id="proof3271">
+<div class="toggleproof" onclick="toggleDisplay('proof3295')">Proof.</div>
+<div class="proofscript" id="proof3295">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEval.html#eval_lambda_nra">eval_lambda_nra</a></span>.<br/>
@@ -1144,8 +1144,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ (<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; (<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrcmr">Q_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrcmr">Q_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>)))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3272')">Proof.</div>
-<div class="proofscript" id="proof3272">
+<div class="toggleproof" onclick="toggleDisplay('proof3296')">Proof.</div>
+<div class="proofscript" id="proof3296">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#cnd_combined_ind">cnd_combined_ind</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">intros</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span><br/>
@@ -1277,8 +1277,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp_rule">Dv_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp_rule">Q_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp_rule">Dv_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp_rule">Q_camp_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3273')">Proof.</div>
-<div class="proofscript" id="proof3273">
+<div class="toggleproof" onclick="toggleDisplay('proof3297')">Proof.</div>
+<div class="proofscript" id="proof3297">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1302,8 +1302,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_tech_rule">Dv_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_tech_rule">Q_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_tech_rule">Dv_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_tech_rule">Q_tech_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3274')">Proof.</div>
-<div class="proofscript" id="proof3274">
+<div class="toggleproof" onclick="toggleDisplay('proof3298')">Proof.</div>
+<div class="proofscript" id="proof3298">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1319,8 +1319,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_designer_rule">Dv_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_designer_rule">Q_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_designer_rule">Dv_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_designer_rule">Q_designer_rule</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3275')">Proof.</div>
-<div class="proofscript" id="proof3275">
+<div class="toggleproof" onclick="toggleDisplay('proof3299')">Proof.</div>
+<div class="proofscript" id="proof3299">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1336,8 +1336,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp">Dv_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp">Q_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_camp">Dv_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_camp">Q_camp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3276')">Proof.</div>
-<div class="proofscript" id="proof3276">
+<div class="toggleproof" onclick="toggleDisplay('proof3300')">Proof.</div>
+<div class="proofscript" id="proof3300">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1352,8 +1352,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nra">Dv_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nra">Q_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nra">Dv_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nra">Q_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3277')">Proof.</div>
-<div class="proofscript" id="proof3277">
+<div class="toggleproof" onclick="toggleDisplay('proof3301')">Proof.</div>
+<div class="proofscript" id="proof3301">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1369,8 +1369,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv">Dv_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv">Dv_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv">Q_nraenv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3278')">Proof.</div>
-<div class="proofscript" id="proof3278">
+<div class="toggleproof" onclick="toggleDisplay('proof3302')">Proof.</div>
+<div class="proofscript" id="proof3302">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1388,8 +1388,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv_core">Dv_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nraenv_core">Dv_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nraenv_core">Q_nraenv_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3279')">Proof.</div>
-<div class="proofscript" id="proof3279">
+<div class="toggleproof" onclick="toggleDisplay('proof3303')">Proof.</div>
+<div class="proofscript" id="proof3303">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1406,8 +1406,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc">Q_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc">Dv_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc">Q_nnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3280')">Proof.</div>
-<div class="proofscript" id="proof3280">
+<div class="toggleproof" onclick="toggleDisplay('proof3304')">Proof.</div>
+<div class="proofscript" id="proof3304">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1427,8 +1427,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc_core">Dv_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc_core">Q_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrc_core">Dv_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrc_core">Q_nnrc_core</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3281')">Proof.</div>
-<div class="proofscript" id="proof3281">
+<div class="toggleproof" onclick="toggleDisplay('proof3305')">Proof.</div>
+<div class="proofscript" id="proof3305">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1447,8 +1447,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrcmr">Q_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_nnrcmr">Dv_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_nnrcmr">Q_nnrcmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3282')">Proof.</div>
-<div class="proofscript" id="proof3282">
+<div class="toggleproof" onclick="toggleDisplay('proof3306')">Proof.</div>
+<div class="proofscript" id="proof3306">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1468,8 +1468,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cldmr">Dv_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_cldmr">Q_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cldmr">Dv_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_cldmr">Q_cldmr</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3283')">Proof.</div>
-<div class="proofscript" id="proof3283">
+<div class="toggleproof" onclick="toggleDisplay('proof3307')">Proof.</div>
+<div class="proofscript" id="proof3307">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1484,8 +1484,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc">Dv_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_dnnrc">Q_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc">Dv_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_dnnrc">Q_dnnrc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3284')">Proof.</div>
-<div class="proofscript" id="proof3284">
+<div class="toggleproof" onclick="toggleDisplay('proof3308')">Proof.</div>
+<div class="proofscript" id="proof3308">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1500,8 +1500,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc_typed">Dv_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_dnnrc_typed">Q_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_dnnrc_typed">Dv_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_dnnrc_typed">Q_dnnrc_typed</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3285')">Proof.</div>
-<div class="proofscript" id="proof3285">
+<div class="toggleproof" onclick="toggleDisplay('proof3309')">Proof.</div>
+<div class="proofscript" id="proof3309">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1517,8 +1517,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_oql">Dv_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_oql">Q_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_oql">Dv_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_oql">Q_oql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3286')">Proof.</div>
-<div class="proofscript" id="proof3286">
+<div class="toggleproof" onclick="toggleDisplay('proof3310')">Proof.</div>
+<div class="proofscript" id="proof3310">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1545,8 +1545,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_lambda_nra">Dv_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_lambda_nra">Q_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_lambda_nra">Dv_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_lambda_nra">Q_lambda_nra</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3287')">Proof.</div>
-<div class="proofscript" id="proof3287">
+<div class="toggleproof" onclick="toggleDisplay('proof3311')">Proof.</div>
+<div class="proofscript" id="proof3311">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -1573,8 +1573,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sql">Dv_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_sql">Q_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sql">Dv_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_sql">Q_sql</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3288')">Proof.</div>
-<div class="proofscript" id="proof3288">
+<div class="toggleproof" onclick="toggleDisplay('proof3312')">Proof.</div>
+<div class="proofscript" id="proof3312">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1590,8 +1590,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sqlpp">Dv_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_sqlpp">Q_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_sqlpp">Dv_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_sqlpp">Q_sqlpp</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3289')">Proof.</div>
-<div class="proofscript" id="proof3289">
+<div class="toggleproof" onclick="toggleDisplay('proof3313')">Proof.</div>
+<div class="proofscript" id="proof3313">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1607,8 +1607,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_javascript">Dv_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_javascript">Q_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_javascript">Dv_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_javascript">Q_javascript</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3290')">Proof.</div>
-<div class="proofscript" id="proof3290">
+<div class="toggleproof" onclick="toggleDisplay('proof3314')">Proof.</div>
+<div class="proofscript" id="proof3314">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1622,8 +1622,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_java">Dv_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_java">Q_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_java">Dv_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_java">Q_java</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3291')">Proof.</div>
-<div class="proofscript" id="proof3291">
+<div class="toggleproof" onclick="toggleDisplay('proof3315')">Proof.</div>
+<div class="proofscript" id="proof3315">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1637,8 +1637,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_rdd">Dv_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_spark_rdd">Q_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_rdd">Dv_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_spark_rdd">Q_spark_rdd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3292')">Proof.</div>
-<div class="proofscript" id="proof3292">
+<div class="toggleproof" onclick="toggleDisplay('proof3316')">Proof.</div>
+<div class="proofscript" id="proof3316">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1652,8 +1652,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_df">Dv_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_spark_df">Q_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_spark_df">Dv_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_spark_df">Q_spark_df</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3293')">Proof.</div>
-<div class="proofscript" id="proof3293">
+<div class="toggleproof" onclick="toggleDisplay('proof3317')">Proof.</div>
+<div class="proofscript" id="proof3317">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1667,8 +1667,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">dv</span>, <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cloudant">Dv_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">q</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_cloudant">Q_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#Dv_cloudant">Dv_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#Q_cloudant">Q_cloudant</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3294')">Proof.</div>
-<div class="proofscript" id="proof3294">
+<div class="toggleproof" onclick="toggleDisplay('proof3318')">Proof.</div>
+<div class="proofscript" id="proof3318">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">intros</span>.<br/>
@@ -1703,8 +1703,8 @@ input data returns the same output data. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_correct">driver_correct</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#driver_matches_query">driver_matches_query</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#query_preserves_eval">query_preserves_eval</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>) (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#compile">compile</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#dv">dv</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#q">q</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3295')">Proof.</div>
-<div class="proofscript" id="proof3295">
+<div class="toggleproof" onclick="toggleDisplay('proof3319')">Proof.</div>
+<div class="proofscript" id="proof3319">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">dv</span>; <span class="tactic">destruct</span> <span class="id">q</span>; <span class="tactic">try</span> <span class="id">contradiction</span>; <span class="tactic">clear</span> <span class="id">H0</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#correct_driver_preserves_eval_camp_rule">correct_driver_preserves_eval_camp_rule</a></span>; <span class="tactic">auto</span>.<br/>

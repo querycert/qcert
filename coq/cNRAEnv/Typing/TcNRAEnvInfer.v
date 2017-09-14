@@ -28,8 +28,6 @@ Section TcNRAEnvInfer.
   Require Import cNRAEnv.
   Require Import TcNRAEnv.
   Require Import Program.
-  Require Import TDataInfer.
-  Require Import TOpsInfer.
   Require Import TNRAInfer. (* Only for a few auxiliary Lemmas that should probably be moved *)
 
   (* Type inference for algebraic expressions *)
@@ -42,17 +40,17 @@ Section TcNRAEnvInfer.
       | ANID => Some τin
       | ANConst d => infer_data_type (normalize_data brand_relation_brands d)
       | ANBinop b op1 op2 =>
-        let binf (τ₁ τ₂:rtype) := infer_binop_type b τ₁ τ₂ in
+        let binf (τ₁ τ₂:rtype) := infer_binary_op_type b τ₁ τ₂ in
         olift2 binf (infer_nraenv_core_type op1 τenv τin) (infer_nraenv_core_type op2 τenv τin)
       | ANUnop u op1 =>
-        let unf (τ₁:rtype) := infer_unop_type u τ₁ in
+        let unf (τ₁:rtype) := infer_unary_op_type u τ₁ in
         olift unf (infer_nraenv_core_type op1 τenv τin)
       | ANMap op1 op2 =>
         let mapf (τ₁:rtype) :=
             olift (fun x => lift (fun y => Coll y) (infer_nraenv_core_type op1 τenv x)) (tuncoll τ₁)
         in
         olift mapf (infer_nraenv_core_type op2 τenv τin)
-      | ANMapConcat op1 op2 =>
+      | ANMapProduct op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
@@ -165,14 +163,14 @@ Section TcNRAEnvInfer.
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
       apply (@ANTBinop m τconstants τenv τin r r0 τout); try assumption.
-      apply infer_binop_type_correct; assumption.
+      apply infer_binary_op_type_correct; assumption.
     - Case "ANUnop"%string.
       specialize (IHe τenv τin).
       destruct (infer_nraenv_core_type e τenv τin); simpl in *;
       try discriminate.
       specialize (IHe r eq_refl).
       apply (@ANTUnop m τconstants τenv τin r τout); try assumption.
-      apply infer_unop_type_correct; assumption.
+      apply infer_unary_op_type_correct; assumption.
     - Case "ANMap"%string.
       case_eq (infer_nraenv_core_type e2 τenv τin); intros; simpl in *.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H. simpl in *.
@@ -189,7 +187,7 @@ Section TcNRAEnvInfer.
         rewrite H in H3; congruence.
         rewrite H1 in H; simpl in H; congruence.
       + rewrite H0 in H. simpl in H; congruence.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       case_eq (infer_nraenv_core_type e2 τenv τin); intros.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H; simpl in *.
         unfold tmapConcatInput in H.
@@ -223,7 +221,7 @@ Section TcNRAEnvInfer.
             by apply RecMaybe_pf_some.
           simpl in H.
           clear e eq22 H1 eq21 srl0 H0.
-          generalize (@ANTMapConcat m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
+          generalize (@ANTMapProduct m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
                                    e1 e2 pf1' pf2' H2 IHe1 IHe2 eq_refl); intros.
           assert (τout = (Coll (Rec Closed (rec_concat_sort l1' l2') H2))).
           assert ((@RecMaybe (@basic_model_foreign_type m)

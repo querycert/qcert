@@ -47,8 +47,8 @@
 &nbsp;&nbsp;<span class="kwd">Notation</span> "<span class="id">b1</span> ⊎ <span class="id">b2</span>" := (<span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span> <span class="id">b1</span> <span class="id">b2</span>) (<span class="id">right</span> <span class="id">associativity</span>, <span class="tactic">at</span> <span class="id">level</span> 70) : <span class="id">rbag_scope</span>.    <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="bunion_proper">bunion_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof631')">Proof.</div>
-<div class="proofscript" id="proof631">
+<div class="toggleproof" onclick="toggleDisplay('proof633')">Proof.</div>
+<div class="proofscript" id="proof633">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation_app">Permutation_app</a></span>; <span class="tactic">assumption</span>.<br/>
@@ -57,30 +57,30 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_nil_r">bunion_nil_r</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> ⊎ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof632')">Proof.</div>
-<div class="proofscript" id="proof632">
+<div class="toggleproof" onclick="toggleDisplay('proof634')">Proof.</div>
+<div class="proofscript" id="proof634">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>; <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#app_nil_r">app_nil_r</a></span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_nil_l">bunion_nil_l</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof633')">Proof.</div>
-<div class="proofscript" id="proof633">
+<div class="toggleproof" onclick="toggleDisplay('proof635')">Proof.</div>
+<div class="proofscript" id="proof635">
  <span class="tactic">reflexivity</span>. Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_assoc">bunion_assoc</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span> <span class="id">l3</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>) ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l3">l3</a></span>) = (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ⊎ (<span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l3">l3</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof634')">Proof.</div>
-<div class="proofscript" id="proof634">
+<div class="toggleproof" onclick="toggleDisplay('proof636')">Proof.</div>
+<div class="proofscript" id="proof636">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>; <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#app_assoc">app_assoc</a></span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_comm">bunion_comm</a></span> (<span class="id">l1</span> <span class="id">l2</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>) ≅ (<span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof635')">Proof.</div>
-<div class="proofscript" id="proof635">
+<div class="toggleproof" onclick="toggleDisplay('proof637')">Proof.</div>
+<div class="proofscript" id="proof637">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation_app_comm">Permutation_app_comm</a></span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
@@ -88,8 +88,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_Forall">bunion_Forall</a></span> <span class="id">P</span> (<span class="id">l1</span> <span class="id">l2</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof636')">Proof.</div>
-<div class="proofscript" id="proof636">
+<div class="toggleproof" onclick="toggleDisplay('proof638')">Proof.</div>
+<div class="proofscript" id="proof638">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#Forall_app">Forall_app</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -132,8 +132,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">subst</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">eauto</span>).<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="remove_one_proper">remove_one_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof637')">Proof.</div>
-<div class="proofscript" id="proof637">
+<div class="toggleproof" onclick="toggleDisplay('proof639')">Proof.</div>
+<div class="proofscript" id="proof639">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="id">tac</span>.<br/>
@@ -153,28 +153,28 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_over_app_delta">bminus_over_app_delta</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">d1</span> <span class="id">d2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#d1">d1</a></span>) ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#d2">d2</a></span>) = (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊖ (<span class="id"><a href="Qcert.Utils.Bag.html#d1">d1</a></span> ++ <span class="id"><a href="Qcert.Utils.Bag.html#d2">d2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof638')">Proof.</div>
-<div class="proofscript" id="proof638">
+<div class="toggleproof" onclick="toggleDisplay('proof640')">Proof.</div>
+<div class="proofscript" id="proof640">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d1</span>; <span class="id">tac</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_to_nil">bminus_to_nil</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">d</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof639')">Proof.</div>
-<div class="proofscript" id="proof639">
+<div class="toggleproof" onclick="toggleDisplay('proof641')">Proof.</div>
+<div class="proofscript" id="proof641">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d</span>; <span class="id">tac</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_nil_to_self">bminus_nil_to_self</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> ⊖ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof640')">Proof.</div>
-<div class="proofscript" id="proof640">
+<div class="toggleproof" onclick="toggleDisplay('proof642')">Proof.</div>
+<div class="proofscript" id="proof642">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="id">tac</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="bminus_proper_lem">bminus_proper_lem</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof641')">Proof.</div>
-<div class="proofscript" id="proof641">
+<div class="toggleproof" onclick="toggleDisplay('proof643')">Proof.</div>
+<div class="proofscript" id="proof643">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span> <span class="id">H</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">y</span>; <span class="id">tac</span>.<br/>
@@ -184,8 +184,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_one_comm">remove_one_comm</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x1</span> <span class="id">x2</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> <span class="id">x</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x1">x1</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x2">x2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>)) = (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x2">x2</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x1">x1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof642')">Proof.</div>
-<div class="proofscript" id="proof642">
+<div class="toggleproof" onclick="toggleDisplay('proof644')">Proof.</div>
+<div class="proofscript" id="proof644">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="id">tac</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
@@ -194,16 +194,16 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_one_not_first">remove_one_not_first</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x1</span> <span class="id">x2</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> <span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#x1">x1</a></span> &lt;&gt; <span class="id"><a href="Qcert.Utils.Bag.html#x2">x2</a></span> -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x1">x1</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#x2">x2</a></span> :: <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>)) = <span class="id"><a href="Qcert.Utils.Bag.html#x2">x2</a></span> :: (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x1">x1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof643')">Proof.</div>
-<div class="proofscript" id="proof643">
+<div class="toggleproof" onclick="toggleDisplay('proof645')">Proof.</div>
+<div class="proofscript" id="proof645">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">x1</span> <span class="id">x2</span>); <span class="tactic">intros</span>; [<span class="id">contradiction</span>|<span class="tactic">reflexivity</span>].<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="bminus_proper">bminus_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof644')">Proof.</div>
-<div class="proofscript" id="proof644">
+<div class="toggleproof" onclick="toggleDisplay('proof646')">Proof.</div>
+<div class="proofscript" id="proof646">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H</span>; <span class="id">tac</span>.<br/>
@@ -214,14 +214,14 @@
 <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_self">bminus_self</a></span> : <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof645')">Proof.</div>
-<div class="proofscript" id="proof645">
+<div class="toggleproof" onclick="toggleDisplay('proof647')">Proof.</div>
+<div class="proofscript" id="proof647">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">induction</span> <span class="id">x</span>; <span class="id">tac</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_naught">bminus_naught</a></span> : <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> ⊖ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof646')">Proof.</div>
-<div class="proofscript" id="proof646">
+<div class="toggleproof" onclick="toggleDisplay('proof648')">Proof.</div>
+<div class="proofscript" id="proof648">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -229,8 +229,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_cons">bminus_cons</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">a</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">x</span> <span class="id">y</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), ((<span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> :: <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) ⊖ (<span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> :: <span class="id"><a href="Qcert.Utils.Bag.html#y">y</a></span>)) = (<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof647')">Proof.</div>
-<div class="proofscript" id="proof647">
+<div class="toggleproof" onclick="toggleDisplay('proof649')">Proof.</div>
+<div class="proofscript" id="proof649">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tac</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -239,8 +239,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_bminus">bunion_bminus</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x</span> <span class="id">y</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), ((<span class="id"><a href="Qcert.Utils.Bag.html#y">y</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#y">y</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof648')">Proof.</div>
-<div class="proofscript" id="proof648">
+<div class="toggleproof" onclick="toggleDisplay('proof650')">Proof.</div>
+<div class="proofscript" id="proof650">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span> <span class="kwd">in</span> *; <span class="id">tac</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">y</span>; <span class="id">tac</span>.<br/>
@@ -249,15 +249,15 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_one_consed">remove_one_consed</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">a</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> :: <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>)) = <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof649')">Proof.</div>
-<div class="proofscript" id="proof649">
+<div class="toggleproof" onclick="toggleDisplay('proof651')">Proof.</div>
+<div class="proofscript" id="proof651">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tac</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_one_In">remove_one_In</a></span> (<span class="id">a</span> <span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof650')">Proof.</div>
-<div class="proofscript" id="proof650">
+<div class="toggleproof" onclick="toggleDisplay('proof652')">Proof.</div>
+<div class="proofscript" id="proof652">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">l2</span> <span class="id">a</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">induction</span> <span class="id">l2</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -275,8 +275,8 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_one_sublist">remove_one_sublist</a></span> <span class="id">l</span> <span class="id">a</span> : <span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof651')">Proof.</div>
-<div class="proofscript" id="proof651">
+<div class="toggleproof" onclick="toggleDisplay('proof653')">Proof.</div>
+<div class="proofscript" id="proof653">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">match_destr</span>.<br/>
@@ -287,8 +287,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_sublist">bminus_sublist</a></span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof652')">Proof.</div>
-<div class="proofscript" id="proof652">
+<div class="toggleproof" onclick="toggleDisplay('proof654')">Proof.</div>
+<div class="proofscript" id="proof654">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">l2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
@@ -298,16 +298,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_Forall">bminus_Forall</a></span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof653')">Proof.</div>
-<div class="proofscript" id="proof653">
+<div class="toggleproof" onclick="toggleDisplay('proof655')">Proof.</div>
+<div class="proofscript" id="proof655">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_sublist">bminus_sublist</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_NoDup">bminus_NoDup</a></span>  (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof654')">Proof.</div>
-<div class="proofscript" id="proof654">
+<div class="toggleproof" onclick="toggleDisplay('proof656')">Proof.</div>
+<div class="proofscript" id="proof656">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_sublist">bminus_sublist</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
@@ -318,8 +318,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pick_an_a">pick_an_a</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;({<span class="id">l</span>':<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span> | <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>::<span class="id">l</span>' ≅ <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>}) + {<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> ≅ <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof655')">Proof.</div>
-<div class="proofscript" id="proof655">
+<div class="toggleproof" onclick="toggleDisplay('proof657')">Proof.</div>
+<div class="proofscript" id="proof657">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">induction</span> <span class="id">l</span>; <span class="id">tac</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">left</span>; <span class="id">exists</span> (<span class="id">a0</span>::<span class="id">x</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#perm_swap">perm_swap</a></span>, <span class="id">l0</span>; <span class="tactic">eauto</span>.<br/>
@@ -327,8 +327,8 @@
 <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="filter_proper">filter_proper</a></span> : <span class="kwd">forall</span> (<span class="id">p</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>), <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof656')">Proof.</div>
-<div class="proofscript" id="proof656">
+<div class="toggleproof" onclick="toggleDisplay('proof658')">Proof.</div>
+<div class="proofscript" id="proof658">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H</span>; <span class="id">tac</span>;<br/>
@@ -352,8 +352,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#mult_equiv">mult_equiv</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="mult_proper">mult_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof657')">Proof.</div>
-<div class="proofscript" id="proof657">
+<div class="toggleproof" onclick="toggleDisplay('proof659')">Proof.</div>
+<div class="proofscript" id="proof659">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
@@ -372,8 +372,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bags_equal_same_mult1">bags_equal_same_mult1</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ≅ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ≅# <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof658')">Proof.</div>
-<div class="proofscript" id="proof658">
+<div class="toggleproof" onclick="toggleDisplay('proof660')">Proof.</div>
+<div class="proofscript" id="proof660">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#mult_equiv">mult_equiv</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">H</span>; <span class="id">tac</span>.<br/>
@@ -391,8 +391,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="groupby_noDup">groupby_noDup</a></span> <span class="id">l</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof659')">Proof.</div>
-<div class="proofscript" id="proof659">
+<div class="toggleproof" onclick="toggleDisplay('proof661')">Proof.</div>
+<div class="proofscript" id="proof661">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Utils.Bag.html#NoDup">NoDup</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id">l</span>) <span class="id">a</span>); [<span class="tactic">intros</span> ? ?| <span class="tactic">intros</span> <span class="id">neq</span>].<br/>
@@ -413,8 +413,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="smush_perm_proper">smush_perm_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> ((@<span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation">Permutation</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>*<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>)) ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#smush">smush</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof660')">Proof.</div>
-<div class="proofscript" id="proof660">
+<div class="toggleproof" onclick="toggleDisplay('proof662')">Proof.</div>
+<div class="proofscript" id="proof662">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation_ind_bis">Permutation_ind_bis</a></span>; <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">x</span>. <span class="tactic">rewrite</span> <span class="id">H0</span>. <span class="tactic">reflexivity</span>.<br/>
@@ -424,14 +424,14 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="smush1">smush1</a></span> <span class="id">a</span> <span class="id">n</span> <span class="id">x</span> : <span class="id"><a href="Qcert.Utils.Bag.html#smush">smush</a></span> ((<span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>,<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>)::<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>::(<span class="id"><a href="Qcert.Utils.Bag.html#smush">smush</a></span> ((<span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>,<span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>)::<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof661')">Proof.</div>
-<div class="proofscript" id="proof661">
+<div class="toggleproof" onclick="toggleDisplay('proof663')">Proof.</div>
+<div class="proofscript" id="proof663">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="smush_groupby">smush_groupby</a></span> <span class="id">l</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation">Permutation</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#smush">smush</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>)) <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof662')">Proof.</div>
-<div class="proofscript" id="proof662">
+<div class="toggleproof" onclick="toggleDisplay('proof664')">Proof.</div>
+<div class="proofscript" id="proof664">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">groupby_noDup</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id">l</span>) <span class="id">a</span>); [<span class="tactic">intros</span> <span class="id">n</span> <span class="id">eqn</span> | <span class="tactic">intros</span> <span class="id">neq</span>].<br/>
@@ -449,8 +449,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pick_an_a_or_absent">pick_an_a_or_absent</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">a</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = 0) \/ (<span class="id">exists</span> <span class="id">l</span>':<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>, <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>::<span class="id">l</span>' ≅ <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof663')">Proof.</div>
-<div class="proofscript" id="proof663">
+<div class="toggleproof" onclick="toggleDisplay('proof665')">Proof.</div>
+<div class="proofscript" id="proof665">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">a</span> <span class="id">a0</span>); <span class="tactic">intros</span>.<br/>
@@ -479,8 +479,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lookup_none_mult0">lookup_none_mult0</a></span> <span class="id">l</span> <span class="id">d</span> : <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span> = 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof664')">Proof.</div>
-<div class="proofscript" id="proof664">
+<div class="toggleproof" onclick="toggleDisplay('proof666')">Proof.</div>
+<div class="proofscript" id="proof666">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id">l</span>) <span class="id">a</span>); <span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id">H0</span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">d</span> <span class="id">a</span>); <span class="tactic">subst</span>.<br/>
@@ -499,8 +499,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lookup_update_eq">lookup_update_eq</a></span> {<span class="id">B</span>:<span class="kwd">Type</span> }{<span class="id">l</span> <span class="id">a</span>} {<span class="id">n</span> <span class="id">n</span>':<span class="id"><a href="Qcert.Utils.Bag.html#B">B</a></span>} : <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#update_first">update_first</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id">n</span>') <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span> = <span class="id">n</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof665')">Proof.</div>
-<div class="proofscript" id="proof665">
+<div class="toggleproof" onclick="toggleDisplay('proof667')">Proof.</div>
+<div class="proofscript" id="proof667">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">a</span> <span class="id">n</span> <span class="id">n</span>'.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">a</span>.<br/>
@@ -511,8 +511,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="groupby_domain">groupby_domain</a></span> {<span class="id">l</span> <span class="id">a</span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>)) &lt;-&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof666')">Proof.</div>
-<div class="proofscript" id="proof666">
+<div class="toggleproof" onclick="toggleDisplay('proof668')">Proof.</div>
+<div class="proofscript" id="proof668">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id">l</span>) <span class="id">a</span>); <span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id">H0</span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -529,8 +529,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lookup_update_eq_in">lookup_update_eq_in</a></span> {<span class="id">B</span>:<span class="kwd">Type</span>}{<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>*<span class="id"><a href="Qcert.Utils.Bag.html#B">B</a></span>)} {<span class="id">a</span>} {<span class="id">n</span>:<span class="id"><a href="Qcert.Utils.Bag.html#B">B</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#update_first">update_first</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof667')">Proof.</div>
-<div class="proofscript" id="proof667">
+<div class="toggleproof" onclick="toggleDisplay('proof669')">Proof.</div>
+<div class="proofscript" id="proof669">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">a</span> <span class="id">n</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">a</span> <span class="id">a</span>); <span class="tactic">simpl</span>; <span class="tactic">intuition</span>.<br/>
@@ -539,8 +539,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lookup_update_neq">lookup_update_neq</a></span> {<span class="id">B</span>:<span class="kwd">Type</span> }{<span class="id">l</span> <span class="id">a</span> <span class="id">a</span>'} {<span class="id">n</span>:<span class="id"><a href="Qcert.Utils.Bag.html#B">B</a></span>} : <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>&lt;&gt;<span class="id">a</span>' -&gt; <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#update_first">update_first</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>) <span class="id">a</span>' = <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id">a</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof668')">Proof.</div>
-<div class="proofscript" id="proof668">
+<div class="toggleproof" onclick="toggleDisplay('proof670')">Proof.</div>
+<div class="proofscript" id="proof670">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">a</span> <span class="id">a</span>' <span class="id">n</span>. <span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">a</span> <span class="id">a0</span>); <span class="tactic">subst</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">e</span> <span class="kwd">in</span> *.<br/>
@@ -549,8 +549,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="groupby_mult_in">groupby_mult_in</a></span> {<span class="id">l</span> <span class="id">d</span> <span class="id">n</span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span>, <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>) (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span> = <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof669')">Proof.</div>
-<div class="proofscript" id="proof669">
+<div class="toggleproof" onclick="toggleDisplay('proof671')">Proof.</div>
+<div class="proofscript" id="proof671">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">n</span>. <span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id">l</span>) <span class="id">a</span>); <span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id">H0</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#in_lookup_nodup">in_lookup_nodup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span>) <span class="kwd">in</span> <span class="id">H</span>; [|<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Assoc.html#domain_update_first">domain_update_first</a></span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#groupby_noDup">groupby_noDup</a></span>].<br/>
@@ -567,8 +567,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="groupby_mult_in_pos">groupby_mult_in_pos</a></span> {<span class="id">l</span> <span class="id">d</span> <span class="id">n</span>} : <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span>, <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>) (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span> &lt;&gt; 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof670')">Proof.</div>
-<div class="proofscript" id="proof670">
+<div class="toggleproof" onclick="toggleDisplay('proof672')">Proof.</div>
+<div class="proofscript" id="proof672">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">n</span>. <span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id">l</span>) <span class="id">a</span>); <span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id">H0</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#in_lookup_nodup">in_lookup_nodup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span>) <span class="kwd">in</span> <span class="id">H</span>; [|<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Assoc.html#domain_update_first">domain_update_first</a></span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#groupby_noDup">groupby_noDup</a></span>].<br/>
@@ -582,8 +582,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="mult_in_groupby">mult_in_groupby</a></span> {<span class="id">l</span> <span class="id">d</span> <span class="id">n</span>} : <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>) (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof671')">Proof.</div>
-<div class="proofscript" id="proof671">
+<div class="toggleproof" onclick="toggleDisplay('proof673')">Proof.</div>
+<div class="proofscript" id="proof673">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">d</span> <span class="id">n</span>. <span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id">l</span>) <span class="id">a</span>); <span class="tactic">intros</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">d</span> <span class="id">a</span>); <span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id">H1</span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">subst</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id">e</span> <span class="kwd">in</span> *.<br/>
@@ -603,8 +603,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="mult_nin_groupby">mult_nin_groupby</a></span> {<span class="id">l</span> <span class="id">d</span>} : <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span> = 0 -&gt; ~ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#d">d</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby">groupby</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof672')">Proof.</div>
-<div class="proofscript" id="proof672">
+<div class="toggleproof" onclick="toggleDisplay('proof674')">Proof.</div>
+<div class="proofscript" id="proof674">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mu</span> <span class="id">ind</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Assoc.html#in_domain_in">in_domain_in</a></span> <span class="id">ind</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.Utils.Bag.html#groupby_mult_in">groupby_mult_in</a></span> <span class="id">H</span>) <span class="kwd">in</span> <span class="id">mu</span>.<br/>
@@ -614,8 +614,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bags_same_mult_has_equal">bags_same_mult_has_equal</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> (<span class="id">a</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>) = (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>)) -&gt;  (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ≅ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof673')">Proof.</div>
-<div class="proofscript" id="proof673">
+<div class="toggleproof" onclick="toggleDisplay('proof675')">Proof.</div>
+<div class="proofscript" id="proof675">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>. <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- (<span class="id"><a href="Qcert.Utils.Bag.html#smush_groupby">smush_groupby</a></span> <span class="id">l1</span>), &lt;- (<span class="id"><a href="Qcert.Utils.Bag.html#smush_groupby">smush_groupby</a></span> <span class="id">l2</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#smush_perm_proper">smush_perm_proper</a></span>.<br/>
@@ -654,8 +654,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_sublist">bdistinct_sublist</a></span> <span class="id">l</span> : <span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof674')">Proof.</div>
-<div class="proofscript" id="proof674">
+<div class="toggleproof" onclick="toggleDisplay('proof676')">Proof.</div>
+<div class="proofscript" id="proof676">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">match_destr</span>.<br/>
@@ -665,8 +665,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_Forall">bdistinct_Forall</a></span> {<span class="id">P</span>} {<span class="id">l</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof675')">Proof.</div>
-<div class="proofscript" id="proof675">
+<div class="toggleproof" onclick="toggleDisplay('proof677')">Proof.</div>
+<div class="proofscript" id="proof677">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id"><a href="Qcert.Utils.Sublist.html#Forall_sublist">Forall_sublist</a></span> <span class="id">_</span> <span class="id">_</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_sublist">bdistinct_sublist</a></span> <span class="id">l</span>)) <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
@@ -675,8 +675,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_at_most_one">bdistinct_at_most_one</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 0 \/ (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 1.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof676')">Proof.</div>
-<div class="proofscript" id="proof676">
+<div class="toggleproof" onclick="toggleDisplay('proof678')">Proof.</div>
+<div class="proofscript" id="proof678">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">IHl</span> <span class="id">x</span>); <span class="tactic">generalize</span> (<span class="id">IHl</span> <span class="id">a</span>); <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">IHl</span>.<br/>
@@ -694,8 +694,8 @@
 <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="bdistinct_proper">bdistinct_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.ListAdd.html#ldeqA">ldeqA</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof677')">Proof.</div>
-<div class="proofscript" id="proof677">
+<div class="toggleproof" onclick="toggleDisplay('proof679')">Proof.</div>
+<div class="proofscript" id="proof679">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_equal_same_mult1">bags_equal_same_mult1</a></span>; <span class="tactic">intros</span>.<br/>
@@ -760,8 +760,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_exactly_zero">bdistinct_exactly_zero</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 0 -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof678')">Proof.</div>
-<div class="proofscript" id="proof678">
+<div class="toggleproof" onclick="toggleDisplay('proof680')">Proof.</div>
+<div class="proofscript" id="proof680">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -781,8 +781,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_exactly_zero_back">bdistinct_exactly_zero_back</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 0 -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof679')">Proof.</div>
-<div class="proofscript" id="proof679">
+<div class="toggleproof" onclick="toggleDisplay('proof681')">Proof.</div>
+<div class="proofscript" id="proof681">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Bag.html#pick_an_a_or_absent">pick_an_a_or_absent</a></span> <span class="id">l</span> <span class="id">x</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>.<br/>
@@ -809,8 +809,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_exactly_one">bdistinct_exactly_one</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) &lt;&gt; 0 -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 1.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof680')">Proof.</div>
-<div class="proofscript" id="proof680">
+<div class="toggleproof" onclick="toggleDisplay('proof682')">Proof.</div>
+<div class="proofscript" id="proof682">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_at_most_one">bdistinct_at_most_one</a></span> <span class="id">l</span> <span class="id">x</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
@@ -825,8 +825,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_exactly_one_back">bdistinct_exactly_one_back</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 1 -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) &lt;&gt; 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof681')">Proof.</div>
-<div class="proofscript" id="proof681">
+<div class="toggleproof" onclick="toggleDisplay('proof683')">Proof.</div>
+<div class="proofscript" id="proof683">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (((<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id">l</span>) <span class="id">a</span>) = 0) \/ ((<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id">l</span>) <span class="id">a</span>) = 1)).<br/>
@@ -847,8 +847,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_exactly_one_back_diff">bdistinct_exactly_one_back_diff</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 1 -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) &gt;= 1.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof682')">Proof.</div>
-<div class="proofscript" id="proof682">
+<div class="toggleproof" onclick="toggleDisplay('proof684')">Proof.</div>
+<div class="proofscript" id="proof684">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> ((<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id">l</span> <span class="id">x</span>) &lt;&gt; 0). <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_exactly_one_back">bdistinct_exactly_one_back</a></span>; <span class="tactic">assumption</span>.<br/>
@@ -858,8 +858,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exist_or_zero">exist_or_zero</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">exists</span> (<span class="id">rs</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>::<span class="id"><a href="Qcert.Utils.Bag.html#rs">rs</a></span>) ≅ <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) \/ (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof683')">Proof.</div>
-<div class="proofscript" id="proof683">
+<div class="toggleproof" onclick="toggleDisplay('proof685')">Proof.</div>
+<div class="proofscript" id="proof685">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">right</span>; <span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -880,8 +880,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_mult">bdistinct_mult</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Min.html#min">min</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) 1.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof684')">Proof.</div>
-<div class="proofscript" id="proof684">
+<div class="toggleproof" onclick="toggleDisplay('proof686')">Proof.</div>
+<div class="proofscript" id="proof686">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">x</span> <span class="id">a</span>); <span class="tactic">intro</span>.<br/>
@@ -911,8 +911,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">l</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> &gt; 0 &lt;-&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof685')">Proof.</div>
-<div class="proofscript" id="proof685">
+<div class="toggleproof" onclick="toggleDisplay('proof687')">Proof.</div>
+<div class="proofscript" id="proof687">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="comment">(*&nbsp;Case&nbsp;"-&gt;"&nbsp;*)</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">omega</span>.<br/>
@@ -945,8 +945,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">l</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof686')">Proof.</div>
-<div class="proofscript" id="proof686">
+<div class="toggleproof" onclick="toggleDisplay('proof688')">Proof.</div>
+<div class="proofscript" id="proof688">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">l</span> <span class="id">x</span> <span class="id">Hx</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#mult_pos_equiv_in">mult_pos_equiv_in</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#mult_pos_equiv_in">mult_pos_equiv_in</a></span> <span class="kwd">in</span> <span class="id">Hx</span>.<br/>
@@ -956,8 +956,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_nil">bdistinct_nil</a></span> {<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof687')">Proof.</div>
-<div class="proofscript" id="proof687">
+<div class="toggleproof" onclick="toggleDisplay('proof689')">Proof.</div>
+<div class="proofscript" id="proof689">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id">l</span>); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">discriminate</span>.<br/>
@@ -966,8 +966,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_NoDup">bdistinct_NoDup</a></span> (<span class="id">l</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof688')">Proof.</div>
-<div class="proofscript" id="proof688">
+<div class="toggleproof" onclick="toggleDisplay('proof690')">Proof.</div>
+<div class="proofscript" id="proof690">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; [<span class="id">constructor</span> | ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_case</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">trivial</span>.<br/>
@@ -977,8 +977,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="NoDup_bdistinct">NoDup_bdistinct</a></span> {<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> = <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof689')">Proof.</div>
-<div class="proofscript" id="proof689">
+<div class="toggleproof" onclick="toggleDisplay('proof691')">Proof.</div>
+<div class="proofscript" id="proof691">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHl</span> <span class="tactic">by</span> <span class="tactic">trivial</span>.<br/>
@@ -989,16 +989,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_idem">bdistinct_idem</a></span> {<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof690')">Proof.</div>
-<div class="proofscript" id="proof690">
+<div class="toggleproof" onclick="toggleDisplay('proof692')">Proof.</div>
+<div class="proofscript" id="proof692">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.Utils.Bag.html#NoDup_bdistinct">NoDup_bdistinct</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id">l</span>)); <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_NoDup">bdistinct_NoDup</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_equivlist">bdistinct_equivlist</a></span>  (<span class="id">l</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist">equivlist</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof691')">Proof.</div>
-<div class="proofscript" id="proof691">
+<div class="toggleproof" onclick="toggleDisplay('proof693')">Proof.</div>
+<div class="proofscript" id="proof693">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist_incls">equivlist_incls</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>.<br/>
@@ -1013,8 +1013,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">comm</span>:<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>, <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#y">y</a></span> = <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#y">y</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">idem</span>:<span class="kwd">forall</span> <span class="id">x</span>  : <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>, <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">unit</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_right">fold_right</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#unit">unit</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_right">fold_right</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#unit">unit</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof692')">Proof.</div>
-<div class="proofscript" id="proof692">
+<div class="toggleproof" onclick="toggleDisplay('proof694')">Proof.</div>
+<div class="proofscript" id="proof694">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_case</span>; <span class="tactic">simpl</span>; <span class="tactic">rewrite</span> <span class="id">IHl</span>; <span class="tactic">trivial</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">inn</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id">a</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id">l</span>))<br/>
@@ -1036,8 +1036,8 @@
 &nbsp;&nbsp;(<span class="id">idem</span>:<span class="kwd">forall</span> <span class="id">x</span>  : <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>, <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">unit</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.ListAdd.html#equivlist">equivlist</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_right">fold_right</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#unit">unit</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_right">fold_right</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#unit">unit</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof693')">Proof.</div>
-<div class="proofscript" id="proof693">
+<div class="toggleproof" onclick="toggleDisplay('proof695')">Proof.</div>
+<div class="proofscript" id="proof695">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.Utils.Bag.html#fold_right_bdistinct">fold_right_bdistinct</a></span> <span class="id">_</span> <span class="id">assoc</span> <span class="id">comm</span> <span class="id">idem</span> <span class="id">l1</span>);<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.Utils.Bag.html#fold_right_bdistinct">fold_right_bdistinct</a></span> <span class="id">_</span> <span class="id">assoc</span> <span class="id">comm</span> <span class="id">idem</span> <span class="id">l2</span>).<br/>
@@ -1051,8 +1051,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_mult">bunion_mult</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span> <span class="id">t</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) + (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof694')">Proof.</div>
-<div class="proofscript" id="proof694">
+<div class="toggleproof" onclick="toggleDisplay('proof696')">Proof.</div>
+<div class="proofscript" id="proof696">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>; <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#app_nil_l">app_nil_l</a></span>; <span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1064,8 +1064,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_one_mult">remove_one_mult</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Peano.html#pred">pred</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof695')">Proof.</div>
-<div class="proofscript" id="proof695">
+<div class="toggleproof" onclick="toggleDisplay('proof697')">Proof.</div>
+<div class="proofscript" id="proof697">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
@@ -1080,8 +1080,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="mult_on_remove">mult_on_remove</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">a</span> <span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof696')">Proof.</div>
-<div class="proofscript" id="proof696">
+<div class="toggleproof" onclick="toggleDisplay('proof698')">Proof.</div>
+<div class="proofscript" id="proof698">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">induction</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -1095,8 +1095,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_mult">bminus_mult</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span> <span class="id">t</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) - (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof697')">Proof.</div>
-<div class="proofscript" id="proof697">
+<div class="toggleproof" onclick="toggleDisplay('proof699')">Proof.</div>
+<div class="proofscript" id="proof699">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="id">revert</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">t</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span>. <span class="tactic">rewrite</span> &lt;- <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Minus.html#minus_n_O">minus_n_O</a></span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1117,8 +1117,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmin_on_nil_r">bmin_on_nil_r</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof698')">Proof.</div>
-<div class="proofscript" id="proof698">
+<div class="toggleproof" onclick="toggleDisplay('proof700')">Proof.</div>
+<div class="proofscript" id="proof700">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmin">bmin</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_naught">bminus_naught</a></span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1129,16 +1129,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmin_on_nil_l">bmin_on_nil_l</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof699')">Proof.</div>
-<div class="proofscript" id="proof699">
+<div class="toggleproof" onclick="toggleDisplay('proof701')">Proof.</div>
+<div class="proofscript" id="proof701">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmin">bmin</a></span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_to_nil">bminus_to_nil</a></span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmax_on_nil_r">bmax_on_nil_r</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id">max</span>-<span class="id">b</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof700')">Proof.</div>
-<div class="proofscript" id="proof700">
+<div class="toggleproof" onclick="toggleDisplay('proof702')">Proof.</div>
+<div class="proofscript" id="proof702">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmax">bmax</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_naught">bminus_naught</a></span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1147,15 +1147,15 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmax_on_nil_l">bmax_on_nil_l</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id">max</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof701')">Proof.</div>
-<div class="proofscript" id="proof701">
+<div class="toggleproof" onclick="toggleDisplay('proof703')">Proof.</div>
+<div class="proofscript" id="proof703">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmax">bmax</a></span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmin_Forall">bmin_Forall</a></span> <span class="id">P</span> (<span class="id">l1</span> <span class="id">l2</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bmin">bmin</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof702')">Proof.</div>
-<div class="proofscript" id="proof702">
+<div class="toggleproof" onclick="toggleDisplay('proof704')">Proof.</div>
+<div class="proofscript" id="proof704">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmin">bmin</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_Forall">bminus_Forall</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -1163,8 +1163,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmax_Forall">bmax_Forall</a></span> <span class="id">P</span> (<span class="id">l1</span> <span class="id">l2</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#P">P</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bmax">bmax</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof703')">Proof.</div>
-<div class="proofscript" id="proof703">
+<div class="toggleproof" onclick="toggleDisplay('proof705')">Proof.</div>
+<div class="proofscript" id="proof705">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmax">bmax</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion_Forall">bunion_Forall</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -1173,8 +1173,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="minus_min">minus_min</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">n</span> <span class="id">n0</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>), <span class="id"><a href="Qcert.Utils.Bag.html#n0">n0</a></span> - (<span class="id"><a href="Qcert.Utils.Bag.html#n0">n0</a></span> - <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Min.html#min">min</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n0">n0</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof704')">Proof.</div>
-<div class="proofscript" id="proof704">
+<div class="toggleproof" onclick="toggleDisplay('proof706')">Proof.</div>
+<div class="proofscript" id="proof706">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">n</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Min.html#min_0_r">min_0_r</a></span>; <span class="tactic">rewrite</span> &lt;- <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Minus.html#minus_n_O">minus_n_O</a></span>; <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Minus.html#minus_diag">minus_diag</a></span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
@@ -1191,8 +1191,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="minus_max">minus_max</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">n</span> <span class="id">n0</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>), <span class="id"><a href="Qcert.Utils.Bag.html#n0">n0</a></span> + (<span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span> - <span class="id"><a href="Qcert.Utils.Bag.html#n0">n0</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Max.html#max">max</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n0">n0</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#n">n</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof705')">Proof.</div>
-<div class="proofscript" id="proof705">
+<div class="toggleproof" onclick="toggleDisplay('proof707')">Proof.</div>
+<div class="proofscript" id="proof707">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">n</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Max.html#max_0_r">max_0_r</a></span>; <span class="tactic">auto</span> <span class="kwd">with</span> <span class="id">arith</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Peano_dec.html#eq_nat_dec">eq_nat_dec</a></span>; <span class="tactic">intro</span>.<br/>
@@ -1208,8 +1208,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmin_mult">bmin_mult</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span> <span class="id">t</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Min.html#min">min</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof706')">Proof.</div>
-<div class="proofscript" id="proof706">
+<div class="toggleproof" onclick="toggleDisplay('proof708')">Proof.</div>
+<div class="proofscript" id="proof708">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmin">bmin</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_mult">bminus_mult</a></span>; <span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>.<br/>
@@ -1224,8 +1224,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmax_mult">bmax_mult</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span> <span class="id">t</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id">max</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Max.html#max">max</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>) (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof707')">Proof.</div>
-<div class="proofscript" id="proof707">
+<div class="toggleproof" onclick="toggleDisplay('proof709')">Proof.</div>
+<div class="proofscript" id="proof709">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmax">bmax</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion_mult">bunion_mult</a></span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_mult">bminus_mult</a></span>; <span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>.<br/>
@@ -1240,8 +1240,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmin_comm">bmin_comm</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span> <span class="id">t</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span>) ≅ (<span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof708')">Proof.</div>
-<div class="proofscript" id="proof708">
+<div class="toggleproof" onclick="toggleDisplay('proof710')">Proof.</div>
+<div class="proofscript" id="proof710">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_same_mult_has_equal">bags_same_mult_has_equal</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span>.<br/>
@@ -1253,8 +1253,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmax_comm">bmax_comm</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">s</span> <span class="id">t</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> <span class="id">max</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span>) ≅ (<span class="id"><a href="Qcert.Utils.Bag.html#t">t</a></span> <span class="id">max</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof709')">Proof.</div>
-<div class="proofscript" id="proof709">
+<div class="toggleproof" onclick="toggleDisplay('proof711')">Proof.</div>
+<div class="proofscript" id="proof711">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_same_mult_has_equal">bags_same_mult_has_equal</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span>.<br/>
@@ -1268,8 +1268,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="select_not_select">select_not_select</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">p</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>), <span class="kwd">forall</span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) ⊎ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#negb">negb</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>)) <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>)) ≅ <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof710')">Proof.</div>
-<div class="proofscript" id="proof710">
+<div class="toggleproof" onclick="toggleDisplay('proof712')">Proof.</div>
+<div class="proofscript" id="proof712">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1283,8 +1283,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_over_bunion_empty_r">bdistinct_over_bunion_empty_r</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0) -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof711')">Proof.</div>
-<div class="proofscript" id="proof711">
+<div class="toggleproof" onclick="toggleDisplay('proof713')">Proof.</div>
+<div class="proofscript" id="proof713">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">x</span> <span class="id">a</span>); <span class="tactic">intro</span>.<br/>
@@ -1313,8 +1313,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_over_bunion_empty_l">bdistinct_over_bunion_empty_l</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0) -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof712')">Proof.</div>
-<div class="proofscript" id="proof712">
+<div class="toggleproof" onclick="toggleDisplay('proof714')">Proof.</div>
+<div class="proofscript" id="proof714">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_mult">bdistinct_mult</a></span> <span class="kwd">in</span> *; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion_mult">bunion_mult</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">H</span>; <span class="tactic">elim</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">x</span> <span class="id">a</span>); <span class="tactic">intros</span>.<br/>
@@ -1326,8 +1326,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_over_bunion_singleton2">bdistinct_over_bunion_singleton2</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0) -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 1) -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 1).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof713')">Proof.</div>
-<div class="proofscript" id="proof713">
+<div class="toggleproof" onclick="toggleDisplay('proof715')">Proof.</div>
+<div class="proofscript" id="proof715">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_mult">bdistinct_mult</a></span> <span class="kwd">in</span> *; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion_mult">bunion_mult</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">H0</span>; <span class="tactic">elim</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">x</span> <span class="id">a</span>); <span class="tactic">intros</span>.<br/>
@@ -1342,8 +1342,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_over_bunion">bdistinct_over_bunion</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)) ≅ ((<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span>) <span class="id">max</span>-<span class="id">b</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof714')">Proof.</div>
-<div class="proofscript" id="proof714">
+<div class="toggleproof" onclick="toggleDisplay('proof716')">Proof.</div>
+<div class="proofscript" id="proof716">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_same_mult_has_equal">bags_same_mult_has_equal</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmax_mult">bmax_mult</a></span>.<br/>
@@ -1380,8 +1380,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmin_zero">bmin_zero</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0 -&gt; (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0) \/ (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof715')">Proof.</div>
-<div class="proofscript" id="proof715">
+<div class="toggleproof" onclick="toggleDisplay('proof717')">Proof.</div>
+<div class="proofscript" id="proof717">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l2</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">right</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmin_mult">bmin_mult</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
@@ -1397,8 +1397,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bmin_zero_back">bmin_zero_back</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>), <span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0) \/ (<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0) -&gt; <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span> = 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof716')">Proof.</div>
-<div class="proofscript" id="proof716">
+<div class="toggleproof" onclick="toggleDisplay('proof718')">Proof.</div>
+<div class="proofscript" id="proof718">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l2</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bmin_mult">bmin_mult</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Min.html#min_0_r">min_0_r</a></span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">H</span>; <span class="tactic">elim</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">x</span> <span class="id">a</span>); <span class="tactic">intros</span>.<br/>
@@ -1416,8 +1416,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bdistinct_over_bmin">bdistinct_over_bmin</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">l2</span> <span class="id">l1</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span> <span class="id">min</span>-<span class="id">b</span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)) ≅ ((<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l1">l1</a></span>) <span class="id">min</span>-<span class="id">b</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l2">l2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof717')">Proof.</div>
-<div class="proofscript" id="proof717">
+<div class="toggleproof" onclick="toggleDisplay('proof719')">Proof.</div>
+<div class="proofscript" id="proof719">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_same_mult_has_equal">bags_same_mult_has_equal</a></span>; <span class="tactic">intro</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_mult">bdistinct_mult</a></span>.<br/>
@@ -1449,8 +1449,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#sp">sp</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#nsp">nsp</a></span>) ≅ <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> /\<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#sp">sp</a></span>) = <span class="id"><a href="Qcert.Utils.Bag.html#sp">sp</a></span> /\<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#nsp">nsp</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof718')">Proof.</div>
-<div class="proofscript" id="proof718">
+<div class="toggleproof" onclick="toggleDisplay('proof720')">Proof.</div>
+<div class="proofscript" id="proof720">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">s</span> ≅ ((<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id">p</span> <span class="id">s</span>) ⊎ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#negb">negb</a></span> (<span class="id">p</span> <span class="id"><a href="Qcert.Utils.Bag.html#x">x</a></span>)) <span class="id">s</span>))).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.Utils.Bag.html#select_not_select">select_not_select</a></span> <span class="id">p</span>) <span class="kwd">with</span> (<span class="id">s</span> := <span class="id">s</span>); <span class="tactic">reflexivity</span>.<br/>
@@ -1464,8 +1464,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="mult_filter_true">mult_filter_true</a></span> <span class="id">l</span> {<span class="id">p</span> <span class="id">a</span>} : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = <span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof719')">Proof.</div>
-<div class="proofscript" id="proof719">
+<div class="toggleproof" onclick="toggleDisplay('proof721')">Proof.</div>
+<div class="proofscript" id="proof721">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">a</span> <span class="id">a0</span>); <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id">e</span> <span class="kwd">in</span> *; <span class="tactic">subst</span>.<br/>
@@ -1476,8 +1476,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="mult_filter_false">mult_filter_false</a></span> <span class="id">l</span> {<span class="id">p</span> <span class="id">a</span>} : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span> -&gt; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Bag.html#mult">mult</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#l">l</a></span>) <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof720')">Proof.</div>
-<div class="proofscript" id="proof720">
+<div class="toggleproof" onclick="toggleDisplay('proof722')">Proof.</div>
+<div class="proofscript" id="proof722">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id">p</span> <span class="id">a0</span>); <span class="tactic">auto</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>. <br/>
@@ -1498,8 +1498,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">Q</span> <span class="id">dQm</span> <span class="id">dQp</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#apply_deltas">apply_deltas</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQm">dQm</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQp">dQp</a></span>) ≅<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bag.html#apply_deltas">apply_deltas</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bminus_delta2">bminus_delta2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQm">dQm</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQp">dQp</a></span>) (<span class="id"><a href="Qcert.Utils.Bag.html#bplus_delta2">bplus_delta2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQm">dQm</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQp">dQp</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof721')">Proof.</div>
-<div class="proofscript" id="proof721">
+<div class="toggleproof" onclick="toggleDisplay('proof723')">Proof.</div>
+<div class="proofscript" id="proof723">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_same_mult_has_equal">bags_same_mult_has_equal</a></span>; <span class="tactic">intro</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#apply_deltas">apply_deltas</a></span>.<br/>
@@ -1519,8 +1519,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="theorem2_b">theorem2_b</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">Q</span> <span class="id">dQm</span> <span class="id">dQp</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Utils.Bag.html#bminus_delta2">bminus_delta2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQm">dQm</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQp">dQp</a></span>) ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span>) ≅ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof722')">Proof.</div>
-<div class="proofscript" id="proof722">
+<div class="toggleproof" onclick="toggleDisplay('proof724')">Proof.</div>
+<div class="proofscript" id="proof724">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_same_mult_has_equal">bags_same_mult_has_equal</a></span>; <span class="tactic">intro</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_delta2">bminus_delta2</a></span>.<br/>
@@ -1538,8 +1538,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="theorem2_c">theorem2_c</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">Q</span> <span class="id">dQm</span> <span class="id">dQp</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Utils.Bag.html#bminus_delta2">bminus_delta2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQm">dQm</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQp">dQp</a></span>) <span class="id">min</span>-<span class="id">b</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bplus_delta2">bplus_delta2</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQm">dQm</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#dQp">dQp</a></span>)) ≅ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof723')">Proof.</div>
-<div class="proofscript" id="proof723">
+<div class="toggleproof" onclick="toggleDisplay('proof725')">Proof.</div>
+<div class="proofscript" id="proof725">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bags_same_mult_has_equal">bags_same_mult_has_equal</a></span>; <span class="tactic">intro</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bminus_delta2">bminus_delta2</a></span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bplus_delta2">bplus_delta2</a></span>.<br/>
@@ -1569,15 +1569,15 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_one_bminus">remove_one_bminus</a></span> <span class="id">r</span> <span class="id">s</span> <span class="id">a</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#r">r</a></span>) = (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊖ (<span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> :: <span class="id"><a href="Qcert.Utils.Bag.html#r">r</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof724')">Proof.</div>
-<div class="proofscript" id="proof724">
+<div class="toggleproof" onclick="toggleDisplay('proof726')">Proof.</div>
+<div class="proofscript" id="proof726">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">s</span> <span class="id">r</span>. <span class="tactic">induction</span> <span class="id">r</span>; <span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="remove_bminus_comm">remove_bminus_comm</a></span> <span class="id">r</span> <span class="id">s</span> <span class="id">a</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#r">r</a></span>) = (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#r">r</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof725')">Proof.</div>
-<div class="proofscript" id="proof725">
+<div class="toggleproof" onclick="toggleDisplay('proof727')">Proof.</div>
+<div class="proofscript" id="proof727">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">r</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
@@ -1588,8 +1588,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="filter_remove_one_false">filter_remove_one_false</a></span> <span class="id">s</span> {<span class="id">p</span> <span class="id">a</span>} : <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof726')">Proof.</div>
-<div class="proofscript" id="proof726">
+<div class="toggleproof" onclick="toggleDisplay('proof728')">Proof.</div>
+<div class="proofscript" id="proof728">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">a</span> <span class="id">a0</span>); <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">simpl</span>.<br/>
@@ -1600,8 +1600,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="filter_remove_one">filter_remove_one</a></span> <span class="id">s</span> {<span class="id">p</span> <span class="id">a</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>)) = <span class="id"><a href="Qcert.Utils.Bag.html#remove_one">remove_one</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#a">a</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof727')">Proof.</div>
-<div class="proofscript" id="proof727">
+<div class="toggleproof" onclick="toggleDisplay('proof729')">Proof.</div>
+<div class="proofscript" id="proof729">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">a</span> <span class="id">a0</span>); <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">red</span> <span class="kwd">in</span> <span class="id">e</span>; <span class="tactic">subst</span>.<br/>
@@ -1619,8 +1619,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bunion_filter">bunion_filter</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">ds</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) (<span class="id">p</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊎ <span class="id"><a href="Qcert.Utils.Bag.html#ds">ds</a></span>)) = ((<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) ⊎ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#ds">ds</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof728')">Proof.</div>
-<div class="proofscript" id="proof728">
+<div class="toggleproof" onclick="toggleDisplay('proof730')">Proof.</div>
+<div class="proofscript" id="proof730">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bag.html#bunion">bunion</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
@@ -1629,8 +1629,8 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bminus_filter">bminus_filter</a></span> (<span class="id">p</span>:<span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>) (<span class="id">s</span> <span class="id">ds</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#Bag.A">A</a></span>) : (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span> ⊖ <span class="id"><a href="Qcert.Utils.Bag.html#ds">ds</a></span>)) = ((<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#s">s</a></span>) ⊖ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Bag.html#ds">ds</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof729')">Proof.</div>
-<div class="proofscript" id="proof729">
+<div class="toggleproof" onclick="toggleDisplay('proof731')">Proof.</div>
+<div class="proofscript" id="proof731">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">ds</span>; <span class="tactic">simpl</span>; <span class="tactic">auto</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHds</span>.<br/>

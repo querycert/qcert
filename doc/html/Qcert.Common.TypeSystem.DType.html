@@ -36,8 +36,8 @@
 &nbsp;&nbsp;| <span class="id"><a name="Tdistr">Tdistr</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.DType.html#drtype">drtype</a></span>.<br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="drtype_eqdec">drtype_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.DType.html#drtype">drtype</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1104')">Proof.</div>
-<div class="proofscript" id="proof1104">
+<div class="toggleproof" onclick="toggleDisplay('proof1118')">Proof.</div>
+<div class="proofscript" id="proof1118">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id">r</span> == <span class="id">r0</span>); <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span> <span class="kwd">in</span> *; <span class="tactic">subst</span>.<br/>

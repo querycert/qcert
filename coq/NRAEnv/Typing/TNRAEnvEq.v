@@ -192,7 +192,7 @@ Section TNRAEnvEq.
    * Proper stuff *
    ****************)
 
-  Require Import ROpsEq NRAEnvEq.
+  Require Import NRAEnvEq.
   
   Global Instance  tnraenv_rewrites_to_pre : PreOrder tnraenv_rewrites_to.
   Proof.
@@ -272,10 +272,10 @@ Section TNRAEnvEq.
     reflexivity.
   Qed.
 
-  (* NRAEnvMapConcat *)
+  (* NRAEnvMapProduct *)
   
   Global Instance nraenv_mapconcat_tproper :
-    Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvMapConcat.
+    Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvMapProduct.
   Proof.
     unfold Proper, respectful; intros.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H.

@@ -35,8 +35,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pull_nra_opt">pull_nra_opt</a></span> (<span class="id">p1</span> <span class="id">p2</span>:<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nra_of_nraenv_core">nra_of_nraenv_core</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ≡ₐ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nra_of_nraenv_core">nra_of_nraenv_core</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1997')">Proof.</div>
-<div class="proofscript" id="proof1997">
+<div class="toggleproof" onclick="toggleDisplay('proof2022')">Proof.</div>
+<div class="proofscript" id="proof2022">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#unfold_env_nra_sort">unfold_env_nra_sort</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H</span>; <span class="tactic">eauto</span>.<br/>
@@ -45,8 +45,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envand_comm">envand_comm</a></span> (<span class="id">p1</span> <span class="id">p2</span>: <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ∧ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ∧ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1998')">Proof.</div>
-<div class="proofscript" id="proof1998">
+<div class="toggleproof" onclick="toggleDisplay('proof2023')">Proof.</div>
+<div class="proofscript" id="proof2023">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nra_of_nraenv_core">nra_of_nraenv_core</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#and_comm">and_comm</a></span>; <span class="tactic">reflexivity</span>.<br/>
@@ -55,8 +55,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envunion_assoc">envunion_assoc</a></span> (<span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span>: <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⋃ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ⋃ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⋃ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ⋃ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1999')">Proof.</div>
-<div class="proofscript" id="proof1999">
+<div class="toggleproof" onclick="toggleDisplay('proof2024')">Proof.</div>
+<div class="proofscript" id="proof2024">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nra_of_nraenv_core">nra_of_nraenv_core</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#union_assoc">union_assoc</a></span>; <span class="tactic">reflexivity</span>.<br/>
@@ -64,8 +64,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="select_union_distr">select_union_distr</a></span> (<span class="id">q</span> <span class="id">q</span>₁ <span class="id">q</span>₂: <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span> ⟩(<span class="id">q</span>₁ ⋃ <span class="id">q</span>₂) ≡ₑ σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span> ⟩(<span class="id">q</span>₁) ⋃ σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span> ⟩(<span class="id">q</span>₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2000')">Proof.</div>
-<div class="proofscript" id="proof2000">
+<div class="toggleproof" onclick="toggleDisplay('proof2025')">Proof.</div>
+<div class="proofscript" id="proof2025">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">q</span>₁ @ₑ <span class="id">x</span>  ⊣ <span class="id">c</span>;<span class="id">env</span>) <span class="kwd">as</span> <span class="id">d1</span>.<br/>
@@ -115,8 +115,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_singleton">envmap_singleton</a></span> (<span class="id">p1</span> <span class="id">p2</span>:<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> |} ) ≡ₑ ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2001')">Proof.</div>
-<div class="proofscript" id="proof2001">
+<div class="toggleproof" onclick="toggleDisplay('proof2026')">Proof.</div>
+<div class="proofscript" id="proof2026">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -127,8 +127,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_map_compose">envmap_map_compose</a></span> (<span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span>:<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ) ) ≡ₑ χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2002')">Proof.</div>
-<div class="proofscript" id="proof2002">
+<div class="toggleproof" onclick="toggleDisplay('proof2027')">Proof.</div>
+<div class="proofscript" id="proof2027">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p3</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -166,8 +166,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_rec">app_over_rec</a></span> <span class="id">s</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) |].<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2003')">Proof.</div>
-<div class="proofscript" id="proof2003">
+<div class="toggleproof" onclick="toggleDisplay('proof2028')">Proof.</div>
+<div class="proofscript" id="proof2028">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -176,8 +176,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envflatten_coll_flatten">envflatten_coll_flatten</a></span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(‵{| ♯<span class="id">flatten</span>( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ) |}) ≡ₑ ♯<span class="id">flatten</span>( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2004')">Proof.</div>
-<div class="proofscript" id="proof2004">
+<div class="toggleproof" onclick="toggleDisplay('proof2029')">Proof.</div>
+<div class="proofscript" id="proof2029">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -200,8 +200,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envflatten_coll_coll">envflatten_coll_coll</a></span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(‵{| ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> |} |}) ≡ₑ ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2005')">Proof.</div>
-<div class="proofscript" id="proof2005">
+<div class="toggleproof" onclick="toggleDisplay('proof2030')">Proof.</div>
+<div class="proofscript" id="proof2030">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -209,8 +209,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envflatten_nil">envflatten_nil</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(‵{||}) ≡ₑ ‵{||}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2006')">Proof.</div>
-<div class="proofscript" id="proof2006">
+<div class="toggleproof" onclick="toggleDisplay('proof2031')">Proof.</div>
+<div class="proofscript" id="proof2031">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -218,8 +218,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envflatten_coll_map">envflatten_coll_map</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(‵{| χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ) |}) ≡ₑ χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2007')">Proof.</div>
-<div class="proofscript" id="proof2007">
+<div class="toggleproof" onclick="toggleDisplay('proof2032')">Proof.</div>
+<div class="proofscript" id="proof2032">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p2</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -240,8 +240,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flatten_flatten_map_either_nil">flatten_flatten_map_either_nil</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span>₃ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>( ♯<span class="id">flatten</span>(χ⟨<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ ‵{||} ◯ <span class="id">p</span>₂⟩(<span class="id">p</span>₃))) ≡ₑ <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>( χ⟨<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span>( ♯<span class="id">flatten</span>(<span class="id">p</span>₁)) ‵{||} ◯ <span class="id">p</span>₂⟩(<span class="id">p</span>₃)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2008')">Proof.</div>
-<div class="proofscript" id="proof2008">
+<div class="toggleproof" onclick="toggleDisplay('proof2033')">Proof.</div>
+<div class="proofscript" id="proof2033">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span>₃ @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>; <span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>.<br/>
@@ -373,8 +373,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envflatten_coll_mergeconcat">envflatten_coll_mergeconcat</a></span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>( ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⊗ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> |} ) ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⊗ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2009')">Proof.</div>
-<div class="proofscript" id="proof2009">
+<div class="toggleproof" onclick="toggleDisplay('proof2034')">Proof.</div>
+<div class="proofscript" id="proof2034">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">p1</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p2</span>; <span class="tactic">intros</span>.<br/>
@@ -387,16 +387,16 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rmap_to_map">rmap_to_map</a></span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap">rmap</a></span> (<span class="kwd">fun</span> <span class="id">x</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#x">x</a></span> :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>))) <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#l">l</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="kwd">fun</span> <span class="id">x</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> =&gt; (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#x">x</a></span> :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>))) <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#l">l</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2010')">Proof.</div>
-<div class="proofscript" id="proof2010">
+<div class="toggleproof" onclick="toggleDisplay('proof2035')">Proof.</div>
+<div class="proofscript" id="proof2035">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; [<span class="tactic">reflexivity</span>|<span class="tactic">simpl</span>; <span class="tactic">rewrite</span> <span class="id">IHl</span>; <span class="tactic">reflexivity</span>].<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="double_flatten_map_coll">double_flatten_map_coll</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(χ⟨ χ⟨ ‵{| <span class="id">ID</span> |} ⟩( ♯<span class="id">flatten</span>( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ) ) ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ χ⟨ ‵{| <span class="id">ID</span> |} ⟩(♯<span class="id">flatten</span>(χ⟨ ♯<span class="id">flatten</span>( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ) ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2011')">Proof.</div>
-<div class="proofscript" id="proof2011">
+<div class="toggleproof" onclick="toggleDisplay('proof2036')">Proof.</div>
+<div class="proofscript" id="proof2036">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p2</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -525,8 +525,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envflatten_map_coll">envflatten_map_coll</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(χ⟨ ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> |} ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> )) ≡ₑ χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2012')">Proof.</div>
-<div class="proofscript" id="proof2012">
+<div class="toggleproof" onclick="toggleDisplay('proof2037')">Proof.</div>
+<div class="proofscript" id="proof2037">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p2</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -569,24 +569,24 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="select_over_nil">select_over_nil</a></span> <span class="id">p</span>₁ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨<span class="id">p</span>₁⟩(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2013')">Proof.</div>
-<div class="proofscript" id="proof2013">
+<div class="toggleproof" onclick="toggleDisplay('proof2038')">Proof.</div>
+<div class="proofscript" id="proof2038">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span> <span class="id">br</span> <span class="id">env</span> <span class="id">dn_env</span> <span class="id">d</span> <span class="id">dn_d</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_over_nil">map_over_nil</a></span> <span class="id">p</span>₁ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨<span class="id">p</span>₁⟩(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2014')">Proof.</div>
-<div class="proofscript" id="proof2014">
+<div class="toggleproof" onclick="toggleDisplay('proof2039')">Proof.</div>
+<div class="proofscript" id="proof2039">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span> <span class="id">br</span> <span class="id">env</span> <span class="id">dn_env</span> <span class="id">d</span> <span class="id">dn_d</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_over_flatten">map_over_flatten</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨<span class="id">p</span>₁⟩(♯<span class="id">flatten</span>(<span class="id">p</span>₂)) ≡ₑ (♯<span class="id">flatten</span>(χ⟨χ⟨<span class="id">p</span>₁⟩(<span class="id">ID</span>)⟩(<span class="id">p</span>₂))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2015')">Proof.</div>
-<div class="proofscript" id="proof2015">
+<div class="toggleproof" onclick="toggleDisplay('proof2040')">Proof.</div>
+<div class="proofscript" id="proof2040">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span> <span class="id">br</span> <span class="id">c</span> <span class="id">dn_c</span> <span class="id">env</span> <span class="id">dn_env</span> <span class="id">d</span> <span class="id">dn_d</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">br</span> ⊢ₑ <span class="id">p</span>₂ @ₑ <span class="id">d</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -630,8 +630,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="select_over_flatten">select_over_flatten</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨<span class="id">p</span>₁⟩(♯<span class="id">flatten</span>(<span class="id">p</span>₂)) ≡ₑ (♯<span class="id">flatten</span>(χ⟨σ⟨<span class="id">p</span>₁⟩(<span class="id">ID</span>)⟩(<span class="id">p</span>₂))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2016')">Proof.</div>
-<div class="proofscript" id="proof2016">
+<div class="toggleproof" onclick="toggleDisplay('proof2041')">Proof.</div>
+<div class="proofscript" id="proof2041">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span> <span class="id">br</span> <span class="id">c</span> <span class="id">dn_c</span> <span class="id">env</span> <span class="id">dn_env</span> <span class="id">d</span> <span class="id">dn_d</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">br</span> ⊢ₑ <span class="id">p</span>₂ @ₑ <span class="id">d</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -695,8 +695,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="select_over_either">select_over_either</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span>₃ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨<span class="id">p</span>₁⟩( <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₂ <span class="id">p</span>₃) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> (σ⟨<span class="id">p</span>₁⟩(<span class="id">p</span>₂)) (σ⟨<span class="id">p</span>₁⟩(<span class="id">p</span>₃)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2017')">Proof.</div>
-<div class="proofscript" id="proof2017">
+<div class="toggleproof" onclick="toggleDisplay('proof2042')">Proof.</div>
+<div class="proofscript" id="proof2042">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -705,8 +705,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envdot_from_duplicate_r">envdot_from_duplicate_r</a></span> <span class="id">s1</span> <span class="id">s2</span> <span class="id">p1</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |])·<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2018')">Proof.</div>
-<div class="proofscript" id="proof2018">
+<div class="toggleproof" onclick="toggleDisplay('proof2043')">Proof.</div>
+<div class="proofscript" id="proof2043">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">p1</span> <span class="id">x</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -726,8 +726,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envdot_from_duplicate_l">envdot_from_duplicate_l</a></span> <span class="id">s1</span> <span class="id">s2</span> <span class="id">p1</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |])·<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2019')">Proof.</div>
-<div class="proofscript" id="proof2019">
+<div class="toggleproof" onclick="toggleDisplay('proof2044')">Proof.</div>
+<div class="proofscript" id="proof2044">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">p1</span> <span class="id">x</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -747,16 +747,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_over_either">envmap_over_either</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span>₃ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨<span class="id">p</span>₁⟩( <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₂ <span class="id">p</span>₃) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> (χ⟨<span class="id">p</span>₁⟩(<span class="id">p</span>₂)) (χ⟨<span class="id">p</span>₁⟩(<span class="id">p</span>₃)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2020')">Proof.</div>
-<div class="proofscript" id="proof2020">
+<div class="toggleproof" onclick="toggleDisplay('proof2045')">Proof.</div>
+<div class="proofscript" id="proof2045">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_over_either_app">envmap_over_either_app</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span>₃ <span class="id">p</span>₄:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨<span class="id">p</span>₁⟩( <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₂ <span class="id">p</span>₃ ◯ <span class="id">p</span>₄) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> (χ⟨<span class="id">p</span>₁⟩(<span class="id">p</span>₂)) (χ⟨<span class="id">p</span>₁⟩(<span class="id">p</span>₃)) ◯ <span class="id">p</span>₄.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2021')">Proof.</div>
-<div class="proofscript" id="proof2021">
+<div class="toggleproof" onclick="toggleDisplay('proof2046')">Proof.</div>
+<div class="proofscript" id="proof2046">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span>₄ @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>; <span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -766,8 +766,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_into_id">envmap_into_id</a></span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id">ID</span> ⟩(‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> |}) ≡ₑ ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2022')">Proof.</div>
-<div class="proofscript" id="proof2022">
+<div class="toggleproof" onclick="toggleDisplay('proof2047')">Proof.</div>
+<div class="proofscript" id="proof2047">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -778,8 +778,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_into_id_flatten">envmap_into_id_flatten</a></span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id">ID</span> ⟩( ♯<span class="id">flatten</span>(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ) ≡ₑ ♯<span class="id">flatten</span>(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2023')">Proof.</div>
-<div class="proofscript" id="proof2023">
+<div class="toggleproof" onclick="toggleDisplay('proof2048')">Proof.</div>
+<div class="proofscript" id="proof2048">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">clear</span> <span class="id">x</span> <span class="id">p</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -796,8 +796,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="product_singletons">product_singletons</a></span> <span class="id">s1</span> <span class="id">s2</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;‵{|‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] |} × ‵{| ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) |] |} ≡ₑ<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;‵{|‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) |] |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2024')">Proof.</div>
-<div class="proofscript" id="proof2024">
+<div class="toggleproof" onclick="toggleDisplay('proof2049')">Proof.</div>
+<div class="proofscript" id="proof2049">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">destruct</span> <span class="id">o0</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -806,16 +806,16 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_id">app_over_id</a></span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ◯ <span class="id">ID</span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2025')">Proof.</div>
-<div class="proofscript" id="proof2025">
+<div class="toggleproof" onclick="toggleDisplay('proof2050')">Proof.</div>
+<div class="proofscript" id="proof2050">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_env">appenv_over_env</a></span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ENV</span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2026')">Proof.</div>
-<div class="proofscript" id="proof2026">
+<div class="toggleproof" onclick="toggleDisplay('proof2051')">Proof.</div>
+<div class="proofscript" id="proof2051">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -823,8 +823,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_id_l">app_over_id_l</a></span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ID</span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2027')">Proof.</div>
-<div class="proofscript" id="proof2027">
+<div class="toggleproof" onclick="toggleDisplay('proof2052')">Proof.</div>
+<div class="proofscript" id="proof2052">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -833,8 +833,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_app">app_over_app</a></span> <span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span>  ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2028')">Proof.</div>
-<div class="proofscript" id="proof2028">
+<div class="toggleproof" onclick="toggleDisplay('proof2053')">Proof.</div>
+<div class="proofscript" id="proof2053">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p3</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -843,8 +843,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_unop">app_over_unop</a></span> <span class="id">u</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2029')">Proof.</div>
-<div class="proofscript" id="proof2029">
+<div class="toggleproof" onclick="toggleDisplay('proof2054')">Proof.</div>
+<div class="proofscript" id="proof2054">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -853,8 +853,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_unop">appenv_over_unop</a></span> <span class="id">u</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2030')">Proof.</div>
-<div class="proofscript" id="proof2030">
+<div class="toggleproof" onclick="toggleDisplay('proof2055')">Proof.</div>
+<div class="proofscript" id="proof2055">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -862,16 +862,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="unop_over_either">unop_over_either</a></span> <span class="id">u</span> <span class="id">p</span>₁ <span class="id">p</span>₂ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> <span class="id">p</span>₁)(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> <span class="id">p</span>₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2031')">Proof.</div>
-<div class="proofscript" id="proof2031">
+<div class="toggleproof" onclick="toggleDisplay('proof2056')">Proof.</div>
+<div class="proofscript" id="proof2056">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="unop_over_either_app">unop_over_either_app</a></span> <span class="id">u</span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span>₃ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ ◯ <span class="id">p</span>₃)  ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> <span class="id">p</span>₁)(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#u">u</a></span> <span class="id">p</span>₂) ◯ <span class="id">p</span>₃.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2032')">Proof.</div>
-<div class="proofscript" id="proof2032">
+<div class="toggleproof" onclick="toggleDisplay('proof2057')">Proof.</div>
+<div class="proofscript" id="proof2057">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span>₃ @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>; <span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -881,8 +881,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_merge">app_over_merge</a></span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span> ⊗ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span> ⊗ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2033')">Proof.</div>
-<div class="proofscript" id="proof2033">
+<div class="toggleproof" onclick="toggleDisplay('proof2058')">Proof.</div>
+<div class="proofscript" id="proof2058">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -892,8 +892,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_binop_l">app_over_binop_l</a></span> <span class="id">b</span> <span class="id">d</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2034')">Proof.</div>
-<div class="proofscript" id="proof2034">
+<div class="toggleproof" onclick="toggleDisplay('proof2059')">Proof.</div>
+<div class="proofscript" id="proof2059">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -903,8 +903,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_concat_over_binop">app_concat_over_binop</a></span> <span class="id">b</span> <span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span> <span class="id">p4</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ⊕ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p4">p4</a></span>) )<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ⊕ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p4">p4</a></span>)) (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ⊕ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p4">p4</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2035')">Proof.</div>
-<div class="proofscript" id="proof2035">
+<div class="toggleproof" onclick="toggleDisplay('proof2060')">Proof.</div>
+<div class="proofscript" id="proof2060">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p3</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p4</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -914,10 +914,10 @@
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_binop_env">app_over_binop_env</a></span> <span class="id">b</span> <span class="id">p1</span> <span class="id">p2</span> <span class="id">s</span>:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>))<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>)) (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2036')">Proof.</div>
-<div class="proofscript" id="proof2036">
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>)) (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>))).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2061')">Proof.</div>
+<div class="proofscript" id="proof2061">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">env</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="id">l</span> <span class="id">s</span>); <span class="tactic">reflexivity</span>.<br/>
@@ -926,8 +926,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_select">app_over_select</a></span> <span class="id">p0</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ≡ₑ σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2037')">Proof.</div>
-<div class="proofscript" id="proof2037">
+<div class="toggleproof" onclick="toggleDisplay('proof2062')">Proof.</div>
+<div class="proofscript" id="proof2062">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p0</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -936,8 +936,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_map">app_over_map</a></span> <span class="id">p0</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ≡ₑ χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2038')">Proof.</div>
-<div class="proofscript" id="proof2038">
+<div class="toggleproof" onclick="toggleDisplay('proof2063')">Proof.</div>
+<div class="proofscript" id="proof2063">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p0</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -946,8 +946,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_mapconcat">app_over_mapconcat</a></span> <span class="id">p0</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;⋈ᵈ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ≡ₑ ⋈ᵈ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2039')">Proof.</div>
-<div class="proofscript" id="proof2039">
+<div class="toggleproof" onclick="toggleDisplay('proof2064')">Proof.</div>
+<div class="proofscript" id="proof2064">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p0</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -956,8 +956,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_product">app_over_product</a></span> <span class="id">p0</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> × <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ≡ₑ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>  ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span>) × (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2040')">Proof.</div>
-<div class="proofscript" id="proof2040">
+<div class="toggleproof" onclick="toggleDisplay('proof2065')">Proof.</div>
+<div class="proofscript" id="proof2065">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p0</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -967,8 +967,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_map">appenv_over_map</a></span> <span class="id">p0</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_id">nraenv_core_ignores_id</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ≡ₑ χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2041')">Proof.</div>
-<div class="proofscript" id="proof2041">
+<div class="toggleproof" onclick="toggleDisplay('proof2066')">Proof.</div>
+<div class="proofscript" id="proof2066">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id">h</span> ⊢ₑ <span class="id">p0</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -988,8 +988,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_select">appenv_over_select</a></span> <span class="id">p0</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_id">nraenv_core_ignores_id</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ≡ₑ σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ⟩( <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2042')">Proof.</div>
-<div class="proofscript" id="proof2042">
+<div class="toggleproof" onclick="toggleDisplay('proof2067')">Proof.</div>
+<div class="proofscript" id="proof2067">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id">h</span> ⊢ₑ <span class="id">p0</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1032,9 +1032,9 @@
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_mapenv">appenv_over_mapenv</a></span> <span class="id">p</span>:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>)) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AFlatten">AFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AFlatten">AFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2043')">Proof.</div>
-<div class="proofscript" id="proof2043">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>)) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpFlatten">OpFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpFlatten">OpFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2068')">Proof.</div>
+<div class="proofscript" id="proof2068">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1042,9 +1042,9 @@
 <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_mapenv_coll">appenv_over_mapenv_coll</a></span> <span class="id">p</span>:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>))) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AFlatten">AFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>)) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AFlatten">AFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2044')">Proof.</div>
-<div class="proofscript" id="proof2044">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEnv">ANEnv</a></span>))) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpFlatten">OpFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>)) (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpFlatten">OpFlatten</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2069')">Proof.</div>
+<div class="proofscript" id="proof2069">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1052,10 +1052,10 @@
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_mapenv_merge">appenv_over_mapenv_merge</a></span> <span class="id">s</span>:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> ((<span class="id">ENV</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>))) (<span class="id">ENV</span> ⊗ <span class="id">ID</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> ((<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>)) (<span class="id">ENV</span> ⊗ <span class="id">ID</span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2045')">Proof.</div>
-<div class="proofscript" id="proof2045">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> ((<span class="id">ENV</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>))) (<span class="id">ENV</span> ⊗ <span class="id">ID</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> ((<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>)) (<span class="id">ENV</span> ⊗ <span class="id">ID</span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2070')">Proof.</div>
+<div class="proofscript" id="proof2070">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1064,8 +1064,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_env_merge_l">appenv_over_env_merge_l</a></span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_env">nraenv_core_ignores_env</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id">ENV</span> ⊗ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ⊗ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2046')">Proof.</div>
-<div class="proofscript" id="proof2046">
+<div class="toggleproof" onclick="toggleDisplay('proof2071')">Proof.</div>
+<div class="proofscript" id="proof2071">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_env_swap">nraenv_core_ignores_env_swap</a></span> <span class="id">p1</span> <span class="id">H</span> <span class="id">h</span> <span class="id">c</span> <span class="id">d</span> <span class="id">env</span> <span class="id">x</span>).<br/>
@@ -1076,8 +1076,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_mapenv_merge2">appenv_over_mapenv_merge2</a></span> <span class="id">s</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANAppEnv">ANAppEnv</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> ((<span class="id">ENV</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>)) (<span class="id">ENV</span> ⊗ <span class="id">ID</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> ((<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) (<span class="id">ENV</span> ⊗ <span class="id">ID</span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2047')">Proof.</div>
-<div class="proofscript" id="proof2047">
+<div class="toggleproof" onclick="toggleDisplay('proof2072')">Proof.</div>
+<div class="proofscript" id="proof2072">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1085,8 +1085,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="env_appenv">env_appenv</a></span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">ENV</span>) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2048')">Proof.</div>
-<div class="proofscript" id="proof2048">
+<div class="toggleproof" onclick="toggleDisplay('proof2073')">Proof.</div>
+<div class="proofscript" id="proof2073">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1095,16 +1095,16 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_singleton_rec">envmap_singleton_rec</a></span> <span class="id">s1</span> <span class="id">s2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id">ID</span>) |] ⟩( ‵{|(<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span> |}) ≡ₑ ‵{|‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, (<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>) |] |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2049')">Proof.</div>
-<div class="proofscript" id="proof2049">
+<div class="toggleproof" onclick="toggleDisplay('proof2074')">Proof.</div>
+<div class="proofscript" id="proof2074">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#envmap_singleton">envmap_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envmap_dot_singleton">envmap_dot_singleton</a></span> <span class="id">a</span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id">ID</span>·<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#a">a</a></span> ⟩( ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> |} ) ≡ₑ ‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>·<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#a">a</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2050')">Proof.</div>
-<div class="proofscript" id="proof2050">
+<div class="toggleproof" onclick="toggleDisplay('proof2075')">Proof.</div>
+<div class="proofscript" id="proof2075">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#envmap_singleton">envmap_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -1115,8 +1115,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋈ᵈ⟨ χ⟨‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>,<span class="id">ID</span>) |] ⟩((<span class="id">ID</span>)·<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>) ⟩( ‵{|‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s3">s3</a></span>,<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>,‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> |}) |]|} )<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ ‵{|‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s3">s3</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) |]|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2051')">Proof.</div>
-<div class="proofscript" id="proof2051">
+<div class="toggleproof" onclick="toggleDisplay('proof2076')">Proof.</div>
+<div class="proofscript" id="proof2076">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">clear</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">clear</span> <span class="id">H0</span>; <span class="tactic">intros</span>.<br/>
@@ -1127,7 +1127,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o0</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id">s3</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1192,7 +1192,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id">s3</span> <span class="id">s2</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_dec">StringOrder.lt_dec</a></span> <span class="id">s1</span> <span class="id">s3</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s3</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
@@ -1206,7 +1206,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s3</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s2</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
@@ -1221,7 +1221,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.eq">StringOrder.eq</a></span> <span class="id">s1</span> <span class="id">s3</span>) <span class="tactic">by</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#lt_contr1">lt_contr1</a></span>; <span class="tactic">assumption</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span>; <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product">rmap_product</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#oomap_concat">oomap_concat</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s1</span> <span class="id">s1</span>); <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span>.<br/>
@@ -1263,8 +1263,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> ((<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#a1">a1</a></span>) ((<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#a2">a2</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;◯ (‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#a1">a1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#a2">a2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) |])<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2052')">Proof.</div>
-<div class="proofscript" id="proof2052">
+<div class="toggleproof" onclick="toggleDisplay('proof2077')">Proof.</div>
+<div class="proofscript" id="proof2077">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
@@ -1292,8 +1292,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>) |])<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ (‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) |] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>) |]).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2053')">Proof.</div>
-<div class="proofscript" id="proof2053">
+<div class="toggleproof" onclick="toggleDisplay('proof2078')">Proof.</div>
+<div class="proofscript" id="proof2078">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1301,17 +1301,17 @@
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tostring_dstring">tostring_dstring</a></span> <span class="id">s</span>:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AToString">AToString</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>))) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2054')">Proof.</div>
-<div class="proofscript" id="proof2054">
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpToString">OpToString</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>))) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>)).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2079')">Proof.</div>
+<div class="proofscript" id="proof2079">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tostring_tostring">tostring_tostring</a></span> <span class="id">p</span>:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AToString">AToString</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AToString">AToString</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AToString">AToString</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2055')">Proof.</div>
-<div class="proofscript" id="proof2055">
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpToString">OpToString</a></span> (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpToString">OpToString</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)) ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpToString">OpToString</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2080')">Proof.</div>
+<div class="proofscript" id="proof2080">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1319,8 +1319,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_env_dot">app_over_env_dot</a></span> <span class="id">s</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">ENV</span> ◯ (<span class="id">ENV</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span> ≡ₑ (<span class="id">ENV</span>) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2056')">Proof.</div>
-<div class="proofscript" id="proof2056">
+<div class="toggleproof" onclick="toggleDisplay('proof2081')">Proof.</div>
+<div class="proofscript" id="proof2081">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">env</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">RRelation.edot</a></span> <span class="id">l</span> <span class="id">s</span>); <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">assumption</span>.<br/>
@@ -1329,8 +1329,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_appenv">app_over_appenv</a></span> <span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_id">nraenv_core_ignores_id</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ◯ₑ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2057')">Proof.</div>
-<div class="proofscript" id="proof2057">
+<div class="toggleproof" onclick="toggleDisplay('proof2082')">Proof.</div>
+<div class="proofscript" id="proof2082">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1342,8 +1342,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_over_app_ie">appenv_over_app_ie</a></span> <span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_env">nraenv_core_ignores_env</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p3">p3</a></span> ◯ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2058')">Proof.</div>
-<div class="proofscript" id="proof2058">
+<div class="toggleproof" onclick="toggleDisplay('proof2083')">Proof.</div>
+<div class="proofscript" id="proof2083">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1354,8 +1354,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="app_over_appenv_over_mapenv">app_over_appenv_over_mapenv</a></span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(((<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (‵{|<span class="id">ENV</span>|})) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ≡ₑ<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(((<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (‵{|<span class="id">ENV</span>|})) ◯ₑ (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) )).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2059')">Proof.</div>
-<div class="proofscript" id="proof2059">
+<div class="toggleproof" onclick="toggleDisplay('proof2084')">Proof.</div>
+<div class="proofscript" id="proof2084">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1363,8 +1363,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_full_over_select_id">map_full_over_select_id</a></span> <span class="id">p0</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ⟩(σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⟩(‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> |})) ≡ₑ χ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p0">p0</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ⟩(σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ⟩(‵{| <span class="id">ID</span> |})).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2060')">Proof.</div>
-<div class="proofscript" id="proof2060">
+<div class="toggleproof" onclick="toggleDisplay('proof2085')">Proof.</div>
+<div class="proofscript" id="proof2085">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">d</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1376,8 +1376,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compose_selects_in_mapenv">compose_selects_in_mapenv</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(♯<span class="id">flatten</span>(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (χ⟨<span class="id">ENV</span>⟩(σ⟨<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>⟩( ‵{| <span class="id">ID</span> |}))))) ◯ₑ (χ⟨<span class="id">ENV</span>⟩(σ⟨<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>⟩( ‵{| <span class="id">ID</span> |})))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ (χ⟨<span class="id">ENV</span>⟩(σ⟨<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>⟩(σ⟨<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>⟩( ‵{| <span class="id">ID</span> |})))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2061')">Proof.</div>
-<div class="proofscript" id="proof2061">
+<div class="toggleproof" onclick="toggleDisplay('proof2086')">Proof.</div>
+<div class="proofscript" id="proof2086">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">alg</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -1392,8 +1392,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flatten_through_appenv">flatten_through_appenv</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ≡ₑ ♯<span class="id">flatten</span>(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2062')">Proof.</div>
-<div class="proofscript" id="proof2062">
+<div class="toggleproof" onclick="toggleDisplay('proof2087')">Proof.</div>
+<div class="proofscript" id="proof2087">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -1401,8 +1401,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="appenv_through_either">appenv_through_either</a></span> <span class="id">q</span>₁ <span class="id">q</span>₂ <span class="id">q</span>₃:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_id">nraenv_core_ignores_id</a></span> <span class="id">q</span>₃ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">q</span>₁ <span class="id">q</span>₂ ◯ₑ <span class="id">q</span>₃ ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> (<span class="id">q</span>₁ ◯ₑ <span class="id">q</span>₃) (<span class="id">q</span>₂ ◯ₑ <span class="id">q</span>₃).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2063')">Proof.</div>
-<div class="proofscript" id="proof2063">
+<div class="toggleproof" onclick="toggleDisplay('proof2088')">Proof.</div>
+<div class="proofscript" id="proof2088">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>.<br/>
@@ -1416,8 +1416,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flatten_mapenv_coll">flatten_mapenv_coll</a></span> <span class="id">p1</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> |})) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2064')">Proof.</div>
-<div class="proofscript" id="proof2064">
+<div class="toggleproof" onclick="toggleDisplay('proof2089')">Proof.</div>
+<div class="proofscript" id="proof2089">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">env</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">alg</span>.<br/>
@@ -1442,8 +1442,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flip_env1">flip_env1</a></span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨<span class="id">ENV</span>⟩(σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ⟩(‵{|<span class="id">ID</span>|})) ◯ₑ <span class="id">ID</span> ≡ₑ (σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ⟩(‵{|<span class="id">ID</span>|})) ◯ₑ <span class="id">ID</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2065')">Proof.</div>
-<div class="proofscript" id="proof2065">
+<div class="toggleproof" onclick="toggleDisplay('proof2090')">Proof.</div>
+<div class="proofscript" id="proof2090">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">x</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1452,31 +1452,31 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flip_env2">flip_env2</a></span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ⟩(‵{|<span class="id">ID</span>|}) ◯ₑ <span class="id">ID</span>) ≡ₑ σ⟨ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> ◯ₑ <span class="id">ID</span> ⟩(‵{|<span class="id">ID</span>|}).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2066')">Proof.</div>
-<div class="proofscript" id="proof2066">
+<div class="toggleproof" onclick="toggleDisplay('proof2091')">Proof.</div>
+<div class="proofscript" id="proof2091">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">x</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flip_env3">flip_env3</a></span> <span class="id">b</span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ◯ₑ <span class="id">ID</span> ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANBinop">ANBinop</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#b">b</a></span> (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id">ID</span>) (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ◯ₑ <span class="id">ID</span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2067')">Proof.</div>
-<div class="proofscript" id="proof2067">
+<div class="toggleproof" onclick="toggleDisplay('proof2092')">Proof.</div>
+<div class="proofscript" id="proof2092">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flip_env4">flip_env4</a></span> <span class="id">p1</span> <span class="id">p2</span> <span class="id">s</span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2068')">Proof.</div>
-<div class="proofscript" id="proof2068">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>) (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2093')">Proof.</div>
+<div class="proofscript" id="proof2093">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flip_env5">flip_env5</a></span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(χ⟨σ⟨<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>⟩(‵{|<span class="id">ID</span>|})⟩(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)) ≡ₑ σ⟨<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>⟩(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2069')">Proof.</div>
-<div class="proofscript" id="proof2069">
+<div class="toggleproof" onclick="toggleDisplay('proof2094')">Proof.</div>
+<div class="proofscript" id="proof2094">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1559,8 +1559,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flip_env7">flip_env7</a></span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvIgnore.html#nraenv_core_ignores_id">nraenv_core_ignores_id</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapEnv">ANMapEnv</a></span> (‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> |})) ◯ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span> ≡ₑ χ⟨‵{| <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ◯ₑ <span class="id">ID</span> |}⟩(<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2070')">Proof.</div>
-<div class="proofscript" id="proof2070">
+<div class="toggleproof" onclick="toggleDisplay('proof2095')">Proof.</div>
+<div class="proofscript" id="proof2095">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1581,8 +1581,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_concat_to_concat">merge_concat_to_concat</a></span> <span class="id">s1</span> <span class="id">s2</span> <span class="id">p1</span> <span class="id">p2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span> &lt;&gt; <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>)|] ⊗ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)|] ≡ₑ ‵{|‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s1">s1</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>)|] ⊕ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)|]|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2071')">Proof.</div>
-<div class="proofscript" id="proof2071">
+<div class="toggleproof" onclick="toggleDisplay('proof2096')">Proof.</div>
+<div class="proofscript" id="proof2096">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -1598,8 +1598,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dot_over_rec">dot_over_rec</a></span> <span class="id">s</span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)|]) · <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span> ≡ₑ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2072')">Proof.</div>
-<div class="proofscript" id="proof2072">
+<div class="toggleproof" onclick="toggleDisplay('proof2097')">Proof.</div>
+<div class="proofscript" id="proof2097">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span> ? <span class="id">_</span> ? <span class="id">_</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>; <span class="tactic">simpl</span>.<br/>
@@ -1608,31 +1608,31 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="either_app_over_dleft">either_app_over_dleft</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">d</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂) ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dleft">dleft</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>)) ≡ₑ <span class="id">p</span>₁ ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2073')">Proof.</div>
-<div class="proofscript" id="proof2073">
+<div class="toggleproof" onclick="toggleDisplay('proof2098')">Proof.</div>
+<div class="proofscript" id="proof2098">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="either_app_over_dright">either_app_over_dright</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">d</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂) ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dright">dright</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>)) ≡ₑ <span class="id">p</span>₂ ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#d">d</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2074')">Proof.</div>
-<div class="proofscript" id="proof2074">
+<div class="toggleproof" onclick="toggleDisplay('proof2099')">Proof.</div>
+<div class="proofscript" id="proof2099">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="either_app_over_aleft">either_app_over_aleft</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂) ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ALeft">ALeft</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ <span class="id">p</span>₁ ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2075')">Proof.</div>
-<div class="proofscript" id="proof2075">
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂) ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpLeft">OpLeft</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ <span class="id">p</span>₁ ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2100')">Proof.</div>
+<div class="proofscript" id="proof2100">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="either_app_over_aright">either_app_over_aright</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂) ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARight">ARight</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ <span class="id">p</span>₂ ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2076')">Proof.</div>
-<div class="proofscript" id="proof2076">
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂) ◯ (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpRight">OpRight</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) ≡ₑ <span class="id">p</span>₂ ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2101')">Proof.</div>
+<div class="proofscript" id="proof2101">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">trivial</span>.<br/>
@@ -1642,8 +1642,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rproject_over_concat">rproject_over_concat</a></span> <span class="id">sl</span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> ⊕ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₑ π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>) ⊕ π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2077')">Proof.</div>
-<div class="proofscript" id="proof2077">
+<div class="toggleproof" onclick="toggleDisplay('proof2102')">Proof.</div>
+<div class="proofscript" id="proof2102">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p1</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>);<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p2</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>).<br/>
@@ -1657,8 +1657,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rproject_over_const">rproject_over_const</a></span> <span class="id">sl</span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#l">l</a></span>)) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANConst">ANConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#rproject">RRelation.rproject</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#l">l</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2078')">Proof.</div>
-<div class="proofscript" id="proof2078">
+<div class="toggleproof" onclick="toggleDisplay('proof2103')">Proof.</div>
+<div class="proofscript" id="proof2103">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rproject_rec_sort_commute">rproject_rec_sort_commute</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rproject_map_fst_same">rproject_map_fst_same</a></span>; <span class="tactic">intuition</span>.<br/>
@@ -1667,8 +1667,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rproject_over_rec_in">rproject_over_rec_in</a></span> <span class="id">sl</span> <span class="id">s</span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) |]) ≡ₑ ‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) |].<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2079')">Proof.</div>
-<div class="proofscript" id="proof2079">
+<div class="toggleproof" onclick="toggleDisplay('proof2104')">Proof.</div>
+<div class="proofscript" id="proof2104">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_dec">in_dec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">sl</span>); <span class="tactic">intuition</span>.<br/>
@@ -1677,8 +1677,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rproject_over_rec_nin">rproject_over_rec_nin</a></span> <span class="id">sl</span> <span class="id">s</span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](‵[| (<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>) |]) ≡ₑ ‵[||] ◯ <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span> .<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2080')">Proof.</div>
-<div class="proofscript" id="proof2080">
+<div class="toggleproof" onclick="toggleDisplay('proof2105')">Proof.</div>
+<div class="proofscript" id="proof2105">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_dec">in_dec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">sl</span>); <span class="tactic">intuition</span>.<br/>
@@ -1686,8 +1686,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rproject_over_rproject">rproject_over_rproject</a></span> <span class="id">sl1</span> <span class="id">sl2</span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl1">sl1</a></span>](π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl2">sl2</a></span>](<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>)) ≡ₑ π[<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.ListSet.html#set_inter">set_inter</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl2">sl2</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl1">sl1</a></span>](<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2081')">Proof.</div>
-<div class="proofscript" id="proof2081">
+<div class="toggleproof" onclick="toggleDisplay('proof2106')">Proof.</div>
+<div class="proofscript" id="proof2106">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span> @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>;<span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -1697,16 +1697,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rproject_over_either">rproject_over_either</a></span> <span class="id">sl</span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>) ≡ₑ <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANEither">ANEither</a></span> (π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p1">p1</a></span>)) (π[<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#sl">sl</a></span>](<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#p2">p2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2082')">Proof.</div>
-<div class="proofscript" id="proof2082">
+<div class="toggleproof" onclick="toggleDisplay('proof2107')">Proof.</div>
+<div class="proofscript" id="proof2107">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_over_map_split">map_over_map_split</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ <span class="id">p</span>₃ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨χ⟨<span class="id">p</span>₁ ⟩( <span class="id">p</span>₂) ⟩( <span class="id">p</span>₃) ≡ₑ χ⟨χ⟨<span class="id">p</span>₁ ⟩( <span class="id">ID</span>) ⟩(χ⟨<span class="id">p</span>₂⟩(<span class="id">p</span>₃)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2083')">Proof.</div>
-<div class="proofscript" id="proof2083">
+<div class="toggleproof" onclick="toggleDisplay('proof2108')">Proof.</div>
+<div class="proofscript" id="proof2108">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">h</span> ⊢ₑ <span class="id">p</span>₃ @ₑ <span class="id">x</span> ⊣ <span class="id">c</span>; <span class="id">env</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -1763,9 +1763,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>).<br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dup_elim">dup_elim</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#nodupA">nodupA</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span> -&gt; <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADistinct">ADistinct</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span>  ≡ₑ  <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2084')">Proof.</div>
-<div class="proofscript" id="proof2084">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#nodupA">nodupA</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span> -&gt; <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANUnop">ANUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDistinct">OpDistinct</a></span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span>  ≡ₑ  <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#q">q</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2109')">Proof.</div>
+<div class="proofscript" id="proof2109">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">nd</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -1798,10 +1798,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>, <span class="id">r</span>) =&gt; (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> <span class="id">e1</span> <span class="id">e2</span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">e2last</span>, <span class="id">e2rest</span>) =&gt; (<span class="id">e2last</span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMap">ANMap</a></span> <span class="id">e1</span> <span class="id">e2rest</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapConcat">ANMapConcat</a></span> <span class="id">e1</span> <span class="id">e2</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapProduct">ANMapProduct</a></span> <span class="id">e1</span> <span class="id">e2</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#nraenv_core_split_last">nraenv_core_split_last</a></span> <span class="id">e2</span> <span class="kwd">with</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>, <span class="id">r</span>) =&gt; (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapConcat">ANMapConcat</a></span> <span class="id">e1</span> <span class="id">e2</span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">e2last</span>, <span class="id">e2rest</span>) =&gt; (<span class="id">e2last</span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapConcat">ANMapConcat</a></span> <span class="id">e1</span> <span class="id">e2rest</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>, <span class="id">r</span>) =&gt; (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapProduct">ANMapProduct</a></span> <span class="id">e1</span> <span class="id">e2</span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">e2last</span>, <span class="id">e2rest</span>) =&gt; (<span class="id">e2last</span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANMapProduct">ANMapProduct</a></span> <span class="id">e1</span> <span class="id">e2rest</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANProduct">ANProduct</a></span> <span class="id">e1</span> <span class="id">e2</span> =&gt; (<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANProduct">ANProduct</a></span> <span class="id">e1</span> <span class="id">e2</span>,<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANID">ANID</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#ANSelect">ANSelect</a></span> <span class="id">e1</span> <span class="id">e2</span> =&gt;<br/>

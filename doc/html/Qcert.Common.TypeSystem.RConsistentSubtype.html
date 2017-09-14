@@ -40,8 +40,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1276')">Proof.</div>
-<div class="proofscript" id="proof1276">
+<div class="toggleproof" onclick="toggleDisplay('proof1290')">Proof.</div>
+<div class="proofscript" id="proof1290">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>]; <span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">bwf</span>]; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">cut</span> (  <span class="id">rtype_join</span>₀ <span class="id">a</span> <span class="id">b</span> = <span class="id">b</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ <span class="id">rtype_meet</span>₀ <span class="id">a</span> <span class="id">b</span> = <span class="id">a</span>).<br/>
@@ -900,23 +900,23 @@ Qed.</div>
 <br/>
 <span class="kwd">Corollary</span> <span class="id"><a name="consistent_rtype_join1">consistent_rtype_join1</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1277')">Proof.</div>
-<div class="proofscript" id="proof1277">
+<div class="toggleproof" onclick="toggleDisplay('proof1291')">Proof.</div>
+<div class="proofscript" id="proof1291">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join_meet1">consistent_rtype_join_meet1</a></span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Corollary</span> <span class="id"><a name="consistent_rtype_meet1">consistent_rtype_meet1</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1278')">Proof.</div>
-<div class="proofscript" id="proof1278">
+<div class="toggleproof" onclick="toggleDisplay('proof1292')">Proof.</div>
+<div class="proofscript" id="proof1292">
 &nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join_meet1">consistent_rtype_join_meet1</a></span>; <span class="tactic">trivial</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="consistent_rtype_join_meet2">consistent_rtype_join_meet2</a></span>:<br/>
 &nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>,  (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1279')">Proof.</div>
-<div class="proofscript" id="proof1279">
+<div class="toggleproof" onclick="toggleDisplay('proof1293')">Proof.</div>
+<div class="proofscript" id="proof1293">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">STop</span>₀ <span class="id">SBottom</span>₀ <span class="id">SColl</span>₀.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">awf</span>]; <span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">bwf</span>].<br/>
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span>; <span class="tactic">simpl</span>.<br/>
@@ -1289,8 +1289,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Corollary</span> <span class="id"><a name="consistent_rtype_join2">consistent_rtype_join2</a></span>:<br/>
 &nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1280')">Proof.</div>
-<div class="proofscript" id="proof1280">
+<div class="toggleproof" onclick="toggleDisplay('proof1294')">Proof.</div>
+<div class="proofscript" id="proof1294">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">a</span> <span class="id">b</span> ?.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join_meet2">consistent_rtype_join_meet2</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;<span class="tactic">auto</span>.<br/>
@@ -1298,37 +1298,37 @@ Qed.</div>
 <br/>
 <span class="kwd">Corollary</span> <span class="id"><a name="consistent_rtype_meet2">consistent_rtype_meet2</a></span>:<br/>
 &nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1281')">Proof.</div>
-<div class="proofscript" id="proof1281">
+<div class="toggleproof" onclick="toggleDisplay('proof1295')">Proof.</div>
+<div class="proofscript" id="proof1295">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">a</span> <span class="id">b</span> ?.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join_meet2">consistent_rtype_join_meet2</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="consistent_rtype_join">consistent_rtype_join</a></span>: <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1282')">Proof.</div>
-<div class="proofscript" id="proof1282">
+<div class="toggleproof" onclick="toggleDisplay('proof1296')">Proof.</div>
+<div class="proofscript" id="proof1296">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">consistent_rtype_join1</span> <span class="id">consistent_rtype_join2</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
 Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="rtype_join_subtype_l">rtype_join_subtype_l</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1283')">Proof.</div>
-<div class="proofscript" id="proof1283">
+<div class="toggleproof" onclick="toggleDisplay('proof1297')">Proof.</div>
+<div class="proofscript" id="proof1297">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join">consistent_rtype_join</a></span>, &lt;- <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join_associative">rtype_join_associative</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join_idempotent">rtype_join_idempotent</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="rtype_join_subtype_r">rtype_join_subtype_r</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1284')">Proof.</div>
-<div class="proofscript" id="proof1284">
+<div class="toggleproof" onclick="toggleDisplay('proof1298')">Proof.</div>
+<div class="proofscript" id="proof1298">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join_commutative">rtype_join_commutative</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#rtype_join_subtype_l">rtype_join_subtype_l</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="rtype_join_least">rtype_join_least</a></span> {<span class="id">a</span> <span class="id">b</span> <span class="id">c</span>} : <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#c">c</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#c">c</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#c">c</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1285')">Proof.</div>
-<div class="proofscript" id="proof1285">
+<div class="toggleproof" onclick="toggleDisplay('proof1299')">Proof.</div>
+<div class="proofscript" id="proof1299">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub1</span> <span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join">consistent_rtype_join</a></span> <span class="kwd">in</span> <span class="id">sub1</span>,<span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">sub1</span>, &lt;- <span class="id">sub2</span>.<br/>
@@ -1340,36 +1340,36 @@ Qed.</div>
        its relationship with rtype_join
        and the computable equality of types </div>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="subtype_dec_rtype_join">subtype_dec_rtype_join</a></span> <span class="id">a</span> <span class="id">b</span> : {<span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>} + {~ <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1286')">Proof.</div>
-<div class="proofscript" id="proof1286">
+<div class="toggleproof" onclick="toggleDisplay('proof1300')">Proof.</div>
+<div class="proofscript" id="proof1300">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join">consistent_rtype_join</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id">a</span> <span class="id">b</span> == <span class="id">b</span>); <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span> <span class="kwd">in</span> *; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 &nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="consistent_rtype_meet">consistent_rtype_meet</a></span> : <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1287')">Proof.</div>
-<div class="proofscript" id="proof1287">
+<div class="toggleproof" onclick="toggleDisplay('proof1301')">Proof.</div>
+<div class="proofscript" id="proof1301">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">consistent_rtype_meet1</span> <span class="id">consistent_rtype_meet2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="rtype_meet_subtype_l">rtype_meet_subtype_l</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1288')">Proof.</div>
-<div class="proofscript" id="proof1288">
+<div class="toggleproof" onclick="toggleDisplay('proof1302')">Proof.</div>
+<div class="proofscript" id="proof1302">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_meet">consistent_rtype_meet</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_commutative">rtype_meet_commutative</a></span>, &lt;- <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_associative">rtype_meet_associative</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_idempotent">rtype_meet_idempotent</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="rtype_meet_subtype_r">rtype_meet_subtype_r</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1289')">Proof.</div>
-<div class="proofscript" id="proof1289">
+<div class="toggleproof" onclick="toggleDisplay('proof1303')">Proof.</div>
+<div class="proofscript" id="proof1303">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet_commutative">rtype_meet_commutative</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#rtype_meet_subtype_l">rtype_meet_subtype_l</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="rtype_meet_most">rtype_meet_most</a></span> {<span class="id">a</span> <span class="id">b</span> <span class="id">c</span>} : <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#c">c</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1290')">Proof.</div>
-<div class="proofscript" id="proof1290">
+<div class="toggleproof" onclick="toggleDisplay('proof1304')">Proof.</div>
+<div class="proofscript" id="proof1304">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub1</span> <span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_meet">consistent_rtype_meet</a></span> <span class="kwd">in</span> <span class="id">sub1</span>,<span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">sub1</span>, &lt;- <span class="id">sub2</span>.<br/>
@@ -1382,8 +1382,8 @@ Qed.</div>
        its relationship with rtype_meet
        and the computable equality of types </div>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="subtype_dec_rtype_meet">subtype_dec_rtype_meet</a></span> <span class="id">a</span> <span class="id">b</span> : {<span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>} + {~ <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1291')">Proof.</div>
-<div class="proofscript" id="proof1291">
+<div class="toggleproof" onclick="toggleDisplay('proof1305')">Proof.</div>
+<div class="proofscript" id="proof1305">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_meet">consistent_rtype_meet</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id">a</span> <span class="id">b</span> == <span class="id">a</span>); <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span> <span class="kwd">in</span> *; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
@@ -1391,8 +1391,8 @@ Qed.</div>
 <span class="kwd">End</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#RConsistentSubtype.rtype_join_meet">rtype_join_meet</a></span>.<br/>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_join_absorptive">rtype_join_absorptive</a></span>: <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>) = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1292')">Proof.</div>
-<div class="proofscript" id="proof1292">
+<div class="toggleproof" onclick="toggleDisplay('proof1306')">Proof.</div>
+<div class="proofscript" id="proof1306">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join_commutative">rtype_join_commutative</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_join">consistent_rtype_join</a></span>.<br/>
@@ -1400,8 +1400,8 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Theorem</span> <span class="id"><a name="rtype_meet_absorptive">rtype_meet_absorptive</a></span>: <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_meet">rtype_meet</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeMeetJoin.html#rtype_join">rtype_join</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#b">b</a></span>) = <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1293')">Proof.</div>
-<div class="proofscript" id="proof1293">
+<div class="toggleproof" onclick="toggleDisplay('proof1307')">Proof.</div>
+<div class="proofscript" id="proof1307">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#consistent_rtype_meet">consistent_rtype_meet</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RConsistentSubtype.html#rtype_join_subtype_l">rtype_join_subtype_l</a></span>.<br/>

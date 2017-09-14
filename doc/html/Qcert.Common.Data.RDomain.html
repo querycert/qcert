@@ -29,8 +29,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="domains_included_eq">domains_included_eq</a></span> (<span class="id">ats1</span> <span class="id">ats2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats1">ats1</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats2">ats2</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_alt">domains_included_alt</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats1">ats1</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats2">ats2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof745')">Proof.</div>
-<div class="proofscript" id="proof745">
+<div class="toggleproof" onclick="toggleDisplay('proof747')">Proof.</div>
+<div class="proofscript" id="proof747">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span>, <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_alt">domains_included_alt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -58,8 +58,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="domains_intersection_nil_r">domains_intersection_nil_r</a></span> (<span class="id">ats</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_intersection">domains_intersection</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats">ats</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof746')">Proof.</div>
-<div class="proofscript" id="proof746">
+<div class="toggleproof" onclick="toggleDisplay('proof748')">Proof.</div>
+<div class="proofscript" id="proof748">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">ats</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">assumption</span>.<br/>
@@ -67,8 +67,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="not_so_in">not_so_in</a></span> (<span class="id">x</span> <span class="id">a</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Data.RDomain.html#a">a</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#x">x</a></span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_intersection">domains_intersection</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#l1">l1</a></span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#a">a</a></span> :: <span class="id"><a href="Qcert.Common.Data.RDomain.html#l2">l2</a></span>)) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#x">x</a></span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_intersection">domains_intersection</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof747')">Proof.</div>
-<div class="proofscript" id="proof747">
+<div class="toggleproof" onclick="toggleDisplay('proof749')">Proof.</div>
+<div class="proofscript" id="proof749">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="id">revert</span> <span class="id">H0</span>.<br/>
@@ -94,8 +94,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="intersection_intersects">intersection_intersects</a></span> (<span class="id">ats1</span> <span class="id">ats2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_intersect">domains_intersect</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats1">ats1</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats2">ats2</a></span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_intersection">domains_intersection</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats1">ats1</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats2">ats2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof748')">Proof.</div>
-<div class="proofscript" id="proof748">
+<div class="toggleproof" onclick="toggleDisplay('proof750')">Proof.</div>
+<div class="proofscript" id="proof750">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_intersect">domains_intersect</a></span>; <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">revert</span> <span class="id">H</span>; <span class="id">revert</span> <span class="id">ats2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">ats1</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
@@ -127,8 +127,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="self_domain">self_domain</a></span> (<span class="id">ats</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats">ats</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#ats">ats</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof749')">Proof.</div>
-<div class="proofscript" id="proof749">
+<div class="toggleproof" onclick="toggleDisplay('proof751')">Proof.</div>
+<div class="proofscript" id="proof751">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">ats</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_nil">Forall_nil</a></span>. <br/>
@@ -142,8 +142,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="domains_included_nil_l">domains_included_nil_l</a></span> <span class="id">l</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof750')">Proof.</div>
-<div class="proofscript" id="proof750">
+<div class="toggleproof" onclick="toggleDisplay('proof752')">Proof.</div>
+<div class="proofscript" id="proof752">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_eq">domains_included_eq</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_alt">domains_included_alt</a></span> <span class="kwd">in</span> *; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assumption</span>.<br/>
@@ -153,8 +153,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="domains_included_nil_r">domains_included_nil_r</a></span> <span class="id">l</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#l">l</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDomain.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof751')">Proof.</div>
-<div class="proofscript" id="proof751">
+<div class="toggleproof" onclick="toggleDisplay('proof753')">Proof.</div>
+<div class="proofscript" id="proof753">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_alt">domains_included_alt</a></span> <span class="id">l</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>); <span class="tactic">try</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_eq">domains_included_eq</a></span>; <span class="tactic">assumption</span>); <span class="tactic">clear</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_alt">domains_included_alt</a></span> <span class="kwd">in</span> *; <span class="tactic">intros</span>.<br/>
@@ -167,8 +167,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="domains_included_cons">domains_included_cons</a></span> <span class="id">l1</span> <span class="id">l2</span> (<span class="id">a</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#a">a</a></span>::<span class="id"><a href="Qcert.Common.Data.RDomain.html#l1">l1</a></span>) <span class="id"><a href="Qcert.Common.Data.RDomain.html#l2">l2</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#l2">l2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof752')">Proof.</div>
-<div class="proofscript" id="proof752">
+<div class="toggleproof" onclick="toggleDisplay('proof754')">Proof.</div>
+<div class="proofscript" id="proof754">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_eq">domains_included_eq</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_alt">domains_included_alt</a></span> (<span class="id">a</span> :: <span class="id">l1</span>) <span class="id">l2</span>); <span class="tactic">try</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_eq">domains_included_eq</a></span>; <span class="tactic">assumption</span>); <span class="tactic">clear</span> <span class="id">H</span>.<br/>

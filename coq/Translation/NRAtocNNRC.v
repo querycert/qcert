@@ -31,83 +31,83 @@ Section NRAtocNNRC.
 
   Fixpoint nra_to_nnrc_core (op:nra) (var:var) : nnrc :=
     match op with
+    | NRAGetConstant s =>
+      NNRCGetConstant s
     (* [[ ID ]]_var = var *)
-    | AID => NNRCVar var
+    | NRAID => NNRCVar var
     (* [[ Const ]]_var = Const *)
-    | AConst rd => NNRCConst rd
-    (* [[ op1 ⊕ op2 ]]_var == [[ op1 ]]
-_var ⊕ [[ op2 ]]_var *)
-    | ABinop bop op1 op2 =>
+    | NRAConst rd => NNRCConst rd
+    (* [[ op1 ⊕ op2 ]]_var == [[ op1 ]]_var ⊕ [[ op2 ]]_var *)
+    | NRABinop bop op1 op2 =>
       NNRCBinop bop (nra_to_nnrc_core op1 var) (nra_to_nnrc_core op2 var)
     (* [[ UOP op1 ]]_var = UOP [[ op1 ]]_var *)
-    | AUnop uop op1 =>
+    | NRAUnop uop op1 =>
       NNRCUnop uop (nra_to_nnrc_core op1 var)
     (* [[ χ⟨ op1 ⟩( op2 ) ]]_var = { [[ op1 ]]_t | t ∈ [[ op2 ]]_var } *)
-    | AMap op1 op2 =>
+    | NRAMap op1 op2 =>
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tmap$" (var::nil) in
       NNRCFor t nnrc2 (nra_to_nnrc_core op1 t)
     (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_var
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1 } | t1 ∈ [[ op2 ]]_var } *)
-    | AMapConcat op1 op2 =>
+    | NRAMapProduct op1 op2 =>
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let (t1,t2) := fresh_var2 "tmc$" "tmc$" (var::nil) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
                (NNRCFor t1 nnrc2
                         (NNRCFor t2 (nra_to_nnrc_core op1 t1)
-                                 ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                                 ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
     (* [[ op1 × op2 ]]_var
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_var } | t1 ∈ [[ op1 ]]_var } *)
-    | AProduct op1 op2 =>
+    | NRAProduct op1 op2 =>
       let nnrc1 := (nra_to_nnrc_core op1 var) in
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let (t1,t2) := fresh_var2 "tprod$" "tprod$" (var::nil) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
                (NNRCFor t1 nnrc1
                         (NNRCFor t2 nnrc2
-                                 ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                                 ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
     (* [[ σ⟨ op1 ⟩(op2) ]]_var
                == ⋃{ if [[ op1 ]]_t1 then { t1 } else {} | t1 ∈ [[ op2 ]]_var } *)
-    | ASelect op1 op2 =>
+    | NRASelect op1 op2 =>
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tsel$" (var::nil) in
       let nnrc1 := (nra_to_nnrc_core op1 t) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
                (NNRCFor t nnrc2
-                        (NNRCIf nnrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
+                        (NNRCIf nnrc1 (NNRCUnop OpBag (NNRCVar t)) (NNRCConst (dcoll nil))))
     (* [[ op1 ∥ op2 ]]_var == let t := [[ op1 ]]_var in
                                   if (t = {})
                                   then [[ op2 ]]_var
                                   else t *)
-    | ADefault op1 op2 =>
+    | NRADefault op1 op2 =>
       let nnrc1 := (nra_to_nnrc_core op1 var) in
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tdef$" (var::nil) in
       (NNRCLet t nnrc1
-               (NNRCIf (NNRCBinop AEq
+               (NNRCIf (NNRCBinop OpEqual
                                   (NNRCVar t)
-                                  (NNRCUnop AFlatten (NNRCConst (dcoll nil))))
+                                  (NNRCUnop OpFlatten (NNRCConst (dcoll nil))))
                        nnrc2 (NNRCVar t)))
     (* [[ op1 ◯ op2 ]]_var == let t := [[ op2 ]]_var
                                   in [[ op1 ]]_t *)
-    | AEither opl opr =>
+    | NRAEither opl opr =>
       let nnrcl := (nra_to_nnrc_core opl var) in
       let nnrcr := (nra_to_nnrc_core opr var) in
       NNRCEither (NNRCVar var) var nnrcl var nnrcr
-    | AEitherConcat op1 op2 =>
+    | NRAEitherConcat op1 op2 =>
       let nnrc1 := (nra_to_nnrc_core op1 var) in
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "ec$" (var::nil) in 
       NNRCLet t nnrc2
-              (NNRCEither nnrc1 var (NNRCUnop ALeft (NNRCBinop AConcat (NNRCVar var) (NNRCVar t)))
-                          var (NNRCUnop ARight (NNRCBinop AConcat (NNRCVar var) (NNRCVar t))))
-    | AApp op1 op2 =>
+              (NNRCEither nnrc1
+                          var (NNRCUnop OpLeft (NNRCBinop OpRecConcat (NNRCVar var) (NNRCVar t)))
+                          var (NNRCUnop OpRight (NNRCBinop OpRecConcat (NNRCVar var) (NNRCVar t))))
+    | NRAApp op1 op2 =>
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tapp$" (var::nil) in
       let nnrc1 := (nra_to_nnrc_core op1 t) in
       (NNRCLet t nnrc2 nnrc1)
-    | AGetConstant s =>
-      NNRCGetConstant s
     end.
 
   (** Auxiliary lemmas used in the proof of correctness for the translation *)
@@ -141,22 +141,24 @@ _var ⊕ [[ op2 ]]_var *)
     Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
     revert did env vid.
     nra_cases (induction op) Case; intros; simpl.
-    - Case "AID"%string.
-      assumption.
-    - Case "AConst"%string.
+    - Case "NRAGetConstant"%string.
       reflexivity.
-    - Case "ABinop"%string.
+    - Case "NRAID"%string.
+      assumption.
+    - Case "NRAConst"%string.
+      reflexivity.
+    - Case "NRABinop"%string.
       rewrite (IHop1 did env vid H); trivial.
       rewrite (IHop2 did env vid H); trivial.
-    - Case "AUnop"%string.
+    - Case "NRAUnop"%string.
        simpl; rewrite (IHop did env vid H); trivial.
-    - Case "AMap"%string.
+    - Case "NRAMap"%string.
       simpl; rewrite (IHop2 did env vid H); clear IHop2.
       destruct (h ⊢ op2 @ₐ did ⊣ cenv); try reflexivity.
       destruct d; try reflexivity.
       rewrite (map_sem_correct h op1 cenv l env); try reflexivity; intros.
       auto.
-    - Case "AMapConcat"%string.
+    - Case "NRAMapProduct"%string.
       generalize (fresh_var2_distinct  "tmc$" "tmc$" [vid]).
       simpl; intros dis.
       repeat (dest_eqdec; try congruence).
@@ -167,7 +169,7 @@ _var ⊕ [[ op2 ]]_var *)
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop1 a (((fresh_var "tmc$" [vid], a)) :: env) (fresh_var "tmc$" [vid])) at 1; clear IHop1; trivial.
@@ -189,7 +191,7 @@ _var ⊕ [[ op2 ]]_var *)
         reflexivity.
       + simpl.
         dest_eqdec; try congruence.
-    - Case "AProduct"%string.
+    - Case "NRAProduct"%string.
       generalize (fresh_var2_distinct  "tprod$" "tprod$" [vid]).
       simpl; rewrite (IHop1 did env vid H).
       intros dis.
@@ -200,7 +202,7 @@ _var ⊕ [[ op2 ]]_var *)
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop2 did ((fresh_var "tprod$" [vid], a) :: env) vid) at 1; clear IHop2; trivial.
@@ -223,7 +225,7 @@ _var ⊕ [[ op2 ]]_var *)
       + simpl.
         match_destr.
         elim (fresh_var_fresh1 _ _ _ e1).
-    - Case "ASelect"%string.
+    - Case "NRASelect"%string.
       simpl.
       rewrite (IHop2 did env vid H).
       destruct (h ⊢ op2 @ₐ did ⊣ cenv); try reflexivity. clear IHop2 op2.
@@ -247,7 +249,7 @@ _var ⊕ [[ op2 ]]_var *)
       trivial.
       trivial.
       simpl. match_destr; congruence.
-    - Case "ADefault"%string.
+    - Case "NRADefault"%string.
       simpl. rewrite (IHop1 did env vid H).
       case_eq (h ⊢ op1 @ₐ did ⊣ cenv); intros; try reflexivity.
       repeat (dest_eqdec; try congruence).
@@ -257,11 +259,11 @@ _var ⊕ [[ op2 ]]_var *)
         simpl; match_destr.
         elim (fresh_var_fresh1 _ _ _ e0).
       + destruct d; trivial. destruct l; congruence.
-    - Case "AEither"%string.
+    - Case "NRAEither"%string.
       simpl. rewrite H. match_destr.
       + apply IHop1. simpl; trivial; match_destr; try congruence.
       + apply IHop2. simpl; trivial; match_destr; try congruence.
-    - Case "AEitherConcat"%string.
+    - Case "NRAEitherConcat"%string.
       rewrite H.
       rewrite (IHop2 _ _ _ H).
       match_destr; [| repeat (match_destr; trivial)].
@@ -274,14 +276,12 @@ _var ⊕ [[ op2 ]]_var *)
         match_destr; simpl; match_destr; match_destr.
       + match_destr.
         elim (fresh_var_fresh1 _ _ _ e).
-    - Case "AApp"%string.
+    - Case "NRAApp"%string.
       simpl. rewrite (IHop2 did env vid H).
       case (h ⊢ op2 @ₐ did ⊣ cenv); intros; try reflexivity; simpl.
       rewrite (IHop1 d); simpl; try reflexivity.
       trivial. match_destr; trivial.
       congruence.
-    - Case "AGetConstant"%string.
-      reflexivity.
   Qed.
 
   Lemma nra_to_nnrc_core_is_core :
@@ -306,6 +306,7 @@ _var ⊕ [[ op2 ]]_var *)
       induction op; simpl in *; intros; trivial.
       - omega.
       - omega.
+      - omega.
       - specialize (IHop1 v); specialize (IHop2 v); omega.
       - specialize (IHop v); omega.
       - generalize (IHop1 (fresh_var "tmap$" [v]));
@@ -320,7 +321,6 @@ _var ⊕ [[ op2 ]]_var *)
       - specialize (IHop1 v); specialize (IHop2 v); omega.
       - specialize (IHop1 v); specialize (IHop2 v); omega.
       - specialize (IHop2 v); specialize (IHop1 (fresh_var "tapp$" [v])); omega.
-      - omega.
     Qed.
 
   End Size.

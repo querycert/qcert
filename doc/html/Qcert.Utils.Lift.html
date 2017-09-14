@@ -47,8 +47,8 @@ code to propagate errors. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="olift_some">olift_some</a></span> {<span class="id">A</span> <span class="id">B</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>) (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span>) = <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof277')">Proof.</div>
-<div class="proofscript" id="proof277">
+<div class="toggleproof" onclick="toggleDisplay('proof278')">Proof.</div>
+<div class="proofscript" id="proof278">
  <span class="tactic">reflexivity</span>. Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="olift2">olift2</a></span> {<span class="id">A</span> <span class="id">B</span> <span class="id">C</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#C">C</a></span>) (<span class="id">x1</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>) (<span class="id">x2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#C">C</a></span> :=<br/>
@@ -60,29 +60,29 @@ code to propagate errors. </div>
 <h1> Lift properties </h1>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_some_simpl">lift_some_simpl</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>) <span class="id">x</span> : <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof278')">Proof.</div>
-<div class="proofscript" id="proof278">
+<div class="toggleproof" onclick="toggleDisplay('proof279')">Proof.</div>
+<div class="proofscript" id="proof279">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_some_simpl_eq">lift_some_simpl_eq</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>) <span class="id">x</span> <span class="id">y</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span> &lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof279')">Proof.</div>
-<div class="proofscript" id="proof279">
+<div class="toggleproof" onclick="toggleDisplay('proof280')">Proof.</div>
+<div class="proofscript" id="proof280">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">split</span>; [|<span class="tactic">inversion</span> 1]; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_none_simpl">lift_none_simpl</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>) : <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof280')">Proof.</div>
-<div class="proofscript" id="proof280">
+<div class="toggleproof" onclick="toggleDisplay('proof281')">Proof.</div>
+<div class="proofscript" id="proof281">
  <span class="tactic">reflexivity</span>. Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_none">lift_none</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} {<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>} {<span class="id">x</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof281')">Proof.</div>
-<div class="proofscript" id="proof281">
+<div class="toggleproof" onclick="toggleDisplay('proof282')">Proof.</div>
+<div class="proofscript" id="proof282">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -90,40 +90,40 @@ code to propagate errors. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#z">z</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#z">z</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof282')">Proof.</div>
-<div class="proofscript" id="proof282">
+<div class="toggleproof" onclick="toggleDisplay('proof283')">Proof.</div>
+<div class="proofscript" id="proof283">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="none_lift">none_lift</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} {<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>} {<span class="id">x</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof283')">Proof.</div>
-<div class="proofscript" id="proof283">
+<div class="toggleproof" onclick="toggleDisplay('proof284')">Proof.</div>
+<div class="proofscript" id="proof284">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="some_lift">some_lift</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} {<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>} {<span class="id">x</span> <span class="id">y</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">z</span> | <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">z</span> &amp; <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id">z</span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof284')">Proof.</div>
-<div class="proofscript" id="proof284">
+<div class="toggleproof" onclick="toggleDisplay('proof285')">Proof.</div>
+<div class="proofscript" id="proof285">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>; [<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">eauto</span>|<span class="tactic">discriminate</span>].<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_injective">lift_injective</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>)  :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>, <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>, <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof285')">Proof.</div>
-<div class="proofscript" id="proof285">
+<div class="toggleproof" onclick="toggleDisplay('proof286')">Proof.</div>
+<div class="proofscript" id="proof286">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">simpl</span>; <span class="tactic">inversion</span> 1; <span class="tactic">auto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">f_equal</span>; <span class="tactic">auto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_id">lift_id</a></span> {<span class="id">A</span>} (<span class="id">x</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> (<span class="kwd">fun</span> <span class="id">l</span>'' =&gt; <span class="id">l</span>'') <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof286')">Proof.</div>
-<div class="proofscript" id="proof286">
+<div class="toggleproof" onclick="toggleDisplay('proof287')">Proof.</div>
+<div class="proofscript" id="proof287">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -132,22 +132,22 @@ code to propagate errors. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">l</span>'' =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">l</span>''<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span> = <span class="id"><a href="Qcert.Utils.Lift.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof287')">Proof.</div>
-<div class="proofscript" id="proof287">
+<div class="toggleproof" onclick="toggleDisplay('proof288')">Proof.</div>
+<div class="proofscript" id="proof288">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="olift2_none_r">olift2_none_r</a></span> {<span class="id">A</span> <span class="id">B</span> <span class="id">C</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#C">C</a></span>) (<span class="id">x1</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#olift2">olift2</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x1">x1</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof288')">Proof.</div>
-<div class="proofscript" id="proof288">
+<div class="toggleproof" onclick="toggleDisplay('proof289')">Proof.</div>
+<div class="proofscript" id="proof289">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x1</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="olift2_somes">olift2_somes</a></span> {<span class="id">A</span> <span class="id">B</span> <span class="id">C</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#C">C</a></span>) (<span class="id">x1</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>) (<span class="id">x2</span>:<span class="id"><a href="Qcert.Utils.Lift.html#B">B</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#olift2">olift2</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x1">x1</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x2">x2</a></span>) = <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x1">x1</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#x2">x2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof289')">Proof.</div>
-<div class="proofscript" id="proof289">
+<div class="toggleproof" onclick="toggleDisplay('proof290')">Proof.</div>
+<div class="proofscript" id="proof290">
  <span class="tactic">reflexivity</span>. Qed.</div>
 <br/>
 <h1> Lift iterators </h1>
@@ -192,8 +192,8 @@ code to propagate errors. </div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_filter_eq">lift_filter_eq</a></span> {<span class="id">A</span>} (<span class="id">f</span> <span class="id">g</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>) <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">a</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#l">l</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#a">a</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#g">g</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#a">a</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift_filter">lift_filter</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#f">f</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#l">l</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#lift_filter">lift_filter</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#g">g</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof290')">Proof.</div>
-<div class="proofscript" id="proof290">
+<div class="toggleproof" onclick="toggleDisplay('proof291')">Proof.</div>
+<div class="proofscript" id="proof291">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -209,8 +209,8 @@ code to propagate errors. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lift_app_filter">lift_app_filter</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} (<span class="id">p</span>:<span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>) (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift_filter">lift_filter</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#p">p</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#app">app</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#l2">l2</a></span>) = <span class="id"><a href="Qcert.Utils.Lift.html#lift2">lift2</a></span> (@<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#app">app</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#A">A</a></span>) (<span class="id"><a href="Qcert.Utils.Lift.html#lift_filter">lift_filter</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#l1">l1</a></span>) (<span class="id"><a href="Qcert.Utils.Lift.html#lift_filter">lift_filter</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Lift.html#l2">l2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof291')">Proof.</div>
-<div class="proofscript" id="proof291">
+<div class="toggleproof" onclick="toggleDisplay('proof292')">Proof.</div>
+<div class="proofscript" id="proof292">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Lift.html#lift_filter">lift_filter</a></span> <span class="id">p</span> <span class="id">l2</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">p</span> <span class="id">a</span>); <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>

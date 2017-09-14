@@ -242,8 +242,8 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tfor_singleton_to_let_fun  {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-    | NNRCFor x (NNRCUnop AColl e1) e2
-      => NNRCUnop AColl (NNRCLet x e1 e2)
+    | NNRCFor x (NNRCUnop OpBag e1) e2
+      => NNRCUnop OpBag (NNRCLet x e1 e2)
     | _ => e
     end.
 
@@ -314,13 +314,13 @@ Section NNRCOptimizer.
 
   Definition tsigma_to_if_fun  {fruntime:foreign_runtime}(e:nnrc) :=
     match e with
-      | (NNRCUnop AFlatten
-                 (NNRCFor v1 (NNRCUnop AColl e2)
+      | (NNRCUnop OpFlatten
+                 (NNRCFor v1 (NNRCUnop OpBag e2)
                          (NNRCIf e1
-                                (NNRCUnop AColl (NNRCVar v2))
+                                (NNRCUnop OpBag (NNRCVar v2))
                                 (NNRCConst (dcoll nil))))) =>
         if (v1 == v2)
-        then (NNRCLet v1 e2 (NNRCIf e1 (NNRCUnop AColl (NNRCVar v1)) (NNRCConst (dcoll nil))))
+        then (NNRCLet v1 e2 (NNRCIf e1 (NNRCUnop OpBag (NNRCVar v1)) (NNRCConst (dcoll nil))))
         else e
       | _ => e
     end.
@@ -351,18 +351,18 @@ Section NNRCOptimizer.
   Definition tmap_sigma_fusion_samevar_fun  {fruntime:foreign_runtime}(e:nnrc) :=
     match e with
       | (NNRCFor v2 
-                (NNRCUnop AFlatten
+                (NNRCUnop OpFlatten
                          (NNRCFor v1 e1
-                                 (NNRCIf e2 (NNRCUnop AColl (NNRCVar v1')) (NNRCConst (dcoll nil)))))
+                                 (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1')) (NNRCConst (dcoll nil)))))
                 e3) =>
         if (v1 == v1')
         then
           if (v1 == v2)
           then
-            (NNRCUnop AFlatten
+            (NNRCUnop OpFlatten
                      (NNRCFor v1 e1
                              (NNRCIf e2
-                                    (NNRCUnop AColl e3)
+                                    (NNRCUnop OpBag e3)
                                     (NNRCConst (dcoll nil)))))
           else e
         else e
@@ -389,8 +389,8 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tdot_of_rec_fun  {fruntime:foreign_runtime}(e:nnrc) :=
     match e with
-      | (NNRCUnop (ADot s1)
-                (NNRCUnop (ARec s2) e1)) =>
+      | (NNRCUnop (OpDot s1)
+                (NNRCUnop (OpRec s2) e1)) =>
         if (s1 == s2)
         then e1
         else e
@@ -451,10 +451,10 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tdot_of_concat_rec_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
-       | (NNRCUnop (ADot s) (NNRCBinop AConcat e1 (NNRCUnop (ARec s2) e2)))
+       | (NNRCUnop (OpDot s) (NNRCBinop OpRecConcat e1 (NNRCUnop (OpRec s2) e2)))
          => if equiv_decb s s2
             then e2
-            else (NNRCUnop (ADot s) e1)
+            else (NNRCUnop (OpDot s) e1)
        | _ => e
        end.
 
@@ -490,15 +490,15 @@ Section NNRCOptimizer.
   (* TODO: A better/less hacky cost function.  This will probably need many more real
      examples to tune with, as it will always contain some black-magic. *)
   (* Java equivalent: NnrcOptimizer.is_small_unop *)
-  Definition is_small_unop {fruntime:foreign_runtime} (u:unaryOp) :=
+  Definition is_small_unop {fruntime:foreign_runtime} (u:unary_op) :=
     match u with
-    | AIdOp
-    | ANeg
-    | AColl
-    | ALeft
-    | ARight
-    | ABrand _
-    | ARec _
+    | OpIdentity
+    | OpNeg
+    | OpBag
+    | OpLeft
+    | OpRight
+    | OpBrand _
+    | OpRec _
       => true
     | _ => false
     end.
@@ -509,7 +509,7 @@ Section NNRCOptimizer.
        | NNRCVar _
        | NNRCConst _ => true
        | NNRCUnop u e => is_small_unop u && should_inline_small e
-       | NNRCBinop AConcat (NNRCUnop (ARec _) e1) (NNRCUnop (ARec _) e2) => true
+       | NNRCBinop OpRecConcat (NNRCUnop (OpRec _) e1) (NNRCUnop (OpRec _) e2) => true
        | _ => false
        end.
 
@@ -670,7 +670,7 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
    Definition tproject_nil_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-      | NNRCUnop (ARecProject nil) e₁
+      | NNRCUnop (OpRecProject nil) e₁
         => NNRCConst (drec nil)
       | _ => e
     end.
@@ -697,7 +697,7 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tproject_over_const_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-      | NNRCUnop (ARecProject sl)
+      | NNRCUnop (OpRecProject sl)
           (NNRCConst (drec l))
         => NNRCConst (drec (rproject l sl))
       | _ => e
@@ -725,10 +725,10 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tproject_over_rec_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-      | NNRCUnop (ARecProject sl)
-          (NNRCUnop (ARec s) p₁)
+      | NNRCUnop (OpRecProject sl)
+          (NNRCUnop (OpRec s) p₁)
         => if in_dec string_dec s sl
-           then NNRCUnop (ARec s) p₁
+           then NNRCUnop (OpRec s) p₁
            else ‵[||]
       | _ => e
     end.
@@ -756,14 +756,14 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
    Definition tproject_over_concat_r_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-      | NNRCUnop (ARecProject sl)
-               (NNRCBinop AConcat
-                        p₁ (NNRCUnop (ARec s) p₂))
+      | NNRCUnop (OpRecProject sl)
+               (NNRCBinop OpRecConcat
+                        p₁ (NNRCUnop (OpRec s) p₂))
         => if in_dec string_dec s sl
-           then NNRCBinop AConcat
-                         (NNRCUnop (ARecProject (remove string_dec s sl)) p₁)
-                        (NNRCUnop (ARec s) p₂)
-           else (NNRCUnop (ARecProject sl) p₁)
+           then NNRCBinop OpRecConcat
+                         (NNRCUnop (OpRecProject (remove string_dec s sl)) p₁)
+                        (NNRCUnop (OpRec s) p₂)
+           else (NNRCUnop (OpRecProject sl) p₁)
       | _ => e
     end.
 
@@ -790,14 +790,14 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
      Definition tproject_over_concat_l_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-      | NNRCUnop (ARecProject sl)
-               (NNRCBinop AConcat
-                        (NNRCUnop (ARec s) p₁) p₂)
+      | NNRCUnop (OpRecProject sl)
+               (NNRCBinop OpRecConcat
+                        (NNRCUnop (OpRec s) p₁) p₂)
         => if in_dec string_dec s sl
                      (* this case would need shape/type inference to handle, since we don't know if s is in p₂ *)
 
            then e
-           else (NNRCUnop (ARecProject sl) p₂)
+           else (NNRCUnop (OpRecProject sl) p₂)
       | _ => e
     end.
 
@@ -823,9 +823,9 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tproject_over_project_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-      | NNRCUnop (ARecProject sl1)
-          (NNRCUnop (ARecProject sl2) p1)
-        => NNRCUnop (ARecProject (set_inter string_dec sl2 sl1)) p1
+      | NNRCUnop (OpRecProject sl1)
+          (NNRCUnop (OpRecProject sl2) p1)
+        => NNRCUnop (OpRecProject (set_inter string_dec sl2 sl1)) p1
       | _ => e
     end.
 
@@ -851,9 +851,9 @@ Section NNRCOptimizer.
   (* Java equivalent: NnrcOptimizer.[same] *)
    Definition tproject_over_either_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
-      | NNRCUnop (ARecProject sl)
+      | NNRCUnop (OpRecProject sl)
           (NNRCEither p xl p₁ xr p₂)
-        => NNRCEither p xl (NNRCUnop (ARecProject sl) p₁) xr (NNRCUnop (ARecProject sl) p₂)
+        => NNRCEither p xl (NNRCUnop (OpRecProject sl) p₁) xr (NNRCUnop (OpRecProject sl) p₂)
       | _ => e
     end.
 

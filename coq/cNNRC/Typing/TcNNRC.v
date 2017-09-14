@@ -24,40 +24,44 @@ Section TcNNRC.
   Require Import CommonSystem.
   Require Import cNNRC.
 
-  (** Typing rules for NNRC *)
+  (** Typing rules for cNNRC *)
   Context {m:basic_model}.
   Section typ.
     Context (τconstants:tbindings).
 
     Inductive nnrc_core_type : tbindings -> nnrc -> rtype -> Prop :=
-    | TNNRCGetConstant {τout} tenv s :
+    | type_cNNRCGetConstant {τout} tenv s :
         tdot τconstants s = Some τout ->
         nnrc_core_type tenv (NNRCGetConstant s) τout
-    | TNNRCVar {τ} tenv v : lookup equiv_dec tenv v = Some τ -> nnrc_core_type tenv (NNRCVar v) τ
-    | TNNRCConst {τ} tenv c : data_type (normalize_data brand_relation_brands c) τ -> nnrc_core_type tenv (NNRCConst c) τ
-    | TNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
-        binOp_type b τ₁ τ₂ τ ->
+    | type_cNNRCVar {τ} tenv v :
+        lookup equiv_dec tenv v = Some τ ->
+        nnrc_core_type tenv (NNRCVar v) τ
+    | type_cNNRCConst {τ} tenv c :
+        data_type (normalize_data brand_relation_brands c) τ ->
+        nnrc_core_type tenv (NNRCConst c) τ
+    | type_cNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
+        binary_op_type b τ₁ τ₂ τ ->
         nnrc_core_type tenv e1 τ₁ ->
         nnrc_core_type tenv e2 τ₂ ->
         nnrc_core_type tenv (NNRCBinop b e1 e2) τ
-    | TNNRCUnop {τ₁ τ} tenv u e1 :
-        unaryOp_type u τ₁ τ ->
+    | type_cNNRCUnop {τ₁ τ} tenv u e1 :
+        unary_op_type u τ₁ τ ->
         nnrc_core_type tenv e1 τ₁ ->
         nnrc_core_type tenv (NNRCUnop u e1) τ
-    | TNNRCLet {τ₁ τ₂} v tenv e1 e2 :
+    | type_cNNRCLet {τ₁ τ₂} v tenv e1 e2 :
         nnrc_core_type tenv e1 τ₁ ->
         nnrc_core_type ((v,τ₁)::tenv) e2 τ₂ ->
         nnrc_core_type tenv (NNRCLet v e1 e2) τ₂
-    | TNNRCFor {τ₁ τ₂} v tenv e1 e2 :
+    | type_cNNRCFor {τ₁ τ₂} v tenv e1 e2 :
         nnrc_core_type tenv e1 (Coll τ₁) ->
         nnrc_core_type ((v,τ₁)::tenv) e2 τ₂ ->
         nnrc_core_type tenv (NNRCFor v e1 e2) (Coll τ₂)
-    | TNNRCIf {τ} tenv e1 e2 e3 :
+    | type_cNNRCIf {τ} tenv e1 e2 e3 :
         nnrc_core_type tenv e1 Bool ->
         nnrc_core_type tenv e2 τ ->
         nnrc_core_type tenv e3 τ ->
         nnrc_core_type tenv (NNRCIf e1 e2 e3) τ
-    | TNNRCEither {τ τl τr} tenv ed xl el xr er :
+    | type_cNNRCEither {τ τl τr} tenv ed xl el xr er :
         nnrc_core_type tenv ed (Either τl τr) ->
         nnrc_core_type ((xl,τl)::tenv) el τ ->
         nnrc_core_type ((xr,τr)::tenv) er τ ->
@@ -66,22 +70,6 @@ Section TcNNRC.
   End typ.
   
   (** Main lemma for the type correctness of NNNRC *)
-
-  Lemma rmap_exists0 v (cenv:bindings) (env:bindings) e2 dl x0 :
-    match
-      rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2)
-           dl
-    with
-    | Some a' => Some (dcoll a')
-    | None => None
-    end = Some x0 ->
-    exists x1, rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2) dl = Some x1 /\ (dcoll x1) = x0.
-  Proof.
-    elim (rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2) dl); intros.
-    exists a; split; try inversion H1. reflexivity.
-    congruence.
-    congruence.
-  Qed.    
 
   Theorem typed_nnrc_core_yields_typed_data {τc} {τ} (cenv env:bindings) (tenv:tbindings) (e:nnrc) :
     bindings_type cenv τc ->
@@ -121,12 +109,12 @@ Section TcNNRC.
       elim H1; clear H1; intros.
       elim H2; clear H2; intros.
       rewrite H1; rewrite H2.
-      simpl; apply (@typed_binop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τ₂ τ); assumption.
+      simpl; apply (@typed_binary_op_yields_typed_data _ _ _ _ _ _ τ₁ τ₂ τ); assumption.
     - specialize (IHnnrc_core_type env H1).
       elim IHnnrc_core_type; intros; clear IHnnrc_core_type.
       elim H2; clear H2; intros.
       rewrite H2; clear H2.
-      simpl; apply (@typed_unop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τ); assumption.
+      simpl; apply (@typed_unary_op_yields_typed_data _ _ _ _ _ _ τ₁ τ); assumption.
     - destruct (IHnnrc_core_type1 _ H) as [?[re1 ?]].
       destruct (IHnnrc_core_type2 ((v,x)::env)) as [?[re2 ?]].
       + apply Forall2_cons; intuition.
@@ -149,7 +137,10 @@ Section TcNNRC.
         elim H1; clear H1; intros.
         unfold lift in H1.
         unfold var in *.
-        generalize (rmap_exists0 v cenv env e2 dl x0 H1); intros.
+        generalize (rmap_data_exists
+                      (fun d1 : data =>
+                         nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2)
+                   dl x0 H1); intros.
         elim H3; clear H3; intros.
         elim H3; clear H3; intros.
         rewrite H3.
@@ -225,6 +216,13 @@ Section TcNNRC.
       simpl; match_destr.
   Qed.
 
+  Section Top.
+    Inductive nnrc_core_type_top : tbindings -> nnrc -> rtype -> Prop :=
+    | type_cNNRC_top : forall tenv e τ,
+        nnrc_core_type tenv nil e τ ->
+        nnrc_core_type_top tenv e τ.
+  End Top.
+  
 End TcNNRC.
 
 Ltac nnrc_core_inverter := 
@@ -232,7 +230,7 @@ Ltac nnrc_core_inverter :=
     | [H:Coll _ = Coll _ |- _] => inversion H; clear H
     | [H: proj1_sig ?τ₁ = Coll₀ (proj1_sig ?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
     | [H:  Coll₀ (proj1_sig ?τ₂) = proj1_sig ?τ₁ |- _] => symmetry in H
-    (* Note: do not generalize too hastily on unaryOp/binOp constructors *)
+    (* Note: do not generalize too hastily on unary_op/binary_op constructors *)
     | [H:nnrc_core_type _ _ (NNRCVar _) _ |- _ ] => inversion H; clear H
     | [H:nnrc_core_type _ _ (NNRCConst _) _ |- _ ] => inversion H; clear H
     | [H:nnrc_core_type _ _ (NNRCBinop _ _ _ ) _ |- _ ] => inversion H; clear H
@@ -264,17 +262,17 @@ Ltac nnrc_core_inverter :=
     | [H:nnrc_core_type _ _ _ (snd ?x) |- _ ] => destruct x
     | [H: Coll₀ _ = Coll₀ _ |- _ ] => inversion H; clear H
     | [H: Rec₀ _ _ = Rec₀ _ _ |- _ ] => inversion H; clear H
-    | [H:unaryOp_type AColl _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type AFlatten _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARec _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ADot _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARecProject _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARecRemove _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type ALeft _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type ARight _ _ |- _ ] => inversion H; clear H; subst
-    | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
-    | [H:binOp_type AAnd _ _ _ |- _ ] => inversion H; clear H
-    | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
+    | [H:unary_op_type OpBag _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpFlatten _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRec _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpDot _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRecProject _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRecRemove _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpLeft _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpRight _ _ |- _ ] => inversion H; clear H; subst
+    | [H:binary_op_type OpRecConcat _ _ _ |- _ ] => inversion H; clear H
+    | [H:binary_op_type OpAnd _ _ _ |- _ ] => inversion H; clear H
+    | [H:binary_op_type OpRecMerge _ _ _ |- _ ] => inversion H; clear H
     | [H:context [@equiv_dec ?a ?b ?c ?d ?v ?v] |- _]
       => destruct (@equiv_dec a b c d v v); [ | congruence]
     | [H:context [string_eqdec ?v ?v] |- _]

@@ -75,8 +75,8 @@ Section tDNNRCOptimizer.
   Proof.
     induction e; simpl; 
       try reflexivity.
-    - apply dbinop_proper; trivial; try reflexivity.
-    - apply dunop_proper; trivial; try reflexivity.
+    - apply dbinary_op_proper; trivial; try reflexivity.
+    - apply dunary_op_proper; trivial; try reflexivity.
     - apply dlet_proper; trivial; reflexivity.
     - apply dfor_proper; trivial; reflexivity.
     - apply dif_proper; trivial; reflexivity.
@@ -134,8 +134,8 @@ Section tDNNRCOptimizer.
     Proof.
       induction e; simpl; try auto 2
       ;  (etransitivity; [| apply pf]).
-      - apply dbinop_proper; trivial; try reflexivity.
-      - apply dunop_proper; trivial; try reflexivity.
+      - apply dbinary_op_proper; trivial; try reflexivity.
+      - apply dunary_op_proper; trivial; try reflexivity.
       - apply dlet_proper; trivial; reflexivity.
       - apply dfor_proper; trivial; reflexivity.
       - apply dif_proper; trivial; reflexivity.
@@ -161,10 +161,10 @@ Section tDNNRCOptimizer.
              (e: @dnnrc_base _ (type_annotation A) dataframe) :
     @dnnrc_base _ (type_annotation A) dataframe
     := match e with
-    | DNNRCUnop t1 AFlatten
+    | DNNRCUnop t1 OpFlatten
                (DNNRCFor t2 x
                         (DNNRCCollect t3 xs)
-                        (DNNRCEither _ (DNNRCUnop t4 (ACast brands) (DNNRCVar _ x'))
+                        (DNNRCEither _ (DNNRCUnop t4 (OpCast brands) (DNNRCVar _ x'))
                                     leftVar
                                     leftE
                                     _
@@ -186,7 +186,7 @@ Section tDNNRCOptimizer.
                             (DSFilter (CUDFCast brands (CCol "$type"))
                                       (DSVar "map_cast"))
                             (("map_cast"%string, xs)::nil)) in
-          (DNNRCUnop t1 AFlatten
+          (DNNRCUnop t1 OpFlatten
                          (DNNRCFor t2 leftVar (DNNRCCollect collectTypeA ALG)
                                   leftE))
         | _ => e
@@ -212,11 +212,11 @@ Section tDNNRCOptimizer.
            (s: string)
            (e: @dnnrc_base _ A P) : option (@dnnrc_base _ A P)
     := match e with
-    | DNNRCUnop t1 AUnbrand (DNNRCGetConstant t2 v) =>
+    | DNNRCUnop t1 OpUnbrand (DNNRCGetConstant t2 v) =>
       if (s == v)
       then Some (DNNRCGetConstant t1 s)
       else None
-    | DNNRCUnop t1 AUnbrand (DNNRCVar t2 v) =>
+    | DNNRCUnop t1 OpUnbrand (DNNRCVar t2 v) =>
       if (s == v)
       then Some (DNNRCVar t1 s)
       else None
@@ -317,12 +317,12 @@ Section tDNNRCOptimizer.
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
-    | DNNRCUnop _ (ADot fld) (DNNRCGetConstant _ n) =>
+    | DNNRCUnop _ (OpDot fld) (DNNRCGetConstant _ n) =>
       let (var, _) := binding in
       if (n == var)
       then Some (CCol ("$known."%string ++ fld))
       else None
-    | DNNRCUnop _ (ADot fld) (DNNRCVar _ n) =>
+    | DNNRCUnop _ (OpDot fld) (DNNRCVar _ n) =>
       let (var, _) := binding in
       if (n == var)
       then Some (CCol ("$known."%string ++ fld))
@@ -333,13 +333,13 @@ Section tDNNRCOptimizer.
       if (n == var)
       then Some expr
       else None
-    | DNNRCUnop _ (ADot fld) c =>
+    | DNNRCUnop _ (OpDot fld) c =>
       lift (fun c =>
               (CDot cname fld c))
            (condition_to_column c "c" binding) *)
     | DNNRCConst _ d =>
       lift (fun t => CLit (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
-    | DNNRCBinop _ AEq l r =>
+    | DNNRCBinop _ OpEqual l r =>
       let types_are_okay :=
           lift2 (fun lt rt => andb (equiv_decb lt rt)
                                    (spark_equality_matches_qcert_equality_for_type (proj1_sig lt)))
@@ -349,16 +349,16 @@ Section tDNNRCOptimizer.
         Some (CEq l' r')
       | _, _, _ => None
       end
-    | DNNRCBinop _ ASConcat l r =>
+    | DNNRCBinop _ OpStringConcat l r =>
       lift2 CSConcat
             (condition_to_column l binding)
             (condition_to_column r binding)
-    | DNNRCBinop _ ALt l r =>
+    | DNNRCBinop _ OpLt l r =>
       lift2 CLessThan
             (condition_to_column l binding)
             (condition_to_column r binding)
     (* TODO properly implement this *)
-    | DNNRCUnop _ AToString x =>
+    | DNNRCUnop _ OpToString x =>
       lift CToString
            (condition_to_column x binding)
 
@@ -369,7 +369,7 @@ Section tDNNRCOptimizer.
              (e: @dnnrc_base _ (type_annotation A) dataframe):
     (@dnnrc_base _ (type_annotation A) dataframe) :=
     match e with
-    | DNNRCUnop t1 AFlatten
+    | DNNRCUnop t1 OpFlatten
                (DNNRCFor t2 x (DNNRCCollect t3 xs)
                         (DNNRCIf _ condition
                                 thenE
@@ -381,7 +381,7 @@ Section tDNNRCOptimizer.
                     (DSFilter c' (DSVar "if_else_empty_to_filter"))
                     (("if_else_empty_to_filter"%string, xs)::nil)
         in
-        DNNRCUnop t1 AFlatten
+        DNNRCUnop t1 OpFlatten
                        (DNNRCFor t2 x (DNNRCCollect t3 ALG)
                                 thenE)
       | None => e
@@ -400,9 +400,9 @@ Section tDNNRCOptimizer.
              (e: @dnnrc_base _ (type_annotation A) dataframe):
     @dnnrc_base _ (type_annotation A) dataframe :=
     match e with
-    | DNNRCUnop t1 AFlatten
+    | DNNRCUnop t1 OpFlatten
                (DNNRCFor t2 x xs
-                        (DNNRCUnop t3 AColl e)) =>
+                        (DNNRCUnop t3 OpBag e)) =>
       DNNRCFor t1 x xs e
     | _ => e
     end.

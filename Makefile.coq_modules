@@ -46,14 +46,14 @@ MODULES = \
 	Common/Env/RConstants \
 	Common/Env/DConstants \
 	Common/Env/RVar \
-	Common/Operators/RUtilOps \
-	Common/Operators/ForeignOps \
-	Common/Operators/RUnaryOps \
-	Common/Operators/RUnaryOpsSem \
-	Common/Operators/RBinaryOps \
-	Common/Operators/RBinaryOpsSem \
-	Common/Operators/ROpsEq \
-	Common/Operators/ROps \
+	Common/Operators/OperatorsUtils \
+	Common/Operators/ForeignOperators \
+	Common/Operators/UnaryOperators \
+	Common/Operators/UnaryOperatorsSem \
+	Common/Operators/BinaryOperators \
+	Common/Operators/BinaryOperatorsSem \
+	Common/Operators/OperatorsEq \
+	Common/Operators/Operators \
 	Common/ForeignRuntime \
 	Common/CommonRuntime \
 	Common/TypeSystem/ForeignType \
@@ -69,19 +69,20 @@ MODULES = \
 	Common/TypeSystem/RTypeLattice \
 	Common/TypeSystem/TBrandModelProp \
 	Common/TypeSystem/Types \
-	Common/Typing/ForeignDataTyping \
-	Common/Typing/TUtil \
-	Common/Typing/TData \
-	Common/Typing/TDData \
-	Common/Typing/TBindings \
-	Common/Typing/TDBindings \
-	Common/Typing/ForeignOpsTyping \
-	Common/Typing/TDataInfer \
-	Common/Typing/TDataSort \
-	Common/Typing/TOps \
-	Common/Typing/TOpsEq \
-	Common/Typing/TOpsInfer \
-	Common/Typing/TOpsInferSub \
+	Common/DataTyping/ForeignDataTyping \
+	Common/DataTyping/TUtil \
+	Common/DataTyping/TData \
+	Common/DataTyping/TDData \
+	Common/DataTyping/TDataSort \
+	Common/DataTyping/TDataInfer \
+	Common/EnvTyping/TBindings \
+	Common/EnvTyping/TDBindings \
+	Common/OperatorsTyping/ForeignOperatorsTyping \
+	Common/OperatorsTyping/TUnaryOperators \
+	Common/OperatorsTyping/TBinaryOperators \
+	Common/OperatorsTyping/TOperatorsEq \
+	Common/OperatorsTyping/TOperatorsInfer \
+	Common/OperatorsTyping/TOperatorsInferSub \
 	Common/ForeignTyping \
 	Common/JSON/JSON \
 	Common/JSON/ForeignToJSON \
@@ -270,18 +271,10 @@ MODULES = \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
 	Translation/CAMPtoNRAEnv \
-	Translation/TNRAtocNNRC \
-	Translation/TcNRAEnvtocNNRC \
-	Translation/TcNNRCtoCAMP \
-	Translation/TCAMPtoNRA \
-	Translation/TCAMPtocNRAEnv \
-	Translation/TCAMPtoNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
-	Translation/TLambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
 	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \
-	Translation/TOQLtoNRAEnv \
 	Translation/ForeignToJavaScript \
 	Translation/ForeignToJava \
 	Translation/ForeignToScala \
@@ -292,6 +285,14 @@ MODULES = \
 	Translation/NNRCMRtoSparkRDD \
 	Translation/DatatoSparkDF \
 	Translation/tDNNRCtoSparkDF \
+	Translation/TNRAtocNNRC \
+	Translation/TcNRAEnvtocNNRC \
+	Translation/TcNNRCtoCAMP \
+	Translation/TCAMPtoNRA \
+	Translation/TCAMPtocNRAEnv \
+	Translation/TCAMPtoNRAEnv \
+	Translation/TLambdaNRAtoNRAEnv \
+	Translation/TOQLtoNRAEnv \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
 	Compiler/Model/FloatModelPart \

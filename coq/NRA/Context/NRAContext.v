@@ -43,93 +43,93 @@ Section NRAContext.
   Inductive nra_ctxt : Set :=
   | CHole : nat -> nra_ctxt
   | CPlug : nra -> nra_ctxt
-  | CABinop : binOp -> nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CAUnop : unaryOp -> nra_ctxt -> nra_ctxt
-  | CAMap : nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CAMapConcat : nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CAProduct : nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CASelect : nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CADefault : nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CAEither : nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CAEitherConcat : nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CAApp : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRABinop : binary_op -> nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRAUnop : unary_op -> nra_ctxt -> nra_ctxt
+  | CNRAMap : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRAMapProduct : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRAProduct : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRASelect : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRADefault : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRAEither : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRAEitherConcat : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CNRAApp : nra_ctxt -> nra_ctxt -> nra_ctxt
   .
 
-  Definition CAID : nra_ctxt
-    := CPlug AID.
+  Definition CNRAID : nra_ctxt
+    := CPlug NRAID.
 
-  Definition CAConst : data -> nra_ctxt
-    := fun d => CPlug (AConst d).
+  Definition CNRAConst : data -> nra_ctxt
+    := fun d => CPlug (NRAConst d).
 
   Fixpoint ac_holes (c:nra_ctxt) : list nat :=
     match c with
       | CHole x => x::nil
       | CPlug a => nil
-      | CABinop b c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CAUnop u c' => ac_holes c'
-      | CAMap c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CAMapConcat c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CAProduct c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CASelect c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CADefault c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CAEither c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CAEitherConcat c1 c2 => ac_holes c1 ++ ac_holes c2
-      | CAApp c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRABinop b c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRAUnop u c' => ac_holes c'
+      | CNRAMap c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRAMapProduct c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRAProduct c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRASelect c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRADefault c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRAEither c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRAEitherConcat c1 c2 => ac_holes c1 ++ ac_holes c2
+      | CNRAApp c1 c2 => ac_holes c1 ++ ac_holes c2
     end.
 
   Fixpoint ac_simplify (c:nra_ctxt) : nra_ctxt :=
     match c with
       | CHole x => CHole x
       | CPlug a => CPlug a
-      | CABinop b c1 c2 =>
+      | CNRABinop b c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (ABinop b a1 a2)
-          | c1', c2' => CABinop b c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRABinop b a1 a2)
+          | c1', c2' => CNRABinop b c1' c2'
         end
-      | CAUnop u c =>
+      | CNRAUnop u c =>
         match ac_simplify c with
-          | CPlug a => CPlug (AUnop u a)
-          | c' => CAUnop u c'
+          | CPlug a => CPlug (NRAUnop u a)
+          | c' => CNRAUnop u c'
         end
-      | CAMap c1 c2 =>
+      | CNRAMap c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (AMap a1 a2)
-          | c1', c2' => CAMap c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRAMap a1 a2)
+          | c1', c2' => CNRAMap c1' c2'
         end
-      | CAMapConcat c1 c2 =>
+      | CNRAMapProduct c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (AMapConcat a1 a2)
-          | c1', c2' => CAMapConcat c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRAMapProduct a1 a2)
+          | c1', c2' => CNRAMapProduct c1' c2'
         end
-      | CAProduct c1 c2 =>
+      | CNRAProduct c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (AProduct a1 a2)
-          | c1', c2' => CAProduct c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRAProduct a1 a2)
+          | c1', c2' => CNRAProduct c1' c2'
         end
-      | CASelect c1 c2 =>
+      | CNRASelect c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (ASelect a1 a2)
-          | c1', c2' => CASelect c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRASelect a1 a2)
+          | c1', c2' => CNRASelect c1' c2'
         end
-      | CADefault c1 c2 =>
+      | CNRADefault c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (ADefault a1 a2)
-          | c1', c2' => CADefault c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRADefault a1 a2)
+          | c1', c2' => CNRADefault c1' c2'
         end
-      | CAEither c1 c2 =>
+      | CNRAEither c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (AEither a1 a2)
-          | c1', c2' => CAEither c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRAEither a1 a2)
+          | c1', c2' => CNRAEither c1' c2'
         end
-      | CAEitherConcat c1 c2 =>
+      | CNRAEitherConcat c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (AEitherConcat a1 a2)
-          | c1', c2' => CAEitherConcat c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRAEitherConcat a1 a2)
+          | c1', c2' => CNRAEitherConcat c1' c2'
         end
-      | CAApp c1 c2 =>
+      | CNRAApp c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (AApp a1 a2)
-          | c1', c2' => CAApp c1' c2'
+          | (CPlug a1), (CPlug a2) => CPlug (NRAApp a1 a2)
+          | c1', c2' => CNRAApp c1' c2'
         end
     end.
 
@@ -193,26 +193,26 @@ Section NRAContext.
         => if x == x' then CPlug p else CHole x'
       | CPlug a
         => CPlug a
-      | CABinop b c1 c2
-        => CABinop b (ac_subst c1 x p) (ac_subst c2 x p)
-      | CAUnop u c
-        => CAUnop u (ac_subst c x p)
-      | CAMap c1 c2
-        => CAMap (ac_subst c1 x p) (ac_subst c2 x p)
-      | CAMapConcat c1 c2
-        => CAMapConcat (ac_subst c1 x p) (ac_subst c2 x p)
-      | CAProduct c1 c2
-        => CAProduct (ac_subst c1 x p) (ac_subst c2 x p)
-      | CASelect c1 c2
-        => CASelect (ac_subst c1 x p) (ac_subst c2 x p)
-      | CADefault c1 c2
-        => CADefault (ac_subst c1 x p) (ac_subst c2 x p)
-      | CAEither c1 c2
-        => CAEither (ac_subst c1 x p) (ac_subst c2 x p)
-      | CAEitherConcat c1 c2
-        => CAEitherConcat (ac_subst c1 x p) (ac_subst c2 x p)
-      | CAApp c1 c2
-        => CAApp (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRABinop b c1 c2
+        => CNRABinop b (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRAUnop u c
+        => CNRAUnop u (ac_subst c x p)
+      | CNRAMap c1 c2
+        => CNRAMap (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRAMapProduct c1 c2
+        => CNRAMapProduct (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRAProduct c1 c2
+        => CNRAProduct (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRASelect c1 c2
+        => CNRASelect (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRADefault c1 c2
+        => CNRADefault (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRAEither c1 c2
+        => CNRAEither (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRAEitherConcat c1 c2
+        => CNRAEitherConcat (ac_subst c1 x p) (ac_subst c2 x p)
+      | CNRAApp c1 c2
+        => CNRAApp (ac_subst c1 x p) (ac_subst c2 x p)
     end.
 
   Definition ac_substp (c:nra_ctxt) xp
@@ -273,7 +273,7 @@ Section NRAContext.
   Qed.
   
   Lemma ac_substs_Binop b c1 c2 ps :
-    ac_substs (CABinop b c1 c2) ps = CABinop b (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs (CNRABinop b c1 c2) ps = CNRABinop b (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -281,7 +281,7 @@ Section NRAContext.
   Qed.
 
   Lemma ac_substs_Unop u c ps :
-      ac_substs (CAUnop u c) ps = CAUnop u (ac_substs c ps).
+      ac_substs (CNRAUnop u c) ps = CNRAUnop u (ac_substs c ps).
   Proof.
     revert c.
     induction ps; simpl; trivial; intros.
@@ -289,17 +289,17 @@ Section NRAContext.
   Qed.
 
   Lemma ac_substs_Map c1 c2 ps :
-    ac_substs ( CAMap c1 c2) ps =
-    CAMap (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs ( CNRAMap c1 c2) ps =
+    CNRAMap (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
     destruct a; simpl; auto.
   Qed.
 
-  Lemma ac_substs_MapConcat c1 c2 ps :
-    ac_substs ( CAMapConcat c1 c2) ps =
-    CAMapConcat (ac_substs c1 ps) (ac_substs c2 ps).
+  Lemma ac_substs_MapProduct c1 c2 ps :
+    ac_substs ( CNRAMapProduct c1 c2) ps =
+    CNRAMapProduct (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -307,8 +307,8 @@ Section NRAContext.
   Qed.
   
   Lemma ac_substs_Product c1 c2 ps :
-    ac_substs ( CAProduct c1 c2) ps =
-    CAProduct (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs ( CNRAProduct c1 c2) ps =
+    CNRAProduct (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -316,8 +316,8 @@ Section NRAContext.
   Qed.
   
   Lemma ac_substs_Select c1 c2 ps :
-    ac_substs ( CASelect c1 c2) ps =
-    CASelect (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs ( CNRASelect c1 c2) ps =
+    CNRASelect (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -325,8 +325,8 @@ Section NRAContext.
   Qed.
   
   Lemma ac_substs_Default c1 c2 ps :
-    ac_substs ( CADefault c1 c2) ps =
-    CADefault (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs ( CNRADefault c1 c2) ps =
+    CNRADefault (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -334,8 +334,8 @@ Section NRAContext.
   Qed.
   
   Lemma ac_substs_Either c1 c2 ps :
-    ac_substs ( CAEither c1 c2) ps =
-    CAEither (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs ( CNRAEither c1 c2) ps =
+    CNRAEither (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -343,8 +343,8 @@ Section NRAContext.
   Qed.
   
   Lemma ac_substs_EitherConcat c1 c2 ps :
-    ac_substs ( CAEitherConcat c1 c2) ps =
-    CAEitherConcat (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs ( CNRAEitherConcat c1 c2) ps =
+    CNRAEitherConcat (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -352,8 +352,8 @@ Section NRAContext.
   Qed.
   
   Lemma ac_substs_App c1 c2 ps :
-    ac_substs ( CAApp c1 c2) ps =
-    CAApp (ac_substs c1 ps) (ac_substs c2 ps).
+    ac_substs ( CNRAApp c1 c2) ps =
+    CNRAApp (ac_substs c1 ps) (ac_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -365,7 +365,7 @@ Section NRAContext.
        ac_substs_Binop
        ac_substs_Unop
        ac_substs_Map
-       ac_substs_MapConcat
+       ac_substs_MapProduct
        ac_substs_Product
        ac_substs_Select
        ac_substs_Default
@@ -373,9 +373,9 @@ Section NRAContext.
        ac_substs_EitherConcat
        ac_substs_App : ac_substs.
   
-  Lemma ac_simplify_holes_binop b c1 c2:
-    ac_holes (CABinop b c1 c2) <> nil ->
-    ac_simplify (CABinop b c1 c2) = CABinop b (ac_simplify c1) (ac_simplify c2).
+  Lemma ac_simplify_holes_binary_op b c1 c2:
+    ac_holes (CNRABinop b c1 c2) <> nil ->
+    ac_simplify (CNRABinop b c1 c2) = CNRABinop b (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -387,9 +387,9 @@ Section NRAContext.
     simpl in H; intuition.
   Qed.
 
-  Lemma ac_simplify_holes_unop u c:
-    ac_holes (CAUnop u c ) <> nil ->
-    ac_simplify (CAUnop u c) = CAUnop u (ac_simplify c).
+  Lemma ac_simplify_holes_unary_op u c:
+    ac_holes (CNRAUnop u c ) <> nil ->
+    ac_simplify (CNRAUnop u c) = CNRAUnop u (ac_simplify c).
   Proof.
     intros.
     simpl in H.
@@ -401,8 +401,8 @@ Section NRAContext.
   Qed.
 
   Lemma ac_simplify_holes_map c1 c2:
-    ac_holes (CAMap c1 c2) <> nil ->
-    ac_simplify (CAMap c1 c2) = CAMap (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRAMap c1 c2) <> nil ->
+    ac_simplify (CNRAMap c1 c2) = CNRAMap (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -415,8 +415,8 @@ Section NRAContext.
   Qed.
 
     Lemma ac_simplify_holes_mapconcat c1 c2:
-    ac_holes (CAMapConcat c1 c2) <> nil ->
-    ac_simplify (CAMapConcat c1 c2) = CAMapConcat (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRAMapProduct c1 c2) <> nil ->
+    ac_simplify (CNRAMapProduct c1 c2) = CNRAMapProduct (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -429,8 +429,8 @@ Section NRAContext.
   Qed.
 
     Lemma ac_simplify_holes_product c1 c2:
-    ac_holes (CAProduct c1 c2) <> nil ->
-    ac_simplify (CAProduct c1 c2) = CAProduct (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRAProduct c1 c2) <> nil ->
+    ac_simplify (CNRAProduct c1 c2) = CNRAProduct (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -443,8 +443,8 @@ Section NRAContext.
   Qed.
 
     Lemma ac_simplify_holes_select c1 c2:
-    ac_holes (CASelect c1 c2) <> nil ->
-    ac_simplify (CASelect c1 c2) = CASelect (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRASelect c1 c2) <> nil ->
+    ac_simplify (CNRASelect c1 c2) = CNRASelect (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -457,8 +457,8 @@ Section NRAContext.
   Qed.
 
     Lemma ac_simplify_holes_default c1 c2:
-    ac_holes (CADefault c1 c2) <> nil ->
-    ac_simplify (CADefault c1 c2) = CADefault (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRADefault c1 c2) <> nil ->
+    ac_simplify (CNRADefault c1 c2) = CNRADefault (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -471,8 +471,8 @@ Section NRAContext.
   Qed.
 
     Lemma ac_simplify_holes_either c1 c2:
-    ac_holes (CAEither c1 c2) <> nil ->
-    ac_simplify (CAEither c1 c2) = CAEither (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRAEither c1 c2) <> nil ->
+    ac_simplify (CNRAEither c1 c2) = CNRAEither (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -485,8 +485,8 @@ Section NRAContext.
   Qed.
 
     Lemma ac_simplify_holes_eitherconcat c1 c2:
-    ac_holes (CAEitherConcat c1 c2) <> nil ->
-    ac_simplify (CAEitherConcat c1 c2) = CAEitherConcat (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRAEitherConcat c1 c2) <> nil ->
+    ac_simplify (CNRAEitherConcat c1 c2) = CNRAEitherConcat (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -499,8 +499,8 @@ Section NRAContext.
   Qed.
 
     Lemma ac_simplify_holes_app c1 c2:
-    ac_holes (CAApp c1 c2) <> nil ->
-    ac_simplify (CAApp c1 c2) = CAApp (ac_simplify c1) (ac_simplify c2).
+    ac_holes (CNRAApp c1 c2) <> nil ->
+    ac_simplify (CNRAApp c1 c2) = CNRAApp (ac_simplify c1) (ac_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -545,24 +545,24 @@ Section NRAContext.
     induction c.
     - simpl; match_destr.
     - simpl; trivial.
-    - destr_solv IHc1 IHc2 (CABinop b c1 c2) ac_simplify_holes_binop.
-    -  destruct (is_nil_dec (ac_holes (CAUnop u c))) as [h|h].
+    - destr_solv IHc1 IHc2 (CNRABinop b c1 c2) ac_simplify_holes_binary_op.
+    -  destruct (is_nil_dec (ac_holes (CNRAUnop u c))) as [h|h].
       + rewrite (ac_subst_nholes _ _ _ h).
         rewrite (ac_subst_simplify_nholes _ _ _ h).
         rewrite ac_simplify_idempotent.
         trivial.
-      + rewrite ac_simplify_holes_unop; [| eauto].
+      + rewrite ac_simplify_holes_unary_op; [| eauto].
         simpl.
         rewrite IHc.
         trivial.
-    - destr_solv IHc1 IHc2 (CAMap c1 c2) ac_simplify_holes_map.
-    - destr_solv IHc1 IHc2 (CAMapConcat c1 c2) ac_simplify_holes_mapconcat.
-    - destr_solv IHc1 IHc2 (CAProduct c1 c2) ac_simplify_holes_product.
-    - destr_solv IHc1 IHc2 (CASelect c1 c2) ac_simplify_holes_select.
-    - destr_solv IHc1 IHc2 (CADefault c1 c2) ac_simplify_holes_default.
-    - destr_solv IHc1 IHc2 (CAEither c1 c2) ac_simplify_holes_either.
-    - destr_solv IHc1 IHc2 (CAEitherConcat c1 c2) ac_simplify_holes_eitherconcat.
-    - destr_solv IHc1 IHc2 (CAApp c1 c2) ac_simplify_holes_app.
+    - destr_solv IHc1 IHc2 (CNRAMap c1 c2) ac_simplify_holes_map.
+    - destr_solv IHc1 IHc2 (CNRAMapProduct c1 c2) ac_simplify_holes_mapconcat.
+    - destr_solv IHc1 IHc2 (CNRAProduct c1 c2) ac_simplify_holes_product.
+    - destr_solv IHc1 IHc2 (CNRASelect c1 c2) ac_simplify_holes_select.
+    - destr_solv IHc1 IHc2 (CNRADefault c1 c2) ac_simplify_holes_default.
+    - destr_solv IHc1 IHc2 (CNRAEither c1 c2) ac_simplify_holes_either.
+    - destr_solv IHc1 IHc2 (CNRAEitherConcat c1 c2) ac_simplify_holes_eitherconcat.
+    - destr_solv IHc1 IHc2 (CNRAApp c1 c2) ac_simplify_holes_app.
   Qed.
 
   Lemma ac_simplify_substs_simplify1 c ps :
@@ -945,8 +945,8 @@ Section NRAContext.
   Proof.
     unfold nra_ctxt_equiv.
     red; intros.
-    - specialize (H (ps ++ (map (fun x => (x, AID)) (ac_holes y)))).
-      specialize (H0 (ps ++ (map (fun x => (x, AID)) (ac_holes y)))).
+    - specialize (H (ps ++ (map (fun x => (x, NRAID)) (ac_holes y)))).
+      specialize (H0 (ps ++ (map (fun x => (x, NRAID)) (ac_holes y)))).
       repeat rewrite map_app in H, H0.
       rewrite (ac_substs_app x) in H.
       rewrite (ac_substs_app z) in H0.
@@ -1061,39 +1061,39 @@ End NRAContext.
 
 Delimit Scope nra_ctxt_scope with nra_ctxt.
 
-Notation "'ID'" := (CAID)  (at level 50) : nra_ctxt_scope.
+Notation "'ID'" := (CNRAID)  (at level 50) : nra_ctxt_scope.
 
-Notation "‵‵ c" := (CAConst (dconst c))  (at level 0) : nra_ctxt_scope.                           (* ‵ = \backprime *)
-Notation "‵ c" := (CAConst c)  (at level 0) : nra_ctxt_scope.                                     (* ‵ = \backprime *)
-Notation "‵{||}" := (CAConst (dcoll nil))  (at level 0) : nra_ctxt_scope.                         (* ‵ = \backprime *)
-Notation "‵[||]" := (CAConst (drec nil)) (at level 50) : nra_ctxt_scope.                          (* ‵ = \backprime *)
+Notation "‵‵ c" := (CNRAConst (dconst c))  (at level 0) : nra_ctxt_scope.                           (* ‵ = \backprime *)
+Notation "‵ c" := (CNRAConst c)  (at level 0) : nra_ctxt_scope.                                     (* ‵ = \backprime *)
+Notation "‵{||}" := (CNRAConst (dcoll nil))  (at level 0) : nra_ctxt_scope.                         (* ‵ = \backprime *)
+Notation "‵[||]" := (CNRAConst (drec nil)) (at level 50) : nra_ctxt_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (CABinop AAnd r1 r2) (right associativity, at level 65): nra_ctxt_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (CABinop AOr r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (CABinop AEq r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (CABinop ALt r1 r2) (no associativity, at level 70): nra_ctxt_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (CABinop AUnion r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (CABinop AMinus r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (CABinop AMin r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (CABinop AMax r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((CABinop AConcat) p r) (at level 70) : nra_ctxt_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((CABinop AMergeConcat) p r) (at level 70) : nra_ctxt_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (CNRABinop OpAnd r1 r2) (right associativity, at level 65): nra_ctxt_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (CNRABinop OpOr r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (CNRABinop OpEqual r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (CNRABinop OpLt r1 r2) (no associativity, at level 70): nra_ctxt_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (CNRABinop OpBagUnion r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (CNRABinop OpBagDiff r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (CNRABinop OpBagMin r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (CNRABinop OpBagMax r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((CNRABinop OpRecConcat) p r) (at level 70) : nra_ctxt_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((CNRABinop OpRecMerge) p r) (at level 70) : nra_ctxt_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (CAUnop ANeg r1) (right associativity, at level 70): nra_ctxt_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (CAUnop ADistinct r1) (right associativity, at level 70): nra_ctxt_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (CAUnop ACount r1) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (CAUnop AFlatten d) (at level 50) : nra_ctxt_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((CAUnop AColl) d)  (at level 50) : nra_ctxt_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((CAUnop (ARec s)) r) (at level 50) : nra_ctxt_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((CAUnop (ARecRemove s1)) r) (at level 50) : nra_ctxt_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((CAUnop (ADot r)) p) (left associativity, at level 40): nra_ctxt_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (CNRAUnop OpNeg r1) (right associativity, at level 70): nra_ctxt_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (CNRAUnop OpDistinct r1) (right associativity, at level 70): nra_ctxt_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (CNRAUnop OpCount r1) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (CNRAUnop OpFlatten d) (at level 50) : nra_ctxt_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((CNRAUnop OpBag) d)  (at level 50) : nra_ctxt_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((CNRAUnop (OpRec s)) r) (at level 50) : nra_ctxt_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((CNRAUnop (OpRecRemove s1)) r) (at level 50) : nra_ctxt_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((CNRAUnop (OpDot r)) p) (left associativity, at level 40): nra_ctxt_scope.      (* · = \cdot *)
 
-Notation "χ⟨ p ⟩( r )" := (CAMap p r) (at level 70) : nra_ctxt_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CAMapConcat e2 e1) (at level 70) : nra_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
-Notation "r1 × r2" := (CAProduct r1 r2) (right associativity, at level 70): nra_ctxt_scope.       (* × = \times *)
-Notation "σ⟨ p ⟩( r )" := (CASelect p r) (at level 70) : nra_ctxt_scope.                           (* σ = \sigma *)
-Notation "r1 ∥ r2" := (CADefault r1 r2) (right associativity, at level 70): nra_ctxt_scope.       (* ∥ = \parallel *)
-Notation "r1 ◯ r2" := (CAApp r1 r2) (right associativity, at level 60): nra_ctxt_scope.           (* ◯ = \bigcirc *)
+Notation "χ⟨ p ⟩( r )" := (CNRAMap p r) (at level 70) : nra_ctxt_scope.                              (* χ = \chi *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CNRAMapProduct e2 e1) (at level 70) : nra_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "r1 × r2" := (CNRAProduct r1 r2) (right associativity, at level 70): nra_ctxt_scope.       (* × = \times *)
+Notation "σ⟨ p ⟩( r )" := (CNRASelect p r) (at level 70) : nra_ctxt_scope.                           (* σ = \sigma *)
+Notation "r1 ∥ r2" := (CNRADefault r1 r2) (right associativity, at level 70): nra_ctxt_scope.       (* ∥ = \parallel *)
+Notation "r1 ◯ r2" := (CNRAApp r1 r2) (right associativity, at level 60): nra_ctxt_scope.           (* ◯ = \bigcirc *)
 
 Notation "$ n" := (CHole n) (at level 50)  : nra_ctxt_scope.
 
@@ -1104,7 +1104,7 @@ Notation "X ≡ₐ Y" := (nra_ctxt_equiv nra_eq X Y) (at level 90) : nra_ctxt_sc
        @ac_substs_Binop
        @ac_substs_Unop
        @ac_substs_Map
-       @ac_substs_MapConcat
+       @ac_substs_MapProduct
        @ac_substs_Product
        @ac_substs_Select
        @ac_substs_Default

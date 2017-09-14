@@ -34,8 +34,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="hide_use">hide_use</a></span> {<span class="id">A</span> <span class="id">B</span>} (<span class="id">x</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#A">A</a></span>) (<span class="id">y</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#B">B</a></span>) := <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#y">y</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="hide_use_eq">hide_use_eq</a></span> {<span class="id">A</span> <span class="id">B</span>} (<span class="id">x</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#A">A</a></span>) (<span class="id">y</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#B">B</a></span>) : <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#hide_use">hide_use</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#y">y</a></span> = <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#y">y</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof739')">Proof.</div>
-<div class="proofscript" id="proof739">
+<div class="toggleproof" onclick="toggleDisplay('proof741')">Proof.</div>
+<div class="proofscript" id="proof741">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#hide_use">hide_use</a></span>.<br/>
@@ -64,8 +64,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">step</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#OptimizerStep">OptimizerStep</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#lang">lang</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">input</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optimizer_logger_token_type">optimizer_logger_token_type</a></span>*<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#lang">lang</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> (<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_optimizer_step">run_optimizer_step</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#step">step</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#input">input</a></span>) = (<span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#optim_step_step">optim_step_step</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#step">step</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#input">input</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof740')">Proof.</div>
-<div class="proofscript" id="proof740">
+<div class="toggleproof" onclick="toggleDisplay('proof742')">Proof.</div>
+<div class="proofscript" id="proof742">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_optimizer_step">run_optimizer_step</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -91,8 +91,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">input</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#lang">lang</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#optim_list_correct">optim_list_correct</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#R">R</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#steps">steps</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#R">R</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#input">input</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_right">fold_right</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_optimizer_step">run_optimizer_step</a></span> (<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#tok">tok</a></span>,<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#input">input</a></span>) <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#steps">steps</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof741')">Proof.</div>
-<div class="proofscript" id="proof741">
+<div class="toggleproof" onclick="toggleDisplay('proof743')">Proof.</div>
+<div class="proofscript" id="proof743">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">input</span> <span class="id">tok</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;reverse&nbsp;induction&nbsp;*)</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">steps</span> <span class="kwd">using</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#rev_ind">rev_ind</a></span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">input</span> <span class="id">tok</span> <span class="id">pf</span>.<br/>
@@ -115,8 +115,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">input</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#lang">lang</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#optim_list_correct">optim_list_correct</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#R">R</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#steps">steps</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#R">R</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#input">input</a></span> (<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_optimizer_steps">run_optimizer_steps</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#passName">passName</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#steps">steps</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#input">input</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof742')">Proof.</div>
-<div class="proofscript" id="proof742">
+<div class="toggleproof" onclick="toggleDisplay('proof744')">Proof.</div>
+<div class="proofscript" id="proof744">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_optimizer_steps">run_optimizer_steps</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">pf</span>.<br/>
@@ -153,8 +153,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">iterationsBetweenCostCheck</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#R">R</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#p">p</a></span> (<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_phase">run_phase</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#mapdeep">mapdeep</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#cost">cost</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#lang_optim_list">lang_optim_list</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#phaseName">phaseName</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optims">optims</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#iterationsBetweenCostCheck">iterationsBetweenCostCheck</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof743')">Proof.</div>
-<div class="proofscript" id="proof743">
+<div class="toggleproof" onclick="toggleDisplay('proof745')">Proof.</div>
+<div class="proofscript" id="proof745">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_phase">run_phase</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#iter_cost_trans">iter_cost_trans</a></span>; <span class="tactic">trivial</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#iter_trans">iter_trans</a></span>; <span class="tactic">trivial</span>; <span class="tactic">intros</span>.<br/>
@@ -196,8 +196,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">opc</span>: <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optim_phases_config">optim_phases_config</a></span>) <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#R">R</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#p">p</a></span> (<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_phases">run_phases</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#mapdeep">mapdeep</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#cost">cost</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#lang_optim_list">lang_optim_list</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#opc">opc</a></span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof744')">Proof.</div>
-<div class="proofscript" id="proof744">
+<div class="toggleproof" onclick="toggleDisplay('proof746')">Proof.</div>
+<div class="proofscript" id="proof746">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">opc</span>; <span class="tactic">simpl</span>; [<span class="tactic">reflexivity</span>|]; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>

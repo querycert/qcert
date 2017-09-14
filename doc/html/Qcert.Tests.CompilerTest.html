@@ -60,7 +60,7 @@
 &nbsp;&nbsp;<span class="kwd">Example</span> <span class="id">Example1</span>' :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">total</span>-<span class="id">attribute</span>" <span class="id">IS</span> <span class="id">AGGREGATE</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_when">rule_when</a></span> ("<span class="id">e</span>" <span class="id">INSTANCEOF</span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>") <span class="id">WHERE</span> ("<span class="id">doubleAttribute</span>" !#-&gt; … ≐ ‵50)))<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">DO</span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ACount">ACount</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">DO</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpCount">OpCount</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">OVER</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#withVar">withVar</a></span> "<span class="id">e</span>" …)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">FLATTEN</span> 0).<br/>
 &nbsp;&nbsp;<br/>
@@ -68,7 +68,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_global">rule_global</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">total</span>-<span class="id">attribute</span>" <span class="id">IS</span> <span class="id">AGGREGATE</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_when">rule_when</a></span> ("<span class="id">e</span>" <span class="id">INSTANCEOF</span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>") <span class="id">WHERE</span> ("<span class="id">doubleAttribute</span>" !#-&gt; … ≐ ‵50)))<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">DO</span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ACount">ACount</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">DO</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpCount">OpCount</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">OVER</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#withVar">withVar</a></span> "<span class="id">e</span>" …)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">FLATTEN</span> 0)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;; <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_return">rule_return</a></span> (‵"<span class="id">MainEntitys</span> <span class="kwd">with</span> <span class="id">doubleAttribute</span> 50: "<br/>
@@ -125,14 +125,14 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="makeMainEntity_typed">makeMainEntity_typed</a></span> <span class="id">db</span> <span class="id">id</span> <span class="id">i</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#normalize_data">normalize_data</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#db">db</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#id">id</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#i">i</a></span>)) ▹ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>")).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3321')">Proof.</div>
-<div class="proofscript" id="proof3321">
+<div class="toggleproof" onclick="toggleDisplay('proof3345')">Proof.</div>
+<div class="proofscript" id="proof3345">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id">dtbrand</span>' <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> (@<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_singleton">canon_brands_singleton</a></span> (@<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model_relation">brand_model_relation</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.TBrandModelProp.html#brands_type_singleton">brands_type_singleton</a></span>. <span class="tactic">simpl</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.Common.Typing.TData.html#dtrec_full">dtrec_full</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.Common.DataTyping.TData.html#dtrec_full">dtrec_full</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_cons">Forall2_cons</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [<span class="tactic">reflexivity</span>|<span class="id">constructor</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_cons">Forall2_cons</a></span>; <span class="tactic">simpl</span>.<br/>
@@ -149,12 +149,11 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tinp1">tinp1</a></span> := (("<span class="id">WORLD</span>", <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>")))::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html">TCAMP</a></span> <span class="id"><a href="Qcert.Common.Typing.TOps.html">TOps</a></span>.<br/>
-<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.CAMP.CAMPSystem.html">CAMPSystem</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id">Example1</span>'<span class="id">_wt</span> τ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#camp_type">camp_type</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#tinp1">tinp1</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id">Example1</span>' τ <span class="id"><a href="Qcert.Tests.CompilerTest.html#tout1">tout1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3322')">Proof.</div>
-<div class="proofscript" id="proof3322">
+<div class="toggleproof" onclick="toggleDisplay('proof3346')">Proof.</div>
+<div class="proofscript" id="proof3346">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
@@ -201,8 +200,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="alg5_wt">alg5_wt</a></span> τ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Tests.CompilerTest.html#algopt5">algopt5</a></span> ▷ τ &gt;=&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#tout1">tout1</a></span> ⊣ <span class="id"><a href="Qcert.Tests.CompilerTest.html#tinp1">tinp1</a></span>;(<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3323')">Proof.</div>
-<div class="proofscript" id="proof3323">
+<div class="toggleproof" onclick="toggleDisplay('proof3347')">Proof.</div>
+<div class="proofscript" id="proof3347">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#algopt5">algopt5</a></span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv_core">camp_to_nraenv_core</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#camp_to_nraenv_core_top">CAMPtocNRAEnv.camp_to_nraenv_core_top</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#nraenv_core_of_camp">CAMPtocNRAEnv.nraenv_core_of_camp</a></span>.<br/>

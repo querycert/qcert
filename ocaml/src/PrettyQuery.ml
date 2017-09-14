@@ -79,22 +79,22 @@ let pretty_lambda_nra greek margin annot hierarchy harness q =
 
 let rec pretty_nra_aux p sym ff a =
   match a with
-  | QcertCompiler.AID -> fprintf ff "%s" "ID"
-  | QcertCompiler.AConst d -> fprintf ff "%a" pretty_data d
-  | QcertCompiler.ABinop (b,a1,a2) -> (pretty_binop p sym pretty_nra_aux) ff b a1 a2
-  | QcertCompiler.AUnop (u,a1) -> (pretty_unop p sym pretty_nra_aux) ff u a1
-  | QcertCompiler.AMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
-  | QcertCompiler.AMapConcat (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
-  | QcertCompiler.AProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nra_aux sym.times ff a1 a2
-  | QcertCompiler.ASelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
-  | QcertCompiler.ADefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nra_aux sym.bars ff a1 a2
-  | QcertCompiler.AEither (a1,a2) ->
+  | QcertCompiler.NRAID -> fprintf ff "%s" "ID"
+  | QcertCompiler.NRAConst d -> fprintf ff "%a" pretty_data d
+  | QcertCompiler.NRABinop (b,a1,a2) -> (pretty_binary_op p sym pretty_nra_aux) ff b a1 a2
+  | QcertCompiler.NRAUnop (u,a1) -> (pretty_unary_op p sym pretty_nra_aux) ff u a1
+  | QcertCompiler.NRAMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
+  | QcertCompiler.NRAMapProduct (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
+  | QcertCompiler.NRAProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nra_aux sym.times ff a1 a2
+  | QcertCompiler.NRASelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
+  | QcertCompiler.NRADefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nra_aux sym.bars ff a1 a2
+  | QcertCompiler.NRAEither (a1,a2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	 (pretty_nra_aux p sym) a1
 	 (pretty_nra_aux p sym) a2
-  | QcertCompiler.AEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
-  | QcertCompiler.AApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
-  | QcertCompiler.AGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
+  | QcertCompiler.NRAEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
+  | QcertCompiler.NRAApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
+  | QcertCompiler.NRAGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
   
 (* resets precedence back to 0 *)
 and pretty_nra_exp p sym thissym ff a1 oa2 =
@@ -128,10 +128,10 @@ let rec pretty_nraenv_aux p sym ff a =
   match a with
   | QcertCompiler.NRAEnvID -> fprintf ff "%s" "ID"
   | QcertCompiler.NRAEnvConst d -> fprintf ff "%a" pretty_data d
-  | QcertCompiler.NRAEnvBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
-  | QcertCompiler.NRAEnvUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
+  | QcertCompiler.NRAEnvBinop (b,a1,a2) -> (pretty_binary_op p sym pretty_nraenv_aux) ff b a1 a2
+  | QcertCompiler.NRAEnvUnop (u,a1) -> (pretty_unary_op p sym pretty_nraenv_aux) ff u a1
   | QcertCompiler.NRAEnvMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
-  | QcertCompiler.NRAEnvMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
+  | QcertCompiler.NRAEnvMapProduct (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
   | QcertCompiler.NRAEnvProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
   | QcertCompiler.NRAEnvSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
   | QcertCompiler.NRAEnvDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
@@ -199,8 +199,8 @@ let rec pretty_nnrc_aux p sym ff n =
   | QcertCompiler.NNRCGetConstant v -> fprintf ff "$%s"  (Util.string_of_char_list v)
   | QcertCompiler.NNRCVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
   | QcertCompiler.NNRCConst d -> fprintf ff "%a" pretty_data d
-  | QcertCompiler.NNRCBinop (b,n1,n2) -> (pretty_binop p sym pretty_nnrc_aux) ff b n1 n2
-  | QcertCompiler.NNRCUnop (u,n1) -> (pretty_unop p sym pretty_nnrc_aux) ff u n1
+  | QcertCompiler.NNRCBinop (b,n1,n2) -> (pretty_binary_op p sym pretty_nnrc_aux) ff b n1 n2
+  | QcertCompiler.NNRCUnop (u,n1) -> (pretty_unary_op p sym pretty_nnrc_aux) ff u n1
   | QcertCompiler.NNRCLet (v,n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
 	 (Util.string_of_char_list v)
@@ -359,11 +359,11 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
   | QcertCompiler.DNNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
   | QcertCompiler.DNNRCBinop (a, b,n1,n2) ->
       fprintf ff "%a(" ann a
-    ; ((pretty_binop 0 sym (pretty_dnnrc_aux ann plug)) ff b n1 n2)
+    ; ((pretty_binary_op 0 sym (pretty_dnnrc_aux ann plug)) ff b n1 n2)
     ; fprintf ff ")"
   | QcertCompiler.DNNRCUnop (a,u,n1) ->
      fprintf ff "%a(" ann a
-    ; ((pretty_unop 0 sym (pretty_dnnrc_aux ann plug)) ff u n1)
+    ; ((pretty_unary_op 0 sym (pretty_dnnrc_aux ann plug)) ff u n1)
     ; fprintf ff ")"
   | QcertCompiler.DNNRCLet (a,v,n1,n2) ->
      fprintf ff "@[<hv 0>@[<hv 2>%a let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
@@ -428,15 +428,15 @@ let pretty_plug_nraenv greek ff a =
 let rec pretty_column_aux p sym ff col =
   match col with
   | QcertCompiler.CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle (Util.string_of_char_list v) pretty_sym sym.rangle
-  | QcertCompiler.CDot (v,c) -> pretty_unop p sym pretty_column_aux ff (QcertCompiler.ADot v) c
+  | QcertCompiler.CDot (v,c) -> pretty_unary_op p sym pretty_column_aux ff (QcertCompiler.OpDot v) c
   | QcertCompiler.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
-  | QcertCompiler.CPlus (c1,c2) -> pretty_binop p sym pretty_column_aux ff (QcertCompiler.ABArith QcertCompiler.ArithPlus) c1 c2
-  | QcertCompiler.CEq (c1,c2) -> pretty_binop p sym pretty_column_aux ff QcertCompiler.AEq c1 c2
-  | QcertCompiler.CLessThan (c1,c2) -> pretty_binop p sym pretty_column_aux ff QcertCompiler.ALt c1 c2
-  | QcertCompiler.CNeg c -> pretty_unop p sym pretty_column_aux ff QcertCompiler.ANeg c
-  | QcertCompiler.CToString c -> pretty_unop p sym pretty_column_aux ff QcertCompiler.AToString c
-  | QcertCompiler.CSConcat (c1,c2) -> pretty_binop p sym pretty_column_aux ff QcertCompiler.ASConcat c1 c2
-  | QcertCompiler.CUDFCast (bs,c) -> pretty_unop p sym pretty_column_aux ff (QcertCompiler.ACast bs) c
+  | QcertCompiler.CPlus (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff (QcertCompiler.OpArithBinary QcertCompiler.ArithPlus) c1 c2
+  | QcertCompiler.CEq (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff QcertCompiler.OpEqual c1 c2
+  | QcertCompiler.CLessThan (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff QcertCompiler.OpLt c1 c2
+  | QcertCompiler.CNeg c -> pretty_unary_op p sym pretty_column_aux ff QcertCompiler.OpNeg c
+  | QcertCompiler.CToString c -> pretty_unary_op p sym pretty_column_aux ff QcertCompiler.OpToString c
+  | QcertCompiler.CSConcat (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff QcertCompiler.OpStringConcat c1 c2
+  | QcertCompiler.CUDFCast (bs,c) -> pretty_unary_op p sym pretty_column_aux ff (QcertCompiler.OpCast bs) c
   | QcertCompiler.CUDFUnbrand (rt,c) -> fprintf ff "@[!%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle (pretty_column_aux p sym) c
 
 let pretty_named_column_aux p sym ff (name, col) =
@@ -449,7 +449,7 @@ let rec pretty_dataframe_aux p sym ff ds =
 				      (pretty_list (pretty_named_column_aux p sym) ",") cl (pretty_dataframe_aux p sym) ds1
   | QcertCompiler.DSFilter (c,ds1) -> fprintf ff "@[filter %a @[<hv 2>from %a@] @]"
 				      (pretty_column_aux p sym) c (pretty_dataframe_aux p sym) ds1
-  | QcertCompiler.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataframe_aux ff QcertCompiler.AConcat ds1 ds2
+  | QcertCompiler.DSCartesian (ds1,ds2) ->  pretty_binary_op p sym pretty_dataframe_aux ff QcertCompiler.OpRecConcat ds1 ds2
   | QcertCompiler.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataframe_aux p sym) ds
 
 let pretty_dataframe greek margin annot ds =

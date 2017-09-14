@@ -36,111 +36,111 @@ Section cNRAEnvIgnore.
 
   Fixpoint nraenv_core_is_nra (e:nraenv_core) : Prop :=
     match e with
-      | ANID => True
-      | ANConst rd => True
-      | ANBinop bop e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANUnop uop e1 => nraenv_core_is_nra e1
-      | ANMap e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANMapConcat e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANProduct e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANSelect e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANDefault e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANEither e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANEitherConcat e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANApp e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANGetConstant _ => True
-      | ANEnv => False
-      | ANAppEnv e1 e2 => False
-      | ANMapEnv e1 => False
+    | ANID => True
+    | ANConst rd => True
+    | ANBinop bop e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANUnop uop e1 => nraenv_core_is_nra e1
+    | ANMap e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANMapProduct e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANProduct e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANSelect e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANDefault e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANEither e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANEitherConcat e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANApp e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | ANGetConstant _ => True
+    | ANEnv => False
+    | ANAppEnv e1 e2 => False
+    | ANMapEnv e1 => False
     end.
 
   Fixpoint nraenv_core_is_nra_fun (e:nraenv_core) : bool :=
     match e with
-      | ANID => true
-      | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANUnop uop e1 => nraenv_core_is_nra_fun e1
-      | ANMap e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANMapConcat e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANProduct e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANSelect e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANDefault e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANEither e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANEitherConcat e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANApp e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANGetConstant _ => true
-      | ANEnv => false
-      | ANAppEnv e1 e2 => false
-      | ANMapEnv e1 => false
+    | ANID => true
+    | ANConst rd => true
+    | ANBinop bop e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANUnop uop e1 => nraenv_core_is_nra_fun e1
+    | ANMap e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANMapProduct e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANProduct e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANSelect e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANDefault e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANEither e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANEitherConcat e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANApp e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | ANGetConstant _ => true
+    | ANEnv => false
+    | ANAppEnv e1 e2 => false
+    | ANMapEnv e1 => false
     end.
 
   Lemma nraenv_core_is_nra_eq (e:nraenv_core):
     nraenv_core_is_nra e <-> (nraenv_core_is_nra_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence;
-    try (rewrite IHe1 in H; rewrite IHe2 in H;
-         elim H; clear H; intros;
-         rewrite H; rewrite H0; reflexivity);
-    try (rewrite andb_true_inversion in H;
-         elim H; clear H; intros;
-         rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-         split; assumption).
+      try (rewrite IHe1 in H; rewrite IHe2 in H;
+           elim H; clear H; intros;
+           rewrite H; rewrite H0; reflexivity);
+      try (rewrite andb_true_inversion in H;
+           elim H; clear H; intros;
+           rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+           split; assumption).
     - rewrite IHe in H; assumption.
     - rewrite <- IHe in H; assumption.
   Qed.
 
   Fixpoint nraenv_core_ignores_env (e:nraenv_core) : Prop :=
     match e with
-      | ANID => True
-      | ANConst rd => True
-      | ANBinop bop e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANUnop uop e1 => nraenv_core_ignores_env e1
-      | ANMap e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANMapConcat e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANProduct e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANSelect e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANDefault e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANEither e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANEitherConcat e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANApp e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-      | ANGetConstant _ => True
-      | ANEnv => False
-      | ANAppEnv e1 e2 => (nraenv_core_ignores_env e2)
-      | ANMapEnv e1 => False
+    | ANID => True
+    | ANConst rd => True
+    | ANBinop bop e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANUnop uop e1 => nraenv_core_ignores_env e1
+    | ANMap e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANMapProduct e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANProduct e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANSelect e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANDefault e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANEither e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANEitherConcat e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANApp e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | ANGetConstant _ => True
+    | ANEnv => False
+    | ANAppEnv e1 e2 => (nraenv_core_ignores_env e2)
+    | ANMapEnv e1 => False
     end.
 
   (* Java equivalent: NraOptimizer.nraenv_core_ignores_env_fun *)
   Fixpoint nraenv_core_ignores_env_fun (e:nraenv_core) : bool :=
     match e with
-      | ANID => true
-      | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANUnop uop e1 => nraenv_core_ignores_env_fun e1
-      | ANMap e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANMapConcat e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANProduct e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANSelect e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANDefault e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANEither e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANEitherConcat e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANApp e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-      | ANGetConstant _ => true
-      | ANEnv => false
-      | ANAppEnv e1 e2 => (nraenv_core_ignores_env_fun e2)
-      | ANMapEnv e1 => false
+    | ANID => true
+    | ANConst rd => true
+    | ANBinop bop e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANUnop uop e1 => nraenv_core_ignores_env_fun e1
+    | ANMap e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANMapProduct e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANProduct e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANSelect e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANDefault e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANEither e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANEitherConcat e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANApp e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | ANGetConstant _ => true
+    | ANEnv => false
+    | ANAppEnv e1 e2 => (nraenv_core_ignores_env_fun e2)
+    | ANMapEnv e1 => false
     end.
 
   Lemma nraenv_core_ignores_env_eq (e:nraenv_core):
     nraenv_core_ignores_env e <-> (nraenv_core_ignores_env_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence;
-    try (rewrite IHe1 in H; rewrite IHe2 in H;
-         elim H; clear H; intros;
-         rewrite H; rewrite H0; reflexivity);
-    try (rewrite andb_true_inversion in H;
-         elim H; clear H; intros;
-         rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-         split; assumption).
+      try (rewrite IHe1 in H; rewrite IHe2 in H;
+           elim H; clear H; intros;
+           rewrite H; rewrite H0; reflexivity);
+      try (rewrite andb_true_inversion in H;
+           elim H; clear H; intros;
+           rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+           split; assumption).
     - rewrite IHe in H; assumption.
     - rewrite <- IHe in H; assumption.
     - rewrite <- IHe2; assumption.
@@ -151,55 +151,55 @@ Section cNRAEnvIgnore.
 
   Fixpoint nraenv_core_fixed_env (e:nraenv_core) : Prop :=
     match e with
-      | ANID => True
-      | ANConst rd => True
-      | ANBinop bop e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANUnop uop e1 => nraenv_core_fixed_env e1
-      | ANMap e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANMapConcat e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANProduct e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANSelect e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANDefault e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANEither e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANEitherConcat e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANApp e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-      | ANGetConstant _ => True 
-      | ANEnv => True (* That's the difference with ignore... *)
-      | ANAppEnv e1 e2 => False (* Changes the environment *)
-      | ANMapEnv e1 => False (* Changes the environment *)
+    | ANID => True
+    | ANConst rd => True
+    | ANBinop bop e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANUnop uop e1 => nraenv_core_fixed_env e1
+    | ANMap e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANMapProduct e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANProduct e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANSelect e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANDefault e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANEither e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANEitherConcat e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANApp e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | ANGetConstant _ => True 
+    | ANEnv => True (* That's the difference with ignore... *)
+    | ANAppEnv e1 e2 => False (* Changes the environment *)
+    | ANMapEnv e1 => False (* Changes the environment *)
     end.
 
   Fixpoint nraenv_core_fixed_env_fun (e:nraenv_core) : bool :=
     match e with
-      | ANID => true
-      | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANUnop uop e1 => nraenv_core_fixed_env_fun e1
-      | ANMap e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANMapConcat e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANProduct e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANSelect e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANDefault e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANEither e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANEitherConcat e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANApp e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-      | ANGetConstant _ => true
-      | ANEnv => true
-      | ANAppEnv e1 e2 => false
-      | ANMapEnv e1 => false
+    | ANID => true
+    | ANConst rd => true
+    | ANBinop bop e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANUnop uop e1 => nraenv_core_fixed_env_fun e1
+    | ANMap e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANMapProduct e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANProduct e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANSelect e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANDefault e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANEither e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANEitherConcat e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANApp e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | ANGetConstant _ => true
+    | ANEnv => true
+    | ANAppEnv e1 e2 => false
+    | ANMapEnv e1 => false
     end.
 
   Lemma nraenv_core_fixed_env_eq (e:nraenv_core):
     nraenv_core_fixed_env e <-> (nraenv_core_fixed_env_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence;
-    try (rewrite IHe1 in H; rewrite IHe2 in H;
-         elim H; clear H; intros;
-         rewrite H; rewrite H0; reflexivity);
-    try (rewrite andb_true_inversion in H;
-         elim H; clear H; intros;
-         rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-         split; assumption).
+      try (rewrite IHe1 in H; rewrite IHe2 in H;
+           elim H; clear H; intros;
+           rewrite H; rewrite H0; reflexivity);
+      try (rewrite andb_true_inversion in H;
+           elim H; clear H; intros;
+           rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+           split; assumption).
     - rewrite IHe in H; assumption.
     - rewrite <- IHe in H; assumption.
   Qed.
@@ -208,56 +208,56 @@ Section cNRAEnvIgnore.
   
   Fixpoint nraenv_core_ignores_id (e:nraenv_core) : Prop :=
     match e with
-      | ANID => False
-      | ANConst rd => True
-      | ANBinop bop e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-      | ANUnop uop e1 => nraenv_core_ignores_id e1
-      | ANMap e1 e2 => nraenv_core_ignores_id e2
-      | ANMapConcat e1 e2 => nraenv_core_ignores_id e2
-      | ANProduct e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-      | ANSelect e1 e2 => (nraenv_core_ignores_id e2)
-      | ANDefault e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-      | ANEither e1 e2 => False
-      | ANEitherConcat e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-      | ANApp e1 e2 => (nraenv_core_ignores_id e2)
-      | ANGetConstant _ => True
-      | ANEnv => True
-      | ANAppEnv e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-      | ANMapEnv e1 => (nraenv_core_ignores_id e1)
+    | ANID => False
+    | ANConst rd => True
+    | ANBinop bop e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | ANUnop uop e1 => nraenv_core_ignores_id e1
+    | ANMap e1 e2 => nraenv_core_ignores_id e2
+    | ANMapProduct e1 e2 => nraenv_core_ignores_id e2
+    | ANProduct e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | ANSelect e1 e2 => (nraenv_core_ignores_id e2)
+    | ANDefault e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | ANEither e1 e2 => False
+    | ANEitherConcat e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | ANApp e1 e2 => (nraenv_core_ignores_id e2)
+    | ANGetConstant _ => True
+    | ANEnv => True
+    | ANAppEnv e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | ANMapEnv e1 => (nraenv_core_ignores_id e1)
     end.
 
   (* Java equivalent: NraOptimizer.nraenv_core_ignores_id_fun *)
   Fixpoint nraenv_core_ignores_id_fun (e:nraenv_core) : bool :=
     match e with
-      | ANID => false
-      | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-      | ANUnop uop e1 => nraenv_core_ignores_id_fun e1
-      | ANMap e1 e2 => nraenv_core_ignores_id_fun e2
-      | ANMapConcat e1 e2 => nraenv_core_ignores_id_fun e2
-      | ANProduct e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-      | ANSelect e1 e2 => (nraenv_core_ignores_id_fun e2)
-      | ANDefault e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-      | ANEither e1 e2 => false
-      | ANEitherConcat e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-      | ANApp e1 e2 => (nraenv_core_ignores_id_fun e2)
-      | ANGetConstant _ => true
-      | ANEnv => true
-      | ANAppEnv e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-      | ANMapEnv e1 => (nraenv_core_ignores_id_fun e1)
+    | ANID => false
+    | ANConst rd => true
+    | ANBinop bop e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | ANUnop uop e1 => nraenv_core_ignores_id_fun e1
+    | ANMap e1 e2 => nraenv_core_ignores_id_fun e2
+    | ANMapProduct e1 e2 => nraenv_core_ignores_id_fun e2
+    | ANProduct e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | ANSelect e1 e2 => (nraenv_core_ignores_id_fun e2)
+    | ANDefault e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | ANEither e1 e2 => false
+    | ANEitherConcat e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | ANApp e1 e2 => (nraenv_core_ignores_id_fun e2)
+    | ANGetConstant _ => true
+    | ANEnv => true
+    | ANAppEnv e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | ANMapEnv e1 => (nraenv_core_ignores_id_fun e1)
     end.
-
+  
   Lemma nraenv_core_ignores_id_eq (e:nraenv_core):
     nraenv_core_ignores_id e <-> (nraenv_core_ignores_id_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence.
     - rewrite IHe1 in H; rewrite IHe2 in H;
-      elim H; clear H; intros;
-      rewrite H; rewrite H0; reflexivity.
+        elim H; clear H; intros;
+          rewrite H; rewrite H0; reflexivity.
     - rewrite andb_true_inversion in H;
-      elim H; clear H; intros;
-      rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-      split; assumption.
+        elim H; clear H; intros;
+          rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+            split; assumption.
     - rewrite IHe in H; assumption.
     - rewrite <- IHe in H; assumption.
     - rewrite IHe2 in H; assumption.
@@ -265,57 +265,57 @@ Section cNRAEnvIgnore.
     - rewrite IHe2 in H; assumption.
     - rewrite <- IHe2 in H; assumption.
     - rewrite IHe1 in H; rewrite IHe2 in H;
-      elim H; clear H; intros;
-      rewrite H; rewrite H0; reflexivity.
+        elim H; clear H; intros;
+          rewrite H; rewrite H0; reflexivity.
     - rewrite andb_true_inversion in H;
-      elim H; clear H; intros;
-      rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-      split; assumption.
+        elim H; clear H; intros;
+          rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+            split; assumption.
     - rewrite IHe2 in H; assumption.
     - rewrite <- IHe2 in H; assumption.
     - rewrite IHe1 in H; rewrite IHe2 in H;
-      elim H; clear H; intros;
-      rewrite H; rewrite H0; reflexivity.
+        elim H; clear H; intros;
+          rewrite H; rewrite H0; reflexivity.
     - rewrite andb_true_inversion in H;
-      elim H; clear H; intros;
-      rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-      split; assumption.
+        elim H; clear H; intros;
+          rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+            split; assumption.
     - rewrite IHe1 in H; rewrite IHe2 in H;
-      elim H; clear H; intros;
-      rewrite H; rewrite H0; reflexivity.
+        elim H; clear H; intros;
+          rewrite H; rewrite H0; reflexivity.
     - rewrite andb_true_inversion in H;
-      elim H; clear H; intros;
-      rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-      split; assumption.
+        elim H; clear H; intros;
+          rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+            split; assumption.
     - intuition.
     - intuition.
     - intuition.
     - rewrite andb_true_inversion in H;
-      elim H; clear H; intros;
-      rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
-      split; assumption.
+        elim H; clear H; intros;
+          rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+            split; assumption.
     - rewrite <- IHe; assumption.
     - rewrite IHe; assumption.
   Qed.
   
   Fixpoint nraenv_core_deenv_nra (ae:nraenv_core) : nra :=
     match ae with
-      | ANID => AID
-      | ANConst d => AConst d
-      | ANBinop b ae1 ae2 => ABinop b (nraenv_core_deenv_nra ae1) (nraenv_core_deenv_nra ae2)
-      | ANUnop u ae1 => AUnop u (nraenv_core_deenv_nra ae1)
-      | ANMap ea1 ea2 => AMap (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANMapConcat ea1 ea2 => AMapConcat (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANProduct ea1 ea2 => AProduct (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANSelect ea1 ea2 => ASelect (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANDefault ea1 ea2 => ADefault (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANEither ea1 ea2 => AEither (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANEitherConcat ea1 ea2 => AEitherConcat (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANApp ea1 ea2 => AApp (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANGetConstant s => AGetConstant s
-      | ANEnv => AID
-      | ANAppEnv ea1 ea2 => AID
-      | ANMapEnv ea1 => AID
+    | ANID => NRAID
+    | ANConst d => NRAConst d
+    | ANBinop b ae1 ae2 => NRABinop b (nraenv_core_deenv_nra ae1) (nraenv_core_deenv_nra ae2)
+    | ANUnop u ae1 => NRAUnop u (nraenv_core_deenv_nra ae1)
+    | ANMap ea1 ea2 => NRAMap (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANMapProduct ea1 ea2 => NRAMapProduct (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANProduct ea1 ea2 => NRAProduct (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANSelect ea1 ea2 => NRASelect (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANDefault ea1 ea2 => NRADefault (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANEither ea1 ea2 => NRAEither (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANEitherConcat ea1 ea2 => NRAEitherConcat (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANApp ea1 ea2 => NRAApp (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | ANGetConstant s => NRAGetConstant s
+    | ANEnv => NRAID
+    | ANAppEnv ea1 ea2 => NRAID
+    | ANMapEnv ea1 => NRAID
     end.
 
   Lemma nraenv_core_ignores_env_swap (e:nraenv_core) :
@@ -350,25 +350,25 @@ Section cNRAEnvIgnore.
       destruct d; try reflexivity; simpl.
       induction l; try reflexivity; simpl.
       unfold lift in *; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *; simpl.
       rewrite (IHe1 H0 h env1 env2); clear IHe1 H0.
       generalize (h ⊢ₑ e1 @ₑ a ⊣ c;env2); intros.
       destruct o; try reflexivity; simpl.
       revert IHl.
       generalize (oflat_map
-       (fun a0 : data =>
-        match h ⊢ₑ e1 @ₑ a0 ⊣ c;env1 with
-        | Some (dcoll y) => omap_concat a0 y
-        | _ => None
-        end) l
-        ); generalize (oflat_map
-       (fun a0 : data =>
-        match h ⊢ₑ e1 @ₑ a0 ⊣ c;env2 with
-        | Some (dcoll y) => omap_concat a0 y
-        | _ => None
-        end) l
-               ); intros.
+                    (fun a0 : data =>
+                       match h ⊢ₑ e1 @ₑ a0 ⊣ c;env1 with
+                       | Some (dcoll y) => omap_concat a0 y
+                       | _ => None
+                       end) l
+                 ); generalize (oflat_map
+                                  (fun a0 : data =>
+                                     match h ⊢ₑ e1 @ₑ a0 ⊣ c;env2 with
+                                     | Some (dcoll y) => omap_concat a0 y
+                                     | _ => None
+                                     end) l
+                               ); intros.
       destruct o; destruct o0; try congruence.
       inversion IHl; reflexivity.
     - inversion H; clear H.
@@ -385,18 +385,18 @@ Section cNRAEnvIgnore.
       unfold lift in *; simpl in *.
       revert IHl.
       generalize (lift_filter
-       (fun x' : data =>
-        match h ⊢ₑ e1 @ₑx' ⊣ c;env1 with
-        | Some (dbool b) => Some b
-        | _ => None
-        end) l
-        ); generalize (lift_filter
-       (fun x' : data =>
-        match h ⊢ₑ e1 @ₑ x' ⊣ c;env2 with
-        | Some (dbool b) => Some b
-        | _ => None
-        end) l
-             ); intros.
+                    (fun x' : data =>
+                       match h ⊢ₑ e1 @ₑx' ⊣ c;env1 with
+                       | Some (dbool b) => Some b
+                       | _ => None
+                       end) l
+                 ); generalize (lift_filter
+                                  (fun x' : data =>
+                                     match h ⊢ₑ e1 @ₑ x' ⊣ c;env2 with
+                                     | Some (dbool b) => Some b
+                                     | _ => None
+                                     end) l
+                               ); intros.
       destruct o; destruct o0; try congruence.
       inversion IHl; reflexivity.
     - inversion H; clear H.
@@ -406,7 +406,7 @@ Section cNRAEnvIgnore.
       unfold olift; simpl.
       rewrite (IHe2 H1 h env1 env2).
       destruct (h ⊢ₑ e2 @ₑ x ⊣ c;env2);
-      rewrite (IHe1 H0 h env1 env2); reflexivity.
+        rewrite (IHe1 H0 h env1 env2); reflexivity.
     - inversion H; clear H.
       unfold olift; simpl.
       rewrite (IHe2 H1 h env1 env2).
@@ -420,8 +420,8 @@ Section cNRAEnvIgnore.
   
   Lemma nraenv_core_ignores_id_swap (e:nraenv_core) :
     nraenv_core_ignores_id e -> forall h:list (string*string), forall c,
-      forall env:data, forall x1 x2:data,
-          h ⊢ₑ e @ₑ x1 ⊣ c;env = h ⊢ₑ e @ₑ x2 ⊣ c;env.
+        forall env:data, forall x1 x2:data,
+            h ⊢ₑ e @ₑ x1 ⊣ c;env = h ⊢ₑ e @ₑ x2 ⊣ c;env.
   Proof.
     intros H h c.
     revert H h.
@@ -473,7 +473,7 @@ Section cNRAEnvIgnore.
       generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
-      unfold lift, rmap_concat, oomap_concat; simpl.
+      unfold lift, rmap_product, oomap_concat; simpl.
       rewrite rmap_map_rec1 in *; simpl.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r.
@@ -496,7 +496,7 @@ Section cNRAEnvIgnore.
       generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
-      unfold lift, rmap_concat, oomap_concat; simpl.
+      unfold lift, rmap_product, oomap_concat; simpl.
       rewrite rmap_map_rec1 in *; simpl.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r in *.
@@ -624,7 +624,7 @@ Section cNRAEnvIgnore.
       generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
-      unfold lift, rmap_concat, oomap_concat; simpl.
+      unfold lift, rmap_product, oomap_concat; simpl.
       rewrite rmap_map_rec1 in *; simpl.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r in *.
@@ -715,19 +715,19 @@ Section cNRAEnvIgnore.
   (* TODO: this (and the Proper) should move *)
   Fixpoint nraenv_core_of_nra (a:nra) : nraenv_core :=
     match a with
-      | AID => ANID
-      | AConst d => ANConst d
-      | ABinop b e1 e2 => ANBinop b (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | AUnop u e1 => ANUnop u (nraenv_core_of_nra e1)
-      | AMap e1 e2 => ANMap (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | AMapConcat e1 e2 => ANMapConcat (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | AProduct e1 e2 => ANProduct (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | ASelect e1 e2 => ANSelect (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | ADefault e1 e2 => ANDefault (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | AEither opl opr => ANEither (nraenv_core_of_nra opl) (nraenv_core_of_nra opr)
-      | AEitherConcat op1 op2 => ANEitherConcat (nraenv_core_of_nra op1) (nraenv_core_of_nra op2)
-      | AApp e1 e2 => ANApp (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | AGetConstant s => ANGetConstant s
+      | NRAGetConstant s => ANGetConstant s
+      | NRAID => ANID
+      | NRAConst d => ANConst d
+      | NRABinop b e1 e2 => ANBinop b (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAUnop u e1 => ANUnop u (nraenv_core_of_nra e1)
+      | NRAMap e1 e2 => ANMap (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAMapProduct e1 e2 => ANMapProduct (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAProduct e1 e2 => ANProduct (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRASelect e1 e2 => ANSelect (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRADefault e1 e2 => ANDefault (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAEither opl opr => ANEither (nraenv_core_of_nra opl) (nraenv_core_of_nra opr)
+      | NRAEitherConcat op1 op2 => ANEitherConcat (nraenv_core_of_nra op1) (nraenv_core_of_nra op2)
+      | NRAApp e1 e2 => ANApp (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
     end.
 
   Lemma nraenv_core_eval_of_nra h c e d env :
@@ -742,7 +742,7 @@ Section cNRAEnvIgnore.
               | apply lift_oncoll_ext
               | apply lift_dcoll_inversion
               | apply rmap_ext
-              | apply rmap_concat_ext
+              | apply rmap_product_ext
               | apply lift_filter_ext]; intros); trivial.
     - rewrite <- IHe1; trivial.
     - match_destr.

@@ -57,20 +57,20 @@ Section CAMPRule.
   Fixpoint camp_rule_to_camp (rule:camp_rule) : camp
     := match rule with
          | rule_when p ps =>
-           punop AFlatten
+           punop OpFlatten
                  (WW
                     (pmap
                        (pletEnv
                           p
                           (camp_rule_to_camp ps))))
          | rule_global p ps =>
-           punop AFlatten
+           punop OpFlatten
                  (makeSingleton
                     (pletEnv
                        (WW p)
                        (camp_rule_to_camp ps)))
          | rule_not p ps =>
-           punop AFlatten
+           punop OpFlatten
                  (makeSingleton
                     (pletEnv
                        (notholds p RETURN BINDINGS)

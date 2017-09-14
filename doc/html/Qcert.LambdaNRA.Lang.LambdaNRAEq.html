@@ -48,8 +48,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lnra_lambda_eval">lnra_lambda_eval</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#h">h</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#env">env</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#op1">op1</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#d">d</a></span> = <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lnra_lambda_eval">lnra_lambda_eval</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#h">h</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#env">env</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#op2">op2</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#d">d</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="lambda_nra_equiv">lambda_nra_equiv</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2729')">Proof.</div>
-<div class="proofscript" id="proof2729">
+<div class="toggleproof" onclick="toggleDisplay('proof2753')">Proof.</div>
+<div class="proofscript" id="proof2753">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Reflexive">Reflexive</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -60,8 +60,8 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="lnra_lambda_equiv">lnra_lambda_equiv</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2730')">Proof.</div>
-<div class="proofscript" id="proof2730">
+<div class="toggleproof" onclick="toggleDisplay('proof2754')">Proof.</div>
+<div class="proofscript" id="proof2754">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Reflexive">Reflexive</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -72,24 +72,24 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="lavar_proper">lavar_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAVar">LNRAVar</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2731')">Proof.</div>
-<div class="proofscript" id="proof2731">
+<div class="toggleproof" onclick="toggleDisplay('proof2755')">Proof.</div>
+<div class="proofscript" id="proof2755">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="latable_proper">latable_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRATable">LNRATable</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2732')">Proof.</div>
-<div class="proofscript" id="proof2732">
+<div class="toggleproof" onclick="toggleDisplay('proof2756')">Proof.</div>
+<div class="proofscript" id="proof2756">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="laconst_proper">laconst_proper</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAConst">LNRAConst</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2733')">Proof.</div>
-<div class="proofscript" id="proof2733">
+<div class="toggleproof" onclick="toggleDisplay('proof2757')">Proof.</div>
+<div class="proofscript" id="proof2757">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -97,8 +97,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="labinop_proper">labinop_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRABinop">LNRABinop</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2734')">Proof.</div>
-<div class="proofscript" id="proof2734">
+<div class="toggleproof" onclick="toggleDisplay('proof2758')">Proof.</div>
+<div class="proofscript" id="proof2758">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">cbn</span>.<br/>
@@ -108,8 +108,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="launop_proper">launop_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAUnop">LNRAUnop</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2735')">Proof.</div>
-<div class="proofscript" id="proof2735">
+<div class="toggleproof" onclick="toggleDisplay('proof2759')">Proof.</div>
+<div class="proofscript" id="proof2759">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">cbn</span>.<br/>
@@ -119,8 +119,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="lamap_proper">lamap_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMap">LNRAMap</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2736')">Proof.</div>
-<div class="proofscript" id="proof2736">
+<div class="toggleproof" onclick="toggleDisplay('proof2760')">Proof.</div>
+<div class="proofscript" id="proof2760">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span> <span class="tactic">by</span> <span class="tactic">trivial</span>.<br/>
@@ -136,16 +136,16 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="lamapconcat_proper">lamapconcat_proper</a></span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMapConcat">LNRAMapConcat</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2737')">Proof.</div>
-<div class="proofscript" id="proof2737">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMapProduct">LNRAMapProduct</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2761')">Proof.</div>
+<div class="proofscript" id="proof2761">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span> <span class="tactic">by</span> <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#olift_ext">olift_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#lift_oncoll_ext">lift_oncoll_ext</a></span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">f_equal</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat_ext">rmap_concat_ext</a></span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product_ext">rmap_product_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">H</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_normalized">lambda_nra_eval_normalized</a></span> <span class="kwd">in</span> <span class="id">H1</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">invcs</span> <span class="id">H1</span>.<br/>
@@ -155,8 +155,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="laproduct_proper">laproduct_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAProduct">LNRAProduct</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2738')">Proof.</div>
-<div class="proofscript" id="proof2738">
+<div class="toggleproof" onclick="toggleDisplay('proof2762')">Proof.</div>
+<div class="proofscript" id="proof2762">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -166,8 +166,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="lafilter_proper">lafilter_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAFilter">LNRAFilter</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2739')">Proof.</div>
-<div class="proofscript" id="proof2739">
+<div class="toggleproof" onclick="toggleDisplay('proof2763')">Proof.</div>
+<div class="proofscript" id="proof2763">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span> <span class="tactic">by</span> <span class="tactic">trivial</span>.<br/>
@@ -184,8 +184,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="lalambda_proper">lalambda_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span> ==&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRALambda">LNRALambda</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2740')">Proof.</div>
-<div class="proofscript" id="proof2740">
+<div class="toggleproof" onclick="toggleDisplay('proof2764')">Proof.</div>
+<div class="proofscript" id="proof2764">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lambda_nra_eq">lambda_nra_eq</a></span>, <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRAEq.html#lnra_lambda_eq">lnra_lambda_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>.<br/>

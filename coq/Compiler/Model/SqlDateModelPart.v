@@ -20,7 +20,7 @@ Require Import EquivDec.
 Require Import Equivalence.
 Require Import Utils.
 Require Import ForeignData.
-Require Import ForeignOps.
+Require Import ForeignOperators.
 
 (*********  <WARNING>*********************)
 (** Extraction to OCaml is currently a stub **)

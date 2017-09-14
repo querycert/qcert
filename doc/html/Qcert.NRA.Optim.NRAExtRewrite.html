@@ -14,7 +14,7 @@
 <h1 class="title">Module Qcert.NRA.Optim.NRAExtRewrite</h1>
 <div class="coq">
 <br/>
-<span class="kwd">Section</span> <span class="id"><a name="ROptimExt">ROptimExt</a></span>.<br/>
+<span class="kwd">Section</span> <span class="id"><a name="NRAExtRewrite">NRAExtRewrite</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.NRA.Lang.NRA.html">NRA</a></span>.<br/>
@@ -34,8 +34,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pull_nra_opt">pull_nra_opt</a></span> (<span class="id">p1</span> <span class="id">p2</span>:<span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nraext">nraext</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nra_of_nraext">nra_of_nraext</a></span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span>) ≡ₐ (<span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nra_of_nraext">nra_of_nraext</a></span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ≡ₓ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1662')">Proof.</div>
-<div class="proofscript" id="proof1662">
+<div class="toggleproof" onclick="toggleDisplay('proof1687')">Proof.</div>
+<div class="proofscript" id="proof1687">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.NRA.Lang.NRAExtEq.html#nraext_eq">nraext_eq</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nraext_eval">nraext_eval</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H</span>; <span class="tactic">trivial</span>.<br/>
@@ -44,8 +44,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="eand_comm">eand_comm</a></span> (<span class="id">p1</span> <span class="id">p2</span>: <span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nraext">nraext</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> ∧ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ≡ₓ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ∧ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1663')">Proof.</div>
-<div class="proofscript" id="proof1663">
+<div class="toggleproof" onclick="toggleDisplay('proof1688')">Proof.</div>
+<div class="proofscript" id="proof1688">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#and_comm">and_comm</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -53,8 +53,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="eunion_assoc">eunion_assoc</a></span> (<span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span>: <span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nraext">nraext</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>) ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p3">p3</a></span> ≡ₓ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ⋃ (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p3">p3</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1664')">Proof.</div>
-<div class="proofscript" id="proof1664">
+<div class="toggleproof" onclick="toggleDisplay('proof1689')">Proof.</div>
+<div class="proofscript" id="proof1689">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#union_assoc">union_assoc</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -62,8 +62,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="eunion_select_distr">eunion_select_distr</a></span> (<span class="id">p</span> <span class="id">p1</span> <span class="id">p2</span>: <span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nraext">nraext</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> ⟩(<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ⋃ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>) ≡ₓ σ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> ⟩(<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span>) ⋃ σ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> ⟩(<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1665')">Proof.</div>
-<div class="proofscript" id="proof1665">
+<div class="toggleproof" onclick="toggleDisplay('proof1690')">Proof.</div>
+<div class="proofscript" id="proof1690">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#union_select_distr">union_select_distr</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -71,8 +71,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="emap_singleton">emap_singleton</a></span> (<span class="id">p1</span> <span class="id">p2</span>:<span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nraext">nraext</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ⟩( ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> |} ) ≡ₓ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ◯ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1666')">Proof.</div>
-<div class="proofscript" id="proof1666">
+<div class="toggleproof" onclick="toggleDisplay('proof1691')">Proof.</div>
+<div class="proofscript" id="proof1691">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#map_singleton">map_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -80,16 +80,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ecompose_rec_id">ecompose_rec_id</a></span> <span class="id">s</span> <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s">s</a></span>, <span class="id">ID</span>) |] ◯ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> ≡ₓ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s">s</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span>) |].<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1667')">Proof.</div>
-<div class="proofscript" id="proof1667">
+<div class="toggleproof" onclick="toggleDisplay('proof1692')">Proof.</div>
+<div class="proofscript" id="proof1692">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#compose_rec_id">compose_rec_id</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="eflatten_map_coll">eflatten_map_coll</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>(χ⟨ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> |} ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> )) ≡ₓ χ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1668')">Proof.</div>
-<div class="proofscript" id="proof1668">
+<div class="toggleproof" onclick="toggleDisplay('proof1693')">Proof.</div>
+<div class="proofscript" id="proof1693">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#flatten_map_coll">flatten_map_coll</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -100,8 +100,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s1">s1</a></span> &lt;&gt; <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s2">s2</a></span> /\ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s2">s2</a></span> &lt;&gt; <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s3">s3</a></span> /\ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s3">s3</a></span> &lt;&gt; <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s1">s1</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;μ[<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s1">s1</a></span> ][ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s2">s2</a></span> ]( ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s3">s3</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span>)|] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s1">s1</a></span>, ‵{|<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>|})|]|})<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₓ ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s3">s3</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span>)|] ⊕ ‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s2">s2</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>)|]|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1669')">Proof.</div>
-<div class="proofscript" id="proof1669">
+<div class="toggleproof" onclick="toggleDisplay('proof1694')">Proof.</div>
+<div class="proofscript" id="proof1694">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#unnest_singleton">unnest_singleton</a></span>; <span class="tactic">assumption</span>.<br/>
@@ -110,8 +110,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="emap_into_singleton">emap_into_singleton</a></span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ ‵{| <span class="id">ID</span> |} ⟩(‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> |}) ≡ₓ ‵{|‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> |}|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1670')">Proof.</div>
-<div class="proofscript" id="proof1670">
+<div class="toggleproof" onclick="toggleDisplay('proof1695')">Proof.</div>
+<div class="proofscript" id="proof1695">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#map_into_singleton">map_into_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -119,8 +119,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="eflatten_over_map_into_singleton">eflatten_over_map_into_singleton</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;♯<span class="id">flatten</span>( χ⟨ ‵{|‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> |}|} ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> ) ) ≡ₓ χ⟨ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> |} ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1671')">Proof.</div>
-<div class="proofscript" id="proof1671">
+<div class="toggleproof" onclick="toggleDisplay('proof1696')">Proof.</div>
+<div class="proofscript" id="proof1696">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#flatten_over_map_into_singleton">flatten_over_map_into_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -128,8 +128,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="join_intro">join_intro</a></span> <span class="id">p1</span> <span class="id">p2</span> <span class="id">p3</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ⟩( <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span> × <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p3">p3</a></span> ) ≡ₓ ⋈⟨ <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span> ⟩(<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>, <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p3">p3</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1672')">Proof.</div>
-<div class="proofscript" id="proof1672">
+<div class="toggleproof" onclick="toggleDisplay('proof1697')">Proof.</div>
+<div class="proofscript" id="proof1697">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#join">join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>; <span class="tactic">intros</span> ? ? <span class="id">_</span>.<br/>
@@ -140,8 +140,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="emap_singleton_rec">emap_singleton_rec</a></span> <span class="id">s1</span> <span class="id">s2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s1">s1</a></span>, <span class="id">ID</span>) |] ⟩( ‵{|(<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s2">s2</a></span> |}) ≡ₓ ‵{|‵[| (<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s1">s1</a></span>, (<span class="id">ID</span>) · <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s2">s2</a></span>) |] |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1673')">Proof.</div>
-<div class="proofscript" id="proof1673">
+<div class="toggleproof" onclick="toggleDisplay('proof1698')">Proof.</div>
+<div class="proofscript" id="proof1698">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#map_singleton_rec">map_singleton_rec</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -149,8 +149,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="emap_dot_singleton">emap_dot_singleton</a></span> <span class="id">s</span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ (<span class="id">ID</span>)·<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s">s</a></span> ⟩( ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> |} ) ≡ₓ ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span>·<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#s">s</a></span> |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1674')">Proof.</div>
-<div class="proofscript" id="proof1674">
+<div class="toggleproof" onclick="toggleDisplay('proof1699')">Proof.</div>
+<div class="proofscript" id="proof1699">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#map_dot_singleton">map_dot_singleton</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -159,8 +159,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="eunnest_singleton_context">eunnest_singleton_context</a></span> <span class="id">p1</span> <span class="id">p2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;μ["<span class="id">a1</span>"]["<span class="id">PDATA</span>"]( ‵{|‵[| ("<span class="id">PBIND</span>", <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span>)|] ⊕ ‵[| ("<span class="id">a1</span>", ‵{|<span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>|})|]|})<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₓ ‵{|‵[| ("<span class="id">PBIND</span>", <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p1">p1</a></span>)|] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p2">p2</a></span>)|]|}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1675')">Proof.</div>
-<div class="proofscript" id="proof1675">
+<div class="toggleproof" onclick="toggleDisplay('proof1700')">Proof.</div>
+<div class="proofscript" id="proof1700">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#eunnest_singleton">eunnest_singleton</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
@@ -170,8 +170,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="esubstitute_in_bindings">esubstitute_in_bindings</a></span> (<span class="id">p</span>:<span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#nraext">nraext</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;χ⟨ (‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PDATA</span>"·"<span class="id">WORLD</span>") |])·"<span class="id">PDATA</span>" ⟩( ‵{| <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span> |} )<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₓ ‵{|(‵[| ("<span class="id">PBIND</span>", <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#p">p</a></span>·"<span class="id">PDATA</span>"·"<span class="id">WORLD</span>") |])·"<span class="id">PDATA</span>" |}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1676')">Proof.</div>
-<div class="proofscript" id="proof1676">
+<div class="toggleproof" onclick="toggleDisplay('proof1701')">Proof.</div>
+<div class="proofscript" id="proof1701">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#substitute_in_bindings">substitute_in_bindings</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -179,8 +179,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="edot_from_duplicate_bind_r">edot_from_duplicate_bind_r</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |])·"<span class="id">PDATA</span>" ≡ₓ <span class="id">ID</span>·"<span class="id">PBIND</span>".<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1677')">Proof.</div>
-<div class="proofscript" id="proof1677">
+<div class="toggleproof" onclick="toggleDisplay('proof1702')">Proof.</div>
+<div class="proofscript" id="proof1702">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#dot_from_duplicate_bind_r">dot_from_duplicate_bind_r</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -188,8 +188,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="edot_from_duplicate_bind_l">edot_from_duplicate_bind_l</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |])·"<span class="id">PBIND</span>" ≡ₓ <span class="id">ID</span>·"<span class="id">PBIND</span>".<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1678')">Proof.</div>
-<div class="proofscript" id="proof1678">
+<div class="toggleproof" onclick="toggleDisplay('proof1703')">Proof.</div>
+<div class="proofscript" id="proof1703">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#dot_from_duplicate_bind_l">dot_from_duplicate_bind_l</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -198,8 +198,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="edot_dot_from_duplicate_bind">edot_dot_from_duplicate_bind</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>"·"<span class="id">WORLD</span>") |])·"<span class="id">PDATA</span>"<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₓ <span class="id">ID</span>·"<span class="id">PBIND</span>"·"<span class="id">WORLD</span>".<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1679')">Proof.</div>
-<div class="proofscript" id="proof1679">
+<div class="toggleproof" onclick="toggleDisplay('proof1704')">Proof.</div>
+<div class="proofscript" id="proof1704">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#dot_dot_from_duplicate_bind">dot_dot_from_duplicate_bind</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -211,13 +211,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;χ⟨(‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>·"<span class="id">PDATA</span>"·"<span class="id">e</span>") |])·"<span class="id">PDATA</span>"<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⟩( ‵{|‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">PDATA</span>", <span class="id">ID</span>· "<span class="id">PBIND</span>") |] |}))|]<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;≡ₓ ‵[| ("<span class="id">PBIND</span>", <span class="id">ID</span>·"<span class="id">PBIND</span>") |] ⊕ ‵[| ("<span class="id">a1</span>", ‵{| <span class="id">ID</span>·"<span class="id">PBIND</span>"·"<span class="id">e</span>" |}) |].<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1680')">Proof.</div>
-<div class="proofscript" id="proof1680">
+<div class="toggleproof" onclick="toggleDisplay('proof1705')">Proof.</div>
+<div class="proofscript" id="proof1705">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#pull_nra_opt">pull_nra_opt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewrite.html#big_nested_bind_simplify_one">big_nested_bind_simplify_one</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-<span class="kwd">End</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#ROptimExt">ROptimExt</a></span>.<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.NRA.Optim.NRAExtRewrite.html#NRAExtRewrite">NRAExtRewrite</a></span>.<br/>
 <br/>
 
 </div>

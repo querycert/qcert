@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section ROptim.
+Section NRARewrite.
   Require Import List.
   Require Import String.
   Require Import Utils.
@@ -325,7 +325,7 @@ Section ROptim.
       destruct o0; try reflexivity; simpl.
       destruct (StringOrder.lt_dec s3 s1); try reflexivity; simpl.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try reflexivity; simpl.
@@ -389,7 +389,7 @@ Section ROptim.
       destruct (StringOrder.lt_dec s3 s2); try reflexivity; try congruence; simpl.
       destruct (StringOrder.lt_dec s1 s3); try reflexivity; try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s3); try congruence; simpl.
@@ -403,7 +403,7 @@ Section ROptim.
       destruct (string_dec s1 s3); try congruence; simpl.
       destruct (string_dec s1 s2); try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       destruct (string_dec s1 s1); try congruence; simpl.
       unfold rremove; simpl.
@@ -418,7 +418,7 @@ Section ROptim.
       assert (StringOrder.eq s1 s3) by (apply lt_contr1; assumption).
       congruence.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try congruence; simpl.
@@ -496,18 +496,18 @@ Section ROptim.
   (* [ PBIND : ID.PBIND; PDATA : ID.PBIND ].PDATA ≡ₐ ID.PBIND *)
 
   Lemma dot_from_duplicate_bind_r :
-    (‵[| ("PBIND", (AUnop (ADot "PBIND") AID)) |] ⊕ ‵[| ("PDATA", (AUnop (ADot "PBIND") AID)) |])·"PDATA" ≡ₐ (AUnop (ADot "PBIND") AID).
+    (‵[| ("PBIND", (NRAUnop (OpDot "PBIND") NRAID)) |] ⊕ ‵[| ("PDATA", (NRAUnop (OpDot "PBIND") NRAID)) |])·"PDATA" ≡ₐ (NRAUnop (OpDot "PBIND") NRAID).
   Proof.
-    rewrite (dot_from_duplicate_r "PBIND" "PDATA" (AUnop (ADot "PBIND") AID)).
+    rewrite (dot_from_duplicate_r "PBIND" "PDATA" (NRAUnop (OpDot "PBIND") NRAID)).
     reflexivity.
   Qed.
 
   (* [ PBIND : ID.PBIND; PDATA : ID.PBIND ].PBIND ≡ₐ ID.PBIND *)
 
   Lemma dot_from_duplicate_bind_l :
-    (‵[| ("PBIND", (AUnop (ADot "PBIND") AID)) |] ⊕ ‵[| ("PDATA", (AUnop (ADot "PBIND") AID)) |])·"PBIND" ≡ₐ (AUnop (ADot "PBIND") AID).
+    (‵[| ("PBIND", (NRAUnop (OpDot "PBIND") NRAID)) |] ⊕ ‵[| ("PDATA", (NRAUnop (OpDot "PBIND") NRAID)) |])·"PBIND" ≡ₐ (NRAUnop (OpDot "PBIND") NRAID).
   Proof.
-    rewrite (dot_from_duplicate_l "PBIND" "PDATA" (AUnop (ADot "PBIND") AID)).
+    rewrite (dot_from_duplicate_l "PBIND" "PDATA" (NRAUnop (OpDot "PBIND") NRAID)).
     reflexivity.
   Qed.
 
@@ -550,7 +550,7 @@ Section ROptim.
     destruct o; try reflexivity; simpl.
   Qed.
   
-End ROptim.
+End NRARewrite.
 
 (* 
 *** Local Variables: ***

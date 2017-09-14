@@ -41,8 +41,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ddata_eq_dec">ddata_eq_dec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#ddata">ddata</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1012')">Proof.</div>
-<div class="proofscript" id="proof1012">
+<div class="toggleproof" onclick="toggleDisplay('proof1026')">Proof.</div>
+<div class="proofscript" id="proof1026">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RData.html#data_eq_dec">data_eq_dec</a></span> <span class="id">d</span> <span class="id">d0</span>).<br/>
@@ -83,8 +83,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="unlocalize_distributed_id">unlocalize_distributed_id</a></span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.DData.html#unlocalize_data">unlocalize_data</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Ddistr">Ddistr</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#l">l</a></span>) = <span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1013')">Proof.</div>
-<div class="proofscript" id="proof1013">
+<div class="toggleproof" onclick="toggleDisplay('proof1027')">Proof.</div>
+<div class="proofscript" id="proof1027">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -99,8 +99,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dlocalization_eq_dec">dlocalization_eq_dec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1014')">Proof.</div>
-<div class="proofscript" id="proof1014">
+<div class="toggleproof" onclick="toggleDisplay('proof1028')">Proof.</div>
+<div class="proofscript" id="proof1028">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>

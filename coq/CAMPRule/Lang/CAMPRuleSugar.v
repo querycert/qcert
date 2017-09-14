@@ -31,16 +31,16 @@ Section CAMPRuleSugar.
   Fixpoint flattenn (n:nat) (p:camp)
     := match n with
        | 0 => p
-       | S m =>flattenn m (punop AFlatten p)
+       | S m =>flattenn m (punop OpFlatten p)
        end.
   
   (* Java equivalent: CampAggregateMacro *)
-  Definition aggregate (rules:camp_rule->camp_rule) (op:unaryOp) (secondMap:camp) (nflat:nat): camp
+  Definition aggregate (rules:camp_rule->camp_rule) (op:unary_op) (secondMap:camp) (nflat:nat): camp
     :=  pletIt
           (camp_rule_to_camp (rules (rule_return penv)))
           (punop op (flattenn nflat (pmap (pletEnv pit secondMap)))).
 
-  Definition aggregate_group_by (rules:camp_rule->camp_rule) (opg:camp) (op:unaryOp) (secondMap:camp) : camp
+  Definition aggregate_group_by (rules:camp_rule->camp_rule) (opg:camp) (op:unary_op) (secondMap:camp) : camp
     :=  pletIt
           (camp_rule_to_camp (rules (rule_return penv)))
           (punop op (pmap (pletEnv pit secondMap))).

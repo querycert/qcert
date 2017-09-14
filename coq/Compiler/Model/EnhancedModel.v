@@ -712,36 +712,36 @@ Definition enhanced_reduce_op_tostring (op:enhanced_reduce_op) : string
      | RedOpStats typ => append (enhanced_numeric_type_prefix typ) "FSTATS"%string
      end.
 
-Definition enhanced_numeric_sum (typ:enhanced_numeric_type) : unaryOp
+Definition enhanced_numeric_sum (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => ASum
+       => OpSum
      | enhanced_numeric_float
-       => AForeignUnaryOp (enhanced_unary_float_op uop_float_sum)
+       => OpForeignUnary (enhanced_unary_float_op uop_float_sum)
      end.
 
-Definition enhanced_numeric_min (typ:enhanced_numeric_type) : unaryOp
+Definition enhanced_numeric_min (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => ANumMin
+       => OpNumMin
      | enhanced_numeric_float
-       => AForeignUnaryOp (enhanced_unary_float_op uop_float_listmin)
+       => OpForeignUnary (enhanced_unary_float_op uop_float_listmin)
      end.
 
-Definition enhanced_numeric_max (typ:enhanced_numeric_type) : unaryOp
+Definition enhanced_numeric_max (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => ANumMax
+       => OpNumMax
      | enhanced_numeric_float
-       => AForeignUnaryOp (enhanced_unary_float_op uop_float_listmax)
+       => OpForeignUnary (enhanced_unary_float_op uop_float_listmax)
      end.
 
-Definition enhanced_numeric_arith_mean (typ:enhanced_numeric_type) : unaryOp
+Definition enhanced_numeric_arith_mean (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => AArithMean
+       => OpNumMean
      | enhanced_numeric_float
-       => AForeignUnaryOp (enhanced_unary_float_op uop_float_arithmean)
+       => OpForeignUnary (enhanced_unary_float_op uop_float_arithmean)
      end.
 
 Definition enhanced_reduce_op_interp
@@ -752,21 +752,21 @@ Definition enhanced_reduce_op_interp
       | RedOpCount | RedOpSum _ | RedOpMin _ | RedOpMax _ | RedOpArithMean _ =>
         let uop :=
             match op with
-            | RedOpCount  => ACount
+            | RedOpCount  => OpCount
             | RedOpSum typ => enhanced_numeric_sum typ
             | RedOpMin typ => enhanced_numeric_min typ
             | RedOpMax typ => enhanced_numeric_max typ
             | RedOpArithMean typ => enhanced_numeric_arith_mean typ
-            | RedOpStats _ => ACount (* assert false *)
+            | RedOpStats _ => OpCount (* assert false *)
             end
         in
-        fun_of_unaryop br uop (dcoll dl) 
+        unary_op_eval br uop (dcoll dl) 
       | RedOpStats typ =>
         let coll := dcoll dl in
-        let count := fun_of_unaryop br ACount coll in
-        let sum := fun_of_unaryop br (enhanced_numeric_sum typ) coll in
-        let min := fun_of_unaryop br (enhanced_numeric_min typ) coll in
-        let max := fun_of_unaryop br (enhanced_numeric_max typ) coll in
+        let count := unary_op_eval br OpCount coll in
+        let sum := unary_op_eval br (enhanced_numeric_sum typ) coll in
+        let min := unary_op_eval br (enhanced_numeric_min typ) coll in
+        let max := unary_op_eval br (enhanced_numeric_max typ) coll in
         let v :=
             match (count, sum, min, max) with
               | (Some count, Some sum, Some min, Some max) =>
@@ -859,47 +859,47 @@ Next Obligation.
       * reflexivity.
 Qed.
 
-Definition enhanced_to_reduce_op (uop:unaryOp) : option NNRCMR.reduce_op
+Definition enhanced_to_reduce_op (uop:unary_op) : option NNRCMR.reduce_op
   := match uop with
-     | ACount => Some (NNRCMR.RedOpForeign RedOpCount)
-     | ASum =>
+     | OpCount => Some (NNRCMR.RedOpForeign RedOpCount)
+     | OpSum =>
        Some (NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_int))
-     | AForeignUnaryOp (enhanced_unary_float_op uop_float_sum) =>
+     | OpForeignUnary (enhanced_unary_float_op uop_float_sum) =>
        Some (NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_float))
-     | ANumMin =>
+     | OpNumMin =>
        Some (NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_int))
-     | AForeignUnaryOp (enhanced_unary_float_op uop_float_listmin) =>
+     | OpForeignUnary (enhanced_unary_float_op uop_float_listmin) =>
        Some (NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_float))
-     | ANumMax =>
+     | OpNumMax =>
        Some (NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_int))
-     | AForeignUnaryOp (enhanced_unary_float_op uop_float_listmax) =>
+     | OpForeignUnary (enhanced_unary_float_op uop_float_listmax) =>
        Some (NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_float))
-     | AArithMean =>
+     | OpNumMean =>
        Some (NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_int))
-     | AForeignUnaryOp (enhanced_unary_float_op uop_float_arithmean) =>
+     | OpForeignUnary (enhanced_unary_float_op uop_float_arithmean) =>
        Some (NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_float))
      | _ => None
      end.
 
-Definition enhanced_of_reduce_op (rop:NNRCMR.reduce_op) : option unaryOp
+Definition enhanced_of_reduce_op (rop:NNRCMR.reduce_op) : option unary_op
   := match rop with
-     | NNRCMR.RedOpForeign RedOpCount => Some ACount
+     | NNRCMR.RedOpForeign RedOpCount => Some OpCount
      | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_int) =>
-       Some (ASum)
+       Some (OpSum)
      | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_float) =>
-       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_sum))
+       Some (OpForeignUnary (enhanced_unary_float_op uop_float_sum))
      | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_int) =>
-       Some (ANumMin)
+       Some (OpNumMin)
      | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_float) =>
-       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_listmin))
+       Some (OpForeignUnary (enhanced_unary_float_op uop_float_listmin))
      | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_int) =>
-       Some (ANumMax)
+       Some (OpNumMax)
      | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_float) =>
-       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_listmax))
+       Some (OpForeignUnary (enhanced_unary_float_op uop_float_listmax))
      | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_int) =>
-       Some (AArithMean)
+       Some (OpNumMean)
      | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_float) =>
-       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_arithmean))
+       Some (OpForeignUnary (enhanced_unary_float_op uop_float_arithmean))
      | NNRCMR.RedOpForeign (RedOpStats _) =>
        None (* XXX TODO? XXX *)
      end.
@@ -972,7 +972,7 @@ Require Import NNRCRuntime NNRCMRRuntime NNRCMRRewrite.
             mkMR
               tmp
               mr.(mr_output)
-              (MapScalar (x, NNRCUnop AColl (NNRCUnop (ADot stats_field) (NNRCVar x))))
+              (MapScalar (x, NNRCUnop OpBag (NNRCUnop (OpDot stats_field) (NNRCVar x))))
               RedSingleton
         in
         Some (mr1::mr2::nil)
@@ -1000,23 +1000,23 @@ Require Import NNRCRuntime NNRCMRRuntime NNRCMRRewrite.
             | enhanced_numeric_int =>
               let zero := NNRCConst (dnat 0) in
               let x := "stats"%string in
-              MapScalar (x, NNRCUnop AColl
-                                    (NNRCIf (NNRCBinop AEq (NNRCUnop (ADot "count"%string) (NNRCVar x)) zero)
+              MapScalar (x, NNRCUnop OpBag
+                                    (NNRCIf (NNRCBinop OpEqual (NNRCUnop (OpDot "count"%string) (NNRCVar x)) zero)
                                            zero
-                                           (NNRCBinop (ABArith ArithDivide)
-                                                     (NNRCUnop (ADot "sum"%string) (NNRCVar x))
-                                                     (NNRCUnop (ADot "count"%string) (NNRCVar x)))))
+                                           (NNRCBinop (OpArithBinary ArithDivide)
+                                                     (NNRCUnop (OpDot "sum"%string) (NNRCVar x))
+                                                     (NNRCUnop (OpDot "count"%string) (NNRCVar x)))))
             | enhanced_numeric_float =>
               let zero := NNRCConst (dnat 0) in
               let zerof := NNRCConst (denhancedfloat FLOAT_CONST0) in
               let x := "stats"%string in
-              MapScalar (x, NNRCUnop AColl
-                                    (NNRCIf (NNRCBinop AEq (NNRCUnop (ADot "count"%string) (NNRCVar x)) zero)
+              MapScalar (x, NNRCUnop OpBag
+                                    (NNRCIf (NNRCBinop OpEqual (NNRCUnop (OpDot "count"%string) (NNRCVar x)) zero)
                                            zerof
-                                           (NNRCBinop (AForeignBinaryOp (enhanced_binary_float_op bop_float_div))
-                                                     (NNRCUnop (ADot "sum"%string) (NNRCVar x))
-                                                     (NNRCUnop (AForeignUnaryOp (enhanced_unary_float_op uop_float_of_int))
-                                                       (NNRCUnop (ADot "count"%string) (NNRCVar x))))))
+                                           (NNRCBinop (OpForeignBinary (enhanced_binary_float_op bop_float_div))
+                                                     (NNRCUnop (OpDot "sum"%string) (NNRCVar x))
+                                                     (NNRCUnop (OpForeignUnary (enhanced_unary_float_op uop_float_of_int))
+                                                       (NNRCUnop (OpDot "count"%string) (NNRCVar x))))))
             end
         in
         let mr2 :=
@@ -1080,9 +1080,9 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
 Instance enhanced_foreign_cloudant : foreign_cloudant
   := mk_foreign_cloudant
        enhanced_foreign_runtime
-       (AForeignUnaryOp (enhanced_unary_float_op uop_float_sum))
-       (AForeignUnaryOp (enhanced_unary_float_op uop_float_listmin))
-       (AForeignUnaryOp (enhanced_unary_float_op uop_float_listmax)).
+       (OpForeignUnary (enhanced_unary_float_op uop_float_sum))
+       (OpForeignUnary (enhanced_unary_float_op uop_float_listmin))
+       (OpForeignUnary (enhanced_unary_float_op uop_float_listmax)).
 
 Definition enhanced_to_cloudant_reduce_op
            (rop:enhanced_reduce_op) : CldMR.cld_reduce_op
@@ -2597,175 +2597,175 @@ Module CompEnhanced.
     Module Ops.
       Module Unary.
         Definition float_neg
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_neg).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_neg).
         Definition float_sqrt
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_sqrt).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_sqrt).
         Definition float_exp
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_exp).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_exp).
         Definition float_log
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_log).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_log).
         Definition float_log10
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_log10).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_log10).
         Definition float_of_int
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_of_int).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_of_int).
         Definition float_ceil
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_ceil).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_ceil).
         Definition float_floor
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_floor).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_floor).
         Definition float_truncate
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_truncate).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_truncate).
         Definition float_abs
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_abs).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_abs).
 
         Definition float_sum
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_sum).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_sum).
         Definition float_arithmean
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_arithmean).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_arithmean).
         Definition float_listmin
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_listmin).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_listmin).
         Definition float_listmax
-          := AForeignUnaryOp (enhanced_unary_float_op uop_float_listmax).
+          := OpForeignUnary (enhanced_unary_float_op uop_float_listmax).
 
         Definition time_to_scale
-          := AForeignUnaryOp (enhanced_unary_time_op uop_time_to_scale).
+          := OpForeignUnary (enhanced_unary_time_op uop_time_to_scale).
         Definition time_from_string
-          := AForeignUnaryOp (enhanced_unary_time_op uop_time_from_string).
+          := OpForeignUnary (enhanced_unary_time_op uop_time_from_string).
         Definition time_duration_from_string
-          := AForeignUnaryOp (enhanced_unary_time_op uop_time_duration_from_string).
+          := OpForeignUnary (enhanced_unary_time_op uop_time_duration_from_string).
 
         Definition sql_get_date_component (component:sql_date_component)
-          := AForeignUnaryOp (enhanced_unary_sql_date_op (uop_sql_get_date_component component)).
+          := OpForeignUnary (enhanced_unary_sql_date_op (uop_sql_get_date_component component)).
         Definition sql_date_from_string
-          := AForeignUnaryOp (enhanced_unary_sql_date_op uop_sql_date_from_string).
+          := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_from_string).
         Definition sql_date_interval_from_string
-          := AForeignUnaryOp (enhanced_unary_sql_date_op uop_sql_date_interval_from_string).
+          := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_interval_from_string).
 
         (* for coq style syntax *)
-        Definition AFloatNeg := float_neg.
-        Definition AFloatSqrt := float_sqrt.
-        Definition AFloatExp := float_exp.
-        Definition AFloatLog := float_log.
-        Definition AFloatLog10 := float_log10.
-        Definition AFloatOfInt := float_of_int.
-        Definition AFloatCeil := float_ceil.
-        Definition AFloatFloor := float_floor.
-        Definition AFloatTruncate := float_truncate.
-        Definition AFloatAbs := float_abs.
+        Definition OpFloatNeg := float_neg.
+        Definition OpFloatSqrt := float_sqrt.
+        Definition OpFloatExp := float_exp.
+        Definition OpFloatLog := float_log.
+        Definition OpFloatLog10 := float_log10.
+        Definition OpFloatOfInt := float_of_int.
+        Definition OpFloatCeil := float_ceil.
+        Definition OpFloatFloor := float_floor.
+        Definition OpFloatTruncate := float_truncate.
+        Definition OpFloatAbs := float_abs.
 
-        Definition AFloatSum := float_sum.
-        Definition AFloatArithMean := float_arithmean.
-        Definition AFloatListMin := float_listmin.
-        Definition AFloatListMax := float_listmax.
+        Definition OpFloatSum := float_sum.
+        Definition OpFloatArithMean := float_arithmean.
+        Definition OpFloatListMin := float_listmin.
+        Definition OpFloatListMax := float_listmax.
 
-        Definition ATimeToSscale := time_to_scale.
-        Definition ATimeFromString := time_from_string.
-        Definition ATimeDurationFromString := time_duration_from_string.
+        Definition OpTimeToSscale := time_to_scale.
+        Definition OpTimeFromString := time_from_string.
+        Definition OpTimeDurationFromString := time_duration_from_string.
 
-        Definition ASqlGetDateComponent := sql_get_date_component.
-        Definition ASqlDateFromString := sql_date_from_string.
-        Definition ASqlDateIntervalFromString := sql_date_interval_from_string.
+        Definition OpSqlGetDateComponent := sql_get_date_component.
+        Definition OpSqlDateFromString := sql_date_from_string.
+        Definition OpSqlDateIntervalFromString := sql_date_interval_from_string.
         
       End Unary.
       
       Module Binary.
         Definition float_plus
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_plus).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_plus).
         Definition float_minus
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_minus).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_minus).
         Definition float_mult 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_mult).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_mult).
         Definition float_div 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_div).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_div).
         Definition float_pow 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_pow).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_pow).
         Definition float_min 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_min).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_min).
         Definition float_max 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_max).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_max).
         Definition float_ne 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_ne).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_ne).
         Definition float_lt 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_lt).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_lt).
         Definition float_le 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_le).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_le).
         Definition float_gt 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_gt).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_gt).
         Definition float_ge 
-          := AForeignBinaryOp (enhanced_binary_float_op bop_float_ge).
+          := OpForeignBinary (enhanced_binary_float_op bop_float_ge).
 
         (* for ocaml *)
         Definition time_as
-          := AForeignBinaryOp (enhanced_binary_time_op bop_time_as).
+          := OpForeignBinary (enhanced_binary_time_op bop_time_as).
         Definition time_shift
-          := AForeignBinaryOp (enhanced_binary_time_op bop_time_shift).
+          := OpForeignBinary (enhanced_binary_time_op bop_time_shift).
         Definition time_ne 
-          := AForeignBinaryOp (enhanced_binary_time_op bop_time_ne).
+          := OpForeignBinary (enhanced_binary_time_op bop_time_ne).
         Definition time_lt 
-          := AForeignBinaryOp (enhanced_binary_time_op bop_time_lt).
+          := OpForeignBinary (enhanced_binary_time_op bop_time_lt).
         Definition time_le 
-          := AForeignBinaryOp (enhanced_binary_time_op bop_time_le).
+          := OpForeignBinary (enhanced_binary_time_op bop_time_le).
         Definition time_gt 
-          := AForeignBinaryOp (enhanced_binary_time_op bop_time_gt).
+          := OpForeignBinary (enhanced_binary_time_op bop_time_gt).
         Definition time_ge 
-          := AForeignBinaryOp (enhanced_binary_time_op bop_time_ge).
+          := OpForeignBinary (enhanced_binary_time_op bop_time_ge).
 
         Definition time_duration_from_scale 
-          := AForeignBinaryOp (enhanced_binary_time_op (bop_time_duration_from_scale)).               
+          := OpForeignBinary (enhanced_binary_time_op (bop_time_duration_from_scale)).               
         Definition time_duration_between 
-          := AForeignBinaryOp (enhanced_binary_time_op (bop_time_duration_between)).
+          := OpForeignBinary (enhanced_binary_time_op (bop_time_duration_between)).
 
         Definition sql_date_plus
-          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_plus).
+          := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_plus).
         Definition sql_date_minus
-          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_minus).
+          := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_minus).
         Definition sql_date_ne 
-          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_ne).
+          := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_ne).
         Definition sql_date_lt 
-          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_lt).
+          := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_lt).
         Definition sql_date_le 
-          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_le).
+          := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_le).
         Definition sql_date_gt 
-          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_gt).
+          := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_gt).
         Definition sql_date_ge 
-          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_ge).
+          := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_ge).
 
         Definition sql_date_interval_between 
-          := AForeignBinaryOp (enhanced_binary_sql_date_op (bop_sql_date_interval_between)).
+          := OpForeignBinary (enhanced_binary_sql_date_op (bop_sql_date_interval_between)).
         
         (* for coq style syntax *)
-        Definition AFloatPlus := float_plus.
-        Definition AFloatMinus := float_minus.
-        Definition AFloatMult  := float_mult .
-        Definition AFloatDiv  := float_div .
-        Definition AFloatPow  := float_pow .
-        Definition AFloatMin  := float_min .
-        Definition AFloatMax  := float_max .
-        Definition AFloatNe  := float_ne .
-        Definition AFloatLt  := float_lt .
-        Definition AFloatLe  := float_le .
-        Definition AFloatGt  := float_gt .
-        Definition AFloatGe  := float_ge .
+        Definition OpFloatPlus := float_plus.
+        Definition OpFloatMinus := float_minus.
+        Definition OpFloatMult  := float_mult .
+        Definition OpFloatDiv  := float_div .
+        Definition OpFloatPow  := float_pow .
+        Definition OpFloatMin  := float_min .
+        Definition OpFloatMax  := float_max .
+        Definition OpFloatNe  := float_ne .
+        Definition OpFloatLt  := float_lt .
+        Definition OpFloatLe  := float_le .
+        Definition OpFloatGt  := float_gt .
+        Definition OpFloatGe  := float_ge .
 
-        Definition ATimeAs := time_as.
-        Definition ATimeShift := time_shift.
-        Definition ATimeNe := time_ne.
-        Definition ATimeLt := time_lt.
-        Definition ATimeLe := time_le.
-        Definition ATimeGt := time_gt.
-        Definition ATimeGe := time_ge.
+        Definition OpTimeAs := time_as.
+        Definition OpTimeShift := time_shift.
+        Definition OpTimeNe := time_ne.
+        Definition OpTimeLt := time_lt.
+        Definition OpTimeLe := time_le.
+        Definition OpTimeGt := time_gt.
+        Definition OpTimeGe := time_ge.
 
-        Definition ATimeDurationFromScale := time_duration_from_scale.
-        Definition ATimeDurationBetween := time_duration_between.
+        Definition OpTimeDurationFromScale := time_duration_from_scale.
+        Definition OpTimeDurationBetween := time_duration_between.
 
-        Definition ASqlDatePlus := sql_date_plus.
-        Definition ASqlDateMinus := sql_date_minus.
-        Definition ASqlDateNe := sql_date_ne.
-        Definition ASqlDateLt := sql_date_lt.
-        Definition ASqlDateLe := sql_date_le.
-        Definition ASqlDateGt := sql_date_gt.
-        Definition ASqlDateGe := sql_date_ge.
+        Definition OpSqlDatePlus := sql_date_plus.
+        Definition OpSqlDateMinus := sql_date_minus.
+        Definition OpSqlDateNe := sql_date_ne.
+        Definition OpSqlDateLt := sql_date_lt.
+        Definition OpSqlDateLe := sql_date_le.
+        Definition OpSqlDateGt := sql_date_gt.
+        Definition OpSqlDateGe := sql_date_ge.
 
-        Definition ASqlDateIntervalBetween := sql_date_interval_between.
+        Definition OpSqlDateIntervalBetween := sql_date_interval_between.
 
       End Binary.
     End Ops.

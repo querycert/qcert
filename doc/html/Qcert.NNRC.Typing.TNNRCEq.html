@@ -33,13 +33,13 @@
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>}.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> (<span class="id">e1</span> <span class="id">e2</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) : <span class="kwd">Prop</span> :=<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (τ<span class="id">cenv</span> τ<span class="id">env</span> : <span class="id"><a href="Qcert.Common.Typing.TBindings.html#tbindings">tbindings</a></span>) (τ<span class="id">out</span>:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (τ<span class="id">cenv</span> τ<span class="id">env</span> : <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#tbindings">tbindings</a></span>) (τ<span class="id">out</span>:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#nnrc_type">nnrc_type</a></span> τ<span class="id">cenv</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e1">e1</a></span> τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#nnrc_type">nnrc_type</a></span> τ<span class="id">cenv</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e2">e2</a></span> τ<span class="id">out</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ (<span class="kwd">forall</span> (<span class="id">cenv</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>),<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#cenv">cenv</a></span> τ<span class="id">cenv</span> -&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#cenv">cenv</a></span> τ<span class="id">cenv</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_eval">nnrc_eval</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e1">e1</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= @<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_eval">nnrc_eval</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e2">e2</a></span>).<br/>
 <br/>
@@ -48,24 +48,24 @@
 &nbsp;&nbsp;<span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">nnrc_scope</span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_normalized_bindings_type_map">data_normalized_bindings_type_map</a></span> <span class="id">env</span> τ<span class="id">env</span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2466')">Proof.</div>
-<div class="proofscript" id="proof2466">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Typing.TData.html#Forall_map">Forall_map</a></span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type_Forall_normalized">bindings_type_Forall_normalized</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2490')">Proof.</div>
+<div class="proofscript" id="proof2490">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.DataTyping.TData.html#Forall_map">Forall_map</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type_Forall_normalized">bindings_type_Forall_normalized</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">data_normalized_bindings_type_map</span>.<br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrc_rewrites_typed_with_untyped">nnrc_rewrites_typed_with_untyped</a></span> (<span class="id">e1</span> <span class="id">e2</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e1">e1</a></span> ≡ᶜ <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e2">e2</a></span> -&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> {τ<span class="id">cenv</span>: <span class="id"><a href="Qcert.Common.Typing.TBindings.html#tbindings">tbindings</a></span>}<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ<span class="id">env</span>: <span class="id"><a href="Qcert.Common.Typing.TBindings.html#tbindings">tbindings</a></span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> {τ<span class="id">cenv</span>: <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#tbindings">tbindings</a></span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ<span class="id">env</span>: <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#tbindings">tbindings</a></span>}<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ<span class="id">out</span>:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>}, <span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#nnrc_type">nnrc_type</a></span> τ<span class="id">cenv</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e1">e1</a></span> τ<span class="id">out</span> -&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#nnrc_type">nnrc_type</a></span> τ<span class="id">cenv</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e2">e2</a></span> τ<span class="id">out</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;-&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e1">e1</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e2">e2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2467')">Proof.</div>
-<div class="proofscript" id="proof2467">
+<div class="toggleproof" onclick="toggleDisplay('proof2491')">Proof.</div>
+<div class="proofscript" id="proof2491">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">auto</span> 2; <span class="tactic">intros</span>.<br/>
@@ -74,12 +74,12 @@
 <br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#nnrc_core_type">nnrc_core_type</a></span>.<br/>
-&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#unaryOp_type">unaryOp_type</a></span>.<br/>
-&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#binOp_type">binOp_type</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#unary_op_type">unary_op_type</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#binary_op_type">binary_op_type</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tnnrc_rewrites_to_pre">tnnrc_rewrites_to_pre</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2468')">Proof.</div>
-<div class="proofscript" id="proof2468">
+<div class="toggleproof" onclick="toggleDisplay('proof2492')">Proof.</div>
+<div class="proofscript" id="proof2492">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">assumption</span>; <span class="tactic">intros</span>.<br/>
@@ -94,12 +94,11 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H3</span> <span class="id">cenv</span> <span class="id">env</span>); <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
-&nbsp;&nbsp;<br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_get_constant_tproper">nnrc_get_constant_tproper</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCGetConstant">tproper_NNRCGetConstant</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCGetConstant">NNRCGetConstant</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2469')">Proof.</div>
-<div class="proofscript" id="proof2469">
+<div class="toggleproof" onclick="toggleDisplay('proof2493')">Proof.</div>
+<div class="proofscript" id="proof2493">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
@@ -107,10 +106,10 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_var_tproper">nnrc_var_tproper</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCVar">tproper_NNRCVar</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCVar">NNRCVar</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2470')">Proof.</div>
-<div class="proofscript" id="proof2470">
+<div class="toggleproof" onclick="toggleDisplay('proof2494')">Proof.</div>
+<div class="proofscript" id="proof2494">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
@@ -118,10 +117,10 @@
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_const_tproper">nnrc_const_tproper</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCConst">tproper_NNRCConst</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCConst">NNRCConst</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2471')">Proof.</div>
-<div class="proofscript" id="proof2471">
+<div class="toggleproof" onclick="toggleDisplay('proof2495')">Proof.</div>
+<div class="proofscript" id="proof2495">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
@@ -129,12 +128,12 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_binop_tproper">nnrc_binop_tproper</a></span>:<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCBinop">tproper_NNRCBinop</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCBinop">NNRCBinop</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2472')">Proof.</div>
-<div class="proofscript" id="proof2472">
+<div class="toggleproof" onclick="toggleDisplay('proof2496')">Proof.</div>
+<div class="proofscript" id="proof2496">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H</span> <span class="kwd">in</span> *; <span class="tactic">clear</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H2</span>; <span class="tactic">clear</span> <span class="id">H2</span>; <span class="tactic">subst</span>.<br/>
@@ -151,10 +150,10 @@
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_unop_tproper">nnrc_unop_tproper</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCUnop">tproper_NNRCUnop</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCUnop">NNRCUnop</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2473')">Proof.</div>
-<div class="proofscript" id="proof2473">
+<div class="toggleproof" onclick="toggleDisplay('proof2497')">Proof.</div>
+<div class="proofscript" id="proof2497">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H</span> <span class="kwd">in</span> *; <span class="tactic">clear</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H1</span>; <span class="tactic">clear</span> <span class="id">H1</span>; <span class="tactic">subst</span>.<br/>
@@ -168,10 +167,10 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_let_tproper">nnrc_let_tproper</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCLet">tproper_NNRCLet</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCLet">NNRCLet</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2474')">Proof.</div>
-<div class="proofscript" id="proof2474">
+<div class="toggleproof" onclick="toggleDisplay('proof2498')">Proof.</div>
+<div class="proofscript" id="proof2498">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_eval">nnrc_eval</a></span>,<span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#nnrc_type">nnrc_type</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H2</span>; <span class="tactic">clear</span> <span class="id">H2</span>; <span class="tactic">subst</span>.<br/>
@@ -184,7 +183,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">cenv</span> <span class="id">env</span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_to_nnrc_base">nnrc_to_nnrc_base</a></span> <span class="id">y0</span>));<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H2</span> <span class="id">cenv</span> ((<span class="id">y</span>, <span class="id">d</span>) :: <span class="id">env</span>) <span class="id">H3</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_cons">Forall2_cons</a></span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (@<span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#typed_nnrc_yields_typed_data">typed_nnrc_yields_typed_data</a></span> <span class="id">_</span> τ<span class="id">cenv</span> τ₁ <span class="id">cenv</span> <span class="id">env</span> τ<span class="id">env</span> <span class="id">y0</span> <span class="id">H3</span> <span class="id">H4</span> <span class="id">H</span>); <span class="tactic">intros</span>.<br/>
@@ -194,16 +193,16 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H5</span> <span class="kwd">in</span> <span class="id">H7</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H7</span>; <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
-&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dcoll_wt">dcoll_wt</a></span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) (τ<span class="id">cenv</span> τ<span class="id">env</span>:<span class="id"><a href="Qcert.Common.Typing.TBindings.html#tbindings">tbindings</a></span>) (<span class="id">cenv</span> <span class="id">env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>) (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>):<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#cenv">cenv</a></span> τ<span class="id">cenv</span> -&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dcoll_wt">dcoll_wt</a></span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) (τ<span class="id">cenv</span> τ<span class="id">env</span>:<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#tbindings">tbindings</a></span>) (<span class="id">cenv</span> <span class="id">env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>) (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>):<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#cenv">cenv</a></span> τ<span class="id">cenv</span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#nnrc_core_type">nnrc_core_type</a></span> τ<span class="id">cenv</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e">e</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#env">env</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#e">e</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#l">l</a></span>) -&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#l">l</a></span> -&gt; (<span class="id"><a href="Qcert.Common.Typing.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> τ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2475')">Proof.</div>
-<div class="proofscript" id="proof2475">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#l">l</a></span> -&gt; (<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> τ).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2499')">Proof.</div>
+<div class="proofscript" id="proof2499">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#typed_nnrc_core_yields_typed_data">typed_nnrc_core_yields_typed_data</a></span> <span class="id">_</span> τ<span class="id">cenv</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ) <span class="id">cenv</span> <span class="id">env</span> τ<span class="id">env</span> <span class="id">e</span> <span class="id">H</span> <span class="id">H0</span> <span class="id">H1</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H4</span>; <span class="tactic">clear</span> <span class="id">H4</span>; <span class="tactic">intros</span>.<br/>
@@ -218,10 +217,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id">H2</span> <span class="id">x0</span> <span class="id">H3</span>).<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_for_tproper">nnrc_for_tproper</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCFor">tproper_NNRCFor</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCFor">NNRCFor</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2476')">Proof.</div>
-<div class="proofscript" id="proof2476">
+<div class="toggleproof" onclick="toggleDisplay('proof2500')">Proof.</div>
+<div class="proofscript" id="proof2500">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H2</span>; <span class="tactic">clear</span> <span class="id">H2</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H0</span> τ<span class="id">cenv</span> τ<span class="id">env</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₁) <span class="id">H8</span>); <span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">clear</span> <span class="id">H0</span> <span class="id">H8</span>; <span class="tactic">intros</span>.<br/>
@@ -234,13 +233,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">cenv</span> <span class="id">env</span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_to_nnrc_base">nnrc_to_nnrc_base</a></span> <span class="id">y0</span>));<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="kwd">forall</span> <span class="id">x</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> <span class="id">l</span> -&gt; (<span class="id"><a href="Qcert.Common.Typing.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> τ₁))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="kwd">forall</span> <span class="id">x</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> <span class="id">l</span> -&gt; (<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> τ₁))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">by</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="tactic">apply</span> (<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#dcoll_wt">dcoll_wt</a></span> <span class="id">l</span> τ₁ τ<span class="id">cenv</span> τ<span class="id">env</span> <span class="id">cenv</span> <span class="id">env</span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_to_nnrc_base">nnrc_to_nnrc_base</a></span> <span class="id">y0</span>)); <span class="tactic">assumption</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H5</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="kwd">forall</span> <span class="id">x</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> <span class="id">l</span> -&gt; <span class="id"><a href="Qcert.Common.Typing.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> τ₁)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="kwd">forall</span> <span class="id">x</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> <span class="id">l</span> -&gt; <span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#x">x</a></span> τ₁)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">by</span> (<span class="tactic">intros</span>; <span class="tactic">apply</span> (<span class="id">H6</span> <span class="id">x</span>); <span class="id">right</span>; <span class="tactic">assumption</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHl</span> <span class="id">H</span>); <span class="tactic">clear</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H2</span> <span class="id">cenv</span> ((<span class="id">y</span>, <span class="id">a</span>) :: <span class="id">env</span>) <span class="id">H3</span>).<br/>
@@ -248,19 +247,18 @@
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> ((<span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap">rmap</a></span> (<span class="kwd">fun</span> <span class="id">d1</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> =&gt; <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">cenv</span> ((<span class="id">y</span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#d1">d1</a></span>) :: <span class="id">env</span>) (<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_to_nnrc_base">nnrc_to_nnrc_base</a></span> <span class="id">x1</span>)) <span class="id">l</span>));<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> ((<span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap">rmap</a></span> (<span class="kwd">fun</span> <span class="id">d1</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> =&gt; <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">cenv</span> ((<span class="id">y</span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#d1">d1</a></span>) :: <span class="id">env</span>) (<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_to_nnrc_base">nnrc_to_nnrc_base</a></span> <span class="id">y1</span>)) <span class="id">l</span>));<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_cons">Forall2_cons</a></span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id">H6</span> <span class="id">a</span>); <span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
-<br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_if_tproper">nnrc_if_tproper</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCIf">tproper_NNRCIf</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCIf">NNRCIf</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2477')">Proof.</div>
-<div class="proofscript" id="proof2477">
+<div class="toggleproof" onclick="toggleDisplay('proof2501')">Proof.</div>
+<div class="proofscript" id="proof2501">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H2</span>; <span class="tactic">clear</span> <span class="id">H2</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> τ<span class="id">cenv</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span> <span class="id">H7</span>); <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">clear</span> <span class="id">H</span> <span class="id">H7</span>; <span class="tactic">intros</span>.<br/>
@@ -274,13 +272,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-<br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_either_tproper">nnrc_either_tproper</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCEither">tproper_NNRCEither</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCEither">NNRCEither</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2478')">Proof.</div>
-<div class="proofscript" id="proof2478">
+<div class="toggleproof" onclick="toggleDisplay('proof2502')">Proof.</div>
+<div class="proofscript" id="proof2502">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_eval">nnrc_eval</a></span>,<span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#nnrc_type">nnrc_type</a></span> <span class="kwd">in</span> *; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
@@ -295,18 +292,17 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H2</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#typed_nnrc_core_yields_typed_data">typed_nnrc_core_yields_typed_data</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">H</span> <span class="id">H1</span> <span class="id">H0</span>) <span class="kwd">as</span> [?[??]].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H3</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TData.html#data_type_Either_inv">data_type_Either_inv</a></span> <span class="kwd">in</span> <span class="id">H8</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type_Either_inv">data_type_Either_inv</a></span> <span class="kwd">in</span> <span class="id">H8</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">H8</span> <span class="kwd">as</span> [[?[??]]|[?[??]]]; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (<span class="id">H5</span> <span class="id">_</span> <span class="id">_</span> <span class="id">H</span>). <span class="id">constructor</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">eapply</span> (<span class="id">H7</span> <span class="id">_</span> <span class="id">_</span> <span class="id">H</span>). <span class="id">constructor</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="group_by_macro_eq">group_by_macro_eq</a></span> <span class="id">g</span> <span class="id">sl</span> <span class="id">n1</span> <span class="id">n2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCGroupBy">NNRCGroupBy</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#g">g</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#sl">sl</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#n1">n1</a></span> ⇒ᶜ <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCGroupBy">NNRCGroupBy</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#g">g</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#sl">sl</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#n2">n2</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;-&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_group_by">nnrc_group_by</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#g">g</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#sl">sl</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#n1">n1</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_group_by">nnrc_group_by</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#g">g</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#sl">sl</a></span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#n2">n2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2479')">Proof.</div>
-<div class="proofscript" id="proof2479">
+<div class="toggleproof" onclick="toggleDisplay('proof2503')">Proof.</div>
+<div class="proofscript" id="proof2503">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_group_by">nnrc_group_by</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRC.html#nnrc_type">nnrc_type</a></span> <span class="kwd">in</span> *.<br/>
@@ -317,10 +313,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Transparent</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_group_by">nnrc_group_by</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_groupby_tproper">nnrc_groupby_tproper</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tproper_NNRCGroupBy">tproper_NNRCGroupBy</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> ==&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span>) <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCGroupBy">NNRCGroupBy</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2480')">Proof.</div>
-<div class="proofscript" id="proof2480">
+<div class="toggleproof" onclick="toggleDisplay('proof2504')">Proof.</div>
+<div class="proofscript" id="proof2504">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#group_by_macro_eq">group_by_macro_eq</a></span>.<br/>

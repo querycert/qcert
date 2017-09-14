@@ -30,15 +30,15 @@ Section OQLSugar.
     match el with
     | nil => OConst (drec nil)
     | (s0,x) :: rest =>
-      let init_rec := OUnop (ARec s0) x in
+      let init_rec := OUnop (OpRec s0) x in
       let proc_one (e:string * oql_expr) acc :=
-          OBinop AConcat (OUnop (ARec (fst e)) (snd e)) acc
+          OBinop OpRecConcat (OUnop (OpRec (fst e)) (snd e)) acc
       in
       fold_right proc_one init_rec rest
     end.
 
-  Definition ODot (s:string) (e:oql_expr) := OUnop (ADot s) e.
-  Definition OArrow (s:string) (e:oql_expr) := OUnop (ADot s) (OUnop AUnbrand e).
+  Definition ODot (s:string) (e:oql_expr) := OUnop (OpDot s) e.
+  Definition OArrow (s:string) (e:oql_expr) := OUnop (OpDot s) (OUnop OpUnbrand e).
   
   (* replaces free variables by table lookups -- used in parser *)
   Definition tableify_one_var (e:oql_expr) (v:string) : oql_expr :=

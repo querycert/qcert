@@ -47,32 +47,32 @@ Section cNRAEnvtocNNRC.
         NNRCFor t nnrc2 (nraenv_core_to_nnrc_core op1 t varenv)
       (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1,venv } | t1 ∈ [[ op2 ]]_vid,venv } *)
-      | ANMapConcat op1 op2 =>
+      | ANMapProduct op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in
-        NNRCUnop AFlatten
+        NNRCUnop OpFlatten
                 (NNRCFor t1 nnrc2
                         (NNRCFor t2 (nraenv_core_to_nnrc_core op1 t1 varenv)
-                                ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                                ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
       (* [[ op1 × op2 ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_vid,venv } | t1 ∈ [[ op1 ]]_vid,venv } *)
       | ANProduct op1 op2 =>
         let nnrc1 := (nraenv_core_to_nnrc_core op1 varid varenv) in
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let (t1,t2) := fresh_var2 "tprod$" "tprod$" (varid::varenv::nil) in
-        NNRCUnop AFlatten
+        NNRCUnop OpFlatten
                 (NNRCFor t1 nnrc1
                         (NNRCFor t2 nnrc2
-                                ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                                ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
       (* [[ σ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ if [[ op1 ]]_t1,venv then { t1 } else {} | t1 ∈ [[ op2 ]]_vid,venv } *)
       | ANSelect op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tsel$" (varid::varenv::nil) in
         let nnrc1 := (nraenv_core_to_nnrc_core op1 t varenv) in
-        NNRCUnop AFlatten
+        NNRCUnop OpFlatten
                 (NNRCFor t nnrc2
-                        (NNRCIf nnrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
+                        (NNRCIf nnrc1 (NNRCUnop OpBag (NNRCVar t)) (NNRCConst (dcoll nil))))
       (* [[ op1 ∥ op2 ]]_vid,venv == let t := [[ op1 ]]_vid,venv in
                                        if (t = {})
                                        then [[ op2 ]]_vid,venv
@@ -82,9 +82,9 @@ Section cNRAEnvtocNNRC.
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tdef$" (varid::varenv::nil) in
         (NNRCLet t nnrc1
-                (NNRCIf (NNRCBinop AEq
+                (NNRCIf (NNRCBinop OpEqual
                                  (NNRCVar t)
-                                 (NNRCUnop AFlatten (NNRCConst (dcoll nil))))
+                                 (NNRCUnop OpFlatten (NNRCConst (dcoll nil))))
                        nnrc2 (NNRCVar t)))
       (* [[ op1 ◯ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
                                      in [[ op1 ]]_t,venv *)
@@ -98,8 +98,11 @@ Section cNRAEnvtocNNRC.
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tec$" (varid::varenv::nil) in 
         NNRCLet t nnrc2
-        (NNRCEither nnrc1 varid (NNRCUnop ALeft (NNRCBinop AConcat (NNRCVar varid) (NNRCVar t)))
-                  varid (NNRCUnop ARight (NNRCBinop AConcat (NNRCVar varid) (NNRCVar t))))
+                (NNRCEither nnrc1
+                            varid (NNRCUnop OpLeft
+                                            (NNRCBinop OpRecConcat (NNRCVar varid) (NNRCVar t)))
+                            varid (NNRCUnop OpRight
+                                            (NNRCBinop OpRecConcat (NNRCVar varid) (NNRCVar t))))
       | ANApp op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tapp$" (varid::varenv::nil) in
@@ -177,7 +180,7 @@ Section cNRAEnvtocNNRC.
       destruct d; try reflexivity.
       rewrite (map_sem_correct h op1 cenv denv l); trivial.
       prove_fresh_nin.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       rewrite (IHop2 did denv env vid venv H); trivial.
       repeat (dest_eqdec; try congruence).
       prove_fresh_nin.
@@ -187,7 +190,7 @@ Section cNRAEnvtocNNRC.
         autorewrite with alg in *;
         apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop1 a denv) at 1; clear IHop1; try assumption; simpl; auto 3.
@@ -222,7 +225,7 @@ Section cNRAEnvtocNNRC.
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop2 did denv _ vid venv) at 1; clear IHop2; trivial; try congruence.
@@ -381,7 +384,7 @@ Section cNRAEnvtocNNRC.
       + auto.
       + apply remove_inv in H.
         destruct (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv v); intuition.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       intros vid venv v.
       Opaque fresh_var2.
       simpl.
@@ -546,7 +549,7 @@ Section cNRAEnvtocNNRC.
     Proof.
       revert vid venv.
       nraenv_core_cases (induction q) Case; intros; simpl; auto.
-      - Case "ANMapConcat"%string.
+      - Case "ANMapProduct"%string.
         destruct (fresh_var2 "tmc$" "tmc$" (vid :: venv :: nil));simpl.
         auto.
       - Case "ANProduct"%string.

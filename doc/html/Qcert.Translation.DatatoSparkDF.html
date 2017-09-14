@@ -21,7 +21,7 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="kwd">Types</span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
-<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html">ForeignDataTyping</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html">ForeignDataTyping</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Translation.NNRCtoJavaScript.html">NNRCtoJavaScript</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.JSON.ForeignToJSON.html">ForeignToJSON</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.JSON.JSON.html">JSON</a></span>.<br/>
@@ -34,7 +34,7 @@
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">h</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_t">brand_relation_t</a></span>}.<br/>
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fttojs</span>: <span class="id"><a href="Qcert.Translation.ForeignToJavaScript.html#foreign_to_javascript">ForeignToJavaScript.foreign_to_javascript</a></span>}.<br/>
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ftype</span>:<span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span>}.<br/>
-&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fdtyping</span>:<span class="id"><a href="Qcert.Common.Typing.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fdtyping</span>:<span class="id"><a href="Qcert.Common.DataTyping.ForeignDataTyping.html#foreign_data_typing">foreign_data_typing</a></span>}.<br/>
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>}.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="data_to_blob">data_to_blob</a></span> (<span class="id">d</span>: <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>): <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> :=<br/>
@@ -42,8 +42,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dataToJS_correctly_escapes_quote_inside_string">dataToJS_correctly_escapes_quote_inside_string</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.NNRCtoJavaScript.html#dataToJS">dataToJS</a></span> """" (<span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">abc</span>""<span class="id">cde</span>") = """<span class="id">abc</span>\""<span class="id">cde</span>"""%<span class="id">string</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3033')">Proof.</div>
-<div class="proofscript" id="proof3033">
+<div class="toggleproof" onclick="toggleDisplay('proof2990')">Proof.</div>
+<div class="proofscript" id="proof2990">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">vm_compute</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -128,8 +128,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"{""<span class="id">age</span>"": 35, ""<span class="id">name</span>"": ""<span class="id">Fred</span>"", ""<span class="id">friends</span>"": [{""<span class="id">type</span>"": [""<span class="id">Person</span>""], ""<span class="id">data</span>"": {""<span class="id">age</span>"": 42, ""<span class="id">name</span>"": ""<span class="id">Berta</span>"", ""<span class="id">friends</span>"": []}}]}")<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("$<span class="id">type</span>"%<span class="id">string</span>, <span class="id"><a href="Qcert.Common.JSON.JSON.html#jarray">jarray</a></span> (<span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span> "<span class="id">Person</span>" :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3034')">Proof.</div>
-<div class="proofscript" id="proof3034">
+<div class="toggleproof" onclick="toggleDisplay('proof2991')">Proof.</div>
+<div class="proofscript" id="proof2991">
  <span class="id">vm_compute</span>. <span class="tactic">reflexivity</span>. Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="test_json_with_nested_brand">test_json_with_nested_brand</a></span>:<br/>
@@ -155,8 +155,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.JSON.JSON.html#jobject">jobject</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(("$<span class="id">data</span>"%<span class="id">string</span>, <span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span> "{""<span class="id">age</span>"": 42, ""<span class="id">name</span>"": ""<span class="id">Berta</span>"", ""<span class="id">friends</span>"": []}")<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("$<span class="id">type</span>"%<span class="id">string</span>, <span class="id"><a href="Qcert.Common.JSON.JSON.html#jarray">jarray</a></span> (<span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span> "<span class="id">Person</span>" :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3035')">Proof.</div>
-<div class="proofscript" id="proof3035">
+<div class="toggleproof" onclick="toggleDisplay('proof2992')">Proof.</div>
+<div class="proofscript" id="proof2992">
  <span class="id">vm_compute</span>. <span class="tactic">reflexivity</span>. Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ftojson</span>:<span class="id"><a href="Qcert.Common.JSON.ForeignToJSON.html#foreign_to_JSON">foreign_to_JSON</a></span>}.<br/>

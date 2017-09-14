@@ -65,8 +65,8 @@
 &nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">nraenv_core_ctxt_scope</span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envctxt_and_comm_ctxt">envctxt_and_comm_ctxt</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;$2 ∧ $1 ≡ₑ $1 ∧ $2.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2085')">Proof.</div>
-<div class="proofscript" id="proof2085">
+<div class="toggleproof" onclick="toggleDisplay('proof2110')">Proof.</div>
+<div class="proofscript" id="proof2110">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#ctxt_and_comm_ctxt">ctxt_and_comm_ctxt</a></span>; <span class="tactic">intros</span> <span class="id">pf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.cNRAEnv.Context.cNRAEnvContextLift.html#lift_nra_context_proper">lift_nra_context_proper</a></span> <span class="kwd">in</span> <span class="id">pf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">pf</span>; <span class="tactic">trivial</span>.<br/>
@@ -74,24 +74,24 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ctxt_envunion_assoc">ctxt_envunion_assoc</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;($1 ⋃ $2) ⋃ $3 ≡ₑ $1 ⋃ ($2 ⋃ $3).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2086')">Proof.</div>
-<div class="proofscript" id="proof2086">
+<div class="toggleproof" onclick="toggleDisplay('proof2111')">Proof.</div>
+<div class="proofscript" id="proof2111">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl_ctxt_equiv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#envunion_assoc">envunion_assoc</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ctxt_app_over_merge">ctxt_app_over_merge</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">ENV</span> ⊗ $1) ◯ $2 ≡ₑ <span class="id">ENV</span> ⊗ ($1 ◯ $2).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2087')">Proof.</div>
-<div class="proofscript" id="proof2087">
+<div class="toggleproof" onclick="toggleDisplay('proof2112')">Proof.</div>
+<div class="proofscript" id="proof2112">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">simpl_ctxt_equiv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvRewrite.html#app_over_merge">app_over_merge</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="envctxt_select_union_distr">envctxt_select_union_distr</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;σ⟨ $0 ⟩($1 ⋃ $2) ≡ₑ σ⟨ $0 ⟩($1) ⋃ σ⟨ $0 ⟩($2).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2088')">Proof.</div>
-<div class="proofscript" id="proof2088">
+<div class="toggleproof" onclick="toggleDisplay('proof2113')">Proof.</div>
+<div class="proofscript" id="proof2113">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.NRA.Optim.NRARewriteContext.html#ctxt_select_union_distr">ctxt_select_union_distr</a></span>; <span class="tactic">intros</span> <span class="id">pf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.cNRAEnv.Context.cNRAEnvContextLift.html#lift_nra_context_proper">lift_nra_context_proper</a></span> <span class="kwd">in</span> <span class="id">pf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">pf</span>; <span class="tactic">trivial</span>.<br/>

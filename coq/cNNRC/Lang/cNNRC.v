@@ -61,12 +61,12 @@ Section cNNRC.
     | NNRCGetConstant : var -> nnrc                           (**r global variable lookup ([$$v]) *)
     | NNRCVar : var -> nnrc                                   (**r local variable lookup ([$v])*)
     | NNRCConst : data -> nnrc                                (**r constant data ([d]) *)
-    | NNRCBinop : binOp -> nnrc -> nnrc -> nnrc               (**r binary operator ([e₁ ⊠ e₂]) *)
-    | NNRCUnop : unaryOp -> nnrc -> nnrc                      (**r unary operator ([⊞ e]) *)
+    | NNRCBinop : binary_op -> nnrc -> nnrc -> nnrc           (**r binary operator ([e₁ ⊠ e₂]) *)
+    | NNRCUnop : unary_op -> nnrc -> nnrc                     (**r unary operator ([⊞ e]) *)
     | NNRCLet : var -> nnrc -> nnrc -> nnrc                   (**r let expression ([let $v := e₁ in e₂]) *)
     | NNRCFor : var -> nnrc -> nnrc -> nnrc                   (**r for loop ([{ e₂ | $v in e₁ }]) *)
     | NNRCIf : nnrc -> nnrc -> nnrc -> nnrc                   (**r conditional ([e₁ ? e₂ : e₃]) *)
-    | NNRCEither : nnrc -> var -> nnrc -> var -> nnrc -> nnrc (**r case expression ([either e left v₁ : e₁ | right v₂ : e₂]) *)
+    | NNRCEither : nnrc -> var -> nnrc -> var -> nnrc -> nnrc (**r case expression ([either e left $v₁ : e₁ | right $v₂ : e₂]) *)
     | NNRCGroupBy : string -> list string -> nnrc -> nnrc.    (**r group by expression ([e groupby g fields]) -- only in full NNRC *)
 
     (** The [nnrcIsCore] predicate defines what fragment is part of
@@ -117,7 +117,7 @@ Section cNNRC.
     Proof.
       change (forall x y : nnrc,  {x = y} + {x <> y}).
       decide equality;
-        try solve [apply binOp_eqdec | apply unaryOp_eqdec
+        try solve [apply binary_op_eqdec | apply unary_op_eqdec
                    | apply data_eqdec | apply string_eqdec].
       - decide equality; apply string_dec.
     Defined.
@@ -142,71 +142,72 @@ Section cNNRC.
 
     (** ** Denotational Semantics *)
 
-    (** The semantics is defined using the main judgment [Γc ; Γ ⊢〚e〛⇓ d]
-    ([nnrc_core_sem]) where [Γc] is the global environment, [Γ] is the
-    local environment, [e] the expression and [d] the resulting value. *)
+    (** The semantics is defined using the main judgment [Γc ; Γ ⊢〚e
+    〛⇓ d] ([nnrc_core_sem]) where [Γc] is the global environment, [Γ]
+    is the local environment, [e] the cNNRC expression and [d] the
+    resulting value. *)
     
     (** Conditionals and matching expressions only evaluate one of
     their branches. The auxiliary judgment [Γc ; Γ ; v ; c₁ ⊢ 〚e〛φ ⇓ c₂]
     ([nnrc_core_sem_for]) is used in the definition of [for]
     expressions. *)
     
-    Section DenoteSemantics.
+    Section Denotation.
       Inductive nnrc_core_sem: bindings -> nnrc -> data -> Prop :=
-      | sem_NNRCGetConstant: forall env v d,
+      | sem_cNNRCGetConstant : forall env v d,
           edot constant_env v = Some d ->                 (**r   [Γc(v) = d] *)
           nnrc_core_sem env (NNRCGetConstant v) d         (**r ⇒ [Γc ; Γ ⊢〚$$v〛⇓ d] *)
-      | sem_NNRCVar: forall env v d,
+      | sem_cNNRCVar : forall env v d,
           lookup equiv_dec env v = Some d ->              (**r   [Γ(v) = d] *)
           nnrc_core_sem env (NNRCVar v) d                 (**r ⇒ [Γc ; Γ ⊢〚$v〛⇓ d] *)
-      | sem_NNRCConst: forall env d1 d2,
+      | sem_cNNRCConst : forall env d1 d2,
           normalize_data h d1 = d2 ->                     (**r   [norm(d₁) = d₂] *)
           nnrc_core_sem env (NNRCConst d1) d2             (**r ⇒ [Γc ; Γ ⊢〚d₁〛⇓ d₂] *)
-      | sem_NNRCBinop: forall bop env e1 e2 d1 d2 d3,
+      | sem_cNNRCBinop : forall bop env e1 e2 d1 d2 d3,
           nnrc_core_sem env e1 d1 ->                      (**r   [Γc ; Γ ⊢〚e₁〛⇓ d₁] *)
           nnrc_core_sem env e2 d2 ->                      (**r ∧ [Γc ; Γ ⊢〚e₂〛⇓ d₂] *)
-          fun_of_binop h bop d1 d2 = Some d3 ->           (**r ∧ [d₁ ⊠ d₂ = d₃] *)
+          binary_op_eval h bop d1 d2 = Some d3 ->         (**r ∧ [d₁ ⊠ d₂ = d₃] *)
           nnrc_core_sem env (NNRCBinop bop e1 e2) d3      (**r ⇒ [Γc ; Γ ⊢〚e₁ ⊠ e₂〛⇓ d₃] *)
-      | sem_NNRCUnop: forall uop env e d1 d2,
+      | sem_cNNRCUnop : forall uop env e d1 d2,
           nnrc_core_sem env e d1 ->                       (**r   [Γc ; Γ ⊢〚e〛⇓ d₁] *)
-          fun_of_unaryop h uop d1 = Some d2 ->            (**r ∧ [⊞ d₁ = d₂] *)
+          unary_op_eval h uop d1 = Some d2 ->             (**r ∧ [⊞ d₁ = d₂] *)
           nnrc_core_sem env (NNRCUnop uop e) d2           (**r ⇒ [Γc ; Γ ⊢〚⊞ e〛⇓ d₂] *)
-      | sem_NNRCLet: forall env e1 v e2 d1 d2,
+      | sem_cNNRCLet : forall env e1 v e2 d1 d2,
           nnrc_core_sem env e1 d1 ->                      (**r   [Γc ; Γ ⊢〚e₁〛⇓ d₁] *)
           nnrc_core_sem ((v,d1)::env) e2 d2 ->            (**r ∧ [Γc ; (v,d₁),Γ ⊢〚e₂〛⇓ d₂] *)
-          nnrc_core_sem env (NNRCLet v e1 e2) d2          (**r ⇒ [Γc ; Γ ⊢〚let v := e₁ in e₂〛⇓ d₂] *)
-      | sem_NNRCFor: forall env e1 v e2 c1 c2,
+          nnrc_core_sem env (NNRCLet v e1 e2) d2          (**r ⇒ [Γc ; Γ ⊢〚let 4v := e₁ in e₂〛⇓ d₂] *)
+      | sem_cNNRCFor : forall env e1 v e2 c1 c2,
           nnrc_core_sem env e1 (dcoll c1) ->              (**r   [Γc ; Γ ⊢〚e₁〛= {c₁}] *)
           nnrc_core_sem_for v env e2 c1 c2 ->             (**r ∧ [Γc ; Γ ; v ; {c₁} ⊢〚e₂〛φ ⇓ {c₂}] *)
-          nnrc_core_sem env (NNRCFor v e1 e2) (dcoll c2)  (**r ⇒ [Γc ; Γ ⊢ 〚for v := e₁ in e₂〛⇓ {c₂}] *)
-      | sem_NNRCIf_true: forall env e1 e2 e3 d,
+          nnrc_core_sem env (NNRCFor v e1 e2) (dcoll c2)  (**r ⇒ [Γc ; Γ ⊢ 〚{ e₂ | $v in e₁ }〛⇓ {c₂}] *)
+      | sem_cNNRCIf_true : forall env e1 e2 e3 d,
           nnrc_core_sem env e1 (dbool true) ->            (**r   [Γc ; Γ ⊢〚e₁〛⇓ true] *)
           nnrc_core_sem env e2 d ->                       (**r ∧ [Γc ; Γ ⊢〚e₂〛⇓ d] *)
           nnrc_core_sem env (NNRCIf e1 e2 e3) d           (**r ⇒ [Γc ; Γ ⊢〚e₁ ? e₂ : e₃〛⇓ d] *)
-      | sem_NNRCIf_false: forall env e1 e2 e3 d,
+      | sem_cNNRCIf_false : forall env e1 e2 e3 d,
           nnrc_core_sem env e1 (dbool false) ->           (**r   [Γc ; Γ ⊢〚e₁〛⇓ false] *)
           nnrc_core_sem env e3 d ->                       (**r ∧ [Γc ; Γ ⊢〚e₃〛⇓ d] *)
           nnrc_core_sem env (NNRCIf e1 e2 e3) d           (**r ⇒ [Γc ; Γ ⊢〚e₁ ? e₂ : e₃〛⇓ d] *)
-      | sem_NNRCEither_left: forall env e v1 e1 v2 e2 d d1,
+      | sem_cNNRCEither_left : forall env e v1 e1 v2 e2 d d1,
           nnrc_core_sem env e (dleft d) ->                (**r   [Γc ; Γ ⊢〚e〛⇓ left d] *)
           nnrc_core_sem ((v1,d)::env) e1 d1 ->            (**r ∧ [Γc ; (v₁,d),Γ ⊢〚e₁〛⇓ d₁] *)
-          nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d1 (**r ⇒ [Γc ; Γ ⊢〚either e left v₁ : e₁ | right v₂ : e₂〛⇓ d₁] *)
-      | sem_NNRCEither_right: forall env e v1 e1 v2 e2 d d2,
+          nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d1 (**r ⇒ [Γc ; Γ ⊢〚either e left $v₁ : e₁ | right $v₂ : e₂〛⇓ d₁] *)
+      | sem_cNNRCEither_right : forall env e v1 e1 v2 e2 d d2,
           nnrc_core_sem env e (dright d) ->               (**r   [Γc ; Γ ⊢〚e〛⇓ right d] *)
           nnrc_core_sem ((v2,d)::env) e2 d2 ->            (**r ∧ [Γc ; (v₂,d),Γ ⊢〚e₂〛⇓ d₂] *)
-          nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d2 (**r ⇒ [Γc ; Γ ⊢〚either e left v₁ : e₁ | right v₂ : e₂〛⇓ d₂] *)
+          nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d2 (**r ⇒ [Γc ; Γ ⊢〚either e left $v₁ : e₁ | right $v₂ : e₂〛⇓ d₂] *)
       with nnrc_core_sem_for: var -> bindings -> nnrc -> list data -> list data -> Prop :=
-      | sem_NNRCFor_empty v: forall env e,
+      | sem_cNNRCFor_empty v : forall env e,
           nnrc_core_sem_for v env e nil nil            (**r   [Γc ; Γ ; v ; {} ⊢〚e〛φ ⇓ {}] *)
-      | sem_NNRCFor_cons v: forall env e d1 c1 d2 c2,
+      | sem_cNNRCFor_cons v : forall env e d1 c1 d2 c2,
           nnrc_core_sem ((v,d1)::env) e d2 ->          (**r   [Γc ; (v,d₁),Γ ⊢〚e₂〛⇓ d₂]  *)
           nnrc_core_sem_for v env e c1 c2 ->           (**r ∧ [Γc ; Γ ; v ; {c₁} ⊢〚e〛φ ⇓ {c₂}] *)
           nnrc_core_sem_for v env e (d1::c1) (d2::c2). (**r ⇒ [Γc ; Γ ; v ; {d₁::c₁} ⊢〚e〛φ ⇓ {d₂::c₂}] *)
 
-    End DenoteSemantics.
+    End Denotation.
 
     (** ** Evaluation Semantics *)
-    Section EvalSemantics.
+    Section Evaluation.
 
       (** Evaluation takes a cNNRC expression and an environment. It
           returns an optional value. When [None] is returned, it
@@ -214,50 +215,50 @@ Section cNNRC.
 
       Fixpoint nnrc_core_eval (env:bindings) (e:nnrc) : option data :=
         match e with
-        | NNRCGetConstant x =>
-          edot constant_env x
-        | NNRCVar x =>
-          lookup equiv_dec env x
+        | NNRCGetConstant v =>
+          edot constant_env v
+        | NNRCVar v =>
+          lookup equiv_dec env v
         | NNRCConst d =>
           Some (normalize_data h d)
         | NNRCBinop bop e1 e2 =>
-          olift2 (fun d1 d2 => fun_of_binop h bop d1 d2)
+          olift2 (fun d1 d2 => binary_op_eval h bop d1 d2)
                  (nnrc_core_eval env e1)
                  (nnrc_core_eval env e2)
-        | NNRCUnop uop e1 =>
-          olift (fun d1 => fun_of_unaryop h uop d1)
-                (nnrc_core_eval env e1)
-        | NNRCLet x e1 e2 =>
+        | NNRCUnop uop e =>
+          olift (fun d1 => unary_op_eval h uop d1)
+                (nnrc_core_eval env e)
+        | NNRCLet v e1 e2 =>
           match nnrc_core_eval env e1 with
-          | Some d => nnrc_core_eval ((x,d)::env) e2
+          | Some d1 => nnrc_core_eval ((v,d1)::env) e2
           | _ => None
           end
-        | NNRCFor x e1 e2 =>
+        | NNRCFor v e1 e2 =>
           match nnrc_core_eval env e1 with
           | Some (dcoll c1) =>
-            let inner_eval d1 :=
-                let env' := (x,d1) :: env
-                in nnrc_core_eval env' e2
+            let for_fun :=
+                fun d1 => nnrc_core_eval ((v,d1)::env) e2
             in
-            lift dcoll (rmap inner_eval c1)
+            lift dcoll (rmap for_fun c1)
           | _ => None
           end
         | NNRCIf e1 e2 e3 =>
-          let aux_if d :=
-              match d with
-              | dbool b =>
-                if b
-                then nnrc_core_eval env e2
-                else nnrc_core_eval env e3
-              | _ => None
-              end
-          in olift aux_if (nnrc_core_eval env e1)
-        | NNRCEither ed xl el xr er =>
-          match nnrc_core_eval env ed with
-          | Some (dleft dl) =>
-            nnrc_core_eval ((xl,dl)::env) el
-          | Some (dright dr) =>
-            nnrc_core_eval ((xr,dr)::env) er
+          let cond_fun :=
+              fun d =>
+                match d with
+                | dbool true =>
+                  nnrc_core_eval env e2
+                | dbool false =>
+                  nnrc_core_eval env e3
+                | _ => None
+                end
+          in olift cond_fun (nnrc_core_eval env e1)
+        | NNRCEither e v1 e1 v2 e2 =>
+          match nnrc_core_eval env e with
+          | Some (dleft d) =>
+            nnrc_core_eval ((v1,d)::env) e1
+          | Some (dright d) =>
+            nnrc_core_eval ((v2,d)::env) e2
           | _ => None
           end
         | NNRCGroupBy _ _ _ => None (**r Evaluation for GroupBy always fails for cNNRC *)
@@ -295,13 +296,13 @@ Section cNNRC.
             simpl; match_destr.
       Qed.
 
-    End EvalSemantics.
+    End Evaluation.
 
     (** * Correctness of evaluation *)
     
     (** The evaluation and denotational semantics are equivalent. *)
     
-    Section EvalCorrect.
+    Section EvaluationCorrect.
       (** Auxiliary lemma on [for] loops used in the correctness theorem *)
 
       Lemma nnrc_core_for_eval_correct v env e l1 l2:
@@ -324,6 +325,8 @@ Section cNNRC.
             auto.
           + congruence.
       Qed.
+
+      (** Evaluation is correct wrt. the cNNRC semantics. *)
 
       Lemma nnrc_core_eval_correct : forall e env d,
           nnrc_core_eval env e = Some d ->
@@ -371,12 +374,12 @@ Section cNNRC.
           (* condition true *)
           + case_eq (nnrc_core_eval env e2); intros; rewrite H1 in *.
             * specialize (IHe1 (dbool true) eq_refl); specialize (IHe2 d0 eq_refl);
-                inversion H; subst; eapply sem_NNRCIf_true; eauto.
+                inversion H; subst; eapply sem_cNNRCIf_true; eauto.
             * simpl in H; congruence.
           (* condition false *)
           + case_eq (nnrc_core_eval env e3); intros; rewrite H1 in *.
             * specialize (IHe1 (dbool false) eq_refl); specialize (IHe3 d0 eq_refl);
-                inversion H; subst; eapply sem_NNRCIf_false; eauto.
+                inversion H; subst; eapply sem_cNNRCIf_false; eauto.
             * simpl in H; congruence.
           + simpl in H; congruence.
         - specialize (IHe1 env).
@@ -385,11 +388,11 @@ Section cNNRC.
           (* left case *)
           + specialize (IHe2 ((v,d0)::env)).
             * specialize (IHe1 (dleft d0) eq_refl); specialize (IHe2 d H);
-                inversion H; subst; eapply sem_NNRCEither_left; eauto.
+                inversion H; subst; eapply sem_cNNRCEither_left; eauto.
           (* right case *)
           + specialize (IHe3 ((v0,d0)::env)).
             * specialize (IHe1 (dright d0) eq_refl); specialize (IHe3 d H);
-                inversion H; subst; eapply sem_NNRCEither_right; eauto.
+                inversion H; subst; eapply sem_cNNRCEither_right; eauto.
           + simpl in H; congruence.
         - congruence.
       Qed.
@@ -414,6 +417,8 @@ Section cNNRC.
             rewrite H0 in *; [|congruence].
           inversion IHc1; subst; auto.
       Qed.
+
+      (** Evaluation is complete wrt. the cNNRC semantics. *)
 
       Lemma nnrc_core_eval_complete : forall e env d,
           nnrc_core_sem env e d ->
@@ -457,7 +462,7 @@ Section cNNRC.
         apply nnrc_core_eval_complete.
       Qed.
 
-    End EvalCorrect.
+    End EvaluationCorrect.
 
   End Semantics.
 
@@ -510,30 +515,31 @@ Notation "‵ c" := (NNRCConst c)  (at level 0) : nnrc_scope.                   
 Notation "‵{||}" := (NNRCConst (dcoll nil))  (at level 0) : nnrc_scope.                         (* ‵ = \backprime *)
 Notation "‵[||]" := (NNRCConst (drec nil)) (at level 50) : nnrc_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (NNRCBinop AAnd r1 r2) (right associativity, at level 65): nnrc_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (NNRCBinop AOr r1 r2) (right associativity, at level 70): nnrc_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (NNRCBinop AEq r1 r2) (right associativity, at level 70): nnrc_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (NNRCBinop ALt r1 r2) (no associativity, at level 70): nnrc_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (NNRCBinop AUnion r1 r2) (right associativity, at level 70): nnrc_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (NNRCBinop AMinus r1 r2) (right associativity, at level 70): nnrc_scope.  (* − = \minus *)
-Notation "r1 ⋂min r2" := (NNRCBinop AMin r1 r2) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
-Notation "r1 ⋃max r2" := (NNRCBinop AMax r1 r2) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((NNRCBinop AConcat) p r) (at level 70) : nnrc_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((NNRCBinop AMergeConcat) p r) (at level 70) : nnrc_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (NNRCBinop OpAnd r1 r2) (right associativity, at level 65): nnrc_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (NNRCBinop OpOr r1 r2) (right associativity, at level 70): nnrc_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (NNRCBinop OpEqual r1 r2) (right associativity, at level 70): nnrc_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (NNRCBinop OpLe r1 r2) (no associativity, at level 70): nnrc_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (NNRCBinop OpBagUnion r1 r2) (right associativity, at level 70): nnrc_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (NNRCBinop OpBagDiff r1 r2) (right associativity, at level 70): nnrc_scope.  (* − = \minus *)
+Notation "r1 ⋂min r2" := (NNRCBinop OpBagMin r1 r2) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
+Notation "r1 ⋃max r2" := (NNRCBinop OpBagMax r1 r2) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((NNRCBinop OpRecConcat) p r) (at level 70) : nnrc_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((NNRCBinop OpRecMerge) p r) (at level 70) : nnrc_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (NNRCUnop ANeg r1) (right associativity, at level 70): nnrc_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (NNRCUnop ADistinct r1) (right associativity, at level 70): nnrc_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (NNRCUnop ACount r1) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (NNRCUnop AFlatten d) (at level 50) : nnrc_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((NNRCUnop AColl) d)  (at level 50) : nnrc_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((NNRCUnop (ARec s)) r) (at level 50) : nnrc_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((NNRCUnop (ARecRemove s1)) r) (at level 50) : nnrc_scope.          (* ¬ = \neg and π = \pi *)
-Notation "π[ s1 ]( r )" := ((NNRCUnop (ARecProject s1)) r) (at level 50) : nnrc_scope.          (* π = \pi *)
-Notation "p · r" := ((NNRCUnop (ADot r)) p) (left associativity, at level 40): nnrc_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (NNRCUnop OpNeg r1) (right associativity, at level 70): nnrc_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (NNRCUnop OpDistinct r1) (right associativity, at level 70): nnrc_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (NNRCUnop OpCount r1) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (NNRCUnop OpFlatten d) (at level 50) : nnrc_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((NNRCUnop OpBag) d)  (at level 50) : nnrc_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((NNRCUnop (OpRec s)) r) (at level 50) : nnrc_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((NNRCUnop (OpRecRemove s1)) r) (at level 50) : nnrc_scope.          (* ¬ = \neg and π = \pi *)
+Notation "π[ s1 ]( r )" := ((NNRCUnop (OpRecProject s1)) r) (at level 50) : nnrc_scope.          (* π = \pi *)
+Notation "p · r" := ((NNRCUnop (OpDot r)) p) (left associativity, at level 40): nnrc_scope.      (* · = \cdot *)
 
-Notation "'$$' v" := (NNRCVar v%string) (at level 50, format "'$$' v") : nnrc_scope.
-Notation "{| e1 | '$$' x ∈ e2 |}" := (NNRCFor x%string e2 e1) (at level 50, format "{|  e1  '/ ' |  '$$' x  ∈  e2  |}") : nnrc_scope.   (* ∈ = \in *)
-Notation "'LET' '$$' x ':=' e2 'IN' e1" := (NNRCLet x%string e2 e1) (at level 50, format "'[hv' 'LET'  '$$' x  ':='  '[' e2 ']'  '/' 'IN'  '[' e1 ']' ']'") : nnrc_scope.
+Notation "'$$' v" := (NNRCGetConstant v%string) (at level 50, format "'$$' v") : nnrc_scope.
+Notation "'$' v" := (NNRCVar v%string) (at level 50, format "'$' v") : nnrc_scope.
+Notation "{| e1 | '$' x ∈ e2 |}" := (NNRCFor x%string e2 e1) (at level 50, format "{|  e1  '/ ' |  '$' x  ∈  e2  |}") : nnrc_scope.   (* ∈ = \in *)
+Notation "'let' '$' x ':=' e2 'in' e1" := (NNRCLet x%string e2 e1) (at level 50, format "'[hv' 'let'  '$' x  ':='  '[' e2 ']'  '/' 'in'  '[' e1 ']' ']'") : nnrc_scope.
 Notation "e1 ? e2 : e3" := (NNRCIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  e2 '/' :  e3 ']'") : nnrc_scope.
 
 Tactic Notation "nnrc_cases" tactic(first) ident(c) :=

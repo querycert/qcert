@@ -47,11 +47,11 @@ Section TOQL.
       | OTBinop {τ₁ τ₂ τout} tenv b e₁ e₂ :
           oql_expr_type tenv e₁ τ₁ ->
           oql_expr_type tenv e₂ τ₂ ->
-          binOp_type b τ₁ τ₂ τout ->
+          binary_op_type b τ₁ τ₂ τout ->
           oql_expr_type tenv (OBinop b e₁ e₂) τout
       | OTUnop {τ₁ τout} tenv u e₁ :
           oql_expr_type tenv e₁ τ₁ ->
-          unaryOp_type u τ₁ τout ->
+          unary_op_type u τ₁ τout ->
           oql_expr_type tenv (OUnop u e₁) τout.
 
     End constt.
@@ -97,13 +97,13 @@ Section TOQL.
       elim H2; clear H2; intros.
       elim H3; clear H3; intros.
       rewrite H2; rewrite H3; simpl.
-      destruct (typed_binop_yields_typed_data _ _ _ H4 H5 H) as [?[??]].
+      destruct (typed_binary_op_yields_typed_data _ _ _ H4 H5 H) as [?[??]].
       rewrite H6.
       exists x1; auto.
     - elim (IHoql_expr_type _ _ H0 H2); intros.
       elim H3; clear H3; intros.
       rewrite H3; simpl.
-      destruct (typed_unop_yields_typed_data _ _ H4 H) as [?[??]].
+      destruct (typed_unary_op_yields_typed_data _ _ H4 H) as [?[??]].
       rewrite H5.
       exists x0; auto.
   Qed.

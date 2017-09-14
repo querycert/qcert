@@ -19,73 +19,71 @@ Require String.
 Require Ascii.
 Require Import ZArith.
 Require BrandRelation.
-Require RBinaryOps.
 
 Module QOperators(runtime:CompilerRuntime).
   
   Module Unary.
 
     Definition op : Set  
-      := RUnaryOps.unaryOp.
+      := UnaryOperators.unary_op.
     Definition t : Set 
       := op.
 
-    Definition aidop : op 
-      := RUnaryOps.AIdOp.
-
     Module ZArith.
-      Definition aabs : op 
-        := RUnaryOps.AUArith RUnaryOps.ArithAbs.
-      Definition alog2 : op 
-        := RUnaryOps.AUArith RUnaryOps.ArithLog2.
-      Definition asqrt : op 
-        := RUnaryOps.AUArith RUnaryOps.ArithSqrt.
+      Definition opabs : op 
+        := UnaryOperators.OpArithUnary UnaryOperators.ArithAbs.
+      Definition oplog2 : op 
+        := UnaryOperators.OpArithUnary UnaryOperators.ArithLog2.
+      Definition opsqrt : op 
+        := UnaryOperators.OpArithUnary UnaryOperators.ArithSqrt.
     End ZArith.
 
-    Definition aneg : op 
-      := RUnaryOps.ANeg.
-    Definition acoll : op 
-      := RUnaryOps.AColl.
-    Definition acount : op 
-      := RUnaryOps.ACount.
-    Definition aflatten : op 
-      := RUnaryOps.AFlatten.
-    Definition aleft : op 
-      := RUnaryOps.ALeft.
-    Definition aright : op 
-      := RUnaryOps.ARight.
-    Definition abrand b : op 
-      := RUnaryOps.ABrand b.
-    Definition arec : String.string -> op 
-      := RUnaryOps.ARec.
-    Definition adot : String.string -> op 
-      := RUnaryOps.ADot.
-    Definition arecremove : String.string -> op 
-      := RUnaryOps.ARecRemove.
-    Definition arecproject : list String.string -> op 
-      := RUnaryOps.ARecProject.
-    Definition adistinct : op 
-      := RUnaryOps.ADistinct.
-    Definition asum : op 
-      := RUnaryOps.ASum.
-    Definition aarithmean : op 
-      := RUnaryOps.AArithMean.
-    Definition atostring : op 
-      := RUnaryOps.AToString.
-    Definition asubstring : Z -> option Z -> op 
-      := RUnaryOps.ASubstring.
-    Definition alike : String.string -> option Ascii.ascii -> op 
-      := RUnaryOps.ALike.
-    Definition acast : BrandRelation.brands -> op 
-      := RUnaryOps.ACast.
-    Definition aunbrand : op 
-      := RUnaryOps.AUnbrand.
-    Definition asingleton : op 
-      := RUnaryOps.ASingleton.
-    Definition anummin : op 
-      := RUnaryOps.ANumMin.
-    Definition anummax : op 
-      := RUnaryOps.ANumMax.
+    Definition opidentity : op 
+      := UnaryOperators.OpIdentity.
+    Definition opneg : op 
+      := UnaryOperators.OpNeg.
+    Definition oprec : String.string -> op 
+      := UnaryOperators.OpRec.
+    Definition opdot : String.string -> op 
+      := UnaryOperators.OpDot.
+    Definition oprecremove : String.string -> op 
+      := UnaryOperators.OpRecRemove.
+    Definition oprecproject : list String.string -> op 
+      := UnaryOperators.OpRecProject.
+    Definition opbag : op 
+      := UnaryOperators.OpBag.
+    Definition opsingleton : op 
+      := UnaryOperators.OpSingleton.
+    Definition opflatten : op 
+      := UnaryOperators.OpFlatten.
+    Definition opdistinct : op 
+      := UnaryOperators.OpDistinct.
+    Definition opcount : op 
+      := UnaryOperators.OpCount.
+    Definition opsum : op 
+      := UnaryOperators.OpSum.
+    Definition opnummin : op 
+      := UnaryOperators.OpNumMin.
+    Definition opnummax : op 
+      := UnaryOperators.OpNumMax.
+    Definition opnummean : op 
+      := UnaryOperators.OpNumMean.
+    Definition optostring : op 
+      := UnaryOperators.OpToString.
+    Definition opsubstring : Z -> option Z -> op 
+      := UnaryOperators.OpSubstring.
+    Definition oplike : String.string -> option Ascii.ascii -> op 
+      := UnaryOperators.OpLike.
+    Definition opleft : op 
+      := UnaryOperators.OpLeft.
+    Definition opright : op 
+      := UnaryOperators.OpRight.
+    Definition opbrand b : op 
+      := UnaryOperators.OpBrand b.
+    Definition opunbrand : op 
+      := UnaryOperators.OpUnbrand.
+    Definition opcast : BrandRelation.brands -> op 
+      := UnaryOperators.OpCast.
 
   (* Note that foreign operators should be encapuslated and 
      exported as part of the model *)
@@ -94,55 +92,53 @@ Module QOperators(runtime:CompilerRuntime).
   Module Binary.
 
     Definition op : Set 
-      := RBinaryOps.binOp.
+      := BinaryOperators.binary_op.
     Definition t : Set 
       := op.
 
-    Definition aeq : op 
-      := RBinaryOps.AEq.
-    
-    Definition aunion : op 
-      := RBinaryOps.AUnion.
-    Definition aconcat : op 
-      := RBinaryOps.AConcat.
-    Definition amergeconcat : op 
-      := RBinaryOps.AMergeConcat.
-    Definition aand : op 
-      := RBinaryOps.AAnd.
-    Definition aor : op 
-      := RBinaryOps.AOr.
-
     Module ZArith.
-      Definition aplus : op 
-        := RBinaryOps.ABArith RBinaryOps.ArithPlus.
-      Definition aminus : op 
-        := RBinaryOps.ABArith RBinaryOps.ArithMinus.
-      Definition amult : op 
-        := RBinaryOps.ABArith RBinaryOps.ArithMult.
-      Definition amin : op 
-        := RBinaryOps.ABArith RBinaryOps.ArithMin.
-      Definition amax : op 
-        := RBinaryOps.ABArith RBinaryOps.ArithMax.
-      Definition adiv : op 
-        := RBinaryOps.ABArith RBinaryOps.ArithDivide.
-      Definition arem : op 
-        := RBinaryOps.ABArith RBinaryOps.ArithRem.
+      Definition opplus : op 
+        := BinaryOperators.OpArithBinary BinaryOperators.ArithPlus.
+      Definition opminus : op 
+        := BinaryOperators.OpArithBinary BinaryOperators.ArithMinus.
+      Definition opmult : op 
+        := BinaryOperators.OpArithBinary BinaryOperators.ArithMult.
+      Definition opmin : op 
+        := BinaryOperators.OpArithBinary BinaryOperators.ArithMin.
+      Definition opmax : op 
+        := BinaryOperators.OpArithBinary BinaryOperators.ArithMax.
+      Definition opdiv : op 
+        := BinaryOperators.OpArithBinary BinaryOperators.ArithDivide.
+      Definition oprem : op 
+        := BinaryOperators.OpArithBinary BinaryOperators.ArithRem.
     End ZArith.
     
-    Definition alt : op 
-      := RBinaryOps.ALt.
-    Definition ale : op 
-      := RBinaryOps.ALe.
-    Definition aminus : op 
-      := RBinaryOps.AMinus.
-    Definition amin : op 
-      := RBinaryOps.AMin.
-    Definition amax : op 
-      := RBinaryOps.AMax.
-    Definition acontains : op 
-      := RBinaryOps.AContains.
-    Definition asconcat : op 
-      := RBinaryOps.ASConcat.
+    Definition opequal : op 
+      := BinaryOperators.OpEqual.
+    Definition oprecconcat : op 
+      := BinaryOperators.OpRecConcat.
+    Definition oprecmerge : op 
+      := BinaryOperators.OpRecMerge.
+    Definition opand : op
+      := BinaryOperators.OpAnd.
+    Definition opor : op 
+      := BinaryOperators.OpOr.
+    Definition oplt : op 
+      := BinaryOperators.OpLt.
+    Definition ople : op 
+      := BinaryOperators.OpLe.
+    Definition opbagunion : op 
+      := BinaryOperators.OpBagUnion.
+    Definition opbagdiff : op 
+      := BinaryOperators.OpBagDiff.
+    Definition opbagmin : op 
+      := BinaryOperators.OpBagMin.
+    Definition opbagmax : op 
+      := BinaryOperators.OpBagMax.
+    Definition opcontains : op 
+      := BinaryOperators.OpContains.
+    Definition opstringconcat : op 
+      := BinaryOperators.OpStringConcat.
 
     (* Note that foreign operators should be encapuslated and 
        exported as part of the model *)

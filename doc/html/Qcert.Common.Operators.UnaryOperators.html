@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Common.Operators.UnaryOperators</title>
+<meta name="description" content="Documentation of Coq module Qcert.Common.Operators.UnaryOperators" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Common.Operators.UnaryOperators</h1>
+<div class="coq">
+<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="UnaryOperators">UnaryOperators</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.Ascii.html">Ascii</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html">BrandRelation</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html">RDataSort</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.ForeignData.html">ForeignData</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html">OperatorsUtils</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html">ForeignOperators</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fdata</span>:<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fuop</span>:<span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#foreign_unary_op">foreign_unary_op</a></span>}.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="arith_unary_op">arith_unary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a name="ArithAbs">ArithAbs</a></span>  <span class="docright">(* absolute value  *)</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="ArithLog2">ArithLog2</a></span> <span class="docright">(* base2 logarithm  *)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a name="ArithSqrt">ArithSqrt</a></span> <span class="docright">(* square root  *)</span><br/>
+&nbsp;&nbsp;.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="unary_op">unary_op</a></span> : <span class="kwd">Set</span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpIdentity">OpIdentity</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                      <span class="docright">(* identity, returns its value  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpNeg">OpNeg</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                           <span class="docright">(* boolean negation  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpRec">OpRec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                 <span class="docright">(* create a record with a single field  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpDot">OpDot</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                 <span class="docright">(* record field access  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpRecRemove">OpRecRemove</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>           <span class="docright">(* record remove the given fields  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpRecProject">OpRecProject</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>     <span class="docright">(* record projects on the given fields  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpBag">OpBag</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                           <span class="docright">(* create a singleton bag  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpSingleton">OpSingleton</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                     <span class="docright">(* value within a singleton bag  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpFlatten">OpFlatten</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                       <span class="docright">(* flattens a bag of bags  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpDistinct">OpDistinct</a></span>: <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                       <span class="docright">(* distinct values in a bag  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpOrderBy">OpOrderBy</a></span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>      <span class="docright">(* sorts a collection of records  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpCount">OpCount</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                         <span class="docright">(* bag count  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpSum">OpSum</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                           <span class="docright">(* sum of natural numbers in a bag  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpNumMin">OpNumMin</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                        <span class="docright">(* minimum of natural numbers in a bag  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpNumMax">OpNumMax</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                        <span class="docright">(* maximum of natural numbers in a bag  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpNumMean">OpNumMean</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                       <span class="docright">(* arithmetic mean of natural numbers in a bag  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpToString">OpToString</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                      <span class="docright">(* convert any data to a string  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpSubstring">OpSubstring</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>    <span class="docright">(* returns the substring starting with the nth character, for m characters (or the rest of the string)  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpLike">OpLike</a></span> (<span class="tactic">pattern</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">escape</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.Ascii.html#ascii">ascii</a></span>) : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span> <span class="docright">(* like expression (as in sql)  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpLeft">OpLeft</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                          <span class="docright">(* create a left value  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpRight">OpRight</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                         <span class="docright">(* create a right value  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpBrand">OpBrand</a></span> : <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>               <span class="docright">(* brands a value  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpUnbrand">OpUnbrand</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                       <span class="docright">(* content of a branded value  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpCast">OpCast</a></span> : <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">brands</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>                <span class="docright">(* coerce a branded value into one of its sub-brands  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpArithUnary">OpArithUnary</a></span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op">arith_unary_op</a></span> -&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>  <span class="docright">(* arithmetic operations  *)</span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="OpForeignUnary">OpForeignUnary</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">fu</span>:<span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#foreign_unary_op_type">foreign_unary_op_type</a></span>) : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>    <span class="docright">(* foreign unary operators  *)</span><br/>
+&nbsp;&nbsp;.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="arith_unary_op_eqdec">arith_unary_op_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op">arith_unary_op</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1034')">Proof.</div>
+<div class="proofscript" id="proof1034">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op">arith_unary_op</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>}).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="SortCriterias_eqdec">SortCriterias_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1035')">Proof.</div>
+<div class="proofscript" id="proof1035">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>}).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="unary_op_eqdec">unary_op_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1036')">Proof.</div>
+<div class="proofscript" id="proof1036">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>}).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">induction</span> <span class="id">l</span>; <span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#SortCriterias_eqdec">SortCriterias_eqdec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#option_eqdec">option_eqdec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#Z_eqdec">Z_eqdec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">induction</span> <span class="id">b</span>; <span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">induction</span> <span class="id">b</span>; <span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op_eqdec">arith_unary_op_eqdec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html#foreign_unary_op_dec">foreign_unary_op_dec</a></span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="ToString_arith_unary_op">ToString_arith_unary_op</a></span> : <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#ToString">ToString</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op">arith_unary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">fun</span> (<span class="id">op</span>:<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op">arith_unary_op</a></span>) =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#op">op</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#ArithAbs">ArithAbs</a></span> =&gt; "<span class="id">ArithAbs</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#ArithLog2">ArithLog2</a></span> =&gt; "<span class="id">ArithLog2</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#ArithSqrt">ArithSqrt</a></span> =&gt; "<span class="id">Sqrt</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="ToString_SortDesc">ToString_SortDesc</a></span> <span class="id">sd</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#sd">sd</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RDataSort.html#Ascending">Ascending</a></span> =&gt; "<span class="id">asc</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RDataSort.html#Descending">Descending</a></span> =&gt; "<span class="id">desc</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="ToString_SortCriteria">ToString_SortCriteria</a></span> (<span class="id">sc</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortDesc">SortDesc</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> (<span class="id">att</span>,<span class="id">sd</span>) := <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#sc">sc</a></span> <span class="kwd">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html#bracketString">bracketString</a></span> "(" (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#att">att</a></span> ++ "," ++ (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#ToString_SortDesc">ToString_SortDesc</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#sd">sd</a></span>)) ")".<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="ToString_unary_op">ToString_unary_op</a></span> : <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#ToString">ToString</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">fun</span> (<span class="id">op</span>:<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>) =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#op">op</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpIdentity">OpIdentity</a></span> =&gt; "<span class="id">OpIdentity</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpNeg">OpNeg</a></span> =&gt; "<span class="id">OpNeg</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpRec">OpRec</a></span> <span class="id">f</span> =&gt; "(<span class="id">OpRec</span> " ++ <span class="id">f</span> ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id">s</span> =&gt; "(<span class="id">OpDot</span> " ++ <span class="id">s</span> ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpRecRemove">OpRecRemove</a></span> <span class="id">s</span> =&gt; "(<span class="id">OpRecRemove</span> " ++ <span class="id">s</span> ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpRecProject">OpRecProject</a></span> <span class="id">ls</span> =&gt; "(<span class="id">OpRecProject</span> "<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++ (<span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html#bracketString">bracketString</a></span> "[" (<span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html#joinStrings">joinStrings</a></span> "," <span class="id">ls</span>) "]")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBag">OpBag</a></span> =&gt; "<span class="id">OpBag</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpSingleton">OpSingleton</a></span> =&gt; "<span class="id">OpSingleton</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpFlatten">OpFlatten</a></span> =&gt; "<span class="id">OpFlatten</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDistinct">OpDistinct</a></span> =&gt; "<span class="id">OpDistinct</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpOrderBy">OpOrderBy</a></span> <span class="id">ls</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"(<span class="id">OpOrderBy</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++ (<span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html#bracketString">bracketString</a></span> "[" (<span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html#joinStrings">joinStrings</a></span> "," (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">List.map</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#ToString_SortCriteria">ToString_SortCriteria</a></span> <span class="id">ls</span>)) "]")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpCount">OpCount</a></span> =&gt; "<span class="id">OpCount</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpSum">OpSum</a></span> =&gt; "<span class="id">OpSum</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpNumMin">OpNumMin</a></span> =&gt; "<span class="id">OpNumMin</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpNumMax">OpNumMax</a></span> =&gt; "<span class="id">OpNumMax</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpNumMean">OpNumMean</a></span> =&gt; "<span class="id">OpNumMean</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpToString">OpToString</a></span> =&gt; "<span class="id">OpToString</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpSubstring">OpSubstring</a></span> <span class="id">start</span> <span class="id">len</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"(<span class="id">OpSubstring</span> " ++ (<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">start</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++ (<span class="kwd">match</span> <span class="id">len</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; ""<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">len</span> =&gt; " " ++ (<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">len</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpLike">OpLike</a></span> <span class="tactic">pattern</span> <span class="id">oescape</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"(<span class="id">OpLike</span> " ++ <span class="tactic">pattern</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++ (<span class="kwd">match</span> <span class="id">oescape</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; ""<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">escape</span> =&gt; " <span class="id">ESCAPE</span> " ++ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#String">String</a></span> <span class="id">escape</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#EmptyString">EmptyString</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpLeft">OpLeft</a></span> =&gt; "<span class="id">OpLeft</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpRight">OpRight</a></span> =&gt; "<span class="id">OpRight</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpBrand">OpBrand</a></span> <span class="id">b</span> =&gt; "(<span class="id">OpBrand</span> " ++ (@<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html#ToString_brands">ToString_brands</a></span> <span class="id">b</span>)++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpUnbrand">OpUnbrand</a></span> =&gt; "<span class="id">OpUnbrand</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpCast">OpCast</a></span> <span class="id">b</span> =&gt; "(<span class="id">OpCast</span> " ++ (@<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Common.Operators.OperatorsUtils.html#ToString_brands">ToString_brands</a></span> <span class="id">b</span>) ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpArithUnary">OpArithUnary</a></span> <span class="id">aop</span> =&gt; "(<span class="id">OpArithUnary</span> " ++ <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">aop</span> ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpForeignUnary">OpForeignUnary</a></span> <span class="id">fu</span> =&gt; <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">fu</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#UnaryOperators">UnaryOperators</a></span>.<br/>
+<br/>
+<span class="kwd">Tactic</span> <span class="kwd">Notation</span> "<span class="id">unary_op_cases</span>" <span class="id">tactic</span>(<span class="id">first</span>) <span class="id">ident</span>(<span class="id">c</span>) :=<br/>
+&nbsp;&nbsp;<span class="id">first</span>;<br/>
+&nbsp;&nbsp;[ <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpIdentity</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpNeg</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpRec</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpDot</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpRecRemove</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpRecProject</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpBag</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpSingleton</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpFlatten</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpDistinct</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpOrderBy</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpCount</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpSum</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpNumMin</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpNumMax</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpNumMean</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpToString</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpSubstring</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpLike</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpLeft</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpRight</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpBrand</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpUnbrand</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpCast</span>"%<span class="id">string</span> <br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpArithUnary</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;| <span class="id">Case_aux</span> <span class="id">c</span> "<span class="id">OpForeignUnary</span>"%<span class="id">string</span><br/>
+&nbsp;&nbsp;].<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

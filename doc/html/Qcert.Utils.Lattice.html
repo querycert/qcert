@@ -82,8 +82,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="consistent_join">consistent_join</a></span> <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;: <span class="kwd">forall</span> <span class="id">a</span> <span class="id">b</span>, <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ⊔ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span> === <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof266')">Proof.</div>
-<div class="proofscript" id="proof266">
+<div class="toggleproof" onclick="toggleDisplay('proof267')">Proof.</div>
+<div class="proofscript" id="proof267">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_meet">consistent_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
@@ -97,8 +97,8 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="meet_leq_l">meet_leq_l</a></span> <span class="id">a</span> <span class="id">b</span>: (<span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ⊓ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>) ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof267')">Proof.</div>
-<div class="proofscript" id="proof267">
+<div class="toggleproof" onclick="toggleDisplay('proof268')">Proof.</div>
+<div class="proofscript" id="proof268">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_meet">consistent_meet</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#meet_commutative">meet_commutative</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Utils.Lattice.html#meet_associative">meet_associative</a></span>, <span class="id"><a href="Qcert.Utils.Lattice.html#meet_idempotent">meet_idempotent</a></span>.<br/>
@@ -106,15 +106,15 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="meet_leq_r">meet_leq_r</a></span> <span class="id">a</span> <span class="id">b</span>: (<span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ⊓ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>) ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof268')">Proof.</div>
-<div class="proofscript" id="proof268">
+<div class="toggleproof" onclick="toggleDisplay('proof269')">Proof.</div>
+<div class="proofscript" id="proof269">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#meet_commutative">meet_commutative</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Lattice.html#meet_leq_l">meet_leq_l</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="meet_most">meet_most</a></span> {<span class="id">a</span> <span class="id">b</span> <span class="id">c</span>} : <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#c">c</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ (<span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span> ⊓ <span class="id"><a href="Qcert.Utils.Lattice.html#c">c</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof269')">Proof.</div>
-<div class="proofscript" id="proof269">
+<div class="toggleproof" onclick="toggleDisplay('proof270')">Proof.</div>
+<div class="proofscript" id="proof270">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub1</span> <span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_meet">consistent_meet</a></span> <span class="kwd">in</span> <span class="id">sub1</span>,<span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">sub1</span>, &lt;- <span class="id">sub2</span>.<br/>
@@ -124,23 +124,23 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="join_leq_l">join_leq_l</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ (<span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ⊔ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof270')">Proof.</div>
-<div class="proofscript" id="proof270">
+<div class="toggleproof" onclick="toggleDisplay('proof271')">Proof.</div>
+<div class="proofscript" id="proof271">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_join">consistent_join</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Utils.Lattice.html#join_associative">join_associative</a></span>, <span class="id"><a href="Qcert.Utils.Lattice.html#join_idempotent">join_idempotent</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="join_leq_r">join_leq_r</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span> ≤ (<span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ⊔ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof271')">Proof.</div>
-<div class="proofscript" id="proof271">
+<div class="toggleproof" onclick="toggleDisplay('proof272')">Proof.</div>
+<div class="proofscript" id="proof272">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#join_commutative">join_commutative</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Lattice.html#join_leq_l">join_leq_l</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="join_least">join_least</a></span> {<span class="id">a</span> <span class="id">b</span> <span class="id">c</span>} : <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#c">c</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#c">c</a></span> -&gt; (<span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ⊔ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>) ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#c">c</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof272')">Proof.</div>
-<div class="proofscript" id="proof272">
+<div class="toggleproof" onclick="toggleDisplay('proof273')">Proof.</div>
+<div class="proofscript" id="proof273">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub1</span> <span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_join">consistent_join</a></span> <span class="kwd">in</span> <span class="id">sub1</span>,<span class="id">sub2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_join">consistent_join</a></span>.<br/>
@@ -151,8 +151,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="meet_leq_proper">meet_leq_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.Lattice.html#part_le">part_le</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#part_le">part_le</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#part_le">part_le</a></span>) <span class="id"><a href="Qcert.Utils.Lattice.html#meet">meet</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof273')">Proof.</div>
-<div class="proofscript" id="proof273">
+<div class="toggleproof" onclick="toggleDisplay('proof274')">Proof.</div>
+<div class="proofscript" id="proof274">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">a1</span> <span class="id">a2</span> <span class="id">aleq</span> <span class="id">b1</span> <span class="id">b2</span> <span class="id">bleq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_meet">consistent_meet</a></span> <span class="kwd">in</span> <span class="id">aleq</span>, <span class="id">bleq</span> |- *.<br/>
@@ -168,8 +168,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="join_leq_proper">join_leq_proper</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.Lattice.html#part_le">part_le</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#part_le">part_le</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#part_le">part_le</a></span>) <span class="id"><a href="Qcert.Utils.Lattice.html#join">join</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof274')">Proof.</div>
-<div class="proofscript" id="proof274">
+<div class="toggleproof" onclick="toggleDisplay('proof275')">Proof.</div>
+<div class="proofscript" id="proof275">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">a1</span> <span class="id">a2</span> <span class="id">aleq</span> <span class="id">b1</span> <span class="id">b2</span> <span class="id">bleq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Lattice.html#consistent_join">consistent_join</a></span> <span class="kwd">in</span> <span class="id">aleq</span>, <span class="id">bleq</span> |- *.<br/>
@@ -188,15 +188,15 @@
      then we can decide the leq relation using either meet or join 
    </div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="leq_dec_meet">leq_dec_meet</a></span> `{<span class="id">dec</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Utils.Lattice.html#Lattice.props.A">A</a></span> <span class="id"><a href="Qcert.Utils.Lattice.html#Lattice.props.eqA">eqA</a></span>} <span class="id">a</span> <span class="id">b</span> : {<span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>} + {~ <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof275')">Proof.</div>
-<div class="proofscript" id="proof275">
+<div class="toggleproof" onclick="toggleDisplay('proof276')">Proof.</div>
+<div class="proofscript" id="proof276">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Lattice.html#consistent_meet">consistent_meet</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Lattice.html#meet">meet</a></span> <span class="id">a</span> <span class="id">b</span> == <span class="id">a</span>); <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span> <span class="kwd">in</span> *; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="leq_dec_join">leq_dec_join</a></span> `{<span class="id">dec</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Utils.Lattice.html#Lattice.props.A">A</a></span> <span class="id"><a href="Qcert.Utils.Lattice.html#Lattice.props.eqA">eqA</a></span>} <span class="id">a</span> <span class="id">b</span> : {<span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>} + {~ <span class="id"><a href="Qcert.Utils.Lattice.html#a">a</a></span> ≤ <span class="id"><a href="Qcert.Utils.Lattice.html#b">b</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof276')">Proof.</div>
-<div class="proofscript" id="proof276">
+<div class="toggleproof" onclick="toggleDisplay('proof277')">Proof.</div>
+<div class="proofscript" id="proof277">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Lattice.html#consistent_join">consistent_join</a></span> <span class="id">a</span> <span class="id">b</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Lattice.html#join">join</a></span> <span class="id">a</span> <span class="id">b</span> == <span class="id">b</span>); <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span> <span class="kwd">in</span> *; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;Defined.</div>

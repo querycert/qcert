@@ -41,8 +41,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lookup_in_domain">lookup_in_domain</a></span> <span class="id">l</span> (<span class="id">a</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#a">a</a></span> (<span class="id"><a href="Qcert.NRA.Typing.TDomain.html#tdomain">tdomain</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#l">l</a></span>) -&gt; (<span class="id">exists</span> <span class="id">y</span>, <span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr">assoc_lookupr</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#l">l</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1572')">Proof.</div>
-<div class="proofscript" id="proof1572">
+<div class="toggleproof" onclick="toggleDisplay('proof1597')">Proof.</div>
+<div class="proofscript" id="proof1597">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">contradiction</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H</span>.<br/>
@@ -63,8 +63,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="lookup_in_included_domain">lookup_in_included_domain</a></span> <span class="id">ats</span> <span class="id">l</span> (<span class="id">a</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#ats">ats</a></span> (<span class="id"><a href="Qcert.NRA.Typing.TDomain.html#tdomain">tdomain</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#l">l</a></span>) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#a">a</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#ats">ats</a></span> -&gt; (<span class="id">exists</span> <span class="id">y</span>, <span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr">assoc_lookupr</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#l">l</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#y">y</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1573')">Proof.</div>
-<div class="proofscript" id="proof1573">
+<div class="toggleproof" onclick="toggleDisplay('proof1598')">Proof.</div>
+<div class="proofscript" id="proof1598">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">ats</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -83,8 +83,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="preserves_tdomain">preserves_tdomain</a></span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id">rtype</span>₀)) (<span class="id">ats</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included">domains_included</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#ats">ats</a></span> (<span class="id"><a href="Qcert.NRA.Typing.TDomain.html#tdomain">tdomain</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#l">l</a></span>) -&gt; (<span class="id"><a href="Qcert.NRA.Typing.TDomain.html#tdomain">tdomain</a></span> (<span class="id"><a href="Qcert.NRA.Typing.TDomain.html#tproject">tproject</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#l">l</a></span> <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#ats">ats</a></span>)) = <span class="id"><a href="Qcert.NRA.Typing.TDomain.html#ats">ats</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1574')">Proof.</div>
-<div class="proofscript" id="proof1574">
+<div class="toggleproof" onclick="toggleDisplay('proof1599')">Proof.</div>
+<div class="proofscript" id="proof1599">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">ats</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_alt">domains_included_alt</a></span> (<span class="id">a</span> :: <span class="id">ats</span>) (<span class="id"><a href="Qcert.NRA.Typing.TDomain.html#tdomain">tdomain</a></span> <span class="id">l</span>)); <span class="tactic">try</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDomain.html#domains_included_eq">domains_included_eq</a></span>; <span class="tactic">assumption</span>).<br/>
@@ -109,8 +109,8 @@
 &nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html">TBrandModel</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nra_domain">nra_domain</a></span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} {τ<span class="id">c</span>} {τ<span class="kwd">in</span> τ<span class="id">out</span>} (<span class="id">op</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Typing.TDomain.html#op">op</a></span> ▷ τ<span class="kwd">in</span> &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">c</span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1575')">Proof.</div>
-<div class="proofscript" id="proof1575">
+<div class="toggleproof" onclick="toggleDisplay('proof1600')">Proof.</div>
+<div class="proofscript" id="proof1600">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ<span class="id">out</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>.<br/>

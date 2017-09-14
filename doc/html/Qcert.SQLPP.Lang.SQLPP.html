@@ -33,6 +33,36 @@
 &nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="sqlpp_distinct">sqlpp_distinct</a></span> : <span class="kwd">Set</span> := <span class="id"><a name="SPDistinct">SPDistinct</a></span> | <span class="id"><a name="SPAll">SPAll</a></span>.<br/>
 &nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="sqlpp_join_type">sqlpp_join_type</a></span> : <span class="kwd">Set</span> := <span class="id"><a name="SPInner">SPInner</a></span> | <span class="id"><a name="SPLeftOuter">SPLeftOuter</a></span>.<br/>
 <br/>
+<div class="doc">The set of function names currently supported </div>
+&nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="sqlpp_function_name">sqlpp_function_name</a></span> : <span class="kwd">Set</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="SPFget_year">SPFget_year</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFget_month">SPFget_month</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFget_day">SPFget_day</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFget_hour">SPFget_hour</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFget_minute">SPFget_minute</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFget_second">SPFget_second</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFget_millisecond">SPFget_millisecond</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFavg">SPFavg</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFmin">SPFmin</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFmax">SPFmax</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFcount">SPFcount</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFsum">SPFsum</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFcoll_avg">SPFcoll_avg</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFcoll_min">SPFcoll_min</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFcoll_max">SPFcoll_max</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFcoll_count">SPFcoll_count</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFcoll_sum">SPFcoll_sum</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFarray_avg">SPFarray_avg</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFarray_min">SPFarray_min</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFarray_max">SPFarray_max</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFarray_count">SPFarray_count</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFarray_sum">SPFarray_sum</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFsqrt">SPFsqrt</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFsubstring">SPFsubstring</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFregexp_contains">SPFregexp_contains</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFcontains">SPFcontains</a></span><br/>
+&nbsp;&nbsp;.<br/>
+&nbsp;&nbsp;<br/>
 <div class="doc">The SQLPP grammar according to AsterixDB
 <pre>
 Statement ::= ( SingleStatement ( ";" )? )* &lt;EOF&gt;
@@ -123,7 +153,7 @@ Note that we restrict the RHS of 'like' to be a String literal, which is more re
 &nbsp;&nbsp;| <span class="id"><a name="SPVarRef">SPVarRef</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_expr">sqlpp_expr</a></span>                                   <br/>
 <br/>
 <br/>
-&nbsp;&nbsp;| <span class="id"><a name="SPFunctionCall">SPFunctionCall</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_expr">sqlpp_expr</a></span> -&gt; <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_expr">sqlpp_expr</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="SPFunctionCall">SPFunctionCall</a></span> : <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_function_name">sqlpp_function_name</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_expr">sqlpp_expr</a></span> -&gt; <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_expr">sqlpp_expr</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 <br/>
 &nbsp;&nbsp;| <span class="id"><a name="SPArray">SPArray</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_expr">sqlpp_expr</a></span> -&gt; <span class="id"><a href="Qcert.SQLPP.Lang.SQLPP.html#sqlpp_expr">sqlpp_expr</a></span>                                                   <br/>

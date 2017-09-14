@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TOptim.
+Section TNRARewrite.
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
@@ -58,8 +58,8 @@ Section TOptim.
     split.
     - inversion H; clear H; try eauto; subst.
       inversion H3; clear H3; subst.
-      eapply ATBinop; try eauto.
-      eapply TOps.ATAnd; assumption.
+      eapply type_NRABinop; try eauto.
+      eapply type_OpAnd; assumption.
     - intros; rewrite and_comm; eauto.
   Qed.
 
@@ -182,15 +182,15 @@ Section TOptim.
     unfold tnra_eq in H.
     specialize (H τ op1 op2 op).
     assert (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( ` op)) ▷ τin >=> Coll τ ⊣ τc).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op1).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op2).
     apply (proj2_sig op).
     assert (σ⟨ `op2 ⟩( σ⟨ `op1 ⟩( ` op)) ▷ τin >=> Coll τ ⊣ τc).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op2).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op1).
     apply (proj2_sig op).
     assert (exists opl:τin ⇝ Coll τ ⊣ τc, `opl = σ⟨ `op1 ⟩( σ⟨ `op2 ⟩(`op))).
@@ -425,7 +425,7 @@ Section TOptim.
     eapply lift_filter_over_bminus; eauto.
   Qed.
  
-End TOptim.
+End TNRARewrite.
 
 (* 
 *** Local Variables: ***

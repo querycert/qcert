@@ -28,17 +28,17 @@ Section NRASugar.
 
   Open Scope string_scope.
 
-  Definition nra_bind := AUnop (ADot "PBIND") AID.
-  Definition nra_data := AUnop (ADot "PDATA") AID.
-  Definition nra_data_op op := AUnop (ADot "PDATA") op.
+  Definition nra_bind := NRAUnop (OpDot "PBIND") NRAID.
+  Definition nra_data := NRAUnop (OpDot "PDATA") NRAID.
+  Definition nra_data_op op := NRAUnop (OpDot "PDATA") op.
 
   (* Match failure returns the empty sequence, success returns a singleton sequence *)
-  Definition nra_fail := AConst (dcoll nil).
-  Definition nra_match op := AUnop AColl op.
+  Definition nra_fail := NRAConst (dcoll nil).
+  Definition nra_match op := NRAUnop OpBag op.
   Definition nra_double s1 s2 (abind:nra) (adata:nra) :=
-    ABinop AConcat
-           (AUnop (ARec s1) abind)
-           (AUnop (ARec s2) adata).
+    NRABinop OpRecConcat
+           (NRAUnop (OpRec s1) abind)
+           (NRAUnop (OpRec s2) adata).
   
   Definition nra_context (abind:nra) (adata:nra) :=
     nra_double "PBIND" "PDATA" abind adata.
@@ -53,9 +53,9 @@ Section NRASugar.
 
   (* Variant used in context *)
   Definition make_fixed_nra_context_data (env:data) : nra
-    := ABinop AConcat
-              (AUnop (ARec "PBIND"%string) (AConst env))
-              (AUnop (ARec "PDATA"%string) AID).
+    := NRABinop OpRecConcat
+              (NRAUnop (OpRec "PBIND"%string) (NRAConst env))
+              (NRAUnop (OpRec "PDATA"%string) NRAID).
 
   Definition nra_wrap op  :=
     nra_double "PBIND" "PDATA" nra_bind op.
@@ -67,7 +67,7 @@ Section NRASugar.
     nra_double "a1" "PDATA" nra_bind op.
 
   Definition nra_wrap_with_bind op1 :=
-    nra_context op1 AID.
+    nra_context op1 NRAID.
   
   Definition nra_project_wrap :=
     nra_wrap_with_bind nra_fail.

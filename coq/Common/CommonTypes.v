@@ -22,10 +22,11 @@ Require Export TDataInfer.
 Require Export TDData.
 Require Export TBindings.
 Require Export TDBindings.
-Require Export TOps.
-Require Export TOpsEq.
-Require Export TOpsInfer.
-Require Export TOpsInferSub.
+Require Export TUnaryOperators.
+Require Export TBinaryOperators.
+Require Export TOperatorsEq.
+Require Export TOperatorsInfer.
+Require Export TOperatorsInferSub.
 Require Export ForeignTyping.
 
 (* 

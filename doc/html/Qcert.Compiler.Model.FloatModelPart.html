@@ -17,7 +17,7 @@
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.ForeignData.html">ForeignData</a></span>.<br/>
-<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html">ForeignOps</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Operators.ForeignOperators.html">ForeignOperators</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
 <span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html">Equivalence</a></span>.<br/>
 <br/>
@@ -42,8 +42,8 @@
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="float_foreign_data">float_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
 &nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_type">foreign_data_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#FLOAT">FLOAT</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3036')">Next Obligation.</div>
-<div class="proofscript" id="proof3036">
+<div class="toggleproof" onclick="toggleDisplay('proof3060')">Next Obligation.</div>
+<div class="proofscript" id="proof3060">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#FLOAT_eq">FLOAT_eq</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;+ <span class="id">left</span>.<br/>
@@ -55,16 +55,16 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#FLOAT_eq_correct">FLOAT_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq2</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3037')">Next Obligation.</div>
-<div class="proofscript" id="proof3037">
+<div class="toggleproof" onclick="toggleDisplay('proof3061')">Next Obligation.</div>
+<div class="proofscript" id="proof3061">
 &nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3038')">Next Obligation.</div>
-<div class="proofscript" id="proof3038">
+<div class="toggleproof" onclick="toggleDisplay('proof3062')">Next Obligation.</div>
+<div class="proofscript" id="proof3062">
 &nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3039')">Next Obligation.</div>
-<div class="proofscript" id="proof3039">
+<div class="toggleproof" onclick="toggleDisplay('proof3063')">Next Obligation.</div>
+<div class="proofscript" id="proof3063">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#FLOAT_tostring">FLOAT_tostring</a></span> <span class="id">f</span>).<br/>

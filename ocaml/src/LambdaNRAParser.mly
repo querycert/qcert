@@ -39,10 +39,10 @@
     begin match a with
     | "map" -> QLambdaNRA.lamap (resolve_one_lambda a el) e0
     | "flatmap" -> QLambdaNRA.laflatmap (resolve_one_lambda a el) e0
-    | "mapconcat" -> QLambdaNRA.lamapconcat (resolve_one_lambda a el) e0
+    | "mapproduct" -> QLambdaNRA.lamapproduct (resolve_one_lambda a el) e0
     | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
     | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
-    | "union" -> QLambdaNRA.labinop QcertCompiler.AUnion e0 (resolve_one_expr a el)
+    | "union" -> QLambdaNRA.labinop QcertCompiler.OpBagUnion e0 (resolve_one_expr a el)
     | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
@@ -110,33 +110,33 @@ expr:
 | e = expr ARROW a = IDENT
     { QLambdaNRA.laarrow (Util.char_list_of_string a) e }
 | e = expr DOT AVG LPAREN RPAREN
-    { QLambdaNRA.launop QOps.Unary.aarithmean e }
+    { QLambdaNRA.launop QOps.Unary.opnummean e }
 | STRUCT LPAREN r = reclist RPAREN
     { QLambdaNRA.lastruct r }
 | e = expr DOT a = IDENT LPAREN el=params RPAREN
     { resolve_nra_operator a el e }
 (* Unary operators *)
 | NOT LPAREN e1 = expr RPAREN
-    { QLambdaNRA.launop QOps.Unary.aneg e1 }
+    { QLambdaNRA.launop QOps.Unary.opneg e1 }
 (* Binary operators *)
 | e1 = expr EQUAL e2 = expr
-    { QLambdaNRA.labinop QOps.Binary.aeq e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.opequal e1 e2 }
 | e1 = expr NEQUAL e2 = expr
-    { QLambdaNRA.launop QOps.Unary.aneg (QLambdaNRA.labinop QOps.Binary.aeq e1 e2) }
+    { QLambdaNRA.launop QOps.Unary.opneg (QLambdaNRA.labinop QOps.Binary.opequal e1 e2) }
 | e1 = expr GT e2 = expr
-    { QLambdaNRA.launop QOps.Unary.aneg (QLambdaNRA.labinop QOps.Binary.ale e1 e2) }
+    { QLambdaNRA.launop QOps.Unary.opneg (QLambdaNRA.labinop QOps.Binary.ople e1 e2) }
 | e1 = expr LT e2 = expr
-    { QLambdaNRA.labinop QOps.Binary.alt e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.oplt e1 e2 }
 | e1 = expr MINUS e2 = expr
-    { QLambdaNRA.labinop QOps.Binary.ZArith.aminus e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.ZArith.opminus e1 e2 }
 | e1 = expr PLUS e2 = expr
-    { QLambdaNRA.labinop QOps.Binary.ZArith.aplus e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.ZArith.opplus e1 e2 }
 | e1 = expr STAR e2 = expr
-    { QLambdaNRA.labinop QOps.Binary.ZArith.amult e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.ZArith.opmult e1 e2 }
 | e1 = expr AND e2 = expr
-    { QLambdaNRA.labinop QOps.Binary.aand e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.opand e1 e2 }
 | e1 = expr OR e2 = expr
-    { QLambdaNRA.labinop QOps.Binary.aor e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.opor e1 e2 }
 
 reclist:
 | 

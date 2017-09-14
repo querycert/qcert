@@ -143,10 +143,10 @@ Section NRATest.
 
   Definition nothing : data := dunit.
 
-  Definition qpersons := (AXConst (persons)).
+  Definition qpersons := (xNRAConst (persons)).
   (* Eval compute in qpersons@nothing. *)
 
-  Definition qcompanies := (AXConst (companies)).
+  Definition qcompanies := (xNRAConst (companies)).
   (* Eval compute in qcompanies@nothing. *)
 
   (***********

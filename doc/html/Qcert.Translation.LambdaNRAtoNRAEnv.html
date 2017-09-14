@@ -30,94 +30,96 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id"><a name="lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id">op</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>) : <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">nraenv</a></span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op">op</a></span> <span class="kwd">with</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAVar">LNRAVar</a></span> <span class="id">x</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id">x</span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAVar">LNRAVar</a></span> <span class="id">x</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id">x</span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRATable">LNRATable</a></span> <span class="id">x</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvGetConstant">NRAEnvGetConstant</a></span> <span class="id">x</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAConst">LNRAConst</a></span> <span class="id">d</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvConst">NRAEnvConst</a></span> <span class="id">d</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRABinop">LNRABinop</a></span> <span class="id">b</span> <span class="id">op1</span> <span class="id">op2</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvBinop">NRAEnvBinop</a></span> <span class="id">b</span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op1</span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op2</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAUnop">LNRAUnop</a></span> <span class="id">u</span> <span class="id">op1</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> <span class="id">u</span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op1</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMap">LNRAMap</a></span> <span class="id">lop1</span> <span class="id">op2</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvMap">NRAEnvMap</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id">lop1</span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op2</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMapConcat">LNRAMapConcat</a></span> <span class="id">lop1</span> <span class="id">op2</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvMapConcat">NRAEnvMapConcat</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id">lop1</span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMapProduct">LNRAMapProduct</a></span> <span class="id">lop1</span> <span class="id">op2</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvMapProduct">NRAEnvMapProduct</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id">lop1</span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op2</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAProduct">LNRAProduct</a></span> <span class="id">op1</span> <span class="id">op2</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvProduct">NRAEnvProduct</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op1</span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op2</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAFilter">LNRAFilter</a></span> <span class="id">lop1</span> <span class="id">op2</span> =&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvSelect">NRAEnvSelect</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id">lop1</span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op2</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;<span class="kwd">with</span> <span class="id"><a name="nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> (<span class="id">lop</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lnra_lambda">lnra_lambda</a></span>) : <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">nraenv</a></span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop">lop</a></span> <span class="kwd">with</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRALambda">LNRALambda</a></span> <span class="id">x</span> <span class="id">op</span> =&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvAppEnv">NRAEnvAppEnv</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op</span>) (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvBinop">NRAEnvBinop</a></span> <span class="id"><a href="Qcert.Common.Operators.RBinaryOps.html#AConcat">AConcat</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span> (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> <span class="id">x</span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvID">NRAEnvID</a></span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvAppEnv">NRAEnvAppEnv</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id">op</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvBinop">NRAEnvBinop</a></span> <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#OpRecConcat">OpRecConcat</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span> (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpRec">OpRec</a></span> <span class="id">x</span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvID">NRAEnvID</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_var_eq">lambda_nra_to_nraenv_var_eq</a></span> <span class="id">x</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAVar">LNRAVar</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span>) = <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2987')">Proof.</div>
-<div class="proofscript" id="proof2987">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpDot">OpDot</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2950')">Proof.</div>
+<div class="proofscript" id="proof2950">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_table_eq">lambda_nra_to_nraenv_table_eq</a></span> <span class="id">x</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRATable">LNRATable</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvGetConstant">NRAEnvGetConstant</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2988')">Proof.</div>
-<div class="proofscript" id="proof2988">
+<div class="toggleproof" onclick="toggleDisplay('proof2951')">Proof.</div>
+<div class="proofscript" id="proof2951">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_const_eq">lambda_nra_to_nraenv_const_eq</a></span> <span class="id">d</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAConst">LNRAConst</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#d">d</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvConst">NRAEnvConst</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2989')">Proof.</div>
-<div class="proofscript" id="proof2989">
+<div class="toggleproof" onclick="toggleDisplay('proof2952')">Proof.</div>
+<div class="proofscript" id="proof2952">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_binop_eq">lambda_nra_to_nraenv_binop_eq</a></span> <span class="id">b</span> <span class="id">op1</span> <span class="id">op2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRABinop">LNRABinop</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#b">b</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op1">op1</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvBinop">NRAEnvBinop</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#b">b</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op1">op1</a></span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2990')">Proof.</div>
-<div class="proofscript" id="proof2990">
+<div class="toggleproof" onclick="toggleDisplay('proof2953')">Proof.</div>
+<div class="proofscript" id="proof2953">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_unop_eq">lambda_nra_to_nraenv_unop_eq</a></span> <span class="id">u</span> <span class="id">op</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAUnop">LNRAUnop</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#u">u</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op">op</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#u">u</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op">op</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2991')">Proof.</div>
-<div class="proofscript" id="proof2991">
+<div class="toggleproof" onclick="toggleDisplay('proof2954')">Proof.</div>
+<div class="proofscript" id="proof2954">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_map_eq">lambda_nra_to_nraenv_map_eq</a></span> <span class="id">lop1</span> <span class="id">op2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMap">LNRAMap</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvMap">NRAEnvMap</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2992')">Proof.</div>
-<div class="proofscript" id="proof2992">
+<div class="toggleproof" onclick="toggleDisplay('proof2955')">Proof.</div>
+<div class="proofscript" id="proof2955">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_map_concat_eq">lambda_nra_to_nraenv_map_concat_eq</a></span> <span class="id">lop1</span> <span class="id">op2</span> :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMapConcat">LNRAMapConcat</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvMapConcat">NRAEnvMapConcat</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2993')">Proof.</div>
-<div class="proofscript" id="proof2993">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAMapProduct">LNRAMapProduct</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvMapProduct">NRAEnvMapProduct</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2956')">Proof.</div>
+<div class="proofscript" id="proof2956">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_product_eq">lambda_nra_to_nraenv_product_eq</a></span> <span class="id">op1</span> <span class="id">op2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAProduct">LNRAProduct</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op1">op1</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvProduct">NRAEnvProduct</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op1">op1</a></span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2994')">Proof.</div>
-<div class="proofscript" id="proof2994">
+<div class="toggleproof" onclick="toggleDisplay('proof2957')">Proof.</div>
+<div class="proofscript" id="proof2957">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_filter_eq">lambda_nra_to_nraenv_filter_eq</a></span> <span class="id">lop1</span> <span class="id">op2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRAFilter">LNRAFilter</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvSelect">NRAEnvSelect</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop1">lop1</a></span>) (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op2">op2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2995')">Proof.</div>
-<div class="proofscript" id="proof2995">
+<div class="toggleproof" onclick="toggleDisplay('proof2958')">Proof.</div>
+<div class="proofscript" id="proof2958">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="lambda_nra_to_nraenv_lambda_eq">lambda_nra_to_nraenv_lambda_eq</a></span> <span class="id">x</span> <span class="id">op</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRALambda">LNRALambda</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op">op</a></span>) =<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvAppEnv">NRAEnvAppEnv</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op">op</a></span>) (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvBinop">NRAEnvBinop</a></span> <span class="id"><a href="Qcert.Common.Operators.RBinaryOps.html#AConcat">AConcat</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span> (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvID">NRAEnvID</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2996')">Proof.</div>
-<div class="proofscript" id="proof2996">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvAppEnv">NRAEnvAppEnv</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#op">op</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvBinop">NRAEnvBinop</a></span> <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#OpRecConcat">OpRecConcat</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvEnv">NRAEnvEnv</a></span> (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvUnop">NRAEnvUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#OpRec">OpRec</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#x">x</a></span>) <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#NRAEnvID">NRAEnvID</a></span>)).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2959')">Proof.</div>
+<div class="proofscript" id="proof2959">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -145,8 +147,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#q">q</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#env">env</a></span>) <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#d1">d1</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.Translation.global_env">global_env</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#q">q</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#env">env</a></span>) <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#d2">d2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2997')">Proof.</div>
-<div class="proofscript" id="proof2997">
+<div class="toggleproof" onclick="toggleDisplay('proof2960')">Proof.</div>
+<div class="proofscript" id="proof2960">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">lambda_nra_cases</span> (<span class="tactic">induction</span> <span class="id">q</span>) <span class="id">Case</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">intros</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="kwd">in</span> *; <span class="tactic">simpl</span> <span class="kwd">in</span> *<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -160,7 +162,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAMap</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">IHq2</span> <span class="id">d1</span> <span class="id">d2</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAMapConcat</span>"%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAMapProduct</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">IHq2</span> <span class="id">d1</span> <span class="id">d2</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAProduct</span>"%<span class="id">string</span>.<br/>
@@ -182,8 +184,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval">lambda_nra_eval</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.Translation.global_env">global_env</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#env">env</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#q">q</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.Translation.global_env">global_env</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#q">q</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#env">env</a></span>) <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2998')">Proof.</div>
-<div class="proofscript" id="proof2998">
+<div class="toggleproof" onclick="toggleDisplay('proof2961')">Proof.</div>
+<div class="proofscript" id="proof2961">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">lambda_nra_cases</span> (<span class="tactic">induction</span> <span class="id">q</span>) <span class="id">Case</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">intros</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="kwd">in</span> *; <span class="tactic">simpl</span> <span class="kwd">in</span> *<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -205,13 +207,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">IHq1</span> <span class="id">_</span> <span class="id">x</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAMapConcat</span>"%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAMapProduct</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- (<span class="id">IHq2</span> <span class="id">_</span> <span class="id">d</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#olift_ext">olift_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#lift_oncoll_ext">lift_oncoll_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">f_equal</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat_ext">rmap_concat_ext</a></span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product_ext">rmap_product_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">autorewrite</span> <span class="kwd">with</span> <span class="id">lambda_nra</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">IHq1</span> <span class="id">_</span> <span class="id">x</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -236,8 +238,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lnra_lambda_eval">lnra_lambda_eval</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.Translation.global_env">global_env</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#env">env</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop">lop</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#d">d</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.Translation.global_env">global_env</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lop">lop</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#env">env</a></span>) <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2999')">Proof.</div>
-<div class="proofscript" id="proof2999">
+<div class="toggleproof" onclick="toggleDisplay('proof2962')">Proof.</div>
+<div class="proofscript" id="proof2962">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">lop</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">env</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">lambda_nra_cases</span> (<span class="tactic">induction</span> <span class="id">l</span>) <span class="id">Case</span><br/>
@@ -268,13 +270,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHl1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort_rec_sort_app1">rec_sort_rec_sort_app1</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAMapConcat</span>"%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">LNRAMapProduct</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">IHl2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#olift_ext">olift_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#lift_oncoll_ext">lift_oncoll_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">f_equal</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat_ext">rmap_concat_ext</a></span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_product_ext">rmap_product_ext</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHl1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort_rec_sort_app1">rec_sort_rec_sort_app1</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
@@ -298,8 +300,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="eval_nraenv_q_correct">eval_nraenv_q_correct</a></span> (<span class="id">Q</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span> -&gt; <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>) (<span class="id">input</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lnra_lambda_eval_top">lnra_lambda_eval_top</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#Q">Q</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.Translation.global_env">global_env</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#input">input</a></span> = <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#eval_nraenv_q">eval_nraenv_q</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda">nraenv_of_lnra_lambda</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#q_to_lambda">q_to_lambda</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#Q">Q</a></span>)) <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#input">input</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3000')">Proof.</div>
-<div class="proofscript" id="proof3000">
+<div class="toggleproof" onclick="toggleDisplay('proof2963')">Proof.</div>
+<div class="proofscript" id="proof2963">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lnra_lambda_eval_top">lnra_lambda_eval_top</a></span>, <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#eval_nraenv_q">eval_nraenv_q</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#nraenv_of_lnra_lambda_correct">nraenv_of_lnra_lambda_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -314,8 +316,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">q</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>, <span class="kwd">forall</span> <span class="id">global_env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">lambda_nra_eval_top</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#q">q</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#global_env">global_env</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval_top">nraenv_eval_top</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#LambdaNRAtoNRAEnv.h">h</a></span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top">lambda_nra_to_nraenv_top</a></span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#q">q</a></span>) <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#global_env">global_env</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3001')">Proof.</div>
-<div class="proofscript" id="proof3001">
+<div class="toggleproof" onclick="toggleDisplay('proof2964')">Proof.</div>
+<div class="proofscript" id="proof2964">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top">lambda_nra_to_nraenv_top</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">lambda_nra_eval_top</a></span>.<br/>

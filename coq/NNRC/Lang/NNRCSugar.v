@@ -42,24 +42,24 @@ Section NNRCSugar.
   
   Definition nnrc_group_by_from_nraenv (vid venv:var) (g:string) (sl:list string) (e:nnrc) :=
     (NNRCLet (fresh_var "tappe$" (vid :: venv :: nil))
-             (NNRCUnop (ARec "$pregroup") e)
+             (NNRCUnop (OpRec "$pregroup") e)
              (NNRCFor
                 (fresh_var "tmap$"
                            (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
-                (NNRCUnop ADistinct
+                (NNRCUnop OpDistinct
                           (NNRCFor
                              (fresh_var "tmap$"
                                         (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
-                             (NNRCUnop (ADot "$pregroup")
+                             (NNRCUnop (OpDot "$pregroup")
                                        (NNRCVar (fresh_var "tappe$" (vid :: venv :: nil))))
-                             (NNRCUnop (ARecProject sl)
+                             (NNRCUnop (OpRecProject sl)
                                        (NNRCVar
                                           (fresh_var "tmap$"
                                                      (vid
                                                         :: fresh_var "tappe$" (vid :: venv :: nil)
                                                         :: nil))))))
-                (NNRCBinop AConcat
-                           (NNRCUnop (ARec g)
+                (NNRCBinop OpRecConcat
+                           (NNRCUnop (OpRec g)
                                      (NNRCLet
                                         (fresh_var "tappe$"
                                                    (fresh_var "tmap$"
@@ -67,15 +67,15 @@ Section NNRCSugar.
                                                                  :: fresh_var "tappe$" (vid :: venv :: nil)
                                                                  :: nil)
                                                               :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
-                                        (NNRCBinop AConcat
-                                                   (NNRCUnop (ARec "$key")
+                                        (NNRCBinop OpRecConcat
+                                                   (NNRCUnop (OpRec "$key")
                                                              (NNRCVar
                                                                 (fresh_var "tmap$"
                                                                            (vid
                                                                               :: fresh_var "tappe$" (vid :: venv :: nil)
                                                                               :: nil))))
                                                    (NNRCVar (fresh_var "tappe$" (vid :: venv :: nil))))
-                                        (NNRCUnop AFlatten
+                                        (NNRCUnop OpFlatten
                                                   (NNRCFor
                                                      (fresh_var "tsel$"
                                                                 (fresh_var "tmap$"
@@ -90,7 +90,7 @@ Section NNRCSugar.
                                                                                       :: fresh_var "tappe$"
                                                                                       (vid :: venv :: nil) :: nil)
                                                                            :: nil))
-                                                     (NNRCUnop (ADot "$pregroup")
+                                                     (NNRCUnop (OpDot "$pregroup")
                                                                (NNRCVar
                                                                   (fresh_var "tappe$"
                                                                              (fresh_var "tmap$"
@@ -100,8 +100,8 @@ Section NNRCSugar.
                                                                                         :: fresh_var "tappe$"
                                                                                         (vid :: venv :: nil) :: nil))))
                                                      (NNRCIf
-                                                        (NNRCBinop AEq
-                                                                   (NNRCUnop (ARecProject sl)
+                                                        (NNRCBinop OpEqual
+                                                                   (NNRCUnop (OpRecProject sl)
                                                                              (NNRCVar
                                                                                 (fresh_var "tsel$"
                                                                                            (fresh_var "tmap$"
@@ -120,7 +120,7 @@ Section NNRCSugar.
                                                                                                                  fresh_var "tappe$"
                                                                                                                  (vid :: venv :: nil)
                                                                                                                  :: nil) :: nil))))
-                                                                   (NNRCUnop (ADot "$key")
+                                                                   (NNRCUnop (OpDot "$key")
                                                                              (NNRCVar
                                                                                 (fresh_var "tappe$"
                                                                                            (fresh_var "tmap$"
@@ -130,7 +130,7 @@ Section NNRCSugar.
                                                                                                          :: nil)
                                                                                                       :: fresh_var "tappe$"
                                                                                                       (vid :: venv :: nil) :: nil)))))
-                                                        (NNRCUnop AColl
+                                                        (NNRCUnop OpBag
                                                                   (NNRCVar
                                                                      (fresh_var "tsel$"
                                                                                 (fresh_var "tmap$"
@@ -304,39 +304,39 @@ Section NNRCSugar.
   
   Definition unnest_from_nraenv vid venv a b n1 := 
     (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
-             (NNRCUnop AFlatten
+             (NNRCUnop OpFlatten
                        (NNRCFor (fresh_var "tmc$" (vid :: venv :: nil))
                                 n1
                                 (NNRCFor
                                    (fresh_var "tmc$" (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil))
                                    (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
-                                            (NNRCUnop (ADot a) (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil))))
-                                            (NNRCUnop (ARec b) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil)))))
-                                   (NNRCBinop AConcat (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil)))
+                                            (NNRCUnop (OpDot a) (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil))))
+                                            (NNRCUnop (OpRec b) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil)))))
+                                   (NNRCBinop OpRecConcat (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil)))
                                               (NNRCVar
                                                  (fresh_var "tmc$"
                                                             (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil)))))))
-             (NNRCUnop (ARecRemove a) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))).
+             (NNRCUnop (OpRecRemove a) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))).
   
   Definition unnest_from_nraenv_core vid venv a b n1 :=
     (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
-             (NNRCUnop AFlatten
+             (NNRCUnop OpFlatten
                        (NNRCFor (fresh_var "tmc$" (vid :: venv :: nil))
                                 n1
                                 (NNRCFor
                                    (fresh_var "tmc$" (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil))
                                    (NNRCFor
                                       (fresh_var "tmap$" (fresh_var "tmc$" (vid :: venv :: nil) :: venv :: nil))
-                                      (NNRCUnop (ADot a) (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil))))
-                                      (NNRCUnop (ARec b)
+                                      (NNRCUnop (OpDot a) (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil))))
+                                      (NNRCUnop (OpRec b)
                                                 (NNRCVar
                                                    (fresh_var "tmap$"
                                                               (fresh_var "tmc$" (vid :: venv :: nil) :: venv :: nil)))))
-                                   (NNRCBinop AConcat (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil)))
+                                   (NNRCBinop OpRecConcat (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil)))
                                               (NNRCVar
                                                  (fresh_var "tmc$"
                                                             (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil)))))))
-             (NNRCUnop (ARecRemove a) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))).
+             (NNRCUnop (OpRecRemove a) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))).
 
   Lemma unnest_from_nraenv_and_nraenv_core_eq {cenv} vid venv env a b op1 op1' :
     nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->

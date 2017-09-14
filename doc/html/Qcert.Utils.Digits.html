@@ -38,8 +38,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="K_nat">K_nat</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">x</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">P</span>:<span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> -&gt; <span class="kwd">Prop</span>), <span class="id"><a href="Qcert.Utils.Digits.html#P">P</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#refl_equal">refl_equal</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span>) -&gt; <span class="kwd">forall</span> <span class="id">p</span>:<span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#P">P</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof539')">Proof.</div>
-<div class="proofscript" id="proof539">
+<div class="toggleproof" onclick="toggleDisplay('proof540')">Proof.</div>
+<div class="proofscript" id="proof540">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Logic.Eqdep_dec.html#K_dec_set">K_dec_set</a></span> <span class="kwd">with</span> (<span class="id">p</span> := <span class="id">p</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Peano_dec.html#eq_nat_dec">eq_nat_dec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assumption</span>.<br/>
@@ -47,16 +47,16 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="eq_rect_eq_nat">eq_rect_eq_nat</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">p</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">Q</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>-&gt;<span class="kwd">Type</span>) (<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Digits.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#p">p</a></span>) (<span class="id">h</span>:<span class="id"><a href="Qcert.Utils.Digits.html#p">p</a></span>=<span class="id"><a href="Qcert.Utils.Digits.html#p">p</a></span>), <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_rect">eq_rect</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#Q">Q</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#p">p</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#h">h</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof540')">Proof.</div>
-<div class="proofscript" id="proof540">
+<div class="toggleproof" onclick="toggleDisplay('proof541')">Proof.</div>
+<div class="proofscript" id="proof541">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Digits.html#K_nat">K_nat</a></span> <span class="kwd">with</span> (<span class="id">p</span> := <span class="id">h</span>); <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Scheme</span> <span class="id">le_ind</span>' := <span class="kwd">Induction</span> <span class="kwd">for</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Peano.html#le">le</a></span> <span class="kwd">Sort</span> <span class="kwd">Prop</span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="le_uniqueness_proof">le_uniqueness_proof</a></span> : <span class="kwd">forall</span> (<span class="id">n</span> <span class="id">m</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">p</span> <span class="id">q</span> : <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> &lt;= <span class="id"><a href="Qcert.Utils.Digits.html#m">m</a></span>), <span class="id"><a href="Qcert.Utils.Digits.html#p">p</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#q">q</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof541')">Proof.</div>
-<div class="proofscript" id="proof541">
+<div class="toggleproof" onclick="toggleDisplay('proof542')">Proof.</div>
+<div class="proofscript" id="proof542">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">p</span> <span class="kwd">using</span> <span class="id">le_ind</span>'; <span class="tactic">intro</span> <span class="id">q</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">replace</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Peano.html#le_n">le_n</a></span> <span class="id">n</span>) <span class="kwd">with</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_rect">eq_rect</a></span> <span class="id">_</span> (<span class="kwd">fun</span> <span class="id">n0</span> =&gt; <span class="id">n</span> &lt;= <span class="id"><a href="Qcert.Utils.Digits.html#n0">n0</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Peano.html#le_n">le_n</a></span> <span class="id">n</span>) <span class="id">_</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#refl_equal">refl_equal</a></span> <span class="id">n</span>)).<br/>
@@ -93,14 +93,14 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;<span class="kwd">Section</span> <span class="id"><a name="Digits.natexplosion">natexplosion</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digit_pf_irrel">digit_pf_irrel</a></span> <span class="id">a</span> (<span class="id">pf1</span> <span class="id">pf2</span>:<span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>&lt;<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>) : <span class="id"><a href="Qcert.Utils.Digits.html#pf1">pf1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#pf2">pf2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof542')">Proof.</div>
-<div class="proofscript" id="proof542">
+<div class="toggleproof" onclick="toggleDisplay('proof543')">Proof.</div>
+<div class="proofscript" id="proof543">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Digits.html#le_uniqueness_proof">le_uniqueness_proof</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digit_ext">digit_ext</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="Qcert.Utils.Digits.html#digit">digit</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof543')">Proof.</div>
-<div class="proofscript" id="proof543">
+<div class="toggleproof" onclick="toggleDisplay('proof544')">Proof.</div>
+<div class="proofscript" id="proof544">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">destruct</span> <span class="id">b</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
@@ -116,8 +116,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_nat_aux_app">digits_to_nat_aux_app</a></span> <span class="id">l1</span> <span class="id">l2</span> <span class="id">n</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof544')">Proof.</div>
-<div class="proofscript" id="proof544">
+<div class="toggleproof" onclick="toggleDisplay('proof545')">Proof.</div>
+<div class="proofscript" id="proof545">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">n</span> <span class="id">l2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -138,25 +138,25 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">else</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#cons">cons</a></span> (<span class="id">n</span> <span class="id">mod</span> <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits_backwards">nat_to_digits_backwards</a></span> (<span class="id">n</span> / <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>)%<span class="id">nat</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof545')">Next Obligation.</div>
-<div class="proofscript" id="proof545">
+<div class="toggleproof" onclick="toggleDisplay('proof546')">Next Obligation.</div>
+<div class="proofscript" id="proof546">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof546')">Next Obligation.</div>
-<div class="proofscript" id="proof546">
+<div class="toggleproof" onclick="toggleDisplay('proof547')">Next Obligation.</div>
+<div class="proofscript" id="proof547">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.divmod_spec">Nat.divmod_spec</a></span> <span class="id">n</span> <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> 0 <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.divmod">Nat.divmod</a></span> <span class="id">n</span> <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> 0 <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>); <span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.mod_upper_bound">Nat.mod_upper_bound</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof547')">Next Obligation.</div>
-<div class="proofscript" id="proof547">
+<div class="toggleproof" onclick="toggleDisplay('proof548')">Next Obligation.</div>
+<div class="proofscript" id="proof548">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.div_lt">Nat.div_lt</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof548')">Next Obligation.</div>
-<div class="proofscript" id="proof548">
+<div class="toggleproof" onclick="toggleDisplay('proof549')">Next Obligation.</div>
+<div class="proofscript" id="proof549">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux_app">digits_to_nat_aux_app</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -187,8 +187,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#rev">rev</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits_backwards">nat_to_digits_backwards</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>).<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="trim_digits_to_nat">trim_digits_to_nat</a></span> <span class="id">l</span> : <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#trim_digits">trim_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>) = <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof549')">Proof.</div>
-<div class="proofscript" id="proof549">
+<div class="toggleproof" onclick="toggleDisplay('proof550')">Proof.</div>
+<div class="proofscript" id="proof550">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
@@ -198,8 +198,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_nat_aux_acc_le_preserve">digits_to_nat_aux_acc_le_preserve</a></span> <span class="id">l</span> <span class="id">acc</span> <span class="id">acc</span>':<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#acc">acc</a></span> &lt;= <span class="id">acc</span>' -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#acc">acc</a></span> &lt;= <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span> <span class="id">acc</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof550')">Proof.</div>
-<div class="proofscript" id="proof550">
+<div class="toggleproof" onclick="toggleDisplay('proof551')">Proof.</div>
+<div class="proofscript" id="proof551">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">acc</span> <span class="id">acc</span>'.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
@@ -210,8 +210,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_nat_aux_le">digits_to_nat_aux_le</a></span> <span class="id">l</span> <span class="id">acc</span> : <span class="id"><a href="Qcert.Utils.Digits.html#acc">acc</a></span> &lt;= <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#acc">acc</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof551')">Proof.</div>
-<div class="proofscript" id="proof551">
+<div class="toggleproof" onclick="toggleDisplay('proof552')">Proof.</div>
+<div class="proofscript" id="proof552">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">acc</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">auto</span>.<br/>
@@ -229,8 +229,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_nat_aux_bound">digits_to_nat_aux_bound</a></span> <span class="id">l</span> <span class="id">c</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span>*(<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>^<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#length">length</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>) &lt;= <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> &lt;  (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span>+1)*(<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>^(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#length">length</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof552')">Proof.</div>
-<div class="proofscript" id="proof552">
+<div class="toggleproof" onclick="toggleDisplay('proof553')">Proof.</div>
+<div class="proofscript" id="proof553">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">c</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">split</span>.<br/>
@@ -271,8 +271,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> &lt; <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> + <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>) * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> &lt; (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> + <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> + 1) * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> &lt; <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof553')">Proof.</div>
-<div class="proofscript" id="proof553">
+<div class="toggleproof" onclick="toggleDisplay('proof554')">Proof.</div>
+<div class="proofscript" id="proof554">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> ? ? ? <span class="id">lt1</span> <span class="id">ltn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">le12</span>:<span class="id">c</span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id">n2</span> + 0 &lt;= <span class="id">c</span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id">n2</span> + <span class="id">a</span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id">n2</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Plus.html#plus_le_compat_l">plus_le_compat_l</a></span>.<br/>
@@ -348,8 +348,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> &lt; <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> + <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>) * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> &lt; (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> + <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> + 1) * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> &lt; <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof554')">Proof.</div>
-<div class="proofscript" id="proof554">
+<div class="toggleproof" onclick="toggleDisplay('proof555')">Proof.</div>
+<div class="proofscript" id="proof555">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> ? ? ? <span class="id">lt1</span> <span class="id">ltn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">c</span> == 0)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; [ | <span class="tactic">eapply</span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux_acc_inj_helper1">digits_to_nat_aux_acc_inj_helper1</a></span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span> <span class="id">n1</span> <span class="id">n2</span>); <span class="tactic">eauto</span>].<br/>
@@ -384,8 +384,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_nat_aux_acc_inj_helper2">digits_to_nat_aux_acc_inj_helper2</a></span> <span class="id">a</span> <span class="id">b</span> <span class="id">c</span> <span class="id">n</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> + <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>) * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> &lt; (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> + <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> + 1) * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> &lt; <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof555')">Proof.</div>
-<div class="proofscript" id="proof555">
+<div class="toggleproof" onclick="toggleDisplay('proof556')">Proof.</div>
+<div class="proofscript" id="proof556">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">lt1</span> <span class="id">l2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Lt.html#lt_not_le">lt_not_le</a></span> <span class="kwd">in</span> <span class="id">lt1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">lt1</span>.<br/>
@@ -401,8 +401,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> &lt; <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> &lt; (<span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> + 1) * <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span> ^ <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> &lt; <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof556')">Proof.</div>
-<div class="proofscript" id="proof556">
+<div class="toggleproof" onclick="toggleDisplay('proof557')">Proof.</div>
+<div class="proofscript" id="proof557">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> ? ? ? <span class="id">lt1</span> <span class="id">l2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Lt.html#lt_not_le">lt_not_le</a></span> <span class="kwd">in</span> <span class="id">lt1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">lt1</span>.<br/>
@@ -426,8 +426,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 &lt;&gt; <span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span>*<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>+<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>) = <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span>*<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>+<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#length">length</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#length">length</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span>) /\ <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof557')">Proof.</div>
-<div class="proofscript" id="proof557">
+<div class="toggleproof" onclick="toggleDisplay('proof558')">Proof.</div>
+<div class="proofscript" id="proof558">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">alt</span>]; <span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">blt</span>]; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">cne0</span> <span class="id">eqq1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux_bound">digits_to_nat_aux_bound</a></span> <span class="id">l1</span> (<span class="id">c</span>*<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>+<span class="id">a</span>)) <span class="kwd">as</span> [<span class="id">lb1</span> <span class="id">ub1</span>].<br/>
@@ -461,8 +461,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span> &lt;&gt; 0 -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span>*<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>+<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>) = <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#c">c</a></span>*<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>+<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#length">length</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#length">length</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span>) /\ <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof558')">Proof.</div>
-<div class="proofscript" id="proof558">
+<div class="toggleproof" onclick="toggleDisplay('proof559')">Proof.</div>
+<div class="proofscript" id="proof559">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">a</span> <span class="id">alt</span>]; <span class="tactic">destruct</span> <span class="id">b</span> <span class="kwd">as</span> [<span class="id">b</span> <span class="id">blt</span>]; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">ane0</span> <span class="id">bne0</span> <span class="id">eqq1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux_bound">digits_to_nat_aux_bound</a></span> <span class="id">l1</span> (<span class="id">c</span>*<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>+<span class="id">a</span>)) <span class="kwd">as</span> [<span class="id">lb1</span> <span class="id">ub1</span>].<br/>
@@ -495,8 +495,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> &lt;&gt; 0 -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof559')">Proof.</div>
-<div class="proofscript" id="proof559">
+<div class="toggleproof" onclick="toggleDisplay('proof560')">Proof.</div>
+<div class="proofscript" id="proof560">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">l2</span> <span class="id">n</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">destruct</span> <span class="id">l2</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
@@ -536,8 +536,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="trim_digits_nz">trim_digits_nz</a></span> {<span class="id">y</span> <span class="id">d</span> <span class="id">l</span>}: <span class="id"><a href="Qcert.Utils.Digits.html#trim_digits">trim_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#y">y</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#d">d</a></span> :: <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#proj1_sig">proj1_sig</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#d">d</a></span> &lt;&gt; 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof560')">Proof.</div>
-<div class="proofscript" id="proof560">
+<div class="toggleproof" onclick="toggleDisplay('proof561')">Proof.</div>
+<div class="proofscript" id="proof561">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">y</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">trivial</span>.<br/>
@@ -550,8 +550,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_nat_nzero">digits_to_nat_nzero</a></span> <span class="id">l</span> <span class="id">x</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> &lt;&gt; 0 -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_aux">digits_to_nat_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> &lt;&gt; 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof561')">Proof.</div>
-<div class="proofscript" id="proof561">
+<div class="toggleproof" onclick="toggleDisplay('proof562')">Proof.</div>
+<div class="proofscript" id="proof562">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">IHl</span>.<br/>
@@ -563,8 +563,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="trim_nat_to_digits">trim_nat_to_digits</a></span> <span class="id">x</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#trim_digits">trim_digits</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span>) = <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof562')">Proof.</div>
-<div class="proofscript" id="proof562">
+<div class="toggleproof" onclick="toggleDisplay('proof563')">Proof.</div>
+<div class="proofscript" id="proof563">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits_backwards">nat_to_digits_backwards</a></span> <span class="id">x</span>); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">_</span> <span class="id">pf2</span>].<br/>
@@ -579,8 +579,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="digits_to_nat_inv">digits_to_nat_inv</a></span> <span class="id">x</span> <span class="id">y</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#y">y</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#trim_digits">trim_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#trim_digits">trim_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#y">y</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof563')">Proof.</div>
-<div class="proofscript" id="proof563">
+<div class="toggleproof" onclick="toggleDisplay('proof564')">Proof.</div>
+<div class="proofscript" id="proof564">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- (<span class="id"><a href="Qcert.Utils.Digits.html#trim_digits_to_nat">trim_digits_to_nat</a></span> <span class="id">x</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- (<span class="id"><a href="Qcert.Utils.Digits.html#trim_digits_to_nat">trim_digits_to_nat</a></span> <span class="id">y</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span>.<br/>
@@ -610,8 +610,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nat_to_digits_inv">nat_to_digits_inv</a></span> <span class="id">x</span> <span class="id">y</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#y">y</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#x">x</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#y">y</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof564')">Proof.</div>
-<div class="proofscript" id="proof564">
+<div class="toggleproof" onclick="toggleDisplay('proof565')">Proof.</div>
+<div class="proofscript" id="proof565">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits_backwards">nat_to_digits_backwards</a></span> <span class="id">x</span>);<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits_backwards">nat_to_digits_backwards</a></span> <span class="id">y</span>).<br/>
@@ -622,8 +622,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nat_to_digits_to_nat">nat_to_digits_to_nat</a></span> (<span class="id">n</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>) = <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof565')">Proof.</div>
-<div class="proofscript" id="proof565">
+<div class="toggleproof" onclick="toggleDisplay('proof566')">Proof.</div>
+<div class="proofscript" id="proof566">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits_backwards">nat_to_digits_backwards</a></span> <span class="id">n</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -635,8 +635,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="digits_to_nat_to_digits">digits_to_nat_to_digits</a></span> (<span class="id">ld</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#digit">digit</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat">digits_to_nat</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span>) = <span class="id"><a href="Qcert.Utils.Digits.html#trim_digits">trim_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof566')">Proof.</div>
-<div class="proofscript" id="proof566">
+<div class="toggleproof" onclick="toggleDisplay('proof567')">Proof.</div>
+<div class="proofscript" id="proof567">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Utils.Digits.html#trim_nat_to_digits">trim_nat_to_digits</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_nat_inv">digits_to_nat_inv</a></span>.<br/>
@@ -744,8 +744,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="char_to_digit_to_char">char_to_digit_to_char</a></span> (<span class="id">a</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.Ascii.html#ascii">ascii</a></span>) (<span class="id">d</span>:<span class="id"><a href="Qcert.Utils.Digits.html#digit">digit</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#d">d</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Digits.html#digit_to_char">digit_to_char</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#d">d</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof567')">Proof.</div>
-<div class="proofscript" id="proof567">
+<div class="toggleproof" onclick="toggleDisplay('proof568')">Proof.</div>
+<div class="proofscript" id="proof568">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#digit_to_char">digit_to_char</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">destruct</span> <span class="id">b0</span><br/>
@@ -764,8 +764,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digit_to_char_to_digit">digit_to_char_to_digit</a></span> (<span class="id">basesmall</span>:<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>&lt;=<span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span>) (<span class="id">d</span>:<span class="id"><a href="Qcert.Utils.Digits.html#digit">digit</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#digit_to_char">digit_to_char</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#d">d</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof568')">Proof.</div>
-<div class="proofscript" id="proof568">
+<div class="toggleproof" onclick="toggleDisplay('proof569')">Proof.</div>
+<div class="proofscript" id="proof569">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#digit_to_char">digit_to_char</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span> <span class="kwd">in</span> *.<br/>
@@ -815,8 +815,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="string_to_digits_to_string_aux">string_to_digits_to_string_aux</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">ld</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#digit">digit</a></span>) (<span class="id">rest</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span>,<span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string_aux">digits_to_string_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>)%<span class="id">string</span> = <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof569')">Proof.</div>
-<div class="proofscript" id="proof569">
+<div class="toggleproof" onclick="toggleDisplay('proof570')">Proof.</div>
+<div class="proofscript" id="proof570">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">ld</span> <span class="id">rest</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span> <span class="id">a</span>); [<span class="tactic">intros</span> ? <span class="id">eqq</span> | <span class="tactic">intros</span> <span class="id">eqq</span>]<br/>
@@ -839,8 +839,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="string_to_digits_to_string">string_to_digits_to_string</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">ld</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#digit">digit</a></span>) (<span class="id">rest</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span>,<span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string">digits_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>)%<span class="id">string</span> = <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof570')">Proof.</div>
-<div class="proofscript" id="proof570">
+<div class="toggleproof" onclick="toggleDisplay('proof571')">Proof.</div>
+<div class="proofscript" id="proof571">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string">digits_to_string</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string_aux">digits_to_string_aux</a></span> <span class="id">ld</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
@@ -857,8 +857,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="string_to_digits_empty">string_to_digits_empty</a></span> : <span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> ""%<span class="id">string</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof571')">Proof.</div>
-<div class="proofscript" id="proof571">
+<div class="toggleproof" onclick="toggleDisplay('proof572')">Proof.</div>
+<div class="proofscript" id="proof572">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -885,8 +885,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=  <span class="id"><a href="Qcert.Utils.Digits.html#default_to_string0">default_to_string0</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#trim_extra_stringdigits">trim_extra_stringdigits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>). <br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digit0pf">digit0pf</a></span> : 0 &lt; <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof572')">Proof.</div>
-<div class="proofscript" id="proof572">
+<div class="toggleproof" onclick="toggleDisplay('proof573')">Proof.</div>
+<div class="proofscript" id="proof573">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -899,8 +899,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="char_to_digit0">char_to_digit0</a></span> : (<span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span> "0") = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#digit0">digit0</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof573')">Proof.</div>
-<div class="proofscript" id="proof573">
+<div class="toggleproof" onclick="toggleDisplay('proof574')">Proof.</div>
+<div class="proofscript" id="proof574">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html#lt_dec">lt_dec</a></span> 0 <span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>).<br/>
@@ -912,8 +912,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="char_to_digit0_inv">char_to_digit0_inv</a></span> <span class="id">a</span> <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> 0 <span class="id"><a href="Qcert.Utils.Digits.html#pf">pf</a></span>) -&gt; <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> = "0"%<span class="id">char</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof574')">Proof.</div>
-<div class="proofscript" id="proof574">
+<div class="toggleproof" onclick="toggleDisplay('proof575')">Proof.</div>
+<div class="proofscript" id="proof575">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit_to_char">char_to_digit_to_char</a></span> <span class="kwd">in</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">eqq</span>.<br/>
@@ -924,8 +924,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#trim_stringdigits">trim_stringdigits</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#String">String</a></span> "0" <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>)) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#trim_stringdigits">trim_stringdigits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof575')">Proof.</div>
-<div class="proofscript" id="proof575">
+<div class="toggleproof" onclick="toggleDisplay('proof576')">Proof.</div>
+<div class="proofscript" id="proof576">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#trim_stringdigits">trim_stringdigits</a></span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -933,8 +933,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="trim_extra_stringdigits_None">trim_extra_stringdigits_None</a></span> <span class="id">rest</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#trim_extra_stringdigits">trim_extra_stringdigits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof576')">Proof.</div>
-<div class="proofscript" id="proof576">
+<div class="toggleproof" onclick="toggleDisplay('proof577')">Proof.</div>
+<div class="proofscript" id="proof577">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">rest</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">destruct</span> <span class="id">b0</span><br/>
@@ -950,8 +950,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="trim_extra_stringdigits_nzero">trim_extra_stringdigits_nzero</a></span>  <span class="id">a</span> <span class="id">s</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span>&lt;&gt; "0"%<span class="id">char</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#trim_extra_stringdigits">trim_extra_stringdigits</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#String">String</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#String">String</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof577')">Proof.</div>
-<div class="proofscript" id="proof577">
+<div class="toggleproof" onclick="toggleDisplay('proof578')">Proof.</div>
+<div class="proofscript" id="proof578">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">neqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">destruct</span> <span class="id">b0</span><br/>
@@ -964,8 +964,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="string_to_digits_trim">string_to_digits_trim</a></span> <span class="id">s</span> <span class="id">l</span> <span class="id">rest</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#trim_stringdigits">trim_stringdigits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#default_to_digits0">default_to_digits0</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#trim_digits">trim_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>),<span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof578')">Proof.</div>
-<div class="proofscript" id="proof578">
+<div class="toggleproof" onclick="toggleDisplay('proof579')">Proof.</div>
+<div class="proofscript" id="proof579">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">l</span> <span class="id">rest</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Digits.html#char_to_digit">char_to_digit</a></span> <span class="id">a</span>)<br/>
@@ -1023,8 +1023,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span> &lt;&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string_aux">digits_to_string_aux</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#ld">ld</a></span>,<span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof579')">Proof.</div>
-<div class="proofscript" id="proof579">
+<div class="toggleproof" onclick="toggleDisplay('proof580')">Proof.</div>
+<div class="proofscript" id="proof580">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqq1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">ld</span>; <span class="tactic">simpl</span>.<br/>
@@ -1057,8 +1057,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_string_default">digits_to_string_default</a></span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string">digits_to_string</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#default_to_digits0">default_to_digits0</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>) = <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string">digits_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof580')">Proof.</div>
-<div class="proofscript" id="proof580">
+<div class="toggleproof" onclick="toggleDisplay('proof581')">Proof.</div>
+<div class="proofscript" id="proof581">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#default_to_digits0">default_to_digits0</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string">digits_to_string</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -1066,8 +1066,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="string_to_nat_to_string">string_to_nat_to_string</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">n</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">rest</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_nat">string_to_nat</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>,<span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>)%<span class="id">string</span> = <span class="id"><a href="Qcert.Utils.Digits.html#trim_stringdigits">trim_stringdigits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof581')">Proof.</div>
-<div class="proofscript" id="proof581">
+<div class="toggleproof" onclick="toggleDisplay('proof582')">Proof.</div>
+<div class="proofscript" id="proof582">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#string_to_nat">string_to_nat</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id">s</span>); <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">p</span>; <span class="tactic">intros</span> <span class="id">eqq1</span> <span class="id">eqq2</span>.<br/>
@@ -1081,8 +1081,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="digits_to_string_aux_empty">digits_to_string_aux_empty</a></span> <span class="id">n</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string_aux">digits_to_string_aux</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>) = ""%<span class="id">string</span> -&gt; <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> = 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof582')">Proof.</div>
-<div class="proofscript" id="proof582">
+<div class="toggleproof" onclick="toggleDisplay('proof583')">Proof.</div>
+<div class="proofscript" id="proof583">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits_backwards">nat_to_digits_backwards</a></span> <span class="id">n</span>); <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span> <span class="kwd">as</span> [<span class="id">pf1</span> <span class="id">pf2</span>].<br/>
@@ -1095,16 +1095,16 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="append_nil_r">append_nil_r</a></span> <span class="id">s</span> : (<span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span> ++ "")%<span class="id">string</span> = <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof583')">Proof.</div>
-<div class="proofscript" id="proof583">
+<div class="toggleproof" onclick="toggleDisplay('proof584')">Proof.</div>
+<div class="proofscript" id="proof584">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">s</span>; <span class="tactic">simpl</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nat_to_string_to_nat">nat_to_string_to_nat</a></span> (<span class="id">basesmall</span>:<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>&lt;=<span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span>) <span class="id">n</span> (<span class="id">rest</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_nat">string_to_nat</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof584')">Proof.</div>
-<div class="proofscript" id="proof584">
+<div class="toggleproof" onclick="toggleDisplay('proof585')">Proof.</div>
+<div class="proofscript" id="proof585">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#string_to_nat">string_to_nat</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span>; <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string">digits_to_string</a></span>.<br/>
@@ -1147,8 +1147,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#rest2">rest2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest1">rest1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest2">rest2</a></span>)%<span class="id">string</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> /\ <span class="id"><a href="Qcert.Utils.Digits.html#rest1">rest1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#rest2">rest2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof585')">Proof.</div>
-<div class="proofscript" id="proof585">
+<div class="toggleproof" onclick="toggleDisplay('proof586')">Proof.</div>
+<div class="proofscript" id="proof586">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">neq1</span> <span class="id">neq2</span> <span class="id">eqq1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string_to_nat">nat_to_string_to_nat</a></span> <span class="id">basesmall</span> <span class="id">n1</span> <span class="id">rest1</span> <span class="id">neq1</span>); <span class="tactic">intros</span> <span class="id">eqq11</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string_to_nat">nat_to_string_to_nat</a></span> <span class="id">basesmall</span> <span class="id">n2</span> <span class="id">rest2</span> <span class="id">neq2</span>); <span class="tactic">intros</span> <span class="id">eqq12</span>.<br/>
@@ -1160,8 +1160,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nat_to_string_inj">nat_to_string_inj</a></span> (<span class="id">basesmall</span>:<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>&lt;=<span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span>) <span class="id">n1</span> <span class="id">n2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof586')">Proof.</div>
-<div class="proofscript" id="proof586">
+<div class="toggleproof" onclick="toggleDisplay('proof587')">Proof.</div>
+<div class="proofscript" id="proof587">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> ((<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string_inj_full">nat_to_string_inj_full</a></span> <span class="id">basesmall</span> <span class="id">n1</span> <span class="id">n2</span> "" "")%<span class="id">string</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -1216,8 +1216,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nat_to_string_nempty">nat_to_string_nempty</a></span> <span class="id">n</span> : <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> &lt;&gt; ""%<span class="id">string</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof587')">Proof.</div>
-<div class="proofscript" id="proof587">
+<div class="toggleproof" onclick="toggleDisplay('proof588')">Proof.</div>
+<div class="proofscript" id="proof588">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#nat_to_string">nat_to_string</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string">digits_to_string</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Digits.html#digits_to_string_aux">digits_to_string_aux</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#nat_to_digits">nat_to_digits</a></span> <span class="id">n</span>)); <span class="tactic">simpl</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -1225,8 +1225,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="append_empty_both">append_empty_both</a></span> <span class="id">l1</span> <span class="id">l2</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: (<span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span>)%<span class="id">string</span> = ""%<span class="id">string</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#l1">l1</a></span> = ""%<span class="id">string</span> /\ <span class="id"><a href="Qcert.Utils.Digits.html#l2">l2</a></span> = ""%<span class="id">string</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof588')">Proof.</div>
-<div class="proofscript" id="proof588">
+<div class="toggleproof" onclick="toggleDisplay('proof589')">Proof.</div>
+<div class="proofscript" id="proof589">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">l1</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">tauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">inversion</span> 1.<br/>
@@ -1235,8 +1235,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="string_to_Z_to_string">string_to_Z_to_string</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">n</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) (<span class="id">rest</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_Z">string_to_Z</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>,<span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>)%<span class="id">string</span> = <span class="id"><a href="Qcert.Utils.Digits.html#trim_stringZdigits">trim_stringZdigits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#s">s</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof589')">Proof.</div>
-<div class="proofscript" id="proof589">
+<div class="toggleproof" onclick="toggleDisplay('proof590')">Proof.</div>
+<div class="proofscript" id="proof590">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#string_to_Z">string_to_Z</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">s</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
@@ -1271,8 +1271,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="Z_to_string_to_Z">Z_to_string_to_Z</a></span> (<span class="id">basesmall</span>:(<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>&lt;=<span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span>)%<span class="id">nat</span>) <span class="id">n</span> (<span class="id">rest</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_Z">string_to_Z</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Digits.html#n">n</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#rest">rest</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof590')">Proof.</div>
-<div class="proofscript" id="proof590">
+<div class="toggleproof" onclick="toggleDisplay('proof591')">Proof.</div>
+<div class="proofscript" id="proof591">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Digits.html#string_to_Z">string_to_Z</a></span>, <span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">neq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">n</span>; <span class="tactic">simpl</span>.<br/>
@@ -1310,8 +1310,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#string_to_digits">string_to_digits</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#rest2">rest2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest1">rest1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> ++ <span class="id"><a href="Qcert.Utils.Digits.html#rest2">rest2</a></span>)%<span class="id">string</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> /\ <span class="id"><a href="Qcert.Utils.Digits.html#rest1">rest1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#rest2">rest2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof591')">Proof.</div>
-<div class="proofscript" id="proof591">
+<div class="toggleproof" onclick="toggleDisplay('proof592')">Proof.</div>
+<div class="proofscript" id="proof592">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">neq1</span> <span class="id">neq2</span> <span class="id">eqq1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string_to_Z">Z_to_string_to_Z</a></span> <span class="id">basesmall</span> <span class="id">n1</span> <span class="id">rest1</span> <span class="id">neq1</span>); <span class="tactic">intros</span> <span class="id">eqq11</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string_to_Z">Z_to_string_to_Z</a></span> <span class="id">basesmall</span> <span class="id">n2</span> <span class="id">rest2</span> <span class="id">neq2</span>); <span class="tactic">intros</span> <span class="id">eqq12</span>.<br/>
@@ -1323,8 +1323,8 @@ main use for this is when defining fresh names. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="Z_to_string_inj">Z_to_string_inj</a></span> (<span class="id">basesmall</span>:(<span class="id"><a href="Qcert.Utils.Digits.html#Digits.base">base</a></span>&lt;=<span class="id"><a href="Qcert.Utils.Digits.html#maxbase">maxbase</a></span>)%<span class="id">nat</span>) <span class="id">n1</span> <span class="id">n2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string">Z_to_string</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Digits.html#n1">n1</a></span> = <span class="id"><a href="Qcert.Utils.Digits.html#n2">n2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof592')">Proof.</div>
-<div class="proofscript" id="proof592">
+<div class="toggleproof" onclick="toggleDisplay('proof593')">Proof.</div>
+<div class="proofscript" id="proof593">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> ((<span class="id"><a href="Qcert.Utils.Digits.html#Z_to_string_inj_full">Z_to_string_inj_full</a></span> <span class="id">basesmall</span> <span class="id">n1</span> <span class="id">n2</span> "" "")%<span class="id">string</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -1345,8 +1345,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">pf</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Peano.html#lt">lt</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof593')">Proof.</div>
-<div class="proofscript" id="proof593">
+<div class="toggleproof" onclick="toggleDisplay('proof594')">Proof.</div>
+<div class="proofscript" id="proof594">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html#lt_dec">lt_dec</a></span>); <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -1355,8 +1355,8 @@ main use for this is when defining fresh names. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">pf</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Peano.html#le">le</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#a">a</a></span> <span class="id"><a href="Qcert.Utils.Digits.html#b">b</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof594')">Proof.</div>
-<div class="proofscript" id="proof594">
+<div class="toggleproof" onclick="toggleDisplay('proof595')">Proof.</div>
+<div class="proofscript" id="proof595">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html#le_dec">le_dec</a></span>); <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>

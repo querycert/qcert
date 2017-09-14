@@ -30,14 +30,14 @@
 <span class="kwd">Context</span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>}.<br/>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="top_subtype">top_subtype</a></span> <span class="id">z</span> : ⊤ &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#z">z</a></span> -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#z">z</a></span> = ⊤.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1118')">Proof.</div>
-<div class="proofscript" id="proof1118">
+<div class="toggleproof" onclick="toggleDisplay('proof1132')">Proof.</div>
+<div class="proofscript" id="proof1132">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="tactic">eauto</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="subtype_bottom">subtype_bottom</a></span> <span class="id">z</span> : <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#z">z</a></span> &lt;: ⊥ -&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#z">z</a></span> = ⊥.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1119')">Proof.</div>
-<div class="proofscript" id="proof1119">
+<div class="toggleproof" onclick="toggleDisplay('proof1133')">Proof.</div>
+<div class="proofscript" id="proof1133">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="tactic">eauto</span>.<br/>
 Qed.</div>
 <br/>
@@ -48,8 +48,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 <span class="kwd">Instance</span> <span class="id"><a name="subtype_trans">subtype_trans</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Transitive">Transitive</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1120')">Proof.</div>
-<div class="proofscript" id="proof1120">
+<div class="toggleproof" onclick="toggleDisplay('proof1134')">Proof.</div>
+<div class="proofscript" id="proof1134">
 &nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#subtype">subtype</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">red</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
@@ -85,16 +85,16 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="subtype_pre">subtype_pre</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1121')">Proof.</div>
-<div class="proofscript" id="proof1121">
+<div class="toggleproof" onclick="toggleDisplay('proof1135')">Proof.</div>
+<div class="proofscript" id="proof1135">
 &nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#subtype_trans">subtype_trans</a></span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="Rec_subtype_cons_weaken">Rec_subtype_cons_weaken</a></span> <span class="id">k</span> <span class="id">s</span> <span class="id">r</span> <span class="id">l</span>₁ <span class="id">pf</span> <span class="id">pf2</span>: <br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k">k</a></span> ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#r">r</a></span>) :: <span class="id">l</span>₁) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="kwd">Open</span> <span class="id">l</span>₁ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1122')">Proof.</div>
-<div class="proofscript" id="proof1122">
+<div class="toggleproof" onclick="toggleDisplay('proof1136')">Proof.</div>
+<div class="proofscript" id="proof1136">
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#SRec_open">SRec_open</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s0</span> <span class="id">s</span>); [<span class="tactic">intros</span> ? ?; <span class="tactic">subst</span> | <span class="tactic">eauto</span>].<br/>
@@ -109,8 +109,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> <span class="id">l</span>₁ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k2">k2</a></span> ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#r">r</a></span>) :: <span class="id">l</span>₂) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">pf</span>', <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> <span class="id">l</span>₁ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="kwd">Open</span> <span class="id">l</span>₂ <span class="id">pf</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1123')">Proof.</div>
-<div class="proofscript" id="proof1123">
+<div class="toggleproof" onclick="toggleDisplay('proof1137')">Proof.</div>
+<div class="proofscript" id="proof1137">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id">pf2</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.Assoc.html#domain_cons">domain_cons</a></span>, <span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted_cons">is_list_sorted_cons</a></span>.<br/>
@@ -123,8 +123,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#r">r</a></span>) :: <span class="id">l</span>₁) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k2">k2</a></span> <span class="id">l</span>₂ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">l</span>₂ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k2">k2</a></span> = <span class="kwd">Open</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1124')">Proof.</div>
-<div class="proofscript" id="proof1124">
+<div class="toggleproof" onclick="toggleDisplay('proof1138')">Proof.</div>
+<div class="proofscript" id="proof1138">
 &nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">rt</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">k2</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">lo</span>.<br/>
@@ -141,8 +141,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">l</span>₂ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">pf</span>', <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> <span class="id">l</span>₁ <span class="id">pf</span>' &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="kwd">Open</span> <span class="id">l</span>₂ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1125')">Proof.</div>
-<div class="proofscript" id="proof1125">
+<div class="toggleproof" onclick="toggleDisplay('proof1139')">Proof.</div>
+<div class="proofscript" id="proof1139">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">rt</span> <span class="id">lo</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#Rec_subtype_cons_inv1_open">Rec_subtype_cons_inv1_open</a></span> <span class="id">rt</span> <span class="id">lo</span>); <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">rt</span>; <span class="tactic">subst</span>; <span class="id">rtype_equalizer</span>.<br/>
@@ -170,8 +170,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#r1">r1</a></span>) :: <span class="id">l</span>₁) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k2">k2</a></span> ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#r2">r2</a></span>) :: <span class="id">l</span>₂) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id">exists</span> <span class="id">pf</span>' <span class="id">pf2</span>', <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> <span class="id">l</span>₁ <span class="id">pf</span>' &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k2">k2</a></span> <span class="id">l</span>₂ <span class="id">pf2</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1126')">Proof.</div>
-<div class="proofscript" id="proof1126">
+<div class="toggleproof" onclick="toggleDisplay('proof1140')">Proof.</div>
+<div class="proofscript" id="proof1140">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">rt</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">rt</span>; <span class="tactic">subst</span>; <span class="id">rtype_equalizer</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">repeat</span> (<span class="id">exists</span> (<span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted_cons_inv">is_list_sorted_cons_inv</a></span> <span class="id">_</span> <span class="id">pf</span>)). <span class="tactic">reflexivity</span>.<br/>
@@ -203,8 +203,8 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="subtype_part">subtype_part</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype">subtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1127')">Proof.</div>
-<div class="proofscript" id="proof1127">
+<div class="toggleproof" onclick="toggleDisplay('proof1141')">Proof.</div>
+<div class="proofscript" id="proof1141">
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#relation_equivalence">relation_equivalence</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#predicate_equivalence">predicate_equivalence</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#relation_conjunction">relation_conjunction</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#predicate_intersection">predicate_intersection</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#flip">Basics.flip</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">intuition</span>.<br/>
@@ -286,8 +286,8 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="wf_rtype_subtype_refl">wf_rtype_subtype_refl</a></span> τ <span class="id">pf1</span> <span class="id">pf2</span>:<br/>
 &nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) τ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf1">pf1</a></span> &lt;:<br/>
 &nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) τ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1128')">Proof.</div>
-<div class="proofscript" id="proof1128">
+<div class="toggleproof" onclick="toggleDisplay('proof1142')">Proof.</div>
+<div class="proofscript" id="proof1142">
 &nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id">wf_rtype</span>₀<span class="id">_ext</span> <span class="id">pf1</span> <span class="id">pf2</span>); <span class="tactic">intros</span> <span class="id">s</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">subst</span>. <span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
@@ -295,8 +295,8 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="Rec_subtype_cons_eq">Rec_subtype_cons_eq</a></span> {<span class="id">k</span>₁ <span class="id">k</span>₂ <span class="id">s</span> <span class="id">r</span>₁ <span class="id">r</span>₂ <span class="id">rl</span>₁ <span class="id">rl</span>₂ <span class="id">pf1</span> <span class="id">pf2</span>}  :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₁ ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, <span class="id">r</span>₁) :: <span class="id">rl</span>₁) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf1">pf1</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₂ ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, <span class="id">r</span>₂) :: <span class="id">rl</span>₂) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">r</span>₁ &lt;: <span class="id">r</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1129')">Proof.</div>
-<div class="proofscript" id="proof1129">
+<div class="toggleproof" onclick="toggleDisplay('proof1143')">Proof.</div>
+<div class="proofscript" id="proof1143">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="id">rtype_equalizer</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">subst</span>; <span class="tactic">intros</span>. <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">rl1</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
@@ -315,32 +315,32 @@ Qed.</div>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id">STop</span>₀ <span class="id">pf</span> τ : τ &lt;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) ⊤₀ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1130')">Proof.</div>
-<div class="proofscript" id="proof1130">
+<div class="toggleproof" onclick="toggleDisplay('proof1144')">Proof.</div>
+<div class="proofscript" id="proof1144">
 &nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#STop">STop</a></span> τ).<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> τ; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Top">Top</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype_ext">subtype_ext</a></span>; <span class="tactic">eauto</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id">SBottom</span>₀ <span class="id">pf</span> τ : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) ⊥₀ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span> &lt;: τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1131')">Proof.</div>
-<div class="proofscript" id="proof1131">
+<div class="toggleproof" onclick="toggleDisplay('proof1145')">Proof.</div>
+<div class="proofscript" id="proof1145">
 &nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#SBottom">SBottom</a></span> τ).<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> τ; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Top">Top</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype_ext">subtype_ext</a></span>; <span class="tactic">eauto</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id">SRefl</span>₀ τ₀ <span class="id">pf</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) τ₀ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span> &lt;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) τ₀ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf">pf</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1132')">Proof.</div>
-<div class="proofscript" id="proof1132">
+<div class="toggleproof" onclick="toggleDisplay('proof1146')">Proof.</div>
+<div class="proofscript" id="proof1146">
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#SRefl">SRefl</a></span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id">SColl</span>₀ τ₁ <span class="id">pf</span>₁ τ₂ <span class="id">pf</span>₂ : <br/>
 &nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) τ₁ <span class="id">pf</span>₁ &lt;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) τ₂ <span class="id">pf</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) (<span class="id">Coll</span>₀ τ₁) <span class="id">pf</span>₁ &lt;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) (<span class="id">Coll</span>₀ τ₂) <span class="id">pf</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1133')">Proof.</div>
-<div class="proofscript" id="proof1133">
+<div class="toggleproof" onclick="toggleDisplay('proof1147')">Proof.</div>
+<div class="proofscript" id="proof1147">
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#SColl">SColl</a></span>.<br/>
 Qed.</div>
 <br/>
@@ -352,8 +352,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">s</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl1">rl1</a></span>) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl2">rl2</a></span>))) -&gt;<br/>
 <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl1">rl1</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf1">pf1</a></span> &lt;:<br/>
 <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> (<span class="kwd">fun</span> τ₀ : <span class="id">rtype</span>₀ =&gt; <span class="id">wf_rtype</span>₀ τ₀ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) (<span class="id">Rec</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k2">k2</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl2">rl2</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1134')">Proof.</div>
-<div class="proofscript" id="proof1134">
+<div class="toggleproof" onclick="toggleDisplay('proof1148')">Proof.</div>
+<div class="proofscript" id="proof1148">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">from_Rec</span>₀ <span class="id">rl1</span> <span class="id">pf1</span>) <span class="kwd">as</span> [<span class="id">l1</span>' [<span class="id">pf1</span>' [<span class="id">eq11</span> <span class="id">eq12</span>]]].<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">from_Rec</span>₀ <span class="id">rl2</span> <span class="id">pf2</span>) <span class="kwd">as</span> [<span class="id">l2</span>' [<span class="id">pf2</span>' [<span class="id">eq21</span> <span class="id">eq22</span>]]].<br/>
@@ -377,8 +377,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="subtype_Rec_sublist">subtype_Rec_sublist</a></span> {<span class="id">k</span>₁ <span class="id">l</span>₁ <span class="id">pf</span>₁ <span class="id">k</span>₂ <span class="id">l</span>₂ <span class="id">pf</span>₂} :<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₁ <span class="id">l</span>₁ <span class="id">pf</span>₁ &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₂ <span class="id">l</span>₂ <span class="id">pf</span>₂ -&gt; <span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1135')">Proof.</div>
-<div class="proofscript" id="proof1135">
+<div class="toggleproof" onclick="toggleDisplay('proof1149')">Proof.</div>
+<div class="proofscript" id="proof1149">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="id">rtype_equalizer</span>; <span class="tactic">subst</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id">pf</span>₁ <span class="id">pf</span>₂.<br/>
 &nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#sorted_StronglySorted">sorted_StronglySorted</a></span> <span class="tactic">by</span> <span class="tactic">eapply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#StrictOrder_Transitive">StrictOrder_Transitive</a></span>.<br/>
@@ -390,8 +390,8 @@ Qed.</div>
 <br/>
 <span class="kwd">Lemma</span> <span class="id"><a name="subtype_Rec_closed_domain">subtype_Rec_closed_domain</a></span> {<span class="id">k</span>₁ <span class="id">l</span>₁ <span class="id">pf</span>₁ <span class="id">l</span>₂ <span class="id">pf</span>₂} :<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id">k</span>₁ <span class="id">l</span>₁ <span class="id">pf</span>₁ &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> <span class="id">l</span>₂ <span class="id">pf</span>₂ -&gt; (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂) = (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1136')">Proof.</div>
-<div class="proofscript" id="proof1136">
+<div class="toggleproof" onclick="toggleDisplay('proof1150')">Proof.</div>
+<div class="proofscript" id="proof1150">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sub</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Sublist.html#Sorted_incl_both_eq">Sorted_incl_both_eq</a></span>; <span class="tactic">try</span> <span class="tactic">eapply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted_Sorted_iff">is_list_sorted_Sorted_iff</a></span>; <span class="tactic">eauto</span><br/>
 &nbsp;&nbsp;;  <span class="tactic">intros</span>; <span class="tactic">eapply</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#SRec_closed_equiv_domain">SRec_closed_equiv_domain</a></span> <span class="id">sub</span>); <span class="tactic">trivial</span>.<br/>
@@ -400,8 +400,8 @@ Qed.</div>
 <span class="kwd">Lemma</span> <span class="id"><a name="subtype_Rec_closed2_closed1">subtype_Rec_closed2_closed1</a></span> {<span class="id">k1</span> <span class="id">l1</span> <span class="id">pf1</span> <span class="id">l2</span> <span class="id">pf2</span>}:<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf1">pf1</a></span> &lt;: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#l2">l2</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf2">pf2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#k1">k1</a></span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1137')">Proof.</div>
-<div class="proofscript" id="proof1137">
+<div class="toggleproof" onclick="toggleDisplay('proof1151')">Proof.</div>
+<div class="proofscript" id="proof1151">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="tactic">intuition</span>.<br/>
 Qed.</div>
 <br/>
@@ -410,8 +410,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;(<span class="id">x</span> : <span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted">is_list_sorted</a></span> <span class="id"><a href="Qcert.Utils.Bindings.html#ODT_lt_dec">ODT_lt_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span>, τ₁) :: <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl0">rl0</a></span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;(<span class="id">inn</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#b">b</a></span>, τ₀) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl0">rl0</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> ((<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#b">b</a></span>, τ₂) :: <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl1">rl1</a></span>) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1138')">Proof.</div>
-<div class="proofscript" id="proof1138">
+<div class="toggleproof" onclick="toggleDisplay('proof1152')">Proof.</div>
+<div class="proofscript" id="proof1152">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id"><a href="Qcert.Utils.Bindings.html#sorted_cons_in">sorted_cons_in</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">x</span>) <span class="kwd">in</span> <span class="id">inn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">inn</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">isl</span>:<span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted">is_list_sorted</a></span> <span class="id"><a href="Qcert.Utils.Bindings.html#ODT_lt_dec">ODT_lt_dec</a></span> (<span class="id">s</span>::<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> ((<span class="id">b</span>, τ₃) :: <span class="id">rl1</span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>) <span class="tactic">by</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted_cons">is_list_sorted_cons</a></span>; <span class="tactic">intuition</span>).<br/>
@@ -425,8 +425,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="kwd">Open</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl0">rl0</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf0">pf0</a></span> &lt;:<br/>
 &nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="kwd">Open</span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl1">rl1</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#pf1">pf1</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#b">b</a></span>, τ₁) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl0">rl0</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#b">b</a></span>, τ₂) <span class="id"><a href="Qcert.Common.TypeSystem.RSubtypeProp.html#rl1">rl1</a></span> -&gt; τ₁ &lt;: τ₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1139')">Proof.</div>
-<div class="proofscript" id="proof1139">
+<div class="toggleproof" onclick="toggleDisplay('proof1153')">Proof.</div>
+<div class="proofscript" id="proof1153">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">rl0</span> <span class="id">pf0</span> <span class="id">pf1</span> <span class="id">b</span> τ₁ τ₂. <span class="tactic">induction</span> <span class="id">rl1</span>; [<span class="tactic">simpl</span>; <span class="tactic">intuition</span>| ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">rl0</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H1</span>; [<span class="tactic">intuition</span> |].<br/>

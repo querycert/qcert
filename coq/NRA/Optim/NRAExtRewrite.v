@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section ROptimExt.
+Section NRAExtRewrite.
   Require Import List.
   Require Import CommonRuntime.
   Require Import NRA.
@@ -236,7 +236,7 @@ Section ROptimExt.
     apply big_nested_bind_simplify_one.
   Qed.
 
-End ROptimExt.
+End NRAExtRewrite.
 
 (* 
 *** Local Variables: ***

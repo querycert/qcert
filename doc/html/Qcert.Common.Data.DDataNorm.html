@@ -44,8 +44,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="dnormalize_normalizes">dnormalize_normalizes</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">d</span>:<span class="id"><a href="Qcert.Common.Data.DData.html#ddata">ddata</a></span>), <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#ddata_normalized">ddata_normalized</a></span> (<span class="id"><a href="Qcert.Common.Data.DDataNorm.html#normalize_ddata">normalize_ddata</a></span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#d">d</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1015')">Proof.</div>
-<div class="proofscript" id="proof1015">
+<div class="toggleproof" onclick="toggleDisplay('proof1029')">Proof.</div>
+<div class="proofscript" id="proof1029">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">constructor</span>.<br/>
@@ -64,8 +64,8 @@
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="dnormalize_normalized_eq">dnormalize_normalized_eq</a></span> {<span class="id">d</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.DDataNorm.html#ddata_normalized">ddata_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#d">d</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.DDataNorm.html#normalize_ddata">normalize_ddata</a></span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#d">d</a></span> = <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1016')">Proof.</div>
-<div class="proofscript" id="proof1016">
+<div class="toggleproof" onclick="toggleDisplay('proof1030')">Proof.</div>
+<div class="proofscript" id="proof1030">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#normalize_normalized_eq">normalize_normalized_eq</a></span>.<br/>
@@ -97,8 +97,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Corollary</span> <span class="id"><a name="dnormalize_idem">dnormalize_idem</a></span> <span class="id">d</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.DDataNorm.html#normalize_ddata">normalize_ddata</a></span> (<span class="id"><a href="Qcert.Common.Data.DDataNorm.html#normalize_ddata">normalize_ddata</a></span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#d">d</a></span>) = <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#normalize_ddata">normalize_ddata</a></span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1017')">Proof.</div>
-<div class="proofscript" id="proof1017">
+<div class="toggleproof" onclick="toggleDisplay('proof1031')">Proof.</div>
+<div class="proofscript" id="proof1031">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#dnormalize_normalized_eq">dnormalize_normalized_eq</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#dnormalize_normalizes">dnormalize_normalizes</a></span>.<br/>
@@ -106,8 +106,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Corollary</span> <span class="id"><a name="dnormalize_normalizes_local">dnormalize_normalizes_local</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">d</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>), <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#ddata_normalized">ddata_normalized</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#normalize_data">normalize_data</a></span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#DDataNorm.h">h</a></span> <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#d">d</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1018')">Proof.</div>
-<div class="proofscript" id="proof1018">
+<div class="toggleproof" onclick="toggleDisplay('proof1032')">Proof.</div>
+<div class="proofscript" id="proof1032">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#normalize_normalizes">normalize_normalizes</a></span>.<br/>

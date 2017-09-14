@@ -113,123 +113,123 @@ and sexp_to_drec (sel:sexp) : (char list * QData.qdata) =
 
 (* Operators Section *)
 
-let arithbop_to_sexp (b:arithBOp) : sexp =
-  STerm (PrettyCommon.string_of_binarith b,[])
+let arithbop_to_sexp (b:arith_binary_op) : sexp =
+  STerm (PrettyCommon.string_of_arith_binary_op b,[])
   
-let sexp_to_arithbop (se:sexp) : arithBOp =
+let sexp_to_arithbop (se:sexp) : arith_binary_op =
   match se with
-  | STerm (s,[]) -> PrettyCommon.binarith_of_string s
+  | STerm (s,[]) -> PrettyCommon.arith_binary_op_of_string s
   | _ ->
-      raise  (Qcert_Error "Not well-formed S-expr inside arith binop")
+      raise  (Qcert_Error "Not well-formed S-expr inside arith binary_op")
   
-let binop_to_sexp (b:binOp) : sexp =
+let binary_op_to_sexp (b:binary_op) : sexp =
   match b with
-  | AEq -> STerm ("AEq",[])
-  | AUnion -> STerm ("AUnion",[])
-  | AConcat -> STerm ("AConcat",[])
-  | AMergeConcat -> STerm ("AMergeConcat",[])
-  | AAnd -> STerm ("AAnd",[])
-  | AOr -> STerm ("AOr",[])
-  | ABArith ab -> STerm ("ABArith",[arithbop_to_sexp ab])
-  | ALt -> STerm ("ALt",[])
-  | ALe -> STerm ("ALe",[])
-  | AMinus -> STerm ("AMinus",[])
-  | AMin -> STerm ("AMin",[])
-  | AMax -> STerm ("AMax",[])
-  | AContains -> STerm ("AContains",[])
-  | ASConcat -> STerm ("ASConcat",[])
-  | AForeignBinaryOp fbop -> SString (PrettyCommon.string_of_foreign_binop (Obj.magic fbop))
+  | OpEqual -> STerm ("AEq",[])
+  | OpBagUnion -> STerm ("AUnion",[])
+  | OpRecConcat -> STerm ("AConcat",[])
+  | OpRecMerge -> STerm ("AMergeConcat",[])
+  | OpAnd -> STerm ("AAnd",[])
+  | OpOr -> STerm ("AOr",[])
+  | OpArithBinary ab -> STerm ("ABArith",[arithbop_to_sexp ab])
+  | OpLt -> STerm ("ALt",[])
+  | OpLe -> STerm ("ALe",[])
+  | OpBagDiff -> STerm ("AMinus",[])
+  | OpBagMin -> STerm ("AMin",[])
+  | OpBagMax -> STerm ("AMax",[])
+  | OpContains -> STerm ("AContains",[])
+  | OpStringConcat -> STerm ("ASConcat",[])
+  | OpForeignBinary fbop -> SString (PrettyCommon.string_of_foreign_binary_op (Obj.magic fbop))
 
-let sexp_to_binop (se:sexp) : binOp =
+let sexp_to_binary_op (se:sexp) : binary_op =
   match se with
-  | STerm ("AEq",[]) -> AEq
-  | STerm ("AUnion",[]) -> AUnion
-  | STerm ("AConcat",[]) -> AConcat
-  | STerm ("AMergeConcat",[]) -> AMergeConcat
-  | STerm ("AAnd",[]) -> AAnd
-  | STerm ("AOr",[]) -> AOr
-  | STerm ("ABArith",[se']) -> ABArith (sexp_to_arithbop se')
-  | STerm ("ALt",[]) -> ALt
-  | STerm ("ALe",[]) -> ALe
-  | STerm ("AMinus",[]) -> AMinus
-  | STerm ("AMin",[]) -> AMin
-  | STerm ("AMax",[]) -> AMax
-  | STerm ("AContains",[]) -> AContains
-  | STerm ("ASConcat",[]) -> ASConcat
-  | SString fbop -> AForeignBinaryOp (Obj.magic (PrettyCommon.foreign_binop_of_string fbop))
+  | STerm ("AEq",[]) -> OpEqual
+  | STerm ("AUnion",[]) -> OpBagUnion
+  | STerm ("AConcat",[]) -> OpRecConcat
+  | STerm ("AMergeConcat",[]) -> OpRecMerge
+  | STerm ("AAnd",[]) -> OpAnd
+  | STerm ("AOr",[]) -> OpOr
+  | STerm ("ABArith",[se']) -> OpArithBinary (sexp_to_arithbop se')
+  | STerm ("ALt",[]) -> OpLt
+  | STerm ("ALe",[]) -> OpLe
+  | STerm ("AMinus",[]) -> OpBagDiff
+  | STerm ("AMin",[]) -> OpBagMin
+  | STerm ("AMax",[]) -> OpBagMax
+  | STerm ("AContains",[]) -> OpContains
+  | STerm ("ASConcat",[]) -> OpStringConcat
+  | SString fbop -> OpForeignBinary (Obj.magic (PrettyCommon.foreign_binary_op_of_string fbop))
   (* WARNING: Those are not printed, only parsed *)
-  | STerm ("AFloatPlus",[]) -> Enhanced.Ops.Binary.coq_AFloatPlus
-  | STerm ("AFloatMinus",[]) -> Enhanced.Ops.Binary.coq_AFloatMinus
-  | STerm ("AFloatMult",[]) -> Enhanced.Ops.Binary.coq_AFloatMult
-  | STerm ("AFloatDiv",[]) -> Enhanced.Ops.Binary.coq_AFloatDiv
-  | STerm ("AFloatPow",[]) -> Enhanced.Ops.Binary.coq_AFloatPow
-  | STerm ("AFloatMin",[]) -> Enhanced.Ops.Binary.coq_AFloatMin
-  | STerm ("AFloatMax",[]) -> Enhanced.Ops.Binary.coq_AFloatMax
-  | STerm ("AFloatNe",[]) -> Enhanced.Ops.Binary.coq_AFloatNe
-  | STerm ("AFloatLt",[]) -> Enhanced.Ops.Binary.coq_AFloatLt
-  | STerm ("AFloatLe",[]) -> Enhanced.Ops.Binary.coq_AFloatLe
-  | STerm ("AFloatGt",[]) -> Enhanced.Ops.Binary.coq_AFloatGt
-  | STerm ("AFloatGe",[]) -> Enhanced.Ops.Binary.coq_AFloatGe
-  | STerm ("ATimeAs",[]) -> Enhanced.Ops.Binary.coq_ATimeAs
-  | STerm ("ATimeShift",[]) -> Enhanced.Ops.Binary.coq_ATimeShift
-  | STerm ("ATimeNe",[]) -> Enhanced.Ops.Binary.coq_ATimeNe
-  | STerm ("ATimeLt",[]) -> Enhanced.Ops.Binary.coq_ATimeLt
-  | STerm ("ATimeLe",[]) -> Enhanced.Ops.Binary.coq_ATimeLe
-  | STerm ("ATimeGt",[]) -> Enhanced.Ops.Binary.coq_ATimeGt
-  | STerm ("ATimeGe",[]) -> Enhanced.Ops.Binary.coq_ATimeGe
-  | STerm ("ATimeDurationFromScale",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationFromScale
-  | STerm ("ATimeDurationBetween",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationBetween
-  | STerm ("ASqlDatePlus",[]) -> Enhanced.Ops.Binary.coq_ASqlDatePlus
-  | STerm ("ASqlDateMinus",[]) -> Enhanced.Ops.Binary.coq_ASqlDateMinus
-  | STerm ("ASqlDateNe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateNe
-  | STerm ("ASqlDateLt",[]) -> Enhanced.Ops.Binary.coq_ASqlDateLt
-  | STerm ("ASqlDateLe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateLe
-  | STerm ("ASqlDateGt",[]) -> Enhanced.Ops.Binary.coq_ASqlDateGt
-  | STerm ("ASqlDateGe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateGe
-  | STerm ("ASqlDateIntervalBetween",[]) -> Enhanced.Ops.Binary.coq_ASqlDateIntervalBetween
+  | STerm ("AFloatPlus",[]) -> Enhanced.Ops.Binary.coq_OpFloatPlus
+  | STerm ("AFloatMinus",[]) -> Enhanced.Ops.Binary.coq_OpFloatMinus
+  | STerm ("AFloatMult",[]) -> Enhanced.Ops.Binary.coq_OpFloatMult
+  | STerm ("AFloatDiv",[]) -> Enhanced.Ops.Binary.coq_OpFloatDiv
+  | STerm ("AFloatPow",[]) -> Enhanced.Ops.Binary.coq_OpFloatPow
+  | STerm ("AFloatMin",[]) -> Enhanced.Ops.Binary.coq_OpFloatMin
+  | STerm ("AFloatMax",[]) -> Enhanced.Ops.Binary.coq_OpFloatMax
+  | STerm ("AFloatNe",[]) -> Enhanced.Ops.Binary.coq_OpFloatNe
+  | STerm ("AFloatLt",[]) -> Enhanced.Ops.Binary.coq_OpFloatLt
+  | STerm ("AFloatLe",[]) -> Enhanced.Ops.Binary.coq_OpFloatLe
+  | STerm ("AFloatGt",[]) -> Enhanced.Ops.Binary.coq_OpFloatGt
+  | STerm ("AFloatGe",[]) -> Enhanced.Ops.Binary.coq_OpFloatGe
+  | STerm ("ATimeAs",[]) -> Enhanced.Ops.Binary.coq_OpTimeAs
+  | STerm ("ATimeShift",[]) -> Enhanced.Ops.Binary.coq_OpTimeShift
+  | STerm ("ATimeNe",[]) -> Enhanced.Ops.Binary.coq_OpTimeNe
+  | STerm ("ATimeLt",[]) -> Enhanced.Ops.Binary.coq_OpTimeLt
+  | STerm ("ATimeLe",[]) -> Enhanced.Ops.Binary.coq_OpTimeLe
+  | STerm ("ATimeGt",[]) -> Enhanced.Ops.Binary.coq_OpTimeGt
+  | STerm ("ATimeGe",[]) -> Enhanced.Ops.Binary.coq_OpTimeGe
+  | STerm ("ATimeDurationFromScale",[]) -> Enhanced.Ops.Binary.coq_OpTimeDurationFromScale
+  | STerm ("ATimeDurationBetween",[]) -> Enhanced.Ops.Binary.coq_OpTimeDurationBetween
+  | STerm ("ASqlDatePlus",[]) -> Enhanced.Ops.Binary.coq_OpSqlDatePlus
+  | STerm ("ASqlDateMinus",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateMinus
+  | STerm ("ASqlDateNe",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateNe
+  | STerm ("ASqlDateLt",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateLt
+  | STerm ("ASqlDateLe",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateLe
+  | STerm ("ASqlDateGt",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateGt
+  | STerm ("ASqlDateGe",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateGe
+  | STerm ("ASqlDateIntervalBetween",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateIntervalBetween
   | STerm (t, _) ->
-      raise (Qcert_Error ("Not well-formed S-expr inside arith binop with name " ^ t))
-  | _ -> raise  (Qcert_Error "Not well-formed S-expr inside arith binop")
+      raise (Qcert_Error ("Not well-formed S-expr inside arith binary_op with name " ^ t))
+  | _ -> raise  (Qcert_Error "Not well-formed S-expr inside arith binary_op")
 
-let arithuop_to_sexp (b:arithUOp) : sexp =
-  STerm (PrettyCommon.string_of_unarith b,[])
+let arith_unary_op_to_sexp (b:arith_unary_op) : sexp =
+  STerm (PrettyCommon.string_of_arith_unary_op b,[])
 
-let sexp_to_arithuop (se:sexp) : arithUOp =
+let sexp_to_arith_unary_op (se:sexp) : arith_unary_op =
   match se with
-  | STerm (s,[]) -> PrettyCommon.unarith_of_string s
+  | STerm (s,[]) -> PrettyCommon.arith_unary_op_of_string s
   | _ ->
-      raise  (Qcert_Error "Not well-formed S-expr inside arith unop")
+      raise  (Qcert_Error "Not well-formed S-expr inside arith unary_op")
 
-let unop_to_sexp (u:unaryOp) : sexp =
+let unary_op_to_sexp (u:unary_op) : sexp =
   match u with
-  | AIdOp -> STerm ("AIdOp",[])
-  | AUArith au -> STerm ("AUArith", [arithuop_to_sexp au])
-  | ANeg -> STerm ("ANeg",[])
-  | AColl -> STerm ("AColl",[])
-  | ACount -> STerm ("ACount",[])
-  | AFlatten -> STerm ("AFlatten",[])
-  | ALeft -> STerm ("ALeft",[])
-  | ARight -> STerm ("ARight",[])
-  | ABrand bl -> STerm ("ABrand", dbrands_to_sexp bl)
-  | ARec s -> STerm ("ARec", [coq_string_to_sstring s])
-  | ADot s -> STerm ("ADot", [coq_string_to_sstring s])
-  | ARecRemove s -> STerm ("ARecRemove", [coq_string_to_sstring s])
-  | ARecProject sl -> STerm ("ARecProject", coq_string_list_to_sstring_list sl)
-  | ADistinct -> STerm ("ADistinct",[])
-  | AOrderBy sl -> STerm ("AOrderBy", coq_string_list_to_sstring_list_with_order sl)
-  | ASum -> STerm ("ASum",[])
-  | AArithMean -> STerm ("AArithMean",[])
-  | AToString -> STerm ("AToString",[])
-  | ASubstring (n,None) -> STerm ("ASubstring",[SInt n])
-  | ASubstring (n1,(Some n2)) -> STerm ("ASubstring",[SInt n1;SInt n2])
-  | ALike (p,None) -> STerm ("ALike",[coq_string_to_sstring p])
-  | ALike (p,(Some esc)) -> STerm ("ALike",[coq_string_to_sstring p;coq_string_to_sstring [esc]])
-  | ACast bl -> STerm ("ACast", dbrands_to_sexp bl)
-  | AUnbrand -> STerm ("AUnbrand",[])
-  | ASingleton -> STerm ("ASingleton",[])
-  | ANumMin -> STerm ("ANumMin",[])
-  | ANumMax -> STerm ("ANumMax",[])
-  | AForeignUnaryOp fuop -> SString (PrettyCommon.string_of_foreign_unop (Obj.magic fuop))
+  | OpIdentity -> STerm ("AIdOp",[])
+  | OpArithUnary au -> STerm ("AUArith", [arith_unary_op_to_sexp au])
+  | OpNeg -> STerm ("ANeg",[])
+  | OpBag -> STerm ("AColl",[])
+  | OpCount -> STerm ("ACount",[])
+  | OpFlatten -> STerm ("AFlatten",[])
+  | OpLeft -> STerm ("ALeft",[])
+  | OpRight -> STerm ("ARight",[])
+  | OpBrand bl -> STerm ("ABrand", dbrands_to_sexp bl)
+  | OpRec s -> STerm ("ARec", [coq_string_to_sstring s])
+  | OpDot s -> STerm ("ADot", [coq_string_to_sstring s])
+  | OpRecRemove s -> STerm ("ARecRemove", [coq_string_to_sstring s])
+  | OpRecProject sl -> STerm ("ARecProject", coq_string_list_to_sstring_list sl)
+  | OpDistinct -> STerm ("ADistinct",[])
+  | OpOrderBy sl -> STerm ("AOrderBy", coq_string_list_to_sstring_list_with_order sl)
+  | OpSum -> STerm ("ASum",[])
+  | OpNumMean -> STerm ("AArithMean",[])
+  | OpToString -> STerm ("AToString",[])
+  | OpSubstring (n,None) -> STerm ("ASubstring",[SInt n])
+  | OpSubstring (n1,(Some n2)) -> STerm ("ASubstring",[SInt n1;SInt n2])
+  | OpLike (p,None) -> STerm ("ALike",[coq_string_to_sstring p])
+  | OpLike (p,(Some esc)) -> STerm ("ALike",[coq_string_to_sstring p;coq_string_to_sstring [esc]])
+  | OpCast bl -> STerm ("ACast", dbrands_to_sexp bl)
+  | OpUnbrand -> STerm ("AUnbrand",[])
+  | OpSingleton -> STerm ("ASingleton",[])
+  | OpNumMin -> STerm ("ANumMin",[])
+  | OpNumMax -> STerm ("ANumMax",[])
+  | OpForeignUnary fuop -> SString (PrettyCommon.string_of_foreign_unary_op (Obj.magic fuop))
 
 let sstring_to_sql_date_component (part:sexp) : Enhanced.Data.sql_date_part =
   match part with
@@ -238,64 +238,64 @@ let sstring_to_sql_date_component (part:sexp) : Enhanced.Data.sql_date_part =
   | SString "YEAR" ->  Enhanced.Data.sql_date_year
   | _ -> raise (Qcert_Error "Not well-formed S-expr for sql date component")
 			  
-let sexp_to_unop (se:sexp) : unaryOp =
+let sexp_to_unary_op (se:sexp) : unary_op =
   match se with
-  | STerm ("AIdOp",[]) -> AIdOp
+  | STerm ("AIdOp",[]) -> OpIdentity
   | STerm ("AUArith", [se']) ->
-      let au = sexp_to_arithuop se' in
-      AUArith au
-  | STerm ("ANeg",[]) -> ANeg
-  | STerm ("AColl",[]) -> AColl
-  | STerm ("ACount",[]) -> ACount
-  | STerm ("AFlatten",[]) -> AFlatten
-  | STerm ("ALeft",[]) -> ALeft
-  | STerm ("ARight",[]) -> ARight
-  | STerm ("ABrand", bl) -> ABrand (sexp_to_dbrands bl)
-  | STerm ("ARec", [se']) -> ARec (sstring_to_coq_string se')
-  | STerm ("ADot", [se']) -> ADot (sstring_to_coq_string se')
-  | STerm ("ARecRemove", [se']) -> ARecRemove (sstring_to_coq_string se')
-  | STerm ("ARecProject", sl) -> ARecProject (sstring_list_to_coq_string_list sl)
-  | STerm ("ADistinct",[]) -> ADistinct
-  | STerm ("AOrderBy",sl) -> AOrderBy (sstring_list_with_order_to_coq_string_list sl)
-  | STerm ("ASum",[]) -> ASum
-  | STerm ("AArithMean",[]) -> AArithMean
-  | STerm ("AToString",[]) -> AToString
-  | STerm ("ASubstring",[SInt n1]) -> ASubstring (n1,None)
-  | STerm ("ASubstring",[SInt n1;SInt n2]) -> ASubstring (n1,Some n2)
-  | STerm ("ALike",[p]) -> ALike (sstring_to_coq_string p,None)
+      let au = sexp_to_arith_unary_op se' in
+      OpArithUnary au
+  | STerm ("ANeg",[]) -> OpNeg
+  | STerm ("AColl",[]) -> OpBag
+  | STerm ("ACount",[]) -> OpCount
+  | STerm ("AFlatten",[]) -> OpFlatten
+  | STerm ("ALeft",[]) -> OpLeft
+  | STerm ("ARight",[]) -> OpRight
+  | STerm ("ABrand", bl) -> OpBrand (sexp_to_dbrands bl)
+  | STerm ("ARec", [se']) -> OpRec (sstring_to_coq_string se')
+  | STerm ("ADot", [se']) -> OpDot (sstring_to_coq_string se')
+  | STerm ("ARecRemove", [se']) -> OpRecRemove (sstring_to_coq_string se')
+  | STerm ("ARecProject", sl) -> OpRecProject (sstring_list_to_coq_string_list sl)
+  | STerm ("ADistinct",[]) -> OpDistinct
+  | STerm ("AOrderBy",sl) -> OpOrderBy (sstring_list_with_order_to_coq_string_list sl)
+  | STerm ("ASum",[]) -> OpSum
+  | STerm ("AArithMean",[]) -> OpNumMean
+  | STerm ("AToString",[]) -> OpToString
+  | STerm ("ASubstring",[SInt n1]) -> OpSubstring (n1,None)
+  | STerm ("ASubstring",[SInt n1;SInt n2]) -> OpSubstring (n1,Some n2)
+  | STerm ("ALike",[p]) -> OpLike (sstring_to_coq_string p,None)
   | STerm ("ALike",[p;SString esc]) ->
-     ALike (sstring_to_coq_string p,Some (esc.[0]))
-  | STerm ("ACast", bl) -> ACast (sexp_to_dbrands bl)
-  | STerm ("AUnbrand",[]) -> AUnbrand
-  | STerm ("ASingleton",[]) -> ASingleton
-  | STerm ("ANumMin",[]) -> ANumMin
-  | STerm ("ANumMax",[]) -> ANumMax
-  | SString s -> AForeignUnaryOp (Obj.magic (PrettyCommon.foreign_unop_of_string s))
+     OpLike (sstring_to_coq_string p,Some (esc.[0]))
+  | STerm ("ACast", bl) -> OpCast (sexp_to_dbrands bl)
+  | STerm ("AUnbrand",[]) -> OpUnbrand
+  | STerm ("ASingleton",[]) -> OpSingleton
+  | STerm ("ANumMin",[]) -> OpNumMin
+  | STerm ("ANumMax",[]) -> OpNumMax
+  | SString s -> OpForeignUnary (Obj.magic (PrettyCommon.foreign_unary_op_of_string s))
   (* WARNING: Those are not printed, only parsed *)
-  | STerm ("AFloatNeg",[]) -> Enhanced.Ops.Unary.coq_AFloatNeg
-  | STerm ("AFloatSqrt",[]) -> Enhanced.Ops.Unary.coq_AFloatSqrt
-  | STerm ("AFloatExp",[]) -> Enhanced.Ops.Unary.coq_AFloatExp
-  | STerm ("AFloatLog",[]) -> Enhanced.Ops.Unary.coq_AFloatLog
-  | STerm ("AFloatLog10",[]) -> Enhanced.Ops.Unary.coq_AFloatLog10
-  | STerm ("AFloatOfInt",[]) -> Enhanced.Ops.Unary.coq_AFloatOfInt
-  | STerm ("AFloatCeil",[]) -> Enhanced.Ops.Unary.coq_AFloatCeil
-  | STerm ("AFloatFloor",[]) -> Enhanced.Ops.Unary.coq_AFloatFloor
-  | STerm ("AFloatTruncate",[]) -> Enhanced.Ops.Unary.coq_AFloatTruncate
-  | STerm ("AFloatAbs",[]) -> Enhanced.Ops.Unary.coq_AFloatAbs
-  | STerm ("AFloatSum",[]) -> Enhanced.Ops.Unary.coq_AFloatSum
-  | STerm ("AFloatArithMean",[]) -> Enhanced.Ops.Unary.coq_AFloatArithMean
-  | STerm ("AFloatListMin",[]) -> Enhanced.Ops.Unary.coq_AFloatListMin
-  | STerm ("AFloatListMax",[]) -> Enhanced.Ops.Unary.coq_AFloatListMax
-  | STerm ("ATimeToSscale",[]) -> Enhanced.Ops.Unary.coq_ATimeToSscale
-  | STerm ("ATimeFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeFromString
-  | STerm ("ATimeDurationFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeDurationFromString
-  | STerm ("ASqlDateFromString",[]) -> Enhanced.Ops.Unary.coq_ASqlDateFromString
-  | STerm ("ASqlDateIntervalromString",[]) -> Enhanced.Ops.Unary.coq_ASqlDateIntervalFromString
-  | STerm ("ASqlGetDateComponent",[part]) -> Enhanced.Ops.Unary.coq_ASqlGetDateComponent (sstring_to_sql_date_component part)
+  | STerm ("AFloatNeg",[]) -> Enhanced.Ops.Unary.coq_OpFloatNeg
+  | STerm ("AFloatSqrt",[]) -> Enhanced.Ops.Unary.coq_OpFloatSqrt
+  | STerm ("AFloatExp",[]) -> Enhanced.Ops.Unary.coq_OpFloatExp
+  | STerm ("AFloatLog",[]) -> Enhanced.Ops.Unary.coq_OpFloatLog
+  | STerm ("AFloatLog10",[]) -> Enhanced.Ops.Unary.coq_OpFloatLog10
+  | STerm ("AFloatOfInt",[]) -> Enhanced.Ops.Unary.coq_OpFloatOfInt
+  | STerm ("AFloatCeil",[]) -> Enhanced.Ops.Unary.coq_OpFloatCeil
+  | STerm ("AFloatFloor",[]) -> Enhanced.Ops.Unary.coq_OpFloatFloor
+  | STerm ("AFloatTruncate",[]) -> Enhanced.Ops.Unary.coq_OpFloatTruncate
+  | STerm ("AFloatAbs",[]) -> Enhanced.Ops.Unary.coq_OpFloatAbs
+  | STerm ("AFloatSum",[]) -> Enhanced.Ops.Unary.coq_OpFloatSum
+  | STerm ("AFloatArithMean",[]) -> Enhanced.Ops.Unary.coq_OpFloatArithMean
+  | STerm ("AFloatListMin",[]) -> Enhanced.Ops.Unary.coq_OpFloatListMin
+  | STerm ("AFloatListMax",[]) -> Enhanced.Ops.Unary.coq_OpFloatListMax
+  | STerm ("ATimeToSscale",[]) -> Enhanced.Ops.Unary.coq_OpTimeToSscale
+  | STerm ("ATimeFromString",[]) -> Enhanced.Ops.Unary.coq_OpTimeFromString
+  | STerm ("ATimeDurationFromString",[]) -> Enhanced.Ops.Unary.coq_OpTimeDurationFromString
+  | STerm ("ASqlDateFromString",[]) -> Enhanced.Ops.Unary.coq_OpSqlDateFromString
+  | STerm ("ASqlDateIntervalromString",[]) -> Enhanced.Ops.Unary.coq_OpSqlDateIntervalFromString
+  | STerm ("ASqlGetDateComponent",[part]) -> Enhanced.Ops.Unary.coq_OpSqlGetDateComponent (sstring_to_sql_date_component part)
   | STerm (t, _) ->
-      raise (Qcert_Error ("Not well-formed S-expr inside unop with name " ^ t))
+      raise (Qcert_Error ("Not well-formed S-expr inside unary_op with name " ^ t))
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside unop")
+      raise (Qcert_Error "Not well-formed S-expr inside unary_op")
 
 
 (* CAMP Section *)
@@ -303,8 +303,8 @@ let sexp_to_unop (se:sexp) : unaryOp =
 let rec camp_to_sexp (p : QLang.camp) : sexp =
   match p with
   | Pconst d -> STerm ("Pconst", [data_to_sexp d])
-  | Punop (u, p1) -> STerm ("Punop", (unop_to_sexp u) :: [camp_to_sexp p1])
-  | Pbinop (b, p1, p2) -> STerm ("Pbinop", (binop_to_sexp b) :: [camp_to_sexp p1; camp_to_sexp p2])
+  | Punop (u, p1) -> STerm ("Punop", (unary_op_to_sexp u) :: [camp_to_sexp p1])
+  | Pbinop (b, p1, p2) -> STerm ("Pbinop", (binary_op_to_sexp b) :: [camp_to_sexp p1; camp_to_sexp p2])
   | Pmap p1 -> STerm ("Pmap", [camp_to_sexp p1])
   | Passert p1 -> STerm ("Passert", [camp_to_sexp p1])
   | PorElse (p1,p2) -> STerm ("PorElse", [camp_to_sexp p1; camp_to_sexp p2])
@@ -320,10 +320,10 @@ let rec sexp_to_camp (se : sexp) : QLang.camp =
   match se with
   | STerm ("Pconst", [d]) -> Pconst (sexp_to_data d)
   | STerm ("Punop", use :: [se1]) ->
-      let u = sexp_to_unop use in
+      let u = sexp_to_unary_op use in
       Punop (u, sexp_to_camp se1)
   | STerm ("Pbinop", bse :: [se1;se2]) ->
-      let b = sexp_to_binop bse in
+      let b = sexp_to_binary_op bse in
       Pbinop (b, sexp_to_camp se1, sexp_to_camp se2)
   | STerm ("Pmap", [se1]) -> Pmap (sexp_to_camp se1)
   | STerm ("Passert", [se1])  -> Passert (sexp_to_camp se1)
@@ -380,10 +380,10 @@ let rec nraenv_to_sexp (op : QLang.nraenv_core) : sexp =
   match op with
   | ANID -> STerm ("ANID",[])
   | ANConst d -> STerm ("ANConst", [data_to_sexp d])
-  | ANBinop (b, op1, op2) -> STerm ("ANBinop", (binop_to_sexp b) :: [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANUnop (u, op1) -> STerm ("ANUnop", (unop_to_sexp u) :: [nraenv_to_sexp op1])
+  | ANBinop (b, op1, op2) -> STerm ("ANBinop", (binary_op_to_sexp b) :: [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANUnop (u, op1) -> STerm ("ANUnop", (unary_op_to_sexp u) :: [nraenv_to_sexp op1])
   | ANMap (op1,op2) -> STerm ("ANMap", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANMapConcat (op1,op2) -> STerm ("ANMapConcat", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANMapProduct (op1,op2) -> STerm ("ANMapProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANProduct (op1,op2) -> STerm ("ANProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANSelect (op1,op2) -> STerm ("ANSelect", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANDefault (op1,op2) -> STerm ("ANDefault", [nraenv_to_sexp op1;nraenv_to_sexp op2])
@@ -400,13 +400,13 @@ let rec sexp_to_nraenv (se : sexp) : QLang.nraenv_core =
   | STerm ("ANID",[]) -> ANID
   | STerm ("ANConst", [d]) -> ANConst (sexp_to_data d)
   | STerm ("ANBinop", bse :: [se1;se2]) ->
-      let b = sexp_to_binop bse in
+      let b = sexp_to_binary_op bse in
       ANBinop (b, sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANUnop", use :: [se1]) ->
-      let u = sexp_to_unop use in
+      let u = sexp_to_unary_op use in
       ANUnop (u, sexp_to_nraenv se1)
   | STerm ("ANMap", [se1;se2]) -> ANMap (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANMapConcat", [se1;se2]) -> ANMapConcat (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANMapProduct", [se1;se2]) -> ANMapProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANProduct", [se1;se2]) -> ANProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANSelect", [se1;se2]) -> ANSelect (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANDefault", [se1;se2]) -> ANDefault (sexp_to_nraenv se1, sexp_to_nraenv se2)
@@ -429,8 +429,8 @@ let rec nnrc_to_sexp (n : QLang.nnrc) : sexp =
   | NNRCGetConstant v -> STerm ("NNRCGetConstant", [SString (string_of_char_list v)])
   | NNRCVar v -> STerm ("NNRCVar", [SString (string_of_char_list v)])
   | NNRCConst d -> STerm ("NNRCConst", [data_to_sexp d])
-  | NNRCBinop (b, n1, n2) -> STerm ("NNRCBinop", (binop_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
-  | NNRCUnop (u, n1) -> STerm ("NNRCUnop", (unop_to_sexp u) :: [nnrc_to_sexp n1])
+  | NNRCBinop (b, n1, n2) -> STerm ("NNRCBinop", (binary_op_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NNRCUnop (u, n1) -> STerm ("NNRCUnop", (unary_op_to_sexp u) :: [nnrc_to_sexp n1])
   | NNRCLet (v, n1, n2) -> STerm ("NNRCLet", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
   | NNRCFor (v, n1, n2) -> STerm ("NNRCFor", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
   | NNRCIf (n1, n2, n3) -> STerm ("NNRCIf", [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
@@ -448,8 +448,8 @@ let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
   | STerm ("NNRCGetConstant", [SString v]) -> NNRCGetConstant (char_list_of_string v)
   | STerm ("NNRCVar", [SString v]) -> NNRCVar (char_list_of_string v)
   | STerm ("NNRCConst", [d]) -> NNRCConst (sexp_to_data d)
-  | STerm ("NNRCBinop", b :: [n1;n2]) -> NNRCBinop (sexp_to_binop b, sexp_to_nnrc n1, sexp_to_nnrc n2)
-  | STerm ("NNRCUnop", u :: [n1]) -> NNRCUnop (sexp_to_unop u, sexp_to_nnrc n1)
+  | STerm ("NNRCBinop", b :: [n1;n2]) -> NNRCBinop (sexp_to_binary_op b, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NNRCUnop", u :: [n1]) -> NNRCUnop (sexp_to_unary_op u, sexp_to_nnrc n1)
   | STerm ("NNRCLet", (SString v) :: [n1;n2]) -> NNRCLet (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
   | STerm ("NNRCFor", (SString v) :: [n1;n2]) -> NNRCFor (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
   | STerm ("NNRCIf", [n1;n2;n3]) -> NNRCIf (sexp_to_nnrc n1, sexp_to_nnrc n2, sexp_to_nnrc n3)

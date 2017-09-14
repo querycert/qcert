@@ -30,25 +30,26 @@ Section LambdaNRAtoNRAEnv.
 
   Fixpoint lambda_nra_to_nraenv (op:lambda_nra) : nraenv :=
     match op with
-    | LNRAVar x => NRAEnvUnop (ADot x) NRAEnvEnv
+    | LNRAVar x => NRAEnvUnop (OpDot x) NRAEnvEnv
     | LNRATable x => NRAEnvGetConstant x
     | LNRAConst d => NRAEnvConst d
     | LNRABinop b op1 op2 => NRAEnvBinop b (lambda_nra_to_nraenv op1) (lambda_nra_to_nraenv op2)
     | LNRAUnop u op1 => NRAEnvUnop u (lambda_nra_to_nraenv op1)
     | LNRAMap lop1 op2 => NRAEnvMap (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2)
-    | LNRAMapConcat lop1 op2 => NRAEnvMapConcat (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2)
+    | LNRAMapProduct lop1 op2 => NRAEnvMapProduct (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2)
     | LNRAProduct op1 op2 => NRAEnvProduct (lambda_nra_to_nraenv op1) (lambda_nra_to_nraenv op2)
     | LNRAFilter lop1 op2 => NRAEnvSelect (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2)
     end
   with nraenv_of_lnra_lambda (lop:lnra_lambda) : nraenv :=
     match lop with
     | LNRALambda x op =>
-      NRAEnvAppEnv (lambda_nra_to_nraenv op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID))
+      NRAEnvAppEnv (lambda_nra_to_nraenv op)
+                   (NRAEnvBinop OpRecConcat NRAEnvEnv (NRAEnvUnop (OpRec x) NRAEnvID))
     end.
 
   Lemma  lambda_nra_to_nraenv_var_eq x :
       lambda_nra_to_nraenv (LNRAVar x) = 
-      NRAEnvUnop (ADot x) NRAEnvEnv.
+      NRAEnvUnop (OpDot x) NRAEnvEnv.
   Proof.
     reflexivity.
   Qed.
@@ -87,7 +88,7 @@ Section LambdaNRAtoNRAEnv.
   Qed.
 
   Lemma  lambda_nra_to_nraenv_map_concat_eq lop1 op2 :
-    lambda_nra_to_nraenv (LNRAMapConcat lop1 op2) = NRAEnvMapConcat (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2).
+    lambda_nra_to_nraenv (LNRAMapProduct lop1 op2) = NRAEnvMapProduct (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2).
   Proof.
     reflexivity.
   Qed.
@@ -106,7 +107,8 @@ Section LambdaNRAtoNRAEnv.
 
   Lemma  lambda_nra_to_nraenv_lambda_eq x op :
     nraenv_of_lnra_lambda (LNRALambda x op) =
-    NRAEnvAppEnv (lambda_nra_to_nraenv op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID)).
+    NRAEnvAppEnv (lambda_nra_to_nraenv op)
+                 (NRAEnvBinop OpRecConcat NRAEnvEnv (NRAEnvUnop (OpRec x) NRAEnvID)).
   Proof.
     reflexivity.
   Qed.
@@ -149,7 +151,7 @@ Section LambdaNRAtoNRAEnv.
       - Case "LNRAMap"%string.
         rewrite (IHq2 d1 d2).
         reflexivity.
-      - Case "LNRAMapConcat"%string.
+      - Case "LNRAMapProduct"%string.
         rewrite (IHq2 d1 d2).
         reflexivity.
       - Case "LNRAProduct"%string.
@@ -193,13 +195,13 @@ Section LambdaNRAtoNRAEnv.
         autorewrite with lambda_nra.
         rewrite (IHq1 _ x).
         reflexivity.
-      - Case "LNRAMapConcat"%string.
+      - Case "LNRAMapProduct"%string.
         rewrite <- (IHq2 _ d).
         apply olift_ext; intros.
         apply lift_oncoll_ext; intros.
         subst.
         f_equal.
-        apply rmap_concat_ext; intros.
+        apply rmap_product_ext; intros.
         autorewrite with lambda_nra.
         rewrite (IHq1 _ x).
         reflexivity.
@@ -255,13 +257,13 @@ Section LambdaNRAtoNRAEnv.
         rewrite IHl1.
         rewrite rec_sort_rec_sort_app1.
         trivial.
-      - Case "LNRAMapConcat"%string.
+      - Case "LNRAMapProduct"%string.
         rewrite <- IHl2.
         apply olift_ext; intros.
         apply lift_oncoll_ext; intros.
         subst.
         f_equal.
-        apply rmap_concat_ext; intros.
+        apply rmap_product_ext; intros.
         rewrite IHl1.
         rewrite rec_sort_rec_sort_app1.
         trivial.

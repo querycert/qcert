@@ -80,8 +80,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pack_unpack_vl">pack_unpack_vl</a></span> (<span class="id">coll</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#unpack_vl">unpack_vl</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#pack_kvl_id">pack_kvl_id</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2704')">Proof.</div>
-<div class="proofscript" id="proof2704">
+<div class="toggleproof" onclick="toggleDisplay('proof2728')">Proof.</div>
+<div class="proofscript" id="proof2728">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">coll</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#unpack_vl">unpack_vl</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#pack_kv_id">pack_kv_id</a></span>; <span class="tactic">simpl</span>.<br/>
@@ -110,8 +110,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pre_pack_pack_unpack_kvl_id">pre_pack_pack_unpack_kvl_id</a></span> (<span class="id">l</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>*<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#pre_unpack_kvl">pre_unpack_kvl</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#pre_pack_kvl">pre_pack_kvl</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#l">l</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2705')">Proof.</div>
-<div class="proofscript" id="proof2705">
+<div class="toggleproof" onclick="toggleDisplay('proof2729')">Proof.</div>
+<div class="proofscript" id="proof2729">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#pre_unpack_kvl">pre_unpack_kvl</a></span> <span class="kwd">in</span> *; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHl</span>.<br/>
@@ -121,8 +121,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pack_unpack_kvl_id">pack_unpack_kvl_id</a></span> (<span class="id">l</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>*<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#unpack_kvl">unpack_kvl</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#pack_kvl">pack_kvl</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#l">l</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2706')">Proof.</div>
-<div class="proofscript" id="proof2706">
+<div class="toggleproof" onclick="toggleDisplay('proof2730')">Proof.</div>
+<div class="proofscript" id="proof2730">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#pre_pack_pack_unpack_kvl_id">pre_pack_pack_unpack_kvl_id</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -146,8 +146,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="map_unbox_box_nat">map_unbox_box_nat</a></span> (<span class="id">nl</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap">rmap</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#unbox_nat">unbox_nat</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#box_nat">box_nat</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#nl">nl</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#nl">nl</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2707')">Proof.</div>
-<div class="proofscript" id="proof2707">
+<div class="toggleproof" onclick="toggleDisplay('proof2731')">Proof.</div>
+<div class="proofscript" id="proof2731">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">nl</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">IHnl</span>; <span class="tactic">simpl</span>.<br/>
@@ -158,8 +158,8 @@
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="box_key">box_key</a></span> (<span class="id">nl</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> := (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">List.map</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#box_nat">box_nat</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#nl">nl</a></span>)).<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="box_unbox_key">box_unbox_key</a></span> (<span class="id">nl</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) : (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#unbox_key">unbox_key</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#box_key">box_key</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#nl">nl</a></span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#nl">nl</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2708')">Proof.</div>
-<div class="proofscript" id="proof2708">
+<div class="toggleproof" onclick="toggleDisplay('proof2732')">Proof.</div>
+<div class="proofscript" id="proof2732">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">nl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -230,8 +230,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> (<span class="id">i</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">x</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) =&gt; <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#keys_one_map_kv">keys_one_map_kv</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#map_invent_key">map_invent_key</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#i">i</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#box_key">box_key</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefix">prefix</a></span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#x">x</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefixed_init_keys">prefixed_init_keys</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefix">prefix</a></span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2709')">Proof.</div>
-<div class="proofscript" id="proof2709">
+<div class="toggleproof" onclick="toggleDisplay('proof2733')">Proof.</div>
+<div class="proofscript" id="proof2733">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#rmap_index">rmap_index</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefixed_init_keys">prefixed_init_keys</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> 0;<br/>
@@ -244,8 +244,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="get_values_of_init_aux_same">get_values_of_init_aux_same</a></span> (<span class="id">prefix</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">n</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">coll</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#cld_get_values">cld_get_values</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#init_keys_aux">init_keys_aux</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefix">prefix</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#n">n</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>) = <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2710')">Proof.</div>
-<div class="proofscript" id="proof2710">
+<div class="toggleproof" onclick="toggleDisplay('proof2734')">Proof.</div>
+<div class="proofscript" id="proof2734">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">n</span>; <span class="tactic">induction</span> <span class="id">coll</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#init_keys">init_keys</a></span> <span class="kwd">in</span> *.<br/>
@@ -255,16 +255,16 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="get_values_of_init_same">get_values_of_init_same</a></span> (<span class="id">coll</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#cld_get_values">cld_get_values</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#init_keys">init_keys</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>) = <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2711')">Proof.</div>
-<div class="proofscript" id="proof2711">
+<div class="toggleproof" onclick="toggleDisplay('proof2735')">Proof.</div>
+<div class="proofscript" id="proof2735">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#init_keys">init_keys</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#get_values_of_init_aux_same">get_values_of_init_aux_same</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="get_values_of_prefixed_init_same">get_values_of_prefixed_init_same</a></span> (<span class="id">prefix</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">coll</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#cld_get_values">cld_get_values</a></span> (<span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefixed_init_keys">prefixed_init_keys</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefix">prefix</a></span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>) = <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2712')">Proof.</div>
-<div class="proofscript" id="proof2712">
+<div class="toggleproof" onclick="toggleDisplay('proof2736')">Proof.</div>
+<div class="proofscript" id="proof2736">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#prefixed_init_keys">prefixed_init_keys</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.CldMR.Lang.CldMRUtil.html#get_values_of_init_aux_same">get_values_of_init_aux_same</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>

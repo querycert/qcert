@@ -128,7 +128,7 @@ Section LambdaNRAEq.
   Qed.
 
   Global Instance lamapconcat_proper :
-    Proper (lnra_lambda_eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRAMapConcat.
+    Proper (lnra_lambda_eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRAMapProduct.
   Proof.
     unfold Proper, respectful, lambda_nra_eq, lnra_lambda_eq; intros.
     autorewrite with lambda_nra.
@@ -136,7 +136,7 @@ Section LambdaNRAEq.
     apply olift_ext; intros.
     apply lift_oncoll_ext; intros; subst.
     f_equal.
-    apply rmap_concat_ext; intros.
+    apply rmap_product_ext; intros.
     apply H; trivial.
     eapply lambda_nra_eval_normalized in H1; trivial.
     invcs H1.

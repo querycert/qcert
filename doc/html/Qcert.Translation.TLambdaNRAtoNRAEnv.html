@@ -30,11 +30,11 @@
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>}.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="tlambda_nra_sem_correct">tlambda_nra_sem_correct</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ<span class="id">cenv</span>} {Γ:<span class="id"><a href="Qcert.Common.Typing.TBindings.html#tbindings">tbindings</a></span>} {τ₀ τ} (<span class="id">e</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>) <span class="id">pf</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ<span class="id">cenv</span>} {Γ:<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#tbindings">tbindings</a></span>} {τ₀ τ} (<span class="id">e</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>) <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#lambda_nra_type">lambda_nra_type</a></span> τ<span class="id">cenv</span> <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#e">e</a></span> Γ τ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">nraenv_type</a></span> τ<span class="id">cenv</span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#e">e</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> Γ <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#pf">pf</a></span>) τ₀ τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3002')">Proof.</div>
-<div class="proofscript" id="proof3002">
+<div class="toggleproof" onclick="toggleDisplay('proof3054')">Proof.</div>
+<div class="proofscript" id="proof3054">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> Γ <span class="id">pf</span> τ₀ τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">e</span>; <span class="tactic">intros</span> Γ <span class="id">pf</span> τ₀ τ <span class="id">lnt</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="id">invcs</span> <span class="id">lnt</span><br/>
@@ -84,8 +84,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tlambda_nra_ignores_input_type">tlambda_nra_ignores_input_type</a></span> {τ<span class="id">cenv</span>} {Γ<span class="id">rec</span>} {τ₁ τ₂ τ} (<span class="id">e</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">nraenv_type</a></span> τ<span class="id">cenv</span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#e">e</a></span>) Γ<span class="id">rec</span> τ₁ τ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">nraenv_type</a></span> τ<span class="id">cenv</span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#e">e</a></span>) Γ<span class="id">rec</span> τ₂ τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3003')">Proof.</div>
-<div class="proofscript" id="proof3003">
+<div class="toggleproof" onclick="toggleDisplay('proof3055')">Proof.</div>
+<div class="proofscript" id="proof3055">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> Γ<span class="id">rec</span> τ₁ τ₂ τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">e</span>; <span class="tactic">intros</span> Γ<span class="id">rec</span> τ₁ τ₂ τ  <span class="id">lnt</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="id">invcs</span> <span class="id">lnt</span><br/>
@@ -97,11 +97,11 @@
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="tlambda_nra_sem_correct_back">tlambda_nra_sem_correct_back</a></span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ<span class="id">cenv</span>} {Γ:<span class="id"><a href="Qcert.Common.Typing.TBindings.html#tbindings">tbindings</a></span>} {τ₀ τ} (<span class="id">e</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>) <span class="id">pf</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ<span class="id">cenv</span>} {Γ:<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#tbindings">tbindings</a></span>} {τ₀ τ} (<span class="id">e</span>:<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">lambda_nra</a></span>) <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">nraenv_type</a></span> τ<span class="id">cenv</span> (<span class="id"><a href="Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv">lambda_nra_to_nraenv</a></span> <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#e">e</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> Γ <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#pf">pf</a></span>) τ₀ τ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#lambda_nra_type">lambda_nra_type</a></span> τ<span class="id">cenv</span> <span class="id"><a href="Qcert.Translation.TLambdaNRAtoNRAEnv.html#e">e</a></span> Γ τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3004')">Proof.</div>
-<div class="proofscript" id="proof3004">
+<div class="toggleproof" onclick="toggleDisplay('proof3056')">Proof.</div>
+<div class="proofscript" id="proof3056">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> Γ τ₀ τ <span class="id">pf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">e</span>; <span class="tactic">intros</span> Γ τ₀ τ <span class="id">pf</span> <span class="id">lnt</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="id">invcs</span> <span class="id">lnt</span><br/>
