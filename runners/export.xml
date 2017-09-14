@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_runners_jar" name="Export artifacts from query runners project to bin">
+  <property name="dest" value="../bin"/>
+
+  <target name="create_runners_jar">
+    <delete file="${dest}/javaRunners.jar"/>
+      <jar destfile="${dest}/javaRunners.jar">
+        <fileset dir="bin"/>
+      </jar>
+      <copy todir="${dest}/lib">
+	<fileset file="lib/cloudant-client-1.2.3.jar"/>
+	<fileset file="lib/cloudant-client-1.2.3-sources.jar"/>
+	<fileset file="lib/commons-codec-1.9.jar"/>
+	<fileset file="lib/commons-codec-1.9-sources.jar"/>
+	<fileset file="lib/commons-collections-3.2.2.jar"/>
+	<fileset file="lib/commons-collections-3.2.2-sources.jar"/>
+	<fileset file="lib/commons-logging-1.2.jar"/>
+	<fileset file="lib/commons-logging-1.2-sources.jar"/>
+	<fileset file="lib/gson-2.7.jar"/>
+	<fileset file="lib/gson-2.7-sources.jar"/>
+	<fileset file="lib/httpclient-4.5.2.jar"/>
+	<fileset file="lib/httpclient-4.5.2-sources.jar"/>
+	<fileset file="lib/httpcore-4.4.5.jar"/>
+	<fileset file="lib/httpcore-4.4.5-sources.jar"/>
+	<fileset file="lib/junit-4.9.jar"/>
+	<fileset file="lib/junit-4.9-sources.jar"/>
+      </copy>
+  </target>
+</project>

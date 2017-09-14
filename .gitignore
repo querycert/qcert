@@ -4,6 +4,7 @@ bin/qcert
 bin/qcertJS.js
 bin/*.jar
 bin/services/*.jar
+bin/lib/*.jar
 /.project
 *~
 .#*
