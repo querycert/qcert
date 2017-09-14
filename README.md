@@ -27,7 +27,7 @@ To build Q\*cert from the source, you will need:
 - OCaml 4.05.0 or later (http://ocaml.org/) along with the following libraries:
   - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
-  - camlp5, a pre-processor (http://camlp5.gforge.inria.fr)
+  - camlp5, a pre-processor (https://camlp5.github.io)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
   - js\_of\_ocaml, a compiler from OCaml to JavaScript
 - Coq 8.6.1 (https://coq.inria.fr/)
@@ -105,32 +105,8 @@ internet connection (needed the first time you do `make` in order to
 download the libraries needed for the Java part of the code). If you
 want or need to change the default configuration (e.g., you do not
 have Java installed, want to build support for Spark, etc), consult
-the detailed instructions below.
-
-For instance:
-
-```
-$ cat samples/oql/persons1.oql 
-select p
-from p in Customers
-where p->age = 32
-```
-
-Calling the compiler on that sample with OQL as source language and
-JavaScript as target language can be done as follows:
-
-```
-$ ./bin/qcert -source oql -target js samples/oql/persons1.oql
-```
-
-This will tell you the compilation steps being used:
-
-```
-Compiling from oql to js:
-  oql -> nraenv -> nraenv -> nnrc -> nnrc -> js
-```
-
-and produce a JavaScript file called `samples/oql/persons1.js`.
+the instructions for the [Build Configuration](#build-configuration)
+below.
 
 
 ### Compile a query
