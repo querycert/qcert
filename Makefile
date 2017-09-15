@@ -205,17 +205,17 @@ cleanall-runners:
 ## Tests
 
 tests:
-	$(MAKE) -C samples
+	@$(MAKE) -C samples
 
 clean-tests:
-	$(MAKE) -C samples clean
+	@$(MAKE) -C samples clean
 
 cleanall-tests:
-	$(MAKE) -C samples cleanall
+	@$(MAKE) -C samples cleanall
 
 ## Documentation
 documentation:
-	$(MAKE) -C coq documentation
+	@$(MAKE) -C coq documentation
 
 
 ## Cleanup
