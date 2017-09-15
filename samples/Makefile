@@ -45,7 +45,7 @@ OQLWORLDNUM=1 2
 OQLWORLDTEST=$(foreach N,$(OQLWORLDNUM),oql/world$(N).oql)
 OQLWORLDJSTESTS=$(foreach N,$(TESTNUMBERS),data/test$(N).js)
 
-OQLTARGETS=nraenv nnrc nnrcmr cldmr
+OQLTARGETS=oql nraenv nnrc nnrcmr cldmr
 
 oql-tests:
 	@$(MAKE) oql-persons-tests
