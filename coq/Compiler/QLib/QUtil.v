@@ -38,6 +38,7 @@ Module QUtil(runtime:CompilerRuntime).
 
   (* Processing for input or output of queries *)
   Definition validate_lifted_success := validate_lifted_success.
+  Definition validate_data := validate_data.
 
   Definition mkDistWorld env := mkDistWorld env.
 End QUtil.

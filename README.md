@@ -294,6 +294,13 @@ command line, for instance:
 $ bin/qcert -source lambda_nra -target java -dir . samples/lambda_nra/persons6.lnra
 ```
 
+You can also compile multiple queries at once, for instance:
+
+```
+$ bin/qcert -source oql -target javascript samples/oql/*.oql
+```
+
+
 ### Specifying the compilation path
 
 When compiling from source to target, Q\*cert choses a default

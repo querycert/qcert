@@ -41,15 +41,25 @@ Section QEnv.
 
   Require Import DData.
 
-  Definition validate (oresult oexpected:option (list data))
-    := match oresult, oexpected with
-       | None, None => true
-       | Some ((dcoll result)::nil), Some expected =>
-         if permutation_dec result expected 
-         then true
-         else false
-       | _,_ => false
-       end.
+  Definition validate_data (oresult oexpected:option data) :=
+      match oresult, oexpected with
+      | None, None => true
+      | Some result, Some expected =>
+        if data_eq_dec result expected 
+        then true
+        else false
+      | _,_ => false
+      end.
+
+  Definition validate (oresult oexpected:option (list data)) :=
+      match oresult, oexpected with
+      | None, None => true
+      | Some ((dcoll result)::nil), Some expected =>
+        if permutation_dec result expected 
+        then true
+        else false
+      | _,_ => false
+      end.
   (* validate a successful run *)
   Definition validate_success (oresult:option (list data)) (expected:list data)
     := validate oresult (Some expected).

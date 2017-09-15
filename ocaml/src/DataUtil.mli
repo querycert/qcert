@@ -40,7 +40,7 @@ type rtype_content = QData.json
 type vrtype_content = QData.json
 
 type content_input = (char list * QData.qdata) list
-type content_output = QData.qdata list
+type content_output = QData.qdata
 
 type content_hierarchy = (char list * char list) list
 type full_content_hierarchy = (content_hierarchy * io_hierarchy)

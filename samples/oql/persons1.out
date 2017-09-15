@@ -1,0 +1,1 @@
+[{"type": ["Customer"], "data": {"age": 32, "cid": 123, "name": "John Doe"}}, {"type": ["Customer"], "data": {"age": 32, "cid": 124, "name": "Jane Doe"}}, {"type": ["Customer"], "data": {"age": 32, "cid": 126, "name": "Jill Does"}}]

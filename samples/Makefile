@@ -31,11 +31,28 @@ QCERTEVAL=../bin/qcert -eval
 
 # Default target just builds the code
 all:
-	$(MAKE) tests
+	@$(MAKE) tests
 
-tests: ## Disabled for now
+tests:
+	@$(MAKE) oql-tests
 
-# Compilation targets
+# OQL
+OQLPERSONSNUM=0 1 2 3 4 5 6 7 8
+OQLPERSONSTESTS=$(foreach N,$(OQLPERSONSNUM),oql/persons$(N).oql)
+OQLPERSONSJSTESTS=$(foreach N,$(OQLPERSONSNUM),oql/persons$(N).js)
+
+OQLWORLDNUM=1 2
+OQLWORLDTEST=$(foreach N,$(OQLWORLDNUM),oql/world$(N).oql)
+OQLWORLDJSTESTS=$(foreach N,$(TESTNUMBERS),data/test$(N).js)
+
+OQLTARGETS=nraenv nnrc nnrcmr cldmr
+
+oql-tests:
+	@$(MAKE) oql-persons-tests
+	@$(MAKE) oql-world-tests
+
+oql-persons-tests:
+	@$(MAKE) 
 
 oql/%.js: oql/%.oql
 	@echo
@@ -69,9 +86,9 @@ run_java_%: oql/%.class
 
 clean:
 	@rm -rf bin/*
-	@rm -f oql/*.js
-	@rm -f oql/*.java
-	@rm -f oql/*.class
+	@rm -f */*.js
+	@rm -f */*.java
+	@rm -f */*.class
 
 cleanall: clean
 	@rm -f $(DEPENDENCIES)
@@ -83,3 +100,4 @@ TESTNUMBERS = 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22
 CAMPTESTS = $(foreach N,$(TESTNUMBERS),data/test$(N).camp)
 JSTESTS =  $(foreach N,$(TESTNUMBERS),data/test$(N).js)
 RUNTESTS = $(foreach N,$(TESTNUMBERS),run_test$(N))
+

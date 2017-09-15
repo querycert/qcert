@@ -40,7 +40,7 @@ type rtype_content = QData.json
 type vrtype_content = QData.json
 
 type content_input = (char list * QData.qdata) list
-type content_output = QData.qdata list
+type content_output = QData.qdata
 
 type content_hierarchy = (char list * char list) list
 type full_content_hierarchy = (content_hierarchy * io_hierarchy)
@@ -224,10 +224,7 @@ let build_input format h input =
   end
 
 let build_output h output =
-  begin match output with
-  | QcertCompiler.Jarray l -> List.map (QData.json_to_qdata h) l (* in coq so we can prove properties on conversions *)
-  | _ -> raise (Qcert_Error "Ill-formed output")
-  end
+  QData.json_to_qdata h output
 
 let build_phase_config j =
   begin match j with

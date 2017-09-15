@@ -29,5 +29,5 @@ dependencies:
 test:
   override:
     - eval `opam config env` && make 
+    - make tests
     - cd samples/spark2 && ./run.sh
-

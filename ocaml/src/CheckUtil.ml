@@ -33,12 +33,26 @@ let print_nraenv_result fname actual_res =
       let res_string = PrettyCommon.pretty_data str_formatter res; flush_str_formatter () in
       Format.printf "Evaluation for file %s : %s@." fname res_string
 
+let print_error_opt_data d =
+  begin match d with
+  | None ->
+      Format.eprintf "[NOTHING]@."
+  | Some d ->
+      Format.eprintf "%a@." PrettyCommon.pretty_data d
+  end
+
 let validate_result expected_res actual_res =
-  let ok = QUtil.validate_lifted_success actual_res expected_res in
+  let ok = QUtil.validate_data actual_res (Some expected_res) in
   if ok then
     Format.printf "OK@."
   else
-    Format.printf "ERROR@."
+    begin
+      Format.eprintf "Expected:@.";
+      print_error_opt_data (Some expected_res);
+      Format.eprintf "Actual:@.";
+      print_error_opt_data actual_res;
+      Format.eprintf "ERROR@."
+    end
 	
 let validate_result_debug conf expected_res actual_res debug_res =
   let ok = QUtil.validate_lifted_success actual_res expected_res in
