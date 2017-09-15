@@ -299,8 +299,8 @@ $ bin/qcert -source lambda_nra -target java -dir . samples/lambda_nra/persons6.l
 When compiling from source to target, Q\*cert choses a default
 compilation path. The compilation path that is being used is always
 printed out. For instance, if you compile the same SQL example as
-above to the core named nested relational calculus (cNNRC), you should
-see:
+above to `nnrc_core (Core Named Nested Relational Calculus), you
+should see:
 
 ```
 $ bin/qcert -source sql -target nnrc_core samples/sql/org2.sql
@@ -349,7 +349,7 @@ Coq which can serve as a reference.
 
 You can get the result of a query according to that reference
 semantics by using the `-eval` option on the command line, along with
-the `-input` option to specific an input in JSON. For instance, the
+the `-input` option to specify a JSON input. For instance, the
 reference semantics for the λ-NRA example
 `samples/lambda_nra/persons6_lambda_nra.json` on the input data in
 `samples/lambda_nra/persons.input` can be obtained by calling:
@@ -360,7 +360,7 @@ $ bin/qcert -source lambda_nra -target lambda_nra samples/lambda_nra/persons6.ln
 Compiling from lambda_nra to lambda_nra:
   lambda_nra
 $ cat samples/lambda_nra/persons6_lambda_nra.json 
-["John Doe", "Jane Doe", "Jill Does"]me@here:~/git/qcert$ 
+["John Doe", "Jane Doe", "Jill Does"]
 ```
 
 The reference semantics for that same example after compilation to the
