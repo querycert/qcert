@@ -455,7 +455,7 @@ Then to run the compiled `persons1` Class:
 ```
 $ java -cp runtimes/java/bin:bin/*:bin/lib/*:samples/oql testing.runners.RunJava \
        -input samples/oql/persons.input \
-	   persons1
+       persons1
 [{"type":["Customer"],"data":{"name":"John Doe","age":32,"cid":123}},
  {"type":["Customer"],"data":{"name":"Jane Doe","age":32,"cid":124}},
  {"type":["Customer"],"data":{"name":"Jill Does","age":32,"cid":126}}]
