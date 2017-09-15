@@ -81,7 +81,7 @@ not currently have detailed instructions for how to build on Windows.
 
 ### Build the compiler
 
-To compile Q*cert from the source, do:
+To compile Q\*cert from the source, do:
 
 ```
 $ make
@@ -240,7 +240,7 @@ $ cd bin; java -jar javaService.jar -server 9879
 ## Documentation
 
 Code documentation and background information, notably references for
-all supported languages, can be found on the Q*cert Web site:
+all supported languages, can be found on the Q\*cert Web site:
 https://querycert.github.io
 
 If you want to re-generated the documentation from the source itself,
@@ -418,10 +418,10 @@ $ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
        samples/oql/persons1.js
 ```
 
-The input data in [`data/persons.json`](./samples/data/persons.json)
+The input data in [`data/persons.json`](samples/data/persons.json)
 contains a collection of persons and a collection of companies in JSON
-format and can be used for all the tests. If you run persons1, it should
-return all persons whose age is 32:
+format and can be used for all the tests. If you run persons1, it
+should return all persons whose age is 32:
 
 ```
 [{"type":["Customer"],"data":{"name":"John Doe","age":32,"cid":123}},
@@ -477,9 +477,9 @@ TO BE WRITTEN
 We provide a Spark example in `samples/spark2`. To compile and run it, do:
 
 ```
-make spark2-runtime
-cd samples/spark2/
-./run.sh
+$ make spark2-runtime
+$ cd samples/spark2/
+$ run.sh
 ```
 
 
@@ -493,11 +493,12 @@ cd samples/spark2/
 
 ## License
 
-Q\*cert is distributed under the terms of the Apache 2.0 License, see `./LICENSE.txt`
+Q\*cert is distributed under the terms of the Apache 2.0 License, see
+[LICENSE.txt](LICENSE.txt)
 
 ## Contributions
 
 Q\*cert is still at an early phase of development and we welcome
 contributions. Contributors are expected to submit a 'Developer's
-Certificate of Origin' which can be found in ./DCO1.1.txt.
+Certificate of Origin' which can be found in [DCO1.1.txt](DCO1.1.txt).
 
