@@ -385,11 +385,23 @@ Compiling from lambda_nra to nnrc:
   lambda_nra -> nraenv -> nraenv -> nnrc -> nnrc
 $ cat samples/lambda_nra/persons6_lnra_nraenv.json 
 ["John Doe", "Jane Doe", "Jill Does"]
+$ cat samples/lambda_nra/persons6_lnra_nraenv_nraenv.json 
+["John Doe", "Jane Doe", "Jill Does"]
 ```
 
-### Run queries compiled to JavaScript
 
-(In the [`samples`](samples) directory)
+## Target specific information
+
+How to use or run the compiled code can vary greatly depending on the
+target language. Facilitating the use of the resulting code and
+supporting a broader range of targets is still an area of active
+work.
+
+We welcome comments and suggestions (please use the Q\*cert github
+issue tracker). Below are some initial target-specific guidelines.
+
+
+### JavaScript Target
 
 To run a query compiled to JavaScript, you can call `java` for the
 `RunJavascript` query runner (It uses uses the Nashorn JavaScript
@@ -399,10 +411,10 @@ and (ii) some input data on which to run the query. From the command
 line, you can do it as follows:
 
 ```
-java -cp ../bin/*:../bin/lib/* testing.runners.RunJavascript \
-     -input oql/persons.input \
-	 -runtime ../runtimes/javascript/qcert-runtime.js \
-	 oql/persons1.js > oql/persons1.out 
+$ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
+       -runtime runtimes/javascript/qcert-runtime.js \
+       -input samples/oql/persons.input \
+       samples/oql/persons1.js
 ```
 
 The input data in [`data/persons.json`](./samples/data/persons.json)
@@ -411,49 +423,55 @@ format and can be used for all the tests. If you run persons1, it should
 return all persons whose age is 32:
 
 ```
-[{"pid":1,"name":"John Doe","age":32,"company":101},
- {"pid":2,"name":"Jane Doe","age":32,"company":103},
- {"pid":4,"name":"Jill Does","age":32,"company":102}]
+[{"type":["Customer"],"data":{"name":"John Doe","age":32,"cid":123}},
+ {"type":["Customer"],"data":{"name":"Jane Doe","age":32,"cid":124}},
+ {"type":["Customer"],"data":{"name":"Jill Does","age":32,"cid":126}}]
 ```
 
-Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
-can compile and run a given test for you:
+
+### Java Target
+
+First compile a query to Java, for instance:
 
 ```
-make run_js_persons1
+$ bin/qcert -source oql -target java samples/oql/persons1.oql
 ```
 
-### Run queries compiled to Java
-
-To run a query compiled to Java, you must first compile it by calling
+To run the resulting Java code, you must first compile it by calling
 `javac` for the produced Java code, then call `java` with the
-`RunJava` query runner. You will need to pass it three pieces of
-information: (i) the location of the gson jar which is used to parse
-the input, (ii) the location of the Q\*cert runtime for Java, both as
-part of the classpath, and (ii) some input data on which to run the
+`RunJava` query runner. You will need to pass it two pieces of
+information: (i) the location of the Q\*cert runtime for Java, as part
+of the classpath, and (ii) some input data on which to run the
 query. From the command line, you can do it as follows, first to
 compile the Java code:
 
 ```
-javac -cp ../runtimes/java/bin:../bin/lib/* oql/persons1.java
+$ javac -cp runtimes/java/bin:bin/lib/* oql/persons1.java
 ```
 
-Then to run the compiled Class:
+Then to run the compiled Persons1 Class:
 
 ```
-java -cp ../runtimes/java/bin:../bin/*:../bin/lib/*:oql testing.runners.RunJava \
-     -input oql/persons.input \
-	 persons1
+$ java -cp runtimes/java/bin:bin/*:bin/lib/*:samples/oql testing.runners.RunJava \
+       -input samples/oql/persons.input \
+	   persons1
+[{"type":["Customer"],"data":{"name":"John Doe","age":32,"cid":123}},
+ {"type":["Customer"],"data":{"name":"Jane Doe","age":32,"cid":124}},
+ {"type":["Customer"],"data":{"name":"Jill Does","age":32,"cid":126}}]
 ```
 
-Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
-can compile and run a given test for you:
 
-```
-make run_java_persons1
-```
+### Cloudant Target
 
-#### Spark Dataset backend
+TO BE WRITTEN
+
+
+### Spark RDDs Target
+
+TO BE WRITTEN
+
+
+### Spark DataFrames Target
 
 We provide a Spark example in `samples/spark2`. To compile and run it, do:
 
@@ -467,7 +485,7 @@ cd samples/spark2/
 ## Caveats
 
 - There is no official support for Windows, although some success has been reported using Cygwin
-- The Spark 2 target is under development
+- The Spark 2 target is still under development
 - Some of the source languages are only partially supported
 - Only part of the compilation pipeline has been mechanically verified for correctness
 
