@@ -135,9 +135,9 @@ which should produce a JavaScript file called
 
 ### Run that compiled query
 
-To run the resulting JavaScript, you can the provided `RunJavascript`
-query runner written in Java (It uses uses the Nashorn JavaScript
-engine for the JVM).
+To run the resulting JavaScript, you can use the provided
+`RunJavascript` query runner written in Java (It uses uses the Nashorn
+JavaScript engine for the JVM).
 
 You will need to pass it two pieces of information: (i) the location
 of the Q\*cert runtime for JavaScript, and (ii) some input data on
