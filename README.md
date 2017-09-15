@@ -397,8 +397,9 @@ target language. Facilitating the use of the resulting code and
 supporting a broader range of targets is still an area of active
 work.
 
-We welcome comments and suggestions (please use the Q\*cert github
-issue tracker). Below are some initial target-specific guidelines.
+We welcome comments and suggestions (please use the
+[Q\*cert github issue tracker](https://github.com/querycert/qcert/issues)). Below
+are some initial target-specific guidelines.
 
 
 ### JavaScript Target
