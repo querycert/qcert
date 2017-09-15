@@ -35,69 +35,94 @@ all:
 
 tests:
 	@$(MAKE) oql-tests
+	@$(MAKE) lambda_nra-tests
+	@$(MAKE) camp-tests
+#	@$(MAKE) sql-tests
+#	@$(MAKE) tech_rule-tests
 
-# OQL
-OQLPERSONSNUM=0 1 2 3 4 5 6 7 8
-OQLPERSONSTESTS=$(foreach N,$(OQLPERSONSNUM),oql/persons$(N).oql)
-OQLPERSONSJSTESTS=$(foreach N,$(OQLPERSONSNUM),oql/persons$(N).js)
 
+## OQL
+OQLPERSONSNUM=1 2 3 4 5 6 7 8
 OQLWORLDNUM=1 2
-OQLWORLDTEST=$(foreach N,$(OQLWORLDNUM),oql/world$(N).oql)
-OQLWORLDJSTESTS=$(foreach N,$(TESTNUMBERS),data/test$(N).js)
-
-OQLTARGETS=oql nraenv nnrc nnrcmr cldmr
+OQLTARGETS=oql nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 oql-tests:
-	@$(MAKE) oql-persons-tests
 	@$(MAKE) oql-world-tests
+	@$(MAKE) oql-persons-tests
+
+oql-world-tests: 
+	@$(foreach N,$(OQLWORLDNUM), \
+            $(foreach T,$(OQLTARGETS), \
+	       $(QCERTCOMP) -source oql -target $(T) oql/world$(N).oql \
+                            -eval -input oql/world.input \
+                            -schema oql/world.schema \
+                            -eval-validate -output oql/world$(N).out;))
 
 oql-persons-tests:
-	@$(MAKE) 
+	@$(foreach N,$(OQLPERSONSNUM), \
+            $(foreach T,$(OQLTARGETS), \
+	       $(QCERTCOMP) -source oql -target $(T) oql/persons$(N).oql \
+                            -eval -input oql/persons.input \
+                            -schema oql/persons.schema \
+                            -eval-validate -output oql/persons$(N).out;))
 
-oql/%.js: oql/%.oql
-	@echo
-	@echo "Compiling test with Q*cert: '"$<"' to '"$@"'"
-	$(QCERTCOMP) -source oql -target js $<
+## λ-NRA
+LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7
+LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
-oql/%.java: oql/%.oql
-	@echo
-	@echo "Compiling test with Q*cert: '"$<"' to '"$@"'"
-	$(QCERTCOMP) -source oql -target java $<
+lambda_nra-tests:
+	@$(MAKE) lambda_nra-persons-tests
 
-oql/%.class: oql/%.java
-	@echo
-	@echo "Compiling test with javac: '"$<"' to '"$@"'"
-	$(JAVAC) -cp $(CPATH) $<
+lambda_nra-persons-tests:
+	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
+            $(foreach T,$(LAMBDANRATARGETS), \
+	       $(QCERTCOMP) -source lambda_nra -target $(T) lambda_nra/persons$(N).lnra \
+                            -eval -input lambda_nra/persons.input \
+                            -schema lambda_nra/persons.schema \
+                            -eval-validate -output lambda_nra/persons$(N).out;))
 
-# Run targets
-JAVA=java
+## CAMP
+CAMPWORLDNUM=1
+CAMPTARGETS=camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
-run_js_%: oql/%.js
-	@echo
-	@echo "Running test: '"$<"' on data: oql/persons.input"
-	@echo
-	$(JAVA) -cp bin:$(CPATH) testing.runners.RunJavascript -input oql/persons.input -runtime ../runtimes/javascript/qcert-runtime.js $< 
+camp-tests:
+	@$(MAKE) camp-world-tests
 
-run_java_%: oql/%.class
-	@echo
-	@echo "Running test: '"$<"' on data: oql/persons.input"
-	@echo
-	$(JAVA) -cp bin:$(CPATH):oql testing.runners.RunJava -input oql/persons.input $*
+camp-world-tests:
+	@$(foreach N,$(CAMPWORLDNUM), \
+            $(foreach T,$(CAMPTARGETS), \
+	       $(QCERTCOMP) -source camp -target $(T) camp/world$(N).camp \
+                            -eval -input camp/world.input \
+                            -schema camp/world.schema \
+                            -eval-validate -output camp/world$(N).out;))
 
-clean:
-	@rm -rf bin/*
-	@rm -f */*.js
-	@rm -f */*.java
-	@rm -f */*.class
+## SQL
+SQLORGNUM=1 2 3 4 5
+SQLTARGETS=nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
-cleanall: clean
-	@rm -f $(DEPENDENCIES)
+sql-tests:
+	@$(MAKE) sql-org-tests
 
-# There's no 21, and 20 uses the not-yet-implemented groupBy.
-TESTNUMBERS = 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22
-# Note that test 06 executes and produce a result we believe to be correct.  For some reason, ODM produces what we think is an incorrect result.
-# All other tests in TESTNUMBERS produce results identical to ODM.
-CAMPTESTS = $(foreach N,$(TESTNUMBERS),data/test$(N).camp)
-JSTESTS =  $(foreach N,$(TESTNUMBERS),data/test$(N).js)
-RUNTESTS = $(foreach N,$(TESTNUMBERS),run_test$(N))
+sql-org-tests:
+	@$(foreach N,$(SQLORGNUM), \
+            $(foreach T,$(SQLTARGETS), \
+	       $(QCERTCOMP) -source sql -target $(T) sql/org$(N).sql \
+                            -eval -input sql/org.input \
+                            -schema sql/org.schema \
+                            -eval-validate -output sql/org$(N).out;))
+
+## TECHRULE
+TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 22
+TECHRULETARGETS=camp_rule camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+
+tech_rule-tests:
+	@$(MAKE) tech_rule-test-tests
+
+tech_rule-test-tests:
+	@$(foreach N,$(TECHRULETESTNUM), \
+            $(foreach T,$(TECHRULETARGETS), \
+	       $(QCERTCOMP) -source tech_rule -target $(T) tech_rule/test$(N).arl \
+                            -eval -input tech_rule/test.input \
+                            -schema tech_rule/test.schema \
+                            -eval-validate -output tech_rule/test$(N).out;))
 
