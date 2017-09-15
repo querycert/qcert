@@ -450,7 +450,7 @@ compile the Java code:
 $ javac -cp runtimes/java/bin:bin/lib/* oql/persons1.java
 ```
 
-Then to run the compiled Persons1 Class:
+Then to run the compiled `persons1` Class:
 
 ```
 $ java -cp runtimes/java/bin:bin/*:bin/lib/*:samples/oql testing.runners.RunJava \
