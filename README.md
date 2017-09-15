@@ -133,20 +133,22 @@ which should produce a JavaScript file called
 `samples/oql/persons1.js`.
 
 
-### Run a compiled query
+### Run that compiled query
 
-To run a query compiled to JavaScript, you can call `java` for the
-`RunJavascript` query runner (It uses uses the Nashorn JavaScript
-engine for the JVM). You will need to pass it two pieces of
-information: (i) the location of the Q\*cert runtime for JavaScript,
-and (ii) some input data on which to run the query. From the command
-line, you can do it as follows:
+To run the resulting JavaScript, you can the provided `RunJavascript`
+query runner written in Java (It uses uses the Nashorn JavaScript
+engine for the JVM).
+
+You will need to pass it two pieces of information: (i) the location
+of the Q\*cert runtime for JavaScript, and (ii) some input data on
+which to run the query. From the command line, you can do it as
+follows:
 
 ```
 $ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
-  	   -runtime runtimes/javascript/qcert-runtime.js \
+       -runtime runtimes/javascript/qcert-runtime.js \
        -input samples/oql/persons.input \
-	   samples/oql/persons1.js
+       samples/oql/persons1.js
 ```
 
 The input data in [`data/persons.json`](samples/data/persons.json)
@@ -160,27 +162,26 @@ format. If you run persons1, it should return all persons whose age is
  {"type":["Customer"],"data":{"name":"Jill Does","age":32,"cid":126}}]
 ```
 
+
 ## Build configuration
 
-The build relies on a small configuration file, which controls what
-source and target languages should be supported:
+The build relies on a small configuration file in the toplevel
+directory called ```Makefile.config```. This file controls what source
+and target languages should be supported. By default the configuration
+assumes you have Java and Ant installed and attempts to build the SQL
+and SQL++ support, as well as the Java runtime.
 
-```
-Makefile.config
-```
-
-You can edit that file, which by default assumes you have Java and Ant
-installed and attempts to build the SQL and SQL++ support, as well as
-the Java runtime.
-
-You can also override the configuration from the command line to build
-specific components, for instance, to build only for JavaScript:
+You can edit that file by commenting out the languages you want or
+commenting those you don't want. Alternatively, you can override the
+configuration from the command line to build specific components, for
+instance, to build without any Java support (i.e., only for
+JavaScript):
 
 ```
 $ make SQL= SQLPP= JAVA=
 ```
 
-To add support for all sources and target languages, including ODM
+To add support for all source and target languages, including ODM
 rules and Spark:
 
 ```
@@ -194,6 +195,7 @@ Whichever of these components you choose to build, they should be
 built together in one step because some of the Java components are
 deployed as a set of interrelated jar files.
 
+
 ## Cleaning up
 
 If you want to rebuild the compiler from scratch, first do a clean up
@@ -203,12 +205,13 @@ by calling:
 $ make clean
 ```
 
-or, if you also want to remove the external (Java dependencies) that
-may have downloaded, by calling:
+or, if you also want to remove the external libraries (Java
+dependencies) that may have downloaded, by calling:
 
 ```
 $ make cleanall
 ```
+
 
 ## Building the Web demo
 
@@ -232,6 +235,7 @@ javaService as follows:
 ```
 $ cd bin; java -jar javaService.jar -server 9879
 ```
+
 
 ## Documentation
 
@@ -270,7 +274,6 @@ For instance, compiling from SQL to JavaScript (on the example query
 
 ```
 $ bin/qcert -source sql -target javascript samples/sql/org2.sql
-
 ```
 
 Compiling from λ-NRA to Java (on the example query
@@ -278,7 +281,6 @@ Compiling from λ-NRA to Java (on the example query
 
 ```
 $ bin/qcert -source lambda_nra -target java samples/lambda_nra/persons6.lnra
-
 ```
 
 By default the compiled code will be placed in the same directory as
@@ -290,7 +292,6 @@ command line, for instance:
 
 ```
 $ bin/qcert -source lambda_nra -target java -dir . samples/lambda_nra/persons6.lnra
-
 ```
 
 ### Specifying the compilation path
@@ -360,7 +361,6 @@ Compiling from lambda_nra to lambda_nra:
   lambda_nra
 $ cat samples/lambda_nra/persons6_lambda_nra.json 
 ["John Doe", "Jane Doe", "Jill Does"]me@here:~/git/qcert$ 
-
 ```
 
 The reference semantics for that same example after compilation to the
@@ -373,7 +373,6 @@ Compiling from lambda_nra to nnrc:
   lambda_nra -> nraenv -> nraenv -> nnrc -> nnrc
 $ cat samples/lambda_nra/persons6_nnrc.json 
 ["John Doe", "Jane Doe", "Jill Does"]
-
 ```
 
 You can also get the reference semantics for all the languages on the
@@ -423,9 +422,8 @@ can compile and run a given test for you:
 ```
 make run_js_persons1
 ```
-### Run queries compiled to Java
 
-(In the [`./samples`](./samples) directory)
+### Run queries compiled to Java
 
 To run a query compiled to Java, you must first compile it by calling
 `javac` for the produced Java code, then call `java` with the
