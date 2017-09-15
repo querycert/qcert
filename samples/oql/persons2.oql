@@ -1,6 +1,4 @@
-/* Example of returning a record (struct in OQL terminology) */
-
+/* Returns a record (struct in OQL terminology) */
 select struct(marketer: c->name, clients: d)
 from c in Marketers,
      d in c->clients
-

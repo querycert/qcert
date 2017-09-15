@@ -1,6 +1,4 @@
-/* Example of simple select-from-where */
-
+/* Simple select-from-where */
 select p
 from p in Customers
 where p->age = 32
-

@@ -1,3 +1,4 @@
+/* Simple view */
 define view as
   select struct(name:c->name, purchased: p->name)
   from c in Clients,

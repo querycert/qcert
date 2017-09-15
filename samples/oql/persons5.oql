@@ -1,5 +1,4 @@
-/* Example with count */
-
+/* SFW with count */
 select m
 from m in Marketers
 where count(m->products) >= 3

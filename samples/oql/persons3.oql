@@ -1,6 +1,4 @@
-/* Example with distinct */
-
+/* SFW with distinct */
 select distinct d
 from c in Marketers,
      d in c->clients
-

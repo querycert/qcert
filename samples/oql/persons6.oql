@@ -1,5 +1,4 @@
-/* Example of view definition, including dropping a view */
-
+/* View definition, including dropping a view */
 define t as Clients;
 
 define s as select struct(name:c->name, purchased: p->name)

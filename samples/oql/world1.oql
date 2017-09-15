@@ -1,5 +1,3 @@
-/* Example of simple select-from-where */
-
+/* Simple select-from-where */
 select p->name
 from p as entities.Customer in WORLD
-

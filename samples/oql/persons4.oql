@@ -1,7 +1,5 @@
-/* Example of Join: between Purchases and Clients */
-
+/* Join between Purchases and Clients */
 select struct(name:c->name, purchased: p->name)
 from c in Clients,
      p in Purchases
 where p->cid = c->id
-

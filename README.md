@@ -37,8 +37,8 @@ package manager (https://opam.ocaml.org). Once opam is installed, you
 can just add the corresponding libraries:
 
 ```
-opam install ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
-opam install coq.8.6.1
+$ opam install ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
+$ opam install coq.8.6.1
 ```
 
 ### Java (Recommended)
@@ -84,7 +84,7 @@ not currently have detailed instructions for how to build on Windows.
 To compile Q*cert from the source, do:
 
 ```
-make
+$ make
 ```
 
 (Note: this will take a while, you can run make faster with `make -j 8`)
@@ -116,6 +116,7 @@ instance:
 
 ```
 $ cat samples/oql/persons1.oql 
+/* Simple select-from-where */
 select p
 from p in Customers
 where p->age = 32
@@ -125,17 +126,11 @@ Calling the compiler on that sample with OQL as source language and
 JavaScript as target language can be done as follows:
 
 ```
-$ ./bin/qcert -source oql -target js samples/oql/persons1.oql
+$ bin/qcert -source oql -target js samples/oql/persons1.oql
 ```
 
-This will tell you the compilation steps being used:
-
-```
-Compiling from oql to js:
-  oql -> nraenv -> nraenv -> nnrc -> nnrc -> js
-```
-
-and produce a JavaScript file called `samples/oql/persons1.js`.
+which should produce a JavaScript file called
+`samples/oql/persons1.js`.
 
 
 ### Run a compiled query
@@ -148,22 +143,21 @@ and (ii) some input data on which to run the query. From the command
 line, you can do it as follows:
 
 ```
-cd samples
-java -cp ../bin/*:../bin/lib/* testing.runners.RunJavascript \
-     -input oql/persons.input \
-	 -runtime ../runtimes/javascript/qcert-runtime.js \
-	 oql/persons1.js > oql/persons1.out 
+$ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
+  	   -runtime runtimes/javascript/qcert-runtime.js \
+       -input samples/oql/persons.input \
+	   samples/oql/persons1.js
 ```
 
-The input data in [`data/persons.json`](./samples/data/persons.json)
+The input data in [`data/persons.json`](samples/data/persons.json)
 contains a collection of persons and a collection of companies in JSON
 format. If you run persons1, it should return all persons whose age is
 32:
 
 ```
-[{"pid":1,"name":"John Doe","age":32,"company":101},
- {"pid":2,"name":"Jane Doe","age":32,"company":103},
- {"pid":4,"name":"Jill Does","age":32,"company":102}]
+[{"type":["Customer"],"data":{"name":"John Doe","age":32,"cid":123}},
+ {"type":["Customer"],"data":{"name":"Jane Doe","age":32,"cid":124}},
+ {"type":["Customer"],"data":{"name":"Jill Does","age":32,"cid":126}}]
 ```
 
 ## Build configuration
@@ -183,14 +177,14 @@ You can also override the configuration from the command line to build
 specific components, for instance, to build only for JavaScript:
 
 ```
-make SQL= SQLPP= JAVA=
+$ make SQL= SQLPP= JAVA=
 ```
 
 To add support for all sources and target languages, including ODM
 rules and Spark:
 
 ```
-make JRULES=yes SPARK=yes
+$ make JRULES=yes SPARK=yes
 ```
 
 Note that the ODM rules support will only build if you satisfy an
@@ -202,18 +196,18 @@ deployed as a set of interrelated jar files.
 
 ## Cleaning up
 
-If you want to rebuild the compiler from scratch, first clean up by
-calling:
+If you want to rebuild the compiler from scratch, first do a clean up
+by calling:
 
 ```
-make clean
+$ make clean
 ```
 
 or, if you also want to remove the external (Java dependencies) that
 may have downloaded, by calling:
 
 ```
-make cleanall
+$ make cleanall
 ```
 
 ## Building the Web demo
@@ -221,7 +215,7 @@ make cleanall
 To compile the web demo, do:
 
 ```
-make demo
+$ make demo
 ```
 
 Once, compiler, the Web demo can be started by opening the following
@@ -236,7 +230,7 @@ SQL++ and ODM rules) in the demo, you will also need to run the
 javaService as follows:
 
 ```
-cd bin; java -jar javaService.jar -server 9879
+$ cd bin; java -jar javaService.jar -server 9879
 ```
 
 ## Documentation
@@ -246,43 +240,157 @@ all supported languages, can be found on the Q*cert Web site:
 https://querycert.github.io
 
 If you want to re-generated the documentation from the source itself,
-you will need to install the
-[coq2html](https://github.com/xavierleroy/coq2html) tool. Detailed
-instructions are provided in [./doc/README.md](./doc/README.md)
+you will need to install
+[coq2html](https://github.com/xavierleroy/coq2html). Detailed
+instructions are provided in [doc/README.md](doc/README.md)
 
 
 ## Using Q\*cert
 
-### Compiling Queries
+### Command line help
 
-The `./bin/qcert` can simply be called by giving a source and target
-language. For instance, to compile the sample query
-`samples/sql/org2.sql` from SQL to Java, do:
-
-```
-./bin/qcert -source sql -target java samples/sql/org2.sql
+Q\*cert supports many languages. A list of all the available
+languages, along with a description of the command-line options for
+the compiler can be obtained by calling:
 
 ```
-
-The compiler will always list the chosen compilation path:
-
-```
-Compiling from sql to java:
-  sql -> nraenv -> nraenv -> nnrc -> nnrc -> java
+$ bin/qcert -help
 ```
 
-A list of all the available languages, along with options for the
-compiler can be found from the command line:
+The list includes source query languages, target languages, and
+intermediate languages.
+
+### Specifying the source and target
+
+The simplest way to call the compiler is by simply providing a source
+and target language.
+
+For instance, compiling from SQL to JavaScript (on the example query
+`samples/sql/org2.sql`) can be done by calling:
 
 ```
-./bin/qcert -help
+$ bin/qcert -source sql -target javascript samples/sql/org2.sql
+
 ```
 
-### Running the compiled queries
+Compiling from λ-NRA to Java (on the example query
+`samples/lambda_nra/persons6.lnra`) can be done by calling:
 
-#### Run queries compiled to JavaScript
+```
+$ bin/qcert -source lambda_nra -target java samples/lambda_nra/persons6.lnra
 
-(In the [`./samples`](./samples) directory)
+```
+
+By default the compiled code will be placed in the same directory as
+your input query (in this example in
+`samples/lambda_nra/persons6.java`).
+
+You can change the target directory by using the `-dir` option on the
+command line, for instance:
+
+```
+$ bin/qcert -source lambda_nra -target java -dir . samples/lambda_nra/persons6.lnra
+
+```
+
+### Specifying the compilation path
+
+When compiling from source to target, Q\*cert choses a default
+compilation path. The compilation path that is being used is always
+printed out. For instance, if you compile the same SQL example as
+above to the core named nested relational calculus (cNNRC), you should
+see:
+
+```
+$ bin/qcert -source sql -target nnrc_core samples/sql/org2.sql
+Compiling from sql to nnrc_core:
+  sql -> nraenv -> nraenv -> nnrc -> nnrc -> nnrc_core
+```
+
+When the path indicates the same intermediate language twice in a row
+it means an optimization pass has been used. Here optimization has
+been performed on both `nraenv` (Nested Relational Algebra with
+Environments) and `nnrc` (Named Nested Relational Calculus).
+
+You can force the use of a specific intermediate language by using the
+`-path` option on the command line, for instance:
+
+```
+$ bin/qcert -source sql -path nraenv_core -target nnrc_core samples/sql/org2.sql
+Compiling from sql to nnrc_core:
+  sql -> nraenv -> nraenv -> nraenv_core -> nraenv -> nraenv -> nnrc -> nnrc -> nnrc_core
+```
+
+You can also fully specify the compilation path by using the
+`-exact-path` option on the command line, for instance:
+
+```
+$ bin/qcert -exact-path -source sql -path nraenv -path nraenv_core -target nnrc_core samples/sql/org2.sql
+Compiling from sql to nnrc_core:
+  sql -> nraenv -> nraenv_core -> nnrc_core
+```
+
+If the specified path does not exist, the compiler will return a
+compilation error:
+
+```
+$ bin/qcert -exact-path -source sql -path nraenv -target javascript samples/sql/org2.sql
+Compiling from sql to js:
+  sql -> nraenv -> js
+Fatal error: exception Util.Qcert_Error("In file [samples/sql/org2.sql] Cannot compile to error (No compilation path from nraenv to js)")
+```
+
+### Reference semantics
+
+All of the intermediate languages, and some of the source languages
+(OQL and λ-NRA) are accompanied by an executable semantics written in
+Coq which can serve as a reference.
+
+You can get the result of a query according to that reference
+semantics by using the `-eval` option on the command line, along with
+the `-input` option to specific an input in JSON. For instance, the
+reference semantics for the λ-NRA example
+`samples/lambda_nra/persons6_lambda_nra.json` on the input data in
+`samples/lambda_nra/persons.input` can be obtained by calling:
+
+```
+$ bin/qcert -source lambda_nra -target lambda_nra samples/lambda_nra/persons6.lnra \
+            -eval -input samples/lambda_nra/persons.input 
+Compiling from lambda_nra to lambda_nra:
+  lambda_nra
+$ cat samples/lambda_nra/persons6_lambda_nra.json 
+["John Doe", "Jane Doe", "Jill Does"]me@here:~/git/qcert$ 
+
+```
+
+The reference semantics for that same example after compilation to the
+Named Nested Relational Calculus can be obtained by calling:
+
+```
+$ bin/qcert -source lambda_nra -target nnrc samples/lambda_nra/persons6.lnra \
+            -eval -input samples/lambda_nra/persons.input 
+Compiling from lambda_nra to nnrc:
+  lambda_nra -> nraenv -> nraenv -> nnrc -> nnrc
+$ cat samples/lambda_nra/persons6_nnrc.json 
+["John Doe", "Jane Doe", "Jill Does"]
+
+```
+
+You can also get the reference semantics for all the languages on the
+compilation path by using the `-eval-all` option on the command line:
+
+```
+$ bin/qcert -source lambda_nra -target nnrc samples/lambda_nra/persons6.lnra \
+            -eval -input samples/lambda_nra/persons.input -eval-all 
+Compiling from lambda_nra to nnrc:
+  lambda_nra -> nraenv -> nraenv -> nnrc -> nnrc
+$ cat samples/lambda_nra/persons6_lnra_nraenv.json 
+["John Doe", "Jane Doe", "Jill Does"]
+```
+
+### Run queries compiled to JavaScript
+
+(In the [`samples`](samples) directory)
 
 To run a query compiled to JavaScript, you can call `java` for the
 `RunJavascript` query runner (It uses uses the Nashorn JavaScript
@@ -292,7 +400,6 @@ and (ii) some input data on which to run the query. From the command
 line, you can do it as follows:
 
 ```
-cd samples
 java -cp ../bin/*:../bin/lib/* testing.runners.RunJavascript \
      -input oql/persons.input \
 	 -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -316,7 +423,7 @@ can compile and run a given test for you:
 ```
 make run_js_persons1
 ```
-#### Run queries compiled to Java
+### Run queries compiled to Java
 
 (In the [`./samples`](./samples) directory)
 
