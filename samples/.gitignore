@@ -9,6 +9,7 @@
 oql/*.json
 sql/*.json
 camp/*.json
+camp/*_camp.camp
 lambda_nra/*.json
 /lib/*
 /bin/
