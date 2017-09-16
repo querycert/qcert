@@ -19,7 +19,7 @@ open DataUtil
 open QcertUtil
 open QcertConfig
 open QcertCompiler.EnhancedCompiler
-   
+
 
 (**********************************)
 (* Library functions              *)
@@ -71,11 +71,11 @@ let map_array_gen gconf f o =
 let optim_config_from_json s : optim_config =
   let optim_json = ParseString.parse_json_from_string s in
   DataUtil.build_optim_config optim_json
-  
+
 (**********************************)
 (* Equivalent to qcert cmd        *)
 (**********************************)
-  
+
 let global_config_of_json j =
   let gconf =
     { gconf_source = QcertCompiler.L_camp_rule;
@@ -225,7 +225,7 @@ let js_of_optim_step_list {QcertCompiler.optim_step_name; QcertCompiler.optim_st
     val description = Js.string (Util.string_of_char_list optim_step_description)
     val lemma = Js.string (Util.string_of_char_list optim_step_lemma)
   end
-  
+
 let json_of_optim_list () =
   let ocl = QDriver.optim_config_list in
   let wrap (QcertCompiler.ExistT (x, (optim_module_name, y))) =
@@ -241,7 +241,7 @@ let json_of_optim_list () =
   object%js
     val optims = Js.def (wrap_all wrap ocl)
   end
-  
+
 let js_of_optim_phase x =
   let ((name,optim_list), iter) = x in
   object%js
@@ -249,7 +249,7 @@ let js_of_optim_phase x =
     val optims = Js.def (wrap_all json_of_optim optim_list)
     val iter = Js.number_of_float (float_of_int iter)
   end
-  
+
 let json_of_optim_default () =
   let ocd = QDriver.optim_config_default in
   let wrap (x,y) =
@@ -261,7 +261,7 @@ let json_of_optim_default () =
   object%js
     val optims = Js.def (wrap_all wrap ocd)
   end
-  
+
 let qcert_compile input =
   begin try
     let gconf =
@@ -301,6 +301,6 @@ let _ =
   Js.Unsafe.global##.qcertOptimDefaults :=
     Js.wrap_callback json_of_optim_default;
   Js.Unsafe.global##.qcertCompile :=
+    Js.wrap_callback qcert_compile;
+  Js.Unsafe.global##.main :=
     Js.wrap_callback qcert_compile
-
-

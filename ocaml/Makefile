@@ -73,13 +73,12 @@ _build_js/$(MAIN3).byte: extracted $(MAIN3).ml
 	$(OCAMLBUILD) $(MENHIRFLAG) -build-dir _build_js -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is extracted -Is src $(MAIN3).byte
 
 ## Whisk
-wsk-update:
-	wsk action update qcert _build/$(MAIN3).js
+wsk-update: js
+	wsk action update qcert _build_js/$(MAIN3).js
 
 wsk-invoke:
-	wsk action invoke -v -br qcert -p source camp -p target nraenv \
-		-p query pit
-# -p query 'punop AFlatten (pletIt ((pgetconstant "WORLD")) (pmap (pletEnv (pletIt (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft)) (pletEnv (punop (ARec "c") (pit)) (pletEnv (passert (pbinop AEq (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) (pletIt (penv) (pit))))) (punop AColl (pbinop ASConcat (punop AToString (#` "Customer =")) (punop AToString (pletIt (pletIt (penv) (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit))))))))))'
+	wsk action invoke -br qcert -p source lambda_nra -p target nraenv \
+		-p query 'Persons.filter{ p => p.age = 32 }'
 
 ## Clean
 
