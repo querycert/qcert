@@ -56,7 +56,7 @@ oql-world-tests:
 	       $(QCERTCOMP) -source oql -target $(T) oql/world$(N).oql \
                             -eval -input oql/world.input \
                             -schema oql/world.schema \
-                            -eval-validate -output oql/world$(N).out;))
+                            -eval-validate -output oql/world$(N).out; || exit 1;) || exit 1;)
 
 oql-persons-tests:
 	@$(foreach N,$(OQLPERSONSNUM), \
@@ -64,7 +64,7 @@ oql-persons-tests:
 	       $(QCERTCOMP) -source oql -target $(T) oql/persons$(N).oql \
                             -eval -input oql/persons.input \
                             -schema oql/persons.schema \
-                            -eval-validate -output oql/persons$(N).out;))
+                            -eval-validate -output oql/persons$(N).out; || exit 1;) || exit 1;)
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7
@@ -79,7 +79,7 @@ lambda_nra-persons-tests:
 	       $(QCERTCOMP) -source lambda_nra -target $(T) lambda_nra/persons$(N).lnra \
                             -eval -input lambda_nra/persons.input \
                             -schema lambda_nra/persons.schema \
-                            -eval-validate -output lambda_nra/persons$(N).out;))
+                            -eval-validate -output lambda_nra/persons$(N).out; || exit 1;) || exit 1;)
 
 ## CAMP
 CAMPWORLDNUM=1
@@ -94,7 +94,7 @@ camp-world-tests:
 	       $(QCERTCOMP) -source camp -target $(T) camp/world$(N).camp \
                             -eval -input camp/world.input \
                             -schema camp/world.schema \
-                            -eval-validate -output camp/world$(N).out;))
+                            -eval-validate -output camp/world$(N).out || exit 1;) || exit 1;)
 
 ## SQL
 SQLORGNUM=1 2 3 4 5
@@ -109,7 +109,7 @@ sql-org-tests:
 	       $(QCERTCOMP) -source sql -target $(T) sql/org$(N).sql \
                             -eval -input sql/org.input \
                             -schema sql/org.schema \
-                            -eval-validate -output sql/org$(N).out;))
+                            -eval-validate -output sql/org$(N).out; || exit 1;) || exit 1;)
 
 ## TECHRULE
 TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 22
@@ -124,5 +124,5 @@ tech_rule-test-tests:
 	       $(QCERTCOMP) -source tech_rule -target $(T) tech_rule/test$(N).arl \
                             -eval -input tech_rule/test.input \
                             -schema tech_rule/test.schema \
-                            -eval-validate -output tech_rule/test$(N).out;))
+                            -eval-validate -output tech_rule/test$(N).out; || exit 1;) || exit 1;)
 
