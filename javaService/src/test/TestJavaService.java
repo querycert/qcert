@@ -26,12 +26,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.logging.Level;
 
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Jdk14Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ResponseProcessCookies;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
@@ -40,28 +44,36 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 /**
- * Just a test that we are able to communicate with the Java service at localhost or AWS instance, port 9879.
+ * Just a test that we are able to communicate with the Java service at localhost or AWS instance, port 9879, or as a whisk
+ * action at a specified URL
  */
 public class TestJavaService {
 	private static final String REMOTE_LOC = "35.164.159.76";
 
 	/**
-	 * Main.  The cmdline arguments either do or don't contain the flag -remote: that's the only supported flag.  If it is specified,
-	 *   we test code on the AWS instance.  If it is not, we test code running locally.
+	 * Main.  The cmdline arguments either do or don't contain the flags -remote or -whisk: those are the only supported flags.  
+	 * If -remote is specified, we test code on the AWS instance using the "server" protocol.  
+	 * If -whisk is specified, the next commandline token is assumed to be the URL of a whisk web action and it is consumed along with the
+	 *    flag.  We then test code running as a whisk action.
+	 * If neither -remote nor -whisk is specified, we test code running locallly using the "server" protocol.
 	 * The first non-flag argument is the "verb", which (currently) should be one of the verbs set at the top of source file
-	 *   org.qcert.javasrc.Main.  Remaining non-flag arguments are file names.  There must be at least one.  The number of such 
+	 *   org.qcert.javasrc.Dispatcher.  Remaining non-flag arguments are file names.  There must be at least one.  The number of such 
 	 *   arguments and what they should contain depends on the verb.
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		/* Parse command line */
 		List<String> files = new ArrayList<>();
-		String loc = "localhost", verb = null;
+		String loc = "localhost", verb = null, whisk = null;
 		for (String arg : args) {
 			if (arg.equals("-remote"))
 				loc = REMOTE_LOC;
+			else if (arg.equals("-whisk"))
+				whisk = "*";
 			else if (arg.startsWith("-"))
 				illegal();
+			else if (whisk != null && whisk.equals("*"))
+				whisk = arg;
 			else if (verb == null)
 				verb = arg;
 			else 
@@ -93,7 +105,7 @@ public class TestJavaService {
 		}
 
 		/* Assemble information from arguments */
-		String url = String.format("http://%s:9879?verb=%s", loc, verb);
+		String url = whisk == null ? String.format("http://%s:9879?verb=%s", loc, verb) : whisk;
 		byte[] contents = Files.readAllBytes(Paths.get(file));
 		String toSend;
 		if ("serialRule2CAMP".equals(verb))
@@ -106,8 +118,15 @@ public class TestJavaService {
 			toSend = makeSpecialJson(toSend, files);
 		HttpClient client = HttpClients.createDefault();
 		HttpPost post = new HttpPost(url);
-		StringEntity entity = new StringEntity(toSend);
-		entity.setContentType("text/plain");
+		StringEntity entity;
+		if (whisk == null) {
+			entity = new StringEntity(toSend);
+			entity.setContentType("text/plain");
+		} else {
+			entity = new StringEntity(makeWhisk(verb, toSend));
+			((Jdk14Logger) LogFactory.getLog(ResponseProcessCookies.class)).getLogger().setLevel(Level.SEVERE);
+			entity.setContentType("application/json");
+		}
 		post.setEntity(entity);
 		HttpResponse resp = client.execute(post);
 		int code = resp.getStatusLine().getStatusCode();
@@ -172,5 +191,19 @@ public class TestJavaService {
 		JsonObject schema = new JsonParser().parse(new FileReader(schemaFile)).getAsJsonObject();
 		result.add("schema", schema);
 		return result.toString();
+	}
+
+	/** 
+	 * Make composite JSON object for a whisk invocation.
+	 * 
+	 * @param verb the verb (becomes the "verb" member)
+	 * @param toSend (becomes the "arg" member)
+	 * @return a Stringified JSON object combining 'verb' and 'toSend'
+	 */
+	private static String makeWhisk(String verb, String toSend) {
+		JsonObject ans = new JsonObject();
+		ans.addProperty("verb", verb);
+		ans.addProperty("arg", toSend);
+		return ans.toString();
 	}
 }

@@ -20,6 +20,9 @@ import java.util.Map;
 
 import org.qcert.util.CSV2JSON;
 
+/**
+ * Contains logic used by both Main (long-running http server) and WhiskMain (short-lived Whisk Action).
+ */
 public class Dispatcher {
 	/** Mapping from verb names to class names where the class implements the Command interface and provides the logic for the verb */
 	static Map<String, String> verbToClass = new HashMap<>();
@@ -33,7 +36,9 @@ public class Dispatcher {
 		verbToClass.put("sqlSchema2JSON", "org.qcert.sql.SQLSchema2JSON");
 	}
 	
-	/** Mapping from class names to Command instances (conserves instantiations) */
+	/** Mapping from class names to Command instances (conserves instantiations in the long running case); note that this
+	 * effort may be wasted in the short-running (whisk) case because whisk assumes statelessness; on other hand, it is harmless
+	 * and could, in some cases, allow instances to be reused. */
 	static Map<String, Command> classToInstance = new HashMap<>(); 
 
 	/**
