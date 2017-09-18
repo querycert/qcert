@@ -51,7 +51,7 @@
 		For the moment, we also omit the JRules dependencies since the whisk action is destined to always be public. -->
 		<delete file="qcertJavaWhiskAction.jar"/>
 		<jar destfile="qcertJavaWhiskAction.jar">
-			<zipgroupfileset dir ="${dest}" includesfile="whiskjars"/>
+			<zipgroupfileset dir ="${dest}" includesfile="whiskJars"/>
 		</jar>
     </target>
 </project>
