@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+include ../Makefile.config
+
 ifeq ($(OS),Windows_NT)
   PATH_SEP=';'
 else
@@ -37,8 +40,12 @@ tests:
 	@$(MAKE) oql-tests
 	@$(MAKE) lambda_nra-tests
 	@$(MAKE) camp-tests
-#	@$(MAKE) sql-tests
-#	@$(MAKE) tech_rule-tests
+ifneq ($(SQL),)
+	@$(MAKE) sql-tests
+endif
+ifneq ($(JRULES),)
+	@$(MAKE) tech_rule-tests
+endif
 
 
 ## OQL
@@ -47,6 +54,9 @@ OQLWORLDNUM=1 2
 OQLTARGETS=oql nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 oql-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] OQL tests"
+	@echo "[Q*cert] "
 	@$(MAKE) oql-world-tests
 	@$(MAKE) oql-persons-tests
 
@@ -71,6 +81,9 @@ LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7
 LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 lambda_nra-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] λ-NRA tests"
+	@echo "[Q*cert] "
 	@$(MAKE) lambda_nra-persons-tests
 
 lambda_nra-persons-tests:
@@ -86,6 +99,9 @@ CAMPWORLDNUM=1
 CAMPTARGETS=camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 camp-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] CAMP tests"
+	@echo "[Q*cert] "
 	@$(MAKE) camp-world-tests
 
 camp-world-tests:
@@ -101,6 +117,9 @@ SQLORGNUM=1 2 3 4 5
 SQLTARGETS=nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 sql-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] SQL tests"
+	@echo "[Q*cert] "
 	@$(MAKE) sql-org-tests
 
 sql-org-tests:
@@ -112,10 +131,13 @@ sql-org-tests:
                             -eval-validate -output sql/org$(N).out;))
 
 ## TECHRULE
-TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 22
+TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22 #20
 TECHRULETARGETS=camp_rule camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 tech_rule-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] ODM Rules tests"
+	@echo "[Q*cert] "
 	@$(MAKE) tech_rule-test-tests
 
 tech_rule-test-tests:

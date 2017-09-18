@@ -196,7 +196,7 @@ let pretty_nraenv_core greek margin annot hierarchy harness q =
 
 let rec pretty_nnrc_aux p sym ff n =
   match n with
-  | QcertCompiler.NNRCGetConstant v -> fprintf ff "$%s"  (Util.string_of_char_list v)
+  | QcertCompiler.NNRCGetConstant v -> fprintf ff "$$%s"  (Util.string_of_char_list v)
   | QcertCompiler.NNRCVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
   | QcertCompiler.NNRCConst d -> fprintf ff "%a" pretty_data d
   | QcertCompiler.NNRCBinop (b,n1,n2) -> (pretty_binary_op p sym pretty_nnrc_aux) ff b n1 n2
