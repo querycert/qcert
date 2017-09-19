@@ -148,3 +148,14 @@ tech_rule-test-tests:
                             -schema tech_rule/test.schema \
                             -eval-validate -output tech_rule/test$(N).out;))
 
+clean:
+	@rm -f */*.txt
+	@rm -f oql/*.json
+	@rm -f sql/*.json
+	@rm -f tech_rule/*.json
+	@rm -f tech_rule/*_camp.camp
+	@rm -f tech_rule/*_rule.camp
+	@rm -f camp/*.json
+	@rm -f camp/*_camp.camp
+	@rm -f lambda_nra/*.json
+

@@ -210,8 +210,7 @@ tests:
 clean-tests:
 	@$(MAKE) -C samples clean
 
-cleanall-tests:
-	@$(MAKE) -C samples cleanall
+cleanall-tests: clean-tests
 
 ## Documentation
 documentation:

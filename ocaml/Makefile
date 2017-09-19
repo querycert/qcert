@@ -85,6 +85,7 @@ wsk-invoke:
 clean:
 	ocamlbuild -clean -no-log
 	rm -rf _build
+	rm -rf _build_js
 	rm -f ../bin/$(MAIN) ../bin/$(MAIN2)
 	rm -f ../bin/$(MAIN3).js
 
