@@ -207,13 +207,14 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
 	QData.drec [(Util.char_list_of_string "debug", QData.dstring s)]
     end
   in
+  let queryname = Filename.chop_extension file_name in
   let _ =
     if validate
-    then CheckUtil.validate_result expected_output (Some ev_data)
+    then CheckUtil.validate_result queryname language_name expected_output (Some ev_data)
     else ()
   in
   let s = Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") ev_data) in
-  let fpref = Filename.chop_extension file_name in
+  let fpref = queryname in
   let fpost = language_name in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".json" in
   { res_file = fout; res_lang = language_name; res_content = s; }
