@@ -8,6 +8,9 @@
 *.txt
 oql/*.json
 sql/*.json
+tech_rule/*.json
+tech_rule/*_camp.camp
+tech_rule/*_rule.camp
 camp/*.json
 camp/*_camp.camp
 lambda_nra/*.json
