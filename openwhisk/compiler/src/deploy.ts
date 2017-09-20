@@ -12,7 +12,8 @@ const deployMain = async () => {
       ow: ow,
       manifest: deployConfig,
       cache: '..',
-      force: true
+      force: true,
+      logger_level: 'INFO'
     })
   } catch (err) {
     console.error('Deployment failed')

@@ -6,17 +6,18 @@ const undeployMain = async () => {
     const deployConfig = require('./actions').config()
 
     // Deploy
-    console.log('### Deploy on OpenWhisk ###')
+    console.log('### Undeploy OpenWhisk actions ###')
     const ow = owDeployer.auth.initWsk()
     try {
       await owDeployer.undeploy.apply({
         ow: ow,
         manifest: deployConfig,
-        force: true
+        force: true,
+        logger_level: 'INFO'
       })
     } catch (err) { }
   } catch (err) {
-    console.error('Deployment failed')
+    console.error('Undeployment failed')
     console.error(err)
     process.exit(1)
   }
@@ -29,7 +30,7 @@ const sleep = (time) => {
 undeployMain().then(() => {
   sleep(500) // XXX Hack!
 }).then(() => {
-  console.log('Deployment done!')
+  console.log('Undeployment done!')
 })
 
 export { }
