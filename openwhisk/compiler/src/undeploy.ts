@@ -1,25 +1,9 @@
 
 const undeployMain = async () => {
   try {
-    const path = require('path')
     const owDeployer = require('openwhisk-deploy')
 
-    const qcertDir = path.resolve(__dirname, '..', '..', '..', '..')
-
-    const deployConfig = {
-      packages: {
-        qcert: {
-          actions: {
-            qcert: {
-              location: path.resolve(qcertDir, 'bin', 'qcertJS.js'),
-              annotations: {
-                'web-export': true
-              }
-            }
-          }
-        }
-      }
-    }
+    const deployConfig = require('./actions').config()
 
     // Deploy
     console.log('### Deploy on OpenWhisk ###')
