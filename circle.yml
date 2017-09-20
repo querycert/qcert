@@ -23,8 +23,6 @@ dependencies:
     - opam install -y ocamlbuild menhir camlp5 base64 coq.8.6.1 js_of_ocaml js_of_ocaml-ppx:
         timeout: 1200
     - if [[ ! -d ~/spark-2.1.1-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.1/spark-2.1.1-bin-hadoop2.7.tgz && tar xf spark-2.1.1-bin-hadoop2.7.tgz ; fi
-  override:
-    - cp Makefile.config_circle Makefile.config
 
 test:
   override:
