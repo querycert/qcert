@@ -1,4 +1,4 @@
-(*
+ (*
  * Copyright 2015-2017 IBM Corporation.  Portions Copyright 2017 Joshua Auerbach.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -123,7 +123,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
 	| SPDot  expr name
 		=> NRAEnvUnop (OpDot name) (sqlpp_to_nraenv expr)
     (* TODO: the index operation has no obvious translation since our internal data model has only bags, not ordered lists.  We could
-      implement Index Any without fixing this since order doesn't matter in a random selection, but we would have to tackle the issue
+      implement IndexAny without fixing this since order doesn't matter in a random selection, but we would have to tackle the issue
       of how to achieve randomness in Coq *)
 	| SPIndex  _ _
 	| SPIndexAny _
@@ -137,9 +137,39 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   		=> NRAEnvConst dunit
 	| SPVarRef name
 		=> NRAEnvUnop (OpDot name) NRAEnvID
-	| SPFunctionCall _ _ (* TODO: there are really two cases here.  (1) Many built-in functions that are documented as part of the SQL++
-	   specification; these are really operations in disguise.  (2) User-defined functions.  These may not be supported for a while if ever *)
+	| SPFunctionCall name args
+		=> match name with
+		| SPFget_year
+		| SPFget_month
+		| SPFget_day
+		| SPFget_hour
+		| SPFget_minute
+		| SPFget_second
+		| SPFget_millisecond
+		| SPFavg
+		| SPFmin
+		| SPFmax
+		| SPFcount
+		| SPFsum
+		| SPFcoll_avg
+		| SPFcoll_min
+		| SPFcoll_max
+		| SPFcoll_count
+		| SPFcoll_sum
+		| SPFarray_avg
+		| SPFarray_min
+		| SPFarray_max
+		| SPFarray_count
+		| SPFarray_sum
+		| SPFsqrt
+		| SPFsubstring
+		| SPFregexp_contains
+		| SPFcontains
+		(* TODO: none of these are implemented yet.  The intent is to eventually implement (only) those in the explicit list of
+		 well-known built-in functions above. Calls involving names not on the list are screened in the front-end and won't reach 
+		 this function. *)
     	=> sqlpp_to_nraenv_not_implemented "function call expressions"
+    	end
 	(* Note: we don't have ordered lists in our data model so the distinction between array and bag isn't obvious.  We construct what our
 	  data model calls a bag in both cases.  Because the elements of the constructor can be arbitrary expressions, we have to
 	  construct the list programmatically.  Perhaps we should have a special case for when the elements are all constants, in which case
@@ -150,9 +180,14 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
 	| SPObject items (*Note: we only support objects whose field names are literals. *)
         => List.fold_right (fun (item : (string * sqlpp)) acc => let (name , expr) := item in 
 			NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec name) (sqlpp_to_nraenv expr)) acc) (NRAEnvConst (drec nil)) items
-	| SPQuery _
-    	=> sqlpp_to_nraenv_not_implemented "select expressions"
-	end.
+	| SPQuery stmt
+    	=> sqlpp_select_statement_to_nraenv stmt
+	end
+
+    with sqlpp_select_statement_to_nraenv (stmt: sqlpp_select_statement) :=
+    	sqlpp_to_nraenv_not_implemented "select"
+	.
+	
 
 (* External entry point. *)
 Definition sqlpp_to_nraenv_top := sqlpp_to_nraenv.
