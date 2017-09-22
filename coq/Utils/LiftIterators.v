@@ -33,6 +33,8 @@ Section LiftIterators.
 
   (** * Lift iterators *)
 
+  (** ** Lifted map *)
+  
   Section lift_map.
     Fixpoint lift_map {A B} (f : A -> option B) (l:list A) : option (list B) :=
       match l with
@@ -158,6 +160,8 @@ Section LiftIterators.
 
   End lift_map.
 
+  (** ** Lifted flat-map *)
+  
   Section lift_flat_map.
     Fixpoint lift_flat_map {A B} (f : A -> option (list B)) (l:list A) : option (list B) :=
       match l with
@@ -197,6 +201,8 @@ Section LiftIterators.
     Qed.
   End lift_flat_map.
 
+  (** ** Lifted filter *)
+  
   Section lift_filter.
     Fixpoint lift_filter {A:Type} (f:A -> option bool) (l:list A) : option (list A) :=
       match l with
@@ -258,6 +264,8 @@ Section LiftIterators.
  
   End lift_filter.
 
+  (** ** Lifted append *)
+  
   Section lift_app.
 
     Definition lift_app {A:Type} (l1 l2:option (list A)) : option (list A) :=
@@ -278,6 +286,8 @@ Section LiftIterators.
     Qed.
   End lift_app.
 
+  (** ** Lifted flatten *)
+  
   Section lift_flatten.
     Definition lift_flatten {A} : option (list (list A)) -> option (list A) :=
       lift lflatten.

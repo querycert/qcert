@@ -32,6 +32,9 @@ Section TcNRAEnv.
     Context (τconstants:tbindings).
   
   Inductive nraenv_core_type : nraenv_core -> rtype -> rtype -> rtype -> Prop :=
+  | type_cNRAEnvGetConstant {τenv τin τout} s :
+      tdot τconstants s = Some τout ->
+      nraenv_core_type (cNRAEnvGetConstant s) τenv τin τout
   | type_cNRAEnvID {τenv τ} :
       nraenv_core_type cNRAEnvID τenv τ τ
   | type_cNRAEnvConst {τenv τin τout} c :
@@ -81,9 +84,6 @@ Section TcNRAEnv.
       nraenv_core_type op1 τenv τin τ1 ->
       nraenv_core_type op2 τenv τ1 τ2 ->
       nraenv_core_type (cNRAEnvApp op2 op1) τenv τin τ2
-  | type_cNRAEnvGetConstant {τenv τin τout} s :
-      tdot τconstants s = Some τout ->
-      nraenv_core_type (cNRAEnvGetConstant s) τenv τin τout
   | type_cNRAEnvEnv {τenv τin} :
       nraenv_core_type cNRAEnvEnv τenv τin τenv
   | type_cNRAEnvAppEnv {τenv τenv' τin τ2} op2 op1 :
@@ -410,6 +410,12 @@ Section TcNRAEnv.
     intros.
     revert env Henv d H.
     dependent induction H0; simpl; intros.
+    (* type_cNRAEnvGetConstant *)
+    - unfold tdot in *.
+      unfold edot in *.
+      destruct (Forall2_lookupr_some _ _ _ _ dt_c H) as [? [eqq1 eqq2]].
+      rewrite eqq1.
+      eauto.
     (* type_cNRAEnvID *)
     - exists d; split; [reflexivity|assumption].
     (* type_cNRAEnvConst *)
@@ -538,12 +544,6 @@ Section TcNRAEnv.
       elim H; intros; clear H.
       rewrite H0; simpl.
       exists x0;split;[reflexivity|assumption].
-    (* type_cNRAEnvGetConstant *)
-    - unfold tdot in *.
-      unfold edot in *.
-      destruct (Forall2_lookupr_some _ _ _ _ dt_c H) as [? [eqq1 eqq2]].
-      rewrite eqq1.
-      eauto.
     (* type_cNRAEnvEnv *)
     - exists env; split; [reflexivity|assumption].
     (* type_cNRAEnvAppEnv *)
@@ -781,6 +781,9 @@ Section TcNRAEnv.
   Proof.
     intros.
     dependent induction H; simpl; intros.
+    (* cNRAEnvGetConstant *)
+    - unfold nra_bind, nra_context_type.
+      econstructor; eauto.
     (* cNRAEnvID *)
     - eauto.
     (* cNRAEnvConst *)
@@ -879,9 +882,6 @@ Section TcNRAEnv.
         econstructor; eauto.
         econstructor; eauto.
       + trivial.
-    (* cNRAEnvGetConstant *)
-    - unfold nra_bind, nra_context_type.
-      econstructor; eauto.
     (* cNRAEnvEnv *)
     - unfold nra_bind, nra_context_type. eauto.
     (* cNRAEnvAppEnv *)
@@ -991,20 +991,20 @@ Section TcNRAEnv.
     Hint Constructors nraenv_core_type.
     revert k τenv τin τout pf.
     induction op; simpl; intros.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
     - inversion H; clear H; subst.
       econstructor; trivial.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
     - nra_inverter2; try tdot_inverter; eauto.
     - nra_inverter2; try tdot_inverter; eauto.
     - nra_inverter2; try tdot_inverter; eauto.

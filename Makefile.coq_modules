@@ -34,7 +34,20 @@ MODULES = \
 	Utils/Utils \
 	Common/Logger/OptimizerStep \
 	Common/Logger/OptimizerLogger \
-	Common/Data/BrandRelation \
+	Common/Brands/BrandRelation \
+	Common/TypeSystem/ForeignType \
+	Common/TypeSystem/RType \
+	Common/TypeSystem/RTypeNorm \
+	Common/TypeSystem/DType \
+        Common/TypeSystem/TBrandContext \
+	Common/TypeSystem/RSubtype \
+	Common/TypeSystem/RSubtypeProp \
+	Common/TypeSystem/RTypeMeetJoin \
+	Common/TypeSystem/RConsistentSubtype \
+	Common/TypeSystem/TBrandModel \
+	Common/TypeSystem/RTypeLattice \
+	Common/TypeSystem/TBrandModelProp \
+	Common/TypeSystem/Types \
 	Common/Data/ForeignData \
 	Common/Data/Data \
 	Common/Data/DataLift \
@@ -57,28 +70,11 @@ MODULES = \
 	Common/Env/Constants \
 	Common/Env/DConstants \
 	Common/Env/Var \
-	Common/ForeignRuntime \
-	Common/CommonRuntime \
-	Common/TypeSystem/ForeignType \
-	Common/TypeSystem/RType \
-	Common/TypeSystem/RTypeNorm \
-	Common/TypeSystem/DType \
-        Common/TypeSystem/TBrandContext \
-	Common/TypeSystem/RSubtype \
-	Common/TypeSystem/RSubtypeProp \
-	Common/TypeSystem/RTypeMeetJoin \
-	Common/TypeSystem/RConsistentSubtype \
-	Common/TypeSystem/TBrandModel \
-	Common/TypeSystem/RTypeLattice \
-	Common/TypeSystem/TBrandModelProp \
-	Common/TypeSystem/Types \
 	Common/DataTyping/ForeignDataTyping \
 	Common/DataTyping/TUtil \
 	Common/DataTyping/TData \
 	Common/DataTyping/TDData \
 	Common/DataTyping/TDataInfer \
-	Common/EnvTyping/TBindings \
-	Common/EnvTyping/TDBindings \
 	Common/OperatorsTyping/ForeignOperatorsTyping \
 	Common/OperatorsTyping/TSortBy \
 	Common/OperatorsTyping/TUnaryOperators \
@@ -86,6 +82,10 @@ MODULES = \
 	Common/OperatorsTyping/TOperatorsEq \
 	Common/OperatorsTyping/TOperatorsInfer \
 	Common/OperatorsTyping/TOperatorsInferSub \
+	Common/EnvTyping/TBindings \
+	Common/EnvTyping/TDBindings \
+	Common/ForeignRuntime \
+	Common/CommonRuntime \
 	Common/ForeignTyping \
 	Common/JSON/JSON \
 	Common/JSON/ForeignToJSON \

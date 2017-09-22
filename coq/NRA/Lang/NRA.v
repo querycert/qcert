@@ -20,7 +20,7 @@ with a separate notion of environment, it is kept in the compiler as a
 reference. *)
 
 (** NRA is a small pure language without functions based on
-combinators (i.e., with no environment). Expressions in NRA take a
+combinators (i.e., with no variables). Expressions in NRA take a
 single value as input. *)
 
 (** Summary:
@@ -206,7 +206,7 @@ Section NRA.
           nra_sem e2 d1 d2 ->                             (**r   [Γc ; d₁ ⊢〚e₂〛⇓ d₂] *)
           nra_sem (NRAApp e2 e1) d d2                     (**r ⇒ [Γc ; d ⊢〚e₂ ∘ e₁〛⇓ d₂] *)
       with nra_sem_map: nra -> list data -> list data -> Prop :=
-      | sem_NRAMMap_empty : forall e,
+      | sem_NRAMap_empty : forall e,
           nra_sem_map e nil nil                       (**r   [Γc ; {} ⊢〚e〛χ ⇓ {}] *)
       | sem_NRAMap_cons : forall e d1 c1 d2 c2,
           nra_sem e d1 d2 ->                          (**r   [Γc ; d₁ ⊢〚e〛⇓ d₂]  *)
@@ -260,13 +260,15 @@ Section NRA.
               lift_oncoll (fun d1 => lift dcoll (omap_product (nra_eval e2) d1)) c1
           in olift aux_mapconcat (nra_eval e1 din)
         | NRAProduct e1 e2 =>
-          (* Note: (fun y => nra_eval op2 x) does not depend on input,
-             but we still use a nested loop and delay op2 evaluation
-             so it does not fail in case the op1 operand is an empty
-             collection -- this makes sure to align the semantics with
-             the NNRC version. - Jerome *)
+          (* Note: (fun _ => nra_eval e2 din) does not depend on
+             input, but we still use a nested loop and delay op2
+             evaluation so it does not fail in case the op1 operand is
+             an empty collection -- this facilitates translation for
+             the NNRC version where one cannot easily enforce an eager
+             evaluation. *)
           let aux_product d :=
-              lift_oncoll (fun c1 => lift dcoll (omap_product (fun _ => nra_eval e2 din) c1)) d
+              lift_oncoll
+                (fun c1 => lift dcoll (omap_product (fun _ => nra_eval e2 din) c1)) d
           in olift aux_product (nra_eval e1 din)
         | NRASelect e2 e1 =>
           let pred d1 :=
@@ -275,8 +277,8 @@ Section NRA.
               | _ => None
               end
           in
-          let aux_select c1 :=
-              lift_oncoll (fun d1 => lift dcoll (lift_filter pred d1)) c1
+          let aux_select d :=
+              lift_oncoll (fun d1 => lift dcoll (lift_filter pred d1)) d
           in
           olift aux_select (nra_eval e1 din)
         | NRADefault e1 e2 =>

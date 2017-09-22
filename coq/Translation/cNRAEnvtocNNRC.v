@@ -30,6 +30,8 @@ Section cNRAEnvtocNNRC.
   (* Java equivalent: NraToNnrc.cnraenv_to_nnrc *)
   Fixpoint nraenv_core_to_nnrc_core (op:nraenv_core) (varid varenv:var) : nnrc :=
     match op with
+      (* [[ CENV v ]]_vid,venv = v *)
+      | cNRAEnvGetConstant s => NNRCGetConstant s
       (* [[ ID ]]_vid,venv == vid *)
       | cNRAEnvID => NNRCVar varid
       (* [[ Const ]]_vid,venv == Const *)
@@ -108,8 +110,6 @@ Section cNRAEnvtocNNRC.
         let t := fresh_var "tapp$" (varid::varenv::nil) in
         let nnrc1 := (nraenv_core_to_nnrc_core op1 t varenv) in
         (NNRCLet t nnrc2 nnrc1)
-      (* [[ CENV v ]]_vid,venv = v *)
-      | cNRAEnvGetConstant s => NNRCGetConstant s
       (* [[ ENV ]]_vid,venv = venv *)
       | cNRAEnvEnv => NNRCVar varenv
       (* [[ op1 ◯ₑ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
@@ -165,6 +165,8 @@ Section cNRAEnvtocNNRC.
     Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
     revert did denv env vid venv.
     nraenv_core_cases (induction op) Case; intros; simpl.
+    - Case "cNRAEnvGetConstant"%string.
+      reflexivity.
     - Case "cNRAEnvID"%string.
       assumption.
     - Case "cNRAEnvConst"%string.
@@ -327,8 +329,6 @@ Section cNRAEnvtocNNRC.
         congruence.
       + simpl; match_destr.
         elim (fresh_var_fresh2 _ _ _ _ e).
-    - Case "cNRAEnvGetConstant"%string.
-      reflexivity.
     - Case "cNRAEnvEnv"%string.
       assumption.
     - Case "cNRAEnvAppEnv"%string.
@@ -362,6 +362,10 @@ Section cNRAEnvtocNNRC.
       v = vid \/ v = venv.
   Proof.
     nraenv_core_cases (induction op) Case.
+    - Case "cNRAEnvGetConstant"%string.
+      intros vid venv v.
+      simpl.
+      intros; contradiction.
     - Case "cNRAEnvID"%string.
       intros;
       simpl in *; repeat rewrite in_app_iff in *;
@@ -500,10 +504,6 @@ Section cNRAEnvtocNNRC.
       destruct H.
       clear IHop2; specialize (IHop1 _ venv v H).
       intuition.
-    - Case "cNRAEnvGetConstant"%string.
-      intros vid venv v.
-      simpl.
-      intros; contradiction.
     - Case "cNRAEnvEnv"%string.
       intros vid venv v.
       simpl.
@@ -611,6 +611,7 @@ Section cNRAEnvtocNNRC.
       induction op; simpl in *; intros; trivial.
       - omega.
       - omega.
+      - omega.
       - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
       - specialize (IHop vid venv); omega.
       - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
@@ -623,7 +624,6 @@ Section cNRAEnvtocNNRC.
       - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
       - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
       - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - omega.
       - omega.
       - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
       - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.

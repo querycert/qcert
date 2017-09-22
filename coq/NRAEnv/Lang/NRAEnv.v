@@ -64,22 +64,22 @@ Section NRAEnv.
    1993. *)
 
   Inductive nraenv : Set :=
+  | NRAEnvGetConstant : string -> nraenv                      (**r Accesses a global constant *)
   | NRAEnvID : nraenv                                         (**r Current value *)
   | NRAEnvConst : data -> nraenv                              (**r Constant value *)
-  | NRAEnvBinop : binary_op -> nraenv -> nraenv -> nraenv         (**r Binary operator *)
-  | NRAEnvUnop : unary_op -> nraenv -> nraenv                  (**r Unary operator *)
+  | NRAEnvBinop : binary_op -> nraenv -> nraenv -> nraenv     (**r Binary operator *)
+  | NRAEnvUnop : unary_op -> nraenv -> nraenv                 (**r Unary operator *)
   | NRAEnvMap : nraenv -> nraenv -> nraenv                    (**r Map [χ] *)
-  | NRAEnvMapProduct : nraenv -> nraenv -> nraenv              (**r Dependent cartesian product [⋈ᵈ] *)
+  | NRAEnvMapProduct : nraenv -> nraenv -> nraenv             (**r Dependent cartesian product [⋈ᵈ] *)
   | NRAEnvProduct : nraenv -> nraenv -> nraenv                (**r Cartesian product [×] *)
   | NRAEnvSelect : nraenv -> nraenv -> nraenv                 (**r Relational selection [σ] *) 
   | NRAEnvDefault : nraenv -> nraenv -> nraenv                (**r Default for empty collection [∥] *)
   | NRAEnvEither : nraenv -> nraenv -> nraenv                 (**r Choice *)
   | NRAEnvEitherConcat : nraenv -> nraenv -> nraenv           (**r Choice with concatenation *)
-  | NRAEnvApp : nraenv -> nraenv -> nraenv                    (**r Composition *)
-  | NRAEnvGetConstant : string -> nraenv                      (**r Accesses a global constant *)
+  | NRAEnvApp : nraenv -> nraenv -> nraenv                    (**r Composition [∘] *)
   | NRAEnvEnv : nraenv                                        (**r Current environment *)
-  | NRAEnvAppEnv : nraenv -> nraenv -> nraenv                 (**r Composition over the environment *)
-  | NRAEnvMapEnv : nraenv -> nraenv                           (**r Map over the environment *)
+  | NRAEnvAppEnv : nraenv -> nraenv -> nraenv                 (**r Composition over the environment [∘ᵉ] *)
+  | NRAEnvMapEnv : nraenv -> nraenv                           (**r Map over the environment [χᵉ] *)
   | NRAEnvFlatMap : nraenv -> nraenv -> nraenv                (**r Flat map *)
   | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv         (**r Join [⋈] *)
   | NRAEnvProject : list string -> nraenv -> nraenv           (**r Projection [Π] *)
@@ -102,6 +102,8 @@ Section NRAEnv.
   
   (** ** Join operations *)
 
+  (** [e₂ ⋈⟨e₁) e₃ = σ⟨e₁⟩(e₂ × e₃)] *)
+  
   Definition join (op1 op2 op3 : nraenv_core) : nraenv_core :=
     (cNRAEnvSelect op1 (cNRAEnvProduct op2 op3)).
 
@@ -214,6 +216,7 @@ Section NRAEnv.
   
   Fixpoint nraenv_core_of_nraenv (e:nraenv) : nraenv_core :=
     match e with
+      | NRAEnvGetConstant s => cNRAEnvGetConstant s
       | NRAEnvID => cNRAEnvID
       | NRAEnvConst d => cNRAEnvConst d
       | NRAEnvBinop b e1 e2 => cNRAEnvBinop b (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
@@ -226,7 +229,6 @@ Section NRAEnv.
       | NRAEnvEither opl opr => cNRAEnvEither (nraenv_core_of_nraenv opl) (nraenv_core_of_nraenv opr)
       | NRAEnvEitherConcat op1 op2 => cNRAEnvEitherConcat (nraenv_core_of_nraenv op1) (nraenv_core_of_nraenv op2)
       | NRAEnvApp e1 e2 => cNRAEnvApp (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
-      | NRAEnvGetConstant s => cNRAEnvGetConstant s
       | NRAEnvEnv => cNRAEnvEnv
       | NRAEnvAppEnv e1 e2 => cNRAEnvAppEnv (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
       | NRAEnvMapEnv e1 => cNRAEnvMapEnv (nraenv_core_of_nraenv e1)
@@ -247,22 +249,22 @@ Section NRAEnv.
 
   Fixpoint nraenv_of_nraenv_core (a:nraenv_core) : nraenv :=
     match a with
-      | cNRAEnvID => NRAEnvID
-      | cNRAEnvConst d => NRAEnvConst d
-      | cNRAEnvBinop b e1 e2 => NRAEnvBinop b (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvUnop u e1 => NRAEnvUnop u (nraenv_of_nraenv_core e1)
-      | cNRAEnvMap e1 e2 => NRAEnvMap (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvMapProduct e1 e2 => NRAEnvMapProduct (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvProduct e1 e2 => NRAEnvProduct (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvSelect e1 e2 => NRAEnvSelect (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvDefault e1 e2 => NRAEnvDefault (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvEither opl opr => NRAEnvEither (nraenv_of_nraenv_core opl) (nraenv_of_nraenv_core opr)
-      | cNRAEnvEitherConcat op1 op2 => NRAEnvEitherConcat (nraenv_of_nraenv_core op1) (nraenv_of_nraenv_core op2)
-      | cNRAEnvApp e1 e2 => NRAEnvApp (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvGetConstant s => NRAEnvGetConstant s
-      | cNRAEnvEnv => NRAEnvEnv
-      | cNRAEnvAppEnv e1 e2 => NRAEnvAppEnv (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | cNRAEnvMapEnv e1 => NRAEnvMapEnv (nraenv_of_nraenv_core e1)
+    | cNRAEnvGetConstant s => NRAEnvGetConstant s
+    | cNRAEnvID => NRAEnvID
+    | cNRAEnvConst d => NRAEnvConst d
+    | cNRAEnvBinop b e1 e2 => NRAEnvBinop b (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvUnop u e1 => NRAEnvUnop u (nraenv_of_nraenv_core e1)
+    | cNRAEnvMap e1 e2 => NRAEnvMap (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvMapProduct e1 e2 => NRAEnvMapProduct (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvProduct e1 e2 => NRAEnvProduct (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvSelect e1 e2 => NRAEnvSelect (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvDefault e1 e2 => NRAEnvDefault (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvEither opl opr => NRAEnvEither (nraenv_of_nraenv_core opl) (nraenv_of_nraenv_core opr)
+    | cNRAEnvEitherConcat op1 op2 => NRAEnvEitherConcat (nraenv_of_nraenv_core op1) (nraenv_of_nraenv_core op2)
+    | cNRAEnvApp e1 e2 => NRAEnvApp (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvEnv => NRAEnvEnv
+    | cNRAEnvAppEnv e1 e2 => NRAEnvAppEnv (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+    | cNRAEnvMapEnv e1 => NRAEnvMapEnv (nraenv_of_nraenv_core e1)
     end.
 
   Lemma nraenv_roundtrip (a:nraenv_core) :
@@ -288,6 +290,7 @@ Section NRAEnv.
   Section FreeVars.
     Fixpoint nraenv_free_vars (q:nraenv) : list string :=
       match q with
+      | NRAEnvGetConstant s => s :: nil
       | NRAEnvID => nil
       | NRAEnvConst rd => nil
       | NRAEnvBinop _ q1 q2 =>
@@ -310,7 +313,6 @@ Section NRAEnv.
         nraenv_free_vars q1 ++ nraenv_free_vars q2
       | NRAEnvApp q2 q1 =>
         nraenv_free_vars q1 ++ nraenv_free_vars q2
-      | NRAEnvGetConstant s => s :: nil
       | NRAEnvEnv => nil
       | NRAEnvAppEnv q2 q1 =>
         nraenv_free_vars q1 ++ nraenv_free_vars q2
@@ -352,7 +354,8 @@ Notation "h ⊢ EOp @ₓ x ⊣ c ; env" := (nraenv_eval h c EOp env x) (at level
 Local Open Scope string_scope.
 Tactic Notation "nraenv_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "NRAEnvID"
+  [ Case_aux c "NRAEnvGetConstant"
+  | Case_aux c "NRAEnvID"
   | Case_aux c "NRAEnvConst"
   | Case_aux c "NRAEnvBinop"
   | Case_aux c "NRAEnvUnop"
@@ -364,7 +367,6 @@ Tactic Notation "nraenv_cases" tactic(first) ident(c) :=
   | Case_aux c "NRAEnvEither"
   | Case_aux c "NRAEnvEitherConcat"
   | Case_aux c "NRAEnvApp"
-  | Case_aux c "NRAEnvGetConstant"
   | Case_aux c "NRAEnvEnv"
   | Case_aux c "NRAEnvAppEnv"
   | Case_aux c "NRAEnvMapEnv"

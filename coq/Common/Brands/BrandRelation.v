@@ -25,7 +25,6 @@ Require Import Program.Basics.
 Require Import RelationClasses.
 Require Import EquivDec.
 Require Import Morphisms.
-
 Require Import Utils.
 
 Definition brands := list brand.
@@ -34,276 +33,277 @@ Definition any : brands := nil.
 
 Definition brand_relation_t := list (string*string).
 
-  Section brand_relation_types.
-    Context  (brand_relation_brands:brand_relation_t).
+Section brand_relation_types.
+  Context  (brand_relation_brands:brand_relation_t).
 
-    Definition brand_relation_trans_t
-      := forall a b c, In (a,b) brand_relation_brands ->
-                       In (b,c) brand_relation_brands ->
-                       In (a,c) brand_relation_brands.
+  Definition brand_relation_trans_t
+    := forall a b c, In (a,b) brand_relation_brands ->
+                     In (b,c) brand_relation_brands ->
+                     In (a,c) brand_relation_brands.
     
-    Definition brand_relation_assym_t
-      := forall a b, In (a,b) brand_relation_brands ->
-                     ~ In (b,a) brand_relation_brands.
+  Definition brand_relation_assym_t
+    := forall a b, In (a,b) brand_relation_brands ->
+                   ~ In (b,a) brand_relation_brands.
+
   Section brand_relation_dec.
    
-Lemma brand_relation_trans_dec :
-  {brand_relation_trans_t}
-  +  {~ brand_relation_trans_t}.
-Proof.
-  unfold brand_relation_trans_t.
-  case_eq (forallb (fun ab => forallb (fun bc =>
-                                         if string_dec (snd ab) (fst bc)
-                                         then set_mem (pair_eqdec) ((fst ab), (snd bc)) brand_relation_brands 
-                                         else true
-                                      ) brand_relation_brands) brand_relation_brands).
-  - left; intros.
-    rewrite forallb_forall in H.
-    specialize (H _ H0).
-    rewrite forallb_forall in H.
-    specialize (H _ H1).
-    match_destr_in H; simpl in *; [| intuition ].
-    apply set_mem_correct1 in H. trivial.
-  - right; intro fb.
-    rewrite forallb_not_existb, negb_false_iff, existsb_exists in H.
-    destruct H as [[? ?] [inn ne]].
-    rewrite negb_true_iff, forallb_not_existb, negb_false_iff, existsb_exists in ne.
-    destruct ne as [[? ?] [inn2 ne]].
-    simpl in *.
-    match_destr_in ne; subst.
-    rewrite negb_true_iff in ne.
-    apply set_mem_complete1 in ne.
-    specialize (fb _ _ _ inn inn2). 
-    apply (ne fb). 
-Defined.
+    Lemma brand_relation_trans_dec :
+      {brand_relation_trans_t}
+      +  {~ brand_relation_trans_t}.
+    Proof.
+      unfold brand_relation_trans_t.
+      case_eq (forallb (fun ab => forallb (fun bc =>
+                                             if string_dec (snd ab) (fst bc)
+                                             then set_mem (pair_eqdec) ((fst ab), (snd bc)) brand_relation_brands 
+                                             else true
+                                          ) brand_relation_brands) brand_relation_brands).
+      - left; intros.
+        rewrite forallb_forall in H.
+        specialize (H _ H0).
+        rewrite forallb_forall in H.
+        specialize (H _ H1).
+        match_destr_in H; simpl in *; [| intuition ].
+        apply set_mem_correct1 in H. trivial.
+      - right; intro fb.
+        rewrite forallb_not_existb, negb_false_iff, existsb_exists in H.
+        destruct H as [[? ?] [inn ne]].
+        rewrite negb_true_iff, forallb_not_existb, negb_false_iff, existsb_exists in ne.
+        destruct ne as [[? ?] [inn2 ne]].
+        simpl in *.
+        match_destr_in ne; subst.
+        rewrite negb_true_iff in ne.
+        apply set_mem_complete1 in ne.
+        specialize (fb _ _ _ inn inn2). 
+        apply (ne fb). 
+    Defined.
 
-Lemma brand_relation_assym_dec :
-  {brand_relation_assym_t}
-  +  {~ brand_relation_assym_t}.
-Proof.
-  unfold brand_relation_assym_t.
-  case_eq (forallb (fun ab =>
-                      negb (set_mem (pair_eqdec) ((snd ab), (fst ab)) brand_relation_brands)) brand_relation_brands).
-  - left; intros.
-    rewrite forallb_forall in H.
-    specialize (H _ H0).
-    apply negb_true_iff in H.
-    apply set_mem_complete1 in H. simpl in *.
-    trivial.
-  - right; intro fb.
-    rewrite forallb_not_existb, negb_false_iff, existsb_exists in H.
-    destruct H as [[? ?] [inn ne]].
-    rewrite negb_involutive in ne.
-    apply set_mem_correct1 in ne.
-    simpl in *.
-    apply (fb _ _ inn ne).
-Defined.
+    Lemma brand_relation_assym_dec :
+      {brand_relation_assym_t}
+      +  {~ brand_relation_assym_t}.
+    Proof.
+      unfold brand_relation_assym_t.
+      case_eq (forallb (fun ab =>
+                          negb (set_mem (pair_eqdec) ((snd ab), (fst ab)) brand_relation_brands)) brand_relation_brands).
+      - left; intros.
+        rewrite forallb_forall in H.
+        specialize (H _ H0).
+        apply negb_true_iff in H.
+        apply set_mem_complete1 in H. simpl in *.
+        trivial.
+      - right; intro fb.
+        rewrite forallb_not_existb, negb_false_iff, existsb_exists in H.
+        destruct H as [[? ?] [inn ne]].
+        rewrite negb_involutive in ne.
+        apply set_mem_correct1 in ne.
+        simpl in *.
+        apply (fb _ _ inn ne).
+    Defined.
 
   End brand_relation_dec.
-  End brand_relation_types.
+End brand_relation_types.
   
-  Class brand_relation :=
-    mkBrand_relation {
-        brand_relation_brands : list (string*string);
-        
-        brand_relation_trans_b :
-          holds (brand_relation_trans_dec brand_relation_brands);
-        brand_relation_assym_b :
-          holds (brand_relation_assym_dec brand_relation_brands)
-      }.
+Class brand_relation :=
+  mkBrand_relation {
+      brand_relation_brands : list (string*string);
+      
+      brand_relation_trans_b :
+        holds (brand_relation_trans_dec brand_relation_brands);
+      brand_relation_assym_b :
+        holds (brand_relation_assym_dec brand_relation_brands)
+    }.
 
-  Section brand_relation_prop.
-    Context {br:brand_relation}.
-
-    Lemma brand_relation_trans :
-      brand_relation_trans_t brand_relation_brands.
-    Proof.
-      generalize (brand_relation_trans_b).
-      unfold holds, is_true; match_destr.
-    Qed.
-    
-    Lemma brand_relation_assym :
-      brand_relation_assym_t brand_relation_brands.
-    Proof.
-      generalize (brand_relation_assym_b).
-      unfold holds, is_true; match_destr.
-    Qed.
-    
-    Lemma brand_relation_irrefl a : ~ In (a,a) brand_relation_brands.
-    Proof.
-      intro inn.
-      apply (brand_relation_assym a a); trivial.
-    Qed.
-
-End brand_relation_prop.
-
-  Lemma brand_relation_ext b pf1 pf2 pf1' pf2' :
-    mkBrand_relation b pf1 pf2  = mkBrand_relation b pf1' pf2' .
+Section brand_relation_prop.
+  Context {br:brand_relation}.
+  
+  Lemma brand_relation_trans :
+    brand_relation_trans_t brand_relation_brands.
   Proof.
-    f_equal; apply UIP_dec; try apply bool_dec;
-    try (decide equality; apply string_dec).
-  Defined.
-
-    Lemma brand_relation_fequal {br₁ br₂}:
-    @brand_relation_brands br₁ = @brand_relation_brands br₂ ->
-    br₁ = br₂.
+    generalize (brand_relation_trans_b).
+    unfold holds, is_true; match_destr.
+  Qed.
+    
+  Lemma brand_relation_assym :
+    brand_relation_assym_t brand_relation_brands.
   Proof.
-     destruct br₁; destruct br₂; simpl; intros; subst.
-     apply brand_relation_ext.
+    generalize (brand_relation_assym_b).
+    unfold holds, is_true; match_destr.
   Qed.
   
-  Section sub_brand.
+  Lemma brand_relation_irrefl a : ~ In (a,a) brand_relation_brands.
+  Proof.
+    intro inn.
+    apply (brand_relation_assym a a); trivial.
+  Qed.
+  
+End brand_relation_prop.
 
-    Definition sub_brand (h:brand_relation_t) (a b:brand)
-      := a = b \/ In (a,b) h.
+Lemma brand_relation_ext b pf1 pf2 pf1' pf2' :
+  mkBrand_relation b pf1 pf2  = mkBrand_relation b pf1' pf2' .
+Proof.
+  f_equal; apply UIP_dec; try apply bool_dec;
+    try (decide equality; apply string_dec).
+Defined.
 
-    Definition sub_brand_dec br a b : {sub_brand br a b} + {~sub_brand br a b}.
-    Proof.
-      unfold sub_brand.
-      destruct (a == b).
-      - left; intuition.
-      - destruct (in_dec equiv_dec (a,b) br).
-        * left; intuition.
-        * right; intuition.
-    Defined.
+Lemma brand_relation_fequal {br₁ br₂}:
+  @brand_relation_brands br₁ = @brand_relation_brands br₂ ->
+  br₁ = br₂.
+Proof.
+  destruct br₁; destruct br₂; simpl; intros; subst.
+  apply brand_relation_ext.
+Qed.
+  
+Section sub_brand.
+  
+  Definition sub_brand (h:brand_relation_t) (a b:brand)
+    := a = b \/ In (a,b) h.
+  
+  Definition sub_brand_dec br a b : {sub_brand br a b} + {~sub_brand br a b}.
+  Proof.
+    unfold sub_brand.
+    destruct (a == b).
+    - left; intuition.
+    - destruct (in_dec equiv_dec (a,b) br).
+      * left; intuition.
+      * right; intuition.
+  Defined.
     
-    Global Instance sub_brand_refl br : Reflexive (sub_brand br).
-    Proof.
-      repeat red; intuition.
-    Qed.
+  Global Instance sub_brand_refl br : Reflexive (sub_brand br).
+  Proof.
+    repeat red; intuition.
+  Qed.
 
-    Global Instance sub_brand_pre `{brand_relation} : PreOrder (sub_brand brand_relation_brands).
-    Proof.
-      split; unfold sub_brand;
+  Global Instance sub_brand_pre `{brand_relation} : PreOrder (sub_brand brand_relation_brands).
+  Proof.
+    split; unfold sub_brand;
       repeat red; intuition; subst; intuition.
-      - generalize (brand_relation_trans _ _ _ H2 H0); eauto.
-    Qed.
+    - generalize (brand_relation_trans _ _ _ H2 H0); eauto.
+  Qed.
 
-    Global Instance sub_brand_part `{brand_relation} : PartialOrder eq (sub_brand brand_relation_brands).
-    Proof.
-      unfold sub_brand, PartialOrder, relation_equivalence, relation_conjunction,
-      predicate_equivalence, predicate_intersection, Basics.flip; simpl.
-      intros; split; intros; subst; intuition; subst; trivial.
-      eelim brand_relation_assym; eauto.
-    Qed.
-
-    Lemma sub_brand_in_trans `{brand_relation} {x y z}:
-      sub_brand brand_relation_brands x y ->
-      In (y, z) brand_relation_brands ->
-      In (x, z) brand_relation_brands.
-    Proof.
-      intros [?|?] ?; subst; trivial.
-      eapply brand_relation_trans; eauto.
-    Qed.
+  Global Instance sub_brand_part `{brand_relation} : PartialOrder eq (sub_brand brand_relation_brands).
+  Proof.
+    unfold sub_brand, PartialOrder, relation_equivalence, relation_conjunction,
+    predicate_equivalence, predicate_intersection, Basics.flip; simpl.
+    intros; split; intros; subst; intuition; subst; trivial.
+    eelim brand_relation_assym; eauto.
+  Qed.
+  
+  Lemma sub_brand_in_trans `{brand_relation} {x y z}:
+    sub_brand brand_relation_brands x y ->
+    In (y, z) brand_relation_brands ->
+    In (x, z) brand_relation_brands.
+  Proof.
+    intros [?|?] ?; subst; trivial.
+    eapply brand_relation_trans; eauto.
+  Qed.
       
-    Lemma in_sub_brand_trans `{brand_relation} {x y z}:
-      In (x, y) brand_relation_brands ->
-      sub_brand brand_relation_brands y z ->
-      In (x, z) brand_relation_brands.
-    Proof.
-      intros ? [?|?]; subst; trivial.
-      eapply brand_relation_trans; eauto.
-    Qed.
+  Lemma in_sub_brand_trans `{brand_relation} {x y z}:
+    In (x, y) brand_relation_brands ->
+    sub_brand brand_relation_brands y z ->
+    In (x, z) brand_relation_brands.
+  Proof.
+    intros ? [?|?]; subst; trivial.
+    eapply brand_relation_trans; eauto.
+  Qed.
 
-    (* everything in the second brand list is a 
-      parent of (or same as) something in the first brand list *)
-    Definition sub_brands (h:brand_relation_t) (a b:brands)
-      := forall y, In y b -> exists x, In x a /\ sub_brand h x y.
+  (* everything in the second brand list is a 
+     parent of (or same as) something in the first brand list *)
+  Definition sub_brands (h:brand_relation_t) (a b:brands)
+    := forall y, In y b -> exists x, In x a /\ sub_brand h x y.
+  
+  Definition sub_brands_dec br a b :
+    {sub_brands br a b} + {~sub_brands br a b}.
+  Proof.
+    apply forall_in_dec; intros.
+    apply exists_in_dec; intros.
+    apply sub_brand_dec.
+  Defined.
+  
+  Global Instance sub_brands_pre `{brand_relation} : PreOrder (sub_brands brand_relation_brands).
+  Proof.
+    unfold sub_brands.
+    constructor; red; intros.
+    - exists y; intuition.
+    - destruct (H1 _ H2) as [y' [yin ysb]].
+      destruct (H0 _ yin) as [z' [zin zsb]].
+      exists z'; split.
+      + intuition.
+      + etransitivity; eauto.
+  Qed.
 
-    Definition sub_brands_dec br a b :
-      {sub_brands br a b} + {~sub_brands br a b}.
-    Proof.
-      apply forall_in_dec; intros.
-      apply exists_in_dec; intros.
-      apply sub_brand_dec.
-    Defined.
+  Lemma incl_sub_brands (hs:brand_relation_t) (a b:brands) :
+    incl a b -> sub_brands hs b a.
+  Proof.
+    unfold incl, sub_brands.
+    intros.
+    exists y; intuition.
+  Qed.
 
-    Global Instance sub_brands_pre `{brand_relation} : PreOrder (sub_brands brand_relation_brands).
-    Proof.
-      unfold sub_brands.
-      constructor; red; intros.
-      - exists y; intuition.
-      - destruct (H1 _ H2) as [y' [yin ysb]].
-        destruct (H0 _ yin) as [z' [zin zsb]].
-        exists z'; split.
-        + intuition.
-        + etransitivity; eauto.
-    Qed.
+  Definition equiv_brands (h:brand_relation_t) (a b:brands)
+    := sub_brands h a b /\ sub_brands h b a.
 
-    Lemma incl_sub_brands (hs:brand_relation_t) (a b:brands) :
-      incl a b -> sub_brands hs b a.
-    Proof.
-      unfold incl, sub_brands.
-      intros.
-      exists y; intuition.
-    Qed.
+  Global Instance equiv_brands_sub_subr  (hs:brand_relation_t) :
+    subrelation (equiv_brands hs) (sub_brands hs).
+  Proof.
+    unfold equiv_brands.
+    repeat red; intuition.
+  Qed.
+  
+  Global Instance equiv_brands_sub_flip_subr  (hs:brand_relation_t) :
+    subrelation (equiv_brands hs) (flip (sub_brands hs)).
+  Proof.
+    unfold equiv_brands.
+    repeat red; intuition.
+  Qed.
+  
+  Definition equiv_brands_dec br a b :
+    {equiv_brands br a b} + {~equiv_brands br a b}.
+  Proof.
+    unfold equiv_brands.
+    destruct (sub_brands_dec br a b).
+    - destruct (sub_brands_dec br b a).
+      + left; intuition.
+      + right; intuition.
+    - right; intuition.
+  Defined.
 
-    Definition equiv_brands (h:brand_relation_t) (a b:brands)
-      := sub_brands h a b /\ sub_brands h b a.
-
-    Global Instance equiv_brands_sub_subr  (hs:brand_relation_t) :
-      subrelation (equiv_brands hs) (sub_brands hs).
-    Proof.
-      unfold equiv_brands.
-      repeat red; intuition.
-    Qed.
-
-    Global Instance equiv_brands_sub_flip_subr  (hs:brand_relation_t) :
-      subrelation (equiv_brands hs) (flip (sub_brands hs)).
-    Proof.
-      unfold equiv_brands.
-      repeat red; intuition.
-    Qed.
-    
-    Definition equiv_brands_dec br a b :
-      {equiv_brands br a b} + {~equiv_brands br a b}.
-    Proof.
-      unfold equiv_brands.
-      destruct (sub_brands_dec br a b).
-      - destruct (sub_brands_dec br b a).
-        + left; intuition.
-        + right; intuition.
-      - right; intuition.
-    Defined.
-
-    Global Instance equiv_brands_equiv `{brand_relation} :
-      Equivalence (equiv_brands brand_relation_brands).
-    Proof.
+  Global Instance equiv_brands_equiv `{brand_relation} :
+    Equivalence (equiv_brands brand_relation_brands).
+  Proof.
     unfold equiv_brands.
     constructor; red; intros.
     - intuition.
     - intuition.
     - intuition; etransitivity; eauto.
-    Qed.
+  Qed.
 
-    Global Instance equiv_brands_eqdec `{brand_relation} :
-      EqDec brands (equiv_brands brand_relation_brands).
-    Proof.
-      red; intros.
-      apply equiv_brands_dec.
-    Defined.
-
-    Global Instance equivlist_equiv_brands (hs:brand_relation_t)
+  Global Instance equiv_brands_eqdec `{brand_relation} :
+    EqDec brands (equiv_brands brand_relation_brands).
+  Proof.
+    red; intros.
+    apply equiv_brands_dec.
+  Defined.
+  
+  Global Instance equivlist_equiv_brands (hs:brand_relation_t)
     : subrelation equivlist (equiv_brands hs).
-    Proof.
-      repeat red.
-      unfold equiv_brands; intros.
-      split; apply incl_sub_brands;
+  Proof.
+    repeat red.
+    unfold equiv_brands; intros.
+    split; apply incl_sub_brands;
       red; intros; eapply equivlist_in; eauto.
-      symmetry; eauto.
-    Qed.
+    symmetry; eauto.
+  Qed.
 
-    Global Instance sub_brands_part `{brand_relation} : PartialOrder (equiv_brands brand_relation_brands) (sub_brands brand_relation_brands).
-    Proof.
-      unfold PartialOrder, relation_equivalence, predicate_equivalence,
+  Global Instance sub_brands_part `{brand_relation} : PartialOrder (equiv_brands brand_relation_brands) (sub_brands brand_relation_brands).
+  Proof.
+    unfold PartialOrder, relation_equivalence, predicate_equivalence,
     relation_conjunction, predicate_intersection, Basics.flip; simpl.
-      unfold equiv_brands. intuition.
-    Qed.
+    unfold equiv_brands. intuition.
+  Qed.
 
-    Global Instance sub_brands_app_proper `{brand_relation} :
+  Global Instance sub_brands_app_proper `{brand_relation} :
     Proper (sub_brands brand_relation_brands ==>
-                         sub_brands brand_relation_brands ==>
-                         sub_brands brand_relation_brands)
+                       sub_brands brand_relation_brands ==>
+                       sub_brands brand_relation_brands)
            (@app brand).
   Proof.
     unfold Proper, respectful, equiv_brands; intros.
@@ -326,21 +326,21 @@ End brand_relation_prop.
     intuition; apply sub_brands_app_proper; trivial.
   Qed.
   
-    Lemma sub_brands_any hs b : sub_brands hs b any.
-    Proof.
-      unfold sub_brands; intuition.
-    Qed.
+  Lemma sub_brands_any hs b : sub_brands hs b any.
+  Proof.
+    unfold sub_brands; intuition.
+  Qed.
 
-    Lemma any_sub_brands hs b : sub_brands hs any b -> b = any.
-    Proof.
-      unfold sub_brands, any.
-      destruct b; trivial; intros.
-      destruct (H b); simpl; intuition.
-    Qed.
+  Lemma any_sub_brands hs b : sub_brands hs any b -> b = any.
+  Proof.
+    unfold sub_brands, any.
+    destruct b; trivial; intros.
+    destruct (H b); simpl; intuition.
+  Qed.
 
 End sub_brand.
 
-  Section brand_ops.
+Section brand_ops.
     
   Definition parents (hs:brand_relation_t) (a:brand)
     := map snd
@@ -354,14 +354,14 @@ End sub_brand.
       apply in_map_iff in inn.
       destruct inn as [[? ?] [? inn]]; simpl in *; subst.
       apply filter_In in inn. destruct inn as [??]; unfold brand in *;
-      match goal with [H: context [match ?x with _ => _ end] |- _] => destruct x end; trivial; unfold equiv, complement in *; simpl in *; congruence.
+                                match goal with [H: context [match ?x with _ => _ end] |- _] => destruct x end; trivial; unfold equiv, complement in *; simpl in *; congruence.
     - intros inn.
       apply in_map_iff. exists (a, s); simpl; intuition.
       apply filter_In; intuition.
       simpl.
       unfold brand in *;
-      match goal with [|- context [match ?x with _ => _ end] ] => destruct x end; trivial; unfold equiv, complement in *; simpl in *; congruence.
-    Qed.
+        match goal with [|- context [match ?x with _ => _ end] ] => destruct x end; trivial; unfold equiv, complement in *; simpl in *; congruence.
+  Qed.
   
   Definition parents_and_self (hs:brand_relation_t) (a:brand)
     := a::(parents hs a).
@@ -392,17 +392,17 @@ End sub_brand.
     apply incl_explode_brands.
   Qed.
   
-   Lemma explode_brands_sub
+  Lemma explode_brands_sub
         (hs:brand_relation_t) (a:brands) :
-     sub_brands hs a (explode_brands hs a).
-   Proof.
+    sub_brands hs a (explode_brands hs a).
+  Proof.
     unfold sub_brands, explode_brands.
     intros x inn.
     apply in_flat_map in inn.
     destruct inn as [y [inn1 inn2]].
     apply parents_and_self_In in inn2.
     eauto.
-   Qed.
+  Qed.
 
   Lemma explode_brands_equivbrands
         (hs:brand_relation_t) (a:brands) :
@@ -460,18 +460,18 @@ End sub_brand.
     equivlist
       (explode_brands brand_relation_brands
                       (explode_brands brand_relation_brands a))
-              (explode_brands brand_relation_brands a).
+      (explode_brands brand_relation_brands a).
   Proof.
     apply equivlist_incls; split.
     - apply explode_brands_incl.
       transitivity (explode_brands brand_relation_brands a);
-      apply explode_brands_sub.
+        apply explode_brands_sub.
     - apply incl_explode_brands.
   Qed.
 
   Lemma explode_brands_app_incl hs a b :
     incl (explode_brands hs a)
-    (explode_brands hs (a++b)).
+         (explode_brands hs (a++b)).
   Proof.
     unfold explode_brands.
     intros x xin.
@@ -484,7 +484,7 @@ End sub_brand.
   Qed.
     
   Definition has_subtype_in (hs:brand_relation_t) (c:brands) (a:brand)
-  : bool
+    : bool
     := existsb (fun x => (if in_dec equiv_dec (x,a) hs then true else false)) c.
   
   Definition collapse_brands (hs:brand_relation_t) (c:brands)
@@ -496,7 +496,7 @@ End sub_brand.
     unfold incl, collapse_brands.
     apply filter_sublist.
   Qed.
-
+  
   Lemma collapse_brands_incl (hs:brand_relation_t) (a:brands) :
     incl (collapse_brands hs a) a.
   Proof.
@@ -507,13 +507,13 @@ End sub_brand.
   Lemma has_subtype_in_app hs a l1 l2 : 
     has_subtype_in hs (l1 ++ l2) a =
     has_subtype_in hs l1 a ||
-    has_subtype_in hs l2 a.
+                   has_subtype_in hs l2 a.
   Proof.
     unfold has_subtype_in.
     apply existsb_app.
   Qed.
 
-    Lemma nosub_collapse_brands hs a : 
+  Lemma nosub_collapse_brands hs a : 
     (forall x y : brand, In x a -> In y a -> ~ In (x, y) hs) ->
     collapse_brands hs a = a.
   Proof.
@@ -553,7 +553,7 @@ End sub_brand.
     intuition.
   Qed.
 
-    Lemma collapse_brands_singleton {br:brand_relation} (bb:brand)
+  Lemma collapse_brands_singleton {br:brand_relation} (bb:brand)
     : collapse_brands brand_relation_brands (singleton bb) = singleton bb.
   Proof.
     unfold collapse_brands.
@@ -578,7 +578,7 @@ End sub_brand.
   Lemma has_subtype_in_least `{brand_relation} {x:brand} {a:brands} :
     In x a ->
     {y:brand | 
-         In y a
+     In y a
      /\ sub_brand brand_relation_brands y x
      /\ has_subtype_in brand_relation_brands a y = false}.
   Proof.
@@ -587,28 +587,28 @@ End sub_brand.
     destruct (in_dec string_dec x a0).
     - destruct (IHa _ i) as [y [iny [subyx nsuby]]].
       case_eq (@in_dec (prod string brand)
-                     (@equiv_dec (prod string brand)
-                        (@eq (prod string brand))
-                        (@eq_equivalence (prod string brand))
-                        (@pair_eqdec string brand (@eq_equivalence string)
-                           string_eqdec (@eq_equivalence string) string_eqdec))
-                     (@pair string brand a y) (@brand_relation_brands H)); intros.
+                       (@equiv_dec (prod string brand)
+                                   (@eq (prod string brand))
+                                   (@eq_equivalence (prod string brand))
+                                   (@pair_eqdec string brand (@eq_equivalence string)
+                                                string_eqdec (@eq_equivalence string) string_eqdec))
+                       (@pair string brand a y) (@brand_relation_brands H)); intros.
       + exists a.
-         split; [intuition | ].
-         split.
-          * generalize (in_sub_brand_trans i0 subyx); right; trivial.
-          * { match_destr.
-              - elim (brand_relation_irrefl _ i1).
-              - simpl. unfold has_subtype_in.
-                rewrite existsb_not_forallb, negb_false_iff, forallb_forall.
-                intros. match_destr.
-                unfold has_subtype_in in nsuby.
-                rewrite existsb_not_forallb, negb_false_iff, forallb_forall in nsuby.
-                specialize (nsuby x0 H2).
-                match_destr_in nsuby.
-                generalize (in_sub_brand_trans i0 subyx).
-                elim n0. eapply brand_relation_trans; eauto.
-            }
+        split; [intuition | ].
+        split.
+        * generalize (in_sub_brand_trans i0 subyx); right; trivial.
+        * { match_destr.
+            - elim (brand_relation_irrefl _ i1).
+            - simpl. unfold has_subtype_in.
+              rewrite existsb_not_forallb, negb_false_iff, forallb_forall.
+              intros. match_destr.
+              unfold has_subtype_in in nsuby.
+              rewrite existsb_not_forallb, negb_false_iff, forallb_forall in nsuby.
+              specialize (nsuby x0 H2).
+              match_destr_in nsuby.
+              generalize (in_sub_brand_trans i0 subyx).
+              elim n0. eapply brand_relation_trans; eauto.
+          }
       + exists y. rewrite nsuby, H1. intuition.
     - destruct (string_dec a x).
       + subst.
@@ -625,8 +625,8 @@ End sub_brand.
               elim (brand_relation_assym _ _ i0); trivial.
           }
         * exists x. rewrite H1.
-           intuition. match_destr.
-           elim (brand_relation_irrefl _ i).
+          intuition. match_destr.
+          elim (brand_relation_irrefl _ i).
       + elim n0. destruct H0; intuition.
   Qed.
 
@@ -646,13 +646,13 @@ End sub_brand.
     trivial.
   Qed.
     
-   Lemma collapse_brands_sub
+  Lemma collapse_brands_sub
         (hs:brand_relation_t) (a:brands) :
-     sub_brands hs a (collapse_brands hs a).
-   Proof.
-     apply incl_sub_brands.
-     apply collapse_brands_incl.
-   Qed.
+    sub_brands hs a (collapse_brands hs a).
+  Proof.
+    apply incl_sub_brands.
+    apply collapse_brands_incl.
+  Qed.
 
   Lemma collapse_brands_equivbrands
         `{brand_relation} (a:brands) :
@@ -706,7 +706,6 @@ End sub_brand.
     rewrite orb_assoc; trivial.
   Qed.
     
-
   Lemma collapse_brands_idempotent `{brand_relation} (a:brands) :
     collapse_brands brand_relation_brands (collapse_brands brand_relation_brands a) = collapse_brands brand_relation_brands a.
   Proof.
@@ -725,7 +724,7 @@ End sub_brand.
     match_destr.
   Qed.
 
-Lemma sort_brands_equiv hs a :
+  Lemma sort_brands_equiv hs a :
     equiv_brands hs (insertion_sort StringOrder.lt_dec a) a.
   Proof.
     apply equivlist_equiv_brands.
@@ -745,10 +744,10 @@ Lemma sort_brands_equiv hs a :
   Qed.
   
   Lemma canon_brands_equiv `{brand_relation} (a:brands)
-  : equiv_brands
-      brand_relation_brands
-      (canon_brands brand_relation_brands a)
-      a.
+    : equiv_brands
+        brand_relation_brands
+        (canon_brands brand_relation_brands a)
+        a.
   Proof.
     unfold canon_brands.
     rewrite sort_brands_equiv.
@@ -761,7 +760,7 @@ Lemma sort_brands_equiv hs a :
     unfold Proper, respectful; intros; subst.
     unfold has_subtype_in.
     match goal with
-        [|- ?x = ?y ] => case_eq y
+      [|- ?x = ?y ] => case_eq y
     end; intros eqq1.
     - rewrite existsb_exists in eqq1 |- *.
       destruct eqq1 as [x [? inn]].
@@ -774,8 +773,8 @@ Lemma sort_brands_equiv hs a :
   Qed.
   
   Lemma collapse_sort_brands_commute (hs:brand_relation_t) (a:brands)
-  : insertion_sort StringOrder.lt_dec (collapse_brands hs a)
-    = collapse_brands hs (insertion_sort StringOrder.lt_dec a).
+    : insertion_sort StringOrder.lt_dec (collapse_brands hs a)
+      = collapse_brands hs (insertion_sort StringOrder.lt_dec a).
   Proof.
     unfold collapse_brands.
     rewrite sort_filter_commute.
@@ -786,16 +785,16 @@ Lemma sort_brands_equiv hs a :
     - apply StringOrder.trichotemy.
   Qed.
 
-    Lemma canon_brands_incl (hs:brand_relation_t) (a:brands) :
-      incl (canon_brands hs a) a.
-    Proof.
-      unfold canon_brands.
-      intros ? xin.
-      apply in_insertion_sort in xin.
-      revert a0 xin.
-      apply sublist_incl_sub.
-      apply collapse_brands_sublist.
-    Qed.
+  Lemma canon_brands_incl (hs:brand_relation_t) (a:brands) :
+    incl (canon_brands hs a) a.
+  Proof.
+    unfold canon_brands.
+    intros ? xin.
+    apply in_insertion_sort in xin.
+    revert a0 xin.
+    apply sublist_incl_sub.
+    apply collapse_brands_sublist.
+  Qed.
 
   Definition is_canon_brands (hs:brand_relation_t) (a:brands)
     := is_list_sorted StringOrder.lt_dec a = true
@@ -856,7 +855,7 @@ Lemma sort_brands_equiv hs a :
   Qed.
 
   (* two brands are equivalent if and only if there canonicalizations 
-      are equal.  *)
+     are equal.  *)
   Lemma canon_equiv `{brand_relation} (a b:brands) :
     equiv_brands brand_relation_brands a b
     <->
@@ -866,9 +865,9 @@ Lemma sort_brands_equiv hs a :
     - apply insertion_sort_equivlist; [apply lt_contr1 | ].
       revert a b H0.
       cut (forall a b : brands,
-   equiv_brands brand_relation_brands a b ->
-   incl (collapse_brands brand_relation_brands a)
-        (collapse_brands brand_relation_brands b)).
+              equiv_brands brand_relation_brands a b ->
+              incl (collapse_brands brand_relation_brands a)
+                   (collapse_brands brand_relation_brands b)).
       { intros. apply equivlist_incls; intuition. }
       unfold equiv_brands, sub_brands.
       unfold canon_brands.
@@ -896,24 +895,24 @@ Lemma sort_brands_equiv hs a :
         match_destr_in hasx.
         generalize (sub_brand_in_trans subz i); intuition.
       + specialize (Hb _ iny).
-         destruct Hb as [z [inz subz]].
-         specialize (hasx _ inz).
-         match_destr_in hasx.
-         generalize (sub_brand_in_trans subz H0); intuition.
+        destruct Hb as [z [inz subz]].
+        specialize (hasx _ inz).
+        match_destr_in hasx.
+        generalize (sub_brand_in_trans subz H0); intuition.
     - unfold equiv_brands.
       revert a b H0.
       cut (forall a b : brands,
-             canon_brands brand_relation_brands a =
-             canon_brands brand_relation_brands b ->
-             sub_brands brand_relation_brands a b).
+              canon_brands brand_relation_brands a =
+              canon_brands brand_relation_brands b ->
+              sub_brands brand_relation_brands a b).
       { intuition. }
       intros a b eqq.
       unfold sub_brands; intros.
       unfold canon_brands in eqq.
       assert (eqq1: equivlist (insertion_sort StringOrder.lt_dec
-          (collapse_brands brand_relation_brands a))
-        (insertion_sort StringOrder.lt_dec
-                        (collapse_brands brand_relation_brands b)))
+                                              (collapse_brands brand_relation_brands a))
+                              (insertion_sort StringOrder.lt_dec
+                                              (collapse_brands brand_relation_brands b)))
         by (rewrite eqq; reflexivity).
       repeat rewrite -> insertion_sort_trich_equiv in eqq1 by (apply StringOrder.trichotemy).
       apply equivlist_incls in eqq1.
@@ -939,8 +938,8 @@ Lemma sort_brands_equiv hs a :
   Lemma canon_equiv_is_canon_brands `{brand_relation} (a b:brands) :
     is_canon_brands brand_relation_brands b ->
     (equiv_brands brand_relation_brands a b
-    <->
-    canon_brands brand_relation_brands a = b).
+     <->
+     canon_brands brand_relation_brands a = b).
   Proof.
     intros can.
     rewrite <- (is_canon_brands_canon_brands _ _ can).
@@ -952,7 +951,7 @@ Lemma sort_brands_equiv hs a :
   (* canonicalization gives rise to a different decision procedure
      for brand equivalence: canonicalize and compare *)
   Definition equiv_brands_dec_alt `{brand_relation} a b :
-       {equiv_brands brand_relation_brands a b}
+    {equiv_brands brand_relation_brands a b}
     + {~equiv_brands brand_relation_brands a b}.
   Proof.
     destruct (list_eqdec string_dec
@@ -961,11 +960,11 @@ Lemma sort_brands_equiv hs a :
     - left. rewrite canon_equiv; trivial.
     - right. rewrite canon_equiv; trivial.
   Defined.
-
+  
   Lemma explode_canon_explode `{brand_relation} a :
     equivlist (explode_brands brand_relation_brands
-                    (canon_brands brand_relation_brands a))
-    (explode_brands brand_relation_brands a).
+                              (canon_brands brand_relation_brands a))
+              (explode_brands brand_relation_brands a).
   Proof.
     rewrite canon_brands_equiv.
     reflexivity.
@@ -981,9 +980,9 @@ Lemma sort_brands_equiv hs a :
     reflexivity.
   Qed.
 
-  End brand_ops.
+End brand_ops.
 
-  Section brand_join.
+Section brand_join.
   Definition brand_join (hs:brand_relation_t) (a b:brands)
     := canon_brands hs
                     (set_inter string_dec
@@ -1137,7 +1136,7 @@ Lemma sort_brands_equiv hs a :
     rewrite subx in subz.
     eauto.
   Qed.
-    
+
   Theorem brand_join_consistent `{brand_relation} b b2 :
     sub_brands brand_relation_brands b b2 <->
     brand_join brand_relation_brands b b2
@@ -1147,11 +1146,11 @@ Lemma sort_brands_equiv hs a :
     - apply brand_join_consistent1.
     - apply brand_join_consistent2.
   Qed.
-
+  
   Lemma brand_join_consistent_can `{brand_relation} b b2 :
     is_canon_brands brand_relation_brands b2 ->
     (sub_brands brand_relation_brands b b2 <->
-    brand_join brand_relation_brands b b2 = b2).
+     brand_join brand_relation_brands b b2 = b2).
   Proof.
     intros.
     rewrite brand_join_consistent; trivial.
@@ -1159,9 +1158,9 @@ Lemma sort_brands_equiv hs a :
     reflexivity.
   Qed.
 
-  End brand_join.
+End brand_join.
 
-  Section brand_meet.
+Section brand_meet.
 
   Definition brand_meet (hs:brand_relation_t) (a b:brands)
     := canon_brands hs (a ++ b).
@@ -1190,7 +1189,7 @@ Lemma sort_brands_equiv hs a :
     rewrite canon_brands_canon_brands_app1.
     rewrite app_commutative_equivlist; trivial.
   Qed.
-
+  
   Theorem brand_meet_idempotent `{brand_relation} a :
     brand_meet brand_relation_brands a a
     = canon_brands brand_relation_brands a.
@@ -1209,7 +1208,7 @@ Lemma sort_brands_equiv hs a :
     rewrite brand_meet_idempotent; trivial.
     apply is_canon_brands_canon_brands; trivial.
   Qed.
-
+  
   Theorem brand_meet_commutative `{brand_relation}  a b :
     brand_meet brand_relation_brands a b = brand_meet brand_relation_brands b a.
   Proof.
@@ -1272,11 +1271,11 @@ Lemma sort_brands_equiv hs a :
     - apply brand_meet_consistent1.
     - apply brand_meet_consistent2.
   Qed.
-
+  
   Lemma brand_meet_consistent_can `{brand_relation} b b2 :
     is_canon_brands brand_relation_brands b ->
     (sub_brands brand_relation_brands b b2 <->
-    brand_meet brand_relation_brands b b2 = b).
+     brand_meet brand_relation_brands b b2 = b).
   Proof.
     intros.
     rewrite brand_meet_consistent; trivial.
@@ -1284,78 +1283,78 @@ Lemma sort_brands_equiv hs a :
     reflexivity.
   Qed.
   
-  End brand_meet.
+End brand_meet.
 
-  Section meet_join.
+Section meet_join.
 
-    Theorem brand_join_absorptive `{brand_relation} a b:
-      brand_join brand_relation_brands
-                 a
-                 (brand_meet brand_relation_brands a b)
-      = canon_brands brand_relation_brands a.
-    Proof.
-      unfold brand_join, brand_meet.
-      rewrite explode_canon_explode.
-      rewrite set_inter_contained.
-      rewrite explode_brands_equivbrands; trivial.
-      intros.
-      apply explode_brands_app_incl; trivial.
-    Qed.
-
-    Lemma brand_join_absorptive_can `{brand_relation} a b:
-      is_canon_brands brand_relation_brands a ->
-      brand_join brand_relation_brands
-                 a
-                 (brand_meet brand_relation_brands a b)
-      = a.
-    Proof.
-      intros; rewrite brand_join_absorptive, is_canon_brands_canon_brands; trivial.
-    Qed.
-
-    Theorem brand_meet_absorptive `{brand_relation} a b:
-      brand_meet brand_relation_brands
-                 a
-                 (brand_join brand_relation_brands a b)
-      = canon_brands brand_relation_brands a.
-    Proof.
-      unfold brand_join, brand_meet.
-      replace (canon_brands brand_relation_brands
-     (a ++
-      canon_brands brand_relation_brands
-        (set_inter string_dec (explode_brands brand_relation_brands a)
-           (explode_brands brand_relation_brands b))))
+  Theorem brand_join_absorptive `{brand_relation} a b:
+    brand_join brand_relation_brands
+               a
+               (brand_meet brand_relation_brands a b)
+    = canon_brands brand_relation_brands a.
+  Proof.
+    unfold brand_join, brand_meet.
+    rewrite explode_canon_explode.
+    rewrite set_inter_contained.
+    rewrite explode_brands_equivbrands; trivial.
+    intros.
+    apply explode_brands_app_incl; trivial.
+  Qed.
+  
+  Lemma brand_join_absorptive_can `{brand_relation} a b:
+    is_canon_brands brand_relation_brands a ->
+    brand_join brand_relation_brands
+               a
+               (brand_meet brand_relation_brands a b)
+    = a.
+  Proof.
+    intros; rewrite brand_join_absorptive, is_canon_brands_canon_brands; trivial.
+  Qed.
+  
+  Theorem brand_meet_absorptive `{brand_relation} a b:
+    brand_meet brand_relation_brands
+               a
+               (brand_join brand_relation_brands a b)
+    = canon_brands brand_relation_brands a.
+  Proof.
+    unfold brand_join, brand_meet.
+    replace (canon_brands brand_relation_brands
+                          (a ++
+                             canon_brands brand_relation_brands
+                             (set_inter string_dec (explode_brands brand_relation_brands a)
+                                        (explode_brands brand_relation_brands b))))
       with (canon_brands brand_relation_brands
-     (explode_brands brand_relation_brands a ++
-      canon_brands brand_relation_brands
-        (set_inter string_dec (explode_brands brand_relation_brands a)
-                   (explode_brands brand_relation_brands b)))).
-      - rewrite app_contained_equivlist; trivial.
-        { rewrite explode_brands_equivbrands; reflexivity. }
-        intros x xin.
-        apply canon_brands_incl in xin.
-        apply set_inter_elim in xin.
-        intuition.
-      - apply canon_equiv.
-        apply equiv_brands_app_proper.
-        + apply explode_brands_equivbrands.
-        + reflexivity.
-    Qed.
+                         (explode_brands brand_relation_brands a ++
+                                         canon_brands brand_relation_brands
+                                         (set_inter string_dec (explode_brands brand_relation_brands a)
+                                                    (explode_brands brand_relation_brands b)))).
+    - rewrite app_contained_equivlist; trivial.
+      { rewrite explode_brands_equivbrands; reflexivity. }
+      intros x xin.
+      apply canon_brands_incl in xin.
+      apply set_inter_elim in xin.
+      intuition.
+    - apply canon_equiv.
+      apply equiv_brands_app_proper.
+      + apply explode_brands_equivbrands.
+      + reflexivity.
+  Qed.
 
-    Lemma brand_meet_absorptive_can `{brand_relation} a b:
-      is_canon_brands brand_relation_brands a ->
-      brand_meet brand_relation_brands
-                 a
-                 (brand_join brand_relation_brands a b)
-      = a.
-    Proof.
-      intros; rewrite brand_meet_absorptive, is_canon_brands_canon_brands; trivial.
-    Qed.
+  Lemma brand_meet_absorptive_can `{brand_relation} a b:
+    is_canon_brands brand_relation_brands a ->
+    brand_meet brand_relation_brands
+               a
+               (brand_join brand_relation_brands a b)
+    = a.
+  Proof.
+    intros; rewrite brand_meet_absorptive, is_canon_brands_canon_brands; trivial.
+  Qed.
+  
+End meet_join.
 
-  End meet_join.
+Section brands_lattice.
 
-  Section brands_lattice.
-
-    Context {br:brand_relation}.
+  Context {br:brand_relation}.
   
   Global Instance brands_lattice : Lattice brands (equiv_brands brand_relation_brands)
     := { meet:=brand_meet brand_relation_brands;
@@ -1397,24 +1396,24 @@ Lemma sort_brands_equiv hs a :
     - transitivity (canon_brands brand_relation_brands
                                  (brand_meet brand_relation_brands a b)).
       + rewrite is_canon_brands_canon_brands; trivial.
-         apply brand_meet_is_canon.
+        apply brand_meet_is_canon.
       + apply canon_equiv. apply eqq.
   Defined.
   
-  End brands_lattice.
+End brands_lattice.
   
- Global Instance brand_relation_eqdec : EqDec brand_relation eq.
-   Proof.
-     red; unfold equiv, complement.
-     intros x y.
-     destruct (@brand_relation_brands x == @brand_relation_brands y).
-     - left.
-       apply brand_relation_fequal; trivial.
-     - right. intros; subst.
-       apply c. reflexivity.
-   Defined.
+Global Instance brand_relation_eqdec : EqDec brand_relation eq.
+Proof.
+  red; unfold equiv, complement.
+  intros x y.
+  destruct (@brand_relation_brands x == @brand_relation_brands y).
+  - left.
+    apply brand_relation_fequal; trivial.
+  - right. intros; subst.
+    apply c. reflexivity.
+Defined.
    
-  Hint Resolve canon_brands_is_canon_brands.
+Hint Resolve canon_brands_is_canon_brands.
   
 (* 
 *** Local Variables: ***

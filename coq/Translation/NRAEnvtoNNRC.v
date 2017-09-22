@@ -29,6 +29,8 @@ Section NRAEnvtoNNRC.
   (** Translation from NRAEnv to Named Nested Relational Calculus Extended *)
   Fixpoint nraenv_to_nnrc (op:nraenv) (varid varenv:var) : nnrc :=
     match op with
+    (* [[ CENV v ]]_vid,venv = v *)
+    | NRAEnvGetConstant s => NNRCGetConstant s
     (* [[ ID ]]_vid,venv == vid *)
     | NRAEnvID => NNRCVar varid
     (* [[ Const ]]_vid,venv == Const *)
@@ -107,8 +109,6 @@ Section NRAEnvtoNNRC.
       let t := fresh_var "tapp$" (varid::varenv::nil) in
       let nrc1 := (nraenv_to_nnrc op1 t varenv) in
       (NNRCLet t nrc2 nrc1)
-    (* [[ CENV v ]]_vid,venv = v *)
-    | NRAEnvGetConstant s => NNRCGetConstant s
     (* [[ ENV ]]_vid,venv = venv *)
     | NRAEnvEnv => NNRCVar varenv
     (* [[ op1 ◯ₑ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
@@ -310,6 +310,11 @@ Section NRAEnvtoNNRC.
       v = vid \/ v = venv.
   Proof.
     nraenv_cases (induction op) Case.
+    - Case "NRAEnvGetConstant"%string.
+      intros vid venv v.
+      simpl.
+      intros.
+      contradiction.
     - Case "NRAEnvID"%string.
       intros;
       simpl in *; repeat rewrite in_app_iff in *;
@@ -448,11 +453,6 @@ Section NRAEnvtoNNRC.
       destruct H.
       clear IHop2; specialize (IHop1 _ venv v H).
       intuition.
-    - Case "NRAEnvGetConstant"%string.
-      intros vid venv v.
-      simpl.
-      intros.
-      contradiction.
     - Case "NRAEnvEnv"%string.
       simpl.
       intros vid venv v.
@@ -627,6 +627,7 @@ Section NRAEnvtoNNRC.
       induction op; simpl in *; intros; trivial.
       - omega.
       - omega.
+      - omega.
       - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
       - specialize (IHop vid venv); omega.
       - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
@@ -639,7 +640,6 @@ Section NRAEnvtoNNRC.
       - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
       - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
       - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - omega.
       - omega.
       - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
       - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.

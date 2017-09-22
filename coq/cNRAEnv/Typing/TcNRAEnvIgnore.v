@@ -45,6 +45,9 @@ Section TcNRAEnvIgnore.
     - inversion H; clear H.
       inversion H0; clear H0; subst.
       econstructor; eauto.
+    - inversion H; clear H.
+      inversion H0; clear H0; subst.
+      econstructor; eauto.
     - inversion H0; clear H0; subst.
       econstructor; eauto.
     - inversion H; clear H.
@@ -60,9 +63,6 @@ Section TcNRAEnvIgnore.
       inversion H0; clear H0; subst.
       econstructor; eauto.
     - inversion H; clear H.
-      inversion H0; clear H0; subst.
-      econstructor; eauto.
-    - inversion H; clear H.
       inversion H0; clear H0.
       econstructor; eauto.
     - inversion H; clear H.
@@ -71,7 +71,8 @@ Section TcNRAEnvIgnore.
     - inversion H; clear H.
       inversion H0; clear H0.
       econstructor; eauto.
-    - inversion H0; clear H0.
+    - inversion H; clear H.
+      inversion H0; clear H0.
       econstructor; eauto.
     - inversion H0; clear H0.
       econstructor; eauto.
@@ -88,6 +89,9 @@ Section TcNRAEnvIgnore.
     - inversion H; clear H.
       inversion H0; clear H0; subst.
       econstructor; eauto.
+    - inversion H; clear H.
+      inversion H0; clear H0; subst.
+      econstructor; eauto.
     - inversion H0; clear H0; subst.
       econstructor; eauto.
     - inversion H0; clear H0; subst.
@@ -98,14 +102,12 @@ Section TcNRAEnvIgnore.
       inversion H0; clear H0; subst.
       econstructor; eauto.
     - inversion H0; clear H0; subst.
-      econstructor; eauto.
-    - inversion H; clear H.
-      inversion H0; clear H0; subst.
       econstructor; eauto.
     - inversion H0; clear H0; subst.
       inversion H; clear H; subst.
       econstructor; eauto.
     - inversion H0; clear H0; subst.
+      inversion H; clear H; subst.
       econstructor; eauto.
     - inversion H0; clear H0. econstructor; eauto.
     - inversion H0; clear H0. econstructor; eauto.

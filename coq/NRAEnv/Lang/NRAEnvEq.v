@@ -135,6 +135,13 @@ Section NRAEnvEq.
   
   (* all the extended algebraic constructors are proper wrt. equivalence *)
 
+  (* NRAEnvGetConstant *)
+  Global Instance proper_NRAEnvGetConstant s : Proper nraenv_eq (NRAEnvGetConstant s).
+  Proof.
+    unfold Proper, respectful, nraenv_eq.
+    apply proper_cNRAEnvGetConstant; assumption.
+  Qed.
+  
   (* NRAEnvID *)
   Global Instance proper_NRAEnvID : Proper nraenv_eq NRAEnvID.
   Proof.
@@ -220,13 +227,6 @@ Section NRAEnvEq.
     apply proper_cNRAEnvApp; assumption.
   Qed.
 
-  (* NRAEnvGetConstant *)
-  Global Instance proper_NRAEnvGetConstant s : Proper nraenv_eq (NRAEnvGetConstant s).
-  Proof.
-    unfold Proper, respectful, nraenv_eq.
-    apply proper_cNRAEnvGetConstant; assumption.
-  Qed.
-  
   (* NRAEnvEnv *)
   Global Instance proper_NRAEnvEnv : Proper nraenv_eq NRAEnvEnv.
   Proof.

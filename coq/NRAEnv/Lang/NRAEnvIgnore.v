@@ -33,54 +33,54 @@ Section NRAEnvIgnore.
 
   Fixpoint is_nra (e:nraenv) : Prop :=
     match e with
-      | NRAEnvID => True
-      | NRAEnvConst rd => True
-      | NRAEnvBinop bop e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvUnop uop e1 => is_nra e1
-      | NRAEnvMap e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvMapProduct e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvProduct e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvSelect e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvDefault e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvEither e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvEitherConcat e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvApp e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvGetConstant _ => False
-      | NRAEnvEnv => False
-      | NRAEnvAppEnv e1 e2 => False
-      | NRAEnvMapEnv e1 => False
-      (* Those are additional operators *)
-      | NRAEnvFlatMap e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvJoin e1 e2 e3 =>  (is_nra e1) /\ (is_nra e2) /\ (is_nra e3)
-      | NRAEnvProject _ e1 => (is_nra e1)
-      | NRAEnvGroupBy _ _ e1 => (is_nra e1)
-      | NRAEnvUnnest _ _ e1 => (is_nra e1)
+    | NRAEnvGetConstant _ => False
+    | NRAEnvID => True
+    | NRAEnvConst rd => True
+    | NRAEnvBinop bop e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvUnop uop e1 => is_nra e1
+    | NRAEnvMap e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvMapProduct e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvProduct e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvSelect e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvDefault e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvEither e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvEitherConcat e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvApp e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvEnv => False
+    | NRAEnvAppEnv e1 e2 => False
+    | NRAEnvMapEnv e1 => False
+    (* Those are additional operators *)
+    | NRAEnvFlatMap e1 e2 => (is_nra e1) /\ (is_nra e2)
+    | NRAEnvJoin e1 e2 e3 =>  (is_nra e1) /\ (is_nra e2) /\ (is_nra e3)
+    | NRAEnvProject _ e1 => (is_nra e1)
+    | NRAEnvGroupBy _ _ e1 => (is_nra e1)
+    | NRAEnvUnnest _ _ e1 => (is_nra e1)
     end.
 
   Fixpoint is_nra_fun (e:nraenv) : bool :=
     match e with
-      | NRAEnvID => true
-      | NRAEnvConst rd => true
-      | NRAEnvBinop bop e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvUnop uop e1 => is_nra_fun e1
-      | NRAEnvMap e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvMapProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvSelect e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvDefault e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvEither e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvEitherConcat e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvApp e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvGetConstant _ => false
-      | NRAEnvEnv => false
-      | NRAEnvAppEnv e1 e2 => false
-      | NRAEnvMapEnv e1 => false
-      (* Those are additional operators *)
-      | NRAEnvFlatMap e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvJoin e1 e2 e3 =>  andb (is_nra_fun e1) (andb (is_nra_fun e2) (is_nra_fun e3))
-      | NRAEnvProject _ e1 => (is_nra_fun e1)
-      | NRAEnvGroupBy _ _ e1 => (is_nra_fun e1)
-      | NRAEnvUnnest _ _ e1 => (is_nra_fun e1)
+    | NRAEnvGetConstant _ => false
+    | NRAEnvID => true
+    | NRAEnvConst rd => true
+    | NRAEnvBinop bop e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvUnop uop e1 => is_nra_fun e1
+    | NRAEnvMap e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvMapProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvSelect e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvDefault e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvEither e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvEitherConcat e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvApp e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvEnv => false
+    | NRAEnvAppEnv e1 e2 => false
+    | NRAEnvMapEnv e1 => false
+    (* Those are additional operators *)
+    | NRAEnvFlatMap e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+    | NRAEnvJoin e1 e2 e3 =>  andb (is_nra_fun e1) (andb (is_nra_fun e2) (is_nra_fun e3))
+    | NRAEnvProject _ e1 => (is_nra_fun e1)
+    | NRAEnvGroupBy _ _ e1 => (is_nra_fun e1)
+    | NRAEnvUnnest _ _ e1 => (is_nra_fun e1)
     end.
 
   Lemma is_nra_eq (e:nraenv):
@@ -111,55 +111,55 @@ Section NRAEnvIgnore.
 
   Fixpoint nraenv_ignores_env (e:nraenv) : Prop :=
     match e with
-      | NRAEnvID => True
-      | NRAEnvConst rd => True
-      | NRAEnvBinop bop e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvUnop uop e1 => nraenv_ignores_env e1
-      | NRAEnvMap e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvMapProduct e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvProduct e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvSelect e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvDefault e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvEither e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvEitherConcat e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvApp e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvGetConstant _ => True
-      | NRAEnvEnv => False
-      | NRAEnvAppEnv e1 e2 => (nraenv_ignores_env e2)
-      | NRAEnvMapEnv e1 => False
-      (* Those are additional operators *)
-      | NRAEnvFlatMap e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvJoin e1 e2 e3 =>  (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2) /\ (nraenv_ignores_env e3)
-      | NRAEnvProject _ e1 => (nraenv_ignores_env e1)
-      | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_env e1)
-      | NRAEnvUnnest _ _ e1 => (nraenv_ignores_env e1)
+    | NRAEnvGetConstant _ => True
+    | NRAEnvID => True
+    | NRAEnvConst rd => True
+    | NRAEnvBinop bop e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvUnop uop e1 => nraenv_ignores_env e1
+    | NRAEnvMap e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvMapProduct e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvProduct e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvSelect e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvDefault e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvEither e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvEitherConcat e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvApp e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvEnv => False
+    | NRAEnvAppEnv e1 e2 => (nraenv_ignores_env e2)
+    | NRAEnvMapEnv e1 => False
+    (* Those are additional operators *)
+    | NRAEnvFlatMap e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+    | NRAEnvJoin e1 e2 e3 =>  (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2) /\ (nraenv_ignores_env e3)
+    | NRAEnvProject _ e1 => (nraenv_ignores_env e1)
+    | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_env e1)
+    | NRAEnvUnnest _ _ e1 => (nraenv_ignores_env e1)
     end.
 
   (* Java equivalent: NraOptimizer.nraenv_ignores_env_fun *)
   Fixpoint nraenv_ignores_env_fun (e:nraenv) : bool :=
     match e with
-      | NRAEnvID => true
-      | NRAEnvConst rd => true
-      | NRAEnvBinop bop e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvUnop uop e1 => nraenv_ignores_env_fun e1
-      | NRAEnvMap e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvMapProduct e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvProduct e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvSelect e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvDefault e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvEither e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvEitherConcat e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvApp e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvGetConstant _ => true
-      | NRAEnvEnv => false
-      | NRAEnvAppEnv e1 e2 => (nraenv_ignores_env_fun e2)
-      | NRAEnvMapEnv e1 => false
-      (* Those are additional operators *)
-      | NRAEnvFlatMap e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvJoin e1 e2 e3 =>  andb (nraenv_ignores_env_fun e1) (andb (nraenv_ignores_env_fun e2) (nraenv_ignores_env_fun e3))
-      | NRAEnvProject _ e1 => (nraenv_ignores_env_fun e1)
-      | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_env_fun e1)
-      | NRAEnvUnnest _ _ e1 => (nraenv_ignores_env_fun e1)
+    | NRAEnvGetConstant _ => true
+    | NRAEnvID => true
+    | NRAEnvConst rd => true
+    | NRAEnvBinop bop e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvUnop uop e1 => nraenv_ignores_env_fun e1
+    | NRAEnvMap e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvMapProduct e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvProduct e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvSelect e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvDefault e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvEither e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvEitherConcat e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvApp e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvEnv => false
+    | NRAEnvAppEnv e1 e2 => (nraenv_ignores_env_fun e2)
+    | NRAEnvMapEnv e1 => false
+    (* Those are additional operators *)
+    | NRAEnvFlatMap e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+    | NRAEnvJoin e1 e2 e3 =>  andb (nraenv_ignores_env_fun e1) (andb (nraenv_ignores_env_fun e2) (nraenv_ignores_env_fun e3))
+    | NRAEnvProject _ e1 => (nraenv_ignores_env_fun e1)
+    | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_env_fun e1)
+    | NRAEnvUnnest _ _ e1 => (nraenv_ignores_env_fun e1)
     end.
 
   Lemma nraenv_ignores_env_eq (e:nraenv):

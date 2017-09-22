@@ -24,28 +24,28 @@ Section NRAEnvSize.
   (* Java equivalent: NraOptimizer.optim_size.nraenv_size *)
   Fixpoint nraenv_size (a:nraenv) : nat
     := match a with
-         | NRAEnvID => 1
-         | NRAEnvConst d => 1
-         | NRAEnvBinop op a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvUnop op a₁ => S (nraenv_size a₁)
-         | NRAEnvMap a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvMapProduct a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvProduct a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvSelect a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvDefault a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvEither a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvEitherConcat a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvApp a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvGetConstant _ => 1
-         | NRAEnvEnv => 1
-         | NRAEnvAppEnv a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvMapEnv a₁ => S (nraenv_size a₁)
-         (* Those are additional operators *)
-         | NRAEnvFlatMap a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvJoin a₁ a₂ a₃ => S (nraenv_size a₁ + nraenv_size a₂ + nraenv_size a₃)
-         | NRAEnvProject _ a₁ => S (nraenv_size a₁)
-         | NRAEnvGroupBy _ _ a₁ => S (nraenv_size a₁)
-         | NRAEnvUnnest _ _ a₁ => S (nraenv_size a₁)
+       | NRAEnvGetConstant _ => 1
+       | NRAEnvID => 1
+       | NRAEnvConst d => 1
+       | NRAEnvBinop op a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvUnop op a₁ => S (nraenv_size a₁)
+       | NRAEnvMap a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvMapProduct a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvProduct a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvSelect a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvDefault a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvEither a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvEitherConcat a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvApp a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvEnv => 1
+       | NRAEnvAppEnv a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvMapEnv a₁ => S (nraenv_size a₁)
+       (* Those are additional operators *)
+       | NRAEnvFlatMap a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+       | NRAEnvJoin a₁ a₂ a₃ => S (nraenv_size a₁ + nraenv_size a₂ + nraenv_size a₃)
+       | NRAEnvProject _ a₁ => S (nraenv_size a₁)
+       | NRAEnvGroupBy _ _ a₁ => S (nraenv_size a₁)
+       | NRAEnvUnnest _ _ a₁ => S (nraenv_size a₁)
        end.
 
   Lemma nraenv_size_nzero (a:nraenv) : nraenv_size a <> 0.
@@ -56,6 +56,7 @@ Section NRAEnvSize.
   Fixpoint nraenv_depth (a:nraenv) : nat :=
     (* Better to start at zero, level one is at least one nested plan *)
     match a with
+    | NRAEnvGetConstant _ => 0
     | NRAEnvID => 0
     | NRAEnvConst d => 0
     | NRAEnvBinop op a₁ a₂ => max (nraenv_depth a₁) (nraenv_depth a₂)
@@ -68,7 +69,6 @@ Section NRAEnvSize.
     | NRAEnvEither a₁ a₂=> max (nraenv_depth a₁) (nraenv_depth a₂)
     | NRAEnvEitherConcat a₁ a₂=> max (nraenv_depth a₁) (nraenv_depth a₂)
     | NRAEnvApp a₁ a₂ => max (nraenv_depth a₁) (nraenv_depth a₂)
-    | NRAEnvGetConstant _ => 0
     | NRAEnvEnv => 0
     | NRAEnvAppEnv a₁ a₂ => max (nraenv_depth a₁) (nraenv_depth a₂)
     | NRAEnvMapEnv a₁ => (S (nraenv_depth a₁))

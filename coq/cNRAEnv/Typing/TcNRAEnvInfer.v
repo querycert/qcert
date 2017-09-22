@@ -37,110 +37,110 @@ Section TcNRAEnvInfer.
 
   Fixpoint infer_nraenv_core_type (e:nraenv_core) (τenv τin:rtype) : option rtype :=
     match e with
-      | cNRAEnvID => Some τin
-      | cNRAEnvConst d => infer_data_type (normalize_data brand_relation_brands d)
-      | cNRAEnvBinop b op1 op2 =>
-        let binf (τ₁ τ₂:rtype) := infer_binary_op_type b τ₁ τ₂ in
-        olift2 binf (infer_nraenv_core_type op1 τenv τin) (infer_nraenv_core_type op2 τenv τin)
-      | cNRAEnvUnop u op1 =>
-        let unf (τ₁:rtype) := infer_unary_op_type u τ₁ in
-        olift unf (infer_nraenv_core_type op1 τenv τin)
-      | cNRAEnvMap op1 op2 =>
-        let mapf (τ₁:rtype) :=
-            olift (fun x => lift (fun y => Coll y) (infer_nraenv_core_type op1 τenv x)) (tuncoll τ₁)
-        in
-        olift mapf (infer_nraenv_core_type op2 τenv τin)
-      | cNRAEnvMapProduct op1 op2 =>
-        let mapconcatf (τ₁:list (string*rtype)) :=
-            match RecMaybe Closed τ₁ with
-              | None => None
-              | Some τr₁ =>
-                match olift (tmapConcatOutput τ₁) (infer_nraenv_core_type op1 τenv τr₁) with
-                  | None => None
-                  | Some τ₂ => Some (Coll τ₂)
-                end
+    | cNRAEnvGetConstant s =>
+      tdot τconstants s
+    | cNRAEnvID => Some τin
+    | cNRAEnvConst d => infer_data_type (normalize_data brand_relation_brands d)
+    | cNRAEnvBinop b op1 op2 =>
+      let binf (τ₁ τ₂:rtype) := infer_binary_op_type b τ₁ τ₂ in
+      olift2 binf (infer_nraenv_core_type op1 τenv τin) (infer_nraenv_core_type op2 τenv τin)
+    | cNRAEnvUnop u op1 =>
+      let unf (τ₁:rtype) := infer_unary_op_type u τ₁ in
+      olift unf (infer_nraenv_core_type op1 τenv τin)
+    | cNRAEnvMap op1 op2 =>
+      let mapf (τ₁:rtype) :=
+          olift (fun x => lift (fun y => Coll y) (infer_nraenv_core_type op1 τenv x)) (tuncoll τ₁)
+      in
+      olift mapf (infer_nraenv_core_type op2 τenv τin)
+    | cNRAEnvMapProduct op1 op2 =>
+      let mapconcatf (τ₁:list (string*rtype)) :=
+          match RecMaybe Closed τ₁ with
+          | None => None
+          | Some τr₁ =>
+            match olift (tmapConcatOutput τ₁) (infer_nraenv_core_type op1 τenv τr₁) with
+            | None => None
+            | Some τ₂ => Some (Coll τ₂)
             end
-        in
-        olift mapconcatf (olift tmapConcatInput (infer_nraenv_core_type op2 τenv τin))
-      | cNRAEnvProduct op1 op2 =>
-        let mapconcatf (τ₁:list (string*rtype)) :=
-            match RecMaybe Closed τ₁ with
-              | None => None
-              | Some τr₁ =>
-                match olift (tmapConcatOutput τ₁) (infer_nraenv_core_type op2 τenv τin) with
-                  | None => None
-                  | Some τ₂ => Some (Coll τ₂)
-                end
-            end
-        in
-        olift mapconcatf (olift tmapConcatInput (infer_nraenv_core_type op1 τenv τin))
-      | cNRAEnvSelect op1 op2 =>
-        let selectf (τ₁:rtype) :=
-            match tuncoll τ₁ with
-              | Some τ₁' =>
-                match infer_nraenv_core_type op1 τenv τ₁' with
-                  | Some τ₂ =>
-                    match `τ₂ with
-                      | Bool₀ => Some (Coll τ₁')
-                      | _ => None
-                    end
-                  | None => None
-                end
-              | None => None
-            end
-        in
-        olift selectf (infer_nraenv_core_type op2 τenv τin)
-      | cNRAEnvDefault op1 op2 =>
-        match ((infer_nraenv_core_type op1 τenv τin), (infer_nraenv_core_type op2 τenv τin)) with
-            | (Some τ₁', Some τ₂') =>
-              match (tuncoll τ₁', tuncoll τ₂') with
-                | (Some τ₁₀, Some τ₂₀) =>
-                  if (`τ₁₀ == `τ₂₀) then Some τ₁' else None
-                | _ => None
-              end
-            | (_, _) => None
-        end
-      | cNRAEnvEither op1 op2 =>
-        match tuneither τin with
-        | Some (τl, τr) =>
-          match ((infer_nraenv_core_type op1 τenv τl), (infer_nraenv_core_type op2 τenv τr)) with
-          | (Some τ₁', Some τ₂') =>
-            if (rtype_eq_dec τ₁' τ₂') (* Probably should be generalized using join... *)
-            then Some τ₁'
-            else None
-          | (_, _) => None
           end
-        | _ => None
-        end
-      | cNRAEnvEitherConcat op1 op2 =>
-        match (infer_nraenv_core_type op1 τenv τin, infer_nraenv_core_type op2 τenv τin) with
-        | (Some τeither, Some τrecplus) =>          
-          match tuneither τeither with
-          | Some (τl, τr) =>
-            match (trecConcat τl τrecplus, trecConcat τr τrecplus) with
-            | (Some τrecl, Some τrecr) =>
-              Some (Either τrecl τrecr)
-            | (_, _) => None
+      in
+      olift mapconcatf (olift tmapConcatInput (infer_nraenv_core_type op2 τenv τin))
+    | cNRAEnvProduct op1 op2 =>
+      let mapconcatf (τ₁:list (string*rtype)) :=
+          match RecMaybe Closed τ₁ with
+          | None => None
+          | Some τr₁ =>
+            match olift (tmapConcatOutput τ₁) (infer_nraenv_core_type op2 τenv τin) with
+            | None => None
+            | Some τ₂ => Some (Coll τ₂)
+            end
+          end
+      in
+      olift mapconcatf (olift tmapConcatInput (infer_nraenv_core_type op1 τenv τin))
+    | cNRAEnvSelect op1 op2 =>
+      let selectf (τ₁:rtype) :=
+          match tuncoll τ₁ with
+          | Some τ₁' =>
+            match infer_nraenv_core_type op1 τenv τ₁' with
+            | Some τ₂ =>
+              match `τ₂ with
+              | Bool₀ => Some (Coll τ₁')
+              | _ => None
+              end
+            | None => None
             end
           | None => None
           end
+      in
+      olift selectf (infer_nraenv_core_type op2 τenv τin)
+    | cNRAEnvDefault op1 op2 =>
+      match ((infer_nraenv_core_type op1 τenv τin), (infer_nraenv_core_type op2 τenv τin)) with
+      | (Some τ₁', Some τ₂') =>
+        match (tuncoll τ₁', tuncoll τ₂') with
+        | (Some τ₁₀, Some τ₂₀) =>
+          if (`τ₁₀ == `τ₂₀) then Some τ₁' else None
+        | _ => None
+        end
+      | (_, _) => None
+      end
+    | cNRAEnvEither op1 op2 =>
+      match tuneither τin with
+      | Some (τl, τr) =>
+        match ((infer_nraenv_core_type op1 τenv τl), (infer_nraenv_core_type op2 τenv τr)) with
+        | (Some τ₁', Some τ₂') =>
+          if (rtype_eq_dec τ₁' τ₂') (* Probably should be generalized using join... *)
+          then Some τ₁'
+          else None
         | (_, _) => None
         end
-      | cNRAEnvApp op1 op2 =>
-        let appf (τ₁:rtype) := infer_nraenv_core_type op1 τenv τ₁ in
-        olift appf (infer_nraenv_core_type op2 τenv τin)
-      | cNRAEnvGetConstant s =>
-        tdot τconstants s
-      | cNRAEnvEnv =>
-        Some τenv
-      | cNRAEnvAppEnv op1 op2 =>
-        let appf (τ₁:rtype) := infer_nraenv_core_type op1 τ₁ τin in
-        olift appf (infer_nraenv_core_type op2 τenv τin)
-      | cNRAEnvMapEnv op1 =>
-        let mapf (τenv':rtype) :=
-            lift Coll (infer_nraenv_core_type op1 τenv' τin)
-        in
-        olift mapf (tuncoll τenv)
+      | _ => None
+      end
+    | cNRAEnvEitherConcat op1 op2 =>
+      match (infer_nraenv_core_type op1 τenv τin, infer_nraenv_core_type op2 τenv τin) with
+      | (Some τeither, Some τrecplus) =>          
+        match tuneither τeither with
+        | Some (τl, τr) =>
+          match (trecConcat τl τrecplus, trecConcat τr τrecplus) with
+          | (Some τrecl, Some τrecr) =>
+            Some (Either τrecl τrecr)
+          | (_, _) => None
+          end
+        | None => None
+        end
+      | (_, _) => None
+      end
+    | cNRAEnvApp op1 op2 =>
+      let appf (τ₁:rtype) := infer_nraenv_core_type op1 τenv τ₁ in
+      olift appf (infer_nraenv_core_type op2 τenv τin)
+    | cNRAEnvEnv =>
+      Some τenv
+    | cNRAEnvAppEnv op1 op2 =>
+      let appf (τ₁:rtype) := infer_nraenv_core_type op1 τ₁ τin in
+      olift appf (infer_nraenv_core_type op2 τenv τin)
+    | cNRAEnvMapEnv op1 =>
+      let mapf (τenv':rtype) :=
+          lift Coll (infer_nraenv_core_type op1 τenv' τin)
+      in
+      olift mapf (tuncoll τenv)
     end.
 
   Lemma infer_nraenv_core_type_correct (τenv τin τout:rtype) (e:nraenv_core) :
@@ -150,6 +150,8 @@ Section TcNRAEnvInfer.
     intros.
     revert τenv τin τout H.
     nraenv_core_cases (induction e) Case; intros; simpl in H.
+    - Case "cNRAEnvGetConstant"%string.
+      apply type_cNRAEnvGetConstant; assumption.
     - Case "cNRAEnvID"%string.
       inversion H; clear H.
       apply type_cNRAEnvID.
@@ -433,8 +435,6 @@ Section TcNRAEnvInfer.
       specialize (IHe2 r eq_refl).
       econstructor; eauto.
       simpl in *; congruence.
-    - Case "cNRAEnvGetConstant"%string.
-      apply type_cNRAEnvGetConstant; assumption.
     - Case "cNRAEnvEnv"%string.
       inversion H; apply type_cNRAEnvEnv.
     - Case "cNRAEnvAppEnv"%string.
