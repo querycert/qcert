@@ -74,7 +74,7 @@ Section TCAMPtocNRAEnv.
       econstructor; eauto.
       assert (Γeq:Γ'' = rec_concat_sort Γ Γ')
         by (unfold merge_bindings in *; 
-             destruct (compatible Γ Γ'); congruence).
+             destruct (Compat.compatible Γ Γ'); congruence).
       generalize (merge_bindings_sorted H4). subst. 
       intros.
       econstructor; eauto.

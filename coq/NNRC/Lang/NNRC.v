@@ -471,7 +471,7 @@ Section NNRC.
         case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_to_nnrc_base e1)); trivial; intros d deq.
         destruct d; trivial.
         f_equal.
-        apply rmap_ext; intros.
+        apply lift_map_ext; intros.
         destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
         + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 x0 nil); 
             simpl; intros rr1; rewrite rr1.

@@ -136,11 +136,11 @@ Section cNRAEnvtocNNRC.
         lookup equiv_dec env vid = Some did ->
         lookup equiv_dec env venv = Some denv ->
         nnrc_core_eval h cenv env (nraenv_core_to_nnrc_core op vid venv) = (nraenv_core_eval h cenv op denv did)) ->
-    rmap
+    lift_map
       (fun x : data =>
          nnrc_core_eval h cenv ((vid, x) :: env) (nraenv_core_to_nnrc_core op vid venv)) l
     =
-    rmap (nraenv_core_eval h cenv op denv) l.
+    lift_map (nraenv_core_eval h cenv op denv) l.
   Proof.
     intros Hdiff1 Henv.
     intros; induction l.
@@ -190,15 +190,15 @@ Section cNRAEnvtocNNRC.
         autorewrite with alg in *;
         apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop1 a denv) at 1; clear IHop1; try assumption; simpl; auto 3.
       + destruct (h ⊢ₑ op1 @ₑ a ⊣ cenv;denv); try reflexivity; simpl.
         destruct d; try reflexivity.
         unfold omap_concat, orecconcat, rec_concat_sort.
         simpl.
-        generalize (rmap
+        generalize (lift_map
                       (fun d1 : data =>
                          match a with
                            | drec r1 =>
@@ -209,7 +209,7 @@ Section cNRAEnvtocNNRC.
                            | _ => None
                          end) l0); intros.
         destruct o; try reflexivity.
-        rewrite rflatten_through_match.
+        rewrite oflatten_through_match.
         reflexivity.
       +match_destr; unfold Equivalence.equiv in *.
        prove_fresh_nin.
@@ -225,15 +225,15 @@ Section cNRAEnvtocNNRC.
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop2 did denv _ vid venv) at 1; clear IHop2; trivial; try congruence.
       + destruct (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); try reflexivity; simpl;
         destruct d; try reflexivity;
         unfold omap_concat, orecconcat, rec_concat_sort;
         simpl.
-        generalize (rmap
+        generalize (lift_map
                       (fun d1 : data =>
                          match a with
                            | drec r1 =>
@@ -245,7 +245,7 @@ Section cNRAEnvtocNNRC.
                          end) l0); intros.
         simpl.
         destruct o; try reflexivity.
-        rewrite rflatten_through_match; simpl.
+        rewrite oflatten_through_match; simpl.
         reflexivity.
       + simpl; match_destr; unfold Equivalence.equiv in *.
         elim (fresh_var_fresh1 _ _ _ e1).
@@ -267,10 +267,10 @@ Section cNRAEnvtocNNRC.
       + destruct (h ⊢ₑ op1 @ₑ a ⊣ cenv;denv); try reflexivity; simpl.
         destruct d; simpl in *; try congruence.
         destruct b.
-        * rewrite lift_cons_dcoll.
+        * rewrite oflatten_lift_cons_dcoll.
           reflexivity.
         * rewrite match_lift_id.
-          rewrite lift_empty_dcoll.
+          rewrite oflatten_lift_empty_dcoll.
           reflexivity.
       + prove_fresh_nin.
       + simpl; match_destr.
@@ -344,7 +344,7 @@ Section cNRAEnvtocNNRC.
       rewrite H1.
       destruct denv; try reflexivity; simpl.
       f_equal.
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
       specialize (IHop did x ((fresh_var "tmape$" (vid :: venv :: nil), x) :: env) vid (fresh_var "tmape$" (vid :: venv :: nil))).
       rewrite <- IHop; trivial; simpl.
       + match_destr.

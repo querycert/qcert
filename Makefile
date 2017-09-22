@@ -247,7 +247,7 @@ remove_all_derived:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
 
 ##
-Makefile.coq: Makefile $(VS) $(FILES)
+Makefile.coq: Makefile Makefile.coq_modules $(FILES)
 	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
 
 .PHONY: all clean clean_detritus documentation documentation_old

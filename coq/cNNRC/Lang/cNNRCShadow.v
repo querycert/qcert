@@ -913,7 +913,7 @@ Section cNNRCShadow.
          elim H2. apply remove_in_neq; auto.
     - apply nin_app_or in H. rewrite IHe1 by intuition.
       destruct (nnrc_core_eval h c (l ++ l') e1); trivial. destruct d; trivial.
-      f_equal. apply rmap_ext; intros.
+      f_equal. apply lift_map_ext; intros.
       destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst.
       + generalize (@nnrc_core_eval_remove_duplicate_env h c nil v0 x0 l); simpl; auto.
       + generalize (IHe2 ((v,x0)::l)); simpl; intros rr; rewrite rr; intuition.
@@ -1013,7 +1013,7 @@ Section cNNRCShadow.
       destruct (nnrc_core_eval h c env (nnrc_subst e1 v (NNRCConst dunit))); try reflexivity.
       destruct d; try reflexivity.
       apply lift_dcoll_inversion.
-      apply rmap_ext.
+      apply lift_map_ext.
       intros d Hd.
       match_destr; unfold Equivalence.equiv in * .
       + SCase "v0 = v"%string.
@@ -1103,7 +1103,7 @@ Section cNNRCShadow.
       case_eq (nnrc_core_eval h c ((v0, x) :: env) e1); trivial; intros d deq.
       destruct d; trivial.
       f_equal.
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
       destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
       + generalize (@nnrc_core_eval_remove_duplicate_env h c nil v0 x0 nil); 
         simpl; intros rr1; rewrite rr1.
@@ -1227,8 +1227,8 @@ Section cNNRCShadow.
       destruct d; try reflexivity.
       unfold lift.
       
-      assert (rmap (fun d1 : data => nnrc_core_eval h c ((v, d1) :: env1) n2) l = rmap (fun d1 : data => nnrc_core_eval h c ((v, d1) :: env2) n2) l) as Hfun_eq; try solve [rewrite Hfun_eq; reflexivity].
-      apply rmap_ext; intros d ind.
+      assert (lift_map (fun d1 : data => nnrc_core_eval h c ((v, d1) :: env1) n2) l = lift_map (fun d1 : data => nnrc_core_eval h c ((v, d1) :: env2) n2) l) as Hfun_eq; try solve [rewrite Hfun_eq; reflexivity].
+      apply lift_map_ext; intros d ind.
       rewrite (IHn2 ((v, d) :: env1) ((v, d) :: env2)); try reflexivity.
       intros x.
       simpl.
@@ -1443,10 +1443,10 @@ Section cNNRCShadow.
     elim H; intros; congruence.
   Qed.
 
-  Lemma nnrc_core_eval_single_context_var_cons_rmap h c env n v l:
+  Lemma nnrc_core_eval_single_context_var_cons_lift_map h c env n v l:
     (forall x, In x (nnrc_free_vars n) -> x = v) ->
-    rmap (fun d => nnrc_core_eval h c ((v, d) :: nil) n) l =
-    rmap (fun d => nnrc_core_eval h c ((v,d)::env) n) l.
+    lift_map (fun d => nnrc_core_eval h c ((v, d) :: nil) n) l =
+    lift_map (fun d => nnrc_core_eval h c ((v,d)::env) n) l.
   Proof.
     intros.
     induction l; simpl; try reflexivity.
@@ -1456,10 +1456,10 @@ Section cNNRCShadow.
     reflexivity.
   Qed.
 
-  Lemma nnrc_core_eval_single_context_var_cons_keepone_rmap h c env n v v1 d1 l:
+  Lemma nnrc_core_eval_single_context_var_cons_keepone_lift_map h c env n v v1 d1 l:
     (forall x, In x (nnrc_free_vars n) -> x = v) ->
-    rmap (fun d => nnrc_core_eval h c ((v, d) :: (v1,d1) :: nil) n) l =
-    rmap (fun d => nnrc_core_eval h c ((v,d) :: (v1,d1) :: env) n) l.
+    lift_map (fun d => nnrc_core_eval h c ((v, d) :: (v1,d1) :: nil) n) l =
+    lift_map (fun d => nnrc_core_eval h c ((v,d) :: (v1,d1) :: env) n) l.
   Proof.
     intros.
     induction l; simpl; try reflexivity.
@@ -1469,10 +1469,10 @@ Section cNNRCShadow.
     reflexivity.
   Qed.
 
-  Lemma rmap_skip_free_var h c v1 v2 d2 n l:
+  Lemma lift_map_skip_free_var h c v1 v2 d2 n l:
     ~ In v2 (nnrc_free_vars n) ->
-    (rmap (fun d : data => nnrc_core_eval h c ((v1, d) :: (v2, d2) :: nil) n) l) =
-    (rmap (fun d : data => nnrc_core_eval h c ((v1, d) :: nil) n) l).
+    (lift_map (fun d : data => nnrc_core_eval h c ((v1, d) :: (v2, d2) :: nil) n) l) =
+    (lift_map (fun d : data => nnrc_core_eval h c ((v1, d) :: nil) n) l).
   Proof.
     intros; induction l; try reflexivity; simpl.
     rewrite nnrc_core_eval_remove_free_env_weak.
@@ -1530,10 +1530,10 @@ Section cNNRCShadow.
       + red in e; subst.
         unfold var in *.
         f_equal.
-        apply rmap_ext; intros.
+        apply lift_map_ext; intros.
         generalize (nnrc_core_eval_remove_duplicate_env (h:=h) c nil v' x nil d env e2); simpl; congruence.
       + f_equal.
-        apply rmap_ext; intros.
+        apply lift_map_ext; intros.
         generalize (nnrc_core_eval_swap_neq (h:=h) c nil v x v' d); simpl;
           intros re1; rewrite re1; eauto 2.
         erewrite IHe2; try reflexivity; eauto 2.
@@ -1628,7 +1628,7 @@ Section cNNRCShadow.
       match_destr.
       match_destr.
       f_equal.
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
       rewrite <- IHe2.
       apply nnrc_core_eval_cons_rename_pick.
     - rewrite IHe1, IHe2, IHe3; trivial.

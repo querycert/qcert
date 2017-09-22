@@ -119,7 +119,7 @@ Section LambdaNRAEq.
     apply olift_ext; intros.
     apply lift_oncoll_ext; intros; subst.
     f_equal.
-    apply rmap_ext; intros.
+    apply lift_map_ext; intros.
     apply H; trivial.
     eapply lambda_nra_eval_normalized in H1; trivial.
     invcs H1.
@@ -136,7 +136,7 @@ Section LambdaNRAEq.
     apply olift_ext; intros.
     apply lift_oncoll_ext; intros; subst.
     f_equal.
-    apply rmap_product_ext; intros.
+    apply omap_product_ext; intros.
     apply H; trivial.
     eapply lambda_nra_eval_normalized in H1; trivial.
     invcs H1.

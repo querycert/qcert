@@ -269,13 +269,13 @@ Section TDNNRCBase.
         elim H1; clear H1; intros.
         unfold lift in H1.
         unfold var in *.
-        assert (exists x1, rmap
+        assert (exists x1, lift_map
            (fun d1 : data =>
             olift checkLocal
               (dnnrc_base_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2))
            dl = Some x1 /\ (Dlocal (dcoll x1)) = x0).
         revert H1.
-        elim (rmap
+        elim (lift_map
        (fun d1 : data =>
         olift checkLocal
               (dnnrc_base_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.
@@ -328,13 +328,13 @@ Section TDNNRCBase.
         elim H0; clear H0; intros.
         unfold lift in H0.
         unfold var in *.
-        assert (exists x1, rmap
+        assert (exists x1, lift_map
            (fun d1 : data =>
             olift checkLocal
               (dnnrc_base_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2))
            dl = Some x1 /\ (Ddistr x1) = x).
         revert H0.
-        elim (rmap
+        elim (lift_map
                 (fun d1 : data =>
                    olift checkLocal
                          (dnnrc_base_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.
@@ -360,7 +360,7 @@ Section TDNNRCBase.
         exists (Ddistr (d::x0)); split; try reflexivity.
         simpl.
         revert H0.
-        elim (rmap
+        elim (lift_map
        (fun d1 : data =>
         olift checkLocal
               (dnnrc_base_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.

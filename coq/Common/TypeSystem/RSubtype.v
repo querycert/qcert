@@ -25,7 +25,7 @@ Require Import RType.
 
 Require Import BrandRelation.
 
-Section subtype.
+Section RSubtype.
 
   Context {ftype:foreign_type}.
   Context {br:brand_relation}.
@@ -474,7 +474,7 @@ Require Import Eqdep_dec.
     trivial.
   Defined.
 
-End subtype.
+End RSubtype.
 
 Lemma subtype_ext {ftype:foreign_type} {br:brand_relation} {a b pfa pfb} :
   subtype (exist _ a pfa) (exist _ b pfb) ->

@@ -28,7 +28,7 @@ Section TUnaryOperators.
   Require Import ForeignDataTyping.
   Require Import TUtil.
   Require Import TData.
-  Require Import TDataSort.
+  Require Import TSortBy.
   Require Import ForeignOperatorsTyping.
 
   (** Typing rules for unary operators *)
@@ -357,7 +357,7 @@ Section TUnaryOperators.
     - Case "type_OpFlatten"%string.
       dependent induction H.
       rewrite Forall_forall in *.
-      unfold rflatten.
+      unfold oflatten.
       induction dl; simpl in *.
       exists (dcoll []).
       split; try reflexivity.
@@ -367,14 +367,14 @@ Section TUnaryOperators.
       elim (IHdl H0); clear IHdl H0; intros.
       elim H0; clear H0; intros.
       unfold lift in H0.
-      assert (exists a', oflat_map
+      assert (exists a', lift_flat_map
            (fun x : data =>
             match x with
             | dcoll y => Some y
             | _ => None
             end) dl = Some a' /\ x0 = (dcoll a')).
       revert H0.
-      destruct (oflat_map
+      destruct (lift_flat_map
        (fun x1 : data =>
         match x1 with
           | dcoll y => Some y
@@ -441,7 +441,7 @@ Section TUnaryOperators.
       rewrite <- H4 in H2.
       destruct (data_type_Nat_inv H2); subst.
       simpl.
-      destruct (rmap (ondnat (fun x3 : Z => x3)) dl); try congruence.
+      destruct (lift_map (ondnat (fun x3 : Z => x3)) dl); try congruence.
       simpl.
       exists (dnat (fold_right (fun x3 y : Z => Z.min x3 y) x1 l)).
       split; [reflexivity|auto].
@@ -464,7 +464,7 @@ Section TUnaryOperators.
       rewrite <- H4 in H2.
       destruct (data_type_Nat_inv H2); subst.
       simpl.
-      destruct (rmap (ondnat (fun x3 : Z => x3)) dl); try congruence.
+      destruct (lift_map (ondnat (fun x3 : Z => x3)) dl); try congruence.
       simpl.
       exists (dnat (fold_right (fun x3 y : Z => Z.max x3 y) x1 l)).
       split; [reflexivity|auto].

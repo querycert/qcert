@@ -204,7 +204,7 @@ Section cNRAEnvEq.
     rewrite unfold_env_nra_sort by trivial; simpl.
     case_eq (nra_eval h (rec_sort c) (nra_of_nraenv_core y0) (nra_context_data env x1)); simpl; trivial.
     destruct d; try reflexivity; simpl; intros.
-    f_equal. apply rmap_ext; intros.
+    f_equal. apply lift_map_ext; intros.
     apply H; eauto.
   Qed.
 
@@ -223,7 +223,7 @@ Section cNRAEnvEq.
     case_eq (h ⊢ₑ y0 @ₑ x1 ⊣ c;env); try reflexivity; simpl.
     destruct d; try reflexivity; simpl; intros.
     f_equal.
-    apply rmap_product_ext; intros.
+    apply omap_product_ext; intros.
     apply H; eauto.
   Qed.
 
@@ -413,7 +413,7 @@ Section cNRAEnvEq.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     destruct env; try reflexivity; simpl.
     f_equal.
-    apply rmap_ext; intros.
+    apply lift_map_ext; intros.
     eauto.
   Qed.
 

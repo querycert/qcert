@@ -18,7 +18,6 @@ Require Export CommonTypes.
 Require Export TNRA.
 Require Export TNRAEq.
 Require Export TNRAExt.
-Require Export TDomain.
 
 (* 
 *** Local Variables: ***

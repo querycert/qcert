@@ -106,8 +106,8 @@ Section CAMPtoNRA.
 
   (** Auxiliary lemmas -- all used inside pmap proof *)
 
-  Lemma rmap_lift (l:list data) :
-    rmap (fun x : data => Some (drec (("PDATA", x) :: nil))) l =
+  Lemma lift_map_lift (l:list data) :
+    lift_map (fun x : data => Some (drec (("PDATA", x) :: nil))) l =
     Some (map (fun x => (drec (("PDATA", x) :: nil))) l).
   Proof.
     induction l; simpl. reflexivity.
@@ -115,8 +115,8 @@ Section CAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma rmap_lift2 bind (l l':list data):
-    (rmap
+  Lemma lift_map_lift2 bind (l l':list data):
+    (lift_map
        (fun x : data =>
           match x with
             | drec r1 =>
@@ -140,8 +140,8 @@ Section CAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma rmap_lift3 bind (l l':list data):
-    rmap
+  Lemma lift_map_lift3 bind (l l':list data):
+    lift_map
       (fun x : data =>
          match x with
            | drec r => Some (drec (rremove r "a1"))
@@ -169,21 +169,21 @@ Section CAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma rflatten_lift1 (l:option (list data)):
+  Lemma oflatten_lift1 (l:option (list data)):
     (olift
        (fun d1 : data =>
-          lift_oncoll (fun l0 : list data => lift dcoll (rflatten l0)) d1)
+          lift_oncoll (fun l0 : list data => lift dcoll (oflatten l0)) d1)
        (lift dcoll
              (lift (fun t' : list data => dcoll nil :: t') l))) =
      (olift
        (fun d1 : data =>
-          lift_oncoll (fun l0 : list data => lift dcoll (rflatten l0)) d1)
+          lift_oncoll (fun l0 : list data => lift dcoll (oflatten l0)) d1)
        (lift dcoll l)).
   Proof.
     destruct l; try reflexivity.
     induction l; simpl; try reflexivity.
     simpl.
-    unfold rflatten; simpl.
+    unfold oflatten; simpl.
     assert (forall d, lift (fun t':list data => t') d = d).
     intros.
     destruct d; try reflexivity.
@@ -211,12 +211,12 @@ Section CAMPtoNRA.
       simpl; destruct (binary_op_eval h b res res0); reflexivity.
     - Case "pmap"%string.
       destruct d; try reflexivity.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *; simpl.
-      rewrite rmap_lift; simpl.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *; simpl.
+      rewrite lift_map_lift; simpl.
       unfold omap_concat in *; simpl.
-      rewrite rmap_lift2; simpl.
-      rewrite rmap_lift3; simpl.
+      rewrite lift_map_lift2; simpl.
+      rewrite lift_map_lift3; simpl.
       induction l; simpl; try reflexivity.
       unfold nra_context_data in IHp.
       assert ((rec_concat_sort (("PBIND", drec bind) :: nil)
@@ -228,20 +228,20 @@ Section CAMPtoNRA.
       clear IHp.
       destruct (camp_eval h c p bind a); try reflexivity; simpl.
       rewrite IHl; simpl.
-      rewrite rflatten_lift1.
+      rewrite oflatten_lift1.
       reflexivity.
       revert IHl.
-      destruct ((rmap (nra_eval h c (nra_of_camp p))
+      destruct ((lift_map (nra_eval h c (nra_of_camp p))
               (map
                  (fun x : data =>
                   drec
                     (rec_concat_sort (("PBIND", drec bind) :: nil)
                        (("PDATA", x) :: nil))) l ++ nil))).
       * simpl. intros.
-        unfold rflatten in *.
+        unfold oflatten in *.
         simpl.
         revert IHl.
-        destruct ((oflat_map
+        destruct ((lift_flat_map
               (fun x : data =>
                match x with
                | dcoll y => Some y
@@ -336,7 +336,7 @@ Section CAMPtoNRA.
     simpl.
     unfold olift, nra_context_data; intros; trivial.
     case_eq (h ⊢ (nra_of_camp p) @ₐ (drec (("PBIND", drec nil) :: ("PDATA", d) :: nil)) ⊣ c); simpl; trivial; intros.
-    unfold rflatten.
+    unfold oflatten.
     simpl.
     apply camp_trans_yields_coll in H0; trivial.
     destruct H0; subst; simpl.

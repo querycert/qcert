@@ -354,7 +354,7 @@ Section NNRCMR.
       in
       match input_d with
       | Ddistr coll =>
-        rmap f_map coll
+        lift_map f_map coll
       | Dlocal d => None
       end
     | MapDistFlatten f =>
@@ -364,8 +364,8 @@ Section NNRCMR.
       in
       match input_d with
       | Ddistr coll =>
-        let nested_coll := rmap f_map coll in
-        olift rflatten nested_coll
+        let nested_coll := lift_map f_map coll in
+        olift oflatten nested_coll
       | Dlocal d => None
       end
     | MapScalar f =>

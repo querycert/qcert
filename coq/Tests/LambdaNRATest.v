@@ -116,7 +116,7 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
         rewrite <- IHl; clear IHl.
         rewrite e.
         simpl.
-        destruct ((@rmap (@data TrivialModel.trivial_foreign_data)
+        destruct ((@lift_map (@data TrivialModel.trivial_foreign_data)
                  (@data TrivialModel.trivial_foreign_data)
                  (@lnra_lambda_eval TrivialModel.trivial_foreign_runtime h0 cenv env
                     (@LNRALambda TrivialModel.trivial_foreign_runtime

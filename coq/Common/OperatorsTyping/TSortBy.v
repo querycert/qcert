@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TDataSort.
+Section TSortBy.
   Require Import String.
   Require Import List.
   Require Import ZArith.
@@ -22,7 +22,6 @@ Section TDataSort.
   Require Import Utils.
   Require Import Types.
   Require Import CommonRuntime.
-  Require Import RDataSort.
   Require Import ForeignDataTyping.
   Require Import TData.
   Require Import Program.
@@ -158,7 +157,7 @@ Section TDataSort.
         trivial.
   Qed.
 
-End TDataSort.
+End TSortBy.
 
 (* 
  *** Local Variables: ***

@@ -28,8 +28,8 @@ Section TOperatorsInfer.
   Require Import ForeignDataTyping.
   Require Import TUtil.
   Require Import TData.
-  Require Import TDataSort.
   Require Import ForeignOperatorsTyping.
+  Require Import TSortBy.
   Require Import TUnaryOperators.
   Require Import TBinaryOperators.
 

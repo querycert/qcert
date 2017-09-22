@@ -23,6 +23,7 @@ Require Export SortingAdd.
 Require Export Digits.
 Require Export Lattice.
 Require Export Lift.
+Require Export LiftIterators.
 Require Export Assoc.
 Require Export Sublist.
 Require Export Compat.

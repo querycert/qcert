@@ -20,10 +20,9 @@ Section RTypeNorm.
   Require Import Sorting.
   Require Import Eqdep_dec.
   Require Import Bool.
-  Require Import EquivDec Morphisms.
-  
+  Require Import EquivDec.
+  Require Import Morphisms.
   Require Import Utils.
-
   Require Import BrandRelation.
   Require Import ForeignType.
   Require Import RType.
@@ -49,7 +48,6 @@ Section RTypeNorm.
     | Foreign₀ ft => Foreign₀ ft
     end.
 
-  Require Import RRelation.
   Lemma exists_normalized_in_rec_sort x r:
     In x
        (rec_sort

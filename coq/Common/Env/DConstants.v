@@ -15,16 +15,15 @@
  *)
 
 Section DConstants.
-
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import RData.
-  Require Import DData.
-  Require Import RRelation.
-  Require Import RConstants.
   Require Import ForeignData.
+  Require Import Data.
+  Require Import DData.
+  Require Import Iterators.
+  Require Import Constants.
 
   Local Open Scope string.
 
@@ -50,7 +49,7 @@ Section DConstants.
         olift (fun d => lift (fun dd => (x, dd)) (mkDistConstant loc d))
               (lookup equiv_dec env x)
     in
-    rmap one vars_loc.
+    lift_map one vars_loc.
 
   Section World.
     (* Declares single *distributed* input collection containing world *)

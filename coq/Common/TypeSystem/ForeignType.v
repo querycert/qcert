@@ -14,9 +14,8 @@
  * limitations under the License.
  *)
 
-Section TForeign.
+Section ForeignType.
   Require Import EquivDec.
-
   Require Import Lattice.
   
   Class foreign_type : Type
@@ -36,7 +35,7 @@ Section TForeign.
            ; foreign_type_olattice :> OLattice eq foreign_type_sub
       }.
   
-End TForeign.
+End ForeignType.
 
 (* 
 *** Local Variables: ***

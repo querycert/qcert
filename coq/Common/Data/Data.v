@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section RData.
+Section Data.
   Require Import String.
   Require Import List.
   Require Import Sumbool.
@@ -216,7 +216,7 @@ Section RData.
 
   Definition bindings := list (string*data).
 
-End RData.
+End Data.
 
 (* begin hide *)
 Class ConstLiteral {fdata:foreign_data} (A:Type)

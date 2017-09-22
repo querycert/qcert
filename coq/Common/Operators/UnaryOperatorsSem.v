@@ -21,14 +21,17 @@ Section UnaryOperatorsSem.
   Require Import Compare_dec.
   Require Import ZArith.
   Require Import Utils.
-  Require Import RData.
-  Require Import RDataNorm.
-  Require Import RDataSort.
-  Require Import RRelation.
   Require Import BrandRelation.
   Require Import ForeignData.
-  Require Import OperatorsUtils.
+  Require Import Data.
+  Require Import DataLift.
+  Require Import DataNorm.
+  Require Import DataSort.
   Require Import ForeignOperators.
+  Require Import Iterators.
+  Require Import RecOperators.
+  Require Import OperatorsUtils.
+  Require Import SortBy.
   Require Export UnaryOperators.
 
   Context {fdata:foreign_data}.
@@ -71,7 +74,7 @@ Section UnaryOperatorsSem.
       | _ => None
       end
     | OpFlatten => 
-      lift_oncoll (fun l => (lift dcoll (rflatten l))) d
+      lift_oncoll (fun l => (lift dcoll (oflatten l))) d
     | OpDistinct =>
       rondcoll (@bdistinct data data_eq_dec) d
     | OpOrderBy sc =>
@@ -238,13 +241,13 @@ Section UnaryOperatorsSem.
         rewrite <- data_normalized_dcoll; intros [??]; eauto.
     - Case "OpFlatten"%string.
       destruct d; simpl; try discriminate.
-      unfold rflatten.
+      unfold oflatten.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
       intros.
       inversion H; subst.
       constructor.
-      apply (oflat_map_Forall e H1); intros.
+      apply (lift_flat_map_Forall e H1); intros.
       match_destr_in H0.
       inversion H0; subst.
       inversion H2; trivial.

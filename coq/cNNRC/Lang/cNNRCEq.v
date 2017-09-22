@@ -122,7 +122,7 @@ Section cNNRCEq.
     case_eq (nnrc_core_eval h cenv env y0); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     f_equal.
-    apply rmap_ext; intros.
+    apply lift_map_ext; intros.
     apply H1; simpl; eauto.
   Qed.
 

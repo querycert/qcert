@@ -259,8 +259,8 @@ Section NNRCSugar.
     rewrite H1 in H; clear H1.
     rewrite <- H; clear H.
     destruct (equiv_dec v1 v1); try congruence; clear e0.
-    rewrite <- rmap_with_rproject.
-    destruct (rmap
+    rewrite <- lift_map_with_rproject.
+    destruct (lift_map
                 (fun d1 : data =>
                    match d1 with
                    | dunit => None
@@ -275,7 +275,7 @@ Section NNRCSugar.
                    | dforeign _ => None
                    end) l); try reflexivity; simpl.
     f_equal.
-    apply rmap_ext; intros. simpl.
+    apply lift_map_ext; intros. simpl.
     destruct (equiv_dec v0 v1); try congruence; clear c; simpl.
     destruct (equiv_dec (fresh_var "tappe$" (v1 :: v0 :: nil))
                         (fresh_var "tappe$" (v1 :: v0 :: nil))); try congruence;
@@ -285,7 +285,7 @@ Section NNRCSugar.
     f_equal.
     f_equal.
     f_equal.
-    apply rmap_ext; intros.
+    apply lift_map_ext; intros.
     unfold olift.
     generalize (fresh_var "tappe$" (v1 :: v0 :: nil)); intros v2.
     destruct (equiv_dec (fresh_var "tsel$" (v1 :: v2 :: nil))

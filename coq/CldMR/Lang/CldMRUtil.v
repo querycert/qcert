@@ -71,13 +71,13 @@ Section CldMRUtil.
     end.
 
   Definition unpack_vl (coll: list data) : option (list data) :=
-    rmap unpack_v coll.
+    lift_map unpack_v coll.
 
   Definition unpack_v_keep (d:data) : option (data * data) :=
     lift (fun x => (x,d)) (unpack_v d).
 
   Definition unpack_vl_keep (coll: list data) : option (list (data * data)) :=
-    rmap unpack_v_keep coll.
+    lift_map unpack_v_keep coll.
 
   Lemma pack_unpack_vl (coll: list data) :
     unpack_vl (pack_kvl_id coll) = Some coll.
@@ -100,7 +100,7 @@ Section CldMRUtil.
     end.
 
   Definition pre_unpack_kvl (coll: list data) : option (list (data * data)) :=
-    rmap unpack_kv coll.
+    lift_map unpack_kv coll.
 
   Definition unpack_kvl (d: data) : option (list (data * data)) :=
     match d with
@@ -136,14 +136,14 @@ Section CldMRUtil.
 
   Definition unbox_key (key: data) : option (list nat) :=
     match key with
-    | dcoll coll => rmap unbox_nat coll
+    | dcoll coll => lift_map unbox_nat coll
     | _ => None
     end.
 
   Definition box_nat (n:nat) : data := (dnat (Z.of_nat n)).
 
   Lemma map_unbox_box_nat (nl:list nat) :
-    rmap unbox_nat (map box_nat nl) = Some nl.
+    lift_map unbox_nat (map box_nat nl) = Some nl.
   Proof.
     induction nl; simpl.
     - reflexivity.
@@ -175,19 +175,19 @@ Section CldMRUtil.
   Definition map_const_key (n:nat) : key_fun := fun (i:nat) (d:data) => Some (box_key (n::nil)).
   Definition map_invent_key : key_fun := fun (i:nat) (d:data) => make_invent_key i d.
   
-  Fixpoint rmap_index_rec {A B} (i:nat) (f: nat -> A -> option B) (l:list A) : option (list B) :=
+  Fixpoint lift_map_index_rec {A B} (i:nat) (f: nat -> A -> option B) (l:list A) : option (list B) :=
     match l with
       | nil => Some nil
       | x :: t =>
         match f i x with
           | None => None
           | Some x' =>
-            lift (fun t' => x' :: t') (rmap_index_rec (S i) f t)
+            lift (fun t' => x' :: t') (lift_map_index_rec (S i) f t)
         end
     end.
 
-  Definition rmap_index {A B} (f: nat -> A -> option B) (l:list A) : option (list B) :=
-    rmap_index_rec O f l.
+  Definition lift_map_index {A B} (f: nat -> A -> option B) (l:list A) : option (list B) :=
+    lift_map_index_rec O f l.
 
   Definition keys_one_map_kv
              (compute_key:key_fun) (i:nat) (k:data) (x:data) : option (data * data) :=
@@ -197,17 +197,17 @@ Section CldMRUtil.
     end.
   
   Fixpoint map_without_key (compute_key:key_fun) (coll:list data) : option (list (data * data)) :=
-    rmap_index (fun i x => keys_one_map_kv compute_key i (box_key nil) x) coll.
+    lift_map_index (fun i x => keys_one_map_kv compute_key i (box_key nil) x) coll.
 
   Fixpoint flat_map_with_key (compute_key:key_fun) (coll:list (data * data)) : option (list (data * data)) :=
-    oflat_map (fun x =>
-                 match x with
-                 | (k, dcoll y) => rmap_index (fun i x => keys_one_map_kv compute_key i k x) y
-                 | _ => None
-                 end) coll.
+    lift_flat_map (fun x =>
+                     match x with
+                     | (k, dcoll y) => lift_map_index (fun i x => keys_one_map_kv compute_key i k x) y
+                     | _ => None
+                     end) coll.
 
   Fixpoint flat_map_without_key (coll:list data) : option (list data) :=
-    rflatten coll.
+    oflatten coll.
 
   (* Used to initialize the keys on the input collection *)
   
@@ -223,12 +223,12 @@ Section CldMRUtil.
   Definition prefixed_init_keys (prefix:list nat) (coll:list data) : list (data*data) := init_keys_aux prefix O coll.
 
   Lemma init_like_first_map_index (prefix:nat) (coll : list data) :
-    rmap_index
+    lift_map_index
       (fun (i : nat) (x : data) => keys_one_map_kv map_invent_key i (box_key (prefix::nil)) x)
       coll
     = Some (prefixed_init_keys (prefix::nil) coll).
   Proof.
-    unfold rmap_index; simpl.
+    unfold lift_map_index; simpl.
     unfold prefixed_init_keys; simpl.
     generalize 0;
       induction coll; intros; try reflexivity; simpl.

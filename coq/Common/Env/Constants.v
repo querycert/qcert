@@ -14,13 +14,13 @@
  * limitations under the License.
  *)
 
-Section RConstants.
+Section Constants.
 
   Require Import String.
   Require Import List.
   
   Section World.
-    Require Import RData.
+    Require Import Data.
     Require Import ForeignData.
 
     Context {fdata:foreign_data}.
@@ -33,7 +33,7 @@ Section RConstants.
 
   End World.
 
-End RConstants.
+End Constants.
 
 (* 
 *** Local Variables: ***

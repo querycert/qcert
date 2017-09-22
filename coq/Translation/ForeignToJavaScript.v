@@ -38,7 +38,7 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
        }.
   
   Section toJavascript.
-    Require Import RData.
+    Require Import Data.
     Require Import JSON.
     Context {fdata:foreign_data}.
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
@@ -76,6 +76,6 @@ End ForeigntoJavaScript.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

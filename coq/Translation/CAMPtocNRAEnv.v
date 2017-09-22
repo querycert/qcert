@@ -94,7 +94,7 @@ Section CAMPtocNRAEnv.
       simpl; destruct (binary_op_eval h b res res0); reflexivity.
     (* pmap *)
     - destruct d; try reflexivity.
-      unfold rmap_product in *; simpl in *.
+      unfold omap_product in *; simpl in *.
       unfold olift, liftpr ; simpl.
       induction l; try reflexivity; simpl.
       unfold lift_failure in *.
@@ -102,20 +102,20 @@ Section CAMPtocNRAEnv.
       destruct (camp_eval h c q env a); try reflexivity; simpl.
       * rewrite IHl; clear IHl; simpl.
         unfold lift; simpl.
-        destruct (rmap (nraenv_core_eval h c (nraenv_core_of_camp q) (drec env)) l); try reflexivity; simpl.
-        unfold rflatten, lift; simpl.
-        destruct (oflat_map
+        destruct (lift_map (nraenv_core_eval h c (nraenv_core_of_camp q) (drec env)) l); try reflexivity; simpl.
+        unfold oflatten, lift; simpl.
+        destruct (lift_flat_map
             (fun x : data =>
              match x with
              | dcoll y => Some y
              | _ => None
              end) l0); reflexivity.
       * unfold lift, liftpr in *; simpl in *.
-        revert IHl; generalize (rmap (nraenv_core_eval h c (nraenv_core_of_camp q) (drec env)) l); intros.
+        revert IHl; generalize (lift_map (nraenv_core_eval h c (nraenv_core_of_camp q) (drec env)) l); intros.
         destruct o; simpl in *.
         revert IHl; generalize (gather_successes (map (camp_eval h c q env) l)); intros.
-        destruct p; unfold rflatten in *; simpl in *; try congruence;
-        revert IHl; generalize (oflat_map
+        destruct p; unfold oflatten in *; simpl in *; try congruence;
+        revert IHl; generalize (lift_flat_map
               (fun x : data =>
                match x with
                | dcoll y => Some y

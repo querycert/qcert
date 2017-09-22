@@ -965,18 +965,18 @@ Ltac dtype_enrich :=
 Hint Immediate dttop dttop'.
 Hint Resolve dttop_weaken.
 
-Section rmap.
+Section lift_map.
   Context {fdata:foreign_data}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
-  Lemma rmap_product_empty_right τ pf l:
+  Lemma omap_product_empty_right τ pf l:
     Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
-    (rmap_product (fun _ : data => Some (dcoll (drec nil :: nil))) l) = Some l.
+    (omap_product (fun _ : data => Some (dcoll (drec nil :: nil))) l) = Some l.
   Proof.
     intros.
-    induction l; simpl; unfold rmap_product in *; simpl.
+    induction l; simpl; unfold omap_product in *; simpl.
     - reflexivity.
     - inversion H; clear H; subst.
       specialize (IHl H3); clear H3.
@@ -1000,16 +1000,16 @@ Section rmap.
         reflexivity.
   Qed.
   
-  Lemma rproduct_empty_right τ pf l:
+  Lemma oproduct_empty_right τ pf l:
     Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
-    (rproduct l (drec nil :: nil)) = Some l.
+    (oproduct l (drec nil :: nil)) = Some l.
   Proof.
     intros.
-    induction l; simpl; unfold rmap_product in *; simpl.
+    induction l; simpl; unfold omap_product in *; simpl.
     - reflexivity.
     - inversion H; clear H; subst.
       specialize (IHl H3); clear H3.
-      unfold rproduct in *; simpl in *; rewrite IHl.
+      unfold oproduct in *; simpl in *; rewrite IHl.
       inversion H2.
       dtype_inverter. subst.
       unfold rec_concat_sort.
@@ -1029,17 +1029,17 @@ Section rmap.
         reflexivity.
   Qed.
   
-  Lemma rmap_product_empty_left τ pf l:
+  Lemma omap_product_empty_left τ pf l:
     Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
-    (rmap_product (fun _ : data => Some (dcoll l)) (drec nil::nil)) = Some l.
+    (omap_product (fun _ : data => Some (dcoll l)) (drec nil::nil)) = Some l.
   Proof.
     intros.
-    induction l; simpl; unfold rmap_product in *; simpl.
+    induction l; simpl; unfold omap_product in *; simpl.
     - reflexivity.
     - inversion H; clear H; subst.
       specialize (IHl H3); clear H3.
-      unfold oflat_map in IHl.
-      unfold oomap_concat in *.
+      unfold lift_flat_map in IHl.
+      unfold oncoll_map_concat in *.
       unfold omap_concat in *.
       simpl in *.
       inversion H2.
@@ -1057,7 +1057,7 @@ Section rmap.
         apply (sorted_forall_same_domain); assumption.
         auto.
         assumption.
-      + destruct (rmap
+      + destruct (lift_map
          (fun x : data =>
           match x with
           | dunit => None
@@ -1073,17 +1073,17 @@ Section rmap.
           end) l); simpl in *; congruence.
   Qed.
     
-  Lemma rproduct_empty_left τ pf l:
+  Lemma oproduct_empty_left τ pf l:
     Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
-    (rproduct (drec nil::nil) l) = Some l.
+    (oproduct (drec nil::nil) l) = Some l.
   Proof.
     intros.
-    induction l; simpl; unfold rmap_product in *; simpl.
+    induction l; simpl; unfold omap_product in *; simpl.
     - reflexivity.
     - inversion H; clear H; subst.
       specialize (IHl H3); clear H3.
       simpl in *.
-      unfold rproduct in *; simpl in *.
+      unfold oproduct in *; simpl in *.
       unfold omap_concat in *.
       simpl in *.
       inversion H2.
@@ -1101,7 +1101,7 @@ Section rmap.
         apply (sorted_forall_same_domain); assumption.
         auto.
         assumption.
-      + destruct (rmap
+      + destruct (lift_map
          (fun x : data =>
           match x with
           | dunit => None
@@ -1117,7 +1117,7 @@ Section rmap.
           end) l); simpl in *; congruence.
   Qed.
     
-End rmap.
+End lift_map.
 
 Section subtype.
 

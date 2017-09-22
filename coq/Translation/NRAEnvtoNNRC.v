@@ -220,7 +220,7 @@ Section NRAEnvtoNNRC.
     match_destr.
     match_destr.
     f_equal.
-    apply rmap_ext; intros.
+    apply lift_map_ext; intros.
     eauto.
   Qed.
 

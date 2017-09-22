@@ -24,7 +24,7 @@ Delimit Scope data_scope with data.
 Notation "⊥" := (dunit) : data_scope. (* null value *)
 
 Notation "[||]" := (drec nil) : data_scope. (* records *)
-Notation "[| x1 ; .. ; xn |]" := (RData.drec (cons x1 .. (cons xn nil) ..)) : data_scope.
+Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_scope.
 
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.

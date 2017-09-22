@@ -19,13 +19,12 @@ Require Import List.
 Require Import Bool.
 Require Import RelationClasses.
 Require Import EquivDec.
-
 Require Import Utils.
+Require Import BrandRelation.
 Require Import ForeignType.
 Require Import RType.
 Require Import RSubtypeProp.
 Require Import RTypeMeetJoin.
-Require Import BrandRelation.
 
 Section RConsistentSubtype.
 

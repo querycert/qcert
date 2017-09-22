@@ -28,7 +28,6 @@ Section TBinaryOperators.
   Require Import ForeignDataTyping.
   Require Import TUtil.
   Require Import TData.
-  Require Import TDataSort.
   Require Import ForeignOperatorsTyping.
 
   (** Typing rules for binary operators *)

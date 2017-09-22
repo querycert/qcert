@@ -17,6 +17,7 @@
 Section TCAMPtoNRA.
   Require Import String.
   Require Import List.
+  Require Import Utils.
   Require Import CommonSystem.
   Require Import NRASystem.
   Require Import CAMPSystem.
@@ -201,7 +202,7 @@ Section TCAMPtoNRA.
       econstructor; eauto.
       + assert (Γeq:Γ'' = rec_concat_sort Γ Γ')
                   by (unfold merge_bindings in *; 
-                       destruct (compatible Γ Γ'); congruence).
+                       destruct (Compat.compatible Γ Γ'); congruence).
            generalize (merge_bindings_sorted H4). subst. 
            intros.
            eapply ATunnest_two.

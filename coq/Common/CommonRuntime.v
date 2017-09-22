@@ -15,17 +15,16 @@
  *)
 
 Require Export BrandRelation.
-Require Export RData.
-Require Export RDataNorm.
-Require Export RDomain.
-Require Export RRelation.
-Require Export RGroupBy.
+Require Export Data.
+Require Export DataLift.
+Require Export DataNorm.
+Require Export DataSort.
 Require Export DData.
 Require Export DDataNorm.
-Require Export RConstants.
-Require Export DConstants.
-Require Export RVar.
 Require Export Operators.
+Require Export Constants.
+Require Export DConstants.
+Require Export Var.
 Require Export ForeignRuntime.
 
 (* 

@@ -16,11 +16,11 @@
 
 Require Import String.
 
-Section RVar.
+Section Var.
   (** Variables are defined as strings *)
   Definition var := string.
 
-End RVar.
+End Var.
 
 (* 
 *** Local Variables: ***

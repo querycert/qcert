@@ -244,8 +244,8 @@ Section TNNRCEq.
     specialize (IHl H); clear H.
     rewrite (H2 cenv ((y, a) :: env) H3).
     destruct (nnrc_core_eval brand_relation_brands cenv ((y, a) :: env) (nnrc_to_nnrc_base y1)); try reflexivity.
-    - destruct ((rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((y, d1) :: env) (nnrc_to_nnrc_base x1)) l));
-      destruct ((rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((y, d1) :: env) (nnrc_to_nnrc_base y1)) l));
+    - destruct ((lift_map (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((y, d1) :: env) (nnrc_to_nnrc_base x1)) l));
+      destruct ((lift_map (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((y, d1) :: env) (nnrc_to_nnrc_base y1)) l));
       simpl in *; try congruence.
     - unfold bindings_type.
       apply Forall2_cons; try assumption.

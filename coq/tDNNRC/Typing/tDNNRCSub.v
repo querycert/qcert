@@ -250,13 +250,13 @@ Section tDNNRCSub.
         elim H1; clear H1; intros.
         unfold lift in H1.
         unfold var in *.
-        assert (exists x1, rmap
+        assert (exists x1, lift_map
            (fun d1 : data =>
             olift checkLocal
               (dnnrc_base_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2))
            dl = Some x1 /\ (Dlocal (dcoll x1)) = x0).
         revert H1.
-        assert (@rmap (@data (@foreign_runtime_data (@basic_model_runtime m)))
+        assert (@lift_map (@data (@foreign_runtime_data (@basic_model_runtime m)))
               (@data (@foreign_runtime_data (@basic_model_runtime m)))
               (fun d1 : @data (@foreign_runtime_data (@basic_model_runtime m)) =>
                @olift (@ddata (@foreign_runtime_data (@basic_model_runtime m)))
@@ -272,7 +272,7 @@ Section tDNNRCSub.
                        (@pair DNNRCBase.var
                           (@ddata (@foreign_runtime_data (@basic_model_runtime m))) v
                           (@Dlocal (@foreign_runtime_data (@basic_model_runtime m)) d1)) env)
-                    e2)) dl = (@rmap (@data (@foreign_runtime_data (@basic_model_runtime m)))
+                    e2)) dl = (@lift_map (@data (@foreign_runtime_data (@basic_model_runtime m)))
              (@data (@foreign_runtime_data (@basic_model_runtime m)))
              (fun d1 : @data (@foreign_runtime_data (@basic_model_runtime m)) =>
               @olift (@ddata (@foreign_runtime_data (@basic_model_runtime m)))
@@ -288,7 +288,7 @@ Section tDNNRCSub.
                          (@Dlocal (@foreign_runtime_data (@basic_model_runtime m)) d1)) env) e2))
              dl)) by reflexivity.
         rewrite H1; clear H1.
-        elim (rmap
+        elim (lift_map
                 (fun d1 : data =>
                    olift checkLocal
                          (dnnrc_base_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.
@@ -297,7 +297,7 @@ Section tDNNRCSub.
         congruence.
         elim H3; clear H3; intros.
         elim H3; clear H3; intros.
-        assert ((@rmap (@data (@foreign_runtime_data (@basic_model_runtime m)))
+        assert ((@lift_map (@data (@foreign_runtime_data (@basic_model_runtime m)))
             (@data (@foreign_runtime_data (@basic_model_runtime m)))
             (fun d1 : @data (@foreign_runtime_data (@basic_model_runtime m)) =>
              @olift (@ddata (@foreign_runtime_data (@basic_model_runtime m)))
@@ -311,7 +311,7 @@ Section tDNNRCSub.
                      (prod string (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
                      (@pair string (@ddata (@foreign_runtime_data (@basic_model_runtime m))) v
                         (@Dlocal (@foreign_runtime_data (@basic_model_runtime m)) d1)) env) e2))
-            dl) = (@rmap (@data (@foreign_runtime_data (@basic_model_runtime m)))
+            dl) = (@lift_map (@data (@foreign_runtime_data (@basic_model_runtime m)))
                       (@data (@foreign_runtime_data (@basic_model_runtime m)))
                       (fun d1 : @data (@foreign_runtime_data (@basic_model_runtime m)) =>
                        @olift (@ddata (@foreign_runtime_data (@basic_model_runtime m)))

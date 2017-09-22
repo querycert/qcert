@@ -253,11 +253,11 @@ Section NRA.
           olift (fun d1 => unary_op_eval h uop d1) (nra_eval e din)
         | NRAMap e2 e1 =>
           let aux_map c1 :=
-              lift_oncoll (fun d1 => lift dcoll (rmap (nra_eval e2) d1)) c1
+              lift_oncoll (fun d1 => lift dcoll (lift_map (nra_eval e2) d1)) c1
           in olift aux_map (nra_eval e1 din)
         | NRAMapProduct e2 e1 =>
           let aux_mapconcat c1 :=
-              lift_oncoll (fun d1 => lift dcoll (rmap_product (nra_eval e2) d1)) c1
+              lift_oncoll (fun d1 => lift dcoll (omap_product (nra_eval e2) d1)) c1
           in olift aux_mapconcat (nra_eval e1 din)
         | NRAProduct e1 e2 =>
           (* Note: (fun y => nra_eval op2 x) does not depend on input,
@@ -266,7 +266,7 @@ Section NRA.
              collection -- this makes sure to align the semantics with
              the NNRC version. - Jerome *)
           let aux_product d :=
-              lift_oncoll (fun c1 => lift dcoll (rmap_product (fun _ => nra_eval e2 din) c1)) d
+              lift_oncoll (fun c1 => lift dcoll (omap_product (fun _ => nra_eval e2 din) c1)) d
           in olift aux_product (nra_eval e1 din)
         | NRASelect e2 e1 =>
           let pred d1 :=
@@ -309,7 +309,7 @@ Section NRA.
       (** Auxiliary correctness lemmas for map, map_product and select judgments. *)
       Lemma nra_eval_map_correct : forall e l1 l2,
         (forall d1 d2 : data, nra_eval e d1 = Some d2 -> nra_sem e d1 d2) ->
-        rmap (nra_eval e) l1 = Some l2 ->
+        lift_map (nra_eval e) l1 = Some l2 ->
         nra_sem_map e l1 l2.
       Proof.
         intros.
@@ -318,7 +318,7 @@ Section NRA.
         - inversion H0; econstructor.
         - case_eq (nra_eval e a); intros; rewrite H1 in *; [|congruence].
           unfold lift in H0.
-          case_eq (rmap (nra_eval e) l1); intros; rewrite H2 in *; [|congruence].
+          case_eq (lift_map (nra_eval e) l1); intros; rewrite H2 in *; [|congruence].
           specialize (IHl1 l eq_refl).
           inversion H0.
           econstructor; eauto.
@@ -326,20 +326,20 @@ Section NRA.
           
       Lemma nra_eval_map_product_correct : forall e l1 l2,
         (forall d1 d2 : data, nra_eval e d1 = Some d2 -> nra_sem e d1 d2) ->
-        rmap_product (nra_eval e) l1 = Some l2 ->
+        omap_product (nra_eval e) l1 = Some l2 ->
         nra_sem_map_product e l1 l2.
       Proof.
         intros.
         revert l2 H0.
         induction l1; simpl in *; intros.
         - inversion H0; econstructor.
-        - generalize (rmap_product_cons_inv (nra_eval e) l1 a l2 H0); intros.
+        - generalize (omap_product_cons_inv (nra_eval e) l1 a l2 H0); intros.
           elim H1; clear H1; intros.
           elim H1; clear H1; intros.
           elim H1; clear H1; intros.
           elim H2; clear H2; intros.
           subst.
-          unfold oomap_concat in H1.
+          unfold oncoll_map_concat in H1.
           case_eq (nra_eval e a); intros; rewrite H3 in *; [|congruence].
           case_eq d; intros; rewrite H4 in H1; try congruence.
           subst.
@@ -400,15 +400,15 @@ Section NRA.
           + congruence.
       Qed.
 
-      Lemma rmap_product_some_is_rproduct d1 d2 l1 l2 :
-        rmap_product (fun _ : data => Some d2) (d1 :: l1) = Some l2 ->
-        exists l, d2 = dcoll l /\ rproduct (d1::l1) l = Some l2.
+      Lemma omap_product_some_is_oproduct d1 d2 l1 l2 :
+        omap_product (fun _ : data => Some d2) (d1 :: l1) = Some l2 ->
+        exists l, d2 = dcoll l /\ oproduct (d1::l1) l = Some l2.
       Proof.
         intros.
-        unfold rmap_product, rproduct in *; simpl in *.
+        unfold omap_product, oproduct in *; simpl in *.
         case_eq d2; intros; rewrite H0 in *; simpl in *; try congruence.
         exists l; split; [reflexivity| ].
-        unfold oomap_concat in H.
+        unfold oncoll_map_concat in H.
         destruct (omap_concat d1 l); [|congruence].
         assumption.
       Qed.
@@ -436,7 +436,7 @@ Section NRA.
           unfold lift_oncoll in H.
           destruct d; simpl in H; try congruence.
           unfold lift in H.
-          case_eq (rmap (nra_eval e1) l); intros; rewrite H1 in *; [|congruence].
+          case_eq (lift_map (nra_eval e1) l); intros; rewrite H1 in *; [|congruence].
           inversion H; subst; clear H.
           econstructor; eauto.
           apply nra_eval_map_correct; auto.
@@ -445,7 +445,7 @@ Section NRA.
           unfold lift_oncoll in H.
           destruct d; simpl in H; try congruence.
           unfold lift in H.
-          case_eq (rmap_product (nra_eval e1) l); intros; rewrite H1 in *; [|congruence].
+          case_eq (omap_product (nra_eval e1) l); intros; rewrite H1 in *; [|congruence].
           inversion H; subst; clear H.
           econstructor; eauto.
           apply nra_eval_map_product_correct; auto.
@@ -460,14 +460,14 @@ Section NRA.
           + specialize (IHe1 d1 (dcoll (d::l)) H0).
             unfold lift in H.
             case_eq (nra_eval e2 d1); intros; rewrite H1 in *.
-            * case_eq (rmap_product (fun _ : data => nra_eval e2 d1) (d :: l)); intros;
+            * case_eq (omap_product (fun _ : data => nra_eval e2 d1) (d :: l)); intros;
                 rewrite H1 in H2; simpl in *; rewrite H2 in *; [|congruence].
               inversion H; clear H; subst.
-              elim (rmap_product_some_is_rproduct d d0 l l0 H2); intros.
+              elim (omap_product_some_is_oproduct d d0 l l0 H2); intros.
               elim H; clear H; intros; subst.
               econstructor; eauto. congruence.
-              apply rproduct_correct; assumption.
-            * unfold rmap_product in H; simpl in H.
+              apply oproduct_correct; assumption.
+            * unfold omap_product in H; simpl in H.
               congruence.
         - unfold olift in H.
           case_eq (nra_eval e2 d1); intros; rewrite H0 in *; [|congruence].
@@ -528,7 +528,7 @@ Section NRA.
       Lemma nra_map_eval_complete e c1 c2:
         (forall d1 d2 : data, nra_sem e d1 d2 -> nra_eval e d1 = Some d2) ->
         (nra_sem_map e c1 c2) ->
-        lift dcoll (rmap (nra_eval e) c1) = Some (dcoll c2).
+        lift dcoll (lift_map (nra_eval e) c1) = Some (dcoll c2).
       Proof.
         intros.
         revert c2 H0.
@@ -538,28 +538,28 @@ Section NRA.
           rewrite (H a d2 H4); simpl.
           specialize (IHc1 c3 H6).
           unfold lift in *.
-          case_eq (rmap (nra_eval e) c1); intros; rewrite H0 in *; [|congruence].
+          case_eq (lift_map (nra_eval e) c1); intros; rewrite H0 in *; [|congruence].
           inversion IHc1; clear IHc1; subst; reflexivity.
       Qed.
         
       Lemma nra_map_product_eval_complete e c1 c2:
         (forall d1 d2 : data, nra_sem e d1 d2 -> nra_eval e d1 = Some d2) ->
         (nra_sem_map_product e c1 c2) ->
-        lift dcoll (rmap_product (nra_eval e) c1) = Some (dcoll c2).
+        lift dcoll (omap_product (nra_eval e) c1) = Some (dcoll c2).
       Proof.
         intros.
         revert c2 H0.
         induction c1; simpl in *; intros.
         - inversion H0; reflexivity.
         - inversion H0; clear H0; subst.
-          unfold rmap_product in *.
-          unfold oomap_concat in *; simpl.
+          unfold omap_product in *.
+          unfold oncoll_map_concat in *; simpl.
           rewrite (H a (dcoll c4) H3); simpl.
           rewrite <- omap_concat_correct_and_complete in H5.
           rewrite H5; simpl.
           specialize (IHc1 c3 H7).
           unfold lift in *.
-          destruct (oflat_map
+          destruct (lift_flat_map
              (fun a : data =>
               match nra_eval e a with
               | Some dunit => None
@@ -669,11 +669,11 @@ Section NRA.
           + rewrite (IHe1 d1 (dcoll nil) H4); reflexivity.
           + destruct c1; [congruence| ]; clear H3.
             rewrite (IHe1 d1 (dcoll (d :: c1)) H2); simpl.
-            rewrite <- rproduct_correct_and_complete in H7.
+            rewrite <- oproduct_correct_and_complete in H7.
             rewrite (IHe2 d1 (dcoll c2) H4).
-            unfold rproduct in H7.
-            unfold rmap_product.
-            unfold oomap_concat.
+            unfold oproduct in H7.
+            unfold omap_product.
+            unfold oncoll_map_concat.
             unfold omap_concat in *.
             rewrite H7; reflexivity.
         - inversion H; subst; simpl.
@@ -760,7 +760,7 @@ Section NRA.
           apply some_lift in H; destruct H; subst.
           constructor.
           inversion IHop2; subst.
-          apply (rmap_Forall e H1); eauto.
+          apply (lift_map_Forall e H1); eauto.
         - intros;
             specialize (IHop2 d);
             destruct (nra_eval op2 d); simpl in *; try discriminate;
@@ -769,16 +769,16 @@ Section NRA.
           apply some_lift in H; destruct H; subst.
           constructor.
           inversion IHop2; subst.
-          unfold rmap_product in *.
-          apply (oflat_map_Forall e H1); intros.
+          unfold omap_product in *.
+          apply (lift_flat_map_Forall e H1); intros.
           specialize (IHop1 x0).
-          unfold oomap_concat in H.
+          unfold oncoll_map_concat in H.
           match_destr_in H.
           specialize (IHop1 _ (eq_refl _) H2).
           unfold omap_concat in H.
           match_destr_in H.
           inversion IHop1; subst.
-          apply (rmap_Forall H H4); intros.
+          apply (lift_map_Forall H H4); intros.
           eapply (data_normalized_orecconcat H3); trivial.
         - intros;
             specialize (IHop1 d);
@@ -788,16 +788,16 @@ Section NRA.
           apply some_lift in H; destruct H; subst.
           constructor.
           inversion IHop1; subst.
-          unfold rmap_product in *.
-          apply (oflat_map_Forall e H1); intros.
+          unfold omap_product in *.
+          apply (lift_flat_map_Forall e H1); intros.
           specialize (IHop2 d).
-          unfold oomap_concat in H.
+          unfold oncoll_map_concat in H.
           match_destr_in H.
           specialize (IHop2 _ (eq_refl _) H0).
           unfold omap_concat in H.
           match_destr_in H.
           inversion IHop2; subst.
-          apply (rmap_Forall H H4); intros.
+          apply (lift_map_Forall H H4); intros.
           eapply (data_normalized_orecconcat H3); trivial.
         - intros;
           specialize (IHop2 d);
@@ -807,7 +807,7 @@ Section NRA.
           apply some_lift in H; destruct H; subst.      
           constructor.
           inversion IHop2; subst.
-          unfold rmap_product in *.
+          unfold omap_product in *.
           apply (lift_filter_Forall e H1).
         - intros;
             specialize (IHop1 d);

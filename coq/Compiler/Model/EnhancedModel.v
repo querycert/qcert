@@ -247,7 +247,7 @@ Definition rondfloat (f: FLOAT -> FLOAT) (d:data) : option data
   := lift denhancedfloat (ondfloat f d).
 
 Definition ondcollfloat {A} (f : list FLOAT -> A) (d : data) : option A
-  := lift_oncoll (fun x => lift f (rmap (fun z => ondfloat id z) x)) d.
+  := lift_oncoll (fun x => lift f (lift_map (fun z => ondfloat id z) x)) d.
 
 Definition rondcollfloat (f: list FLOAT -> FLOAT) (d:data) : option data
   := lift denhancedfloat (ondcollfloat f d).
@@ -841,15 +841,15 @@ Next Obligation.
       * reflexivity.
     + unfold rondcollfloat, ondcollfloat, lift in H2.
       simpl in H2.
-      destruct ( match rmap (fun z : data => ondfloat id z) dl with
+      destruct ( match lift_map (fun z : data => ondfloat id z) dl with
            | Some a' => Some (FLOAT_sum a')
            | None => None
            end); try discriminate.
-      destruct ( match rmap (fun z : data => ondfloat id z) dl with
+      destruct ( match lift_map (fun z : data => ondfloat id z) dl with
                | Some a' => Some (FLOAT_listmin a')
                | None => None
                  end); try discriminate.
-      destruct ( match rmap (fun z : data => ondfloat id z) dl with
+      destruct ( match lift_map (fun z : data => ondfloat id z) dl with
                | Some a' => Some (FLOAT_listmax a')
                | None => None
                  end); try discriminate.
@@ -1686,7 +1686,7 @@ Proof.
     simpl.
     destruct (IHdl H2) as [? [eqq typ]]; clear IHdl H2.
     unfold lift.
-    destruct (rmap (fun z : data => ondfloat id z) dl); simpl;
+    destruct (lift_map (fun z : data => ondfloat id z) dl); simpl;
       invcs eqq.
     eexists; split; try reflexivity; repeat econstructor.
 Qed.

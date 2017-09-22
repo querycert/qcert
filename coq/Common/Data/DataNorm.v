@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section RDataNorm.
+Section DataNorm.
   Require Import String.
   Require Import List.
   Require Import Sumbool.
@@ -24,7 +24,7 @@ Section RDataNorm.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
-  Require Import RData.
+  Require Import Data.
 
   Context {fdata:foreign_data}.
   Context (h:brand_relation_t).
@@ -238,7 +238,7 @@ Section RDataNorm.
     apply Forall_sorted; trivial.
   Qed.
   
-End RDataNorm.
+End DataNorm.
 
 (* 
 *** Local Variables: ***

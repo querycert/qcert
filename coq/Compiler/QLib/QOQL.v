@@ -70,7 +70,7 @@ Module QOQL(runtime:CompilerRuntime).
     := OQL.OWhere.
   Definition onoorder : order_by_expr 
     := OQL.ONoOrder.
-  Definition oorder_by : expr -> RDataSort.SortDesc -> order_by_expr 
+  Definition oorder_by : expr -> DataSort.SortDesc -> order_by_expr 
     := OQL.OOrderBy.
   
   Definition odot : String.string -> expr -> expr 

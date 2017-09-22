@@ -22,8 +22,9 @@ Require Import Eqdep_dec.
 Require Import Basics.
 Require Import ListSet.
 Require Import Program.Basics.
-
-Require Import RelationClasses EquivDec Morphisms.
+Require Import RelationClasses.
+Require Import EquivDec.
+Require Import Morphisms.
 
 Require Import Utils.
 

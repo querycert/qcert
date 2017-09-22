@@ -101,14 +101,14 @@ Section TcNRAEnv.
 
   Context {m:basic_model}.
   
-  Lemma rmap_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : nraenv_core) (env:data) (dl : list data) :
+  Lemma lift_map_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : nraenv_core) (env:data) (dl : list data) :
     (bindings_type c τc) ->
     (env ▹ τenv) ->
     (Forall (fun d : data => data_type d τ₁) dl) ->
     (op1 ▷ τ₁ >=> τ₂ ⊣ τc; τenv) ->
     (forall d : data,
        data_type d τ₁ -> exists x : data, brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c; env = Some x /\ x ▹ τ₂) ->
-    exists x : list data, (rmap (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+    exists x : list data, (lift_map (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
     intros dt_c; intros.
     induction dl; simpl; intros.
@@ -130,7 +130,7 @@ Section TcNRAEnv.
       rewrite <- H3; assumption.
   Qed.
 
-  Lemma rmap_env_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : nraenv_core) (x0:data) (dl : list data) :
+  Lemma lift_map_env_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : nraenv_core) (x0:data) (dl : list data) :
     bindings_type c τc ->
     (x0 ▹ τ₁) ->
     (Forall (fun d : data => data_type d τenv) dl) ->
@@ -140,7 +140,7 @@ Section TcNRAEnv.
        forall d : data,
          data_type d τ₁ ->
          exists x : data, brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c;env = Some x /\ data_type x τ₂) ->
-    exists x : list data, (rmap (fun env' => (nraenv_core_eval brand_relation_brands c op1 env' x0)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+    exists x : list data, (lift_map (fun env' => (nraenv_core_eval brand_relation_brands c op1 env' x0)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
     intros dt_c.
     induction dl; simpl; intros.
@@ -203,7 +203,7 @@ Section TcNRAEnv.
     rec_concat_sort τ₁ τ₂ = τ₃ ->
     data_type (drec x) (Rec Closed τ₁ pf1) ->
     (exists y : list data,
-       rmap (fun x1 : data => orecconcat (drec x) x1) dl2
+       lift_map (fun x1 : data => orecconcat (drec x) x1) dl2
        = Some y /\ data_type (dcoll y) (Coll (Rec Closed τ₃ pf3))).
   Proof.
     intro Henv.
@@ -218,7 +218,7 @@ Section TcNRAEnv.
         (eapply forall_in_weaken; eassumption).
     specialize (IHdl2 H'); clear H'.
     destruct IHdl2 as [? [??]].
-    revert H0; elim (rmap (fun x2 : data => orecconcat (drec x) x2) dl2); intros; try discriminate.
+    revert H0; elim (lift_map (fun x2 : data => orecconcat (drec x) x2) dl2); intros; try discriminate.
     inversion H0; subst; clear H0.
     unfold lift.
     induction dl2.
@@ -255,11 +255,11 @@ Section TcNRAEnv.
       + apply Forall2_app; trivial.
   Qed.
 
-  Lemma rproduct_typed_env {τ₁ τ₂ τ₃: list (string * rtype)} (dl dl0: list data) pf1 pf2 pf3:
+  Lemma oproduct_typed_env {τ₁ τ₂ τ₃: list (string * rtype)} (dl dl0: list data) pf1 pf2 pf3:
     Forall (fun d : data => data_type d (Rec Closed τ₂ pf2)) dl0 ->
     Forall (fun d : data => data_type d (Rec Closed τ₁ pf1)) dl ->
     rec_concat_sort τ₁ τ₂ = τ₃ ->
-    exists x : list data, (rproduct dl dl0 = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+    exists x : list data, (oproduct dl dl0 = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
     intros; rewrite Forall_forall in *.
     induction dl; simpl in *.
@@ -276,13 +276,13 @@ Section TcNRAEnv.
         by (apply forall_in_weaken with (P := (fun x0 => (drec x) = x0)); assumption).
       specialize (IHdl H1).
       destruct IHdl as [? [??]].
-      unfold rproduct.
+      unfold oproduct.
       simpl.
       assert (exists y, (omap_concat (drec x) dl0) = Some y /\ (data_type  (dcoll y) (Coll (Rec Closed  (rec_concat_sort τ₁ τ₂) pf3))))
         by (eapply omap_concat_typed_env; eauto).
       destruct H5 as [? [??]].
-      generalize (rproduct_cons _ _ _ _ _ H2 H5).
-      unfold rproduct; simpl.
+      generalize (oproduct_cons _ _ _ _ _ H2 H5).
+      unfold oproduct; simpl.
       rewrite H5. intros eqq.
       exists (x1 ++ x0).
       split; trivial.
@@ -308,7 +308,7 @@ Section TcNRAEnv.
     rewrite H1 in H; rewrite H2 in H0; assumption.
   Qed.
 
-  Lemma rmap_product_typed_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} (op1 : nraenv_core) c (env:data) (dl: list data) pf1 pf2 pf3:
+  Lemma omap_product_typed_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} (op1 : nraenv_core) c (env:data) (dl: list data) pf1 pf2 pf3:
     bindings_type c τc ->
     env ▹ τenv ->
     rec_concat_sort τ₁ τ₂ = τ₃ ->
@@ -318,11 +318,11 @@ Section TcNRAEnv.
                 data_type d (Rec Closed τ₁ pf1) ->
                 exists x : data,
                    brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c;env = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
-    exists x : list data, (rmap_product (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+    exists x : list data, (omap_product (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
     intros dt_c Henv.
     intros; rewrite Forall_forall in *.
-    induction dl; simpl in *; unfold rmap_product in *; simpl.
+    induction dl; simpl in *; unfold omap_product in *; simpl.
     exists (@nil data); split; [reflexivity|apply dtcoll; apply Forall_nil].
     assert (forall x : data, In x dl -> data_type x (Rec Closed τ₁ pf1))
       by (apply forall_in_weaken with (P := (fun x => a = x)); assumption).
@@ -334,7 +334,7 @@ Section TcNRAEnv.
     apply dtrec_closed_inv in H4.
     assert (data_type (drec x0) (Rec Closed τ₁ pf1))
       by (apply (H0 (drec x0)); left; reflexivity).
-    unfold oomap_concat.
+    unfold oncoll_map_concat.
     elim (H2 (drec x0) H); intros; clear H2.
     elim H5; intros; clear H5.
     rewrite H2; clear H2.
@@ -353,7 +353,7 @@ Section TcNRAEnv.
     apply data_type_concat; assumption.
   Qed.
 
-  Lemma rmap_product_typed2_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} τin c (op1 : nraenv_core) (env:data) y (dl: list data) pf1 pf2 pf3:
+  Lemma omap_product_typed2_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} τin c (op1 : nraenv_core) (env:data) y (dl: list data) pf1 pf2 pf3:
     bindings_type c τc ->
     env▹ τenv ->
     rec_concat_sort τ₁ τ₂ = τ₃ ->
@@ -363,11 +363,11 @@ Section TcNRAEnv.
                 data_type d (Rec Closed τ₁ pf1) ->
                 exists x : data,
                    brand_relation_brands ⊢ₑ op1 @ₑ y ⊣ c;env = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
-    exists x : list data, (rmap_product (fun z =>  brand_relation_brands ⊢ₑ op1@ₑ y ⊣ c;env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+    exists x : list data, (omap_product (fun z =>  brand_relation_brands ⊢ₑ op1@ₑ y ⊣ c;env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
     intros dt_c Henv.
     intros; rewrite Forall_forall in *.
-    induction dl; simpl in *; unfold rmap_product in *; simpl.
+    induction dl; simpl in *; unfold omap_product in *; simpl.
     exists (@nil data); split; [reflexivity|apply dtcoll; apply Forall_nil].
     assert (forall x : data, In x dl -> data_type x (Rec Closed τ₁ pf1))
       by (apply forall_in_weaken with (P := (fun x => a = x)); assumption).
@@ -380,7 +380,7 @@ Section TcNRAEnv.
     rename x0 into dl0.
     assert (data_type (drec dl0) (Rec Closed τ₁ pf1))
       by (apply (H0 (drec dl0)); left; reflexivity).
-    unfold oomap_concat.
+    unfold oncoll_map_concat.
     elim (H2 (drec dl0) H); intros; clear H2.
     elim H5; intros; clear H5.
     rewrite H2; clear H2.
@@ -413,7 +413,7 @@ Section TcNRAEnv.
     (* ANTID *)
     - exists d; split; [reflexivity|assumption].
     (* ANTConst *)
-    - exists (RDataNorm.normalize_data brand_relation_brands c0); split; try reflexivity.
+    - exists (normalize_data brand_relation_brands c0); split; try reflexivity.
       assumption.
     (* ANTBinop *)
     - elim (IHnraenv_core_type1 env Henv d H0); elim (IHnraenv_core_type2 env Henv d H0); intros.
@@ -433,9 +433,9 @@ Section TcNRAEnv.
       invcs H1.
       rtype_equalizer.
       subst.
-      assert (EE : exists x : list data, (rmap (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x)
+      assert (EE : exists x : list data, (lift_map (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x)
                                     /\ data_type (dcoll x) (Coll τ₂)).
-      + apply (@rmap_typed τc τenv τ₁ τ₂ c op1 env dl dt_c Henv); trivial.
+      + apply (@lift_map_typed τc τenv τ₁ τ₂ c op1 env dl dt_c Henv); trivial.
         apply IHnraenv_core_type1; trivial.
       + destruct EE as [? [eqq dt]].
         simpl.
@@ -447,8 +447,8 @@ Section TcNRAEnv.
       elim H1; intros; clear H1.
       rewrite H0; clear H0.
       invcs H2.
-      assert (EE : exists x : list data, (rmap_product (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
-      + apply (rmap_product_typed_env op1 c env dl pf1 pf2 pf3 dt_c Henv); try assumption; try reflexivity.
+      assert (EE : exists x : list data, (omap_product (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
+      + apply (omap_product_typed_env op1 c env dl pf1 pf2 pf3 dt_c Henv); try assumption; try reflexivity.
         apply recover_rec_forall with (r:= r); assumption.
         apply IHnraenv_core_type1; assumption.
       + destruct EE as [? [eqq typ]].
@@ -459,8 +459,8 @@ Section TcNRAEnv.
     - elim (IHnraenv_core_type1 env Henv d H0); intros; clear IHnraenv_core_type1.
       elim H1; intros; clear H1.
       rewrite H2; clear H2; invcs H3.
-      assert (EE : exists x : list data, (rmap_product (fun _ : data => brand_relation_brands ⊢ₑ op2 @ₑ d ⊣ c;env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
-      + apply (@rmap_product_typed2_env τc τenv τ₁ τ₂ (rec_concat_sort τ₁ τ₂) τin c op2 env d dl pf1 pf2 pf3); try assumption; try reflexivity.
+      assert (EE : exists x : list data, (omap_product (fun _ : data => brand_relation_brands ⊢ₑ op2 @ₑ d ⊣ c;env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
+      + apply (@omap_product_typed2_env τc τenv τ₁ τ₂ (rec_concat_sort τ₁ τ₂) τin c op2 env d dl pf1 pf2 pf3); try assumption; try reflexivity.
         apply recover_rec_forall with (r:= r); assumption.
         destruct (IHnraenv_core_type2 env Henv d H0) as [? [eqq dt]].
         rewrite eqq.
@@ -558,8 +558,8 @@ Section TcNRAEnv.
     - intros.
       invcs Henv; rtype_equalizer.
       subst; simpl.
-      assert (exists x : list data, (rmap (fun env' : data => (nraenv_core_eval brand_relation_brands c op1 env' d)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂)).
-      * apply (@rmap_env_typed τc τenv τin τ₂); try assumption.
+      assert (exists x : list data, (lift_map (fun env' : data => (nraenv_core_eval brand_relation_brands c op1 env' d)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂)).
+      * apply (@lift_map_env_typed τc τenv τin τ₂); try assumption.
       * destruct H1 as [? [eqq dt]].
         rewrite eqq; simpl.
         eexists; split; try reflexivity; trivial.

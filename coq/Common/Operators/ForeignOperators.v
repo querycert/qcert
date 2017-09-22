@@ -15,14 +15,12 @@
  *)
 
 Section ForeignOperators.
-
   Require Import EquivDec.
-
   Require Import Utils.
-  Require Import RData.
-  Require Import ForeignData.
-  Require Import RDataNorm.
   Require Import BrandRelation.
+  Require Import ForeignData.
+  Require Import Data.
+  Require Import DataNorm.
 
     Class foreign_unary_op {fdata:foreign_data}
       : Type

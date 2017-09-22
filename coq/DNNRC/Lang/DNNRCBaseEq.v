@@ -133,7 +133,7 @@ Section DNNRCBaseEq.
     destruct d; try reflexivity; simpl.
     { destruct d; try reflexivity; simpl.
       f_equal.
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
       rewrite H2; simpl; eauto.
       constructor; [|assumption].
       assert (ddata_normalized h (Dlocal (dcoll l))).
@@ -144,7 +144,7 @@ Section DNNRCBaseEq.
         rewrite Forall_forall in H5.
         auto. }
     { f_equal.
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
       rewrite H2; simpl; eauto.
       constructor; [|assumption].
       assert (ddata_normalized h (Ddistr l)).

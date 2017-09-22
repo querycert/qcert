@@ -25,11 +25,10 @@ Section TBrandContext.
   Require Import Basics.
   Require Import EquivDec.
   Require Import Eqdep_dec.
-
   Require Import Utils.
+  Require Import BrandRelation.
   Require Import ForeignType.
   Require Import RType.
-  Require Import BrandRelation.
 
   (** Implicitly, everything derives from Any *)
   Definition Any {ftype:foreign_type} {br:brand_relation} := Brand nil. 
@@ -75,7 +74,7 @@ Section TBrandContext.
   Qed.
 
   End Brand_Context.
-  End TBrandContext.
+End TBrandContext.
 
 (* 
 *** Local Variables: ***

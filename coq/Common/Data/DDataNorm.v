@@ -24,7 +24,8 @@ Section DDataNorm.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
-  Require Import RData RDataNorm.
+  Require Import Data.
+  Require Import DataNorm.
   Require Import DData.
 
   Context {fdata:foreign_data}.

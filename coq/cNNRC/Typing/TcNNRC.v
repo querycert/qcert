@@ -137,7 +137,7 @@ Section TcNNRC.
         elim H1; clear H1; intros.
         unfold lift in H1.
         unfold var in *.
-        generalize (rmap_data_exists
+        generalize (lift_map_data_exists
                       (fun d1 : data =>
                          nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2)
                    dl x0 H1); intros.

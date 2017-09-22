@@ -124,10 +124,10 @@ Section NNRCRewrite.
     destruct d; try reflexivity; simpl.
     case_eq b; intros.
     - autorewrite with alg.
-      rewrite lift_cons_dcoll.
+      rewrite oflatten_lift_cons_dcoll.
       autorewrite with alg in IHl.
       unfold olift in *.
-      case_eq (rmap
+      case_eq (lift_map
               (fun d1 : data =>
                match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                | Some (dbool true) =>
@@ -137,7 +137,7 @@ Section NNRCRewrite.
                    end
                | Some (dbool false) => Some (dcoll nil)
                | _ => None
-               end) l); intros; rewrite H1 in IHl; case_eq (rmap
+               end) l); intros; rewrite H1 in IHl; case_eq (lift_map
                 (fun d1 : data =>
                  match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                  | Some (dbool true) => Some (dcoll (d1 :: nil))
@@ -146,10 +146,10 @@ Section NNRCRewrite.
                  end) l); intros; rewrite H2 in IHl; simpl in *.
       + clear H1 H2.
         unfold lift in *.
-        case_eq (rflatten l1); case_eq (rflatten l0); intros;  rewrite H1 in *; rewrite H2 in *.
+        case_eq (oflatten l1); case_eq (oflatten l0); intros;  rewrite H1 in *; rewrite H2 in *.
         * simpl.
-          assert (exists l4, rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l3 = Some l4).
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l3); try congruence.
+          assert (exists l4, lift_map (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l3 = Some l4).
+          destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l3); try congruence.
           exists l4; reflexivity.
           elim H3; clear H3; intros.
           rewrite H3 in *; clear H3.
@@ -163,37 +163,37 @@ Section NNRCRewrite.
           rewrite H0; clear H0; reflexivity.
           rewrite H0; clear H0.
           destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-          rewrite (rflatten_cons (d::nil) l0 l2).
+          rewrite (oflatten_cons (d::nil) l0 l2).
           reflexivity.
           assumption.
         * simpl.
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l2); try congruence.
+          destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l2); try congruence.
           simpl.
           destruct (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-          rewrite rflatten_cons_none; [reflexivity|assumption].
+          rewrite oflatten_cons_none; [reflexivity|assumption].
           destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-          rewrite rflatten_cons_none; [reflexivity|assumption].
+          rewrite oflatten_cons_none; [reflexivity|assumption].
         * congruence.
         * destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-          rewrite rflatten_cons_none; [reflexivity|assumption].
+          rewrite oflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
-        case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
+        case_eq (oflatten l0); intros; rewrite H3 in *; try congruence.
         destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-        rewrite rflatten_cons_none; [reflexivity|assumption].
+        rewrite oflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
-        case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
+        case_eq (oflatten l0); intros; rewrite H3 in *; try congruence.
         simpl in *.
         destruct (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l1); try reflexivity; try congruence.
+        destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l1); try reflexivity; try congruence.
         simpl.
         destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
         destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
         destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
       + destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
     - autorewrite with alg.
-      rewrite lift_empty_dcoll.
-      rewrite lift_empty_dcoll.
+      rewrite oflatten_lift_empty_dcoll.
+      rewrite oflatten_lift_empty_dcoll.
       autorewrite with alg in IHl.
       rewrite IHl.
       reflexivity.
@@ -226,10 +226,10 @@ Section NNRCRewrite.
     destruct d; try reflexivity; simpl.
     case_eq b; intros.
     - autorewrite with alg.
-      rewrite lift_cons_dcoll.
+      rewrite oflatten_lift_cons_dcoll.
       autorewrite with alg in IHl.
       unfold olift in *.
-      case_eq (rmap
+      case_eq (lift_map
               (fun d1 : data =>
                match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                | Some (dbool true) =>
@@ -239,7 +239,7 @@ Section NNRCRewrite.
                    end
                | Some (dbool false) => Some (dcoll nil)
                | _ => None
-               end) l); intros; rewrite H1 in IHl; case_eq (rmap
+               end) l); intros; rewrite H1 in IHl; case_eq (lift_map
                 (fun d1 : data =>
                  match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                  | Some (dbool true) => Some (dcoll (d1 :: nil))
@@ -248,42 +248,42 @@ Section NNRCRewrite.
                  end) l); intros; rewrite H2 in IHl; simpl in *.
       + clear H1 H2.
         unfold lift in *.
-        case_eq (rflatten l1); case_eq (rflatten l0); intros;  rewrite H1 in *; rewrite H2 in *.
+        case_eq (oflatten l1); case_eq (oflatten l0); intros;  rewrite H1 in *; rewrite H2 in *.
         * simpl.
-          assert (exists l4, rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l3 = Some l4).
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l3); try congruence.
+          assert (exists l4, lift_map (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l3 = Some l4).
+          destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l3); try congruence.
           exists l4; reflexivity.
           elim H3; clear H3; intros.
           rewrite H3 in *; clear H3.
           simpl.
           inversion IHl. subst; clear IHl.
           destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-          rewrite (rflatten_cons (d::nil) l0 l2).
+          rewrite (oflatten_cons (d::nil) l0 l2).
           reflexivity.
           assumption.
         * simpl.
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l2); try congruence.
+          destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l2); try congruence.
           simpl.
           destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-          rewrite rflatten_cons_none; [reflexivity|assumption].
+          rewrite oflatten_cons_none; [reflexivity|assumption].
         * congruence.
         * destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-          rewrite rflatten_cons_none; [reflexivity|assumption].
+          rewrite oflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
-        case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
+        case_eq (oflatten l0); intros; rewrite H3 in *; try congruence.
         destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-        rewrite rflatten_cons_none; [reflexivity|assumption].
+        rewrite oflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
-        case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
+        case_eq (oflatten l0); intros; rewrite H3 in *; try congruence.
         simpl in *.
         destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l1); try reflexivity; try congruence.
+        destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l1); try reflexivity; try congruence.
         simpl.
         destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
       + destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
     - autorewrite with alg.
-      rewrite lift_empty_dcoll.
-      rewrite lift_empty_dcoll.
+      rewrite oflatten_lift_empty_dcoll.
+      rewrite oflatten_lift_empty_dcoll.
       autorewrite with alg in IHl.
       rewrite IHl.
       reflexivity.
@@ -320,7 +320,7 @@ Section NNRCRewrite.
       (destruct (equiv_dec (A:=string) xl xl); [|congruence]);
       match_case; simpl; intros; match_destr;
         f_equal;
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
     - generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x,x0)::nil) xl d env (nnrc_to_nnrc_base ebody)); simpl; intros re1; rewrite re1; trivial.
     - generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x,x0)::nil) xr d env (nnrc_to_nnrc_base ebody)); simpl; intros re1; rewrite re1; trivial.
   Qed.

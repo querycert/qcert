@@ -340,8 +340,8 @@ Section cNRAEnvIgnore.
       destruct (nraenv_core_eval h c e1 env2 a); intros; trivial.
       unfold lift in *; simpl in *.
       revert IHl.
-      generalize (rmap (nraenv_core_eval h c e1 env1) l); 
-        generalize (rmap (nraenv_core_eval h c e1 env2) l); intros.
+      generalize (lift_map (nraenv_core_eval h c e1 env1) l); 
+        generalize (lift_map (nraenv_core_eval h c e1 env2) l); intros.
       destruct o1; destruct o0; simpl; congruence.
     - inversion H; clear H.
       rewrite (IHe2 H1 h env1 env2); clear IHe2 H1.
@@ -350,19 +350,19 @@ Section cNRAEnvIgnore.
       destruct d; try reflexivity; simpl.
       induction l; try reflexivity; simpl.
       unfold lift in *; simpl.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *; simpl.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *; simpl.
       rewrite (IHe1 H0 h env1 env2); clear IHe1 H0.
       generalize (h ⊢ₑ e1 @ₑ a ⊣ c;env2); intros.
       destruct o; try reflexivity; simpl.
       revert IHl.
-      generalize (oflat_map
+      generalize (lift_flat_map
                     (fun a0 : data =>
                        match h ⊢ₑ e1 @ₑ a0 ⊣ c;env1 with
                        | Some (dcoll y) => omap_concat a0 y
                        | _ => None
                        end) l
-                 ); generalize (oflat_map
+                 ); generalize (lift_flat_map
                                   (fun a0 : data =>
                                      match h ⊢ₑ e1 @ₑ a0 ⊣ c;env2 with
                                      | Some (dcoll y) => omap_concat a0 y
@@ -447,7 +447,7 @@ Section cNRAEnvIgnore.
       erewrite IHe1 by trivial; reflexivity.
     - destruct env; try reflexivity; simpl.
       f_equal.
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
       rewrite (IHe H h x x1 x2); reflexivity.
   Qed.
 
@@ -473,20 +473,20 @@ Section cNRAEnvIgnore.
       generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
-      unfold lift, rmap_product, oomap_concat; simpl.
-      rewrite rmap_map_rec1 in *; simpl.
+      unfold lift, omap_product, oncoll_map_concat; simpl.
+      rewrite lift_map_map_rec1 in *; simpl.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r.
-      rewrite rmap_remove1; simpl.
+      rewrite lift_map_remove1; simpl.
       unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl.
       destruct (nra_eval h c (nraenv_core_deenv_nra e1) a); try reflexivity.
       unfold lift; simpl.
       revert IHl.
-      generalize (rmap (nra_eval h c (nra_of_nraenv_core e1))
+      generalize (lift_map (nra_eval h c (nra_of_nraenv_core e1))
                        (map (fun x : data => drec (("PBIND"%string, d1) :: ("PDATA"%string, x) :: nil)) l));
-        generalize (rmap (nra_eval h c (nraenv_core_deenv_nra e1)) l); intros.
+        generalize (lift_map (nra_eval h c (nraenv_core_deenv_nra e1)) l); intros.
       destruct o; destruct o0; try congruence.
     - inversion H; clear H.
       specialize (IHe1 H0); clear H0.
@@ -496,11 +496,11 @@ Section cNRAEnvIgnore.
       generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
-      unfold lift, rmap_product, oomap_concat; simpl.
-      rewrite rmap_map_rec1 in *; simpl.
+      unfold lift, omap_product, oncoll_map_concat; simpl.
+      rewrite lift_map_map_rec1 in *; simpl.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r in *.
-      rewrite rmap_remove1 in *; simpl.
+      rewrite lift_map_remove1 in *; simpl.
       unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
@@ -508,18 +508,18 @@ Section cNRAEnvIgnore.
       destruct o; try reflexivity.
       destruct d; try reflexivity.
       unfold lift_oncoll in *; simpl in *.
-      rewrite rmap_map_rec1 in *; simpl in *.
+      rewrite lift_map_map_rec1 in *; simpl in *.
       rewrite omap_concat_map_rec2 in *; simpl in *.
       unfold lift in *; simpl in *.
       revert IHl.
       generalize (
-                 oflat_map
+                 lift_flat_map
          (fun a0 : data =>
           match
             match nra_eval h c (nra_of_nraenv_core e1) a0 with
             | Some (dcoll l1) =>
                 match
-                  rmap (fun x : data => Some (drec (("PDATA2"%string, x) :: nil))) l1
+                  lift_map (fun x : data => Some (drec (("PDATA2"%string, x) :: nil))) l1
                 with
                 | Some a' => Some (dcoll a')
                 | None => None
@@ -532,20 +532,20 @@ Section cNRAEnvIgnore.
           end) (map (fun x : data => drec (("PBIND"%string, d1) :: ("PDATA"%string, x) :: nil)) l)
 
         ); generalize (
-     oflat_map
+     lift_flat_map
        (fun a0 : data =>
         match nra_eval h c (nraenv_core_deenv_nra e1) a0 with
         | Some (dcoll y) => omap_concat a0 y
         | _ => None
         end) l
              ); intros.
-      destruct o; destruct o0; try reflexivity; try congruence; simpl; try rewrite rmap_map_unnest2; simpl in *.
-      * generalize rmap_map_unnest2; intros HH.
+      destruct o; destruct o0; try reflexivity; try congruence; simpl; try rewrite lift_map_map_unnest2; simpl in *.
+      * generalize lift_map_map_unnest2; intros HH.
         unfold olift2 in HH.
         rewrite HH; clear HH.
         revert IHl.
         unfold olift2 in *; simpl in *.
-        generalize (     rmap
+        generalize (     lift_map
        (fun x : data =>
         match
           match x with
@@ -577,12 +577,12 @@ Section cNRAEnvIgnore.
         inversion IHl.
         subst.
         reflexivity.
-      * generalize rmap_map_unnest2; intros HH.
+      * generalize lift_map_map_unnest2; intros HH.
         unfold olift2 in HH.
         rewrite HH; clear HH.
         revert IHl.
         unfold olift2 in *; simpl in *.
-        generalize (     rmap
+        generalize (     lift_map
        (fun x : data =>
         match
           match x with
@@ -624,11 +624,11 @@ Section cNRAEnvIgnore.
       generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
-      unfold lift, rmap_product, oomap_concat; simpl.
-      rewrite rmap_map_rec1 in *; simpl.
+      unfold lift, omap_product, oncoll_map_concat; simpl.
+      rewrite lift_map_map_rec1 in *; simpl.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r in *.
-      rewrite rmap_remove1 in *; simpl.
+      rewrite lift_map_remove1 in *; simpl.
       unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
@@ -646,9 +646,9 @@ Section cNRAEnvIgnore.
                  ); intros.
       destruct o; try reflexivity; try congruence; simpl.
       * destruct b; try reflexivity.
-        rewrite rmap_one1.
+        rewrite lift_map_one1.
         revert IHl.
-        generalize (rmap
+        generalize (lift_map
          (fun x : data =>
           match x with
           | drec r => edot r "PDATA"
@@ -663,7 +663,7 @@ Section cNRAEnvIgnore.
                                  ); intros.
         destruct o; destruct o0; try reflexivity; try congruence; simpl.
         revert IHl.
-        generalize (rmap
+        generalize (lift_map
          (fun x : data =>
           match x with
           | drec r => edot r "PDATA"
@@ -741,8 +741,8 @@ Section cNRAEnvIgnore.
                 apply olift_ext
               | apply lift_oncoll_ext
               | apply lift_dcoll_inversion
-              | apply rmap_ext
-              | apply rmap_product_ext
+              | apply lift_map_ext
+              | apply omap_product_ext
               | apply lift_filter_ext]; intros); trivial.
     - rewrite <- IHe1; trivial.
     - match_destr.

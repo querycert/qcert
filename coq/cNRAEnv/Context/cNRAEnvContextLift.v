@@ -183,8 +183,8 @@ Section cNRAEnvContext.
     := repeat match goal with
               | [|- lift dcoll _ = lift dcoll _ ] => f_equal
               | [|- lift_oncoll _ ?x = lift_oncoll _ ?x ] => apply lift_oncoll_ext; intros
-              | [|- rmap _ ?x = rmap _ ?x ] => apply rmap_ext; intros
-              | [|- rmap_product _ ?x = rmap_product _ ?x ] => apply rmap_product_ext; intros
+              | [|- lift_map _ ?x = lift_map _ ?x ] => apply lift_map_ext; intros
+              | [|- omap_product _ ?x = omap_product _ ?x ] => apply omap_product_ext; intros
               | [|- olift _ ?x = olift _ ?x ] => apply olift_ext; intros
               | [|- lift_filter _ ?x = lift_filter _ ?x ] => apply lift_filter_ext; intros
               end; try subst.

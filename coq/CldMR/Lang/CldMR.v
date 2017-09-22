@@ -282,7 +282,7 @@ Section CldMR.
           | None => None
           | Some res => Some (k, res)
           end
-      in rmap f_map coll.
+      in lift_map f_map coll.
   
   Definition apply_map_fun_without_keys (doc:var) (body:nnrc) :
     list (data * data) -> option (list data) :=
@@ -293,7 +293,7 @@ Section CldMR.
           | None => None
           | Some res => Some res
           end
-      in rmap f_map coll.
+      in lift_map f_map coll.
 
   (* Note: CldMapFlatten allows multiple emits ... *)
   Definition cldmr_step_map_eval (map: cld_map) (coll: list (data * data)) : option (list (data * data)) :=
@@ -340,7 +340,7 @@ Section CldMR.
       destruct p; simpl.
       destruct (nnrc_core_eval h empty_cenv ((v, d1) :: nil) n0); try reflexivity; simpl.
       generalize ((lift (fun t' : list (data * data) => (d0, d2) :: t')
-           (rmap
+           (lift_map
               (fun d3 : data * data =>
                let (k, v0) := d3 in
                match nnrc_core_eval h empty_cenv ((v, v0) :: nil) n0 with
@@ -390,7 +390,7 @@ Section CldMR.
         | Some res => Some (key_v, res)
         end
     in
-    let reduced := rmap f_reduce groups in
+    let reduced := lift_map f_reduce groups in
     let f_rereduce (key_value_v: (data * data)) : option (data * data) :=
         let '(key_v, value_v) := key_value_v in
         let '(values_arg, rebody) := f_rereduce in
@@ -399,7 +399,7 @@ Section CldMR.
         | Some res => Some (key_v, res)
         end
     in
-    olift (rmap f_rereduce) reduced.
+    olift (lift_map f_rereduce) reduced.
 
   Definition cloudant_sum_op (typ:cld_numeric_type)
     := match typ with

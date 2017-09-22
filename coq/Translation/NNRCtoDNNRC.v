@@ -235,18 +235,18 @@ Section NNRCtoDNNRC.
     - apply IHdenv. apply H.
   Qed.
 
-  Lemma rmap_nnrc_to_dnnrc_base_correct {A:Set} {plug_type:Set} {plug:AlgPlug plug_type} (h:brand_relation_t) (annot:A) ctenv tenv cdenv denv v l n2 :
+  Lemma lift_map_nnrc_to_dnnrc_base_correct {A:Set} {plug_type:Set} {plug:AlgPlug plug_type} (h:brand_relation_t) (annot:A) ctenv tenv cdenv denv v l n2 :
     wf_denv tenv denv ->
     (forall (tenv : list (var * dlocalization))
             (denv : list (var * ddata)),
         wf_denv tenv denv ->
         lift Dlocal (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n2) =
         dnnrc_base_eval h cdenv denv (nnrc_to_dnnrc_base annot ctenv tenv n2)) ->
-    rmap
+    lift_map
       (fun d1 : data =>
          olift checkLocal
                (dnnrc_base_eval h cdenv ((v, Dlocal d1) :: denv)
-                          (nnrc_to_dnnrc_base annot ctenv ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nnrc_core_eval h (unlocalize_constants cdenv) ((v, d1) :: unlocalize_constants denv) n2) l.
+                          (nnrc_to_dnnrc_base annot ctenv ((v, Vlocal) :: tenv) n2))) l = lift_map (fun d1 : data => nnrc_core_eval h (unlocalize_constants cdenv) ((v, d1) :: unlocalize_constants denv) n2) l.
   Proof.
     intros Hwf; intros.
     induction l; [reflexivity| ]; simpl.
@@ -428,20 +428,20 @@ Section NNRCtoDNNRC.
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl in *; try reflexivity.
       unfold lift.
-      rewrite rmap_nnrc_to_dnnrc_base_correct; try assumption.
-      assert (@rmap (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
+      rewrite lift_map_nnrc_to_dnnrc_base_correct; try assumption.
+      assert (@lift_map (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
           (fun d1 : @data (@foreign_runtime_data fruntime) =>
            @nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
-             (@cons (prod RVar.var (@data (@foreign_runtime_data fruntime)))
-                (@pair RVar.var (@data (@foreign_runtime_data fruntime)) v d1)
-                (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2) l = @rmap (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
+             (@cons (prod Var.var (@data (@foreign_runtime_data fruntime)))
+                (@pair Var.var (@data (@foreign_runtime_data fruntime)) v d1)
+                (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2) l = @lift_map (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
         (fun d1 : @data (@foreign_runtime_data fruntime) =>
          @nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
            (@cons (prod var (@data (@foreign_runtime_data fruntime)))
               (@pair var (@data (@foreign_runtime_data fruntime)) v d1)
               (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2) l) by reflexivity.
       rewrite <- H1. clear H1.
-      destruct (rmap
+      destruct (lift_map
                   (fun d1 : data => nnrc_core_eval h (unlocalize_constants cdenv)
                   ((v, d1) :: unlocalize_constants denv) n2)
                   l); try reflexivity.

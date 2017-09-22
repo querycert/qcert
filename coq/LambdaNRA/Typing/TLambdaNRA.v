@@ -206,16 +206,16 @@ Section TLambdaNRA.
           constructor; simpl; intuition. 
         }
         destruct (IHe1 _ _ _ bt1 H1) as [dd3 [edd3 tdd3]].
-        rewrite (rmap_product_ext _  (fun d => lambda_nra_eval brand_relation_brands cenv (rec_sort (env ++ [(s, d)])) e1));
+        rewrite (omap_product_ext _  (fun d => lambda_nra_eval brand_relation_brands cenv (rec_sort (env ++ [(s, d)])) e1));
           [ | intros; apply lnra_lambda_eval_lambda_eq ].
         dtype_inverter.
         apply Col_inv in tdd1.
         apply Col_inv in tdd3.
-        assert (part1pf:exists part1, oomap_concat (fun d => lambda_nra_eval brand_relation_brands cenv 
+        assert (part1pf:exists part1, oncoll_map_concat (fun d => lambda_nra_eval brand_relation_brands cenv 
                                                                              (rec_sort (env ++ [(s, d)])) e1) (drec a) = Some part1 /\ Forall (fun d : data => d ▹ Rec Closed (rec_concat_sort τ₁ τ₂) pf3) part1
 ).
         {
-          unfold oomap_concat.
+          unfold oncoll_map_concat.
           rewrite edd3.
           unfold omap_concat.
           clear edd3.
@@ -236,7 +236,7 @@ Section TLambdaNRA.
             apply rec_concat_with_drec_concat_well_typed; auto.
         }
         destruct part1pf as [part1 [part1eq part1t]].
-        erewrite rmap_product_cons; eauto.
+        erewrite omap_product_cons; eauto.
         simpl; eexists; split; [reflexivity | ].
         constructor.
         apply Forall_app; trivial.
@@ -254,10 +254,10 @@ Section TLambdaNRA.
         destruct (IHdd1 H4) as [dd3 [dde3 ddt3]]; clear IHdd1.
         apply some_lift in dde3.
         destruct dde3 as [dd33 dde33 ?]; subst.
-        assert (part1pf:exists part1, oomap_concat (fun _ : data => Some (dcoll dd2)) a = Some part1 /\ Forall (fun d : data => d ▹ Rec Closed (rec_concat_sort τ₁ τ₂) pf3) part1).
+        assert (part1pf:exists part1, oncoll_map_concat (fun _ : data => Some (dcoll dd2)) a = Some part1 /\ Forall (fun d : data => d ▹ Rec Closed (rec_concat_sort τ₁ τ₂) pf3) part1).
         {
           clear  dd33 dde33 ddt3.
-          unfold oomap_concat.
+          unfold oncoll_map_concat.
           dtype_inverter.
           apply dtrec_closed_inv in H3.
           unfold omap_concat.
@@ -280,7 +280,7 @@ Section TLambdaNRA.
         dtype_inverter.
         apply Col_inv in ddt3.
         destruct part1pf as [part1 [part1eq part1t]].
-        erewrite rmap_product_cons; eauto.
+        erewrite omap_product_cons; eauto.
         simpl; eexists; split; [reflexivity | ].
         constructor.
         apply Forall_app; trivial.

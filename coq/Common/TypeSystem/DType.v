@@ -20,12 +20,11 @@ Section DType.
   Require Import Sorting.
   Require Import Eqdep_dec.
   Require Import Bool.
-  Require Import EquivDec Morphisms.
-  
-  Require Import BrandRelation.
-  Require Import ForeignType.
-          
+  Require Import EquivDec.
+  Require Import Morphisms.
   Require Import Utils.
+  Require Import BrandRelation.
+  Require Import ForeignType.          
   Require Import RType.
 
   Context {ftype:foreign_type}.

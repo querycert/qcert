@@ -26,7 +26,7 @@ Require Import ForeignType.
 Require Import RType.
 Require Import BrandRelation.
 
-Section rtype_meetjoin.
+Section RTypeMeetJoin.
 
 (* the rtype_join of two records is Closed iff the records are both closed 
    and have the same domain *)
@@ -2171,7 +2171,7 @@ destruct (H0 (fst p)); intuition.
 Qed.
 
 End mj.
-End rtype_meetjoin.
+End RTypeMeetJoin.
 
 Section rtype_join_re.
 

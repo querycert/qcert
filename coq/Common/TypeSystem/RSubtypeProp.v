@@ -24,7 +24,7 @@ Require Import RType.
 Require Import BrandRelation.
 Require Export RSubtype.
 
-Section subtype.
+Section RSubtypeProp.
 
 Context {ftype:foreign_type}.
 Context {m:brand_relation}.
@@ -436,7 +436,7 @@ Qed.
         apply (IHrl1 _ _ _ b τ₁ τ₂ H); simpl; auto.
   Qed.
   
-End subtype.
+End RSubtypeProp.
 
 (* 
 *** Local Variables: ***

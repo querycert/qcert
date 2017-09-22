@@ -76,8 +76,6 @@ Section SQL.
 
   Context {fruntime:foreign_runtime}.
 
-  Require Import RDataSort. (* For SortCriterias *)
-
   Unset Elimination Schemes.
 
   Definition sql_env := list (string * data). (* For eval -- unused now *)

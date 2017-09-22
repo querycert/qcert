@@ -116,11 +116,11 @@ Section NRAtocNNRC.
     (forall (did: data) (env : bindings) (vid : var),
         lookup equiv_dec env vid = Some did ->
         nnrc_core_eval h cenv env (nra_to_nnrc_core op vid) = (nra_eval h cenv op did)) ->
-    rmap
+    lift_map
       (fun x : data =>
          nnrc_core_eval h cenv ((vid, x) :: env) (nra_to_nnrc_core op vid)) l
     =
-    rmap (nra_eval h cenv op) l.
+    lift_map (nra_eval h cenv op) l.
   Proof.
     intros.
     induction l.
@@ -169,14 +169,14 @@ Section NRAtocNNRC.
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop1 a (((fresh_var "tmc$" [vid], a)) :: env) (fresh_var "tmc$" [vid])) at 1; clear IHop1; trivial.
       destruct (h ⊢ op1 @ₐ a ⊣ cenv); try reflexivity.
       destruct d; try reflexivity.
       unfold omap_concat, orecconcat, rec_concat_sort.
-      generalize (rmap
+      generalize (lift_map
        (fun d1 : data =>
         match a with
         | drec r1 =>
@@ -187,7 +187,7 @@ Section NRAtocNNRC.
         | _ => None
         end) l0); intros.
       destruct o; try reflexivity.
-      + rewrite rflatten_through_match.
+      + rewrite oflatten_through_match.
         reflexivity.
       + simpl.
         dest_eqdec; try congruence.
@@ -202,14 +202,14 @@ Section NRAtocNNRC.
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop2 did ((fresh_var "tprod$" [vid], a) :: env) vid) at 1; clear IHop2; trivial.
       destruct (h ⊢ op2 @ₐ did ⊣ cenv); try reflexivity.
       destruct d; try reflexivity.
       unfold omap_concat, orecconcat, rec_concat_sort.
-      generalize (rmap
+      generalize (lift_map
        (fun d1 : data =>
         match a with
         | drec r1 =>
@@ -220,7 +220,7 @@ Section NRAtocNNRC.
         | _ => None
         end) l0); intros.
       destruct o; try reflexivity.
-      + rewrite rflatten_through_match.
+      + rewrite oflatten_through_match.
         reflexivity.
       + simpl.
         match_destr.
@@ -240,10 +240,10 @@ Section NRAtocNNRC.
       destruct (h ⊢ op1 @ₐ a ⊣ cenv); try (simpl;reflexivity).
       destruct d; simpl in *; try congruence.
       destruct b.
-      rewrite lift_cons_dcoll.
+      rewrite oflatten_lift_cons_dcoll.
       reflexivity.
       rewrite match_lift_id.
-      rewrite lift_empty_dcoll.
+      rewrite oflatten_lift_empty_dcoll.
       reflexivity.
       simpl.
       trivial.

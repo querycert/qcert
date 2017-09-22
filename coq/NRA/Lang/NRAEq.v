@@ -26,6 +26,7 @@ Section NRAEq.
   Require Import Program.
   Require Import List.
   Require Import String.
+  Require Import Utils.
   Require Import CommonRuntime.
   Require Import NRA.
 
@@ -115,22 +116,11 @@ Section NRAEq.
     case_eq (h ⊢ y0 @ₐ x1 ⊣ c); simpl; trivial; intros.
     destruct d; try reflexivity.
     simpl; f_equal.
-    apply rmap_ext.
+    apply lift_map_ext.
     eauto.
   Qed.
 
   (* NRAMapProduct *)
-
-  Lemma oomap_concat_eq {h:list(string*string)} op1 op2 l:
-    forall (c:list (string*data))
-           (dn_c:Forall (fun d => data_normalized h (snd d)) c),
-      (forall x : data, 
-          h ⊢ op1 @ₐ x ⊣ c = h ⊢ op2 @ₐ x ⊣ c) ->
-    oomap_concat (nra_eval h c op1) l = oomap_concat (nra_eval h c op2) l.
-  Proof.
-    intros.
-    unfold oomap_concat; rewrite H; reflexivity.
-  Qed.
 
   Global Instance proper_NRAMapProduct : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAMapProduct.
   Proof.
@@ -140,7 +130,7 @@ Section NRAEq.
     destruct d; try reflexivity.
     apply olift_ext; inversion 1; subst; intros.
     simpl. f_equal.
-    apply rmap_product_ext; intros.
+    apply omap_product_ext; intros.
     eauto.
   Qed.
 

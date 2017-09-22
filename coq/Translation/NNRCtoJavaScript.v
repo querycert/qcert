@@ -199,8 +199,6 @@ Section NNRCtoJavaScript.
   End DataJS.
 
   Section NNRCJS.
-
-    Require Import RDataSort.
     (* Sort criteria *)
     Definition singleSortCriteriaToJson (sc: string * SortDesc) : json :=
       match snd sc with

@@ -84,7 +84,7 @@ Section NNRCtoNNRCMR.
     destruct Hmr_env.
     destruct H0.
     unfold load_init_env, mkDistConstants, mkDistConstant in H.
-    destruct (rmap
+    destruct (lift_map
            (fun x_loc : string * dlocalization =>
             let (x, loc) := x_loc in
             olift
@@ -375,7 +375,7 @@ Section NNRCtoNNRCMR.
               @Some ddata (Ddistr x)) as Heq;
         [ assumption | rewrite Heq; clear Heq].
       unfold mr_eval; simpl.
-      rewrite rmap_id.
+      rewrite lift_map_id.
       simpl.
       assert (nnrc_core_eval h empty_cenv ((v, dcoll x) :: nil) n =
               nnrc_core_eval h empty_cenv nnrc_env n) as Heq.

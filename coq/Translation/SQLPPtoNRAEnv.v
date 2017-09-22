@@ -21,10 +21,9 @@ Section SQLPPtoNRAEnv.
   Require Import Arith.
   Require Import EquivDec.
   Require Import CommonSystem.
-  Require Import RDataSort. (* For SortCriterias *)
-  Require Import SQLPP.
-  Require Import SQLtoNRAEnv.
+  Require Import SQLPPRuntime.
   Require Import NRAEnvRuntime.
+  Require Import SQLtoNRAEnv.
 
   Context {fruntime:foreign_runtime}.
 

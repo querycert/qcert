@@ -120,8 +120,8 @@ Section OQLtoNRAEnv.
   
   (* Some useful lemmas *)
 
-  Lemma rmap_rec_concat_map_is_map_rec_concat_map a s l1 :
-    rmap
+  Lemma lift_map_rec_concat_map_is_map_rec_concat_map a s l1 :
+    lift_map
       (fun x : data =>
          match x with
          | dunit => None
@@ -143,10 +143,10 @@ Section OQLtoNRAEnv.
     reflexivity.
   Qed.
                                                         
-  Lemma flatten_either_is_rmap_either h bn l0:
-    (olift rflatten
+  Lemma flatten_either_is_lift_map_either h bn l0:
+    (olift oflatten
            (olift
-              (rmap
+              (lift_map
                  (fun x : data =>
                     match x with
                     | dunit => None
@@ -160,7 +160,7 @@ Section OQLtoNRAEnv.
                     | dbrand _ _ => None
                     | dforeign _ => None
                     end))
-              (rmap
+              (lift_map
                  (fun x : data =>
                     match x with
                     | dunit => None
@@ -177,7 +177,7 @@ Section OQLtoNRAEnv.
                       else Some dnone
                     | dforeign _ => None
                     end) l0))) =
-    oflat_map
+    lift_flat_map
       (fun x : data =>
          match x with
          | dunit => None
@@ -199,7 +199,7 @@ Section OQLtoNRAEnv.
     destruct a; try reflexivity.
     destruct (sub_brands_dec h b (bn :: nil)); simpl;
     rewrite <- IHl0;
-      destruct ((rmap
+      destruct ((lift_map
              (fun x : data =>
               match x with
               | dunit => None
@@ -216,7 +216,7 @@ Section OQLtoNRAEnv.
                   else Some dnone
               | dforeign _ => None
               end) l0)); simpl; try reflexivity;
-      destruct (rmap
+      destruct (lift_map
           (fun x : data =>
            match x with
            | dunit => None
@@ -249,9 +249,9 @@ Section OQLtoNRAEnv.
     reflexivity.
   Qed.
 
-  Lemma push_lift_coll_in_rmap l f :
-    olift (fun x0 : list oql_env => lift dcoll (rmap f x0)) l =
-    lift dcoll (olift (fun x0 : list oql_env => (rmap f x0)) l).
+  Lemma push_lift_coll_in_lift_map l f :
+    olift (fun x0 : list oql_env => lift dcoll (lift_map f x0)) l =
+    lift dcoll (olift (fun x0 : list oql_env => (lift_map f x0)) l).
   Proof.
     destruct l; reflexivity.
   Qed.
@@ -305,8 +305,8 @@ Section OQLtoNRAEnv.
     reflexivity.
   Qed.
 
-  Lemma rmap_orecconcat_rmap_drec s a l0 :
-    rmap (fun x : data => orecconcat (drec a) x)
+  Lemma lift_map_orecconcat_lift_map_drec s a l0 :
+    lift_map (fun x : data => orecconcat (drec a) x)
          (map (fun d : data => drec ((s, d) :: nil)) l0) =
     Some (map (fun d : data => drec (rec_concat_sort a ((s,d)::nil))) l0).
   Proof.
@@ -340,13 +340,13 @@ Section OQLtoNRAEnv.
       (forall xenv (env : oql_env),
           oql_expr_interp h (rec_concat_sort constant_env defls) o env =
           (h ⊢ oql_to_nraenv_expr (domain defls) o @ₓ (drec env) ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv) ->
-      olift (fun x0 : list oql_env => lift dcoll (rmap (oql_expr_interp h (rec_concat_sort constant_env defls) o) x0)) env0 =
+      olift (fun x0 : list oql_env => lift dcoll (lift_map (oql_expr_interp h (rec_concat_sort constant_env defls) o) x0)) env0 =
     olift
       (fun d : data =>
          lift_oncoll
            (fun c1 : list data =>
               lift dcoll
-                   (rmap
+                   (lift_map
                       (nraenv_eval h constant_env (oql_to_nraenv_expr (domain defls) o) (drec (rec_concat_sort xenv defls)))
                       c1)) d) (lift (fun x => dcoll (map drec x)) env0).
     Proof.
@@ -356,8 +356,8 @@ Section OQLtoNRAEnv.
       rewrite (H xenv).
       destruct (h ⊢ oql_to_nraenv_expr (domain defls) o @ₓ (drec a) ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv; simpl;
         [|reflexivity].
-      destruct (rmap (oql_expr_interp h (rec_concat_sort constant_env defls) o) l);
-        destruct (rmap (nraenv_eval h constant_env (oql_to_nraenv_expr (domain defls) o) (drec (rec_concat_sort xenv defls)))
+      destruct (lift_map (oql_expr_interp h (rec_concat_sort constant_env defls) o) l);
+        destruct (lift_map (nraenv_eval h constant_env (oql_to_nraenv_expr (domain defls) o) (drec (rec_concat_sort xenv defls)))
                        (map drec l)); simpl in *; congruence.
     Qed.
 
@@ -387,8 +387,8 @@ Section OQLtoNRAEnv.
       destruct envs0; [|reflexivity]; simpl.
       induction l; try reflexivity; simpl.
       unfold env_map_concat in *; simpl.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *; simpl.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *; simpl.
       unfold oenv_map_concat_single in *; simpl.
       rewrite (H0 xenv).
       destruct (cNRAEnv.nraenv_core_eval h constant_env
@@ -399,8 +399,8 @@ Section OQLtoNRAEnv.
       destruct d; try reflexivity; simpl.
       autorewrite with alg; simpl.
       unfold omap_concat in *.
-      rewrite rmap_orecconcat_rmap_drec.
-      destruct ((oflat_map
+      rewrite lift_map_orecconcat_lift_map_drec.
+      destruct ((lift_flat_map
                    (fun a0 : oql_env =>
                       match oql_expr_interp h (rec_concat_sort constant_env defls) o a0 with
                       | Some (dcoll y) =>
@@ -410,7 +410,7 @@ Section OQLtoNRAEnv.
                       | Some _ => None
                       | None => None
                       end) l));
-        destruct (oflat_map
+        destruct (lift_flat_map
                     (fun a0 : data =>
                        match
                          olift
@@ -418,13 +418,13 @@ Section OQLtoNRAEnv.
                               lift_oncoll
                                 (fun c1 : list data =>
                                    lift dcoll
-                                        (rmap
+                                        (lift_map
                                            (fun x : data => Some (drec ((s, x) :: nil)))
                                            c1)) d)
                            (cNRAEnv.nraenv_core_eval h constant_env
                                                      (nraenv_core_of_nraenv (oql_to_nraenv_expr (domain defls) o)) (drec (rec_concat_sort xenv defls)) a0)%nraenv
                        with
-                       | Some (dcoll y) => rmap (fun x : data => orecconcat a0 x) y
+                       | Some (dcoll y) => lift_map (fun x : data => orecconcat a0 x) y
                        | Some _ => None
                        | None => None
                        end) (map drec l)); simpl in *; try congruence; simpl in *.
@@ -467,8 +467,8 @@ Section OQLtoNRAEnv.
       destruct envs0; [|reflexivity]; simpl.
       induction l; try reflexivity; simpl.
       unfold env_map_concat_cast in *; simpl.
-      unfold rmap_product in *; simpl.
-      unfold oomap_concat in *; simpl.
+      unfold omap_product in *; simpl.
+      unfold oncoll_map_concat in *; simpl.
       unfold oenv_map_concat_single_with_cast in *; simpl.
       rewrite (H0 xenv).
       destruct (cNRAEnv.nraenv_core_eval h constant_env
@@ -478,8 +478,8 @@ Section OQLtoNRAEnv.
       destruct d; try reflexivity; simpl.
       unfold filter_cast in *; simpl in *.
       autorewrite with alg; simpl.
-      rewrite flatten_either_is_rmap_either; simpl.
-      assert (@oflat_map (@data (@foreign_runtime_data fruntime))
+      rewrite flatten_either_is_lift_map_either; simpl.
+      assert (@lift_flat_map (@data (@foreign_runtime_data fruntime))
                          (@data (@foreign_runtime_data fruntime))
                          (fun x : @data (@foreign_runtime_data fruntime) =>
                             match
@@ -507,7 +507,7 @@ Section OQLtoNRAEnv.
                             | _ =>
                               None
                             end) l0 =
-              (@oflat_map (@data (@foreign_runtime_data fruntime))
+              (@lift_flat_map (@data (@foreign_runtime_data fruntime))
                           (@data (@foreign_runtime_data fruntime))
                           (fun x : @data (@foreign_runtime_data fruntime) =>
                              match
@@ -545,7 +545,7 @@ Section OQLtoNRAEnv.
                              | _ => None
                              end) l0)) by reflexivity.
       rewrite H; clear H.
-      destruct (oflat_map
+      destruct (lift_flat_map
                   (fun x : data =>
                      match x with
                      | dbrand b' _ =>
@@ -558,7 +558,7 @@ Section OQLtoNRAEnv.
       unfold env_map_concat_single in *.
       unfold omap_concat in *.
       autorewrite with alg; simpl.
-      rewrite rmap_rec_concat_map_is_map_rec_concat_map; simpl.
+      rewrite lift_map_rec_concat_map_is_map_rec_concat_map; simpl.
       match type of IHl with
       | lift _ ?x = lift _ ?y  => destruct y; destruct x; simpl in *
       end; simpl in *; try discriminate.
@@ -580,9 +580,9 @@ Section OQLtoNRAEnv.
     Proof.
       intros; simpl.
       unfold nraenv_eval; simpl.
-      unfold rmap_product; simpl.
+      unfold omap_product; simpl.
       unfold env_map_concat; simpl.
-      unfold oomap_concat; simpl.
+      unfold oncoll_map_concat; simpl.
       unfold oenv_map_concat_single; simpl.
       rewrite (H xenv); clear H.
       unfold nraenv_eval; simpl.
@@ -831,7 +831,7 @@ Section OQLtoNRAEnv.
           generalize nraenv_of_select_expr_correct; intros Hselect.
           unfold nraenv_eval in *; simpl.
           rewrite <- Hselect; [|assumption].
-          rewrite push_lift_coll_in_rmap; simpl.
+          rewrite push_lift_coll_in_lift_map; simpl.
           rewrite olift_rondcoll_over_dcoll.
           reflexivity.
       - destruct e1.
@@ -856,7 +856,7 @@ Section OQLtoNRAEnv.
           generalize nraenv_of_select_expr_correct; intros Hselect.
           unfold nraenv_eval in *; simpl.
           rewrite <- Hselect; [|assumption].
-          rewrite push_lift_coll_in_rmap; simpl.
+          rewrite push_lift_coll_in_lift_map; simpl.
           rewrite olift_rondcoll_over_dcoll.
           reflexivity.
       - destruct e1.
@@ -875,7 +875,7 @@ Section OQLtoNRAEnv.
           generalize nraenv_of_select_expr_correct; intros Hselect.
           unfold nraenv_eval in *; simpl.
           rewrite <- Hselect; [|assumption].
-          rewrite push_lift_coll_in_rmap; simpl.
+          rewrite push_lift_coll_in_lift_map; simpl.
           rewrite olift_rondcoll_over_dcoll.
           reflexivity.
       - destruct e1.
@@ -900,7 +900,7 @@ Section OQLtoNRAEnv.
           generalize nraenv_of_select_expr_correct; intros Hselect.
           unfold nraenv_eval in *; simpl.
           rewrite <- Hselect; [|assumption].
-          rewrite push_lift_coll_in_rmap; simpl.
+          rewrite push_lift_coll_in_lift_map; simpl.
           rewrite olift_rondcoll_over_dcoll.
           reflexivity.
     Qed.

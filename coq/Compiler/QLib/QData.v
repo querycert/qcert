@@ -16,7 +16,7 @@
 
 Require Import CompilerRuntime.
 Require String.
-Require RData.
+Require Data.
 Require JSON.
 Require JSONtoData.
 Require NNRCtoJavaScript.
@@ -26,7 +26,7 @@ Module QData(runtime:CompilerRuntime).
   Definition json : Set 
     := JSON.json.
   Definition qdata : Set 
-    := RData.data.
+    := Data.data.
   Definition t : Set 
     := qdata.
   
@@ -44,23 +44,23 @@ Module QData(runtime:CompilerRuntime).
     := JSON.jobject jl.
 
   Definition dunit : qdata 
-    := RData.dunit.
+    := Data.dunit.
   Definition dnat z : qdata 
-    := RData.dnat z.
+    := Data.dnat z.
   Definition dbool b : qdata 
-    := RData.dbool b.
+    := Data.dbool b.
   Definition dstring s : qdata 
-    := RData.dstring s.
+    := Data.dstring s.
   Definition dcoll dl : qdata 
-    := RData.dcoll dl.
+    := Data.dcoll dl.
   Definition drec dl : qdata 
-    := RData.drec dl.
+    := Data.drec dl.
   Definition dleft : qdata -> qdata 
-    := RData.dleft.
+    := Data.dleft.
   Definition dright : qdata -> qdata 
-    := RData.dright.
+    := Data.dright.
   Definition dbrand b : qdata -> qdata 
-    := RData.dbrand b.
+    := Data.dbrand b.
   (* foreign data is supported via the model *)
   
   (** JSON -> data conversion (META variant) *)
@@ -82,7 +82,7 @@ Module QData(runtime:CompilerRuntime).
     Definition dlocal : qdata -> qddata := DData.Dlocal.
     Definition ddistr (x:qdata) : option qddata :=
       match x with
-      | RData.dcoll c => Some (DData.Ddistr c)
+      | Data.dcoll c => Some (DData.Ddistr c)
       | _ => None
       end.
   End dist.

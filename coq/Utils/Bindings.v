@@ -43,7 +43,8 @@ Section Bindings.
                ODT_lt_strorder:>StrictOrder ODT_lt;
                ODT_lt_dec: forall (a b:K), {ODT_lt a b} + {~ODT_lt a b};
                ODT_compare:K -> K -> comparison;
-               ODT_compare_spec: forall x y : K, CompareSpec (eq x y) (ODT_lt x y) (ODT_lt y x) (ODT_compare x y) }.
+               ODT_compare_spec: forall x y : K,
+                   CompareSpec (eq x y) (ODT_lt x y) (ODT_lt y x) (ODT_compare x y) }.
 
   Generalizable Variables K.
   Context `{odt:@ODT K}.
@@ -75,7 +76,7 @@ Section Bindings.
   Lemma compare_eq_iff x y : (ODT_compare x y) = Eq <-> x=y.
   Proof.
     case ODT_compare_spec; intro H; split; try easy; intro EQ;
-    contradict H;rewrite EQ; apply irreflexivity.
+      contradict H;rewrite EQ; apply irreflexivity.
   Qed.
   
   Lemma ODT_lt_contr (x y : K) : ~ ODT_lt x y -> ~ ODT_lt y x -> x = y.
@@ -211,9 +212,9 @@ Section Bindings.
     intros; simpl in *.
     revert H; destruct l; try reflexivity; simpl.
     elim (ODT_lt_dec (fst a1) (fst a2));
-    elim (ODT_lt_dec (fst a2) (fst p));
-    elim (ODT_lt_dec (fst a1) (fst p));
-    intros; try congruence.
+      elim (ODT_lt_dec (fst a2) (fst p));
+      elim (ODT_lt_dec (fst a1) (fst p));
+      intros; try congruence.
     assert (ODT_lt (fst a1) (fst p))
       by (apply transitivity with (y := (fst a2)); assumption).
     contradiction.
@@ -227,13 +228,13 @@ Section Bindings.
     revert H; destruct l; simpl.
     - simpl.
       elim (ODT_lt_dec (fst a1) (fst a2));
-      elim (ODT_lt_dec (fst a2) (fst a3));
-      elim (ODT_lt_dec (fst a1) (fst a3)); intros; try congruence.
+        elim (ODT_lt_dec (fst a2) (fst a3));
+        elim (ODT_lt_dec (fst a1) (fst a3)); intros; try congruence.
     - elim (ODT_lt_dec (fst a1) (fst a2));
-      elim (ODT_lt_dec (fst a2) (fst a3));
-      elim (ODT_lt_dec (fst a3) (fst p));
-      elim (ODT_lt_dec (fst a2) (fst p));
-      intros; try congruence.
+        elim (ODT_lt_dec (fst a2) (fst a3));
+        elim (ODT_lt_dec (fst a3) (fst p));
+        elim (ODT_lt_dec (fst a2) (fst p));
+        intros; try congruence.
       assert (ODT_lt (fst a2) (fst p))
         by (apply transitivity with (y := (fst a3)); assumption).
       contradiction.
@@ -370,13 +371,13 @@ Section Bindings.
       unfold rec_cons_sort in H1.
       assumption.
   Qed.
-  
+
   Lemma rec_cons_gt_first {A} (l' l:list (K*A)) (a1 a2:K*A) :
     rec_cons_sort a1 l = l' ->
     is_list_sorted ODT_lt_dec (domain (a2 :: l)) = true ->
     ODT_lt (fst a2) (fst a1) ->
     (exists a3, exists l'', rec_cons_sort a1 l = (a3 :: l'')
-                           /\ ODT_lt (fst a2) (fst a3)).
+                            /\ ODT_lt (fst a2) (fst a3)).
   Proof.
     revert a1 a2 l'.
     induction l; intros.
@@ -536,15 +537,15 @@ Section Bindings.
 
   Lemma insertion_sort_insert_nin_perm {A:Type} l a :
     ~ In (fst a) (@domain _ A l) ->
-  Permutation (a::l) (insertion_sort_insert rec_field_lt_dec a l).
+    Permutation (a::l) (insertion_sort_insert rec_field_lt_dec a l).
   Proof.
     induction l; simpl; auto.
     intuition.
     destruct (rec_field_lt_dec a a0); trivial.
     generalize (field_not_less_and_neq_is_more _ _ n).
     destruct (rec_field_lt_dec a0 a); intuition.
-   rewrite perm_swap.
-   rewrite Permutation_cons; try eassumption; trivial.
+    rewrite perm_swap.
+    rewrite Permutation_cons; try eassumption; trivial.
   Qed.
 
   Lemma insertion_sort_perm_proper {A:Type} (l l':list (K*A)) a :
@@ -639,7 +640,7 @@ Section Bindings.
           contradiction.
   Qed.
 
- Lemma insertion_sort_insert_cons_app {A} (a:K*A) l l2 :
+  Lemma insertion_sort_insert_cons_app {A} (a:K*A) l l2 :
     insertion_sort rec_field_lt_dec (insertion_sort_insert rec_field_lt_dec a l ++ l2) = insertion_sort rec_field_lt_dec (a::l ++ l2).
   Proof.
     revert a l2.
@@ -651,7 +652,7 @@ Section Bindings.
     - rewrite insertion_sort_insert_insertion_nin; eauto.
   Qed.
 
- Lemma insertion_sort_insertion_sort_app1 {A} l1 l2 :
+  Lemma insertion_sort_insertion_sort_app1 {A} l1 l2 :
     insertion_sort rec_field_lt_dec (insertion_sort (@rec_field_lt_dec A) l1 ++ l2) =
     insertion_sort rec_field_lt_dec (l1 ++ l2).
   Proof.
@@ -685,8 +686,8 @@ Section Bindings.
   Qed.
 
   Lemma rec_sort_rec_sort_app1 {A} l1 l2 :
-   rec_sort ((@rec_sort A) l1 ++ l2) =
-   rec_sort (l1 ++ l2).
+    rec_sort ((@rec_sort A) l1 ++ l2) =
+    rec_sort (l1 ++ l2).
   Proof.
     apply insertion_sort_insertion_sort_app1.
   Qed.
@@ -728,16 +729,16 @@ Section Bindings.
     destruct (rec_field_lt_dec a0 a); 
       destruct (rec_field_lt_dec b y); 
       unfold rec_field_lt in *; rewrite H7 in *;
-      simpl in *; inversion H6; rewrite H1 in *; intuition.
+        simpl in *; inversion H6; rewrite H1 in *; intuition.
     destruct (rec_field_lt_dec a a0);  unfold rec_field_lt in *;
-    rewrite H7,H1 in *;
-    destruct (rec_field_lt_dec y b);  unfold rec_field_lt in *; intuition.
+      rewrite H7,H1 in *;
+      destruct (rec_field_lt_dec y b);  unfold rec_field_lt in *; intuition.
   Qed.
 
   Lemma rec_sort_Forall2 {A B} P l1 l2 :
-      (domain l1) = (domain l2) ->
-      Forall2 P l1 l2 ->
-      Forall2 P (@rec_sort A l1) (@rec_sort B l2).
+    (domain l1) = (domain l2) ->
+    Forall2 P l1 l2 ->
+    Forall2 P (@rec_sort A l1) (@rec_sort B l2).
   Proof.
     Hint Constructors Forall2.
     revert l2; induction l1; simpl; inversion 2; subst; eauto.
@@ -785,7 +786,7 @@ Section Bindings.
   Qed.
 
   Hint Resolve ODT_lt_strorder.
-
+  
   Lemma insertion_sort_insert_swap_neq {A} a1 (b1:A) a2 b2 l :
     ~(eq a1 a2) ->
     insertion_sort_insert rec_field_lt_dec (a1, b1)
@@ -797,12 +798,12 @@ Section Bindings.
   Proof.
     revert a1 b1 a2 b2. induction l; simpl; intros.
     - destruct (ODT_lt_dec a1 a2); 
-      destruct (ODT_lt_dec a2 a1); trivial.
+        destruct (ODT_lt_dec a2 a1); trivial.
       + eelim @asymmetry; eauto.
         unfold Asymmetric; intros.
         apply (@asymmetry _ _ _ x y); assumption.
       + destruct (trichotemy a1 a2) as [[?|?]|?];
-        intuition.
+          intuition.
     - destruct a; simpl.
       Ltac t := try (solve[eelim @asymmetry; eauto]); intuition.
       repeat dest_strlt; 
@@ -818,7 +819,7 @@ Section Bindings.
   Lemma insertion_sort_insert_middle {A} l1 l2 a (b:A) :
     ~ In a (domain l1) ->
     SortingAdd.insertion_sort_insert rec_field_lt_dec (a, b)
-                                (SortingAdd.insertion_sort rec_field_lt_dec (l1 ++ l2)) =
+                                     (SortingAdd.insertion_sort rec_field_lt_dec (l1 ++ l2)) =
     SortingAdd.insertion_sort rec_field_lt_dec (l1 ++ (a, b) :: l2).
   Proof.
     revert l2 a b.
@@ -888,16 +889,16 @@ Section Bindings.
 
   Lemma drec_sort_sorted {A} l :
     SortingAdd.is_list_sorted ODT_lt_dec
-                         (@domain _ A
-                                  (rec_sort l)) = true.
+                              (@domain _ A
+                                       (rec_sort l)) = true.
   Proof.
     eapply rec_sort_sorted; eauto.
   Qed.
 
   Lemma drec_concat_sort_sorted {A} l l' :
     SortingAdd.is_list_sorted ODT_lt_dec
-                         (@domain _ A
-                                  (rec_concat_sort l l')) = true.
+                              (@domain _ A
+                                       (rec_concat_sort l l')) = true.
   Proof.
     unfold rec_concat_sort.
     eapply rec_sort_sorted; eauto.
@@ -936,7 +937,7 @@ Section Bindings.
   Lemma assoc_lookupr_insertion_sort_fresh {B:Type} x (d:B) b :
     ~ In x (domain b) ->
     assoc_lookupr ODT_eqdec
-     (SortingAdd.insertion_sort rec_field_lt_dec (b ++ (x, d) :: nil)) x = 
+                  (SortingAdd.insertion_sort rec_field_lt_dec (b ++ (x, d) :: nil)) x = 
     Some d.
   Proof.
     revert x d.
@@ -1139,7 +1140,7 @@ Section Bindings.
   Lemma insertion_sort_insert_domain {B:Type} x a (b:B) l : 
     In x (domain
             (SortingAdd.insertion_sort_insert rec_field_lt_dec 
-                                         (a, b) l)) ->
+                                              (a, b) l)) ->
     a = x \/ In x (domain l).
   Proof.
     revert x a b. induction l; simpl; intuition.
@@ -1273,65 +1274,65 @@ Section Bindings.
   Lemma rec_sort_insert_filter_fst_true {A:Type} f  
         (a:K*A) (l:list (K*A)) 
         (fstonly:forall a b c, f (a,b) = f (a,c)) :
-     StronglySorted rec_field_lt l ->
-     f a = true ->
-     filter f (insertion_sort_insert rec_field_lt_dec a l)
-     = insertion_sort_insert rec_field_lt_dec a (filter f l).
-   Proof.
-     revert a.
-     induction l; simpl; intros b lsort fb.
-     - rewrite fb; trivial.
-     - inversion lsort; subst.
-       case_eq (f a); simpl; intros fa.
-       +  destruct (rec_field_lt_dec b a); simpl.
+    StronglySorted rec_field_lt l ->
+    f a = true ->
+    filter f (insertion_sort_insert rec_field_lt_dec a l)
+    = insertion_sort_insert rec_field_lt_dec a (filter f l).
+  Proof.
+    revert a.
+    induction l; simpl; intros b lsort fb.
+    - rewrite fb; trivial.
+    - inversion lsort; subst.
+      case_eq (f a); simpl; intros fa.
+      +  destruct (rec_field_lt_dec b a); simpl.
          * rewrite fb.
            simpl. match_destr.
          * rewrite <- IHl; trivial.
            match_destr; simpl; rewrite fa; trivial.
-       + match_destr.
-         * simpl. rewrite fb, fa.
-            rewrite insertion_sort_insert_forall_lt; trivial.
-            apply Forall_filter.
-            revert H2.
-            apply Forall_impl_in; intros.
-            etransitivity; eauto.
-          * rewrite <- IHl; trivial.
-            match_destr; simpl; rewrite fa; trivial.
-            unfold rec_field_lt in *.
-            destruct (trichotemy (fst a) (fst b)) as [[?|?]|?]; try congruence.
-            destruct a; destruct b; simpl in *; subst.
-            specialize (fstonly k0 a a0). congruence.
-   Qed.
+      + match_destr.
+        * simpl. rewrite fb, fa.
+          rewrite insertion_sort_insert_forall_lt; trivial.
+          apply Forall_filter.
+          revert H2.
+          apply Forall_impl_in; intros.
+          etransitivity; eauto.
+        * rewrite <- IHl; trivial.
+          match_destr; simpl; rewrite fa; trivial.
+          unfold rec_field_lt in *.
+          destruct (trichotemy (fst a) (fst b)) as [[?|?]|?]; try congruence.
+          destruct a; destruct b; simpl in *; subst.
+          specialize (fstonly k0 a a0). congruence.
+  Qed.
    
-   Lemma rec_sort_insert_filter_fst_false {A:Type} f  
+  Lemma rec_sort_insert_filter_fst_false {A:Type} f  
         (a:K*A) (l:list (K*A)) 
-         (fstonly:forall a b c, f (a,b) = f (a,c)) :
-     f a = false ->
-     filter f (insertion_sort_insert rec_field_lt_dec a l) =
-     filter f l.
-   Proof.
-     revert a.
-     induction l; simpl; intros ? fa.
-     - rewrite fa; trivial.
-     - match_destr; simpl.
-       + rewrite fa; trivial.
-       + match_destr; simpl.
-         rewrite IHl; trivial.
-   Qed.
+        (fstonly:forall a b c, f (a,b) = f (a,c)) :
+    f a = false ->
+    filter f (insertion_sort_insert rec_field_lt_dec a l) =
+    filter f l.
+  Proof.
+    revert a.
+    induction l; simpl; intros ? fa.
+    - rewrite fa; trivial.
+    - match_destr; simpl.
+      + rewrite fa; trivial.
+      + match_destr; simpl.
+        rewrite IHl; trivial.
+  Qed.
    
-   Lemma rec_sort_filter_fst_commute {A:Type} f (l:list (K*A))
-         (fstonly:forall a b c, f (a,b) = f (a,c)) :
-     filter f (rec_sort l)
-     = rec_sort (filter f l).
-   Proof.
-     induction l; simpl; trivial.
-     case_eq (f a); intros fa; simpl.
-     - rewrite <- IHl, rec_sort_insert_filter_fst_true; trivial.
-       eapply Sorted_StronglySorted.
-       + apply StrictOrder_Transitive.
-       + eapply insertion_sort_Sorted.
-     - rewrite <- IHl, rec_sort_insert_filter_fst_false; trivial.
-   Qed.
+  Lemma rec_sort_filter_fst_commute {A:Type} f (l:list (K*A))
+        (fstonly:forall a b c, f (a,b) = f (a,c)) :
+    filter f (rec_sort l)
+    = rec_sort (filter f l).
+  Proof.
+    induction l; simpl; trivial.
+    case_eq (f a); intros fa; simpl.
+    - rewrite <- IHl, rec_sort_insert_filter_fst_true; trivial.
+      eapply Sorted_StronglySorted.
+      + apply StrictOrder_Transitive.
+      + eapply insertion_sort_Sorted.
+    - rewrite <- IHl, rec_sort_insert_filter_fst_false; trivial.
+  Qed.
    
   Lemma forallb_rec_sort {A} f (l:list (K*A)) :
     forallb f l = true ->
@@ -1353,7 +1354,6 @@ Section Bindings.
     eapply Permutation_in; try eassumption.
     apply rec_sort_perm; trivial.
   Qed.
-
   
   Lemma domain_rec_sort_insert {B} (a:K*B) l :
     domain (insertion_sort_insert rec_field_lt_dec a l) =
@@ -1386,7 +1386,7 @@ Section Bindings.
     match_destr.
   Qed.
 
-    Lemma rec_sort_insert_in_dom {B} a (l:list (K*B)) : 
+  Lemma rec_sort_insert_in_dom {B} a (l:list (K*B)) : 
     In (fst a) (domain l) ->
     is_list_sorted ODT_lt_dec (domain l) = true ->
     insertion_sort_insert rec_field_lt_dec a l = l.
@@ -1412,6 +1412,22 @@ Section Bindings.
         apply is_list_sorted_cons_inv in H0; trivial.
   Qed.
   
+  Lemma in_rec_sort_insert {A} `{EqDec A eq} (x:K*A) (k:K) (a:A) l:
+    In x (insertion_sort_insert rec_field_lt_dec (k, a) l) ->
+    x = (k, a) \/ In x l.
+  Proof.
+    revert x a. induction l; simpl; [intuition | ].
+    intros x a0.
+    destruct a; simpl in *.
+    destruct (ODT_lt_dec k k0); simpl; intros; trivial.
+    - elim H0; clear H0; intros; [left|]; auto.
+    - destruct (ODT_lt_dec k0 k); simpl; intros; intuition.
+      simpl in H0.
+      elim H0; clear H0; intros.
+      + intuition.
+      + destruct (IHl _ _ H0); intuition.
+  Qed.
+
   Lemma rec_sort_filter_latter_from_former {B} s (l1 l2:list (K*B)) :
     In s (domain l2) ->
     rec_sort (l1 ++ l2) =
@@ -1563,7 +1579,7 @@ Section Bindings.
       rewrite incl_appl; try reflexivity.
       rewrite domain_app. reflexivity.
     Qed.
-
+    
     Lemma rec_concat_sort_sublist_sorted {B} l1 l2 :
       is_list_sorted ODT_lt_dec (domain l1) = true ->
       sublist (@domain _ B l1) (domain (rec_concat_sort l1 l2)).
@@ -1626,9 +1642,258 @@ Section BindingsString.
 
 End BindingsString.
 
+Section edot.
+  (* note: right-rec so that new fields hide old fields *)
+  Definition edot {A} (r:list (string*A)) (a:string) : option A :=
+    assoc_lookupr ODT_eqdec r a.
+
+  Lemma edot_nodup_perm {A:Type} (l l':list (string*A)) x :
+    NoDup (domain l) -> Permutation l l' -> edot l x = edot l' x.
+  Proof.
+    apply assoc_lookupr_nodup_perm.
+  Qed.
+  
+  Lemma edot_fresh_concat {A} x (d:A) b :
+    ~ In x (domain b) ->
+    edot (rec_concat_sort b ((x,d)::nil)) x = Some d.
+  Proof.
+    intros.
+    apply (@assoc_lookupr_insertion_sort_fresh string ODT_string); trivial.
+  Qed.
+
+End edot.
+
 Hint Unfold rec_sort rec_concat_sort.
 Hint Resolve drec_sort_sorted drec_concat_sort_sorted.
 Hint Resolve is_list_sorted_NoDup_strlt.
+
+Section MergeBindings.
+  (* Merge record stuff *)
+
+  Definition merge_bindings {A} `{EqDec A eq} (l₁ l₂:list (string * A)) : option (list (string * A)) :=
+    if compatible l₁ l₂
+    then Some (rec_concat_sort l₁ l₂)
+    else None.
+
+  Lemma merge_bindings_nil_r {A} `{EqDec A eq} l : merge_bindings l nil = Some (rec_sort l).
+  Proof.
+    unfold merge_bindings.
+    simpl.
+    rewrite compatible_nil_r.
+    unfold rec_concat_sort.
+    rewrite app_nil_r.
+    trivial.
+  Qed.
+
+  Lemma merge_bindings_single_nin {A} `{EqDec A eq} b x d :
+    ~ In x (domain b) ->
+    merge_bindings b ((x,d)::nil) =
+    Some (rec_concat_sort b ((x,d)::nil)).
+  Proof.
+    intro nin.
+    unfold merge_bindings.
+    rewrite compatible_single_nin; auto.
+  Qed.
+
+  Lemma merge_bindings_sorted {A} `{EqDec A eq} {g g1 g2} :
+    Some g = merge_bindings g1 g2 ->
+    is_list_sorted ODT_lt_dec (@domain string A g) = true.
+  Proof.
+    unfold merge_bindings. intros.
+    destruct (compatible g1 g2); try discriminate.
+    inversion H0; subst.
+    unfold rec_concat_sort, rec_concat_sort in *.
+    eauto.
+  Qed.
+
+  Lemma edot_merge_bindings {A} `{EqDec A eq} (l1 l2:list (string*A)) (s:string) (x:A) :
+    merge_bindings l1 ((s, x)::nil) = Some l2 ->
+    edot l2 s = Some x.
+  Proof.
+    intros.
+    unfold merge_bindings in *.
+    case_eq (compatible l1 ((s, x)::nil)); intros; rewrite H1 in *; try congruence.
+    inversion H0; clear H0.
+    unfold edot.
+    unfold rec_concat_sort in *.
+    rewrite (@assoc_lookupr_drec_sort string ODT_string) in *.
+    rewrite (@assoc_lookupr_app).
+    simpl.
+    destruct (string_eqdec s s); [reflexivity|congruence].
+  Qed.
+
+  Lemma merge_bindings_nodup {A} `{EqDec A eq} (l l0 l1:list (string*A)):
+    merge_bindings l l0 = Some l1 -> NoDup (domain l1).
+  Proof.
+    intros.
+    unfold merge_bindings in *.
+    destruct (compatible l l0); try congruence.
+    inversion H0.
+    apply is_list_sorted_NoDup_strlt.
+    apply (rec_concat_sort_sorted l l0).
+    reflexivity.
+  Qed.
+  
+  Lemma merge_bindings_compatible {A} `{EqDec A eq} (l l0 l1:list (string*A)):
+    merge_bindings l l0 = Some l1 -> compatible l l0 = true.
+  Proof.
+    intros.
+    unfold merge_bindings in H0.
+    destruct (compatible l l0); congruence.
+  Qed.
+
+  Lemma sorted_cons_is_compatible {A} `{EqDec A eq} (l:list (string*A)) (a:string*A):
+    is_list_sorted ODT_lt_dec (domain (a :: l)) = true ->
+    compatible_with (fst a) (snd a) l = true.
+  Proof.
+    intros.
+    assert (NoDup (domain (a :: l)))
+      by (apply is_list_sorted_NoDup_strlt; assumption).
+    unfold compatible_with.
+    destruct a; simpl.
+    inversion H1. subst.
+    assert (assoc_lookupr equiv_dec l s = None) by
+        (apply assoc_lookupr_nin_none; assumption).
+    rewrite H2.
+    reflexivity.
+  Qed.
+
+  Lemma compatible_self {A} `{EqDec A eq} (l:list (string*A)):
+    is_list_sorted ODT_lt_dec (domain l) = true ->
+    compatible l l = true.
+  Proof.
+    intros.
+    induction l; try reflexivity.
+    assert (is_list_sorted ODT_lt_dec (domain l) = true)
+      by (apply (@rec_sorted_skip_first string ODT_string _ l a); assumption).
+    assert (NoDup (domain (a::l)))
+      by (apply is_list_sorted_NoDup_strlt; assumption).
+    inversion H2. subst.
+    specialize (IHl H1).
+    simpl. rewrite andb_true_inversion.
+    destruct a; simpl.
+    unfold compatible_with; simpl.
+    assert (assoc_lookupr equiv_dec l s = None) by
+        (apply assoc_lookupr_nin_none; assumption).
+    rewrite H3.
+    destruct (equiv_dec s s); try congruence.
+    destruct (equiv_dec a a); try congruence.
+    split; try reflexivity.
+    apply compatible_cons_r; try assumption.
+    simpl.
+    unfold compatible_with.
+    assert (assoc_lookupr equiv_dec l s = None) by
+        (apply assoc_lookupr_nin_none; assumption).
+    rewrite H4; reflexivity.
+  Qed.
+
+  Lemma merge_self_sorted {A} `{EqDec A eq} (l:list (string*A)):
+    is_list_sorted ODT_lt_dec (domain l) = true ->
+    merge_bindings l l = Some l.
+  Proof.
+    intros.
+    unfold merge_bindings.
+    rewrite compatible_self; try assumption.
+    f_equal.
+    apply rec_concat_sort_self; assumption.
+  Qed.
+
+  Lemma merge_self_sorted_r {A} `{EqDec A eq} (l:list (string*A)):
+    is_list_sorted ODT_lt_dec (domain l) = true ->
+    merge_bindings l (rec_sort l) = Some (rec_sort l).
+  Proof.
+    intros.
+    rewrite rec_sorted_id; try assumption.
+    apply merge_self_sorted; assumption.
+  Qed.
+
+  Lemma same_domain_merge_bindings_eq
+        {A} `{EqDec A eq} (l₁ l₂ l₃:list (string*A)) :
+    NoDup (domain l₁) ->
+    domain l₁ = domain l₂ ->
+    merge_bindings l₁ l₂ = Some l₃ ->
+    l₁ = l₂.
+  Proof.
+    unfold merge_bindings.
+    match_case; intros compat nd eqd eqq.
+    invcs eqq.
+    apply (same_domain_compatible _ _ nd eqd compat).
+  Qed.
+
+  Definition compatible {A:Type} `{x:EqDec A eq} := @compatible string A _ _ _ _.
+  
+  Lemma merge_returns_compatible {A} `{equiv:EqDec A eq} (l1 l2 l3:list (string*A)):
+    is_list_sorted ODT_lt_dec (domain l1) = true ->
+    is_list_sorted ODT_lt_dec (domain l2) = true ->
+    compatible l1 l2 = true ->
+    rec_concat_sort l1 l2 = l3 ->
+    compatible l1 l3 = true.
+  Proof.
+    intros.
+    assert (NoDup (domain l1)) by (apply is_list_sorted_NoDup_strlt; assumption).
+    assert (NoDup (domain l2)) by (apply is_list_sorted_NoDup_strlt; assumption).
+    unfold merge_bindings in H2.
+    unfold compatible, Compat.compatible in *.
+    rewrite forallb_forall in H1.
+    rewrite forallb_forall; intros.
+    destruct x; simpl in *.
+    specialize (H1 (s,a) H5).
+    simpl in *.
+    rewrite <- H2.
+    unfold compatible_with in *.
+    unfold rec_concat_sort.
+    rewrite (@assoc_lookupr_drec_sort string ODT_string).
+    simpl in *; unfold equiv_dec, string_eqdec in *.
+    rewrite (@assoc_lookupr_app string).
+    case_eq (assoc_lookupr string_dec l2 s); intros.
+    assert ((@assoc_lookupr string A
+                            (@Equivalence.equiv string (@eq string)
+                                                (@eq_equivalence string))
+                            (@complement string
+                                         (@Equivalence.equiv string (@eq string)
+                                                             (@eq_equivalence string))) string_dec l2 s ) =
+            (@assoc_lookupr string A (@eq string)
+                            (fun s1 s2 : string => not (@eq string s1 s2)) string_dec l2 s)) by reflexivity.
+    rewrite H7 in *.
+    rewrite H6 in H1.
+    - assumption.
+    - assert (assoc_lookupr string_dec l1 s = Some a).
+      apply in_assoc_lookupr_nodup; assumption.
+      unfold string_eqdec.
+      rewrite H7.
+      destruct (equiv a a); congruence.
+  Qed.
+  
+  Lemma merge_idem {A} `{EqDec A eq} (l l0 l1:list (string*A)):
+    is_list_sorted ODT_lt_dec (domain l) = true ->
+    is_list_sorted ODT_lt_dec (domain l0) = true ->
+    merge_bindings l l0 = Some l1 ->
+    merge_bindings l l1 = Some l1.
+  Proof.
+    intros.
+    unfold merge_bindings in *.
+    case_eq (compatible l l0); intros;
+      unfold compatible in *; rewrite H3 in H2; try congruence.
+    inversion H2; clear H2.
+    assert (compatible l (rec_concat_sort l l0) = true)
+      by (apply (merge_returns_compatible l l0 (rec_concat_sort l l0) H0 H1 H3); reflexivity).
+    unfold compatible in *. rewrite H2.
+    rewrite rec_concat_sort_idem; try assumption; reflexivity.
+  Qed.
+
+  (* merge_idem isn't true unless l is without duplicates! Here is a
+     counter example.
+   Open Scope string.
+   Definition tup1 := ("a",1) :: ("b",2) :: ("a", 3) :: nil.
+   Definition tup2 := ("c",2) :: nil.
+   Eval compute in (merge_bindings tup1 tup2).
+   Definition tup3 := [("a", 3); ("b", 2); ("c", 2)].
+   Eval compute in (compatible tup1 tup3).
+   *)
+
+End MergeBindings.
+
+Hint Resolve @merge_bindings_sorted.
 
 (* 
 *** Local Variables: ***

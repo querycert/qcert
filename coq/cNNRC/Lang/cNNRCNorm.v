@@ -82,7 +82,7 @@ Section cNNRCNorm.
       apply some_lift in H.
       destruct H; subst.
       constructor.
-      apply (rmap_Forall e H2); intros.
+      apply (lift_map_Forall e H2); intros.
       apply (IHe2 _ _ Hc H).
       constructor; eauto.
     - Case "NNRCIf"%string.

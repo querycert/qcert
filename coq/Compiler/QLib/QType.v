@@ -21,7 +21,7 @@ Require String.
 Require Import TypingRuntime.
 Require Import JSONtoData.
 Require DatatoSparkDF.
-Require RData.
+Require Data.
 Require TUtil.
 
 Module QType(runtime:CompilerRuntime).

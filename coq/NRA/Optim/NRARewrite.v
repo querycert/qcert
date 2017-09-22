@@ -145,18 +145,18 @@ Section NRARewrite.
     destruct o; try reflexivity; simpl.
     unfold olift in *.
     revert IHl.
-    generalize (rmap
+    generalize (lift_map
              (fun x : data =>
               match h ⊢ p1 @ₐ x ⊣ c with
               | Some x' => Some (dcoll (x' :: nil))
               | None => None
-              end) l); generalize (rmap (nra_eval h c p1) l); intros.
+              end) l); generalize (lift_map (nra_eval h c p1) l); intros.
     unfold lift in *; simpl.
     destruct o; destruct o0; simpl; try reflexivity; try congruence.
     - simpl in *.
-      unfold rflatten in *; simpl in *.
+      unfold oflatten in *; simpl in *.
       revert IHl.
-      generalize ((oflat_map
+      generalize ((lift_flat_map
                      (fun x : data =>
                         match x with
                           | dcoll y => Some y
@@ -165,9 +165,9 @@ Section NRARewrite.
       destruct o; try congruence.
       inversion IHl; clear IHl H0; reflexivity.
     - simpl in *.
-      unfold rflatten in *; simpl.
+      unfold oflatten in *; simpl.
       revert IHl.
-      generalize ((oflat_map
+      generalize ((lift_flat_map
                      (fun x : data =>
                         match x with
                           | dcoll y => Some y
@@ -243,7 +243,7 @@ Section NRARewrite.
     generalize (h ⊢ p1 @ₐ a ⊣ c); clear a; intros; simpl.
     destruct o; try reflexivity; simpl.
     revert IHl.
-    generalize (rmap
+    generalize (lift_map
               (fun x : data =>
                match
                  match h ⊢ p1 @ₐ x ⊣ c with
@@ -254,15 +254,15 @@ Section NRARewrite.
                | Some x' => Some (dcoll (x'::nil))
                | None => None
                end) l);
-    generalize (rmap
+    generalize (lift_map
             (fun x : data =>
              match h ⊢ p1 @ₐ x ⊣ c with
              | Some x' => Some (dcoll (x'::nil))
              | None => None
              end) l); intros.
     destruct o; destruct o0; try reflexivity; simpl; unfold lift_oncoll in *; simpl; try congruence.
-    - unfold rflatten in *; simpl in *.
-      revert IHl; generalize (oflat_map
+    - unfold oflatten in *; simpl in *.
+      revert IHl; generalize (lift_flat_map
                                 (fun x : data =>
                                    match x with
                                      | dcoll y => Some y
@@ -271,8 +271,8 @@ Section NRARewrite.
       destruct o; try reflexivity; simpl.
       inversion IHl; reflexivity.
       congruence.
-    - unfold rflatten in *; simpl.
-      revert IHl; generalize (oflat_map
+    - unfold oflatten in *; simpl.
+      revert IHl; generalize (lift_flat_map
                                 (fun x : data =>
                                    match x with
                                      | dcoll y => Some y
@@ -325,7 +325,7 @@ Section NRARewrite.
       destruct o0; try reflexivity; simpl.
       destruct (StringOrder.lt_dec s3 s1); try reflexivity; simpl.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try reflexivity; simpl.
@@ -389,7 +389,7 @@ Section NRARewrite.
       destruct (StringOrder.lt_dec s3 s2); try reflexivity; try congruence; simpl.
       destruct (StringOrder.lt_dec s1 s3); try reflexivity; try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s3); try congruence; simpl.
@@ -403,7 +403,7 @@ Section NRARewrite.
       destruct (string_dec s1 s3); try congruence; simpl.
       destruct (string_dec s1 s2); try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       destruct (string_dec s1 s1); try congruence; simpl.
       unfold rremove; simpl.
@@ -418,7 +418,7 @@ Section NRARewrite.
       assert (StringOrder.eq s1 s3) by (apply lt_contr1; assumption).
       congruence.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try congruence; simpl.

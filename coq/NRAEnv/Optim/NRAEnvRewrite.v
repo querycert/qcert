@@ -139,23 +139,23 @@ Section ROptimEnv.
     induction l; try reflexivity; simpl.
     generalize (h ⊢ₑ p2 @ₑ a ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
-    revert IHl; generalize (rmap (nraenv_core_eval h c p2 env) l); intros.
+    revert IHl; generalize (lift_map (nraenv_core_eval h c p2 env) l); intros.
     destruct o; try reflexivity; simpl.
     destruct (h ⊢ₑ p1 @ₑ d ⊣ c;env); try reflexivity; simpl.
-    revert IHl; generalize (rmap
+    revert IHl; generalize (lift_map
               (fun x0 : data =>
                match h ⊢ₑ p2 @ₑ x0 ⊣ c;env with
                | Some x'0 => h ⊢ₑ p1 @ₑ x'0 ⊣ c;env
                | None => None
                end) l); intros.
     destruct o; try reflexivity; simpl in *.
-    destruct (rmap (nraenv_core_eval h c p1 env) l0).
+    destruct (lift_map (nraenv_core_eval h c p1 env) l0).
     inversion IHl; reflexivity.
     congruence.
-    destruct (rmap (nraenv_core_eval h c p1 env) l0).
+    destruct (lift_map (nraenv_core_eval h c p1 env) l0).
     congruence.
     reflexivity.
-    revert IHl; generalize (rmap
+    revert IHl; generalize (lift_map
               (fun x0 : data =>
                match h ⊢ₑ p2 @ₑ x0 ⊣ c;env with
                | Some x'0 => h ⊢ₑ p1 @ₑ x'0 ⊣ c;env
@@ -186,9 +186,9 @@ Section ROptimEnv.
     unfold olift; simpl.
     destruct d; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    unfold lift, rflatten in *; simpl in *.
+    unfold lift, oflatten in *; simpl in *.
     destruct a; try reflexivity.
-    revert IHl; generalize (oflat_map
+    revert IHl; generalize (lift_flat_map
                 (fun x : data =>
                  match x with
                  | dcoll y => Some y
@@ -230,7 +230,7 @@ Section ROptimEnv.
     generalize (h ⊢ₑ p1 @ₑ a ⊣ c;env); clear a; intros.
     destruct o; try reflexivity; simpl.
     unfold lift in *; simpl in *.
-    revert IHl; generalize (rmap (nraenv_core_eval h c p1 env) l); intros.
+    revert IHl; generalize (lift_map (nraenv_core_eval h c p1 env) l); intros.
     destruct o; try reflexivity; try congruence.
     unfold lift_oncoll in *; simpl in *.
     rewrite app_nil_r.
@@ -248,7 +248,7 @@ Section ROptimEnv.
     destruct d; simpl; trivial.
     induction l; simpl; trivial.
     unfold lift in *.
-    destruct ( rmap
+    destruct ( lift_map
                 (fun x0 : data =>
                  match h ⊢ₑ p₂ @ₑ x0 ⊣ c; env with
                  | Some (dleft dl) => h ⊢ₑ p₁ @ₑ dl ⊣ c; env
@@ -256,7 +256,7 @@ Section ROptimEnv.
                  | Some _ => None
                  | None => None
                  end) l); simpl in *;
-    destruct (rmap
+    destruct (lift_map
               (fun x0 : data =>
                match h ⊢ₑ p₂ @ₑ x0 ⊣ c; env with
                | Some (dleft dl) =>
@@ -264,7 +264,7 @@ Section ROptimEnv.
                    | Some x'0 =>
                        lift_oncoll
                          (fun l1 : list data =>
-                          match rflatten l1 with
+                          match oflatten l1 with
                           | Some a' => Some (dcoll a')
                           | None => None
                           end) x'0
@@ -275,99 +275,99 @@ Section ROptimEnv.
                | None => None
                end) l); simpl in * .
     - destruct (h ⊢ₑ p₂ @ₑ a ⊣ c; env); simpl; trivial.
-      case_eq (rflatten l0);
+      case_eq (oflatten l0);
         [intros ? eqq0 | intros eqq0]; rewrite eqq0 in *;
-        (case_eq (rflatten l1);
+        (case_eq (oflatten l1);
          [intros ? eqq1 | intros eqq1]; rewrite eqq1 in *;
            simpl in IHl); try discriminate.
-      + case_eq (rflatten l2);
+      + case_eq (oflatten l2);
         [intros ? eqq2 | intros eqq2]; try rewrite eqq2 in *;
         try discriminate.
         inversion IHl; clear IHl; subst.
         destruct d; simpl; trivial.
         * destruct (h ⊢ₑ p₁ @ₑ d ⊣ c; env); simpl; trivial.
           destruct d0; simpl; trivial.
-          rewrite (rflatten_cons _ _ _ eqq0).
+          rewrite (oflatten_cons _ _ _ eqq0).
           simpl.
-          { case_eq (rflatten l4);
+          { case_eq (oflatten l4);
             [intros ? eqq4 | intros eqq4]; simpl.
-            - rewrite (rflatten_cons _ _ _ eqq1).
-              rewrite (rflatten_app _ _ _ _ eqq4 eqq2).
+            - rewrite (oflatten_cons _ _ _ eqq1).
+              rewrite (oflatten_app _ _ _ _ eqq4 eqq2).
               trivial.
-            -  rewrite (rflatten_app_none1 _ _ eqq4).
+            -  rewrite (oflatten_app_none1 _ _ eqq4).
                trivial.
           } 
-        * rewrite (rflatten_cons _ _ _ eqq0).
-          rewrite (rflatten_cons _ _ _ eqq1).
+        * rewrite (oflatten_cons _ _ _ eqq0).
+          rewrite (oflatten_cons _ _ _ eqq1).
           simpl.
           rewrite eqq2.
           trivial.
-      +  case_eq (rflatten l2);
+      +  case_eq (oflatten l2);
         [intros ? eqq2 | intros eqq2]; try rewrite eqq2 in *;
         try discriminate.
          destruct d; simpl; trivial.
         * destruct (h ⊢ₑ p₁ @ₑ d ⊣ c; env); simpl; trivial.
           destruct d0; simpl; trivial.
-          rewrite (rflatten_cons _ _ _ eqq0).
+          rewrite (oflatten_cons _ _ _ eqq0).
           simpl.
-          rewrite (rflatten_app_none2 _ _ eqq2).
-          destruct (rflatten l3); simpl; trivial.
-          rewrite (rflatten_cons_none _ _ eqq1).
+          rewrite (oflatten_app_none2 _ _ eqq2).
+          destruct (oflatten l3); simpl; trivial.
+          rewrite (oflatten_cons_none _ _ eqq1).
           trivial.
-        * rewrite (rflatten_cons _ _ _ eqq0).
+        * rewrite (oflatten_cons _ _ _ eqq0).
           simpl.
-          rewrite (rflatten_cons_none _ _ eqq1).
+          rewrite (oflatten_cons_none _ _ eqq1).
           rewrite eqq2.
           trivial.
       + destruct d; simpl; trivial.
         * destruct (h ⊢ₑ p₁ @ₑ d ⊣ c; env); simpl; trivial.
-          rewrite (rflatten_cons_none _ _ eqq0).
+          rewrite (oflatten_cons_none _ _ eqq0).
           destruct d0; simpl; trivial.
-          destruct (rflatten l2); simpl; trivial.
-          rewrite (rflatten_cons_none _ _ eqq1).
+          destruct (oflatten l2); simpl; trivial.
+          rewrite (oflatten_cons_none _ _ eqq1).
           trivial.
-        * rewrite (rflatten_cons_none _ _ eqq0).
-          rewrite (rflatten_cons_none _ _ eqq1).
+        * rewrite (oflatten_cons_none _ _ eqq0).
+          rewrite (oflatten_cons_none _ _ eqq1).
           trivial.
     - destruct (h ⊢ₑ p₂ @ₑ a ⊣ c; env); simpl; trivial.
       destruct d; simpl; trivial.
       + destruct (h ⊢ₑ p₁ @ₑ d ⊣ c; env); simpl; trivial.
         destruct d0; simpl; trivial.
-        case_eq (rflatten l0);
+        case_eq (oflatten l0);
           [intros ? eqq0 | intros eqq0]; rewrite eqq0 in *; simpl in *.
-        * case_eq (rflatten l2);
+        * case_eq (oflatten l2);
           [intros ? eqq2 | intros eqq2]; rewrite eqq2 in *; try discriminate.
-          rewrite (rflatten_cons _ _ _ eqq0); simpl.
-          rewrite (rflatten_app_none2 _ _ eqq2).
-          destruct (rflatten l1); trivial.
-        * rewrite (rflatten_cons_none _ _ eqq0).
-          destruct (rflatten l1); trivial.
-      + case_eq (rflatten l0);
+          rewrite (oflatten_cons _ _ _ eqq0); simpl.
+          rewrite (oflatten_app_none2 _ _ eqq2).
+          destruct (oflatten l1); trivial.
+        * rewrite (oflatten_cons_none _ _ eqq0).
+          destruct (oflatten l1); trivial.
+      + case_eq (oflatten l0);
             [intros ? eqq0 | intros eqq0]; rewrite eqq0 in *; simpl in *.
-        * case_eq (rflatten l1);
+        * case_eq (oflatten l1);
           [intros ? eqq1 | intros eqq1]; rewrite eqq1 in *; try discriminate.
-          rewrite (rflatten_cons _ _ _ eqq0); simpl.
+          rewrite (oflatten_cons _ _ _ eqq0); simpl.
           rewrite eqq1.
           trivial.
-        * rewrite (rflatten_cons_none _ _ eqq0).
+        * rewrite (oflatten_cons_none _ _ eqq0).
           trivial.
-    - case_eq (rflatten l0);
+    - case_eq (oflatten l0);
       [intros ? eqq0 | intros eqq0];
        rewrite eqq0 in *; simpl in *; try discriminate.
       destruct (h ⊢ₑ p₂ @ₑ a ⊣ c; env); simpl; trivial.
       destruct d; simpl; trivial.
       + destruct (h ⊢ₑ p₁ @ₑ d ⊣ c; env); simpl; trivial.
         destruct d0; simpl; trivial.
-        destruct (rflatten l1); simpl; trivial.
-        rewrite (rflatten_cons_none _ _ eqq0).
+        destruct (oflatten l1); simpl; trivial.
+        rewrite (oflatten_cons_none _ _ eqq0).
         trivial.
-      + rewrite (rflatten_cons_none _ _ eqq0).
+      + rewrite (oflatten_cons_none _ _ eqq0).
         trivial.
     - destruct (h ⊢ₑ p₂ @ₑ a ⊣ c; env); simpl; trivial.
       destruct d; simpl; trivial.
       destruct (h ⊢ₑ p₁ @ₑ d ⊣ c; env); simpl; trivial.
       destruct d0; simpl; trivial.
-      destruct (rflatten l0); simpl; trivial.
+      destruct (oflatten l0); simpl; trivial.
   Qed.
       
   (* ♯flatten( ‵{| p1 ⊗ p2 |} ) ≡ p1 ⊗ p2 *)
@@ -386,8 +386,8 @@ Section ROptimEnv.
   (* ♯flatten(χ⟨ χ⟨ { ID } ⟩( ♯flatten( p1 ) ) ⟩( p2 ))
             ≡ χ⟨ { ID } ⟩(♯flatten(χ⟨ ♯flatten( p1 ) ⟩( p2 ))) *)
 
-  Lemma rmap_to_map l :
-    rmap (fun x : data => Some (dcoll (x :: nil))) l =
+  Lemma lift_map_to_map l :
+    lift_map (fun x : data => Some (dcoll (x :: nil))) l =
     Some (map (fun x : data => (dcoll (x :: nil))) l).
   Proof.
     induction l; [reflexivity|simpl; rewrite IHl; reflexivity].
@@ -405,31 +405,31 @@ Section ROptimEnv.
     induction l; try reflexivity; simpl.
     generalize (h ⊢ₑ p1 @ₑ a ⊣ c;env); clear a; intros.
     destruct o; try reflexivity; simpl.
-    destruct (lift_oncoll (fun l0 : list data => lift dcoll (rflatten l0)) d); try reflexivity; simpl.
+    destruct (lift_oncoll (fun l0 : list data => lift dcoll (oflatten l0)) d); try reflexivity; simpl.
     unfold lift in *; simpl in *.
-    destruct (         rmap
+    destruct (         lift_map
            (fun x : data =>
             match h ⊢ₑ p1 @ₑ x ⊣ c;env with
             | Some x' =>
                 lift_oncoll
                   (fun l0 : list data =>
-                   match rflatten l0 with
+                   match oflatten l0 with
                    | Some a' => Some (dcoll a')
                    | None => None
                    end) x'
             | None => None
             end) l); try reflexivity; try congruence; simpl in *.
-    - unfold rflatten, lift_oncoll in *; simpl in *.
+    - unfold oflatten, lift_oncoll in *; simpl in *.
       destruct d0; try reflexivity; try congruence; simpl in *.
-      generalize (rmap_to_map l1); intros.
+      generalize (lift_map_to_map l1); intros.
       rewrite H; clear H; simpl.
-      destruct (            rmap
+      destruct (            lift_map
               (fun x : data =>
                match
                  match h ⊢ₑ p1 @ₑ x ⊣ c;env with
                  | Some (dcoll l1) =>
                      match
-                       oflat_map
+                       lift_flat_map
                          (fun x0 : data =>
                           match x0 with
                           | dcoll y => Some y
@@ -444,7 +444,7 @@ Section ROptimEnv.
                with
                | Some (dcoll l1) =>
                    match
-                     rmap (fun x0 : data => Some (dcoll (x0 :: nil))) l1
+                     lift_map (fun x0 : data => Some (dcoll (x0 :: nil))) l1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
@@ -452,50 +452,50 @@ Section ROptimEnv.
                | _ => None
                end) l
                ); try reflexivity; try congruence; simpl in *.
-      destruct ((oflat_map
+      destruct ((lift_flat_map
           (fun x : data =>
            match x with
            | dcoll y => Some y
            | _ => None
            end) l2)); try reflexivity; try congruence; simpl in *.
-      destruct (       (oflat_map
+      destruct (       (lift_flat_map
           (fun x : data =>
            match x with
            | dcoll y => Some y
            | _ => None
            end) l0)); try reflexivity; try congruence; simpl in *.
-      generalize (rmap_to_map l4); intros.
+      generalize (lift_map_to_map l4); intros.
       rewrite H in *; clear H.
-      generalize (rmap_to_map (l1++l4)); intros.
+      generalize (lift_map_to_map (l1++l4)); intros.
       rewrite H in *; clear H.
       inversion IHl; clear IHl H0.
       * rewrite map_app; simpl; reflexivity.
-      * destruct ((oflat_map
+      * destruct ((lift_flat_map
                    (fun x : data =>
                       match x with
                         | dcoll y => Some y
                         | _ => None
                       end) l0)); try reflexivity; try congruence; simpl in *.
-        generalize (rmap_to_map l3); intros.
+        generalize (lift_map_to_map l3); intros.
         rewrite H in *; clear H; congruence.
-      * destruct ((oflat_map
+      * destruct ((lift_flat_map
                      (fun x : data =>
                         match x with
                           | dcoll y => Some y
                           | _ => None
                         end) l0)); try reflexivity; try congruence; simpl in *.
-        generalize (rmap_to_map l2); intros.
+        generalize (lift_map_to_map l2); intros.
         rewrite H in *; clear H; congruence.
     - destruct d0; try reflexivity; try congruence; simpl in *.
-      destruct (rmap (fun x : data => Some (dcoll (x :: nil))) l0); try reflexivity; try congruence; simpl.
-      destruct (            rmap
+      destruct (lift_map (fun x : data => Some (dcoll (x :: nil))) l0); try reflexivity; try congruence; simpl.
+      destruct (            lift_map
               (fun x : data =>
                match
                  match h ⊢ₑ p1 @ₑ x ⊣ c;env with
                  | Some x' =>
                      lift_oncoll
                        (fun l0 : list data =>
-                        match rflatten l0 with
+                        match oflatten l0 with
                         | Some a' => Some (dcoll a')
                         | None => None
                         end) x'
@@ -506,15 +506,15 @@ Section ROptimEnv.
                    lift_oncoll
                      (fun c1 : list data =>
                       match
-                        rmap (fun x0 : data => Some (dcoll (x0 :: nil))) c1
+                        lift_map (fun x0 : data => Some (dcoll (x0 :: nil))) c1
                       with
                       | Some a' => Some (dcoll a')
                       | None => None
                       end) x'
                | None => None
                end) l); try reflexivity; try congruence; simpl in *.
-      unfold rflatten in *; simpl.
-      destruct (oflat_map
+      unfold oflatten in *; simpl.
+      destruct (lift_flat_map
             (fun x : data =>
              match x with
              | dcoll y => Some y
@@ -536,18 +536,18 @@ Section ROptimEnv.
     destruct o; try reflexivity; simpl.
     unfold olift in *.
     revert IHl.
-    generalize (rmap
+    generalize (lift_map
              (fun x : data =>
               match h ⊢ₑ p1 @ₑ x ⊣ c;env with
               | Some x' => Some (dcoll (x' :: nil))
               | None => None
-              end) l); generalize (rmap (nraenv_core_eval h c p1 env) l); intros.
+              end) l); generalize (lift_map (nraenv_core_eval h c p1 env) l); intros.
     unfold lift in *; simpl.
     destruct o; destruct o0; simpl; try reflexivity; try congruence.
     - simpl in *.
-      unfold rflatten in *; simpl in *.
+      unfold oflatten in *; simpl in *.
       revert IHl.
-      generalize ((oflat_map
+      generalize ((lift_flat_map
                      (fun x : data =>
                         match x with
                           | dcoll y => Some y
@@ -556,9 +556,9 @@ Section ROptimEnv.
       destruct o; try congruence.
       inversion IHl; clear IHl H0; reflexivity.
     - simpl in *.
-      unfold rflatten in *; simpl.
+      unfold oflatten in *; simpl.
       revert IHl.
-      generalize ((oflat_map
+      generalize ((lift_flat_map
                      (fun x : data =>
                         match x with
                           | dcoll y => Some y
@@ -591,30 +591,30 @@ Section ROptimEnv.
     clear d dn_d.
     induction l; simpl; trivial.
     destruct a; simpl; trivial.
-    case_eq (rflatten l); [intros ? eqq1 | intros eqq1];
+    case_eq (oflatten l); [intros ? eqq1 | intros eqq1];
     rewrite eqq1 in IHl; simpl in *;
-    [rewrite (rflatten_cons _ _ _ eqq1) | rewrite (rflatten_cons_none _ _ eqq1)]
-    ; (case_eq (rmap
+    [rewrite (oflatten_cons _ _ _ eqq1) | rewrite (oflatten_cons_none _ _ eqq1)]
+    ; (case_eq (lift_map
                  (fun x : data =>
                   lift_oncoll
                     (fun c1 : list data =>
-                     lift dcoll (rmap (nraenv_core_eval br c p₁ env) c1)) x) l);  [intros ? eqq2 | intros eqq2];
+                     lift dcoll (lift_map (nraenv_core_eval br c p₁ env) c1)) x) l);  [intros ? eqq2 | intros eqq2];
      rewrite eqq2 in IHl; simpl in * ).
     - apply lift_injective in IHl; [ | inversion 1; trivial].
-      rewrite rmap_over_app.
+      rewrite lift_map_over_app.
       rewrite IHl.
-      destruct (rmap (nraenv_core_eval br c p₁ env) l0); simpl; trivial.
+      destruct (lift_map (nraenv_core_eval br c p₁ env) l0); simpl; trivial.
     - apply none_lift in IHl.
-      rewrite rmap_over_app.
+      rewrite lift_map_over_app.
       rewrite IHl; simpl.
-      destruct (rmap (nraenv_core_eval br c p₁ env) l0); simpl; trivial.
+      destruct (lift_map (nraenv_core_eval br c p₁ env) l0); simpl; trivial.
     - clear IHl.
       cut False; [intuition | ].
       revert eqq1 l1 eqq2.
       induction l; simpl in *; try discriminate.
       destruct a; simpl in *; try discriminate.
       intros.
-      unfold rflatten in *.
+      unfold oflatten in *.
       simpl in *.
       apply none_lift in eqq1.
       specialize (IHl eqq1); clear eqq1.
@@ -636,10 +636,10 @@ Section ROptimEnv.
     induction l; simpl; trivial.
     simpl.
     destruct a; simpl; trivial.
-    case_eq (rflatten l); [intros ? eqq1 | intros eqq1];
+    case_eq (oflatten l); [intros ? eqq1 | intros eqq1];
     rewrite eqq1 in IHl; simpl in *;
-    [rewrite (rflatten_cons _ _ _ eqq1) | rewrite (rflatten_cons_none _ _ eqq1)];
-    (case_eq (rmap
+    [rewrite (oflatten_cons _ _ _ eqq1) | rewrite (oflatten_cons_none _ _ eqq1)];
+    (case_eq (lift_map
                 (fun x : data =>
                  lift_oncoll
                    (fun c1 : list data =>
@@ -678,7 +678,7 @@ Section ROptimEnv.
       induction l; simpl in *; try discriminate.
       destruct a; simpl in *; try discriminate.
       intros.
-      unfold rflatten in *.
+      unfold oflatten in *.
       simpl in *.
       apply none_lift in eqq1.
       specialize (IHl eqq1); clear eqq1.
@@ -779,10 +779,10 @@ Section ROptimEnv.
     unfold lift_oncoll; simpl.
     destruct d; try reflexivity; simpl.
     unfold olift, lift; simpl.
-    destruct (rflatten l); try reflexivity; clear l; simpl.
+    destruct (oflatten l); try reflexivity; clear l; simpl.
     induction l0; try reflexivity; simpl.
     unfold lift; simpl.
-    revert IHl0; destruct (rmap (fun x: data => Some x) l0); congruence.
+    revert IHl0; destruct (lift_map (fun x: data => Some x) l0); congruence.
   Qed.
 
   (* { [ s1 : p1 ] } × { [ s2 : p2 ] } ≡ { [ s1 : p1; s2 : p2 ] } *)
@@ -969,8 +969,8 @@ Section ROptimEnv.
     rewrite H0; simpl.
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;d); try reflexivity; simpl.
     f_equal; unfold lift in *; simpl in *.
-    destruct (rmap (nraenv_core_eval h c p1 d) l);
-      destruct (rmap
+    destruct (lift_map (nraenv_core_eval h c p1 d) l);
+      destruct (lift_map
             (fun x0 : data =>
              olift (fun env' : data => h ⊢ₑ p1 @ₑ x0 ⊣ c;env') (h ⊢ₑ p0 @ₑ x0 ⊣ c;env)) l); congruence.
   Qed.    
@@ -1125,7 +1125,7 @@ Section ROptimEnv.
       destruct o0; try reflexivity; simpl.
       destruct (StringOrder.lt_dec s3 s1); try reflexivity; simpl.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try reflexivity; simpl.
@@ -1190,7 +1190,7 @@ Section ROptimEnv.
       destruct (StringOrder.lt_dec s3 s2); try reflexivity; try congruence; simpl.
       destruct (StringOrder.lt_dec s1 s3); try reflexivity; try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s3); try congruence; simpl.
@@ -1204,7 +1204,7 @@ Section ROptimEnv.
       destruct (string_dec s1 s3); try congruence; simpl.
       destruct (string_dec s1 s2); try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try congruence; simpl.
@@ -1219,7 +1219,7 @@ Section ROptimEnv.
       assert (StringOrder.eq s1 s3) by (apply lt_contr1; assumption).
       congruence.
       unfold lift; simpl.
-      unfold rmap_product, oomap_concat; simpl.
+      unfold omap_product, oncoll_map_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try congruence; simpl.
@@ -1323,7 +1323,7 @@ Section ROptimEnv.
   Proof.
     unfold nraenv_core_eq; intros ? ? _ ? _ ? _; simpl.
     destruct env; try reflexivity; simpl.
-    case_eq (RRelation.edot l s); intros; try reflexivity; assumption.
+    case_eq (edot l s); intros; try reflexivity; assumption.
   Qed.
 
   Lemma app_over_appenv p1 p2 p3:
@@ -1419,17 +1419,17 @@ Section ROptimEnv.
     destruct (h ⊢ₑ p1 @ₑ x ⊣ c;a); try reflexivity; simpl.
     apply f_equal.
     revert IHl.
-    destruct ((rmap (fun env' : data => h ⊢ₑ p1 @ₑ x ⊣ c;env') l));
-      destruct ((rmap
+    destruct ((lift_map (fun env' : data => h ⊢ₑ p1 @ₑ x ⊣ c;env') l));
+      destruct ((lift_map
                    (fun env' : data =>
                       olift (fun d1 : data => Some (dcoll (d1 :: nil)))
                             (h ⊢ₑ p1 @ₑ x ⊣ c;env')) l)); intros; simpl in *; try congruence.
-    rewrite (rflatten_cons (d::nil) l1 l0).
+    rewrite (oflatten_cons (d::nil) l1 l0).
     auto.
-    destruct (rflatten l1); simpl in *; congruence.
+    destruct (oflatten l1); simpl in *; congruence.
     unfold lift in *.
-    case_eq (rflatten l0); intros; simpl in *; try (rewrite H in *; congruence).
-    unfold rflatten in *; simpl.
+    case_eq (oflatten l0); intros; simpl in *; try (rewrite H in *; congruence).
+    unfold oflatten in *; simpl.
     rewrite H.
     reflexivity.
   Qed.
@@ -1475,7 +1475,7 @@ Section ROptimEnv.
     f_equal.
     destruct d; try reflexivity; simpl.
     destruct b; try reflexivity; simpl.
-    - destruct ((rmap
+    - destruct ((lift_map
                 (fun x0 : data =>
                  lift dcoll
                    match
@@ -1493,14 +1493,14 @@ Section ROptimEnv.
           | Some (dbool b) => Some b
           | _ => None
           end) l); simpl in *.
-      rewrite rflatten_cons with (r' := l1).
+      rewrite oflatten_cons with (r' := l1).
       simpl.
       reflexivity.
       unfold lift in IHl.
-      destruct (rflatten l0); try congruence.
+      destruct (oflatten l0); try congruence.
       unfold lift in IHl.
-      unfold rflatten in *; simpl in *.
-      destruct (oflat_map
+      unfold oflatten in *; simpl in *.
+      destruct (lift_flat_map
             (fun x0 : data =>
              match x0 with
              | dcoll y => Some y
@@ -1508,7 +1508,7 @@ Section ROptimEnv.
              end) l0); try congruence; try reflexivity.
       congruence.
       reflexivity.
-    - destruct ((rmap
+    - destruct ((lift_map
                 (fun x0 : data =>
                  lift dcoll
                    match
@@ -1526,14 +1526,14 @@ Section ROptimEnv.
           | Some (dbool b) => Some b
           | _ => None
           end) l); simpl in *.
-      rewrite rflatten_cons with (r' := l1).
+      rewrite oflatten_cons with (r' := l1).
       reflexivity.
       unfold lift in *.
-      destruct (rflatten l0); simpl in *.
+      destruct (oflatten l0); simpl in *.
       inversion IHl; reflexivity.
       congruence.
-      unfold rflatten in *; simpl in *.
-      destruct ((oflat_map
+      unfold oflatten in *; simpl in *.
+      destruct ((lift_flat_map
              (fun x0 : data =>
               match x0 with
               | dcoll y => Some y
@@ -1555,11 +1555,11 @@ Section ROptimEnv.
     induction l; try reflexivity; simpl.
     rewrite (nraenv_core_ignores_id_swap p1 H h c a x a).
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;a); try reflexivity; simpl.
-    destruct ((rmap
+    destruct ((lift_map
              (fun env' : data =>
               olift (fun d1 : data => Some (dcoll (d1 :: nil)))
                     (h ⊢ₑ p1 @ₑ x ⊣ c;env')) l));
-      destruct ((rmap
+      destruct ((lift_map
            (fun x0 : data =>
             olift (fun d1 : data => Some (dcoll (d1 :: nil))) (h ⊢ₑ p1 @ₑ x0 ⊣ c;x0))
            l)); simpl in *; congruence.
@@ -1640,7 +1640,7 @@ Section ROptimEnv.
   Qed.
 
   Lemma rproject_over_const sl l :
-    π[sl](ANConst (drec l)) ≡ₑ ANConst (drec (RRelation.rproject l sl)).
+    π[sl](ANConst (drec l)) ≡ₑ ANConst (drec (RecOperators.rproject l sl)).
   Proof.
     red; simpl; intros.
     rewrite rproject_rec_sort_commute.
@@ -1691,43 +1691,43 @@ Section ROptimEnv.
     unfold lift, olift.
     induction l; simpl; trivial.
     destruct (h ⊢ₑ p₂ @ₑ a ⊣ c; env); simpl; trivial.
-    destruct (rmap
+    destruct (lift_map
               (fun x0 : data =>
                match h ⊢ₑ p₂ @ₑ x0 ⊣ c; env with
                | Some x'0 =>
                    lift_oncoll
                      (fun c1 : list data =>
-                      match rmap (nraenv_core_eval h c p₁ env) c1 with
+                      match lift_map (nraenv_core_eval h c p₁ env) c1 with
                       | Some a' => Some (dcoll a')
                       | None => None
                       end) x'0
                | None => None
                end) l);
-      destruct (rmap (nraenv_core_eval h c p₂ env) l);
+      destruct (lift_map (nraenv_core_eval h c p₂ env) l);
       simpl in * .
-    - destruct (rmap
+    - destruct (lift_map
             (fun x0 : data =>
              lift_oncoll
                (fun c1 : list data =>
-                match rmap (nraenv_core_eval h c p₁ env) c1 with
+                match lift_map (nraenv_core_eval h c p₁ env) c1 with
                 | Some a' => Some (dcoll a')
                 | None => None
                 end) x0) l1); try discriminate.
       inversion IHl; clear IHl; subst.
       trivial.
     - discriminate.
-    - destruct (rmap
+    - destruct (lift_map
             (fun x0 : data =>
              lift_oncoll
                (fun c1 : list data =>
-                match rmap (nraenv_core_eval h c p₁ env) c1 with
+                match lift_map (nraenv_core_eval h c p₁ env) c1 with
                 | Some a' => Some (dcoll a')
                 | None => None
                 end) x0) l0); try discriminate.
       trivial.
     - destruct ( lift_oncoll
          (fun c1 : list data =>
-          match rmap (nraenv_core_eval h c p₁ env) c1 with
+          match lift_map (nraenv_core_eval h c p₁ env) c1 with
           | Some a' => Some (dcoll a')
           | None => None
           end) d); trivial.

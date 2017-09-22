@@ -22,11 +22,12 @@ Section BinaryOperatorsSem.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
-  Require Import RData.
-  Require Import RDataNorm.
-  Require Import RRelation.
-  Require Import OperatorsUtils.
+  Require Import Data.
+  Require Import DataLift.
+  Require Import DataNorm.
   Require Import ForeignOperators.
+  Require Import OperatorsUtils.
+  Require Import Iterators.
   Require Export BinaryOperators.
   
   (* Algebra Unary/Binary Ops *)

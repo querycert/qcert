@@ -83,7 +83,7 @@ Section NNRCMRRewrite.
     is_flatten_function (x,n) = true ->
     forall d,
       lookup equiv_dec env x = Some d ->
-      (nnrc_core_eval h empty_cenv env n) = lift_oncoll (fun l => (lift dcoll (rflatten l))) d.
+      (nnrc_core_eval h empty_cenv env n) = lift_oncoll (fun l => (lift dcoll (oflatten l))) d.
   Proof.
     intros Hfun d Henv.
     simpl in *.
@@ -103,7 +103,7 @@ Section NNRCMRRewrite.
       unfold equiv_decb in *.
       repeat dest_eqdec; try congruence.
       rewrite Henv; simpl.
-      destruct (lift_oncoll (fun l : list data => lift dcoll (rflatten l)) d); reflexivity.
+      destruct (lift_oncoll (fun l : list data => lift dcoll (oflatten l)) d); reflexivity.
   Qed.
 
   (* Coll/Uncoll functions *)
@@ -170,13 +170,13 @@ Section NNRCMRRewrite.
         destruct n; try congruence; simpl in *.
         * unfold equiv_decb in *.
           repeat dest_eqdec; try congruence.
-          apply rmap_id.
+          apply lift_map_id.
         * destruct u; try congruence; simpl in *.
           destruct n; try congruence; simpl in *.
           unfold equiv_decb in *.
           repeat dest_eqdec; try congruence.
           simpl.
-          apply rmap_id.
+          apply lift_map_id.
     - Case "MapDistFlatten"%string.
       destruct p; try congruence; simpl in *.
       destruct n; try congruence; simpl in *.
@@ -238,7 +238,7 @@ Section NNRCMRRewrite.
 
   Lemma flatten_dist_map_correct mr_map coll:
     is_flatten_dist_map mr_map = true ->
-    mr_map_eval h mr_map (Ddistr coll) = rflatten coll.
+    mr_map_eval h mr_map (Ddistr coll) = oflatten coll.
   Proof.
     intros.
     unfold mr_map_eval; simpl.
@@ -247,13 +247,13 @@ Section NNRCMRRewrite.
     destruct n; try congruence; simpl in *.
     + unfold equiv_decb in *.
       repeat dest_eqdec; try congruence; simpl.
-      rewrite rmap_id.
+      rewrite lift_map_id.
       reflexivity.
     + destruct u; try congruence; simpl in *.
       destruct n; try congruence; simpl in *.
       unfold equiv_decb in *;
       repeat dest_eqdec; try congruence; simpl.
-      rewrite rmap_id.
+      rewrite lift_map_id.
       reflexivity.
   Qed.
 
@@ -493,9 +493,9 @@ Section NNRCMRRewrite.
     map_well_localized mr.(mr_map) loc_d ->
     match loc_d with
     | Ddistr coll =>
-      mr_eval h mr loc_d = lift (fun l => Dlocal (dcoll l)) (rflatten coll)
+      mr_eval h mr loc_d = lift (fun l => Dlocal (dcoll l)) (oflatten coll)
     | Dlocal d =>
-      mr_eval h mr loc_d = lift (fun l => Dlocal (dcoll l)) (rflatten (d::nil))
+      mr_eval h mr loc_d = lift (fun l => Dlocal (dcoll l)) (oflatten (d::nil))
     end.
   Proof.
     intros Hmr Hwell_localized.
@@ -521,7 +521,7 @@ Section NNRCMRRewrite.
         unfold equiv_decb in *.
         repeat dest_eqdec; try congruence.
         simpl.
-        destruct (rflatten l); reflexivity.
+        destruct (oflatten l); reflexivity.
       + destruct n1; try congruence; simpl in *.
         destruct u; try congruence; simpl in *.
         destruct n1; try congruence; simpl in *.
@@ -531,7 +531,7 @@ Section NNRCMRRewrite.
         unfold equiv_decb in *.
         repeat dest_eqdec; try congruence.
         simpl.
-        destruct (rflatten l); reflexivity.
+        destruct (oflatten l); reflexivity.
   Qed.
 
   (* Collect M/R *)
@@ -611,7 +611,7 @@ Section NNRCMRRewrite.
     unfold mr_eval; simpl.
     rewrite dispatch_map_correct; [|assumption].
     unfold mr_reduce_eval; simpl.
-    destruct (rflatten coll); reflexivity.
+    destruct (oflatten coll); reflexivity.
   Qed.
 
   (***************
@@ -665,11 +665,11 @@ Section NNRCMRRewrite.
       unfold equiv_decb in *;
       repeat dest_eqdec; try congruence; simpl.
       destruct
-        (rmap
+        (lift_map
            (fun d0 : data =>
               let (doc, body) := p in nnrc_core_eval h empty_cenv ((doc, d0) :: nil) body) l);
         simpl; try reflexivity.
-      destruct (rflatten l0);
+      destruct (oflatten l0);
         simpl; try reflexivity.
     - destruct n1; simpl in *; try congruence.
       destruct u; simpl in *; try congruence.
@@ -680,7 +680,7 @@ Section NNRCMRRewrite.
       rewrite Bool.andb_true_iff in Heq.
       destruct Heq.
       destruct
-        (rmap
+        (lift_map
            (fun d : data =>
               let (doc, body) := p in nnrc_core_eval h empty_cenv ((doc, d) :: nil) body) l);
         simpl; try reflexivity.
@@ -691,7 +691,7 @@ Section NNRCMRRewrite.
       [ | unfold equiv_decb in *;
           repeat dest_eqdec; try congruence ].
       simpl.
-      destruct (rflatten l0);
+      destruct (oflatten l0);
         simpl; try reflexivity.
   Qed.
 
@@ -1070,7 +1070,7 @@ Section NNRCMRRewrite.
     simpl.
     destruct loc_d; simpl in *; try contradiction.
     dest_eqdec; try congruence; simpl.
-    destruct (rmap
+    destruct (lift_map
                  (fun d : data =>
                   let (doc, body) := p in nnrc_core_eval h empty_cenv ((doc, d) :: nil) body)
                  l);
@@ -1082,7 +1082,7 @@ Section NNRCMRRewrite.
     repeat dest_eqdec; try congruence; simpl.
     rewrite (flatten_dist_map_correct _ _ Hmr2_map_is_flatten).
     simpl.
-    destruct (olift (mr_reduce_eval h (mr_reduce mr2)) (rflatten l0));
+    destruct (olift (mr_reduce_eval h (mr_reduce mr2)) (oflatten l0));
       simpl; try congruence.
     unfold merge_env; simpl.
     repeat dest_eqdec; try congruence; simpl.

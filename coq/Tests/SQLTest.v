@@ -25,7 +25,7 @@ Delimit Scope data_scope with data.
 Notation "⊥" := (dunit) : data_scope. (* null value *)
 
 Notation "[||]" := (drec nil) : data_scope. (* records *)
-Notation "[| x1 ; .. ; xn |]" := (RData.drec (cons x1 .. (cons xn nil) ..)) : data_scope.
+Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_scope.
 
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
@@ -34,7 +34,7 @@ Section SQLTest.
   Require Import String ZArith.
   Open Scope Z_scope.
 
-  Require Import RDataSort SQL SQLtoNRAEnv.
+  Require Import SQL SQLtoNRAEnv.
   
   Local Open Scope string_scope.
   Local Open Scope data_scope.

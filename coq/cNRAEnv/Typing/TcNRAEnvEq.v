@@ -205,7 +205,7 @@ Section TcNRAEnvEq.
     input_well_typed.
     unfold lift in *.
     specialize (IHdout H7).
-    destruct (rmap (nraenv_core_eval brand_relation_brands c x env) dout); destruct (rmap (nraenv_core_eval brand_relation_brands c y env) dout); congruence.
+    destruct (lift_map (nraenv_core_eval brand_relation_brands c x env) dout); destruct (lift_map (nraenv_core_eval brand_relation_brands c y env) dout); congruence.
   Qed.
 
   (* ANMapProduct *)
@@ -230,19 +230,19 @@ Section TcNRAEnvEq.
     assert (data_type a (Rec Closed τ₁ pf1)).
     - assert (Rec Closed τ₁ pf1 = Rec Closed τ₁ x2) by (apply rtype_fequal; reflexivity).
       rewrite H3 in *; clear H3; assumption.
-    - unfold rmap_product in *; simpl in *.
-      unfold oomap_concat in *; simpl in *.
+    - unfold omap_product in *; simpl in *.
+      unfold oncoll_map_concat in *; simpl in *.
       rewrite (H2 a c env H3 dt_c dt_env).
       input_well_typed.
       dtype_inverter.
       specialize (IHdout H8).
-      destruct ((oflat_map
+      destruct ((lift_flat_map
                    (fun a0 : data =>
                       match brand_relation_brands ⊢ₑ x @ₑ a0 ⊣ c;env with
                         | Some (dcoll y1) => omap_concat a0 y1
                         | _ => None
                       end) dout));
-        destruct ((oflat_map
+        destruct ((lift_flat_map
                      (fun a0 : data =>
                         match brand_relation_brands ⊢ₑ y @ₑ a0 ⊣ c;env with
                           | Some (dcoll y1) => omap_concat a0 y1
@@ -380,7 +380,7 @@ Section TcNRAEnvEq.
     econstructor; eauto; intros.
     dtype_inverter.
     f_equal.
-    apply rmap_ext; intros.
+    apply lift_map_ext; intros.
     rewrite (H0 x0 c x1 dt_x dt_c).
     reflexivity.
     inversion dt_env.

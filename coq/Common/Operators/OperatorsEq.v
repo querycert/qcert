@@ -29,9 +29,9 @@ Section OperatorsEq.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
-  Require Import RData.
-  Require Import RDataNorm.
-  Require Import RRelation.
+  Require Import Data.
+  Require Import DataNorm.
+  Require Import Iterators.
   Require Import OperatorsUtils.
   Require Import BinaryOperatorsSem.
   Require Import UnaryOperatorsSem.

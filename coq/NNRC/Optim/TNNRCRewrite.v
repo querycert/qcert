@@ -478,10 +478,10 @@ Section TNNRCRewrite.
       trivial.
   Qed.
 
-  Ltac casermap H := match type of H with
-      | context [rmap ?x ?l] =>
+  Ltac caselift_map H := match type of H with
+      | context [lift_map ?x ?l] =>
         let fr := fresh "eqq" in
-        case_eq (rmap x l); [intros ? fr | intros fr];
+        case_eq (lift_map x l); [intros ? fr | intros fr];
           rewrite fr in H
              end; simpl in H.
 
@@ -531,7 +531,7 @@ Section TNNRCRewrite.
       assert (typ1':dcoll l ▹ Coll τ₁)
         by (econstructor; trivial).
       specialize (IHl typ1').
-      casermap IHl; [ casermap IHl | ].
+      caselift_map IHl; [ caselift_map IHl | ].
       + simpl.
         assert (bt2:bindings_type ((v, a) :: env) ((v, τ₁) :: τenv))
           by (econstructor; eauto).
@@ -554,35 +554,35 @@ Section TNNRCRewrite.
           unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq3.
           simpl.
-          { case_eq (rflatten l0);
+          { case_eq (oflatten l0);
             [intros ? reqq0 | intros reqq0];
             rewrite reqq0 in IHl;
-            (case_eq (rflatten l1);
+            (case_eq (oflatten l1);
              [intros ? reqq1 | intros reqq1];
              rewrite reqq1 in IHl); simpl in IHl; inversion IHl.
             - apply of_nat_inv in H2.
               destruct x0; simpl;
-              rewrite (rflatten_cons _ _ _ reqq0);
-                rewrite (rflatten_cons _ _ _ reqq1); simpl;
+              rewrite (oflatten_cons _ _ _ reqq0);
+                rewrite (oflatten_cons _ _ _ reqq1); simpl;
               congruence.
             - destruct x0; simpl;
-              rewrite (rflatten_cons_none _ _ reqq0);
-                rewrite (rflatten_cons_none _ _ reqq1); simpl; trivial.
+              rewrite (oflatten_cons_none _ _ reqq0);
+                rewrite (oflatten_cons_none _ _ reqq1); simpl; trivial.
           }
         * subst.
-          { case_eq (rflatten l0);
+          { case_eq (oflatten l0);
             [intros ? reqq0 | intros reqq0];
             rewrite reqq0 in IHl;
-            (case_eq (rflatten l1);
+            (case_eq (oflatten l1);
              [intros ? reqq1 | intros reqq1];
              rewrite reqq1 in IHl); simpl in IHl; inversion IHl;
             simpl.
             - apply of_nat_inv in H2.
-              rewrite (rflatten_cons _ _ _ reqq0);
-                rewrite (rflatten_cons _ _ _ reqq1); simpl;
+              rewrite (oflatten_cons _ _ _ reqq0);
+                rewrite (oflatten_cons _ _ _ reqq1); simpl;
                   congruence.
-            - rewrite (rflatten_cons_none _ _ reqq0);
-                rewrite (rflatten_cons_none _ _ reqq1); simpl; trivial.
+            - rewrite (oflatten_cons_none _ _ reqq0);
+                rewrite (oflatten_cons_none _ _ reqq1); simpl; trivial.
           }
       + cut False; [intuition | ].
         clear eqq IHl.
@@ -693,7 +693,7 @@ Section TNNRCRewrite.
         by (econstructor; trivial).
       clear H4.
       specialize (IHl typ1').
-      casermap IHl; [ casermap IHl | ].
+      caselift_map IHl; [ caselift_map IHl | ].
       + simpl.
         assert (bt2:bindings_type ((v, a) :: env) ((v, τ₁) :: τenv))
                by (econstructor; eauto).
@@ -719,48 +719,48 @@ Section TNNRCRewrite.
           unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq3.
           simpl.
-          { case_eq (rflatten l0);
+          { case_eq (oflatten l0);
             [intros ? reqq0 | intros reqq0];
             rewrite reqq0 in IHl;
-            (case_eq (rflatten l1);
+            (case_eq (oflatten l1);
              [intros ? reqq1 | intros reqq1];
              rewrite reqq1 in IHl); simpl in IHl; inversion IHl.
             - apply of_nat_inv in H1.
-              rewrite (rflatten_cons _ _ _ reqq0);
-                rewrite (rflatten_cons _ _ _ reqq1); simpl;
+              rewrite (oflatten_cons _ _ _ reqq0);
+                rewrite (oflatten_cons _ _ _ reqq1); simpl;
               congruence.
-            - rewrite (rflatten_cons_none _ _ reqq0);
-                rewrite (rflatten_cons_none _ _ reqq1); simpl; trivial.
+            - rewrite (oflatten_cons_none _ _ reqq0);
+                rewrite (oflatten_cons_none _ _ reqq1); simpl; trivial.
           }
         * subst.
-          { case_eq (rflatten l0);
+          { case_eq (oflatten l0);
             [intros ? reqq0 | intros reqq0];
             rewrite reqq0 in IHl;
-            (case_eq (rflatten l1);
+            (case_eq (oflatten l1);
              [intros ? reqq1 | intros reqq1];
              rewrite reqq1 in IHl); simpl in IHl; inversion IHl;
             simpl.
             - apply of_nat_inv in H1.
-              rewrite (rflatten_cons _ _ _ reqq0);
-                rewrite (rflatten_cons _ _ _ reqq1); simpl;
+              rewrite (oflatten_cons _ _ _ reqq0);
+                rewrite (oflatten_cons _ _ _ reqq1); simpl;
                   congruence.
-            - rewrite (rflatten_cons_none _ _ reqq0);
-                rewrite (rflatten_cons_none _ _ reqq1); simpl; trivial.
+            - rewrite (oflatten_cons_none _ _ reqq0);
+                rewrite (oflatten_cons_none _ _ reqq1); simpl; trivial.
           }
           }
         * subst.
-          { case_eq (rflatten l0);
+          { case_eq (oflatten l0);
             [intros ? reqq0 | intros reqq0];
             rewrite reqq0 in IHl;
-            (case_eq (rflatten l1);
+            (case_eq (oflatten l1);
              [intros ? reqq1 | intros reqq1];
              rewrite reqq1 in IHl); simpl in IHl; inversion IHl; simpl.
             - apply of_nat_inv in H1.
-              rewrite (rflatten_cons _ _ _ reqq0);
-                rewrite (rflatten_cons _ _ _ reqq1); simpl;
+              rewrite (oflatten_cons _ _ _ reqq0);
+                rewrite (oflatten_cons _ _ _ reqq1); simpl;
               congruence.
-            - rewrite (rflatten_cons_none _ _ reqq0);
-                rewrite (rflatten_cons_none _ _ reqq1); simpl; trivial.
+            - rewrite (oflatten_cons_none _ _ reqq0);
+                rewrite (oflatten_cons_none _ _ reqq1); simpl; trivial.
           }
       + cut False; [intuition | ].
         clear eqq IHl.

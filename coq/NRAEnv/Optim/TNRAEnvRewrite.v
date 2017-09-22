@@ -415,7 +415,7 @@ Section TNRAEnvRewrite.
       simpl.
       dtype_inverter.
       subst.
-      rewrite (rmap_product_empty_right τ₁ x1).
+      rewrite (omap_product_empty_right τ₁ x1).
       reflexivity.
       assumption.
   Qed.
@@ -459,7 +459,7 @@ Section TNRAEnvRewrite.
       simpl.
       dtype_inverter.
       subst.
-      rewrite (rmap_product_empty_left τ₂ x1).
+      rewrite (omap_product_empty_left τ₂ x1).
       reflexivity.
       assumption.
   Qed.
@@ -892,92 +892,92 @@ Section TNRAEnvRewrite.
     simpl.
     assert (dcoll dout ▹ Coll τ₁) by (constructor; assumption).
     specialize (IHdout H); clear H.
-    destruct (rmap
+    destruct (lift_map
                    (fun x0 : data =>
                     olift
                       (fun d : data =>
                        lift_oncoll
                          (fun c1 : list data =>
                           lift dcoll
-                            (rmap
+                            (lift_map
                                (fun x1 : data =>
                                 olift (fun d1 : data => Some (dcoll [d1]))
                                   (brand_relation_brands ⊢ₑ q₃ @ₑ x1 ⊣ c;env))
                                c1)) d)
                       (brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;env)) dout);
-      destruct ((rmap (nraenv_core_eval brand_relation_brands c q₁ env) dout)); simpl in *; try congruence.
+      destruct ((lift_map (nraenv_core_eval brand_relation_brands c q₁ env) dout)); simpl in *; try congruence.
     - unfold olift in *.
-      case_eq (rflatten l0); intros; rewrite H in *.
-      + rewrite (rflatten_cons dout0 l0 l1 H).
-        rewrite rmap_over_app.
-        destruct ((rmap
+      case_eq (oflatten l0); intros; rewrite H in *.
+      + rewrite (oflatten_cons dout0 l0 l1 H).
+        rewrite lift_map_over_app.
+        destruct ((lift_map
            (fun x0 : data =>
             match brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env with
             | Some x' => Some (dcoll [x'])
             | None => None
             end) l1)); simpl in *; try congruence.
-        destruct ((rmap
+        destruct ((lift_map
               (fun x0 : data =>
                match brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env with
                | Some x' => Some (dcoll [x'])
                | None => None
                end) dout0)); simpl; try reflexivity.
         unfold lift in *.
-        case_eq (rflatten l); intros.
+        case_eq (oflatten l); intros.
         rewrite H0 in IHdout.
         inversion IHdout.
-        rewrite (rflatten_cons l3 l l4).
+        rewrite (oflatten_cons l3 l l4).
         subst; reflexivity. assumption.
         rewrite H0 in IHdout; congruence.
-        destruct (rmap
+        destruct (lift_map
               (fun x0 : data =>
                match brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env with
                | Some x' => Some (dcoll [x'])
                | None => None
                end) dout0); try reflexivity.
         simpl.
-        rewrite (rflatten_cons_none); auto.
+        rewrite (oflatten_cons_none); auto.
         unfold lift in IHdout.
-        destruct (rflatten l); try congruence.
+        destruct (oflatten l); try congruence.
       + simpl in *.
-        rewrite (rflatten_cons_none); simpl in *; auto.
-        destruct ((rmap
+        rewrite (oflatten_cons_none); simpl in *; auto.
+        destruct ((lift_map
               (fun x0 : data =>
                match brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env with
                | Some x' => Some (dcoll [x'])
                | None => None
                end) dout0)); simpl.
-        rewrite (rflatten_cons_none); simpl in *; auto.
+        rewrite (oflatten_cons_none); simpl in *; auto.
         unfold lift in IHdout.
-        destruct (rflatten l); try congruence.
+        destruct (oflatten l); try congruence.
         reflexivity.
-    - destruct ((rmap
+    - destruct ((lift_map
                (fun x0 : data =>
                 olift (fun d1 : data => Some (dcoll [d1]))
                       (brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env)) dout0)); simpl.
-        rewrite (rflatten_cons_none); simpl in *; auto.
+        rewrite (oflatten_cons_none); simpl in *; auto.
         unfold lift in IHdout.
-        destruct (rflatten l); try congruence.
+        destruct (oflatten l); try congruence.
         reflexivity.
-    - case_eq (rflatten l); intros.
+    - case_eq (oflatten l); intros.
       rewrite H in IHdout.
-      rewrite (rflatten_cons dout0 l l0); try assumption; simpl.
-      rewrite rmap_over_app.
+      rewrite (oflatten_cons dout0 l l0); try assumption; simpl.
+      rewrite lift_map_over_app.
       simpl in IHdout.
-      destruct ((rmap
+      destruct ((lift_map
                 (fun x0 : data =>
                  olift (fun d1 : data => Some (dcoll [d1]))
                        (brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env)) l0)); simpl in *; try congruence.
-      destruct (rmap
+      destruct (lift_map
                   (fun x0 : data =>
                      olift (fun d1 : data => Some (dcoll [d1]))
                            (brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env)) dout0); try reflexivity.
-      rewrite rflatten_cons_none; simpl in *; auto.
-      destruct (rmap
+      rewrite oflatten_cons_none; simpl in *; auto.
+      destruct (lift_map
                   (fun x0 : data =>
                      olift (fun d1 : data => Some (dcoll [d1]))
                            (brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env)) dout0); reflexivity.
-    - destruct (rmap
+    - destruct (lift_map
                   (fun x0 : data =>
                      olift (fun d1 : data => Some (dcoll [d1]))
                            (brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env)) dout0); reflexivity.
@@ -1005,8 +1005,8 @@ Section TNRAEnvRewrite.
     dtype_inverter.
     destruct x0; simpl.
     - autorewrite with alg.
-      destruct (rmap (nraenv_core_eval brand_relation_brands c q₂ env) dout);
-        destruct (rmap
+      destruct (lift_map (nraenv_core_eval brand_relation_brands c q₂ env) dout);
+        destruct (lift_map
               (fun x0 : data =>
                olift
                  (fun d : data =>
@@ -1026,9 +1026,9 @@ Section TNRAEnvRewrite.
                         (brand_relation_brands ⊢ₑ q₂ @ₑ x0 ⊣ c;env))) dout); simpl in *; try congruence.
       rewrite eout0; simpl.
       unfold lift in IHdout.
-      case_eq (rflatten l0); intros.
+      case_eq (oflatten l0); intros.
       rewrite H in *.
-      rewrite (rflatten_cons [dout0] l0 l1 H).
+      rewrite (oflatten_cons [dout0] l0 l1 H).
       destruct (lift_filter
          (fun x' : data =>
           match brand_relation_brands ⊢ₑ q₁ @ₑ x' ⊣ c;env with
@@ -1046,7 +1046,7 @@ Section TNRAEnvRewrite.
           | Some _ => None
           | None => None
           end) l); simpl in *; try congruence.
-      rewrite rflatten_cons_none; try reflexivity. assumption.
+      rewrite oflatten_cons_none; try reflexivity. assumption.
       rewrite eout0.
       destruct (lift_filter
                 (fun x' : data =>
@@ -1056,10 +1056,10 @@ Section TNRAEnvRewrite.
                  | None => None
                  end) l); simpl in *.
       congruence. reflexivity.
-      rewrite rflatten_cons_none; try reflexivity.
+      rewrite oflatten_cons_none; try reflexivity.
       unfold lift in IHdout.
-      destruct (rflatten l); try congruence.
-    - destruct (rmap
+      destruct (oflatten l); try congruence.
+    - destruct (lift_map
                    (fun x0 : data =>
                     olift
                       (fun d : data =>
@@ -1077,7 +1077,7 @@ Section TNRAEnvRewrite.
                                 end) c1)) d)
                       (olift (fun d1 : data => Some (dcoll [d1]))
                              (brand_relation_brands ⊢ₑ q₂ @ₑ x0 ⊣ c;env))) dout);
-      destruct (rmap (nraenv_core_eval brand_relation_brands c q₂ env) dout); simpl in *; try congruence; try rewrite eout0.
+      destruct (lift_map (nraenv_core_eval brand_relation_brands c q₂ env) dout); simpl in *; try congruence; try rewrite eout0.
       + destruct (lift_filter
                 (fun x' : data =>
                  match brand_relation_brands ⊢ₑ q₁ @ₑ x' ⊣ c;env with
@@ -1085,16 +1085,16 @@ Section TNRAEnvRewrite.
                  | Some _ => None
                  | None => None
                  end) l0); simpl in *; try congruence.
-        case_eq (rflatten l); intros.
+        case_eq (oflatten l); intros.
         rewrite H in *. inversion IHdout.  subst.
-        rewrite (rflatten_cons [] l l1 H). reflexivity.
+        rewrite (oflatten_cons [] l l1 H). reflexivity.
         rewrite H in *; simpl in *; congruence.
-        rewrite rflatten_cons_none; try reflexivity.
+        rewrite oflatten_cons_none; try reflexivity.
         unfold lift in IHdout.
-        destruct (rflatten l); try congruence.
-      + rewrite rflatten_cons_none; try reflexivity.
+        destruct (oflatten l); try congruence.
+      + rewrite oflatten_cons_none; try reflexivity.
         unfold lift in IHdout.
-        destruct (rflatten l); try congruence.
+        destruct (oflatten l); try congruence.
       + destruct (lift_filter
                 (fun x' : data =>
                  match brand_relation_brands ⊢ₑ q₁ @ₑ x' ⊣ c;env with
@@ -1132,7 +1132,7 @@ Section TNRAEnvRewrite.
       (* left *)
       + simpl.
         unfold olift, lift in *; simpl in *.
-        case_eq (rmap
+        case_eq (lift_map
                      (fun x0 : data =>
                       match brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env with
                       | Some (dleft dl) => Some (dcoll [dl])
@@ -1140,9 +1140,9 @@ Section TNRAEnvRewrite.
                       | Some _ => None
                       | None => None
                       end) dout); intros; rewrite H in *; simpl in *.
-        * case_eq (rflatten l); intros; rewrite H2 in *; simpl in *.
+        * case_eq (oflatten l); intros; rewrite H2 in *; simpl in *.
           Focus 2.
-          rewrite rflatten_cons_none; try assumption.
+          rewrite oflatten_cons_none; try assumption.
           destruct (match brand_relation_brands ⊢ₑ q₂ @ₑ dout0 ⊣ c;env with
                | Some (dbool b) => Some b
                | Some _ => None
@@ -1152,12 +1152,12 @@ Section TNRAEnvRewrite.
           destruct (lift_oncoll
            (fun c1 : list data =>
             match
-              rmap (nraenv_core_eval brand_relation_brands c q₁ env) c1
+              lift_map (nraenv_core_eval brand_relation_brands c q₁ env) c1
             with
             | Some a' => Some (dcoll a')
             | None => None
             end) (dcoll l)); try reflexivity; simpl in *.
-          destruct (rmap
+          destruct (lift_map
            (fun x0 : data =>
             match
               match
@@ -1192,19 +1192,19 @@ Section TNRAEnvRewrite.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (nraenv_core_eval brand_relation_brands c q₁ env) c1
+                     lift_map (nraenv_core_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
                    end) x'
             | None => None
             end) dout); try congruence.
-          destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try reflexivity.
-          clear H1 H2; case_eq (rflatten l1); intros; rewrite H1 in *; try congruence.
-          rewrite rflatten_cons_none; assumption.
-          destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try reflexivity.
-          destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try reflexivity.
-          destruct (rmap
+          destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try reflexivity.
+          clear H1 H2; case_eq (oflatten l1); intros; rewrite H1 in *; try congruence.
+          rewrite oflatten_cons_none; assumption.
+          destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try reflexivity.
+          destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try reflexivity.
+          destruct (lift_map
                  (fun x0 : data =>
                   match
                     match
@@ -1239,7 +1239,7 @@ Section TNRAEnvRewrite.
                       lift_oncoll
                         (fun c1 : list data =>
                          match
-                           rmap
+                           lift_map
                              (nraenv_core_eval brand_relation_brands c q₁ env)
                              c1
                          with
@@ -1248,9 +1248,9 @@ Section TNRAEnvRewrite.
                          end) x'
                   | None => None
                   end) dout); try reflexivity.
-          clear H1 H2; case_eq (rflatten l2); intros; rewrite H1 in *; try congruence.
-          rewrite rflatten_cons_none; assumption.
-          rewrite (rflatten_cons [dout0] l l0 H2); simpl in *.
+          clear H1 H2; case_eq (oflatten l2); intros; rewrite H1 in *; try congruence.
+          rewrite oflatten_cons_none; assumption.
+          rewrite (oflatten_cons [dout0] l l0 H2); simpl in *.
           destruct (brand_relation_brands ⊢ₑ q₂ @ₑ dout0 ⊣ c;env); try reflexivity.
           destruct d; try reflexivity; simpl in *.
           destruct b; simpl in *.
@@ -1262,7 +1262,7 @@ Section TNRAEnvRewrite.
             | None => None
             end) l0); intros; rewrite H9 in *; simpl in *.
           destruct (brand_relation_brands ⊢ₑ q₁ @ₑ dout0 ⊣ c;env); try reflexivity.
-          destruct (rmap
+          destruct (lift_map
                  (fun x0 : data =>
                   match
                     match
@@ -1297,7 +1297,7 @@ Section TNRAEnvRewrite.
                       lift_oncoll
                         (fun c1 : list data =>
                          match
-                           rmap
+                           lift_map
                              (nraenv_core_eval brand_relation_brands c q₁ env)
                              c1
                          with
@@ -1306,18 +1306,18 @@ Section TNRAEnvRewrite.
                          end) x'
                   | None => None
                   end) dout); try congruence.
-          case_eq (rflatten l2); intros;
+          case_eq (oflatten l2); intros;
           rewrite H10 in *; simpl in *.
-          rewrite (rflatten_cons [d] l2 l3 H10); simpl in *.
-          destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
+          rewrite (oflatten_cons [d] l2 l3 H10); simpl in *.
+          destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
           inversion IHdout; reflexivity.
-          rewrite rflatten_cons_none; simpl.
-          destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
+          rewrite oflatten_cons_none; simpl.
+          destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
           reflexivity. assumption.
-          destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
+          destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
           reflexivity.
           destruct (brand_relation_brands ⊢ₑ q₁ @ₑ dout0 ⊣ c;env); try reflexivity; simpl.
-          destruct (rmap
+          destruct (lift_map
            (fun x0 : data =>
             match
               match
@@ -1352,16 +1352,16 @@ Section TNRAEnvRewrite.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (nraenv_core_eval brand_relation_brands c q₁ env) c1
+                     lift_map (nraenv_core_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
                    end) x'
             | None => None
             end) dout); try reflexivity; simpl.
-          case_eq (rflatten l1); intros; rewrite H10 in *; simpl in *. congruence.
-          rewrite rflatten_cons_none. reflexivity. assumption.
-          destruct (rmap
+          case_eq (oflatten l1); intros; rewrite H10 in *; simpl in *. congruence.
+          rewrite oflatten_cons_none. reflexivity. assumption.
+          destruct (lift_map
            (fun x0 : data =>
             match
               match
@@ -1396,7 +1396,7 @@ Section TNRAEnvRewrite.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (nraenv_core_eval brand_relation_brands c q₁ env) c1
+                     lift_map (nraenv_core_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
@@ -1409,13 +1409,13 @@ Section TNRAEnvRewrite.
             | Some _ => None
             | None => None
             end) l0); try congruence; simpl in *.
-          case_eq (rflatten l1); intros; rewrite H9 in *; simpl in *.
-          rewrite (rflatten_cons [] l1 l3 H9); simpl. assumption.
-          rewrite rflatten_cons_none; simpl.
-          destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l2); congruence.
+          case_eq (oflatten l1); intros; rewrite H9 in *; simpl in *.
+          rewrite (oflatten_cons [] l1 l3 H9); simpl. assumption.
+          rewrite oflatten_cons_none; simpl.
+          destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l2); congruence.
           assumption.
-          case_eq (rflatten l1); intros; rewrite H9 in *; simpl in *. congruence.
-          rewrite rflatten_cons_none; simpl. reflexivity.
+          case_eq (oflatten l1); intros; rewrite H9 in *; simpl in *. congruence.
+          rewrite oflatten_cons_none; simpl. reflexivity.
           assumption.
         * destruct (match brand_relation_brands ⊢ₑ q₂ @ₑ dout0 ⊣ c;env with
                | Some (dbool b) => Some b
@@ -1426,12 +1426,12 @@ Section TNRAEnvRewrite.
           destruct (lift_oncoll
            (fun c1 : list data =>
             match
-              rmap (nraenv_core_eval brand_relation_brands c q₁ env) c1
+              lift_map (nraenv_core_eval brand_relation_brands c q₁ env) c1
             with
             | Some a' => Some (dcoll a')
             | None => None
             end) (dcoll l)); try reflexivity; simpl in *.
-          destruct (rmap
+          destruct (lift_map
            (fun x0 : data =>
             match
               match
@@ -1466,20 +1466,20 @@ Section TNRAEnvRewrite.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (nraenv_core_eval brand_relation_brands c q₁ env) c1
+                     lift_map (nraenv_core_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
                    end) x'
             | None => None
             end) dout); try congruence.
-          clear H; case_eq (rflatten l0); intros; rewrite H in *.
+          clear H; case_eq (oflatten l0); intros; rewrite H in *.
           congruence.
-          rewrite rflatten_cons_none; assumption.
+          rewrite oflatten_cons_none; assumption.
       (* right *)
       + simpl.
         unfold olift, lift in *; simpl in *.
-        case_eq (rmap
+        case_eq (lift_map
                      (fun x0 : data =>
                       match brand_relation_brands ⊢ₑ q₃ @ₑ x0 ⊣ c;env with
                       | Some (dleft dl) => Some (dcoll [dl])
@@ -1487,10 +1487,10 @@ Section TNRAEnvRewrite.
                       | Some _ => None
                       | None => None
                       end) dout); intros; rewrite H in *; simpl in *.
-        * case_eq (rflatten l); intros; rewrite H2 in *; simpl in *.
+        * case_eq (oflatten l); intros; rewrite H2 in *; simpl in *.
           Focus 2.
-          rewrite rflatten_cons_none; try assumption.
-          destruct (rmap
+          rewrite oflatten_cons_none; try assumption.
+          destruct (lift_map
            (fun x0 : data =>
             match
               match
@@ -1525,16 +1525,16 @@ Section TNRAEnvRewrite.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (nraenv_core_eval brand_relation_brands c q₁ env) c1
+                     lift_map (nraenv_core_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
                    end) x'
             | None => None
             end) dout); try congruence.
-          clear H; case_eq (rflatten l0); intros; rewrite H in *; try congruence.
-          rewrite rflatten_cons_none; assumption.
-          destruct (rmap
+          clear H; case_eq (oflatten l0); intros; rewrite H in *; try congruence.
+          rewrite oflatten_cons_none; assumption.
+          destruct (lift_map
                  (fun x0 : data =>
                   match
                     match
@@ -1569,7 +1569,7 @@ Section TNRAEnvRewrite.
                       lift_oncoll
                         (fun c1 : list data =>
                          match
-                           rmap
+                           lift_map
                              (nraenv_core_eval brand_relation_brands c q₁ env)
                              c1
                          with
@@ -1578,12 +1578,12 @@ Section TNRAEnvRewrite.
                          end) x'
                   | None => None
                   end) dout); try reflexivity.
-          clear H; case_eq (rflatten l1); intros; rewrite H in *; try congruence.
-          rewrite (rflatten_cons [] l1 l2 H); simpl in *.
-          rewrite (rflatten_cons [] l l0 H2); simpl in *.
+          clear H; case_eq (oflatten l1); intros; rewrite H in *; try congruence.
+          rewrite (oflatten_cons [] l1 l2 H); simpl in *.
+          rewrite (oflatten_cons [] l l0 H2); simpl in *.
           assumption.
-          rewrite rflatten_cons_none; try assumption.
-          rewrite (rflatten_cons [] l l0 H2); simpl in *.
+          rewrite oflatten_cons_none; try assumption.
+          rewrite (oflatten_cons [] l l0 H2); simpl in *.
           destruct (lift_filter
            (fun x' : data =>
             match brand_relation_brands ⊢ₑ q₂ @ₑ x' ⊣ c;env with
@@ -1591,7 +1591,7 @@ Section TNRAEnvRewrite.
             | Some _ => None
             | None => None
             end) l0); try congruence; simpl in *.
-          rewrite (rflatten_cons [] l l0 H2); simpl in *.
+          rewrite (oflatten_cons [] l l0 H2); simpl in *.
           destruct (lift_filter
            (fun x' : data =>
             match brand_relation_brands ⊢ₑ q₂ @ₑ x' ⊣ c;env with
@@ -1599,7 +1599,7 @@ Section TNRAEnvRewrite.
             | Some _ => None
             | None => None
             end) l0); try congruence; simpl in *.
-        * destruct (rmap
+        * destruct (lift_map
                  (fun x0 : data =>
                   match
                     match
@@ -1634,7 +1634,7 @@ Section TNRAEnvRewrite.
                       lift_oncoll
                         (fun c1 : list data =>
                          match
-                           rmap
+                           lift_map
                              (nraenv_core_eval brand_relation_brands c q₁ env)
                              c1
                          with
@@ -1643,9 +1643,9 @@ Section TNRAEnvRewrite.
                          end) x'
                   | None => None
                   end) dout); try congruence.
-          clear H; case_eq (rflatten l); intros; rewrite H in *; simpl in *.
+          clear H; case_eq (oflatten l); intros; rewrite H in *; simpl in *.
           congruence.
-          rewrite rflatten_cons_none; try reflexivity. assumption.
+          rewrite oflatten_cons_none; try reflexivity. assumption.
   Qed.
 
   (* ♯flatten(χ⟨χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( { ID } ) ) ⟩( q₃ )) ⇒ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( q₃ ) ) *)
@@ -1664,14 +1664,14 @@ Section TNRAEnvRewrite.
     destruct (brand_relation_brands ⊢ₑ q₂ @ₑ a ⊣ c;env); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     destruct b; try reflexivity; simpl in *; autorewrite with alg; simpl in *.
-    - destruct (rmap
+    - destruct (lift_map
                   (fun x0 : data =>
                      olift
                        (fun d : data =>
                           lift_oncoll
                             (fun c1 : list data =>
                                lift dcoll
-                                    (rmap
+                                    (lift_map
                                        (nraenv_core_eval brand_relation_brands c q₁ env)
                                        c1)) d)
                        (lift dcoll
@@ -1697,30 +1697,30 @@ Section TNRAEnvRewrite.
                      end) dout); simpl in *; try congruence.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
         unfold lift in *.
-        case_eq (rflatten l); intros; rewrite H in *.
-        destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
-        rewrite (rflatten_cons [d] l l1 H).
+        case_eq (oflatten l); intros; rewrite H in *.
+        destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
+        rewrite (oflatten_cons [d] l l1 H).
         inversion IHdout; subst.
         reflexivity.
-        destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
-        rewrite rflatten_cons_none; try assumption; reflexivity.
+        destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
+        rewrite oflatten_cons_none; try assumption; reflexivity.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
         unfold lift in *.
-        case_eq (rflatten l); intros; rewrite H in *. congruence.
-        rewrite rflatten_cons_none; try assumption.
+        case_eq (oflatten l); intros; rewrite H in *. congruence.
+        rewrite oflatten_cons_none; try assumption.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
-        destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l); try congruence.
+        destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l); try congruence.
         simpl in *; congruence.
         reflexivity.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); reflexivity.
-    - destruct (rmap
+    - destruct (lift_map
                   (fun x0 : data =>
                      olift
                        (fun d : data =>
                           lift_oncoll
                             (fun c1 : list data =>
                                lift dcoll
-                                    (rmap
+                                    (lift_map
                                        (nraenv_core_eval brand_relation_brands c q₁ env)
                                        c1)) d)
                        (lift dcoll
@@ -1746,26 +1746,26 @@ Section TNRAEnvRewrite.
                      end) dout); simpl in *; try congruence.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
         unfold lift in *.
-        case_eq (rflatten l); intros; rewrite H in *.
-        destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
-        rewrite (rflatten_cons [] l l1 H).
+        case_eq (oflatten l); intros; rewrite H in *.
+        destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
+        rewrite (oflatten_cons [] l l1 H).
         inversion IHdout; subst.
         reflexivity.
-        destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
-        rewrite rflatten_cons_none; try assumption; reflexivity.
-        destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
+        destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
+        rewrite oflatten_cons_none; try assumption; reflexivity.
+        destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ env) l0); try congruence.
         unfold lift in *.
-        case_eq (rflatten l); intros; rewrite H in *.
-        rewrite (rflatten_cons [] l l2 H).
+        case_eq (oflatten l); intros; rewrite H in *.
+        rewrite (oflatten_cons [] l l2 H).
         inversion IHdout; subst.
         reflexivity.
         congruence.
         unfold lift in *.
-        case_eq (rflatten l); intros; rewrite H in *. congruence.
-        rewrite rflatten_cons_none; try assumption.
+        case_eq (oflatten l); intros; rewrite H in *. congruence.
+        rewrite oflatten_cons_none; try assumption.
       + unfold lift in *.
-        case_eq (rflatten l); intros; rewrite H in *. congruence.
-        rewrite rflatten_cons_none; try assumption.
+        case_eq (oflatten l); intros; rewrite H in *. congruence.
+        rewrite oflatten_cons_none; try assumption.
   Qed.
 
   Lemma tselect_over_flatten p₁ p₂ :
@@ -1838,7 +1838,7 @@ Section TNRAEnvRewrite.
     specialize (IHdout H3); clear H3.
     simpl.
     unfold lift in *.
-    destruct (rmap (fun x : data => Some x) dout); congruence.
+    destruct (lift_map (fun x : data => Some x) dout); congruence.
   Qed.
 
   (* χ⟨ q₁ ⟩( χ⟨ q₂ ⟩( q ) ) ⇒ χ⟨ q₁ ◯ q₂ ⟩( q ) *)
@@ -2219,8 +2219,8 @@ Section TNRAEnvRewrite.
       rewrite (nraenv_core_ignores_env_swap q₁ H _ c x a a).
       destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;a); try reflexivity; simpl.
       unfold lift in *.
-      destruct (rmap (nraenv_core_eval brand_relation_brands c q₁ x) l);
-        destruct (rmap (fun x0 : data => brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;x0) l);
+      destruct (lift_map (nraenv_core_eval brand_relation_brands c q₁ x) l);
+        destruct (lift_map (fun x0 : data => brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;x0) l);
         simpl in *; congruence.
   Qed.
 
@@ -2409,7 +2409,7 @@ Section TNRAEnvRewrite.
     intros.
     input_well_typed; simpl.
     dtype_inverter.
-    rewrite rmap_id.
+    rewrite lift_map_id.
     reflexivity.
   Qed.
 
@@ -2441,8 +2441,8 @@ Section TNRAEnvRewrite.
       induction l; try reflexivity; simpl.
       rewrite (nraenv_core_ignores_id_swap q₁ H _ _ a x a).
       destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;a); try reflexivity; simpl.
-      destruct (rmap (fun env' : data => brand_relation_brands ⊢ₑ q₁ @ₑ x ⊣ c;env') l);
-        destruct (rmap (fun x0 : data => brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;x0) l);
+      destruct (lift_map (fun env' : data => brand_relation_brands ⊢ₑ q₁ @ₑ x ⊣ c;env') l);
+        destruct (lift_map (fun x0 : data => brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;x0) l);
          simpl in *; congruence.
   Qed.
 
@@ -2972,7 +2972,7 @@ Section TNRAEnvRewrite.
              by (econstructor; trivial).
       specialize (IHl typ).
       input_well_typed.
-      case_eq ((rmap
+      case_eq ((lift_map
                    (fun x0 : data =>
                     olift
                       (fun x' : data =>
@@ -2986,7 +2986,7 @@ Section TNRAEnvRewrite.
       ; [ intros ? eqq | intros eqq];
       rewrite eqq in IHl; simpl in *; try discriminate.
       + unfold olift in IHl |- *.
-        case_eq ((rmap
+        case_eq ((lift_map
                  (fun x0 : data =>
                   match @brand_relation_brands brand_model_relation ⊢ₑ p₃ @ₑ x0 ⊣ c; env with
                   | Some (dleft _) => Some (dcoll [dunit])
@@ -3010,14 +3010,14 @@ Section TNRAEnvRewrite.
               + inversion τout1; clear τout1.
                 rtype_equalizer. subst.
                 input_well_typed.
-                rewrite (rflatten_cons _ _ _ eqq2).
+                rewrite (oflatten_cons _ _ _ eqq2).
                 simpl.
                 rewrite H1.
-                rewrite (rflatten_cons _ _ _ eqq3).
+                rewrite (oflatten_cons _ _ _ eqq3).
                 simpl.
                 trivial.
-              + rewrite (rflatten_cons _ _ _ eqq2).
-                rewrite (rflatten_cons _ _ _ eqq3).
+              + rewrite (oflatten_cons _ _ _ eqq2).
+                rewrite (oflatten_cons _ _ _ eqq3).
                 simpl.
                 rewrite H1.
                 trivial.
@@ -3037,14 +3037,14 @@ Section TNRAEnvRewrite.
               + inversion τout1; clear τout1; rtype_equalizer.
                 subst.
                 input_well_typed.
-                rewrite (rflatten_cons_none _ _ eqq2).
+                rewrite (oflatten_cons_none _ _ eqq2).
                 simpl.
-                rewrite (rflatten_cons_none _ _ eqq3).
+                rewrite (oflatten_cons_none _ _ eqq3).
                 simpl.
                 trivial.
-              + rewrite (rflatten_cons_none _ _ eqq2).
+              + rewrite (oflatten_cons_none _ _ eqq2).
                 simpl.
-                rewrite (rflatten_cons_none _ _ eqq3).
+                rewrite (oflatten_cons_none _ _ eqq3).
                 simpl.
                 trivial.
           }
@@ -3059,16 +3059,16 @@ Section TNRAEnvRewrite.
               + rtype_equalizer.
                 subst.
                 input_well_typed.
-                rewrite (rflatten_cons_none _ _ eqq2).
+                rewrite (oflatten_cons_none _ _ eqq2).
                 simpl.
                 trivial.
               + simpl.
-                rewrite (rflatten_cons_none _ _ eqq2).
+                rewrite (oflatten_cons_none _ _ eqq2).
                 simpl.
                 trivial.
           }
       + unfold olift in IHl.
-        case_eq ((rmap
+        case_eq ((lift_map
                  (fun x0 : data =>
                   match @brand_relation_brands brand_model_relation ⊢ₑ p₃ @ₑ x0 ⊣ c; env with
                   | Some (dleft _) => Some (dcoll [dunit])
@@ -3090,11 +3090,11 @@ Section TNRAEnvRewrite.
               + rtype_equalizer.
                 subst.
                 input_well_typed.
-                rewrite (rflatten_cons_none _ _ eqq2).
+                rewrite (oflatten_cons_none _ _ eqq2).
                 simpl.
                 trivial.
               + simpl.
-                rewrite (rflatten_cons_none _ _ eqq2).
+                rewrite (oflatten_cons_none _ _ eqq2).
                 simpl.
                 trivial.
           }
@@ -3139,8 +3139,8 @@ Section TNRAEnvRewrite.
       apply dtrec_full. auto.
     - intros.
       simpl.
-      unfold rmap_product; simpl.
-      unfold oomap_concat; simpl.
+      unfold omap_product; simpl.
+      unfold oncoll_map_concat; simpl.
       nraenv_core_inferer.
       assert (Rec Closed τ₁ pf1 = τ)
         by (apply rtype_fequal; simpl in *; auto).
@@ -3168,7 +3168,7 @@ Section TNRAEnvRewrite.
       assert (domain a = domain rl).
       apply (@sorted_forall_same_domain _ _ _ _ a rl); assumption. auto.
       rewrite sort_sorted_is_id; [|assumption].
-      destruct (rmap
+      destruct (lift_map
                  (fun x0 : data =>
                   match x0 with
                   | drec r1 => Some (drec (rec_sort r1))

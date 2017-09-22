@@ -21,7 +21,6 @@ Section OQL.
   Require Import EquivDec.
   Require Import Utils.
   Require Import CommonRuntime.
-  Require Import RDataSort.
 
   Context {fruntime:foreign_runtime}.
 
@@ -466,7 +465,7 @@ Section OQL.
         | _ => None
         end
     in
-    oflat_map apply_cast l.
+    lift_flat_map apply_cast l.
 
   Definition oenv_map_concat_single_with_cast
              (v:string)
@@ -487,14 +486,14 @@ Section OQL.
              (v:string)
              (f:oql_env -> option data)
              (d:list oql_env) : option (list oql_env) :=
-    oflat_map (oenv_map_concat_single v f) d.
+    lift_flat_map (oenv_map_concat_single v f) d.
 
   Definition env_map_concat_cast
              (v:string)
              (brand_name:string)
              (f:oql_env -> option data)
              (d:list oql_env) : option (list oql_env) :=
-    oflat_map (oenv_map_concat_single_with_cast v brand_name f) d.
+    lift_flat_map (oenv_map_concat_single_with_cast v brand_name f) d.
 
   Fixpoint oql_expr_interp (q:oql_expr) (env:oql_env) : option data :=
     match q with
@@ -547,11 +546,11 @@ Section OQL.
       let select_result :=
           match select_clause with
           | OSelect select_expr =>
-            olift (fun x => lift dcoll (rmap (oql_expr_interp select_expr) x))
+            olift (fun x => lift dcoll (lift_map (oql_expr_interp select_expr) x))
                   order_by_result
           | OSelectDistinct select_expr =>
             let select_dup :=
-                olift (fun x => (rmap (oql_expr_interp select_expr) x))
+                olift (fun x => (lift_map (oql_expr_interp select_expr) x))
                       order_by_result
             in
             lift (fun x => dcoll ((@bdistinct data data_eq_dec) x)) select_dup

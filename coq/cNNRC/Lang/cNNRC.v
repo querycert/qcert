@@ -239,7 +239,7 @@ Section cNNRC.
             let for_fun :=
                 fun d1 => nnrc_core_eval ((v,d1)::env) e2
             in
-            lift dcoll (rmap for_fun c1)
+            lift dcoll (lift_map for_fun c1)
           | _ => None
           end
         | NNRCIf e1 e2 e3 =>
@@ -281,7 +281,7 @@ Section cNNRC.
         - match_destr.
           destruct d; simpl; trivial.
           f_equal.
-          apply rmap_ext; intros.
+          apply lift_map_ext; intros.
           apply IHe2; intros.
           simpl; match_destr.
         - unfold olift.
@@ -306,7 +306,7 @@ Section cNNRC.
       (** Auxiliary lemma on [for] loops used in the correctness theorem *)
 
       Lemma nnrc_core_for_eval_correct v env e l1 l2:
-        (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l1 = Some l2) ->
+        (lift_map (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l1 = Some l2) ->
         (forall (env : bindings) (d : data),
             nnrc_core_eval env e = Some d -> nnrc_core_sem env e d) ->
         nnrc_core_sem_for v env e l1 l2.
@@ -316,7 +316,7 @@ Section cNNRC.
         - case_eq (nnrc_core_eval ((v, a) :: env) e); intros;
             rewrite H1 in *.
           + unfold lift in H.
-            case_eq (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l1);
+            case_eq (lift_map (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l1);
               intros; rewrite H2 in *; clear H2; [|congruence].
             inversion H; subst; clear H.
             specialize (IHl1 l eq_refl H0).
@@ -361,7 +361,7 @@ Section cNNRC.
           + destruct d0; simpl in H; try congruence.
             specialize (IHe1 (dcoll l) eq_refl).
             unfold lift in H.
-            case_eq (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e2) l);
+            case_eq (lift_map (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e2) l);
               intros; rewrite H1 in H; try congruence.
             inversion H; subst; clear H.
             econstructor; eauto.
@@ -403,7 +403,7 @@ Section cNNRC.
         (forall (env : bindings) (d : data),
             nnrc_core_sem env e d -> nnrc_core_eval env e = Some d) ->
         (nnrc_core_sem_for v env e c1 c2) ->
-        lift dcoll (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) c1) =
+        lift dcoll (lift_map (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) c1) =
         Some (dcoll c2).
       Proof.
         intro Hcomp.
@@ -413,7 +413,7 @@ Section cNNRC.
           rewrite (Hcomp ((v,a)::env) d2); auto.
           unfold lift in *.
           specialize (IHc1 c3 H7).
-          case_eq (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) c1); intros;
+          case_eq (lift_map (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) c1); intros;
             rewrite H0 in *; [|congruence].
           inversion IHc1; subst; auto.
       Qed.

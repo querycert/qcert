@@ -191,7 +191,7 @@ Section LambdaNRAtoNRAEnv.
         apply lift_oncoll_ext; intros.
         subst.
         f_equal.
-        apply rmap_ext; intros.
+        apply lift_map_ext; intros.
         autorewrite with lambda_nra.
         rewrite (IHq1 _ x).
         reflexivity.
@@ -201,7 +201,7 @@ Section LambdaNRAtoNRAEnv.
         apply lift_oncoll_ext; intros.
         subst.
         f_equal.
-        apply rmap_product_ext; intros.
+        apply omap_product_ext; intros.
         autorewrite with lambda_nra.
         rewrite (IHq1 _ x).
         reflexivity.
@@ -253,7 +253,7 @@ Section LambdaNRAtoNRAEnv.
         apply lift_oncoll_ext; intros.
         subst.
         f_equal.
-        apply rmap_ext; intros.
+        apply lift_map_ext; intros.
         rewrite IHl1.
         rewrite rec_sort_rec_sort_app1.
         trivial.
@@ -263,7 +263,7 @@ Section LambdaNRAtoNRAEnv.
         apply lift_oncoll_ext; intros.
         subst.
         f_equal.
-        apply rmap_product_ext; intros.
+        apply omap_product_ext; intros.
         rewrite IHl1.
         rewrite rec_sort_rec_sort_app1.
         trivial.

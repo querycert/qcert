@@ -14,8 +14,12 @@
  * limitations under the License.
  *)
 
-Require Export OperatorsUtils.
 Require Export ForeignOperators.
+Require Export Iterators.
+Require Export RecOperators.
+Require Export GroupBy.
+Require Export SortBy.
+Require Export OperatorsUtils.
 Require Export UnaryOperators.
 Require Export BinaryOperators.
 Require Export UnaryOperatorsSem.

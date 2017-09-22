@@ -239,12 +239,12 @@ Section DNNRCBase.
           let inner_eval d1 :=
               let env' := (x,Dlocal d1) :: env in olift checkLocal (dnnrc_base_eval env' e2)
           in
-          lift (fun coll => Ddistr coll) (rmap inner_eval c1)
+          lift (fun coll => Ddistr coll) (lift_map inner_eval c1)
         | Some (Dlocal (dcoll c1)) =>
           let inner_eval d1 :=
               let env' := (x,Dlocal d1) :: env in olift checkLocal (dnnrc_base_eval env' e2)
           in
-          lift (fun coll => Dlocal (dcoll coll)) (rmap inner_eval c1)
+          lift (fun coll => Dlocal (dcoll coll)) (lift_map inner_eval c1)
         | Some (Dlocal _) => None
         | None => None
         end
@@ -355,7 +355,7 @@ Section DNNRCBase.
            forall (denv : dbindings) (o : ddata),
              dnnrc_base_eval denv (snd n) = Some o ->
              Forall (ddata_normalized h) (map snd denv) -> ddata_normalized h o) r ->
-      rmap
+      lift_map
          (fun x : string * dnnrc_base =>
           match dnnrc_base_eval denv (snd x) with
           | Some (Dlocal _) => None
@@ -449,7 +449,7 @@ Section DNNRCBase.
           destruct H; subst.
           constructor; constructor.
           inversion H2; subst; clear H2.
-          apply (rmap_Forall e H1); intros.
+          apply (lift_map_Forall e H1); intros.
           case_eq (dnnrc_base_eval ((v, Dlocal x0) :: denv) e2); intros;
           rewrite H3 in H; simpl in H; try congruence.
           destruct d; simpl in H; try congruence.
@@ -465,7 +465,7 @@ Section DNNRCBase.
           apply some_lift in H.
           destruct H; subst.
           constructor.
-          apply (rmap_Forall e H2); intros.
+          apply (lift_map_Forall e H2); intros.
           case_eq (dnnrc_base_eval ((v, Dlocal x0) :: denv) e2); intros;
           rewrite H3 in H; simpl in H; try congruence.
           destruct d; simpl in H; try congruence.
@@ -514,8 +514,8 @@ Section DNNRCBase.
         specialize (IHe denv (Dlocal (dcoll l)) H0 H1).
         inversion IHe; inversion H2; constructor; assumption.
       - simpl in H1.
-        rewrite <- listo_to_olist_simpl_rmap in H1.
-        case_eq (rmap
+        rewrite <- listo_to_olist_simpl_lift_map in H1.
+        case_eq (lift_map
            (fun x : string * dnnrc_base =>
             match dnnrc_base_eval denv (snd x) with
             | Some (Dlocal _) => None

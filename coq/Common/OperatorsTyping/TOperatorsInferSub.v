@@ -29,7 +29,7 @@ Section TOperatorsInferSub.
   Require Import ForeignOperatorsTyping.
   Require Import TUtil.
   Require Import TData.
-  Require Import TDataSort.
+  Require Import TSortBy.
   Require Import TUnaryOperators.
   Require Import TBinaryOperators.
   Require Import TOperatorsInfer.

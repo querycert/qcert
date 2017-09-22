@@ -21,10 +21,11 @@ Section OperatorsUtils.
   Require Import List.
   Require Import Utils.
   Require Import ZArith.
-  Require Import RData.
-  Require Import RRelation.
   Require Import BrandRelation.
   Require Import ForeignData.
+  Require Import Data.
+  Require Import DataLift.
+  Require Import Iterators.
 
   Import ListNotations.
 
@@ -113,7 +114,7 @@ Section OperatorsUtils.
        end.
 
   Definition lifted_zbag (l : list data) : option (list Z) :=
-    rmap (ondnat (fun x => x)) l.
+    lift_map (ondnat (fun x => x)) l.
   Definition lifted_min (l : list data) : option data :=
     lift dnat (lift bnummin (lifted_zbag l)).
   Definition lifted_max (l : list data) : option data :=

@@ -24,7 +24,7 @@ Section DData.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
-  Require Import RData.
+  Require Import Data.
 
   (** Localized Data is:
      - Dlocal - single, non-distributed value

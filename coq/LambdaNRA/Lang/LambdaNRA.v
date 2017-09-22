@@ -106,16 +106,16 @@ Section LambdaNRA.
         olift (fun d1 => unary_op_eval h u d1) (lambda_nra_eval env op1)
       | LNRAMap lop1 op2 =>
         let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (lift_map (lnra_lambda_eval env lop1) c1)) d
         in olift aux_map (lambda_nra_eval env op2)
       | LNRAMapProduct lop1 op2 =>
         let aux_mapconcat d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_product (lnra_lambda_eval env lop1) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (omap_product (lnra_lambda_eval env lop1) c1)) d
         in olift aux_mapconcat (lambda_nra_eval env op2)
       | LNRAProduct op1 op2 =>
         (* Note: it's even clearer from this formulation that both branches take the same environment *)
         let aux_product d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_product (fun _ => lambda_nra_eval env op2) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (omap_product (fun _ => lambda_nra_eval env op2) c1)) d
         in olift aux_product (lambda_nra_eval env op1)
       | LNRAFilter lop1 op2 =>
         let pred x' :=
@@ -182,7 +182,7 @@ Section LambdaNRA.
     Lemma lambda_nra_eval_map_eq env lop1 op2 :
       lambda_nra_eval env (LNRAMap lop1 op2) = 
       let aux_map d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
+          lift_oncoll (fun c1 => lift dcoll (lift_map (lnra_lambda_eval env lop1) c1)) d
       in olift aux_map (lambda_nra_eval env op2).
     Proof.
       reflexivity.
@@ -191,7 +191,7 @@ Section LambdaNRA.
     Lemma lambda_nra_eval_map_concat_eq env lop1 op2 :
       lambda_nra_eval env (LNRAMapProduct lop1 op2) = 
       let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_product (lnra_lambda_eval env lop1) c1)) d
+          lift_oncoll (fun c1 => lift dcoll (omap_product (lnra_lambda_eval env lop1) c1)) d
       in olift aux_mapconcat (lambda_nra_eval env op2).
     Proof.
       reflexivity.
@@ -200,7 +200,7 @@ Section LambdaNRA.
     Lemma lambda_nra_eval_product_eq env op1 op2 :
       lambda_nra_eval env (LNRAProduct op1 op2) = 
       let aux_product d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_product (fun _ => lambda_nra_eval env op2) c1)) d
+          lift_oncoll (fun c1 => lift dcoll (omap_product (fun _ => lambda_nra_eval env op2) c1)) d
       in olift aux_product (lambda_nra_eval env op1).
     Proof.
       reflexivity.
@@ -267,7 +267,7 @@ Section LambdaNRA.
         destruct H as [? ? ?]; subst.
         constructor.
         invcs IHop2.
-        eapply (rmap_Forall e).
+        eapply (lift_map_Forall e).
         + apply H3.
         + intros. eapply IHop1; eauto.
           apply Forall_sorted.
@@ -282,18 +282,18 @@ Section LambdaNRA.
         destruct H as [? ? ?]; subst.
         constructor.
         invcs IHop2.
-        unfold rmap_product in e.
-        eapply (oflat_map_Forall e).
+        unfold omap_product in e.
+        eapply (lift_flat_map_Forall e).
         + apply H3.
         + intros.
-          unfold oomap_concat in H.
+          unfold oncoll_map_concat in H.
           match_case_in H; intros; rewrite H5 in H; try discriminate.
           match_destr_in H.
           unfold omap_concat in H.
           specialize (IHop1 _ _ H5).
           cut_to IHop1.
           { invcs IHop1.
-            eapply (rmap_Forall H).
+            eapply (lift_map_Forall H).
             - eapply H7.
             - intros.
               simpl in *.
@@ -322,18 +322,18 @@ Section LambdaNRA.
         destruct H as [? ? ?]; subst.
         constructor.
         invcs IHop1.
-        unfold rmap_product in e.
-        eapply (oflat_map_Forall e).
+        unfold omap_product in e.
+        eapply (lift_flat_map_Forall e).
         + apply H3.
         + intros.
-          unfold oomap_concat in H.
+          unfold oncoll_map_concat in H.
           match_case_in H; intros; rewrite H5 in H; try discriminate.
           match_destr_in H.
           unfold omap_concat in H.
           specialize (IHop2 _ _ H5).
           cut_to IHop2.
           { invcs IHop2.
-            eapply (rmap_Forall H).
+            eapply (lift_map_Forall H).
             - eapply H7.
             - intros.
               simpl in *.
@@ -438,14 +438,14 @@ Section LambdaNRA.
     - apply olift_ext; intros.
       apply lift_oncoll_ext; intros.
       f_equal.
-      apply rmap_ext; intros.
+      apply lift_map_ext; intros.
       simpl.
       apply IHe1.
       rewrite enveq; reflexivity.
     - apply olift_ext; intros.
       apply lift_oncoll_ext; intros.
       f_equal.
-      apply rmap_product_ext; intros.
+      apply omap_product_ext; intros.
       simpl.
       apply IHe1.
       rewrite enveq; reflexivity.

@@ -22,6 +22,7 @@ MODULES = \
 	Utils/Lattice \
 	Utils/Monoid \
 	Utils/Lift \
+	Utils/LiftIterators \
 	Utils/Assoc \
 	Utils/Sublist \
 	Utils/Compat \
@@ -33,27 +34,29 @@ MODULES = \
 	Utils/Utils \
 	Common/Logger/OptimizerStep \
 	Common/Logger/OptimizerLogger \
-	Common/Data/RDomain \
 	Common/Data/BrandRelation \
 	Common/Data/ForeignData \
-	Common/Data/RData \
-	Common/Data/RDataNorm \
-	Common/Data/RRelation \
-	Common/Data/RDataSort \
-	Common/Data/RGroupBy \
+	Common/Data/Data \
+	Common/Data/DataLift \
+	Common/Data/DataNorm \
+	Common/Data/DataSort \
 	Common/Data/DData \
 	Common/Data/DDataNorm \
-	Common/Env/RConstants \
-	Common/Env/DConstants \
-	Common/Env/RVar \
-	Common/Operators/OperatorsUtils \
 	Common/Operators/ForeignOperators \
+	Common/Operators/RecOperators \
+	Common/Operators/Iterators \
+	Common/Operators/OperatorsUtils \
+	Common/Operators/SortBy \
+	Common/Operators/GroupBy \
 	Common/Operators/UnaryOperators \
 	Common/Operators/UnaryOperatorsSem \
 	Common/Operators/BinaryOperators \
 	Common/Operators/BinaryOperatorsSem \
 	Common/Operators/OperatorsEq \
 	Common/Operators/Operators \
+	Common/Env/Constants \
+	Common/Env/DConstants \
+	Common/Env/Var \
 	Common/ForeignRuntime \
 	Common/CommonRuntime \
 	Common/TypeSystem/ForeignType \
@@ -73,11 +76,11 @@ MODULES = \
 	Common/DataTyping/TUtil \
 	Common/DataTyping/TData \
 	Common/DataTyping/TDData \
-	Common/DataTyping/TDataSort \
 	Common/DataTyping/TDataInfer \
 	Common/EnvTyping/TBindings \
 	Common/EnvTyping/TDBindings \
 	Common/OperatorsTyping/ForeignOperatorsTyping \
+	Common/OperatorsTyping/TSortBy \
 	Common/OperatorsTyping/TUnaryOperators \
 	Common/OperatorsTyping/TBinaryOperators \
 	Common/OperatorsTyping/TOperatorsEq \
@@ -101,7 +104,6 @@ MODULES = \
 	NRA/Typing/TNRAInfer \
         NRA/Typing/TNRAEq \
         NRA/Typing/TNRAExt \
-        NRA/Typing/TDomain \
 	NRA/Context/NRAContext \
 	NRA/NRARuntime \
 	NRA/NRATypes \

@@ -134,72 +134,19 @@ Section Lift.
     olift2 f (Some x1) (Some x2) = f x1 x2.
   Proof. reflexivity. Qed.
 
-  (** * Lift iterators *)
-  
-  Fixpoint lift_map {A B:Type} (f:A -> option B) (l:list A) : option (list B) :=
-    match l with
-      | nil => Some nil
-      | x::l' =>
-        match (f x) with
-          | None => None
-          | Some x' =>
-            match lift_map f l' with
-              | None => None
-              | Some l'' => Some (x'::l'')
-            end
-        end
-    end.
-
-  Fixpoint lift_filter {A:Type} (f:A -> option bool) (l:list A) : option (list A) :=
-    match l with
-      | nil => Some nil
-      | x::l' =>
-        match (f x) with
-          | None => None
-          | Some b =>
-            match lift_filter f l' with
-              | None => None
-              | Some l'' =>
-                if b then Some (x::l'') else Some l''
-            end
-        end
-    end.
-
-  Definition lift_app {A:Type} (l1 l2:option (list A)) : option (list A) :=
-    match l1,l2 with
-      | Some l1',Some l2' => Some (l1'++l2')
-      | _,_ => None
-    end.
-
-  (** * Lift iterators properties *)
-  
-  Lemma lift_filter_eq {A} (f g:A -> option bool) l :
-    (forall a, In a l -> f a = g a) ->
-    lift_filter f l = lift_filter g l.
+  Lemma olift_ext {A B:Type} (f g : A -> option B) (x : option A) :
+    (forall a, x = Some a -> f a = g a) ->
+    olift f x = olift g x.
   Proof.
-    intros.
-    induction l; try reflexivity.
-    simpl in *.
-    assert (forall a0, In a0 l -> f a0 = g a0).
-    intros; apply H. right; assumption.
-    specialize (IHl H0).
-    assert (f a = g a).
-    apply (H a); left; reflexivity.
-    clear H.
-    rewrite H1. rewrite IHl.
-    reflexivity.
+    destruct x; simpl; auto.
   Qed.
 
-  Lemma lift_app_filter {A:Type} (p:A -> option bool) (l1 l2:list A):
-    lift_filter p (app l1 l2) = lift2 (@app A) (lift_filter p l1) (lift_filter p l2).
-  Proof.
-    induction l1; simpl.
-    destruct (lift_filter p l2); reflexivity.
-    destruct (p a); simpl; try reflexivity.
-    rewrite IHl1; clear IHl1.
-    destruct (lift_filter p l1); try reflexivity.
-    destruct b; destruct (lift_filter p l2); reflexivity.
-  Qed.
+  Definition rif {A} (e:A -> option bool) (a:A) : option (list A) :=
+    match (e a) with
+      | None => None
+      | Some b =>
+        if b then Some (a::nil) else Some nil
+    end.
 
 End Lift.
 

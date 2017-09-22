@@ -14,13 +14,14 @@
  * limitations under the License.
  *)
 
-Section RGroupBy.
+Section GroupBy.
   Require Import List.
   Require Import Utils.
-  Require Import RDomain.
-  Require Import RData.
   Require Import ForeignData.
-  Require Import RRelation.
+  Require Import Data.
+  Require Import DataLift.
+  Require Import Iterators.
+  Require Import RecOperators.
 
   Context {fdata:foreign_data}.
 
@@ -103,9 +104,9 @@ Section RGroupBy.
     (lift_filter (fun d => key_is_eq_r eval_key d k) l).
 
   Definition group_by_nested_eval (eval_key: data -> option data) (l: list data) : option (list (data * (list data))) :=
-    let dupkeys := rmap (fun d => eval_key d) l in
+    let dupkeys := lift_map (fun d => eval_key d) l in
     let keys := lift bdistinct dupkeys in
-    olift (rmap (fun k => olift (fun group => Some (k, group)) (group_of_key eval_key k l))) keys.
+    olift (lift_map (fun k => olift (fun group => Some (k, group)) (group_of_key eval_key k l))) keys.
 
   Definition to_kv (l: list (data * list data)) :=
     map (fun x => drec (("key"%string,(fst x))::("value"%string,dcoll (snd x)) :: nil)) l.
@@ -169,9 +170,9 @@ Section RGroupBy.
 (olift
               (fun d1 : data =>
                lift_oncoll
-                 (fun l2 : list data => lift dcoll (rflatten l2)) d1)
+                 (fun l2 : list data => lift dcoll (oflatten l2)) d1)
               (lift dcoll
-                 (rmap
+                 (lift_map
                     (fun d1 : data =>
                      olift
                        (fun d0 : data =>
@@ -229,7 +230,7 @@ Section RGroupBy.
                             | dbrand _ _ => None
                             | dforeign _ => None
                             end) d0 d) incoll);
-        destruct ((rmap
+        destruct ((lift_map
              (fun d1 : data =>
               olift
                 (fun d0 : data =>
@@ -263,16 +264,16 @@ Section RGroupBy.
                    | dbrand _ _ => None
                    | dforeign _ => None
                    end (Some d))) incoll)); simpl in *; try congruence.
-        case_eq (rflatten l1); intros.
+        case_eq (oflatten l1); intros.
         subst.
         rewrite H in IHincoll; simpl in *.
         inversion IHincoll; subst.
-        rewrite (rflatten_cons _ _ l2); try assumption. reflexivity.
+        rewrite (oflatten_cons _ _ l2); try assumption. reflexivity.
         rewrite H in IHincoll; simpl in *; congruence.
-        case_eq (rflatten l0); intros; subst; simpl in *; try congruence.
+        case_eq (oflatten l0); intros; subst; simpl in *; try congruence.
         rewrite H in IHincoll; simpl in *; congruence.
         rewrite H in IHincoll; simpl in *.
-        rewrite rflatten_cons_none; [reflexivity|assumption].
+        rewrite oflatten_cons_none; [reflexivity|assumption].
       - destruct (lift_filter
                     (fun d0 : data =>
                        key_is_eq_r
@@ -289,7 +290,7 @@ Section RGroupBy.
                             | dbrand _ _ => None
                             | dforeign _ => None
                             end) d0 d) incoll);
-        destruct ((rmap
+        destruct ((lift_map
              (fun d1 : data =>
               olift
                 (fun d0 : data =>
@@ -323,16 +324,16 @@ Section RGroupBy.
                    | dbrand _ _ => None
                    | dforeign _ => None
                    end (Some d))) incoll)); simpl in *; try congruence.
-        case_eq (rflatten l1); intros.
+        case_eq (oflatten l1); intros.
         subst.
         rewrite H in IHincoll; simpl in *.
         inversion IHincoll; subst.
-        rewrite (rflatten_cons _ _ l2); try assumption.
+        rewrite (oflatten_cons _ _ l2); try assumption.
         rewrite H in IHincoll; simpl in *; congruence.
-        case_eq (rflatten l0); intros; subst; simpl in *; try congruence.
+        case_eq (oflatten l0); intros; subst; simpl in *; try congruence.
         rewrite H in IHincoll; simpl in *; congruence.
         rewrite H in IHincoll; simpl in *.
-        rewrite rflatten_cons_none; [reflexivity|assumption].
+        rewrite oflatten_cons_none; [reflexivity|assumption].
     Qed.
 
     Lemma group_of_key_destruct_drec_inv g sl d l0 l1 incoll:
@@ -354,7 +355,7 @@ Section RGroupBy.
       end = None ->
       olift (to_partitions g)
             (lift (fun t' : list (data * list data) => (d, l1) :: t')
-                  (rmap
+                  (lift_map
                      (fun k : data =>
                         olift (fun group : list data => Some (k, group))
                               (group_of_key
@@ -374,7 +375,7 @@ Section RGroupBy.
     Proof.
       intros.
       case_eq d; intros; subst; simpl in *; try congruence;
-      destruct (rmap
+      destruct (lift_map
           (fun k : data =>
            olift (fun group : list data => Some (k, group))
              (group_of_key
@@ -397,7 +398,7 @@ Section RGroupBy.
     Lemma test l0 g sl l1 l2 incoll :
       olift (to_partitions g)
             (lift (fun t' : list (data * list data) => (drec l2, l1) :: t')
-                  (rmap
+                  (lift_map
                      (fun k : data =>
                         olift (fun group : list data => Some (k, group))
                               (group_of_key
@@ -420,7 +421,7 @@ Section RGroupBy.
            drec
              (insertion_sort_insert rec_field_lt_dec 
                                     (g, dcoll l1) (rec_sort l2)) :: t')
-        (rmap
+        (lift_map
            (fun d1 : data =>
               olift2
                 (fun d0 d2 : data =>
@@ -452,9 +453,9 @@ Section RGroupBy.
                        (olift
                           (fun d0 : data =>
                              lift_oncoll
-                               (fun l3 : list data => lift dcoll (rflatten l3)) d0)
+                               (fun l3 : list data => lift dcoll (oflatten l3)) d0)
                           (lift dcoll
-                                (rmap
+                                (lift_map
                                    (fun d0 : data =>
                                       olift
                                         (fun d2 : data =>
@@ -527,7 +528,7 @@ Section RGroupBy.
                  | dforeign _ => None
                  end); intros.
         + simpl in *. 
-          destruct (rmap
+          destruct (lift_map
              (fun k : data =>
               olift (fun group : list data => Some (k, group))
                 (group_of_key
@@ -544,7 +545,7 @@ Section RGroupBy.
                     | dbrand _ _ => None
                     | dforeign _ => None
                     end) k incoll)) l0); simpl in *;
-          destruct (rmap
+          destruct (lift_map
               (fun d1 : data =>
                olift2
                  (fun d0 d2 : data =>
@@ -576,10 +577,10 @@ Section RGroupBy.
                     (olift
                        (fun d0 : data =>
                         lift_oncoll
-                          (fun l3 : list data => lift dcoll (rflatten l3))
+                          (fun l3 : list data => lift dcoll (oflatten l3))
                           d0)
                        (lift dcoll
-                          (rmap
+                          (lift_map
                              (fun d0 : data =>
                               olift
                                 (fun d2 : data =>
@@ -615,7 +616,7 @@ Section RGroupBy.
                                    | dbrand _ _ => None
                                    | dforeign _ => None
                                    end (Some d1))) incoll)))) 
-                 (Some d1)) l0); simpl in *; try reflexivity; try congruence;
+                 (Some d1)) l0); simpl in *; try reflexivity; simpl in *; try congruence;
           unfold to_partitions in *;
           unfold group_to_partitions in *; simpl in *;
           rewrite H in *; simpl;
@@ -636,10 +637,10 @@ Section RGroupBy.
          | dright _ => None
          | dbrand _ _ => None
          | dforeign _ => None
-         end) l3); try congruence.
+         end) l3); simpl in *; try congruence.
         + generalize (group_of_key_destruct_drec_inv g sl a l0 l incoll H); intros.
           auto.
-          destruct (rmap
+          destruct (lift_map
                (fun k : data =>
                 olift (fun group : list data => Some (k, group))
                   (group_of_key
@@ -658,8 +659,8 @@ Section RGroupBy.
                       end) k incoll)) l0); simpl in *.
           unfold to_partitions in *.
           simpl in *.
-          destruct (group_to_partitions g (a, l)); try congruence.
-          destruct (lift_map (group_to_partitions g) l3); try congruence.
+          destruct (group_to_partitions g (a, l)); simpl in *; try congruence.
+          destruct (lift_map (group_to_partitions g) l3); simpl in *; try congruence.
           reflexivity.
     Qed.
 
@@ -670,7 +671,7 @@ Section RGroupBy.
       match
         olift (fun d1 : data => rondcoll bdistinct d1)
               (lift dcoll
-                    (rmap
+                    (lift_map
                        (fun d1 : data =>
                           match d1 with
                           | dunit => None
@@ -691,7 +692,7 @@ Section RGroupBy.
       | Some (dstring _) => None
       | Some (dcoll c1) =>
         lift dcoll
-             (rmap
+             (lift_map
                 (fun d1 : data =>
                    olift2
                      (fun d0 d2 : data =>
@@ -723,9 +724,9 @@ Section RGroupBy.
                             (olift
                                (fun d0 : data =>
                                   lift_oncoll
-                                    (fun l : list data => lift dcoll (rflatten l)) d0)
+                                    (fun l : list data => lift dcoll (oflatten l)) d0)
                                (lift dcoll
-                                     (rmap
+                                     (lift_map
                                         (fun d0 : data =>
                                            olift
                                              (fun d2 : data =>
@@ -774,7 +775,7 @@ Section RGroupBy.
       unfold group_by_nested_eval_table in H.
       unfold group_by_nested_eval_keys_partition in H.
       unfold group_by_nested_eval in H.
-      destruct ((rmap
+      destruct ((lift_map
                   (fun d : data =>
                    match d with
                    | dunit => None
@@ -829,7 +830,7 @@ Section RGroupBy.
         clear Htest H0.
         rewrite <- (test l0 g sl l1 l2 incoll).
         unfold lift.
-        destruct (rmap
+        destruct (lift_map
               (fun k : data =>
                olift (fun group : list data => Some (k, group))
                  (group_of_key
@@ -856,7 +857,7 @@ Section RGroupBy.
   
   Section normalized.
     Require Import BrandRelation.
-    Require Import RDataNorm.
+    Require Import DataNorm.
     Context (h:brand_relation_t).
 
     Lemma bdistinct_normalized l :
@@ -867,9 +868,9 @@ Section RGroupBy.
       rewrite bdistinct_sublist; trivial.
     Qed.
 
-    Lemma rmap_rproject_normalized l l0 o :
+    Lemma lift_map_rproject_normalized l l0 o :
       Forall (data_normalized h) l0 ->
-      (rmap
+      (lift_map
          (fun d : data =>
             match d with
             | dunit => None
@@ -886,7 +887,7 @@ Section RGroupBy.
       Forall (data_normalized h) o.
     Proof.
       intros.
-      eapply rmap_Forall; eauto; intros.
+      eapply lift_map_Forall; eauto; intros.
       simpl in *.
       match_destr_in H1.
       invcs H1.
@@ -950,7 +951,7 @@ Section RGroupBy.
       assert (dn1:Forall (data_normalized h) l1).
       { subst.
         apply bdistinct_Forall.
-        eapply rmap_rproject_normalized; eauto.
+        eapply lift_map_rproject_normalized; eauto.
       } 
       clear d1 d2 eqq2.
       revert dn1 o eqq.
@@ -1028,9 +1029,10 @@ Section RGroupBy.
         repeat constructor.
       - invcs dn2.
         specialize (IHl1 H2).
-        simpl in eqq.
+        simpl in *.
       match_case_in eqq; [intros ? eqq2 | intros eqq2]
       ; rewrite eqq2 in eqq; try discriminate.
+      unfold lift in eqq.
       match_case_in eqq; [intros ? eqq3 | intros eqq3]
       ; rewrite eqq3 in eqq; try discriminate.
       invcs eqq.
@@ -1042,7 +1044,7 @@ Section RGroupBy.
 
   End normalized.
 
-End RGroupBy.
+End GroupBy.
   
 
 (*

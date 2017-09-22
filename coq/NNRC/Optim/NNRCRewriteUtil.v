@@ -243,8 +243,8 @@ Section NNRCRewriteUtil.
         rewrite H1.
         destruct (nnrc_core_eval h cenv ((x1,a)::env) e2_2); try reflexivity.
         unfold lift in *; simpl in *.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x1, d) :: env) e2_2)
-            l); destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x2, d) :: env) e2_2)
+        destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x1, d) :: env) e2_2)
+            l); destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x2, d) :: env) e2_2)
             l); congruence.
       + (* v =/= x1 and substitution moves forward *)
         destruct d0; try reflexivity; simpl.
@@ -263,8 +263,8 @@ Section NNRCRewriteUtil.
         rewrite (IHe2_2 ((v, a) :: env)).
         destruct (nnrc_core_eval h cenv ((x2, d) :: (v, a) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2))); try reflexivity.
         unfold lift in *; simpl in *.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x1, d) :: env) e2_2)
-            l); destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x2, d) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2)))
+        destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x1, d) :: env) e2_2)
+            l); destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x2, d) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2)))
             l); congruence.
     - Case "NNRCIf"%string.
       simpl in *.
