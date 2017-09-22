@@ -57,30 +57,30 @@ Section cNRAEnvContext.
 
   Fixpoint lift_nra_context (c:nra_ctxt) : nraenv_core_ctxt :=
     match c with
-      | CHole x'
-        => CNHole x'
-      | CPlug a
-        => CNPlug (nraenv_core_of_nra a)
+      | CNRAHole x'
+        => CcNRAEnvHole x'
+      | CNRAPlug a
+        => CcNRAEnvPlug (nraenv_core_of_nra a)
       | CNRABinop b c1 c2
-        => CANBinop b (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvBinop b (lift_nra_context c1) (lift_nra_context c2)
       | CNRAUnop u c
-        => CANUnop u (lift_nra_context c)
+        => CcNRAEnvUnop u (lift_nra_context c)
       | CNRAMap c1 c2
-        => CANMap (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvMap (lift_nra_context c1) (lift_nra_context c2)
       | CNRAMapProduct c1 c2
-        => CANMapProduct (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvMapProduct (lift_nra_context c1) (lift_nra_context c2)
       | CNRAProduct c1 c2
-        => CANProduct (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvProduct (lift_nra_context c1) (lift_nra_context c2)
       | CNRASelect c1 c2
-        => CANSelect (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvSelect (lift_nra_context c1) (lift_nra_context c2)
       | CNRADefault c1 c2
-        => CANDefault (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvDefault (lift_nra_context c1) (lift_nra_context c2)
       | CNRAEither c1 c2
-        => CANEither (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvEither (lift_nra_context c1) (lift_nra_context c2)
       | CNRAEitherConcat c1 c2
-        => CANEitherConcat (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvEitherConcat (lift_nra_context c1) (lift_nra_context c2)
       | CNRAApp c1 c2
-        => CANApp (lift_nra_context c1) (lift_nra_context c2)
+        => CcNRAEnvApp (lift_nra_context c1) (lift_nra_context c2)
     end.
 
   Lemma aec_simplify_lift_commute c :
@@ -128,7 +128,7 @@ Section cNRAEnvContext.
       match aec_simplify (aec_substs c1 ps),
             aec_simplify (aec_substs c2 ps)
       with
-      | CNPlug a1, CNPlug a2 => nraenv_core_eq_under h c env a1 a2
+      | CcNRAEnvPlug a1, CcNRAEnvPlug a2 => nraenv_core_eq_under h c env a1 a2
       | _, _ => True
       end.
 
@@ -203,7 +203,7 @@ Section cNRAEnvContext.
       (eq ==>
           nraenv_core_eq_under h c env ==>
           nraenv_core_eq_under h c env ==>
-          nraenv_core_eq_under h c env) ANBinop.
+          nraenv_core_eq_under h c env) cNRAEnvBinop.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0, H1 by trivial; trivial.
@@ -213,7 +213,7 @@ Section cNRAEnvContext.
     Proper
       (eq ==>
           nraenv_core_eq_under h c env ==>
-          nraenv_core_eq_under h c env) ANUnop.
+          nraenv_core_eq_under h c env) cNRAEnvUnop.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0 by trivial.
@@ -224,7 +224,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANMap.
+                       nraenv_core_eq_under h c env) cNRAEnvMap.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
@@ -235,7 +235,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANMapProduct.
+                       nraenv_core_eq_under h c env) cNRAEnvMapProduct.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
@@ -246,7 +246,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANProduct.
+                       nraenv_core_eq_under h c env) cNRAEnvProduct.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0 by trivial.
@@ -257,7 +257,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANSelect.
+                       nraenv_core_eq_under h c env) cNRAEnvSelect.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
@@ -269,7 +269,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANDefault.
+                       nraenv_core_eq_under h c env) cNRAEnvDefault.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0 by trivial.
@@ -280,7 +280,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANEither.
+                       nraenv_core_eq_under h c env) cNRAEnvEither.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     match_destr; dn_inverter; eauto.
@@ -290,7 +290,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANEitherConcat.
+                       nraenv_core_eq_under h c env) cNRAEnvEitherConcat.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
@@ -302,7 +302,7 @@ Section cNRAEnvContext.
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANApp.
+                       nraenv_core_eq_under h c env) cNRAEnvApp.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
@@ -316,7 +316,7 @@ Section cNRAEnvContext.
     reflexivity.
   Qed.
 
-  Instance aecu_Plug_proper h c env : Proper (nraenv_core_eq_under h c env ==> nraenv_core_ctxt_equiv_under h c env) CNPlug.
+  Instance aecu_Plug_proper h c env : Proper (nraenv_core_eq_under h c env ==> nraenv_core_ctxt_equiv_under h c env) CcNRAEnvPlug.
   Proof.
     unfold Proper, respectful, nraenv_core_ctxt_equiv_under, nraenv_core_eq_under; intros.
     autorewrite with aec_substs.
@@ -329,7 +329,7 @@ Section cNRAEnvContext.
       (eq ==>
           nraenv_core_ctxt_equiv_under h c env ==>
           nraenv_core_ctxt_equiv_under h c env ==>
-          nraenv_core_ctxt_equiv_under h c env) CANBinop.
+          nraenv_core_ctxt_equiv_under h c env) CcNRAEnvBinop.
   Proof.
     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
     intros; subst.
@@ -343,7 +343,7 @@ Section cNRAEnvContext.
     Proper
       (eq ==>
           nraenv_core_ctxt_equiv_under h c env ==>
-          nraenv_core_ctxt_equiv_under h c env) CANUnop.
+          nraenv_core_ctxt_equiv_under h c env) CcNRAEnvUnop.
   Proof.
     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
     intros; subst.
@@ -357,7 +357,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANMap.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvMap.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
@@ -371,7 +371,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANMapProduct.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvMapProduct.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
@@ -385,7 +385,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANProduct.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvProduct.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
@@ -399,7 +399,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANSelect.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvSelect.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
@@ -413,7 +413,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANDefault.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvDefault.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
@@ -427,7 +427,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANEither.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvEither.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
@@ -441,7 +441,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANEitherConcat.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvEitherConcat.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
@@ -455,7 +455,7 @@ Section cNRAEnvContext.
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANApp.
+                        nraenv_core_ctxt_equiv_under h c env) CcNRAEnvApp.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.

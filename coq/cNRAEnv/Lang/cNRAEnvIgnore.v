@@ -36,42 +36,42 @@ Section cNRAEnvIgnore.
 
   Fixpoint nraenv_core_is_nra (e:nraenv_core) : Prop :=
     match e with
-    | ANID => True
-    | ANConst rd => True
-    | ANBinop bop e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANUnop uop e1 => nraenv_core_is_nra e1
-    | ANMap e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANMapProduct e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANProduct e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANSelect e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANDefault e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANEither e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANEitherConcat e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANApp e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-    | ANGetConstant _ => True
-    | ANEnv => False
-    | ANAppEnv e1 e2 => False
-    | ANMapEnv e1 => False
+    | cNRAEnvID => True
+    | cNRAEnvConst rd => True
+    | cNRAEnvBinop bop e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_is_nra e1
+    | cNRAEnvMap e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvMapProduct e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvProduct e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvSelect e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvDefault e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvEither e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvEitherConcat e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvApp e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
+    | cNRAEnvGetConstant _ => True
+    | cNRAEnvEnv => False
+    | cNRAEnvAppEnv e1 e2 => False
+    | cNRAEnvMapEnv e1 => False
     end.
 
   Fixpoint nraenv_core_is_nra_fun (e:nraenv_core) : bool :=
     match e with
-    | ANID => true
-    | ANConst rd => true
-    | ANBinop bop e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANUnop uop e1 => nraenv_core_is_nra_fun e1
-    | ANMap e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANMapProduct e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANProduct e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANSelect e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANDefault e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANEither e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANEitherConcat e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANApp e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-    | ANGetConstant _ => true
-    | ANEnv => false
-    | ANAppEnv e1 e2 => false
-    | ANMapEnv e1 => false
+    | cNRAEnvID => true
+    | cNRAEnvConst rd => true
+    | cNRAEnvBinop bop e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_is_nra_fun e1
+    | cNRAEnvMap e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvMapProduct e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvProduct e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvSelect e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvDefault e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvEither e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvEitherConcat e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvApp e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
+    | cNRAEnvGetConstant _ => true
+    | cNRAEnvEnv => false
+    | cNRAEnvAppEnv e1 e2 => false
+    | cNRAEnvMapEnv e1 => false
     end.
 
   Lemma nraenv_core_is_nra_eq (e:nraenv_core):
@@ -91,43 +91,43 @@ Section cNRAEnvIgnore.
 
   Fixpoint nraenv_core_ignores_env (e:nraenv_core) : Prop :=
     match e with
-    | ANID => True
-    | ANConst rd => True
-    | ANBinop bop e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANUnop uop e1 => nraenv_core_ignores_env e1
-    | ANMap e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANMapProduct e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANProduct e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANSelect e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANDefault e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANEither e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANEitherConcat e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANApp e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
-    | ANGetConstant _ => True
-    | ANEnv => False
-    | ANAppEnv e1 e2 => (nraenv_core_ignores_env e2)
-    | ANMapEnv e1 => False
+    | cNRAEnvID => True
+    | cNRAEnvConst rd => True
+    | cNRAEnvBinop bop e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_ignores_env e1
+    | cNRAEnvMap e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvMapProduct e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvProduct e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvSelect e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvDefault e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvEither e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvEitherConcat e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvApp e1 e2 => (nraenv_core_ignores_env e1) /\ (nraenv_core_ignores_env e2)
+    | cNRAEnvGetConstant _ => True
+    | cNRAEnvEnv => False
+    | cNRAEnvAppEnv e1 e2 => (nraenv_core_ignores_env e2)
+    | cNRAEnvMapEnv e1 => False
     end.
 
   (* Java equivalent: NraOptimizer.nraenv_core_ignores_env_fun *)
   Fixpoint nraenv_core_ignores_env_fun (e:nraenv_core) : bool :=
     match e with
-    | ANID => true
-    | ANConst rd => true
-    | ANBinop bop e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANUnop uop e1 => nraenv_core_ignores_env_fun e1
-    | ANMap e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANMapProduct e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANProduct e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANSelect e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANDefault e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANEither e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANEitherConcat e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANApp e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
-    | ANGetConstant _ => true
-    | ANEnv => false
-    | ANAppEnv e1 e2 => (nraenv_core_ignores_env_fun e2)
-    | ANMapEnv e1 => false
+    | cNRAEnvID => true
+    | cNRAEnvConst rd => true
+    | cNRAEnvBinop bop e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_ignores_env_fun e1
+    | cNRAEnvMap e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvMapProduct e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvProduct e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvSelect e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvDefault e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvEither e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvEitherConcat e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvApp e1 e2 => andb (nraenv_core_ignores_env_fun e1) (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvGetConstant _ => true
+    | cNRAEnvEnv => false
+    | cNRAEnvAppEnv e1 e2 => (nraenv_core_ignores_env_fun e2)
+    | cNRAEnvMapEnv e1 => false
     end.
 
   Lemma nraenv_core_ignores_env_eq (e:nraenv_core):
@@ -151,42 +151,42 @@ Section cNRAEnvIgnore.
 
   Fixpoint nraenv_core_fixed_env (e:nraenv_core) : Prop :=
     match e with
-    | ANID => True
-    | ANConst rd => True
-    | ANBinop bop e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANUnop uop e1 => nraenv_core_fixed_env e1
-    | ANMap e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANMapProduct e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANProduct e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANSelect e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANDefault e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANEither e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANEitherConcat e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANApp e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
-    | ANGetConstant _ => True 
-    | ANEnv => True (* That's the difference with ignore... *)
-    | ANAppEnv e1 e2 => False (* Changes the environment *)
-    | ANMapEnv e1 => False (* Changes the environment *)
+    | cNRAEnvID => True
+    | cNRAEnvConst rd => True
+    | cNRAEnvBinop bop e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_fixed_env e1
+    | cNRAEnvMap e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvMapProduct e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvProduct e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvSelect e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvDefault e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvEither e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvEitherConcat e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvApp e1 e2 => (nraenv_core_fixed_env e1) /\ (nraenv_core_fixed_env e2)
+    | cNRAEnvGetConstant _ => True 
+    | cNRAEnvEnv => True (* That's the difference with ignore... *)
+    | cNRAEnvAppEnv e1 e2 => False (* Changes the environment *)
+    | cNRAEnvMapEnv e1 => False (* Changes the environment *)
     end.
 
   Fixpoint nraenv_core_fixed_env_fun (e:nraenv_core) : bool :=
     match e with
-    | ANID => true
-    | ANConst rd => true
-    | ANBinop bop e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANUnop uop e1 => nraenv_core_fixed_env_fun e1
-    | ANMap e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANMapProduct e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANProduct e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANSelect e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANDefault e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANEither e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANEitherConcat e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANApp e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
-    | ANGetConstant _ => true
-    | ANEnv => true
-    | ANAppEnv e1 e2 => false
-    | ANMapEnv e1 => false
+    | cNRAEnvID => true
+    | cNRAEnvConst rd => true
+    | cNRAEnvBinop bop e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_fixed_env_fun e1
+    | cNRAEnvMap e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvMapProduct e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvProduct e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvSelect e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvDefault e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvEither e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvEitherConcat e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvApp e1 e2 => andb (nraenv_core_fixed_env_fun e1) (nraenv_core_fixed_env_fun e2)
+    | cNRAEnvGetConstant _ => true
+    | cNRAEnvEnv => true
+    | cNRAEnvAppEnv e1 e2 => false
+    | cNRAEnvMapEnv e1 => false
     end.
 
   Lemma nraenv_core_fixed_env_eq (e:nraenv_core):
@@ -208,43 +208,43 @@ Section cNRAEnvIgnore.
   
   Fixpoint nraenv_core_ignores_id (e:nraenv_core) : Prop :=
     match e with
-    | ANID => False
-    | ANConst rd => True
-    | ANBinop bop e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-    | ANUnop uop e1 => nraenv_core_ignores_id e1
-    | ANMap e1 e2 => nraenv_core_ignores_id e2
-    | ANMapProduct e1 e2 => nraenv_core_ignores_id e2
-    | ANProduct e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-    | ANSelect e1 e2 => (nraenv_core_ignores_id e2)
-    | ANDefault e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-    | ANEither e1 e2 => False
-    | ANEitherConcat e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-    | ANApp e1 e2 => (nraenv_core_ignores_id e2)
-    | ANGetConstant _ => True
-    | ANEnv => True
-    | ANAppEnv e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
-    | ANMapEnv e1 => (nraenv_core_ignores_id e1)
+    | cNRAEnvID => False
+    | cNRAEnvConst rd => True
+    | cNRAEnvBinop bop e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_ignores_id e1
+    | cNRAEnvMap e1 e2 => nraenv_core_ignores_id e2
+    | cNRAEnvMapProduct e1 e2 => nraenv_core_ignores_id e2
+    | cNRAEnvProduct e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | cNRAEnvSelect e1 e2 => (nraenv_core_ignores_id e2)
+    | cNRAEnvDefault e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | cNRAEnvEither e1 e2 => False
+    | cNRAEnvEitherConcat e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | cNRAEnvApp e1 e2 => (nraenv_core_ignores_id e2)
+    | cNRAEnvGetConstant _ => True
+    | cNRAEnvEnv => True
+    | cNRAEnvAppEnv e1 e2 => (nraenv_core_ignores_id e1) /\ (nraenv_core_ignores_id e2)
+    | cNRAEnvMapEnv e1 => (nraenv_core_ignores_id e1)
     end.
 
   (* Java equivalent: NraOptimizer.nraenv_core_ignores_id_fun *)
   Fixpoint nraenv_core_ignores_id_fun (e:nraenv_core) : bool :=
     match e with
-    | ANID => false
-    | ANConst rd => true
-    | ANBinop bop e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-    | ANUnop uop e1 => nraenv_core_ignores_id_fun e1
-    | ANMap e1 e2 => nraenv_core_ignores_id_fun e2
-    | ANMapProduct e1 e2 => nraenv_core_ignores_id_fun e2
-    | ANProduct e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-    | ANSelect e1 e2 => (nraenv_core_ignores_id_fun e2)
-    | ANDefault e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-    | ANEither e1 e2 => false
-    | ANEitherConcat e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-    | ANApp e1 e2 => (nraenv_core_ignores_id_fun e2)
-    | ANGetConstant _ => true
-    | ANEnv => true
-    | ANAppEnv e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
-    | ANMapEnv e1 => (nraenv_core_ignores_id_fun e1)
+    | cNRAEnvID => false
+    | cNRAEnvConst rd => true
+    | cNRAEnvBinop bop e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | cNRAEnvUnop uop e1 => nraenv_core_ignores_id_fun e1
+    | cNRAEnvMap e1 e2 => nraenv_core_ignores_id_fun e2
+    | cNRAEnvMapProduct e1 e2 => nraenv_core_ignores_id_fun e2
+    | cNRAEnvProduct e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | cNRAEnvSelect e1 e2 => (nraenv_core_ignores_id_fun e2)
+    | cNRAEnvDefault e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | cNRAEnvEither e1 e2 => false
+    | cNRAEnvEitherConcat e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | cNRAEnvApp e1 e2 => (nraenv_core_ignores_id_fun e2)
+    | cNRAEnvGetConstant _ => true
+    | cNRAEnvEnv => true
+    | cNRAEnvAppEnv e1 e2 => andb (nraenv_core_ignores_id_fun e1) (nraenv_core_ignores_id_fun e2)
+    | cNRAEnvMapEnv e1 => (nraenv_core_ignores_id_fun e1)
     end.
   
   Lemma nraenv_core_ignores_id_eq (e:nraenv_core):
@@ -300,22 +300,22 @@ Section cNRAEnvIgnore.
   
   Fixpoint nraenv_core_deenv_nra (ae:nraenv_core) : nra :=
     match ae with
-    | ANID => NRAID
-    | ANConst d => NRAConst d
-    | ANBinop b ae1 ae2 => NRABinop b (nraenv_core_deenv_nra ae1) (nraenv_core_deenv_nra ae2)
-    | ANUnop u ae1 => NRAUnop u (nraenv_core_deenv_nra ae1)
-    | ANMap ea1 ea2 => NRAMap (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANMapProduct ea1 ea2 => NRAMapProduct (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANProduct ea1 ea2 => NRAProduct (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANSelect ea1 ea2 => NRASelect (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANDefault ea1 ea2 => NRADefault (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANEither ea1 ea2 => NRAEither (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANEitherConcat ea1 ea2 => NRAEitherConcat (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANApp ea1 ea2 => NRAApp (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-    | ANGetConstant s => NRAGetConstant s
-    | ANEnv => NRAID
-    | ANAppEnv ea1 ea2 => NRAID
-    | ANMapEnv ea1 => NRAID
+    | cNRAEnvID => NRAID
+    | cNRAEnvConst d => NRAConst d
+    | cNRAEnvBinop b ae1 ae2 => NRABinop b (nraenv_core_deenv_nra ae1) (nraenv_core_deenv_nra ae2)
+    | cNRAEnvUnop u ae1 => NRAUnop u (nraenv_core_deenv_nra ae1)
+    | cNRAEnvMap ea1 ea2 => NRAMap (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvMapProduct ea1 ea2 => NRAMapProduct (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvProduct ea1 ea2 => NRAProduct (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvSelect ea1 ea2 => NRASelect (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvDefault ea1 ea2 => NRADefault (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvEither ea1 ea2 => NRAEither (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvEitherConcat ea1 ea2 => NRAEitherConcat (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvApp ea1 ea2 => NRAApp (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
+    | cNRAEnvGetConstant s => NRAGetConstant s
+    | cNRAEnvEnv => NRAID
+    | cNRAEnvAppEnv ea1 ea2 => NRAID
+    | cNRAEnvMapEnv ea1 => NRAID
     end.
 
   Lemma nraenv_core_ignores_env_swap (e:nraenv_core) :
@@ -711,23 +711,23 @@ Section cNRAEnvIgnore.
         rewrite IHe1; reflexivity.
   Qed.
 
-  (* TODO: try to define ANEitherConcat. *)
+  (* TODO: try to define cNRAEnvEitherConcat. *)
   (* TODO: this (and the Proper) should move *)
   Fixpoint nraenv_core_of_nra (a:nra) : nraenv_core :=
     match a with
-      | NRAGetConstant s => ANGetConstant s
-      | NRAID => ANID
-      | NRAConst d => ANConst d
-      | NRABinop b e1 e2 => ANBinop b (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | NRAUnop u e1 => ANUnop u (nraenv_core_of_nra e1)
-      | NRAMap e1 e2 => ANMap (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | NRAMapProduct e1 e2 => ANMapProduct (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | NRAProduct e1 e2 => ANProduct (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | NRASelect e1 e2 => ANSelect (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | NRADefault e1 e2 => ANDefault (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
-      | NRAEither opl opr => ANEither (nraenv_core_of_nra opl) (nraenv_core_of_nra opr)
-      | NRAEitherConcat op1 op2 => ANEitherConcat (nraenv_core_of_nra op1) (nraenv_core_of_nra op2)
-      | NRAApp e1 e2 => ANApp (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAGetConstant s => cNRAEnvGetConstant s
+      | NRAID => cNRAEnvID
+      | NRAConst d => cNRAEnvConst d
+      | NRABinop b e1 e2 => cNRAEnvBinop b (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAUnop u e1 => cNRAEnvUnop u (nraenv_core_of_nra e1)
+      | NRAMap e1 e2 => cNRAEnvMap (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAMapProduct e1 e2 => cNRAEnvMapProduct (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAProduct e1 e2 => cNRAEnvProduct (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRASelect e1 e2 => cNRAEnvSelect (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRADefault e1 e2 => cNRAEnvDefault (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | NRAEither opl opr => cNRAEnvEither (nraenv_core_of_nra opl) (nraenv_core_of_nra opr)
+      | NRAEitherConcat op1 op2 => cNRAEnvEitherConcat (nraenv_core_of_nra op1) (nraenv_core_of_nra op2)
+      | NRAApp e1 e2 => cNRAEnvApp (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
     end.
 
   Lemma nraenv_core_eval_of_nra h c e d env :

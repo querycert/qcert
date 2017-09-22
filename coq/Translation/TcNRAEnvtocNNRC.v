@@ -167,15 +167,15 @@ Section TcNRAEnvtocNNRC.
     intros.
     revert τin τenv τout vid venv tenv H H0 H1.
     nraenv_core_cases (induction op) Case; simpl; intros; inversion H1; subst.
-    - Case "ANID"%string.
+    - Case "cNRAEnvID"%string.
       rewrite H in H4; inversion H4; subst. eauto.
-    - Case "ANConst"%string.
+    - Case "cNRAEnvConst"%string.
       eauto.
-    - Case "ANBinop"%string.
+    - Case "cNRAEnvBinop"%string.
       eauto. 
-    - Case "ANUnop"%string.
+    - Case "cNRAEnvUnop"%string.
       eauto.
-    - Case "ANMap"%string.
+    - Case "cNRAEnvMap"%string.
       econstructor; eauto 2.
       eapply (IHop1 _ _ _ (fresh_var "tmap$" [vid; venv])
                     venv
@@ -183,7 +183,7 @@ Section TcNRAEnvtocNNRC.
                       τ₁) :: tenv)); simpl; trivial.
       + match_destr; congruence.
       + match_destr. elim_fresh e.
-    - Case "ANMapProduct"%string.
+    - Case "cNRAEnvMapProduct"%string.
       inversion H7; subst.
       inversion H10; subst.
       inversion H12; subst.
@@ -210,7 +210,7 @@ Section TcNRAEnvtocNNRC.
         congruence.
       + simpl; match_destr.
         elim_fresh e2.
-    - Case "ANProduct"%string.
+    - Case "cNRAEnvProduct"%string.
       inversion H5; subst.
       inversion H7; subst.
       destruct τ₂; simpl in *.
@@ -233,7 +233,7 @@ Section TcNRAEnvtocNNRC.
         match_destr.
         elim_fresh e2.
       + simpl; match_destr; try elim_fresh e2.
-    - Case "ANSelect"%string.
+    - Case "cNRAEnvSelect"%string.
       inversion H5; clear H5; subst.
       inversion H7; clear H7; subst.
       inversion H9; clear H9; subst.
@@ -250,7 +250,7 @@ Section TcNRAEnvtocNNRC.
       econstructor; eauto 2.
       eapply (IHop1 _ _ _ (fresh_var "tsel$" (vid::venv::nil)) venv ((fresh_var "tsel$" (vid::venv::nil), τ) :: tenv)); eauto; simpl;
         match_destr; try elim_fresh e0.
-    - Case "ANDefault"%string.
+    - Case "cNRAEnvDefault"%string.
       inversion H8; subst; clear H8.
       inversion H11; subst. inversion H6; subst.
       inversion H9; inversion H13; inversion H14;
@@ -261,7 +261,7 @@ Section TcNRAEnvtocNNRC.
       inversion H4; subst; inversion H12; subst; clear H4 H12.
       constructor; eauto 2.
       eapply (IHop2 _ _ _ vid venv ((fresh_var "tdef$" [vid; venv], Coll τ) :: tenv)); eauto; simpl; match_destr; elim_fresh e0.
-    - Case "ANEither"%string.
+    - Case "cNRAEnvEither"%string.
       inversion H9; subst.
       rewrite H in H4; inversion H4; clear H4; subst.
       econstructor.
@@ -269,7 +269,7 @@ Section TcNRAEnvtocNNRC.
           simpl; match_destr; try elim_fresh e.
       + eapply IHop2; try eapply H11; trivial;
         simpl; match_destr; try elim_fresh e.
-    - Case "ANEitherConcat"%string.
+    - Case "cNRAEnvEitherConcat"%string.
       inversion H8; clear H8; subst.
       clear H1.
       inversion H12; clear H12; subst.
@@ -298,22 +298,22 @@ Section TcNRAEnvtocNNRC.
       econstructor; try reflexivity; eauto 2.
       eapply IHop1; try eapply H11; trivial;
         simpl; match_destr; try elim_fresh e1.
-    - Case "ANApp"%string.
+    - Case "cNRAEnvApp"%string.
       inversion H; subst; clear H.
       econstructor; eauto 2.
       eapply (IHop1 _ _ _ (fresh_var "tapp$" [vid; venv]) venv ((fresh_var "tapp$" [vid; venv], τ₁) :: tenv)); simpl; trivial;
         try (match_destr; try elim_fresh e).
-    - Case "ANGetConstant"%string.
+    - Case "cNRAEnvGetConstant"%string.
       econstructor.
       eauto.
-    - Case "ANEnv"%string.
+    - Case "cNRAEnvEnv"%string.
       rewrite H0 in H4; inversion H4; subst; eauto.
-    - Case "ANAppEnv"%string.
+    - Case "cNRAEnvAppEnv"%string.
       inversion H; subst; clear H.
       econstructor; eauto 2.
       eapply (IHop1 _ _ _ vid (fresh_var "tappe$" [vid; venv]) ((fresh_var "tappe$" [vid; venv], τ₁) :: tenv)); trivial; simpl;
         try (match_destr; elim_fresh e).
-    - Case "ANMapEnv"%string.
+    - Case "cNRAEnvMapEnv"%string.
       inversion H7; clear H7; subst.
       rewrite H0 in H4.
       inversion H4; clear H4; subst.

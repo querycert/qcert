@@ -850,8 +850,8 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tflatten_flatten_map_either_nil p₁ p₂ p₃ :
-    ♯flatten( ♯flatten(χ⟨ANEither p₁ ‵{||} ◯ p₂⟩(p₃))) ⇒
-     ♯flatten( χ⟨ANEither( ♯flatten(p₁)) ‵{||} ◯ p₂⟩(p₃)).
+    ♯flatten( ♯flatten(χ⟨cNRAEnvEither p₁ ‵{||} ◯ p₂⟩(p₃))) ⇒
+     ♯flatten( χ⟨cNRAEnvEither( ♯flatten(p₁)) ‵{||} ◯ p₂⟩(p₃)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (flatten_flatten_map_either_nil p₁ p₂ p₃)).
     intros. nraenv_core_inferer.
@@ -861,7 +861,7 @@ Section TNRAEnvRewrite.
   (* ♯flatten(χᵉ⟨{ q₁ }⟩) ⇒ χᵉ⟨ q₁ ⟩ *)
   
   Lemma tflatten_mapenv_coll_arrow q₁:
-    ♯flatten(ANMapEnv (‵{| q₁ |})) ⇒ ANMapEnv q₁.
+    ♯flatten(cNRAEnvMapEnv (‵{| q₁ |})) ⇒ cNRAEnvMapEnv q₁.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (flatten_mapenv_coll q₁)).
     intros. nraenv_core_inferer.
@@ -1104,12 +1104,12 @@ Section TNRAEnvRewrite.
                  end) l); simpl in *; congruence.
   Qed.
 
-  (* ♯flatten(χ⟨ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( (ANEither { ID } {}) ◯ q₃ ) ) ⟩( q₄ ))
-            ⇒ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( ♯flatten( χ⟨ (ANEither { ID } {}) ◯ q₃ ⟩( q₄ ) ) ) ) *)
+  (* ♯flatten(χ⟨ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( (cNRAEnvEither { ID } {}) ◯ q₃ ) ) ⟩( q₄ ))
+            ⇒ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( ♯flatten( χ⟨ (cNRAEnvEither { ID } {}) ◯ q₃ ⟩( q₄ ) ) ) ) *)
 
   Lemma tflatten_over_double_map_with_either_arrow q₁ q₂ q₃ q₄ :
-    ♯flatten(χ⟨ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( (ANEither (‵{|ID|}) ‵{||}) ◯ q₃ ) ) ⟩( q₄ ))
-            ⇒ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( ♯flatten( χ⟨ (ANEither (‵{|ID|}) ‵{||}) ◯ q₃ ⟩( q₄ ) ) ) ).
+    ♯flatten(χ⟨ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( (cNRAEnvEither (‵{|ID|}) ‵{||}) ◯ q₃ ) ) ⟩( q₄ ))
+            ⇒ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( ♯flatten( χ⟨ (cNRAEnvEither (‵{|ID|}) ‵{||}) ◯ q₃ ⟩( q₄ ) ) ) ).
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -1801,7 +1801,7 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tselect_over_either p₁ p₂ p₃ :
-    σ⟨p₁⟩( ANEither p₂ p₃) ⇒ ANEither (σ⟨p₁⟩(p₂)) (σ⟨p₁⟩(p₃)).
+    σ⟨p₁⟩( cNRAEnvEither p₂ p₃) ⇒ cNRAEnvEither (σ⟨p₁⟩(p₂)) (σ⟨p₁⟩(p₃)).
   Proof.
     apply rewrites_typed_with_untyped.
     - apply select_over_either.
@@ -1942,7 +1942,7 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tmap_over_either p₁ p₂ p₃ :
-    χ⟨p₁⟩( ANEither p₂ p₃) ⇒ ANEither (χ⟨p₁⟩(p₂)) (χ⟨p₁⟩(p₃)).
+    χ⟨p₁⟩( cNRAEnvEither p₂ p₃) ⇒ cNRAEnvEither (χ⟨p₁⟩(p₂)) (χ⟨p₁⟩(p₃)).
   Proof.
     apply rewrites_typed_with_untyped.
     - apply envmap_over_either.
@@ -1951,7 +1951,7 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tmap_over_either_app p₁ p₂ p₃ p₄:
-    χ⟨p₁⟩( ANEither p₂ p₃ ◯ p₄) ⇒ ANEither (χ⟨p₁⟩(p₂)) (χ⟨p₁⟩(p₃)) ◯ p₄.
+    χ⟨p₁⟩( cNRAEnvEither p₂ p₃ ◯ p₄) ⇒ cNRAEnvEither (χ⟨p₁⟩(p₂)) (χ⟨p₁⟩(p₃)) ◯ p₄.
   Proof.
     apply rewrites_typed_with_untyped.
     - apply envmap_over_either_app.
@@ -1966,7 +1966,7 @@ Section TNRAEnvRewrite.
   (* d ◯ q ⇒ d *)
   
   Lemma tapp_over_const_arrow d q:
-    (ANConst d) ◯ q ⇒ (ANConst d).
+    (cNRAEnvConst d) ◯ q ⇒ (cNRAEnvConst d).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2008,7 +2008,7 @@ Section TNRAEnvRewrite.
   (* (⊕u(q₁)) ◯ q₂ ⇒ ⊕u(q₁ ◯ q₂) *)
 
   Lemma tapp_over_unop_arrow u q₁ q₂:
-    (ANUnop u q₁) ◯ q₂ ⇒ (ANUnop u (q₁ ◯ q₂)).
+    (cNRAEnvUnop u q₁) ◯ q₂ ⇒ (cNRAEnvUnop u (q₁ ◯ q₂)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_unop u q₁ q₂)).
     intros. nraenv_core_inferer.
@@ -2018,7 +2018,7 @@ Section TNRAEnvRewrite.
   (* This is a generalization, but duplicates the input... *)
   
   Lemma tapp_over_binop_arrow b q q₁ q₂:
-    (ANBinop b q₂ q₁) ◯ q ⇒ (ANBinop b (q₂ ◯ q) (q₁ ◯ q)).
+    (cNRAEnvBinop b q₂ q₁) ◯ q ⇒ (cNRAEnvBinop b (q₂ ◯ q) (q₁ ◯ q)).
   Proof.
     intros.
     unfold tnraenv_core_rewrites_to; intros.
@@ -2081,7 +2081,7 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tselect_over_app_either p₁ p₂ p₃ p₄ :
-    σ⟨p₁⟩( ANEither p₂ p₃ ◯ p₄ ) ⇒ ANEither (σ⟨p₁⟩(p₂)) (σ⟨p₁⟩(p₃)) ◯ p₄.
+    σ⟨p₁⟩( cNRAEnvEither p₂ p₃ ◯ p₄ ) ⇒ cNRAEnvEither (σ⟨p₁⟩(p₂)) (σ⟨p₁⟩(p₃)) ◯ p₄.
   Proof.
     rewrite tapp_over_select_back_arrow.
     rewrite tselect_over_either.
@@ -2096,7 +2096,7 @@ Section TNRAEnvRewrite.
   (* d ◯ᵉ q ⇒ d *)
   
   Lemma tappenv_over_const_arrow d q:
-    (ANConst d) ◯ₑ q ⇒ (ANConst d).
+    (cNRAEnvConst d) ◯ₑ q ⇒ (cNRAEnvConst d).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2154,21 +2154,21 @@ Section TNRAEnvRewrite.
   (* (⊕u(q₁)) ◯ᵉ q₂ ⇒ ⊕u(q₁ ◯ᵉ q₂) *)
 
   Lemma tappenv_over_unop_arrow u q₁ q₂:
-    (ANUnop u q₁) ◯ₑ q₂ ⇒ (ANUnop u (q₁ ◯ₑ q₂)).
+    (cNRAEnvUnop u q₁) ◯ₑ q₂ ⇒ (cNRAEnvUnop u (q₁ ◯ₑ q₂)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_unop u q₁ q₂)).
     intros. nraenv_core_inferer.
   Qed.
 
   Lemma tunop_over_either u p₁ p₂ :
-    ANUnop u (ANEither p₁ p₂)  ⇒ ANEither (ANUnop u p₁)(ANUnop u p₂).
+    cNRAEnvUnop u (cNRAEnvEither p₁ p₂)  ⇒ cNRAEnvEither (cNRAEnvUnop u p₁)(cNRAEnvUnop u p₂).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (unop_over_either u p₁ p₂)).
     intros. nraenv_core_inferer.
   Qed.
 
   Lemma tunop_over_either_app u p₁ p₂ p₃:
-    ANUnop u (ANEither p₁ p₂ ◯ p₃) ⇒ ANEither (ANUnop u p₁)(ANUnop u p₂) ◯ p₃.
+    cNRAEnvUnop u (cNRAEnvEither p₁ p₂ ◯ p₃) ⇒ cNRAEnvEither (cNRAEnvUnop u p₁)(cNRAEnvUnop u p₂) ◯ p₃.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (unop_over_either_app u p₁ p₂ p₃)).
     intros. nraenv_core_inferer.
@@ -2177,7 +2177,7 @@ Section TNRAEnvRewrite.
   (* (q₁ ⊗b q₂) ◯ᵉ ID ⇒ (q₁ ◯ᵉ ID) ⊗b (q₂ ◯ᵉ ID) *)
   
   Lemma tappenv_over_binop b q₁ q₂ q :
-    (ANBinop b q₁ q₂) ◯ₑ q ⇒ (ANBinop b (q₁ ◯ₑ q) (q₂ ◯ₑ q)).
+    (cNRAEnvBinop b q₁ q₂) ◯ₑ q ⇒ (cNRAEnvBinop b (q₁ ◯ₑ q) (q₂ ◯ₑ q)).
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -2204,7 +2204,7 @@ Section TNRAEnvRewrite.
   
   Lemma tappenv_over_map_nraenv_core_ignores_env_arrow q₁ q₂:
     nraenv_core_ignores_env q₁ ->
-    χ⟨ q₁ ⟩( q₂ ) ◯ₑ ANID ⇒ χ⟨ q₁ ◯ₑ ANID ⟩( q₂ ◯ₑ ANID ).
+    χ⟨ q₁ ⟩( q₂ ) ◯ₑ cNRAEnvID ⇒ χ⟨ q₁ ◯ₑ cNRAEnvID ⟩( q₂ ◯ₑ cNRAEnvID ).
   Proof.
     unfold tnraenv_core_rewrites_to; simpl; intros.
     nraenv_core_inferer.
@@ -2316,7 +2316,7 @@ Section TNRAEnvRewrite.
   
   Lemma tappenv_over_env_merge_l_arrow q₁ q:
     nraenv_core_ignores_env q₁ ->
-    ANAppEnv (ENV ⊗ q₁) q ⇒ q ⊗ q₁.
+    cNRAEnvAppEnv (ENV ⊗ q₁) q ⇒ q ⊗ q₁.
   Proof.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_env_merge_l q₁ q H)); intros.
@@ -2384,7 +2384,7 @@ Section TNRAEnvRewrite.
 
   Lemma tappenv_through_either q₁ q₂ q₃:
     nraenv_core_ignores_id q₃ ->
-    ANEither q₁ q₂ ◯ₑ q₃ ⇒ ANEither (q₁ ◯ₑ q₃) (q₂ ◯ₑ q₃).
+    cNRAEnvEither q₁ q₂ ◯ₑ q₃ ⇒ cNRAEnvEither (q₁ ◯ₑ q₃) (q₂ ◯ₑ q₃).
   Proof.
     intros ig.
     apply (rewrites_typed_with_untyped _ _ (appenv_through_either q₁ q₂ q₃ ig)).
@@ -2401,7 +2401,7 @@ Section TNRAEnvRewrite.
   (* χᵉ⟨ ENV ⟩( q ) ⇒ ENV *)
 
   Lemma tmapenv_to_env_arrow q :
-    (ANMapEnv (ENV)) ◯ q ⇒ ENV.
+    (cNRAEnvMapEnv (ENV)) ◯ q ⇒ ENV.
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2414,7 +2414,7 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tmapenv_over_singleton_arrow q₁ q₂ :
-    (ANMapEnv q₁) ◯ₑ (‵{|q₂|}) ⇒ ‵{| q₁ ◯ₑ q₂ |}.
+    (cNRAEnvMapEnv q₁) ◯ₑ (‵{|q₂|}) ⇒ ‵{| q₁ ◯ₑ q₂ |}.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -2428,7 +2428,7 @@ Section TNRAEnvRewrite.
   
   Lemma tmapenv_to_map_arrow q₁ q₂:
     nraenv_core_ignores_id q₁ ->
-    (ANMapEnv q₁) ◯ₑ q₂ ⇒ χ⟨ q₁ ◯ₑ ID ⟩(q₂).
+    (cNRAEnvMapEnv q₁) ◯ₑ q₂ ⇒ χ⟨ q₁ ◯ₑ ID ⟩(q₂).
   Proof.
     intros.
     unfold tnraenv_core_rewrites_to; simpl; intros.
@@ -2455,7 +2455,7 @@ Section TNRAEnvRewrite.
        ⇒ χ⟨ ENV ⟩(σ⟨ q₁ ⟩(σ⟨ q₂ ⟩(‵{| ID |})) *)
   
   Lemma tcompose_selects_in_mapenv_arrow q₁ q₂ :
-    (♯flatten(ANMapEnv (χ⟨ENV⟩(σ⟨ q₁ ⟩( ‵{| ID |}))))) ◯ₑ (χ⟨ENV⟩(σ⟨ q₂ ⟩( ‵{| ID |})))
+    (♯flatten(cNRAEnvMapEnv (χ⟨ENV⟩(σ⟨ q₁ ⟩( ‵{| ID |}))))) ◯ₑ (χ⟨ENV⟩(σ⟨ q₂ ⟩( ‵{| ID |})))
                                                           ⇒ (χ⟨ENV⟩(σ⟨ q₁ ⟩(σ⟨ q₂ ⟩( ‵{| ID |})))).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (compose_selects_in_mapenv q₁ q₂)).
@@ -2465,8 +2465,8 @@ Section TNRAEnvRewrite.
   (* (χᵉ⟨ q ⟩) ◯ᵉ (ENV ⊗ [ a : ID ]) ⇒ χ⟨ (q ◯ ENV·a) ◯ᵉ ID ⟩(ENV ⊗ [ a : ID ]) *)
   
   Lemma tappenv_mapenv_to_map_arrow q a:
-    ANAppEnv (ANMapEnv q) (ENV ⊗ ‵[| (a, ID)|]) ⇒
-             χ⟨(q ◯ (ANUnop (OpDot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) ).
+    cNRAEnvAppEnv (cNRAEnvMapEnv q) (ENV ⊗ ‵[| (a, ID)|]) ⇒
+             χ⟨(q ◯ (cNRAEnvUnop (OpDot a) cNRAEnvEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) ).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2515,8 +2515,8 @@ Section TNRAEnvRewrite.
    ⇒ ♯flatten(χ⟨ ( q ◯ ENV·a ) ◯ᵉ ID ⟩( ENV ⊗ [ a : ID ])) *)
   
   Lemma tappenv_flatten_mapenv_to_map_arrow q a:
-    ANAppEnv (♯flatten(ANMapEnv q)) (ENV ⊗ ‵[| (a, ID)|]) ⇒
-           ♯flatten(χ⟨(q ◯ (ANUnop (OpDot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) )).
+    cNRAEnvAppEnv (♯flatten(cNRAEnvMapEnv q)) (ENV ⊗ ‵[| (a, ID)|]) ⇒
+           ♯flatten(χ⟨(q ◯ (cNRAEnvUnop (OpDot a) cNRAEnvEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) )).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2568,7 +2568,7 @@ Section TNRAEnvRewrite.
   (* ♯toString(s) ⇒ s *)
   
   Lemma ttostring_dstring_arrow s:
-    (ANUnop OpToString (ANConst (dstring s))) ⇒ (ANConst (dstring s)).
+    (cNRAEnvUnop OpToString (cNRAEnvConst (dstring s))) ⇒ (cNRAEnvConst (dstring s)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (tostring_dstring s)).
     intros; nraenv_core_inferer.
@@ -2580,7 +2580,7 @@ Section TNRAEnvRewrite.
   (* ♯toString(♯toString(q)) ⇒ ♯toString(q) *)
   
   Lemma ttostring_tostring_arrow q:
-    (ANUnop OpToString (ANUnop OpToString q)) ⇒ (ANUnop OpToString q).
+    (cNRAEnvUnop OpToString (cNRAEnvUnop OpToString q)) ⇒ (cNRAEnvUnop OpToString q).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (tostring_tostring q)).
     intros.
@@ -2593,7 +2593,7 @@ Section TNRAEnvRewrite.
   (* ♯toString(♯sConcat q₁ q₂) ⇒ ♯toString(♯sConcat q₁ q₂) *)
   
   Lemma ttostring_sconcat_arrow q₁ q₂:
-    (ANUnop OpToString (ANBinop OpStringConcat q₁ q₂)) ⇒ (ANBinop OpStringConcat q₁ q₂).
+    (cNRAEnvUnop OpToString (cNRAEnvBinop OpStringConcat q₁ q₂)) ⇒ (cNRAEnvBinop OpStringConcat q₁ q₂).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2675,7 +2675,7 @@ Section TNRAEnvRewrite.
   Qed.
 
    Lemma trproject_over_const sl l :
-    π[sl](ANConst (drec l)) ⇒ ANConst (drec (rproject l sl)).
+    π[sl](cNRAEnvConst (drec l)) ⇒ cNRAEnvConst (drec (rproject l sl)).
   Proof.
     apply rewrites_typed_with_untyped.
     - apply rproject_over_const.
@@ -2852,7 +2852,7 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma trproject_over_either sl p1 p2 :
-    π[sl](ANEither p1 p2) ⇒ ANEither (π[sl](p1)) (π[sl](p2)).
+    π[sl](cNRAEnvEither p1 p2) ⇒ cNRAEnvEither (π[sl](p1)) (π[sl](p2)).
   Proof.
     apply rewrites_typed_with_untyped.
     - apply rproject_over_either.
@@ -2918,7 +2918,7 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tmap_over_either_nil_b p₁ p₂ :
-    ANEither (χ⟨p₁⟩(p₂)) ‵{||} ⇒ χ⟨p₁⟩(ANEither p₂ ‵{||}).
+    cNRAEnvEither (χ⟨p₁⟩(p₂)) ‵{||} ⇒ χ⟨p₁⟩(cNRAEnvEither p₂ ‵{||}).
   Proof.
      apply rewrites_typed_with_untyped.
      - rewrite envmap_over_either.
@@ -2929,8 +2929,8 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tcount_over_flat_map_either_nil_map p₁ p₂ p₃ :
-    ♯count(♯flatten(χ⟨ANEither (χ⟨p₁⟩(p₂)) ‵{||}⟩(p₃))) ⇒
-          ♯count(♯flatten(χ⟨ANEither p₂ ‵{||}⟩(p₃))).
+    ♯count(♯flatten(χ⟨cNRAEnvEither (χ⟨p₁⟩(p₂)) ‵{||}⟩(p₃))) ⇒
+          ♯count(♯flatten(χ⟨cNRAEnvEither p₂ ‵{||}⟩(p₃))).
   Proof.
     rewrite tmap_over_either_nil_b.
     rewrite tcount_over_flat_map_map.
@@ -2938,8 +2938,8 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tcount_over_flat_map_either_nil_app_map p₁ p₂ p₃ p₄:
-    ♯count(♯flatten(χ⟨ANEither (χ⟨p₁⟩(p₂)) ‵{||} ◯ p₄⟩(p₃))) ⇒
-          ♯count(♯flatten(χ⟨ANEither p₂ ‵{||} ◯ p₄⟩(p₃))).
+    ♯count(♯flatten(χ⟨cNRAEnvEither (χ⟨p₁⟩(p₂)) ‵{||} ◯ p₄⟩(p₃))) ⇒
+          ♯count(♯flatten(χ⟨cNRAEnvEither p₂ ‵{||} ◯ p₄⟩(p₃))).
   Proof.
     rewrite tmap_over_either_nil_b.
     rewrite tapp_over_map_arrow.
@@ -2948,8 +2948,8 @@ Section TNRAEnvRewrite.
   Qed.
 
   Lemma tcount_over_flat_map_either_nil_app_singleton p₁ p₂ p₃:
-    ♯count(♯flatten(χ⟨ANEither (‵{| p₁ |}) ‵{||} ◯ p₃⟩(p₂))) ⇒
-          ♯count(♯flatten(χ⟨ANEither (‵{| ANConst dunit |}) ‵{||} ◯ p₃⟩(p₂))).
+    ♯count(♯flatten(χ⟨cNRAEnvEither (‵{| p₁ |}) ‵{||} ◯ p₃⟩(p₂))) ⇒
+          ♯count(♯flatten(χ⟨cNRAEnvEither (‵{| cNRAEnvConst dunit |}) ‵{||} ◯ p₃⟩(p₂))).
   Proof.
     red; intros; split.
     - nraenv_core_inferer.
@@ -3307,10 +3307,10 @@ Hint Rewrite @ttostring_sconcat_arrow : tnraenv_core_optim.
        -- Those handle operators on the environment
        appenv_over_mapenv : χᵉ⟨ { ENV } ⟩(ID) ◯ₑ ♯flatten(p) ⇒ χ⟨ { ID } ⟩(♯flatten(p))
        appenv_over_mapenv_coll : (χᵉ⟨ { { ENV } } ⟩(ID) ◯ₑ ♯flatten(p)) ⇒ χ⟨ { { ID } } ⟩(♯flatten(p))
-       appenv_over_mapenv_merge : (χᵉ⟨ { ENV.e } ⟩(ID) ◯ₑ ANBinop AMergeConcat ENV ID)
-                                   ⇒ χ⟨ { ID.e } ⟩(ANBinop AMergeConcat ENV ID)
+       appenv_over_mapenv_merge : (χᵉ⟨ { ENV.e } ⟩(ID) ◯ₑ cNRAEnvBinop AMergeConcat ENV ID)
+                                   ⇒ χ⟨ { ID.e } ⟩(cNRAEnvBinop AMergeConcat ENV ID)
        tcompose_selects_in_mapenv_arrow :
-            ♯flatten(ANMapEnv (χ⟨ENV⟩(σ⟨p1⟩( ‵{| ID |})))(ID) ◯ₑ (χ⟨ENV⟩(σ⟨p2⟩( ‵{| ID |}))))
+            ♯flatten(cNRAEnvMapEnv (χ⟨ENV⟩(σ⟨p1⟩( ‵{| ID |})))(ID) ◯ₑ (χ⟨ENV⟩(σ⟨p2⟩( ‵{| ID |}))))
                 ⇒ (χ⟨ENV⟩(σ⟨p1⟩(σ⟨p2⟩( ‵{| ID |}))))
 *)
 

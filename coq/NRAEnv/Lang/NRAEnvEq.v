@@ -136,71 +136,70 @@ Section NRAEnvEq.
   (* all the extended algebraic constructors are proper wrt. equivalence *)
 
   (* NRAEnvID *)
-  Global Instance nraenv_id_proper : Proper nraenv_eq NRAEnvID.
+  Global Instance proper_NRAEnvID : Proper nraenv_eq NRAEnvID.
   Proof.
     unfold Proper, respectful, nraenv_eq.
-    apply anid_proper; assumption.
+    apply proper_cNRAEnvID; assumption.
   Qed.
 
   (* NRAEnvConst *)
-  Global Instance nraenv_const_proper : Proper (eq ==> nraenv_eq) NRAEnvConst.
+  Global Instance proper_NRAEnvConst : Proper (eq ==> nraenv_eq) NRAEnvConst.
   Proof.
     unfold Proper, respectful, nraenv_eq; intros.
-    apply anconst_proper; assumption.
+    apply proper_cNRAEnvConst; assumption.
   Qed.
 
-  (* NRAEnvBinOp *)
-
-  Global Instance nraenv_binary_op_proper : Proper (binary_op_eq ==> nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvBinop.
+  (* NRAEnvBinop *)
+  Global Instance proper_NRAEnvBinop : Proper (binary_op_eq ==> nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvBinop.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anbinary_op_proper; assumption.
+    apply proper_cNRAEnvBinop; assumption.
   Qed.
 
   (* NRAEnvUnop *)
-  Global Instance nraenv_unary_op_proper : Proper (unary_op_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvUnop.
+  Global Instance proper_NRAEnvUnop : Proper (unary_op_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvUnop.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anunary_op_proper; assumption.
+    apply proper_cNRAEnvUnop; assumption.
   Qed.
 
   (* NRAEnvMap *)
-  Global Instance nraenv_map_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvMap.
+  Global Instance proper_NRAEnvMap : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvMap.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anmap_proper; assumption.
+    apply proper_cNRAEnvMap; assumption.
   Qed.
 
   (* NRAEnvMapProduct *)
-  Global Instance nraenv_mapconcat_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvMapProduct.
+  Global Instance proper_NRAEnvMapProduct : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvMapProduct.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anmapconcat_proper; assumption.
+    apply proper_cNRAEnvMapProduct; assumption.
   Qed.
 
   (* NRAEnvProduct *)
-  Global Instance nraenv_product_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvProduct.
+  Global Instance proper_NRAEnvProduct : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvProduct.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anproduct_proper; assumption.
+    apply proper_cNRAEnvProduct; assumption.
   Qed.
 
   (* NRAEnvSelect *)
-  Global Instance nraenv_select_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvSelect.
+  Global Instance proper_NRAEnvSelect : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvSelect.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anselect_proper; assumption.
+    apply proper_cNRAEnvSelect; assumption.
   Qed.
 
   (* NRAEnvEither *)
-  Global Instance nraenv_either_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvEither.
+  Global Instance proper_NRAEnvEither : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvEither.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros; simpl.
     destruct x1; simpl; trivial; inversion dn_x; subst; eauto.
   Qed.
 
   (* NRAEnvEitherConcat *)
-  Global Instance nraenv_eitherconcat_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvEitherConcat.
+  Global Instance proper_NRAEnvEitherConcat : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvEitherConcat.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros; simpl.
     rewrite (H0 h c dn_c env dn_env x1) by trivial; rewrite (H h c dn_c env dn_env x1) by trivial.
@@ -208,65 +207,65 @@ Section NRAEnvEq.
   Qed.
   
   (* NRAEnvDefault *)
-  Global Instance nraenv_default_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvDefault.
+  Global Instance proper_NRAEnvDefault : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvDefault.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply andefault_proper; assumption.
+    apply proper_cNRAEnvDefault; assumption.
   Qed.
 
   (* NRAEnvApp *)
-  Global Instance nraenv_app_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvApp.
+  Global Instance proper_NRAEnvApp : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvApp.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anapp_proper; assumption.
+    apply proper_cNRAEnvApp; assumption.
   Qed.
 
-  (* NRAEnvENV *)
-  Global Instance nraenv_getconstant_proper s : Proper nraenv_eq (NRAEnvGetConstant s).
+  (* NRAEnvGetConstant *)
+  Global Instance proper_NRAEnvGetConstant s : Proper nraenv_eq (NRAEnvGetConstant s).
   Proof.
     unfold Proper, respectful, nraenv_eq.
-    apply angetconstant_proper; assumption.
+    apply proper_cNRAEnvGetConstant; assumption.
   Qed.
   
-  (* NRAEnvENV *)
-  Global Instance nraenv_env_proper : Proper nraenv_eq NRAEnvEnv.
+  (* NRAEnvEnv *)
+  Global Instance proper_NRAEnvEnv : Proper nraenv_eq NRAEnvEnv.
   Proof.
     unfold Proper, respectful, nraenv_eq.
-    apply anenv_proper; assumption.
+    apply proper_cNRAEnvEnv; assumption.
   Qed.
 
-  (* NRAEnvApp *)
-  Global Instance nraenv_appenv_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvAppEnv.
+  (* NRAEnvAppEnv *)
+  Global Instance proper_NRAEnvAppEnv : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvAppEnv.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anappenv_proper; assumption.
+    apply proper_cNRAEnvAppEnv; assumption.
   Qed.
 
   (* NRAEnvMapEnv *)
-  Global Instance nraenv_mapenv_proper : Proper (nraenv_eq ==> nraenv_eq) NRAEnvMapEnv.
+  Global Instance proper_NRAEnvMapEnv : Proper (nraenv_eq ==> nraenv_eq) NRAEnvMapEnv.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anmapenv_proper; assumption.
+    apply proper_cNRAEnvMapEnv; assumption.
   Qed.
 
   (* NRAEnvFlatMap *)
-  Global Instance nraenv_flatmap_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvFlatMap.
+  Global Instance proper_NRAEnvFlatMap : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvFlatMap.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anunary_op_proper; try assumption; try reflexivity.
-    apply anmap_proper; assumption.
+    apply proper_cNRAEnvUnop; try assumption; try reflexivity.
+    apply proper_cNRAEnvMap; assumption.
   Qed.
 
   (* NRAEnvJoin *)
-  Global Instance nraenv_join_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvJoin.
+  Global Instance proper_NRAEnvJoin : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvJoin.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anselect_proper; try assumption.
-    apply anproduct_proper; assumption.
+    apply proper_cNRAEnvSelect; try assumption.
+    apply proper_cNRAEnvProduct; assumption.
   Qed.
 
   (* NRAEnvProject *)
-  Global Instance nraenv_project_proper : Proper (eq ==> nraenv_eq ==> nraenv_eq) NRAEnvProject.
+  Global Instance proper_NRAEnvProject : Proper (eq ==> nraenv_eq ==> nraenv_eq) NRAEnvProject.
   Proof.
     unfold Proper, respectful.
     intros; subst.
@@ -278,7 +277,7 @@ Section NRAEnvEq.
   Qed.
 
   (* NRAEnvGroupBy *)
-  Global Instance nraenv_group_by_proper : Proper (eq ==> eq ==> nraenv_eq ==> nraenv_eq) NRAEnvGroupBy.
+  Global Instance proper_NRAEnvGroupBy : Proper (eq ==> eq ==> nraenv_eq ==> nraenv_eq) NRAEnvGroupBy.
   Proof.
     unfold Proper, respectful.
     intros; subst.
@@ -289,7 +288,7 @@ Section NRAEnvEq.
   Qed.
 
   (* NRAEnvUnnest *)
-  Global Instance nraenv_unnest_proper : Proper (eq ==> eq ==> nraenv_eq ==> nraenv_eq) NRAEnvUnnest.
+  Global Instance proper_NRAEnvUnnest : Proper (eq ==> eq ==> nraenv_eq ==> nraenv_eq) NRAEnvUnnest.
   Proof.
     unfold Proper, respectful.
     intros; subst.

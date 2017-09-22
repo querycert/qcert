@@ -31,23 +31,23 @@ Section cNRAEnvtocNNRC.
   Fixpoint nraenv_core_to_nnrc_core (op:nraenv_core) (varid varenv:var) : nnrc :=
     match op with
       (* [[ ID ]]_vid,venv == vid *)
-      | ANID => NNRCVar varid
+      | cNRAEnvID => NNRCVar varid
       (* [[ Const ]]_vid,venv == Const *)
-      | ANConst rd => NNRCConst rd
+      | cNRAEnvConst rd => NNRCConst rd
       (* [[ op1 ⊕ op2 ]]_vid,venv == [[ op1 ]]_vid,venv ⊕ [[ op2 ]]_vid,venv *)
-      | ANBinop bop op1 op2 =>
+      | cNRAEnvBinop bop op1 op2 =>
         NNRCBinop bop (nraenv_core_to_nnrc_core op1 varid varenv) (nraenv_core_to_nnrc_core op2 varid varenv)
       (* [[ UOP op1 ]]_vid,venv = UOP [[ op1 ]]_vid,venv *)
-      | ANUnop uop op1 =>
+      | cNRAEnvUnop uop op1 =>
         NNRCUnop uop (nraenv_core_to_nnrc_core op1 varid varenv)
       (* [[ χ⟨ op1 ⟩( op2 ) ]]_vid,venv = { [[ op1 ]]_t,venv | t ∈ [[ op2 ]]_vid,venv } *)
-      | ANMap op1 op2 =>
+      | cNRAEnvMap op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tmap$" (varid::varenv::nil) in
         NNRCFor t nnrc2 (nraenv_core_to_nnrc_core op1 t varenv)
       (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1,venv } | t1 ∈ [[ op2 ]]_vid,venv } *)
-      | ANMapProduct op1 op2 =>
+      | cNRAEnvMapProduct op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in
         NNRCUnop OpFlatten
@@ -56,7 +56,7 @@ Section cNRAEnvtocNNRC.
                                 ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
       (* [[ op1 × op2 ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_vid,venv } | t1 ∈ [[ op1 ]]_vid,venv } *)
-      | ANProduct op1 op2 =>
+      | cNRAEnvProduct op1 op2 =>
         let nnrc1 := (nraenv_core_to_nnrc_core op1 varid varenv) in
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let (t1,t2) := fresh_var2 "tprod$" "tprod$" (varid::varenv::nil) in
@@ -66,7 +66,7 @@ Section cNRAEnvtocNNRC.
                                 ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
       (* [[ σ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ if [[ op1 ]]_t1,venv then { t1 } else {} | t1 ∈ [[ op2 ]]_vid,venv } *)
-      | ANSelect op1 op2 =>
+      | cNRAEnvSelect op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tsel$" (varid::varenv::nil) in
         let nnrc1 := (nraenv_core_to_nnrc_core op1 t varenv) in
@@ -77,7 +77,7 @@ Section cNRAEnvtocNNRC.
                                        if (t = {})
                                        then [[ op2 ]]_vid,venv
                                        else t *)
-      | ANDefault op1 op2 =>
+      | cNRAEnvDefault op1 op2 =>
         let nnrc1 := (nraenv_core_to_nnrc_core op1 varid varenv) in
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tdef$" (varid::varenv::nil) in
@@ -88,12 +88,12 @@ Section cNRAEnvtocNNRC.
                        nnrc2 (NNRCVar t)))
       (* [[ op1 ◯ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
                                      in [[ op1 ]]_t,venv *)
-      | ANEither opl opr =>
+      | cNRAEnvEither opl opr =>
         let (t1,t2) := fresh_var2 "teitherL$" "teitherR$" (varid::varenv::nil) in
         let nnrcl := (nraenv_core_to_nnrc_core opl t1 varenv) in
         let nnrcr := (nraenv_core_to_nnrc_core opr t2 varenv) in
         NNRCEither (NNRCVar varid) t1 nnrcl t2 nnrcr
-      | ANEitherConcat op1 op2 =>
+      | cNRAEnvEitherConcat op1 op2 =>
         let nnrc1 := (nraenv_core_to_nnrc_core op1 varid varenv) in
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tec$" (varid::varenv::nil) in 
@@ -103,24 +103,24 @@ Section cNRAEnvtocNNRC.
                                             (NNRCBinop OpRecConcat (NNRCVar varid) (NNRCVar t)))
                             varid (NNRCUnop OpRight
                                             (NNRCBinop OpRecConcat (NNRCVar varid) (NNRCVar t))))
-      | ANApp op1 op2 =>
+      | cNRAEnvApp op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tapp$" (varid::varenv::nil) in
         let nnrc1 := (nraenv_core_to_nnrc_core op1 t varenv) in
         (NNRCLet t nnrc2 nnrc1)
       (* [[ CENV v ]]_vid,venv = v *)
-      | ANGetConstant s => NNRCGetConstant s
+      | cNRAEnvGetConstant s => NNRCGetConstant s
       (* [[ ENV ]]_vid,venv = venv *)
-      | ANEnv => NNRCVar varenv
+      | cNRAEnvEnv => NNRCVar varenv
       (* [[ op1 ◯ₑ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
                                       in [[ op1 ]]_vid,t *)
-      | ANAppEnv op1 op2 =>
+      | cNRAEnvAppEnv op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let t := fresh_var "tappe$" (varid::varenv::nil) in
         let nnrc1 := (nraenv_core_to_nnrc_core op1 varid t) in
         (NNRCLet t nnrc2 nnrc1)
       (* [[ χᵉ⟨ op1 ⟩ ]]_vid,venv = { [[ op1 ]]_vid,t1 | t1 ∈ venv } *)
-      | ANMapEnv op1 =>
+      | cNRAEnvMapEnv op1 =>
         let t1 := fresh_var "tmape$" (varid::varenv::nil) in
         let nnrc1 := (nraenv_core_to_nnrc_core op1 varid t1) in
         (NNRCFor t1 (NNRCVar varenv) nnrc1)
@@ -165,22 +165,22 @@ Section cNRAEnvtocNNRC.
     Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
     revert did denv env vid venv.
     nraenv_core_cases (induction op) Case; intros; simpl.
-    - Case "ANID"%string.
+    - Case "cNRAEnvID"%string.
       assumption.
-    - Case "ANConst"%string.
+    - Case "cNRAEnvConst"%string.
       reflexivity.
-    - Case "ANBinop"%string.
+    - Case "cNRAEnvBinop"%string.
       rewrite (IHop1 did denv env vid venv H); trivial.
       rewrite (IHop2 did denv env vid venv H); trivial.
-    - Case "ANUnop"%string.
+    - Case "cNRAEnvUnop"%string.
       rewrite (IHop did denv env vid venv H); trivial.
-    - Case "ANMap"%string.
+    - Case "cNRAEnvMap"%string.
       rewrite (IHop2 did denv env vid venv H); trivial; clear IHop2.
       destruct (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); try reflexivity; simpl.
       destruct d; try reflexivity.
       rewrite (map_sem_correct h op1 cenv denv l); trivial.
       prove_fresh_nin.
-    - Case "ANMapProduct"%string.
+    - Case "cNRAEnvMapProduct"%string.
       rewrite (IHop2 did denv env vid venv H); trivial.
       repeat (dest_eqdec; try congruence).
       prove_fresh_nin.
@@ -215,7 +215,7 @@ Section cNRAEnvtocNNRC.
        prove_fresh_nin.
       + match_destr; unfold Equivalence.equiv in *.
         elim (fresh_var_fresh2 _ _ _ _ e1).
-    - Case "ANProduct"%string.
+    - Case "cNRAEnvProduct"%string.
       rewrite (IHop1 did denv env vid venv H).
       dest_eqdec; [elim (fresh_var_fresh1 _ _ _ e) | ].
       dest_eqdec; [ | congruence ].
@@ -253,7 +253,7 @@ Section cNRAEnvtocNNRC.
         elim (fresh_var_fresh2 _ _ _ _ e1).
       + trivial.
       + trivial.
-    - Case "ANSelect"%string.
+    - Case "cNRAEnvSelect"%string.
       rewrite (IHop2 did denv env vid venv H); trivial.
       destruct (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); try reflexivity; clear IHop2 op2; simpl.
       destruct d; try reflexivity.
@@ -277,7 +277,7 @@ Section cNRAEnvtocNNRC.
         congruence.
       + simpl; match_destr.
         elim (fresh_var_fresh2 _ _ _ _ e0).
-    - Case "ANDefault"%string.
+    - Case "cNRAEnvDefault"%string.
       simpl. rewrite (IHop1 did denv env vid venv H); trivial.
       case_eq (h ⊢ₑ op1 @ₑ did ⊣ cenv;denv); intros; try reflexivity; simpl.
       dest_eqdec; [| congruence ].
@@ -290,7 +290,7 @@ Section cNRAEnvtocNNRC.
           elim (fresh_var_fresh2 _ _ _ _ e0).
       + destruct d; trivial.
         destruct l; congruence.
-    - Case "ANEither"%string.
+    - Case "cNRAEnvEither"%string.
       rewrite H0. match_destr.
       + apply IHop1; trivial; simpl.
         * prove_fresh_nin.
@@ -302,7 +302,7 @@ Section cNRAEnvtocNNRC.
         * match_destr; congruence.
         * match_destr.
           elim (fresh_var_fresh3 _ _ _ _ _ e).
-    - Case "ANEitherConcat"%string.
+    - Case "cNRAEnvEitherConcat"%string.
       rewrite H0.
       rewrite <- (IHop2 _ _ _ _ _ H H0 H1).
       match_destr; [| repeat (match_destr; trivial)].
@@ -318,7 +318,7 @@ Section cNRAEnvtocNNRC.
         elim (fresh_var_fresh1 _ _ _ e).
       + match_destr.
         elim (fresh_var_fresh2 _ _ _ _ e).
-    - Case "ANApp"%string.
+    - Case "cNRAEnvApp"%string.
       rewrite (IHop2 did denv env vid venv H H0 H1).
       case (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); intros; try reflexivity; simpl.
       rewrite (IHop1 d denv); trivial.
@@ -327,11 +327,11 @@ Section cNRAEnvtocNNRC.
         congruence.
       + simpl; match_destr.
         elim (fresh_var_fresh2 _ _ _ _ e).
-    - Case "ANGetConstant"%string.
+    - Case "cNRAEnvGetConstant"%string.
       reflexivity.
-    - Case "ANEnv"%string.
+    - Case "cNRAEnvEnv"%string.
       assumption.
-    - Case "ANAppEnv"%string.
+    - Case "cNRAEnvAppEnv"%string.
       rewrite (IHop2 did denv env vid venv H); trivial.
       case (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); intros; trivial.
       rewrite (IHop1 did d); simpl; try reflexivity; trivial; simpl.
@@ -339,7 +339,7 @@ Section cNRAEnvtocNNRC.
         elim (fresh_var_fresh1 _ _ _ e).
       + match_destr.
         congruence.
-    - Case "ANMapEnv"%string.
+    - Case "cNRAEnvMapEnv"%string.
       intros.
       rewrite H1.
       destruct denv; try reflexivity; simpl.
@@ -362,21 +362,21 @@ Section cNRAEnvtocNNRC.
       v = vid \/ v = venv.
   Proof.
     nraenv_core_cases (induction op) Case.
-    - Case "ANID"%string.
+    - Case "cNRAEnvID"%string.
       intros;
       simpl in *; repeat rewrite in_app_iff in *;
       intuition.
-    - Case "ANConst"%string.
+    - Case "cNRAEnvConst"%string.
       contradiction.
-    - Case "ANBinop"%string.
+    - Case "cNRAEnvBinop"%string.
       intros;
       simpl in *; repeat rewrite in_app_iff in *;
       intuition.
-    - Case "ANUnop"%string.
+    - Case "cNRAEnvUnop"%string.
       intros;
       simpl in *; repeat rewrite in_app_iff in *;
       intuition.
-    - Case "ANMap"%string.
+    - Case "cNRAEnvMap"%string.
       intros vid venv v Hv.
       simpl in Hv.
       rewrite in_app_iff in Hv.
@@ -384,7 +384,7 @@ Section cNRAEnvtocNNRC.
       + auto.
       + apply remove_inv in H.
         destruct (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv v); intuition.
-    - Case "ANMapProduct"%string.
+    - Case "cNRAEnvMapProduct"%string.
       intros vid venv v.
       Opaque fresh_var2.
       simpl.
@@ -405,7 +405,7 @@ Section cNRAEnvtocNNRC.
           clear IHop2.
           specialize (IHop1 s venv v H0).
           intuition.
-    - Case "ANProduct"%string.
+    - Case "cNRAEnvProduct"%string.
       intros vid venv v H.
       simpl in *.
       case_eq (fresh_var2 "tprod$" "tprod$" (vid :: venv :: nil)); intros.
@@ -423,7 +423,7 @@ Section cNRAEnvtocNNRC.
       rewrite In_app_iff in H; simpl in H.
       elim H; clear H; intros. subst; congruence.
       apply IHop2; assumption.
-    - Case "ANSelect"%string.
+    - Case "cNRAEnvSelect"%string.
       intros vid venv v.
       simpl.
       rewrite in_app_iff.
@@ -441,7 +441,7 @@ Section cNRAEnvtocNNRC.
         elim H; clear H; intros.
         rewrite In_app_iff in H; simpl in H.
         intuition.
-    - Case "ANDefault"%string.
+    - Case "cNRAEnvDefault"%string.
       intros vid venv v.
       simpl.
       rewrite in_app_iff.
@@ -456,7 +456,7 @@ Section cNRAEnvtocNNRC.
         elim H; clear H; intros.
         subst; congruence.
         apply IHop2; assumption.
-    - Case "ANEither"%string.
+    - Case "cNRAEnvEither"%string.
       intros vid venv v.
       simpl.
       match_case; intros ? ? eqq.
@@ -475,7 +475,7 @@ Section cNRAEnvtocNNRC.
         elim H; clear H; intros.
         clear IHop1; specialize (IHop2 _ venv v H).
         intuition.
-    - Case "ANEitherConcat"%string.
+    - Case "cNRAEnvEitherConcat"%string.
       intros vid venv v.
       simpl.
       rewrite in_app_iff.
@@ -490,7 +490,7 @@ Section cNRAEnvtocNNRC.
         match_destr_in H; simpl in *; intuition.
       + match_destr_in H; [| congruence ].
         match_destr_in H; simpl in *; intuition.
-    - Case "ANApp"%string.
+    - Case "cNRAEnvApp"%string.
       intros vid venv v.
       simpl.
       rewrite in_app_iff.
@@ -500,16 +500,16 @@ Section cNRAEnvtocNNRC.
       destruct H.
       clear IHop2; specialize (IHop1 _ venv v H).
       intuition.
-    - Case "ANGetConstant"%string.
+    - Case "cNRAEnvGetConstant"%string.
       intros vid venv v.
       simpl.
       intros; contradiction.
-    - Case "ANEnv"%string.
+    - Case "cNRAEnvEnv"%string.
       intros vid venv v.
       simpl.
       intros Hv.
       intuition.
-    - Case "ANAppEnv"%string.
+    - Case "cNRAEnvAppEnv"%string.
       intros vid venv v.
       simpl.
       rewrite in_app_iff.
@@ -519,7 +519,7 @@ Section cNRAEnvtocNNRC.
       destruct H.
       clear IHop2; specialize (IHop1 vid _ v H).
       intuition.
-    - Case "ANMapEnv"%string.
+    - Case "cNRAEnvMapEnv"%string.
       intros vid venv v.
       simpl.
       intros.
@@ -549,13 +549,13 @@ Section cNRAEnvtocNNRC.
     Proof.
       revert vid venv.
       nraenv_core_cases (induction q) Case; intros; simpl; auto.
-      - Case "ANMapProduct"%string.
+      - Case "cNRAEnvMapProduct"%string.
         destruct (fresh_var2 "tmc$" "tmc$" (vid :: venv :: nil));simpl.
         auto.
-      - Case "ANProduct"%string.
+      - Case "cNRAEnvProduct"%string.
         destruct (fresh_var2 "tprod$" "tprod$" (vid :: venv :: nil)); simpl.
         auto.
-      - Case "ANEither"%string.
+      - Case "cNRAEnvEither"%string.
         destruct (fresh_var2 "teitherL$" "teitherR$" (vid :: venv :: nil)); simpl.
         auto.
     Qed.

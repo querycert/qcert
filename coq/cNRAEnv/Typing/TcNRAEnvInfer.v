@@ -37,20 +37,20 @@ Section TcNRAEnvInfer.
 
   Fixpoint infer_nraenv_core_type (e:nraenv_core) (τenv τin:rtype) : option rtype :=
     match e with
-      | ANID => Some τin
-      | ANConst d => infer_data_type (normalize_data brand_relation_brands d)
-      | ANBinop b op1 op2 =>
+      | cNRAEnvID => Some τin
+      | cNRAEnvConst d => infer_data_type (normalize_data brand_relation_brands d)
+      | cNRAEnvBinop b op1 op2 =>
         let binf (τ₁ τ₂:rtype) := infer_binary_op_type b τ₁ τ₂ in
         olift2 binf (infer_nraenv_core_type op1 τenv τin) (infer_nraenv_core_type op2 τenv τin)
-      | ANUnop u op1 =>
+      | cNRAEnvUnop u op1 =>
         let unf (τ₁:rtype) := infer_unary_op_type u τ₁ in
         olift unf (infer_nraenv_core_type op1 τenv τin)
-      | ANMap op1 op2 =>
+      | cNRAEnvMap op1 op2 =>
         let mapf (τ₁:rtype) :=
             olift (fun x => lift (fun y => Coll y) (infer_nraenv_core_type op1 τenv x)) (tuncoll τ₁)
         in
         olift mapf (infer_nraenv_core_type op2 τenv τin)
-      | ANMapProduct op1 op2 =>
+      | cNRAEnvMapProduct op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
@@ -62,7 +62,7 @@ Section TcNRAEnvInfer.
             end
         in
         olift mapconcatf (olift tmapConcatInput (infer_nraenv_core_type op2 τenv τin))
-      | ANProduct op1 op2 =>
+      | cNRAEnvProduct op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
@@ -74,7 +74,7 @@ Section TcNRAEnvInfer.
             end
         in
         olift mapconcatf (olift tmapConcatInput (infer_nraenv_core_type op1 τenv τin))
-      | ANSelect op1 op2 =>
+      | cNRAEnvSelect op1 op2 =>
         let selectf (τ₁:rtype) :=
             match tuncoll τ₁ with
               | Some τ₁' =>
@@ -90,7 +90,7 @@ Section TcNRAEnvInfer.
             end
         in
         olift selectf (infer_nraenv_core_type op2 τenv τin)
-      | ANDefault op1 op2 =>
+      | cNRAEnvDefault op1 op2 =>
         match ((infer_nraenv_core_type op1 τenv τin), (infer_nraenv_core_type op2 τenv τin)) with
             | (Some τ₁', Some τ₂') =>
               match (tuncoll τ₁', tuncoll τ₂') with
@@ -100,7 +100,7 @@ Section TcNRAEnvInfer.
               end
             | (_, _) => None
         end
-      | ANEither op1 op2 =>
+      | cNRAEnvEither op1 op2 =>
         match tuneither τin with
         | Some (τl, τr) =>
           match ((infer_nraenv_core_type op1 τenv τl), (infer_nraenv_core_type op2 τenv τr)) with
@@ -112,7 +112,7 @@ Section TcNRAEnvInfer.
           end
         | _ => None
         end
-      | ANEitherConcat op1 op2 =>
+      | cNRAEnvEitherConcat op1 op2 =>
         match (infer_nraenv_core_type op1 τenv τin, infer_nraenv_core_type op2 τenv τin) with
         | (Some τeither, Some τrecplus) =>          
           match tuneither τeither with
@@ -126,17 +126,17 @@ Section TcNRAEnvInfer.
           end
         | (_, _) => None
         end
-      | ANApp op1 op2 =>
+      | cNRAEnvApp op1 op2 =>
         let appf (τ₁:rtype) := infer_nraenv_core_type op1 τenv τ₁ in
         olift appf (infer_nraenv_core_type op2 τenv τin)
-      | ANGetConstant s =>
+      | cNRAEnvGetConstant s =>
         tdot τconstants s
-      | ANEnv =>
+      | cNRAEnvEnv =>
         Some τenv
-      | ANAppEnv op1 op2 =>
+      | cNRAEnvAppEnv op1 op2 =>
         let appf (τ₁:rtype) := infer_nraenv_core_type op1 τ₁ τin in
         olift appf (infer_nraenv_core_type op2 τenv τin)
-      | ANMapEnv op1 =>
+      | cNRAEnvMapEnv op1 =>
         let mapf (τenv':rtype) :=
             lift Coll (infer_nraenv_core_type op1 τenv' τin)
         in
@@ -150,28 +150,28 @@ Section TcNRAEnvInfer.
     intros.
     revert τenv τin τout H.
     nraenv_core_cases (induction e) Case; intros; simpl in H.
-    - Case "ANID"%string.
+    - Case "cNRAEnvID"%string.
       inversion H; clear H.
-      apply ANTID.
-    - Case "ANConst"%string.
-      apply ANTConst.
+      apply type_cNRAEnvID.
+    - Case "cNRAEnvConst"%string.
+      apply type_cNRAEnvConst.
       apply infer_data_type_correct. assumption.
-    - Case "ANBinop"%string.
+    - Case "cNRAEnvBinop"%string.
       specialize (IHe1 τenv τin); specialize (IHe2 τenv τin).
       destruct (infer_nraenv_core_type e1 τenv τin);
         destruct (infer_nraenv_core_type e2 τenv τin); simpl in *;
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
-      apply (@ANTBinop m τconstants τenv τin r r0 τout); try assumption.
+      apply (@type_cNRAEnvBinop m τconstants τenv τin r r0 τout); try assumption.
       apply infer_binary_op_type_correct; assumption.
-    - Case "ANUnop"%string.
+    - Case "cNRAEnvUnop"%string.
       specialize (IHe τenv τin).
       destruct (infer_nraenv_core_type e τenv τin); simpl in *;
       try discriminate.
       specialize (IHe r eq_refl).
-      apply (@ANTUnop m τconstants τenv τin r τout); try assumption.
+      apply (@type_cNRAEnvUnop m τconstants τenv τin r τout); try assumption.
       apply infer_unary_op_type_correct; assumption.
-    - Case "ANMap"%string.
+    - Case "cNRAEnvMap"%string.
       case_eq (infer_nraenv_core_type e2 τenv τin); intros; simpl in *.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H. simpl in *.
         unfold lift in H.
@@ -181,13 +181,13 @@ Section TcNRAEnvInfer.
         specialize (IHe1 τenv r0 r1 H).
         rewrite H in H3.
         inversion H3.
-        apply (@ANTMap m τconstants τenv τin r0 r1); try assumption.
+        apply (@type_cNRAEnvMap m τconstants τenv τin r0 r1); try assumption.
         apply tuncoll_correct in H1.
         rewrite <- H1; assumption.
         rewrite H in H3; congruence.
         rewrite H1 in H; simpl in H; congruence.
       + rewrite H0 in H. simpl in H; congruence.
-    - Case "ANMapProduct"%string.
+    - Case "cNRAEnvMapProduct"%string.
       case_eq (infer_nraenv_core_type e2 τenv τin); intros.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H; simpl in *.
         unfold tmapConcatInput in H.
@@ -221,7 +221,7 @@ Section TcNRAEnvInfer.
             by apply RecMaybe_pf_some.
           simpl in H.
           clear e eq22 H1 eq21 srl0 H0.
-          generalize (@ANTMapProduct m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
+          generalize (@type_cNRAEnvMapProduct m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
                                    e1 e2 pf1' pf2' H2 IHe1 IHe2 eq_refl); intros.
           assert (τout = (Coll (Rec Closed (rec_concat_sort l1' l2') H2))).
           assert ((@RecMaybe (@basic_model_foreign_type m)
@@ -256,7 +256,7 @@ Section TcNRAEnvInfer.
           assumption.
         * rewrite H0 in H; simpl in H; congruence.
       + rewrite H0 in H; simpl in H; congruence.
-    - Case "ANProduct"%string.
+    - Case "cNRAEnvProduct"%string.
       case_eq (infer_nraenv_core_type e1 τenv τin); intros.
       case_eq (infer_nraenv_core_type e2 τenv τin); intros.
       + specialize (IHe1 τenv τin r H0). rewrite H0 in H; simpl in *.
@@ -289,7 +289,7 @@ Section TcNRAEnvInfer.
         assert (RecMaybe Closed (rec_concat_sort l1' l2') = Some (Rec Closed (rec_concat_sort l1' l2') H2))
           by apply RecMaybe_pf_some.
         clear e eq22 H1 eq21 srl0 H0.
-        generalize (@ANTProduct m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
+        generalize (@type_cNRAEnvProduct m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
                                e1 e2 pf1' pf2' H2 IHe1 IHe2 eq_refl); intros.
         assert (τout = (Coll (Rec Closed (rec_concat_sort l1' l2') H2))).
         assert (τout = (Coll (Rec Closed (rec_concat_sort l1' l2') H2))).
@@ -329,7 +329,7 @@ Section TcNRAEnvInfer.
         destruct (RecMaybe Closed l); congruence.
         congruence.
       + rewrite H0 in H; simpl in H; congruence.
-    - Case "ANSelect"%string.
+    - Case "cNRAEnvSelect"%string.
       simpl.
       case_eq (infer_nraenv_core_type e2 τenv τin); intros; simpl in *.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H. simpl in *.
@@ -342,7 +342,7 @@ Section TcNRAEnvInfer.
         destruct r1; try congruence; simpl in *.
         destruct x; try congruence; simpl in *.
         inversion H3; clear H3 H2.
-        apply (@ANTSelect m τconstants τenv τin r0); try assumption.
+        apply (@type_cNRAEnvSelect m τconstants τenv τin r0); try assumption.
         assert (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) Bool₀ e = Bool).
         apply rtype_fequal; reflexivity.
         rewrite H0 in IHe1. assumption.
@@ -351,7 +351,7 @@ Section TcNRAEnvInfer.
         rewrite H in H3; congruence.
         rewrite H1 in H; congruence.
       + rewrite H0 in H. simpl in H; congruence.
-    - Case "ANDefault"%string.
+    - Case "cNRAEnvDefault"%string.
       specialize (IHe1 τenv τin); specialize (IHe2 τenv τin).
       destruct (infer_nraenv_core_type e1 τenv τin); destruct (infer_nraenv_core_type e2 τenv τin); simpl in *;
       try discriminate.
@@ -368,8 +368,8 @@ Section TcNRAEnvInfer.
       apply rtype_fequal; simpl; reflexivity.
       elim H; clear H; intros.
       rewrite <- H in *.
-      apply ANTDefault; assumption.
-    - Case "ANEither"%string.
+      apply type_cNRAEnvDefault; assumption.
+    - Case "cNRAEnvEither"%string.
       unfold tuneither in H.
       destruct τin.
       destruct x; simpl in *; try discriminate.
@@ -381,9 +381,9 @@ Section TcNRAEnvInfer.
       specialize (IHe1 _ _ _ H0).
       specialize (IHe2 _ _ _ H1).
       erewrite Either_canon
-      ; eapply ANTEither
+      ; eapply type_cNRAEnvEither
       ; eauto.
-    - Case "ANEitherConcat"%string.
+    - Case "cNRAEnvEitherConcat"%string.
       case_eq (infer_nraenv_core_type e1 τenv τin); case_eq (infer_nraenv_core_type e2 τenv τin); simpl in *; intros;
       rewrite H0 in *; rewrite H1 in *; try discriminate.
       unfold tuneither in H.
@@ -426,18 +426,18 @@ Section TcNRAEnvInfer.
       rewrite eqq1, eqq2 in IHe1.
       destruct (to_Rec _ _ e0) as [? eqq3].
       rewrite eqq3 in IHe2.
-      eapply ANTEitherConcat; eauto.
-    - Case "ANApp"%string.
+      eapply type_cNRAEnvEitherConcat; eauto.
+    - Case "cNRAEnvApp"%string.
       specialize (IHe2 τenv τin).
       destruct (infer_nraenv_core_type e2 τenv τin).
       specialize (IHe2 r eq_refl).
       econstructor; eauto.
       simpl in *; congruence.
-    - Case "ANGetConstant"%string.
-      apply ANTGetConstant; assumption.
-    - Case "ANEnv"%string.
-      inversion H; apply ANTEnv.
-    - Case "ANAppEnv"%string.
+    - Case "cNRAEnvGetConstant"%string.
+      apply type_cNRAEnvGetConstant; assumption.
+    - Case "cNRAEnvEnv"%string.
+      inversion H; apply type_cNRAEnvEnv.
+    - Case "cNRAEnvAppEnv"%string.
       specialize (IHe2 τenv τin).
       destruct (infer_nraenv_core_type e2 τenv τin).
       simpl in H.
@@ -446,7 +446,7 @@ Section TcNRAEnvInfer.
       econstructor; eauto.
       econstructor; eauto.
       simpl in *; congruence.
-    - Case "ANMapEnv"%string.
+    - Case "cNRAEnvMapEnv"%string.
       case_eq (tuncoll τenv); intros.
       + apply tuncoll_correct in H0.
         subst.
@@ -459,7 +459,7 @@ Section TcNRAEnvInfer.
           rewrite H0 in H; simpl in H.
           inversion H. subst; clear H.
           specialize (IHe r τin r0 H0).
-          apply (@ANTMapEnv m τconstants r τin r0 e IHe).
+          apply (@type_cNRAEnvMapEnv m τconstants r τin r0 e IHe).
         * rewrite H0 in H; simpl in H; congruence.
       + rewrite H0 in H; simpl in H; congruence.
   Qed.

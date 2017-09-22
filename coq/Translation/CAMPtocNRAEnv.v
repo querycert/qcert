@@ -31,46 +31,46 @@ Section CAMPtocNRAEnv.
 
   (* Match failure returns the empty sequence, success returns a singleton sequence *)
   (* Java equivalent: CampToNra.nraenv_fail *)
-  Definition nraenv_fail := ANConst (dcoll nil).
+  Definition nraenv_fail := cNRAEnvConst (dcoll nil).
   (* Java equivalent: CampToNra.nraenv_match *)
-  Definition nraenv_match op := ANUnop OpBag op.
+  Definition nraenv_match op := cNRAEnvUnop OpBag op.
 
   (** Translation from CAMP to EnvNRA *)
 
   (* Java equivalent: CampToNra.cnraenv_of_camp *)
   Fixpoint nraenv_core_of_camp (p:camp) : nraenv_core :=
     match p with
-      | pconst d' => nraenv_match (ANConst d')
-      | punop uop p₁ => ANMap (ANUnop uop ANID) (nraenv_core_of_camp p₁)
+      | pconst d' => nraenv_match (cNRAEnvConst d')
+      | punop uop p₁ => cNRAEnvMap (cNRAEnvUnop uop cNRAEnvID) (nraenv_core_of_camp p₁)
       | pbinop bop p₁ p₂ =>
-        ANMap (ANBinop bop (ANUnop (OpDot "a1") ANID) (ANUnop (OpDot "a2") ANID))
-              (ANProduct (ANMap (ANUnop (OpRec "a1") ANID) (nraenv_core_of_camp p₁))
-                         (ANMap (ANUnop (OpRec "a2") ANID) (nraenv_core_of_camp p₂)))
+        cNRAEnvMap (cNRAEnvBinop bop (cNRAEnvUnop (OpDot "a1") cNRAEnvID) (cNRAEnvUnop (OpDot "a2") cNRAEnvID))
+              (cNRAEnvProduct (cNRAEnvMap (cNRAEnvUnop (OpRec "a1") cNRAEnvID) (nraenv_core_of_camp p₁))
+                         (cNRAEnvMap (cNRAEnvUnop (OpRec "a2") cNRAEnvID) (nraenv_core_of_camp p₂)))
       | pmap p₁ =>
         nraenv_match
-          (ANUnop OpFlatten
-                  (ANMap
-                     (nraenv_core_of_camp p₁) ANID))
+          (cNRAEnvUnop OpFlatten
+                  (cNRAEnvMap
+                     (nraenv_core_of_camp p₁) cNRAEnvID))
       | passert p₁ =>
-        ANMap (ANConst (drec nil)) (ANSelect ANID (nraenv_core_of_camp p₁))
-      | porElse p₁ p₂ => ANDefault (nraenv_core_of_camp p₁) (nraenv_core_of_camp p₂)
-      | pit => nraenv_match ANID
+        cNRAEnvMap (cNRAEnvConst (drec nil)) (cNRAEnvSelect cNRAEnvID (nraenv_core_of_camp p₁))
+      | porElse p₁ p₂ => cNRAEnvDefault (nraenv_core_of_camp p₁) (nraenv_core_of_camp p₂)
+      | pit => nraenv_match cNRAEnvID
       | pletIt p₁ p₂ =>
-        ANUnop OpFlatten
-               (ANMap (nraenv_core_of_camp p₂)
+        cNRAEnvUnop OpFlatten
+               (cNRAEnvMap (nraenv_core_of_camp p₂)
                       (nraenv_core_of_camp p₁))
-      | pgetConstant s => nraenv_match (ANGetConstant s)
-      | penv => nraenv_match ANEnv
+      | pgetConstant s => nraenv_match (cNRAEnvGetConstant s)
+      | penv => nraenv_match cNRAEnvEnv
       | pletEnv p₁ p₂ =>
-        ANUnop OpFlatten
-               (ANAppEnv
-                  (ANMapEnv (nraenv_core_of_camp p₂))
-                  (ANUnop OpFlatten
-                          (ANMap (ANBinop OpRecMerge ANEnv ANID) (nraenv_core_of_camp p₁))))
+        cNRAEnvUnop OpFlatten
+               (cNRAEnvAppEnv
+                  (cNRAEnvMapEnv (nraenv_core_of_camp p₂))
+                  (cNRAEnvUnop OpFlatten
+                          (cNRAEnvMap (cNRAEnvBinop OpRecMerge cNRAEnvEnv cNRAEnvID) (nraenv_core_of_camp p₁))))
       | pleft =>
-        ANEither (nraenv_match ANID) (nraenv_fail)
+        cNRAEnvEither (nraenv_match cNRAEnvID) (nraenv_fail)
       | pright =>
-        ANEither (nraenv_fail) (nraenv_match ANID)
+        cNRAEnvEither (nraenv_fail) (nraenv_match cNRAEnvID)
     end.
 
   (** Theorem 4.2: lemma of translation correctness for patterns *)
@@ -173,8 +173,8 @@ Section CAMPtocNRAEnv.
   *)
 
   Definition nraenv_core_of_camp_top p :=
-    ANUnop OpFlatten
-           (ANMap (nraenv_core_of_camp p) (ANUnop OpBag ANID)).
+    cNRAEnvUnop OpFlatten
+           (cNRAEnvMap (nraenv_core_of_camp p) (cNRAEnvUnop OpBag cNRAEnvID)).
   
   Lemma nraenv_core_of_camp_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
@@ -207,7 +207,7 @@ Section CAMPtocNRAEnv.
     (* Toplevel translation call XXX TODO: Why are there two??? XXX *)
     Definition camp_to_nraenv_core_top (p:camp) : nraenv_core :=
       (* Produces the initial plan *)
-      ANAppEnv (nraenv_core_of_camp p) (ANConst (drec nil)).
+      cNRAEnvAppEnv (nraenv_core_of_camp p) (cNRAEnvConst (drec nil)).
 
     Theorem camp_to_nraenv_core_top_correct :
       forall q:camp, forall global_env:bindings,
@@ -237,12 +237,12 @@ Section CAMPtocNRAEnv.
       nraenv_core_of_camp (pand p1 p2).
 
     Definition nraenv_core_for_pand (q1 q2: nraenv_core) : nraenv_core :=
-      ANUnop OpFlatten
-             (ANAppEnv (ANMapEnv q2)
-                       (ANUnop OpFlatten
-                               (ANMap (ANBinop OpRecMerge ANEnv ANID)
-                                      (ANMap (ANConst (drec nil))
-                                             (ANSelect ANID q1))))).
+      cNRAEnvUnop OpFlatten
+             (cNRAEnvAppEnv (cNRAEnvMapEnv q2)
+                       (cNRAEnvUnop OpFlatten
+                               (cNRAEnvMap (cNRAEnvBinop OpRecMerge cNRAEnvEnv cNRAEnvID)
+                                      (cNRAEnvMap (cNRAEnvConst (drec nil))
+                                             (cNRAEnvSelect cNRAEnvID q1))))).
   
     Lemma nraenv_core_of_pand_works (p1 p2:camp) :
       nraenv_core_of_camp (pand p1 p2) = nraenv_core_for_pand (nraenv_core_of_camp p1) (nraenv_core_of_camp p2).

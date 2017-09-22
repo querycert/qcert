@@ -378,45 +378,45 @@ let rec sexp_to_camp_rule (se : sexp) : QLang.camp_rule =
 
 let rec nraenv_to_sexp (op : QLang.nraenv_core) : sexp =
   match op with
-  | ANID -> STerm ("ANID",[])
-  | ANConst d -> STerm ("ANConst", [data_to_sexp d])
-  | ANBinop (b, op1, op2) -> STerm ("ANBinop", (binary_op_to_sexp b) :: [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANUnop (u, op1) -> STerm ("ANUnop", (unary_op_to_sexp u) :: [nraenv_to_sexp op1])
-  | ANMap (op1,op2) -> STerm ("ANMap", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANMapProduct (op1,op2) -> STerm ("ANMapProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANProduct (op1,op2) -> STerm ("ANProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANSelect (op1,op2) -> STerm ("ANSelect", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANDefault (op1,op2) -> STerm ("ANDefault", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANEither (op1,op2) -> STerm ("ANEither", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANEitherConcat (op1,op2) -> STerm ("ANEitherConcat", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANApp (op1,op2) -> STerm ("ANApp", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANGetConstant sl -> STerm ("ANGetConstant", [coq_string_to_sstring sl])
-  | ANEnv -> STerm ("ANEnv",[])
-  | ANAppEnv (op1,op2) -> STerm ("ANAppEnv", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANMapEnv op1 -> STerm ("ANMapEnv", [nraenv_to_sexp op1])
+  | CNRAEnvID -> STerm ("ANID",[])
+  | CNRAEnvConst d -> STerm ("ANConst", [data_to_sexp d])
+  | CNRAEnvBinop (b, op1, op2) -> STerm ("ANBinop", (binary_op_to_sexp b) :: [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvUnop (u, op1) -> STerm ("ANUnop", (unary_op_to_sexp u) :: [nraenv_to_sexp op1])
+  | CNRAEnvMap (op1,op2) -> STerm ("ANMap", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvMapProduct (op1,op2) -> STerm ("ANMapProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvProduct (op1,op2) -> STerm ("ANProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvSelect (op1,op2) -> STerm ("ANSelect", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvDefault (op1,op2) -> STerm ("ANDefault", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvEither (op1,op2) -> STerm ("ANEither", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvEitherConcat (op1,op2) -> STerm ("ANEitherConcat", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvApp (op1,op2) -> STerm ("ANApp", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvGetConstant sl -> STerm ("ANGetConstant", [coq_string_to_sstring sl])
+  | CNRAEnvEnv -> STerm ("ANEnv",[])
+  | CNRAEnvAppEnv (op1,op2) -> STerm ("ANAppEnv", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | CNRAEnvMapEnv op1 -> STerm ("ANMapEnv", [nraenv_to_sexp op1])
 
 let rec sexp_to_nraenv (se : sexp) : QLang.nraenv_core =
   match se with
-  | STerm ("ANID",[]) -> ANID
-  | STerm ("ANConst", [d]) -> ANConst (sexp_to_data d)
+  | STerm ("ANID",[]) -> CNRAEnvID
+  | STerm ("ANConst", [d]) -> CNRAEnvConst (sexp_to_data d)
   | STerm ("ANBinop", bse :: [se1;se2]) ->
       let b = sexp_to_binary_op bse in
-      ANBinop (b, sexp_to_nraenv se1, sexp_to_nraenv se2)
+      CNRAEnvBinop (b, sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANUnop", use :: [se1]) ->
       let u = sexp_to_unary_op use in
-      ANUnop (u, sexp_to_nraenv se1)
-  | STerm ("ANMap", [se1;se2]) -> ANMap (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANMapProduct", [se1;se2]) -> ANMapProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANProduct", [se1;se2]) -> ANProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANSelect", [se1;se2]) -> ANSelect (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANDefault", [se1;se2]) -> ANDefault (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANEither", [se1;se2]) -> ANEither (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANEitherConcat", [se1;se2]) -> ANEitherConcat (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANApp", [se1;se2]) -> ANApp (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANGetConstant", [sl]) -> ANGetConstant (sstring_to_coq_string sl)
-  | STerm ("ANEnv",[]) -> ANEnv
-  | STerm ("ANAppEnv", [se1;se2]) -> ANAppEnv (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANMapEnv", [se1]) -> ANMapEnv (sexp_to_nraenv se1)
+      CNRAEnvUnop (u, sexp_to_nraenv se1)
+  | STerm ("ANMap", [se1;se2]) -> CNRAEnvMap (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANMapProduct", [se1;se2]) -> CNRAEnvMapProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANProduct", [se1;se2]) -> CNRAEnvProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANSelect", [se1;se2]) -> CNRAEnvSelect (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANDefault", [se1;se2]) -> CNRAEnvDefault (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANEither", [se1;se2]) -> CNRAEnvEither (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANEitherConcat", [se1;se2]) -> CNRAEnvEitherConcat (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANApp", [se1;se2]) -> CNRAEnvApp (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANGetConstant", [sl]) -> CNRAEnvGetConstant (sstring_to_coq_string sl)
+  | STerm ("ANEnv",[]) -> CNRAEnvEnv
+  | STerm ("ANAppEnv", [se1;se2]) -> CNRAEnvAppEnv (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANMapEnv", [se1]) -> CNRAEnvMapEnv (sexp_to_nraenv se1)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside NRAEnv with name " ^ t))
   | _ ->

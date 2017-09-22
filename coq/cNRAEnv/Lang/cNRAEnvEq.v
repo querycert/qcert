@@ -44,17 +44,6 @@ Section cNRAEnvEq.
       (dn_x:data_normalized h x),
       h ⊢ₑ op1 @ₑ x ⊣ c;env = h ⊢ₑ op2 @ₑ x ⊣ c;env.
 
-  Definition nra_eqenv (op1 op2:nraenv_core) : Prop :=
-    forall
-      (h:list(string*string))
-      (c:list (string*data))
-      (dn_c:Forall (fun d => data_normalized h (snd d)) c)
-      (env:data)
-      (dn_env:data_normalized h env)
-      (x:data)
-      (dn_x:data_normalized h x),
-      h ⊢ (nra_of_nraenv_core op1) @ₐ (nra_context_data env x) ⊣ (rec_sort c) = h ⊢ (nra_of_nraenv_core op2) @ₐ (nra_context_data env x) ⊣ (rec_sort c).
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
@@ -72,62 +61,26 @@ Section cNRAEnvEq.
       intros. rewrite (H h c dn_c env dn_env x0) by trivial; rewrite (H0 h c dn_c env dn_env x0) by trivial; reflexivity.
   Qed.
 
-  Global Instance nra_eqenv_equiv : Equivalence nra_eqenv.
-  Proof.
-    constructor.
-    - unfold Reflexive, nra_eqenv.
-      intros; reflexivity.
-    - unfold Symmetric, nra_eqenv.
-      intros; rewrite (H h c dn_c env dn_env x0) by trivial; reflexivity.
-    - unfold Transitive, nra_eqenv.
-      intros; rewrite (H h c dn_c env dn_env x0) by trivial; rewrite (H0 h c dn_c env dn_env x0) by trivial; reflexivity.
-  Qed.
-
   Hint Resolve dnrec_sort.
-    
-  Lemma nra_eqenv_same (op1 op2:nraenv_core) :
-    nraenv_core_eq op1 op2 <-> nra_eqenv op1 op2.
-  Proof.
-    split; unfold nraenv_core_eq, nra_eqenv; intros.
-    - repeat rewrite <- unfold_env_nra by trivial.
-      rewrite H; trivial.
-      apply Forall_sorted.
-      trivial.
-    - repeat rewrite unfold_env_nra_sort by trivial.
-      rewrite H; trivial.
-  Qed.
     
   (* all the extended nraebraic constructors are proper wrt. equivalence *)
 
-  (* ANID *)
-  Global Instance anid_proper : Proper nraenv_core_eq ANID.
+  (* cNRAEnvID *)
+  Global Instance proper_cNRAEnvID : Proper nraenv_core_eq cNRAEnvID.
   Proof.
     unfold Proper, respectful, nraenv_core_eq.
     reflexivity.
   Qed.
 
-  Global Instance anideq_proper : Proper nra_eqenv ANID.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anid_proper.
-  Qed.
-
-  (* ANConst *)
-  Global Instance anconst_proper : Proper (eq ==> nraenv_core_eq) ANConst.
+  (* cNRAEnvConst *)
+  Global Instance proper_cNRAEnvConst : Proper (eq ==> nraenv_core_eq) cNRAEnvConst.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros.
     rewrite H; reflexivity.
   Qed.
 
-  Global Instance anconsteq_proper : Proper (eq ==> nra_eqenv) ANConst.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anconst_proper; assumption.
-  Qed.
-
-  (* ANBinOp *)
-    
-  Global Instance anbinary_op_proper : Proper (binary_op_eq ==> nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANBinop.
+  (* cNRAEnvBinOp *)
+  Global Instance proper_cNRAEnvBinop : Proper (binary_op_eq ==> nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvBinop.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     generalize proper_NRABinop.
@@ -158,15 +111,8 @@ Section cNRAEnvEq.
     eauto.
   Qed.
 
-  Global Instance anbinary_opeq_proper : Proper (binary_op_eq ==> nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANBinop.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anbinary_op_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-
-  (* ANUnop *)
-  Global Instance anunary_op_proper : Proper (unary_op_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANUnop.
+  (* cNRAEnvUnop *)
+  Global Instance proper_cNRAEnvUnop : Proper (unary_op_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvUnop.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H0 by trivial.
@@ -189,15 +135,8 @@ Section cNRAEnvEq.
 
   Hint Resolve data_normalized_dcoll_in.
 
-  Global Instance anunary_opeq_proper : Proper (unary_op_eq ==> nra_eqenv ==> nra_eqenv) ANUnop.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anunary_op_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-
-  (* ANMap *)
-  Global Instance anmap_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANMap.
+  (* cNRAEnvMap *)
+  Global Instance proper_cNRAEnvMap : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvMap.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H0 by trivial.
@@ -208,15 +147,8 @@ Section cNRAEnvEq.
     apply H; eauto.
   Qed.
 
-  Global Instance anmapeq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANMap.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anmap_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-
-  (* ANMapProduct *)
-  Global Instance anmapconcat_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANMapProduct.
+  (* cNRAEnvMapProduct *)
+  Global Instance proper_cNRAEnvMapProduct : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvMapProduct.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H0 by trivial.
@@ -227,15 +159,8 @@ Section cNRAEnvEq.
     apply H; eauto.
   Qed.
 
-  Global Instance anmapconcateq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANMapProduct.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anmapconcat_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-  
-  (* ANProduct *)
-  Global Instance anproduct_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANProduct.
+  (* cNRAEnvProduct *)
+  Global Instance proper_cNRAEnvProduct : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvProduct.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H by trivial; rewrite H0 by trivial.
@@ -260,15 +185,8 @@ Section cNRAEnvEq.
     apply (H1 h); eauto.      
   Qed.
 
-  Global Instance anmapproducteq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANProduct.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anproduct_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-  
-  (* ANSelect *)
-  Global Instance anselect_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANSelect.
+  (* cNRAEnvSelect *)
+  Global Instance proper_cNRAEnvSelect : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvSelect.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     rewrite H0 by trivial.
@@ -279,15 +197,8 @@ Section cNRAEnvEq.
     rewrite H; eauto.
   Qed.
 
-  Global Instance anselecteq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANSelect.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anselect_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-
-  (* ANDefault *)
-  Global Instance andefault_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANDefault.
+  (* cNRAEnvDefault *)
+  Global Instance proper_cNRAEnvDefault : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvDefault.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H by trivial; rewrite H0 by trivial.
@@ -314,43 +225,22 @@ Section cNRAEnvEq.
     apply (H1 h); eauto.
   Qed.
 
-  Global Instance andefaulteq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANDefault.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply andefault_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-
-    (* ANEither *)
-  Global Instance aneither_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANEither.
+  (* cNRAEnvEither *)
+  Global Instance proper_cNRAEnvEither : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvEither.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     destruct x1; trivial; inversion dn_x; subst; eauto.
   Qed.
 
-    Global Instance aneithereq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANEither.
-  Proof.
-    unfold Proper, respectful, nra_eqenv; intros; simpl.
-    destruct x1; simpl; trivial; inversion dn_x; subst.
-    + apply H; trivial.
-    + apply H0; trivial.
-  Qed.
-
-      (* ANEitherConcat *)
-  Global Instance aneitherconcat_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANEitherConcat.
+  (* cNRAEnvEitherConcat *)
+  Global Instance proper_cNRAEnvEitherConcat : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvEitherConcat.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     rewrite H,H0 by trivial. repeat match_destr.
   Qed.
 
-    Global Instance aneitherconcateq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANEitherConcat.
-  Proof.
-    unfold Proper, respectful, nra_eqenv; intros; simpl.
-    rewrite H,H0 by trivial. repeat match_destr.
-  Qed.
-
-  (* ANApp *)
-  Global Instance anapp_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANApp.
+  (* cNRAEnvApp *)
+  Global Instance proper_cNRAEnvApp : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvApp.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     rewrite H0 by trivial.
@@ -358,41 +248,22 @@ Section cNRAEnvEq.
     eauto.
   Qed.
 
-  Global Instance anappeq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANApp.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anapp_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-
-  (* ANGetConstant *)
-  Global Instance angetconstant_proper s : Proper (nraenv_core_eq) (ANGetConstant s).
+  (* cNRAEnvGetConstant *)
+  Global Instance proper_cNRAEnvGetConstant s : Proper (nraenv_core_eq) (cNRAEnvGetConstant s).
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     reflexivity.
   Qed.
 
-  Global Instance angetconstanteq_proper s : Proper (nra_eqenv) (ANGetConstant s).
-  Proof.
-    unfold Proper, respectful; intros.
-    reflexivity.
-  Qed.
-  
-  (* ANEnv *)
-  Global Instance anenv_proper : Proper (nraenv_core_eq) ANEnv.
+  (* cNRAEnvEnv *)
+  Global Instance proper_cNRAEnvEnv : Proper (nraenv_core_eq) cNRAEnvEnv.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     reflexivity.
   Qed.
 
-  Global Instance anenveq_proper : Proper (nra_eqenv) ANEnv.
-  Proof.
-    unfold Proper, respectful; intros.
-    reflexivity.
-  Qed.
-
-  (* ANAppEnv *)
-  Global Instance anappenv_proper : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) ANAppEnv.
+  (* cNRAEnvAppEnv *)
+  Global Instance proper_cNRAEnvAppEnv : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvAppEnv.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     rewrite H0 by trivial.
@@ -400,28 +271,14 @@ Section cNRAEnvEq.
     apply H; eauto.
   Qed.
 
-  Global Instance anappenveq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANAppEnv.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anappenv_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
-  Qed.
-
-  (* ANMapEnv *)
-  Global Instance anmapenv_proper : Proper (nraenv_core_eq ==> nraenv_core_eq) ANMapEnv.
+  (* cNRAEnvMapEnv *)
+  Global Instance proper_cNRAEnvMapEnv : Proper (nraenv_core_eq ==> nraenv_core_eq) cNRAEnvMapEnv.
   Proof.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     destruct env; try reflexivity; simpl.
     f_equal.
     apply lift_map_ext; intros.
     eauto.
-  Qed.
-
-  Global Instance anmapenveq_proper : Proper (nra_eqenv ==> nra_eqenv) ANMapEnv.
-  Proof.
-    unfold Proper, respectful; intros.
-    rewrite <- nra_eqenv_same; apply anmapenv_proper;
-    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   Lemma nraenv_core_of_nra_proper : Proper (nra_eq ==> nraenv_core_eq) nraenv_core_of_nra.

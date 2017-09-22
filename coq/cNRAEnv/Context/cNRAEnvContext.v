@@ -41,115 +41,115 @@ Section cNRAEnvContext.
   Context {fruntime:foreign_runtime}.
 
   Inductive nraenv_core_ctxt : Set :=
-  | CNHole : nat -> nraenv_core_ctxt
-  | CNPlug : nraenv_core -> nraenv_core_ctxt
-  | CANBinop : binary_op -> nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANUnop : unary_op -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANMap : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANMapProduct : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANProduct : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANSelect : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANDefault : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANEither : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANEitherConcat : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANApp : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANAppEnv : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANMapEnv : nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvHole : nat -> nraenv_core_ctxt
+  | CcNRAEnvPlug : nraenv_core -> nraenv_core_ctxt
+  | CcNRAEnvBinop : binary_op -> nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvUnop : unary_op -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvMap : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvMapProduct : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvProduct : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvSelect : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvDefault : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvEither : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvEitherConcat : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvApp : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvAppEnv : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CcNRAEnvMapEnv : nraenv_core_ctxt -> nraenv_core_ctxt
   .
 
-  Definition CANID : nraenv_core_ctxt
-    := CNPlug ANID.
+  Definition CcNRAEnvID : nraenv_core_ctxt
+    := CcNRAEnvPlug cNRAEnvID.
 
-    Definition CANEnv : nraenv_core_ctxt
-    := CNPlug ANEnv.
+    Definition CcNRAEnvEnv : nraenv_core_ctxt
+    := CcNRAEnvPlug cNRAEnvEnv.
 
-    Definition CANGetConstant s : nraenv_core_ctxt
-    := CNPlug (ANGetConstant s).
+    Definition CcNRAEnvGetConstant s : nraenv_core_ctxt
+    := CcNRAEnvPlug (cNRAEnvGetConstant s).
 
-  Definition CANConst : data -> nraenv_core_ctxt
-    := fun d => CNPlug (ANConst d).
+  Definition CcNRAEnvConst : data -> nraenv_core_ctxt
+    := fun d => CcNRAEnvPlug (cNRAEnvConst d).
 
   Fixpoint aec_holes (c:nraenv_core_ctxt) : list nat :=
     match c with
-      | CNHole x => x::nil
-      | CNPlug a => nil
-      | CANBinop b c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANUnop u c' => aec_holes c'
-      | CANMap c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANMapProduct c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANProduct c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANSelect c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANDefault c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANEither c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANEitherConcat c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANApp c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANAppEnv c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANMapEnv c1 => aec_holes c1
+      | CcNRAEnvHole x => x::nil
+      | CcNRAEnvPlug a => nil
+      | CcNRAEnvBinop b c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvUnop u c' => aec_holes c'
+      | CcNRAEnvMap c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvMapProduct c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvProduct c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvSelect c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvDefault c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvEither c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvEitherConcat c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvApp c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvAppEnv c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CcNRAEnvMapEnv c1 => aec_holes c1
     end.
 
   Fixpoint aec_simplify (c:nraenv_core_ctxt) : nraenv_core_ctxt :=
     match c with
-      | CNHole x => CNHole x
-      | CNPlug a => CNPlug a
-      | CANBinop b c1 c2 =>
+      | CcNRAEnvHole x => CcNRAEnvHole x
+      | CcNRAEnvPlug a => CcNRAEnvPlug a
+      | CcNRAEnvBinop b c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANBinop b a1 a2)
-          | c1', c2' => CANBinop b c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvBinop b a1 a2)
+          | c1', c2' => CcNRAEnvBinop b c1' c2'
         end
-      | CANUnop u c =>
+      | CcNRAEnvUnop u c =>
         match aec_simplify c with
-          | CNPlug a => CNPlug (ANUnop u a)
-          | c' => CANUnop u c'
+          | CcNRAEnvPlug a => CcNRAEnvPlug (cNRAEnvUnop u a)
+          | c' => CcNRAEnvUnop u c'
         end
-      | CANMap c1 c2 =>
+      | CcNRAEnvMap c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANMap a1 a2)
-          | c1', c2' => CANMap c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvMap a1 a2)
+          | c1', c2' => CcNRAEnvMap c1' c2'
         end
-      | CANMapProduct c1 c2 =>
+      | CcNRAEnvMapProduct c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANMapProduct a1 a2)
-          | c1', c2' => CANMapProduct c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvMapProduct a1 a2)
+          | c1', c2' => CcNRAEnvMapProduct c1' c2'
         end
-      | CANProduct c1 c2 =>
+      | CcNRAEnvProduct c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANProduct a1 a2)
-          | c1', c2' => CANProduct c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvProduct a1 a2)
+          | c1', c2' => CcNRAEnvProduct c1' c2'
         end
-      | CANSelect c1 c2 =>
+      | CcNRAEnvSelect c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANSelect a1 a2)
-          | c1', c2' => CANSelect c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvSelect a1 a2)
+          | c1', c2' => CcNRAEnvSelect c1' c2'
         end
-      | CANDefault c1 c2 =>
+      | CcNRAEnvDefault c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANDefault a1 a2)
-          | c1', c2' => CANDefault c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvDefault a1 a2)
+          | c1', c2' => CcNRAEnvDefault c1' c2'
         end
-      | CANEither c1 c2 =>
+      | CcNRAEnvEither c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANEither a1 a2)
-          | c1', c2' => CANEither c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvEither a1 a2)
+          | c1', c2' => CcNRAEnvEither c1' c2'
         end
-      | CANEitherConcat c1 c2 =>
+      | CcNRAEnvEitherConcat c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANEitherConcat a1 a2)
-          | c1', c2' => CANEitherConcat c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvEitherConcat a1 a2)
+          | c1', c2' => CcNRAEnvEitherConcat c1' c2'
         end
-      | CANApp c1 c2 =>
+      | CcNRAEnvApp c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANApp a1 a2)
-          | c1', c2' => CANApp c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvApp a1 a2)
+          | c1', c2' => CcNRAEnvApp c1' c2'
         end
-      | CANAppEnv c1 c2 =>
+      | CcNRAEnvAppEnv c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANAppEnv a1 a2)
-          | c1', c2' => CANAppEnv c1' c2'
+          | (CcNRAEnvPlug a1), (CcNRAEnvPlug a2) => CcNRAEnvPlug (cNRAEnvAppEnv a1 a2)
+          | c1', c2' => CcNRAEnvAppEnv c1' c2'
         end
-      | CANMapEnv c1 =>
+      | CcNRAEnvMapEnv c1 =>
         match aec_simplify c1 with
-          | (CNPlug a1) => CNPlug (ANMapEnv a1)
-          | c1' => CANMapEnv c1'
+          | (CcNRAEnvPlug a1) => CcNRAEnvPlug (cNRAEnvMapEnv a1)
+          | c1' => CcNRAEnvMapEnv c1'
         end
     end.
 
@@ -167,12 +167,12 @@ Section cNRAEnvContext.
 
   Definition aec_nraenv_core_of_ctxt c
     := match (aec_simplify c) with
-         | CNPlug a => Some a
+         | CcNRAEnvPlug a => Some a
          | _ => None
        end.
 
   Lemma aec_simplify_nholes c :
-    aec_holes c = nil -> {a | aec_simplify c = CNPlug a}.
+    aec_holes c = nil -> {a | aec_simplify c = CcNRAEnvPlug a}.
   Proof.
     induction c; simpl; [discriminate | eauto 2 | ..];
     try solve [intros s0; apply app_eq_nil in s0;
@@ -208,34 +208,34 @@ Section cNRAEnvContext.
 
   Fixpoint aec_subst (c:nraenv_core_ctxt) (x:nat) (p:nraenv_core) : nraenv_core_ctxt :=
     match c with
-      | CNHole x'
-        => if x == x' then CNPlug p else CNHole x'
-      | CNPlug a
-        => CNPlug a
-      | CANBinop b c1 c2
-        => CANBinop b (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANUnop u c
-        => CANUnop u (aec_subst c x p)
-      | CANMap c1 c2
-        => CANMap (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANMapProduct c1 c2
-        => CANMapProduct (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANProduct c1 c2
-        => CANProduct (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANSelect c1 c2
-        => CANSelect (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANDefault c1 c2
-        => CANDefault (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANEither c1 c2
-        => CANEither (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANEitherConcat c1 c2
-        => CANEitherConcat (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANApp c1 c2
-        => CANApp (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANAppEnv c1 c2
-        => CANAppEnv (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANMapEnv c1
-        => CANMapEnv (aec_subst c1 x p)
+      | CcNRAEnvHole x'
+        => if x == x' then CcNRAEnvPlug p else CcNRAEnvHole x'
+      | CcNRAEnvPlug a
+        => CcNRAEnvPlug a
+      | CcNRAEnvBinop b c1 c2
+        => CcNRAEnvBinop b (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvUnop u c
+        => CcNRAEnvUnop u (aec_subst c x p)
+      | CcNRAEnvMap c1 c2
+        => CcNRAEnvMap (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvMapProduct c1 c2
+        => CcNRAEnvMapProduct (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvProduct c1 c2
+        => CcNRAEnvProduct (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvSelect c1 c2
+        => CcNRAEnvSelect (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvDefault c1 c2
+        => CcNRAEnvDefault (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvEither c1 c2
+        => CcNRAEnvEither (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvEitherConcat c1 c2
+        => CcNRAEnvEitherConcat (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvApp c1 c2
+        => CcNRAEnvApp (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvAppEnv c1 c2
+        => CcNRAEnvAppEnv (aec_subst c1 x p) (aec_subst c2 x p)
+      | CcNRAEnvMapEnv c1
+        => CcNRAEnvMapEnv (aec_subst c1 x p)
     end.
 
   Definition aec_substp (c:nraenv_core_ctxt) xp
@@ -267,7 +267,7 @@ Section cNRAEnvContext.
   Proof.
     induction c; simpl; intros;
     trivial; try solve[ rewrite remove_all_app; congruence].
-    (* CNHole *)
+    (* CcNRAEnvHole *)
     match_destr; match_destr; simpl; try rewrite app_nil_r; congruence.
   Qed.
 
@@ -290,14 +290,14 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_Plug a ps :
-    aec_substs (CNPlug a) ps = CNPlug a.
+    aec_substs (CcNRAEnvPlug a) ps = CcNRAEnvPlug a.
   Proof.
     induction ps; simpl; trivial; intros.
     destruct a0; simpl; auto.
   Qed.
   
   Lemma aec_substs_Binop b c1 c2 ps :
-    aec_substs (CANBinop b c1 c2) ps = CANBinop b (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs (CcNRAEnvBinop b c1 c2) ps = CcNRAEnvBinop b (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -305,7 +305,7 @@ Section cNRAEnvContext.
   Qed.
 
   Lemma aec_substs_Unop u c ps :
-      aec_substs (CANUnop u c) ps = CANUnop u (aec_substs c ps).
+      aec_substs (CcNRAEnvUnop u c) ps = CcNRAEnvUnop u (aec_substs c ps).
   Proof.
     revert c.
     induction ps; simpl; trivial; intros.
@@ -313,8 +313,8 @@ Section cNRAEnvContext.
   Qed.
 
   Lemma aec_substs_Map c1 c2 ps :
-    aec_substs ( CANMap c1 c2) ps =
-    CANMap (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvMap c1 c2) ps =
+    CcNRAEnvMap (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -322,8 +322,8 @@ Section cNRAEnvContext.
   Qed.
 
   Lemma aec_substs_MapProduct c1 c2 ps :
-    aec_substs ( CANMapProduct c1 c2) ps =
-    CANMapProduct (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvMapProduct c1 c2) ps =
+    CcNRAEnvMapProduct (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -331,8 +331,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_Product c1 c2 ps :
-    aec_substs ( CANProduct c1 c2) ps =
-    CANProduct (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvProduct c1 c2) ps =
+    CcNRAEnvProduct (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -340,8 +340,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_Select c1 c2 ps :
-    aec_substs ( CANSelect c1 c2) ps =
-    CANSelect (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvSelect c1 c2) ps =
+    CcNRAEnvSelect (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -349,8 +349,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_Default c1 c2 ps :
-    aec_substs ( CANDefault c1 c2) ps =
-    CANDefault (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvDefault c1 c2) ps =
+    CcNRAEnvDefault (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -358,8 +358,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_Either c1 c2 ps :
-    aec_substs ( CANEither c1 c2) ps =
-    CANEither (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvEither c1 c2) ps =
+    CcNRAEnvEither (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -367,8 +367,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_EitherConcat c1 c2 ps :
-    aec_substs ( CANEitherConcat c1 c2) ps =
-    CANEitherConcat (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvEitherConcat c1 c2) ps =
+    CcNRAEnvEitherConcat (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -376,8 +376,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_App c1 c2 ps :
-    aec_substs ( CANApp c1 c2) ps =
-    CANApp (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvApp c1 c2) ps =
+    CcNRAEnvApp (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -385,8 +385,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_AppEnv c1 c2 ps :
-    aec_substs ( CANAppEnv c1 c2) ps =
-    CANAppEnv (aec_substs c1 ps) (aec_substs c2 ps).
+    aec_substs ( CcNRAEnvAppEnv c1 c2) ps =
+    CcNRAEnvAppEnv (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -394,8 +394,8 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma aec_substs_MapEnv c1 ps :
-    aec_substs ( CANMapEnv c1) ps =
-    CANMapEnv (aec_substs c1 ps).
+    aec_substs ( CcNRAEnvMapEnv c1) ps =
+    CcNRAEnvMapEnv (aec_substs c1 ps).
   Proof.
     revert c1.
     induction ps; simpl; trivial; intros.
@@ -418,8 +418,8 @@ Section cNRAEnvContext.
        aec_substs_MapEnv : aec_substs.
   
   Lemma aec_simplify_holes_binary_op b c1 c2:
-    aec_holes (CANBinop b c1 c2) <> nil ->
-    aec_simplify (CANBinop b c1 c2) = CANBinop b (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvBinop b c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvBinop b c1 c2) = CcNRAEnvBinop b (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -432,8 +432,8 @@ Section cNRAEnvContext.
   Qed.
 
   Lemma aec_simplify_holes_unary_op u c:
-    aec_holes (CANUnop u c ) <> nil ->
-    aec_simplify (CANUnop u c) = CANUnop u (aec_simplify c).
+    aec_holes (CcNRAEnvUnop u c ) <> nil ->
+    aec_simplify (CcNRAEnvUnop u c) = CcNRAEnvUnop u (aec_simplify c).
   Proof.
     intros.
     simpl in H.
@@ -445,8 +445,8 @@ Section cNRAEnvContext.
   Qed.
 
   Lemma aec_simplify_holes_map c1 c2:
-    aec_holes (CANMap c1 c2) <> nil ->
-    aec_simplify (CANMap c1 c2) = CANMap (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvMap c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvMap c1 c2) = CcNRAEnvMap (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -459,8 +459,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_mapconcat c1 c2:
-    aec_holes (CANMapProduct c1 c2) <> nil ->
-    aec_simplify (CANMapProduct c1 c2) = CANMapProduct (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvMapProduct c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvMapProduct c1 c2) = CcNRAEnvMapProduct (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -473,8 +473,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_product c1 c2:
-    aec_holes (CANProduct c1 c2) <> nil ->
-    aec_simplify (CANProduct c1 c2) = CANProduct (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvProduct c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvProduct c1 c2) = CcNRAEnvProduct (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -487,8 +487,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_select c1 c2:
-    aec_holes (CANSelect c1 c2) <> nil ->
-    aec_simplify (CANSelect c1 c2) = CANSelect (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvSelect c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvSelect c1 c2) = CcNRAEnvSelect (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -501,8 +501,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_default c1 c2:
-    aec_holes (CANDefault c1 c2) <> nil ->
-    aec_simplify (CANDefault c1 c2) = CANDefault (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvDefault c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvDefault c1 c2) = CcNRAEnvDefault (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -515,8 +515,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_either c1 c2:
-    aec_holes (CANEither c1 c2) <> nil ->
-    aec_simplify (CANEither c1 c2) = CANEither (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvEither c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvEither c1 c2) = CcNRAEnvEither (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -529,8 +529,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_eitherconcat c1 c2:
-    aec_holes (CANEitherConcat c1 c2) <> nil ->
-    aec_simplify (CANEitherConcat c1 c2) = CANEitherConcat (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvEitherConcat c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvEitherConcat c1 c2) = CcNRAEnvEitherConcat (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -543,8 +543,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_app c1 c2:
-    aec_holes (CANApp c1 c2) <> nil ->
-    aec_simplify (CANApp c1 c2) = CANApp (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvApp c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvApp c1 c2) = CcNRAEnvApp (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -557,8 +557,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_appenv c1 c2:
-    aec_holes (CANAppEnv c1 c2) <> nil ->
-    aec_simplify (CANAppEnv c1 c2) = CANAppEnv (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CcNRAEnvAppEnv c1 c2) <> nil ->
+    aec_simplify (CcNRAEnvAppEnv c1 c2) = CcNRAEnvAppEnv (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -571,8 +571,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_mapenv c1 :
-    aec_holes (CANMapEnv c1) <> nil ->
-    aec_simplify (CANMapEnv c1) = CANMapEnv (aec_simplify c1).
+    aec_holes (CcNRAEnvMapEnv c1) <> nil ->
+    aec_simplify (CcNRAEnvMapEnv c1) = CcNRAEnvMapEnv (aec_simplify c1).
   Proof.
     intros.
     simpl in H.
@@ -616,8 +616,8 @@ Section cNRAEnvContext.
     induction c.
     - simpl; match_destr.
     - simpl; trivial.
-    - destr_solv IHc1 IHc2 (CANBinop b c1 c2) aec_simplify_holes_binary_op.
-    -  destruct (is_nil_dec (aec_holes (CANUnop u c))) as [h|h].
+    - destr_solv IHc1 IHc2 (CcNRAEnvBinop b c1 c2) aec_simplify_holes_binary_op.
+    -  destruct (is_nil_dec (aec_holes (CcNRAEnvUnop u c))) as [h|h].
       + rewrite (aec_subst_nholes _ _ _ h).
         rewrite (aec_subst_simplify_nholes _ _ _ h).
         rewrite aec_simplify_idempotent.
@@ -626,16 +626,16 @@ Section cNRAEnvContext.
         simpl.
         rewrite IHc.
         trivial.
-    - destr_solv IHc1 IHc2 (CANMap c1 c2) aec_simplify_holes_map.
-    - destr_solv IHc1 IHc2 (CANMapProduct c1 c2) aec_simplify_holes_mapconcat.
-    - destr_solv IHc1 IHc2 (CANProduct c1 c2) aec_simplify_holes_product.
-    - destr_solv IHc1 IHc2 (CANSelect c1 c2) aec_simplify_holes_select.
-    - destr_solv IHc1 IHc2 (CANDefault c1 c2) aec_simplify_holes_default.
-    - destr_solv IHc1 IHc2 (CANEither c1 c2) aec_simplify_holes_either.
-    - destr_solv IHc1 IHc2 (CANEitherConcat c1 c2) aec_simplify_holes_eitherconcat.
-    - destr_solv IHc1 IHc2 (CANApp c1 c2) aec_simplify_holes_app.
-    - destr_solv IHc1 IHc2 (CANAppEnv c1 c2) aec_simplify_holes_appenv.
-    - destruct (is_nil_dec (aec_holes (CANMapEnv c))) as [h|h].
+    - destr_solv IHc1 IHc2 (CcNRAEnvMap c1 c2) aec_simplify_holes_map.
+    - destr_solv IHc1 IHc2 (CcNRAEnvMapProduct c1 c2) aec_simplify_holes_mapconcat.
+    - destr_solv IHc1 IHc2 (CcNRAEnvProduct c1 c2) aec_simplify_holes_product.
+    - destr_solv IHc1 IHc2 (CcNRAEnvSelect c1 c2) aec_simplify_holes_select.
+    - destr_solv IHc1 IHc2 (CcNRAEnvDefault c1 c2) aec_simplify_holes_default.
+    - destr_solv IHc1 IHc2 (CcNRAEnvEither c1 c2) aec_simplify_holes_either.
+    - destr_solv IHc1 IHc2 (CcNRAEnvEitherConcat c1 c2) aec_simplify_holes_eitherconcat.
+    - destr_solv IHc1 IHc2 (CcNRAEnvApp c1 c2) aec_simplify_holes_app.
+    - destr_solv IHc1 IHc2 (CcNRAEnvAppEnv c1 c2) aec_simplify_holes_appenv.
+    - destruct (is_nil_dec (aec_holes (CcNRAEnvMapEnv c))) as [h|h].
       + rewrite (aec_subst_nholes _ _ _ h).
         rewrite (aec_subst_simplify_nholes _ _ _ h).
         rewrite aec_simplify_idempotent.
@@ -667,7 +667,7 @@ Section cNRAEnvContext.
            match aec_simplify (aec_substs c1 ps),
                  aec_simplify (aec_substs c2 ps)
            with
-             | CNPlug a1, CNPlug a2 => base_equiv a1 a2
+             | CcNRAEnvPlug a1, CcNRAEnvPlug a2 => base_equiv a1 a2
              | _, _ => True
            end.
 
@@ -678,7 +678,7 @@ Section cNRAEnvContext.
           match aec_simplify (aec_substs c1 ps),
                 aec_simplify (aec_substs c2 ps)
           with
-            | CNPlug a1, CNPlug a2 => base_equiv a1 a2
+            | CcNRAEnvPlug a1, CcNRAEnvPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
 
@@ -729,7 +729,7 @@ Section cNRAEnvContext.
           match aec_simplify (aec_substs c1 ps),
                 aec_simplify (aec_substs c2 ps)
           with
-            | CNPlug a1, CNPlug a2 => base_equiv a1 a2
+            | CcNRAEnvPlug a1, CcNRAEnvPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
 
@@ -819,7 +819,7 @@ Section cNRAEnvContext.
           match aec_simplify (aec_substs c1 ps),
                 aec_simplify (aec_substs c2 ps)
           with
-            | CNPlug a1, CNPlug a2 => base_equiv a1 a2
+            | CcNRAEnvPlug a1, CcNRAEnvPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
 
@@ -896,7 +896,7 @@ Section cNRAEnvContext.
           match aec_simplify (aec_substs c1 ps),
                 aec_simplify (aec_substs c2 ps)
           with
-            | CNPlug a1, CNPlug a2 => base_equiv a1 a2
+            | CcNRAEnvPlug a1, CcNRAEnvPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
    
@@ -1027,8 +1027,8 @@ Section cNRAEnvContext.
   Proof.
     unfold nraenv_core_ctxt_equiv.
     red; intros.
-    - specialize (H (ps ++ (map (fun x => (x, ANID)) (aec_holes y)))).
-      specialize (H0 (ps ++ (map (fun x => (x, ANID)) (aec_holes y)))).
+    - specialize (H (ps ++ (map (fun x => (x, cNRAEnvID)) (aec_holes y)))).
+      specialize (H0 (ps ++ (map (fun x => (x, cNRAEnvID)) (aec_holes y)))).
       repeat rewrite map_app in H, H0.
       rewrite (aec_substs_app x) in H.
       rewrite (aec_substs_app z) in H0.
@@ -1119,8 +1119,8 @@ Section cNRAEnvContext.
     - etransitivity; eauto.
   Qed.
 
-  Global Instance CNPlug_proper :
-    Proper (base_equiv ==> nraenv_core_ctxt_equiv) CNPlug.
+  Global Instance CcNRAEnvPlug_proper :
+    Proper (base_equiv ==> nraenv_core_ctxt_equiv) CcNRAEnvPlug.
   Proof.
     unfold Proper, respectful.
     unfold nraenv_core_ctxt_equiv.
@@ -1128,8 +1128,8 @@ Section cNRAEnvContext.
     simpl; trivial.
   Qed.
 
-  Global Instance CNPlug_proper_strict :
-    Proper (base_equiv ==> nraenv_core_ctxt_equiv_strict) CNPlug.
+  Global Instance CcNRAEnvPlug_proper_strict :
+    Proper (base_equiv ==> nraenv_core_ctxt_equiv_strict) CcNRAEnvPlug.
   Proof.
     unfold Proper, respectful.
     unfold nraenv_core_ctxt_equiv_strict.
@@ -1145,46 +1145,46 @@ End cNRAEnvContext.
 
 Delimit Scope nraenv_core_ctxt_scope with nraenv_core_ctxt.
 
-Notation "'ID'" := (CANID)  (at level 50) : nraenv_core_ctxt_scope.
-Notation "'ENV'" := (CANEnv)  (at level 50) : nraenv_core_ctxt_scope.
+Notation "'ID'" := (CcNRAEnvID)  (at level 50) : nraenv_core_ctxt_scope.
+Notation "'ENV'" := (CcNRAEnvEnv)  (at level 50) : nraenv_core_ctxt_scope.
 
-Notation "‵‵ c" := (CANConst (dconst c))  (at level 0) : nraenv_core_ctxt_scope.                           (* ‵ = \baeckprime *)
-Notation "‵ c" := (CANConst c)  (at level 0) : nraenv_core_ctxt_scope.                                     (* ‵ = \baeckprime *)
-Notation "‵{||}" := (CANConst (dcoll nil))  (at level 0) : nraenv_core_ctxt_scope.                         (* ‵ = \baeckprime *)
-Notation "‵[||]" := (CANConst (drec nil)) (at level 50) : nraenv_core_ctxt_scope.                          (* ‵ = \baeckprime *)
+Notation "‵‵ c" := (CcNRAEnvConst (dconst c))  (at level 0) : nraenv_core_ctxt_scope.                           (* ‵ = \baeckprime *)
+Notation "‵ c" := (CcNRAEnvConst c)  (at level 0) : nraenv_core_ctxt_scope.                                     (* ‵ = \baeckprime *)
+Notation "‵{||}" := (CcNRAEnvConst (dcoll nil))  (at level 0) : nraenv_core_ctxt_scope.                         (* ‵ = \baeckprime *)
+Notation "‵[||]" := (CcNRAEnvConst (drec nil)) (at level 50) : nraenv_core_ctxt_scope.                          (* ‵ = \baeckprime *)
 
-Notation "r1 ∧ r2" := (CANBinop OpAnd r1 r2) (right associativity, at level 65): nraenv_core_ctxt_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (CANBinop OpOr r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (CANBinop OpEqual r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (CANBinop OpLe r1 r2) (no associativity, at level 70): nraenv_core_ctxt_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (CANBinop OpBagUnion r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (CANBinop OpBagDiff r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (CANBinop OpBagMin r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (CANBinop OpBagMax r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((CANBinop OpRecConcat) p r) (at level 70) : nraenv_core_ctxt_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((CANBinop OpRecMerge) p r) (at level 70) : nraenv_core_ctxt_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (CcNRAEnvBinop OpAnd r1 r2) (right associativity, at level 65): nraenv_core_ctxt_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (CcNRAEnvBinop OpOr r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (CcNRAEnvBinop OpEqual r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (CcNRAEnvBinop OpLe r1 r2) (no associativity, at level 70): nraenv_core_ctxt_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (CcNRAEnvBinop OpBagUnion r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (CcNRAEnvBinop OpBagDiff r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (CcNRAEnvBinop OpBagMin r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (CcNRAEnvBinop OpBagMax r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((CcNRAEnvBinop OpRecConcat) p r) (at level 70) : nraenv_core_ctxt_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((CcNRAEnvBinop OpRecMerge) p r) (at level 70) : nraenv_core_ctxt_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (CANUnop OpNeg r1) (right associativity, at level 70): nraenv_core_ctxt_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (CANUnop OpDistinct r1) (right associativity, at level 70): nraenv_core_ctxt_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (CANUnop OpCount r1) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (CANUnop OpFlatten d) (at level 50) : nraenv_core_ctxt_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((CANUnop OpBag) d)  (at level 50) : nraenv_core_ctxt_scope.                        (* ‵ = \baeckprime *)
-Notation "‵[| ( s , r ) |]" := ((CANUnop (OpRec s)) r) (at level 50) : nraenv_core_ctxt_scope.              (* ‵ = \baeckprime *)
-Notation "¬π[ s1 ]( r )" := ((CANUnop (OpRecRemove s1)) r) (at level 50) : nraenv_core_ctxt_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((CANUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_ctxt_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (CcNRAEnvUnop OpNeg r1) (right associativity, at level 70): nraenv_core_ctxt_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (CcNRAEnvUnop OpDistinct r1) (right associativity, at level 70): nraenv_core_ctxt_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (CcNRAEnvUnop OpCount r1) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (CcNRAEnvUnop OpFlatten d) (at level 50) : nraenv_core_ctxt_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((CcNRAEnvUnop OpBag) d)  (at level 50) : nraenv_core_ctxt_scope.                        (* ‵ = \baeckprime *)
+Notation "‵[| ( s , r ) |]" := ((CcNRAEnvUnop (OpRec s)) r) (at level 50) : nraenv_core_ctxt_scope.              (* ‵ = \baeckprime *)
+Notation "¬π[ s1 ]( r )" := ((CcNRAEnvUnop (OpRecRemove s1)) r) (at level 50) : nraenv_core_ctxt_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((CcNRAEnvUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_ctxt_scope.      (* · = \cdot *)
 
-Notation "χ⟨ p ⟩( r )" := (CANMap p r) (at level 70) : nraenv_core_ctxt_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CANMapProduct e2 e1) (at level 70) : nraenv_core_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
-Notation "r1 × r2" := (CANProduct r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.       (* × = \times *)
-Notation "σ⟨ p ⟩( r )" := (CANSelect p r) (at level 70) : nraenv_core_ctxt_scope.                           (* σ = \sigma *)
-Notation "r1 ∥ r2" := (CANDefault r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.       (* ∥ = \parallel *)
-Notation "r1 ◯ r2" := (CANApp r1 r2) (right associativity, at level 60): nraenv_core_ctxt_scope.           (* ◯ = \bigcirc *)
+Notation "χ⟨ p ⟩( r )" := (CcNRAEnvMap p r) (at level 70) : nraenv_core_ctxt_scope.                              (* χ = \chi *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CcNRAEnvMapProduct e2 e1) (at level 70) : nraenv_core_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "r1 × r2" := (CcNRAEnvProduct r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.       (* × = \times *)
+Notation "σ⟨ p ⟩( r )" := (CcNRAEnvSelect p r) (at level 70) : nraenv_core_ctxt_scope.                           (* σ = \sigma *)
+Notation "r1 ∥ r2" := (CcNRAEnvDefault r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.       (* ∥ = \parallel *)
+Notation "r1 ◯ r2" := (CcNRAEnvApp r1 r2) (right associativity, at level 60): nraenv_core_ctxt_scope.           (* ◯ = \bigcirc *)
 
-Notation "r1 ◯ₑ r2" := (CANAppEnv r1 r2) (right associativity, at level 60): nraenv_core_ctxt_scope.           (* ◯ = \bigcirc *)
+Notation "r1 ◯ₑ r2" := (CcNRAEnvAppEnv r1 r2) (right associativity, at level 60): nraenv_core_ctxt_scope.           (* ◯ = \bigcirc *)
 
-Notation "χᵉ⟨ p ⟩( r )" := (CANMapEnv p r) (at level 70) : nraenv_core_ctxt_scope.                              (* χ = \chi *)
+Notation "χᵉ⟨ p ⟩( r )" := (CcNRAEnvMapEnv p r) (at level 70) : nraenv_core_ctxt_scope.                              (* χ = \chi *)
 
-Notation "$ n" := (CNHole n) (at level 50)  : nraenv_core_ctxt_scope.
+Notation "$ n" := (CcNRAEnvHole n) (at level 50)  : nraenv_core_ctxt_scope.
 
 Notation "X ≡ₑ Y" := (nraenv_core_ctxt_equiv nraenv_core_eq X Y) (at level 90) : nraenv_core_ctxt_scope.
 

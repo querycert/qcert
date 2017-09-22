@@ -41,8 +41,8 @@ Section NRAContext.
   Context {fruntime:foreign_runtime}.
 
   Inductive nra_ctxt : Set :=
-  | CHole : nat -> nra_ctxt
-  | CPlug : nra -> nra_ctxt
+  | CNRAHole : nat -> nra_ctxt
+  | CNRAPlug : nra -> nra_ctxt
   | CNRABinop : binary_op -> nra_ctxt -> nra_ctxt -> nra_ctxt
   | CNRAUnop : unary_op -> nra_ctxt -> nra_ctxt
   | CNRAMap : nra_ctxt -> nra_ctxt -> nra_ctxt
@@ -56,15 +56,15 @@ Section NRAContext.
   .
 
   Definition CNRAID : nra_ctxt
-    := CPlug NRAID.
+    := CNRAPlug NRAID.
 
   Definition CNRAConst : data -> nra_ctxt
-    := fun d => CPlug (NRAConst d).
+    := fun d => CNRAPlug (NRAConst d).
 
   Fixpoint ac_holes (c:nra_ctxt) : list nat :=
     match c with
-      | CHole x => x::nil
-      | CPlug a => nil
+      | CNRAHole x => x::nil
+      | CNRAPlug a => nil
       | CNRABinop b c1 c2 => ac_holes c1 ++ ac_holes c2
       | CNRAUnop u c' => ac_holes c'
       | CNRAMap c1 c2 => ac_holes c1 ++ ac_holes c2
@@ -79,56 +79,56 @@ Section NRAContext.
 
   Fixpoint ac_simplify (c:nra_ctxt) : nra_ctxt :=
     match c with
-      | CHole x => CHole x
-      | CPlug a => CPlug a
+      | CNRAHole x => CNRAHole x
+      | CNRAPlug a => CNRAPlug a
       | CNRABinop b c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRABinop b a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRABinop b a1 a2)
           | c1', c2' => CNRABinop b c1' c2'
         end
       | CNRAUnop u c =>
         match ac_simplify c with
-          | CPlug a => CPlug (NRAUnop u a)
+          | CNRAPlug a => CNRAPlug (NRAUnop u a)
           | c' => CNRAUnop u c'
         end
       | CNRAMap c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRAMap a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRAMap a1 a2)
           | c1', c2' => CNRAMap c1' c2'
         end
       | CNRAMapProduct c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRAMapProduct a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRAMapProduct a1 a2)
           | c1', c2' => CNRAMapProduct c1' c2'
         end
       | CNRAProduct c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRAProduct a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRAProduct a1 a2)
           | c1', c2' => CNRAProduct c1' c2'
         end
       | CNRASelect c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRASelect a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRASelect a1 a2)
           | c1', c2' => CNRASelect c1' c2'
         end
       | CNRADefault c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRADefault a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRADefault a1 a2)
           | c1', c2' => CNRADefault c1' c2'
         end
       | CNRAEither c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRAEither a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRAEither a1 a2)
           | c1', c2' => CNRAEither c1' c2'
         end
       | CNRAEitherConcat c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRAEitherConcat a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRAEitherConcat a1 a2)
           | c1', c2' => CNRAEitherConcat c1' c2'
         end
       | CNRAApp c1 c2 =>
         match ac_simplify c1, ac_simplify c2 with
-          | (CPlug a1), (CPlug a2) => CPlug (NRAApp a1 a2)
+          | (CNRAPlug a1), (CNRAPlug a2) => CNRAPlug (NRAApp a1 a2)
           | c1', c2' => CNRAApp c1' c2'
         end
     end.
@@ -147,12 +147,12 @@ Section NRAContext.
 
   Definition ac_nra_of_ctxt c
     := match (ac_simplify c) with
-         | CPlug a => Some a
+         | CNRAPlug a => Some a
          | _ => None
        end.
 
   Lemma ac_simplify_nholes c :
-    ac_holes c = nil -> {a | ac_simplify c = CPlug a}.
+    ac_holes c = nil -> {a | ac_simplify c = CNRAPlug a}.
   Proof.
     induction c; simpl; [discriminate | eauto 2 | ..];
     try solve [intros s0; apply app_eq_nil in s0;
@@ -189,10 +189,10 @@ Section NRAContext.
 
   Fixpoint ac_subst (c:nra_ctxt) (x:nat) (p:nra) : nra_ctxt :=
     match c with
-      | CHole x'
-        => if x == x' then CPlug p else CHole x'
-      | CPlug a
-        => CPlug a
+      | CNRAHole x'
+        => if x == x' then CNRAPlug p else CNRAHole x'
+      | CNRAPlug a
+        => CNRAPlug a
       | CNRABinop b c1 c2
         => CNRABinop b (ac_subst c1 x p) (ac_subst c2 x p)
       | CNRAUnop u c
@@ -243,7 +243,7 @@ Section NRAContext.
   Proof.
     induction c; simpl; intros;
     trivial; try solve[ rewrite remove_all_app; congruence].
-    (* CHole *)
+    (* CNRAHole *)
     match_destr; match_destr; simpl; try rewrite app_nil_r; congruence.
   Qed.
 
@@ -266,7 +266,7 @@ Section NRAContext.
   Qed.
 
   Lemma ac_substs_Plug a ps :
-    ac_substs (CPlug a) ps = CPlug a.
+    ac_substs (CNRAPlug a) ps = CNRAPlug a.
   Proof.
     induction ps; simpl; trivial; intros.
     destruct a0; simpl; auto.
@@ -586,7 +586,7 @@ Section NRAContext.
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
           with
-            | CPlug a1, CPlug a2 => base_equiv a1 a2
+            | CNRAPlug a1, CNRAPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
 
@@ -597,7 +597,7 @@ Section NRAContext.
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
           with
-            | CPlug a1, CPlug a2 => base_equiv a1 a2
+            | CNRAPlug a1, CNRAPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
 
@@ -648,7 +648,7 @@ Section NRAContext.
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
           with
-            | CPlug a1, CPlug a2 => base_equiv a1 a2
+            | CNRAPlug a1, CNRAPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
 
@@ -737,7 +737,7 @@ Section NRAContext.
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
           with
-            | CPlug a1, CPlug a2 => base_equiv a1 a2
+            | CNRAPlug a1, CNRAPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
 
@@ -814,7 +814,7 @@ Section NRAContext.
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
           with
-            | CPlug a1, CPlug a2 => base_equiv a1 a2
+            | CNRAPlug a1, CNRAPlug a2 => base_equiv a1 a2
             | _, _ => True
           end.
    
@@ -1037,8 +1037,8 @@ Section NRAContext.
   Qed.
 
 
-  Global Instance CPlug_proper :
-    Proper (base_equiv ==> nra_ctxt_equiv) CPlug.
+  Global Instance CNRAPlug_proper :
+    Proper (base_equiv ==> nra_ctxt_equiv) CNRAPlug.
   Proof.
     unfold Proper, respectful.
     unfold nra_ctxt_equiv.
@@ -1046,8 +1046,8 @@ Section NRAContext.
     simpl; trivial.
   Qed.
 
-  Global Instance CPlug_proper_strict :
-    Proper (base_equiv ==> nra_ctxt_equiv_strict) CPlug.
+  Global Instance CNRAPlug_proper_strict :
+    Proper (base_equiv ==> nra_ctxt_equiv_strict) CNRAPlug.
   Proof.
     unfold Proper, respectful.
     unfold nra_ctxt_equiv_strict.
@@ -1095,7 +1095,7 @@ Notation "σ⟨ p ⟩( r )" := (CNRASelect p r) (at level 70) : nra_ctxt_scope. 
 Notation "r1 ∥ r2" := (CNRADefault r1 r2) (right associativity, at level 70): nra_ctxt_scope.       (* ∥ = \parallel *)
 Notation "r1 ◯ r2" := (CNRAApp r1 r2) (right associativity, at level 60): nra_ctxt_scope.           (* ◯ = \bigcirc *)
 
-Notation "$ n" := (CHole n) (at level 50)  : nra_ctxt_scope.
+Notation "$ n" := (CNRAHole n) (at level 50)  : nra_ctxt_scope.
 
 Notation "X ≡ₐ Y" := (nra_ctxt_equiv nra_eq X Y) (at level 90) : nra_ctxt_scope.
 

@@ -31,42 +31,42 @@ Section cNRAEnv.
   Context {fruntime:foreign_runtime}.
 
   Inductive nraenv_core : Set :=
-  | ANID : nraenv_core
-  | ANConst : data -> nraenv_core
-  | ANBinop : binary_op -> nraenv_core -> nraenv_core -> nraenv_core
-  | ANUnop : unary_op -> nraenv_core -> nraenv_core
-  | ANMap : nraenv_core -> nraenv_core -> nraenv_core
-  | ANMapProduct : nraenv_core -> nraenv_core -> nraenv_core
-  | ANProduct : nraenv_core -> nraenv_core -> nraenv_core
-  | ANSelect : nraenv_core -> nraenv_core -> nraenv_core
-  | ANDefault : nraenv_core -> nraenv_core -> nraenv_core
-  | ANEither :  nraenv_core -> nraenv_core -> nraenv_core
-  | ANEitherConcat :  nraenv_core -> nraenv_core -> nraenv_core
-  | ANApp : nraenv_core -> nraenv_core -> nraenv_core
-  | ANGetConstant : string -> nraenv_core
-  | ANEnv : nraenv_core
-  | ANAppEnv : nraenv_core -> nraenv_core -> nraenv_core
-  | ANMapEnv : nraenv_core -> nraenv_core
+  | cNRAEnvID : nraenv_core
+  | cNRAEnvConst : data -> nraenv_core
+  | cNRAEnvBinop : binary_op -> nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvUnop : unary_op -> nraenv_core -> nraenv_core
+  | cNRAEnvMap : nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvMapProduct : nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvProduct : nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvSelect : nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvDefault : nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvEither :  nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvEitherConcat :  nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvApp : nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvGetConstant : string -> nraenv_core
+  | cNRAEnvEnv : nraenv_core
+  | cNRAEnvAppEnv : nraenv_core -> nraenv_core -> nraenv_core
+  | cNRAEnvMapEnv : nraenv_core -> nraenv_core
   .
 
   Tactic Notation "nraenv_core_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "ANID"%string
-  | Case_aux c "ANConst"%string
-  | Case_aux c "ANBinop"%string
-  | Case_aux c "ANUnop"%string
-  | Case_aux c "ANMap"%string
-  | Case_aux c "ANMapProduct"%string
-  | Case_aux c "ANProduct"%string
-  | Case_aux c "ANSelect"%string
-  | Case_aux c "ANDefault"%string
-  | Case_aux c "ANEither"%string
-  | Case_aux c "ANEitherConcat"%string
-  | Case_aux c "ANApp"%string
-  | Case_aux c "ANGetConstant"%string
-  | Case_aux c "ANEnv"%string
-  | Case_aux c "ANAppEnv"%string
-  | Case_aux c "ANMapEnv"%string].
+  [ Case_aux c "cNRAEnvID"%string
+  | Case_aux c "cNRAEnvConst"%string
+  | Case_aux c "cNRAEnvBinop"%string
+  | Case_aux c "cNRAEnvUnop"%string
+  | Case_aux c "cNRAEnvMap"%string
+  | Case_aux c "cNRAEnvMapProduct"%string
+  | Case_aux c "cNRAEnvProduct"%string
+  | Case_aux c "cNRAEnvSelect"%string
+  | Case_aux c "cNRAEnvDefault"%string
+  | Case_aux c "cNRAEnvEither"%string
+  | Case_aux c "cNRAEnvEitherConcat"%string
+  | Case_aux c "cNRAEnvApp"%string
+  | Case_aux c "cNRAEnvGetConstant"%string
+  | Case_aux c "cNRAEnvEnv"%string
+  | Case_aux c "cNRAEnvAppEnv"%string
+  | Case_aux c "cNRAEnvMapEnv"%string].
   
   Global Instance nraenv_core_eqdec : EqDec nraenv_core eq.
   Proof.
@@ -81,21 +81,21 @@ Section cNRAEnv.
   Context (constant_env:list (string*data)).
   Fixpoint nraenv_core_eval (op:nraenv_core) (env: data) (x:data) : option data :=
     match op with
-      | ANID => Some x
-      | ANConst rd => Some (normalize_data h rd)
-      | ANBinop bop op1 op2 =>
+      | cNRAEnvID => Some x
+      | cNRAEnvConst rd => Some (normalize_data h rd)
+      | cNRAEnvBinop bop op1 op2 =>
         olift2 (fun d1 d2 => binary_op_eval h bop d1 d2) (nraenv_core_eval op1 env x) (nraenv_core_eval op2 env x)
-      | ANUnop uop op1 =>
+      | cNRAEnvUnop uop op1 =>
         olift (fun d1 => unary_op_eval h uop d1) (nraenv_core_eval op1 env x)
-      | ANMap op1 op2 =>
+      | cNRAEnvMap op1 op2 =>
         let aux_map d :=
             lift_oncoll (fun c1 => lift dcoll (lift_map (nraenv_core_eval op1 env) c1)) d
         in olift aux_map (nraenv_core_eval op2 env x)
-      | ANMapProduct op1 op2 =>
+      | cNRAEnvMapProduct op1 op2 =>
         let aux_mapconcat d :=
             lift_oncoll (fun c1 => lift dcoll (omap_product (nraenv_core_eval op1 env) c1)) d
         in olift aux_mapconcat (nraenv_core_eval op2 env x)
-      | ANProduct op1 op2 =>
+      | cNRAEnvProduct op1 op2 =>
           (* Note: (fun y => nra_eval op2 x) does not depend on input,
              but we still use a nested loop and delay op2 evaluation
              so it does not fail in case the op1 operand is an empty
@@ -104,7 +104,7 @@ Section cNRAEnv.
           let aux_product d :=
               lift_oncoll (fun c1 => lift dcoll (omap_product (fun _ => nraenv_core_eval op2 env x) c1)) d
           in olift aux_product (nraenv_core_eval op1 env x)
-      | ANSelect op1 op2 =>
+      | cNRAEnvSelect op1 op2 =>
         let pred x' :=
             match nraenv_core_eval op1 env x' with
               | Some (dbool b) => Some b
@@ -115,13 +115,13 @@ Section cNRAEnv.
             lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
         in
         olift aux_select (nraenv_core_eval op2 env x)
-      | ANEither opl opr =>
+      | cNRAEnvEither opl opr =>
         match x with
           | dleft dl => nraenv_core_eval opl env dl
           | dright dr => nraenv_core_eval opr env dr
           | _ => None
         end
-      | ANEitherConcat op1 op2 =>
+      | cNRAEnvEitherConcat op1 op2 =>
         match nraenv_core_eval op1 env x, nraenv_core_eval op2 env x with
           | Some (dleft (drec l)), Some (drec t)  =>
             Some (dleft (drec (rec_concat_sort l t)))
@@ -129,21 +129,21 @@ Section cNRAEnv.
             Some (dright (drec (rec_concat_sort r t)))
           | _, _ => None
         end
-      | ANDefault op1 op2 =>
+      | cNRAEnvDefault op1 op2 =>
         olift (fun d1 => match d1 with
                                | dcoll nil => nraenv_core_eval op2 env x
                                | _ => Some d1
                          end) (nraenv_core_eval op1 env x)
-      | ANApp op2 op1 =>
+      | cNRAEnvApp op2 op1 =>
         olift (fun x' => nraenv_core_eval op2 env x') (nraenv_core_eval op1 env x)
-      | ANGetConstant s => edot constant_env s
-      | ANEnv => (Some env)
-      | ANAppEnv op2 op1 =>
+      | cNRAEnvGetConstant s => edot constant_env s
+      | cNRAEnvEnv => (Some env)
+      | cNRAEnvAppEnv op2 op1 =>
         (* Note: evaluate op1 to create a new environment;
                  evaluate op2 in that new environment *)
         (* This is the parallel to AApp, but for the environment *)
         olift (fun env' => nraenv_core_eval op2 env' x) (nraenv_core_eval op1 env x)
-      | ANMapEnv op1 =>
+      | cNRAEnvMapEnv op1 =>
         lift_oncoll (fun c1 => lift dcoll (lift_map ((fun env' => nraenv_core_eval op1 env' x)) c1)) env
     end.
 
@@ -161,21 +161,21 @@ Section cNRAEnv.
   
   Fixpoint nra_of_nraenv_core (ae:nraenv_core) : nra :=
     match ae with
-    | ANID =>
+    | cNRAEnvID =>
       nra_data
-    | ANConst d =>
+    | cNRAEnvConst d =>
       NRAConst d
-    | ANBinop b ae1 ae2 =>
+    | cNRAEnvBinop b ae1 ae2 =>
       NRABinop b (nra_of_nraenv_core ae1) (nra_of_nraenv_core ae2)
-    | ANUnop u ae1 =>
+    | cNRAEnvUnop u ae1 =>
       NRAUnop u (nra_of_nraenv_core ae1)
-    | ANMap ea1 ea2 =>
+    | cNRAEnvMap ea1 ea2 =>
       NRAMap (nra_of_nraenv_core ea1)
              (unnest_two
                 "a1"
                 "PDATA"
                 (NRAUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))
-    | ANMapProduct ea1 ea2 =>
+    | cNRAEnvMapProduct ea1 ea2 =>
       (NRAMap (NRABinop OpRecConcat
                         (NRAUnop (OpDot "PDATA") NRAID)
                         (NRAUnop (OpDot "PDATA2") NRAID))
@@ -185,35 +185,35 @@ Section cNRAEnv.
                     "a1"
                     "PDATA"
                     (NRAUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
-    | ANProduct ea1 ea2 =>
+    | cNRAEnvProduct ea1 ea2 =>
       NRAProduct (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
-    | ANSelect ea1 ea2 =>
+    | cNRAEnvSelect ea1 ea2 =>
       (NRAMap (NRAUnop (OpDot "PDATA") NRAID)
               (NRASelect (nra_of_nraenv_core ea1)
                          (unnest_two
                             "a1"
                             "PDATA"
                             (NRAUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
-    | ANDefault ea1 ea2 =>
+    | cNRAEnvDefault ea1 ea2 =>
       NRADefault (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
-    | ANEither eal ear =>
+    | cNRAEnvEither eal ear =>
       NRAApp
         (NRAEither (nra_of_nraenv_core eal) (nra_of_nraenv_core ear))
         (NRAEitherConcat
            (NRAApp (NRARecEither "PDATA") nra_data)
            (NRAUnop (OpRec "PBIND") nra_bind))
-    | ANEitherConcat ea1 ea2 =>
+    | cNRAEnvEitherConcat ea1 ea2 =>
       NRAEitherConcat (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
-    | ANApp ea1 ea2 =>
+    | cNRAEnvApp ea1 ea2 =>
       NRAApp (nra_of_nraenv_core ea1)
              (nra_wrap (nra_of_nraenv_core ea2))
-    | ANGetConstant s =>
+    | cNRAEnvGetConstant s =>
       NRAGetConstant s
-    | ANEnv => nra_bind
-    | ANAppEnv ea1 ea2 =>
+    | cNRAEnvEnv => nra_bind
+    | cNRAEnvAppEnv ea1 ea2 =>
       NRAApp (nra_of_nraenv_core ea1)
              (nra_context (nra_of_nraenv_core ea2) nra_data)
-    | ANMapEnv ea1 =>
+    | cNRAEnvMapEnv ea1 =>
       (* fix this: the nra_data should change to a nra_pair *)
       NRAMap (nra_of_nraenv_core ea1)
              (unnest_two
@@ -493,15 +493,15 @@ Section cNRAEnv.
     (nraenv_core_eval ae env x) = (h ⊢ (nra_of_nraenv_core ae) @ₐ (nra_context_data env x) ⊣ constant_env).
   Proof.
     revert env x; nraenv_core_cases (induction ae) Case; simpl; intros.
-    - Case "ANID"%string.
+    - Case "cNRAEnvID"%string.
       simpl; reflexivity.
-    - Case "ANConst"%string.
+    - Case "cNRAEnvConst"%string.
       reflexivity.
-    - Case "ANBinop"%string.
+    - Case "cNRAEnvBinop"%string.
       rewrite IHae1; rewrite IHae2; reflexivity.
-    - Case "ANUnop"%string.
+    - Case "cNRAEnvUnop"%string.
       rewrite IHae; reflexivity.
-    - Case "ANMap"%string.
+    - Case "cNRAEnvMap"%string.
       rewrite IHae2; clear IHae2.
       generalize (h ⊢ (nra_of_nraenv_core ae2) @ₐ (nra_context_data env x) ⊣ constant_env);
         intros; clear ae2 x.
@@ -528,7 +528,7 @@ Section cNRAEnv.
            drec
              (("PBIND", env)
               :: ("PDATA", x) :: nil)) l)); try reflexivity; try congruence; simpl; destruct (lift_map (nraenv_core_eval ae1 env) l); try reflexivity; try congruence.
-    - Case "ANMapProduct"%string.
+    - Case "cNRAEnvMapProduct"%string.
       rewrite IHae2; clear IHae2.
       generalize (h ⊢ (nra_of_nraenv_core ae2) @ₐ (nra_context_data env x) ⊣ constant_env); intros; clear ae2 x.
       unfold olift.
@@ -635,9 +635,9 @@ Section cNRAEnv.
           | _ => None
           end) l); intros.
         destruct o; try reflexivity; congruence.
-    - Case "ANProduct"%string.
+    - Case "cNRAEnvProduct"%string.
       rewrite IHae1; rewrite IHae2; reflexivity.
-    - Case "ANSelect"%string.
+    - Case "cNRAEnvSelect"%string.
       rewrite IHae2; clear IHae2.
       generalize (h ⊢ (nra_of_nraenv_core ae2) @ₐ (nra_context_data env x) ⊣ constant_env); intros; clear ae2 x.
       unfold olift.
@@ -708,28 +708,28 @@ Section cNRAEnv.
                 :: ("PDATA", x) :: nil)) l));
           intros.
         destruct o; destruct o0; try congruence; reflexivity.
-    - Case "ANDefault"%string.
+    - Case "cNRAEnvDefault"%string.
       rewrite IHae1; rewrite IHae2; reflexivity.
-    - Case "ANEither"%string.
+    - Case "cNRAEnvEither"%string.
       destruct x; simpl; trivial; [rewrite IHae1|rewrite IHae2]; reflexivity.
-    - Case "ANEitherConcat"%string.
+    - Case "cNRAEnvEitherConcat"%string.
       rewrite IHae2. generalize ((h ⊢ (nra_of_nraenv_core ae2) @ₐ (nra_context_data env x) ⊣ constant_env)); intros.
       destruct o; try reflexivity; simpl;
       rewrite IHae1; reflexivity.
-    - Case "ANApp"%string.
+    - Case "cNRAEnvApp"%string.
       rewrite IHae2. generalize ((h ⊢ (nra_of_nraenv_core ae2) @ₐ (nra_context_data env x) ⊣ constant_env)); intros.
       destruct o; try reflexivity; simpl.
       rewrite IHae1; reflexivity.
-    - Case "ANGetConstant"%string.
+    - Case "cNRAEnvGetConstant"%string.
       reflexivity.
-    - Case "ANEnv"%string.
+    - Case "cNRAEnvEnv"%string.
       reflexivity.
-    - Case "ANAppEnv"%string.
+    - Case "cNRAEnvAppEnv"%string.
       rewrite IHae2; clear IHae2.
       generalize (h ⊢ (nra_of_nraenv_core ae2) @ₐ (nra_context_data env x) ⊣ constant_env); intros.
       destruct o; try reflexivity; simpl.
       apply IHae1.
-    - Case "ANMapEnv"%string.
+    - Case "cNRAEnvMapEnv"%string.
       unfold lift, olift, omap_product, oncoll_map_concat; simpl.
       destruct env; try reflexivity; simpl.
       induction l; try reflexivity; simpl; unfold lift in *; simpl.
@@ -826,33 +826,33 @@ Section RcNRAEnv2.
   Section FreeVars.
     Fixpoint nraenv_core_free_vars (q:nraenv_core) : list string :=
       match q with
-      | ANID => nil
-      | ANConst rd => nil
-      | ANBinop _ q1 q2 =>
+      | cNRAEnvID => nil
+      | cNRAEnvConst rd => nil
+      | cNRAEnvBinop _ q1 q2 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANUnop _ q1 =>
+      | cNRAEnvUnop _ q1 =>
         nraenv_core_free_vars q1
-      | ANMap q2 q1 =>
+      | cNRAEnvMap q2 q1 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANMapProduct q2 q1 =>
+      | cNRAEnvMapProduct q2 q1 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANProduct q1 q2 =>
+      | cNRAEnvProduct q1 q2 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANSelect q2 q1 =>
+      | cNRAEnvSelect q2 q1 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANEither ql qr =>
+      | cNRAEnvEither ql qr =>
         nraenv_core_free_vars ql ++ nraenv_core_free_vars qr
-      | ANEitherConcat q1 q2 =>
+      | cNRAEnvEitherConcat q1 q2 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANDefault q1 q2 =>
+      | cNRAEnvDefault q1 q2 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANApp q2 q1 =>
+      | cNRAEnvApp q2 q1 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANGetConstant s => s :: nil
-      | ANEnv => nil
-      | ANAppEnv q2 q1 =>
+      | cNRAEnvGetConstant s => s :: nil
+      | cNRAEnvEnv => nil
+      | cNRAEnvAppEnv q2 q1 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANMapEnv q1 =>
+      | cNRAEnvMapEnv q1 =>
         nraenv_core_free_vars q1
       end.
   End FreeVars.
@@ -860,73 +860,73 @@ Section RcNRAEnv2.
 End RcNRAEnv2.
 
   
-Notation "'ID'" := (ANID)  (at level 50) : nraenv_core_scope.
-Notation "'ENV'" := (ANEnv)  (at level 50) : nraenv_core_scope.
-Notation "CGET⟨ s ⟩" := (ANGetConstant s) (at level 50) : nraenv_core_scope.
+Notation "'ID'" := (cNRAEnvID)  (at level 50) : nraenv_core_scope.
+Notation "'ENV'" := (cNRAEnvEnv)  (at level 50) : nraenv_core_scope.
+Notation "CGET⟨ s ⟩" := (cNRAEnvGetConstant s) (at level 50) : nraenv_core_scope.
   
-Notation "‵‵ c" := (ANConst (dconst c))  (at level 0) : nraenv_core_scope.                           (* ‵ = \backprime *)
-Notation "‵ c" := (ANConst c)  (at level 0) : nraenv_core_scope.                                     (* ‵ = \backprime *)
-Notation "‵{||}" := (ANConst (dcoll nil))  (at level 0) : nraenv_core_scope.                         (* ‵ = \backprime *)
-Notation "‵[||]" := (ANConst (drec nil)) (at level 50) : nraenv_core_scope.                          (* ‵ = \backprime *)
+Notation "‵‵ c" := (cNRAEnvConst (dconst c))  (at level 0) : nraenv_core_scope.                           (* ‵ = \backprime *)
+Notation "‵ c" := (cNRAEnvConst c)  (at level 0) : nraenv_core_scope.                                     (* ‵ = \backprime *)
+Notation "‵{||}" := (cNRAEnvConst (dcoll nil))  (at level 0) : nraenv_core_scope.                         (* ‵ = \backprime *)
+Notation "‵[||]" := (cNRAEnvConst (drec nil)) (at level 50) : nraenv_core_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (ANBinop OpAnd r1 r2) (right associativity, at level 65): nraenv_core_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (ANBinop OpOr r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (ANBinop OpEqual r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (ANBinop OpLe r1 r2) (no associativity, at level 70): nraenv_core_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (ANBinop OpBagUnion r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (ANBinop OpBagDiff r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* − = \minus *)
-Notation "r1 ⋂min r2" := (ANBinop OpBagMin r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
-Notation "r1 ⋃max r2" := (ANBinop OpBagMax r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((ANBinop OpRecConcat) p r) (at level 70) : nraenv_core_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((ANBinop OpRecMerge) p r) (at level 70) : nraenv_core_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (cNRAEnvBinop OpAnd r1 r2) (right associativity, at level 65): nraenv_core_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (cNRAEnvBinop OpOr r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (cNRAEnvBinop OpEqual r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (cNRAEnvBinop OpLe r1 r2) (no associativity, at level 70): nraenv_core_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (cNRAEnvBinop OpBagUnion r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (cNRAEnvBinop OpBagDiff r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* − = \minus *)
+Notation "r1 ⋂min r2" := (cNRAEnvBinop OpBagMin r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
+Notation "r1 ⋃max r2" := (cNRAEnvBinop OpBagMax r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((cNRAEnvBinop OpRecConcat) p r) (at level 70) : nraenv_core_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((cNRAEnvBinop OpRecMerge) p r) (at level 70) : nraenv_core_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (ANUnop OpNeg r1) (right associativity, at level 70): nraenv_core_scope.        (* ¬ = \neg *)
-Notation "♯distinct( r1 )" := (ANUnop OpDistinct r1) (right associativity, at level 70): nraenv_core_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (ANUnop OpCount r1) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (ANUnop OpFlatten d) (at level 50) : nraenv_core_scope.                   (* ♯ = \sharp *)
+Notation "¬( r1 )" := (cNRAEnvUnop OpNeg r1) (right associativity, at level 70): nraenv_core_scope.        (* ¬ = \neg *)
+Notation "♯distinct( r1 )" := (cNRAEnvUnop OpDistinct r1) (right associativity, at level 70): nraenv_core_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (cNRAEnvUnop OpCount r1) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (cNRAEnvUnop OpFlatten d) (at level 50) : nraenv_core_scope.                   (* ♯ = \sharp *)
 
-Notation "a1 ♯+ a2" := (ANBinop (OpArithBinary ArithPlus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
+Notation "a1 ♯+ a2" := (cNRAEnvBinop (OpArithBinary ArithPlus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
    (* ♯ = \sharp *)
 
-Notation "a1 ♯- a2" := (ANBinop (OpArithBinary ArithMinus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
+Notation "a1 ♯- a2" := (cNRAEnvBinop (OpArithBinary ArithMinus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
    (* ♯ = \sharp *)
 
-Notation "‵{| d |}" := ((ANUnop OpBag) d)  (at level 50) : nraenv_core_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((ANUnop (OpRec s)) r) (at level 50) : nraenv_core_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((ANUnop (OpRecRemove s1)) r) (at level 50) : nraenv_core_scope.          (* ¬ = \neg and π = \pi *)
-Notation "π[ s1 ]( r )" := ((ANUnop (OpRecProject s1)) r) (at level 50) : nraenv_core_scope.          (* π = \pi *)
-Notation "p · r" := ((ANUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_scope.      (* · = \cdot *)
+Notation "‵{| d |}" := ((cNRAEnvUnop OpBag) d)  (at level 50) : nraenv_core_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((cNRAEnvUnop (OpRec s)) r) (at level 50) : nraenv_core_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((cNRAEnvUnop (OpRecRemove s1)) r) (at level 50) : nraenv_core_scope.          (* ¬ = \neg and π = \pi *)
+Notation "π[ s1 ]( r )" := ((cNRAEnvUnop (OpRecProject s1)) r) (at level 50) : nraenv_core_scope.          (* π = \pi *)
+Notation "p · r" := ((cNRAEnvUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_scope.      (* · = \cdot *)
 
-Notation "χ⟨ p ⟩( r )" := (ANMap p r) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (ANMapProduct e2 e1) (at level 70) : nraenv_core_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
-Notation "r1 × r2" := (ANProduct r1 r2) (right associativity, at level 70): nraenv_core_scope.       (* × = \times *)
-Notation "σ⟨ p ⟩( r )" := (ANSelect p r) (at level 70) : nraenv_core_scope.                           (* σ = \sigma *)
-Notation "r1 ∥ r2" := (ANDefault r1 r2) (right associativity, at level 70): nraenv_core_scope.       (* ∥ = \parallel *)
-Notation "r1 ◯ r2" := (ANApp r1 r2) (right associativity, at level 60): nraenv_core_scope.           (* ◯ = \bigcirc *)
+Notation "χ⟨ p ⟩( r )" := (cNRAEnvMap p r) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (cNRAEnvMapProduct e2 e1) (at level 70) : nraenv_core_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "r1 × r2" := (cNRAEnvProduct r1 r2) (right associativity, at level 70): nraenv_core_scope.       (* × = \times *)
+Notation "σ⟨ p ⟩( r )" := (cNRAEnvSelect p r) (at level 70) : nraenv_core_scope.                           (* σ = \sigma *)
+Notation "r1 ∥ r2" := (cNRAEnvDefault r1 r2) (right associativity, at level 70): nraenv_core_scope.       (* ∥ = \parallel *)
+Notation "r1 ◯ r2" := (cNRAEnvApp r1 r2) (right associativity, at level 60): nraenv_core_scope.           (* ◯ = \bigcirc *)
 
-Notation "r1 ◯ₑ r2" := (ANAppEnv r1 r2) (right associativity, at level 60): nraenv_core_scope.           (* ◯ = \bigcirc *)
-Notation "χᵉ⟨ p ⟩" := (ANMapEnv p) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
+Notation "r1 ◯ₑ r2" := (cNRAEnvAppEnv r1 r2) (right associativity, at level 60): nraenv_core_scope.           (* ◯ = \bigcirc *)
+Notation "χᵉ⟨ p ⟩" := (cNRAEnvMapEnv p) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
 
 Hint Resolve nraenv_core_eval_normalized.
 
 Tactic Notation "nraenv_core_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "ANID"%string
-  | Case_aux c "ANConst"%string
-  | Case_aux c "ANBinop"%string
-  | Case_aux c "ANUnop"%string
-  | Case_aux c "ANMap"%string
-  | Case_aux c "ANMapProduct"%string
-  | Case_aux c "ANProduct"%string
-  | Case_aux c "ANSelect"%string
-  | Case_aux c "ANDefault"%string
-  | Case_aux c "ANEither"%string
-  | Case_aux c "ANEitherConcat"%string
-  | Case_aux c "ANApp"%string
-  | Case_aux c "ANGetConstant"%string
-  | Case_aux c "ANEnv"%string
-  | Case_aux c "ANAppEnv"%string
-  | Case_aux c "ANMapEnv"%string].
+  [ Case_aux c "cNRAEnvID"%string
+  | Case_aux c "cNRAEnvConst"%string
+  | Case_aux c "cNRAEnvBinop"%string
+  | Case_aux c "cNRAEnvUnop"%string
+  | Case_aux c "cNRAEnvMap"%string
+  | Case_aux c "cNRAEnvMapProduct"%string
+  | Case_aux c "cNRAEnvProduct"%string
+  | Case_aux c "cNRAEnvSelect"%string
+  | Case_aux c "cNRAEnvDefault"%string
+  | Case_aux c "cNRAEnvEither"%string
+  | Case_aux c "cNRAEnvEitherConcat"%string
+  | Case_aux c "cNRAEnvApp"%string
+  | Case_aux c "cNRAEnvGetConstant"%string
+  | Case_aux c "cNRAEnvEnv"%string
+  | Case_aux c "cNRAEnvAppEnv"%string
+  | Case_aux c "cNRAEnvMapEnv"%string].
 
 (* 
 *** Local Variables: ***

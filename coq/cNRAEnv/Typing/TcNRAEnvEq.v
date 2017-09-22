@@ -135,31 +135,31 @@ Section TcNRAEnvEq.
       reflexivity.
   Qed.
 
-  (* ANID *)
+  (* cNRAEnvID *)
 
   Global Instance anid_tproper:
-    Proper tnraenv_core_rewrites_to ANID.
+    Proper tnraenv_core_rewrites_to cNRAEnvID.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     split; [assumption|reflexivity].
   Qed.
 
-  (* ANConst *)
+  (* cNRAEnvConst *)
 
   Global Instance anconst_tproper:
-    Proper (eq ==> tnraenv_core_rewrites_to) ANConst.
+    Proper (eq ==> tnraenv_core_rewrites_to) cNRAEnvConst.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     rewrite <- H; clear H.
     split; [assumption|reflexivity].
   Qed.
 
-  (* ANBinop *)
+  (* cNRAEnvBinop *)
 
   Global Instance anbinop_tproper:
     Proper (eq ==> tnraenv_core_rewrites_to
                ==> tnraenv_core_rewrites_to
-               ==> tnraenv_core_rewrites_to) ANBinop.
+               ==> tnraenv_core_rewrites_to) cNRAEnvBinop.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     rewrite H in *; clear H.
@@ -170,10 +170,10 @@ Section TcNRAEnvEq.
     rewrite (H0 x2 c env dt_x dt_c dt_env); rewrite (H2 x2 c env dt_x dt_c dt_env); reflexivity.
   Qed.
   
-  (* ANUnop *)
+  (* cNRAEnvUnop *)
 
   Global Instance anunop_tproper :
-    Proper (eq ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANUnop.
+    Proper (eq ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvUnop.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -183,10 +183,10 @@ Section TcNRAEnvEq.
     rewrite (H0 x c env dt_x dt_c dt_env); reflexivity.
   Qed.
 
-  (* ANMap *)
+  (* cNRAEnvMap *)
 
   Global Instance anmap_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANMap.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvMap.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -208,10 +208,10 @@ Section TcNRAEnvEq.
     destruct (lift_map (nraenv_core_eval brand_relation_brands c x env) dout); destruct (lift_map (nraenv_core_eval brand_relation_brands c y env) dout); congruence.
   Qed.
 
-  (* ANMapProduct *)
+  (* cNRAEnvMapProduct *)
   
   Global Instance anmapconcat_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANMapProduct.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvMapProduct.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -252,10 +252,10 @@ Section TcNRAEnvEq.
         inversion IHdout; reflexivity.
   Qed.
 
-  (* ANProduct *)
+  (* cNRAEnvProduct *)
   
   Global Instance anproduct_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANProduct.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvProduct.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -267,10 +267,10 @@ Section TcNRAEnvEq.
     reflexivity.
   Qed.
   
-  (* ANSelect *)
+  (* cNRAEnvSelect *)
   
   Global Instance anselect_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANSelect.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvSelect.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -287,10 +287,10 @@ Section TcNRAEnvEq.
     reflexivity.
   Qed.
 
-  (* ANDefault *)
+  (* cNRAEnvDefault *)
 
   Global Instance andefault_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANDefault.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvDefault.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -302,9 +302,9 @@ Section TcNRAEnvEq.
     reflexivity.
   Qed.
 
-  (* ANEither *)
+  (* cNRAEnvEither *)
   Global Instance aneither_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANEither.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvEither.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     inversion H1; subst.
@@ -316,9 +316,9 @@ Section TcNRAEnvEq.
     - subst; eauto.
   Qed.
 
-    (* ANEitherConcat *)
+    (* cNRAEnvEitherConcat *)
   Global Instance aneitherconcat_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANEitherConcat.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvEitherConcat.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     inversion H1; clear H1; subst.
@@ -328,10 +328,10 @@ Section TcNRAEnvEq.
     rewrite H1, H2; trivial.
   Qed.
   
-  (* ANApp *)
+  (* cNRAEnvApp *)
 
   Global Instance anapp_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANApp.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvApp.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -344,19 +344,19 @@ Section TcNRAEnvEq.
     auto.
   Qed.
 
-  (* ANEnv *)
+  (* cNRAEnvEnv *)
 
   Global Instance anenv_tproper:
-    Proper tnraenv_core_rewrites_to ANEnv.
+    Proper tnraenv_core_rewrites_to cNRAEnvEnv.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     split; [assumption|reflexivity].
   Qed.
 
-  (* ANAppEnv *)
+  (* cNRAEnvAppEnv *)
 
   Global Instance anappenv_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANAppEnv.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvAppEnv.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -369,10 +369,10 @@ Section TcNRAEnvEq.
     auto.
   Qed.
 
-  (* ANMapEnv *)
+  (* cNRAEnvMapEnv *)
 
   Global Instance anmapenv_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANMapEnv.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) cNRAEnvMapEnv.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
