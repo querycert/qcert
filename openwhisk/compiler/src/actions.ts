@@ -8,8 +8,11 @@ export const config = () => {
     packages: {
       qcert: {
         actions: {
-          qcert: {
-            location: path.resolve(qcertDir, 'bin', 'qcertJS.js'),
+          qcertCompile: {
+            location: path.resolve(qcertDir, 'bin', 'qcertJS.js')
+					},
+					qcert: {
+						sequence: "qcert/preCompile,qcert/qcertCompile",
             annotations: {
               'web-export': true
             }
