@@ -53,7 +53,7 @@ public class FrontAction extends Dispatcher {
 		// Input is only present when evaluation is called for.  If present, it might need conversion from CSV form to our standard form */
 		String input = getAsString(args, "input");
 		input = maybeConvertInput(input, schema);
-		switch (source) {
+		switch (source.toLowerCase()) {
 		case "sql": {
 	        verb = "parseSQL";
 	        sourceCAMP = false;
