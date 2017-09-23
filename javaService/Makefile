@@ -49,6 +49,12 @@ all:
 install:
 	ant -f export.xml
 
+whisk_deploy:
+	wsk action update qcert/preCompile qcertJavaWhiskAction.jar --main org.qcert.javasvc.FrontAction
+
+whisk_undeploy:
+	wsk action delete qcert/preCompile
+
 classes: $(CLASSES)
 
 $(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)

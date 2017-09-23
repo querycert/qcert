@@ -8,10 +8,12 @@ compile:
 
 
 deploy: compile
+	$(MAKE) -C ../../javaService whisk_deploy
 	./tools/cli/deploy
 
 undeploy:
 	- ./tools/cli/undeploy
+	$(MAKE) -C ../../javaService whisk_undeploy
 
 tests:
 
