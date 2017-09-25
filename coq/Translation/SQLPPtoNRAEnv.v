@@ -20,7 +20,8 @@ Section SQLPPtoNRAEnv.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
-  Require Import CommonSystem.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import SQLPPRuntime.
   Require Import NRAEnvRuntime.
   Require Import SQLtoNRAEnv.

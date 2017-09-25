@@ -21,6 +21,7 @@ Section TNRARewrite.
   Require Import EquivDec.
   Require Import Program.
   Require Import List.
+  Require Import Utils.
   Require Import CommonSystem.
   Require Import NRA.
   Require Import NRAExt.

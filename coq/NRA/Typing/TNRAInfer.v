@@ -21,6 +21,7 @@ Section TNRAInfer.
   Require Import Eqdep_dec.
   Require Import Bool.
   Require Import EquivDec.
+  Require Import Utils.
   Require Import CommonSystem.
   Require Import NRA.
   Require Import TNRA.

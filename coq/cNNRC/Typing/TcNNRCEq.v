@@ -23,6 +23,7 @@ Section TcNNRCEq.
   Require Import String.
   Require Import List.
   Require Import Arith.
+  Require Import Utils.
   Require Import CommonSystem.
   Require Import cNNRC.
   Require Import cNNRCEq.

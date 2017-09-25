@@ -16,6 +16,7 @@
 
 Section CompLang.
   Require Import String.
+  Require Import Utils.
   Require Import List.
   Require Import EquivDec.
 

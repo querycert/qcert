@@ -20,7 +20,8 @@ Section SQLtoNRAEnv.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
-  Require Import CommonSystem.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import SQLRuntime.
   Require Import NRAEnvRuntime.
 

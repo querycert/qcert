@@ -19,6 +19,7 @@ Section TNRA.
   Require Import List.
   Require Import Compare_dec.
   Require Import Program.
+  Require Import Utils.
   Require Import CommonSystem.
   Require Import NRA.
 

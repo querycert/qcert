@@ -19,6 +19,7 @@ Section CompConfig.
   Require Import String.
   
   (* Common *)
+  Require Import Utils.
   Require Import CommonSystem.
   Require Import TypingRuntime.
   Require Import ForeignReduceOps.

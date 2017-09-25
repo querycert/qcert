@@ -19,6 +19,7 @@ Section TCAMPRule.
   Require Import String.
   Require Import List.
   Require Import EquivDec.
+  Require Import Utils.
   Require Import CommonSystem.
   Require Export CAMPRule.
   Require Import TCAMP.
