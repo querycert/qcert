@@ -15,11 +15,8 @@ export type ListIn = {
     queryname: string;
     querycode: Designs;
 }
-export interface ListOut {
-    result: any;
-}
 
-const main = async (params:ListIn) : Promise<ListOut> => {
+const main = async (params:ListIn) : Promise<ListIn> => {
     const pkgname: string = params.pkgname;
     const queryname: string = params.queryname;
     const designs: Designs = params.querycode;
@@ -73,7 +70,7 @@ const main = async (params:ListIn) : Promise<ListOut> => {
         }
 	return failure('ACTUALLY CREATED VIEW IN:'+dbname)
     }))
-    return { "result" : res };
+    return params;
 }
 
 const failure = (err) => {

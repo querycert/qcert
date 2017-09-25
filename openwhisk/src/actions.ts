@@ -8,20 +8,26 @@ export const config = () => {
     packages: {
       qcert: {
         actions: {
-            core-compile: {
+            'core-compile': {
 		location: path.resolve(qcertDir, 'bin', 'qcertJS.js'),
 		annotations: {
 		    'web-export': true
 		}
             },
-	    compile: {
+	    'compile': {
 		sequence: "qcert/preCompile,qcert/core-compile",
 		annotations: {
 		    'web-export': true
 		}
             },
 	    'cloudant-deploy': {
-		location: path.resolve(__dirname, '.', 'cloudant-deploy.js'),
+		sequence: "qcert/cloudant-deploy-views,qcert/cloudant-deploy-postproc",
+		annotations: {
+		    'web-export': true
+		}
+            },
+	    'cloudant-deploy-views': {
+		location: path.resolve(__dirname, '.', 'cloudant-deploy-views.js'),
 		annotations: {
 		    'web-export': true
 		}
@@ -32,14 +38,14 @@ export const config = () => {
 		    'web-export': true
 		}
 	    },
-	    'cloudant-refresh': {
-		location: path.resolve(__dirname, '.', 'cloudant-refresh.js'),
+	    'cloudant-deploy-postproc': {
+		location: path.resolve(__dirname, '.', 'cloudant-deploy-postproc.js'),
 		annotations: {
 		    'web-export': true
 		}
 	    },
-	    'cloudant-postproc-deploy': {
-		location: path.resolve(__dirname, '.', 'cloudant-postproc-deploy.js'),
+	    'cloudant-refresh': {
+		location: path.resolve(__dirname, '.', 'cloudant-refresh.js'),
 		annotations: {
 		    'web-export': true
 		}
