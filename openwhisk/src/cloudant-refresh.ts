@@ -67,7 +67,8 @@ const main = async (params:ListIn) : Promise<ListOut> => {
                 host: `${params.cloudant.username}.cloudant.com`,
                 username: `${params.cloudant.username}`,
                 password: `${params.cloudant.password}`,
-		doc: doc
+		doc: doc,
+                dbname: dbname
             }
         })
 	

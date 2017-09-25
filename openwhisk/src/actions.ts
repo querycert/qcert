@@ -38,8 +38,8 @@ export const config = () => {
 		    'web-export': true
 		}
 	    },
-	    'postproc-deploy': {
-		location: path.resolve(__dirname, '.', 'postproc-deploy.js'),
+	    'cloudant-postproc-deploy': {
+		location: path.resolve(__dirname, '.', 'cloudant-postproc-deploy.js'),
 		annotations: {
 		    'web-export': true
 		}
