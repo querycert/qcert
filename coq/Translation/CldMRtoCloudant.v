@@ -32,6 +32,7 @@ Section CldMRtoCloudant.
   Context {fruntime:foreign_runtime}.
   Context {ftojavascript:foreign_to_javascript}.
   Context {fcloudant:foreign_cloudant}.
+  Context {ftjson:foreign_to_JSON}.
 
   Section MRJS.
 

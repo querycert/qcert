@@ -121,6 +121,7 @@ Section CompCorrectness.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
+  Context {ftjson:foreign_to_JSON}.
 
   (** Note: All stops are assumed correct (i.e., not moving does not change semantics) *)
   (** Note: True/False is indicated for each edge in the compiler pipeline *)

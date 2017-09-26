@@ -16,7 +16,10 @@
 
 Section ForeignDataTyping.
 
-  Require Import Utils CommonRuntime Types.
+  Require Import Utils.
+  Require Import ForeignData.
+  Require Import CommonData.
+  Require Import Types.
   
   Class foreign_data_typing
         {fdata:foreign_data}

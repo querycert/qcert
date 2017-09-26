@@ -34,8 +34,6 @@ Section TDataTest.
   
   (******* Defining model – should be automatized, but for now *** *)
 
-  Require Import JSON JSONtoData.
-
   Definition personcoll :=
     (jobject (("$coll",jobject
                          (

@@ -122,6 +122,7 @@ Section CompDriver.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
+  Context {ftjson:foreign_to_JSON}.
 
   (** Translation functions *)
   Section translations_util.

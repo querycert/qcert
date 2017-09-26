@@ -15,6 +15,7 @@
  *)
 
 Require Export ForeignData.
+Require Export ForeignDataToJSON.
 Require Export ForeignOperators.
 
 Class foreign_runtime : Type

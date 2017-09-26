@@ -43,6 +43,7 @@ Section tDNNRCtoSparkDF.
   Context {fuoptyping:foreign_unary_op_typing}.
   Context {fttjs: ForeignToJavaScript.foreign_to_javascript}.
   Context {fts: ForeignToScala.foreign_to_scala}.
+  Context {ftjson:foreign_to_JSON}.
 
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".

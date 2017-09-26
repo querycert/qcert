@@ -63,6 +63,8 @@ val float_listmin : float list -> float
 val float_listmax : float list -> float
 
 val qcert_string_of_float : float -> string
+val string_of_enhanced_float : float -> char list
+val string_of_enhanced_string : string -> char list
 
 (* Timing function for CompStat   *)
 

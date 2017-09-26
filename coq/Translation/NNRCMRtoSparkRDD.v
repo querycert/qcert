@@ -34,6 +34,7 @@ Section NNRCMRtoSparkRDD.
   Context {fredop:foreign_reduce_op}.
   Context {ftojavascript:foreign_to_javascript}.
   Context {ftospark:foreign_to_spark}.
+  Context {ftjson:foreign_to_JSON}.
 
   Definition js_endl := eol_backn.
 

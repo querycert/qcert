@@ -129,6 +129,7 @@ Section NNRCtoJavaScript.
 
   Context {fruntime:foreign_runtime}.
   Context {ftojavascript:foreign_to_javascript}.
+  Context {ftjson:foreign_to_JSON}.
 
   Definition varvalue := 100.
   Definition varenv := 1.
@@ -169,7 +170,6 @@ Section NNRCtoJavaScript.
 
     
     (* Java equivalent: JavaScriptBackend.dataToJS *)
-    Require Import JSON.
     Fixpoint jsonToJS (quotel:string) (j : json) : string
       := match j with
          | jnil => "null" (* to be discussed *)
@@ -183,10 +183,8 @@ Section NNRCtoJavaScript.
            let ss := (map (fun kv => let '(k,v) := kv in
                                      "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (jsonToJS quotel v)) ls) in
            "{" ++ (joinStrings ", " ss) ++ "}"
-         | jforeign fd => foreign_to_javascript_data quotel fd
          end.
 
-    Require Import JSONtoData.
     Definition dataToJS (quotel:string) (d : data) : string :=
       jsonToJS quotel (data_to_js quotel d).
 

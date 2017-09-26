@@ -14,7 +14,6 @@
  * limitations under the License.
  *)
 
-Require Export ForeignOperators.
 Require Export Iterators.
 Require Export RecOperators.
 Require Export GroupBy.

@@ -14,23 +14,24 @@
  * limitations under the License.
  *)
 
-Require Import List String.
-
-Require Import Utils ForeignType.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import ForeignType.
 
 Local Open Scope string_scope.
 
 Section ForeignTypeToJSON.
 
-(* TODO: properties required to ensure round-tripping *)
+  (* TODO: properties required to ensure round-tripping *)
 
-Class foreign_type_to_JSON {ftype:foreign_type}: Type
-  := mk_foreign_type_to_JSON {
-         foreign_to_string_to_type
-           (s:string) : option foreign_type_type
-         ; foreign_to_string_from_type
-             (fd:foreign_type_type) : string
-       }.
+  Class foreign_type_to_JSON {ftype:foreign_type}: Type
+    := mk_foreign_type_to_JSON {
+           foreign_to_string_to_type
+             (s:string) : option foreign_type_type
+           ; foreign_to_string_from_type
+               (fd:foreign_type_type) : string
+         }.
 
 End ForeignTypeToJSON.
 

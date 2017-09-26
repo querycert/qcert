@@ -17,7 +17,10 @@
 Section ForeignOperatorsTyping.
 
   Require Import Utils.
-  Require Import CommonRuntime.
+  Require Import CommonUtils.
+  Require Import CommonData.
+  Require Import ForeignData.
+  Require Import ForeignOperators.
   Require Import Types.
   Require Import ForeignDataTyping.
   Require Import TData.

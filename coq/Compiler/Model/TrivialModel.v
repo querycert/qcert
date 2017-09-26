@@ -18,7 +18,7 @@ Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToScala.
-Require Import ForeignToJSON.
+Require Import ForeignDataToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
@@ -249,7 +249,7 @@ Defined.
     @foreign_to_javascript trivial_foreign_runtime
     := mk_foreign_to_javascript
          trivial_foreign_runtime
-         _ _ _.
+         _ _.
 
   Program Instance trivial_foreign_to_scala :
     @foreign_to_scala trivial_foreign_runtime trivial_foreign_type

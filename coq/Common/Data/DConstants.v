@@ -22,7 +22,6 @@ Section DConstants.
   Require Import ForeignData.
   Require Import Data.
   Require Import DData.
-  Require Import Iterators.
   Require Import Constants.
 
   Local Open Scope string.

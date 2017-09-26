@@ -32,14 +32,20 @@ MODULES = \
 	Utils/Fresh \
 	Utils/Bag \
 	Utils/Utils \
-	Common/Logger/OptimizerStep \
-	Common/Logger/OptimizerLogger \
+	Common/Utils/Var \
+	Common/Utils/JSON \
+	Common/Utils/OptimizerStep \
+	Common/Utils/OptimizerLogger \
+	Common/Utils/CommonUtils \
 	Common/Brands/BrandRelation \
 	Common/TypeSystem/ForeignType \
+	Common/TypeSystem/ForeignTypeToJSON \
 	Common/TypeSystem/RType \
 	Common/TypeSystem/RTypeNorm \
+	Common/TypeSystem/RTypetoJSON \
 	Common/TypeSystem/DType \
-        Common/TypeSystem/TBrandContext \
+        Common/TypeSystem/DTypetoJSON \
+	Common/TypeSystem/TBrandContext \
 	Common/TypeSystem/RSubtype \
 	Common/TypeSystem/RSubtypeProp \
 	Common/TypeSystem/RTypeMeetJoin \
@@ -49,12 +55,23 @@ MODULES = \
 	Common/TypeSystem/TBrandModelProp \
 	Common/TypeSystem/Types \
 	Common/Data/ForeignData \
+	Common/Data/ForeignDataToJSON \
 	Common/Data/Data \
 	Common/Data/DataLift \
 	Common/Data/DataNorm \
+	Common/Data/DatatoJSON \
 	Common/Data/DataSort \
 	Common/Data/DData \
 	Common/Data/DDataNorm \
+	Common/Data/Constants \
+	Common/Data/DConstants \
+	Common/Data/CommonData \
+	Common/DataTyping/ForeignDataTyping \
+	Common/DataTyping/TData \
+	Common/DataTyping/TDData \
+	Common/DataTyping/TDataInfer \
+	Common/DataTyping/TBindings \
+	Common/DataTyping/TDBindings \
 	Common/Operators/ForeignOperators \
 	Common/Operators/RecOperators \
 	Common/Operators/Iterators \
@@ -67,30 +84,17 @@ MODULES = \
 	Common/Operators/BinaryOperatorsSem \
 	Common/Operators/OperatorsEq \
 	Common/Operators/Operators \
-	Common/Env/Constants \
-	Common/Env/DConstants \
-	Common/Env/Var \
-	Common/DataTyping/ForeignDataTyping \
-	Common/DataTyping/TUtil \
-	Common/DataTyping/TData \
-	Common/DataTyping/TDData \
-	Common/DataTyping/TDataInfer \
 	Common/OperatorsTyping/ForeignOperatorsTyping \
+	Common/OperatorsTyping/TUtil \
 	Common/OperatorsTyping/TSortBy \
 	Common/OperatorsTyping/TUnaryOperators \
 	Common/OperatorsTyping/TBinaryOperators \
 	Common/OperatorsTyping/TOperatorsEq \
 	Common/OperatorsTyping/TOperatorsInfer \
 	Common/OperatorsTyping/TOperatorsInferSub \
-	Common/EnvTyping/TBindings \
-	Common/EnvTyping/TDBindings \
 	Common/ForeignRuntime \
 	Common/CommonRuntime \
 	Common/ForeignTyping \
-	Common/JSON/JSON \
-	Common/JSON/ForeignToJSON \
-	Common/JSON/ForeignTypeToJSON \
-	Common/JSON/JSONtoData \
 	Common/CommonTypes \
 	Common/CommonSystem \
 	Common/TypingRuntime \

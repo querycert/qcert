@@ -19,7 +19,7 @@ Require Import Types.
 Require RType.
 Require String.
 Require Import TypingRuntime.
-Require Import JSONtoData.
+Require Import DatatoJSON.
 Require DatatoSparkDF.
 Require Data.
 Require TUtil.
@@ -102,7 +102,7 @@ Module QType(runtime:CompilerRuntime).
     := @TUtil.tuncoll _ m.
   
   Definition data_to_sjson (m:brand_model) : data -> qtype -> option String.string
-    := @DatatoSparkDF.data_to_sjson _ _ _ m.
+    := @DatatoSparkDF.data_to_sjson _ _ m _.
 
 End QType.
 

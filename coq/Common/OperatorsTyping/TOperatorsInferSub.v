@@ -24,9 +24,13 @@ Section TOperatorsInferSub.
   Require Import EquivDec.
   Require Import Utils.
   Require Import Types.
-  Require Import CommonRuntime.
+  Require Import CommonUtils.
+  Require Import CommonData.
+  Require Import ForeignData.
+  Require Import ForeignOperators.
   Require Import ForeignDataTyping.
   Require Import ForeignOperatorsTyping.
+  Require Import Operators.
   Require Import TUtil.
   Require Import TData.
   Require Import TSortBy.

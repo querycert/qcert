@@ -25,7 +25,8 @@ Section TBindings.
   Require Import BrandRelation.
   Require Import Utils.
   Require Import Types.
-  Require Import CommonRuntime.
+  Require Import ForeignData.
+  Require Import CommonData.
   Require Import ForeignDataTyping.
   Require Import TData.
 

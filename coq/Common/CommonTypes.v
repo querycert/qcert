@@ -15,12 +15,12 @@
  *)
 
 Require Export Types.
-Require Export TUtil.
 Require Export TData.
 Require Export TDataInfer.
 Require Export TDData.
 Require Export TBindings.
 Require Export TDBindings.
+Require Export TUtil.
 Require Export TUnaryOperators.
 Require Export TBinaryOperators.
 Require Export TOperatorsEq.

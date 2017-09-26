@@ -60,6 +60,7 @@ Section CompStat.
   Require Import ForeignCloudant.
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
+  Context {ftjson:foreign_to_JSON}.
   Context {bm:brand_model}.
   Context {nraenv_core_logger:optimizer_logger string nraenv_core}.
   Context {nraenv_logger:optimizer_logger string nraenv}.

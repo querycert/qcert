@@ -120,6 +120,7 @@ the following:</p>
   The <code>coq/Utils</code> directory contains general purpose
   libraries, tactics and lemmas used throughout the system.
 </p>
+
 <ul>
 <li><a href="html/Qcert.Utils.CoqLibAdd.html">CoqLibAdd</a>:
  Additional definitions and lemmas complementing those found in the
@@ -167,22 +168,54 @@ multisets).
  </li>
 </ul>
 
-<h3>Common components, data model, built-in operators, type system</h3>
+<h3>Common components</h3>
 
-<p>
-  The <code>coq/Common</code> directory contains components shared
+<p>The <code>coq/Common</code> directory contains components shared
   across languages.</p>
 
+<h4>Common utilities</h4>
+
+<p>The <code>coq/Common/Utils</code> directory contains utilities that
+are Q*cert specific.</p>
+
 <ul>
-<li><code>Common/Data</code>: definition and properties of the data model</li>
-<li><code>Common/Env</code>: support for environments</li>
-<li><code>Common/Operators</code>: syntax and semantics for built-in operators</li>
+<li><a href="html/Qcert.Common.Utils.Var.html">Var</a>: Variables.</li>
+<li><a href="html/Qcert.Common.Utils.JSON.html">JSON</a>: A simple
+JSON AST.</li>
+<li><a href="html/Qcert.Common.Utils.OptimizerStep.html">OptimizerStep</a>
+and <a href="html/Qcert.Common.Utils.OptimizerLogger.html">: Support
+for log traces, used to monitor optimizations.</li>
+</ul>
+
+<h4>Data Model and Type System</h4>
+
+<p>The data model and type system includes support for atomic types,
+bags, records, and <emph>branded values</emph> which are used to
+encode objects with inheritance.</p>
+
+<ul>
+<li><code>Common/Brands</code>: Notion of brand relations, used as foundation for type hierarchies</li>
 <li><code>Common/TypeSystem</code>: definition and properties of the type system </li>
+<li><code>Common/Data</code>: definition and properties of the data model</li>
 <li><code>Common/DataTyping</code>: typing for the data model </li>
-<li><code>Common/EnvTyping</code>: typing for the environment </li>
+</ul>
+
+<p>Note that the type system modules
+(in <code>Common/TypeSystem</code>) and the data modules
+(in <code>Common/Data</code>) are independent from each other, only
+relying on the notion of brands. How data relates to type is made
+explicit in the data typing modules
+(in <code>Common/DataTyping</code>).</p>
+
+<h4>Built-in Operators</h4>
+
+<p>A number of operations are assumed to be available in all
+languages, and defined as built-in operators.</p>
+
+<ul>
+<li><code>Common/Operators</code>: syntax and semantics for built-in
+operators</li>
 <li><code>Common/OperatorsTyping</code>: typing for the built-in operators </li>
-<li><code>Common/Logger</code>: support for producing log traces</li>
-<li><code>Common/JSON</code>: JSON conversions for data and types </li>
 </ul>
 
 <h3>Languages</h3>

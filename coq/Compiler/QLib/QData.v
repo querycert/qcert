@@ -18,7 +18,7 @@ Require Import CompilerRuntime.
 Require String.
 Require Data.
 Require JSON.
-Require JSONtoData.
+Require DatatoJSON.
 Require NNRCtoJavaScript.
 
 Module QData(runtime:CompilerRuntime).
@@ -65,10 +65,10 @@ Module QData(runtime:CompilerRuntime).
   
   (** JSON -> data conversion (META variant) *)
   Definition json_to_qdata br : JSON.json -> qdata 
-    := JSONtoData.json_to_data br.
+    := DatatoJSON.json_to_data br.
   (** JSON -> data conversion (Enhanced variant) *)
   Definition json_enhanced_to_qdata br : JSON.json -> qdata 
-    := JSONtoData.json_enhanced_to_data br.
+    := DatatoJSON.json_enhanced_to_data br.
   (** data -> JSON *string* conversion *)
   Definition qdataToJS s : qdata -> String.string 
     := NNRCtoJavaScript.dataToJS s.

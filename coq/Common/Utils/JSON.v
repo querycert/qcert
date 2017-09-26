@@ -19,11 +19,8 @@ Section JSON.
   Require Import String.
   Require Import ZArith.
   Require Import Utils.
-  Require Import CommonRuntime.
   
   Unset Elimination Schemes.
-
-  Context {fdata:foreign_data}.
 
   Inductive json : Set :=
   | jnil : json
@@ -32,9 +29,8 @@ Section JSON.
   | jstring : string -> json
   | jarray : list json -> json
   | jobject : list (string * json) -> json
-  | jforeign : foreign_data_type -> json
   .
-  
+
   Set Elimination Schemes.
 
   (** Induction principles used as backbone for inductive proofs on json *)
@@ -45,7 +41,6 @@ Section JSON.
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forallt P c -> P (jarray c))
              (fobject : forall r : list (string * json), Forallt (fun ab => P (snd ab)) r -> P (jobject r))
-             (fforeign: forall fd, P (jforeign fd))
     :=
       fix F (j : json) : P j :=
     match j as j0 return (P j0) with
@@ -63,7 +58,6 @@ Section JSON.
                              | nil => Forallt_nil _
                              | cons sj c0 => @Forallt_cons _ (fun ab => P (snd ab)) sj c0 (F (snd sj)) (F3 c0)
                            end) x)
-      | jforeign fd => fforeign fd
     end.
 
   Definition json_ind (P : json -> Prop)
@@ -73,7 +67,6 @@ Section JSON.
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forall P c -> P (jarray c))
              (fobject : forall r : list (string * json), Forall (fun ab => P (snd ab)) r -> P (jobject r))
-             (fforeign: forall fd, P (jforeign fd))
     :=
       fix F (j : json) : P j :=
     match j as j0 return (P j0) with
@@ -91,7 +84,6 @@ Section JSON.
                              | nil => Forall_nil _
                              | cons sj c0 => @Forall_cons _ (fun ab => P (snd ab)) sj c0 (F (snd sj)) (F3 c0)
                            end) x)
-      | jforeign fd => fforeign fd
     end.
 
   Definition json_rec (P:json->Set) := json_rect P.
@@ -102,8 +94,7 @@ Section JSON.
         (fb : forall b : bool, P (jbool b))
         (f1 : forall s : string, P (jstring s))
         (f2 : forall c : list json, (forall x, In x c -> P x) -> P (jarray c))
-        (f3 : forall r : list (string * json), (forall x y, In (x,y) r -> P y) -> P (jobject r))
-        (fforeign : forall fd, P (jforeign fd)):
+        (f3 : forall r : list (string * json), (forall x y, In (x,y) r -> P y) -> P (jobject r)):
     forall d, P d.
   Proof.
     intros.

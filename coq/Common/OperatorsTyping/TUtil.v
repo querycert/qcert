@@ -23,8 +23,10 @@ Section TUtil.
   Require Import Bool.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import CommonRuntime.
   Require Import Types.
+  Require Import ForeignData.
+  Require Import CommonData.
+  Require Import Operators.
 
   (* Lemma/definitions over types involved in the inference *)
   
@@ -375,6 +377,159 @@ Section TUtil.
     destruct τ₁; simpl; intros; subst.
     apply rtype_ext.
   Qed.
+
+  Section lift_map.
+    Require Import TData.
+    Require Import ForeignDataTyping.
+    Context {fdtyping:foreign_data_typing}.
+
+  Lemma omap_product_empty_right τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (omap_product (fun _ : data => Some (dcoll (drec nil :: nil))) l) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold omap_product in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      rewrite IHl.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort.
+      rewrite app_nil_r.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        assert (domain dl = domain rl).
+        apply (sorted_forall_same_domain); assumption.
+        auto.
+        assumption.
+      + rewrite H.
+        reflexivity.
+  Qed.
+  
+  Lemma oproduct_empty_right τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (oproduct l (drec nil :: nil)) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold omap_product in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      unfold oproduct in *; simpl in *; rewrite IHl.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort.
+      rewrite app_nil_r.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        assert (domain dl = domain rl).
+        apply (sorted_forall_same_domain); assumption.
+        auto.
+        assumption.
+      + rewrite H.
+        reflexivity.
+  Qed.
+  
+  Lemma omap_product_empty_left τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (omap_product (fun _ : data => Some (dcoll l)) (drec nil::nil)) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold omap_product in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      unfold lift_flat_map in IHl.
+      unfold oncoll_map_concat in *.
+      unfold omap_concat in *.
+      simpl in *.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort in *.
+      rewrite app_nil_l in *.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        assert (domain dl = domain rl).
+        apply (sorted_forall_same_domain); assumption.
+        auto.
+        assumption.
+      + destruct (lift_map
+         (fun x : data =>
+          match x with
+          | dunit => None
+          | dnat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r1 => Some (drec (rec_sort (nil ++ r1)))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end) l); simpl in *; congruence.
+  Qed.
+    
+  Lemma oproduct_empty_left τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (oproduct (drec nil::nil) l) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold omap_product in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      simpl in *.
+      unfold oproduct in *; simpl in *.
+      unfold omap_concat in *.
+      simpl in *.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort in *.
+      rewrite app_nil_l in *.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        assert (domain dl = domain rl).
+        apply (sorted_forall_same_domain); assumption.
+        auto.
+        assumption.
+      + destruct (lift_map
+         (fun x : data =>
+          match x with
+          | dunit => None
+          | dnat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r1 => Some (drec (rec_sort (nil ++ r1)))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end) l); simpl in *; congruence.
+  Qed.
+    
+End lift_map.
 
 End TUtil.
 

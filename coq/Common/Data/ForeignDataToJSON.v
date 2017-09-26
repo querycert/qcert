@@ -14,14 +14,30 @@
  * limitations under the License.
  *)
 
-Require Export ForeignRuntime.
-Require Export BrandRelation.
-Require Export CommonUtils.
-Require Export CommonData.
-Require Export Operators.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import ForeignData.
+Require Import JSON.
+
+Local Open Scope string_scope.
+
+Section ForeignDatatoJSON.
+
+(* TODO: properties required to ensure round-tripping *)
+
+Class foreign_to_JSON {fdata:foreign_data}: Type
+  := mk_foreign_to_JSON {
+         foreign_to_JSON_to_data
+           (j:json) : option foreign_data_type
+         ; foreign_to_JSON_from_data
+             (fd:foreign_data_type) : json
+       }.
+
+End ForeignDatatoJSON.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

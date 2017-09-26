@@ -25,7 +25,8 @@ Section TDBindings.
   Require Import BrandRelation.
   Require Import Utils.
   Require Import Types.
-  Require Import CommonRuntime.
+  Require Import ForeignData.
+  Require Import CommonData.
   Require Import ForeignDataTyping.
   Require Import TDData.
 
@@ -112,7 +113,6 @@ Section TDBindings.
   End unlocalize.
   
   Section vdbindings.
-    Require Import TUtil.
     Require Import EquivDec.
 
     Definition dt_to_v (bind:string * drtype) : string * dlocalization :=
@@ -123,12 +123,6 @@ Section TDBindings.
 
     Definition vdbindings_of_tdbindings (binds:tdbindings) : vdbindings :=
       map dt_to_v binds.
-
-    Definition v_and_t_to_dt_opt (v:dlocalization) (t:rtype) : option drtype :=
-      match v with
-      | Vlocal => Some (Tlocal t)
-      | Vdistr => lift Tdistr (tuncoll t)
-      end.
 
     Definition v_and_t_to_dt (v:dlocalization) (t:rtype) : drtype :=
       match v with

@@ -21,7 +21,7 @@ Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToScala.
-Require Import ForeignToJSON.
+Require Import ForeignDataToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignReduceOps.
@@ -217,14 +217,15 @@ Definition denhancedsqldate td := dforeign (enhancedsqldate td).
 Definition denhancedsqldateinterval td := dforeign (enhancedsqldateinterval td).
 
 Require Import JSON.
-Definition jenhancedfloat f := jforeign (enhancedfloat f).
-Definition jenhancedstring s := jforeign (enhancedstring s).
-Definition jenhancedtimescale ts := jforeign (enhancedtimescale ts).
-Definition jenhancedtimeduration td := jforeign (enhancedtimeduration td).
-Definition jenhancedtimepoint tp := jforeign (enhancedtimepoint tp).
-Definition jenhancedsqldate td := jforeign (enhancedsqldate td).
-Definition jenhancedsqldateinterval td := jforeign (enhancedsqldateinterval td).
 
+Axiom JENHANCED_float : FLOAT -> string.
+Extract Constant JENHANCED_float => "(fun f -> Util.string_of_enhanced_float f)".
+
+Axiom JENHANCED_string : STRING -> string.
+Extract Constant JENHANCED_string => "(fun s -> Util.string_of_enhanced_string s)".
+
+Definition jenhancedfloat f := JENHANCED_float f.
+Definition jenhancedstring s := JENHANCED_string s.
 
 Inductive enhanced_unary_op
   :=
@@ -623,7 +624,6 @@ Instance enhanced_foreign_to_javascript :
   @foreign_to_javascript enhanced_foreign_runtime
   := mk_foreign_to_javascript
        enhanced_foreign_runtime
-       enhanced_to_javascript_data
        enhanced_to_javascript_unary_op
        enhanced_to_javascript_binary_op.
 
@@ -661,8 +661,8 @@ Next Obligation.
 Defined.
 Next Obligation.
   destruct fd.
-  - exact (jenhancedfloat f).
-  - exact (jenhancedstring s).
+  - exact (jstring (jenhancedfloat f)).
+  - exact (jstring (jenhancedstring s)).
   - exact (jstring (toString t)).
   - exact (jstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
   - exact (jstring (@toString _ time_point_foreign_data.(@foreign_data_tostring ) t)).
@@ -2532,9 +2532,9 @@ Module CompEnhanced.
         := dforeign (enhancedstring s).
 
       Definition jfloat (f : FLOAT) : json
-        := jforeign (enhancedfloat f).
+        := jstring (jenhancedfloat f).
       Definition jstringblob (s : STRING) : json
-        := jforeign (enhancedstring s).
+        := jstring (jenhancedstring s).
 
       Definition scale_kind := time_scale.
 

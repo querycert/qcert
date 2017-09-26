@@ -19,7 +19,7 @@ Require Import CommonRuntime.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToScala.
-Require Import ForeignToJSON.
+Require Import ForeignDataToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.

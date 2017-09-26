@@ -14,11 +14,15 @@
  * limitations under the License.
  *)
 
-Require Export ForeignRuntime.
-Require Export BrandRelation.
-Require Export CommonUtils.
-Require Export CommonData.
-Require Export Operators.
+Require Export Data.
+Require Export DataLift.
+Require Export DataNorm.
+Require Export DatatoJSON.
+Require Export DataSort.
+Require Export DData.
+Require Export DDataNorm.
+Require Export Constants.
+Require Export DConstants.
 
 (* 
 *** Local Variables: ***

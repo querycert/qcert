@@ -14,14 +14,16 @@
  * limitations under the License.
  *)
 
-Section JSONtoData.
+Section DatatoJSON.
   Require Import List.
   Require Import String.
   Require Import ZArith.
   Require Import Utils.
-  Require Import CommonRuntime.
   Require Import JSON.
-  Require Import ForeignToJSON.
+  Require Import ForeignData.
+  Require Import ForeignDataToJSON.
+  Require Import Data.
+  Require Import DataNorm.
 
   Context {fdata:foreign_data}.
   Fixpoint json_brands (d:list json) : option (list string) :=
@@ -74,7 +76,6 @@ Section JSONtoData.
             else drec ((s1, json_to_data_pre j1)::(s2, dcoll (map json_to_data_pre j2))::nil)
           else drec ((s1, json_to_data_pre j1)::(s2, dcoll (map json_to_data_pre j2))::nil)
         | jobject r => (drec (map (fun x => (fst x, json_to_data_pre (snd x))) r))
-        | jforeign fd => dforeign fd
         end
       end.
 
@@ -117,7 +118,6 @@ Section JSONtoData.
               end
             else
               drec (map (fun x => (fst x, json_enhanced_to_data_pre (snd x))) r)
-        | jforeign fd => dforeign fd
         end
       end.
 
@@ -158,123 +158,6 @@ Section JSONtoData.
       | dforeign fd => foreign_to_JSON_from_data fd
       end.
   End toJSON.
-
-  (* JSON to RType *)
-  Section toRType.
-    Require Import Types.
-    Require Import RTypeNorm.
-    Require Import ForeignTypeToJSON.
-    Context {ftype:foreign_type}.
-    Context {ftypeToJSON:foreign_type_to_JSON}.
-
-    Fixpoint json_to_rtype₀ (j:json) : rtype₀ :=
-      match j with
-      | jnil => Unit₀
-      | jnumber _ => Unit₀
-      | jbool _ => Unit₀
-      | jarray _ => Unit₀
-      | jstring "String" => String₀
-      | jstring "Nat" => Nat₀
-      | jstring "Bool" => Bool₀
-      | jstring _ => Unit₀
-      | jobject nil => Rec₀ Open nil
-      | jobject (("$brand"%string,jarray jl)::nil) =>
-        match json_brands jl with
-        | Some brs => Brand₀ brs
-        | None => Unit₀
-        end
-      | jobject (("$coll"%string,j')::nil) => Coll₀ (json_to_rtype₀ j')
-      | jobject (("$option"%string,j')::nil) => Either₀ (json_to_rtype₀ j') Unit₀
-      | jobject jl => Rec₀ Open (map (fun kj => ((fst kj), (json_to_rtype₀ (snd kj)))) jl)
-      | jforeign _ => Unit₀
-      end.
-
-    Definition json_to_rtype {br:brand_relation} (j:json) :=
-      normalize_rtype₀_to_rtype (json_to_rtype₀ j).
-
-    Fixpoint json_to_rtype₀_with_fail (j:json) : option rtype₀ :=
-      match j with
-      | jnil => Some Unit₀
-      | jnumber _ => None
-      | jbool _ => None
-      | jarray _ => None
-      | jstring "String" => Some String₀
-      | jstring "Nat" => Some Nat₀
-      | jstring "Bool" => Some Bool₀
-      | jstring s => lift Foreign₀ (foreign_to_string_to_type s)
-      | jobject nil => Some (Rec₀ Open nil)
-      | jobject (("$brand"%string,jarray jl)::nil) =>
-        match json_brands jl with
-        | Some brs => Some (Brand₀ brs)
-        | None => None
-        end
-      | jobject (("$coll"%string,j')::nil) => lift Coll₀ (json_to_rtype₀_with_fail j')
-      | jobject (("$option"%string,j')::nil) => lift (fun x => Either₀ x Unit₀) (json_to_rtype₀_with_fail j')
-      | jobject jl =>
-        lift (fun x => Rec₀ Open x)
-             ((fix rmap_rec (l: list (string * json)) : option (list (string * rtype₀)) :=
-                 match l with
-                 | nil => Some nil
-                 | (x,y)::l' =>
-                   match rmap_rec l' with
-                   | None => None
-                   | Some l'' =>
-                     match json_to_rtype₀_with_fail y with
-                     | None => None
-                     | Some y'' => Some ((x,y'') :: l'')
-                     end
-                   end
-                 end) jl)
-      | jforeign _ => None
-      end.
-
-    Definition json_to_rtype_with_fail {br:brand_relation} (j:json) : option rtype :=
-      lift normalize_rtype₀_to_rtype (json_to_rtype₀_with_fail j).
-
-  End toRType.
-
-  (* JSON to DType *)
-  Section toDType.
-    (* Prototype stuff *)
-    Require Import Types.
-    Require Import RTypeNorm.
-    Require Import ForeignTypeToJSON.
-    Context {ftype:foreign_type}.
-    Context {ftypeToJSON:foreign_type_to_JSON}.
-
-    Definition json_to_drtype {br:brand_relation} (j:json) : drtype :=
-      match j with
-      | jobject (("$dist"%string,j')::nil) => Tdistr (json_to_rtype j')
-      | _ => Tlocal (json_to_rtype j)
-      end.
-
-    Definition json_to_drtype_with_fail {br:brand_relation} (j:json) : option drtype :=
-      match j with
-      | jobject (("$dist"%string,j')::nil) => lift Tdistr (json_to_rtype_with_fail j')
-      | _ => lift Tlocal (json_to_rtype_with_fail j)
-      end.
-
-  End toDType.
-
-  (* JSON to VType *)
-  Section toVType.
-    (* Prototype stuff *)
-    Require Import Types.
-    Require Import RTypeNorm.
-    Require Import ForeignTypeToJSON.
-    Context {ftype:foreign_type}.
-    Context {ftypeToJSON:foreign_type_to_JSON}.
-
-    Definition json_to_vrtype_with_fail {br:brand_relation} (j:json) : option (string * rtype) :=
-      match j with
-      | jobject (("dist"%string,jstring s)::("type"%string,j')::nil) =>
-        lift (fun x => (s,x)) (json_to_rtype_with_fail j')
-      | jobject (("type"%string,j')::("dist"%string,jstring s)::nil) =>
-        lift (fun x => (s,x)) (json_to_rtype_with_fail j')
-      | _ => None
-      end.
-
-  End toVType.
 
   Section RoundTripping.
     Inductive json_data : data -> Prop :=
@@ -368,7 +251,7 @@ Section JSONtoData.
     Qed.
   End RoundTripping.
 
-End JSONtoData.
+End DatatoJSON.
 
 (* 
 *** Local Variables: ***

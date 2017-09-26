@@ -23,10 +23,6 @@ Require Import Utils.
 Require Import CommonRuntime.
 Require Import ForeignDataTyping.
 Require Import NNRCtoJavaScript.
-Require Import ForeignToJSON.
-Require Import JSON.
-Require Import JSONtoData.
-
 
 Section DatatoSparkDF.
 
@@ -36,6 +32,7 @@ Section DatatoSparkDF.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
+  Context {ftjson:foreign_to_JSON}.
 
   Definition data_to_blob (d: data): string :=
     dataToJS quotel_double d.

@@ -25,12 +25,10 @@ Section ForeigntoJavaScript.
 
 Class foreign_to_javascript {fruntime:foreign_runtime}: Type
   := mk_foreign_to_javascript {
-         foreign_to_javascript_data
-           (quotel:string) (fd:foreign_data_type) : string
-         ; foreign_to_javascript_unary_op
-             (indent:nat) (eol:string)
-             (quotel:string) (fu:foreign_unary_op_type)
-             (d:string) : string
+         foreign_to_javascript_unary_op
+           (indent:nat) (eol:string)
+           (quotel:string) (fu:foreign_unary_op_type)
+           (d:string) : string
          ; foreign_to_javascript_binary_op
              (indent:nat) (eol:string)
              (quotel:string) (fb:foreign_binary_op_type)
@@ -41,6 +39,8 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
     Require Import Data.
     Require Import JSON.
     Context {fdata:foreign_data}.
+    Context {ftjson:foreign_to_JSON}.
+
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with
       | dunit => jnil
@@ -53,7 +53,7 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
       | dright d' => jobject (("right"%string, data_enhanced_to_js quotel d')::nil)
       | dbrand b (drec r) => jobject (("$class "%string, jarray (map jstring b))::(map (fun x => (fst x, data_enhanced_to_js quotel (snd x))) r))
       | dbrand b d' => jobject (("$class"%string, jarray (map jstring b))::("$data"%string, (data_enhanced_to_js quotel d'))::nil)
-      | dforeign fd => jforeign fd
+      | dforeign fd => foreign_to_JSON_from_data fd
       end.
 
     Fixpoint data_to_js (quotel:string) (d:data) : json :=
@@ -67,7 +67,7 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
       | dleft d' => jobject (("left"%string, data_to_js quotel d')::nil)
       | dright d' => jobject (("right"%string, data_to_js quotel d')::nil)
       | dbrand b d' => jobject (("type"%string, jarray (map jstring b))::("data"%string, (data_to_js quotel d'))::nil)
-      | dforeign fd => jforeign fd
+      | dforeign fd => foreign_to_JSON_from_data fd
       end.
 
   End toJavascript.
