@@ -194,7 +194,7 @@
  \path[trans, tcoqc] (dnnrc) -- (tdnnrc)
    \transref{3}{\coqurl{Translation}{DNNRCtotDNNRC}{dnnrc_to_dnnrc_typed_top}};
 
- \tikzoptim[ccoqc]{tdnnrc}{\coqurl{DNNRC.Optim}{tDNNRCOptimizer}{run_dnnrc_optims}}
+ \tikzoptim[ccoqc]{tdnnrc}{\coqurl{tDNNRC.Optim}{tDNNRCOptimizer}{run_dnnrc_optims}}
  \path[trans, tcoqc] (tdnnrc) -- (sparkdf)
    \transref{3}{\coqurl{Translation}{tDNNRCtoSparkDF}{dnnrc_typed_to_spark_df_top}};
 
