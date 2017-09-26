@@ -28,7 +28,8 @@ deploy:
 	$(CP) index.html $(QUERYCERTDOTIO)
 	$(CP) demo.html $(QUERYCERTDOTIO)
 	$(CP) doc.html $(QUERYCERTDOTIO)
-	$(CP) figure/* $(QUERYCERTDOTIO)/figure
+	mkdir -p $(QUERYCERTDOTIO)/figure
+	$(CP) figure/figure.svg figure/figure.png figure/figure.pdf $(QUERYCERTDOTIO)/figure
 	$(CP) html/* $(QUERYCERTDOTIO)/html
 	$(CP) -r demo/* $(QUERYCERTDOTIO)/demo
 	@echo ""

@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{xspace}
 \usepackage{pifont} % for \fleur macro
-
+\usepackage{ifpdf}
 \usepackage{tikz}
 \usepackage{calc}
 \usetikzlibrary{automata}
@@ -20,8 +20,11 @@
 \newcommand{\NRAEnv}{\texorpdfstring{NRA$^{\!\mbox{\it e}}$}{NRAe}\xspace}
 \newcommand{\NRALambda}{\texorpdfstring{$\lambda$-NRA}{λ-NRA}\xspace}
 
-
+\ifpdf
 \usepackage{hyperref}
+\else
+\usepackage[hypertex]{hyperref}
+\fi
 \begin{document}
 \input{tikzmacros}
 \input{compiler-coq}

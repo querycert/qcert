@@ -1,4 +1,7 @@
 figure.out
 figure.log
 figure.aux
+figure.dvi
+figure.js.map
+node_modules/
 *~
