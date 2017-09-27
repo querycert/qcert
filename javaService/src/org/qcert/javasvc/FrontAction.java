@@ -40,7 +40,6 @@ public class FrontAction extends Dispatcher {
 	public static JsonObject main(JsonObject args) {
 		String verb = null;
 		boolean sourceCAMP = false;
-		// TODO add support for CSV conversion of input data, if any
 		String source = getAsString(args, "source");
 		if (source == null || source.length() == 0)
 			return argsWithError(args, "Source not specified");
@@ -89,6 +88,8 @@ public class FrontAction extends Dispatcher {
             args.addProperty("source", "camp_rule");
             fixPath(args.get("path"));
         }
+        if (schema != null)
+        	args.addProperty("schema", schema);
         if (input != null)
         	args.addProperty("input", input);
         return args;
@@ -107,7 +108,7 @@ public class FrontAction extends Dispatcher {
 			JsonElement parsed = new JsonParser().parse(schema);
 			JsonObject ans = new JsonObject();
 			ans.add("schema", parsed);
-			ans.addProperty("query",  query);
+			ans.addProperty("source",  query);
 			return stringify(ans);
 		} catch (Throwable t) {
 			return null;
