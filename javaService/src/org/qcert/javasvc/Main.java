@@ -92,6 +92,11 @@ public class Main extends NanoHTTPD {
             String arg = files.get("postData");
             String response = engine != null ? simulateWhisk(arg) : Dispatcher.dispatch(verb.get(0), arg);
 			return respond(Response.Status.OK, response);
+        } else if (Method.OPTIONS.equals(method)) {
+        	Response response = respond(Response.Status.OK, "");
+        	response.addHeader("Access-Control-Allow-Methods", "POST");
+        	response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        	return response;
         } else {
         	System.out.println("Rejecting non-post request");
         	return respond(Response.Status.BAD_REQUEST, "Only POST requests accepted");
