@@ -113,7 +113,7 @@ interface PuzzleSides {
             theTextArea.value = resultPack.result;
         }
         
-        qcertPreCompile({
+        qcertWhiskDispatch({
             source:path[0],
             target:path[path.length-1],
             path:middlePath,
@@ -2768,12 +2768,7 @@ function completeCSVs(readFiles) {
         return;
     }
     let delimiter = (<HTMLTextAreaElement>document.getElementById("delimiter")).value;
-    let schema = JSON.parse(schemaText);
-    let toSend = JSON.stringify({schema: schema, delimiter: delimiter, data: readFiles});
-    let process = function(result) {
-        getExecInputArea().value = result;
-    }
-    preProcess(toSend, "csv2JSON", process);
+		getExecInputArea().value = JSON.stringify({delimiter: delimiter, data: readFiles});
 }
 
 function handleOptimFile(files:FileList) {
@@ -2828,39 +2823,11 @@ function handleFile(output:string, isSchema:boolean, files:FileList) {
         } else {
             reader.onload = function(event) {
                 const contents:string = (<any>event.target).result;
-                if (isSchema && isSQLSchema(contents))
-                    convertSQLSchema(contents, outputElem);
-                else
-                    outputElem.value = contents;
+                outputElem.value = contents;
             }
             reader.readAsText(file);
         }
     }
-}
-
-// Determine if a String contains a SQL schema.  Not intended to be foolproof but just to discriminate the two supported schema
-// notations (SQL and JSON) when the input is at least mostly valid.
-function isSQLSchema(schemaText:string) : boolean {
-    /* A SQL schema should have the word "create" in it but SQL is case insensitive  */
-    var create = schemaText.search(/create/i);
-    if (create < 0)
-        return false;
-    var brace = schemaText.indexOf('{');
-    if (brace >= 0 && brace < create)
-        /* Word create is coincidentally appearing inside what is probably a JSON schema */
-        return false;
-    /* Looking more like SQL.  Drop any blanks that follow 'create' */
-    var balance = schemaText.substring(create + 6).trim();
-    /* The next word must be 'table' (case insensitive) */
-    var table = balance.search(/table/i);
-    return table == 0;
-}
-
-function convertSQLSchema(toConvert:string, outputElem:HTMLTextAreaElement) {
-    var process = function(result:string) {
-        outputElem.value = result;
-    }
-    var result = preProcess(toConvert, "sqlSchema2JSON", process);
 }
 
 function handleFileDrop(output:string, event:DragEvent) {

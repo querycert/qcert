@@ -39,7 +39,7 @@ function compileButton() {
 		document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
 		displayAllResults(compilationResult.emitall);
 	}
-	qcertPreCompile(input, handler);
+	qcertWhiskDispatch(input, handler);
 }
 function verify(result, expected) {
 	result = result[0]; // TODO is this always right?  
@@ -76,7 +76,7 @@ function compileForEval() {
 		evalQuery = compilationResult.eval;
 		document.getElementById("execresult").innerHTML = escapeHtml(evalQuery);
 	}
-	qcertPreCompile(input, handler);
+	qcertWhiskDispatch(input, handler);
 }
 function performJsEvaluation() {
 	// Processing is delegated to a web-worker

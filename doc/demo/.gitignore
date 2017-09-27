@@ -1,6 +1,6 @@
 qcertJS.js
 qcert-runtime.js
 demo.js
-qcertPreCompiler.js
+qcertWhiskDispatch.js
 *.js.map
 node_modules/
