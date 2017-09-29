@@ -12,7 +12,7 @@ export type ListIn = {
 	password: string;
     }
     pkgname: string;
-    queryname: string;
+    action: string;
     querycode: Designs;
 }
 export interface ListOut {
@@ -21,7 +21,7 @@ export interface ListOut {
 
 const main = async (params:ListIn) : Promise<ListOut> => {
     const pkgname: string = params.pkgname;
-    const queryname: string = params.queryname;
+    const action: string = params.action;
     const designs: Designs = params.querycode;
 
     // Delete post-processing action
@@ -30,9 +30,9 @@ const main = async (params:ListIn) : Promise<ListOut> => {
 			  "apihost":params.whisk.apihost});
     return ow.actions.delete({
 	"namespace": params.whisk.namespace,
-        "name" : pkgname + "/" + queryname
+        "name" : pkgname + "/" + action
     }).then(r => {
-        console.log(`[ACTION] [DELETED] ${JSON.stringify("`+pkgname+`/`+queryname+`")}`);
+        console.log(`[ACTION] [DELETED] ${JSON.stringify("`+pkgname+`/`+action+`")}`);
     })
 }
 

@@ -20,8 +20,20 @@ export const config = () => {
 		    'web-export': true
 		}
             },
+	    'cloudant-compile': {
+		location: path.resolve(__dirname, '.', 'cloudant-compile.js'),
+		annotations: {
+		    'web-export': true
+		}
+	    },
+	    'cloudant-compile-deploy': {
+		sequence: "qcert/cloudant-compile,qcert/cloudant-deploy",
+		annotations: {
+		    'web-export': true
+		}
+	    },
 	    'cloudant-deploy': {
-		sequence: "qcert/cloudant-deploy-views,qcert/cloudant-deploy-postproc",
+		sequence: "qcert/cloudant-link-runtime,qcert/cloudant-deploy-views,qcert/cloudant-refresh,qcert/cloudant-deploy-postproc",
 		annotations: {
 		    'web-export': true
 		}
@@ -32,6 +44,12 @@ export const config = () => {
 		    'web-export': true
 		}
             },
+	    'cloudant-link-runtime': {
+		location: path.resolve(__dirname, '.', 'cloudant-link-runtime.js'),
+		annotations: {
+		    'web-export': true
+		}
+	    },
 	    'cloudant-deploy-views': {
 		location: path.resolve(__dirname, '.', 'cloudant-deploy-views.js'),
 		annotations: {

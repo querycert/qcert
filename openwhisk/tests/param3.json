@@ -1,0 +1,61 @@
+{
+    "result": {
+        "cloudant": {
+            "password": "13197587112afe423d5ace19ca80770f4259f437b133efa87c5ea0b236c7a5d7",
+            "username": "9c62497b-9a1f-4753-9c41-e3464441f24e-bluemix"
+        },
+        "pkgname": "qtest",
+        "querycode": {
+            "designs": [
+                {
+                    "dbname": "lambdanra",
+                    "design": {
+                        "views": {
+                            "lambdanra": {
+                                "dbcopy": "lambdanradistcoll_0",
+                                "dbdefault": "function db_default() {\n  return [];\n}\nvar inheritance = [];\n[HARNESS]",
+                                "map": "function (doc) {\n  var v0 = null;\n  var key = doc._id;\n  var doc = unwrap(doc);\n  if (doc != null) {\n  var out = doc;\n  for (var srcout=out, iout=0; iout<out.length; iout++) {\n    emit(key.concat(iout),srcout[iout]);\n  }\n\n  } var inheritance = [];\n[HARNESS] }",
+                                "reduce": "function (keys, values, rereduce) {\n   return values[0];\n}"
+                            }
+                        }
+                    }
+                },
+                {
+                    "dbname": "lambdanradistcoll_0",
+                    "design": {
+                        "views": {
+                            "lambdanra": {
+                                "dbcopy": "lambdanraoutput_0",
+                                "dbdefault": "function db_default() {\n  return [];\n}\nvar inheritance = [];\n[HARNESS]",
+                                "map": "function (doc) {\n  var v0 = null;\n  var key = doc.key;\n  var doc = doc.value;\n  var t1;\n  if (equal(deref(doc, \"age\"), 32)) {\n    t1 = [doc];\n  } else {\n    t1 = [];\n  }\n  var out = t1;\n  for (var srcout=out, iout=0; iout<out.length; iout++) {\n    emit(0,srcout[iout]);\n  }\n\n var inheritance = [];\n[HARNESS] }",
+                                "reduce": "function (keys, values, rereduce) {\n  if (rereduce) {\n    return flatten(values);\n  }\n  else {\n    return values;\n  }\n var inheritance = [];\n[HARNESS] }"
+                            }
+                        }
+                    }
+                },
+                {
+                    "dbname": "lambdanraoutput_0",
+                    "design": {
+                        "views": {
+                            "lambdanra": {
+                                "dbcopy": "lambdanraoutput0",
+                                "dbdefault": "function db_default() {\n  return [];\n}\nvar inheritance = [];\n[HARNESS]",
+                                "map": "function (doc) {\n  var v0 = null;\n  var key = doc.key;\n  var doc = doc.value;\n  var out = [doc];\n  for (var srcout=out, iout=0; iout<out.length; iout++) {\n    emit(0,srcout[iout]);\n  }\n\n var inheritance = [];\n[HARNESS] }",
+                                "reduce": "function (keys, values, rereduce) {\n   return values[0];\n}"
+                            }
+                        }
+                    }
+                }
+            ],
+            "post": "function db_post(output0) {\n  var res1 = null;\n  if (either(singleton(output0))) {\n    var voutput0_0 = null;\n    voutput0_0 = toLeft(singleton(output0));\n    res1 = voutput0_0;\n  } else {\n    var voutput0_0 = null;\n    voutput0_0 = toRight(singleton(output0));\n    res1 = null;\n  }\n  var voutput0_0 = res1;\n  return voutput0_0;\n}\nvar inheritance = [];\n[HARNESS]",
+            "post_input": [
+                "lambdanraoutput0"
+            ]
+        },
+        "action": "lambda1",
+        "whisk": {
+            "api_key": "5063162c-d3eb-4d5f-803f-66f8627d28e4:TLClFdEHxqjhWIPy8VtAPpPlG0dDtgLKN6VoA3CXHekC8zVEstZrYAoOUHoSsGYI",
+            "namespace": "simeon@us.ibm.com_qcerttest"
+        }
+    }
+}
