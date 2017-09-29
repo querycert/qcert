@@ -27,7 +27,7 @@ Section NRAEnvtocNRAEnv.
     Context (h:brand_relation_t).
 
     Definition nraenv_to_nraenv_core_top (q:nraenv) : nraenv_core :=
-      nraenv_core_of_nraenv q.
+      nraenv_to_nraenv_core q.
 
     Theorem nraenv_to_nraenv_core_top_correct :
       forall q:nraenv, forall global_env:bindings,

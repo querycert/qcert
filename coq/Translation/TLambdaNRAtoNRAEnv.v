@@ -42,30 +42,30 @@ Section TLambdaNRAtoNRAEnv.
     - econstructor; eauto.
     - econstructor; eauto.
     - econstructor; eauto.
-    - econstructor. fold nraenv_core_of_nraenv.
+    - econstructor. fold nraenv_to_nraenv_core.
       + eauto.
       + apply IHe1; trivial.
       + apply IHe2; trivial.
-    - econstructor; fold nraenv_core_of_nraenv.
+    - econstructor; fold nraenv_to_nraenv_core.
       + eauto.
       + apply IHe; trivial.
-    - econstructor; fold nraenv_core_of_nraenv
+    - econstructor; fold nraenv_to_nraenv_core
       ; [ | apply IHe2; eassumption].
       econstructor.
       + econstructor; [ | eauto | eauto ]; eauto.
       + apply TLLambda_inv in H1.
         eapply IHe1; eauto.
-    - econstructor; fold nraenv_core_of_nraenv
+    - econstructor; fold nraenv_to_nraenv_core
       ; [ | apply IHe2; eassumption | reflexivity].
       econstructor.
       + econstructor; [ | eauto | eauto ]; eauto.
       + apply TLLambda_inv in H1.
         eapply IHe1; eauto.
-    - econstructor; fold nraenv_core_of_nraenv.
+    - econstructor; fold nraenv_to_nraenv_core.
       + apply IHe1; eauto.
       + apply IHe2; eauto.
       + reflexivity.
-    - econstructor; fold nraenv_core_of_nraenv
+    - econstructor; fold nraenv_to_nraenv_core
       ; [ | apply IHe2; eassumption].
       econstructor.
       + econstructor; [ | eauto | eauto ]; eauto.
@@ -89,7 +89,7 @@ Section TLambdaNRAtoNRAEnv.
     ; invcs lnt
     ; autorewrite with lambda_nra lambda_nra_to_nraenv
     ; simpl
-    ; econstructor; fold nraenv_core_of_nraenv in *; eauto
+    ; econstructor; fold nraenv_to_nraenv_core in *; eauto
     ; try solve [eapply IHe; eauto | eapply IHe1; eauto | eapply IHe2; eauto].
     - invcs H5; eauto.
   Qed.
@@ -104,7 +104,7 @@ Section TLambdaNRAtoNRAEnv.
     ; invcs lnt
     ; autorewrite with lambda_nra lambda_nra_to_nraenv
     ; simpl
-    ; econstructor; fold nraenv_core_of_nraenv in *; eauto.
+    ; econstructor; fold nraenv_to_nraenv_core in *; eauto.
     - invcs H5.
       invcs H1; rtype_equalizer; subst.
       trivial.

@@ -14,15 +14,36 @@
 # limitations under the License.
 #
 
+############# Shouldn't have to be changed after this
+OCAMLBUILD= ocamlbuild \
+		-no-links -classic-display \
+		-tags annot -use-ocamlfind
+
+QUOTE=quote
+
+TARGET=native
+
+all: qcert-runtime.js quoted-qcert-runtime.js
+
+$(QUOTE).$(TARGET):
+	$(OCAMLBUILD) $(QUOTE).$(TARGET)
+
 qcert-runtime.js: qcert-runtime-core.js qcert-runtime-dates.js
 	(for i in qcert-runtime-core.js qcert-runtime-dates.js; do \
          cat $$i; \
          done) > qcert-runtime.js
 
-all: qcert-runtime.js
+qcert_runtime.ml:
+	(echo "let runtime = {runtime|"; \
+         cat qcert-runtime.js; \
+         echo '|runtime}' \
+         ) > qcert_runtime.ml
+
+quoted-qcert-runtime.js: qcert-runtime.js qcert_runtime.ml $(QUOTE).$(TARGET)
+	_build/quote.native > quoted-qcert-runtime.js
 
 clean:
-	-rm -f qcert-runtime.js
+	-rm -f qcert-runtime.js quoted-qcert-runtime.js qcert_runtime.ml
 	-rm -f *~
 
 cleanall: clean

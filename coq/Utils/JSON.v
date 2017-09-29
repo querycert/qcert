@@ -18,7 +18,7 @@ Section JSON.
   Require Import List.
   Require Import String.
   Require Import ZArith.
-  Require Import Utils.
+  Require Import CoqLibAdd.
   
   Unset Elimination Schemes.
 
@@ -110,6 +110,6 @@ End JSON.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

@@ -30,6 +30,10 @@ Require Export Compat.
 Require Export Fresh.
 Require Export Bindings.
 Require Export Bag.
+Require Export Var.
+Require Export JSON.
+Require Export OptimizerStep.
+Require Export OptimizerLogger.
 
 (* 
 *** Local Variables: ***

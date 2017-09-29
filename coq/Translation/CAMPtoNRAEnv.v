@@ -89,7 +89,7 @@ Section CAMPtoNRAEnv.
   Require Import CAMPtocNRAEnv.
 
   Lemma nraenv_of_camp_nraenv_core_of_camp_ident q :
-    nraenv_core_of_nraenv (nraenv_of_camp q) = nraenv_core_of_camp q.
+    nraenv_to_nraenv_core (nraenv_of_camp q) = nraenv_core_of_camp q.
   Proof.
     induction q; intros; try reflexivity; simpl;
     try (rewrite IHq; try reflexivity);

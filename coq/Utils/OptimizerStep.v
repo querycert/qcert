@@ -22,7 +22,8 @@ Section OptimizerStep.
   Require Import Setoid.
   Require Import Equivalence.
   Require Import EquivDec.
-  Require Import Utils.
+  Require Import CoqLibAdd.
+  Require Import ListAdd.
 
   Record OptimizerStep (lang:Set) : Set :=
     mkOptimizerStep {
@@ -257,6 +258,6 @@ Ltac optim_correct_list_complete_prover :=
 
 (* 
  *** Local Variables: ***
- *** coq-load-path: (("../../../coq" "Qcert")) ***
+ *** coq-load-path: (("../../coq" "Qcert")) ***
  *** End: ***
  *)

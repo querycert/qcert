@@ -357,7 +357,7 @@ Section NRAEnvIgnore.
 
   Lemma nraenv_ignores_env_nraenv_core_eq (e:nraenv) :
     nraenv_ignores_env e ->
-    nraenv_core_ignores_env (nraenv_core_of_nraenv e).
+    nraenv_core_ignores_env (nraenv_to_nraenv_core e).
   Proof.
     intros.
     induction e; simpl in *; auto;
@@ -379,7 +379,7 @@ Section NRAEnvIgnore.
   
   Lemma nraenv_ignores_id_nraenv_core_eq (e:nraenv) :
     nraenv_ignores_id e ->
-    nraenv_core_ignores_id (nraenv_core_of_nraenv e).
+    nraenv_core_ignores_id (nraenv_to_nraenv_core e).
   Proof.
     intros.
     induction e; simpl in *; auto;

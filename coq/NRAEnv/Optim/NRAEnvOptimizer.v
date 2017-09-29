@@ -123,7 +123,7 @@ Section NRAEnvOptimizer.
   Section dup.
     (* optimization for distinct *)
     Definition nraenv_nodupA {fruntime:foreign_runtime} (q:nraenv) : Prop :=
-      nodupA (nraenv_core_of_nraenv q).
+      nodupA (nraenv_to_nraenv_core q).
 
     Fixpoint nodupA_checker {fruntime:foreign_runtime} (p:nraenv) : bool
     := match p with
@@ -978,13 +978,13 @@ Section NRAEnvOptimizer.
     - apply tappenv_over_app_ie_arrow.
       rewrite <- nraenv_ignores_env_eq in H.
       generalize nraenv_ignores_env_nraenv_core_eq; intros.
-      unfold nraenv_core_of_nraenv in *.
+      unfold nraenv_to_nraenv_core in *.
       apply H0; assumption.
     - case_eq (nraenv_ignores_id_fun p2); intros.
       + apply tappenv_over_app_arrow.
         rewrite <- nraenv_ignores_id_eq in H0.
         generalize nraenv_ignores_id_nraenv_core_eq; intros.
-        unfold nraenv_core_of_nraenv in *.
+        unfold nraenv_to_nraenv_core in *.
         apply H1; assumption.
       + reflexivity.
   Qed.
@@ -1021,7 +1021,7 @@ Section NRAEnvOptimizer.
     - apply tapp_over_appenv_arrow.
       rewrite <- nraenv_ignores_id_eq in H.
       generalize nraenv_ignores_id_nraenv_core_eq; intros.
-      unfold nraenv_core_of_nraenv in *.
+      unfold nraenv_to_nraenv_core in *.
       apply H0; assumption.
     - reflexivity.
   Qed.
@@ -1531,7 +1531,7 @@ Section NRAEnvOptimizer.
     apply tappenv_over_env_merge_l_arrow.
     rewrite <- nraenv_ignores_env_eq in H.
     generalize nraenv_ignores_env_nraenv_core_eq; intros.
-    unfold nraenv_core_of_nraenv in *.
+    unfold nraenv_to_nraenv_core in *.
     apply H0; assumption.
   Qed.
 
@@ -2113,7 +2113,7 @@ Section NRAEnvOptimizer.
       try reflexivity; intros; rewrite <- nraenv_ignores_env_eq in H;
     apply tflip_env4_arrow;
     generalize nraenv_ignores_env_nraenv_core_eq; intros;
-    unfold nraenv_core_of_nraenv in *;
+    unfold nraenv_to_nraenv_core in *;
     apply H0; assumption.
   Qed.
 
@@ -2245,7 +2245,7 @@ Section NRAEnvOptimizer.
     apply tmapenv_to_map_arrow.
     rewrite <- nraenv_ignores_id_eq in H.
     generalize nraenv_ignores_id_nraenv_core_eq; intros.
-    unfold nraenv_core_of_nraenv in *.
+    unfold nraenv_to_nraenv_core in *.
     apply H0; assumption.
   Qed.
 

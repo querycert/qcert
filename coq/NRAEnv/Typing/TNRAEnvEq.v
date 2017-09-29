@@ -120,7 +120,7 @@ Section TNRAEnvEq.
     Open Scope nraenv_core_scope.
 
     Lemma lift_tnraenv_core_eq_to_tnraenv_eq_r (q1 q2:nraenv_core) :
-      q1 ⇒ q2 -> (nraenv_of_nraenv_core q1) ⇒ₓ (nraenv_of_nraenv_core q2).
+      q1 ⇒ q2 -> (nraenv_core_to_nraenv q1) ⇒ₓ (nraenv_core_to_nraenv q2).
     Proof.
       unfold tnraenv_rewrites_to.
       unfold tnraenv_core_rewrites_to.
@@ -134,7 +134,7 @@ Section TNRAEnvEq.
     Qed.
 
     Lemma lift_tnraenv_core_eq_to_tnraenv_eq_l (q1 q2:nraenv_core) :
-      (nraenv_of_nraenv_core q1) ⇒ₓ (nraenv_of_nraenv_core q2) -> q1 ⇒ q2.
+      (nraenv_core_to_nraenv q1) ⇒ₓ (nraenv_core_to_nraenv q2) -> q1 ⇒ q2.
     Proof.
       unfold tnraenv_rewrites_to.
       unfold tnraenv_core_rewrites_to.
@@ -148,7 +148,7 @@ Section TNRAEnvEq.
     Qed.
 
     Lemma lift_tnraenv_core_eq_to_tnraenv_eq (q1 q2:nraenv_core) :
-      q1 ⇒ q2 <-> (nraenv_of_nraenv_core q1) ⇒ₓ (nraenv_of_nraenv_core q2).
+      q1 ⇒ q2 <-> (nraenv_core_to_nraenv q1) ⇒ₓ (nraenv_core_to_nraenv q2).
     Proof.
       split.
       apply lift_tnraenv_core_eq_to_tnraenv_eq_r.
@@ -156,7 +156,7 @@ Section TNRAEnvEq.
     Qed.
 
     Lemma lift_tnraenv_eq_to_tnraenv_core_eq_r (q1 q2:nraenv) :
-      q1 ⇒ₓ q2 -> (nraenv_core_of_nraenv q1) ⇒ (nraenv_core_of_nraenv q2).
+      q1 ⇒ₓ q2 -> (nraenv_to_nraenv_core q1) ⇒ (nraenv_to_nraenv_core q2).
     Proof.
       unfold tnraenv_rewrites_to.
       unfold tnraenv_core_rewrites_to.
@@ -168,7 +168,7 @@ Section TNRAEnvEq.
     Qed.
   
     Lemma lift_tnraenv_eq_to_tnraenv_core_eq_l (q1 q2:nraenv) :
-      (nraenv_core_of_nraenv q1) ⇒ (nraenv_core_of_nraenv q2) -> q1 ⇒ₓ q2.
+      (nraenv_to_nraenv_core q1) ⇒ (nraenv_to_nraenv_core q2) -> q1 ⇒ₓ q2.
     Proof.
       unfold tnraenv_rewrites_to.
       unfold tnraenv_core_rewrites_to.
@@ -180,7 +180,7 @@ Section TNRAEnvEq.
     Qed.
   
     Lemma lift_tnraenv_eq_to_tnraenv_core_eq (q1 q2:nraenv) :
-      q1 ⇒ₓ q2 <-> (nraenv_core_of_nraenv q1) ⇒ (nraenv_core_of_nraenv q2).
+      q1 ⇒ₓ q2 <-> (nraenv_to_nraenv_core q1) ⇒ (nraenv_to_nraenv_core q2).
     Proof.
       split.
       apply lift_tnraenv_eq_to_tnraenv_core_eq_r.
@@ -414,7 +414,7 @@ Section TNRAEnvEq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H0.
     simpl.
-    unfold flat_map.
+    unfold macro_cNRAEnvFlatMap.
     rewrite H; rewrite H0; reflexivity.
   Qed.
     
@@ -432,7 +432,7 @@ Section TNRAEnvEq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H0.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H1.
     simpl.
-    unfold join.
+    unfold macro_cNRAEnvJoin.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
   Qed.
     
@@ -445,7 +445,7 @@ Section TNRAEnvEq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H0.
     simpl.
-    unfold project.
+    unfold macro_cNRAEnvProject.
     rewrite H; rewrite H0; reflexivity.
   Qed.
     
@@ -458,7 +458,7 @@ Section TNRAEnvEq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H1.
     simpl.
-    unfold group_by_with_env.
+    unfold macro_cNRAEnvGroupBy.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
   Qed.
 
@@ -471,7 +471,7 @@ Section TNRAEnvEq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq.
     rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H1.
     simpl.
-    unfold unnest.
+    unfold macro_cNRAEnvUnnest.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
   Qed.
 

@@ -32,7 +32,7 @@ Section TNRAEnv.
     Context {m:basic_model}.
     Context (τconstants:list (string*rtype)).
     Definition nraenv_type (q:nraenv) : rtype -> rtype -> rtype -> Prop :=
-      @nraenv_core_type m τconstants (nraenv_core_of_nraenv q).
+      @nraenv_core_type m τconstants (nraenv_to_nraenv_core q).
 
   End typ.
 
@@ -46,13 +46,13 @@ Section TNRAEnv.
     (** Main typing soundness theorem for the NRA *)
 
     Lemma typed_nraenv_yields_typed_nraenv_core {τc τenv τin τout} (op:nraenv):
-      (op ▷ₓ τin >=> τout ⊣ τc;τenv) -> nraenv_core_type τc (nraenv_core_of_nraenv op) τenv τin τout.
+      (op ▷ₓ τin >=> τout ⊣ τc;τenv) -> nraenv_core_type τc (nraenv_to_nraenv_core op) τenv τin τout.
     Proof.
       unfold nraenv_type; intro; assumption.
     Qed.
 
     Lemma typed_nraenv_core_yields_typed_nraenv {τc τenv τin τout} (op:nraenv):
-      nraenv_core_type τc (nraenv_core_of_nraenv op) τenv τin τout -> (op ▷ₓ τin >=> τout ⊣ τc;τenv).
+      nraenv_core_type τc (nraenv_to_nraenv_core op) τenv τin τout -> (op ▷ₓ τin >=> τout ⊣ τc;τenv).
     Proof.
       revert τin τout τenv.
       induction op; intros;
@@ -62,7 +62,7 @@ Section TNRAEnv.
     Qed.
     
     Theorem typed_nraenv_core_iff_typed_nraenv {τc τenv τin τout} (op:nraenv):
-      (op ▷ₓ τin >=> τout ⊣ τc;τenv) <-> nraenv_core_type τc (nraenv_core_of_nraenv op) τenv τin τout.
+      (op ▷ₓ τin >=> τout ⊣ τc;τenv) <-> nraenv_core_type τc (nraenv_to_nraenv_core op) τenv τin τout.
     Proof.
       split.
       apply typed_nraenv_yields_typed_nraenv_core.

@@ -19,7 +19,7 @@ Section OptimizerLogger.
   Require Import List.
   Require Import Setoid.
   Require Import Equivalence.
-  Require Import Utils.
+  Require Import CoqLibAdd.
   Require Import OptimizerStep.
   
   Class optimizer_logger (Name:Set) (D:Set) 
@@ -209,6 +209,6 @@ End OptimizerLogger.
 
 (*
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

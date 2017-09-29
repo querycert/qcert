@@ -17,7 +17,6 @@
 Section ForeignOperatorsTyping.
 
   Require Import Utils.
-  Require Import CommonUtils.
   Require Import CommonData.
   Require Import ForeignData.
   Require Import ForeignOperators.

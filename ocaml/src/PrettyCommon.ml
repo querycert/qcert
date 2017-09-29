@@ -31,14 +31,14 @@ type pretty_config =
       mutable charset : charkind;
       mutable type_annotations : bool;
       mutable hierarchy : QData.json;
-      mutable harness : string; }
+      mutable js_runtime : string; }
 
 let make_pretty_config greek margin annot =
   { margin = margin;
     charset = if greek then Greek else Ascii;
     type_annotations = annot;
     hierarchy = QcertCompiler.Jarray [];
-    harness = "[HARNESS]" ;
+    js_runtime = "[HARNESS]" ;
   }
 
 let default_pretty_config () =
@@ -46,7 +46,7 @@ let default_pretty_config () =
     charset = Greek;
     type_annotations = false;
     hierarchy = QcertCompiler.Jarray [];
-    harness = "[HARNESS]" }
+    js_runtime = "[HARNESS]" }
 
 let set_ascii conf () = conf.charset <- Ascii
 let set_greek conf () = conf.charset <- Greek
@@ -66,8 +66,8 @@ let get_margin conf = conf.margin
 let set_hierarchy conf h = conf.hierarchy <- h
 let get_hierarchy conf = conf.hierarchy
 
-let set_harness conf harness = conf.harness <- harness
-let get_harness conf = conf.harness
+let set_js_runtime conf rt = conf.js_runtime <- rt
+let get_js_runtime conf = conf.js_runtime
     
 (* Charset dependent config *)
 (* Note: This should remain within the module *)

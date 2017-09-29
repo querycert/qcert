@@ -392,7 +392,7 @@ Section OQLtoNRAEnv.
       unfold oenv_map_concat_single in *; simpl.
       rewrite (H0 xenv).
       destruct (cNRAEnv.nraenv_core_eval h constant_env
-                                         (nraenv_core_of_nraenv (oql_to_nraenv_expr (domain defls) o))
+                                         (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) o))
                                          (drec (rec_concat_sort xenv defls))
                                          (drec a))%nraenv;
         try reflexivity; simpl.
@@ -422,7 +422,7 @@ Section OQLtoNRAEnv.
                                            (fun x : data => Some (drec ((s, x) :: nil)))
                                            c1)) d)
                            (cNRAEnv.nraenv_core_eval h constant_env
-                                                     (nraenv_core_of_nraenv (oql_to_nraenv_expr (domain defls) o)) (drec (rec_concat_sort xenv defls)) a0)%nraenv
+                                                     (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) o)) (drec (rec_concat_sort xenv defls)) a0)%nraenv
                        with
                        | Some (dcoll y) => lift_map (fun x : data => orecconcat a0 x) y
                        | Some _ => None
@@ -472,7 +472,7 @@ Section OQLtoNRAEnv.
       unfold oenv_map_concat_single_with_cast in *; simpl.
       rewrite (H0 xenv).
       destruct (cNRAEnv.nraenv_core_eval h constant_env
-                                         (nraenv_core_of_nraenv (oql_to_nraenv_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
+                                         (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
                                          (drec a))%nraenv;
         try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
@@ -587,7 +587,7 @@ Section OQLtoNRAEnv.
       rewrite (H xenv); clear H.
       unfold nraenv_eval; simpl.
       destruct (cNRAEnv.nraenv_core_eval h constant_env
-                                         (nraenv_core_of_nraenv (oql_to_nraenv_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
+                                         (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
                                          (drec env))%nraenv;
         try reflexivity; simpl.
       destruct d; simpl; try reflexivity.

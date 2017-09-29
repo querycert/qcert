@@ -25,7 +25,7 @@ Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section TDataTest.
-
+  Require Import Utils.
   Require Import CAMPTest.
   Require Import CommonSystem.
   Require Import TrivialModel.

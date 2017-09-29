@@ -58,7 +58,7 @@ Section NRAEnvEq.
       intros. rewrite (H h c dn_c env dn_env x0) by trivial; rewrite (H0 h c dn_c env dn_env x0) by trivial; reflexivity.
   Qed.
 
-  Definition nraenv_eq_nraenv_core_eq (op1 op2:nraenv) : nraenv_eq op1 op2 <-> nraenv_core_eq (nraenv_core_of_nraenv op1) (nraenv_core_of_nraenv op2).
+  Definition nraenv_eq_nraenv_core_eq (op1 op2:nraenv) : nraenv_eq op1 op2 <-> nraenv_core_eq (nraenv_to_nraenv_core op1) (nraenv_to_nraenv_core op2).
   Proof.
     split; intro; assumption.
   Qed.
@@ -70,7 +70,7 @@ Section NRAEnvEq.
     Open Scope nraenv_core_scope.
 
     Lemma lift_nraenv_core_eq_to_nraenv_eq_r (q1 q2:nraenv_core) :
-      q1 ≡ₑ q2 -> (nraenv_of_nraenv_core q1) ≡ₓ (nraenv_of_nraenv_core q2).
+      q1 ≡ₑ q2 -> (nraenv_core_to_nraenv q1) ≡ₓ (nraenv_core_to_nraenv q2).
     Proof.
       unfold nraenv_eq.
       unfold nraenv_core_eq.
@@ -82,7 +82,7 @@ Section NRAEnvEq.
     Qed.
 
     Lemma lift_nraenv_core_eq_to_nraenv_eq_l (q1 q2:nraenv_core) :
-      (nraenv_of_nraenv_core q1) ≡ₓ (nraenv_of_nraenv_core q2) -> q1 ≡ₑ q2.
+      (nraenv_core_to_nraenv q1) ≡ₓ (nraenv_core_to_nraenv q2) -> q1 ≡ₑ q2.
     Proof.
       unfold nraenv_eq.
       unfold nraenv_core_eq.
@@ -95,7 +95,7 @@ Section NRAEnvEq.
     Qed.
 
     Lemma lift_nraenv_core_eq_to_nraenv_eq (q1 q2:nraenv_core) :
-      q1 ≡ₑ q2 <-> (nraenv_of_nraenv_core q1) ≡ₓ (nraenv_of_nraenv_core q2).
+      q1 ≡ₑ q2 <-> (nraenv_core_to_nraenv q1) ≡ₓ (nraenv_core_to_nraenv q2).
     Proof.
       split.
       apply lift_nraenv_core_eq_to_nraenv_eq_r.
@@ -103,7 +103,7 @@ Section NRAEnvEq.
     Qed.
 
     Lemma lift_nraenv_eq_to_nraenv_core_eq_r (q1 q2:nraenv) :
-      q1 ≡ₓ q2 -> (nraenv_core_of_nraenv q1) ≡ₑ (nraenv_core_of_nraenv q2).
+      q1 ≡ₓ q2 -> (nraenv_to_nraenv_core q1) ≡ₑ (nraenv_to_nraenv_core q2).
     Proof.
       unfold nraenv_eq.
       unfold nraenv_core_eq.
@@ -114,7 +114,7 @@ Section NRAEnvEq.
     Qed.
   
     Lemma lift_nraenv_eq_to_nraenv_core_eq_l (q1 q2:nraenv) :
-      (nraenv_core_of_nraenv q1) ≡ₑ (nraenv_core_of_nraenv q2) -> q1 ≡ₓ q2.
+      (nraenv_to_nraenv_core q1) ≡ₑ (nraenv_to_nraenv_core q2) -> q1 ≡ₓ q2.
     Proof.
       unfold nraenv_eq.
       unfold nraenv_core_eq.
@@ -125,7 +125,7 @@ Section NRAEnvEq.
     Qed.
   
     Lemma lift_nraenv_eq_to_nraenv_core_eq (q1 q2:nraenv) :
-      q1 ≡ₓ q2 <-> (nraenv_core_of_nraenv q1) ≡ₑ (nraenv_core_of_nraenv q2).
+      q1 ≡ₓ q2 <-> (nraenv_to_nraenv_core q1) ≡ₑ (nraenv_to_nraenv_core q2).
     Proof.
       split.
       apply lift_nraenv_eq_to_nraenv_core_eq_r.
@@ -210,7 +210,7 @@ Section NRAEnvEq.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros; simpl.
     rewrite (H0 h c dn_c env dn_env x1) by trivial; rewrite (H h c dn_c env dn_env x1) by trivial.
-    case_eq (h ⊢ₑ nraenv_core_of_nraenv y0 @ₑ x1 ⊣ c;env); case_eq (h ⊢ₑ nraenv_core_of_nraenv y @ₑ x1 ⊣ c;env); intros; simpl; trivial.
+    case_eq (h ⊢ₑ nraenv_to_nraenv_core y0 @ₑ x1 ⊣ c;env); case_eq (h ⊢ₑ nraenv_to_nraenv_core y @ₑ x1 ⊣ c;env); intros; simpl; trivial.
   Qed.
   
   (* NRAEnvDefault *)
@@ -271,7 +271,7 @@ Section NRAEnvEq.
     intros; subst.
     rewrite nraenv_eq_nraenv_core_eq in *.
     simpl.
-    unfold project.
+    unfold macro_cNRAEnvProject.
     rewrite H0 by trivial.
     reflexivity.
   Qed.
@@ -282,7 +282,7 @@ Section NRAEnvEq.
     unfold Proper, respectful.
     intros; subst.
     rewrite nraenv_eq_nraenv_core_eq in *.
-    simpl. unfold group_by_with_env.
+    simpl. unfold macro_cNRAEnvGroupBy.
     rewrite H1 by trivial.
     reflexivity.
   Qed.
@@ -293,7 +293,7 @@ Section NRAEnvEq.
     unfold Proper, respectful.
     intros; subst.
     rewrite nraenv_eq_nraenv_core_eq in *.
-    simpl. unfold unnest.
+    simpl. unfold macro_cNRAEnvUnnest.
     rewrite H1 by trivial.
     reflexivity.
   Qed.

@@ -51,8 +51,8 @@ Section cNRAEnv.
   Section Syntax.
   
   (** By convention, "static" parameters come first, followed by
-     so-called dependent operators. This allows for easy instanciation
-     on those parameters *)
+    so-called dependent operators. This allows for easy instanciation
+    on those parameters *)
 
     Inductive nraenv_core : Set :=
     | cNRAEnvGetConstant : string -> nraenv_core
@@ -73,6 +73,8 @@ Section cNRAEnv.
     | cNRAEnvMapEnv : nraenv_core -> nraenv_core
     .
 
+    (** Equality between two cNRAEnv expressions is decidable. *)
+  
     Global Instance nraenv_core_eqdec : EqDec nraenv_core eq.
     Proof.
       change (forall x y : nraenv_core,  {x = y} + {x <> y}).

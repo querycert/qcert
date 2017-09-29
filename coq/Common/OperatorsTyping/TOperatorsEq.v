@@ -28,7 +28,6 @@ Section TOperatorsEq.
   Require Import String.
   Require Import Utils.
   Require Import Types.
-  Require Import CommonUtils.
   Require Import CommonData.
   Require Import ForeignData.
   Require Import ForeignOperators.
