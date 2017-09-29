@@ -31,12 +31,11 @@ MODULES = \
 	Utils/Digits \
 	Utils/Fresh \
 	Utils/Bag \
+	Utils/Var \
+	Utils/JSON \
+	Utils/OptimizerStep \
+	Utils/OptimizerLogger \
 	Utils/Utils \
-	Common/Utils/Var \
-	Common/Utils/JSON \
-	Common/Utils/OptimizerStep \
-	Common/Utils/OptimizerLogger \
-	Common/Utils/CommonUtils \
 	Common/Brands/BrandRelation \
 	Common/TypeSystem/ForeignType \
 	Common/TypeSystem/ForeignTypeToJSON \
