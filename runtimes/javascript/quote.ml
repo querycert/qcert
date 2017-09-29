@@ -70,7 +70,7 @@ let global_replace const_expr repl text =
   String.concat "" (List.rev (replace [] 0 false))
 
 let quoting s =
-  let s = "var inheritance = [];\n" ^ s in
+  let s = global_replace "\\" "\\\\" s in
   let s = global_replace "\t" " " s in
   let s = global_replace "\"" "\\\"" s in
   let s = global_replace "\n" "\\n" s in
@@ -78,8 +78,9 @@ let quoting s =
 
 let _ =
   let quoted_runtime = quoting runtime in
-  print_string "var runtime =\"";
+  print_string "const runtime = \"";
   print_string quoted_runtime;
   print_string "\"";
+  print_newline ();
   flush stdout
 

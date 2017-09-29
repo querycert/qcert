@@ -33,7 +33,7 @@ qcert-runtime.js: qcert-runtime-core.js qcert-runtime-dates.js
          cat $$i; \
          done) > qcert-runtime.js
 
-qcert_runtime.ml:
+qcert_runtime.ml: qcert-runtime.js
 	(echo "let runtime = {runtime|"; \
          cat qcert-runtime.js; \
          echo '|runtime}' \
