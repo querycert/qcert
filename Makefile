@@ -88,31 +88,31 @@ ifneq ($(SQL)$(SQLPP)$(JRULES),)
 endif
 
 clean-coq:
-	@$(MAKE) -f Makefile.coq clean
+	- @$(MAKE) -f Makefile.coq clean
 
 cleanall-coq: clean-coq
 
 clean-ocaml:
-	@$(MAKE) -C ocaml clean
+	- @$(MAKE) -C ocaml clean
 
 cleanall-ocaml:
-	@$(MAKE) -C ocaml cleanall
+	- @$(MAKE) -C ocaml cleanall
 
 clean-java:
-	@$(MAKE) -C javaService clean
-	@$(MAKE) -C sqlParser clean
-	@$(MAKE) -C sqlppParser clean
-	@$(MAKE) -C jrulesParser clean
-	@rm -rf bin/services
-	@rm -f bin/javaService.jar
+	- @$(MAKE) -C javaService clean
+	- @$(MAKE) -C sqlParser clean
+	- @$(MAKE) -C sqlppParser clean
+	- @$(MAKE) -C jrulesParser clean
+	- @rm -rf bin/services
+	- @rm -f bin/javaService.jar
 
 cleanall-java:
-	@$(MAKE) -C javaService cleanall
-	@$(MAKE) -C sqlParser cleanall
-	@$(MAKE) -C sqlppParser cleanall
-	@$(MAKE) -C jrulesParser cleanall
-	@rm -rf bin/services
-	@rm -f bin/javaService.jar
+	- @$(MAKE) -C javaService cleanall
+	- @$(MAKE) -C sqlParser cleanall
+	- @$(MAKE) -C sqlppParser cleanall
+	- @$(MAKE) -C jrulesParser cleanall
+	- @rm -rf bin/services
+	- @rm -f bin/javaService.jar
 
 
 ## Runtime
@@ -144,14 +144,14 @@ spark2-runtime:
 	@$(MAKE) -C runtimes/spark2
 
 clean-runtimes:
-	@$(MAKE) -C runtimes/javascript clean
-	@$(MAKE) -C runtimes/java clean
-	@$(MAKE) -C runtimes/spark2 clean
+	- @$(MAKE) -C runtimes/javascript clean
+	- @$(MAKE) -C runtimes/java clean
+	- @$(MAKE) -C runtimes/spark2 clean
 
 cleanall-runtimes:
-	@$(MAKE) -C runtimes/javascript cleanall
-	@$(MAKE) -C runtimes/java cleanall
-	@$(MAKE) -C runtimes/spark2 cleanall
+	- @$(MAKE) -C runtimes/javascript cleanall
+	- @$(MAKE) -C runtimes/java cleanall
+	- @$(MAKE) -C runtimes/spark2 cleanall
 
 
 ## Demo
@@ -173,9 +173,9 @@ qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 	cd doc/demo && $(TSC) -p "tsconfig.json"
 
 clean-demo:
-	@rm -f doc/demo/qcertJS.js doc/demo/qcert-runtime.js
-	@rm -f doc/demo/demo.js doc/demo/qcertPreCompiler.js
-	@rm -f doc/demo/demo.js.map doc/demo/qcertPreCompiler.js.map
+	- @rm -f doc/demo/qcertJS.js doc/demo/qcert-runtime.js
+	- @rm -f doc/demo/demo.js doc/demo/qcertPreCompiler.js
+	- @rm -f doc/demo/demo.js.map doc/demo/qcertPreCompiler.js.map
 
 cleanall-demo: clean-demo
 
@@ -193,14 +193,14 @@ else
 endif
 
 clean-runners:
-	@$(MAKE) -C javaRunners clean
-	@rm -rf bin/lib
-	@rm -f bin/javaRunners.jar
+	- @$(MAKE) -C javaRunners clean
+	- @rm -rf bin/lib
+	- @rm -f bin/javaRunners.jar
 
 cleanall-runners:
-	@$(MAKE) -C javaRunners cleanall
-	@rm -rf bin/lib
-	@rm -f bin/javaRunners.jar
+	- @$(MAKE) -C javaRunners cleanall
+	- @rm -rf bin/lib
+	- @rm -f bin/javaRunners.jar
 
 ## Tests
 
@@ -219,26 +219,26 @@ documentation:
 
 ## Cleanup
 clean: Makefile.coq remove_all_derived
-	@$(MAKE) clean-coq
-	@$(MAKE) clean-ocaml
-	@$(MAKE) clean-java
-	@$(MAKE) clean-runtimes
-	@$(MAKE) clean-demo
-	@$(MAKE) clean-runners
-	@$(MAKE) clean-tests
-	@rm -f Makefile.coq
-	@rm -f *~
+	- @$(MAKE) clean-coq
+	- @$(MAKE) clean-ocaml
+	- @$(MAKE) clean-java
+	- @$(MAKE) clean-runtimes
+	- @$(MAKE) clean-demo
+	- @$(MAKE) clean-runners
+	- @$(MAKE) clean-tests
+	- @rm -f Makefile.coq
+	- @rm -f *~
 
 cleanall: Makefile.coq remove_all_derived
-	@$(MAKE) cleanall-coq
-	@$(MAKE) cleanall-ocaml
-	@$(MAKE) cleanall-java
-	@$(MAKE) cleanall-runtimes
-	@$(MAKE) cleanall-demo
-	@$(MAKE) cleanall-runners
-	@$(MAKE) cleanall-tests
-	@rm -f Makefile.coq
-	@rm -f *~
+	- @$(MAKE) cleanall-coq
+	- @$(MAKE) cleanall-ocaml
+	- @$(MAKE) cleanall-java
+	- @$(MAKE) cleanall-runtimes
+	- @$(MAKE) cleanall-demo
+	- @$(MAKE) cleanall-runners
+	- @$(MAKE) cleanall-tests
+	- @rm -f Makefile.coq
+	- @rm -f *~
 
 clean_detritus:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 ./script/remove_detritus_derived_file.sh
