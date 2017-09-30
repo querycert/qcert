@@ -297,7 +297,7 @@ Section CldMRtoCloudant.
       | Some x => db_of_var rulename x
       end.
 
-	(* Java equivalent: CloudantBackend.makeInputDesignDoc *)
+    (* Java equivalent: CloudantBackend.makeInputDesignDoc *)
     Definition makeInputDesignDoc
                (quotel:string)
                (rulename:string)
