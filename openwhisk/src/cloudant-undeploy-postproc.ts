@@ -1,27 +1,11 @@
-import { Config, Design, Designs } from "./types";
+import { Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
-export type ListIn = {
-    whisk: {
-	namespace: string;
-	api_key: string;
-	apihost: string;
-    };
-    cloudant: {
-	username: string;
-	password: string;
-    }
-    pkgname: string;
-    action: string;
-    querycode: Designs;
-}
-export interface ListOut {
-    result: any;
-}
+export type ListIn = Credentials & DeployIn
+export type ListOut = Credentials & DeployOut
 
 const main = async (params:ListIn) : Promise<ListOut> => {
     const pkgname: string = params.pkgname;
-    const action: string = params.action;
     const designs: Designs = params.querycode;
 
     // Delete post-processing action
@@ -30,7 +14,7 @@ const main = async (params:ListIn) : Promise<ListOut> => {
 			  "apihost":params.whisk.apihost});
     return ow.actions.delete({
 	"namespace": params.whisk.namespace,
-        "name" : pkgname + "/" + action
+        "name" : pkgname + "/result"
     }).then(r => {
         console.log(`[ACTION] [DELETED] ${JSON.stringify("`+pkgname+`/`+action+`")}`);
     })

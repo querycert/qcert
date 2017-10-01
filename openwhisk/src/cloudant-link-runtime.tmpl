@@ -1,26 +1,20 @@
-import { Config, Design, Designs } from "./types";
+import { Error, Request, Response, Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
-export type ListIn = {
-    whisk: {
-	namespace: string;
-	api_key: string;
-	apihost: string;
-    };
-    cloudant: {
-	username: string;
-	password: string;
-    }
-    pkgname: string;
-    action: string;
-    querycode: Designs;
-}
+export type ListIn = Credentials & DeployIn
+export type ListOut = Credentials & DeployOut
 
-const main = async (params:ListIn) : Promise<ListIn> => {
+const main = async (eparams:Request<ListIn>) : Promise<Response<ListIn>> => {
+    // Propagate error
+    if ((<Error>eparams).hasOwnProperty('error')) {
+	const error: Error = (<Error>eparams);
+	return error;
+    }
+
+    const params: ListIn = <ListIn>eparams;
     const whisk = params.whisk;
     const cloudant = params.cloudant;
     const pkgname: string = params.pkgname;
-    const action: string = params.action;
     const querycode: Designs = params.querycode;
 
     const linkharness = (str:string):string => {
@@ -51,13 +45,12 @@ const main = async (params:ListIn) : Promise<ListIn> => {
 	  { 'whisk' : whisk,
 	    'cloudant' : cloudant,
 	    'pkgname' : pkgname,
-	    'action' : action,
 	    'querycode' : linkedcode }
     
     return linkedquerycode;
 
 }
 
-const failure = (err) => {
+const failure = (err:string) : Error => {
     return { error: err }
 }

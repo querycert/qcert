@@ -1,24 +1,19 @@
-import { Config, Design, Designs } from "./types";
+import { Error, Request, Response, Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
-export type ListIn = {
-    whisk: {
-	namespace: string;
-	api_key: string;
-	apihost: string;
-    };
-    cloudant: {
-	username: string;
-	password: string;
-    }
-    pkgname: string;
-    action: string;
-    querycode: Designs;
-}
+export type ListIn = Credentials & DeployIn
+export type ListOut = Credentials & DeployOut
 
-const main = async (params:ListIn) : Promise<ListIn> => {
+const main = async (eparams:Request<ListIn>) : Promise<Response<ListIn>> => {
+    // Propagate error
+    if ((<Error>eparams).hasOwnProperty('error')) {
+	const error: Error = (<Error>eparams);
+	return error;
+    }
+
+    const params: ListIn = <ListIn>eparams;
+    
     const pkgname: string = params.pkgname;
-    const action: string = params.action;
     const designs: Designs = params.querycode;
     const ow = openwhisk()
 
@@ -47,11 +42,11 @@ const main = async (params:ListIn) : Promise<ListIn> => {
 		    }
 		})
             } catch (err) {
-		console.log('Unable to create database:'+dbname+' with error:'+err);
+		return failure('Unable to create database:'+dbname+' with error:'+err);
             }
 	}))
 	
-	const viewname = '"_design/'+action+'"'
+	const viewname = '"_design/'+pkgname+'"'
         try {
             await ow.actions.invoke({
 		name: "/whisk.system/cloudant/create-document",
@@ -66,13 +61,13 @@ const main = async (params:ListIn) : Promise<ListIn> => {
 		}
             })
         } catch (err) {
-            console.log('Unable to create view in database:'+dbname+' with error:'+err)
+            return failure('Unable to create view in database:'+dbname+' with error:'+err)
         }
 	return failure('ACTUALLY CREATED VIEW IN:'+dbname)
     }))
     return params;
 }
 
-const failure = (err) => {
+const failure = (err:string) : Error => {
     return { error: err }
 }

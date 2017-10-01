@@ -1,27 +1,19 @@
-import { Config, Design, Designs } from "./types";
+import { Error, Request, Response, Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
-export type ListIn = {
-    whisk: {
-	namespace: string;
-	api_key: string;
-	apihost: string;
-    };
-    cloudant: {
-	username: string;
-	password: string;
-    }
-    pkgname: string;
-    action: string;
-    querycode: Designs;
-}
-export interface ListOut {
-    result: any;
-}
+export type ListIn = Credentials & DeployIn
+export type ListOut = Credentials & DeployOut
 
-const main = async (params:ListIn) : Promise<ListOut> => {
+const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
+    // Propagate error
+    if ((<Error>eparams).hasOwnProperty('error')) {
+	const error: Error = (<Error>eparams);
+	return error;
+    }
+
+    const params: ListIn = <ListIn>eparams;
+    
     const pkgname: string = params.pkgname;
-    const action: string = params.action;
     const designs: Designs = params.querycode;
 
     // Create post-processing action
@@ -76,7 +68,7 @@ const main = async (params:ListIn) : Promise<ListOut> => {
 	result_source += computeEffectiveParams(designs.post_input)+"\n"
 	result_source += "   return { \"result\" : db_post("+makeEffectiveParams(designs.post_input)+") }; } );\n"
     } catch (error) {
-	console.error("Couldn't create action source string from design document");
+	return failure("Couldn't create action source string from design document:" + error);
     }
 
     // Deploy post-processing action to openWhisk
@@ -89,14 +81,14 @@ const main = async (params:ListIn) : Promise<ListOut> => {
     }).then(result => {
 	ow.actions.update({
 	    "namespace": params.whisk.namespace,
-            "name" : pkgname + "/" + action,
+            "name" : pkgname + "/result",
             "action" : { "exec" : { "kind" : "nodejs:6" , "code":result_source } }
 	}).then(r => {
-            console.log(`[ACTION] [DEPLOYED] ${JSON.stringify("`+pkgname+`/`+action+`")}`);
+            return failure(`[ACTION] [DEPLOYED] ${JSON.stringify("`+pkgname+`/`+action+`")}`);
 	});
     })
 }
 
-const failure = (err) => {
+const failure = (err:string) : Error => {
     return { error: err }
 }
