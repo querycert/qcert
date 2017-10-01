@@ -156,35 +156,7 @@ Section NNRCtoJavaScript.
     Definition brandsToJs (quotel:string) (b:brands)
       := bracketString "[" (joinStrings "," (map (fun x => bracketString quotel x quotel) b)) "]".
 
-    Definition js_quote_char (a:ascii)
-      := match a with
-         | """"%char => "\"""
-         | _ => String a EmptyString
-         end.
-
-    Definition js_quote_string (s:string)
-      := flat_map_string js_quote_char s.
-
-    Definition stringToJS (quotel:string) (s:string)
-      := "" ++ quotel ++ "" ++ js_quote_string s ++ "" ++ quotel ++ "".
-
-    
     (* Java equivalent: JavaScriptBackend.dataToJS *)
-    Fixpoint jsonToJS (quotel:string) (j : json) : string
-      := match j with
-         | jnil => "null" (* to be discussed *)
-         | jnumber n => Z_to_string10 n
-         | jbool b => if b then "true" else "false"
-         | jstring s => stringToJS quotel s
-         | jarray ls =>
-           let ss := map (jsonToJS quotel) ls in
-           "[" ++ (joinStrings ", " ss) ++ "]"
-         | jobject ls =>
-           let ss := (map (fun kv => let '(k,v) := kv in
-                                     "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (jsonToJS quotel v)) ls) in
-           "{" ++ (joinStrings ", " ss) ++ "}"
-         end.
-
     Definition dataToJS (quotel:string) (d : data) : string :=
       jsonToJS quotel (data_to_js quotel d).
 

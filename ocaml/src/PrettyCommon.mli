@@ -43,8 +43,8 @@ val get_margin : pretty_config -> int
 val set_hierarchy : pretty_config -> QData.json -> unit
 val get_hierarchy : pretty_config -> QData.json
 
-val set_js_runtime : pretty_config -> string -> unit
-val get_js_runtime : pretty_config -> string
+val set_link_js_runtime : pretty_config -> unit -> unit
+val link_js_runtime : pretty_config -> bool
 
 (* Pretty sym *)
 

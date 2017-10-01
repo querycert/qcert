@@ -33,6 +33,7 @@ parameters.
   
 Section Cloudant.
   Require Import String.
+  Require Import Utils.
 
   Record cloudant_design :=
     mkCloudantDesign

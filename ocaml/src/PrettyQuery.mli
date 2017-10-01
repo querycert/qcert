@@ -22,7 +22,7 @@ open PrettyCommon
 
 (** Pretty queries *)
 
-type 'a pretty_fun = bool -> int -> bool -> QData.json -> string -> 'a -> string
+type 'a pretty_fun = bool -> int -> bool -> QData.json -> bool -> 'a -> string
 
 val pretty_camp_rule : QcertCompiler.camp_rule pretty_fun
 val pretty_tech_rule : QcertCompiler.tech_rule pretty_fun

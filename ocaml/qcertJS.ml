@@ -123,9 +123,7 @@ let global_config_of_json j =
   apply QcertArg.set_schema_content j##.schema;
   apply QcertArg.set_input_content j##.input;
   (* Cloudant options *)
-  Js.Optdef.iter j##.jsruntime_file
-    (fun s -> PrettyCommon.set_js_runtime gconf.gconf_pretty_config (Js.to_string s));
-  apply QcertArg.set_js_runtime_content j##.jsruntime;
+  Js.Optdef.iter j##.jsruntime (fun b -> if b then QcertArg.set_link_js_runtime gconf ());
   Js.Optdef.iter j##.cld_prefix
     (fun s -> QcertArg.set_prefix gconf (Js.to_string s));
   (* Emit options *)

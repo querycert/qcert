@@ -416,6 +416,19 @@ End MapString.
 
 (** Support for 'like' on strings *)
 
+Section Join.
+  Require Import List.
+  Require Import CoqLibAdd.
+
+  Fixpoint joinStrings (delim:string) (l:list string) : string
+    := match l with
+         | nil => EmptyString
+         | x::nil => x
+         | x::ls => append x (append delim (joinStrings delim ls))
+       end.
+
+End Join.
+
 Section Like.
   Require Import List.
   Require Import CoqLibAdd.

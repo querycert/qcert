@@ -74,7 +74,7 @@ Module QData(runtime:CompilerRuntime).
     := NNRCtoJavaScript.dataToJS s.
 
   Definition jsonToJS s : JSON.json -> String.string 
-    := NNRCtoJavaScript.jsonToJS s.
+    := JSON.jsonToJS s.
 
   Section dist.
     Import DData.

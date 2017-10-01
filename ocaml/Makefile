@@ -35,12 +35,20 @@ MAIN3=qcertJS
 TARGET=native
 
 ## Toplevel
-all: ../bin/$(MAIN) ../bin/$(MAIN2)
+all: ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3).js
+
+native: ../bin/$(MAIN) ../bin/$(MAIN2) 
 
 js: ../bin/$(MAIN3).js
 
 ## Extraction
 VO_FILES = $(MODULES:%=../coq/%.vo)
+
+../runtimes/javascript/qcert_runtime.ml:
+	$(MAKE) -C ../runtimes/javascript
+
+src/QcertJsRuntime.ml: ../runtimes/javascript/qcert_runtime.ml
+	cp ../runtimes/javascript/qcert_runtime.ml src/QcertJsRuntime.ml
 
 extracted: extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 
@@ -52,24 +60,24 @@ extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 	(cd extracted; coqc -R ../../coq Qcert ../QcertExtraction.v)
 
 ## Native
-../bin/$(MAIN): extracted $(MAIN).$(TARGET)
+../bin/$(MAIN): src/QcertJsRuntime.ml extracted $(MAIN).$(TARGET)
 	cp _build/$(MAIN).$(TARGET) ../bin/$(MAIN)
 
-$(MAIN).$(TARGET): extracted
+$(MAIN).$(TARGET): src/QcertJsRuntime.ml extracted
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is extracted -Is src $(MAIN).$(TARGET)
 
-../bin/$(MAIN2): extracted $(MAIN2).$(TARGET)
+../bin/$(MAIN2): src/QcertJsRuntime.ml extracted $(MAIN2).$(TARGET)
 	cp _build/$(MAIN2).$(TARGET) ../bin/$(MAIN2)
 
-$(MAIN2).$(TARGET): extracted
+$(MAIN2).$(TARGET): src/QcertJsRuntime.ml extracted
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is extracted -Is src $(MAIN2).$(TARGET)
 
 ## JavaScript
-../bin/$(MAIN3).js: extracted _build_js/$(MAIN3).byte
+../bin/$(MAIN3).js: src/QcertJsRuntime.ml extracted _build_js/$(MAIN3).byte
 	js_of_ocaml _build_js/$(MAIN3).byte
 	cp _build_js/$(MAIN3).js ../bin/$(MAIN3).js
 
-_build_js/$(MAIN3).byte: extracted $(MAIN3).ml
+_build_js/$(MAIN3).byte: src/QcertJsRuntime.ml extracted $(MAIN3).ml
 	$(OCAMLBUILD) $(MENHIRFLAG) -build-dir _build_js -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is extracted -Is src $(MAIN3).byte
 
 ## Whisk
@@ -96,6 +104,7 @@ cleanall: clean
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f QcertExtraction.glob QcertExtraction.vo .QcertExtraction.aux
 	rm -rf extracted
+	rm -rf src/QcertJsRuntime.ml
 	rm -rf *~
 
 .NOTPARALLEL: 

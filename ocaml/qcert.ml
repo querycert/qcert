@@ -36,8 +36,6 @@ let args_list gconf =
        "<dir> Directory for the emited code");
       ("-dir-target", Arg.String (QcertArg.set_dir_target gconf),
        "<dir> Directory for the emitied code of target (if not specified use the one given by -dir)");
-      ("-js-runtime", Arg.String (QcertArg.set_js_runtime gconf),
-       "<qcert-runtime.js> JavaScript runtime");
       ("-schema", Arg.String (QcertArg.set_schema_file gconf),
        "<file.schema> Schema");
       ("-input", Arg.String (QcertArg.set_input_file gconf),
@@ -90,11 +88,13 @@ let args_list gconf =
       ("-margin", Arg.Int (PrettyCommon.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
       ("-cloudant-prefix", Arg.String (QcertArg.set_prefix gconf),
-       "<pref> Cloudant DB prefix");
+       "<pref> Database prefix (only for Cloudant target)");
+      ("-link-js-runtime", Arg.Unit (QcertArg.set_link_js_runtime gconf),
+       "Link the JavaScript runtime (only for JavaScript and Cloudant targets)");
       ("-java-imports", Arg.String (QcertArg.set_java_imports gconf),
-       "<imports> Additional imports for the Java runtime");
+       "<imports> Additional imports for the Java runtime (only for Java target)");
       ("-vinit", Arg.String (QcertArg.set_vinit gconf),
-       "<init> Set the name init variable for the map-reduce backends");
+       "<init> Set the name of the init variable (only for SparkRDD and Cloudant targets)");
     ]
 
 let anon_args input_files f = input_files := f :: !input_files

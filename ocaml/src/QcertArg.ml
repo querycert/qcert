@@ -72,7 +72,6 @@ let set_emit_optim_config gconf () = gconf.gconf_emit_optim_config <- true
 let set_optims gconf optims = gconf.gconf_optim_config <- (optim_conf_from_ocaml_conf optims)
 let set_optim gconf optim = gconf.gconf_optim_config <- gconf.gconf_optim_config@[optim_phases_config_from_ocaml_conf optim]
 
-let set_js_runtime gconf harness_file = PrettyCommon.set_js_runtime gconf.gconf_pretty_config (Util.string_of_file harness_file)
-let set_js_runtime_content gconf harness_content = PrettyCommon.set_js_runtime gconf.gconf_pretty_config harness_content
+let set_link_js_runtime gconf () = PrettyCommon.set_link_js_runtime gconf.gconf_pretty_config ()
 let set_prefix gconf prefix = gconf.gconf_prefix <- prefix
 

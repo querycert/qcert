@@ -41,13 +41,6 @@ Section OperatorsUtils.
 (*    := bracketString "'"%string s "'"%string. *)
     := s.
 
-  Fixpoint joinStrings (delim:string) (l:list string) : string
-    := match l with
-         | nil => EmptyString
-         | x::nil => x
-         | x::ls => append x (append delim (joinStrings delim ls))
-       end.
-
   Definition string_sort := insertion_sort StringOrder.le_dec.
 
   Global Instance ToString_Z : ToString Z

@@ -264,26 +264,26 @@ Section CldMRtoCloudant.
 
     (* Java equivalent: CloudantBackend.buildDesignDoc *)
     Definition buildDesignDoc (view_name:string) (s_map:string) (s_reduce:option string) (s_dboutput:option string) (s_dbdefault:option string) :=
-      let dmap := ("map", dstring s_map) in
+      let dmap := ("map", jstring s_map) in
       let dreduce :=
           match s_reduce with
           | None => nil
-          | Some s_r => ("reduce", dstring s_r)::nil
+          | Some s_r => ("reduce", jstring s_r)::nil
           end
       in
       let dbcopy :=
           match s_dboutput with
           | None => nil
-          | Some s_db => ("dbcopy", dstring (view_name ++ s_db))::nil
+          | Some s_db => ("dbcopy", jstring (view_name ++ s_db))::nil
           end
       in
       let dbdefault :=
           match s_dbdefault with
           | None => nil
-          | Some s_dbd => ("dbdefault", dstring s_dbd)::nil
+          | Some s_dbd => ("dbdefault", jstring s_dbd)::nil
           end
       in
-      drec (("views", drec ((view_name, drec (dmap::(List.app dreduce (List.app dbcopy dbdefault))))::nil))::nil).
+      jobject (("views", jobject ((view_name, jobject (dmap::(List.app dreduce (List.app dbcopy dbdefault))))::nil))::nil).
 
 
     (* Java equivalent: CloudantBackend.db_of_var *)    
@@ -305,7 +305,7 @@ Section CldMRtoCloudant.
         mkCloudantDesign
           (makeInputDB "" inputdb) (* Initial name is external and should be kept as it *)
           view_name
-          (dataToJS quotel (buildDesignDoc view_name mmap mreduce outputdb defaultdb))
+          (jsonToJS quotel (buildDesignDoc view_name mmap mreduce outputdb defaultdb))
       end.
     
     (* Java equivalent: CloudantBackend.makeDesignDoc *)
@@ -316,7 +316,7 @@ Section CldMRtoCloudant.
         mkCloudantDesign
           (makeInputDB rulename inputdb)
           view_name
-          (dataToJS quotel (buildDesignDoc view_name mmap mreduce outputdb defaultdb))
+          (jsonToJS quotel (buildDesignDoc view_name mmap mreduce outputdb defaultdb))
       end.
     
     (* Java equivalent: CloudantBackend.makeCloudantDesignDocs *)

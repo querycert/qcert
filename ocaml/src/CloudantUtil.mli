@@ -19,6 +19,6 @@
 open QcertCompiler.EnhancedCompiler
 
 (* Important functions *)
-val add_js_runtime_top : string -> QData.json -> QLang.cloudant -> QLang.cloudant
+val link_js_runtime_top : bool -> QData.json -> QLang.cloudant -> QLang.cloudant
 val string_of_cloudant : QLang.cloudant -> string
 
