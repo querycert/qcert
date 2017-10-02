@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Q*cert IBM Cloud Functions Demo</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap theme -->
+  <link href="./boostrap/css/bootstrap-theme.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="qcertsite.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <div class="container theme-showcase" role="main">
+
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+          aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        <a class="navbar-brand" href="index.html">Q*cert</a>
+      </div>
+      <div class="container-fluid">
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="doc.html">Commented Code</a></li>
+            <li class="active"><a href="demo.html">Demo</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="http://github.com/querycert/qcert">github</a></li>
+          </ul>
+        </div>
+        <!--/.nav-collapse -->
+      </div>
+      <!--/.container-fluid -->
+    </nav>
+
+    <form>
+      <div class="form-horizontal">
+        <div class="form-group">
+          <h3>Cloudant Database</h3>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="cloudant-username">username:</label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" id="cloudant-username" placeholder="Enter username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="cloudant-password">password: </label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" id="cloudant-password" placeholder="Enter password"></input>
+            </div>
+          </div>
+
+          <h3>IBM Cloud Functions</h3>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="wsk-api_key">api key:</label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" id="wsk-api_key" placeholder="Enter Open Whisk key"></input>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="wsk-namespace">namespace:</label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" id="wsk-namespace" placeholder="Enter Open Whisk namespace"></input>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="wsk-pkg">package: </label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" id="wsk-pkg" placeholder="Enter package name"></input>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="wsk-action">action: </label>
+            <div class="col-sm-10">
+              <input class="form-control" type="text" id="wsk-action" placeholder="Enter action name"></input>
+            </div>
+          </div>
+          <h3>Query</h3>
+          <label class="control-label col-sm-2" for="source">source language:</label>
+          <div class="col-sm-10">
+            <select class="form-control" id="source">
+		  <option value="rule">Rules</option>
+		  <option value="camp">CAMP</option>
+		  <option value="sql">SQL</option>
+		  <option value="oql" selected="selected">OQL</option>
+		  <option value="lambda_nra">Lambda NRA</option>
+		  <!--
+		      <option>nra</option>
+		  <option>nraenv</option>
+		  <option>nnrc</option>
+		  <option>nnrcmr</option>
+		  <option>cldmr</option>
+		  <option>dnnrc</option>
+		  <option>dnnrc_typed</option>
+		  <option>js</option>
+		  <option>java</option>
+		  <option>spark_rdd</option>
+		  <option>spark_dataset</option>
+		  <option>cloudant</option>
+		  -->
+		</select>
+          </div>
+        </div>
+        <!-- <div class="form-group"> -->
+        <!--   <label class="control-label col-sm-2" for="target">target language</label> -->
+        <!--   <select class="form-control" id="target"> -->
+        <!--     <option value="rule">Rule</option> -->
+        <!--     <option value="camp">CAMP</option> -->
+        <!--     <option value="oql">OQL</option> -->
+        <!--     <option value="lambda_nra">Lambda NRA</option> -->
+        <!--     <option value="nra">NRA</option> -->
+        <!--     <option value="nraenv">NRAEnv</option> -->
+        <!--     <option value="nnrc">NNRC</option> -->
+        <!--     <option value="nnrcmr">NNRCMR</option> -->
+        <!--     <option value="cldmr">CldMR</option> -->
+        <!--     <option value="dnnrc">DNNRC</option> -->
+        <!--     <\!-- -->
+        <!--     <option>dnnrc_typed</option> -->
+        <!--     -\-> -->
+        <!--     <option value="js" selected="selected">JavaScript</option> -->
+        <!--     <option value="java">Java</option> -->
+        <!--     <option value="spark_rdd">Spark (RDD)</option> -->
+        <!--     <option value="spark_dataset">Spark (Datasets)</option> -->
+        <!--     <option value="cloudant">Cloudant Map/Reduce</option> -->
+        <!--   </select> -->
+        <!-- </div> -->
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="query">source query:</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" id="query" rows="8">/* Example of simple select-from-where */
+select p
+from p in Persons
+where p.age = 32
+	    </textarea>
+        </div>
+      </div>
+      <div class="form-group text-right">
+        <button type="button" onclick="compileAndDeployButton()" class="btn btn-primary">compile and deploy</button>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="result">result:</label>
+        <pre id="result"></pre>
+      </div>
+    </form>
+
+  </div>
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script>
+    window.jQuery || document.write('<script src="./assets/js/vendor/jquery.min.js"><\/script>')
+  </script>
+  <script src="./bootstrap/js/bootstrap.min.js"></script>
+  <script src="./assets/js/docs.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="./assets/js/ie10-viewport-bug-workaround.js"></script>
+
+  <!-- Q*cert Open Whisk
+    ================================================== -->
+  <script src="./demo/demo-openwhisk.js"></script>
+</body>
+
+</html>
