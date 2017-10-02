@@ -15,47 +15,74 @@ const compileAndDeployButton = () => {
     'exactpath': getParameter("exactpath", "FillPath") === "ExactPath",
     'emitall': getParameter("emitall", "EmitTarget") === "EmitAll",
     'eval': false,
-    'schema': { "hierarchy": [],
-		"brandTypes" :[],
-		"typeDefs" :[],
-		"globals" :
-		{ "employees" :
-		  { "dist" : "distr",
-		    "type" : { "$coll" : { "eid" : "Nat" ,
-					   "name" : "String",
-					   "age" : "Nat",
-					   "company" : "Nat" } } },
-		  "students" :
-		  { "dist" : "distr",
-		    "type" : { "$coll" : { "sid" : "Nat" ,
-					   "name" : "String",
-					   "age" : "Nat",
-					   "univ" : "Nat" } } },
-		  "organizations" :
-		  { "dist" : "distr",
-		    "type" : { "$coll" : { "oid" : "Nat" ,
-					   "name" : "String",
-					   "departments" : { "$coll" : "String" } } } } }
-	      },
+    'schema': {
+      "hierarchy": [],
+      "brandTypes": [],
+      "typeDefs": [],
+      "globals":
+      {
+        "employees":
+        {
+          "dist": "distr",
+          "type": {
+            "$coll": {
+              "eid": "Nat",
+              "name": "String",
+              "age": "Nat",
+              "company": "Nat"
+            }
+          }
+        },
+        "students":
+        {
+          "dist": "distr",
+          "type": {
+            "$coll": {
+              "sid": "Nat",
+              "name": "String",
+              "age": "Nat",
+              "univ": "Nat"
+            }
+          }
+        },
+        "organizations":
+        {
+          "dist": "distr",
+          "type": {
+            "$coll": {
+              "oid": "Nat",
+              "name": "String",
+              "departments": { "$coll": "String" }
+            }
+          }
+        }
+      }
+    },
     'input': getParameter("input", "{}"),
     'ascii': getParameter("charset", "Greek") === "Ascii",
     'javaimports': getParameter("java_imports", ""),
     'query': document.getElementById("query").value,
     'optims': getParameter("optim", "[]")
   };
-  console.log('input =', input)
-  document.getElementById("result").innerHTML = "[ Query is compiling ]";
+
+  const resultLoading = '<h3>Result</h3> <div class="loader"></div>'
+  document.getElementById("result").innerHTML = resultLoading;
   const success = function (result) {
     console.log('result = ', JSON.stringify(result));
     const resultUrl = 'https://openwhisk.ng.bluemix.net/api/v1/web/' +
       input.whisk.namespace + '/' + input.pkgname + '/result.json'
     const undeployUrl = 'https://openwhisk.ng.bluemix.net/api/v1/web/' +
       input.whisk.namespace + '/' + input.pkgname + '/undeploy.json'
-    document.getElementById("result").innerHTML =
-      '<a href="' + resultUrl + '">' + resultUrl + '</a >' + '<br/>' +
-      '<a href="' + undeployUrl + '">' + undeployUrl + '</a >'
+    const resultText =
+      '<h3>Result</h3> \n' +
+      'url: <a href="' + resultUrl + '">' + resultUrl + '</a >' + '<br/> \n' +
+      'undeploy: <a href="' + undeployUrl + '">' + undeployUrl + '</a> \n' +
+      'result: <div id=resultValue></div>'
+    document.getElementById("result").innerHTML = resultText
 
   }
+
+
   const failure = () => {
     document.getElementById("result").innerHTML = "compilation or deployment failed";
   }
