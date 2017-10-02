@@ -73,16 +73,32 @@ const compileAndDeployButton = () => {
       input.whisk.namespace + '/' + input.pkgname + '/result.json'
     const undeployUrl = 'https://openwhisk.ng.bluemix.net/api/v1/web/' +
       input.whisk.namespace + '/' + input.pkgname + '/undeploy.json'
+    const readResultFunc =
+      makeHandler('{}', resultUrl,
+        (res) => {
+          document.getElementById("resultValue").innerHTML = JSON.stringify(res.result)
+        },
+        () => {
+          document.getElementById("resultValue").innerHTML = 'error'
+        })
+    const readResultInterval = setInterval(readResultFunc, 1000)
     const resultText =
-      '<h3>Result</h3> \n' +
-      'url: <a href="' + resultUrl + '">' + resultUrl + '</a >' + '<br/> \n' +
-      'undeploy: <a href="' + undeployUrl + '">' + undeployUrl + '</a> \n' +
-      'result: <div id=resultValue></div>'
+      '<h3>Result</h3>\n' +
+      '<div class="form-group">\n' +
+      '  <label class="control-label col-sm-2" for="result-url">result:</label>\n' +
+      '  <a href="' + resultUrl + '">' + resultUrl + '</a>' + '\n' +
+      '</div>\n' +
+      '<div class="form-group">\n' +
+      '  <label class="control-label col-sm-2" for="undeploy-url">undeploy:</label>\n' +
+      '  <a href="' + undeployUrl + '">' + undeployUrl + '</a>\n' +
+      '</div>\n' +
+      '<div class="form-group">\n' +
+      '  <label class="control-label col-sm-2" for="result-value">result:</label>\n' +
+      '  <pre id=resultValue></pre>' +
+      '</div>'
     document.getElementById("result").innerHTML = resultText
 
   }
-
-
   const failure = () => {
     document.getElementById("result").innerHTML = "compilation or deployment failed";
   }
@@ -100,7 +116,7 @@ const makeHandler = (input, url, success, failure) => {
     request.onloadend = function () {
       if (request.status == 200) {
         console.log("Success at url " + url);
-        const response = JSON.parse(request.responseText);
+        const response = JSON.parse(request.response);
         success(response);
       }
       else {
