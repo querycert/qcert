@@ -82,7 +82,11 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
 	ow.actions.update({
 	    "namespace": params.whisk.namespace,
             "name" : pkgname + "/result",
-            "action" : { "exec" : { "kind" : "nodejs:6" , "code":result_source } }
+            "action" : { "exec" : { "kind" : "nodejs:6" , "code":result_source },
+			 "annotations" :[{
+			     key: "web-export",
+			     value: true
+			 }] }
 	}).then(r => {
             return failure(`[ACTION] [DEPLOYED] ${JSON.stringify("`+pkgname+`/`+action+`")}`);
 	});

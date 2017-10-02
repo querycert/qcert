@@ -89,20 +89,14 @@
               <input class="form-control" type="text" id="wsk-pkg" placeholder="Enter package name"></input>
             </div>
           </div>
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="wsk-action">action: </label>
-            <div class="col-sm-10">
-              <input class="form-control" type="text" id="wsk-action" placeholder="Enter action name"></input>
-            </div>
-          </div>
           <h3>Query</h3>
           <label class="control-label col-sm-2" for="source">source language:</label>
           <div class="col-sm-10">
             <select class="form-control" id="source">
 		  <option value="rule">Rules</option>
 		  <option value="camp">CAMP</option>
-		  <option value="sql">SQL</option>
-		  <option value="oql" selected="selected">OQL</option>
+		  <option value="sql" selected="selected">SQL</option>
+		  <option value="oql">OQL</option>
 		  <option value="lambda_nra">Lambda NRA</option>
 		  <!--
 		      <option>nra</option>
@@ -147,16 +141,15 @@
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" for="query">source query:</label>
-        <div class="col-sm-10">
-          <textarea class="form-control" id="query" rows="8">/* Example of simple select-from-where */
-select p
-from p in Persons
-where p.age = 32
+        <div class="form-group col-sm-10">
+          <textarea class="form-control" id="query" rows="8">select count(*)
+from employees
+where age = 32;
 	    </textarea>
         </div>
-      </div>
       <div class="form-group text-right">
         <button type="button" onclick="compileAndDeployButton()" class="btn btn-primary">compile and deploy</button>
+      </div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" for="result">result:</label>

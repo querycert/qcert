@@ -134,7 +134,11 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
 	ow.actions.update({
 	    "namespace": params.whisk.namespace,
             "name" : params.pkgname + "/undeploy",
-            "action" : { "exec" : { "kind" : "nodejs:6" , "code":undeploy_source } }
+            "action" : { "exec" : { "kind" : "nodejs:6" , "code":undeploy_source },
+			 "annotations" :[{
+			     key: "web-export",
+			     value: true
+			 }] }
 	}).then(r => {
             return failure(`[ACTION] [DEPLOYED] ${JSON.stringify("`+params.pkgname+`/undeploy")}`);
 	});

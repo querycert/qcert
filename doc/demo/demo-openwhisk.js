@@ -1,4 +1,4 @@
-let url = 'https://openwhisk.ng.bluemix.net/api/v1/web/lmandel_dev/qcert/cloudant-compile-deploy.json'
+let url = 'https://openwhisk.ng.bluemix.net/api/v1/web/simeon@us.ibm.com_dev/qcert/cloudant-compile-deploy.json'
 
 const compileAndDeployButton = () => {
   const input = {
@@ -11,12 +11,32 @@ const compileAndDeployButton = () => {
       'namespace': getParameter('wsk-namespace', ''),
     },
     'pkgname': getParameter('wsk-pkg', ''),
-    'action': getParameter('wsk-action', ''),
     'source': getParameter("source", ""),
     'exactpath': getParameter("exactpath", "FillPath") === "ExactPath",
     'emitall': getParameter("emitall", "EmitTarget") === "EmitAll",
     'eval': false,
-    'schema': getParameter("schema", "{}"),
+    'schema': { "hierarchy": [],
+		"brandTypes" :[],
+		"typeDefs" :[],
+		"globals" :
+		{ "employees" :
+		  { "dist" : "distr",
+		    "type" : { "$coll" : { "eid" : "Nat" ,
+					   "name" : "String",
+					   "age" : "Nat",
+					   "company" : "Nat" } } },
+		  "students" :
+		  { "dist" : "distr",
+		    "type" : { "$coll" : { "sid" : "Nat" ,
+					   "name" : "String",
+					   "age" : "Nat",
+					   "univ" : "Nat" } } },
+		  "organizations" :
+		  { "dist" : "distr",
+		    "type" : { "$coll" : { "oid" : "Nat" ,
+					   "name" : "String",
+					   "departments" : { "$coll" : "String" } } } } }
+	      },
     'input': getParameter("input", "{}"),
     'ascii': getParameter("charset", "Greek") === "Ascii",
     'javaimports': getParameter("java_imports", ""),
@@ -28,9 +48,12 @@ const compileAndDeployButton = () => {
   const success = function (result) {
     console.log('result = ', JSON.stringify(result));
     const resultUrl = 'https://openwhisk.ng.bluemix.net/api/v1/web/' +
-      input.whisk.namespace + '/' + input.pkgname + '/' + input.action + '.json'
+      input.whisk.namespace + '/' + input.pkgname + '/result.json'
+    const undeployUrl = 'https://openwhisk.ng.bluemix.net/api/v1/web/' +
+      input.whisk.namespace + '/' + input.pkgname + '/undeploy.json'
     document.getElementById("result").innerHTML =
-      '<a href="' + resultUrl + '">' + resultUrl + '</a >'
+      '<a href="' + resultUrl + '">' + resultUrl + '</a >' + '<br/>' +
+      '<a href="' + undeployUrl + '">' + undeployUrl + '</a >'
 
   }
   const failure = () => {
