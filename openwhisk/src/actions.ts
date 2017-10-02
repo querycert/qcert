@@ -33,7 +33,7 @@ export const config = () => {
 		}
 	    },
 	    'cloudant-deploy': {
-		sequence: "qcert/cloudant-link-runtime,qcert/cloudant-deploy-views,qcert/cloudant-refresh,qcert/cloudant-deploy-postproc",
+		sequence: "qcert/cloudant-deploy-undeploy,qcert/cloudant-link-runtime,qcert/cloudant-deploy-views,qcert/cloudant-refresh,qcert/cloudant-deploy-postproc",
 		annotations: {
 		    'web-export': true
 		}
@@ -44,6 +44,12 @@ export const config = () => {
 		    'web-export': true
 		}
             },
+	    'cloudant-deploy-undeploy': {
+		location: path.resolve(__dirname, '.', 'cloudant-deploy-undeploy.js'),
+		annotations: {
+		    'web-export': true
+		}
+	    },
 	    'cloudant-link-runtime': {
 		location: path.resolve(__dirname, '.', 'cloudant-link-runtime.js'),
 		annotations: {
