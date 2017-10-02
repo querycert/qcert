@@ -86,11 +86,15 @@ const compileAndDeployButton = () => {
       '<h3>Result</h3>\n' +
       '<div class="form-group">\n' +
       '  <label class="control-label col-sm-2" for="result-url">result:</label>\n' +
-      '  <a href="' + resultUrl + '">' + resultUrl + '</a>' + '\n' +
+      '  <div class="col-sm-10">\n' +
+      '    <pre><a href="' + resultUrl + '">' + resultUrl + '</a></pre>' + '\n' +
+      '  </div>\n' +
       '</div>\n' +
       '<div class="form-group">\n' +
       '  <label class="control-label col-sm-2" for="undeploy-url">undeploy:</label>\n' +
-      '  <a href="' + undeployUrl + '">' + undeployUrl + '</a>\n' +
+      '  <div class="col-sm-10">\n' +
+      '    <pre><a href="' + undeployUrl + '">' + undeployUrl + '</a></pre>\n' +
+      '  </div>\n' +
       '</div>\n' +
       '<div class="form-group">\n' +
       '  <label class="control-label col-sm-2" for="result-value">result:</label>\n' +
