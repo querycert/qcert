@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+val set_qname : QcertConfig.global_config -> string -> unit
 val set_source : QcertConfig.global_config -> string -> unit
 val set_target : QcertConfig.global_config -> string -> unit
 val set_exact_path : QcertConfig.global_config -> unit -> unit

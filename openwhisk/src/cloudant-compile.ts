@@ -20,6 +20,7 @@ const main = async (params:ListIn) : Promise<Response<ListOut>> => {
 	    name: "qcert/compile",
 	    blocking: true,
 	    params: {
+		qname: pkgname,
 		source: source,
 		target: 'cloudant',
 		query: querytext,

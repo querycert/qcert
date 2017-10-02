@@ -78,7 +78,8 @@ let optim_config_from_json s : optim_config =
 
 let global_config_of_json j =
   let gconf =
-    { gconf_source = QcertCompiler.L_camp_rule;
+    { gconf_qname = None;
+      gconf_source = QcertCompiler.L_camp_rule;
       gconf_target = QcertCompiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
@@ -111,6 +112,7 @@ let global_config_of_json j =
   let apply = apply gconf in
   let iter_array = iter_array gconf in
   (* Source/Target *)
+  apply QcertArg.set_qname j##.qname;
   apply QcertArg.set_source j##.source;
   apply QcertArg.set_target j##.target;
   (* Compilation path *)

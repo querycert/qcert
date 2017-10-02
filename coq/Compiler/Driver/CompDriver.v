@@ -244,13 +244,13 @@ Section CompDriver.
     Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
       nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
 
-    Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
-      nnrcmr_to_spark_rdd_top init_vinit rulename q. (* XXX init_vinit should be a parameter? *)
+    Definition nnrcmr_to_spark_rdd (queryname: string) (q: nnrcmr) : spark_rdd :=
+      nnrcmr_to_spark_rdd_top init_vinit queryname q. (* XXX init_vinit should be a parameter? *)
 
     (** CldMR translations *)
 
-    Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
-      cldmr_to_cloudant_top h q rulename.
+    Definition cldmr_to_cloudant (queryname:string) (h:list (string*string)) (q:cldmr) : cloudant :=
+      cldmr_to_cloudant_top h q queryname.
 
     (** DNNRC translations *)
 
@@ -300,7 +300,7 @@ Section CompDriver.
 
   Inductive cldmr_driver : Set :=
     | Dv_cldmr_stop : cldmr_driver
-    | Dv_cldmr_to_cloudant : (* rulename *) string -> (* h *) list (string*string) -> cloudant_driver -> cldmr_driver.
+    | Dv_cldmr_to_cloudant : (* queryname *) string -> (* h *) list (string*string) -> cloudant_driver -> cldmr_driver.
 
   Inductive dnnrc_typed_driver : Set :=
     | Dv_dnnrc_typed_stop : dnnrc_typed_driver
@@ -354,7 +354,7 @@ Section CompDriver.
   with nnrcmr_driver : Set :=
     | Dv_nnrcmr_stop : nnrcmr_driver
     | Dv_nnrcmr_optim : nnrcmr_driver -> nnrcmr_driver
-    | Dv_nnrcmr_to_spark_rdd : (* rulename *) string -> spark_rdd_driver -> nnrcmr_driver
+    | Dv_nnrcmr_to_spark_rdd : (* queryname *) string -> spark_rdd_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_nnrc : nnrc_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_dnnrc : dnnrc_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_cldmr : (* h *) list (string*string) -> cldmr_driver -> nnrcmr_driver.
@@ -525,14 +525,14 @@ Section CompDriver.
   Definition driver_length_cldmr (dv: cldmr_driver) :=
     match dv with
     | Dv_cldmr_stop => 1
-    | Dv_cldmr_to_cloudant rulename h dv => 1 + driver_length_cloudant dv
+    | Dv_cldmr_to_cloudant queryname h dv => 1 + driver_length_cloudant dv
     end.
 
   Fixpoint driver_length_dnnrc_typed {ftyping: foreign_typing} (dv: dnnrc_typed_driver) :=
     match dv with
     | Dv_dnnrc_typed_stop => 1
     | Dv_dnnrc_typed_optim dv => 1 + driver_length_dnnrc_typed dv
-    | Dv_dnnrc_typed_to_spark_df rt rulename dv => 1 + driver_length_spark_df dv
+    | Dv_dnnrc_typed_to_spark_df rt queryname dv => 1 + driver_length_spark_df dv
     end.
 
   Definition driver_length_dnnrc (dv: dnnrc_driver) :=
@@ -594,7 +594,7 @@ Section CompDriver.
     match dv with
     | Dv_nnrcmr_stop => 1
     | Dv_nnrcmr_optim dv => 1 + driver_length_nnrcmr dv
-    | Dv_nnrcmr_to_spark_rdd rulename dv => 1 + driver_length_spark_rdd dv
+    | Dv_nnrcmr_to_spark_rdd queryname dv => 1 + driver_length_spark_rdd dv
     | Dv_nnrcmr_to_nnrc dv => 1 + driver_length_nnrc dv
     | Dv_nnrcmr_to_cldmr h dv => 1 + driver_length_cldmr dv
     | Dv_nnrcmr_to_dnnrc dv => 1 + driver_length_dnnrc dv
@@ -717,8 +717,8 @@ Section CompDriver.
       let queries :=
           match dv with
           | Dv_cldmr_stop => nil
-          | Dv_cldmr_to_cloudant rulename h dv =>
-            let q := cldmr_to_cloudant rulename h q in
+          | Dv_cldmr_to_cloudant queryname h dv =>
+            let q := cldmr_to_cloudant queryname h q in
             compile_cloudant dv q
           end
       in
@@ -731,8 +731,8 @@ Section CompDriver.
           | Dv_dnnrc_typed_optim dv =>
             let q := dnnrc_typed_optim q in
             compile_dnnrc_typed dv q
-          | Dv_dnnrc_typed_to_spark_df rt rulename dv =>
-            let q := dnnrc_typed_to_spark_df rt rulename q in
+          | Dv_dnnrc_typed_to_spark_df rt queryname dv =>
+            let q := dnnrc_typed_to_spark_df rt queryname q in
             compile_spark_df dv q
           end
       in
@@ -864,8 +864,8 @@ Section CompDriver.
           | Dv_nnrcmr_optim dv =>
             let q := nnrcmr_optim q in
             compile_nnrcmr dv q
-          | Dv_nnrcmr_to_spark_rdd rulename dv =>
-            let q := nnrcmr_to_spark_rdd rulename q in
+          | Dv_nnrcmr_to_spark_rdd queryname dv =>
+            let q := nnrcmr_to_spark_rdd queryname q in
             compile_spark_rdd dv q
           | Dv_nnrcmr_to_nnrc dv =>
             let q_opt := nnrcmr_to_nnrc q in

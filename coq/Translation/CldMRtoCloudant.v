@@ -287,21 +287,21 @@ Section CldMRtoCloudant.
 
 
     (* Java equivalent: CloudantBackend.db_of_var *)    
-    Definition db_of_var (rulename:string) (var:string) : string := rulename ++ var.
+    Definition db_of_var (queryname:string) (var:string) : string := queryname ++ var.
     
     (* Java equivalent: CloudantBackend.makeInputDb *)
-    Definition makeInputDB (rulename:string) (inputname: string) : string :=
-      db_of_var rulename inputname.
+    Definition makeInputDB (queryname:string) (inputname: string) : string :=
+      db_of_var queryname inputname.
 
     (* Java equivalent: CloudantBackend.makeInputDesignDoc *)
     Definition makeInputDesignDoc
                (quotel:string)
-               (rulename:string)
+               (queryname:string)
                (mrp:string * option string * option string * option string * string)
       : cloudant_design :=
       match mrp with
       | (inputdb, outputdb, defaultdb, mreduce, mmap) =>
-        let view_name := rulename in (* XXX Is that right?!?! Might have to be revised. XXX *)
+        let view_name := queryname in (* XXX Is that right?!?! Might have to be revised. XXX *)
         mkCloudantDesign
           (makeInputDB "" inputdb) (* Initial name is external and should be kept as it *)
           view_name
@@ -309,24 +309,24 @@ Section CldMRtoCloudant.
       end.
     
     (* Java equivalent: CloudantBackend.makeDesignDoc *)
-    Definition makeDesignDoc (quotel:string) (rulename:string) (mrp:string * option string * option string * option string * string) : cloudant_design :=
+    Definition makeDesignDoc (quotel:string) (queryname:string) (mrp:string * option string * option string * option string * string) : cloudant_design :=
       match mrp with
       | (inputdb, outputdb, defaultdb, mreduce, mmap) =>
-        let view_name := rulename in (* XXX Is that right?!?! Might have to be revised. XXX *)
+        let view_name := queryname in (* XXX Is that right?!?! Might have to be revised. XXX *)
         mkCloudantDesign
-          (makeInputDB rulename inputdb)
+          (makeInputDB queryname inputdb)
           view_name
           (jsonToJS quotel (buildDesignDoc view_name mmap mreduce outputdb defaultdb))
       end.
     
     (* Java equivalent: CloudantBackend.makeCloudantDesignDocs *)
-    Definition makeCloudantDesignDocs (quotel:string) (rulename:string) (mrp:list (string * option string * option string * option string * string)) : list cloudant_design :=
-      List.map (fun x => makeDesignDoc quotel rulename x) mrp.
+    Definition makeCloudantDesignDocs (quotel:string) (queryname:string) (mrp:list (string * option string * option string * option string * string)) : list cloudant_design :=
+      List.map (fun x => makeDesignDoc quotel queryname x) mrp.
     
     (* Java equivalent: CloudantBackend.makeCloudantDesignDocsTop *)
     Definition makeCloudantDesignDocsTop
                (quotel:string)
-               (rulename:string)
+               (queryname:string)
                (mrp:list (string * option string * option string * option string * string))
                (last_expr:string)
                (cld_eff:list string)
@@ -339,13 +339,13 @@ Section CldMRtoCloudant.
           cld_eff
       | x :: nil =>
         mkCloudant
-          ((makeInputDesignDoc quotel rulename x) :: nil)
+          ((makeInputDesignDoc quotel queryname x) :: nil)
           last_expr
           cld_eff
       | x :: mrp' =>
         mkCloudant
-          ((makeInputDesignDoc quotel rulename x)
-             :: (makeCloudantDesignDocs quotel rulename mrp'))
+          ((makeInputDesignDoc quotel queryname x)
+             :: (makeCloudantDesignDocs quotel queryname mrp'))
           last_expr
           cld_eff
      end.
@@ -357,19 +357,19 @@ Section CldMRtoCloudant.
       end.
 
     (* Java equivalent: CloudantBackend.mapReduceStringstoDesignDocs *)
-    Definition mapReduceStringstoDesignDocs (mrp:list (string * option string * option string * option string * string)) (last_expr:string) (cld_eff:list string) (rulename:string) : cloudant :=
-      makeCloudantDesignDocsTop quotel_double rulename mrp last_expr cld_eff.
+    Definition mapReduceStringstoDesignDocs (mrp:list (string * option string * option string * option string * string)) (last_expr:string) (cld_eff:list string) (queryname:string) : cloudant :=
+      makeCloudantDesignDocsTop quotel_double queryname mrp last_expr cld_eff.
 
     (* Java equivalent: CloudantBackend.cld_mrParamsLast *)
-    Definition cld_mrParamsLast (rulename:string) (params:list var) :=
-      map (db_of_var rulename) params.
+    Definition cld_mrParamsLast (queryname:string) (params:list var) :=
+      map (db_of_var queryname) params.
 
     (* Java equivalent: CloudantBackend.mapReducePairstoCloudant *)    
-    Definition cldmr_to_cloudant_top (h:list (string*string)) (mrl : cldmr) (rulename:string) : cloudant :=
+    Definition cldmr_to_cloudant_top (h:list (string*string)) (mrl : cldmr) (queryname:string) : cloudant :=
       let mrpl := cld_mrToJS h true eol_backn quotel_double mrl in
       let last_fun := cld_mrToLastJS h true eol_backn quotel_backdouble (fst (mrl.(cldmr_last))) in
-      let cld_eff_params := cld_mrParamsLast rulename (snd (mrl.(cldmr_last))) in
-      mapReduceStringstoDesignDocs mrpl last_fun cld_eff_params rulename.
+      let cld_eff_params := cld_mrParamsLast queryname (snd (mrl.(cldmr_last))) in
+      mapReduceStringstoDesignDocs mrpl last_fun cld_eff_params queryname.
 
   End CloudantJS.
   

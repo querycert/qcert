@@ -18,6 +18,7 @@ open Util
 open QcertUtil
 open QcertConfig
 
+let set_qname gconf s = gconf.gconf_qname <- Some s
 let set_source gconf s = gconf.gconf_source <- language_of_name s
 let set_target gconf s = gconf.gconf_target <- language_of_name s
 let add_path gconf s = gconf.gconf_path <- gconf.gconf_path @ [ language_of_name s ]

@@ -21,6 +21,7 @@ type io_kind =
   | IO_components of string option * string option * string option
   
 type global_config = {
+    mutable gconf_qname : string option;
     mutable gconf_source : QLang.language;
     mutable gconf_target : QLang.language;
     mutable gconf_path : QLang.language list; (* the first element of the path must be source and the last target *)

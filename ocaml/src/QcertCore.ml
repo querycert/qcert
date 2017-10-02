@@ -80,17 +80,17 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
     | QcertCompiler.L_tech_rule -> src_and_schema query_s schema
     | _ -> query_s
     end in
-  let qname, q =
+  let q =
     if gconf.gconf_source_sexp
     then
       let sexp = ParseString.parse_sexp_from_string query_s in
       let lname = QcertUtil.name_of_language slang in
       let q = AstsToSExp.sexp_to_query slang sexp in
-      (lname, q)
+      q
     else
-      ParseString.parse_query_from_string slang the_query
+      snd (ParseString.parse_query_from_string slang the_query)
   in
-  (qname, q)
+  q
 
 (* Compilation *)
 
@@ -288,11 +288,18 @@ let main gconf (file_name, query_s) =
   let input = gconf.gconf_input in
   let expected_output = gconf.gconf_output in
   let brand_model = schema.TypeUtil.sch_brand_model in
-  let (qname, q_source) = parse_string gconf query_s in
-  let class_name =
+  let basename =
     (* for Java code generation *)
     Filename.basename (Filename.chop_extension file_name)
   in
+  let q_source = parse_string gconf query_s in
+  let qname =
+    begin match gconf.gconf_qname with
+    | None -> basename
+    | Some name -> name
+    end
+  in
+  let class_name = basename in
   let dv_conf = QcertConfig.driver_conf_of_global_conf gconf qname class_name in
   let queries = compile_query dv_conf schema gconf.gconf_path q_source in
   let q_target =
