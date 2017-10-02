@@ -48,6 +48,8 @@ Section RTypeToJSON.
       | jnumber _ => Unit₀
       | jbool _ => Unit₀
       | jarray _ => Unit₀
+      | jstring "Top" => Top₀
+      | jstring "Bottom" => Bottom₀
       | jstring "String" => String₀
       | jstring "Nat" => Nat₀
       | jstring "Bool" => Bool₀
@@ -72,6 +74,8 @@ Section RTypeToJSON.
       | jnumber _ => None
       | jbool _ => None
       | jarray _ => None
+      | jstring "Top" => Some Top₀
+      | jstring "Bottom" => Some Bottom₀
       | jstring "String" => Some String₀
       | jstring "Nat" => Some Nat₀
       | jstring "Bool" => Some Bool₀

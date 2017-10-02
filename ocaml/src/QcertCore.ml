@@ -80,17 +80,12 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
     | QcertCompiler.L_tech_rule -> src_and_schema query_s schema
     | _ -> query_s
     end in
-  let q =
-    if gconf.gconf_source_sexp
-    then
-      let sexp = ParseString.parse_sexp_from_string query_s in
-      let lname = QcertUtil.name_of_language slang in
-      let q = AstsToSExp.sexp_to_query slang sexp in
-      q
-    else
-      snd (ParseString.parse_query_from_string slang the_query)
-  in
-  q
+  if gconf.gconf_source_sexp
+  then
+    let sexp = ParseString.parse_sexp_from_string query_s in
+    AstsToSExp.sexp_to_query slang sexp
+  else
+    snd (ParseString.parse_query_from_string slang the_query)
 
 (* Compilation *)
 
