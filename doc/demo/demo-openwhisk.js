@@ -82,6 +82,21 @@ const compileAndDeployButton = () => {
           document.getElementById("resultValue").innerHTML = 'error'
         })
     const readResultInterval = setInterval(readResultFunc, 1000)
+    undeployButton = () => {
+      clearInterval(readResultInterval)
+      const undeploy = makeHandler('{}', undeployUrl,
+        (res) => {
+          console.log('undeployed')
+          document.getElementById("result").innerHTML = ''
+        },
+        () => {
+          console.log('undeployed failed')
+          undeployButton = () => {
+            console.log('already undeploy!')
+          }
+        })
+      undeploy()
+    }
     const resultText =
       '<h3>Result</h3>\n' +
       '<div class="form-group">\n' +
@@ -99,7 +114,10 @@ const compileAndDeployButton = () => {
       '<div class="form-group">\n' +
       '  <label class="control-label col-sm-2" for="result-value">result:</label>\n' +
       '  <pre id=resultValue></pre>' +
-      '</div>'
+      '</div>\n' +
+      '<div class="form-group text-right">\n' +
+      '  <button type="button" onclick="undeployButton()" class="btn btn-primary">undeploy</button>\n' +
+      '</div>\n'
     document.getElementById("result").innerHTML = resultText
 
   }
@@ -110,6 +128,9 @@ const compileAndDeployButton = () => {
   call()
 }
 
+let undeployButton = () => {
+  console.log('undeploy not yet defined!')
+}
 
 const makeHandler = (input, url, success, failure) => {
   return function () {
