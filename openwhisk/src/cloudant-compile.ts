@@ -5,6 +5,19 @@ import openwhisk = require("openwhisk");
 export type ListIn = Credentials & CompileIn
 export type ListOut = Credentials & CompileOut & { statusCode: Success }
 
+const constructSchema = (dbs:string[]) => {
+    let globals = {}
+    for (var i = 0; i < dbs.length; i++) {
+	const db = dbs[i];
+	globals[db] = { "dist" : "distr",
+			"type" : { "$coll" : "Top" } };
+    }
+    return { "hierarchy": [],
+	     "brandTypes" :[],
+	     "typeDefs" :[],
+	     "globals" : globals };
+}
+
 const main = async (params:ListIn) : Promise<Response<ListOut>> => {
     try {
 	const whisk = params.whisk;
@@ -17,9 +30,27 @@ const main = async (params:ListIn) : Promise<Response<ListOut>> => {
 	}
 	else { return failure(400,"A package name must be provided") }
 	const querytext: string = params.query;
-	const schema: string = JSON.stringify(params.schema);
 
 	const ow = openwhisk()
+
+	// Guess the schema from Cloudant, if it isn't given
+	let schema
+	if (params.hasOwnProperty('schema')) {
+	    schema = params.schema;
+	} else {
+	    const entries = await ow.actions.invoke({
+		name: "/whisk.system/cloudant/list-all-databases",
+		blocking: true,
+		params: {
+		    host: `${params.cloudant.username}.cloudant.com`,
+		    username: `${params.cloudant.username}`,
+		    password: `${params.cloudant.password}`
+		}
+	    });
+	    const dbnames = entries.response.result.all_databases;
+	    schema = constructSchema(dbnames);
+	}
+	
 	// Call compiler action for cloudant
 	const compiled = await ow.actions.invoke({
 	    name: "qcert/compile",
@@ -29,7 +60,7 @@ const main = async (params:ListIn) : Promise<Response<ListOut>> => {
 		source: source,
 		target: 'cloudant',
 		query: querytext,
-		schema: schema
+		schema: JSON.stringify(schema)
 	    }
 	});
 	return {

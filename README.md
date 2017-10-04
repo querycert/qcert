@@ -205,8 +205,8 @@ by calling:
 $ make clean
 ```
 
-or, if you also want to remove the external libraries (Java
-dependencies) that may have downloaded, by calling:
+You can also force the removal of all external Java libraries as part
+of that cleanup, by calling:
 
 ```
 $ make cleanall
@@ -221,7 +221,7 @@ To compile the web demo, do:
 $ make demo
 ```
 
-Once, compiler, the Web demo can be started by opening the following
+Once compiled, the Web demo can be started by opening the following
 HTML page:
 
 ```

@@ -46,7 +46,7 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
     }
     await Promise.all(docs.map(async (entry) => {
 	index++;
-	if (index = 5) { index = 0; await sleep(1000); }
+	if (index === 5) { index = 0; await sleep(1000); }
 	const entryid = entry.id
         const readResp =
             await ow.actions.invoke({
