@@ -1,4 +1,5 @@
-import { Error, Request, Response, Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
+import { Success, Failure, Error, Request, Response} from "./types";
+import { Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
 export type ListIn = Credentials & DeployIn
@@ -120,7 +121,7 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
 	undeploy_source += "    return { error: err };\n"
 	undeploy_source += "};\n"
     } catch (error) {
-	return failure("Couldn't create undeploy action source string from design document:" + error);
+	return failure(500,"Couldn't create undeploy action source string from design document:" + error);
     }
 
     // Deploy post-processing action to openWhisk
@@ -140,12 +141,13 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
 			     value: true
 			 }] }
 	}).then(r => {
-            return failure(`[ACTION] [DEPLOYED] ${JSON.stringify("`+params.pkgname+`/undeploy")}`);
+            console.log(`[ACTION] [DEPLOYED] ${JSON.stringify("`+params.pkgname+`/undeploy")}`);
 	});
-	return eparams;
+	return params;
     })
 }
 
-const failure = (err:string) : Error => {
-    return { error: err }
+const failure = (statusCode: Failure, err): Response<ListOut> => {
+    return { error: { message: err, statusCode: statusCode } }
 }
+

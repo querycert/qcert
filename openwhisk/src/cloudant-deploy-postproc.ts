@@ -1,4 +1,5 @@
-import { Error, Request, Response, Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
+import { Success, Failure, Error, Request, Response} from "./types";
+import { Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
 export type ListIn = Credentials & DeployIn
@@ -68,31 +69,37 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
 	result_source += computeEffectiveParams(designs.post_input)+"\n"
 	result_source += "   return { \"result\" : db_post("+makeEffectiveParams(designs.post_input)+") }; } );\n"
     } catch (error) {
-	return failure("Couldn't create action source string from design document:" + error);
+	return failure(500,"Couldn't create action source string from design document:" + error);
     }
 
     // Deploy post-processing action to openWhisk
     const ow = openwhisk({"namespace":params.whisk.namespace,
 			  "api_key":params.whisk.api_key,
 			  "apihost":params.whisk.apihost});
-    return ow.packages.update({
-	"namespace": params.whisk.namespace,
-        "name": "/_/" + pkgname
-    }).then(result => {
-	ow.actions.update({
+    try {
+	return ow.packages.update({
 	    "namespace": params.whisk.namespace,
-            "name" : pkgname + "/result",
-            "action" : { "exec" : { "kind" : "nodejs:6" , "code":result_source },
-			 "annotations" :[{
-			     key: "web-export",
-			     value: true
-			 }] }
-	}).then(r => {
-            return failure(`[ACTION] [DEPLOYED] ${JSON.stringify("`+pkgname+`/`+action+`")}`);
-	});
-    })
+            "name": "/_/" + pkgname
+	}).then(result => {
+	    ow.actions.update({
+		"namespace": params.whisk.namespace,
+		"name" : "/_/" + pkgname + "/result",
+		"action" : { "exec" : { "kind" : "nodejs:6" , "code":result_source },
+			     "annotations" :[{
+				 key: "web-export",
+				 value: true
+			     }] }
+	    }).then(r => {
+		console.log(`[ACTION] [DEPLOYED] ${JSON.stringify("`+pkgname+`/result")}`);
+	    });
+	    return params;
+	})
+    } catch (error) {
+	return failure(500,error);
+    }
 }
 
-const failure = (err:string) : Error => {
-    return { error: err }
+const failure = (statusCode: Failure, err): Response<ListOut> => {
+    return { error: { message: err, statusCode: statusCode } }
 }
+

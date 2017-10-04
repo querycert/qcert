@@ -1,3 +1,4 @@
+import { Success, Failure, Error, Request, Response} from "./types";
 import { Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
@@ -20,6 +21,6 @@ const main = async (params:ListIn) : Promise<ListOut> => {
     })
 }
 
-const failure = (err) => {
-    return { error: err }
+const failure = (statusCode: Failure, err): Response<ListOut> => {
+    return { error: { message: err, statusCode: statusCode } }
 }

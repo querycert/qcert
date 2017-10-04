@@ -33,7 +33,7 @@ export const config = () => {
 		}
 	    },
 	    'cloudant-deploy': {
-		sequence: "qcert/cloudant-deploy-undeploy,qcert/cloudant-link-runtime,qcert/cloudant-deploy-views,qcert/cloudant-refresh,qcert/cloudant-deploy-postproc",
+		sequence: "qcert/cloudant-deploy-undeploy,qcert/cloudant-link-runtime,qcert/cloudant-deploy-views,qcert/cloudant-deploy-postproc,qcert/cloudant-refresh",
 		annotations: {
 		    'web-export': true
 		}

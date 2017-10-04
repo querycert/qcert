@@ -1,10 +1,19 @@
+import { Success, Failure, Error, Request, Response} from "./types";
 import { Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
 export type ListIn = Credentials & DeployIn
-export type ListOut = Credentials & DeployOut
+export type ListOut = { 'success' : string }
 
-const main = async (params:ListIn) : Promise<ListIn> => {
+const main = async (eparams:Request<ListIn>) : Promise<Response<ListOut>> => {
+    // Propagate error
+    if ((<Error>eparams).hasOwnProperty('error')) {
+	const error: Error = (<Error>eparams);
+	return error;
+    }
+
+    const params: ListIn = <ListIn>eparams;
+
     const pkgname: string = params.pkgname;
     const designs: Designs = params.querycode;
     const ow = openwhisk();
@@ -29,7 +38,15 @@ const main = async (params:ListIn) : Promise<ListIn> => {
     })
     // Refresh every record
     const docs = entries.response.result.rows;
+    let index = 0;
+    function sleep(ms){
+	return new Promise(resolve=>{
+            setTimeout(resolve,ms)
+	})
+    }
     await Promise.all(docs.map(async (entry) => {
+	index++;
+	if (index = 5) { index = 0; await sleep(1000); }
 	const entryid = entry.id
         const readResp =
             await ow.actions.invoke({
@@ -57,9 +74,9 @@ const main = async (params:ListIn) : Promise<ListIn> => {
         })
 	
     }))
-    return params;
+    return { "success" : "Deployment successful" };
 }
 
-const failure = (err) => {
-    return { "result": { "error":err } }
+const failure = (statusCode: Failure, err): Response<ListOut> => {
+    return { error: { message: err, statusCode: statusCode } }
 }

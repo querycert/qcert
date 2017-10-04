@@ -121,8 +121,8 @@ const compileAndDeployButton = () => {
     document.getElementById("result").innerHTML = resultText
 
   }
-  const failure = () => {
-    document.getElementById("result").innerHTML = "compilation or deployment failed";
+  const failure = (msg) => {
+    document.getElementById("result").innerHTML = msg;
   }
   const call = makeHandler(input, url, success, failure)
   call()
@@ -139,21 +139,22 @@ const makeHandler = (input, url, success, failure) => {
     request.open("POST", url, true);
     request.setRequestHeader("Content-Type", "application/json");
     request.onloadend = function () {
-      if (request.status == 200) {
-        console.log("Success at url " + url);
-        const response = JSON.parse(request.response);
-        success(response);
-      }
-      else {
-        console.log("Failure at url " + url);
-        failure();
-      }
+	if (request.status == 200) {
+            console.log("Success at url " + url);
+	    const response = JSON.parse(request.response);
+	    if (response.hasOwnProperty('message')) { failure(response.message); }
+	    else { success(response); }
+	}
+	else {
+            console.log("Failure at url " + url);
+            failure("compilation or deployment failed");
+	}
     };
-    try {
-      console.log("Posting request on url " + url);
-      request.send(JSON.stringify(input));
-    } catch (e) {
-    }
+      try {
+	  console.log("Posting request on url " + url);
+	  request.send(JSON.stringify(input));
+      } catch (e) {
+      }
   };
 }
 

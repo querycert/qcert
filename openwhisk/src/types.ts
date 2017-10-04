@@ -21,7 +21,24 @@ export interface Designs {
     post_input: string[];    /** Effective parameters for the post-processing expression */
 }
 
-export interface Error { error: string; }
+export type Success =
+  200 // 'OK'
+  | 201 // 'Created'
+  | 202 // 'Accepted'
+  | 204 // 'No Content'
+export type Failure =
+  400 // 'Bad Request'
+  | 401 // 'Unauthotized'
+  | 403 // 'Forbidden'
+  | 404 // 'Not Found'
+  | 405 // 'Method Not Allowed'
+  | 406 // 'Not Acceptable'
+  | 409 // 'Conflict'
+  | 412 // 'Precondition Failed'
+  | 415 // 'Unsupported Media Type'
+  | 500 // 'Internal Server Error'
+
+export interface Error { error: { statusCode: Failure; message: string }; }
 export type Request<T> = T | Error
 export type Response<T> = T | Error
 

@@ -1,4 +1,5 @@
-import { Error, Request, Response, Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
+import { Success, Failure, Error, Request, Response} from "./types";
+import { Credentials, DeployIn, DeployOut, Design, Designs } from "./types";
 import openwhisk = require("openwhisk");
 
 export type ListIn = Credentials & DeployIn
@@ -42,7 +43,7 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListIn>> => {
 		    }
 		})
             } catch (err) {
-		return failure('Unable to create database:'+dbname+' with error:'+err);
+		return failure(500,'Unable to create database:'+dbname+' with error:'+err);
             }
 	}))
 	
@@ -61,13 +62,13 @@ const main = async (eparams:Request<ListIn>) : Promise<Response<ListIn>> => {
 		}
             })
         } catch (err) {
-            return failure('Unable to create view in database:'+dbname+' with error:'+err)
+            return failure(500,'Unable to create view in database:'+dbname+' with error:'+err)
         }
-	return failure('ACTUALLY CREATED VIEW IN:'+dbname)
+	console.log('CREATED VIEW IN:'+dbname)
     }))
     return params;
 }
 
-const failure = (err:string) : Error => {
-    return { error: err }
+const failure = (statusCode: Failure, err): Response<ListOut> => {
+    return { error: { message: err, statusCode: statusCode } }
 }
