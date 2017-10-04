@@ -113,7 +113,7 @@ camp-world-tests:
                             -eval-validate -output camp/world$(N).out;))
 
 ## SQL
-SQLORGNUM=1 2 3 4 5
+SQLORGNUM=1 2 3 4 5 6 7 8
 SQLTARGETS=nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 sql-tests:
