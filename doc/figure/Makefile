@@ -34,3 +34,5 @@ cleanall: clean
 
 cleandist: cleanall
 	rm -rf node_modules
+
+PRECIOUS: *.gen.svg *.dvi
