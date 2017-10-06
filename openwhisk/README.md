@@ -21,3 +21,7 @@ To deploy the service on openWhisk, do:
 ```
 make deploy
 ```
+
+# Thanks
+
+Lionel Villard for his help on using openwhisk-deploy (https://github.com/lionelvillard/openwhisk-project)
