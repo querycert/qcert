@@ -24,4 +24,4 @@ make deploy
 
 # Thanks
 
-Lionel Villard for his help on using openwhisk-deploy (https://github.com/lionelvillard/openwhisk-project)
+Lionel Villard for his help with openwhisk-project (https://github.com/lionelvillard/openwhisk-project)
