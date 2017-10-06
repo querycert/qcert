@@ -15,49 +15,6 @@ const compileAndDeployButton = () => {
     'exactpath': getParameter("exactpath", "FillPath") === "ExactPath",
     'emitall': getParameter("emitall", "EmitTarget") === "EmitAll",
     'eval': false,
-    'schema': {
-      "hierarchy": [],
-      "brandTypes": [],
-      "typeDefs": [],
-      "globals":
-      {
-        "employees":
-        {
-          "dist": "distr",
-          "type": {
-            "$coll": {
-              "eid": "Nat",
-              "name": "String",
-              "age": "Nat",
-              "company": "Nat"
-            }
-          }
-        },
-        "students":
-        {
-          "dist": "distr",
-          "type": {
-            "$coll": {
-              "sid": "Nat",
-              "name": "String",
-              "age": "Nat",
-              "univ": "Nat"
-            }
-          }
-        },
-        "organizations":
-        {
-          "dist": "distr",
-          "type": {
-            "$coll": {
-              "oid": "Nat",
-              "name": "String",
-              "departments": { "$coll": "String" }
-            }
-          }
-        }
-      }
-    },
     'input': getParameter("input", "{}"),
     'ascii': getParameter("charset", "Greek") === "Ascii",
     'javaimports': getParameter("java_imports", ""),
