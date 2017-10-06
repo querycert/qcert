@@ -1,5 +1,23 @@
 ## Q\*cert openWhisk service
 
-This is code to deploy Q\*cert as on the openWhisk serverless
-platform.
+This is code to deploy Q\*cert on the openWhisk serverless platform.
 
+### Prerequisites
+
+- Node.js (https://nodejs.org/en/)
+- An openWhisk account (e.g., on Bluemix https://bluemix.net/)
+
+### Building
+
+To build the service, do:
+
+```
+make init
+make compile
+```
+
+To deploy the service on openWhisk, do:
+
+```
+make deploy
+```
