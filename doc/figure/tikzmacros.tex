@@ -78,12 +78,12 @@
 ]
 
 \newcommand{\tikzoptim}[3][]{
-   \path[trans, draw=#1!150, fill=#1!150] (#2) edge [looseness=10, loop above]
+   \path[trans, draw=#1!150, fill=#1!150] (#2) edge [looseness=10, loop above, draw=#1!150]
        node [pos=0.5](#2-optim) {}
        node [yshift = 0.5em,below] {\href{#3}{\phantom{XXX}} \\ \href{#3}{\phantom{XXX}}} ();
 }
-\newcommand{\tikzoptimdotted}[3][]{
-   \path[trans, draw=#1!150, fill=#1!150] (#2) edge [looseness=10, loop above, dotted]
+\newcommand{\tikzoptimdashed}[3][]{
+   \path[trans, draw=#1!150, fill=#1!150] (#2) edge [looseness=10, loop above, dashed, draw=#1!150]
        node [pos=0.5](#2-optim) {}
        node [yshift = 0.5em,below] {\href{#3}{\phantom{XXX}} \\ \href{#3}{\phantom{XXX}}} ();
 }
@@ -93,7 +93,7 @@
 }
 
 \newcommand{\transocamljava}[1]{
- \path[draw,thick,latex-latex, densely dotted,
+ \path[draw,thick,latex-latex, densely dashed,
       shorten >=0.2em, shorten <=0.2em,
        java] ([xshift=-0.75em] #1.south) -- ([xshift=-0.75em] #1-java.north);
 }

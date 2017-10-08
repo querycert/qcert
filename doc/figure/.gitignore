@@ -2,6 +2,8 @@ figure.out
 figure.log
 figure.aux
 figure.dvi
+figure.js
 figure.js.map
+figure.svg.gen
 node_modules/
 *~

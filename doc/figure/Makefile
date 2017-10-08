@@ -22,7 +22,7 @@ node_modules:
 	pdflatex --shell-escape $<
 	pdflatex --shell-escape $<
 
-%.dvi: %.tex compiler-coq.tex
+%.dvi: %.tex compiler-coq.tex tikzmacros.tex
 	latex $<
 	latex $<
 

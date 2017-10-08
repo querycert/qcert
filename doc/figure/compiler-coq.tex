@@ -101,12 +101,12 @@
 
 
  % Sources
- \path[trans, tcoqc] (techrule.east) -- (rule.west);
- \path[trans, tcoqc] (designrule.east) -- (rule.west);
- \path[trans, tcoqc] (lnra-src.east) -- (lnra.west);
- \path[trans, tcoqc] (sql-src.east) -- (sql.west);
- \path[trans, tcoqc] (sqlpp-src.east) -- (sqlpp.west);
- \path[trans, tcoqc] (oql-src.east) -- (oql.west);
+ \path[trans] (techrule.east) -- (rule.west);
+ \path[trans] (designrule.east) -- (rule.west);
+ \path[trans] (lnra-src.east) -- (lnra.west);
+ \path[trans] (sql-src.east) -- (sql.west);
+ \path[trans] (sqlpp-src.east) -- (sqlpp.west);
+ \path[trans] (oql-src.east) -- (oql.west);
 
  % ASTs
  \path[trans, tcoqp] (rule) -- (camp)
@@ -129,7 +129,7 @@
    \transref{3}{\coqurl{Translation}{CAMPtoNRA}{camp_to_nra_top}};
 
  % *NRA*
- \tikzoptimdotted[ccoqp]{nraenv}{\coqurl{NRAEnv.Optim}{NRAEnvOptimizer}{run_nraenv_optims}}
+ \tikzoptimdashed[ccoqp]{nraenv}{\coqurl{NRAEnv.Optim}{NRAEnvOptimizer}{run_nraenv_optims}}
  \path[trans, tcoqp] (nraenv.east) -- (nnrc.west)
    \transref{3}{\coqurl{Translation}{NRAEnvtoNNRC}{nraenv_to_nnrc_top}};
  \path[trans, tcoqp] ([xshift=0.25em] nraenv.south) -- ([xshift=0.25em] cnraenv.north)
@@ -148,12 +148,12 @@
    \transref{5}{\coqurl{Translation}{NRAtocNNRC}{nra_to_nnrc_core_top}};
 
  % *NNRC
- \tikzoptimdotted[ccoqp]{nnrc}{\coqurl{NNRC.Optim}{NNRCOptimizer}{run_nnrc_optims}}
+ \tikzoptimdashed[ccoqp]{nnrc}{\coqurl{NNRC.Optim}{NNRCOptimizer}{run_nnrc_optims}}
  \path[trans, tcoqc] ([yshift=0.25em] nnrc.east) -- ([yshift=0.25em] nnrcmr.west)
    \transref{3}{\coqurl{Translation}{NNRCtoNNRCMR}{nnrc_to_nnrcmr_top}};
  \path[trans, tcoqc] ([yshift=-0.25em] nnrcmr.west) -- ([yshift=-0.25em] nnrc.east)
    \transref{3}{\coqurl{Translation}{NNRCMRtoNNRC}{nnrc_of_nnrcmr_top}};
- \path[trans, tcoqp, dotted] (nnrc) -- (dnnrc)
+ \path[trans, tcoqp, dashed] (nnrc) -- (dnnrc)
    \transref{6}{\coqurl{Translation}{NNRCtoDNNRC}{nnrc_to_dnnrc_top}};
  \path[trans, tcoqc] (nnrc)
    .. controls ([yshift=3em] nnrcmr.north) ..
@@ -169,11 +169,10 @@
  \path[trans, tcoqp] ([xshift=-0.25em] cnnrc.north) -- ([xshift=-0.25em] nnrc.south)
    \transref{3}{\coqurl{Translation}{cNNRCtoNNRC}{nnrc_core_to_nnrc_top}};
 
- \path[trans, tcoqp, dotted] (cnnrc.south)
+ \path[trans, tcoqp, dashed] (cnnrc.south)
    .. controls ([yshift=-7em] nra.south) and +(0, -1.5) ..
    (camp.south)
    \transref{30}{\coqurl{Translation}{cNNRCtoCAMP}{nnrc_core_to_camp_top}};
-
 
  % NNRCMR
  \tikzoptim[ccoqc]{nnrcmr}{\coqurl{NNRCMR.Optim}{NNRCMROptimizer}{run_nnrcmr_optims}}

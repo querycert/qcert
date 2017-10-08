@@ -65,11 +65,8 @@ for(let i = 0; i < array.length; i++) {
             if(i >= 2) {
                 if(isPath(array[i-1]) && isPath(array[i-2])) {
 		    const color = getColor(array[i-2]);
-		    console.error('line: '+ array[i-2] + 'color: '+ color);
-		    console.error('line: '+ array[i-1]);
 		    addColor(array,i-1,color);
-		    console.error('line: '+ array[i-1]);
-                    widen(array, i, 2)
+		    widen(array, i, 2)
                 }
                 i++
             }
