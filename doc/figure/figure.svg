@@ -297,135 +297,135 @@ text.f3 {font-family:cmr7;font-size:6.97385px}
 <path d='M47.121 80.5625C45.8984 80.332 43.9101 79.6445 42.5351 78.8437V82.2812C43.9101 81.4766 45.8984 80.7891 47.121 80.5625'/>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.CAMPRuletoCAMP.html#camp_rule_to_camp_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.CAMPRuletoCAMP.html#camp_rule_to_camp_top'>
 <path d='M89.1133 -28.2305H99.9336' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M104.059 -28.2305C102.836 -28.4609 100.848 -29.1484 99.4727 -29.9492V-26.5117C100.848 -27.3164 102.836 -28.0039 104.059 -28.2305'/>
+<path d='M104.059 -28.2305C102.836 -28.4609 100.848 -29.1484 99.4727 -29.9492V-26.5117C100.848 -27.3164 102.836 -28.0039 104.059 -28.2305' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top'>
 <path d='M77.8047 -1.0352L145.746 -22.2227' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M149.687 -23.4492C148.449 -23.3047 146.347 -23.3711 144.797 -23.7265L145.82 -20.4453C146.894 -21.6211 148.586 -22.8672 149.687 -23.4492'/>
+<path d='M149.687 -23.4492C148.449 -23.3047 146.347 -23.3711 144.797 -23.7265L145.82 -20.4453C146.894 -21.6211 148.586 -22.8672 149.687 -23.4492' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.SQLtoNRAEnv.html#sql_to_nraenv_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.SQLtoNRAEnv.html#sql_to_nraenv_top'>
 <path d='M77.8047 26.1641L149.707 -18.6719' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M153.211 -20.8594C152.05 -20.4063 150 -19.9375 148.406 -19.8906L150.226 -16.9688C150.968 -18.3789 152.293 -20.0157 153.211 -20.8594'/>
+<path d='M153.211 -20.8594C152.05 -20.4063 150 -19.9375 148.406 -19.8906L150.226 -16.9688C150.968 -18.3789 152.293 -20.0157 153.211 -20.8594' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.SQLPPtoNRAEnv.html#sqlpp_to_nraenv_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.SQLPPtoNRAEnv.html#sqlpp_to_nraenv_top'>
 <path d='M80.4102 53.3632L154.41 -17.9883' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M157.386 -20.8593C156.343 -20.1757 154.433 -19.289 152.882 -18.9101L155.273 -16.4297C155.711 -17.9648 156.664 -19.8437 157.386 -20.8593'/>
+<path d='M157.386 -20.8593C156.343 -20.1757 154.433 -19.289 152.882 -18.9101L155.273 -16.4297C155.711 -17.9648 156.664 -19.8437 157.386 -20.8593' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.OQLtoNRAEnv.html#oql_to_nraenv_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.OQLtoNRAEnv.html#oql_to_nraenv_top'>
 <path d='M77.8047 80.5622L156.54 -17.6367' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M159.121 -20.8593C158.176 -20.0468 156.395 -18.9296 154.91 -18.3554L157.594 -16.2031C157.828 -17.7812 158.535 -19.7617 159.121 -20.8593'/>
+<path d='M159.121 -20.8593C158.176 -20.0468 156.395 -18.9296 154.91 -18.3554L157.594 -16.2031C157.828 -17.7812 158.535 -19.7617 159.121 -20.8593' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.CAMPtoNRAEnv.html#camp_to_nraenv_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.CAMPtoNRAEnv.html#camp_to_nraenv_top'>
 <path d='M134.743 -28.2305H145.562' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M149.687 -28.2305C148.465 -28.4609 146.48 -29.1484 145.105 -29.9492V-26.5117C146.48 -27.3164 148.465 -28.0039 149.687 -28.2305'/>
+<path d='M149.687 -28.2305C148.465 -28.4609 146.48 -29.1484 145.105 -29.9492V-26.5117C146.48 -27.3164 148.465 -28.0039 149.687 -28.2305' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.CAMPtocNRAEnv.html#camp_to_nraenv_core_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.CAMPtocNRAEnv.html#camp_to_nraenv_core_top'>
 <path d='M134.743 -28.2305L148.054 2.6484' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M149.687 6.4375C149.414 5.22656 149.257 3.12891 149.449 1.54688L146.292 2.91016C147.574 3.85546 148.992 5.40625 149.687 6.4375'/>
+<path d='M149.687 6.4375C149.414 5.22656 149.257 3.12891 149.449 1.54688L146.292 2.91016C147.574 3.85546 148.992 5.40625 149.687 6.4375' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.CAMPtoNRA.html#camp_to_nra_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.CAMPtoNRA.html#camp_to_nra_top'>
 <path d='M134.743 -28.2305L148.816 37.0742' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M149.688 41.1094C149.652 39.8633 149.906 37.7773 150.402 36.2617L147.039 36.9883C148.113 38.164 149.203 39.9609 149.688 41.1094'/>
+<path d='M149.688 41.1094C149.652 39.8633 149.906 37.7773 150.402 36.2617L147.039 36.9883C148.113 38.164 149.203 39.9609 149.688 41.1094' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims' xlink:title='https://querycert.github.io/html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims'>
 <path d='M161.984 -39.5938C159.386 -49.293 170.671 -49.293 167.004 -35.6055' fill='none' stroke='#000000' stroke-dasharray='0.59776,1.99255' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M163.055 -35.6055C162.961 -36.8477 163.11 -38.9453 163.528 -40.4844L160.203 -39.5938C161.336 -38.4727 162.516 -36.7266 163.055 -35.6055'/>
+<path d='M163.055 -35.6055C162.961 -36.8477 163.11 -38.9453 163.528 -40.4844L160.203 -39.5938C161.336 -38.4727 162.516 -36.7266 163.055 -35.6055' fill='#000000'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NRAEnvtoNNRC.html#nraenv_to_nnrc_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NRAEnvtoNNRC.html#nraenv_to_nnrc_top'>
 <path d='M180.371 -28.2305H191.191' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M195.317 -28.2305C194.094 -28.4609 192.11 -29.1484 190.735 -29.9492V-26.5117C192.11 -27.3164 194.094 -28.0039 195.317 -28.2305'/>
+<path d='M195.317 -28.2305C194.094 -28.4609 192.11 -29.1484 190.735 -29.9492V-26.5117C192.11 -27.3164 194.094 -28.0039 195.317 -28.2305' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NRAEnvtocNRAEnv.html#nraenv_to_nraenv_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NRAEnvtocNRAEnv.html#nraenv_to_nraenv_top'>
 <path d='M167.519 -20.8594V-5.0586' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M167.519 -0.93359C167.75 -2.15625 168.437 -4.14063 169.238 -5.51563H165.801C166.602 -4.14063 167.289 -2.15625 167.519 -0.93359'/>
+<path d='M167.519 -0.93359C167.75 -2.15625 168.437 -4.14063 169.238 -5.51563H165.801C166.602 -4.14063 167.289 -2.15625 167.519 -0.93359' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.cNRAEnvtoNRAEnv.html#nraenv_core_to_nraenv_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.cNRAEnvtoNRAEnv.html#nraenv_core_to_nraenv_top'>
 <path d='M162.54 -0.9336V-16.7344' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M162.539 -20.8594C162.309 -19.6367 161.621 -17.6524 160.821 -16.2774H164.258C163.457 -17.6524 162.77 -19.6367 162.539 -20.8594'/>
+<path d='M162.539 -20.8594C162.309 -19.6367 161.621 -17.6524 160.821 -16.2774H164.258C163.457 -17.6524 162.77 -19.6367 162.539 -20.8594' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.cNRAEnvtoNRA.html#nraenv_core_to_nra_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.cNRAEnvtoNRA.html#nraenv_core_to_nra_top'>
 <path d='M167.519 13.8125V29.6133' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M167.519 33.7383C167.75 32.5157 168.437 30.5274 169.238 29.1524H165.801C166.602 30.5274 167.289 32.5157 167.519 33.7383'/>
+<path d='M167.519 33.7383C167.75 32.5157 168.437 30.5274 169.238 29.1524H165.801C166.602 30.5274 167.289 32.5157 167.519 33.7383' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NRAtocNRAEnv.html#nra_to_nraenv_core_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NRAtocNRAEnv.html#nra_to_nraenv_core_top'>
 <path d='M162.54 33.7383V17.9375' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M162.539 13.8125C162.309 15.0351 161.621 17.0195 160.821 18.3945H164.258C163.457 17.0195 162.77 15.0351 162.539 13.8125'/>
+<path d='M162.539 13.8125C162.309 15.0351 161.621 17.0195 160.821 18.3945H164.258C163.457 17.0195 162.77 15.0351 162.539 13.8125' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.cNRAEnvtocNNRC.html#nraenv_core_to_nnrc_core_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.cNRAEnvtocNNRC.html#nraenv_core_to_nnrc_core_top'>
 <path d='M180.371 6.4375H191.171' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M195.297 6.4375C194.078 6.21094 192.09 5.52344 190.715 4.71875V8.15625C192.09 7.35547 194.078 6.66797 195.297 6.4375'/>
+<path d='M195.297 6.4375C194.078 6.21094 192.09 5.52344 190.715 4.71875V8.15625C192.09 7.35547 194.078 6.66797 195.297 6.4375' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core_top'>
 <path d='M180.371 41.1094L201.499 16.9219' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M204.219 13.8125C203.242 14.5821 201.414 15.6289 199.902 16.1367L202.496 18.4024C202.797 16.836 203.586 14.8828 204.219 13.8125'/>
+<path d='M204.219 13.8125C203.242 14.5821 201.414 15.6289 199.902 16.1367L202.496 18.4024C202.797 16.836 203.586 14.8828 204.219 13.8125' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims' xlink:title='https://querycert.github.io/html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims'>
 <path d='M207.613 -39.5938C205.016 -49.293 216.304 -49.293 212.632 -35.6055' fill='none' stroke='#000000' stroke-dasharray='0.59776,1.99255' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M208.683 -35.6055C208.59 -36.8477 208.738 -38.9453 209.16 -40.4844L205.832 -39.5938C206.965 -38.4727 208.144 -36.7266 208.683 -35.6055'/>
+<path d='M208.683 -35.6055C208.59 -36.8477 208.738 -38.9453 209.16 -40.4844L205.832 -39.5938C206.965 -38.4727 208.144 -36.7266 208.683 -35.6055' fill='#000000'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCtoNNRCMR.html#nnrc_to_nnrcmr_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCtoNNRCMR.html#nnrc_to_nnrcmr_top'>
 <path d='M225.999 -30.7227H236.82' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M240.945 -30.7227C239.722 -30.9531 237.738 -31.6406 236.363 -32.4414V-29.0039C237.738 -29.8047 239.722 -30.4922 240.945 -30.7227'/>
+<path d='M240.945 -30.7227C239.722 -30.9531 237.738 -31.6406 236.363 -32.4414V-29.0039C237.738 -29.8047 239.722 -30.4922 240.945 -30.7227' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoNNRC.html#nnrc_of_nnrcmr_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoNNRC.html#nnrc_of_nnrcmr_top'>
 <path d='M240.945 -25.7422H230.124' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M226 -25.7422C227.223 -25.5117 229.211 -24.8242 230.586 -24.0234V-27.4609C229.211 -26.6562 227.223 -25.9687 226 -25.7422'/>
+<path d='M226 -25.7422C227.223 -25.5117 229.211 -24.8242 230.586 -24.0234V-27.4609C229.211 -26.6562 227.223 -25.9687 226 -25.7422' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCtoDNNRC.html#nnrc_to_dnnrc_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCtoDNNRC.html#nnrc_to_dnnrc_top'>
 <path d='M220.488 -20.8594L247.144 -0.8672' fill='none' stroke='#cd7c7b' stroke-dasharray='0.59776,1.99255' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M250.461 1.62108C249.617 0.699204 248.434 -1.05081 247.813 -2.52345L245.742 0.238261C247.328 0.421864 249.34 1.06638 250.461 1.62108'/>
+<path d='M250.461 1.62108C249.617 0.699204 248.434 -1.05081 247.813 -2.52345L245.742 0.238261C247.328 0.421864 249.34 1.06638 250.461 1.62108' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCtoJavaScript.html#nnrc_to_js_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCtoJavaScript.html#nnrc_to_js_top'>
 <path d='M220.476 -35.6055C260.29 -65.4922 260.29 -65.4922 336.085 -62.8477' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M340.207 -62.7032C338.992 -62.9727 337.031 -63.7305 335.688 -64.5782L335.567 -61.1446C336.969 -61.8985 338.977 -62.5157 340.207 -62.7032'/>
+<path d='M340.207 -62.7032C338.992 -62.9727 337.031 -63.7305 335.688 -64.5782L335.567 -61.1446C336.969 -61.8985 338.977 -62.5157 340.207 -62.7032' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCtoJava.html#nnrc_to_java_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCtoJava.html#nnrc_to_java_top'>
 <path d='M224.058 -35.6055C260.29 -55.5313 260.29 -55.5313 336.113 -45.9844' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M340.207 -45.4687C339.023 -45.8476 337.136 -46.7773 335.871 -47.7461L335.441 -44.332C336.906 -44.957 338.964 -45.3906 340.207 -45.4687'/>
+<path d='M340.207 -45.4687C339.023 -45.8476 337.136 -46.7773 335.871 -47.7461L335.441 -44.332C336.906 -44.957 338.964 -45.3906 340.207 -45.4687' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCtocNNRC.html#nnrc_to_nnrc_core_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCtocNNRC.html#nnrc_to_nnrc_core_top'>
 <path d='M213.148 -20.8594V-5.0586' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M213.149 -0.93359C213.379 -2.15625 214.067 -4.14063 214.868 -5.51563H211.43C212.235 -4.14063 212.922 -2.15625 213.149 -0.93359'/>
+<path d='M213.149 -0.93359C213.379 -2.15625 214.067 -4.14063 214.868 -5.51563H211.43C212.235 -4.14063 212.922 -2.15625 213.149 -0.93359' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.cNNRCtoNNRC.html#nnrc_core_to_nnrc_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.cNNRCtoNNRC.html#nnrc_core_to_nnrc_top'>
 <path d='M208.167 -0.9336V-16.7344' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M208.168 -20.8594C207.937 -19.6367 207.25 -17.6524 206.449 -16.2774H209.887C209.086 -17.6524 208.398 -19.6367 208.168 -20.8594'/>
+<path d='M208.168 -20.8594C207.937 -19.6367 207.25 -17.6524 206.449 -16.2774H209.887C209.086 -17.6524 208.398 -19.6367 208.168 -20.8594' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.cNNRCtoCAMP.html#nnrc_core_to_camp_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.cNNRCtoCAMP.html#nnrc_core_to_camp_top'>
 <path d='M210.66 13.8125C165.031 118.222 119.399 21.6602 119.399 -16.7344' fill='none' stroke='#cd7c7b' stroke-dasharray='0.59776,1.99255' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M119.399 -20.8594C119.172 -19.6367 118.485 -17.6524 117.68 -16.2774H121.117C120.317 -17.6524 119.629 -19.6367 119.399 -20.8594'/>
+<path d='M119.399 -20.8594C119.172 -19.6367 118.485 -17.6524 117.68 -16.2774H121.117C120.317 -17.6524 119.629 -19.6367 119.399 -20.8594' fill='#cd7c7b'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.NNRCMR.Optim.NNRCMROptimizer.html#run_nnrcmr_optims' xlink:title='https://querycert.github.io/html/Qcert.NNRCMR.Optim.NNRCMROptimizer.html#run_nnrcmr_optims'>
 <path d='M257.247 -39.5938C254.644 -49.293 265.933 -49.293 262.266 -35.6055' fill='none' stroke='#000000' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M258.316 -35.6055C258.219 -36.8477 258.371 -38.9453 258.789 -40.4844L255.465 -39.5937C256.598 -38.4727 257.777 -36.7266 258.316 -35.6055'/>
+<path d='M258.316 -35.6055C258.219 -36.8477 258.371 -38.9453 258.789 -40.4844L255.465 -39.5937C256.598 -38.4727 257.777 -36.7266 258.316 -35.6055' fill='#000000'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoCldMR.html#nnrcmr_to_cldmr_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoCldMR.html#nnrcmr_to_cldmr_top'>
 <path d='M279.632 -28.2305H290.454' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M294.578 -28.2305C293.355 -28.4609 291.371 -29.1484 289.996 -29.9492V-26.5117C291.371 -27.3164 293.355 -28.0039 294.578 -28.2305'/>
+<path d='M294.578 -28.2305C293.355 -28.4609 291.371 -29.1484 289.996 -29.9492V-26.5117C291.371 -27.3164 293.355 -28.0039 294.578 -28.2305' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoSparkRDD.html#nnrcmr_to_spark_rdd_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoSparkRDD.html#nnrcmr_to_spark_rdd_top'>
 <path d='M279.632 -21.4766C309.921 -10.8945 309.921 -10.8945 336.082 -10.9453' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M340.207 -10.9531C338.984 -11.1797 336.996 -11.8633 335.621 -12.6641L335.629 -9.22656C337 -10.0313 338.984 -10.7227 340.207 -10.9531'/>
+<path d='M340.207 -10.9531C338.984 -11.1797 336.996 -11.8633 335.621 -12.6641L335.629 -9.22656C337 -10.0313 338.984 -10.7227 340.207 -10.9531' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoDNNRC.html#dnnrc_of_nnrcmr' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCMRtoDNNRC.html#dnnrc_of_nnrcmr'>
 <path d='M260.29 -20.8594V-2.5039' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M260.289 1.62109C260.52 0.39844 261.207 -1.58594 262.008 -2.96094H258.571C259.375 -1.58594 260.063 0.39844 260.289 1.62109'/>
+<path d='M260.289 1.62109C260.52 0.39844 261.207 -1.58594 262.008 -2.96094H258.571C259.375 -1.58594 260.063 0.39844 260.289 1.62109' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.CldMRtoCloudant.html#cldmr_to_cloudant_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.CldMRtoCloudant.html#cldmr_to_cloudant_top'>
 <path d='M325.262 -28.2305H336.082' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M340.207 -28.2305C338.984 -28.4609 337 -29.1484 335.625 -29.9492V-26.5117C337 -27.3164 338.984 -28.0039 340.207 -28.2305'/>
+<path d='M340.207 -28.2305C338.984 -28.4609 337 -29.1484 335.625 -29.9492V-26.5117C337 -27.3164 338.984 -28.0039 340.207 -28.2305' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.DNNRCtotDNNRC.html#dnnrc_to_dnnrc_typed_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.DNNRCtotDNNRC.html#dnnrc_to_dnnrc_typed_top'>
 <path d='M276.68 8.9922H285.683' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M289.809 8.99218C288.586 8.76171 286.602 8.07812 285.227 7.27343V10.7109C286.602 9.91015 288.586 9.22265 289.809 8.99218'/>
+<path d='M289.809 8.99218C288.586 8.76171 286.602 8.07812 285.227 7.27343V10.7109C286.602 9.91015 288.586 9.22265 289.809 8.99218' fill='#7299c3'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.tDNNRC.Optim.tDNNRCOptimizer.html#run_dnnrc_optims' xlink:title='https://querycert.github.io/html/Qcert.tDNNRC.Optim.tDNNRCOptimizer.html#run_dnnrc_optims'>
 <path d='M304.493 -2.3711C301.89 -12.0703 313.18 -12.0703 309.512 1.6211' fill='none' stroke='#000000' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M305.562 1.62109C305.465 0.378905 305.617 -1.72266 306.035 -3.26172L302.707 -2.37109C303.84 -1.24609 305.023 0.496086 305.562 1.62109'/>
+<path d='M305.562 1.62109C305.465 0.378905 305.617 -1.72266 306.035 -3.26172L302.707 -2.37109C303.84 -1.24609 305.023 0.496086 305.562 1.62109' fill='#000000'/>
 </a>
 <a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.tDNNRCtoSparkDF.html#dnnrc_typed_to_spark_df_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.tDNNRCtoSparkDF.html#dnnrc_typed_to_spark_df_top'>
 <path d='M325.262 8.9922H336.082' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
-<path d='M340.207 8.99218C338.984 8.76171 337 8.07812 335.625 7.27343V10.7109C337 9.91015 338.984 9.22265 340.207 8.99218'/>
+<path d='M340.207 8.99218C338.984 8.76171 337 8.07812 335.625 7.27343V10.7109C337 9.91015 338.984 9.22265 340.207 8.99218' fill='#7299c3'/>
 </a>
 </g>
 </svg>

@@ -17,7 +17,7 @@ node_modules:
 %.png: %.pdf
 	convert $< $@
 
-%.pdf: %.tex compiler-coq.tex
+%.pdf: %.tex compiler-coq.tex tikzmacros.tex
 	pdflatex --shell-escape $<
 	pdflatex --shell-escape $<
 	pdflatex --shell-escape $<
