@@ -9,6 +9,7 @@ const compileAndDeployButton = () => {
     'whisk': {
       'api_key': getParameter('wsk-api_key', ''),
       'namespace': getParameter('wsk-namespace', ''),
+      'api_host' : getParameter('wsk-api_host', ''),
     },
     'pkgname': getParameter('wsk-pkg', ''),
     'source': getParameter("source", ""),
@@ -57,6 +58,11 @@ const compileAndDeployButton = () => {
     const resultText =
       '<h3>Result</h3>\n' +
       '<div class="form-group">\n' +
+      '  <label class="control-label col-sm-2" for="result-value">result:</label>\n' +
+      '  <pre id=resultValue></pre>' +
+      '</div>\n' +
+      '<h3>Deployment</h3>\n' +
+      '<div class="form-group">\n' +
       '  <label class="control-label col-sm-2" for="result-url">result:</label>\n' +
       '  <div class="col-sm-10">\n' +
       '    <pre><a href="' + resultUrl + '">' + resultUrl + '</a></pre>' + '\n' +
@@ -67,10 +73,6 @@ const compileAndDeployButton = () => {
       '  <div class="col-sm-10">\n' +
       '    <pre><a href="' + undeployUrl + '">' + undeployUrl + '</a></pre>\n' +
       '  </div>\n' +
-      '</div>\n' +
-      '<div class="form-group">\n' +
-      '  <label class="control-label col-sm-2" for="result-value">result:</label>\n' +
-      '  <pre id=resultValue></pre>' +
       '</div>\n' +
       '<div class="form-group text-right">\n' +
       '  <button type="button" onclick="undeployButton()" class="btn btn-primary">undeploy</button>\n' +
