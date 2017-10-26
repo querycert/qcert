@@ -180,15 +180,30 @@ Support for log traces, used to monitor optimizations.</li>
 <p>The <code>coq/Common</code> directory contains components shared
 across languages.</p>
 
-<h4>Data Model and Type System</h4>
+<h4>Brands</h4>
 
-<p>The data model and type system includes support for atomic types,
-bags, records, and <emph>branded values</emph> which are used to
-encode objects with inheritance.</p>
+<p>The <code>Common/Brands</code> directory contains definitions for a
+notion of <emph>brands</emph> (i.e., names with a relation that forms
+a lattice) which is used to capture inheritance in both the type
+system and the data model.</p>
+
+<h4>Type System</h4>
+
+<p>The type system includes support for atomic types, bags, records,
+and <emph>branded types</emph> which are used to encode classes with
+inheritance.</p>
 
 <ul>
-<li><code>Common/Brands</code>: Notion of brand relations, used as foundation for type hierarchies</li>
-<li><code>Common/TypeSystem</code>: definition and properties of the type system </li>
+<li><code>Common/TypeSystem</code>: definition and properties of the type system</li>
+</ul>
+
+<h4>Data Model</h4>
+
+<p>The data model includes atomic values, bags, records,
+and <emph>branded values</emph> which are used to encode objects with
+inheritance.</p>
+
+<ul>
 <li><code>Common/Data</code>: definition and properties of the data model</li>
 <li><code>Common/DataTyping</code>: typing for the data model </li>
 </ul>
