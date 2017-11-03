@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+Require Extraction.
 Require String.
 
 (** Defines the foreign support for a native string type.

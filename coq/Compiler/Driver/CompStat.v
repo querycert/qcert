@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+Require Extraction.
 Require Import String.
 
 Definition time {A: Type} {B: Type} (compile: A -> B) (q: A) := ("no timing info"%string, compile q).

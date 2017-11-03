@@ -1,4 +1,5 @@
 Makefile.coq
+Makefile.coq.conf
 Makefile.config
 bin/qdata
 bin/qcert
