@@ -4046,12 +4046,6 @@ Section CompDriver.
         intros; try solve [ simpl; split; reflexivity ].
     Qed.
 
-    Definition no_L_error (lang: language) : Prop :=
-      match lang with
-      | L_error _ => False
-      | _ => True
-      end.
-
     Definition exists_path_from_source_target source target
       := match get_path_from_source_target source target with
          | L_error _ :: nil => False

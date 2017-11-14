@@ -57,6 +57,12 @@ Section CompLang.
   
     Global Instance language_eqdec : EqDec language eq := language_eq_dec.
 
+    Definition no_L_error (lang: language) : Prop :=
+      match lang with
+      | L_error _ => False
+      | _ => True
+      end.
+
     Definition language_of_name_case_sensitive name : language:=
       match name with
       | "camp_rule"%string => L_camp_rule
@@ -112,6 +118,21 @@ Section CompLang.
       | L_error _ => "error"%string
       end.
 
+    Lemma language_of_name_of_language lang :
+      no_L_error lang ->
+      language_of_name_case_sensitive (name_of_language lang) = lang.
+    Proof.
+      destruct lang; vm_compute; tauto.
+    Qed.
+
+(*    Lemma name_of_language_language_of_name name :
+      no_L_error (language_of_name_case_sensitive name) ->
+      name_of_language (language_of_name_case_sensitive name) = name.
+    Proof.
+    Should be true, but the proof by brute force is computationally intensive.
+    Qed.
+*)
+
     Definition lang_desc : Set := (language * string).
 
     Inductive language_kind : Set :=
@@ -164,6 +185,20 @@ Section CompLang.
       map add_id_to_language_description language_descriptions.
 
     (* Eval vm_compute in languages_descriptions_with_ids. *)
+
+    Lemma languages_descriptions_complete :
+      forall lang,
+        no_L_error lang ->
+        exists kind s1 s2,
+          In (lang, kind, s1, s2) language_descriptions.
+    Proof.
+      destruct lang; vm_compute;
+        intros; try solve [do 3 eexists; tauto].
+      Unshelve.
+      - tauto.
+      - tauto.
+      - tauto.
+    Qed.
 
     Definition check_kind (the_kind:language_kind)
                (ld:language * string * language_kind * string * string)
