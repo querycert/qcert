@@ -24,7 +24,9 @@ open LoggerToSexp
 
 let args_list gconf =
   Arg.align
-    [ ("-source", Arg.String (QcertArg.set_source gconf),
+    [ ("-version", Arg.Unit QcertUtil.get_version,
+       " Prints the compiler version");
+      ("-source", Arg.String (QcertArg.set_source gconf),
        "<lang> Indicates the language for of thesource file (default: Rule)");
       ("-target", Arg.String (QcertArg.set_target gconf),
        "<lang> Indicates the language for the target query (default: js)");

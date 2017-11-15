@@ -68,3 +68,8 @@ let string_of_path sep path =
   in
   Format.pp_print_flush str_ff ();
   Buffer.contents buff
+
+let get_version () =
+  print_endline ("Q*cert compiler version " ^ (Util.string_of_char_list QUtil.qcert_version));
+  exit 0
+

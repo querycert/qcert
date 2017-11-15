@@ -41,6 +41,8 @@ Module QUtil(runtime:CompilerRuntime).
   Definition validate_data := validate_data.
 
   Definition mkDistWorld env := mkDistWorld env.
+
+  Definition qcert_version := Version.qcert_version.
 End QUtil.
 
 (*

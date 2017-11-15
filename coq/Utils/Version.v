@@ -14,30 +14,19 @@
  * limitations under the License.
  *)
 
-(** Gathers all exports needed to access the utility modules. *)
+(** This module defines Q*cert's version number *)
 
-Require Export CoqLibAdd.
-Require Export ListAdd.
-Require Export StringAdd.
-Require Export SortingAdd.
-Require Export Digits.
-Require Export Lattice.
-Require Export Lift.
-Require Export LiftIterators.
-Require Export Assoc.
-Require Export Sublist.
-Require Export Compat.
-Require Export Fresh.
-Require Export Bindings.
-Require Export Bag.
-Require Export Var.
-Require Export JSON.
-Require Export OptimizerStep.
-Require Export OptimizerLogger.
-Require Export Version.
+Require Import String.
+
+Section Version.
+  (** Variables are defined as strings *)
+  Definition qcert_version := "0.1.0"%string.
+
+End Version.
 
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)
+
