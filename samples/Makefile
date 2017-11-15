@@ -51,6 +51,7 @@ endif
 ## OQL
 OQLPERSONSNUM=1 2 3 4 5 6 7 8
 OQLWORLDNUM=1 2
+OQLEMPLOYEESNUM=1
 OQLTARGETS=oql nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 oql-tests:
@@ -59,6 +60,7 @@ oql-tests:
 	@echo "[Q*cert] "
 	@$(MAKE) oql-world-tests
 	@$(MAKE) oql-persons-tests
+	@$(MAKE) oql-employees-tests
 
 oql-world-tests: 
 	@$(foreach N,$(OQLWORLDNUM), \
@@ -75,6 +77,14 @@ oql-persons-tests:
                             -eval -input oql/persons.input \
                             -schema oql/persons.schema \
                             -eval-validate -output oql/persons$(N).out;))
+
+oql-employees-tests:
+	@$(foreach N,$(OQLEMPLOYEESNUM), \
+            $(foreach T,$(OQLTARGETS), \
+	       $(QCERTCOMP) -source oql -target $(T) oql/employees$(N).oql \
+                            -eval -input oql/employees.input \
+                            -schema oql/employees.schema \
+                            -eval-validate -output oql/employees$(N).out;))
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7

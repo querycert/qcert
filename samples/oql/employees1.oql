@@ -1,0 +1,6 @@
+/* Nested query: count departments */
+count(
+  select distinct d
+  from c in Companies,
+       d in c.departments
+)

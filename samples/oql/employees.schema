@@ -1,0 +1,17 @@
+{ "hierarchy": [],
+  "brandTypes" :[],
+  "typeDefs" :[],
+  "globals" :
+  { "Employees" :
+    { "dist" : "distr",
+      "type" : { "$coll" : { "eid" : "Nat" ,
+			     "name" : "String",
+			     "age" : "Nat",
+			     "company" : "Nat",
+			     "salary" : "Nat" } } },
+    "Companies" :
+    { "dist" : "distr",
+      "type" : { "$coll" : { "cid" : "Nat" ,
+			     "cname" : "String",
+			     "departments" : { "$coll" : "String" } } } }
+  } }
