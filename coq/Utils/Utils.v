@@ -34,7 +34,6 @@ Require Export Var.
 Require Export JSON.
 Require Export OptimizerStep.
 Require Export OptimizerLogger.
-Require Export Version.
 
 (* 
 *** Local Variables: ***

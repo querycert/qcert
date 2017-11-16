@@ -19,6 +19,7 @@ Require Import CompilerRuntime.
 Require Import NNRCMRRuntime.
 Require Import tDNNRCRuntime.
 Require Import CompEnv.
+Require Import Version.
 
 Module QUtil(runtime:CompilerRuntime).
 
@@ -42,7 +43,7 @@ Module QUtil(runtime:CompilerRuntime).
 
   Definition mkDistWorld env := mkDistWorld env.
 
-  Definition qcert_version := Version.qcert_version.
+  Definition qcert_version := qcert_version.
 End QUtil.
 
 (*
