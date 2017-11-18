@@ -48,7 +48,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPNot expr
   		=> NRAEnvUnop OpNeg (sqlpp_to_nraenv expr)
  	(* TODO: Our internal data model has null but not 'missing' (unless we add a new convention).  For now, both are translated
-	   to null.  Also, we should really be using sum types to get around type problems like comparing a nat to null. *)
+	   to null.  Also, we should really be using sum types to get around type problems like comparing a number to null. *)
   	| SPIsNull expr
   	| SPIsMissing expr
   	| SPIsUnknown expr
@@ -65,7 +65,9 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
         => NRAEnvBinop (OpArithBinary ArithRem) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPExp e1 e2
 		=> sqlpp_to_nraenv_not_implemented "exp operator" (* TODO.  We either need our own binary exponent operator, or we need to
-		      program out the logic (convert to floating point, perform operation then convert back depending on the expected type) *)
+		      program out the logic (convert to floating point, perform operation then convert back depending on the expected type).
+		      A possibly adequate "good enough for now" solution would be to define the operation when e1 and e2 are floating point
+		      and not otherwise. *)
   	| SPConcat e1 e2
         => NRAEnvBinop OpStringConcat (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPIn e1 e2
@@ -181,13 +183,8 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
         => List.fold_right (fun (item : (string * sqlpp)) acc => let (name , expr) := item in 
 			NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec name) (sqlpp_to_nraenv expr)) acc) (NRAEnvConst (drec nil)) items
 	| SPQuery stmt
-    	=> sqlpp_select_statement_to_nraenv stmt
-	end
-
-    with sqlpp_select_statement_to_nraenv (stmt: sqlpp_select_statement) :=
-    	sqlpp_to_nraenv_not_implemented "select"
-	.
-	
+		=> sqlpp_to_nraenv_not_implemented "select"
+	end.
 
 (* External entry point. *)
 Definition sqlpp_to_nraenv_top := sqlpp_to_nraenv.
