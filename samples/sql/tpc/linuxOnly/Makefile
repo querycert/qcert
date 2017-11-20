@@ -1,4 +1,4 @@
-TPC_H_BASE=tpch_2_17_2
+TPC_H_BASE=2.17.2
 TPC_H=${TPC_H_BASE}/dbgen
 TPCH_QGEN=$(TPC_H)/qgen
 
