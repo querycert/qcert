@@ -164,5 +164,6 @@
 	<classpathentry exported="true" kind="var" path="ASTERIXDB/hyracks-fullstack/hyracks/hyracks-test-support/target/hyracks-test-support-0.3.2-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="var" path="M2_REPO/org/apache/hadoop/hadoop-hdfs/2.2.0/hadoop-hdfs-2.2.0-tests.jar"/>
 	<classpathentry exported="true" kind="var" path="M2_REPO/com/e-movimento/tinytools/privilegedaccessor/1.2.2/privilegedaccessor-1.2.2.jar"/>
+	<classpathentry exported="true" kind="var" path="M2_REPO/org/apache/hadoop/hadoop-common/2.2.0/hadoop-common-2.2.0-tests.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
