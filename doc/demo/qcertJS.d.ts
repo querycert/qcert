@@ -1,19 +1,21 @@
-type QcertLanguage = string;
+export as namespace Qcert;
 
-type QcertLanguageDescription = {langid:QcertLanguage, label:string, description:string};
-type SourceLanguageGroups = {
-		frontend:[QcertLanguageDescription], 
-		core:[QcertLanguageDescription], 
-		distributed:[QcertLanguageDescription], 
-		backend:[QcertLanguageDescription]};
+export type Language = string;
 
-type QcertOptimStepDescription = {name: string, description:string, lemma:string};
+export type LanguageDescription = {langid:Language, label:string, description:string};
+export type SourceLanguageGroups = {
+		frontend:[LanguageDescription], 
+		core:[LanguageDescription], 
+		distributed:[LanguageDescription], 
+		backend:[LanguageDescription]};
 
-type QcertOptimPhase = {name: string; optims: string[]; iter: number};
-type QcertOptimConfig = {language: string; phases: QcertOptimPhase[]};
-type QcertCompilerConfig = {
-    source:QcertLanguage, /* Source language */
-    target:QcertLanguage, /* Target language */
+export type OptimStepDescription = {name: string, description:string, lemma:string};
+
+export type OptimPhase = {name: string; optims: string[]; iter: number};
+export type OptimConfig = {language: string; phases: OptimPhase[]};
+export type CompilerConfig = {
+    source:Language, /* Source language */
+    target:Language, /* Target language */
     path:string[],        /* Intermediate compilation steps (excluding source/target) */
     exactpath: boolean,   /* true if forcing exact compilation path */
     emitall: boolean      /* true if emitting for all intermediate languages */
@@ -26,21 +28,21 @@ type QcertCompilerConfig = {
     eval: boolean,        /* True if evaluation is to be conducted on the target language */
     optims: string };     /* Optimizations configuration */
 
-type QcertResultFile = {
+export type ResultFile = {
     file: string;         /* File name */
     lang: string;         /* Language name */
     value: string};       /* Emitted code */
 
-type QcertResult = {
-    emit: QcertResultFile;
-    emitall: QcertResultFile[];
+export type Result = {
+    emit: ResultFile;
+    emitall: ResultFile[];
     result: string,
     eval: string};
 
 /**  Returns the set of languages known by the compiler, grouped into phases */
-declare function qcertLanguages(): SourceLanguageGroups;
+export declare function languages(): SourceLanguageGroups;
 
-declare function qcertOptimList():{optims:{language:{name:QcertLanguage, modulebase:string}, optims:QcertOptimStepDescription[]}[]};
+export declare function optimList():{optims:{language:{name:Language, modulebase:string}, optims:OptimStepDescription[]}[]};
 
 /**
  * Derives a default path between the arguments
@@ -48,14 +50,14 @@ declare function qcertOptimList():{optims:{language:{name:QcertLanguage, moduleb
  * @returns Includes the source and target languages in the returned path.
  * If no path was found, an array with a single element "error" will be returned.
  */
-declare function qcertLanguagesPath(args:{source:QcertLanguage, target:QcertLanguage}): {path: QcertLanguage[]};
+export declare function languagesPath(args:{source:Language, target:Language}): {path: Language[]};
 
 /** Returns the set of default optimization phases and rewrites for each language */
-declare function qcertOptimDefaults(): {optims: QcertOptimConfig[]};
+export declare function optimDefaults(): {optims: OptimConfig[]};
 
 /** Main compilation call
  * @config specifies the compilation parameters, including source,target,ascii/greek,additional java imports, and the query in source form
  * @returns Includes the intermediate representation for the target language
  */
-declare function qcertCompile(config:QcertCompilerConfig): QcertResult;
+export declare function compile(config:CompilerConfig): Result;
 

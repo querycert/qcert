@@ -24,17 +24,17 @@ var serverHosts = [
     "https://openwhisk.ng.bluemix.net/api/v1/web/JoshAuerbachThoughts_test/qcert/qcert.json"
     ];
 
-function whiskDispatch(input: QcertCompilerConfig, callback: (result: QcertResult) => any) {
+function whiskDispatch(input: Qcert.CompilerConfig, callback: (result: Qcert.Result) => any) {
     var next = function() {
         console.log("No server found to process request, calling qcertJS.js directly");
-        callback(qcertCompile(input));
+        callback(Qcert.compile(input));
     }
     for (var i = serverHosts.length - 1; i >=0; i--)
         next = makeHandler(input, serverHosts[i], callback, next); 
     next();
 }
 
-function makeHandler(input: QcertCompilerConfig, url: string, success: (result: QcertResult) => any, failure: () => any) {
+function makeHandler(input: Qcert.CompilerConfig, url: string, success: (result: Qcert.Result) => any, failure: () => any) {
     return function() {
         console.log("Handler invoked on URL " + url);
         var request = new XMLHttpRequest();
@@ -58,8 +58,8 @@ function makeHandler(input: QcertCompilerConfig, url: string, success: (result: 
     }
 }
 
-function qcertWhiskDispatch(input: QcertCompilerConfig, callback: (result: QcertResult) => any) {
-    var handler = function(result: QcertResult) {
+function qcertWhiskDispatch(input: Qcert.CompilerConfig, callback: (result: Qcert.Result) => any) {
+    var handler = function(result: Qcert.Result) {
         if (result.result.substring(0, 6) == "ERROR:")
             console.log("Calling back with error: " + result.result);
         else

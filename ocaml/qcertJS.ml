@@ -293,7 +293,7 @@ let qcert_compile input =
   end
 
 let _ =
-  Js.Unsafe.global##.qcertLanguages :=
+(*  Js.Unsafe.global##.qcertLanguages :=
     Js.wrap_callback language_specs;
   Js.Unsafe.global##.qcertLanguagesPath :=
     Js.wrap_callback json_of_source_to_target_path;
@@ -304,4 +304,11 @@ let _ =
   Js.Unsafe.global##.qcertCompile :=
     Js.wrap_callback qcert_compile;
   Js.Unsafe.global##.main :=
-    Js.wrap_callback qcert_compile
+    Js.wrap_callback qcert_compile;*)
+  Js.export "Qcert" (object%js
+    val languages = Js.wrap_callback language_specs;
+    val languagesPath = Js.wrap_callback json_of_source_to_target_path
+    val optimList = Js.wrap_callback json_of_optim_list
+    val optimDefaults = Js.wrap_callback json_of_optim_default
+    val compile  = Js.wrap_callback qcert_compile
+   end)

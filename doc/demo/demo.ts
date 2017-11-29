@@ -1,3 +1,4 @@
+
 // some types
 
 interface PuzzleSides {
@@ -48,9 +49,9 @@ interface PuzzleSides {
     var mainCanvas:fabric.ICanvas;
 
 // Functions
-    // A placeholder to fetch ancillary information not currently in QcertLanguageDescription
+    // A placeholder to fetch ancillary information not currently in Qcert.LanguageDescription
     // TODO integrate this
-    function getSourceLanguageExtraInfo(source:QcertLanguage) : {accept: string, schemaForCompile: boolean} {
+    function getSourceLanguageExtraInfo(source:Qcert.Language) : {accept: string, schemaForCompile: boolean} {
         switch (source) {
         case "sql":
             return {accept: ".sql", schemaForCompile: false};
@@ -109,7 +110,7 @@ interface PuzzleSides {
 
         const middlePath = path.slice(1,-1);
         
-        const handler = function(resultPack: QcertResult) {
+        const handler = function(resultPack: Qcert.Result) {
             theTextArea.value = resultPack.result;
         }
         
@@ -203,7 +204,7 @@ interface PuzzleSides {
         worker = null;
     }    
 
-    function setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string,optimconf:QcertOptimConfig[]) : QcertCompilerConfig {
+    function setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string,optimconf:Qcert.OptimConfig[]) : Qcert.CompilerConfig {
         if (srcInput.length == 0) {
             const executing = getExecOutputArea();
             executing.value = noQuerySrc;
@@ -228,7 +229,7 @@ interface PuzzleSides {
 
     // Executes when defaults button is pushed on the optim config tab
     function defaultConfig() {
-        setConfig(qcertOptimDefaults().optims);
+        setConfig(Qcert.optimDefaults().optims);
         setConfigStatus("Default configuration was loaded.", false);
     }
 
@@ -250,14 +251,14 @@ interface PuzzleSides {
     }
 
     function getClearConfig() {
-        function clearOptimsInPhaseList(array:QcertOptimPhase[]) {
+        function clearOptimsInPhaseList(array:Qcert.OptimPhase[]) {
             array.forEach((elem) => elem.optims = [ optPlaceholder ])
         }
-        function clearOptimsInTopList(array:QcertOptimConfig[]) {
+        function clearOptimsInTopList(array:Qcert.OptimConfig[]) {
             array.forEach((elem) => clearOptimsInPhaseList(elem.phases));
             return array;
         }
-        return clearOptimsInTopList(qcertOptimDefaults().optims);
+        return clearOptimsInTopList(Qcert.optimDefaults().optims);
     }
 
     function setConfigStatus(text:string, usedFileChooser:boolean) {
@@ -292,12 +293,12 @@ interface PuzzleSides {
 
 
 	function toSrcLangDescript(color, sides:PuzzleSides) {
-		return function(group:QcertLanguageDescription) {
+		return function(group:Qcert.LanguageDescription) {
 		    return {langid:group.langid, label:group.label, langdescription:group.description, fill:color, sides:sides};
 		}
 	}
 	
-	function getSrcLangDescripts(langGroups:SourceLanguageGroups) {
+	function getSrcLangDescripts(langGroups:Qcert.SourceLanguageGroups) {
 		let ret = [];
 		ret.push(langGroups.frontend.map(toSrcLangDescript('#91D050', {right:-1})));
 		ret.push(langGroups.core.map(toSrcLangDescript('#7AB0DD', {left: 1, right:-1})))
@@ -698,9 +699,9 @@ class Grid {
 
 class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, Displayable {
 
-	langid:QcertLanguage;
+	langid:Qcert.Language;
 	langdescription:string;
-	previouslangid:QcertLanguage|null;
+	previouslangid:Qcert.Language|null;
 	previouslabel:string|null;
 
 	isTransient() {
@@ -719,13 +720,13 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 		this.canvas.remove(this.backingObject);
 	}
 
-        static make(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, options):BasicPuzzlePiece {
+        static make(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, options):BasicPuzzlePiece {
 	    const p = new BasicPuzzlePiece(canvas, previouslangid, previouslabel, {options:options});
 	    p.associate();
 	    return p;
 	}
 
-        protected constructor(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+        protected constructor(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
 		super();
 		this.canvas = canvas;
 
@@ -797,10 +798,10 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 }
 
 class InteractivePuzzlePiece extends BasicPuzzlePiece {
-	langid:QcertLanguage;
+	langid:Qcert.Language;
 	label:string;
 	langdescription:string;
-	previouslangid:QcertLanguage|null;
+	previouslangid:Qcert.Language|null;
 	previouslabel:string|null;
 	movePlace?:{left:number, top:number};
 
@@ -808,13 +809,13 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		return false;
 	}
 
-        static make(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, src:BasicPuzzlePiece):InteractivePuzzlePiece {
+        static make(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, src:BasicPuzzlePiece):InteractivePuzzlePiece {
 	    const p = new InteractivePuzzlePiece(canvas, previouslangid, previouslabel, {srcpuzzle:src});
 		p.associate();
 		return p;
 	}
 
-        public constructor(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+        public constructor(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
 	    super(canvas, previouslangid, previouslabel, args);
 		if('srcpuzzle' in args) {
 			const options = (<any>args).srcpuzzle;
@@ -1130,7 +1131,7 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 
 	// I need to figure out this whole interactive v transient thing better
 	static getPathTransients(piece1:InteractivePuzzlePiece, piece2:InteractivePuzzlePiece):BasicPuzzlePiece[] {
-		const curPath = qcertLanguagesPath({
+		const curPath = Qcert.languagesPath({
 			 			source: piece1.langid,
 			 			target:piece2.langid
 			 		}).path;
@@ -1170,11 +1171,11 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 
 class SourcePuzzlePiece extends BasicPuzzlePiece {
 
-	static makeBasic(langid:QcertLanguage):BasicPuzzlePiece {
+	static makeBasic(langid:Qcert.Language):BasicPuzzlePiece {
 		return sourcePieces[langid].mkBasicDerivative();
 	}
 
-        static makeTransient(prevlangid:QcertLanguage,langid:QcertLanguage):TransientPuzzlePiece {
+        static makeTransient(prevlangid:Qcert.Language,langid:Qcert.Language):TransientPuzzlePiece {
 	    var prevlabel = null;
 	    if (prevlangid != null) {
 		prevlabel = sourcePieces[prevlangid].label;
@@ -1192,7 +1193,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 		return p;
 	}
 
-	langid:QcertLanguage;
+	langid:Qcert.Language;
 	label:string;
 	langdescription:string;
 
@@ -1275,7 +1276,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	    return BasicPuzzlePiece.make(this.canvas, null, null, this.options);
 	}
 
-        mkTransientDerivative(previouslangid:QcertLanguage, previouslabel:string):TransientPuzzlePiece {
+        mkTransientDerivative(previouslangid:Qcert.Language, previouslabel:string):TransientPuzzlePiece {
 	    return TransientPuzzlePiece.make(this.canvas, previouslangid, previouslabel, {options:this.options});
 	}
 	
@@ -1303,10 +1304,10 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 }
 
 class TransientPuzzlePiece extends BasicPuzzlePiece {
-	langid:QcertLanguage;
+	langid:Qcert.Language;
 	label:string;
 	langdescription:string;
-	previouslangid:QcertLanguage|null;
+	previouslangid:Qcert.Language|null;
 	previouslabel:string|null;
 	movePlace?:{left:number, top:number};
 	movedPieces?:number;
@@ -1315,13 +1316,13 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 		return true;
 	}
 
-        static make(canvas:fabric.ICanvas, previouslangid:QcertLanguage,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}):TransientPuzzlePiece {
+        static make(canvas:fabric.ICanvas, previouslangid:Qcert.Language,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}):TransientPuzzlePiece {
 	        const p = new TransientPuzzlePiece(canvas, previouslangid, previouslabel, args);
 		p.associate();
 		return p;
 	}
 
-	public constructor(canvas:fabric.ICanvas, previouslangid:QcertLanguage,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+	public constructor(canvas:fabric.ICanvas, previouslangid:Qcert.Language,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
 	        super(canvas, previouslangid, previouslabel, args);
 		if('srcpuzzle' in args) {
 			const options = (<any>args).srcpuzzle;
@@ -1927,7 +1928,7 @@ class BuilderTab extends ICanvasTab {
 			}
 		});
 
-		const srcLangDescripts = getSrcLangDescripts(qcertLanguages());
+		const srcLangDescripts = getSrcLangDescripts(Qcert.languages());
 		let maxCols:number = 0;
 		// create the list of languages that can be dragged onto the canvas
 		let srcrow=0;
@@ -2231,7 +2232,7 @@ function getPipelinePieces():BasicPuzzlePiece[] {
 	return path;
 }
 
-function getPipelineLangs():{id:QcertLanguage,explicit:boolean}[] {
+function getPipelineLangs():{id:Qcert.Language,explicit:boolean}[] {
 	return getPipelinePieces().map(function (piece) {
 		if('langid' in piece) {
 			return {id:(<any>piece).langid, explicit:! piece.isTransient()};
@@ -2241,7 +2242,7 @@ function getPipelineLangs():{id:QcertLanguage,explicit:boolean}[] {
 	});
 }
 
-// function expandLangsPath(path:QcertLanguage[]):{id:QcertLanguage,explicit:boolean}[] {
+// function expandLangsPath(path:Qcert.Language[]):{id:Qcert.Language,explicit:boolean}[] {
 // 	let expanded = [];
 // 	const pathLen = path.length;
 // 	if(path == null || pathLen == 0) {
@@ -2252,7 +2253,7 @@ function getPipelineLangs():{id:QcertLanguage,explicit:boolean}[] {
 // 	expanded.push({id:prev, explicit:true});
 // 	for(let i = 1; i < pathLen; i++) {
 // 		const cur = path[i];
-// 		const curPath = qcertLanguagesPath({
+// 		const curPath = Qcert.LanguagesPath({
 // 			source: prev,
 // 			target:cur
 // 		}).path;
@@ -2273,7 +2274,7 @@ function getPipelineLangs():{id:QcertLanguage,explicit:boolean}[] {
 // 	return expanded;
 // }
 
-function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):string {
+function getLanguageMarkedLabel(langpack:{id:Qcert.Language, explicit:boolean}):string {
 	const lang = langpack.id;
 	let str:string = "";
 	if(lang in sourcePieces) {
@@ -2318,7 +2319,7 @@ function makeTransitionURL(previouslangid, previouslabel, langid, label) {
 	//return makeLemmaURL(previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
     }
 }
-function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
+function makeOptimElement(modulebase:string, o:Qcert.OptimStepDescription):HTMLLIElement {
 	const entry = document.createElement('li');
 	entry.classList.add("optim-list");
 	entry.appendChild(document.createTextNode(o.name));
@@ -2333,7 +2334,7 @@ function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLI
 	return entry;
 }
 
-function makeAvailableOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
+function makeAvailableOptimElement(modulebase:string, o:Qcert.OptimStepDescription):HTMLLIElement {
 	return makeOptimElement(modulebase, o);
 }
 
@@ -2357,7 +2358,7 @@ function makeSimpleOptimElement(optim:string) {
 
 function makePhaseOptimElement(
 	modulebase:string,
-	optims:QcertOptimStepDescription[],
+	optims:Qcert.OptimStepDescription[],
 	optim:string):HTMLLIElement {
 
 	const fulloptim = findFirstWithField(optims, 'name', optim);
@@ -2388,9 +2389,9 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 	static make(canvas:fabric.ICanvas,
 		parentDiv:HTMLElement, 
 		modulebase:string,
-		optims:QcertOptimStepDescription[],
+		optims:Qcert.OptimStepDescription[],
 
-		phase:QcertOptimPhase, 
+		phase:Qcert.OptimPhase, 
 		options:{color:string, top?:number}):OptimPhaseTab {
 		return new OptimPhaseTab(canvas, parentDiv, modulebase, optims, phase, options);
 	}
@@ -2398,9 +2399,9 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 	constructor(canvas:fabric.ICanvas,
 		div:HTMLElement,  
 		modulebase:string,
-		optims:QcertOptimStepDescription[],
+		optims:Qcert.OptimStepDescription[],
 
-		phase:QcertOptimPhase,
+		phase:Qcert.OptimPhase,
 		options:{color:string, top?:number}) {
 		
 		super(canvas);
@@ -2479,7 +2480,7 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 	name:string;
 	iter:number;
 
-	getPhase():QcertOptimPhase {
+	getPhase():Qcert.OptimPhase {
         let optims:string[] = this.sortable.toArray();
         console.log(optims);
         if (optims.length == 1 && optims[0] == optPlaceholder)
@@ -2521,9 +2522,9 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 function optimPhaseMake(canvas:fabric.ICanvas, 	
 	div:HTMLElement,
 	module_base:string,
-	optims:QcertOptimStepDescription[],
+	optims:Qcert.OptimStepDescription[],
 options:{color:string, top?:number}) {
-	return function(phase:QcertOptimPhase) {
+	return function(phase:Qcert.OptimPhase) {
 		return OptimPhaseTab.make(canvas, div, module_base, optims, phase, options);
 	}
 
@@ -2533,17 +2534,17 @@ class OptimizationManager extends ICanvasTab {
 	
 	static make(canvas:fabric.ICanvas, 
 				options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
-				language:QcertLanguage,
+				language:Qcert.Language,
 				modulebase:string,
-				optims:QcertOptimStepDescription[],
-				cfg_phases:QcertOptimPhase[],
+				optims:Qcert.OptimStepDescription[],
+				cfg_phases:Qcert.OptimPhase[],
 				startTab:number=-1):OptimizationManager {
 					
 		const tm = new OptimizationManager(canvas, options, language, modulebase, optims, cfg_phases);
 		return tm;
 	}
 
-	language:QcertLanguage;
+	language:Qcert.Language;
 	optimTabs:OptimPhaseTab[];
 	tabManager:TabManager;
 	parentDiv:HTMLElement;
@@ -2556,10 +2557,10 @@ class OptimizationManager extends ICanvasTab {
 	protected constructor(
 		canvas:fabric.ICanvas, 
 		options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
-		language:QcertLanguage,
+		language:Qcert.Language,
 		module_base:string,
-		optims:QcertOptimStepDescription[],
-		cfg_phases:QcertOptimPhase[]) {
+		optims:Qcert.OptimStepDescription[],
+		cfg_phases:Qcert.OptimPhase[]) {
 
 		super(canvas);
 		this.language = language;
@@ -2637,14 +2638,14 @@ class OptimizationManager extends ICanvasTab {
 
 	}
 
-	getOptimConfig():QcertOptimConfig {
+	getOptimConfig():Qcert.OptimConfig {
 		return {
 			language:this.language,
 			phases:this.getConfigPhases()
 		}
 	}
 	
-	getConfigPhases():QcertOptimPhase[] {
+	getConfigPhases():Qcert.OptimPhase[] {
 		return this.optimTabs.map((x) => x.getPhase());
 	}
 
@@ -2688,12 +2689,12 @@ function findFirstWithField<T, K extends keyof T>(l:T[], field:K, lang:T[K]):T {
 let globalOptimTabs:OptimizationManager[];
 
 function OptimizationsTabMake(canvas:fabric.ICanvas) {
-    return OptimizationsTabMakeFromConfig(canvas, qcertOptimDefaults().optims);
+    return OptimizationsTabMakeFromConfig(canvas, Qcert.optimDefaults().optims);
 }
 
-function OptimizationsTabMakeFromConfig(canvas:fabric.ICanvas, defaults:QcertOptimConfig[]) {
+function OptimizationsTabMakeFromConfig(canvas:fabric.ICanvas, defaults:Qcert.OptimConfig[]) {
 	const yoffset = 60;
-    const optims = qcertOptimList().optims;
+    const optims = Qcert.optimList().optims;
 
     console.log("Setting optimization config");
     console.log(optims);
@@ -2711,7 +2712,7 @@ function OptimizationsTabMakeFromConfig(canvas:fabric.ICanvas, defaults:QcertOpt
 	return TabManager.make(canvas, {label:"Optim Config", rectOptions:{fill:'#FEBF01'}}, optimTabs, 0);
 }
 
-function getOptimConfig():QcertOptimConfig[] {
+function getOptimConfig():Qcert.OptimConfig[] {
 	if(globalOptimTabs) {
 		return globalOptimTabs.map((x) => x.getOptimConfig());
 	} else {
@@ -2777,7 +2778,7 @@ function handleOptimFile(files:FileList) {
         const reader = new FileReader();
         reader.onload = function(event) {
             const contents:string = (<any>event.target).result;
-            const optims = JSON.parse(contents) as QcertOptimConfig[];
+            const optims = JSON.parse(contents) as Qcert.OptimConfig[];
             addEmptyPhases(optims);
             setConfig(optims);
             setConfigStatus("Configuration loaded from " + file.name, true);
@@ -2786,7 +2787,7 @@ function handleOptimFile(files:FileList) {
     }
 }
 
-function addEmptyPhases(optims:QcertOptimConfig[]) {
+function addEmptyPhases(optims:Qcert.OptimConfig[]) {
     const empty = getClearConfig();
     for (let i = 0; i < empty.length; i++) {
         const conf = empty[i];
