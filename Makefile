@@ -26,10 +26,16 @@ TSC?=tsc
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
 
 ## Compiler
-all:
+all: 
 	@$(MAKE) qcert
 	@$(MAKE) MAKEFLAGS= qcert-runtimes
 	@$(MAKE) MAKEFLAGS= qcert-runners
+	@$(MAKE) npm
+
+# Regenerate the npm directory
+npm:
+	@echo "Updating npm package"
+	@$(MAKE) -C npm package
 
 qcert: Makefile.coq
 	@$(MAKE) qcert-coq
@@ -250,5 +256,5 @@ remove_all_derived:
 Makefile.coq: Makefile Makefile.coq_modules $(FILES)
 	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
 
-.PHONY: all clean clean_detritus documentation documentation_old
+.PHONY: all clean clean_detritus documentation documentation_old npm qcert
 
