@@ -1,0 +1,3 @@
+This folder is separate from the sqlppParser folder because it has many additional dependencies (requires an installed and runnable
+AsterixDB instance and a lot of the testing libraries that come with AsterixDB).  Will first work under eclipse.  A Makefile and
+batch running will come next.
