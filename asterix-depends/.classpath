@@ -159,7 +159,7 @@
 	<classpathentry exported="true" kind="var" path="ASTERIXDB/asterixdb/asterix-server/target/asterix-server-0.9.2-SNAPSHOT-binary-assembly/repo/zookeeper-3.4.5.jar"/>
 	<classpathentry exported="true" kind="var" path="M2_REPO/com/rometools/rome/1.5.1/rome-1.5.1.jar"/>
 	<classpathentry exported="true" kind="var" path="M2_REPO/org/mockito/mockito-all/1.10.19/mockito-all-1.10.19.jar"/>
-	<classpathentry exported="true" kind="var" path="ASTERIXDB/asterixdb/asterix-test-framework/target/asterix-test-framework-0.9.2-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="var" path="ASTERIXDB/asterixdb/asterix-test-framework/target/asterix-test-framework-0.9.2-SNAPSHOT.jar" sourcepath="/ASTERIXDB/asterixdb/asterix-test-framework"/>
 	<classpathentry exported="true" kind="var" path="ASTERIXDB/hyracks-fullstack/hyracks/hyracks-api/target/hyracks-api-0.3.2-SNAPSHOT-tests.jar"/>
 	<classpathentry exported="true" kind="var" path="ASTERIXDB/hyracks-fullstack/hyracks/hyracks-test-support/target/hyracks-test-support-0.3.2-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="var" path="M2_REPO/org/apache/hadoop/hadoop-hdfs/2.2.0/hadoop-hdfs-2.2.0-tests.jar"/>
