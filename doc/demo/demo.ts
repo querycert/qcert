@@ -1,3 +1,5 @@
+/// <reference path="./node_modules/qcert/libs/qcertJS.d.ts" />
+/// <reference path="./lib/fabric.d.ts" />
 
 // some types
 
@@ -17,7 +19,7 @@ interface PuzzleSides {
 	const gridRows = 1; // Only one interactive row for now -JS
 	const pipelineRow = 0;
 
-	const gridOffset:fabric.IPoint = new fabric.Point(22,20);
+	const gridOffset:fabric.Point = new fabric.Point(22,20);
 	const canvasHeightInteractive = gridRows*pieceheight+gridOffset.y*2;
 
 	// we should set canvas width appropriately
@@ -46,7 +48,7 @@ interface PuzzleSides {
     var tabManager:TabManager;
 
     // The main canvas (for late (re)-construction of tabs to be replaced in the top-level tab manager
-    var mainCanvas:fabric.ICanvas;
+    var mainCanvas:fabric.Canvas;
 
 // Functions
     // A placeholder to fetch ancillary information not currently in Qcert.LanguageDescription
@@ -311,23 +313,23 @@ interface PuzzleSides {
 	// the boundary between the interactive and the selections
 	let separatorLine = new fabric.Line([ 0, canvasHeightInteractive, totalCanvasWidth, canvasHeightInteractive], { stroke: '#ccc', selectable: false });
 
-	function updateCanvasWidth(canvas:fabric.IStaticCanvas, newWidth:number) {
+	function updateCanvasWidth(canvas:fabric.StaticCanvas, newWidth:number) {
 		totalCanvasWidth = newWidth;
 		canvas.setWidth(newWidth);
 		separatorLine.set('x2', newWidth);
 	}
 
-	function ensureCanvasWidth(canvas:fabric.IStaticCanvas, newWidth:number) {
+	function ensureCanvasWidth(canvas:fabric.StaticCanvas, newWidth:number) {
 		if(newWidth > totalCanvasWidth) {
 			updateCanvasWidth(canvas, newWidth);
 		}
 	}
 
-	function ensureCanvasInteractivePieceWidth(canvas:fabric.IStaticCanvas, lastpiece:number) {
+	function ensureCanvasInteractivePieceWidth(canvas:fabric.StaticCanvas, lastpiece:number) {
 		ensureCanvasWidth(canvas, lastpiece*piecewidth);
 	}
 
-	function ensureCanvasSourcePieceWidth(canvas:fabric.IStaticCanvas, lastpiece:number) {
+	function ensureCanvasSourcePieceWidth(canvas:fabric.StaticCanvas, lastpiece:number) {
 		ensureCanvasWidth(canvas, getSourceLeft(lastpiece));
 	}
 
@@ -450,11 +452,11 @@ interface PuzzleSides {
 
 function makeToolTip(
 					tip:string,
-					canvas:fabric.IStaticCanvas,
+					canvas:fabric.StaticCanvas,
 					srcRect:{left:number, top:number, width:number, height:number},
-					tooltipOffset:fabric.IPoint,
+					tooltipOffset:fabric.Point,
 					textOptions:fabric.ITextOptions, 
-					rectOptions:fabric.IRectOptions):fabric.IObject {
+					rectOptions:fabric.IRectOptions):fabric.Object {
 	const topts = fabric.util.object.clone(textOptions);
 	topts.left = 0;
 	topts.top = 0;
@@ -499,9 +501,9 @@ function makeToolTip(
 	return group;
 }
 
-// interface IPuzzlePiece extends fabric.IObject {
+// interface IPuzzlePiece extends fabric.Object {
 // 	// this should be in the fabric ts file
-// 	canvas:fabric.IStaticCanvas;
+// 	canvas:fabric.StaticCanvas;
 
 // 	// new stuff
 // 	isSourcePiece?:boolean;
@@ -511,10 +513,10 @@ function makeToolTip(
 // 	langid:string;
 // 	label:string;
 // 	langdescription:string;
-// 	tooltipObj?:fabric.IObject;
-// 	puzzleOffset:fabric.IPoint;
-// 	getGridPoint:()=>fabric.IPoint;
-// 	setGridPoint:(point:fabric.IPoint)=>void;
+// 	tooltipObj?:fabric.Object;
+// 	puzzleOffset:fabric.Point;
+// 	getGridPoint:()=>fabric.Point;
+// 	setGridPoint:(point:fabric.Point)=>void;
 // 	setGridCoords:(x:number, y:number)=>void;
 
 // 	// these are to help avoid accidentally setting
@@ -545,8 +547,8 @@ let errorPiece:SourcePuzzlePiece;
 
 // things that can be get/set via the grid
 interface Griddable {
-	getGridPoint():fabric.IPoint;
-	setGridPoint(point:fabric.IPoint):void;
+	getGridPoint():fabric.Point;
+	setGridPoint(point:fabric.Point):void;
 	setGridCoords(x:number, y:number):void;
 	isTransient():boolean;
 }
@@ -556,22 +558,26 @@ interface Displayable {
 	hide();
 }
 
-// objects that are wrapped by customization
-declare module fabric {
-	export interface IObject  {
-		canvas:ICanvas;
-		moveCursor:string;
-	}
+interface fabricObjectExt extends fabric.Object {
+ 		canvas:fabric.Canvas;
 }
+
+// function ext(obj:fabric.Object):fabricObjectExt {
+// 	return <fabricObjectExt>obj;
+// }
 
 // objects that wrap a fabric object
 interface FrontingObject {
-	backingObject:fabric.IObject;
+	backingObject:fabricObjectExt;
 	associate();
 	deassociate();
 }
 
-// function assignBackingObject(frontingObject:FrontingObject, backingObject:fabric.IObject) {
+function setBackingObject(f:FrontingObject, obj:fabric.Object) {
+	f.backingObject = <fabricObjectExt>obj;
+}
+
+// function assignBackingObject(frontingObject:FrontingObject, backingObject:fabric.Object) {
 // 	// disassociate the backingObject from any previous owner
 // 	if(isBackingObject(backingObject)) {
 // 		const oldObject = backingObject.frontingObject;
@@ -585,7 +591,7 @@ interface FrontingObject {
 
 abstract class GriddablePuzzlePiece implements Griddable {
 	
-	getGridPoint():fabric.IPoint {
+	getGridPoint():fabric.Point {
 		return new fabric.Point(
 			Math.round((this.backingObject.left + this.puzzleOffset.x - gridOffset.x) / piecewidth),
 			Math.round((this.backingObject.top + this.puzzleOffset.y - gridOffset.y) / pieceheight));
@@ -612,8 +618,8 @@ abstract class GriddablePuzzlePiece implements Griddable {
 	}
 
 	abstract isTransient():boolean;
-	backingObject:fabric.IObject;
-	puzzleOffset:fabric.IPoint;
+	backingObject:fabricObjectExt;
+	puzzleOffset:fabric.Point;
 }
 
 class Grid {
@@ -708,9 +714,9 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 		return true;
 	}
 
-	readonly canvas:fabric.ICanvas;
+	readonly canvas:fabric.Canvas;
 	options:any;
-	backingObject:fabric.IObject;
+	backingObject:fabricObjectExt;	
 
 	show() {
 		this.canvas.add(this.backingObject);
@@ -720,13 +726,13 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 		this.canvas.remove(this.backingObject);
 	}
 
-        static make(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, options):BasicPuzzlePiece {
+        static make(canvas:fabric.Canvas, previouslangid:Qcert.Language, previouslabel:string, options):BasicPuzzlePiece {
 	    const p = new BasicPuzzlePiece(canvas, previouslangid, previouslabel, {options:options});
 	    p.associate();
 	    return p;
 	}
 
-        protected constructor(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+        protected constructor(canvas:fabric.Canvas, previouslangid:Qcert.Language, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
 		super();
 		this.canvas = canvas;
 
@@ -769,7 +775,7 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 				hasControls:false,
 				hasBorders:false
 			});
-			this.backingObject = group;
+			setBackingObject(this, group);
 
 			this.puzzleOffset = puzzleOffsetPoint;
 		} else {
@@ -809,13 +815,13 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		return false;
 	}
 
-        static make(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, src:BasicPuzzlePiece):InteractivePuzzlePiece {
+        static make(canvas:fabric.Canvas, previouslangid:Qcert.Language, previouslabel:string, src:BasicPuzzlePiece):InteractivePuzzlePiece {
 	    const p = new InteractivePuzzlePiece(canvas, previouslangid, previouslabel, {srcpuzzle:src});
 		p.associate();
 		return p;
 	}
 
-        public constructor(canvas:fabric.ICanvas, previouslangid:Qcert.Language, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+        public constructor(canvas:fabric.Canvas, previouslangid:Qcert.Language, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
 	    super(canvas, previouslangid, previouslabel, args);
 		if('srcpuzzle' in args) {
 			const options = (<any>args).srcpuzzle;
@@ -927,11 +933,11 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		// // finalize any left objects in their new positions
 		// // remove any transient path objects
 		// if('pathObjects' in this) {
-		// 	for(let i =0; i < this.pathObjects.length; i++) {
-		// 		const obj = this.pathObjects[i];
+		// 	for(let i =0; i < this.PathObjects.length; i++) {
+		// 		const obj = this.PathObjects[i];
 		// 		this.backingObject.canvas.remove(obj.backingObject);
 		// 	}
-		// 	delete this.pathObjects;			
+		// 	delete this.PathObjects;			
 		// }
 
 	}
@@ -960,11 +966,11 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		}
 			// // destroy any associated objects
 			// if('pathObjects' in this) {
-			// 	for(let i =0; i < this.pathObjects.length; i++) {
-			// 		const obj = this.pathObjects[i];
+			// 	for(let i =0; i < this.PathObjects.length; i++) {
+			// 		const obj = this.PathObjects[i];
 			// 		this.backingObject.canvas.remove(obj.backingObject);
 			// 	}
-			// 	delete this.pathObjects;			
+			// 	delete this.PathObjects;			
 			// }
 		// update, since it may have moved when we removed/added transients 
 		leftentry = this.getGridPoint().x;
@@ -1187,7 +1193,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 		return true;
 	}
 
-	static make(canvas:fabric.ICanvas, options):SourcePuzzlePiece {
+	static make(canvas:fabric.Canvas, options):SourcePuzzlePiece {
 		const p = new SourcePuzzlePiece(canvas, options);
 		p.associate();
 		return p;
@@ -1197,7 +1203,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	label:string;
 	langdescription:string;
 
-	protected constructor(canvas:fabric.ICanvas, options) {
+	protected constructor(canvas:fabric.Canvas, options) {
 	    super(canvas, null, null, {options:options});	
 	
 		this.langid = options.langid;
@@ -1241,7 +1247,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	// // 	return copyOfSelf;
 	// }
 
-	tooltipObj?:fabric.IObject;
+	tooltipObj?:fabric.Object;
 
     protected mousedown = () => {
 		// Update source browser to point to the IL definition -JS
@@ -1316,13 +1322,13 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 		return true;
 	}
 
-        static make(canvas:fabric.ICanvas, previouslangid:Qcert.Language,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}):TransientPuzzlePiece {
+        static make(canvas:fabric.Canvas, previouslangid:Qcert.Language,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}):TransientPuzzlePiece {
 	        const p = new TransientPuzzlePiece(canvas, previouslangid, previouslabel, args);
 		p.associate();
 		return p;
 	}
 
-	public constructor(canvas:fabric.ICanvas, previouslangid:Qcert.Language,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+	public constructor(canvas:fabric.Canvas, previouslangid:Qcert.Language,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
 	        super(canvas, previouslangid, previouslabel, args);
 		if('srcpuzzle' in args) {
 			const options = (<any>args).srcpuzzle;
@@ -1468,7 +1474,7 @@ class CompositePuzzlePiece extends GriddablePuzzlePiece implements Displayable, 
 		return false;
 	}
 
-	static make(canvas:fabric.ICanvas, gridx:number, gridy:number, sources:BasicPuzzlePiece[]) {
+	static make(canvas:fabric.Canvas, gridx:number, gridy:number, sources:BasicPuzzlePiece[]) {
 		const piece = new CompositePuzzlePiece(canvas, sources);
 		piece.associate();
 		piece.setGridCoords(gridx, gridy);
@@ -1483,7 +1489,7 @@ class CompositePuzzlePiece extends GriddablePuzzlePiece implements Displayable, 
 		this.canvas.remove(this.backingObject);
 	}
 
-	protected constructor(canvas:fabric.ICanvas, sources:BasicPuzzlePiece[]) {
+	protected constructor(canvas:fabric.Canvas, sources:BasicPuzzlePiece[]) {
 		super();
 
 		this.puzzleOffset = new fabric.Point(GriddablePuzzlePiece.calcPuzzleEdgeOffset(1), 0);
@@ -1491,11 +1497,11 @@ class CompositePuzzlePiece extends GriddablePuzzlePiece implements Displayable, 
 		this.sources = sources;
 		const sourceLen = sources.length;
 		const pwidth = piecewidth / sourceLen;
-		let parts:fabric.IObject[] = [];
-		let fulls:fabric.IObject[] = [];
+		let parts:fabric.Object[] = [];
+		let fulls:fabric.Object[] = [];
 		for(let i=0; i < sourceLen; i++) {
 			const p:BasicPuzzlePiece = sources[i];
-			const ofull:fabric.IObject = p.backingObject;
+			const ofull:fabric.Object = p.backingObject;
 			const shortPiece = new fabric.Path(CompositePuzzlePiece.getLRMask(1, 1, -1, pwidth), {
 				fill:p.backingObject.fill,
 				opacity: 0.5,
@@ -1519,17 +1525,17 @@ class CompositePuzzlePiece extends GriddablePuzzlePiece implements Displayable, 
 		}
 		this.fullGroup = new fabric.Group(fulls);
 
-		this.backingObject = new fabric.Group(parts);
+		setBackingObject(this, new fabric.Group(parts));
 		this.parts = parts;
 		this.lastSelectedPart = -1;
 	}
 
-	readonly canvas:fabric.ICanvas;
-	readonly fullGroup:fabric.IObject;
-	readonly parts:fabric.IObject[];
+	readonly canvas:fabric.Canvas;
+	readonly fullGroup:fabric.Object;
+	readonly parts:fabric.Object[];
 	readonly sources:BasicPuzzlePiece[];
 
-	tooltipObj?:fabric.IObject;
+	tooltipObj?:fabric.Object;
 	lastSelectedPart:number;
 
 	updateTooltip() {
@@ -1646,8 +1652,8 @@ const defaultTabRectOpts:fabric.IRectOptions = {
 	strokeLineCap:'round'
 }
 
-abstract class ICanvasTab {
-	constructor(canvas:fabric.ICanvas) {
+abstract class CanvasTab {
+	constructor(canvas:fabric.Canvas) {
 		this.canvas = canvas;
 	}
 	abstract getLabel():string;
@@ -1661,12 +1667,12 @@ abstract class ICanvasTab {
 	hide() {
 		this.canvas.clear();
 	}
-	canvas:fabric.ICanvas;
-	canvasObj?:fabric.IObject;
+	canvas:fabric.Canvas;
+	canvasObj?:fabric.Object;
 }
 
-abstract class ICanvasDynamicTab extends ICanvasTab {
-		constructor(canvas:fabric.ICanvas) {
+abstract class CanvasDynamicTab extends CanvasTab {
+		constructor(canvas:fabric.Canvas) {
 			super(canvas);
 	}
 	/**
@@ -1681,8 +1687,8 @@ type TabManagerOptions = {label:string,
 					tabOrigin?:{left?:number, top?:number},
 					};
 
-class TabManager extends ICanvasTab {
-	static makeTab(tab:ICanvasTab, top:number, left:number):fabric.IObject {
+class TabManager extends CanvasTab {
+	static makeTab(tab:CanvasTab, top:number, left:number):fabric.Object {
        const ropts = fabric.util.object.clone(defaultTabRectOpts);
 	   fabric.util.object.extend(ropts, tab.getRectOptions() || {});
 
@@ -1732,16 +1738,16 @@ class TabManager extends ICanvasTab {
        return group;
 	}
 					
-	static make(canvas:fabric.ICanvas, 
+	static make(canvas:fabric.Canvas, 
 				options:TabManagerOptions, 
-				tabs:ICanvasTab[], startTab:number=-1):TabManager {
+				tabs:CanvasTab[], startTab:number=-1):TabManager {
         console.log("Making tab manager with label " + options.label + " and initial tab " + startTab + " and " + tabs.length + " tabs");
 		const tm = new TabManager(canvas, options, tabs);
 		tm.setInitTab(tabs, startTab);
 		return tm;
 	}
 
-	protected setInitTab(tabs:ICanvasTab[], startTab:number) {
+	protected setInitTab(tabs:CanvasTab[], startTab:number) {
 		if(startTab >= 0 && startTab < tabs.length) {
 			const t = tabs[startTab];
 			if(t !== undefined && t !== null) {
@@ -1754,9 +1760,9 @@ class TabManager extends ICanvasTab {
 		}
 
 	}
-	protected constructor(canvas:fabric.ICanvas, 
+	protected constructor(canvas:fabric.Canvas, 
 					options:TabManagerOptions, 
-					tabs:ICanvasTab[]) {
+					tabs:CanvasTab[]) {
 		super(canvas);
 		this.label = options.label;
 		this.rectOpts = options.rectOptions || defaultTabRectOpts;
@@ -1783,7 +1789,7 @@ class TabManager extends ICanvasTab {
        }
 	}
     
-    replaceTab(newTab:ICanvasTab, position:number) {
+    replaceTab(newTab:CanvasTab, position:number) {
         const oldGroup = this.tabObjects[position];
         const rect = oldGroup.getBoundingRect();
         console.log("Old tab:");
@@ -1807,7 +1813,7 @@ class TabManager extends ICanvasTab {
 	readonly label:string;
 	readonly rectOpts:fabric.IRectOptions;
 	readonly textOpts:fabric.IITextOptions;
-	tabObjects:fabric.IObject[];
+	tabObjects:fabric.Object[];
 
 	getLabel():string {
 		return this.label;
@@ -1832,9 +1838,9 @@ class TabManager extends ICanvasTab {
 		this.tabObjects.forEach((obj) => this.canvas.remove(obj));
 	}
 
-	currentTab:ICanvasTab = null;
+	currentTab:CanvasTab = null;
 
-	switchTab(tab:ICanvasTab) {
+	switchTab(tab:CanvasTab) {
 		if(this.currentTab != null) {
 			if('canvasObj' in this.currentTab) {
 				const tabobj = this.currentTab.canvasObj;
@@ -1851,9 +1857,9 @@ class TabManager extends ICanvasTab {
 	}
 }
 
-class BuilderTab extends ICanvasTab {
+class BuilderTab extends CanvasTab {
 
-	static make(canvas:fabric.ICanvas) {
+	static make(canvas:fabric.Canvas) {
 		return new BuilderTab(canvas);
 	}
 
@@ -1861,7 +1867,7 @@ class BuilderTab extends ICanvasTab {
 	totalCanvasHeight:number;
 	maxCols:number;
 
-	constructor(canvas:fabric.ICanvas) {
+	constructor(canvas:fabric.Canvas) {
 		super(canvas);
 		separatorLine.set('visible', true);
 
@@ -2043,7 +2049,7 @@ class BuilderTab extends ICanvasTab {
 	}
 }
 
-class CompileTab extends ICanvasTab {
+class CompileTab extends CanvasTab {
 	titleTextElement:Node;
 	inputTabElement:HTMLElement;
 	queryInput:HTMLElement;
@@ -2051,11 +2057,11 @@ class CompileTab extends ICanvasTab {
     queryChooser:HTMLInputElement;
     schemaChooser:HTMLInputElement;
 
-	static make(canvas:fabric.ICanvas) {
+	static make(canvas:fabric.Canvas) {
 		return new CompileTab(canvas);
 	}
 
-	constructor(canvas:fabric.ICanvas) {
+	constructor(canvas:fabric.Canvas) {
 	    super(canvas);
 	    this.inputTabElement = document.getElementById("compile-tab");
 	    this.titleTextElement = document.getElementById("compile-tab-lang-title");
@@ -2131,18 +2137,18 @@ class CompileTab extends ICanvasTab {
 	}
 }
 
-class ExecTab extends ICanvasTab {
+class ExecTab extends CanvasTab {
     titleTextElement:Node;
     inputTabElement:HTMLElement;
     dataInput:HTMLElement;
     defaultTitleTextElement:Node;
     dataChooser:HTMLInputElement;
 
-    static make(canvas:fabric.ICanvas) {
+    static make(canvas:fabric.Canvas) {
         return new ExecTab(canvas);
     }
 
-    constructor(canvas:fabric.ICanvas) {
+    constructor(canvas:fabric.Canvas) {
         super(canvas);
         this.inputTabElement = document.getElementById("execute-tab");
         this.titleTextElement = document.getElementById("execute-tab-lang-title");
@@ -2256,7 +2262,7 @@ function getPipelineLangs():{id:Qcert.Language,explicit:boolean}[] {
 // 		const curPath = Qcert.LanguagesPath({
 // 			source: prev,
 // 			target:cur
-// 		}).path;
+// 		}).Path;
 // 		const curPathLen = curPath.length;
 
 // 		if(curPath == null 
@@ -2385,8 +2391,8 @@ function getCountWithUpdate(listnode:HTMLElement) {
     return count;
 }
 
-class OptimPhaseTab extends ICanvasDynamicTab {
-	static make(canvas:fabric.ICanvas,
+class OptimPhaseTab extends CanvasDynamicTab {
+	static make(canvas:fabric.Canvas,
 		parentDiv:HTMLElement, 
 		modulebase:string,
 		optims:Qcert.OptimStepDescription[],
@@ -2396,7 +2402,7 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		return new OptimPhaseTab(canvas, parentDiv, modulebase, optims, phase, options);
 	}
 
-	constructor(canvas:fabric.ICanvas,
+	constructor(canvas:fabric.Canvas,
 		div:HTMLElement,  
 		modulebase:string,
 		optims:Qcert.OptimStepDescription[],
@@ -2519,7 +2525,7 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 	}
 }
 
-function optimPhaseMake(canvas:fabric.ICanvas, 	
+function optimPhaseMake(canvas:fabric.Canvas, 	
 	div:HTMLElement,
 	module_base:string,
 	optims:Qcert.OptimStepDescription[],
@@ -2530,9 +2536,9 @@ options:{color:string, top?:number}) {
 
 }
 
-class OptimizationManager extends ICanvasTab {
+class OptimizationManager extends CanvasTab {
 	
-	static make(canvas:fabric.ICanvas, 
+	static make(canvas:fabric.Canvas, 
 				options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
 				language:Qcert.Language,
 				modulebase:string,
@@ -2555,7 +2561,7 @@ class OptimizationManager extends ICanvasTab {
 	textOptions?:fabric.IITextOptions;
 
 	protected constructor(
-		canvas:fabric.ICanvas, 
+		canvas:fabric.Canvas, 
 		options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
 		language:Qcert.Language,
 		module_base:string,
@@ -2688,11 +2694,11 @@ function findFirstWithField<T, K extends keyof T>(l:T[], field:K, lang:T[K]):T {
 // are encapsulated
 let globalOptimTabs:OptimizationManager[];
 
-function OptimizationsTabMake(canvas:fabric.ICanvas) {
+function OptimizationsTabMake(canvas:fabric.Canvas) {
     return OptimizationsTabMakeFromConfig(canvas, Qcert.optimDefaults().optims);
 }
 
-function OptimizationsTabMakeFromConfig(canvas:fabric.ICanvas, defaults:Qcert.OptimConfig[]) {
+function OptimizationsTabMakeFromConfig(canvas:fabric.Canvas, defaults:Qcert.OptimConfig[]) {
 	const yoffset = 60;
     const optims = Qcert.optimList().optims;
 
@@ -2720,7 +2726,7 @@ function getOptimConfig():Qcert.OptimConfig[] {
 	}
 }
 
-const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
+const tabinitlist:((canvas:fabric.Canvas)=>CanvasTab)[] = [
     BuilderTab.make,
     OptimizationsTabMake,
     CompileTab.make,

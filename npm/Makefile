@@ -21,7 +21,6 @@
 DEP_FILES=../bin/qcertJS.js \
 	../runtimes/javascript/qcert-runtime.js \
 	../runtimes/javascript/quoted-qcert-runtime.js \
-	../doc/demo/qcertJS.d.ts
 
 all: package
 
