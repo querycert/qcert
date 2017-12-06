@@ -174,16 +174,14 @@ qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling Web Demo in TypeScript"
 	@echo "[Q*cert] "
-	$(CP) bin/qcertJS.js doc/demo
-	$(CP) runtimes/javascript/qcert-runtime.js doc/demo
-	cd doc/demo && $(TSC) -p "tsconfig.json"
+	cd doc/demo && npm install && npm run compile
 
 clean-demo:
-	- @rm -f doc/demo/qcertJS.js doc/demo/qcert-runtime.js
-	- @rm -f doc/demo/demo.js doc/demo/qcertPreCompiler.js
-	- @rm -f doc/demo/demo.js.map doc/demo/qcertPreCompiler.js.map
+	- @rm -f doc/demo/demo.js doc/demo/demo.js.map
+	- @rm -f doc/demo/qcertWhiskDispatch.js doc/demo/qcertWhiskDispatch.js.map
 
 cleanall-demo: clean-demo
+	- @rm -rf doc/demo/node_modules
 
 ## Runners
 qcert-runners:
