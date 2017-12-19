@@ -392,6 +392,17 @@ Section TDataInfer.
      eapply foreign_data_typing_infer_least; eauto.
   Qed.
 
+  Theorem data_has_principal_type {d} :
+    data_normalized brand_relation_brands d ->
+    {τ | d ▹τ & (forall τ', d ▹τ' -> τ <: τ')}.
+  Proof.
+    intros dn.
+    destruct (infer_data_type_normalized dn) as [τ τeq].
+    exists τ.
+    - apply infer_data_type_correct; trivial.
+    - intros. eapply infer_data_type_least; eauto.
+  Defined.
+
   Theorem infer_data_type_complete {d τ} :
     d ▹τ -> {τ' | infer_data_type d = Some τ'}.
   Proof.
