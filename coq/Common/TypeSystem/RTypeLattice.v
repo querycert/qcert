@@ -24,7 +24,6 @@ Require Import ForeignType.
 Require Import RType.
 Require Import RSubtypeProp.
 Require Import RTypeMeetJoin.
-Require Import RTypeMeetJoin.
 Require Import RConsistentSubtype.
 Require Import BrandRelation.
 Require Import Lattice.
@@ -51,7 +50,13 @@ Section RTypeLattice.
     OLattice eq subtype
     := { consistent_meet := consistent_rtype_meet }.
 
-  
+  Global Instance rtype_blattice :
+    BLattice eq 
+    := { top := Top;
+         bottom := Bottom;
+         join_bottom_r := rtype_join_Bottom_r;
+         meet_top_r := rtype_meet_Top_r
+       }.
   
 End RTypeLattice.
 

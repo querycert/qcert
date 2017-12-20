@@ -40,7 +40,15 @@ Section Lattice.
   Definition absorptive {A} eqA `{equivA : Equivalence A eqA}
              (op1 op2 : A->A->A)
     := forall x y, op1 x (op2 x y) === x.
-  
+
+    Definition is_unit_r {A} eqA `{equivA : Equivalence A eqA}
+             (op : A->A->A) (unit:A)
+    := forall a, op a unit === a.
+
+    Definition is_unit_l {A} eqA `{equivA : Equivalence A eqA}
+             (op : A->A->A) (unit:A)
+    := forall a, op unit a === a.
+
   Class Lattice (A:Type) (eqA:A->A->Prop) {equivA:Equivalence eqA}
     := {
         meet : A -> A -> A;
@@ -77,7 +85,7 @@ Section Lattice.
         consistent_meet: forall a b, a ≤ b <-> a ⊓ b === a
         }.
 
-  Section props.
+  Section oprops.
     Context {A eqA ordA} `{olattice:OLattice A eqA ordA}.
 
     Lemma consistent_join 
@@ -190,8 +198,112 @@ Section Lattice.
     destruct (join a b == b); unfold equiv, complement in *; intuition.
   Defined.
 
-  End props.
-  
+  End oprops.
+
+    (* A bounded lattice *)
+  Class BLattice {A:Type}
+        (eqA:A->A->Prop)
+        {equivA:Equivalence eqA}
+        {lattice:Lattice A eqA}
+    := {
+        top:A;
+        bottom:A;
+        join_bottom_r: is_unit_r eqA join bottom;
+        meet_top_r: is_unit_r eqA meet top
+        }.
+
+  Section bprops.
+
+    Lemma is_unit_l_r {A} eqA `{equivA : Equivalence A eqA}
+          (op : A->A->A) : commutative eqA op ->
+                           (forall unit, is_unit_l eqA op unit <-> is_unit_r eqA op unit).
+    Proof.
+      unfold is_unit_l, is_unit_r.
+      intros comm unit.
+      split; intros; rewrite comm; trivial.
+    Qed.
+
+    Context {A eqA} `{blattice:BLattice A eqA}.
+
+    Lemma join_bottom_l: is_unit_l eqA join bottom.
+    Proof.
+      apply is_unit_l_r.
+      - apply join_commutative.
+      - apply join_bottom_r.
+    Qed.
+
+    Lemma meet_top_l: is_unit_l eqA meet top.
+    Proof.
+      apply is_unit_l_r.
+      - apply meet_commutative.
+      - apply meet_top_r.
+    Qed.
+
+    Lemma meet_bottom_r : forall a, a ⊓ bottom === bottom.
+    Proof.
+      intros a.
+      generalize (join_bottom_l a); intros leq.
+      rewrite <- leq.
+      rewrite meet_commutative.
+      rewrite (meet_absorptive bottom a).
+      reflexivity.
+    Qed.
+
+    Lemma meet_bottom_l : forall a, bottom ⊓ a === bottom.
+    Proof.
+      intros a.
+      rewrite meet_commutative, meet_bottom_r.
+      reflexivity.
+    Qed.
+
+    Lemma join_top_r : forall a, a ⊔ top === top.
+    Proof.
+      intros a.
+      generalize (meet_top_l a); intros leq.
+      rewrite <- leq.
+      rewrite join_commutative.
+      rewrite (join_absorptive top a).
+      reflexivity.
+    Qed.
+
+    Lemma join_top_l : forall a, top ⊔ a === top.
+    Proof.
+      intros a.
+      rewrite join_commutative, join_top_r.
+      reflexivity.
+    Qed.
+
+  End bprops.
+
+  Section boprops.
+
+    Context {A eqA ordA equiv}
+            {lattice:@Lattice A eqA equiv}
+            {pre part}
+            {blattice:@BLattice A eqA equiv lattice}
+            {olattice:@OLattice A eqA ordA equiv lattice pre part}.
+
+    Lemma le_top : forall a, a ≤ top.
+    Proof.
+      intros.
+      rewrite consistent_join, join_top_r.
+      reflexivity.
+    Qed.    
+    
+    Lemma bottom_le : forall a, bottom ≤ a.
+    Proof.
+      intros.
+      rewrite consistent_join, join_bottom_l.
+      reflexivity.
+    Qed.    
+
+    Lemma bottom_le_top : bottom ≤ top.
+    Proof.
+      apply le_top.
+    Qed.
+    
+  End boprops.
+
 End Lattice.
 
 Infix "≤" := part_le (at level 70, no associativity).
