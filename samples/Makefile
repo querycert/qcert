@@ -27,6 +27,7 @@ BLANK=$(EMPTY) $(EMPTY)
 
 CPATH=$(subst $(BLANK),$(PATH_SEP),../runtimes/java/bin ../bin/javaRunners.jar ../bin/lib/*)
 JAVAC=javac
+JAVARUN=java
 
 #
 QCERTCOMP=../bin/qcert
@@ -47,6 +48,21 @@ ifneq ($(JRULES),)
 	@$(MAKE) tech_rule-tests
 endif
 
+.PHONY: oql-tests \
+	oql-world-tests oql-world-tests-js \
+	oql-persons-tests oql-persons-tests-js \
+	oql-employees-tests oql-employees-tests-js \
+	lambda_nra-tests \
+	lambda_nra-persons-tests lambda_nra-persons-tests-js \
+	camp-tests \
+	camp-world-tests camp-world-tests-js \
+	sql-tests \
+	sql-org-tests sql-org-tests-js \
+	tech_rule-tests \
+	tech_rule-test-tests \
+	designer_rule-tests \
+	designer_rule-test-tests \
+	clean
 
 ## OQL
 OQLPERSONSNUM=1 2 3 4 5 6 7 8
@@ -61,14 +77,29 @@ oql-tests:
 	@$(MAKE) oql-world-tests
 	@$(MAKE) oql-persons-tests
 	@$(MAKE) oql-employees-tests
+ifneq ($(JAVA),)
+	@$(MAKE) oql-world-tests-js
+	@$(MAKE) oql-persons-tests-js
+	@$(MAKE) oql-employees-tests-js
+endif
 
-oql-world-tests: 
+oql-world-tests:
 	@$(foreach N,$(OQLWORLDNUM), \
             $(foreach T,$(OQLTARGETS), \
 	       $(QCERTCOMP) -source oql -target $(T) oql/world$(N).oql \
                             -eval -input oql/world.input \
                             -schema oql/world.schema \
                             -eval-validate -output oql/world$(N).out;))
+oql-world-tests-js:
+	@$(foreach N,$(OQLWORLDNUM), \
+	       $(QCERTCOMP) -source oql -target js oql/world$(N).oql \
+                            -eval-validate -schema oql/world.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input oql/world.input \
+                          -schema oql/world.schema \
+                          -output oql/world$(N).out \
+                          oql/world$(N).js;)
 
 oql-persons-tests:
 	@$(foreach N,$(OQLPERSONSNUM), \
@@ -77,6 +108,16 @@ oql-persons-tests:
                             -eval -input oql/persons.input \
                             -schema oql/persons.schema \
                             -eval-validate -output oql/persons$(N).out;))
+oql-persons-tests-js:
+	@$(foreach N,$(OQLPERSONSNUM), \
+	       $(QCERTCOMP) -source oql -target js oql/persons$(N).oql \
+                            -eval-validate -schema oql/persons.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input oql/persons.input \
+                          -schema oql/persons.schema \
+                          -output oql/persons$(N).out \
+                          oql/persons$(N).js;)
 
 oql-employees-tests:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
@@ -85,6 +126,16 @@ oql-employees-tests:
                             -eval -input oql/employees.input \
                             -schema oql/employees.schema \
                             -eval-validate -output oql/employees$(N).out;))
+oql-employees-tests-js:
+	@$(foreach N,$(OQLEMPLOYEESNUM), \
+	       $(QCERTCOMP) -source oql -target js oql/employees$(N).oql \
+                            -eval-validate -schema oql/employees.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input oql/employees.input \
+                          -schema oql/employees.schema \
+                          -output oql/employees$(N).out \
+                          oql/employees$(N).js;)
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7
@@ -95,6 +146,9 @@ lambda_nra-tests:
 	@echo "[Q*cert] λ-NRA tests"
 	@echo "[Q*cert] "
 	@$(MAKE) lambda_nra-persons-tests
+ifneq ($(JAVA),)
+	@$(MAKE) lambda_nra-persons-tests-js
+endif
 
 lambda_nra-persons-tests:
 	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
@@ -103,6 +157,16 @@ lambda_nra-persons-tests:
                             -eval -input lambda_nra/persons.input \
                             -schema lambda_nra/persons.schema \
                             -eval-validate -output lambda_nra/persons$(N).out;))
+lambda_nra-persons-tests-js:
+	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
+	       $(QCERTCOMP) -source lambda_nra -target js lambda_nra/persons$(N).lnra \
+                            -eval-validate -schema lambda_nra/persons.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input lambda_nra/persons.input \
+                          -schema lambda_nra/persons.schema \
+                          -output lambda_nra/persons$(N).out \
+                          lambda_nra/persons$(N).js;)
 
 ## CAMP
 CAMPWORLDNUM=1
@@ -113,6 +177,9 @@ camp-tests:
 	@echo "[Q*cert] CAMP tests"
 	@echo "[Q*cert] "
 	@$(MAKE) camp-world-tests
+ifneq ($(JAVA),)
+	@$(MAKE) camp-world-tests-js
+endif
 
 camp-world-tests:
 	@$(foreach N,$(CAMPWORLDNUM), \
@@ -121,6 +188,17 @@ camp-world-tests:
                             -eval -input camp/world.input \
                             -schema camp/world.schema \
                             -eval-validate -output camp/world$(N).out;))
+
+camp-world-tests-js:
+	@$(foreach N,$(CAMPWORLDNUM), \
+	       $(QCERTCOMP) -source camp -target js camp/world$(N).camp \
+                            -eval-validate -schema camp/world.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input camp/world.input \
+                          -schema camp/world.schema \
+                          -output camp/world$(N).out \
+                          camp/world$(N).js;)
 
 ## SQL
 SQLORGNUM=1 2 3 4 5 6 7 8
@@ -131,6 +209,9 @@ sql-tests:
 	@echo "[Q*cert] SQL tests"
 	@echo "[Q*cert] "
 	@$(MAKE) sql-org-tests
+ifneq ($(JAVA),)
+	@$(MAKE) sql-org-tests-js
+endif
 
 sql-org-tests:
 	@$(foreach N,$(SQLORGNUM), \
@@ -139,6 +220,16 @@ sql-org-tests:
                             -eval -input sql/org.input \
                             -schema sql/org.schema \
                             -eval-validate -output sql/org$(N).out;))
+sql-org-tests-js:
+	@$(foreach N,$(SQLORGNUM), \
+	       $(QCERTCOMP) -source sql -target js sql/org$(N).sql \
+                            -eval-validate -schema sql/org.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input sql/org.input \
+                          -schema sql/org.schema \
+                          -output sql/org$(N).out \
+                          sql/org$(N).js;)
 
 ## TECHRULE
 TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22 #20
@@ -146,9 +237,12 @@ TECHRULETARGETS=camp_rule camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_cor
 
 tech_rule-tests:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] ODM Rules tests"
+	@echo "[Q*cert] ODM Tech Rules tests"
 	@echo "[Q*cert] "
 	@$(MAKE) tech_rule-test-tests
+ifneq ($(JAVA),)
+	@$(MAKE) tech_rule-test-tests-js
+endif
 
 tech_rule-test-tests:
 	@$(foreach N,$(TECHRULETESTNUM), \
@@ -157,15 +251,67 @@ tech_rule-test-tests:
                             -eval -input tech_rule/test.input \
                             -schema tech_rule/test.schema \
                             -eval-validate -output tech_rule/test$(N).out;))
+tech_rule-test-tests-js:
+	@$(foreach N,$(TECHRULETESTNUM), \
+	       $(QCERTCOMP) -source tech_rule -target js tech_rule/test$(N).arl \
+                            -eval-validate -schema tech_rule/test.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input tech_rule/test.input \
+                          -schema tech_rule/test.schema \
+                          -output tech_rule/test$(N).out \
+                          tech_rule/test$(N).js;)
+
+## DESIGNERRULE
+DESIGNERRULETESTNUM=
+DESIGNERRULETARGETS=camp_rule camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+
+designer_rule-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] ODM Designer Rules tests"
+	@echo "[Q*cert] "
+	@$(MAKE) designer_rule-test-tests
+ifneq ($(JAVA),)
+	@$(MAKE) designer_rule-test-tests-js
+endif
+
+designer_rule-test-tests:
+	@$(foreach N,$(DESIGNERRULETESTNUM), \
+            $(foreach T,$(DESIGNERRULETARGETS), \
+	       $(QCERTCOMP) -source designer_rule -target $(T) designer_rule/test$(N).agg \
+                            -eval -input designer_rule/test.input \
+                            -schema designer_rule/test.schema \
+                            -eval-validate -output designer_rule/test$(N).out;))
+designer_rule-test-tests-js:
+	@$(foreach N,$(DESIGNERRULETESTNUM), \
+	       $(QCERTCOMP) -source designer_rule -target js designer_rule/test$(N).agg \
+                            -eval-validate -schema designer_rule/test.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input designer_rule/test.input \
+                          -schema designer_rule/test.schema \
+                          -output designer_rule/test$(N).out \
+                          designer_rule/test$(N).js;)
 
 clean:
 	@rm -f */*.txt
 	@rm -f oql/*.json
+	@rm -f oql/*.js
 	@rm -f sql/*.json
+	@rm -f sql/*.js
 	@rm -f tech_rule/*.json
+	@rm -f tech_rule/*.js
 	@rm -f tech_rule/*_camp.camp
 	@rm -f tech_rule/*_rule.camp
+	@rm -f designer_rule/*.json
+	@rm -f designer_rule/*.js
+	@rm -f designer_rule/*_camp.camp
+	@rm -f designer_rule/*_rule.camp
 	@rm -f camp/*.json
+	@rm -f camp/*.js
 	@rm -f camp/*_camp.camp
 	@rm -f lambda_nra/*.json
+	@rm -f lambda_nra/*.js
 
+cleanall: clean
+	@rm -r *~ */*~
