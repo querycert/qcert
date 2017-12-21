@@ -39,57 +39,91 @@ public class RunJavascript {
 
 	// Usage
 	private static void usage() {
-		System.err.println("Q*cert Javascript Runner expects two options:\n [-runtime filename] for the Q*cert Javscript runtime\n [-input filename] for the input data\nAnd the Javascript file\n");
+		System.err.println("Q*cert Javascript Runner requires the option -input or -io, the option -runtime and the Javascript file.\n"+
+				   "Options:\n"+
+				   " [-runtime filename] the Q*cert Javscript runtime\n"+
+				   " [-io filename] a JSON object containing the input data, the schema and the expected output\n"+
+				   " [-input filename] the input data\n"+
+				   " [-schema filename] the schema\n"+
+				   " [-output filename] the expected output\n");
 	}
 
 	// Main
 	public static void main(String[] args) throws Exception {
-		if(args.length != 5) {
+		if(args.length < 5) {
 			usage();
 		}
 
 		ScriptEngineManager factory = new ScriptEngineManager();
 		ScriptEngine engine = factory.getEngineByName("JavaScript");
 
-		String inputFile = null;
 		String runtimeFile = null;
-
+		String ioFile = null;
+		String inputFile = null;
+		String schemaFile = null;
+		String outputFile = null;
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
-			// Must have a -input option for the input JSON
-			if ("-input".equals(arg)) { inputFile = args[i+1]; i++; }
-			// Must have a -runtime option for the Q*cert Javascript runtime
-			else if ("-runtime".equals(arg)) { runtimeFile = args[i+1]; i++; }
+			if ("-runtime".equals(arg)) { runtimeFile = args[i+1]; i++; }
+			else if ("-io".equals(arg)) { ioFile = args[i+1]; i++; }
+			else if ("-input".equals(arg)) { inputFile = args[i+1]; i++; }
+			else if ("-schema".equals(arg)) { schemaFile = args[i+1]; i++; }
+			else if ("-output".equals(arg)) { outputFile = args[i+1]; i++; }
 			else {
-				// Load input JSON, which may include schema (inheritance) and output
-				JsonArray output;	
-				if (inputFile != null) {
-					JsonArray[] outputHolder = new JsonArray[1];
-					String funCall = Utils.loadIO(inputFile, outputHolder);
-					engine.eval(funCall);
-					output = outputHolder[0];
-				} else {
-					throw new IllegalArgumentException("Input Data File Missing");
-				}
 				// Load Q*cert Javascript runtime
+			        // Must have a -runtime option for the Q*cert Javascript runtime
 				if (runtimeFile != null) {
 					engine.eval(readFile(runtimeFile));
 				} else {
 					throw new IllegalArgumentException("Runtime File Missing");
 				}
+				// Load input JSON, which may include schema (inheritance) and output
+				// Must have a -input or -io option for the input JSON
+				JsonElement output = null;
+				if (ioFile != null || inputFile != null) {
+				    if (ioFile != null) {
+					JsonArray[] outputHolder = new JsonArray[1];
+					String funCall = Utils.loadIO(ioFile, outputHolder);
+					engine.eval(funCall);
+					output = outputHolder[0];
+				    } else {
+					String funCall = Utils.loadIO(inputFile, null); // TODO: improve
+					engine.eval(funCall);
+				    }
+				} else {
+					throw new IllegalArgumentException("Input Data File Missing");
+				}
+				// Load the schema
+				if (schemaFile != null) {
+				    String inheritance = Utils.loadSchema(schemaFile);
+				    engine.eval(inheritance);
+				}
+				// Load the output
+				if (outputFile != null) {
+				    output = Utils.parseJsonFileToElement(outputFile);
+				}
+				// Eval
 				engine.eval(new java.io.FileReader(arg));
-				// Evaluate the compiler query + stringify the result
-				engine.eval("var result = JSON.stringify(query(world));");
+				// Evaluate the compiler query
+				engine.eval("var result = query(world);");
 				// Get the result
-				String result = (String) engine.get("result");
-				// Print the result
-				System.out.println(result);
+				String resultAsSting= (String) engine.eval("JSON.stringify(result)");
 				// Validate the result
-				if (output != null) {
-					if (validate(result, output))
-						System.out.println("As expected.");
-					else
-						System.out.println("Result was not as expected.  Expected result: " + output);
+				if (output == null) {
+				    // Print the result
+				    System.out.println(resultAsSting);
+				} else {
+				    engine.eval("var expected = "+output+";");
+				    Boolean valid = (Boolean)engine.eval("equal(result, expected)");
+				    if (valid) {
+					System.out.println("["+arg+" js] OK");
+				    } else {
+					System.out.println("["+arg+" js] ERROR");
+					System.out.println("Actual:");
+					System.out.println(resultAsSting);
+					System.out.println("Expected:");
+					System.out.println(output);
+				    }
 				}
 			}
 		}
@@ -97,7 +131,7 @@ public class RunJavascript {
 
 	// Validate a result when output has been provided as a JsonArray (optional)
 	private static boolean validate(String result, JsonArray expected) {
-		JsonArray actual = new JsonParser().parse(result).getAsJsonArray().get(0).getAsJsonArray();
+		JsonArray actual = new JsonParser().parse(result).getAsJsonArray();
 		if (actual.size() != expected.size())
 			return false;
 		for (JsonElement e : actual)

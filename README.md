@@ -412,11 +412,12 @@ are some initial target-specific guidelines.
 ### JavaScript Target
 
 To run a query compiled to JavaScript, you can call `java` for the
-`RunJavascript` query runner (It uses uses the Nashorn JavaScript
-engine for the JVM). You will need to pass it two pieces of
+`RunJavascript` query runner (it uses uses the Nashorn JavaScript
+engine for the JVM). You will need to pass it three pieces of
 information: (i) the location of the Q\*cert runtime for JavaScript,
-and (ii) some input data on which to run the query. From the command
-line, you can do it as follows:
+(ii) some input data on which to run the query, and (iii) the
+JavaScript code of the query. From the command line, you can do it as
+follows:
 
 ```
 $ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
@@ -425,10 +426,10 @@ $ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
        samples/oql/persons1.js
 ```
 
-The input data in [`data/persons.json`](samples/data/persons.json)
+The input data in [`oql/persons.json`](samples/oql/persons.json)
 contains a collection of persons and a collection of companies in JSON
-format and can be used for all the tests. If you run persons1, it
-should return all persons whose age is 32:
+format and can be used for all the tests. If you run the query
+`persons1`, it should return all persons whose age is 32:
 
 ```
 [{"type":["Customer"],"data":{"name":"John Doe","age":32,"cid":123}},

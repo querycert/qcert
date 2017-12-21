@@ -44,7 +44,7 @@ import java.util.Iterator;
 import com.sun.nio.file.ExtendedCopyOption;
 
 /**
- * Some utilities for managing compilation for the Spark backend 
+ * Some utilities for managing compilation for the Spark backend
  */
 public class Utils {
 	/** Somewhat baked in relative name of the Scala jar to be submitted to spark */
@@ -188,7 +188,7 @@ public class Utils {
 	 */
 	private static JsonArray flatten(JsonArray toFlatten, JsonArray into) {
 		for (JsonElement e : toFlatten.getAsJsonArray()) {
-			if (e.isJsonArray()) 
+			if (e.isJsonArray())
 				flatten((JsonArray) e, into);
 			else
 				into.add(e);
@@ -269,7 +269,7 @@ public class Utils {
 		System.out.println("Actual: " + actualCompare);
                 return false;
 	}
-    
+
 	public static JsonObject parseJsonFileToObject(String ioFile) throws Exception {
 		return new JsonParser().parse(new FileReader(ioFile)).getAsJsonObject();
 	}
@@ -278,12 +278,16 @@ public class Utils {
 		return new JsonParser().parse(new FileReader(ioFile)).getAsJsonArray();
 	}
 
+	public static JsonElement parseJsonFileToElement(String inputFile) throws IOException {
+		return new JsonParser().parse(new FileReader(inputFile));
+	}
+
 	/**
 	 * Parse the I/O file, producing a JsonObject with three members (input, output, inheritance)
 	 * @param ioFile the path name of the I/O file
 	 * @return a JsonObject resulting from the parsing
 	 */
-	public static String loadIO(String inputFile, JsonArray[] output) throws IOException {
+	public static String loadIO(String inputFile, JsonElement[] output) throws IOException {
 		JsonElement rawInput = new JsonParser().parse(new FileReader(inputFile));
 		if (rawInput.isJsonObject()) {
 			// All acceptable input formats are JSON objects
@@ -300,14 +304,40 @@ public class Utils {
 			if (inheritance == null)
 				inheritance = new JsonArray();
 			// Attempt to obtain output (else leave output argument as is)
-			if (input.has("output"))
-				output[0] = input.get("output").getAsJsonArray();
+			if (input.has("output") && output != null)
+				output[0] = input.get("output");
 			// Let input contain just the input object
 			if (input.has("input"))
 				input = input.get("input").getAsJsonObject();
 			// Assemble result
-			return String.format("var world = %s;%nvar inheritance = %s;", input, inheritance); 
+			return String.format("var world = %s;%nvar inheritance = %s;", input, inheritance);
 		}
 		throw new IllegalArgumentException("Input file does not have a recognized format");
 	}
+
+	/**
+	 * Parse the schema file, producing a JsonObject with member inheritance
+	 * @param schemaFile the path name of the schema file
+	 * @return string defining the inheritance variable
+	 */
+	public static String loadSchema(String inputFile) throws IOException {
+		JsonElement rawInput = new JsonParser().parse(new FileReader(inputFile));
+		if (rawInput.isJsonObject()) {
+			// All acceptable input formats are JSON objects
+			JsonObject schema = rawInput.getAsJsonObject();
+			// Attempt to obtain inheritance (else use empty array)
+			JsonArray inheritance = null;
+			if (schema.has("hierarchy"))
+			    inheritance = schema.get("hierarchy").getAsJsonArray();
+			else if (schema.has("inheritance"))
+			    inheritance = schema.get("inheritance").getAsJsonArray();
+			if (inheritance == null)
+				inheritance = new JsonArray();
+			// Assemble result
+			return String.format("var inheritance = %s;", inheritance);
+		}
+		throw new IllegalArgumentException("Schema file does not have a recognized format");
+	}
+
+
 }
