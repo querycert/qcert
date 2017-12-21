@@ -37,7 +37,7 @@
 	"license": "Apache-2.0",
 	"homepage": "https://querycert.github.io/index.html",
 	"scripts": {
-		"compile": "tsc",		
+		"compile": "tsc",
 		"prepack": "tsc"
 	},
 	"devDependencies": {
