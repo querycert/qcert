@@ -69,7 +69,7 @@ step.
 
 5.  Type
 
-make -C ../javaServices install
+make -C ../javaService install
 
 to package up the Java services for use by the qcert command line tool and the qcert.html web form.
 

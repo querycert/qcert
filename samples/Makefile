@@ -314,4 +314,4 @@ clean:
 	@rm -f lambda_nra/*.js
 
 cleanall: clean
-	@rm -r *~ */*~
+	@rm -f *~ */*~
