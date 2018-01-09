@@ -92,7 +92,7 @@ let args_list gconf =
       ("-cloudant-prefix", Arg.String (QcertArg.set_prefix gconf),
        "<pref> Database prefix (only for Cloudant target)");
       ("-link-js-runtime", Arg.Unit (QcertArg.set_link_js_runtime gconf),
-       "Link the JavaScript runtime (only for JavaScript and Cloudant targets)");
+       " Link the JavaScript runtime (only for JavaScript and Cloudant targets)");
       ("-java-imports", Arg.String (QcertArg.set_java_imports gconf),
        "<imports> Additional imports for the Java runtime (only for Java target)");
       ("-vinit", Arg.String (QcertArg.set_vinit gconf),
