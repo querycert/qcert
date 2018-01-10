@@ -38,7 +38,7 @@ can just add the corresponding libraries:
 
 ```
 $ opam install ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
-$ opam install coq.8.7.0
+$ opam install coq.8.7.1
 ```
 
 ### Java (Recommended)
