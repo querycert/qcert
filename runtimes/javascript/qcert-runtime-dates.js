@@ -16,9 +16,9 @@
 
 /* Addendum to "standard library" with limited support for SQL-style dates and durations (aka "intervals") */
 
-DAY = "DAY";
-MONTH = "MONTH";
-YEAR = "YEAR";
+var DAY = "DAY";
+var MONTH = "MONTH";
+var YEAR = "YEAR";
 
 function sqlGetDateComponent(part, date) {
 	mustBeDate(date);
