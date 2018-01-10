@@ -393,7 +393,7 @@ Section NNRCtoJavaScript.
     (* Free variables are assumed to be constant lookups *)
     (* Java equivalent: JavaScriptBackend.closeFreeVars *)
     Definition closeFreeVars (input:string) (e:nnrc) (params:list string) : nnrc :=
-      let all_free_vars := nnrc_global_vars e in
+      let all_free_vars := bdistinct (nnrc_global_vars e) in
       let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
           if (in_dec string_dec fv params)
           then e'
