@@ -100,6 +100,29 @@ Section Lift.
   Proof.
     destruct x; simpl; intuition; [inversion H; eauto|discriminate].
   Qed.
+
+  Lemma some_lift2 {A B C:Type} {f:A->B->C} {x y z} :
+    lift2 f x y = Some z ->
+    {x':A & {y':B | x = Some x' & y = Some y' /\ z = f x' y'}}.
+  Proof.
+    destruct x; simpl; intuition; [inversion H; eauto|discriminate].
+    destruct y; simpl; intuition; [inversion H; eauto|discriminate].
+  Qed.
+
+  Lemma some_olift {A B:Type} {f:A->option B} {x y} :
+    olift f x = Some y ->
+    {z | x = Some z & Some y = f z}.
+  Proof.
+    destruct x; simpl; intuition; [inversion H; eauto|discriminate].
+  Qed.
+
+  Lemma some_olift2 {A B C:Type} {f:A->B->option C} {x y z} :
+    olift2 f x y = Some z ->
+    {x':A & {y':B | x = Some x' & y = Some y' /\ Some z = f x' y'}}.
+  Proof.
+    destruct x; simpl; intuition; [inversion H; eauto|discriminate].
+    destruct y; simpl; intuition; [inversion H; eauto|discriminate].
+  Qed.
   
   Lemma lift_injective {A B:Type} (f:A->B)  :
     (forall x y, f x = f y -> x = y) ->
