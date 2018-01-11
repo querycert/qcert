@@ -221,7 +221,7 @@ Section NNRCtoJavaScript.
         * string                          (* JavaScript expression holding result *)
         * nat                             (* next available unused temporary *)
       := match n with
-         | NNRCGetConstant v => ("", "v" ++ v, t)
+         | NNRCGetConstant v => ("", "vc$" ++ v, t)
          | NNRCVar v =>
            match assoc_lookupr equiv_dec ivs v with
            | Some v_string => ("", v_string, t)
@@ -398,7 +398,9 @@ Section NNRCtoJavaScript.
           if (in_dec string_dec fv params)
           then e'
           else
-            (NNRCLet fv (NNRCUnop (OpDot fv) (NNRCVar input)) e')
+            (* note that this is a bit hacky, and relies on the NNRCLet translation to turn this into "vc$", 
+               matching up with the translation of NNRCGetConstant *)
+            (NNRCLet ("c$" ++ fv) (NNRCUnop (OpDot fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
 
