@@ -22,31 +22,6 @@ open QcertCompiler.EnhancedCompiler
 
 
 (**********************************)
-(* Library functions              *)
-(**********************************)
-
-let compile source_lang_s target_lang_s q_s =
-  let result =
-    begin try
-      let source_lang = language_of_name (Js.to_string source_lang_s) in
-      let target_lang = language_of_name (Js.to_string target_lang_s) in
-      let (qname, q) = ParseString.parse_query_from_string source_lang (Js.to_string q_s) in
-      let schema = TypeUtil.empty_schema in
-      let brand_model = schema.TypeUtil.sch_brand_model in
-      let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-      let dv_conf = QDriver.default_dv_config brand_model in
-      let q_target =
-        QDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
-      in
-      let p_conf = PrettyCommon.default_pretty_config () in
-      QcertOut.output_query p_conf q_target
-    with Qcert_Error err -> "compilation error: "^err
-    | _ -> "compilation error"
-    end
-  in
-  Js.string result
-
-(**********************************)
 (* Configuration support          *)
 (**********************************)
 
@@ -310,5 +285,5 @@ let _ =
     val languagesPath = Js.wrap_callback json_of_source_to_target_path
     val optimList = Js.wrap_callback json_of_optim_list
     val optimDefaults = Js.wrap_callback json_of_optim_default
-    val compile  = Js.wrap_callback qcert_compile
+    val compile = Js.wrap_callback qcert_compile
    end)

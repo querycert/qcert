@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+# User-level configuration
+include ../Makefile.config
+# Contains the list of all the Coq modules
 include ../Makefile.coq_modules
 
 ## Configuraton
@@ -98,10 +101,6 @@ clean:
 	rm -f ../bin/$(MAIN3).js
 
 cleanall: clean
-	rm -f RuleLexer.ml RuleParser.ml RuleParser.mli
-	rm -f CampLexer.ml CampParser.ml CampParser.mli
-	rm -f DataLexer.ml DataParser.ml DataParser.mli
-	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f QcertExtraction.glob QcertExtraction.vo .QcertExtraction.aux
 	rm -rf extracted
 	rm -rf src/QcertJsRuntime.ml
