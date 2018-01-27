@@ -22,9 +22,3 @@ Section Var.
 
 End Var.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
-

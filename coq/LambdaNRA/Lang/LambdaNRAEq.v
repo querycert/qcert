@@ -185,8 +185,3 @@ Section LambdaNRAEq.
 
 End LambdaNRAEq.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

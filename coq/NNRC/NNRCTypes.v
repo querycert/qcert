@@ -20,8 +20,3 @@ Require Export TNNRC.
 Require Export TNNRCEq.
 Require Export TNNRCShadow.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

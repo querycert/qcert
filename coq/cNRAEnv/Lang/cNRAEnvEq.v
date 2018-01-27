@@ -356,8 +356,3 @@ End cNRAEnvEq.
 
 Notation "X ≡ₑ Y" := (nraenv_core_eq X Y) (at level 90) : nraenv_core_scope.                             (* ≡ = \equiv *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

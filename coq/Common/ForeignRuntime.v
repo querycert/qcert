@@ -25,8 +25,3 @@ Class foreign_runtime : Type
          ; foreign_runtime_binary_op :> foreign_binary_op
        }.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

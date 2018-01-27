@@ -152,8 +152,3 @@ End NNRCEq.
 
 Notation "X ≡ᶜ Y" := (nnrc_eq X Y) (at level 90) : nnrc_scope.                             (* ≡ = \equiv *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

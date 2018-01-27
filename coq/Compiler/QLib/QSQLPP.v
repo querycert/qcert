@@ -110,8 +110,3 @@ Module QSQLPP(runtime:CompilerRuntime).
 
 End QSQLPP.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -436,8 +436,3 @@ Section NNRCtoJavaScript.
 
 End NNRCtoJavaScript.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

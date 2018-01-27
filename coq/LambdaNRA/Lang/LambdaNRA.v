@@ -499,8 +499,3 @@ Tactic Notation "lambda_nra_cases" tactic(first) ident(c) :=
   | Case_aux c "LNRAFilter"%string
   ].
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

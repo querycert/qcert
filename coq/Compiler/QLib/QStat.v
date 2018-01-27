@@ -45,9 +45,3 @@ Module QStat(runtime:CompilerRuntime).
   End QS.
 End QStat.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

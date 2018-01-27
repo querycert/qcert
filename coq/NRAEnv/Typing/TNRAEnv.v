@@ -145,8 +145,3 @@ Ltac nraenv_input_well_typed :=
                as [xout [xeval xtype]]; rewrite xeval in *; simpl
          end; input_well_typed.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

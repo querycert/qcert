@@ -231,8 +231,3 @@ Section UDelta.
 
 End UDelta.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

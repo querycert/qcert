@@ -339,8 +339,3 @@ Section TcNRAEnvtocNNRC.
 
 End TcNRAEnvtocNNRC.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

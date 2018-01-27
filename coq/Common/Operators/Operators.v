@@ -25,8 +25,3 @@ Require Export UnaryOperatorsSem.
 Require Export BinaryOperatorsSem.
 Require Export OperatorsEq.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

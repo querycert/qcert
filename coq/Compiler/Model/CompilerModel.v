@@ -97,8 +97,3 @@ Module Type CompilerBrandModel(ftype:CompilerForeignType).
   Axiom compiler_brand_model : brand_model.
 End CompilerBrandModel.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

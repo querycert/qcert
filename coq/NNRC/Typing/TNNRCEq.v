@@ -329,8 +329,3 @@ End TNNRCEq.
 
 Notation "e1 ⇒ᶜ e2" := (tnnrc_rewrites_to e1 e2) (at level 80).
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

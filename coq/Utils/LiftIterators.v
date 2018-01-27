@@ -315,8 +315,3 @@ Section LiftIterators.
 
 End LiftIterators.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -289,8 +289,3 @@ Section NRATest.
 
 End NRATest.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

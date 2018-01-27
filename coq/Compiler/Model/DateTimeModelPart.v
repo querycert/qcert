@@ -296,8 +296,3 @@ Definition time_to_javascript_binary_op
      | bop_time_duration_between => jsFunc "timeDurationBetween" d1 d2
      end.  
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

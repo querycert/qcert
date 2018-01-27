@@ -132,8 +132,3 @@ Section TOQLtoNRAEnv.
         
 End TOQLtoNRAEnv.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -482,8 +482,3 @@ Notation "h ⊧ t1 ⇝ₓ t2 ⊣ c ; tenv" := (@typed_nraenv h c tenv t1 t2) (at
 Notation "X ≡τₓ Y" := (tnraenv_eq X Y) (at level 80) : nraenv_scope.               (* ≡ = \equiv *)
 Notation "X ≡τ'ₓ Y" := (tnraenv_eq (exist _ _ X) (exist _ _ Y)) (at level 80) : nraenv_scope.               (* ≡ = \equiv *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

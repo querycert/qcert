@@ -57,8 +57,3 @@ Section UTDelta.
 
 End UTDelta.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

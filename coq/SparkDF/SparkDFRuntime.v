@@ -17,8 +17,3 @@
 Require Export CommonRuntime.
 Require Export SparkDF.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

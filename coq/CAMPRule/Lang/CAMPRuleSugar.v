@@ -79,8 +79,3 @@ Notation "a ;; b" := (a b) (at level 99, right associativity, only parsing) : ca
 (* Can be use inside an aggregate (function composition instead of application *)
 Notation "a ;;; b" := (fun x => a (b x)) (at level 99, right associativity, only parsing) : camp_scope.  
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

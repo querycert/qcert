@@ -63,8 +63,3 @@ Section DataframeSize.
 
 End DataframeSize.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

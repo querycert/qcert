@@ -39,8 +39,3 @@ Require EnhancedCompiler.
 
 Extraction "QcertCompiler" EnhancedCompiler.EnhancedCompiler.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../coq/CAMP" "CAMP")) ***
-*** End: ***
-*)

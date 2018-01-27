@@ -110,9 +110,3 @@ Module QDriver(runtime:CompilerRuntime).
   End QD.
 End QDriver.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

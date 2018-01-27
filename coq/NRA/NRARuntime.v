@@ -22,8 +22,3 @@ Require Export NRAExt.
 Require Export NRAExtEq.
 Require Export NRASize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

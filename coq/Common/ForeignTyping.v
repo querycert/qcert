@@ -30,8 +30,3 @@ Class foreign_typing
          ; foreign_typing_binary_op :> foreign_binary_op_typing
        }.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -736,9 +736,3 @@ End TBinaryOperators.
     | Case_aux c "type_OpArithBinary"%string
     | Case_aux c "type_OpForeignBinary"%string].
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

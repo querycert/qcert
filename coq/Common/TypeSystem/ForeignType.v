@@ -37,8 +37,3 @@ Section ForeignType.
   
 End ForeignType.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
- *)

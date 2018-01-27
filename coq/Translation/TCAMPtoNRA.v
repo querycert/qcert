@@ -445,8 +445,3 @@ Section TCAMPtoNRA.
 
 End TCAMPtoNRA.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

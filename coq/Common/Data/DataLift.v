@@ -186,8 +186,3 @@ Hint Rewrite @lift_map_id : alg.
 Hint Rewrite @lift_map_map : alg.
 Hint Rewrite @lift_dcoll_cons : alg.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

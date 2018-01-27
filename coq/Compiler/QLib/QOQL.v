@@ -93,8 +93,4 @@ Module QOQL(runtime:CompilerRuntime).
     := OQL.OQuery.
   
 End QOQL.
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
+

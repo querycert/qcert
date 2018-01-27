@@ -256,8 +256,3 @@ Ltac optim_correct_list_complete_prover :=
   unfold optim_model_list_complete; simpl; intros ? steps
   ; repeat optim_correct_list_complete_step steps.
 
-(* 
- *** Local Variables: ***
- *** coq-load-path: (("../../coq" "Qcert")) ***
- *** End: ***
- *)

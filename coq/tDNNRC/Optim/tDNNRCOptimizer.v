@@ -499,8 +499,3 @@ Section tDNNRCOptimizer.
 
 End tDNNRCOptimizer.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -123,9 +123,3 @@ Section ForeignOperatorsTyping.
   
 End ForeignOperatorsTyping.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

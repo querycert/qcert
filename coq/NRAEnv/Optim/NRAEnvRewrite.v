@@ -1930,8 +1930,3 @@ Hint Rewrite @rproject_over_either  : nraenv_core_optim.
   
 (* end hide *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

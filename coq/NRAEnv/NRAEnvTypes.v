@@ -19,8 +19,3 @@ Require Export cNRAEnvTypes. (* Always include core support *)
 Require Export TNRAEnv.
 Require Export TNRAEnvEq.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

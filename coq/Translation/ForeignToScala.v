@@ -34,8 +34,3 @@ Class foreign_to_scala {fruntime:foreign_runtime} {ftype: foreign_type}: Type
   
 End ForeigntoScala.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

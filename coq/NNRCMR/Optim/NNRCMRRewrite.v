@@ -1486,9 +1486,3 @@ Section NNRCMRRewrite.
 
 End NNRCMRRewrite.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

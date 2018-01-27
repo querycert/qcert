@@ -145,8 +145,3 @@ Module QOperators(runtime:CompilerRuntime).
   End Binary.
 End QOperators.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

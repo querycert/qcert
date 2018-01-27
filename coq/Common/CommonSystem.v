@@ -25,8 +25,3 @@ Class basic_model : Type
          ; basic_model_foreign_typing :> foreign_typing
        }.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

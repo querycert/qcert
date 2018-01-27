@@ -321,8 +321,3 @@ Tactic Notation "nraext_cases" tactic(first) ident(c) :=
   | Case_aux c "xNRAUnnestTwo"
   | Case_aux c "xNRAGroupBy" ].
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

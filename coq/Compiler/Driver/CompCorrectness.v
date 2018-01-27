@@ -1691,9 +1691,3 @@ input data returns the same output data. *)
 
 End CompCorrectness.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

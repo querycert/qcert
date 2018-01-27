@@ -435,9 +435,3 @@ Section DataSort.
 
 End DataSort.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

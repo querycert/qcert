@@ -438,8 +438,3 @@ Section NNRCtoJava.
 
 End NNRCtoJava.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

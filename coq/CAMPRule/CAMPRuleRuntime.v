@@ -18,8 +18,3 @@ Require Export CommonRuntime.
 Require Export CAMPRule.
 Require Export CAMPRuleSugar.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

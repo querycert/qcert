@@ -522,8 +522,3 @@ Section UPropag.
 
 End UPropag.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

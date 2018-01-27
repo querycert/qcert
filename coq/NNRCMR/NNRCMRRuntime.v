@@ -18,9 +18,3 @@ Require Export CommonRuntime.
 Require Export ForeignReduceOps.
 Require Export NNRCMR.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
-

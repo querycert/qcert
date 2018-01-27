@@ -240,8 +240,3 @@ Section DataNorm.
   
 End DataNorm.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

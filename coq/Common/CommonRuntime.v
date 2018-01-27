@@ -19,8 +19,3 @@ Require Export BrandRelation.
 Require Export CommonData.
 Require Export Operators.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

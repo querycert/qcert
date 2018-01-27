@@ -1895,9 +1895,3 @@ End MergeBindings.
 
 Hint Resolve @merge_bindings_sorted.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
-

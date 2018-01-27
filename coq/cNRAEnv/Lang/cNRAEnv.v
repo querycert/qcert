@@ -1592,8 +1592,3 @@ Tactic Notation "nraenv_core_cases" tactic(first) ident(c) :=
   | Case_aux c "cNRAEnvAppEnv"%string
   | Case_aux c "cNRAEnvMapEnv"%string].
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -18,9 +18,3 @@ Require Export CommonRuntime.
 Require Export DNNRCSystem.
 Require Export tDNNRC.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
-

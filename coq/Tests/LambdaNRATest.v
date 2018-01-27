@@ -277,8 +277,3 @@ Definition T2env_opt := nraenv_optim_default T2env.
 Definition T2nnrc_opt := TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T2env_opt.
 (* Eval vm_compute in T2nnrc_opt. *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

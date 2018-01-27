@@ -84,8 +84,3 @@ Module QEval(runtime:CompilerRuntime).
 
 End QEval.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

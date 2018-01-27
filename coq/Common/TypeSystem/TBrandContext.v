@@ -76,8 +76,3 @@ Section TBrandContext.
   End Brand_Context.
 End TBrandContext.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -454,8 +454,3 @@ Section CAMPtoNRA.
   
 End CAMPtoNRA.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

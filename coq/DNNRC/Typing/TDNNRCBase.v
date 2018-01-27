@@ -431,8 +431,3 @@ End TDNNRCBase.
 
 (* Global Arguments TAlgPlug {m} plug_type {plug} : clear implicits.  *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

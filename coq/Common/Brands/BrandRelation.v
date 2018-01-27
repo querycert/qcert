@@ -1415,8 +1415,3 @@ Defined.
    
 Hint Resolve canon_brands_is_canon_brands.
   
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

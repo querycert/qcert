@@ -2079,8 +2079,3 @@ Section TcNNRCtoCAMP.
 
 End TcNNRCtoCAMP.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

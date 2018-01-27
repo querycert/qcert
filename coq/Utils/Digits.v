@@ -1465,8 +1465,3 @@ Section Bases.
 
 End Bases.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

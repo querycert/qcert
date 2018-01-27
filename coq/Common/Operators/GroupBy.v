@@ -1046,9 +1046,3 @@ Section GroupBy.
 
 End GroupBy.
   
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

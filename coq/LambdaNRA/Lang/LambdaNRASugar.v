@@ -52,9 +52,3 @@ Section LambdaNRASugar.
   
 End LambdaNRASugar.
 
-
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

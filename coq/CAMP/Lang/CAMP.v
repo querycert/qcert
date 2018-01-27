@@ -537,8 +537,3 @@ Tactic Notation "camp_cases" tactic(first) ident(c) :=
   | Case_aux c "pright"%string].
 (* end hide *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

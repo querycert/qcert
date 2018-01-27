@@ -116,9 +116,3 @@ Section TDData.
   
 End TDData.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

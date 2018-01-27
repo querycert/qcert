@@ -191,8 +191,3 @@ Definition sqlpp_to_nraenv_top := sqlpp_to_nraenv.
 
 End SQLPPtoNRAEnv.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

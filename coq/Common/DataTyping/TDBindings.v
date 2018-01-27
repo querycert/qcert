@@ -136,9 +136,3 @@ End TDBindings.
 
 Hint Resolve dbindings_type_Forall_normalized.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

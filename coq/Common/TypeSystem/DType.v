@@ -61,9 +61,3 @@ Section DType.
 
 End DType.
 
-    
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
- *)

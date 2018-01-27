@@ -2037,8 +2037,3 @@ Section cNNRCtoCAMP.
   End Top.
 End cNNRCtoCAMP.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

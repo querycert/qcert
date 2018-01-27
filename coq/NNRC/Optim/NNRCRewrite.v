@@ -517,8 +517,3 @@ End NNRCRewrite.
 Hint Rewrite @sigma_to_if : nnrc_rew.
 (* Hint Rewrite subst_var_preserves : nnrc_rew. *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

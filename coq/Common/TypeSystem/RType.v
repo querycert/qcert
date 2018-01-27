@@ -1048,21 +1048,21 @@ Ltac rtype_equalizer :=
 
 Ltac r_ext := solve [erewrite (rtype_ext); eauto].
 
-  Ltac rtype_lift_simpler :=
-    match goal with
-      | [ |- lift ?f ?x = Some (?f ?y)] => apply (lift_some y); [|reflexivity]
-      | [ |- lift ?f ?x = None] => apply lift_none
-      | [H:lift ?f ?x = None |- _] => apply none_lift in H
-      | [H: lift (Rec₀ _) ?l1 = Some (Rec₀ _ ?l2) |- _ ] => apply some_lift_Rec₀ in H
-      | [H: lift (Rec₀ _) ?l1 = lift (Rec₀ _) ?l2 |- _ ] => apply lift_Rec₀_injective in H
-      | [H: lift Coll₀ ?l1 = Some (Coll₀ ?l2) |- _ ] => apply some_lift_Coll₀ in H
-      | [H: lift Coll₀ ?l1 = lift Coll₀ ?l2 |- _ ] => apply lift_Coll₀_injective in H
-      | [H: lift Coll ?l1 = Some (Coll ?l2) |- _ ] => apply some_lift_Coll in H
-      | [H: lift Coll ?l1 = lift Coll ?l2 |- _ ] => apply lift_Coll_injective in H
-    end.
+Ltac rtype_lift_simpler :=
+  match goal with
+  | [ |- lift ?f ?x = Some (?f ?y)] => apply (lift_some y); [|reflexivity]
+  | [ |- lift ?f ?x = None] => apply lift_none
+  | [H:lift ?f ?x = None |- _] => apply none_lift in H
+  | [H: lift (Rec₀ _) ?l1 = Some (Rec₀ _ ?l2) |- _ ] => apply some_lift_Rec₀ in H
+  | [H: lift (Rec₀ _) ?l1 = lift (Rec₀ _) ?l2 |- _ ] => apply lift_Rec₀_injective in H
+  | [H: lift Coll₀ ?l1 = Some (Coll₀ ?l2) |- _ ] => apply some_lift_Coll₀ in H
+  | [H: lift Coll₀ ?l1 = lift Coll₀ ?l2 |- _ ] => apply lift_Coll₀_injective in H
+  | [H: lift Coll ?l1 = Some (Coll ?l2) |- _ ] => apply some_lift_Coll in H
+  | [H: lift Coll ?l1 = lift Coll ?l2 |- _ ] => apply lift_Coll_injective in H
+  end.
 
-  (** Cases tactic for use with the derived rtypeRectt induction principle *)
-  Tactic Notation "rtype_rect_cases" tactic(first) ident(c) :=
+(** Cases tactic for use with the derived rtypeRectt induction principle *)
+Tactic Notation "rtype_rect_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "Top"%string
   | Case_aux c "Bottom"%string
@@ -1077,9 +1077,4 @@ Ltac r_ext := solve [erewrite (rtype_ext); eauto].
   | Case_aux c "Brand"%string
   | Case_aux c "Foreign"%string
   ].
-    
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
- *)
+

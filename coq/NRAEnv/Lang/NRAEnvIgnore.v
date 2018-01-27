@@ -401,8 +401,3 @@ Section NRAEnvIgnore.
 
 End NRAEnvIgnore.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

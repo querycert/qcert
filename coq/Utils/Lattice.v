@@ -310,9 +310,3 @@ Infix "≤" := part_le (at level 70, no associativity).
 Infix "⊓" := meet (at level 70). (* ⊓ = \sqcap *)
 Infix "⊔" := join (at level 70). (* ⊔ = \sqcup *)
 
-
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

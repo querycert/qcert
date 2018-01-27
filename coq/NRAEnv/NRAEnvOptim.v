@@ -21,8 +21,3 @@ Require Export NRAEnvRewriteContext.
 Require Export TNRAEnvRewrite.
 Require Export NRAEnvOptimizer.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

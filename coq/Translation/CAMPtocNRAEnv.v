@@ -258,8 +258,3 @@ Section CAMPtocNRAEnv.
   
 End CAMPtocNRAEnv.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

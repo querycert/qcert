@@ -71,9 +71,3 @@ Section DConstants.
 
 End DConstants.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

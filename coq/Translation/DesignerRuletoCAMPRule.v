@@ -32,8 +32,3 @@ Section DesignerRuletoCAMPRule.
     
 End DesignerRuletoCAMPRule.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

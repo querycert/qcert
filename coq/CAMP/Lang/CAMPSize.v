@@ -45,8 +45,3 @@ Section CAMPSize.
 
 End CAMPSize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

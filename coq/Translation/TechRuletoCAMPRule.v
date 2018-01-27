@@ -31,8 +31,3 @@ Section TechRuletoCAMPRule.
     
 End TechRuletoCAMPRule.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

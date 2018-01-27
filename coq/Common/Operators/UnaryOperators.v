@@ -201,8 +201,3 @@ Tactic Notation "unary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpForeignUnary"%string
   ].
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

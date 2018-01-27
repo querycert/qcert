@@ -28,8 +28,3 @@ Require Export TOperatorsInfer.
 Require Export TOperatorsInferSub.
 Require Export ForeignTyping.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

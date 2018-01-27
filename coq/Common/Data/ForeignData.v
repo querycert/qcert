@@ -35,9 +35,3 @@ Section ForeignData.
 
 End ForeignData.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

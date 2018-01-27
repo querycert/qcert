@@ -1114,8 +1114,3 @@ End TNNRCRewrite.
 Hint Rewrite @tsigma_to_if_arrow : nnrc_rew.
 Hint Rewrite @tfor_singleton_to_let_arrow : nnrc_rew.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

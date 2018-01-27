@@ -310,8 +310,3 @@ Ltac nnrc_core_inverter :=
                as [xout [xeval xtype]]; rewrite xeval in *; simpl
          end.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

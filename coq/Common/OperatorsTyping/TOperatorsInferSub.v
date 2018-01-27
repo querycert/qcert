@@ -238,8 +238,3 @@ Section TOperatorsInferSub.
   End u.
 End TOperatorsInferSub.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

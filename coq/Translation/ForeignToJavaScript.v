@@ -74,8 +74,3 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
 
 End ForeigntoJavaScript.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

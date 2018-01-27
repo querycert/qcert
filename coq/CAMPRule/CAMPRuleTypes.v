@@ -17,8 +17,3 @@
 Require Export CommonTypes.
 Require Export TCAMPRule.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

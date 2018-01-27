@@ -281,8 +281,3 @@ End TcNNRCEq.
 
 Notation "e1 ⇒ᶜᶜ e2" := (tnncr_core_rewrites_to e1 e2) (at level 80).
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

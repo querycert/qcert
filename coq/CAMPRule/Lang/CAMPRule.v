@@ -125,8 +125,3 @@ Section CAMPRule.
 
 End CAMPRule.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

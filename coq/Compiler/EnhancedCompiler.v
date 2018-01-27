@@ -20,8 +20,3 @@ Module EnhancedCompiler
   := QLib.QLib(EnhancedModel.EnhancedRuntime)
                       <+ EnhancedModel.CompEnhanced.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

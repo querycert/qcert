@@ -17,8 +17,3 @@
 Require Export DNNRCRuntime.
 Require Export DNNRCTypes.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

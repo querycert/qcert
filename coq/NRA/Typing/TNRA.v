@@ -557,8 +557,3 @@ End TNRA.
 (* Typed algebraic plan *)
 Notation "Op ▷ A >=> B ⊣ C" := (nra_type C Op A B) (at level 70).
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

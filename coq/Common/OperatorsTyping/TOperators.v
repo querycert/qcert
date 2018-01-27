@@ -1247,9 +1247,3 @@ End TOperators.
     | Case_aux c "ATSConcat"%string
     | Case_aux c "ATForeignBinaryOp"%string].
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

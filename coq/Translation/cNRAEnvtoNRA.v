@@ -49,8 +49,3 @@ Section cNRAEnvtoNRA.
     
 End cNRAEnvtoNRA.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

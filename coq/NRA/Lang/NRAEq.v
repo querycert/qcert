@@ -194,8 +194,3 @@ End NRAEq.
 
 Notation "X ≡ₐ Y" := (nra_eq X Y) (at level 90) : nra_scope.                             (* ≡ = \equiv *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

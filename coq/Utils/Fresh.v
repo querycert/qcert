@@ -534,8 +534,4 @@ Ltac prove_fresh_nin
      | [ H:(fresh_var ?pre ?l) = _ |- _ ] =>
        solve[generalize (fresh_var_fresh pre l); simpl; intuition]
      end.
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
+

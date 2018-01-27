@@ -51,8 +51,3 @@ Section tDNNRC.
   
 End tDNNRC.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

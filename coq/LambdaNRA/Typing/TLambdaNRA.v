@@ -344,8 +344,3 @@ Section TLambdaNRA.
   
 End TLambdaNRA.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

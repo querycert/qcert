@@ -1087,8 +1087,3 @@ Section NNRCOptimizer.
 
 End NNRCOptimizer.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

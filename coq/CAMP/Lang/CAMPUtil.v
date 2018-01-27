@@ -283,8 +283,3 @@ Arguments RecoverableError_debug {A} s.
 Arguments Success_debug {A} res.
 (* end hide *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

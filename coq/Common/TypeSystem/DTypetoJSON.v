@@ -48,8 +48,3 @@ Section DTypetoJSON.
   End toDType.
 End DTypetoJSON.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

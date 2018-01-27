@@ -35,8 +35,3 @@ Extract Constant STRING => "string".
 Extract Inlined Constant STRING_eq => "(fun x y -> x = y)".
 Extract Inlined Constant STRING_tostring => "(fun x -> Util.char_list_of_string x)".
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

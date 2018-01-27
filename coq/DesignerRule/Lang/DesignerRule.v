@@ -35,8 +35,3 @@ Section DesignerRule.
   
 End DesignerRule.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

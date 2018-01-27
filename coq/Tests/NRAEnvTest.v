@@ -63,8 +63,3 @@ Section NRAEnvTest.
 
 End NRAEnvTest.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

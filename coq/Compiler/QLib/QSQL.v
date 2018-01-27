@@ -87,8 +87,3 @@ Module QSQL(runtime:CompilerRuntime).
 
 End QSQL.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

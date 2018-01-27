@@ -94,8 +94,4 @@ Module QCAMP(runtime:CompilerRuntime).
     := CAMPSugar.lookup.
   
 End QCAMP.
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
+

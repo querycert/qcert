@@ -36,8 +36,3 @@ Require Export Utils CommonSystem.
 Require Export CAMPRule CAMPRuleSugar CompEnv.
 Open Scope camp_scope.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

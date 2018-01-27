@@ -251,8 +251,3 @@ Section OQLTest.
 
 End OQLTest.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

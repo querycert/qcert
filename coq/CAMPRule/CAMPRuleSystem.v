@@ -17,8 +17,3 @@
 Require Export CAMPRuleRuntime.
 Require Export CAMPRuleTypes.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

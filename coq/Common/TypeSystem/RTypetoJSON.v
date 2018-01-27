@@ -124,8 +124,3 @@ Section RTypeToJSON.
   End toVType.
 End RTypeToJSON.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

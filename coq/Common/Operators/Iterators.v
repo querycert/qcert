@@ -444,8 +444,3 @@ End Iterators.
 
 Hint Rewrite @oflatten_map_dcoll_id : alg.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

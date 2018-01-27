@@ -443,8 +443,3 @@ Section TDataInfer.
 
 End TDataInfer.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

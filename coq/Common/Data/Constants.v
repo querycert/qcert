@@ -35,8 +35,3 @@ Section Constants.
 
 End Constants.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

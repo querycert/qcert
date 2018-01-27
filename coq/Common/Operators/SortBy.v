@@ -201,9 +201,3 @@ Section SortByProps.
 
 End SortByProps.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

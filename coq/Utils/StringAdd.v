@@ -529,9 +529,3 @@ Section Like.
   
 End Like.
 
-
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -36,8 +36,3 @@ Class foreign_to_JSON {fdata:foreign_data}: Type
 
 End ForeignDatatoJSON.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

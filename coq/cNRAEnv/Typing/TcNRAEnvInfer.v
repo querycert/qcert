@@ -468,8 +468,3 @@ Section TcNRAEnvInfer.
   
 End TcNRAEnvInfer.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

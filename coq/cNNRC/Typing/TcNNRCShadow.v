@@ -416,8 +416,3 @@ Section TcNNRCShadow.
 
 End TcNNRCShadow.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

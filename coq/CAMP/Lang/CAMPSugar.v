@@ -236,8 +236,3 @@ Notation "s !#-> p" := (pbdot s p) (only parsing, right associativity, at level 
 Notation "#_" := pit (only parsing): camp_scope.
 Notation "p1 #= p2" := (passert (pbinop OpEqual p1 p2)) (only parsing, right associativity, at level 70): camp_scope.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

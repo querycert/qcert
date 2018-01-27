@@ -19,8 +19,3 @@ Require Export OQL.
 Require Export OQLSugar.
 Require Export OQLSize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

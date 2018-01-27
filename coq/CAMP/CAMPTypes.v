@@ -18,8 +18,3 @@ Require Export CommonTypes.
 Require Export TCAMP.
 Require Export TCAMPSugar.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

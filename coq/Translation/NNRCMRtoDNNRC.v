@@ -150,9 +150,3 @@ Section NNRCMRtoDNNRC.
 
 End NNRCMRtoDNNRC.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -60,9 +60,3 @@ Section TDataTest.
   
 End TDataTest.
 
-
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

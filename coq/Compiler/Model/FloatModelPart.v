@@ -312,8 +312,3 @@ Definition float_to_java_binary_op
      | bop_float_ge => mk_java_binary_op0 "float_ge" d1 d2
      end.
   
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

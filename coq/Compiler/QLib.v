@@ -42,8 +42,3 @@ Module QLib(runtime:CompilerRuntime).
 
 End QLib.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

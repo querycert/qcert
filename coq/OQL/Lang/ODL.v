@@ -49,8 +49,3 @@ Section ODL.
     
 End ODL.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

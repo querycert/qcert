@@ -2773,8 +2773,3 @@ Module CompEnhanced.
   End Enhanced.
 End CompEnhanced.  
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

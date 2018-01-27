@@ -37,8 +37,3 @@ Section ForeigntoSpark.
 
 End ForeigntoSpark.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

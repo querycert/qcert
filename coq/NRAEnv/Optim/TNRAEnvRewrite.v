@@ -3350,8 +3350,3 @@ Hint Rewrite @tflatten_flatten_map_either_nil : tnraenv_core_optim.
 Hint Rewrite @tcount_over_flat_map_either_nil_app_singleton : tnraenv_core_optim.
 (* end hide *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -35,8 +35,3 @@ Require Export JSON.
 Require Export OptimizerStep.
 Require Export OptimizerLogger.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -533,8 +533,3 @@ End lift_map.
 
 End TUtil.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

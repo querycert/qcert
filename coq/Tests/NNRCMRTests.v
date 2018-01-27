@@ -263,8 +263,3 @@ Eval vm_compute in olift get_result res_loop_dist.
 
 End SampleRules.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

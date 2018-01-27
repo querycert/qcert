@@ -253,8 +253,3 @@ Section DatatoJSON.
 
 End DatatoJSON.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

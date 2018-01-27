@@ -331,8 +331,3 @@ Section SQLPPSize.
 
 End SQLPPSize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

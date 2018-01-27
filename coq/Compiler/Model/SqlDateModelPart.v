@@ -269,8 +269,3 @@ Definition sql_date_to_javascript_binary_op
      | bop_sql_date_interval_between => jsFunc "sqlDateDurationBetween" d1 d2
      end.  
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

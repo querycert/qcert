@@ -594,8 +594,3 @@ Section CldMR.
   
 End CldMR.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -24,9 +24,3 @@ Section Version.
 
 End Version.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
-

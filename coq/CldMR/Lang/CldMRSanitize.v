@@ -91,8 +91,3 @@ Section CldMRSanitize.
 
 End CldMRSanitize.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -20,8 +20,3 @@ Require Export CldMRUtil.
 Require Export CldMR.
 Require Export CldMRSanitize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

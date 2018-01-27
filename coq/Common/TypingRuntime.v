@@ -24,8 +24,3 @@ Record typing_runtime
          typing_runtime_brand_model : @brand_model ftype;
        }.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

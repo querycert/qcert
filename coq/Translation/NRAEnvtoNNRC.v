@@ -656,8 +656,3 @@ Section NRAEnvtoNNRC.
 
 End NRAEnvtoNNRC.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

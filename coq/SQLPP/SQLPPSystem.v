@@ -16,8 +16,3 @@
 
 Require Export SQLPPRuntime.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

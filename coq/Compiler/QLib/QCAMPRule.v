@@ -54,8 +54,4 @@ Module QCAMPRule(runtime:CompilerRuntime).
     := CAMPRuleSugar.fetchRef.
 
 End QCAMPRule.
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
+

@@ -50,8 +50,3 @@ Section size.
 
 End size.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

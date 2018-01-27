@@ -34,8 +34,3 @@ Section ForeignCloudant.
 
 End ForeignCloudant.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

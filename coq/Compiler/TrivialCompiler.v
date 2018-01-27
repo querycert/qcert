@@ -22,8 +22,3 @@ Module TrivialCompiler.
   Module TrivialCompiler := QLib.QLib(Runtime).
 End TrivialCompiler.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -71,9 +71,3 @@ Section OQLSize.
   
 End OQLSize.
 
-
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

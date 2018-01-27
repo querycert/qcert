@@ -16,8 +16,3 @@
 
 Require Export SQLRuntime.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

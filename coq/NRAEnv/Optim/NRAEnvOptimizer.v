@@ -3298,8 +3298,3 @@ Section NRAEnvOptimizer.
 
 End NRAEnvOptimizer.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

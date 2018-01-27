@@ -1059,8 +1059,3 @@ Section OQLtoNRAEnv.
 
 End OQLtoNRAEnv.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

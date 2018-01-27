@@ -72,9 +72,3 @@ Module QLang(runtime:CompilerRuntime).
   End QL.
 End QLang.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

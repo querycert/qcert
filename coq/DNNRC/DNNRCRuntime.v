@@ -22,9 +22,3 @@ Require Export Dataframe.
 Require Export DataframeSize.
 Require Export DNNRC.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
-

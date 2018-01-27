@@ -20,8 +20,3 @@ Require Export CAMP.
 Require Export CAMPSize.
 Require Export CAMPSugar.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -19,8 +19,3 @@ Require Export NNRCRewrite.
 Require Export TNNRCRewrite.
 Require Export NNRCOptimizer.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -476,8 +476,3 @@ Section NNRCRewriteUtil.
 
 End NNRCRewriteUtil.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

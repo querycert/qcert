@@ -436,8 +436,3 @@ Section tDNNRCtoSparkDF.
 
 End tDNNRCtoSparkDF.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

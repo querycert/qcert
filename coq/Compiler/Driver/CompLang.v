@@ -432,9 +432,3 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_cloudant"%string
   | Case_aux c "L_error"%string].
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

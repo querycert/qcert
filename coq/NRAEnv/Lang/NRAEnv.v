@@ -779,8 +779,3 @@ Tactic Notation "nraenv_cases" tactic(first) ident(c) :=
   | Case_aux c "NRAEnvGroupBy"%string
   | Case_aux c "NRAEnvUnnest"%string].
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

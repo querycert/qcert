@@ -121,8 +121,3 @@ Section BinaryOperatorsSem.
   
 End BinaryOperatorsSem.
 
-(* 
- *** Local Variables: ***
- *** coq-load-path: (("../../../coq" "Qcert")) ***
- *** End: ***
- *)

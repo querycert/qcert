@@ -428,8 +428,3 @@ Section TNRARewrite.
  
 End TNRARewrite.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

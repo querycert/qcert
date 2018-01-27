@@ -1588,8 +1588,3 @@ Hint Rewrite
 Hint Unfold ldeqA.
 Hint Unfold mult_equiv.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -162,9 +162,3 @@ Section TSortBy.
 
 End TSortBy.
 
-(* 
- *** Local Variables: ***
- *** coq-load-path: (("../../../coq" "Qcert")) ***
- *** End: ***
- *)
-

@@ -377,8 +377,3 @@ Section NNRCSugar.
   
 End NNRCSugar.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

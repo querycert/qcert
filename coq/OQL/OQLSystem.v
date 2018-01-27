@@ -17,8 +17,3 @@
 Require Export OQLRuntime.
 Require Export OQLTypes.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

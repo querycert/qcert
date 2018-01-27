@@ -426,8 +426,3 @@ with sqlpp_when_then : Set:=
   
 End SQLPP.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

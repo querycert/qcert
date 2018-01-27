@@ -901,8 +901,3 @@ Class ToString (A:Type)
       toString (a:A) : string
       }.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -68,8 +68,3 @@ End TNRAExt.
 Notation "Op ▷ A >=> B ⊣ C" := (nraext_type Op C A B) (at level 70) : nraext_scope.
 Notation "Op @▷ d ⊣ c" := (tnraext_eval Op d c) (at level 70) : nraext_scope.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

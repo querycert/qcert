@@ -17,8 +17,3 @@
 Require Export LambdaNRARuntime.
 Require Export LambdaNRATypes.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

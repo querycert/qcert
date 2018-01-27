@@ -568,8 +568,3 @@ Section NNRCMRtoSparkRDD.
 
 End NNRCMRtoSparkRDD.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

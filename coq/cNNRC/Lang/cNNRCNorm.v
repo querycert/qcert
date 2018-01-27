@@ -109,8 +109,3 @@ End cNNRCNorm.
 
 Hint Resolve nnrc_core_eval_normalized.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

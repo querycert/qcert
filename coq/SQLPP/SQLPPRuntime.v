@@ -18,8 +18,3 @@ Require Export CommonRuntime.
 Require Export SQLPP.
 Require Export SQLPPSize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -315,19 +315,14 @@ Section LambdaNRAtoNRAEnv.
 
 End LambdaNRAtoNRAEnv.
 
-  Hint Rewrite @lambda_nra_to_nraenv_var_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_table_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_const_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_binop_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_unop_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_map_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_map_concat_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_product_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_filter_eq : lambda_nra_to_nraenv.
-  Hint Rewrite @lambda_nra_to_nraenv_lambda_eq : lambda_nra_to_nraenv.
-  
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
+Hint Rewrite @lambda_nra_to_nraenv_var_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_table_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_const_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_binop_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_unop_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_map_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_map_concat_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_product_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_filter_eq : lambda_nra_to_nraenv.
+Hint Rewrite @lambda_nra_to_nraenv_lambda_eq : lambda_nra_to_nraenv.
+

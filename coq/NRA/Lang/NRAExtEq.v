@@ -298,9 +298,3 @@ End NRAExt.
 
 Notation "X ≡ₓ Y" := (nraext_eq X Y) (at level 90) : nraext_scope. (* ≡ = \equiv *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

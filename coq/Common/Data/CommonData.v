@@ -24,8 +24,3 @@ Require Export DDataNorm.
 Require Export Constants.
 Require Export DConstants.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

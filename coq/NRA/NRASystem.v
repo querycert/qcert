@@ -17,8 +17,3 @@
 Require Export NRARuntime.
 Require Export NRATypes.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

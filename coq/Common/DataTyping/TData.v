@@ -1572,9 +1572,3 @@ End subtype.
 
 Hint Resolve data_type_normalized. 
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)
-

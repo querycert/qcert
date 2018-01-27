@@ -29,8 +29,3 @@ Require Export TBrandModel.
 Require Export TBrandModelProp.
 Require Export RTypeLattice.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

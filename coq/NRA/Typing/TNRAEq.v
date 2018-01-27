@@ -121,8 +121,3 @@ Notation "t1 ⇝ t2 ⊣ tc" := (typed_nra tc t1 t2) (at level 80).
 Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80).                             (* ≡ = \equiv *)
 Notation "X ≡τ' Y" := (tnra_eq (exist _ _ X) (exist _ _ Y)) (at level 80).    (* ≡ = \equiv *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

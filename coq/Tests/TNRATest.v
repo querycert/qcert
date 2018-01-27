@@ -218,8 +218,3 @@ Section TNRATest.
 
 End TNRATest.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

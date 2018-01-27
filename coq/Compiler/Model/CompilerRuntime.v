@@ -54,8 +54,3 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_data_typing : foreign_data_typing.
 End CompilerRuntime.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

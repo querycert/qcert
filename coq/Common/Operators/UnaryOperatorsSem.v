@@ -297,8 +297,3 @@ Section UnaryOperatorsSem.
 
 End UnaryOperatorsSem.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

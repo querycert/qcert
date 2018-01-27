@@ -22,8 +22,3 @@ Section SparkDF.
   
 End SparkDF.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

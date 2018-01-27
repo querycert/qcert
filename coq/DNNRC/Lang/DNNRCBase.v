@@ -648,8 +648,3 @@ Tactic Notation "dnnrc_base_cases" tactic(first) ident(c) :=
 
 (* end hide *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

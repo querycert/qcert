@@ -46,8 +46,3 @@ Module QUtil(runtime:CompilerRuntime).
   Definition qcert_version := qcert_version.
 End QUtil.
 
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

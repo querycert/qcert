@@ -22,8 +22,3 @@ Section Java.
   
 End Java.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

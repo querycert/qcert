@@ -211,9 +211,3 @@ Section CompConfig.
 
 End CompConfig.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

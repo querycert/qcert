@@ -20,8 +20,3 @@ Require Export NRARewriteContext.
 Require Export NRAExtRewrite.
 Require Export TNRARewrite.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

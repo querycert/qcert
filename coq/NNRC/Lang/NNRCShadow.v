@@ -898,8 +898,3 @@ Section NNRCShadow.
 
 End NNRCShadow.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

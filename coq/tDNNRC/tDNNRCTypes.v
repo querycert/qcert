@@ -19,8 +19,3 @@ Require Export DNNRCTypes.
 Require Export tDNNRCSub.
 Require Export tDNNRCInfer.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

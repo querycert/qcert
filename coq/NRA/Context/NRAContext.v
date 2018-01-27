@@ -1112,8 +1112,3 @@ Notation "X ≡ₐ Y" := (nra_ctxt_equiv nra_eq X Y) (at level 90) : nra_ctxt_sc
        @ac_substs_EitherConcat
        @ac_substs_App : ac_substs.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

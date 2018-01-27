@@ -99,8 +99,3 @@ Section NRAEnvRewriteContext.
 
 End NRAEnvRewriteContext.
   
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

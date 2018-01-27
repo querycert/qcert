@@ -133,9 +133,3 @@ End Monoid.
 Infix "⊕" := merge (at level 70). (* ⊕ = \oplus *)
 Infix "ζ" := z (at level 70).  (* ζ = \zeta *)
 
-
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

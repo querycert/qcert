@@ -272,8 +272,3 @@ Section CompilerUntypedTest.
 
 End CompilerTypedTest.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

@@ -19,8 +19,3 @@ Require Export TNRA.
 Require Export TNRAEq.
 Require Export TNRAExt.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

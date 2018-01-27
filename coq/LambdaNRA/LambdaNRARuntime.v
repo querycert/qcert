@@ -19,8 +19,3 @@ Require Export LambdaNRA.
 Require Export LambdaNRAEq.
 Require Export LambdaNRASugar.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

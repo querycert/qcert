@@ -64,8 +64,3 @@ Section TCAMPtoNRAEnv.
 
 End TCAMPtoNRAEnv.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

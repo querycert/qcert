@@ -70,8 +70,3 @@ Section cNRAEnvSize.
 
 End cNRAEnvSize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

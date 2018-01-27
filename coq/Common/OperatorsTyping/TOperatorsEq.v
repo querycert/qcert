@@ -111,8 +111,3 @@ Section TOperatorsEq.
 
 End TOperatorsEq.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

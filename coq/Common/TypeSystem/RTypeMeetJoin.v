@@ -2828,8 +2828,3 @@ Hint Rewrite @rtype_meet_Brand_neq_l @rtype_meet_Brand_neq_r using discriminate:
 Hint Rewrite @rtype_meet_Foreign_eq : rtype_meet.
 Hint Rewrite @rtype_meet_Foreign_neq_l @rtype_meet_Foreign_neq_r using discriminate: rtype_meet.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

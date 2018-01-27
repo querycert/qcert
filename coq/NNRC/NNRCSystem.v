@@ -17,8 +17,3 @@
 Require Export NNRCRuntime.
 Require Export NNRCTypes.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

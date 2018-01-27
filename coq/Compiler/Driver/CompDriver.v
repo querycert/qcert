@@ -4444,9 +4444,3 @@ Section CompDriver.
 
 End CompDriver.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

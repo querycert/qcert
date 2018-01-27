@@ -596,8 +596,3 @@ Qed.
 End Sublist.
 Hint Immediate sublist_nil_l.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

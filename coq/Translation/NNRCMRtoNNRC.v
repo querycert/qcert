@@ -117,9 +117,3 @@ Section NNRCMRtoNNRC.
 
 End NNRCMRtoNNRC.
 
-
-(*
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

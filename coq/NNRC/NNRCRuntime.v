@@ -22,8 +22,3 @@ Require Export NNRCShadow.
 Require Export NNRCEq.
 Require Export NNRCSize.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)

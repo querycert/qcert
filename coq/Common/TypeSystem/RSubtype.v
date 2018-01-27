@@ -509,8 +509,3 @@ Qed.
 
 Notation "r1 <: r2" := (subtype r1 r2) (at level 70).
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

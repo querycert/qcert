@@ -1203,8 +1203,3 @@ Notation "X ≡ₑ Y" := (nraenv_core_ctxt_equiv nraenv_core_eq X Y) (at level 9
        @aec_substs_AppEnv
        @aec_substs_MapEnv : aec_substs.
   
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

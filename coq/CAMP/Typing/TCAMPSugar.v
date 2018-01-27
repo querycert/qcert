@@ -77,8 +77,3 @@ Section TCAMPSugar.
 
 End TCAMPSugar.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

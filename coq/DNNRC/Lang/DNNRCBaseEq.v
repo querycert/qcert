@@ -254,8 +254,3 @@ End DNNRCBaseEq.
 
 Notation "X ≡ᵈ Y" := (dnnrc_base_eq X Y) (at level 90) : dnnrc_scope.                             (* ≡ = \equiv *)
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
-*** End: ***
-*)

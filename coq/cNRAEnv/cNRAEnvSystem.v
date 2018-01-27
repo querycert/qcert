@@ -17,8 +17,3 @@
 Require Export cNRAEnvRuntime.
 Require Export cNRAEnvTypes.
 
-(* 
-*** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
-*** End: ***
-*)
