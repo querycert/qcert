@@ -201,8 +201,8 @@ Section NNRCtoJavaScript.
       | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
       | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
       end.
-
-        Definition like_clause_to_javascript (lc:like_clause)
+    
+    Definition like_clause_to_javascript (lc:like_clause)
       := match lc with
          | like_literal literal => "escapeRegExp(" ++ quotel_double ++ literal ++ quotel_double ++ ")"
          | like_any_char => quotel_double ++ "." ++ quotel_double 
@@ -211,15 +211,15 @@ Section NNRCtoJavaScript.
 
     (* Java equivalent: JavaScript.Backend.nrcToJS *)
     Fixpoint nnrcToJS
-             (n : nnrc)                    (* NNNRC expression to translate *)
-             (t : nat)                    (* next available unused temporary *)
-             (i : nat)                    (* indentation level *)
-             (eol : string)               (* Choice of end of line character *)
-             (quotel : string)            (* Choice of quote character *)
-             (ivs : list (string * string))  (* Input variables and their corresponding string representation -- should be free in the nnrc expression *)
-      : string                            (* JavaScript statements for computing result *)
-        * string                          (* JavaScript expression holding result *)
-        * nat                             (* next available unused temporary *)
+             (n : nnrc)                      (* NNNRC expression to translate *)
+             (t : nat)                       (* next available unused temporary *)
+             (i : nat)                       (* indentation level *)
+             (eol : string)                  (* Choice of end of line character *)
+             (quotel : string)               (* Choice of quote character *)
+             (ivs : list (string * string))  (* Input variables and their corresponding string representation *)
+      : string                               (* JavaScript statements for computing result *)
+        * string                             (* JavaScript expression holding result *)
+        * nat                                (* next available unused temporary *)
       := match n with
          | NNRCGetConstant v => ("", "vc$" ++ v, t)
          | NNRCVar v =>
@@ -372,31 +372,57 @@ Section NNRCtoJavaScript.
       map (fun x => (x,x)) params.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFunStub *)    
-    Definition nnrcToJSFunStub (harness:bool) (e:nnrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
-      let '(j0, v0, t0) := nnrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
-      "function " ++ fname
-                  ++ "("++ (makeJSParams params) ++ ") {" ++ eol
-                  ++ j0
-                  ++ "  return " ++ v0 ++ ";" ++ eol
-                  ++ "}" ++ eol
-                  ++ (if harness then "%HARNESS%" else "").
+    Definition nnrcToJSFunStub
+               (e:nnrc)
+               (harness:bool)
+               (i:nat)
+               (eol:string)
+               (quotel:string)
+               (params : list string)
+               (fname:string) :=
+      let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
+      "" ++ (indent i) ++ "function " ++ fname
+         ++ (indent i) ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+         ++ j0
+         ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
+         ++ (indent i) ++ "}" ++ eol
+         ++ (if harness then "%HARNESS%" else "").
 
-    Definition nnrcToJSFunStubConstants (e:nnrc) (eol:string) (quotel:string) (params : list string) (fname:string) (fprefix:string) :=
-      let '(j0, v0, t0) := nnrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
-      fprefix ++ fname
-              ++ "("++ (makeJSParams params) ++ ") {" ++ eol
-              ++ j0
-              ++ "  return " ++ v0 ++ ";" ++ eol
-              ++ "}".
+    Definition nnrcToJSFunStubConstants
+               (e:nnrc)
+               (i:nat)
+               (eol:string)
+               (quotel:string)
+               (params : list string)
+               (fname:string)
+               (fprefix:string) :=
+      let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
+      "" ++ (indent i) ++ fprefix ++ fname
+         ++ (indent i) ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+         ++ j0
+         ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
+         ++ (indent i) ++ "}".
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFunStubConstants *)
-    Definition nnrcToJSFunStubConstantsAsFunction (e:nnrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
+    Definition nnrcToJSFunStubConstantsAsFunction
+               (e:nnrc)
+               (i:nat)
+               (eol:string)
+               (quotel:string)
+               (params : list string)
+               (fname:string) :=
       let fprefix := "function " in
-      nnrcToJSFunStubConstants e eol quotel params fname fprefix.
+      nnrcToJSFunStubConstants e i eol quotel params fname fprefix.
 
-    Definition nnrcToJSFunStubConstantsAsMethod (e:nnrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
+    Definition nnrcToJSFunStubConstantsAsMethod
+               (e:nnrc)
+               (i:nat)
+               (eol:string)
+               (quotel:string)
+               (params : list string)
+               (fname:string) :=
       let fprefix := "" in
-      nnrcToJSFunStubConstants e eol quotel params fname fprefix.
+      nnrcToJSFunStubConstants e i eol quotel params fname fprefix.
 
     (* Free variables are assumed to be constant lookups *)
     (* Java equivalent: JavaScriptBackend.closeFreeVars *)
@@ -413,24 +439,39 @@ Section NNRCtoJavaScript.
       fold_left wrap_one_free_var all_free_vars e.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFun *)
-    Definition nnrcToJSFun (input_v:string) (e:nnrc) (eol:string) (quotel:string) (ivs : list string) (fname:string) :=
+    Definition nnrcToJSFun
+               (input_v:string)
+               (e:nnrc)
+               (i:nat)
+               (eol:string)
+               (quotel:string)
+               (ivs : list string)
+               (fname:string) :=
       let e' := closeFreeVars input_v e ivs in
-      nnrcToJSFunStubConstantsAsFunction e' eol quotel ivs fname.
+      nnrcToJSFunStubConstantsAsFunction e' i eol quotel ivs fname.
 
-    Definition nnrcToJSMethod (input_v:string) (e:nnrc) (eol:string) (quotel:string) (ivs : list string) (fname:string) :=
+    Definition nnrcToJSMethod
+               (input_v:string)
+               (e:nnrc)
+               (i:nat)
+               (eol:string)
+               (quotel:string)
+               (ivs : list string)
+               (fname:string) :=
       let e' := closeFreeVars input_v e ivs in
-      nnrcToJSFunStubConstantsAsMethod e' eol quotel ivs fname.
+      nnrcToJSFunStubConstantsAsMethod e' i eol quotel ivs fname.
 
     (* Java equivalent: JavaScriptBackend.generateJavaScript *)
     Definition nnrc_to_js_top (e:nnrc) : string :=
       let input_f := "query" in
       let input_v := "constants" in
-      nnrcToJSFun input_v e eol_newline quotel_double (input_v::nil) input_f.
+      let init_indent := 0 in
+      nnrcToJSFun input_v e init_indent eol_newline quotel_double (input_v::nil) input_f.
 
     Definition nnrc_to_js_top_with_name (e:nnrc) (fname:string) : string :=
-      let input_f := "query" in
       let input_v := "constants" in
-      nnrcToJSFun input_v e eol_newline quotel_double (input_v::nil) fname.
+      let init_indent := 0 in
+      nnrcToJSFun input_v e init_indent eol_newline quotel_double (input_v::nil) fname.
 
   End NNRCJS.
 

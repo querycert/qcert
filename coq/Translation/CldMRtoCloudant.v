@@ -148,13 +148,15 @@ Section CldMRtoCloudant.
 
 	(* Java equivalent: CloudantBackend.nrcToJSDefault *)
     Definition nnrcToJSDefault (harness:bool) (e_def:nnrc) (eol:string) (quotel:string) :=
-      let '(j0, v0, t0) := nnrcToJSunshadow e_def 1 1 eol quotel nil nil in
-      nnrcToJSFunStub harness e_def eol quotel nil "db_default".
+      let init_indent := 1 in
+      let '(j0, v0, t0) := nnrcToJSunshadow e_def 1 init_indent eol quotel nil nil in
+      nnrcToJSFunStub e_def harness init_indent eol quotel nil "db_default".
     
 	(* Java equivalent: CloudantBackend.nrcToJSGen *)
     Definition nnrcToJSGen (harness:bool) (e_closure:(list var) * nnrc) (eol:string) (quotel:string) :=
+      let init_indent := 1 in
       let (params, e) := e_closure in
-      nnrcToJSFunStub harness e eol quotel params "db_post".
+      nnrcToJSFunStub e harness init_indent eol quotel params "db_post".
     
     Definition mapReduceStringstoJS_pair (eol:string) (index:nat) (mr:option string * option string * option string * option string * string) : string :=
       match mr with
