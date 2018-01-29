@@ -216,6 +216,11 @@ clean-tests:
 
 cleanall-tests: clean-tests
 
+## Install
+
+install-coq:
+	@$(MAKE) -f Makefile.coq install
+
 ## Documentation
 documentation:
 	@$(MAKE) -C coq documentation
