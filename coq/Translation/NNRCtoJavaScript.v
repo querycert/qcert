@@ -246,7 +246,7 @@ Section NNRCtoJavaScript.
                      | OpSum => "sum(" ++ e1 ++ ")"
                      | OpNumMin => "Math.min.apply(Math," ++ e1 ++ ")"
                      | OpNumMax => "Math.max.apply(Math," ++ e1 ++ ")"
-                     | OpNumMean => "arithMean(" ++ e1 ++ ")"
+                     | OpNumMean => "Math.floor(arithMean(" ++ e1 ++ "))" (* Casts to Z using Math.floor() *)
                      | OpToString => "toString(" ++ e1 ++ ")"
                      | OpSubstring start olen =>
                        "(" ++ e1 ++ ").substring(" ++ toString start ++
