@@ -381,8 +381,7 @@ Section NNRCtoJavaScript.
                (params : list string)
                (fname:string) :=
       let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
-      "" ++ (indent i) ++ "function " ++ fname
-         ++ (indent i) ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+      "" ++ (indent i) ++ "function " ++ fname ++ "("++ (makeJSParams params) ++ ") {" ++ eol
          ++ j0
          ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
          ++ (indent i) ++ "}" ++ eol
@@ -397,8 +396,7 @@ Section NNRCtoJavaScript.
                (fname:string)
                (fprefix:string) :=
       let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
-      "" ++ (indent i) ++ fprefix ++ fname
-         ++ (indent i) ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+      "" ++ (indent i) ++ fprefix ++ fname ++ "("++ (makeJSParams params) ++ ") {" ++ eol
          ++ j0
          ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
          ++ (indent i) ++ "}".
