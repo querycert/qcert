@@ -171,6 +171,10 @@ MODULES = \
 	NNRC/Optim/TNNRCRewrite \
 	NNRC/Optim/NNRCOptimizer \
 	NNRC/NNRCOptim \
+	NNRCimp/Lang/NNRCimp \
+	NNRCimp/Lang/NNRCimpSize \
+	NNRCimp/Lang/NNRCimpSem \
+	NNRCimp/NNRCimpRuntime \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \
