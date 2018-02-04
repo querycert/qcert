@@ -102,8 +102,8 @@ Section NNRCimpSem.
           [ (v,Some d)::σ₁, ψ₁ ⊢〚 s 〛⇓ (v,dd)::σ₂ , ψ₂ ] ->
           [ σ₁ , ψ₁ ⊢〚 NNRCimpLetMut v (Some e) s 〛⇓ σ₂ , ψ₂ ]
             
-      | sem_NNRCimpLetMutUninitialized v s σ₁ ψ₁ σ₂ ψ₂  :
-          [ (v,None)::σ₁, ψ₁ ⊢〚 s 〛⇓ σ₂ , ψ₂ ] ->
+      | sem_NNRCimpLetMutUninitialized v s σ₁ ψ₁ σ₂ ψ₂ dd :
+          [ (v,None)::σ₁, ψ₁ ⊢〚 s 〛⇓ (v,dd)::σ₂ , ψ₂ ] ->
           [ σ₁ , ψ₁ ⊢〚 NNRCimpLetMut v None s 〛⇓ σ₂ , ψ₂ ]
             
       | sem_NNRCimpBuildCollFor v s₁ s₂ σ₁ ψ₁ σ₂ ψ₂ σ₃ ψ₃ d dd :
@@ -161,13 +161,87 @@ Section NNRCimpSem.
       Notation "[ σ₁ , ψ₁ ⊢〚 s 〛⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
 
       Local Open Scope nnrc_imp.
-      Inductive nnrc_imp_stmt_sem_top_ret : nnrc_imp -> data -> Prop :=
-      | sem_NNRCimpTopRet s d :
-          [ ("ret"%string,None)::nil , nil ⊢〚 s 〛⇓ ("ret"%string, Some d)::nil, nil ] ->
-        nnrc_imp_stmt_sem_top_ret s d.
-      
-      
-    End Denotation.
 
+      Reserved Notation "[ 〚 s 〛⇓[ ret ] d  ]".
+
+      Inductive nnrc_imp_stmt_sem_top_ret (ret:string) : nnrc_imp -> data -> Prop :=
+      | sem_NNRCimpTopRet s d :
+          [ (ret,None)::nil , nil ⊢〚 s 〛⇓ (ret, Some d)::nil, nil ] ->
+          [  〚 s 〛⇓[ ret ] d  ]
+      where
+      "[  〚 s 〛⇓[ ret ] d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
+
+      Notation "[  〚  s 〛⇓[ ret ] d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
+
+      Local Open Scope string.
+
+      Lemma nnrc_imp_stmt_env_stack s σ₁ ψ₁ σ₂ ψ₂ :
+        [ σ₁ , ψ₁ ⊢〚 s 〛⇓ σ₂ , ψ₂ ] -> domain σ₁ = domain σ₂.
+      Proof.
+        revert σ₁ ψ₁ σ₂ ψ₂.
+        nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem.
+        - Case "NNRCimpSeq".
+          transitivity (domain σ₂0); eauto.
+        - Case "NNRCimpLetMut".
+          specialize (IHs _ _ _ _ H7).
+          simpl in IHs; invcs IHs.
+          trivial.
+        - Case "NNRCimpLetMut".
+          specialize (IHs _ _ _ _ H6).
+          simpl in IHs; invcs IHs.
+          trivial.
+        - Case "NNRCimpBuildCollFor".
+          specialize (IHs1 _ _ _ _ H6).
+          specialize (IHs2 _ _ _ _ H7).
+          simpl in IHs2; invcs IHs2.
+          congruence.
+        - Case "NNRCimpPush".
+          trivial.
+        - Case "NNRCimpAssign".
+          rewrite domain_update_first; trivial.
+        - Case  "NNRCimpFor".
+          clear H6.
+          revert σ₁ ψ₁ σ₂ ψ₂ H7.
+          induction dl; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; trivial.
+          specialize (IHdl _ _ _ _ H8).
+          specialize (IHs _ _ _ _ H2).
+          simpl in IHs; invcs IHs.
+          congruence.
+        - Case "NNRCimpIf".
+          eauto.
+        - Case "NNRCimpIf".
+          eauto.
+        - Case "NNRCimpEither".
+          specialize (IHs1 _ _ _ _ H9).
+          simpl in IHs1; invcs IHs1; trivial.
+        - Case "NNRCimpEither".
+          specialize (IHs2 _ _ _ _ H9).
+          simpl in IHs2; invcs IHs2; trivial.
+      Qed.
+
+      Lemma nnrc_imp_stmt_mut_coll_stack s σ₁ ψ₁ σ₂ ψ₂ :
+        [ σ₁ , ψ₁ ⊢〚 s 〛⇓ σ₂ , ψ₂ ] -> domain ψ₁ = domain ψ₂.
+      Proof.
+        revert σ₁ ψ₁ σ₂ ψ₂.
+        nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; eauto.
+        - Case "NNRCimpSeq".
+          transitivity (domain ψ₂0); eauto.
+        - Case "NNRCimpBuildCollFor".
+          specialize (IHs1 _ _ _ _ H6).
+          specialize (IHs2 _ _ _ _ H7).
+          simpl in IHs1; invcs IHs1.
+          congruence.
+        - Case "NNRCimpPush".
+          rewrite domain_update_first; trivial.
+        - Case  "NNRCimpFor".
+          clear H6.
+          revert σ₁ ψ₁ σ₂ ψ₂ H7.
+          induction dl; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; trivial.
+          specialize (IHdl _ _ _ _ H8).
+          specialize (IHs _ _ _ _ H2).
+          congruence.
+      Qed.
+                 
+    End Denotation.
 
 End NNRCimpSem.

@@ -62,9 +62,29 @@ Section NNRCimp.
     | NNRCimpIf : nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt                   (**r conditional ([e₁ ? e₂ : e₃]) *)
     | NNRCimpEither : nnrc_imp_expr -> var -> nnrc_imp_stmt -> var -> nnrc_imp_stmt -> nnrc_imp_stmt (**r case expression ([either e left $v₁ : e₁ | right $v₂ : e₂]) *)
 .
+
     Definition nnrc_imp := nnrc_imp_stmt.
 
   End Syntax.
   
 End NNRCimp.
 
+Tactic Notation "nnrc_imp_expr_cases" tactic(first) ident(c) :=
+  first;
+  [ Case_aux c "NNRCimpGetConstant"%string
+  | Case_aux c "NNRCimpVar"%string
+  | Case_aux c "NNRCimpConst"%string
+  | Case_aux c "NNRCimpBinop"%string
+  | Case_aux c "NNRCimpUnop"%string
+  | Case_aux c "NNRCimpGroupBy"%string].
+
+Tactic Notation "nnrc_imp_stmt_cases" tactic(first) ident(c) :=
+  first;
+  [ Case_aux c "NNRCimpSeq"%string
+  | Case_aux c "NNRCimpLetMut"%string
+  | Case_aux c "NNRCimpBuildCollFor"%string
+  | Case_aux c "NNRCimpPush"%string
+  | Case_aux c "NNRCimpAssign"%string
+  | Case_aux c "NNRCimpFor"%string
+  | Case_aux c "NNRCimpIf"%string
+  | Case_aux c "NNRCimpEither"%string].
