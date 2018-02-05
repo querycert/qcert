@@ -49,12 +49,12 @@ Section NNRCimp.
 
     Inductive nnrc_imp_stmt :=
     | NNRCimpSeq : nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt                    (**r sequence ([s₁; s₂]]) *)
-    | NNRCimpLetMut : var -> option (nnrc_imp_expr) -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([const $v (:= e₁)? { s₂ }]) *)
+    | NNRCimpLetMut : var -> option (nnrc_imp_expr) -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v (:= e₁)? { s₂ }]) *)
     (* This creates a mutable collection, and evaluates the first
        statement with it bound to the given variable.  It then freezes
        the collection (makes it a normal bag) and evaluates the second
        statement with the variable bound to the bag version *)
-    | NNRCimpBuildCollFor : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r mutable collection declaration ([var $v { s1 }; s2]) *)
+    | NNRCimpBuildCollFor : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r mutable collection declaration ([coll $v { s1 }; s2]) *)
     (* pushes to a variable that holds a mutable collection *)
     | NNRCimpPush : var -> nnrc_imp_expr -> nnrc_imp_stmt                             (**r push item in mutable collection ([push e in $v]) *)
     | NNRCimpAssign : var -> nnrc_imp_expr -> nnrc_imp_stmt                           (**r variable assignent ([$v := e]) *)
