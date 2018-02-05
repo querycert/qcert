@@ -39,29 +39,31 @@ Section NNRCimp.
     Context {fruntime:foreign_runtime}.
     
     Inductive nnrc_imp_expr :=
-    | NNRCimpGetConstant : var -> nnrc_imp_expr                           (**r global variable lookup ([$$v]) *)
-    | NNRCimpVar : var -> nnrc_imp_expr                                   (**r local variable lookup ([$v])*)
-    | NNRCimpConst : data -> nnrc_imp_expr                                (**r constant data ([d]) *)
-    | NNRCimpBinop : binary_op -> nnrc_imp_expr -> nnrc_imp_expr -> nnrc_imp_expr           (**r binary operator ([e₁ ⊠ e₂]) *)
-    | NNRCimpUnop : unary_op -> nnrc_imp_expr -> nnrc_imp_expr                     (**r unary operator ([⊞ e]) *)
+    | NNRCimpGetConstant : var -> nnrc_imp_expr                                   (**r global variable lookup ([$$v]) *)
+    | NNRCimpVar : var -> nnrc_imp_expr                                           (**r local variable lookup ([$v])*)
+    | NNRCimpConst : data -> nnrc_imp_expr                                        (**r constant data ([d]) *)
+    | NNRCimpBinop : binary_op -> nnrc_imp_expr -> nnrc_imp_expr -> nnrc_imp_expr (**r binary operator ([e₁ ⊠ e₂]) *)
+    | NNRCimpUnop : unary_op -> nnrc_imp_expr -> nnrc_imp_expr                    (**r unary operator ([⊞ e]) *)
     | NNRCimpGroupBy : string -> list string -> nnrc_imp_expr -> nnrc_imp_expr    (**r group by expression ([e groupby g fields]) -- only in full NNRC *)
     .
 
     Inductive nnrc_imp_stmt :=
-    | NNRCimpSeq : nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt                   (**r for loop ([{ e₂ | $v in e₁ }]) *)
-    | NNRCimpLetMut : var -> option (nnrc_imp_expr) -> nnrc_imp_stmt -> nnrc_imp_stmt                   (**r let expression ([let $v := e₁ in e₂]) *)
-    (** This creates a mutable collection, and evaluates the first
-    statement with it bound to the given variable.  It then freezes
-    the collection (makes it a normal bag) and evaluates the second
-    statement with the variable bound to the bag version *)
-    | NNRCimpBuildCollFor : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt
+    | NNRCimpSeq : nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt                    (**r sequence ([s₁; s₂]]) *)
+    | NNRCimpLetMut : var -> option (nnrc_imp_expr) -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([const $v (:= e₁)? { s₂ }]) *)
+    (* This creates a mutable collection, and evaluates the first
+       statement with it bound to the given variable.  It then freezes
+       the collection (makes it a normal bag) and evaluates the second
+       statement with the variable bound to the bag version *)
+    | NNRCimpBuildCollFor : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r mutable collection declaration ([var $v { s1 }; s2]) *)
     (* pushes to a variable that holds a mutable collection *)
-    | NNRCimpPush : var -> nnrc_imp_expr -> nnrc_imp_stmt 
-    | NNRCimpAssign : var -> nnrc_imp_expr -> nnrc_imp_stmt
-    | NNRCimpFor : var -> nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt                   (**r for loop ([{ e₂ | $v in e₁ }]) *)
-    | NNRCimpIf : nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt                   (**r conditional ([e₁ ? e₂ : e₃]) *)
-    | NNRCimpEither : nnrc_imp_expr -> var -> nnrc_imp_stmt -> var -> nnrc_imp_stmt -> nnrc_imp_stmt (**r case expression ([either e left $v₁ : e₁ | right $v₂ : e₂]) *)
-.
+    | NNRCimpPush : var -> nnrc_imp_expr -> nnrc_imp_stmt                             (**r push item in mutable collection ([push e in $v]) *)
+    | NNRCimpAssign : var -> nnrc_imp_expr -> nnrc_imp_stmt                           (**r variable assignent ([$v := e]) *)
+    | NNRCimpFor : var -> nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt             (**r for loop ([for ($v in e₁) { s₂ }]) *)
+    | NNRCimpIf : nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r conditional ([if e₁ { s₂ } else { s₃ }]) *)
+    | NNRCimpEither : nnrc_imp_expr                                                   (**r case expression ([either e case left $v₁ { s₁ } case right $v₂ { s₂ }]) *)
+                      -> var -> nnrc_imp_stmt
+                      -> var -> nnrc_imp_stmt -> nnrc_imp_stmt
+    .
 
     Definition nnrc_imp := nnrc_imp_stmt.
 
