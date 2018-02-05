@@ -161,6 +161,7 @@ MODULES = \
 	NNRC/Lang/NNRCShadow \
 	NNRC/Lang/NNRCEq \
 	NNRC/Lang/NNRCSize \
+	NNRC/Stratify/NNRCStratify \
 	NNRC/Typing/TNNRC \
 	NNRC/Typing/TNNRCEq \
 	NNRC/Typing/TNNRCShadow \

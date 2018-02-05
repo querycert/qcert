@@ -122,6 +122,40 @@ Section cNNRC.
       - decide equality; apply string_dec.
     Defined.
 
+    Lemma nnrcIsCore_ext (e:nnrc) (pf1 pf2:nnrcIsCore e) : pf1 = pf2.
+    Proof.
+      induction e; simpl in *;
+        try (destruct pf1; destruct pf2; trivial);
+        try f_equal; auto.
+      - destruct a; destruct a0.
+        f_equal; auto.
+      - destruct a; destruct a0.
+        f_equal; auto.
+    Qed.
+
+    Lemma nnrc_core_ext e (pf1 pf2:nnrcIsCore e) : 
+      exist _ e pf1 = exist _ e pf2.
+    Proof.
+      f_equal; apply nnrcIsCore_ext.
+    Qed.
+
+    Lemma nnrc_core_fequal (e1 e2:nnrc_core) :
+      proj1_sig e1 = proj1_sig e2 -> e1 = e2.
+    Proof.
+      destruct e1; destruct e2; simpl; intros eqq.
+      destruct eqq.
+      apply nnrc_core_ext.
+    Qed.
+
+    Global Instance nnrc_core_eqdec : EqDec nnrc_core eq.
+    Proof.
+      intros x y.
+      destruct x as [x xpf]; destruct y as [y ypf].
+      destruct (x == y).
+      - left. apply nnrc_core_fequal; simpl; trivial.
+      - right. inversion 1; congruence.
+    Defined.
+
   End Syntax.
   
   (** * Semantics *)
