@@ -66,7 +66,16 @@ Section NNRCimp.
     Definition nnrc_imp := nnrc_imp_stmt.
 
   End Syntax.
-  
+
+  Section Env.
+      Context {fruntime:foreign_runtime}.
+
+  (* bindings that may or may not be initialized (defined) *)
+    Definition pd_bindings := list (string*option data).
+    Definition mc_bindings := list (string*list data).
+
+  End Env.
+    
 End NNRCimp.
 
 Tactic Notation "nnrc_imp_expr_cases" tactic(first) ident(c) :=
@@ -88,3 +97,5 @@ Tactic Notation "nnrc_imp_stmt_cases" tactic(first) ident(c) :=
   | Case_aux c "NNRCimpFor"%string
   | Case_aux c "NNRCimpIf"%string
   | Case_aux c "NNRCimpEither"%string].
+
+Delimit Scope nnrc_imp with nnrc_imp_scope.
