@@ -50,97 +50,91 @@ Section NNRCimpEval.
           returns an optional value. When [None] is returned, it
           denotes an error. An error is always propagated. *)
 
-
-    Reserved Notation  "[ σ ⊢〚 e 〛 ]". 
-
     Fixpoint nnrc_imp_expr_eval
              (σ:pd_bindings) (e:nnrc_imp_expr)
       : option data
       := match e with
          | NNRCimpGetConstant v =>
            edot σc v
-                
+
          | NNRCimpVar v =>
            olift id (lookup equiv_dec σ v)
-                 
+
          | NNRCimpConst d =>
            Some (normalize_data h d)
-                
+
          | NNRCimpBinop bop e₁ e₂ =>
            olift2 (fun d₁ d₂ => binary_op_eval h bop d₁ d₂)
-                  ([ σ ⊢〚 e₁ 〛 ])
-                  ([ σ ⊢〚 e₂ 〛 ])
-                  
+                  (nnrc_imp_expr_eval σ e₁)
+                  (nnrc_imp_expr_eval σ e₂)
+
          | NNRCimpUnop uop e =>
            olift (fun d => unary_op_eval h uop d)
-                 ([ σ ⊢〚 e 〛 ])
-                 
+                 (nnrc_imp_expr_eval σ e)
+
          | NNRCimpGroupBy g sl e =>
-           match [ σ ⊢〚 e 〛 ] with
+           match nnrc_imp_expr_eval σ e with
            | Some (dcoll dl) => lift dcoll (group_by_nested_eval_table g sl dl)
            | _ => None
            end
-         end
-    where "[ σ ⊢〚 e 〛 ]" := (nnrc_imp_expr_eval σ e) : nnrc_imp. 
-
-    Reserved Notation  "[ σ , ψ ⊢〚 s 〛 ]". 
+         end.
 
     Fixpoint nnrc_imp_stmt_eval
              (σ:pd_bindings) (ψ:mc_bindings)
              (s:nnrc_imp_stmt) : option (pd_bindings*mc_bindings)
       := match s with
          | NNRCimpSeq s₁ s₂ =>
-           match [ σ , ψ ⊢〚 s₁ 〛] with
-           | Some (σ₁, ψ₁) => [ σ₁ , ψ₁ ⊢〚 s₂ 〛 ]
+           match nnrc_imp_stmt_eval σ ψ s₁ with
+           | Some (σ₁, ψ₁) => nnrc_imp_stmt_eval σ₁ ψ₁ s₂
            | None => None
            end
-             
+
          | NNRCimpLetMut v (Some e) s₀ =>
-           match [ σ  ⊢〚 e 〛] with
+           match nnrc_imp_expr_eval σ e with
            | Some d =>
-             match [ ((v,Some d)::σ) , ψ ⊢〚 s₀ 〛 ]  with
+             match nnrc_imp_stmt_eval ((v,Some d)::σ) ψ s₀ with
              | Some (_::σ₁, ψ₁) => Some (σ₁, ψ₁)
              | _ => None
              end
            | None => None
            end
-             
+
          | NNRCimpLetMut v None s₀ =>
-           match [ ((v,None)::σ), ψ ⊢〚 s₀ 〛 ] with
+           match nnrc_imp_stmt_eval ((v,None)::σ) ψ s₀ with
            | Some (_::σ₁, ψ₁) => Some (σ₁, ψ₁)
            | _ => None
            end
-             
+
          | NNRCimpBuildCollFor v s₁ s₂ =>
-           match [ σ, ((v,nil)::ψ) ⊢〚s₁〛]  with
+           match nnrc_imp_stmt_eval σ ((v,nil)::ψ) s₁ with
            | Some (σ₁, ((_,dl)::ψ₁)) =>
-             match [ ((v,Some (dcoll dl))::σ₁), ψ₁ ⊢〚s₂〛]  with
+             match nnrc_imp_stmt_eval ((v,Some (dcoll dl))::σ₁) ψ₁ s₂ with
              | Some ((_::σ₂),ψ₂) => Some (σ₂,ψ₂)
              | _ => None
              end
            | _ => None
            end
-             
+
          | NNRCimpPush v e =>
-           match [ σ  ⊢〚 e 〛] , lookup string_dec ψ v with
+           match nnrc_imp_expr_eval σ e, lookup string_dec ψ v with
            | Some d, Some dl => Some (σ, update_first string_dec ψ v (d::dl))
            | _, _ => None
            end
-             
+
          | NNRCimpAssign v e =>
-           match [ σ  ⊢〚 e 〛] , lookup string_dec σ v with
+           match nnrc_imp_expr_eval σ e, lookup string_dec σ v with
            | Some d, Some _ => Some (update_first string_dec σ v (Some d), ψ)
            | _, _ => None
            end
-             
+
          | NNRCimpFor v e s₀ =>
-           match [ σ  ⊢〚 e 〛]  with
+           match nnrc_imp_expr_eval σ e with
            | Some (dcoll c1) =>
              let fix for_fun (dl:list data) σ₁ ψ₁ :=
                  match dl with
                  | nil => Some (σ₁, ψ₁)
-                 | d::dl' => 
-                   match [ ((v,Some d)::σ₁), ψ₁ ⊢〚 s₀ 〛 ] with
+                 | d::dl' =>
+                   match nnrc_imp_stmt_eval ((v,Some d)::σ₁) ψ₁ s₀ with
                    | Some (_::σ₂, ψ₂) => for_fun dl' σ₂ ψ₂
                    | _ => None
                    end
@@ -148,43 +142,37 @@ Section NNRCimpEval.
              for_fun c1 σ ψ
            | _ => None
            end
-             
+
          | NNRCimpIf e s₁ s₂ =>
-           match [ σ  ⊢〚 e 〛]  with
-           | Some (dbool true) => [ σ, ψ ⊢〚 s₁ 〛]
-           | Some (dbool false) => [ σ, ψ ⊢〚 s₂ 〛] 
+           match nnrc_imp_expr_eval σ e  with
+           | Some (dbool true) => nnrc_imp_stmt_eval σ ψ s₁
+           | Some (dbool false) => nnrc_imp_stmt_eval σ ψ s₂
            | _ => None
            end
-             
+
          | NNRCimpEither e x₁ s₁ x₂ s₂ =>
-           match [ σ  ⊢〚 e 〛] with
+           match nnrc_imp_expr_eval σ e with
            | Some (dleft d) =>
-             match [ ((x₁,Some d)::σ), ψ ⊢〚 s₁ 〛] with
+             match nnrc_imp_stmt_eval ((x₁,Some d)::σ) ψ s₁ with
              | Some (_::σ₂, ψ₂) => Some (σ₂, ψ₂)
              | _ => None
              end
            | Some (dright d) =>
-             match  [ ((x₂,Some d)::σ), ψ ⊢〚 s₂ 〛]with
+             match nnrc_imp_stmt_eval ((x₂,Some d)::σ) ψ s₂ with
              | Some (_::σ₂, ψ₂) => Some (σ₂, ψ₂)
              | _ => None
              end
            | _ => None
            end
-         end
-    where "[ σ , ψ ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval σ ψ s) : nnrc_imp. 
+         end.
 
     Definition nnrc_imp_stmt_eval_top_ret (ret:string) (s:nnrc_imp) : option data
-      := match [ (ret, None)::nil , nil ⊢〚 s 〛 ] with
+      := match nnrc_imp_stmt_eval ((ret, None)::nil) nil s with
          | Some ((_, Some dd)::_, _) => Some dd
          | _ => None
          end.
-    Notation "[ [ ret ] ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval_top_ret ret s).
 
   End Evaluation.
-
-  Notation "[ σ ⊢〚 e 〛 ]" := (nnrc_imp_expr_eval σ e) : nnrc_imp. 
-  Notation "[ σ , ψ ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval σ ψ s) : nnrc_imp.
-  Notation "[ [ ret ] ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval_top_ret ret s).
 
   Section props.
 
@@ -199,9 +187,9 @@ Section NNRCimpEval.
             | (match_case_in H;
                [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
             ]; subst.
-      
+
     Lemma nnrc_imp_stmt_eval_env_stack {s σ₁ ψ₁ σ₂ ψ₂} :
-      [ σ₁ , ψ₁ ⊢〚 s〛] = Some (σ₂ , ψ₂ ) -> domain σ₁ = domain σ₂.
+      nnrc_imp_stmt_eval σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain σ₁ = domain σ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; simpl in sem; repeat destr sem.
@@ -249,7 +237,7 @@ Section NNRCimpEval.
     Qed.
 
     Lemma nnrc_imp_stmt_eval_mcenv_stack {s σ₁ ψ₁ σ₂ ψ₂} :
-      [ σ₁ , ψ₁ ⊢〚 s〛] = Some (σ₂ , ψ₂ ) -> domain ψ₁ = domain ψ₂.
+      nnrc_imp_stmt_eval σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain ψ₁ = domain ψ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; simpl in sem; repeat destr sem.
@@ -295,14 +283,10 @@ Section NNRCimpEval.
         + specialize (IHs2 _ _ _ _ eqq0);
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
-    
+
   End props.
-  
+
 End NNRCimpEval.
 
-Notation "[ h , σc ; σ ⊢〚 e 〛 ]" := (nnrc_imp_expr_eval h σc σ e) : nnrc_imp. 
-Notation "[ h , σc ; σ , ψ ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval h σc σ ψ s) : nnrc_imp.
-Notation "[ h , σc ; [ ret ] ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval_top_ret h σc ret s).
-      
 Arguments nnrc_imp_stmt_eval_env_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
 Arguments nnrc_imp_stmt_eval_mcenv_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.

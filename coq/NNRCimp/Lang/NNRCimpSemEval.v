@@ -46,7 +46,7 @@ Section NNRCimpSemEval.
   Local Open Scope string.
 
   Lemma nnrc_imp_expr_sem_eval σ e d :
-    [ h , σc ; σ ⊢ e ⇓ d ] <-> [ h , σc ; σ ⊢〚 e 〛 ] = Some d.
+    [ h , σc ; σ ⊢ e ⇓ d ] <-> nnrc_imp_expr_eval h σc σ e = Some d.
   Proof.
     split; revert σ d.
     - {
@@ -104,7 +104,7 @@ Section NNRCimpSemEval.
           ]; subst.
 
   Lemma nnrc_imp_stmt_sem_eval σ₁ ψ₁ s σ₂ ψ₂ :
-    [ h , σc ⊢ s, σ₁, ψ₁ ⇓ σ₂, ψ₂ ] <-> [ h , σc ; σ₁, ψ₁ ⊢〚 s 〛 ] = Some (σ₂, ψ₂).
+    [ h , σc ⊢ s, σ₁, ψ₁ ⇓ σ₂, ψ₂ ] <-> nnrc_imp_stmt_eval h σc σ₁ ψ₁ s = Some (σ₂, ψ₂).
   Proof.
     split; revert σ₁ ψ₁ σ₂ ψ₂.
     - {
@@ -200,7 +200,7 @@ Section NNRCimpSemEval.
   Qed.
 
   Lemma nnrc_imp_sem_eval ret s d :
-    [ h , σc ; [ret] ⊢ s ⇓ d ] <-> [ h , σc ; [ret] ⊢〚 s 〛 ] = Some d.
+    [ h , σc ; [ret] ⊢ s ⇓ d ] <-> nnrc_imp_stmt_eval_top_ret h σc ret s = Some d.
   Proof.
     unfold nnrc_imp_stmt_eval_top_ret.
     split; intros hyp.
