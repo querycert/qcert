@@ -173,10 +173,18 @@ Section NNRCimpEval.
          end
     where "[ σ , ψ ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval σ ψ s) : nnrc_imp. 
 
+    Definition nnrc_imp_stmt_eval_top_ret (ret:string) (s:nnrc_imp) : option data
+      := match [ (ret, None)::nil , nil ⊢〚 s 〛 ] with
+         | Some ((_, Some dd)::_, _) => Some dd
+         | _ => None
+         end.
+    Notation "[ [ ret ] ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval_top_ret ret s).
+
   End Evaluation.
 
   Notation "[ σ ⊢〚 e 〛 ]" := (nnrc_imp_expr_eval σ e) : nnrc_imp. 
   Notation "[ σ , ψ ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval σ ψ s) : nnrc_imp.
+  Notation "[ [ ret ] ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval_top_ret ret s).
 
   Section props.
 
@@ -192,7 +200,7 @@ Section NNRCimpEval.
                [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
             ]; subst.
       
-    Lemma nnrc_imp_stmt_eval_env_stack s σ₁ ψ₁ σ₂ ψ₂ :
+    Lemma nnrc_imp_stmt_eval_env_stack {s σ₁ ψ₁ σ₂ ψ₂} :
       [ σ₁ , ψ₁ ⊢〚 s〛] = Some (σ₂ , ψ₂ ) -> domain σ₁ = domain σ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
@@ -240,7 +248,7 @@ Section NNRCimpEval.
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
-    Lemma nnrc_imp_stmt_eval_mcenv_stack s σ₁ ψ₁ σ₂ ψ₂ :
+    Lemma nnrc_imp_stmt_eval_mcenv_stack {s σ₁ ψ₁ σ₂ ψ₂} :
       [ σ₁ , ψ₁ ⊢〚 s〛] = Some (σ₂ , ψ₂ ) -> domain ψ₁ = domain ψ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
@@ -294,4 +302,7 @@ End NNRCimpEval.
 
 Notation "[ h , σc ; σ ⊢〚 e 〛 ]" := (nnrc_imp_expr_eval h σc σ e) : nnrc_imp. 
 Notation "[ h , σc ; σ , ψ ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval h σc σ ψ s) : nnrc_imp.
-
+Notation "[ h , σc ; [ ret ] ⊢〚 s 〛 ]" := (nnrc_imp_stmt_eval_top_ret h σc ret s).
+      
+Arguments nnrc_imp_stmt_eval_env_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
+Arguments nnrc_imp_stmt_eval_mcenv_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.

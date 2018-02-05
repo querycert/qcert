@@ -68,11 +68,11 @@ Section NNRCimpSem.
     | sem_NNRCimpBinop : forall bop e₁ e₂ σ d₁ d₂ d,
         [ σ ⊢ e₁ ⇓ d₁ ] ->
         [ σ ⊢ e₂ ⇓ d₂ ] ->
+        binary_op_eval h bop d₁ d₂ = Some d ->     
         [ σ ⊢ NNRCimpBinop bop e₁ e₂ ⇓ d ]
           
     | sem_NNRCimpUnop : forall uop e σ d₁ d,
         [ σ ⊢ e ⇓ d₁ ] ->
-        nnrc_imp_expr_sem σ e d₁ ->             
         unary_op_eval h uop d₁ = Some d ->     
         [ σ ⊢ NNRCimpUnop uop e ⇓ d ]
 
@@ -139,7 +139,7 @@ Section NNRCimpSem.
         [ σ₁ , ψ₁ ⊢ NNRCimpEither e x₁ s₁ x₂ s₂ ⇓ σ₂, ψ₂]
           
     | sem_NNRCimpEitherRight e x₁ s₁ x₂ s₂ σ₁ ψ₁ σ₂ ψ₂ d dd :
-        [ σ₁ ⊢ e ⇓ (dleft d) ] ->
+        [ σ₁ ⊢ e ⇓ (dright d) ] ->
         [ (x₂,Some d)::σ₁ , ψ₁ ⊢ s₂ ⇓ (x₂,dd)::σ₂, ψ₂] ->
         [ σ₁ , ψ₁ ⊢ NNRCimpEither e x₁ s₁ x₂ s₂ ⇓ σ₂, ψ₂]
           
@@ -157,31 +157,29 @@ Section NNRCimpSem.
     Notation "[ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
     Notation "[ σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
 
-    Reserved Notation "[  s ⇓[ ret ] d  ]".
+    Reserved Notation "[ [ ret ] ⊢ s ⇓ d  ]".
 
     Inductive nnrc_imp_stmt_sem_top_ret (ret:string) :
       nnrc_imp -> data -> Prop
       :=
       | sem_NNRCimpTopRet s d :
           [ (ret,None)::nil , nil ⊢ s ⇓ (ret, Some d)::nil, nil ] ->
-          [   s ⇓[ ret ] d  ]
+          [ [ ret ] ⊢ s ⇓ d  ]
     where
-    "[   s ⇓[ ret ] d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
+    "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
 
-    Notation "[    s ⇓[ ret ] d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
-
-    Local Open Scope string.
+    Notation "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
     
   End Denotation.
 
   Notation "[ σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem σ e d) : nnrc_imp.
   Notation "[ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
   Notation "[ σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
-
+  Notation "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
 
   Section props.
     
-    Lemma nnrc_imp_stmt_sem_env_stack s σ₁ ψ₁ σ₂ ψ₂ :
+    Lemma nnrc_imp_stmt_sem_env_stack {s σ₁ ψ₁ σ₂ ψ₂}:
       [ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ] -> domain σ₁ = domain σ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
@@ -225,7 +223,7 @@ Section NNRCimpSem.
         simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
-    Lemma nnrc_imp_stmt_sem_mcenv_stack s σ₁ ψ₁ σ₂ ψ₂ :
+    Lemma nnrc_imp_stmt_sem_mcenv_stack {s σ₁ ψ₁ σ₂ ψ₂} :
       [ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ] -> domain ψ₁ = domain ψ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
@@ -248,9 +246,39 @@ Section NNRCimpSem.
         congruence.
     Qed.
 
+    Lemma nnrc_imp_stmt_sem_env_cons_same
+          {s v₁ od₁ σ₁ ψ₁ v₂ od₂ σ₂ ψ₂} :
+      [(v₁, od₁) :: σ₁, ψ₁ ⊢ s ⇓ (v₂, od₂) :: σ₂, ψ₂] ->
+      [(v₁, od₁) :: σ₁, ψ₁ ⊢ s ⇓ (v₁, od₂) :: σ₂, ψ₂].
+    Proof.
+      intros sem.
+      generalize (nnrc_imp_stmt_sem_env_stack sem).
+      simpl; intros eqq; invcs eqq.
+      trivial.
+    Qed.
+
+    Lemma nnrc_imp_stmt_sem_mcenv_cons_same
+          {s σ₁ v₁ dl₁ ψ₁ σ₂ v₂ dl₂ ψ₂} :
+      [σ₁, (v₁, dl₁) :: ψ₁ ⊢ s ⇓ σ₂, (v₂, dl₂) ::  ψ₂] ->
+      [σ₁,(v₁, dl₁) ::  ψ₁ ⊢ s ⇓  σ₂, (v₁, dl₂) :: ψ₂].
+    Proof.
+      intros sem.
+      generalize (nnrc_imp_stmt_sem_mcenv_stack sem).
+      simpl; intros eqq; invcs eqq.
+      trivial.
+    Qed.
+
   End props.
   
 End NNRCimpSem.
 Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem h σc σ e d) : nnrc_imp.
 Notation "[ h , σc ; σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem h σc σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
 Notation "[ h , σc ; σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter h σc v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
+Notation "[ h , σc ; [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret h σc ret s d ) : nnrc_imp.
+
+Arguments nnrc_imp_stmt_sem_env_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
+Arguments nnrc_imp_stmt_sem_mcenv_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
+
+Arguments nnrc_imp_stmt_sem_env_cons_same {fruntime h σc s v₁ od₁ σ₁ ψ₁ v₂ od₂ σ₂ ψ₂}.
+
+Arguments nnrc_imp_stmt_sem_mcenv_cons_same {fruntime h σc s σ₁ v₁ dl₁ ψ₁ σ₂ v₂ dl₂ ψ₂}.
