@@ -102,9 +102,9 @@ Section NNRCimpSemEval.
           | (match_case_in H;
              [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
           ]; subst.
-  
+
   Lemma nnrc_imp_stmt_sem_eval σ₁ ψ₁ s σ₂ ψ₂ :
-    [ h , σc ; σ₁, ψ₁ ⊢ s ⇓ σ₂, ψ₂ ] <-> [ h , σc ; σ₁, ψ₁ ⊢〚 s 〛 ] = Some (σ₂, ψ₂).
+    [ h , σc ⊢ s, σ₁, ψ₁ ⇓ σ₂, ψ₂ ] <-> [ h , σc ; σ₁, ψ₁ ⊢〚 s 〛 ] = Some (σ₂, ψ₂).
   Proof.
     split; revert σ₁ ψ₁ σ₂ ψ₂.
     - {
@@ -124,10 +124,10 @@ Section NNRCimpSemEval.
           erewrite IHs2 by eauto; simpl; trivial.
         - Case "NNRCimpPush".
           rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6.
-          rewrite H3; simpl; trivial.
+          rewrite H1; simpl; trivial.
         - Case "NNRCimpAssign".
           rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6.
-          rewrite H3; simpl; trivial.
+          rewrite H1; simpl; trivial.
         - Case "NNRCimpFor".
           rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6; clear H6.
           revert σ₁ ψ₁ σ₂ ψ₂ H7.
@@ -221,5 +221,5 @@ Section NNRCimpSemEval.
       symmetry in eqq2; apply domain_nil in eqq2; subst.
       constructor; trivial.
   Qed.
-  
+
 End NNRCimpSemEval.

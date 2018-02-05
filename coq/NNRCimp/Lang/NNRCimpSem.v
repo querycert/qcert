@@ -41,7 +41,7 @@ Section NNRCimpSem.
   Context (σc:list (string*data)).
 
   (* NB: normal variables and (unfrozen) mutable collection variables have *different namespaces*
-         Thus, when translating to another language without this distinction, care must be avoided to avoid 
+         Thus, when translating to another language without this distinction, care must be avoided to avoid
           accidentally introducing shadowing.
    *)
 
@@ -50,112 +50,112 @@ Section NNRCimpSem.
 
   Section Denotation.
 
-    Reserved Notation  "[ σ ⊢ e ⇓ d ]". 
+    Reserved Notation  "[ σ ⊢ e ⇓ d ]".
 
     Inductive nnrc_imp_expr_sem : pd_bindings -> nnrc_imp_expr -> data -> Prop :=
-    | sem_NNRCimpGetConstant : forall v σ d, 
+    | sem_NNRCimpGetConstant : forall v σ d,
         edot σc v = Some d ->                 (**r   [Γc(v) = d] *)
         [ σ ⊢ NNRCimpGetConstant v ⇓ d ]
-          
+
     | sem_NNRCimpVar : forall v σ d,
         lookup equiv_dec σ v = Some (Some d) ->              (**r   [Γ(v) = d] *)
         [ σ ⊢ NNRCimpVar v ⇓ d ]
-          
+
     | sem_NNRCimpConst : forall d₁ σ d₂,
         normalize_data h d₁ = d₂ ->                     (**r   [norm(d₁) = d₂] *)
         [ σ ⊢ NNRCimpConst d₁ ⇓ d₂ ]
-          
+
     | sem_NNRCimpBinop : forall bop e₁ e₂ σ d₁ d₂ d,
         [ σ ⊢ e₁ ⇓ d₁ ] ->
         [ σ ⊢ e₂ ⇓ d₂ ] ->
-        binary_op_eval h bop d₁ d₂ = Some d ->     
+        binary_op_eval h bop d₁ d₂ = Some d ->
         [ σ ⊢ NNRCimpBinop bop e₁ e₂ ⇓ d ]
-          
+
     | sem_NNRCimpUnop : forall uop e σ d₁ d,
         [ σ ⊢ e ⇓ d₁ ] ->
-        unary_op_eval h uop d₁ = Some d ->     
+        unary_op_eval h uop d₁ = Some d ->
         [ σ ⊢ NNRCimpUnop uop e ⇓ d ]
 
     | sem_NNRCimpGroupBy : forall g sl e σ d₁ d₂ ,
         [ σ ⊢ e ⇓ (dcoll d₁) ] ->
-        group_by_nested_eval_table g sl d₁ = Some d₂ -> 
+        group_by_nested_eval_table g sl d₁ = Some d₂ ->
         [ σ ⊢ NNRCimpGroupBy g sl e ⇓ (dcoll d₂) ]
-          
+
     where
     "[ σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem σ e d) : nnrc_imp
     .
-    
-    Reserved Notation  "[ σ₁ , ψ₁ ⊢ s₁ ⇓ σ₂ , ψ₂ ]". 
-    Reserved Notation "[ σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]".
 
-    Inductive nnrc_imp_stmt_sem : pd_bindings -> mc_bindings -> nnrc_imp_stmt -> pd_bindings -> mc_bindings -> Prop :=
+    Reserved Notation  "[ s₁ , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]".
+    Reserved Notation "[ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]".
+
+    Inductive nnrc_imp_stmt_sem : nnrc_imp_stmt -> pd_bindings -> mc_bindings -> pd_bindings -> mc_bindings -> Prop :=
     | sem_NNRCimpSeq s₁ s₂ σ₁ ψ₁ σ₂ ψ₂ σ₃ ψ₃  :
-        [ σ₁ , ψ₁ ⊢ s₁ ⇓ σ₂ , ψ₂ ] ->
-        [ σ₂ , ψ₂ ⊢ s₂ ⇓ σ₃ , ψ₃ ] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpSeq s₁ s₂ ⇓ σ₃ , ψ₃ ]
-          
+        [ s₁, σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ] ->
+        [ s₂, σ₂ , ψ₂ ⇓ σ₃ , ψ₃ ] ->
+        [ NNRCimpSeq s₁ s₂, σ₁ , ψ₁ ⇓ σ₃ , ψ₃ ]
+
     | sem_NNRCimpLetMutInitialized v e s σ₁ ψ₁ σ₂ ψ₂ d dd :
         [ σ₁ ⊢ e ⇓ d ] ->
-        [ (v,Some d)::σ₁, ψ₁ ⊢ s ⇓ (v,dd)::σ₂ , ψ₂ ] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpLetMut v (Some e) s ⇓ σ₂ , ψ₂ ]
-          
+        [ s, (v,Some d)::σ₁, ψ₁ ⇓ (v,dd)::σ₂ , ψ₂ ] ->
+        [ NNRCimpLetMut v (Some e) s, σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]
+
     | sem_NNRCimpLetMutUninitialized v s σ₁ ψ₁ σ₂ ψ₂ dd :
-        [ (v,None)::σ₁, ψ₁ ⊢ s ⇓ (v,dd)::σ₂ , ψ₂ ] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpLetMut v None s ⇓ σ₂ , ψ₂ ]
-          
+        [ s, (v,None)::σ₁, ψ₁ ⇓ (v,dd)::σ₂ , ψ₂ ] ->
+        [ NNRCimpLetMut v None s, σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]
+
     | sem_NNRCimpBuildCollFor v s₁ s₂ σ₁ ψ₁ σ₂ ψ₂ σ₃ ψ₃ d dd :
-        [ σ₁ , (v,nil)::ψ₁ ⊢ s₁ ⇓ σ₂ , (v,d)::ψ₂ ] ->
-        [ (v,Some (dcoll d))::σ₂ , ψ₂ ⊢ s₂ ⇓ (v,dd)::σ₃ , ψ₃ ] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpBuildCollFor v s₁ s₂ ⇓ σ₃ , ψ₃ ]
-          
+        [ s₁, σ₁ , (v,nil)::ψ₁ ⇓ σ₂ , (v,d)::ψ₂ ] ->
+        [ s₂, (v,Some (dcoll d))::σ₂ , ψ₂ ⇓ (v,dd)::σ₃ , ψ₃ ] ->
+        [ NNRCimpBuildCollFor v s₁ s₂, σ₁ , ψ₁ ⇓ σ₃ , ψ₃ ]
+
     | sem_NNRCimpPush v e σ ψ mc d :
         lookup string_dec ψ v = Some mc ->
         [ σ ⊢ e ⇓ d ] ->
-        [ σ , ψ ⊢ NNRCimpPush v e ⇓ σ , update_first string_dec ψ v (d::mc)]
-          
+        [ NNRCimpPush v e, σ , ψ ⇓ σ , update_first string_dec ψ v (d::mc)]
+
     | sem_NNRCimpAssign v e σ ψ dold d :
         lookup string_dec σ v = Some dold ->
         [ σ ⊢ e ⇓ d ] ->
-        [ σ , ψ ⊢ NNRCimpAssign v e ⇓ update_first string_dec σ v (Some d), ψ]
-          
+        [ NNRCimpAssign v e, σ , ψ ⇓ update_first string_dec σ v (Some d), ψ]
+
     | sem_NNRCimpFor v e s σ₁ ψ₁ σ₂ ψ₂ dl :
         [ σ₁ ⊢ e ⇓ (dcoll dl) ] ->
-        [ σ₁ , ψ₁ ⊢ s ⇓[v<-dl] σ₂, ψ₂] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpFor v e s ⇓ σ₂, ψ₂]
-          
+        [ s, σ₁ , ψ₁ ⇓[v<-dl] σ₂, ψ₂] ->
+        [ NNRCimpFor v e s, σ₁ , ψ₁ ⇓ σ₂, ψ₂]
+
     | sem_NNRCimpIfTrue e s₁ s₂ σ₁ ψ₁ σ₂ ψ₂ :
         [ σ₁ ⊢ e ⇓ (dbool true) ] ->
-        [ σ₁ , ψ₁ ⊢ s₁ ⇓ σ₂, ψ₂] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpIf e s₁ s₂ ⇓ σ₂, ψ₂]
-          
+        [ s₁, σ₁ , ψ₁ ⇓ σ₂, ψ₂] ->
+        [ NNRCimpIf e s₁ s₂, σ₁ , ψ₁ ⇓ σ₂, ψ₂]
+
     | sem_NNRCimpIfFalse e s₁ s₂ σ₁ ψ₁ σ₂ ψ₂ :
         [ σ₁ ⊢ e ⇓ (dbool false) ] ->
-        [ σ₁ , ψ₁ ⊢ s₂ ⇓ σ₂, ψ₂] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpIf e s₁ s₂ ⇓ σ₂, ψ₂]
-          
+        [ s₂, σ₁ , ψ₁ ⇓ σ₂, ψ₂] ->
+        [ NNRCimpIf e s₁ s₂, σ₁ , ψ₁ ⇓ σ₂, ψ₂]
+
     | sem_NNRCimpEitherLeft e x₁ s₁ x₂ s₂ σ₁ ψ₁ σ₂ ψ₂ d dd :
         [ σ₁ ⊢ e ⇓ (dleft d) ] ->
-        [ (x₁,Some d)::σ₁ , ψ₁ ⊢ s₁ ⇓ (x₁,dd)::σ₂, ψ₂] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpEither e x₁ s₁ x₂ s₂ ⇓ σ₂, ψ₂]
-          
+        [ s₁, (x₁,Some d)::σ₁ , ψ₁ ⇓ (x₁,dd)::σ₂, ψ₂] ->
+        [ NNRCimpEither e x₁ s₁ x₂ s₂, σ₁ , ψ₁ ⇓ σ₂, ψ₂]
+
     | sem_NNRCimpEitherRight e x₁ s₁ x₂ s₂ σ₁ ψ₁ σ₂ ψ₂ d dd :
         [ σ₁ ⊢ e ⇓ (dright d) ] ->
-        [ (x₂,Some d)::σ₁ , ψ₁ ⊢ s₂ ⇓ (x₂,dd)::σ₂, ψ₂] ->
-        [ σ₁ , ψ₁ ⊢ NNRCimpEither e x₁ s₁ x₂ s₂ ⇓ σ₂, ψ₂]
-          
-    with nnrc_imp_stmt_sem_iter: var -> list data -> pd_bindings -> mc_bindings -> nnrc_imp_stmt -> pd_bindings -> mc_bindings -> Prop :=
-         | sem_NNRCimpIter_nil v s σ ψ :
-             [ σ , ψ ⊢ s ⇓[v<-nil] σ, ψ]
-         | sem_NNRCimpIter_cons v s σ₁ ψ₁ σ₂ ψ₂ σ₃ ψ₃ d dl dd:
-             [ (v,Some d)::σ₁, ψ₁ ⊢ s ⇓ (v,dd)::σ₂, ψ₂] ->
-             [ σ₂ , ψ₂ ⊢ s ⇓[v<-dl] σ₃, ψ₃] ->
-             [ σ₁ , ψ₁ ⊢ s ⇓[v<-d::dl] σ₃, ψ₃]
-    where
-    "[ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp
-                                                                          and "[ σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
+        [ s₂, (x₂,Some d)::σ₁ , ψ₁ ⇓ (x₂,dd)::σ₂, ψ₂] ->
+        [ NNRCimpEither e x₁ s₁ x₂ s₂, σ₁ , ψ₁ ⇓ σ₂, ψ₂]
 
-    Notation "[ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
-    Notation "[ σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
+    with nnrc_imp_stmt_sem_iter: var -> list data -> nnrc_imp_stmt -> pd_bindings -> mc_bindings -> pd_bindings -> mc_bindings -> Prop :=
+         | sem_NNRCimpIter_nil v s σ ψ :
+             [ s, σ , ψ ⇓[v<-nil] σ, ψ]
+         | sem_NNRCimpIter_cons v s σ₁ ψ₁ σ₂ ψ₂ σ₃ ψ₃ d dl dd:
+             [ s, (v,Some d)::σ₁, ψ₁ ⇓ (v,dd)::σ₂, ψ₂] ->
+             [ s, σ₂ , ψ₂ ⇓[v<-dl] σ₃, ψ₃] ->
+             [ s, σ₁ , ψ₁ ⇓[v<-d::dl] σ₃, ψ₃]
+    where
+    "[ s , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp
+    and "[ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
+
+    Notation "[ s , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
+    Notation "[ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
 
     Reserved Notation "[ [ ret ] ⊢ s ⇓ d  ]".
 
@@ -163,24 +163,24 @@ Section NNRCimpSem.
       nnrc_imp -> data -> Prop
       :=
       | sem_NNRCimpTopRet s d :
-          [ (ret,None)::nil , nil ⊢ s ⇓ (ret, Some d)::nil, nil ] ->
+          [ s, (ret,None)::nil , nil ⇓ (ret, Some d)::nil, nil ] ->
           [ [ ret ] ⊢ s ⇓ d  ]
     where
     "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
 
     Notation "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
-    
+
   End Denotation.
 
   Notation "[ σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem σ e d) : nnrc_imp.
-  Notation "[ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
-  Notation "[ σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
+  Notation "[ s , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
+  Notation "[ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
   Notation "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
 
   Section props.
-    
+
     Lemma nnrc_imp_stmt_sem_env_stack {s σ₁ ψ₁ σ₂ ψ₂}:
-      [ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ] -> domain σ₁ = domain σ₂.
+      [ s, σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ] -> domain σ₁ = domain σ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem.
@@ -224,7 +224,7 @@ Section NNRCimpSem.
     Qed.
 
     Lemma nnrc_imp_stmt_sem_mcenv_stack {s σ₁ ψ₁ σ₂ ψ₂} :
-      [ σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ] -> domain ψ₁ = domain ψ₂.
+      [ s, σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ] -> domain ψ₁ = domain ψ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; eauto.
@@ -248,8 +248,8 @@ Section NNRCimpSem.
 
     Lemma nnrc_imp_stmt_sem_env_cons_same
           {s v₁ od₁ σ₁ ψ₁ v₂ od₂ σ₂ ψ₂} :
-      [(v₁, od₁) :: σ₁, ψ₁ ⊢ s ⇓ (v₂, od₂) :: σ₂, ψ₂] ->
-      [(v₁, od₁) :: σ₁, ψ₁ ⊢ s ⇓ (v₁, od₂) :: σ₂, ψ₂].
+      [ s, (v₁, od₁) :: σ₁, ψ₁ ⇓ (v₂, od₂) :: σ₂, ψ₂] ->
+      [ s, (v₁, od₁) :: σ₁, ψ₁ ⇓ (v₁, od₂) :: σ₂, ψ₂].
     Proof.
       intros sem.
       generalize (nnrc_imp_stmt_sem_env_stack sem).
@@ -259,8 +259,8 @@ Section NNRCimpSem.
 
     Lemma nnrc_imp_stmt_sem_mcenv_cons_same
           {s σ₁ v₁ dl₁ ψ₁ σ₂ v₂ dl₂ ψ₂} :
-      [σ₁, (v₁, dl₁) :: ψ₁ ⊢ s ⇓ σ₂, (v₂, dl₂) ::  ψ₂] ->
-      [σ₁,(v₁, dl₁) ::  ψ₁ ⊢ s ⇓  σ₂, (v₁, dl₂) :: ψ₂].
+      [ s, σ₁, (v₁, dl₁) :: ψ₁ ⇓ σ₂, (v₂, dl₂) ::  ψ₂] ->
+      [ s, σ₁, (v₁, dl₁) :: ψ₁ ⇓  σ₂, (v₁, dl₂) :: ψ₂].
     Proof.
       intros sem.
       generalize (nnrc_imp_stmt_sem_mcenv_stack sem).
@@ -269,11 +269,11 @@ Section NNRCimpSem.
     Qed.
 
   End props.
-  
+
 End NNRCimpSem.
 Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem h σc σ e d) : nnrc_imp.
-Notation "[ h , σc ; σ₁ , ψ₁ ⊢ s ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem h σc σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
-Notation "[ h , σc ; σ₁ , ψ₁ ⊢ s ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter h σc v dl σ₁ ψ₁ s σ₂ ψ₂ ) : nnrc_imp.
+Notation "[ h , σc ⊢ s , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem h σc s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
+Notation "[ h , σc ⊢ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter h σc v dl s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
 Notation "[ h , σc ; [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret h σc ret s d ) : nnrc_imp.
 
 Arguments nnrc_imp_stmt_sem_env_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
