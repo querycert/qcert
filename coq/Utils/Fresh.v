@@ -20,8 +20,10 @@ as strings). *)
 Section Fresh.
   Require Import String.
   Require Import List.
+  Require Import Permutation.
   Require Import Arith Min.
   Require Import EquivDec.
+  Require Import Morphisms.
   Require Import Omega.
   Require Import CoqLibAdd.
   Require Import ListAdd.
@@ -29,7 +31,6 @@ Section Fresh.
   Require Import Digits.
   Require Import Lift.
   Require Import Sublist.
-  Require Import Permutation.
   
   Section finder.
     Context {A:Type}.
@@ -79,101 +80,6 @@ Section Fresh.
     match_destr; auto.
   Qed.
 
-  Lemma incl_NoDup_sublist_perm {A} {dec:EqDec A eq} {l1 l2:list A} :
-    NoDup l1 ->
-    incl l1 l2 ->
-    exists l1', Permutation l1 l1' /\ sublist l1' l2.
-  Proof.
-    unfold incl.
-    revert l1.
-    induction l2; simpl.
-    - destruct l1; simpl; eauto 3.
-      intros ? inn.
-      specialize (inn a); intuition.
-    - intros.
-      case_eq (In_dec dec a l1); intros.
-      + destruct (in_split _ _ i) as [x [y ?]]; subst.
-        assert (perm:Permutation (x ++ a :: y) (a::x ++ y))
-          by (rewrite Permutation_middle; reflexivity).
-        rewrite perm in H.
-        inversion H; clear H; subst.
-        destruct (IHl2 (x++y)) as [l1' [l1'perm l1'incl]]; trivial.
-        * intros ? inn.
-          { destruct (H0 a0); trivial.
-            - rewrite perm; simpl; intuition.
-            - subst. intuition.
-          } 
-        * exists (a::l1').
-           { split.
-             - rewrite perm.
-               eauto.
-             - apply sublist_cons.
-               trivial.
-           } 
-      + destruct (IHl2 l1 H) as [x [perm subl]].
-        * intros ? inn.
-          destruct (H0 _ inn); subst; intuition.
-        * exists x; split; trivial.
-          apply sublist_skip.
-          trivial.
-  Qed.
-
-  Lemma incl_NoDup_length_le {A} {dec:EqDec A eq} {l1 l2:list A} :
-    NoDup l1 ->
-    incl l1 l2 ->
-    length l1 <= length l2.
-  Proof.
-    intros nd inc.
-    destruct (incl_NoDup_sublist_perm nd inc) as [l1' [perm subl]].
-    rewrite (Permutation_length perm).
-    apply sublist_length.
-    trivial.
-  Qed.
-
-  Lemma find_fresh_from {A:Type} {dec:EqDec A eq} (bad l:list A) :
-    length l > length bad ->
-    NoDup l ->
-    {y | find (fun x : A => if in_dec equiv_dec x bad then false else true) l = Some y}.
-  Proof.
-    rewrite find_filter.
-    unfold hd_error.
-    match_case; eauto; intros.
-    generalize (filter_nil_implies_not_pred _ l H); intros.
-    cut (length l <= length bad); [intuition|].
-    apply incl_NoDup_length_le; trivial.
-    intros ? inn.
-    specialize (H2 _ inn).
-    match_destr_in H2.
-  Defined.
-
-  Lemma find_over_map {A B} f (g:A->B) (l:list A) :
-    find f (map g l) = lift g (find (fun x => f (g x)) l).
-  Proof.
-    induction l; simpl; trivial.
-    match_destr.
-  Qed.
-
-  Lemma seq_ge init bound :
-    forall x, In x (seq init bound) -> x >= init.
-  Proof.
-    revert init.
-    induction bound; simpl; intuition.
-    specialize (IHbound (S init) x H0).
-    omega.
-  Qed.
-    
-  Lemma seq_NoDup init bound :
-    NoDup (seq init bound).
-  Proof.
-    revert init.
-    induction bound; simpl; intros.
-    - constructor.
-    - econstructor; eauto.
-      intro inn.
-      apply seq_ge in inn.
-      omega.
-  Qed.
-    
   Lemma find_bounded_S_nin_finds' {A:Type} f {dec:EqDec A eq} (dom:list A)
         (bound:nat) (pf:bound > length dom)
         (inj:forall x y, f x = f y -> x = y) :
@@ -213,14 +119,6 @@ Section Fresh.
       simpl in e. discriminate.
   Defined.
   
-  Lemma compose_inj {A B C} (f:B->C) (g:A->B) :
-    (forall x y, f x = f y -> x = y) ->
-    (forall x y, g x = g y -> x = y) ->
-    (forall x y, f (g x) = f (g y) -> x = y).
-  Proof.
-    intuition.
-  Qed.
-    
   Definition find_fresh_inj_f {A:Type} {dec:EqDec A eq} f (inj:forall x y, f x = f y -> x = y) (dom:list A) : A
     := proj1_sig (find_bounded_S_nin_finds f dom (S (length dom)) (gt_Sn_n _) inj).
 
@@ -250,144 +148,6 @@ Section Fresh.
     apply find_fresh_inj_f_fresh.
   Qed.
 
-  Lemma append_eq_inv1 x y z : append x y = append x z -> y = z.
-  Proof.
-    revert y z.
-    induction x; simpl; trivial; intros.
-    inversion H; subst.
-    auto.
-  Qed.
-
-  Lemma prefix_refl y : prefix y y = true.
-  Proof.
-    induction y; simpl; trivial.
-    match_destr; congruence.
-  Qed.
-    
-  Lemma substring_append_cancel x y :
-    substring (String.length x) (String.length y) (append x y) = y.
-  Proof.
-    revert y.
-    induction x; simpl; intros.
-    - apply prefix_correct. apply prefix_refl.
-    - trivial.
-  Qed.
-
-  Lemma string_length_append x y :
-    String.length (append x y) = String.length x + String.length y.
-  Proof.
-    revert y.
-    induction x; simpl; auto.
-  Qed.
-
-  Lemma prefix_nil post : prefix ""%string post = true.
-  Proof.
-    destruct post; trivial.
-  Qed.
-
-  Lemma prefix_app pre post : prefix pre (append pre post) = true.
-  Proof.
-    revert post.
-    induction pre; intros; simpl.
-    - apply prefix_nil.
-    - match_destr; intuition.
-  Qed.
-
-  Lemma prefix_break {pre x} :
-    prefix pre x = true ->
-    {y | x = append pre y}.
-  Proof.
-    revert x.
-    induction pre; simpl.
-    - eauto.
-    - destruct x; simpl; try discriminate.
-      match_destr.
-      subst; intros p.
-      destruct (IHpre _ p).
-      subst.
-      eauto.
-  Qed.
-
-  
-  Lemma substring_split s n m l :
-    append (substring s n l) (substring (s+n) m l) = substring s (n+m) l.
-  Proof.
-    revert n m s.
-    induction l; simpl; destruct s; destruct n; simpl; trivial.
-    - f_equal.
-      apply IHl.
-    - rewrite IHl; simpl; trivial.
-    - rewrite IHl. simpl; trivial.
-  Qed.
-
-  Lemma substring_all l :
-    substring 0 (String.length l) l = l.
-  Proof.
-    induction l; simpl; congruence.
-  Qed.
-
-  Lemma substring_bounded s n l :
-    substring s n l = substring s (min n (String.length l - s)) l.
-  Proof.
-    revert s n.
-    induction l; destruct s; destruct n; simpl; trivial.
-    - rewrite IHl; simpl.
-      f_equal.
-      f_equal.
-      f_equal.
-      omega.
-    - rewrite IHl.
-      match_case.
-  Qed.
-
-  Lemma substring_le_prefix s n m l :
-    n <= m ->
-    prefix (substring s n l) (substring s m l) = true.
-  Proof.
-    revert s n m.
-    induction l; destruct s; destruct n; destruct m; simpl; trivial;
-    try omega; intuition.
-    match_destr; intuition.
-  Qed.
-
-  Lemma substring_prefix n l :
-    prefix (substring 0 n l) l = true.
-  Proof.
-    rewrite substring_bounded.
-    rewrite <- (substring_all l) at 3.
-    apply substring_le_prefix.
-    replace (String.length l - 0) with (String.length l) by omega.
-    apply le_min_r.
-  Qed.
-
-  Lemma in_of_append pre y l :
-      In (append pre y) l <->
-      In y (map
-              (fun x => substring (String.length pre) (String.length x - String.length pre) x)
-              (filter (prefix pre) l)).
-  Proof.
-    rewrite in_map_iff.
-    split; intros.
-    - exists (append pre y).
-      rewrite string_length_append.
-      replace ((String.length pre + String.length y - String.length pre))
-      with (String.length y) by omega.
-      rewrite substring_append_cancel.
-      split; trivial.
-      apply filter_In.
-      split; trivial.
-      apply prefix_app.
-      - destruct H as [x [subx inx]]; subst.
-        apply filter_In in inx.
-        destruct inx as [inx prex].
-        destruct (prefix_break prex).
-        subst.
-        rewrite string_length_append.
-        replace ((String.length pre + String.length x0 - String.length pre))
-        with (String.length x0) by omega.
-        rewrite substring_append_cancel.
-        trivial.
-  Qed.
 
   (* Java equivalent: NnrcOptimizer.fresh_var (serves same purpose, not an exact translation) *)
   Definition fresh_var (pre:string) (dom:list string) :=
@@ -503,20 +263,52 @@ Section Fresh.
     match_destr.
     apply fresh_var_fresh.
   Qed.
-  
-  Lemma append_ass s1 s2 s3 : ((s1 ++ s2) ++ s3 = s1 ++ s2 ++ s3)%string.
-  Proof.
-    revert s2 s3.
-    induction s1; simpl.
-    - trivial.
-    - intros. rewrite IHs1; trivial.
-  Qed.
 
+  Lemma find_fresh_inj_f_equivlist x y :
+      equivlist x y ->
+      find_fresh_inj_f nat_to_string16 nat_to_string16_inj x =
+      find_fresh_inj_f nat_to_string16 nat_to_string16_inj y.
+    Proof.
+      intros.
+      unfold find_fresh_inj_f; simpl.
+      repeat (match goal with
+      | [|- context[ proj1_sig ?x ]] => destruct x
+      end; simpl).
+      apply some_lift in e.
+      destruct e as [? e ?]; subst.
+      apply some_lift in e0.
+      destruct e0 as [? e0 ?]; subst.
+      f_equal.
+      rewrite find_bounded_S_seq in e, e0.
+      rewrite (find_ext
+                 (fun x0 : nat => if in_dec equiv_dec (nat_to_string16 x0) x then false else true)
+                 (fun x0 : nat => if in_dec equiv_dec (nat_to_string16 x0) y then false else true)) in e.
+      - eapply find_seq_same; eauto.
+      - intros.
+        do 2 match_destr.
+        + rewrite H in i; congruence.
+        + rewrite <- H in i; congruence.
+    Qed.
+                     
+    Global Instance find_fresh_string_equivlist : Proper (equivlist ==> eq) find_fresh_string.
+    Proof.
+      intros ???.
+      unfold find_fresh_string.
+      apply find_fresh_inj_f_equivlist; trivial.      
+    Qed.
   (*
 Eval vm_compute in 
       fresh_var_from "$"%string "cat_var$5"%string ("cat_var$0"::"i"::"cat_var$5"::"tmp1"::"tmp2"::"cat_var1"::nil)%string.
 *)
 
+    Global Instance fresh_var_equivlist : Proper (eq ==> equivlist ==> eq) fresh_var.
+    Proof.
+      intros ??????; subst.
+      unfold fresh_var.
+      rewrite H0.
+      reflexivity.
+    Qed.
+    
 End Fresh.
 
 Ltac prove_fresh_nin

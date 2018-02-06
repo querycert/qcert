@@ -28,14 +28,14 @@ Section ListAdd.
   Require Import EquivDec.
   Require Import RelationClasses.
   Require Import Omega.
-  Require Import CoqLibAdd.
+  Require Import CoqLibAdd Lift.
 
   (** * Miscellaneous operations on lists *)
   
   Section Misc.
     Context {A:Type}.
 
-    Definition singleton {A} (x:A) : list A := x::nil.
+    Definition singleton (x:A) : list A := x::nil.
     
     Lemma is_nil_dec (l:list A) : {l = nil} + {l <> nil}.
     Proof.
@@ -107,7 +107,7 @@ Section ListAdd.
       invcs eqq.
       f_equal; auto.
     Qed.
-  
+    
     Lemma map_inj {B} (f g:A->B) (l1 l2:list A)
           (inj:forall (x y:A), f x = g y -> x = y) :
       map f l1 = map g l2 ->
@@ -123,7 +123,7 @@ Section ListAdd.
       simpl.
       trivial.
     Qed.
-  
+    
   End Misc.
 
   (** * Properties of folds *)
@@ -152,8 +152,8 @@ Section ListAdd.
     Qed.
 
     Lemma fold_right_app_map_singleton l : 
-    fold_right (fun a b : list A => a ++ b) nil
-              (map (fun x : A => (x::nil)) l) = l.
+      fold_right (fun a b : list A => a ++ b) nil
+                 (map (fun x : A => (x::nil)) l) = l.
     Proof.
       induction l; simpl; congruence.
     Qed.
@@ -242,7 +242,7 @@ Section ListAdd.
 
     Lemma filter_not_filter:
       forall (p:A -> bool), forall (s:list A),
-            filter p (filter (fun x => negb (p x)) s) = nil.
+          filter p (filter (fun x => negb (p x)) s) = nil.
     Proof.
       induction s.
       - simpl; reflexivity.
@@ -295,7 +295,7 @@ Section ListAdd.
       simpl.
       generalize (four_cases p1 p2 a);intros.
       elim H; intro H1; elim H1; intro H2; elim H2; intros C1 C2; clear H H1 H2;
-      rewrite C1; rewrite C2; simpl.
+        rewrite C1; rewrite C2; simpl.
       - rewrite C1; rewrite C2; rewrite IHx; reflexivity. (* both predicates true *)
       - rewrite C2; rewrite IHx; reflexivity.             (* p1 true, p2 false *)
       - rewrite C1; rewrite IHx; reflexivity.             (* p2 true, p1 false *)
@@ -312,7 +312,7 @@ Section ListAdd.
       simpl.
       generalize (four_cases p1 p2 a);intros.
       elim H; intro H1; elim H1; intro H2; elim H2; intros C1 C2; clear H H1 H2;
-      rewrite C1; rewrite C2; simpl; try rewrite C1; rewrite IHx; reflexivity.
+        rewrite C1; rewrite C2; simpl; try rewrite C1; rewrite IHx; reflexivity.
     Qed.
 
     Lemma filter_eq:
@@ -353,7 +353,7 @@ Section ListAdd.
       inversion 1; subst.
       destruct (f a); auto.
     Qed.    
-  
+    
     Lemma find_filter f (l:list A) :  find f l = hd_error (filter f l).
     Proof.
       induction l; simpl; trivial.
@@ -410,7 +410,7 @@ Section ListAdd.
     Qed.
 
   End Perm_equiv.
-    
+  
   (** * Properties over two lists *)
   
   Section List2.
@@ -419,9 +419,9 @@ Section ListAdd.
     Section forallb2.
       Fixpoint forallb2 {A B:Type} (f:A->B->bool) (l1:list A) (l2:list B): bool :=
         match l1,l2 with
-          | nil, nil => true
-          | a1::l1, a2::l2 => f a1 a2 && forallb2 f l1 l2
-          | _, _ => false
+        | nil, nil => true
+        | a1::l1, a2::l2 => f a1 a2 && forallb2 f l1 l2
+        | _, _ => false
         end.
 
       Lemma forallb2_forallb {A B:Type} (f:A->B->bool) :
@@ -441,7 +441,7 @@ Section ListAdd.
       Proof.
         Hint Unfold iff.
         induction l1; destruct l2; simpl; intuition;
-        repeat rewrite andb_true_iff in *; firstorder.
+          repeat rewrite andb_true_iff in *; firstorder.
       Qed.
 
       Lemma forallb2_Forallb {A B:Type} (f:A->B->bool) :
@@ -449,11 +449,11 @@ Section ListAdd.
       Proof.
         Hint Constructors Forall2.
         Ltac inv := try match goal with 
-                          | [H:Forall2 _ _ (_::_) |- _ ] => inversion H; clear H
-                          | [H:Forall2 _ (_::_) _ |- _ ] => inversion H; clear H
+                        | [H:Forall2 _ _ (_::_) |- _ ] => inversion H; clear H
+                        | [H:Forall2 _ (_::_) _ |- _ ] => inversion H; clear H
                         end; firstorder.
         induction l1; destruct l2; simpl; intuition; inv;
-        repeat rewrite andb_true_iff in *; firstorder.
+          repeat rewrite andb_true_iff in *; firstorder.
       Qed.
 
       Lemma forallb2_eq {A B:Type} : forall (f1 f2:A->B->bool) l1 l2, 
@@ -470,13 +470,13 @@ Section ListAdd.
         induction l1; destruct l2; simpl; intuition.
         f_equal; trivial.
       Qed.
-    
+      
     End forallb2.
 
     (** ** Properties of [Forall2] *)
     
     Section Forall2.
-  
+      
       Lemma Forall2_incl {A B} : forall (f1 f2:A->B->Prop) l1 l2, 
         (forall x y, In x l1 -> In y l2 -> f1 x y-> f2 x y) ->
         Forall2 f1 l1 l2 -> Forall2 f2 l1 l2.
@@ -557,7 +557,7 @@ Section ListAdd.
             * apply antisymmetry; trivial.
             * apply IHl1; trivial.
       Qed.
-  
+      
       Lemma Forall2_trans_relations_weak {A B C}
             (R1:A->B->Prop) (R2:B->C->Prop) (R3:A->C->Prop):
         (forall a b c, R1 a b -> R2 b c -> R3 a c) ->
@@ -580,7 +580,7 @@ Section ListAdd.
       Proof.
         revert l2; induction l1; simpl; inversion 1; subst; auto.
       Qed.
-  
+      
       Lemma Forall2_In_l {A B} {P:A->B->Prop} {l1 l2 a} :
         Forall2 P l1 l2 ->
         In a l1 ->
@@ -618,7 +618,7 @@ Section ListAdd.
         destruct eqq; subst.
         auto.
       Qed.
-   
+      
       Lemma filter_Forall2_same {A B} P f g (l1:list A) (l2:list B) :
         Forall2 P l1 l2 ->
         map f l1 = map g l2 ->
@@ -640,7 +640,7 @@ Section ListAdd.
         ; induction l; simpl; trivial
         ; inversion 1; subst; auto.
       Qed.
-  
+      
     End Forall2.
 
   End List2.
@@ -719,7 +719,7 @@ Section ListAdd.
       intuition.
       congruence.
     Qed.
-  
+    
     Lemma forallb_ordpairs_refl_app_cons {A} f (l:list A) x :
       forallb_ordpairs_refl f l = true ->
       f x x = true ->
@@ -903,7 +903,7 @@ Section ListAdd.
 
     Lemma fold_left_remove_all_In {l init a} :
       In a (fold_left (fun (a : list A) (b : A) =>
-                       filter (nequiv_decb b) a) l init)
+                         filter (nequiv_decb b) a) l init)
       -> In a init /\ ~ In a l.
     Proof.
       revert init a.
@@ -970,9 +970,9 @@ Section ListAdd.
       induction l; simpl; intuition.
       rewrite H. destruct (eqdec a v); simpl; try (rewrite e in *; clear e).
       - destruct (eqdec v v); intuition; 
-        destruct (eqdec v' v'); intuition.
+          destruct (eqdec v' v'); intuition.
       - destruct (eqdec v a); intuition;
-        destruct (eqdec v' a); intuition.
+          destruct (eqdec v' a); intuition.
     Qed.
 
     Definition flat_replace_all l (v:A) n
@@ -1083,7 +1083,7 @@ Section ListAdd.
       unfold cut_down_to.
       apply filter_app.
     Qed.
-   
+    
     Lemma incl_dec {A} {dec:EqDec A eq} (l1 l2:list A) :
       {incl l1 l2} + {~ incl l1 l2}.
     Proof.
@@ -1127,21 +1127,21 @@ Section ListAdd.
       apply set_inter_elim in inn.
       apply set_inter_intro; intuition.
     Qed.
-  
-   Lemma nincl_exists {A} {dec:EqDec A eq} (l1 l2:list A) :
-     ~ incl l1 l2 -> {x | In x l1 /\ ~ In x l2}.
-   Proof.
-     unfold incl.
-     induction l1; simpl.
-     - intuition.
-     - intros.
-       destruct (in_dec dec a l2).
-       + destruct IHl1.
-         * intros inn.
-           apply H. intuition; subst; trivial.
-         * exists x; intuition.
-      + exists a; intuition.
-   Qed.
+    
+    Lemma nincl_exists {A} {dec:EqDec A eq} (l1 l2:list A) :
+      ~ incl l1 l2 -> {x | In x l1 /\ ~ In x l2}.
+    Proof.
+      unfold incl.
+      induction l1; simpl.
+      - intuition.
+      - intros.
+        destruct (in_dec dec a l2).
+        + destruct IHl1.
+          * intros inn.
+            apply H. intuition; subst; trivial.
+          * exists x; intuition.
+        + exists a; intuition.
+    Qed.
 
   End Inclusion.
 
@@ -1170,7 +1170,7 @@ Section ListAdd.
     Proof.
       intros e x inn. specialize (e x); intuition.
     Qed.
-  
+    
     Lemma equivlist_incls (l1 l2:list A) :
       equivlist l1 l2 <-> (incl l1 l2 /\ incl l2 l1).
     Proof.
@@ -1192,7 +1192,7 @@ Section ListAdd.
         + right; rewrite equivlist_incls; intuition.
       - right; rewrite equivlist_incls; intuition.
     Defined.
-   
+    
     Lemma equivlist_nil {l:list A} : equivlist l nil -> l = nil.
     Proof.
       destruct l; trivial.
@@ -1270,7 +1270,7 @@ Section ListAdd.
          apply set_inter_elim in H0.
          intuition.
     Qed.
-     
+    
     Lemma equivlist_cons l1 l2 (s:A) :
       equivlist l1 l2 ->
       equivlist (s::l1) (s::l2).
@@ -1286,7 +1286,7 @@ Section ListAdd.
       repeat rewrite filter_In.
       firstorder.
     Qed.
-  
+    
     Global Instance equivlist_remove_all {dec:EqDec A eq} :
       Proper (eq ==> equivlist ==> equivlist) (@remove_all A dec).
     Proof.
@@ -1310,13 +1310,22 @@ Section ListAdd.
 
   End Equivalence.
 
+  Global Instance map_equivlist {A B} : Proper (eq ==> equivlist ==> equivlist) (@map A B).
+  Proof.
+    repeat red; intros; subst.
+    repeat rewrite in_map_iff.
+    split; intros [? [??]]; subst.
+    - rewrite H0 in H1; eauto.
+    - rewrite <- H0 in H1; eauto.
+  Qed.
+
   (** * Assymetric relations on a list *)
   
   Section Assym_over.
-  
+    
     Definition asymmetric_over {A} R (l:list A) :=
       forall x y, In x l-> In y l -> ~R x y -> ~R y x -> x = y.
-  
+    
     Lemma asymmetric_asymmetric_over {A} {R} :
       (forall x y:A, ~R x y -> ~R y x -> x = y) ->
       forall l, asymmetric_over R l .
@@ -1339,7 +1348,7 @@ Section ListAdd.
        asymmetric_over R l2).
     Proof.
       intros; split; intros aH; eapply asymmetric_over_incl; try eapply aH;
-      apply equivlist_in; trivial.
+        apply equivlist_in; trivial.
       symmetry; trivial.
     Qed.
     
@@ -1364,13 +1373,13 @@ Section ListAdd.
   (** * Lists without duplicates *)
 
   Section NoDup.
-  
+    
     Global Instance perm_in {A} : Proper (eq ==> (@Permutation A) ==> iff) (@In A).
     Proof.
       Hint Resolve Permutation_in Permutation_sym.
       unfold Proper, respectful; intros; subst; intuition; eauto.
     Qed.
-  
+    
     Lemma NoDup_perm' {A:Type} {a b:list A} : NoDup a -> Permutation a b -> NoDup b.
     Proof.
       intros nd p.
@@ -1382,7 +1391,7 @@ Section ListAdd.
         rewrite H in H4,H6.
         constructor; [|constructor]; simpl in *; intuition; subst; eauto.
     Qed.
-  
+    
     Global Instance NoDup_perm {A:Type} :
       Proper (@Permutation A ==> iff) (@NoDup A).
     Proof.
@@ -1411,7 +1420,7 @@ Section ListAdd.
       - rewrite <- Permutation_middle in H.
         inversion H; subst; auto.
     Qed.
-  
+    
     Hint Resolve NoDup_app_inv.
 
     Lemma NoDup_app_inv2 {A:Type} {a b:list A} : NoDup (a++b) -> NoDup b.
@@ -1442,7 +1451,7 @@ Section ListAdd.
         apply in_map_iff.
         eauto.
     Qed.
-  
+    
     Lemma map_inj_NoDup {A B} (f:A->B) 
           (inj:forall x y, f x = f y -> x = y) (l:list A) :
       NoDup l ->
@@ -1473,6 +1482,37 @@ Section ListAdd.
 
   End NoDup.
 
+  
+  Section find.
+    Context {A:Type}.
+    
+    Lemma find_ext f g (l:list A):
+      (forall x, f x = g x) ->
+      find f l = find g l.
+    Proof.
+      induction l; simpl; trivial; intros.
+      rewrite H, IHl; trivial.
+    Qed.
+
+    Lemma find_app f (l1 l2:list A) :
+      find f (l1 ++ l2) = match find f l1 with
+                          | Some x => Some x
+                          | None => find f l2
+                          end.
+    Proof.
+      revert l2.
+      induction l1; simpl; trivial; intros.
+      destruct (f a); trivial.
+    Qed.
+
+    Lemma find_over_map {B} f (g:A->B) (l:list A) :
+      find f (map g l) = lift g (find (fun x => f (g x)) l).
+    Proof.
+      induction l; simpl; trivial.
+      match_destr.
+    Qed.
+    
+  End find.
   (** * Disjoint lists *)
   
   Section Disjoint.
@@ -1501,31 +1541,31 @@ Section ListAdd.
     Qed.
 
     Lemma disjoint_app_l {A} (l1 l2 l3:list A) :
-    disjoint (l1 ++ l2) l3 <-> (disjoint l1 l3 /\ disjoint l2 l3).
-  Proof.
-    unfold disjoint; intuition.
-    eapply H; try rewrite in_app_iff; eauto.
-    eapply H; try rewrite in_app_iff; eauto.
-    rewrite in_app_iff in H.
-    intuition; eauto.
-  Qed.
+      disjoint (l1 ++ l2) l3 <-> (disjoint l1 l3 /\ disjoint l2 l3).
+    Proof.
+      unfold disjoint; intuition.
+      eapply H; try rewrite in_app_iff; eauto.
+      eapply H; try rewrite in_app_iff; eauto.
+      rewrite in_app_iff in H.
+      intuition; eauto.
+    Qed.
 
-   Lemma disjoint_app_r {A} (l1 l2 l3:list A) :
-    disjoint l1 (l2 ++ l3) <-> (disjoint l1 l2 /\ disjoint l1 l3).
-   Proof.
-    unfold disjoint; intuition.
-    eapply H; try rewrite in_app_iff; eauto.
-    eapply H; try rewrite in_app_iff; eauto.
-    rewrite in_app_iff in H2.
-    intuition; eauto.
-  Qed.
+    Lemma disjoint_app_r {A} (l1 l2 l3:list A) :
+      disjoint l1 (l2 ++ l3) <-> (disjoint l1 l2 /\ disjoint l1 l3).
+    Proof.
+      unfold disjoint; intuition.
+      eapply H; try rewrite in_app_iff; eauto.
+      eapply H; try rewrite in_app_iff; eauto.
+      rewrite in_app_iff in H2.
+      intuition; eauto.
+    Qed.
 
 
     Lemma NoDup_app {A:Type} {a b:list A} :
       disjoint a b -> NoDup a -> NoDup b -> NoDup (a++b).
     Proof.
       revert b;
-      induction a; intuition.
+        induction a; intuition.
       simpl; inversion H0; subst.
       apply disjoint_cons_inv1 in H.
       constructor; intuition.
@@ -1537,12 +1577,53 @@ Section ListAdd.
       red; unfold disjoint; firstorder.
     Qed.
 
+    Lemma disjoint_nil_l {A:Type} (l:list A) : disjoint nil l.
+    Proof.
+      red; inversion 1.
+    Qed.
+
+    Lemma disjoint_nil_r {A:Type} (l:list A) : disjoint l nil.
+    Proof.
+      red; inversion 2.
+    Qed.
+
+    Hint Immediate disjoint_nil_l disjoint_nil_r.
+
+    Lemma disjoint_incl {A:Type} (l1 l2 l3:list A) :
+      incl l3 l2 ->
+      disjoint l1 l2 ->
+      disjoint l1 l3.
+    Proof.
+      unfold disjoint, incl; eauto.
+    Qed.
+
+    Lemma disjoint_cons1 {A : Type} (a : A) (l1 l2 : list A) :
+      disjoint l1 l2 -> ~ In a l2 ->
+      disjoint (a :: l1) l2.
+    Proof.
+      unfold disjoint; simpl; intuition; subst; eauto.
+    Qed.
+
+    Lemma disjoint_cons2 {A : Type} (a : A) (l1 l2 : list A) :
+      disjoint l1 l2 -> ~ In a l1 ->
+      disjoint l1 (a::l2).
+    Proof.
+      intros.
+      unfold disjoint; simpl; intuition; subst; eauto.
+    Qed.
+
+    Lemma disjoint_cons_inv2 {A : Type} (a : A) (l1 l2 : list A) :
+      disjoint l1 (a::l2) -> (disjoint l1 l2 /\ ~ In a l1).
+    Proof.
+      unfold disjoint; simpl; intuition; subst; eauto.
+    Qed.
+
   End Disjoint.
 
   (** * Zip of two lists *)
 
   Section Zip.
-  
+    
     Fixpoint zip {A B} (l1:list A) (l2: list B) : option (list (A * B)) :=
       match l1 with
       | nil =>
@@ -1562,6 +1643,66 @@ Section ListAdd.
         end
       end.
   End Zip.
+
+  Section Seq.
+    Lemma seq_ge init bound :
+      forall x, In x (seq init bound) -> x >= init.
+    Proof.
+      revert init.
+      induction bound; simpl; intuition.
+      specialize (IHbound (S init) x H0).
+      omega.
+    Qed.
+    
+    Lemma seq_NoDup init bound :
+      NoDup (seq init bound).
+    Proof.
+      revert init.
+      induction bound; simpl; intros.
+      - constructor.
+      - econstructor; eauto.
+        intro inn.
+        apply seq_ge in inn.
+        omega.
+    Qed.
+
+    Lemma seq_plus a b c : seq a (b+c) = seq a b ++ seq (a+b) c.
+    Proof.
+      revert a c.
+      induction b; simpl; intros.
+      - auto.
+      - rewrite IHb.
+        rewrite plus_Sn_m, plus_n_Sm.
+        trivial.
+    Qed.
+
+    Lemma find_seq_same_aux b a n1 n2 x y :
+      n1 < n2 ->
+      find b (seq a n1) = Some x ->
+      find b (seq a n2) = Some y ->
+      x = y.
+    Proof.
+      intros nlt eq1 eq2.
+      assert (n2eq:n2 = n1 + (n2 - n1))
+        by (rewrite le_plus_minus_r; auto with arith).
+      rewrite n2eq in eq2.
+      rewrite seq_plus, find_app, eq1 in eq2.
+      congruence.
+    Qed.
+
+    Lemma find_seq_same b a n1 n2 x y : find b (seq a n1) = Some x ->
+                                        find b (seq a n2) = Some y ->
+                                        x = y.
+    Proof.
+      destruct (lt_eq_lt_dec n1 n2) as [[?|?]|?].
+      - apply find_seq_same_aux; auto.
+      - congruence.
+      - intros; symmetry.
+        eapply find_seq_same_aux; eauto.
+    Qed.
+    
+
+  End Seq.
 
 End ListAdd.
 

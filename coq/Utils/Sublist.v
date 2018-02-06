@@ -106,7 +106,7 @@ Section Sublist.
       - inversion 1; subst; simpl; intros.
         + f_equal; auto with arith.
         + apply sublist_length in H2. omega.
-     Qed.
+    Qed.
 
     Global Instance sublist_antisymm : Antisymmetric (list A) eq sublist.
     Proof.
@@ -171,7 +171,7 @@ Section Sublist.
         + apply sublist_cons; trivial.
         + apply sublist_skip; trivial.
     Qed.
-   
+    
   End sublist.
 
   Hint Constructors sublist.
@@ -324,7 +324,7 @@ Section Sublist.
   Proof.
     intros.
     apply StronglySorted_incl_sublist; trivial;
-    apply Sorted_StronglySorted; trivial; apply StrictOrder_Transitive.
+      apply Sorted_StronglySorted; trivial; apply StrictOrder_Transitive.
   Qed.
 
   Lemma Sorted_incl_both_eq {A R l1 l2} `{EqDec A eq} `{StrictOrder A R}: 
@@ -429,7 +429,7 @@ Section Sublist.
     sublist l1(a::l2) ->
     NoDup (a::l2) ->
     (exists l',
-       l1 = a::l' /\ sublist l' l2)
+        l1 = a::l' /\ sublist l' l2)
     \/
     (~ In a l1
      /\ sublist l1 l2).
@@ -514,7 +514,7 @@ Section Sublist.
   Qed.
 
   
-    Lemma insertion_sort_insert_sublist_self {A R}
+  Lemma insertion_sort_insert_sublist_self {A R}
         R_dec (a:A) l :
     sublist l (@insertion_sort_insert A R R_dec a l).
   Proof.
@@ -530,68 +530,134 @@ Section Sublist.
   Lemma insertion_sort_insert_sublist_prop {A R} {rstrict:StrictOrder R}
         (trich:forall a b, {R a b} + {a = b} + {R b a})
         R_dec a l1 l2:
-  is_list_sorted R_dec l2 = true ->
-  sublist l1 l2 ->
-  sublist (@insertion_sort_insert A R R_dec a l1)
-          (@insertion_sort_insert A R R_dec a l2).
-Proof.
-  unfold Proper, respectful; intros; subst.
-  revert l1 H H0. induction l2.
-  - inversion 2; subst; simpl; reflexivity.
-  - intros. apply sublist_cons_inv_simple in H0;
-      [ | apply (is_list_sorted_NoDup R_dec); trivial].
-    destruct H0 as [[?[??]]|[??]]; subst.
-    + simpl. match_destr.
-      * do 2 apply sublist_cons; eauto.
-      * match_destr; apply sublist_cons; trivial.
-        apply IHl2; trivial.
-        eapply is_list_sorted_cons_inv; eauto.
-    + simpl. match_destr.
-      * rewrite IHl2; trivial; [| eapply is_list_sorted_cons_inv; eauto].
-        rewrite insertion_sort_insert_forall_lt.
-        { apply sublist_cons; apply sublist_skip; reflexivity. }
-        apply sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
-        inversion H; subst.
-        revert H5. apply Forall_impl; intros.
-        rewrite <- H2; trivial.
-      * specialize (IHl2 l1).
-        cut_to IHl2; trivial; [| eapply is_list_sorted_cons_inv; eauto].
-        match_destr; [apply sublist_skip; trivial | ].
-        destruct (trich a a0) as [[?|?]|?]; try congruence.
-        subst.
-        rewrite insertion_sort_insert_forall_lt; [ apply sublist_cons; trivial | ].
-        rewrite H1.
-        apply sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
-        inversion H; subst. trivial.
-Qed.
+    is_list_sorted R_dec l2 = true ->
+    sublist l1 l2 ->
+    sublist (@insertion_sort_insert A R R_dec a l1)
+            (@insertion_sort_insert A R R_dec a l2).
+  Proof.
+    unfold Proper, respectful; intros; subst.
+    revert l1 H H0. induction l2.
+    - inversion 2; subst; simpl; reflexivity.
+    - intros. apply sublist_cons_inv_simple in H0;
+                [ | apply (is_list_sorted_NoDup R_dec); trivial].
+      destruct H0 as [[?[??]]|[??]]; subst.
+      + simpl. match_destr.
+        * do 2 apply sublist_cons; eauto.
+        * match_destr; apply sublist_cons; trivial.
+          apply IHl2; trivial.
+          eapply is_list_sorted_cons_inv; eauto.
+      + simpl. match_destr.
+        * rewrite IHl2; trivial; [| eapply is_list_sorted_cons_inv; eauto].
+          rewrite insertion_sort_insert_forall_lt.
+          { apply sublist_cons; apply sublist_skip; reflexivity. }
+          apply sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
+          inversion H; subst.
+          revert H5. apply Forall_impl; intros.
+          rewrite <- H2; trivial.
+        * specialize (IHl2 l1).
+          cut_to IHl2; trivial; [| eapply is_list_sorted_cons_inv; eauto].
+          match_destr; [apply sublist_skip; trivial | ].
+          destruct (trich a a0) as [[?|?]|?]; try congruence.
+          subst.
+          rewrite insertion_sort_insert_forall_lt; [ apply sublist_cons; trivial | ].
+          rewrite H1.
+          apply sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
+          inversion H; subst. trivial.
+  Qed.
 
-Lemma insertion_sort_sublist_proper {A R} {rstrict:StrictOrder R}
+  Lemma insertion_sort_sublist_proper {A R} {rstrict:StrictOrder R}
         (trich:forall a b, {R a b} + {a = b} + {R b a}) R_dec :
-  Proper (sublist ==> sublist) (@insertion_sort A R R_dec).
-Proof.
-  unfold Proper, respectful; intros.
-  revert x H. induction y; simpl; inversion 1; subst; simpl; trivial.
-  - specialize (IHy _ H2).
-    apply insertion_sort_insert_sublist_prop; trivial.
-    apply is_list_sorted_Sorted_iff.
-    apply insertion_sort_Sorted.
-  - rewrite IHy; trivial.
-    apply insertion_sort_insert_sublist_self.
-Qed.
-        
-Lemma sublist_of_sorted_sublist {A R} {rstrict:StrictOrder R}
-      (trich:forall a b, {R a b} + {a = b} + {R b a})
-      R_dec {l1 l2} : 
-  sublist (@insertion_sort A R R_dec l1) l2 ->
-  forall l1',
-        sublist l1' l1 -> 
-        sublist (insertion_sort R_dec l1') l2.
-Proof.
-  intros.
-  transitivity (insertion_sort R_dec l1); trivial.
-  apply insertion_sort_sublist_proper; trivial.
-Qed.
+    Proper (sublist ==> sublist) (@insertion_sort A R R_dec).
+  Proof.
+    unfold Proper, respectful; intros.
+    revert x H. induction y; simpl; inversion 1; subst; simpl; trivial.
+    - specialize (IHy _ H2).
+      apply insertion_sort_insert_sublist_prop; trivial.
+      apply is_list_sorted_Sorted_iff.
+      apply insertion_sort_Sorted.
+    - rewrite IHy; trivial.
+      apply insertion_sort_insert_sublist_self.
+  Qed.
+  
+  Lemma sublist_of_sorted_sublist {A R} {rstrict:StrictOrder R}
+        (trich:forall a b, {R a b} + {a = b} + {R b a})
+        R_dec {l1 l2} : 
+    sublist (@insertion_sort A R R_dec l1) l2 ->
+    forall l1',
+      sublist l1' l1 -> 
+      sublist (insertion_sort R_dec l1') l2.
+  Proof.
+    intros.
+    transitivity (insertion_sort R_dec l1); trivial.
+    apply insertion_sort_sublist_proper; trivial.
+  Qed.
 
+  Lemma incl_NoDup_sublist_perm {A} {dec:EqDec A eq} {l1 l2:list A} :
+    NoDup l1 ->
+    incl l1 l2 ->
+    exists l1', Permutation l1 l1' /\ sublist l1' l2.
+  Proof.
+    unfold incl.
+    revert l1.
+    induction l2; simpl.
+    - destruct l1; simpl; eauto 3.
+      intros ? inn.
+      specialize (inn a); intuition.
+    - intros.
+      case_eq (In_dec dec a l1); intros.
+      + destruct (in_split _ _ i) as [x [y ?]]; subst.
+        assert (perm:Permutation (x ++ a :: y) (a::x ++ y))
+          by (rewrite Permutation_middle; reflexivity).
+        rewrite perm in H.
+        inversion H; clear H; subst.
+        destruct (IHl2 (x++y)) as [l1' [l1'perm l1'incl]]; trivial.
+        * intros ? inn.
+          { destruct (H0 a0); trivial.
+            - rewrite perm; simpl; intuition.
+            - subst. intuition.
+          } 
+        * exists (a::l1').
+          { split.
+            - rewrite perm.
+              eauto.
+            - apply sublist_cons.
+              trivial.
+          } 
+      + destruct (IHl2 l1 H) as [x [perm subl]].
+        * intros ? inn.
+          destruct (H0 _ inn); subst; intuition.
+        * exists x; split; trivial.
+          apply sublist_skip.
+          trivial.
+  Qed.    
+
+  Lemma incl_NoDup_length_le {A} {dec:EqDec A eq} {l1 l2:list A} :
+    NoDup l1 ->
+    incl l1 l2 ->
+    length l1 <= length l2.
+  Proof.
+    intros nd inc.
+    destruct (incl_NoDup_sublist_perm nd inc) as [l1' [perm subl]].
+    rewrite (Permutation_length perm).
+    apply sublist_length.
+    trivial.
+  Qed.
+
+  Lemma find_fresh_from {A} {dec:EqDec A eq} (bad l:list A) :
+    length l > length bad ->
+    NoDup l ->
+    {y | find (fun x : A => if in_dec equiv_dec x bad then false else true) l = Some y}.
+  Proof.
+    rewrite find_filter.
+    unfold hd_error.
+    match_case; eauto; intros.
+    generalize (filter_nil_implies_not_pred _ l H); intros.
+    cut (length l <= length bad); [intuition|].
+    apply incl_NoDup_length_le; trivial.
+    intros ? inn.
+    specialize (H2 _ inn).
+    match_destr_in H2.
+  Defined.
 
 End Sublist.
 Hint Immediate sublist_nil_l.

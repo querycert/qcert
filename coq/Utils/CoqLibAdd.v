@@ -33,7 +33,7 @@ Section CoqLibAdd.
   (** * Properties of Booleans *)
   
   Section Booleans.
-  
+    
     Lemma andb_true_inversion:
       forall b1 b2 : bool,
         andb b1 b2 = true <-> b1 = true /\ b2 = true.
@@ -77,7 +77,7 @@ Section CoqLibAdd.
       intros.
       rewrite H; reflexivity.
     Qed.
-  
+    
     Lemma not_pred_implies_neq {A:Type}:
       forall (p:A -> bool), forall (x1 x2:A),
           (p x1) <> (p x2) -> x1 <> x2.
@@ -297,7 +297,7 @@ Section CoqLibAdd.
       right; left; assumption.
       right; right; assumption.
     Qed.
-  
+    
   End In.
 
   (** * Properties of [Forallt] *)
@@ -307,7 +307,7 @@ Section CoqLibAdd.
       Forallt_nil : Forallt P nil
     | Forallt_cons : forall (x : A) (l : list A),
         P x -> Forallt P l -> Forallt P (x :: l).
-  
+    
     Lemma list_Forallt_eq_dec {A:Type}:
       forall (c l: list A),
         Forallt (fun x : A => forall y : A, {x = y} + {x <> y}) c -> {c = l} + {c <> l}.
@@ -363,7 +363,7 @@ Section CoqLibAdd.
       destruct (In_dec eq a l); unfold equiv, complement in *; subst; auto.
       assert False; intuition.
     Defined.
-  
+    
     Lemma Forall_app {A} (P:A->Prop) (l1 l2:list A):
       Forall P l1 -> Forall P l2 ->
       Forall P (l1 ++ l2).
@@ -379,11 +379,11 @@ Section CoqLibAdd.
 
     Lemma Forall_app_inv {A : Type} {P : A -> Prop} (l1 l2 : list A) :
       Forall P (l1 ++ l2) ->   Forall P l1 /\ Forall P l2.
-  Proof.
-    repeat rewrite Forall_forall.
-    intros Finn; split; intros ? inn
-    ; apply Finn; rewrite in_app_iff; tauto.
-  Qed.
+    Proof.
+      repeat rewrite Forall_forall.
+      intros Finn; split; intros ? inn
+      ; apply Finn; rewrite in_app_iff; tauto.
+    Qed.
 
     Lemma Forall_map {A B} P (f:A->B) l:
       Forall P (map f l) <->
@@ -585,7 +585,7 @@ Section CoqLibAdd.
       rewrite (IHl (f a + x0)); simpl.
       omega.
     Qed.
-      
+    
     Lemma fold_left_arith_dist2 {A} (x0 n0:nat) (l:list A) (f:A -> nat):
       fold_left (fun (x:nat) (y:A) => n0 * (f y) + x) l x0 =
       n0 * (fold_left (fun (x:nat) (y:A) => (f y) + x) l 0) + x0.
@@ -624,13 +624,13 @@ Section CoqLibAdd.
   Section Zutil.
     Require Import ZArith Zdigits Znat.
     Open Scope Z_scope.
-  
+    
     Definition ZToSignedNat (z:Z) : (bool*nat) :=
       match (Z.sgn z) with
       | -1 => (false,(Z.to_nat z))
       | _ => (true, (Z.to_nat z))
       end.
-  
+    
     Lemma pos_succ_inv (n1 n2:positive):
       (Pos.succ n1 = Pos.succ n2 -> n1 = n2).
     Proof.
@@ -638,7 +638,7 @@ Section CoqLibAdd.
       apply Pos.succ_inj.
       assumption.
     Qed.
-  
+    
     Lemma Pos_of_nat_inv (n1 n2:nat) :
       Pos.of_nat (S n1) = Pos.of_nat (S n2) -> n1 = n2.
     Proof.
@@ -678,7 +678,7 @@ Section CoqLibAdd.
       apply IHn1.
       apply pos_succ_inv; assumption.
     Qed.
-  
+    
     Lemma of_nat_inv (n1 n2:nat) :
       Z.of_nat n1 = Z.of_nat n2 -> n1 = n2.
     Proof.
@@ -691,7 +691,7 @@ Section CoqLibAdd.
       inversion H1.
       rewrite (Pos_of_nat_inv n1 n2 H1); reflexivity.
     Qed.
-  
+    
     Lemma pos_succ_nat_inv (n1 n2:nat) :
       Pos.of_succ_nat n1 = Pos.of_succ_nat n2 -> n1 = n2.
     Proof.
@@ -808,6 +808,28 @@ Section CoqLibAdd.
       is_true x = true.
   End Holds.
 
+  Lemma compose_inj {A B C} (f:B->C) (g:A->B) :
+    (forall x y, f x = f y -> x = y) ->
+    (forall x y, g x = g y -> x = y) ->
+    (forall x y, f (g x) = f (g y) -> x = y).
+  Proof.
+    intuition.
+  Qed.
+
+  Lemma sumbool_and {P Q} : {P} + {~ P} -> {Q} + {~ Q} -> {P /\ Q} + {~ (P /\ Q)}.
+  Proof.
+    do 2 destruct 1; tauto.
+  Defined.
+
+  Lemma eqdec_neq {A} `{EqDec A eq} (x y:A) :  {x <> y} + {~ x <> y}.
+  Proof.
+    destruct (x == y).
+    - red in e.
+      right; congruence.
+    - left; congruence.
+  Defined.
+
+  
 End CoqLibAdd.
 
 (** * Tactics *)
@@ -835,9 +857,9 @@ Tactic Notation "assert_eq" ident(x) constr(v) :=
 
 Tactic Notation "Case_aux" ident(x) constr(name) :=
   first [
-    set (x := name); move_to_top x
-  | assert_eq x name; move_to_top x
-  | fail 1 "because we are working on a different case" ].
+      set (x := name); move_to_top x
+    | assert_eq x name; move_to_top x
+    | fail 1 "because we are working on a different case" ].
 
 Tactic Notation "Case" constr(name) := Case_aux Case name.
 Tactic Notation "SCase" constr(name) := Case_aux SCase name.
@@ -853,8 +875,8 @@ Tactic Notation "SSSSSSSCase" constr(name) := Case_aux SSSSSSSCase name.
 (* Fails when a specific hypothesis is present *)
 Ltac notHyp P :=
   match goal with
-    | [ _ : P |- _ ] => fail 1
-    | _ => idtac
+  | [ _ : P |- _ ] => fail 1
+  | _ => idtac
   end.
 
 Ltac extend P :=
@@ -876,17 +898,17 @@ Ltac match_case_in H
 
 Ltac cut_to H :=
   match type of H with
-    | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
-    | _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> _ -> ?b => cut (b); [clear H; intros H|apply H]
+  | _ -> ?b => cut (b); [clear H; intros H|apply H]
   end.
 
 Ltac invcs H := inversion H; clear H; try subst.
@@ -899,5 +921,5 @@ Definition brand := string.
 Class ToString (A:Type)
   := {
       toString (a:A) : string
-      }.
+    }.
 

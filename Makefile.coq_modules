@@ -145,6 +145,7 @@ MODULES = \
 	NRAEnv/Optim/NRAEnvOptimizer \
 	NRAEnv/NRAEnvOptim \
 	cNNRC/Lang/cNNRC \
+	cNNRC/Lang/cNNRCVars \
 	cNNRC/Lang/cNNRCShadow \
 	cNNRC/Lang/cNNRCNorm \
 	cNNRC/Lang/cNNRCEq \
