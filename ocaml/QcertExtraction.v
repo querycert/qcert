@@ -21,6 +21,7 @@
 Require Extraction.
 Extraction Language Ocaml.
 Require Import ExtrOcamlBasic ExtrOcamlString ExtrOcamlNatInt ExtrOcamlZInt.
+Require Import NumberExtract.
 Extraction Blacklist String List.
 
 Require Import Digits.

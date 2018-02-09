@@ -72,6 +72,7 @@ let rec data_to_sexp (d : QData.qdata) : sexp =
   match d with
   | Dunit -> STerm ("dunit", [])
   | Dnat n -> SInt n
+  | Dnumber f -> SFloat f
   | Dbool b -> SBool b
   | Dstring s -> SString (string_of_char_list s)
   | Dcoll dl -> STerm ("dcoll", List.map data_to_sexp dl)
@@ -88,7 +89,7 @@ let rec sexp_to_data (se:sexp) : QData.qdata =
   | STerm ("dunit", []) -> Dunit
   | SBool b -> Dbool b
   | SInt n -> Dnat n
-  | SFloat f -> (Dforeign (Obj.magic (Enhancedfloat f)))
+  | SFloat f -> Dnumber f
   | SString s -> Dstring (char_list_of_string s)
   | STerm ("dcoll", sel) ->
       Dcoll (List.map sexp_to_data sel)

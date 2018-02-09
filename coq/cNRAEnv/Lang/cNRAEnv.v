@@ -398,6 +398,7 @@ Section cNRAEnv.
              match nraenv_core_eval e env d1 with
              | Some dunit => None
              | Some (dnat _) => None
+             | Some (dnumber _) => None
              | Some (dbool b) => Some b
              | Some (dstring _) => None
              | Some (dcoll _) => None
@@ -421,6 +422,7 @@ Section cNRAEnv.
                   match nraenv_core_eval e env d1 with
                   | Some dunit => None
                   | Some (dnat _) => None
+                  | Some (dnumber _) => None
                   | Some (dbool b) => Some b
                   | Some (dstring _) => None
                   | Some (dcoll _) => None
@@ -540,6 +542,7 @@ Section cNRAEnv.
                   match nraenv_core_eval e1 env d1 with
                   | Some dunit => None
                   | Some (dnat _) => None
+                  | Some (dnumber _) => None
                   | Some (dbool b) => Some b
                   | Some (dstring _) => None
                   | Some (dcoll _) => None
@@ -637,6 +640,7 @@ Section cNRAEnv.
               match nraenv_core_eval e env a with
               | Some dunit => None
               | Some (dnat _) => None
+              | Some (dnumber _) => None
               | Some (dbool _) => None
               | Some (dstring _) => None
               | Some (dcoll y) => omap_concat a y
@@ -660,6 +664,7 @@ Section cNRAEnv.
                    match nraenv_core_eval e env d0 with
                    | Some dunit => None
                    | Some (dnat _) => None
+                   | Some (dnumber _) => None
                    | Some (dbool b) => Some b
                    | Some (dstring _) => None
                    | Some (dcoll _) => None
@@ -685,6 +690,7 @@ Section cNRAEnv.
                     match nraenv_core_eval e env d0 with
                     | Some dunit => None
                     | Some (dnat _) => None
+                    | Some (dnumber _) => None
                     | Some (dbool b) => Some b
                     | Some (dstring _) => None
                     | Some (dcoll _) => None
@@ -704,6 +710,7 @@ Section cNRAEnv.
                     match nraenv_core_eval e env d0 with
                     | Some dunit => None
                     | Some (dnat _) => None
+                    | Some (dnumber _) => None
                     | Some (dbool b) => Some b
                     | Some (dstring _) => None
                     | Some (dcoll _) => None

@@ -75,11 +75,12 @@ Section DataLift.
   Proof.
     intros f d1 d2.
     destruct d1.
-    exact None. exact None. exact None. exact None.
+    exact None. exact None. exact None. exact None. exact None.
     2: exact None. 2: exact None.
     2: exact None. 2: exact None.
     destruct d2.
-    exact None. exact None. exact None. exact None. 2: exact None. 2: exact None. 2: exact None. 2: exact None.
+    exact None. exact None. exact None.
+    exact None. exact None. 2: exact None. 2: exact None. 2: exact None. 2: exact None.
     exact (Some (f l l0)).
     exact None.
     exact None.

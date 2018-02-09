@@ -230,7 +230,7 @@ let build_phase_config j =
   begin match j with
   | QcertCompiler.Jobject r ->
       let phase_name = get_field_string "name" r in
-      let phase_iter = get_field_int "iter" r in
+      let phase_iter = int_of_float (get_field_int "iter" r) in
       let phase_optims = get_field_string_array "optims" r in
       { optim_phase_name = phase_name;
 	optim_phase_iter = phase_iter;

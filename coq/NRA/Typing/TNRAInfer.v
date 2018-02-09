@@ -46,7 +46,9 @@ Section TNRAInfer.
       - exact None.
       - exact None.
       - exact None.
+      - exact None.
       - destruct x.
+        + exact None.
         + exact None.
         + exact None.
         + exact None.
@@ -79,7 +81,9 @@ Section TNRAInfer.
       - exact None.
       - exact None.
       - exact None.
+      - exact None.
       - destruct x.
+        + exact None.
         + exact None.
         + exact None.
         + exact None.

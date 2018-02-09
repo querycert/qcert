@@ -21,13 +21,16 @@ Section Data.
   Require Import ZArith.
   Require Import Bool.
   Require Import EquivDec.
+  Require Import JsAst.JsNumber.
+  Require Import NumberExtract.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
 
   (** Data is:
      - nil - used for undefined results.
-     - nat - a number
+     - nat - an integer
+     - number - a floating point number
      - bool - true or false
      - string - a character string
      - coll - a bag
@@ -37,10 +40,11 @@ Section Data.
   Unset Elimination Schemes.
 
   Context {fdata:foreign_data}.
-  
+
   Inductive data : Set :=
   | dunit : data
   | dnat : Z -> data
+  | dnumber : number -> data
   | dbool : bool -> data
   | dstring : string -> data
   | dcoll : list data -> data
@@ -57,6 +61,7 @@ Section Data.
   Definition data_rect (P : data -> Type)
              (funit : P dunit)
              (fnat : forall n : Z, P (dnat n))
+             (fnumber : forall n : number, P (dnumber n))
              (fbool : forall b : bool, P (dbool b))
              (fstring : forall s : string, P (dstring s))
              (fcoll : forall c : list data, Forallt P c -> P (dcoll c))
@@ -70,6 +75,7 @@ Section Data.
     match d as d0 return (P d0) with
       | dunit => funit
       | dnat x => fnat x
+      | dnumber x => fnumber x
       | dbool x => fbool x
       | dstring x => fstring x
       | dcoll x => fcoll x ((fix F2 (c : list data) : Forallt P c :=
@@ -91,6 +97,7 @@ Section Data.
   Definition data_ind (P : data -> Prop)
              (funit : P dunit)
              (fnat : forall n : Z, P (dnat n))
+             (fnumber : forall n : number, P (dnumber n))
              (fbool : forall b : bool, P (dbool b))
              (fstring : forall s : string, P (dstring s))
              (fcoll : forall c : list data, Forall P c -> P (dcoll c))
@@ -104,6 +111,7 @@ Section Data.
     match d as d0 return (P d0) with
       | dunit => funit
       | dnat x => fnat x
+      | dnumber x => fnumber x
       | dbool x => fbool x
       | dstring x => fstring x
       | dcoll x => fcoll x ((fix F2 (c : list data) : Forall P c :=
@@ -127,6 +135,7 @@ Section Data.
   Lemma dataInd2 (P : data -> Prop)
         (f : P dunit)
         (f0 : forall n : Z, P (dnat n))
+        (fn : forall n : number, P (dnumber n))
         (fb : forall b : bool, P (dbool b))
         (f1 : forall s : string, P (dstring s))
         (f2 : forall c : list data, (forall x, In x c -> P x) -> P (dcoll c))
@@ -150,7 +159,7 @@ Section Data.
   Proof.
     repeat red. apply string_dec.
   Defined.
-  
+
   (** Equality is decidable for data *)
   Lemma data_eq_dec : forall x y:data, {x=y}+{x<>y}.
   Proof.
@@ -159,6 +168,9 @@ Section Data.
     - destruct (Z_eq_dec n z).
       + left; f_equal; trivial.
       + right;intro;apply n0;inversion H; trivial.
+    - destruct (number_eq_dec n n0).
+      + left; f_equal; trivial.
+      + right;intro;apply c;inversion H; reflexivity.
     - destruct (bool_dec b b0).
       + left; f_equal; trivial.
       + right;intro;apply n;inversion H; trivial. 

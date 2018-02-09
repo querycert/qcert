@@ -1598,6 +1598,7 @@ Inductive float_unary_op_has_type {model:brand_model} :
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - exact (Some (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x e)). 
     - exact None.
     - exact None.

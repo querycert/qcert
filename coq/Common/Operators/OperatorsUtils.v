@@ -26,6 +26,7 @@ Section OperatorsUtils.
   Require Import Data.
   Require Import DataLift.
   Require Import Iterators.
+  Require Import JsAst.JsNumber.
 
   Import ListNotations.
 
@@ -49,6 +50,9 @@ Section OperatorsUtils.
   Global Instance ToString_nat : ToString nat
     := { toString := nat_to_string10}.
 
+  Global Instance ToString_number : ToString number
+    := { toString := to_string}.
+
   Global Instance ToString_bool : ToString bool
     := { toString := boolToString}.
 
@@ -59,6 +63,7 @@ Section OperatorsUtils.
     := match d with
            | dunit => "UNIT"%string
            | dnat n => toString n
+           | dnumber n => toString n
            | dbool b => toString b
            | dstring s => stringToString s
            | dcoll l => bracketString 

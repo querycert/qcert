@@ -52,6 +52,7 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - refine (Some ((exist _ x1 _),(exist _ x2 _))).
       + simpl in e; rewrite andb_true_iff in e; tauto.
       + simpl in e; rewrite andb_true_iff in e; tauto.
@@ -64,6 +65,7 @@ Section TUtil.
   Proof.
     destruct τ.
     destruct x.
+    - exact None.
     - exact None.
     - exact None.
     - exact None.
@@ -91,6 +93,7 @@ Section TUtil.
   Proof.
     destruct τ.
     destruct x.
+    - exact None.
     - exact None.
     - exact None.
     - exact None.
@@ -125,6 +128,7 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - generalize (from_Rec₀ srl e); intros.
       destruct H.
       exact (Some (k,x)).
@@ -134,23 +138,23 @@ Section TUtil.
     - exact None.
   Defined.
 
-   Lemma tunrec_correct k (τ:rtype) {l} :
+  Lemma tunrec_correct k (τ:rtype) {l} :
     tunrec τ = Some (k,l) ->
     {pf | τ =  Rec k l pf}.
-   Proof.
-     destruct τ using rtype_rect; try discriminate.
-     inversion 1; subst.
-     match goal with
-     | [H:context
-            [match ?p with
-             | _ => _
-             end] |- _] => destruct p
-     end.
-     inversion H2; subst; clear H2.
-     destruct e as [? [??]].
-     rtype_equalizer; subst.
-     eauto.
-   Qed.
+  Proof.
+    destruct τ using rtype_rect; try discriminate.
+    inversion 1; subst.
+    match goal with
+    | [H:context
+           [match ?p with
+            | _ => _
+            end] |- _] => destruct p
+    end.
+    inversion H2; subst; clear H2.
+    destruct e as [? [??]].
+    rtype_equalizer; subst.
+    eauto.
+  Qed.
 
   Definition trecConcat (τ₁ τ₂: rtype) : option rtype.
   Proof.
@@ -162,7 +166,9 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - destruct τ₂; destruct x.
+      + exact None.
       + exact None.
       + exact None.
       + exact None.
@@ -199,7 +205,9 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - destruct τ₂; destruct x.
+      + exact None.
       + exact None.
       + exact None.
       + exact None.
@@ -474,6 +482,7 @@ Section TUtil.
           match x with
           | dunit => None
           | dnat _ => None
+          | dnumber _ => None
           | dbool _ => None
           | dstring _ => None
           | dcoll _ => None
@@ -518,6 +527,7 @@ Section TUtil.
           match x with
           | dunit => None
           | dnat _ => None
+          | dnumber _ => None
           | dbool _ => None
           | dstring _ => None
           | dcoll _ => None

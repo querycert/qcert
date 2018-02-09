@@ -37,7 +37,7 @@ json:
 | NULL
     { QData.jnil }
 | i = INT
-    { QData.jnumber (Util.coq_Z_of_int i) }
+    { QData.jnumber (float_of_int i) }
 | f = FLOAT
     { Enhanced.Data.jfloat f }
 | s = STRING

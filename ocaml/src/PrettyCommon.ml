@@ -258,6 +258,7 @@ let rec pretty_data ff d =
   match d with
   | QcertCompiler.Dunit -> fprintf ff "null"
   | QcertCompiler.Dnat n -> fprintf ff "%d" n
+  | QcertCompiler.Dnumber f -> fprintf ff "%f" f
   | QcertCompiler.Dbool true -> fprintf ff "true"
   | QcertCompiler.Dbool false -> fprintf ff "false"
   | QcertCompiler.Dstring s -> fprintf ff "\"%s\"" (Util.string_of_char_list s)
@@ -290,6 +291,7 @@ let rec pretty_rtype_aux sym ff rt =
   | QcertCompiler.Top_UU2080_ ->  fprintf ff "%a" pretty_sym sym.top
   | QcertCompiler.Unit_UU2080_ -> fprintf ff "Unit"
   | QcertCompiler.Nat_UU2080_ -> fprintf ff "Nat"
+  | QcertCompiler.Number_UU2080_ -> fprintf ff "Number"
   | QcertCompiler.Bool_UU2080_ -> fprintf ff "Bool"
   | QcertCompiler.String_UU2080_ -> fprintf ff "String"
   | QcertCompiler.Coll_UU2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc

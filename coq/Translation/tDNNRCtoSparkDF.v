@@ -62,6 +62,7 @@ Section tDNNRCtoSparkDF.
     | Top₀ => "StringType"
     | Unit₀ => "NullType"
     | Nat₀ => "LongType"
+    | Number₀ => "DoubleType"
     | Bool₀ => "BooleanType"
     | String₀ => "StringType"
     | Coll₀ e => "ArrayType(" ++ rtype_to_spark_DataType e ++ ")"
@@ -94,6 +95,7 @@ Section tDNNRCtoSparkDF.
     | Top₀ => "TOP?"
     | Unit₀ => "Unit"
     | Nat₀ => "Long"
+    | Number₀ => "Double"
     | Bool₀ => "Boolean"
     | String₀ => "String"
     | Coll₀ r => "Array[" ++ rtype_to_scala_type r ++ "]"
@@ -291,7 +293,7 @@ Section tDNNRCtoSparkDF.
   (* TODO Move this somewhere, I think rewriting needs something similar *)
   Definition primitive_type (t: rtype) :=
     match proj1_sig t with
-    | ⊥₀ | ⊤₀ | Unit₀ | Nat₀ | String₀ | Bool₀ => true
+    | ⊥₀ | ⊤₀ | Unit₀ | Nat₀ | Number₀ | String₀ | Bool₀ => true
     | Coll₀ _ | Rec₀ _ _ | Either₀ _ _ | Arrow₀ _ _ | Brand₀ _ => false
     (* TODO foreign? *)
     | Foreign₀ _ => false

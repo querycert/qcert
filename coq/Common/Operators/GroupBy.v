@@ -81,6 +81,7 @@ Section GroupBy.
          match d0 with
          | dunit => None
          | dnat _ => None
+         | dnumber _ => None
          | dbool _ => None
          | dstring _ => None
          | dcoll _ => None
@@ -157,6 +158,7 @@ Section GroupBy.
                   match d with
                   | dunit => None
                   | dnat _ => None
+                  | dnumber _ => None
                   | dbool _ => None
                   | dstring _ => None
                   | dcoll _ => None
@@ -179,6 +181,7 @@ Section GroupBy.
                         match d0 with
                         | dunit => None
                         | dnat _ => None
+                        | dnumber _ => None
                         | dbool true => Some (dcoll (d1 :: nil))
                         | dbool false => Some (dcoll nil)
                         | dstring _ => None
@@ -198,6 +201,7 @@ Section GroupBy.
                           match d1 with
                           | dunit => None
                           | dnat _ => None
+                          | dnumber _ => None
                           | dbool _ => None
                           | dstring _ => None
                           | dcoll _ => None
@@ -221,6 +225,7 @@ Section GroupBy.
                             match d1 with
                             | dunit => None
                             | dnat _ => None
+                            | dnumber _ => None
                             | dbool _ => None
                             | dstring _ => None
                             | dcoll _ => None
@@ -237,6 +242,7 @@ Section GroupBy.
                  match d0 with
                  | dunit => None
                  | dnat _ => None
+                 | dnumber _ => None
                  | dbool true => Some (dcoll (d1 :: nil))
                  | dbool false => Some (dcoll nil)
                  | dstring _ => None
@@ -255,6 +261,7 @@ Section GroupBy.
                    match d1 with
                    | dunit => None
                    | dnat _ => None
+                   | dnumber _ => None
                    | dbool _ => None
                    | dstring _ => None
                    | dcoll _ => None
@@ -281,6 +288,7 @@ Section GroupBy.
                             match d1 with
                             | dunit => None
                             | dnat _ => None
+                            | dnumber _ => None
                             | dbool _ => None
                             | dstring _ => None
                             | dcoll _ => None
@@ -297,6 +305,7 @@ Section GroupBy.
                  match d0 with
                  | dunit => None
                  | dnat _ => None
+                 | dnumber _ => None
                  | dbool true => Some (dcoll (d1 :: nil))
                  | dbool false => Some (dcoll nil)
                  | dstring _ => None
@@ -315,6 +324,7 @@ Section GroupBy.
                    match d1 with
                    | dunit => None
                    | dnat _ => None
+                   | dnumber _ => None
                    | dbool _ => None
                    | dstring _ => None
                    | dcoll _ => None
@@ -340,6 +350,7 @@ Section GroupBy.
       match d with
       | dunit => None
       | dnat _ => None
+      | dnumber _ => None
       | dbool _ => None
       | dstring _ => None
       | dcoll _ => None
@@ -363,14 +374,15 @@ Section GroupBy.
                                     match d with
                                     | dunit => None
                                     | dnat _ => None
-                      | dbool _ => None
-                      | dstring _ => None
-                      | dcoll _ => None
-                      | drec r => Some (drec (rproject r sl))
-                      | dleft _ => None
-                      | dright _ => None
-                      | dbrand _ _ => None
-                      | dforeign _ => None
+                                    | dnumber _ => None
+                                    | dbool _ => None
+                                    | dstring _ => None
+                                    | dcoll _ => None
+                                    | drec r => Some (drec (rproject r sl))
+                                    | dleft _ => None
+                                    | dright _ => None
+                                    | dbrand _ _ => None
+                                    | dforeign _ => None
                                     end) k incoll)) l0)) = None.
     Proof.
       intros.
@@ -383,6 +395,7 @@ Section GroupBy.
                  match d with
                  | dunit => None
                  | dnat _ => None
+                 | dnumber _ => None
                  | dbool _ => None
                  | dstring _ => None
                  | dcoll _ => None
@@ -406,6 +419,7 @@ Section GroupBy.
                                     match d with
                                     | dunit => None
                                     | dnat _ => None
+                                    | dnumber _ => None
                                     | dbool _ => None
                                     | dstring _ => None
                                     | dcoll _ => None
@@ -428,6 +442,7 @@ Section GroupBy.
                    match d0 with
                    | dunit => None
                    | dnat _ => None
+                   | dnumber _ => None
                    | dbool _ => None
                    | dstring _ => None
                    | dcoll _ => None
@@ -435,6 +450,7 @@ Section GroupBy.
                      match d2 with
                      | dunit => None
                      | dnat _ => None
+                     | dnumber _ => None
                      | dbool _ => None
                      | dstring _ => None
                      | dcoll _ => None
@@ -462,6 +478,7 @@ Section GroupBy.
                                            match d2 with
                                            | dunit => None
                                            | dnat _ => None
+                                           | dnumber _ => None
                                            | dbool true => Some (dcoll (d0 :: nil))
                                            | dbool false => Some (dcoll nil)
                                            | dstring _ => None
@@ -481,6 +498,7 @@ Section GroupBy.
                                            match d0 with
                                            | dunit => None
                                            | dnat _ => None
+                                           | dnumber _ => None
                                            | dbool _ => None
                                            | dstring _ => None
                                            | dcoll _ => None
@@ -502,6 +520,7 @@ Section GroupBy.
                match d with
                | dunit => None
                | dnat _ => None
+               | dnumber _ => None
                | dbool _ => None
                | dstring _ => None
                | dcoll _ => None
@@ -514,6 +533,7 @@ Section GroupBy.
         case_eq (match a with
                  | dunit => None
                  | dnat _ => None
+                 | dnumber _ => None
                  | dbool _ => None
                  | dstring _ => None
                  | dcoll _ => None
@@ -536,6 +556,7 @@ Section GroupBy.
                     match d0 with
                     | dunit => None
                     | dnat _ => None
+                    | dnumber _ => None
                     | dbool _ => None
                     | dstring _ => None
                     | dcoll _ => None
@@ -552,6 +573,7 @@ Section GroupBy.
                   match d0 with
                   | dunit => None
                   | dnat _ => None
+                  | dnumber _ => None
                   | dbool _ => None
                   | dstring _ => None
                   | dcoll _ => None
@@ -559,6 +581,7 @@ Section GroupBy.
                       match d2 with
                       | dunit => None
                       | dnat _ => None
+                      | dnumber _ => None
                       | dbool _ => None
                       | dstring _ => None
                       | dcoll _ => None
@@ -587,6 +610,7 @@ Section GroupBy.
                                  match d2 with
                                  | dunit => None
                                  | dnat _ => None
+                                 | dnumber _ => None
                                  | dbool true => Some (dcoll (d0 :: nil))
                                  | dbool false => Some (dcoll nil)
                                  | dstring _ => None
@@ -607,6 +631,7 @@ Section GroupBy.
                                    match d0 with
                                    | dunit => None
                                    | dnat _ => None
+                                   | dnumber _ => None
                                    | dbool _ => None
                                    | dstring _ => None
                                    | dcoll _ => None
@@ -625,6 +650,7 @@ Section GroupBy.
          match fst group with
          | dunit => None
          | dnat _ => None
+         | dnumber _ => None
          | dbool _ => None
          | dstring _ => None
          | dcoll _ => None
@@ -648,6 +674,7 @@ Section GroupBy.
                       match d with
                       | dunit => None
                       | dnat _ => None
+                      | dnumber _ => None
                       | dbool _ => None
                       | dstring _ => None
                       | dcoll _ => None
@@ -675,6 +702,7 @@ Section GroupBy.
                           match d1 with
                           | dunit => None
                           | dnat _ => None
+                          | dnumber _ => None
                           | dbool _ => None
                           | dstring _ => None
                           | dcoll _ => None
@@ -687,6 +715,7 @@ Section GroupBy.
       with
       | Some dunit => None
       | Some (dnat _) => None
+      | Some (dnumber _) => None
       | Some (dbool _) => None
       | Some (dstring _) => None
       | Some (dcoll c1) =>
@@ -698,6 +727,7 @@ Section GroupBy.
                         match d0 with
                         | dunit => None
                         | dnat _ => None
+                        | dnumber _ => None
                         | dbool _ => None
                         | dstring _ => None
                         | dcoll _ => None
@@ -705,6 +735,7 @@ Section GroupBy.
                           match d2 with
                           | dunit => None
                           | dnat _ => None
+                          | dnumber _ => None
                           | dbool _ => None
                           | dstring _ => None
                           | dcoll _ => None
@@ -732,6 +763,7 @@ Section GroupBy.
                                                 match d2 with
                                                 | dunit => None
                                                 | dnat _ => None
+                                                | dnumber _ => None
                                                 | dbool true => Some (dcoll (d0 :: nil))
                                                 | dbool false => Some (dcoll nil)
                                                 | dstring _ => None
@@ -752,6 +784,7 @@ Section GroupBy.
                                                 match d0 with
                                                 | dunit => None
                                                 | dnat _ => None
+                                                | dnumber _ => None
                                                 | dbool _ => None
                                                 | dstring _ => None
                                                 | dcoll _ => None
@@ -779,6 +812,7 @@ Section GroupBy.
                    match d with
                    | dunit => None
                    | dnat _ => None
+                   | dnumber _ => None
                    | dbool _ => None
                    | dstring _ => None
                    | dcoll _ => None
@@ -796,6 +830,7 @@ Section GroupBy.
                  match d with
                  | dunit => None
                  | dnat _ => None
+                 | dnumber _ => None
                  | dbool _ => None
                  | dstring _ => None
                  | dcoll _ => None
@@ -811,6 +846,7 @@ Section GroupBy.
       case_eq (match d with
       | dunit => None
       | dnat _ => None
+      | dnumber _ => None
       | dbool _ => None
       | dstring _ => None
       | dcoll _ => None
@@ -837,6 +873,7 @@ Section GroupBy.
                      match d with
                      | dunit => None
                      | dnat _ => None
+                     | dnumber _ => None
                      | dbool _ => None
                      | dstring _ => None
                      | dcoll _ => None
@@ -986,6 +1023,7 @@ Section GroupBy.
             match d with
             | dunit => None
             | dnat _ => None
+            | dnumber _ => None
             | dbool _ => None
             | dstring _ => None
             | dcoll _ => None
@@ -1017,6 +1055,7 @@ Section GroupBy.
             match d with
             | dunit => None
             | dnat _ => None
+            | dnumber _ => None
             | dbool _ => None
             | dstring _ => None
             | dcoll _ => None
@@ -1040,6 +1079,7 @@ Section GroupBy.
             match d with
             | dunit => None
             | dnat _ => None
+            | dnumber _ => None
             | dbool _ => None
             | dstring _ => None
             | dcoll _ => None
@@ -1113,6 +1153,7 @@ Section GroupBy.
                  match d with
                  | dunit => None
                  | dnat _ => None
+                 | dnumber _ => None
                  | dbool _ => None
                  | dstring _ => None
                  | dcoll _ => None

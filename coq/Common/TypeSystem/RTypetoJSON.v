@@ -52,6 +52,7 @@ Section RTypeToJSON.
       | jstring "Bottom" => Bottom₀
       | jstring "String" => String₀
       | jstring "Nat" => Nat₀
+      | jstring "Number" => Number₀
       | jstring "Bool" => Bool₀
       | jstring _ => Unit₀
       | jobject nil => Rec₀ Open nil
@@ -78,6 +79,7 @@ Section RTypeToJSON.
       | jstring "Bottom" => Some Bottom₀
       | jstring "String" => Some String₀
       | jstring "Nat" => Some Nat₀
+      | jstring "Number" => Some Number₀
       | jstring "Bool" => Some Bool₀
       | jstring s => lift Foreign₀ (foreign_to_string_to_type s)
       | jobject nil => Some (Rec₀ Open nil)

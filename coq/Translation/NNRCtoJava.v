@@ -135,6 +135,7 @@ Section NNRCtoJava.
       := match d with
          | dunit => java_json_NULL
          | dnat n => mk_java_json_nat n
+         | dnumber n => mk_java_json_number n
          | dbool b => mk_java_json_bool b
          | dstring s => mk_java_json_string quotel s
          | dcoll ls => mk_java_json_array (map (mk_java_json_data quotel) ls)
