@@ -52,6 +52,7 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - refine (Some ((exist _ x1 _),(exist _ x2 _))).
       + simpl in e; rewrite andb_true_iff in e; tauto.
       + simpl in e; rewrite andb_true_iff in e; tauto.
@@ -64,6 +65,7 @@ Section TUtil.
   Proof.
     destruct τ.
     destruct x.
+    - exact None.
     - exact None.
     - exact None.
     - exact None.
@@ -97,6 +99,7 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - exact (Some (Option (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x e))). 
     - exact None.
     - exact None.
@@ -118,6 +121,7 @@ Section TUtil.
   Definition tunrec (τ: rtype) : option (record_kind * (list (string * rtype))).
   Proof.
     destruct τ; destruct x.
+    - exact None.
     - exact None.
     - exact None.
     - exact None.
@@ -162,7 +166,9 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - destruct τ₂; destruct x.
+      + exact None.
       + exact None.
       + exact None.
       + exact None.
@@ -199,7 +205,9 @@ Section TUtil.
     - exact None.
     - exact None.
     - exact None.
+    - exact None.
     - destruct τ₂; destruct x.
+      + exact None.
       + exact None.
       + exact None.
       + exact None.
@@ -320,6 +328,11 @@ Section TUtil.
     reflexivity.
   Qed.
 
+  Lemma Number_proj : Number₀ = ` Number.
+  Proof.
+    reflexivity.
+  Qed.
+
   Lemma Bool_proj : Bool₀ = ` Bool.
   Proof.
     reflexivity.
@@ -355,6 +368,12 @@ Section TUtil.
   Qed.
 
   Lemma Nat_canon {τ₁:rtype} :` τ₁ = Nat₀ -> τ₁ = Nat.
+  Proof.
+    destruct τ₁; simpl; intros; subst.
+    apply rtype_ext.
+  Qed.
+
+  Lemma Number_canon {τ₁:rtype} :` τ₁ = Number₀ -> τ₁ = Number.
   Proof.
     destruct τ₁; simpl; intros; subst.
     apply rtype_ext.

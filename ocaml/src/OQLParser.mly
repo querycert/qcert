@@ -82,7 +82,7 @@ expr:
 | i = INT
     { QOQL.oconst (QData.dnat (Util.coq_Z_of_int i)) }
 | f = FLOAT
-    { QOQL.oconst (Enhanced.Data.dfloat f) }
+    { QOQL.oconst (QData.dnumber f) }
 | s = STRING
     { QOQL.oconst (QData.dstring (Util.char_list_of_string s)) }
 (* Select from where ... *)
@@ -111,21 +111,19 @@ expr:
 | FLATTEN LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opflatten e }
 | SUM LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opsum e }
+    { QOQL.ounop QOps.Unary.opnatsum e }
 | FLOAT_SUM LPAREN e = expr RPAREN
-    { QOQL.ounop Enhanced.Ops.Unary.float_sum e }
+    { QOQL.ounop QOps.Unary.opnumbersum e }
 | AVG LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnummean e }
+    { QOQL.ounop QOps.Unary.opnatmean e }
 | FAVG LPAREN e = expr RPAREN
-    { QOQL.ounop (QcertCompiler.OpForeignUnary
-		    (Obj.magic (QcertCompiler.Enhanced_unary_float_op
-				  (QcertCompiler.Uop_float_arithmean)))) e }
+    { QOQL.ounop QOps.Unary.opnumbermean e }
 | COUNT LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opcount e }
 | MAX LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnummax e }
+    { QOQL.ounop QOps.Unary.opnatmax e }
 | MIN LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnummin e }
+    { QOQL.ounop QOps.Unary.opnatmin e }
 (* Binary operators *)
 | e1 = expr EQUAL e2 = expr
     { QOQL.obinop QOps.Binary.opequal e1 e2 }

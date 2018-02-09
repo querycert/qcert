@@ -211,8 +211,8 @@ Notation "p1 |p-contains| p2" := (pbinop OpContains p1 p2) (right associativity,
 Notation "p1 |p-stringconcat| p2" := (pbinop OpStringConcat p1 p2) (right associativity, at level 70): camp_scope.
 Notation "a '+s+' b" := (stringConcat a b) (right associativity, at level 60) : camp_scope.
 
-Notation "|p-min-num|( p )" := (punop OpNumMin p) (right associativity, at level 70): camp_scope.
-Notation "|p-max-num|( p )" := (punop OpNumMin p) (right associativity, at level 70): camp_scope.
+Notation "|p-min-num|( p )" := (punop OpNatMin p) (right associativity, at level 70): camp_scope.
+Notation "|p-max-num|( p )" := (punop OpNatMin p) (right associativity, at level 70): camp_scope.
 
 Notation "p1 ≐ p2" := (passert (pbinop OpEqual p1 p2)) (right associativity, at level 70, only parsing): camp_scope.     (* ≐ = \doteq *)
 Notation "p1 ∧ p2" := (pand p1 p2) (right associativity, at level 65): camp_scope. (* ∧ = \wedge *)

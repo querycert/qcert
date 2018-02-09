@@ -36,11 +36,25 @@ Section UnaryOperatorsSem.
 
   Context {fdata:foreign_data}.
   
-  Definition arith_unary_op_eval (op:arith_unary_op) (z:Z) :=
+  Require Import JsAst.JsNumber.
+  Require Import NumberExtract.
+  Definition nat_arith_unary_op_eval (op:nat_arith_unary_op) (z:Z) :=
     match op with
-    | ArithAbs => Z.abs z
-    | ArithLog2 => Z.log2 z
-    | ArithSqrt => Z.sqrt z
+    | NatAbs => Z.abs z
+    | NatLog2 => Z.log2 z
+    | NatSqrt => Z.sqrt z
+    end.
+
+  Definition number_arith_unary_op_eval (op:number_arith_unary_op) (f:number) :=
+    match op with
+    | NumberNeg => neg f
+    | NumberSqrt => sqrt f
+    | NumberExp => exp f
+    | NumberLog => log f
+    | NumberLog10 => log10 f
+    | NumberCeil => ceil f
+    | NumberFloor => floor f
+    | NumberAbs => absolute f
     end.
 
   Context (h:brand_relation_t).
@@ -81,20 +95,6 @@ Section UnaryOperatorsSem.
       data_sort sc d (* XXX Some very limited/hackish sorting XXX *)
     | OpCount =>
       lift dnat (ondcoll (fun z => Z_of_nat (bcount z)) d)
-    | OpSum => 
-      lift dnat (lift_oncoll dsum d)
-    | OpNumMin =>
-      match d with
-      | dcoll l => lifted_min l
-      | _ => None
-      end
-    | OpNumMax =>
-      match d with
-      | dcoll l => lifted_max l
-      | _ => None
-      end
-    | OpNumMean => 
-      lift dnat (lift_oncoll darithmean d)
     | OpToString =>
       Some (dstring (dataToString d))
     | OpSubstring start olen =>
@@ -143,9 +143,52 @@ Section UnaryOperatorsSem.
           Some (dnone)
       | _ => None
       end
-    | OpArithUnary op =>
+    | OpNatUnary op =>
       match d with
-      | dnat n => Some (dnat (arith_unary_op_eval op n))
+      | dnat n => Some (dnat (nat_arith_unary_op_eval op n))
+      | _ => None
+      end
+    | OpNatSum => 
+      lift dnat (lift_oncoll dsum d)
+    | OpNatMin =>
+      match d with
+      | dcoll l => lifted_min l
+      | _ => None
+      end
+    | OpNatMax =>
+      match d with
+      | dcoll l => lifted_max l
+      | _ => None
+      end
+    | OpNatMean => 
+      lift dnat (lift_oncoll darithmean d)
+    | OpNumberOfNat =>
+      match d with
+      | dnat n => Some (dnumber (number_of_int n))
+      | _ => None
+      end
+    | OpNumberUnary op =>
+      match d with
+      | dnumber n => Some (dnumber (number_arith_unary_op_eval op n))
+      | _ => None
+      end
+    | OpNumberTruncate =>
+      match d with
+      | dnumber f => Some (dnat (truncate f))
+      | _ => None
+      end
+    | OpNumberSum =>
+      lift dnumber (lift_oncoll nsum d)
+    | OpNumberMean =>
+      lift dnumber (lift_oncoll narithmean d)
+    | OpNumberBagMin =>
+      match d with
+      | dcoll l => lifted_nmin l
+      | _ => None
+      end
+    | OpNumberBagMax =>
+      match d with
+      | dcoll l => lifted_nmax l
       | _ => None
       end
     | OpForeignUnary fu => foreign_unary_op_interp h fu d
@@ -260,29 +303,6 @@ Section UnaryOperatorsSem.
       intros; apply data_normalized_bdistinct; trivial.
     - Case "OpOrderBy"%string.
       apply data_sort_normalized.
-    - Case "OpSum"%string.
-      destruct d; simpl; try discriminate.
-      intros ll; apply some_lift in ll.
-      destruct ll; subst.
-      eauto.
-    - Case "OpNumMin"%string.
-      destruct d; simpl; try discriminate.
-      unfold lifted_min.
-      intros ll; apply some_lift in ll.
-      destruct ll; subst.
-      eauto.
-    - Case "OpNumMax"%string.
-      destruct d; simpl; try discriminate.
-      unfold lifted_min.
-      intros ll; apply some_lift in ll.
-      destruct ll; subst.
-      eauto.
-    - Case "OpNumMean"%string.
-      destruct d; simpl; try discriminate.
-      intros.
-      apply some_lift in H.
-      destruct H as [???]; subst.
-      eauto.
     - Case "OpUnbrand"%string.
       destruct d; simpl; try discriminate.
       inversion 1; subst.
@@ -290,6 +310,52 @@ Section UnaryOperatorsSem.
     - Case "OpCast"%string.
       destruct d; simpl; try discriminate.
       match_destr; inversion 1; subst; eauto.
+    - Case "OpNatSum"%string.
+      destruct d; simpl; try discriminate.
+      intros ll; apply some_lift in ll.
+      destruct ll; subst.
+      eauto.
+    - Case "OpNatMin"%string.
+      destruct d; simpl; try discriminate.
+      unfold lifted_min.
+      intros ll; apply some_lift in ll.
+      destruct ll; subst.
+      eauto.
+    - Case "OpNatMax"%string.
+      destruct d; simpl; try discriminate.
+      unfold lifted_min.
+      intros ll; apply some_lift in ll.
+      destruct ll; subst.
+      eauto.
+    - Case "OpNatMean"%string.
+      destruct d; simpl; try discriminate.
+      intros.
+      apply some_lift in H.
+      destruct H as [???]; subst.
+      eauto.
+    - Case "OpNumberSum"%string.
+      destruct d; simpl; try discriminate.
+      intros ll; apply some_lift in ll.
+      destruct ll; subst.
+      eauto.
+    - Case "OpNumberMean"%string.
+      destruct d; simpl; try discriminate.
+      intros.
+      apply some_lift in H.
+      destruct H as [???]; subst.
+      eauto.
+    - Case "OpNumberBagMin"%string.
+      destruct d; simpl; try discriminate.
+      unfold lifted_min.
+      intros ll; apply some_lift in ll.
+      destruct ll; subst.
+      eauto.
+    - Case "OpNumberBagMax"%string.
+      destruct d; simpl; try discriminate.
+      unfold lifted_min.
+      intros ll; apply some_lift in ll.
+      destruct ll; subst.
+      eauto.
     - Case "OpForeignUnary"%string.
       intros eqq dn.
       eapply foreign_unary_op_normalized in eqq; eauto.

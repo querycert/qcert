@@ -81,8 +81,10 @@ Section TBinaryOperators.
         binary_op_type OpContains τ (Coll τ) Bool
     | type_OpStringConcat :
         binary_op_type OpStringConcat String String String
-    | type_OpArithBinary (b:arith_binary_op) :
-        binary_op_type (OpArithBinary b) Nat Nat Nat
+    | type_OpNatBinary (b:nat_arith_binary_op) :
+        binary_op_type (OpNatBinary b) Nat Nat Nat
+    | type_OpNumberBinary (b:number_arith_binary_op) :
+        binary_op_type (OpNumberBinary b) Number Number Number
     | type_OpForeignBinary {fb τin₁ τin₂ τout} :
         foreign_binary_op_typing_has_type fb τin₁ τin₂ τout ->
         binary_op_type (OpForeignBinary fb) τin₁ τin₂ τout.
@@ -105,7 +107,8 @@ Section TBinaryOperators.
     | Case_aux c "type_OpBagMax"%string
     | Case_aux c "type_OpContains"%string
     | Case_aux c "type_OpStringConcat"%string
-    | Case_aux c "type_OpArithBinary"%string
+    | Case_aux c "type_OpNatBinary"%string
+    | Case_aux c "type_OpNumberBinary"%string
     | Case_aux c "type_OpForeignBinary"%string].
 
   (** Type soundness lemmas for individual operators *)
@@ -687,7 +690,10 @@ Section TBinaryOperators.
     - Case "type_OpStringConcat"%string.
       dependent induction H; dependent induction H0; simpl.
       eauto.
-    - Case "type_OpArithBinary"%string.
+    - Case "type_OpNatBinary"%string.
+      dependent induction H; dependent induction H0; simpl.
+      eauto.
+    - Case "type_OpNumberBinary"%string.
       dependent induction H; dependent induction H0; simpl.
       eauto.
     - Case "type_OpForeignBinary"%string.
@@ -733,6 +739,7 @@ End TBinaryOperators.
     | Case_aux c "type_OpBagMax"%string
     | Case_aux c "type_OpContains"%string
     | Case_aux c "type_OpStringConcat"%string
-    | Case_aux c "type_OpArithBinary"%string
+    | Case_aux c "type_OpNatBinary"%string
+    | Case_aux c "type_OpNumberBinary"%string
     | Case_aux c "type_OpForeignBinary"%string].
 

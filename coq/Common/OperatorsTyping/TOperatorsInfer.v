@@ -43,7 +43,7 @@ Section TOperatorsInfer.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
-  Hint Rewrite Bottom_proj Top_proj Unit_proj Nat_proj Bool_proj String_proj : type_canon.
+  Hint Rewrite Bottom_proj Top_proj Unit_proj Nat_proj Number_proj Bool_proj String_proj : type_canon.
     
   (* An additional utility function for sortable types *)
   Definition tunrecsortable (sl:list string) (τ:rtype) : option rtype.
@@ -93,6 +93,7 @@ Section TOperatorsInfer.
               | [H: ` _ = Top₀ |- _ ] => apply Top_canon in H
               | [H: ` _ = Unit₀ |- _ ] => apply Unit_canon in H
               | [H: ` _ = Nat₀ |- _ ] => apply Nat_canon in H
+              | [H: ` _ = Number₀ |- _ ] => apply Number_canon in H
               | [H: ` _ = Bool₀ |- _ ] => apply Bool_canon in H
               | [H: ` _ = String₀ |- _ ] => apply String_canon in H
               | [H: ` _ = Coll₀ ?A |- _] =>
@@ -149,9 +150,14 @@ Section TOperatorsInfer.
         | (String₀, String₀) => Some String
         | (_, _) => None
         end
-      | OpArithBinary _ =>
+      | OpNatBinary _ =>
         match (`τ₁, `τ₂) with
         | (Nat₀, Nat₀) => Some Nat
+        | _ => None
+        end
+      | OpNumberBinary _ =>
+        match (`τ₁, `τ₂) with
+        | (Number₀, Number₀) => Some Number
         | _ => None
         end
       | OpForeignBinary fb =>
@@ -187,7 +193,7 @@ Section TOperatorsInfer.
       Hint Constructors binary_op_type.
       Hint Resolve infer_concat_trec infer_merge_tmerge.
       binary_op_cases (case_eq b) Case; intros; simpl in *; destructer;
-      try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
+        try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
       - constructor; apply foreign_binary_op_typing_infer_correct;
         apply H0.
     Qed.
@@ -285,14 +291,6 @@ Section TOperatorsInfer.
         | Coll₀ _ => Some Nat
         | _ => None
         end
-      | OpSum
-      | OpNumMin
-      | OpNumMax
-      | OpNumMean =>
-        match `τ₁ with
-        | Coll₀ Nat₀ => Some Nat
-        | _ => None
-        end
       | OpToString => Some String
       | OpSubstring _ _ =>
         match `τ₁ with
@@ -322,9 +320,40 @@ Section TOperatorsInfer.
         | Brand₀ _ => Some (Option (Brand b))
         | _ => None
         end
-      | OpArithUnary op =>
+      | OpNatUnary op =>
         match `τ₁ with
         | Nat₀ => Some Nat
+        | _ => None
+        end
+      | OpNatSum
+      | OpNatMin
+      | OpNatMax
+      | OpNatMean =>
+        match `τ₁ with
+        | Coll₀ Nat₀ => Some Nat
+        | _ => None
+        end
+      | OpNumberOfNat =>
+        match `τ₁ with
+        | Nat₀ => Some Number
+        | _ => None
+        end
+      | OpNumberUnary op =>
+        match `τ₁ with
+        | Number₀ => Some Number
+        | _ => None
+        end
+      | OpNumberTruncate =>
+        match `τ₁ with
+        | Number₀ => Some Nat
+        | _ => None
+        end
+      | OpNumberSum
+      | OpNumberMean
+      | OpNumberBagMin
+      | OpNumberBagMax =>
+        match `τ₁ with
+        | Coll₀ Number₀ => Some Number
         | _ => None
         end
       | OpForeignUnary fu =>

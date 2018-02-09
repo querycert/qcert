@@ -19,6 +19,7 @@ MODULES = \
 	Utils/CoqLibAdd \
 	Utils/ListAdd \
 	Utils/StringAdd \
+	Utils/NumberExtract \
 	Utils/SortingAdd \
 	Utils/Lattice \
 	Utils/Monoid \
@@ -259,6 +260,8 @@ MODULES = \
 	OQL/OQLRuntime \
 	OQL/OQLTypes \
 	OQL/OQLSystem \
+	JavaScriptAst/Lang/JavaScriptAst \
+	JavaScriptAst/JavaScriptAstRuntime \
 	JavaScript/Lang/JavaScript \
 	JavaScript/JavaScriptRuntime \
 	Java/Lang/Java \
@@ -319,7 +322,6 @@ MODULES = \
 	Translation/TOQLtoNRAEnv \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
-	Compiler/Model/FloatModelPart \
 	Compiler/Model/StringModelPart \
 	Compiler/Model/DateTimeModelPart \
 	Compiler/Model/SqlDateModelPart \

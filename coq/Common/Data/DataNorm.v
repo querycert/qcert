@@ -45,6 +45,8 @@ Section DataNorm.
       data_normalized dunit
   | dnnat n :
       data_normalized (dnat n)
+  | dnnumber n :
+      data_normalized (dnumber n)
   | dnbool b :
       data_normalized (dbool b)
   | dnstring s :
@@ -75,6 +77,7 @@ Section DataNorm.
     induction d using dataInd2; simpl.
     - apply dnunit.
     - apply dnnat.
+    - apply dnnumber.
     - apply dnbool.
     - apply dnstring.
     - apply dncoll.

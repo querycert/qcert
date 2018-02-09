@@ -135,6 +135,7 @@ Section NNRCtoJava.
       := match d with
          | dunit => java_json_NULL
          | dnat n => mk_java_json_nat n
+         | dnumber n => mk_java_json_number n
          | dbool b => mk_java_json_bool b
          | dstring s => mk_java_json_string quotel s
          | dcoll ls => mk_java_json_array (map (mk_java_json_data quotel) ls)
@@ -212,24 +213,46 @@ Section NNRCtoJava.
     Definition mk_java_binary_op0 (opname:string) (e1 e2:java_json) : java_json
       := mk_java_json ("BinaryOperators." ++ opname ++ "(" ++ (from_java_json e1) ++ ", " ++ (from_java_json e2) ++ ")").
 
-    Definition uarithToJavaMethod (u:arith_unary_op) :=
+    Definition uarithToJavaMethod (u:nat_arith_unary_op) :=
       match u with
-      | ArithAbs => "abs"
-      | ArithLog2 => "log2"
-      | ArithSqrt =>"sqrt"
+      | NatAbs => "abs"
+      | NatLog2 => "log2"
+      | NatSqrt =>"sqrt"
       end.
 
-    Definition barithToJavaMethod (b:arith_binary_op)  :=
+    Definition number_uarithToJavaMethod (fu:number_arith_unary_op) :=
+      match fu with
+      | NumberNeg => "float_neg"
+      | NumberSqrt => "float_sqrt"
+      | NumberExp => "float_exp"
+      | NumberLog => "float_log"
+      | NumberLog10 => "float_log10"
+      | NumberCeil => "float_ceil"
+      | NumberFloor => "float_floor"
+      | NumberAbs => "float_abs"
+      end.
+  
+    Definition nat_barithToJavaMethod (b:nat_arith_binary_op)  :=
       match b with
-      | ArithPlus => "plus"
-      | ArithMinus => "minus "
-      | ArithMult => "mult"
-      | ArithDivide => "divide"
-      | ArithRem => "rem"
-      | ArithMin => "min"
-      | ArithMax => "max"
+      | NatPlus => "plus"
+      | NatMinus => "minus "
+      | NatMult => "mult"
+      | NatDiv => "divide"
+      | NatRem => "rem"
+      | NatMin => "min"
+      | NatMax => "max"
       end.
 
+    Definition number_barithToJavaMethod (fb:number_arith_binary_op)
+      := match fb with
+         | NumberPlus => "float_plus"
+         | NumberMinus => "float_minus"
+         | NumberMult => "float_mult"
+         | NumberDiv => "float_divide"
+         | NumberPow => "float_pow"
+         | NumberMin => "float_min"
+         | NumberMax => "float_max"
+         end.
 
     Definition like_clause_to_java (lc:like_clause)
       := match lc with
@@ -272,10 +295,6 @@ Section NNRCtoJava.
                      | OpDistinct => mk_java_unary_op0 "distinct" e1
                      | OpOrderBy sl => mk_java_unary_op1 "sort" (mk_java_string_collection (List.map fst sl)) e1 (* XXX TO FIX XXX *)
                      | OpCount => mk_java_unary_op0 "count" e1
-                     | OpSum =>  mk_java_unary_op0 "sum" e1
-                     | OpNumMin => mk_java_unary_op0 "list_min" e1
-                     | OpNumMax =>  mk_java_unary_op0 "list_max" e1
-                     | OpNumMean => mk_java_unary_op0 "list_mean" e1
                      | OpToString =>  mk_java_unary_op0 "tostring" e1
                      | OpSubstring start olen =>
                        match olen with
@@ -290,7 +309,18 @@ Section NNRCtoJava.
                      | OpBrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1
                      | OpUnbrand => mk_java_unary_op0 "unbrand" e1
                      | OpCast b => mk_java_unary_opn "cast" ["hierarchy"; (mk_java_string_collection b)] e1
-                     | OpArithUnary u => mk_java_unary_op0 (uarithToJavaMethod u) e1
+                     | OpNatUnary u => mk_java_unary_op0 (uarithToJavaMethod u) e1
+                     | OpNatSum =>  mk_java_unary_op0 "sum" e1
+                     | OpNatMin => mk_java_unary_op0 "list_min" e1
+                     | OpNatMax =>  mk_java_unary_op0 "list_max" e1
+                     | OpNatMean => mk_java_unary_op0 "list_mean" e1
+                     | OpNumberOfNat => mk_java_unary_op0 "float_of_int" e1
+                     | OpNumberUnary u => mk_java_unary_op0 (number_uarithToJavaMethod u) e1
+                     | OpNumberTruncate => mk_java_unary_op0 "float_truncate" e1
+                     | OpNumberSum =>  mk_java_unary_op0 "float_sum" e1
+                     | OpNumberBagMin => mk_java_unary_op0 "float_list_min" e1
+                     | OpNumberBagMax =>  mk_java_unary_op0 "float_list_max" e1
+                     | OpNumberMean => mk_java_unary_op0 "float_list_mean" e1
                      | OpForeignUnary fu
                        => foreign_to_java_unary_op i eol quotel fu e1
                      end in
@@ -312,7 +342,8 @@ Section NNRCtoJava.
                      | OpBagMax =>  mk_java_binary_op0 "bag_max" e1 e2
                      | OpContains =>  mk_java_binary_op0 "contains" e1 e2
                      | OpStringConcat => mk_java_binary_op0 "stringConcat" e1 e2
-                     | OpArithBinary b => mk_java_binary_op0 (barithToJavaMethod b) e1 e2
+                     | OpNatBinary b => mk_java_binary_op0 (nat_barithToJavaMethod b) e1 e2
+                     | OpNumberBinary b => mk_java_binary_op0 (number_barithToJavaMethod b) e1 e2
                      | OpForeignBinary fb
                        => foreign_to_java_binary_op i eol quotel fb e1 e2
                      end in

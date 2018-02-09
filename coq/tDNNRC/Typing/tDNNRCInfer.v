@@ -156,14 +156,14 @@ Section tDNNRCInfer.
                                                 OpCount
                                                 (ta_require (Tlocal τ₁') n₁))
                                            (infer_unary_op_type_sub OpCount (Coll τ₁))
-                                    | OpSum =>
+                                    | OpNatSum =>
                                       lift (fun τs =>
                                               let '(τ, τ₁') := τs in
                                               DNNRCUnop
                                                 (ta_mk a (Tlocal τ))
-                                                OpSum
+                                                OpNatSum
                                                 (ta_require (Tlocal τ₁') n₁))
-                                           (infer_unary_op_type_sub OpSum (Coll τ₁))
+                                           (infer_unary_op_type_sub OpNatSum (Coll τ₁))
                                     | OpDistinct =>
                                       olift (fun τs =>
                                               let '(τ, τ₁') := τs in
@@ -353,7 +353,7 @@ Section tDNNRCInfer.
                (DNNRCEither tt
                            (DNNRCVar tt "x"%string)
                            "x1"%string
-                           (DNNRCUnop tt OpSum (DNNRCConst tt (dcoll (nil))))
+                           (DNNRCUnop tt OpNatSum (DNNRCConst tt (dcoll (nil))))
                            "x2"%string
                            (DNNRCConst tt (dcoll ((dbool true)::nil)))).
 

@@ -19,12 +19,13 @@ Section JSON.
   Require Import String.
   Require Import ZArith.
   Require Import CoqLibAdd.
-  
+  Require Import JsAst.JsNumber.
+
   Unset Elimination Schemes.
 
   Inductive json : Set :=
   | jnil : json
-  | jnumber : Z -> json
+  | jnumber : number -> json
   | jbool : bool -> json
   | jstring : string -> json
   | jarray : list json -> json
@@ -36,7 +37,7 @@ Section JSON.
   (** Induction principles used as backbone for inductive proofs on json *)
   Definition json_rect (P : json -> Type)
              (fnil : P jnil)
-             (fnumber : forall n : Z, P (jnumber n))
+             (fnumber : forall n : number, P (jnumber n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forallt P c -> P (jarray c))
@@ -62,7 +63,7 @@ Section JSON.
 
   Definition json_ind (P : json -> Prop)
              (fnil : P jnil)
-             (fnumber : forall n : Z, P (jnumber n))
+             (fnumber : forall n : number, P (jnumber n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forall P c -> P (jarray c))
@@ -90,7 +91,7 @@ Section JSON.
   
   Lemma jsonInd2 (P : json -> Prop)
         (f : P jnil)
-        (f0 : forall n : Z, P (jnumber n))
+        (f0 : forall n : number, P (jnumber n))
         (fb : forall b : bool, P (jbool b))
         (f1 : forall s : string, P (jstring s))
         (f2 : forall c : list json, (forall x, In x c -> P x) -> P (jarray c))
@@ -129,7 +130,7 @@ Section JSON.
     Fixpoint jsonToJS (quotel:string) (j : json) : string
       := match j with
          | jnil => "null" (* to be discussed *)
-         | jnumber n => Z_to_string10 n
+         | jnumber n => to_string n
          | jbool b => if b then "true" else "false"
          | jstring s => stringToJS quotel s
          | jarray ls =>

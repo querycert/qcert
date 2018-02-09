@@ -18,6 +18,8 @@ Require Import List.
 Require Import String.
 Require Import Utils.
 Require Import ForeignRuntime.
+Require Import JsAst.JsNumber.
+Require Import NumberExtract.
 
 Local Open Scope string_scope.
 
@@ -44,7 +46,8 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber n
+      | dnat n => jnumber (number_of_int n)
+      | dnumber n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
       | dcoll c => jarray (map (data_enhanced_to_js quotel) c)
@@ -59,7 +62,8 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
     Fixpoint data_to_js (quotel:string) (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber n
+      | dnat n => jnumber (number_of_int n)
+      | dnumber n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
       | dcoll c => jarray (map (data_to_js quotel) c)

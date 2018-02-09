@@ -126,6 +126,7 @@ Section OQLtoNRAEnv.
          match x with
          | dunit => None
          | dnat _ => None
+         | dnumber _ => None
          | dbool _ => None
          | dstring _ => None
          | dcoll _ => None
@@ -151,6 +152,7 @@ Section OQLtoNRAEnv.
                     match x with
                     | dunit => None
                     | dnat _ => None
+                    | dnumber _ => None
                     | dbool _ => None
                     | dstring _ => None
                     | dcoll _ => None
@@ -165,6 +167,7 @@ Section OQLtoNRAEnv.
                     match x with
                     | dunit => None
                     | dnat _ => None
+                    | dnumber _ => None
                     | dbool _ => None
                     | dstring _ => None
                     | dcoll _ => None
@@ -182,6 +185,7 @@ Section OQLtoNRAEnv.
          match x with
          | dunit => None
          | dnat _ => None
+         | dnumber _ => None
          | dbool _ => None
          | dstring _ => None
          | dcoll _ => None
@@ -204,6 +208,7 @@ Section OQLtoNRAEnv.
               match x with
               | dunit => None
               | dnat _ => None
+              | dnumber _ => None
               | dbool _ => None
               | dstring _ => None
               | dcoll _ => None
@@ -221,6 +226,7 @@ Section OQLtoNRAEnv.
            match x with
            | dunit => None
            | dnat _ => None
+           | dnumber _ => None
            | dbool _ => None
            | dstring _ => None
            | dcoll _ => None

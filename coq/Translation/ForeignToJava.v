@@ -19,6 +19,7 @@ Require Import String.
 Require Import Utils.
 Require Import ForeignRuntime.
 Require Import OperatorsUtils.
+Require Import JsAst.JsNumber.
 
 Local Open Scope string_scope.
 
@@ -42,6 +43,9 @@ Section ForeigntoJava.
      
      Definition mk_java_json_nat n : java_json
        := mk_java_json_primitive (Z_to_string10 n).
+     
+     Definition mk_java_json_number n : java_json
+       := mk_java_json_primitive (to_string n).
      
      Definition mk_java_json_bool (b:bool) : java_json
        := mk_java_json_primitive 

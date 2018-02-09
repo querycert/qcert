@@ -40,9 +40,9 @@ Definition sqlpp_to_nraenv_not_implemented (what : string) : nraenv :=
 Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	match q with
 	| SPPositive expr
-		=> NRAEnvBinop (OpArithBinary ArithPlus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
+		=> NRAEnvBinop (OpNatBinary NatPlus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
 	| SPNegative expr
-        => NRAEnvBinop (OpArithBinary ArithMinus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
+        => NRAEnvBinop (OpNatBinary NatMinus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
   	| SPExists expr
         => NRAEnvUnop OpNeg (NRAEnvBinop OpLe (NRAEnvUnop OpCount (sqlpp_to_nraenv expr)) (NRAEnvConst (dnat 0)))
   	| SPNot expr
@@ -54,15 +54,15 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPIsUnknown expr
 		=> NRAEnvBinop OpEqual (sqlpp_to_nraenv expr) (NRAEnvConst dunit)
 	| SPPlus e1 e2
-        => NRAEnvBinop (OpArithBinary ArithPlus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpNatBinary NatPlus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPMinus  e1 e2
-        => NRAEnvBinop (OpArithBinary ArithMinus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpNatBinary NatMinus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPMult e1 e2
-        => NRAEnvBinop (OpArithBinary ArithMult) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpNatBinary NatMult) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPDiv e1 e2
-        => NRAEnvBinop (OpArithBinary ArithDivide) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpNatBinary NatDiv) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPMod e1 e2
-        => NRAEnvBinop (OpArithBinary ArithRem) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpNatBinary NatRem) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPExp e1 e2
 		=> sqlpp_to_nraenv_not_implemented "exp operator" (* TODO.  We either need our own binary exponent operator, or we need to
 		      program out the logic (convert to floating point, perform operation then convert back depending on the expected type).

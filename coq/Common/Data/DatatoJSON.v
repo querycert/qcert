@@ -39,6 +39,8 @@ Section DatatoJSON.
 
   Section toData.
     Context {ftojson:foreign_to_JSON}.
+    Require Import JsAst.JsNumber.
+    Require Import NumberExtract.
 
     (* JSON to CAMP data model (META Variant) *)
 
@@ -48,12 +50,20 @@ Section DatatoJSON.
       | None => 
         match j with
         | jnil => dunit
-        | jnumber n => dnat n
+        | jnumber n => dnumber n
         | jbool b => dbool b
         | jstring s => dstring s
         | jarray c => dcoll (map json_to_data_pre c)
         | jobject nil => drec nil
         | jobject ((s1,j')::nil) =>
+          if (string_dec s1 "nat") then
+            match j' with
+            | jnumber n =>
+              dnat (truncate n)
+            | _ =>
+              drec ((s1, json_to_data_pre j')::nil)
+            end
+          else
           if (string_dec s1 "left") then dleft (json_to_data_pre j')
           else if (string_dec s1 "right") then dright (json_to_data_pre j')
                else drec ((s1, json_to_data_pre j')::nil)
@@ -90,7 +100,7 @@ Section DatatoJSON.
       | None => 
         match j with
         | jnil => dright dunit
-        | jnumber n => dnat n
+        | jnumber n => dnumber n
         | jbool b => dbool b
         | jstring s => dstring s
         | jarray c => dcoll (map json_enhanced_to_data_pre c)
@@ -128,11 +138,14 @@ Section DatatoJSON.
 
   Section toJSON.
     Context {ftojson:foreign_to_JSON}.
-
+    Require Import JsAst.JsNumber.
+    Require Import NumberExtract.
+    
     Fixpoint data_enhanced_to_json (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber n
+      | dnat n => jnumber (number_of_int n)
+      | dnumber n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
       | dcoll c => jarray (map data_enhanced_to_json c)
@@ -147,7 +160,8 @@ Section DatatoJSON.
     Fixpoint data_to_json (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber n
+      | dnat n => jnumber (number_of_int n)
+      | dnumber n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
       | dcoll c => jarray (map data_to_json c)

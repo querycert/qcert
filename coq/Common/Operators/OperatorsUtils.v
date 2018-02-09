@@ -26,6 +26,7 @@ Section OperatorsUtils.
   Require Import Data.
   Require Import DataLift.
   Require Import Iterators.
+  Require Import JsAst.JsNumber.
 
   Import ListNotations.
 
@@ -49,6 +50,9 @@ Section OperatorsUtils.
   Global Instance ToString_nat : ToString nat
     := { toString := nat_to_string10}.
 
+  Global Instance ToString_number : ToString number
+    := { toString := to_string}.
+
   Global Instance ToString_bool : ToString bool
     := { toString := boolToString}.
 
@@ -59,6 +63,7 @@ Section OperatorsUtils.
     := match d with
            | dunit => "UNIT"%string
            | dnat n => toString n
+           | dnumber n => toString n
            | dbool b => toString b
            | dstring s => stringToString s
            | dcoll l => bracketString 
@@ -112,6 +117,29 @@ Section OperatorsUtils.
     lift dnat (lift bnummin (lifted_zbag l)).
   Definition lifted_max (l : list data) : option data :=
     lift dnat (lift bnummax (lifted_zbag l)).
+
+  Require Import JsAst.JsNumber.
+  Require Import NumberExtract.
+  Fixpoint nsum (ln:list data) : option number
+    := match ln with
+         | nil => Some zero
+         | dnumber f::ln => lift (add f) (nsum ln)
+         | _ => None
+       end.
+
+  Definition narithmean (ln:list data) : option number
+    := match ln with
+         | nil  => Some zero
+         | _ => lift (fun x => div x (number_of_int (Z_of_nat (length ln)))) (nsum ln)
+       end.
+
+  Definition lifted_nbag (l : list data) : option (list number) :=
+    lift_map (ondnumber (fun x => x)) l.
+
+  Definition lifted_nmin (l : list data) : option data :=
+    lift dnumber (lift listmin (lifted_nbag l)).
+  Definition lifted_nmax (l : list data) : option data :=
+    lift dnumber (lift listmax (lifted_nbag l)).
 
 End OperatorsUtils.
 
