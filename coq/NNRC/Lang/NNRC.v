@@ -93,13 +93,26 @@ Section NNRC.
                                                                             (NNRCUnop (OpRecProject sl)
                                                                                       (NNRCVar t3))
                                                                             (NNRCVar t2))
-                                                                       (NNRCUnop OpBag (NNRCVar t3))
-                                                                       (NNRCConst (dcoll nil))))))
+                                                                 (NNRCUnop OpBag (NNRCVar t3))
+                                                                 (NNRCConst (dcoll nil))))))
                             (NNRCVar t2))).
 
     (** This definition is equivalent to a nested evaluation group by algorithm. *)
-    
+
     Lemma nnrc_group_by_correct cenv env
+          (g:string) (sl:list string)
+          (e:nnrc)
+          (incoll:list data):
+      nnrc_core_eval h cenv env e = Some (dcoll incoll) ->
+      nnrc_core_eval h cenv env (nnrc_group_by g sl e) = lift dcoll (group_by_nested_eval_table g sl incoll).
+    Proof.
+      intros.
+      unfold nnrc_group_by; simpl.
+      rewrite H; simpl; clear H.
+      apply (group_by_table_correct g sl incoll).
+    Qed.
+    
+    Lemma nnrc_group_by_correct_some cenv env
           (g:string) (sl:list string)
           (e:nnrc)
           (incoll outcoll:list data):
@@ -110,7 +123,7 @@ Section NNRC.
       intros.
       unfold nnrc_group_by; simpl.
       rewrite H; simpl; clear H.
-      apply (group_by_table_correct g sl incoll outcoll H0).
+      apply (group_by_table_correct_some g sl incoll outcoll H0).
     Qed.
 
   End Macros.

@@ -29,11 +29,12 @@ Require Import Peano_dec.
 Require Import CoqLibAdd.
 Require Import ListAdd.
 Require Import StringAdd.
+Require Import Lift.
 
 Section Assoc.
 
   (** * Association lists *)
- 
+  
   Section Defn.
     Context {A B:Type}.
     Context (dec:forall a a':A, {a=a'} + {a<>a'}).
@@ -41,18 +42,22 @@ Section Assoc.
     (* define lookup for assocation lists *)
     Fixpoint lookup l a : option B
       := match l with 
-           | nil => None
-           | (f',v')::os => if dec a f' then Some v' else lookup os a
+         | nil => None
+         | (f',v')::os => if dec a f' then Some v' else lookup os a
          end.
 
     Fixpoint update_first l a n : list (A*B)
       := match l with 
-           | nil => nil
-           | (f',v')::os => if dec a f' then (a,n)::os else (f',v')::(update_first os a n)
+         | nil => nil
+         | (f',v')::os => if dec a f' then (a,n)::os else (f',v')::(update_first os a n)
          end.
 
     Definition domain (l:list (A*B)) := map (@fst A B) l.
+    Definition codomain (l:list (A*B)) := map (@snd A B) l.
 
+    Definition map_codomain {A B C} (f:B->C) (l:list (A*B)) : list (A*C)
+      := map (fun b => (fst b, f (snd b))) l.
+    
     Lemma domain_eq (l:list (A*B)) : domain l = map fst l.
     Proof.
       reflexivity.
@@ -236,8 +241,8 @@ Section Assoc.
 
     Lemma in_update_break {l a v} :
       lookup l a = Some v -> forall vv,
-                             exists l1 l2, l = l1++(a,v)::l2 /\
-                                           update_first l a vv = l1++(a,vv)::l2.
+        exists l1 l2, l = l1++(a,v)::l2 /\
+                      update_first l a vv = l1++(a,vv)::l2.
     Proof.
       induction l; simpl; intuition (try discriminate).
       destruct a0. destruct (dec a a0); intuition; subst.
@@ -298,8 +303,8 @@ Section Assoc.
     Lemma lookup_app {l1 l2} x:
       lookup (l1++l2) x = 
       match lookup l1 x with
-        | Some y => Some y
-        | None => lookup l2 x
+      | Some y => Some y
+      | None => lookup l2 x
       end.
     Proof.
       revert l2 x. induction l1; simpl; intros.
@@ -320,7 +325,7 @@ Section Assoc.
       - rewrite H0 in H; clear H0.
         right; apply lookup_in; assumption.
     Qed.
-        
+    
     Lemma domain_cons a (l:list (A*B)) :
       domain (a::l) = (fst a)::domain l.
     Proof.
@@ -329,6 +334,29 @@ Section Assoc.
     
   End Defn.
 
+  Lemma lookup_map_same_domain {A B C:Type} dec (f:(A*B)->(A*C)) l v :
+    domain l = domain (map f l) ->
+    lookup dec (map f l) v = lift (fun x => snd (f (v,x))) (lookup dec l v).
+  Proof.
+    induction l; simpl; trivial.
+    destruct a; intros eqq; invcs eqq.
+    rewrite <- H0.
+    rewrite IHl; trivial.
+    case_eq (f (a,b)); intros.
+    rewrite H in H0; simpl in H0; subst.
+    destruct (dec v a0); simpl; trivial.
+    - subst. rewrite H; simpl; trivial.
+  Qed.
+
+  Lemma lookup_map_codomain {A B C:Type} dec (f:B->C) (l:list (A*B)) v :
+    lookup dec (map_codomain f l) v = lift f (lookup dec l v).
+  Proof.
+    apply lookup_map_same_domain; simpl.
+    unfold domain; rewrite map_map.
+    simpl.
+    apply map_ext; trivial.
+  Qed.
+  
   Lemma cut_down_to_incl_to
         {A B} {dec:EqDec A eq}
         (l:list (A*B)) l2 :
@@ -547,9 +575,9 @@ Section Assoc.
   Defined.
 
   Lemma permutation_prover {A:Set} {dec:EqDec A eq}
-           (l1 l2:list A)
-           (pf:holds (permutation_dec l1 l2)) :
-              Permutation l1 l2.
+        (l1 l2:list A)
+        (pf:holds (permutation_dec l1 l2)) :
+    Permutation l1 l2.
   Proof.
     generalize (permutation_dec l1 l2).
     unfold holds, is_true in *.
@@ -680,7 +708,7 @@ Section Assoc.
       unfold lookup_incl.
       constructor; red; intros; intuition.
     Qed.
-      
+    
     Definition lookup_equiv (l1 l2:list (A*B)) : Prop
       := forall (x:A), lookup dec l1 x = lookup dec l2 x.
 
@@ -880,53 +908,53 @@ Section Assoc.
         eapply lookup_none_perm in H1; eauto.
     Qed.
 
-  Lemma assoc_lookupr_lookup_nodup x (ls:list (A*B)):
-    NoDup (domain ls) ->
+    Lemma assoc_lookupr_lookup_nodup x (ls:list (A*B)):
+      NoDup (domain ls) ->
       assoc_lookupr dec ls x = lookup dec ls x.
-  Proof.
-    intros nd.
-    rewrite @assoc_lookupr_lookup.
-    apply lookup_equiv_perm_nodup; trivial.
-    - rewrite domain_rev.
-      rewrite <- Permutation_rev; trivial.
-    - rewrite <- Permutation_rev. reflexivity.
-  Qed.
+    Proof.
+      intros nd.
+      rewrite @assoc_lookupr_lookup.
+      apply lookup_equiv_perm_nodup; trivial.
+      - rewrite domain_rev.
+        rewrite <- Permutation_rev; trivial.
+      - rewrite <- Permutation_rev. reflexivity.
+    Qed.
 
     Definition assoc_lookupr_equiv 
-             (l1 l2:list (A*B))
-    := forall x : A, assoc_lookupr dec l1 x = assoc_lookupr dec l2 x.
+               (l1 l2:list (A*B))
+      := forall x : A, assoc_lookupr dec l1 x = assoc_lookupr dec l2 x.
 
-  Global Instance assoc_lookupr_equiv_equiv : Equivalence (assoc_lookupr_equiv).
-  Proof.
-    constructor; red; unfold assoc_lookupr_equiv; congruence.
-  Qed.
+    Global Instance assoc_lookupr_equiv_equiv : Equivalence (assoc_lookupr_equiv).
+    Proof.
+      constructor; red; unfold assoc_lookupr_equiv; congruence.
+    Qed.
 
-  Global Instance assoc_lookupr_equiv_app:
-    Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@app (A*B)).
-  Proof.
-    unfold Proper, respectful, assoc_lookupr_equiv; intros.
-    rewrite (assoc_lookupr_app x x0).
-    rewrite (assoc_lookupr_app y y0).
-    rewrite H, H0.
-    trivial.
-  Qed.
+    Global Instance assoc_lookupr_equiv_app:
+      Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@app (A*B)).
+    Proof.
+      unfold Proper, respectful, assoc_lookupr_equiv; intros.
+      rewrite (assoc_lookupr_app x x0).
+      rewrite (assoc_lookupr_app y y0).
+      rewrite H, H0.
+      trivial.
+    Qed.
 
-  Lemma assoc_lookupr_equiv_cons_in (s:A) (d:B) l :
-    In s (domain l) -> 
-    assoc_lookupr_equiv l ((s, d) :: l).
-  Proof.
-    unfold assoc_lookupr_equiv; intros.
-    simpl.
-    match_case; intros.
-    match_case; intros.
-    unfold equiv in *; subst.
-    apply assoc_lookupr_none_nin in H0.
-    congruence.
-  Qed.
+    Lemma assoc_lookupr_equiv_cons_in (s:A) (d:B) l :
+      In s (domain l) -> 
+      assoc_lookupr_equiv l ((s, d) :: l).
+    Proof.
+      unfold assoc_lookupr_equiv; intros.
+      simpl.
+      match_case; intros.
+      match_case; intros.
+      unfold equiv in *; subst.
+      apply assoc_lookupr_none_nin in H0.
+      congruence.
+    Qed.
 
-    End lookup_eq.
+  End lookup_eq.
 
-    Lemma remove_domain_filter {A B} `{dec:EqDec A eq} s l:
+  Lemma remove_domain_filter {A B} `{dec:EqDec A eq} s l:
     remove equiv_dec s (domain l) = 
     domain (filter (fun x : A * B => s <>b fst x) l).
   Proof.
@@ -936,53 +964,53 @@ Section Assoc.
     destruct (equiv_dec s (fst a)); simpl; trivial.
   Qed.
   
-   Lemma fold_left_remove_all_nil_in_not_inv {B} {x ps l}:
-     In x (fold_left
-        (fun (h : list nat) (xy : nat * B) =>
-         remove_all (fst xy) h)
-        ps l) ->
-     ~ In x (domain ps).
-   Proof.
-     revert l.
-     induction ps; simpl; intuition; subst.
-     - simpl in *.
-       apply fold_left_remove_all_nil_in_inv in H.
-       rewrite remove_all_filter in H.
-       apply filter_In in H. unfold nequiv_decb, equiv_decb in *.
-       intuition. match_destr_in H1.
-       congruence.
-     - eauto.
-   Qed.
+  Lemma fold_left_remove_all_nil_in_not_inv {B} {x ps l}:
+    In x (fold_left
+            (fun (h : list nat) (xy : nat * B) =>
+               remove_all (fst xy) h)
+            ps l) ->
+    ~ In x (domain ps).
+  Proof.
+    revert l.
+    induction ps; simpl; intuition; subst.
+    - simpl in *.
+      apply fold_left_remove_all_nil_in_inv in H.
+      rewrite remove_all_filter in H.
+      apply filter_In in H. unfold nequiv_decb, equiv_decb in *.
+      intuition. match_destr_in H1.
+      congruence.
+    - eauto.
+  Qed.
 
-   Lemma fold_left_remove_all_nil_in {B} {x ps l}:
-     In x l ->
-     ~ In x (domain ps) ->
-     In x (fold_left
-        (fun (h : list nat) (xy : nat * B) =>
-         remove_all (fst xy) h)
-        ps l).
-   Proof.
-     revert l.
-     induction ps using rev_ind; simpl; intuition; subst.
-     rewrite fold_left_app; simpl.
-     rewrite remove_all_filter.
-     rewrite domain_app, in_app_iff in H0.
-     simpl in H0.
-     apply filter_In. split.
-     - apply IHps; intuition.
-     - unfold nequiv_decb, equiv_decb.
-       match_destr.
-       red in e; subst. intuition.
-   Qed.
+  Lemma fold_left_remove_all_nil_in {B} {x ps l}:
+    In x l ->
+    ~ In x (domain ps) ->
+    In x (fold_left
+            (fun (h : list nat) (xy : nat * B) =>
+               remove_all (fst xy) h)
+            ps l).
+  Proof.
+    revert l.
+    induction ps using rev_ind; simpl; intuition; subst.
+    rewrite fold_left_app; simpl.
+    rewrite remove_all_filter.
+    rewrite domain_app, in_app_iff in H0.
+    simpl in H0.
+    apply filter_In. split.
+    - apply IHps; intuition.
+    - unfold nequiv_decb, equiv_decb.
+      match_destr.
+      red in e; subst. intuition.
+  Qed.
 
-     Definition swap {A B} (xy:A*B) := (snd xy, fst xy).
+  Definition swap {A B} (xy:A*B) := (snd xy, fst xy).
 
   Section Swap.
     Lemma swap_idempotent {A B} (a:A*B) : swap (swap a) = a.
     Proof.
       destruct a; unfold swap; simpl; trivial.
     Qed.
-  
+    
     Lemma in_swap {A B} x (l:list (A*B)):
       In x (map swap l) <-> In (swap x) l.
     Proof.
@@ -1006,11 +1034,11 @@ Section Assoc.
     (* should really be replaced by a filter *)
     Fixpoint lookup_diff {A B C:Type} (dec:forall a a':A, {a=a'} + {a<>a'}) (l₁:list (A*B)) (l₂:list (A*C)) :=
       match l₁ with
-        | nil => nil
-        | x::xs => match lookup dec l₂ (fst x) with
-                     | None => x::lookup_diff dec xs l₂
-                     | Some _ => lookup_diff dec xs l₂
-                   end
+      | nil => nil
+      | x::xs => match lookup dec l₂ (fst x) with
+                 | None => x::lookup_diff dec xs l₂
+                 | Some _ => lookup_diff dec xs l₂
+                 end
       end.
 
     Lemma lookup_diff_none1  {A B C:Type} (dec:forall a a':A, {a=a'} + {a<>a'}) {l₁:list(A*B)} (l₂:list (A*C)) {x} :
@@ -1171,7 +1199,7 @@ Section Assoc.
 
   Section Substlist.
     
-	(* Java equivalent: MROptimizer.substlist_subst *)
+    (* Java equivalent: MROptimizer.substlist_subst *)
     Definition substlist_subst {A} {dec:EqDec A eq}
                (substlist:list (A*A)) (inp:A)
       := match lookup equiv_dec substlist inp with

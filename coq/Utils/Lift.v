@@ -27,22 +27,22 @@ Section Lift.
   Definition lift {A B:Type} (f:A->B) : (option A -> option B) 
     := fun a => 
          match a with
-           | None => None 
-           | Some a' => Some (f a')
+         | None => None 
+         | Some a' => Some (f a')
          end.
 
   Definition olift {A B} (f:A -> option B) (x:option A) : option B :=
     match x with
-      | None => None
-      | Some x' => f x'
+    | None => None
+    | Some x' => f x'
     end.
 
   Definition bind {A B:Type} a b := (@olift A B b a).
 
   Definition lift2 {A B C:Type} (f:A -> B -> C) (x:option A) (y:option B) : option C :=
     match x,y with
-      | Some x', Some y' => Some (f x' y')
-      | _,_ => None
+    | Some x', Some y' => Some (f x' y')
+    | _,_ => None
     end.
 
   Definition olift_some {A B} (f:A -> option B) (x:A) :
@@ -51,8 +51,8 @@ Section Lift.
 
   Definition olift2 {A B C} (f:A -> B -> option C) (x1:option A) (x2:option B) : option C :=
     match x1,x2 with
-      | Some d1, Some d2 => f d1 d2
-      | _,_ => None
+    | Some d1, Some d2 => f d1 d2
+    | _,_ => None
     end.
 
   (** * Lift properties *)
@@ -140,12 +140,19 @@ Section Lift.
 
   Lemma match_lift_id {A} (x:option A) :
     match x with
-      | None => None
-      | Some l'' => Some l''
+    | None => None
+    | Some l'' => Some l''
     end = x.
   Proof.
     destruct x; reflexivity.
   Qed.
+
+  Lemma olift_id_lift_some {A} (x:option A) :
+    olift id (lift Some x) = x.
+  Proof.
+    destruct x; simpl; reflexivity.
+  Qed.
+
 
   Lemma olift2_none_r {A B C} (f:A -> B -> option C) (x1:option A) :
     olift2 f x1 None = None.
@@ -166,9 +173,9 @@ Section Lift.
 
   Definition rif {A} (e:A -> option bool) (a:A) : option (list A) :=
     match (e a) with
-      | None => None
-      | Some b =>
-        if b then Some (a::nil) else Some nil
+    | None => None
+    | Some b =>
+      if b then Some (a::nil) else Some nil
     end.
 
 End Lift.
@@ -181,27 +188,27 @@ Hint Rewrite @olift2_somes : alg.
 
 Ltac case_option 
   := match goal with
-         [|- context [match ?x with
-                        | Some _ => _
-                        | None => _
-                      end]] => case_eq x
+       [|- context [match ?x with
+                    | Some _ => _
+                    | None => _
+                    end]] => case_eq x
      end.
 
 Ltac case_lift 
   := match goal with
-         [|- context [lift _ ?x]] => case_eq x
+       [|- context [lift _ ?x]] => case_eq x
      end.
 
 Ltac case_option_in H
   := match type of H with
-         context [match ?x with
-                    | Some _ => _
-                    | None => _
-                  end] => let HH:=(fresh "eqs") in case_eq x; [intros ? HH|intros HH]; try rewrite HH in H
+       context [match ?x with
+                | Some _ => _
+                | None => _
+                end] => let HH:=(fresh "eqs") in case_eq x; [intros ? HH|intros HH]; try rewrite HH in H
      end.
 
 Ltac case_lift_in H
   := match type of H with
-         context [lift _ ?x] => let HH:=(fresh "eqs") in case_eq x; [intros ? HH|intros HH]; try rewrite HH in H
+       context [lift _ ?x] => let HH:=(fresh "eqs") in case_eq x; [intros ? HH|intros HH]; try rewrite HH in H
      end.
 
