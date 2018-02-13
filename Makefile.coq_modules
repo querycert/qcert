@@ -295,6 +295,7 @@ MODULES = \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \
 	Translation/CldMRtoCloudant \
+	Translation/NNRCtoNNRCimp \
 	Translation/NNRCtoJava \
 	Translation/NNRCtoJavaScript \
 	Translation/NNRCMRtoSparkRDD \
