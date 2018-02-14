@@ -403,19 +403,19 @@ Section CldMR.
 
   Definition cloudant_sum_op (typ:cld_numeric_type)
     := match typ with
-       | Cld_int => OpSum
+       | Cld_int => OpNatSum
        | Cld_float => cloudant_float_sum_op
        end.
 
     Definition cloudant_min_op (typ:cld_numeric_type)
     := match typ with
-       | Cld_int => OpNumMin
+       | Cld_int => OpNatMin
        | Cld_float => cloudant_float_min_op
        end.
 
     Definition cloudant_max_op (typ:cld_numeric_type)
     := match typ with
-       | Cld_int => OpNumMax
+       | Cld_int => OpNatMax
        | Cld_float => cloudant_float_max_op
        end.
   

@@ -184,25 +184,48 @@ Section NNRCtoJavaScript.
       := jsonToJS quotel (sortCriteriaToJson scl).
     
     (* Java equivalent: JavaScriptBackend.uarithToJS *)
-    Definition uarithToJs (u:arith_unary_op) (e:string) :=
+    Definition uarithToJs (u:nat_arith_unary_op) (e:string) :=
       match u with
-      | ArithAbs => "Math.abs (" ++ e ++ ")"
-      | ArithLog2 => "Math.log2(" ++ e ++ ")"
-      | ArithSqrt =>"Math.sqrt(" ++ e ++ ")"
+      | NatAbs => "Math.abs (" ++ e ++ ")"
+      | NatLog2 => "Math.log2(" ++ e ++ ")"
+      | NatSqrt =>"Math.sqrt(" ++ e ++ ")"
+      end.
+
+    Definition number_uarithToJs (fu:number_arith_unary_op) (d:string) : string :=
+      match fu with
+      | NumberNeg => "-" ++ "(" ++ d ++ ")"
+      | NumberSqrt =>"Math.sqrt(" ++ "-" ++ d ++ ")"
+      | NumberExp => "Math.exp(" ++ d ++ ")" 
+      | NumberLog => "Math.log2(" ++ d ++ ")"
+      | NumberLog10 => "Math.log10(" ++ d ++ ")"
+      | NumberCeil => "Math.ceil(" ++ d ++ ")" 
+      | NumberFloor => "Math.floor(" ++ d ++ ")" 
+      | NumberAbs => "Math.abs(" ++ d ++ ")"
       end.
 
     (* Java equivalent: JavaScriptBackend.barithToJs *)
-    Definition barithToJs (b:arith_binary_op) (e1 e2:string) :=
+    Definition nat_barithToJs (b:nat_arith_binary_op) (e1 e2:string) :=
       match b with
-      | ArithPlus => e1 ++ "+" ++ e2
-      | ArithMinus => e1 ++ "-" ++ e2
-      | ArithMult => e1 ++ "*" ++ e2
-      | ArithDivide => e1 ++ "/" ++ e2
-      | ArithRem => e1 ++ "%" ++ e2
-      | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
-      | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatPlus => e1 ++ "+" ++ e2
+      | NatMinus => e1 ++ "-" ++ e2
+      | NatMult => e1 ++ "*" ++ e2
+      | NatDiv => e1 ++ "/" ++ e2
+      | NatRem => e1 ++ "%" ++ e2
+      | NatMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
       end.
     
+    Definition mumber_barithToJs (fb:number_arith_binary_op) (d1 d2:string) : string :=
+      match fb with
+      | NumberPlus => "(" ++ d1 ++ ") + (" ++ d2 ++ ")"
+      | NumberMinus =>  "(" ++ d1 ++ ") - (" ++ d2 ++ ")"
+      | NumberMult =>  "(" ++ d1 ++ ") * (" ++ d2 ++ ")"
+      | NumberDiv =>  "(" ++ d1 ++ ") / (" ++ d2 ++ ")"
+      | NumberPow => "Math.pow(" ++ d1 ++ ", " ++ d2 ++ ")"
+      | NumberMin => "Math.min(" ++ d1 ++ ", " ++ d2 ++ ")"
+      | NumberMax => "Math.max(" ++ d1 ++ ", " ++ d2 ++ ")"
+      end.
+
     Definition like_clause_to_javascript (lc:like_clause)
       := match lc with
          | like_literal literal => "escapeRegExp(" ++ quotel_double ++ literal ++ quotel_double ++ ")"
@@ -244,10 +267,6 @@ Section NNRCtoJavaScript.
                      | OpDistinct => "distinct(" ++ e1 ++ ")"
                      | OpOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
                      | OpCount => e1 ++ ".length"
-                     | OpSum => "sum(" ++ e1 ++ ")"
-                     | OpNumMin => "Math.min.apply(Math," ++ e1 ++ ")"
-                     | OpNumMax => "Math.max.apply(Math," ++ e1 ++ ")"
-                     | OpNumMean => "Math.floor(arithMean(" ++ e1 ++ "))" (* Casts to Z using Math.floor() *)
                      | OpToString => "toString(" ++ e1 ++ ")"
                      | OpSubstring start olen =>
                        "(" ++ e1 ++ ").substring(" ++ toString start ++
@@ -264,7 +283,18 @@ Section NNRCtoJavaScript.
                      | OpBrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
                      | OpUnbrand => "unbrand(" ++ e1 ++ ")"
                      | OpCast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
-                     | OpArithUnary u => uarithToJs u e1
+                     | OpNatUnary u => uarithToJs u e1
+                     | OpNatSum => "sum(" ++ e1 ++ ")"
+                     | OpNatMin => "Math.min.apply(Math," ++ e1 ++ ")"
+                     | OpNatMax => "Math.max.apply(Math," ++ e1 ++ ")"
+                     | OpNatMean => "Math.floor(arithMean(" ++ e1 ++ "))" (* Casts to Z using Math.floor() *)
+                     | OpNumberOfNat => e1
+                     | OpNumberUnary u => number_uarithToJs u e1
+                     | OpNumberTruncate => "Math.trunc(" ++ e1 ++ ")" 
+                     | OpNumberSum => "sum(" ++ e1 ++ ")"
+                     | OpNumberMean => "arithMean(" ++ e1 ++ ")"
+                     | OpNumberBagMin => "Math.min.apply(Math," ++ e1 ++ ")"
+                     | OpNumberBagMax => "Math.max.apply(Math," ++ e1 ++ ")"
                      | OpForeignUnary fu
                        => foreign_to_javascript_unary_op i eol quotel fu e1
                      end in
@@ -286,7 +316,8 @@ Section NNRCtoJavaScript.
                      | OpBagMax => "bmax(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpStringConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
-                     | OpArithBinary b => barithToJs b e1 e2
+                     | OpNatBinary b => nat_barithToJs b e1 e2
+                     | OpNumberBinary b => mumber_barithToJs b e1 e2
                      | OpForeignBinary fb
                        => foreign_to_javascript_binary_op i eol quotel fb e1 e2
                      end in

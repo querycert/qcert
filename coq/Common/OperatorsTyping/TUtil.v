@@ -328,6 +328,11 @@ Section TUtil.
     reflexivity.
   Qed.
 
+  Lemma Number_proj : Number₀ = ` Number.
+  Proof.
+    reflexivity.
+  Qed.
+
   Lemma Bool_proj : Bool₀ = ` Bool.
   Proof.
     reflexivity.
@@ -363,6 +368,12 @@ Section TUtil.
   Qed.
 
   Lemma Nat_canon {τ₁:rtype} :` τ₁ = Nat₀ -> τ₁ = Nat.
+  Proof.
+    destruct τ₁; simpl; intros; subst.
+    apply rtype_ext.
+  Qed.
+
+  Lemma Number_canon {τ₁:rtype} :` τ₁ = Number₀ -> τ₁ = Number.
   Proof.
     destruct τ₁; simpl; intros; subst.
     apply rtype_ext.

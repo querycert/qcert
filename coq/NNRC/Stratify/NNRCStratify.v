@@ -289,11 +289,11 @@ Section Stratify.
     Local Open Scope nnrc_scope.
     Local Open Scope string_scope.
 
-    Notation "r1 ‵+ r2" := (NNRCBinop (OpArithBinary ArithPlus) r1 r2) (right associativity, at level 65): nnrc_scope.
+    Notation "r1 ‵+ r2" := (NNRCBinop (OpNatBinary NatPlus) r1 r2) (right associativity, at level 65): nnrc_scope.
 
-    Notation "r1 ‵* r2" := (NNRCBinop (OpArithBinary ArithMult) r1 r2) (right associativity, at level 65): nnrc_scope.
+    Notation "r1 ‵* r2" := (NNRCBinop (OpNatBinary NatMult) r1 r2) (right associativity, at level 65): nnrc_scope.
 
-    Notation "‵abs r" := (NNRCUnop (OpArithUnary ArithAbs) r) (right associativity, at level 64): nnrc_scope.
+    Notation "‵abs r" := (NNRCUnop (OpNatUnary NatAbs) r) (right associativity, at level 64): nnrc_scope.
 
     Example nnrc1 := (‵abs ‵ (dnat 3) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3)).
 (*    Eval vm_compute in (stratify nnrc1). *)

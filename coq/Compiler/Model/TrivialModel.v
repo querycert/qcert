@@ -324,9 +324,9 @@ Defined.
 Instance trivial_foreign_cloudant : foreign_cloudant
   := mk_foreign_cloudant
        trivial_foreign_runtime
-       OpSum
-       OpNumMin
-       OpNumMax.
+       OpNatSum
+       OpNatMin
+       OpNatMax.
 
 Existing Instance silent_optimizer_logger.
 

@@ -19,6 +19,8 @@ Section DataLift.
   Require Import String.
   Require Import List.
   Require Import Utils.
+  Require Import JsAst.JsNumber.
+  Require Import NumberExtract.
   Require Import ForeignData.
   Require Import Data.
 
@@ -92,6 +94,12 @@ Section DataLift.
   Definition ondnat {A} (f : Z -> A) (d : data) :=
     match d with
     | dnat n => Some (f n)
+    | _ => None
+    end.
+
+  Definition ondnumber {A} (f : number -> A) (d : data) :=
+    match d with
+    | dnumber n => Some (f n)
     | _ => None
     end.
 

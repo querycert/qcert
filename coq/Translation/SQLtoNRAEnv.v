@@ -231,23 +231,23 @@ Section SQLtoNRAEnv.
                          (sql_expr_to_nraenv create_table acc expr1)
                          (sql_expr_to_nraenv create_table acc expr2)
            | SExprBinary SPlus expr1 expr2 =>
-             NRAEnvBinop (OpArithBinary ArithPlus)
+             NRAEnvBinop (OpNatBinary NatPlus)
                          (sql_expr_to_nraenv create_table acc expr1)
                          (sql_expr_to_nraenv create_table acc expr2)
            | SExprBinary SSubtract expr1 expr2 =>
-             NRAEnvBinop (OpArithBinary ArithMinus)
+             NRAEnvBinop (OpNatBinary NatMinus)
                          (sql_expr_to_nraenv create_table acc expr1)
                          (sql_expr_to_nraenv create_table acc expr2)
            | SExprUnary SMinus expr1 =>
-             NRAEnvBinop (OpArithBinary ArithMinus)
+             NRAEnvBinop (OpNatBinary NatMinus)
                          (NRAEnvConst (dnat 0))
                          (sql_expr_to_nraenv create_table acc expr1)
            | SExprBinary SMult expr1 expr2 =>
-             NRAEnvBinop (OpArithBinary ArithMult)
+             NRAEnvBinop (OpNatBinary NatMult)
                          (sql_expr_to_nraenv create_table acc expr1)
                          (sql_expr_to_nraenv create_table acc expr2)
            | SExprBinary SDivide expr1 expr2 =>
-             NRAEnvBinop (OpArithBinary ArithDivide)
+             NRAEnvBinop (OpNatBinary NatDiv)
                          (sql_expr_to_nraenv create_table acc expr1)
                          (sql_expr_to_nraenv create_table acc expr2)
            | SExprBinary SConcat expr1 expr2 =>
@@ -260,15 +260,15 @@ Section SQLtoNRAEnv.
                (sql_expr_to_nraenv create_table acc expr1)
                (sql_expr_to_nraenv create_table acc expr2)
            | SExprAggExpr SSum expr1 =>
-             NRAEnvUnop OpSum (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
+             NRAEnvUnop OpNatSum (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
            | SExprAggExpr SAvg expr1 =>
-             NRAEnvUnop OpNumMean (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
+             NRAEnvUnop OpNatMean (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
            | SExprAggExpr SCount expr1 =>
              NRAEnvUnop OpCount (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
            | SExprAggExpr SMin expr1 =>
-             NRAEnvUnop OpNumMin (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
+             NRAEnvUnop OpNatMin (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
            | SExprAggExpr SMax expr1 =>
-             NRAEnvUnop OpNumMax (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
+             NRAEnvUnop OpNatMax (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
            | SExprQuery q =>
              if create_table
              then sql_query_to_nraenv true q

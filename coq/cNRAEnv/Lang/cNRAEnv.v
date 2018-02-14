@@ -1556,10 +1556,10 @@ Notation "♯distinct( r1 )" := (cNRAEnvUnop OpDistinct r1) (right associativity
 Notation "♯count( r1 )" := (cNRAEnvUnop OpCount r1) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
 Notation "♯flatten( d )" := (cNRAEnvUnop OpFlatten d) (at level 50) : nraenv_core_scope.                   (* ♯ = \sharp *)
 
-Notation "a1 ♯+ a2" := (cNRAEnvBinop (OpArithBinary ArithPlus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
+Notation "a1 ♯+ a2" := (cNRAEnvBinop (OpNatBinary NatPlus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
    (* ♯ = \sharp *)
 
-Notation "a1 ♯- a2" := (cNRAEnvBinop (OpArithBinary ArithMinus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
+Notation "a1 ♯- a2" := (cNRAEnvBinop (OpNatBinary NatMinus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
    (* ♯ = \sharp *)
 
 Notation "‵{| d |}" := ((cNRAEnvUnop OpBag) d)  (at level 50) : nraenv_core_scope.                        (* ‵ = \backprime *)

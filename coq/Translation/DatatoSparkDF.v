@@ -24,6 +24,7 @@ Require Import CommonRuntime.
 Require Import ForeignDataTyping.
 Require Import NNRCtoJavaScript.
 Require Import JsAst.JsNumber.
+Require Import NumberExtract.
 
 Section DatatoSparkDF.
 
@@ -49,7 +50,7 @@ Section DatatoSparkDF.
     match d, r with
     | _, Top₀ => Some (jstring (data_to_blob d))
     | dunit, Unit₀ => Some jnil
-    | dnat i, Nat₀ => Some (jnumber (of_int i))
+    | dnat i, Nat₀ => Some (jnumber (number_of_int i))
     | dnumber i, Number₀ => Some (jnumber i)
     | dbool b, Bool₀ => Some (jbool b)
     | dstring s, String₀ => Some (jstring s)

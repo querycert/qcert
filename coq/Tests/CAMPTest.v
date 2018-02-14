@@ -450,7 +450,7 @@ all customers. *)
          OVER (withVar "pu" …)
          FLATTEN 0)
       ;; rule_return (‵"Average nb purchases for customers below 34 is : " 
-                 +s+ toString (punop OpSum (lookup "total"))
+                 +s+ toString (punop OpNatSum (lookup "total"))
                  +s+ ‵" / " 
                  +s+ toString (punop OpCount (lookup "total")))
                 .

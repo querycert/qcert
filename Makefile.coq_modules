@@ -314,7 +314,6 @@ MODULES = \
 	Translation/TOQLtoNRAEnv \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
-	Compiler/Model/FloatModelPart \
 	Compiler/Model/StringModelPart \
 	Compiler/Model/DateTimeModelPart \
 	Compiler/Model/SqlDateModelPart \

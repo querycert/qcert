@@ -16,6 +16,7 @@
 operations on floating point numbers. *)
 
 Require Import JsAst.JsNumber.
+Require Import EquivDec.
 Require Import Extraction.
 
 Extract Inductive Fappli_IEEE.binary_float => float [
@@ -25,104 +26,117 @@ Extract Inductive Fappli_IEEE.binary_float => float [
   "(fun (s, m, e) -> failwith ""FIXME: No extraction from binary float allowed yet."")"
 ]. 
 
-Extract Constant JsNumber.of_int => "fun x -> float_of_int x".
+Extract Inlined Constant nan => "nan".
+Extract Inlined Constant zero => "0.".
+Extract Inlined Constant neg_zero => "(-0.)".
+Extract Inlined Constant one => "1.".
+Extract Inlined Constant infinity => "infinity".
+Extract Inlined Constant neg_infinity => "neg_infinity".
+Extract Inlined Constant max_value => "max_float".
+Extract Inlined Constant min_value => "(Int64.float_of_bits Int64.one)".
+Extract Inlined Constant floor => "(fun x -> floor x)".
+Extract Inlined Constant absolute => "(fun x -> abs_float x)".
+Extract Inlined Constant neg => "(fun x -> ~-. x)".
 
-Extract Constant JsNumber.nan => "nan".
-Extract Constant JsNumber.zero => "0.".
-Extract Constant JsNumber.neg_zero => "(-0.)".
-Extract Constant JsNumber.one => "1.".
-Extract Constant JsNumber.infinity => "infinity".
-Extract Constant JsNumber.neg_infinity => "neg_infinity".
-Extract Constant JsNumber.max_value => "max_float".
-Extract Constant JsNumber.min_value => "(Int64.float_of_bits Int64.one)".
-Extract Constant JsNumber.pi => "(4. *. atan 1.)".
-Extract Constant JsNumber.e => "(exp 1.)".
-Extract Constant JsNumber.ln2 => "(log 2.)".
-Extract Constant JsNumber.floor => "floor".
-Extract Constant JsNumber.absolute => "abs_float".
+(*
+Extract Inlined Constant fmod => "mod_float".
+Extract Inlined Constant sign => "(fun f -> float_of_int (compare f 0.))".
+*)
 
-Extract Constant JsNumber.from_string =>
-  "(fun s ->
-    try
-      let s = (String.concat """" (List.map (String.make 1) s)) in
-      if s = """" then 0. else float_of_string s
-    with Failure ""float_of_string"" -> nan)
-   (* Note that we're using `float_of_string' there, which does not have the same
-      behavior than JavaScript.  For instance it will read ""022"" as 22 instead of
-      18, which should be the JavaScript result for it. *)".
+Extract Inlined Constant from_string => "(fun s -> float_of_string s)".
+Extract Inlined Constant to_string => "(fun x -> Util.char_list_of_string (Util.qcert_string_of_float x))".
 
-Extract Constant JsNumber.to_string =>
-  "(fun f -> 
-    prerr_string (""Warning:  JsNumber.to_string called.  This might be responsible for errors.  Argument value:  "" ^ string_of_float f ^ ""."");
-    prerr_newline();
-    let string_of_number n =
-      let sfn = string_of_float n in
-      (if (sfn = ""inf"") then ""Infinity"" else
-       if (sfn = ""-inf"") then ""-Infinity"" else
-       if (sfn = ""nan"") then ""NaN"" else
-       let inum = int_of_float n in
-       if (float_of_int inum = n) then (string_of_int inum) else (string_of_float n)) in
-    let ret = ref [] in (* Ugly, but the API for OCaml string is not very functional... *)
-    String.iter (fun c -> ret := c :: !ret) (string_of_number f);
-    List.rev !ret)
-   (* Note that this is ugly, we should use the spec of JsNumber.to_string here (9.8.1). *)".
+(** Defines additional operations on FLOATs *)
+(** Unary operations *)
 
-Extract Constant JsNumber.add => "(+.)".
-Extract Constant JsNumber.sub => "(-.)".
-Extract Constant JsNumber.mult => "( *. )".
-Extract Constant JsNumber.div => "(/.)".
-Extract Constant JsNumber.fmod => "mod_float".
-Extract Constant JsNumber.neg => "(~-.)".
-Extract Constant JsNumber.sign => "(fun f -> float_of_int (compare f 0.))".
-  Require Import EquivDec.
+Axiom sqrt : number -> number.
+Extract Inlined Constant sqrt => "(fun x -> sqrt x)".
+
+Axiom exp : number -> number.
+Extract Inlined Constant exp => "(fun x -> exp x)".
+
+Axiom log : number -> number.
+Extract Inlined Constant log => "(fun x -> log x)".
+
+Axiom log10 : number -> number.
+Extract Inlined Constant log10 => "(fun x -> log10 x)".
+
+Axiom ceil : number -> number.
+Extract Inlined Constant ceil => "(fun x -> ceil x)".
+
+Axiom sum : list number -> number.
+Extract Inlined Constant sum => "(fun x -> Util.float_sum x)".
+
+Axiom arithmean : list number -> number.
+Extract Inlined Constant arithmean => "(fun x -> Util.float_arithmean x)".
+
+Axiom number_eq : number -> number -> bool.
+Extract Inlined Constant number_eq => "(fun x y -> x = y)".
+
+Conjecture number_eq_correct :
+  forall f1 f2, (number_eq f1 f2 = true <-> f1 = f2).
 Lemma number_eq_dec : EqDec number eq.
-  admit.
-Admitted.
+Proof.
+  unfold EqDec.
+  intros x y.
+  case_eq (number_eq x y); intros eqq.
+  + left.
+    f_equal.
+    apply number_eq_correct in eqq.
+    trivial.
+  + right; intros eqq2.
+    red in eqq2.
+    apply number_eq_correct in eqq2.
+    congruence.
+Defined.
   
 Extract Constant number_eq_dec => "(fun n1 n2 -> 0 = compare n1 n2)".
-(* Extract Constant JsNumber.number_comparable => "(fun n1 n2 -> 0 = compare n1 n2)". *)
-Extract Constant JsNumber.lt_bool => "(<)".
+Extract Constant lt_bool => "(<)".
 
-Extract Constant JsNumber.to_int32 => 
-"fun n ->
-  match classify_float n with
-  | FP_normal | FP_subnormal ->
-    let i32 = 2. ** 32. in
-    let i31 = 2. ** 31. in
-    let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
-    let int32bit =
-      let smod = mod_float posint i32 in
-      if smod < 0. then smod +. i32 else smod
-    in
-    (if int32bit >= i31 then int32bit -. i32 else int32bit)
-  | _ -> 0.". (* LATER:  do in Coq.  Spec is 9.5, p. 47.*)
+(** Binary operations *)
+Extract Inlined Constant add => "(fun x y -> x +. y)".
+Extract Inlined Constant sub => "(fun x y -> x -. y)".
+Extract Inlined Constant mult => "(fun x y -> x *. y)".
+Extract Inlined Constant div => "(fun x y -> x /. y)".
 
-Extract Constant JsNumber.to_uint32 =>
-"fun n ->
-  match classify_float n with
-  | FP_normal | FP_subnormal ->
-    let i32 = 2. ** 32. in
-    let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
-    let int32bit =
-      let smod = mod_float posint i32 in
-      if smod < 0. then smod +. i32 else smod
-    in
-    int32bit
-  | _ -> 0.". (* LAER:  do in Coq.  Spec is 9.6, p47.*)
+Axiom number_pow : number -> number -> number.
+Extract Inlined Constant number_pow => "(fun x y -> x ** y)".
+Axiom number_min : number -> number -> number.
+Extract Inlined Constant number_min => "(fun x y -> min x y)".
+Axiom number_max : number -> number -> number.
+Extract Inlined Constant number_max => "(fun x y -> max x y)".
+Axiom number_ne : number -> number -> bool.
+Extract Inlined Constant number_ne => "(fun x y -> x <> y)".
+Axiom number_lt : number -> number -> bool.
+Extract Inlined Constant number_lt => "(fun x y -> x < y)".
+Axiom number_le : number -> number -> bool.
+Extract Inlined Constant number_le => "(fun x y -> x <= y)".
+Axiom number_gt : number -> number -> bool.
+Extract Inlined Constant number_gt => "(fun x y -> x > y)".
+Axiom number_ge : number -> number -> bool.
+Extract Inlined Constant number_ge => "(fun x y -> x >= y)".
 
-Extract Constant JsNumber.modulo_32 => "(fun x -> let r = mod_float x 32. in if x < 0. then r +. 32. else r)".
-Extract Constant JsNumber.int32_bitwise_not => "fun x -> Int32.to_float (Int32.lognot (Int32.of_float x))".
-Extract Constant JsNumber.int32_bitwise_and => "fun x y -> Int32.to_float (Int32.logand (Int32.of_float x) (Int32.of_float y))".
-Extract Constant JsNumber.int32_bitwise_or => "fun x y -> Int32.to_float (Int32.logor (Int32.of_float x) (Int32.of_float y))".
-Extract Constant JsNumber.int32_bitwise_xor => "fun x y -> Int32.to_float (Int32.logxor (Int32.of_float x) (Int32.of_float y))".
-Extract Constant JsNumber.int32_left_shift => "(fun x y -> Int32.to_float (Int32.shift_left (Int32.of_float x) (int_of_float y)))".
-Extract Constant JsNumber.int32_right_shift => "(fun x y -> Int32.to_float (Int32.shift_right (Int32.of_float x) (int_of_float y)))".
-Extract Constant JsNumber.uint32_right_shift => 
-"(fun x y ->
-  let i31 = 2. ** 31. in
-  let i32 = 2. ** 32. in
-  let newx = if x >= i31 then x -. i32 else x in
-  let r = Int32.to_float (Int32.shift_right_logical (Int32.of_float newx) (int_of_float y)) in
-  if r < 0. then r +. i32 else r)".
+Section Additional.
+  Require Import List.
+  Definition listmin (l:list number) :=
+    match l with
+    | nil => zero
+    | x0 :: l' =>
+      fold_right (fun x y => number_min x y) x0 l'
+    end.
 
+  Definition listmax (l:list number) :=
+    match l with
+    | nil => zero
+    | x0 :: l' =>
+      fold_right (fun x y => number_max x y) x0 l'
+    end.
+End Additional.
+
+Require Import ZArith.
+Axiom number_of_int : Z -> number.
+Extract Inlined Constant number_of_int => "(fun x -> float_of_int x)".
+
+Axiom truncate : number -> Z.
+Extract Inlined Constant truncate=> "(fun x -> truncate x)".
 

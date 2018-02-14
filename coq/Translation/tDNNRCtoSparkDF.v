@@ -179,7 +179,7 @@ Section tDNNRCtoSparkDF.
     match op with
       (* ACount, ASum are distributed to local *)
       | OpCount => x ++ ".count()" (* This returns a long, is this a problem? *)
-      | OpSum => x ++ ".select(sum(""value"")).first().getLong(0)" (* This is not pretty, but there does not seem to be a .sum() *)
+      | OpNatSum => x ++ ".select(sum(""value"")).first().getLong(0)" (* This is not pretty, but there does not seem to be a .sum() *)
       (* AFlatten is distributed to distributed *)
       (* TODO FIXME ...but this implementation is distributed to local, right?
         Fix this. Might make the whole collect unwrap issue go away *)
@@ -210,10 +210,6 @@ Section tDNNRCtoSparkDF.
     | OpFlatten => postfix "flatten.sorted(QcertOrdering)"
     | OpDistinct => postfix "distinct"
     | OpCount => postfix "length"
-    | OpSum => postfix "sum"
-    | OpNumMax => prefix "anummax"
-    | OpNumMin => prefix "anummin"
-    | OpNumMean => prefix "arithMean"
     | OpToString => prefix "toQcertString"
     | OpSubstring start olen =>
       "(" ++ x ++ ").substring(" ++ toString start ++
@@ -239,15 +235,26 @@ Section tDNNRCtoSparkDF.
         "unbrand[" ++ scala ++ "](" ++ schema ++ ", " ++ x ++ ")"
       | None => "UNBRAND_REQUIRED_TYPE_ISSUE"
       end
-    | OpArithUnary ArithAbs => prefix "Math.abs"
+    | OpNatUnary NatAbs => prefix "Math.abs"
+    | OpNatSum => postfix "sum"
+    | OpNatMax => prefix "anummax"
+    | OpNatMin => prefix "anummin"
+    | OpNatMean => prefix "arithMean"
     | OpForeignUnary o => foreign_to_scala_unary_op o x
+    | OpNumberSum => postfix "sum"
 
     (* TODO *)
+    | OpNumberOfNat => prefix "NUMBER OF NAT??"
+    | OpNumberUnary _ => prefix "NUMBER ARITH??"
+    | OpNumberTruncate => prefix "TRUNCATE??"
+    | OpNumberBagMax => prefix "MAX??"
+    | OpNumberBagMin => prefix "MIN??"
+    | OpNumberMean => prefix "MEAN??"
     | OpOrderBy scl => "SORT???" (* XXX Might be nice to try and support -JS XXX *)
     | OpRecRemove _ => "ARECREMOVE???"
     | OpSingleton => "SINGLETON???"
-    | OpArithUnary ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
-    | OpArithUnary ArithSqrt => "SQRT???" (* Integer sqrt? Not sure what the Coq semantics are. *)
+    | OpNatUnary NatLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
+    | OpNatUnary NatSqrt => "SQRT???" (* Integer sqrt? Not sure what the Coq semantics are. *)
     end.
 
   Definition spark_of_binary_op (op: binary_op) (x: string) (y: string) : string :=
@@ -278,13 +285,20 @@ Section tDNNRCtoSparkDF.
     | OpBagMin => l ++ ".diff(" ++ l ++ ".diff(" ++ r ++ "))" (* l1 ⊖ (l1 ⊖ l2) Can't make recursive calls, but AMinus is weird anyways... *)
     | OpContains => prefix "AContains" (* left argument is the element, right element is the collection *)
     | OpStringConcat => infix "+" (* string concat *)
-    | OpArithBinary ArithDivide => infix "/"
-    | OpArithBinary ArithMax => infix "max"
-    | OpArithBinary ArithMin => infix "min"
-    | OpArithBinary ArithMinus => infix "-"
-    | OpArithBinary ArithMult => infix "*"
-    | OpArithBinary ArithPlus => infix "+"
-    | OpArithBinary ArithRem => infix "%" (* TODO double check the exact semantics of this *)
+    | OpNatBinary NatDiv => infix "/"
+    | OpNatBinary NatMax => infix "max"
+    | OpNatBinary NatMin => infix "min"
+    | OpNatBinary NatMinus => infix "-"
+    | OpNatBinary NatMult => infix "*"
+    | OpNatBinary NatPlus => infix "+"
+    | OpNatBinary NatRem => infix "%" (* TODO double check the exact semantics of this *)
+    | OpNumberBinary NumberDiv => infix "/"
+    | OpNumberBinary NumberMax => infix "max"
+    | OpNumberBinary NumberMin => infix "min"
+    | OpNumberBinary NumberMinus => infix "-"
+    | OpNumberBinary NumberMult => infix "*"
+    | OpNumberBinary NumberPlus => infix "+"
+    | OpNumberBinary NumberRem => infix "%" (* TODO double check the exact semantics of this *)
 
     (* TODO *)
     | OpForeignBinary op => "FOREIGNBINARYOP???"

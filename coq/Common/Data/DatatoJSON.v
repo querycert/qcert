@@ -129,11 +129,12 @@ Section DatatoJSON.
   Section toJSON.
     Context {ftojson:foreign_to_JSON}.
     Require Import JsAst.JsNumber.
+    Require Import NumberExtract.
     
     Fixpoint data_enhanced_to_json (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber (of_int n)
+      | dnat n => jnumber (number_of_int n)
       | dnumber n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
@@ -149,7 +150,7 @@ Section DatatoJSON.
     Fixpoint data_to_json (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber (of_int n)
+      | dnat n => jnumber (number_of_int n)
       | dnumber n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s

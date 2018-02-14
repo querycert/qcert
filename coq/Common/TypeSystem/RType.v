@@ -440,7 +440,7 @@ Section RType.
       Hint Constructors Forallt.
       destruct τ as [τ₀ wfτ].
       revert wfτ. (* ftop fbottom funit fnat fbool fstring fcol frec. *)
-      unfold Top, Bottom, Unit, Nat, Bool, String, Coll, Rec in *.
+      unfold Top, Bottom, Unit, Nat, Number, Bool, String, Coll, Rec in *.
       (* Ltac r_ext := solve [erewrite (rtype_ext); eauto]. *)
       induction τ₀; simpl; intros.
       - erewrite rtype_ext; eauto.
