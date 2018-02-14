@@ -114,15 +114,19 @@ val string_of_foreign_data : QcertCompiler.enhanced_data -> string
 val foreign_data_of_string : string -> QcertCompiler.enhanced_data
 
 val string_of_foreign_unary_op : QcertCompiler.enhanced_unary_op -> string
-val string_of_arith_unary_op : QcertCompiler.arith_unary_op -> string
+val string_of_nat_arith_unary_op : QcertCompiler.nat_arith_unary_op -> string
+val string_of_number_arith_unary_op : QcertCompiler.number_arith_unary_op -> string
 
 val foreign_unary_op_of_string : string -> QcertCompiler.enhanced_unary_op
-val arith_unary_op_of_string : string -> QcertCompiler.arith_unary_op
+val nat_arith_unary_op_of_string : string -> QcertCompiler.nat_arith_unary_op
+val number_arith_unary_op_of_string : string -> QcertCompiler.number_arith_unary_op
 
 val string_of_foreign_binary_op : QcertCompiler.enhanced_binary_op -> string
-val string_of_arith_binary_op : QcertCompiler.arith_binary_op -> string
+val string_of_nat_arith_binary_op : QcertCompiler.nat_arith_binary_op -> string
+val string_of_number_arith_binary_op : QcertCompiler.number_arith_binary_op -> string
 
-val arith_binary_op_of_string : string -> QcertCompiler.arith_binary_op
+val nat_arith_binary_op_of_string : string -> QcertCompiler.nat_arith_binary_op
+val number_arith_binary_op_of_string : string -> QcertCompiler.number_arith_binary_op
 val foreign_binary_op_of_string : string -> QcertCompiler.enhanced_binary_op
 
 val string_of_binary_op : QcertCompiler.binary_op -> string

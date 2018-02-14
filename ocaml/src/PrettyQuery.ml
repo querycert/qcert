@@ -583,7 +583,7 @@ let rec pretty_column_aux p sym ff col =
   | QcertCompiler.CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle (Util.string_of_char_list v) pretty_sym sym.rangle
   | QcertCompiler.CDot (v,c) -> pretty_unary_op p sym pretty_column_aux ff (QcertCompiler.OpDot v) c
   | QcertCompiler.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
-  | QcertCompiler.CPlus (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff (QcertCompiler.OpArithBinary QcertCompiler.ArithPlus) c1 c2
+  | QcertCompiler.CPlus (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff (QcertCompiler.OpNatBinary QcertCompiler.NatPlus) c1 c2
   | QcertCompiler.CEq (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff QcertCompiler.OpEqual c1 c2
   | QcertCompiler.CLessThan (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff QcertCompiler.OpLt c1 c2
   | QcertCompiler.CNeg c -> pretty_unary_op p sym pretty_column_aux ff QcertCompiler.OpNeg c
