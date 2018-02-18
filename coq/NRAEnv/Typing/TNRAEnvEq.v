@@ -436,6 +436,22 @@ Section TNRAEnvEq.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
   Qed.
     
+  (* NRAEnvNaturalJoin *)
+
+  Global Instance nraenv_natural_join_tproper :
+    Proper (tnraenv_rewrites_to
+              ==> tnraenv_rewrites_to
+              ==> tnraenv_rewrites_to) NRAEnvNaturalJoin.
+  Proof.
+    unfold Proper, respectful; intros.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq in H0.
+    simpl.
+    unfold macro_cNRAEnvNaturalJoin.
+    rewrite H; rewrite H0; reflexivity.
+  Qed.
+    
   (* NRAEnvProject *)
 
   Global Instance nraenv_project_tproper :

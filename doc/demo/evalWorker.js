@@ -20,7 +20,7 @@
 // is going on too long.
 
 // Get dependencies.  We put our merged runtime functions at global scope so they are available to the query
-importScripts("qcert-runtime.js", "qcertWhiskDispatch.js", "qcertJS.js");
+importScripts("../../runtimes/javascript/qcert-runtime.js", "qcertWhiskDispatch.js", "../../bin/qcertJS.js");
 
 // Here upon receiving the activation message from the main thread.  This has two possible forms.
 // 1.  An array of Strings containing inputText, schemaText, and compiledQuery (requesting Javascript execution).

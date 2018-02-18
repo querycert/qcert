@@ -345,6 +345,7 @@ MODULES = \
 	Tests/TDataTest \
 	Tests/NRATest \
 	Tests/NRAEnvTest \
+	Tests/NNRCTest \
 	Tests/TNRATest \
 	Tests/CAMPTest \
 	Tests/TCAMPTest \

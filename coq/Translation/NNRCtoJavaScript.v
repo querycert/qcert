@@ -21,6 +21,7 @@ Require Import EquivDec.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import NNRCRuntime.
+Require Import JavaScriptRuntime.
 Require Import ForeignToJavaScript.
 
 Local Open Scope string_scope.
@@ -211,14 +212,14 @@ Section NNRCtoJavaScript.
 
     (* Java equivalent: JavaScript.Backend.nrcToJS *)
     Fixpoint nnrcToJS
-             (n : nnrc)                      (* NNNRC expression to translate *)
+             (n : nnrc)                      (* NNRC expression to translate *)
              (t : nat)                       (* next available unused temporary *)
              (i : nat)                       (* indentation level *)
              (eol : string)                  (* Choice of end of line character *)
              (quotel : string)               (* Choice of quote character *)
              (ivs : list (string * string))  (* Input variables and their corresponding string representation *)
-      : string                               (* JavaScript statements for computing result *)
-        * string                             (* JavaScript expression holding result *)
+      : javascript                           (* JavaScript statements for computing result *)
+        * javascript                         (* JavaScript expression holding result *)
         * nat                                (* next available unused temporary *)
       := match n with
          | NNRCGetConstant v => ("", "vc$" ++ v, t)
@@ -359,9 +360,16 @@ Section NNRCtoJavaScript.
        end.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSunshadow *)
-    Definition nnrcToJSunshadow (n : nnrc) (t : nat) (i : nat) (eol : string) (quotel : string) (avoid: list var) (ivs : list (string * string)) :=
-      let n := unshadow_js avoid n in
-      nnrcToJS n t i eol quotel ivs.
+    Definition nnrcToJSunshadow
+               (n : nnrc)
+               (t : nat)
+               (i : nat)
+               (eol : string)
+               (quotel : string)
+               (avoid: list var)
+               (ivs : list (string * string))
+      := let n := unshadow_js avoid n in
+         nnrcToJS n t i eol quotel ivs.
 
     (* Java equivalent: JavaScriptBackend.makeJSParams *)
     Definition makeJSParams (ivs: list string) :=
@@ -379,13 +387,13 @@ Section NNRCtoJavaScript.
                (eol:string)
                (quotel:string)
                (params : list string)
-               (fname:string) :=
-      let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
-      "" ++ (indent i) ++ "function " ++ fname ++ "("++ (makeJSParams params) ++ ") {" ++ eol
-         ++ j0
-         ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
-         ++ (indent i) ++ "}" ++ eol
-         ++ (if harness then "%HARNESS%" else "").
+               (fname:string)
+      := let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
+         "" ++ (indent i) ++ "function " ++ fname ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+            ++ j0
+            ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
+            ++ (indent i) ++ "}" ++ eol
+            ++ (if harness then "%HARNESS%" else "").
 
     Definition nnrcToJSFunStubConstants
                (e:nnrc)
@@ -394,12 +402,12 @@ Section NNRCtoJavaScript.
                (quotel:string)
                (params : list string)
                (fname:string)
-               (fprefix:string) :=
-      let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
-      "" ++ (indent i) ++ fprefix ++ fname ++ "("++ (makeJSParams params) ++ ") {" ++ eol
-         ++ j0
-         ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
-         ++ (indent i) ++ "}".
+               (fprefix:string)
+      := let '(j0, v0, t0) := nnrcToJSunshadow e 1 (i+1) eol quotel params (paramsToStringedParams params) in
+         "" ++ (indent i) ++ fprefix ++ fname ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+            ++ j0
+            ++ (indent i) ++ "  return " ++ v0 ++ ";" ++ eol
+            ++ (indent i) ++ "}".
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFunStubConstants *)
     Definition nnrcToJSFunStubConstantsAsFunction
@@ -408,9 +416,9 @@ Section NNRCtoJavaScript.
                (eol:string)
                (quotel:string)
                (params : list string)
-               (fname:string) :=
-      let fprefix := "function " in
-      nnrcToJSFunStubConstants e i eol quotel params fname fprefix.
+               (fname:string)
+      := let fprefix := "function " in
+         nnrcToJSFunStubConstants e i eol quotel params fname fprefix.
 
     Definition nnrcToJSFunStubConstantsAsMethod
                (e:nnrc)
@@ -418,9 +426,9 @@ Section NNRCtoJavaScript.
                (eol:string)
                (quotel:string)
                (params : list string)
-               (fname:string) :=
-      let fprefix := "" in
-      nnrcToJSFunStubConstants e i eol quotel params fname fprefix.
+               (fname:string)
+      := let fprefix := "" in
+         nnrcToJSFunStubConstants e i eol quotel params fname fprefix.
 
     (* Free variables are assumed to be constant lookups *)
     (* Java equivalent: JavaScriptBackend.closeFreeVars *)
@@ -444,9 +452,9 @@ Section NNRCtoJavaScript.
                (eol:string)
                (quotel:string)
                (ivs : list string)
-               (fname:string) :=
-      let e' := closeFreeVars input_v e ivs in
-      nnrcToJSFunStubConstantsAsFunction e' i eol quotel ivs fname.
+               (fname:string)
+      := let e' := closeFreeVars input_v e ivs in
+         nnrcToJSFunStubConstantsAsFunction e' i eol quotel ivs fname.
 
     Definition nnrcToJSMethod
                (input_v:string)
@@ -455,18 +463,18 @@ Section NNRCtoJavaScript.
                (eol:string)
                (quotel:string)
                (ivs : list string)
-               (fname:string) :=
-      let e' := closeFreeVars input_v e ivs in
-      nnrcToJSFunStubConstantsAsMethod e' i eol quotel ivs fname.
+               (fname:string)
+      := let e' := closeFreeVars input_v e ivs in
+         nnrcToJSFunStubConstantsAsMethod e' i eol quotel ivs fname.
 
     (* Java equivalent: JavaScriptBackend.generateJavaScript *)
-    Definition nnrc_to_js_top (e:nnrc) : string :=
+    Definition nnrc_to_js_top (e:nnrc) : javascript :=
       let input_f := "query" in
       let input_v := "constants" in
       let init_indent := 0 in
       nnrcToJSFun input_v e init_indent eol_newline quotel_double (input_v::nil) input_f.
 
-    Definition nnrc_to_js_top_with_name (e:nnrc) (fname:string) : string :=
+    Definition nnrc_to_js_top_with_name (e:nnrc) (fname:string) : javascript :=
       let input_v := "constants" in
       let init_indent := 0 in
       nnrcToJSFun input_v e init_indent eol_newline quotel_double (input_v::nil) fname.

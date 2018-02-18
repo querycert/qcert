@@ -30,7 +30,7 @@ Section NNRCSugar.
   Require Import Decidable.
   Require Import Utils.
   Require Import CommonRuntime.
-  Require Import cNNRC.
+  Require Import cNNRCRuntime.
   Require Import NNRC.
 
   Context {fruntime:foreign_runtime}.
@@ -374,6 +374,37 @@ Section NNRCSugar.
     induction l; [reflexivity| ]; simpl.
     destruct a0; try reflexivity.
   Qed.
-  
+
+  Section natural_join.
+    (* Those two definitions should be proved equivalent (but there might be preconditions
+       on free variables in e2) *)
+    Definition nnrc_natural_join (vid venv:var) (e1 e2:nnrc) : nnrc :=
+      (NNRCUnop OpFlatten
+                (NNRCUnop OpFlatten
+                          (NNRCFor (fresh_var "tprod$" (vid :: venv :: nil)) e1
+                                   (NNRCFor (fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil))
+                                            e2
+                                            (NNRCBinop OpRecMerge (NNRCVar (fresh_var "tprod$" (vid :: venv :: nil)))
+                                                       (NNRCVar (fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil)))))))).
+
+    Definition nnrc_natural_join_from_nraenv (vid venv:var) (e1 e2:nnrc) : nnrc :=
+      (NNRCUnop OpFlatten
+                (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
+                         (NNRCUnop OpFlatten
+                                   (NNRCFor (fresh_var "tprod$" (vid :: venv :: nil))
+                                            (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
+                                                     e1
+                                                     (NNRCUnop (OpRec "t1") (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil)))))
+                                            (NNRCFor (fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil))
+                                                     (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
+                                                              e2
+                                                              (NNRCUnop (OpRec "t2") (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil)))))
+                                                     (NNRCBinop OpRecConcat (NNRCVar (fresh_var "tprod$" (vid :: venv :: nil)))
+                                                                (NNRCVar
+                                                                   (fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil)))))))
+                         (NNRCBinop OpRecMerge (NNRCUnop (OpDot "t1") (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))
+                                    (NNRCUnop (OpDot "t2") (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))))).
+
+  End natural_join.
 End NNRCSugar.
 

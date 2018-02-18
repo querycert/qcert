@@ -264,6 +264,17 @@ Section NRAEnvEq.
     apply proper_cNRAEnvProduct; assumption.
   Qed.
 
+  (* NRAEnvNaturalJoin *)
+  Global Instance proper_NRAEnvNaturalJoin : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvNaturalJoin.
+  Proof.
+    unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
+    apply proper_cNRAEnvUnop; try assumption; try reflexivity.
+    apply proper_cNRAEnvMap; try assumption; try reflexivity.
+    apply proper_cNRAEnvProduct; try assumption.
+    apply proper_cNRAEnvMap; try assumption; reflexivity.
+    apply proper_cNRAEnvMap; try assumption; reflexivity.
+  Qed.
+
   (* NRAEnvProject *)
   Global Instance proper_NRAEnvProject : Proper (eq ==> nraenv_eq ==> nraenv_eq) NRAEnvProject.
   Proof.

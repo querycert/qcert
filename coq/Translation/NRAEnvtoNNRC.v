@@ -23,6 +23,7 @@ Section NRAEnvtoNNRC.
   Require Import CommonRuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
+  Require Import cNRAEnvtocNNRC.
 
   Context {fruntime:foreign_runtime}.
 
@@ -64,7 +65,7 @@ Section NRAEnvtoNNRC.
       NNRCUnop OpFlatten
               (NNRCFor t1 nrc1
                       (NNRCFor t2 nrc2
-                              ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
+                              (NNRCBinop OpRecConcat (NNRCVar t1) (NNRCVar t2))))
     (* [[ σ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ if [[ op1 ]]_t1,venv then { t1 } else {} | t1 ∈ [[ op2 ]]_vid,venv } *)
     | NRAEnvSelect op1 op2 =>
@@ -141,8 +142,12 @@ Section NRAEnvtoNNRC.
       let t := fresh_var "tsel$" (varid::varenv::nil) in
       let nrc1 := (nraenv_to_nnrc op1 t varenv) in
       NNRCUnop OpFlatten
-              (NNRCFor t nrc2
-                      (NNRCIf nrc1 (NNRCUnop OpBag (NNRCVar t)) (NNRCConst (dcoll nil))))
+               (NNRCFor t nrc2
+                        (NNRCIf nrc1 (NNRCUnop OpBag (NNRCVar t)) (NNRCConst (dcoll nil))))
+    | NRAEnvNaturalJoin op1 op2 =>
+      let nrc1 := (nraenv_to_nnrc op1 varid varenv) in
+      let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
+      nnrc_natural_join_from_nraenv varid varenv nrc1 nrc2
     | NRAEnvProject sl op1 =>
       let t := fresh_var "tmap$" (varid::varenv::nil) in
       NNRCFor t (nraenv_to_nnrc op1 varid varenv) (NNRCUnop (OpRecProject sl) (NNRCVar t))
@@ -167,21 +172,6 @@ Section NRAEnvtoNNRC.
       in
       nrc4
     end.
-
-  Open Scope nraenv_scope.
-
-  (* This is clearly not true *)
-  Section negResult.
-    Require Import cNRAEnvtocNNRC.
-    Example nraenv_to_nnrc_codepaths_different vid venv:
-      exists op,
-        ~ (nnrc_to_nnrc_base (nraenv_to_nnrc op vid venv)
-           = nraenv_core_to_nnrc_core (nraenv_to_nraenv_core op) vid venv).
-    Proof.
-      exists (NRAEnvGroupBy "a"%string nil%string NRAEnvID).
-      simpl; inversion 1.
-    Qed.
-  End negResult.
 
   Lemma nnrc_core_eval_binop_eq h cenv env b op1 op2 op1' op2' :
     nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->
@@ -284,8 +274,7 @@ Section NRAEnvtoNNRC.
     ; simpl nraenv_core_to_nnrc_core
     ; simpl nnrc_to_nnrc_base
     ; simpl nraenv_to_nnrc
-    ; eauto 4.
-    - apply nnrc_core_eval_unop_eq; auto.
+    ; eauto 8.
     - apply nnrc_core_eval_group_by_eq; auto.
     - apply unnest_from_nraenv_and_nraenv_core_eq; auto.
   Qed.
@@ -302,6 +291,8 @@ Section NRAEnvtoNNRC.
     rewrite nraenv_to_nnrc_codepaths_equivalent.
     apply nraenv_core_sem_correct; assumption.
   Qed.
+
+  Open Scope nraenv_scope.
 
   Lemma nraenv_to_nnrc_no_free_vars (op: nraenv):
     forall (vid venv: var),
@@ -525,6 +516,40 @@ Section NRAEnvtoNNRC.
         elim H; clear H; intros.
         rewrite In_app_iff in H; simpl in H.
         intuition.
+    - Case "NRAEnvNaturalJoin"%string.
+      intros vid venv v H.
+      Opaque fresh_var.
+      simpl in *.
+      unfold nnrc_natural_join_from_nraenv in H; simpl in H.
+      destruct (string_eqdec (fresh_var "tmap$" (vid :: venv :: nil)) (fresh_var "tmap$" (vid :: venv :: nil)));
+        try congruence; simpl in *.
+      destruct (string_eqdec
+                      (fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil))
+                      (fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil)));
+        try congruence; simpl in *.
+      clear e e0.
+      repeat rewrite in_app_iff in H; simpl in H.
+      elim H; clear H; intros;[|contradiction].
+      elim H; clear H; intros.
+      + elim H; clear H; intros; [auto|contradiction].
+      + assert (fresh_var "tprod$" (vid :: venv :: nil)
+                <> fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil))
+          by (apply fresh_var_fresh1; auto).
+        destruct
+          (string_eqdec (fresh_var "tprod$" (fresh_var "tprod$" (vid :: venv :: nil) :: vid :: venv :: nil))
+                        (fresh_var "tprod$" (vid :: venv :: nil))).
+        * congruence.
+        * clear H0 c.
+          rewrite app_nil_r in H.
+          apply remove_inv in H.
+          elim H; clear H; intros.
+          rewrite In_app_iff in H.
+          elim H; clear H; intros.
+          auto.
+          rewrite <- H in H0.
+          congruence.
+          rewrite app_nil_l in H.
+          auto.
     - Case "NRAEnvProject"%string.
       intros vid venv v Hv.
       Opaque fresh_var.
@@ -620,7 +645,7 @@ Section NRAEnvtoNNRC.
     Require Import Omega.
 
     Theorem nraenvToNNNRC_size op vid venv : 
-      nnrc_size (nraenv_to_nnrc op vid venv) <= 14 * nraenv_size op.
+      nnrc_size (nraenv_to_nnrc op vid venv) <= 19 * nraenv_size op.
     Proof.
       Transparent fresh_var2.
       revert vid venv.
@@ -647,6 +672,7 @@ Section NRAEnvtoNNRC.
           specialize (IHop2 vid venv); omega.
       - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv);
           specialize (IHop2 vid venv); specialize (IHop3 vid venv); try omega.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
       - specialize (IHop vid venv); omega.
       - specialize (IHop vid venv); omega.
       - specialize (IHop vid venv); omega.

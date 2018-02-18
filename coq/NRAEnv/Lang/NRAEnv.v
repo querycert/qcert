@@ -81,7 +81,8 @@ Section NRAEnv.
     | NRAEnvAppEnv : nraenv -> nraenv -> nraenv                 (**r composition over the reified environment [∘ᵉ] *)
     | NRAEnvMapEnv : nraenv -> nraenv                           (**r map over the reified environment [χᵉ] *)
     | NRAEnvFlatMap : nraenv -> nraenv -> nraenv                (**r flat map [Χ] *)
-    | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv         (**r relational join [⋈] *)
+    | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv         (**r predicate join [e₂ ⋈⟨e₁⟩ e₃] *)
+    | NRAEnvNaturalJoin : nraenv -> nraenv -> nraenv            (**r natural join [e₁ ⋈ e₂] *)
     | NRAEnvProject : list string -> nraenv -> nraenv           (**r relational projection [Π] *)
     | NRAEnvGroupBy : string -> list string -> nraenv -> nraenv (**r group-by [Γ] *)
     | NRAEnvUnnest : string -> string -> nraenv -> nraenv       (**r unnest [μ] *)
@@ -118,6 +119,7 @@ Section NRAEnv.
     | Case_aux c "NRAEnvMapEnv"%string
     | Case_aux c "NRAEnvFlatMap"%string
     | Case_aux c "NRAEnvJoin"%string
+    | Case_aux c "NRAEnvNaturalJoin"%string
     | Case_aux c "NRAEnvProject"%string
     | Case_aux c "NRAEnvGroupBy"%string
     | Case_aux c "NRAEnvUnnest"%string].
@@ -130,12 +132,12 @@ Section NRAEnv.
   
     (** ** Joins *)
 
-    (** [e₂ ⋈⟨e₁) e₃ = σ⟨e₁⟩(e₂ × e₃)] *)
+    (** Predicate join [e₂ ⋈⟨e₁) e₃ = σ⟨e₁⟩(e₂ × e₃)] *)
   
     Definition macro_cNRAEnvJoin (e1 e2 e3 : nraenv_core) : nraenv_core :=
       (cNRAEnvSelect e1 (cNRAEnvProduct e2 e3)).
 
-    (** [e₂ ⋉⟨e₁) e₁ = σ⟨σ⟨e₁⟩({ID} × e₃) ≠ {}⟩(e₂)] *)
+    (** Semi join [e₂ ⋉⟨e₁) e₁ = σ⟨σ⟨e₁⟩({ID} × e₃) ≠ {}⟩(e₂)] *)
     
     Definition macro_cNRAEnvSemiJoin (e1 e2 e3 : nraenv_core) : nraenv_core :=
       cNRAEnvSelect
@@ -153,6 +155,19 @@ Section NRAEnv.
                                      (cNRAEnvProduct
                                         ((cNRAEnvUnop OpBag) cNRAEnvID) e3))
                       (cNRAEnvConst (dcoll nil))) e2.
+
+    (** Natural join [e₁ ⋈ e₂] *)
+
+    Definition macro_cNRAEnvNaturalJoin (e1 e2 : nraenv_core) : nraenv_core :=
+      cNRAEnvUnop
+        OpFlatten
+        (cNRAEnvMap
+           (cNRAEnvBinop OpRecMerge
+                         (cNRAEnvUnop (OpDot "t1") cNRAEnvID)
+                         (cNRAEnvUnop (OpDot "t2") cNRAEnvID))
+           (cNRAEnvProduct
+              (cNRAEnvMap (cNRAEnvUnop (OpRec "t1") cNRAEnvID) e1)
+              (cNRAEnvMap (cNRAEnvUnop (OpRec "t2") cNRAEnvID) e2))).
 
     (** ** Map operations *)
 
@@ -317,6 +332,10 @@ Section NRAEnv.
           (nraenv_to_nraenv_core e1)
           (nraenv_to_nraenv_core e2)
           (nraenv_to_nraenv_core e3)
+      | NRAEnvNaturalJoin e1 e2 =>
+        macro_cNRAEnvNaturalJoin
+          (nraenv_to_nraenv_core e1)
+          (nraenv_to_nraenv_core e2)
       | NRAEnvProject ls e1 =>
         macro_cNRAEnvProject ls (nraenv_to_nraenv_core e1)
       | NRAEnvGroupBy s ls e1 =>
@@ -726,6 +745,8 @@ Section NRAEnv.
         nraenv_free_vars q1 ++ nraenv_free_vars q2
       | NRAEnvJoin q3 q1 q2 =>
         nraenv_free_vars q1 ++ nraenv_free_vars q2 ++ nraenv_free_vars q3
+      | NRAEnvNaturalJoin q1 q2 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
       | NRAEnvProject _ q1 =>
         nraenv_free_vars q1
       | NRAEnvGroupBy _ _ q1 =>
@@ -741,6 +762,8 @@ Section NRAEnv.
         try solve[rewrite IHq1; rewrite IHq2; reflexivity|rewrite IHq;reflexivity].
       - rewrite IHq1; rewrite IHq2; rewrite IHq3.
         rewrite app_assoc; reflexivity.
+      - rewrite IHq1; rewrite IHq2;
+        repeat rewrite app_nil_r; reflexivity.
       - rewrite app_nil_r; rewrite IHq; reflexivity.
       - rewrite app_nil_r; rewrite IHq; reflexivity.
       - rewrite app_nil_r; rewrite app_nil_r; rewrite IHq; reflexivity.
@@ -775,6 +798,7 @@ Tactic Notation "nraenv_cases" tactic(first) ident(c) :=
   | Case_aux c "NRAEnvMapEnv"%string
   | Case_aux c "NRAEnvFlatMap"%string
   | Case_aux c "NRAEnvJoin"%string
+  | Case_aux c "NRAEnvNaturalJoin"%string
   | Case_aux c "NRAEnvProject"%string
   | Case_aux c "NRAEnvGroupBy"%string
   | Case_aux c "NRAEnvUnnest"%string].

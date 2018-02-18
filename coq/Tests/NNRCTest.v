@@ -33,33 +33,14 @@ Section NRAEnvTest.
   Require Import String ZArith.
   Open Scope Z_scope.
 
-  Require Import NRAEnvRuntime.
-  Require Import cNRAEnv.
+  Require Import NNRCRuntime.
+  Require Import cNNRC.
 
   Local Open Scope string_scope.
-  Local Open Scope nraenv_core_scope.
+  Local Open Scope nnrc_scope.
   Local Open Scope data_scope.
   Require Import TrivialModel.
 
-
-  Example merge_env_example
-    := [| ("A", dconst 1); ("B", dconst 3) |].
-  
-  Example merge_succeeds : nraenv_core
-    := χᵉ⟨ (ENV·"A") ♯+ (ENV·"C") ⟩ ◯ₑ (ENV ⊗ ‵ [| ("B", dconst 3) ; ("C", dconst 4) |]).
-
-  Remark merge_succeeds_result :
-    nil ⊢ₑ merge_succeeds @ₑ dunit ⊣ nil ; merge_env_example =
-                                           Some {| dconst 5 |}.
-  Proof. reflexivity. Qed.
-
-  Example merge_fails : nraenv_core
-    := χᵉ⟨ (ENV·"A") ♯+ (ENV·"C") ⟩ ◯ₑ (ENV ⊗ ‵ [| ("B", dconst 2) ; ("C", dconst 4) |]).
-
-  Remark merge_fails_result :
-    nil ⊢ₑ merge_fails @ₑ dunit ⊣ nil ; merge_env_example =
-                                           Some {||}.
-  Proof. reflexivity. Qed.
 
   Example db1
     := dcoll
@@ -77,11 +58,22 @@ Section NRAEnvTest.
             :: [| ("A", dconst 4); ("C", dconst 15) |]
             :: nil).
 
-  Example natural_join :=
-    NRAEnvNaturalJoin (NRAEnvConst db1) (NRAEnvConst db2).
-  
-  Eval vm_compute in
-      (nraenv_eval_top nil natural_join nil).
+  (* Canned initial variable for the current value *)
+  Definition init_vid := "id"%string.
+  Definition init_venv := "env"%string.
+
+  Example natural_join_aux varid varenv :=
+    let (t1,t2) := fresh_var2 "tprod$" "tprod$" (varid::varenv::nil) in
+    NNRCUnop OpFlatten
+             (NNRCUnop OpFlatten
+                       (NNRCFor t1 (NNRCConst db1)
+                                (NNRCFor t2
+                                         (NNRCConst db2)
+                                         (NNRCBinop OpRecMerge (NNRCVar t1) (NNRCVar t2))))).
+  Example natural_join : nnrc :=
+    natural_join_aux init_vid init_venv.
+  (* Eval vm_compute in
+     (nnrc_eval_top nil natural_join nil). *)
   
 End NRAEnvTest.
 
