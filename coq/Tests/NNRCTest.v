@@ -76,4 +76,3 @@ Section NRAEnvTest.
      (nnrc_eval_top nil natural_join nil). *)
   
 End NRAEnvTest.
-
