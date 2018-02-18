@@ -1,6 +1,6 @@
 {
 	"name": "qcert",
-	"version": "1.0.4",
+	"version": "1.0.4-dev",
 	"description": "The Q*Cert compiler",
 	"repository": {
 		"type": "git",

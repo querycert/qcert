@@ -15,6 +15,7 @@
 #
 
 MODULES = \
+	Version \
 	Utils/CoqLibAdd \
 	Utils/ListAdd \
 	Utils/StringAdd \
@@ -35,7 +36,6 @@ MODULES = \
 	Utils/JSON \
 	Utils/OptimizerStep \
 	Utils/OptimizerLogger \
-	Utils/Version \
 	Utils/Utils \
 	Common/Brands/BrandRelation \
 	Common/TypeSystem/ForeignType \
