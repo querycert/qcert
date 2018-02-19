@@ -353,5 +353,6 @@ MODULES = \
 	Tests/OQLTest \
 	Tests/SQLTest \
 	Tests/LambdaNRATest \
-	Tests/CompilerTest
+	Tests/CompilerTest \
+	Tests/HelloWorld
 

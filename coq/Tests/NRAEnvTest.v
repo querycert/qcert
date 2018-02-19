@@ -80,8 +80,8 @@ Section NRAEnvTest.
   Example natural_join :=
     NRAEnvNaturalJoin (NRAEnvConst db1) (NRAEnvConst db2).
   
-  Eval vm_compute in
-      (nraenv_eval_top nil natural_join nil).
-  
+  (* Eval vm_compute in
+     (nraenv_eval_top nil natural_join nil). *)
+
 End NRAEnvTest.
 
