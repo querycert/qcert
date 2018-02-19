@@ -31,7 +31,8 @@ Section NNRCtoNNRCimp.
   Require Import cNNRCVars.
   Require Import NNRCimpRuntime.
   Require Import NNRCStratify.
-  
+  Require Import Fresh.
+
   Context {fruntime:foreign_runtime}.
 
   Section from_stratified.
@@ -74,13 +75,13 @@ Section NNRCtoNNRCimp.
 
     Definition pd_bindings_lift (σ:bindings) : pd_bindings
       := map_codomain Some σ.
-    
+
     Lemma lookup_pd_bindings_lift σ v :
       lookup equiv_dec (pd_bindings_lift σ) v = lift Some (lookup equiv_dec σ v).
     Proof.
       apply lookup_map_codomain.
     Qed.
-    
+
     Lemma nnrc_expr_to_nnrc_imp_expr_some_correct (e:nnrc) (ei:nnrc_imp_expr) :
       nnrc_expr_to_nnrc_imp_expr e = Some ei ->
       forall h σc σ,
@@ -113,6 +114,89 @@ Section NNRCtoNNRCimp.
          + simpl.
            rewrite eqq; trivial.
     Qed.
+
+    Inductive terminator :=
+    | Term_assign : var -> terminator
+    | Term_push : var -> terminator
+    .
+
+    Definition terminate (terminator: terminator) (e: nnrc_imp_expr) :=
+      match terminator with
+      | Term_assign result => NNRCimpAssign result e
+      | Term_push result => NNRCimpPush result e
+      end.
+
+    Fixpoint nnrc_stmt_to_nnrc_imp_stmt_aux (fvs: list var) (terminator: terminator) (stmt: nnrc) :
+      option nnrc_imp_stmt
+      := match stmt with
+         | NNRCLet v s1 s2 =>
+           match nnrc_stmt_to_nnrc_imp_stmt_aux (v::fvs) (Term_assign v) s1,
+                 nnrc_stmt_to_nnrc_imp_stmt_aux (v::fvs) terminator s2
+           with
+           | Some s1', Some s2' =>
+             Some (NNRCimpLetMut v None (NNRCimpSeq s1' s2'))
+           | _, _ => None
+           end
+         | NNRCFor v e s =>
+           let tmp := fresh_var "tmp" fvs in
+           match nnrc_expr_to_nnrc_imp_expr e,
+                 nnrc_stmt_to_nnrc_imp_stmt_aux (tmp::v::fvs) (Term_push tmp) s
+           with
+           | Some e', Some s' =>
+             Some (NNRCimpBuildCollFor
+                     tmp
+                     (NNRCimpFor v e' s')
+                     (terminate terminator (NNRCimpVar tmp)))
+           | _, _ => None
+           end
+         | NNRCIf e s1 s2 =>
+           let tmp := fresh_var "tmp" fvs in
+           match nnrc_expr_to_nnrc_imp_expr e,
+                 nnrc_stmt_to_nnrc_imp_stmt_aux (tmp::fvs) (Term_assign tmp) s1,
+                 nnrc_stmt_to_nnrc_imp_stmt_aux (tmp::fvs) (Term_assign tmp) s2
+           with
+           | Some e', Some s1', Some s2' =>
+             Some (NNRCimpLetMut
+                     tmp None
+                     (NNRCimpSeq
+                        (NNRCimpIf e' s1' s2')
+                        (terminate terminator (NNRCimpVar tmp))))
+           | _, _, _ => None
+           end
+         | NNRCEither e x1 s1 x2 s2 =>
+           let tmp := fresh_var "tmp" fvs in
+           match nnrc_expr_to_nnrc_imp_expr e,
+                 nnrc_stmt_to_nnrc_imp_stmt_aux (tmp::x1::fvs) (Term_assign tmp) s1,
+                 nnrc_stmt_to_nnrc_imp_stmt_aux (tmp::x2::fvs) (Term_assign tmp) s2
+           with
+           | Some e', Some s1', Some s2' =>
+             Some (NNRCimpLetMut
+                     tmp None
+                     (NNRCimpSeq
+                        (NNRCimpEither e' x1 s1' x2 s2')
+                        (terminate terminator (NNRCimpVar tmp))))
+           | _, _, _ => None
+           end
+         | NNRCGroupBy _ _ _
+         | NNRCGetConstant _
+         | NNRCVar _
+         | NNRCConst _
+         | NNRCBinop _ _ _
+         | NNRCUnop _ _ =>
+           match nnrc_expr_to_nnrc_imp_expr stmt with
+           | Some e => Some (terminate terminator e)
+           | None => None
+           end
+        end.
+
+    Definition nnrc_stmt_to_nnrc_imp_stmt (globals: list var) (stmt: nnrc) :
+      option (nnrc_imp_stmt * var)
+      :=
+        let ret := fresh_var "ret" globals in
+        match nnrc_stmt_to_nnrc_imp_stmt_aux (ret::globals) (Term_assign ret) stmt with
+        | Some stmt => Some (stmt, ret)
+        | None => None
+        end.
 
   End from_stratified.
 
