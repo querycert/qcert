@@ -200,7 +200,7 @@ Section NNRCimpSemEval.
   Qed.
 
   Lemma nnrc_imp_sem_eval q d :
-    [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h σc q = Some d.
+    [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h q σc = Some d.
   Proof.
     destruct q.
     unfold nnrc_imp_eval_top.

@@ -38,7 +38,6 @@ Section NNRCimpEval.
   Context {fruntime:foreign_runtime}.
 
   Context (h:brand_relation_t).
-  Context (σc:list (string*data)).
 
   Local Open Scope nnrc_imp.
   Local Open Scope string.
@@ -51,7 +50,7 @@ Section NNRCimpEval.
           denotes an error. An error is always propagated. *)
 
     Fixpoint nnrc_imp_expr_eval
-             (σ:pd_bindings) (e:nnrc_imp_expr)
+             (σc:bindings) (σ:pd_bindings) (e:nnrc_imp_expr)
       : option data
       := match e with
          | NNRCimpGetConstant v =>
@@ -65,34 +64,34 @@ Section NNRCimpEval.
 
          | NNRCimpBinop bop e₁ e₂ =>
            olift2 (fun d₁ d₂ => binary_op_eval h bop d₁ d₂)
-                  (nnrc_imp_expr_eval σ e₁)
-                  (nnrc_imp_expr_eval σ e₂)
+                  (nnrc_imp_expr_eval σc σ e₁)
+                  (nnrc_imp_expr_eval σc σ e₂)
 
          | NNRCimpUnop uop e =>
            olift (fun d => unary_op_eval h uop d)
-                 (nnrc_imp_expr_eval σ e)
+                 (nnrc_imp_expr_eval σc σ e)
 
          | NNRCimpGroupBy g sl e =>
-           match nnrc_imp_expr_eval σ e with
+           match nnrc_imp_expr_eval σc σ e with
            | Some (dcoll dl) => lift dcoll (group_by_nested_eval_table g sl dl)
            | _ => None
            end
          end.
 
     Fixpoint nnrc_imp_stmt_eval
-             (σ:pd_bindings) (ψ:mc_bindings)
+             (σc:bindings) (σ:pd_bindings) (ψ:mc_bindings)
              (s:nnrc_imp_stmt) : option (pd_bindings*mc_bindings)
       := match s with
          | NNRCimpSeq s₁ s₂ =>
-           match nnrc_imp_stmt_eval σ ψ s₁ with
-           | Some (σ₁, ψ₁) => nnrc_imp_stmt_eval σ₁ ψ₁ s₂
+           match nnrc_imp_stmt_eval σc σ ψ s₁ with
+           | Some (σ₁, ψ₁) => nnrc_imp_stmt_eval σc σ₁ ψ₁ s₂
            | None => None
            end
 
          | NNRCimpLetMut v (Some e) s₀ =>
-           match nnrc_imp_expr_eval σ e with
+           match nnrc_imp_expr_eval σc σ e with
            | Some d =>
-             match nnrc_imp_stmt_eval ((v,Some d)::σ) ψ s₀ with
+             match nnrc_imp_stmt_eval σc ((v,Some d)::σ) ψ s₀ with
              | Some (_::σ₁, ψ₁) => Some (σ₁, ψ₁)
              | _ => None
              end
@@ -100,15 +99,15 @@ Section NNRCimpEval.
            end
 
          | NNRCimpLetMut v None s₀ =>
-           match nnrc_imp_stmt_eval ((v,None)::σ) ψ s₀ with
+           match nnrc_imp_stmt_eval σc ((v,None)::σ) ψ s₀ with
            | Some (_::σ₁, ψ₁) => Some (σ₁, ψ₁)
            | _ => None
            end
 
          | NNRCimpBuildCollFor v s₁ s₂ =>
-           match nnrc_imp_stmt_eval σ ((v,nil)::ψ) s₁ with
+           match nnrc_imp_stmt_eval σc σ ((v,nil)::ψ) s₁ with
            | Some (σ₁, ((_,dl)::ψ₁)) =>
-             match nnrc_imp_stmt_eval ((v,Some (dcoll dl))::σ₁) ψ₁ s₂ with
+             match nnrc_imp_stmt_eval σc ((v,Some (dcoll dl))::σ₁) ψ₁ s₂ with
              | Some ((_::σ₂),ψ₂) => Some (σ₂,ψ₂)
              | _ => None
              end
@@ -116,25 +115,25 @@ Section NNRCimpEval.
            end
 
          | NNRCimpPush v e =>
-           match nnrc_imp_expr_eval σ e, lookup string_dec ψ v with
+           match nnrc_imp_expr_eval σc σ e, lookup string_dec ψ v with
            | Some d, Some dl => Some (σ, update_first string_dec ψ v (d::dl))
            | _, _ => None
            end
 
          | NNRCimpAssign v e =>
-           match nnrc_imp_expr_eval σ e, lookup string_dec σ v with
+           match nnrc_imp_expr_eval σc σ e, lookup string_dec σ v with
            | Some d, Some _ => Some (update_first string_dec σ v (Some d), ψ)
            | _, _ => None
            end
 
          | NNRCimpFor v e s₀ =>
-           match nnrc_imp_expr_eval σ e with
+           match nnrc_imp_expr_eval σc σ e with
            | Some (dcoll c1) =>
              let fix for_fun (dl:list data) σ₁ ψ₁ :=
                  match dl with
                  | nil => Some (σ₁, ψ₁)
                  | d::dl' =>
-                   match nnrc_imp_stmt_eval ((v,Some d)::σ₁) ψ₁ s₀ with
+                   match nnrc_imp_stmt_eval σc ((v,Some d)::σ₁) ψ₁ s₀ with
                    | Some (_::σ₂, ψ₂) => for_fun dl' σ₂ ψ₂
                    | _ => None
                    end
@@ -144,21 +143,21 @@ Section NNRCimpEval.
            end
 
          | NNRCimpIf e s₁ s₂ =>
-           match nnrc_imp_expr_eval σ e  with
-           | Some (dbool true) => nnrc_imp_stmt_eval σ ψ s₁
-           | Some (dbool false) => nnrc_imp_stmt_eval σ ψ s₂
+           match nnrc_imp_expr_eval σc σ e  with
+           | Some (dbool true) => nnrc_imp_stmt_eval σc σ ψ s₁
+           | Some (dbool false) => nnrc_imp_stmt_eval σc σ ψ s₂
            | _ => None
            end
 
          | NNRCimpEither e x₁ s₁ x₂ s₂ =>
-           match nnrc_imp_expr_eval σ e with
+           match nnrc_imp_expr_eval σc σ e with
            | Some (dleft d) =>
-             match nnrc_imp_stmt_eval ((x₁,Some d)::σ) ψ s₁ with
+             match nnrc_imp_stmt_eval σc ((x₁,Some d)::σ) ψ s₁ with
              | Some (_::σ₂, ψ₂) => Some (σ₂, ψ₂)
              | _ => None
              end
            | Some (dright d) =>
-             match nnrc_imp_stmt_eval ((x₂,Some d)::σ) ψ s₂ with
+             match nnrc_imp_stmt_eval σc ((x₂,Some d)::σ) ψ s₂ with
              | Some (_::σ₂, ψ₂) => Some (σ₂, ψ₂)
              | _ => None
              end
@@ -166,10 +165,10 @@ Section NNRCimpEval.
            end
          end.
 
-    Definition nnrc_imp_eval_top (q:nnrc_imp) : option data
+    Definition nnrc_imp_eval_top (q:nnrc_imp) (σc:bindings) : option data
       :=
         let (s, ret) := q in
-        match nnrc_imp_stmt_eval ((ret, None)::nil) nil s with
+        match nnrc_imp_stmt_eval σc ((ret, None)::nil) nil s with
         | Some ((_, Some dd)::_, _) => Some dd
         | _ => None
         end.
@@ -190,8 +189,8 @@ Section NNRCimpEval.
                [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
             ]; subst.
 
-    Lemma nnrc_imp_stmt_eval_env_stack {s σ₁ ψ₁ σ₂ ψ₂} :
-      nnrc_imp_stmt_eval σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain σ₁ = domain σ₂.
+    Lemma nnrc_imp_stmt_eval_env_stack {s σc σ₁ ψ₁ σ₂ ψ₂} :
+      nnrc_imp_stmt_eval σc σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain σ₁ = domain σ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; simpl in sem; repeat destr sem.
@@ -238,8 +237,8 @@ Section NNRCimpEval.
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
-    Lemma nnrc_imp_stmt_eval_mcenv_stack {s σ₁ ψ₁ σ₂ ψ₂} :
-      nnrc_imp_stmt_eval σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain ψ₁ = domain ψ₂.
+    Lemma nnrc_imp_stmt_eval_mcenv_stack {s σc σ₁ ψ₁ σ₂ ψ₂} :
+      nnrc_imp_stmt_eval σc σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain ψ₁ = domain ψ₂.
     Proof.
       revert σ₁ ψ₁ σ₂ ψ₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; simpl in sem; repeat destr sem.
@@ -290,5 +289,5 @@ Section NNRCimpEval.
 
 End NNRCimpEval.
 
-Arguments nnrc_imp_stmt_eval_env_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
-Arguments nnrc_imp_stmt_eval_mcenv_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
+Arguments nnrc_imp_stmt_eval_env_stack {fruntime h s σc σ₁ ψ₁ σ₂ ψ₂}.
+Arguments nnrc_imp_stmt_eval_mcenv_stack {fruntime h s σc σ₁ ψ₁ σ₂ ψ₂}.
