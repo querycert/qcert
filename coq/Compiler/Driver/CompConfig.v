@@ -17,7 +17,7 @@
 Section CompConfig.
   Require Import List.
   Require Import String.
-  
+
   (* Common *)
   Require Import Utils.
   Require Import CommonSystem.
@@ -27,17 +27,17 @@ Section CompConfig.
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {bm:brand_model}.
-  
+
   Require Import OptimizerLogger.
   Require Import CompLang CompEnv.
-  
+
   Section optim.
     Require Import NNRCOptimizer.
     Require Import NRAEnvOptimizer.
     Require Import OptimizerStep.
 
-    (* CompLang.type_of_language does not suffice, since some language 
-       (the core ones) have optimizations specified in a different language 
+    (* CompLang.type_of_language does not suffice, since some language
+       (the core ones) have optimizations specified in a different language
        (via conversion) *)
 
     Definition optim_type_of_language (l:language) : Set :=
@@ -90,7 +90,7 @@ Section CompConfig.
       vm_compute.
       trivial.
     Qed.
-      
+
   End optim.
 
   Section constants.
@@ -102,6 +102,9 @@ Section CompConfig.
 
     Definition constants_config := list (string * constant_config).
 
+    Definition vars_of_constants_config (cconf:constants_config) :=
+      map fst cconf.
+
     Definition vdbindings_of_constants_config (cconf:constants_config) :=
       map (fun xy => (fst xy, (snd xy).(constant_localization))) cconf.
 
@@ -111,10 +114,10 @@ Section CompConfig.
     Definition tdbinding_of_constant_config (gc:string * constant_config) :=
       let (s,cc) := gc in
       (s,v_and_t_to_dt cc.(constant_localization) cc.(constant_type)).
-    
+
     Definition tdbindings_of_constants_config (gc:constants_config) :=
       map tdbinding_of_constant_config gc.
-    
+
     (* Used to show a constant_config exists for a given tdbindings *)
     Definition constant_config_of_tdbinding_opt (td:string * drtype) : string * constant_config :=
       match td with
@@ -153,7 +156,7 @@ Section CompConfig.
         destruct a; simpl.
         destruct d; simpl; reflexivity.
     Qed.
-    
+
     (* Used to show a constant_config exists for a given avoid list *)
     Definition one_tdbindings_of_avoid_list (avoid:list string) : tdbindings :=
       map (fun x => (x,Tlocal Unit)) avoid.
@@ -169,9 +172,20 @@ Section CompConfig.
       - reflexivity.
       - rewrite IHavoid; reflexivity.
     Qed.
-      
+
+    Lemma vars_of_one_constant_config_of_avoid_list l:
+      vars_of_constants_config (one_constant_config_of_avoid_list l)
+      = l.
+    Proof.
+      unfold one_constant_config_of_avoid_list.
+      induction l; simpl.
+      - reflexivity.
+      - rewrite IHl.
+        reflexivity.
+    Qed.
+
   End constants.
-  
+
   Record driver_config :=
     mkDvConfig
       { comp_qname : string;
@@ -184,7 +198,7 @@ Section CompConfig.
         comp_optim_config : optim_config; }.
 
   (* Trivial driver configuration -- used in some proofs *)
-  
+
   Definition trivial_driver_config : driver_config
     := mkDvConfig
          EmptyString
@@ -210,4 +224,3 @@ Section CompConfig.
       (* comp_optim_config = *) nil.
 
 End CompConfig.
-

@@ -35,6 +35,7 @@ Section CompLang.
     | L_nraenv : language
     | L_nnrc_core : language
     | L_nnrc : language
+    | L_nnrc_imp : language
     | L_nnrcmr : language
     | L_cldmr : language
     | L_dnnrc : language
@@ -78,6 +79,7 @@ Section CompLang.
       | "nraenv"%string => L_nraenv
       | "nnrc_core"%string => L_nnrc_core
       | "nnrc"%string => L_nnrc
+      | "nnrc_imp"%string => L_nnrc_imp
       | "nnrcmr"%string => L_nnrcmr
       | "cldmr"%string => L_cldmr
       | "dnnrc"%string => L_dnnrc
@@ -106,6 +108,7 @@ Section CompLang.
       | L_nraenv => "nraenv"%string
       | L_nnrc_core => "nnrc_core"%string
       | L_nnrc => "nnrc"%string
+      | L_nnrc_imp => "nnrc_imp"%string
       | L_nnrcmr => "nnrcmr"%string
       | L_cldmr => "cldmr"%string
       | L_dnnrc => "dnnrc"%string
@@ -164,6 +167,7 @@ Section CompLang.
         :: (L_nraenv,CoreEnd,"NRAᵉ", "Nested Relational Algebra with Environments")
         :: (L_nnrc_core,CoreEnd,"cNNRC", "Core Named Nested Relational Calculus")
         :: (L_nnrc,CoreEnd,"NNRC", "Named Nested Relational Calculus")
+        :: (L_nnrc_imp,BackEnd,"NNRCimp", "Named Nested Relational Calculus imperative")
         :: (L_nnrcmr,DistrEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
         :: (L_cldmr,DistrEnd,"CldMR", "Named Nested Relational Calculus with Cloudant Map/Reduce")
         :: (L_dnnrc,DistrEnd,"DNNRC", "Distributed Named Nested Relational Calculus")
@@ -246,6 +250,7 @@ Section CompLang.
     Require Import NRARuntime.
     Require Import NRAEnvRuntime.
     Require Import NNRCRuntime.
+    Require Import NNRCimpRuntime.
     Require Import NNRCMRRuntime.
     Require Import CldMRRuntime.
     Require Import DNNRCRuntime.
@@ -283,6 +288,7 @@ Section CompLang.
     Definition nraenv := nraenv.
     Definition nnrc_core := nnrc_core.
     Definition nnrc := nnrc.
+    Definition nnrc_imp := nnrc_imp.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
     Definition dnnrc := dnnrc.
@@ -307,6 +313,7 @@ Section CompLang.
     | Q_nraenv : nraenv -> query
     | Q_nnrc_core : nnrc_core -> query
     | Q_nnrc : nnrc -> query
+    | Q_nnrc_imp : nnrc_imp -> query
     | Q_nnrcmr : nnrcmr -> query
     | Q_cldmr : cldmr -> query
     | Q_dnnrc : dnnrc -> query
@@ -333,6 +340,7 @@ Section CompLang.
       | Case_aux c "Q_nraenv"%string
       | Case_aux c "Q_nnrc_core"%string
       | Case_aux c "Q_nnrc"%string
+      | Case_aux c "Q_nnrc_imp"%string
       | Case_aux c "Q_nnrcmr"%string
       | Case_aux c "Q_cldmr"%string
       | Case_aux c "Q_dnnrc"%string
@@ -359,6 +367,7 @@ Section CompLang.
       | Q_nraenv _ => L_nraenv
       | Q_nnrc_core _ => L_nnrc_core
       | Q_nnrc _ => L_nnrc
+      | Q_nnrc_imp _ => L_nnrc_imp
       | Q_nnrcmr _ => L_nnrcmr
       | Q_cldmr _ => L_cldmr
       | Q_dnnrc _ => L_dnnrc
@@ -391,6 +400,7 @@ Section CompLang.
       | L_nraenv => nraenv
       | L_nnrc_core => nnrc_core
       | L_nnrc => nnrc
+      | L_nnrc_imp => nnrc_imp
       | L_nnrcmr => nnrcmr
       | L_cldmr => cldmr
       | L_dnnrc => dnnrc
@@ -421,6 +431,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_nraenv"%string
   | Case_aux c "L_nnrc_core"%string
   | Case_aux c "L_nnrc"%string
+  | Case_aux c "L_nnrc_imp"%string
   | Case_aux c "L_nnrcmr"%string
   | Case_aux c "L_cldmr"%string
   | Case_aux c "L_dnnrc"%string

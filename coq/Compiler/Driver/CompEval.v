@@ -33,6 +33,7 @@ Section CompEval.
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
+  Require Import NNRCimpRuntime.
   Require Import NNRCMRRuntime.
   Require Import CldMRRuntime.
   Require Import DNNRCRuntime.
@@ -111,6 +112,10 @@ Section CompEval.
     Definition eval_nnrc (q:nnrc) (cenv: bindings) : option data :=
       NNRC.nnrc_eval_top h q cenv.
 
+    (* Language: nnrc_imp *)
+    Definition eval_nnrc_imp (q:nnrc_imp) (cenv: bindings) : option data :=
+      NNRCimpEval.nnrc_imp_eval_top h q cenv.
+
     (* Language: nnrcmr *)
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=
       NNRCMR.nnrcmr_eval_top h init_vinit q dcenv.
@@ -163,6 +168,7 @@ Section CompEval.
       | Q_nraenv q => lift_output (eval_nraenv q (lift_input ev_in))
       | Q_nnrc_core q => lift_output (eval_nnrc_core q (lift_input ev_in))
       | Q_nnrc q => lift_output (eval_nnrc q (lift_input ev_in))
+      | Q_nnrc_imp q => lift_output (eval_nnrc_imp q (lift_input ev_in))
       | Q_nnrcmr q => lift_output (eval_nnrcmr q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
       | Q_cldmr q => lift_output (eval_cldmr q (lift_input ev_in))
       | Q_dnnrc q => lift_output (eval_dnnrc q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
@@ -190,6 +196,7 @@ Section CompEval.
       | Q_nraenv _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nnrc_imp _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_dnnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
@@ -248,6 +255,9 @@ Section CompEval.
     
     Definition eval_nnrc_world (q:nnrc) (world:list data) : option data :=
       eval_nnrc q (mkWorld world).
+
+    Definition eval_nnrc_imp_world (q:nnrc_imp) (world:list data) : option data :=
+      eval_nnrc_imp q (mkWorld world).
     
     Definition eval_nnrcmr_world (q:nnrcmr) (world:list data) : option data :=
       eval_nnrcmr q (mkDistWorld world). (* XXX Creates a distributed WORLD collection XXX *)
@@ -264,4 +274,5 @@ Section CompEval.
   End EvalWorld.
 
 End CompEval.
+
 
