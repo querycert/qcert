@@ -65,7 +65,9 @@ Section NNRCimp.
                       -> var -> nnrc_imp_stmt -> nnrc_imp_stmt
     .
 
-    Definition nnrc_imp := nnrc_imp_stmt.
+    (** [nnrc_imp] is composed of the statement evaluating the query
+        and the variable containing the resulut of the evaluation *)
+    Definition nnrc_imp : Set := (nnrc_imp_stmt * var).
 
   End Syntax.
 

@@ -157,25 +157,24 @@ Section NNRCimpSem.
     Notation "[ s , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
     Notation "[ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
 
-    Reserved Notation "[ [ ret ] ⊢ s ⇓ d  ]".
+    Reserved Notation "[ ⊢ q ⇓ d  ]".
 
-    Inductive nnrc_imp_stmt_sem_top_ret (ret:string) :
-      nnrc_imp -> data -> Prop
+    Inductive nnrc_imp_sem_top : nnrc_imp -> data -> Prop
       :=
-      | sem_NNRCimpTopRet s d :
-          [ s, (ret,None)::nil , nil ⇓ (ret, Some d)::nil, nil ] ->
-          [ [ ret ] ⊢ s ⇓ d  ]
+      | sem_NNRCimpTop (q: nnrc_imp) d :
+          [ (fst q), ((snd q),None)::nil , nil ⇓ ((snd q), Some d)::nil, nil ] ->
+          [ ⊢ q ⇓ d  ]
     where
-    "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
+    "[ ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top q d ) : nnrc_imp.
 
-    Notation "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
+    Notation "[ ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top q d ) : nnrc_imp.
 
   End Denotation.
 
   Notation "[ σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem σ e d) : nnrc_imp.
   Notation "[ s , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
   Notation "[ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
-  Notation "[ [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret ret s d ) : nnrc_imp.
+  Notation "[ ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top q d ) : nnrc_imp.
 
   Section props.
 
@@ -274,7 +273,7 @@ End NNRCimpSem.
 Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem h σc σ e d) : nnrc_imp.
 Notation "[ h , σc ⊢ s , σ₁ , ψ₁ ⇓ σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem h σc s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
 Notation "[ h , σc ⊢ s , σ₁ , ψ₁ ⇓[ v <- dl ] σ₂ , ψ₂ ]" := (nnrc_imp_stmt_sem_iter h σc v dl s σ₁ ψ₁ σ₂ ψ₂ ) : nnrc_imp.
-Notation "[ h , σc ; [ ret ] ⊢ s ⇓ d  ]" := (nnrc_imp_stmt_sem_top_ret h σc ret s d ) : nnrc_imp.
+Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top h σc q d ) : nnrc_imp.
 
 Arguments nnrc_imp_stmt_sem_env_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.
 Arguments nnrc_imp_stmt_sem_mcenv_stack {fruntime h σc s σ₁ ψ₁ σ₂ ψ₂}.

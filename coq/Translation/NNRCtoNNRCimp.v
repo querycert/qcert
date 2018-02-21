@@ -198,6 +198,11 @@ Section NNRCtoNNRCimp.
         | None => None
         end.
 
+    Definition nnrc_stratified_to_nnrc_imp_top (globals: list var) (q: nnrc) :
+      option nnrc_imp
+      :=
+        nnrc_stmt_to_nnrc_imp_stmt globals q.
+
   End from_stratified.
 
 End NNRCtoNNRCimp.

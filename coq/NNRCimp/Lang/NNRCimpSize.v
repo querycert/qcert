@@ -25,7 +25,7 @@ Section NNRCimpSize.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint nnrc_imp_expr_size (n:nnrc_imp_expr) : nat 
+  Fixpoint nnrc_imp_expr_size (n:nnrc_imp_expr) : nat
     := match n with
        | NNRCimpGetConstant v => 1
        | NNRCimpVar v => 1
@@ -35,7 +35,7 @@ Section NNRCimpSize.
        | NNRCimpGroupBy g sl e => S (nnrc_imp_expr_size e)
        end.
 
-    Fixpoint nnrc_imp_stmt_size (n:nnrc_imp_stmt) : nat 
+    Fixpoint nnrc_imp_stmt_size (n:nnrc_imp_stmt) : nat
     := match n with
        | NNRCimpSeq s₁ s₂ => S (nnrc_imp_stmt_size s₁ + nnrc_imp_stmt_size s₂)
        | NNRCimpLetMut v eo s => S ((match eo with Some e => nnrc_imp_expr_size e | None => 0 end) + nnrc_imp_stmt_size s)
@@ -47,8 +47,10 @@ Section NNRCimpSize.
        | NNRCimpEither nd vl nl vr nr => S (nnrc_imp_expr_size nd + nnrc_imp_stmt_size nl + nnrc_imp_stmt_size nr)
        end.
 
-    Definition nnrc_imp_size (n:nnrc_imp) : nat := nnrc_imp_stmt_size n.
-    
+    Definition nnrc_imp_size (q:nnrc_imp) : nat :=
+      let (n, v) := q in
+      nnrc_imp_stmt_size n.
+
     Lemma nnrc_imp_expr_size_nzero (n:nnrc_imp_expr) : nnrc_imp_expr_size n <> 0.
     Proof.
       induction n; simpl; omega.
@@ -59,10 +61,10 @@ Section NNRCimpSize.
       induction n; simpl; omega.
     Qed.
 
-    Corollary nnrc_imp_size_nzero (n:nnrc_imp) : nnrc_imp_size n <> 0.
+    Corollary nnrc_imp_size_nzero (q:nnrc_imp) : nnrc_imp_size q <> 0.
     Proof.
+      destruct q.
       apply nnrc_imp_stmt_size_nzero.
     Qed.
 
 End NNRCimpSize.
-

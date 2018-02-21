@@ -199,13 +199,15 @@ Section NNRCimpSemEval.
       }
   Qed.
 
-  Lemma nnrc_imp_sem_eval ret s d :
-    [ h , σc ; [ret] ⊢ s ⇓ d ] <-> nnrc_imp_stmt_eval_top_ret h σc ret s = Some d.
+  Lemma nnrc_imp_sem_eval q d :
+    [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h σc q = Some d.
   Proof.
-    unfold nnrc_imp_stmt_eval_top_ret.
+    destruct q.
+    unfold nnrc_imp_eval_top.
     split; intros hyp.
     - invcs hyp.
       apply nnrc_imp_stmt_sem_eval in H.
+      simpl in H.
       rewrite H; trivial.
     - destr hyp.
       apply nnrc_imp_stmt_sem_eval in eqq.

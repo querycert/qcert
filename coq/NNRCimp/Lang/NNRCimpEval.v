@@ -166,11 +166,13 @@ Section NNRCimpEval.
            end
          end.
 
-    Definition nnrc_imp_stmt_eval_top_ret (ret:string) (s:nnrc_imp) : option data
-      := match nnrc_imp_stmt_eval ((ret, None)::nil) nil s with
-         | Some ((_, Some dd)::_, _) => Some dd
-         | _ => None
-         end.
+    Definition nnrc_imp_eval_top (q:nnrc_imp) : option data
+      :=
+        let (s, ret) := q in
+        match nnrc_imp_stmt_eval ((ret, None)::nil) nil s with
+        | Some ((_, Some dd)::_, _) => Some dd
+        | _ => None
+        end.
 
   End Evaluation.
 
