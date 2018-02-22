@@ -29,7 +29,7 @@ val parse_json_from_string : string -> QData.json
 
 val parse_rule_from_string : string -> string * QLang.camp_rule
 val parse_camp_from_string : string -> string * QLang.camp
-  
+
 val parse_oql_from_string : string -> QLang.oql
 
 (****************)
@@ -41,6 +41,7 @@ val parse_io_sexp_from_string : string -> QData.qdata
 val parse_camp_sexp_from_string : string -> QLang.camp
 val parse_nraenv_sexp_from_string : string -> QLang.nraenv_core
 val parse_nnrc_sexp_from_string : string -> QLang.nnrc
+val parse_nnrc_imp_sexp_from_string : string -> QLang.nnrc_imp
 val parse_nnrcmr_sexp_from_string : string -> QLang.nnrcmr
 val parse_cldmr_sexp_from_string : string -> QLang.cldmr
 
@@ -49,4 +50,3 @@ val parse_cldmr_sexp_from_string : string -> QLang.cldmr
  *******************)
 
 val parse_query_from_string : QLang.language -> string -> string * QLang.query
-

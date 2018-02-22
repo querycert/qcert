@@ -45,6 +45,9 @@ val sexp_to_sqlpp : sexp -> QLang.sqlpp
 val sexp_to_nnrc : sexp -> QLang.nnrc
 val nnrc_to_sexp : QLang.nnrc -> sexp
 
+val sexp_to_nnrc_imp : sexp -> QLang.nnrc_imp
+val nnrc_imp_to_sexp : QLang.nnrc_imp -> sexp
+
 val sexp_to_nnrcmr : sexp -> QLang.nnrcmr
 val nnrcmr_to_sexp : QLang.nnrcmr -> sexp
 

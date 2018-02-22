@@ -37,6 +37,7 @@ val pretty_nraenv_core : QcertCompiler.nraenv_core pretty_fun
 val pretty_nraenv : QcertCompiler.nraenv pretty_fun
 val pretty_nnrc_core : QcertCompiler.nnrc_core pretty_fun
 val pretty_nnrc : QcertCompiler.nnrc pretty_fun
+val pretty_nnrc_imp : QcertCompiler.nnrc_imp pretty_fun
 val pretty_nnrcmr : QcertCompiler.nnrcmr pretty_fun
 val pretty_cldmr : QcertCompiler.cldmr pretty_fun
 val pretty_dnnrc : QcertCompiler.dnnrc pretty_fun

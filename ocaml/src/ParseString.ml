@@ -47,7 +47,7 @@ let parse_json_from_string s : QData.json = parse_string parse_json s
 
 let parse_rule_from_string s : string * QLang.camp_rule = parse_string parse_rule s
 let parse_camp_from_string s : string * QLang.camp = parse_string parse_camp s
-  
+
 let parse_oql_from_string s : QLang.oql = parse_string parse_oql s
 
 (****************)
@@ -59,6 +59,7 @@ let parse_io_sexp_from_string s : QData.qdata = parse_string parse_io_sexp s
 let parse_camp_sexp_from_string s : QLang.camp = parse_string parse_camp_sexp s
 let parse_nraenv_sexp_from_string s : QLang.nraenv_core = parse_string parse_nraenv_sexp s
 let parse_nnrc_sexp_from_string s : QLang.nnrc = parse_string parse_nnrc_sexp s
+let parse_nnrc_imp_sexp_from_string s : QLang.nnrc_imp = parse_string parse_nnrc_imp_sexp s
 let parse_nnrcmr_sexp_from_string s : QLang.nnrcmr = parse_string parse_nnrcmr_sexp s
 let parse_cldmr_sexp_from_string s : QLang.cldmr = parse_string parse_cldmr_sexp s
 
@@ -72,9 +73,9 @@ let parse_tech_rule_from_string s : QLang.tech_rule =
        (JavaService.main "techRule2CAMP" s))
 let parse_designer_rule_from_string s : QLang.designer_rule =
   QCAMPRule.rule_match
-    (parse_camp_sexp_from_string 
+    (parse_camp_sexp_from_string
        (JavaService.main "serialRule2CAMP" (B64.encode s)))
-    
+
 let parse_query_from_string l s : string * QLang.query =
   begin match l with
   | QcertCompiler.L_sql -> ("SQL", QcertCompiler.Q_sql (AstsToSExp.sexp_to_sql(parse_sexp_from_string (JavaService.main "parseSQL" s))))
