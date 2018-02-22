@@ -218,7 +218,7 @@ Section CompDriver.
     (* Free variables should eventually be passed from the application. *)
     Definition nnrc_to_nnrc_imp (inputs: list var) (q: nnrc) : option nnrc_imp :=
       let nnrc_stratified := NNRCStratify.stratify q in
-      nnrc_stratified_to_nnrc_imp_top inputs q.
+      nnrc_stratified_to_nnrc_imp_top inputs nnrc_stratified.
 
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)
