@@ -41,6 +41,7 @@ Module QLang(runtime:CompilerRuntime).
     Definition nraenv_core := nraenv_core.
     Definition nraenv := nraenv.
     Definition nnrc := nnrc.
+    Definition nnrc_imp := nnrc_imp.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
     Definition dnnrc := dnnrc.
