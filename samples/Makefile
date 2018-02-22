@@ -68,7 +68,7 @@ endif
 OQLPERSONSNUM=1 2 3 4 5 6 7 8
 OQLWORLDNUM=1 2
 OQLEMPLOYEESNUM=1
-OQLTARGETS=oql nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+OQLTARGETS=oql nraenv nnrc nnrc_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 oql-tests:
 	@echo "[Q*cert] "
@@ -139,7 +139,7 @@ oql-employees-tests-js:
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7
-LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrc_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 lambda_nra-tests:
 	@echo "[Q*cert] "
@@ -170,7 +170,7 @@ lambda_nra-persons-tests-js:
 
 ## CAMP
 CAMPWORLDNUM=1
-CAMPTARGETS=camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+CAMPTARGETS=camp nraenv nnrc nnrc_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 camp-tests:
 	@echo "[Q*cert] "
@@ -202,7 +202,7 @@ camp-world-tests-js:
 
 ## SQL
 SQLORGNUM=1 2 3 4 5 6 7 8
-SQLTARGETS=nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+SQLTARGETS=nraenv nnrc nnrc_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 sql-tests:
 	@echo "[Q*cert] "
@@ -233,7 +233,7 @@ sql-org-tests-js:
 
 ## TECHRULE
 TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22 #20
-TECHRULETARGETS=camp_rule camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+TECHRULETARGETS=camp_rule camp nraenv nnrc nnrc_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 tech_rule-tests:
 	@echo "[Q*cert] "
@@ -264,7 +264,7 @@ tech_rule-test-tests-js:
 
 ## DESIGNERRULE
 DESIGNERRULETESTNUM=
-DESIGNERRULETARGETS=camp_rule camp nraenv nnrc nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
+DESIGNERRULETARGETS=camp_rule camp nraenv nnrc nnrc_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 designer_rule-tests:
 	@echo "[Q*cert] "
