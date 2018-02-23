@@ -52,7 +52,7 @@ Section NNRCtoNNRCimp.
                 (nnrc_expr_to_nnrc_imp_expr e1)
          | NNRCGroupBy s ls e1 =>
            lift (NNRCimpGroupBy s ls)
-                 (nnrc_expr_to_nnrc_imp_expr e1)
+                (nnrc_expr_to_nnrc_imp_expr e1)
          | _ => None
          end.
 
@@ -97,22 +97,22 @@ Section NNRCtoNNRCimp.
         apply some_lift2 in eqq.
         destruct eqq as [?[??[??]]]; subst; simpl.
         f_equal; auto.
-       - simpl in eqq.
-         apply some_lift in eqq.
-         destruct eqq as [??]; subst; simpl.
-         f_equal; auto.
-       - simpl in eqq.
-         apply some_lift in eqq.
-         destruct eqq as [??]; subst.
-         simpl nnrc_to_nnrc_base.
-         simpl nnrc_imp_expr_eval.
-         rewrite <- (IHe _ e0).
-         case_eq (nnrc_core_eval h σc σ (nnrc_to_nnrc_base e));
-           [intros ? eqq | intros eqq].
-         + destruct d; try solve [simpl; rewrite eqq; trivial].
-           apply nnrc_group_by_correct; trivial.
-         + simpl.
-           rewrite eqq; trivial.
+      - simpl in eqq.
+        apply some_lift in eqq.
+        destruct eqq as [??]; subst; simpl.
+        f_equal; auto.
+      - simpl in eqq.
+        apply some_lift in eqq.
+        destruct eqq as [??]; subst.
+        simpl nnrc_to_nnrc_base.
+        simpl nnrc_imp_expr_eval.
+        rewrite <- (IHe _ e0).
+        case_eq (nnrc_core_eval h σc σ (nnrc_to_nnrc_base e));
+          [intros ? eqq | intros eqq].
+        + destruct d; try solve [simpl; rewrite eqq; trivial].
+          apply nnrc_group_by_correct; trivial.
+        + simpl.
+          rewrite eqq; trivial.
     Qed.
 
     Inductive terminator :=
@@ -187,7 +187,7 @@ Section NNRCtoNNRCimp.
            | Some e => Some (terminate terminator e)
            | None => None
            end
-        end.
+         end.
 
     Definition nnrc_stmt_to_nnrc_imp_stmt (globals: list var) (stmt: nnrc) :
       option (nnrc_imp_stmt * var)
@@ -202,6 +202,71 @@ Section NNRCtoNNRCimp.
       option nnrc_imp
       :=
         nnrc_stmt_to_nnrc_imp_stmt globals q.
+
+    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some fvs term s :
+      stratifiedLevel nnrcStmt s  ->
+      { s' | nnrc_stmt_to_nnrc_imp_stmt_aux fvs term s = Some s'}.
+    Proof.
+      revert fvs term;
+        induction s; intros fvs term; simpl; intuition; eauto 2; try discriminate
+        ; try unfold nnrc_stmt_to_nnrc_imp_stmt; simpl; eauto 2.
+      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H0) as [e1 eqe1].
+        destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H1) as [e2 eqe2].
+        rewrite eqe1, eqe2; simpl.
+        eauto 2.
+      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e eqe].
+        rewrite eqe; simpl.
+        eauto 2.
+      - destruct (IHs1 (v :: fvs) (Term_assign v) H)  as [s1' eqs1'].
+        destruct (IHs2 (v :: fvs) term H2)  as [s2' eqs2'].
+        rewrite eqs1', eqs2'; simpl.
+        eauto 2.
+      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e1 eqe1].
+        destruct (IHs2 (fresh_var "tmp" fvs :: v :: fvs)
+                       (Term_push (fresh_var "tmp" fvs)) H2)  as [s1' eqs1'].
+        rewrite eqe1, eqs1'; simpl.
+        eauto 2.
+      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e1 eqe1].
+        destruct (IHs2 (fresh_var "tmp" fvs :: fvs)
+                       (Term_assign (fresh_var "tmp" fvs)) H1)  as [s2' eqs2'].
+        destruct (IHs3 (fresh_var "tmp" fvs :: fvs)
+                       (Term_assign (fresh_var "tmp" fvs)) H3)  as [s3' eqs3'].
+        rewrite eqe1, eqs2', eqs3'; simpl.
+        eauto 2.
+      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e1 eqe1].
+        destruct (IHs2 (fresh_var "tmp" fvs :: v :: fvs)
+                       (Term_assign (fresh_var "tmp" fvs)) H1)  as [s2' eqs2'].
+        destruct (IHs3 (fresh_var "tmp" fvs :: v0 :: fvs)
+                       (Term_assign (fresh_var "tmp" fvs)) H3)  as [s3' eqs3'].
+        rewrite eqe1, eqs2', eqs3'; simpl.
+        eauto 2.
+      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H1) as [e1 eqe1].
+        rewrite eqe1; simpl.
+        eauto 2.
+    Defined.
+    
+    Lemma nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s :
+      stratifiedLevel nnrcStmt s  ->
+      { s' | nnrc_stmt_to_nnrc_imp_stmt fvs s = Some s'}.
+    Proof.
+      unfold nnrc_stmt_to_nnrc_imp_stmt.
+      intros strats.
+      destruct (nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some
+                  (fresh_var "ret" fvs :: fvs)
+                  (Term_assign (fresh_var "ret" fvs)) _ strats) as [s' eqs'].
+      rewrite eqs'.
+      eauto 2.
+    Defined.
+
+    Definition stratified_nnrc_stmt_to_nnrc_imp_stmt fvs (s:nnrc)
+               (strats:stratifiedLevel nnrcStmt s) : nnrc_imp
+      := proj1_sig (nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s strats).
+
+    Definition nnrc_to_nnrc_imp_top (globals: list var) (q: nnrc) :
+      nnrc_imp
+      := let nnrc_stratified := NNRCStratify.stratify q in
+         let nnrc_stratified_pf := NNRCStratify.stratify_stratified q in
+         stratified_nnrc_stmt_to_nnrc_imp_stmt globals nnrc_stratified nnrc_stratified_pf.
 
   End from_stratified.
 

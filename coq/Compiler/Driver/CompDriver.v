@@ -216,9 +216,8 @@ Section CompDriver.
       lift_nnrc_core (nnrcToCamp_let avoid) q. (* XXX avoid ? XXX *)
 
     (* Free variables should eventually be passed from the application. *)
-    Definition nnrc_to_nnrc_imp (inputs: list var) (q: nnrc) : option nnrc_imp :=
-      let nnrc_stratified := NNRCStratify.stratify q in
-      nnrc_stratified_to_nnrc_imp_top inputs nnrc_stratified.
+    Definition nnrc_to_nnrc_imp (inputs: list var) (q: nnrc) : nnrc_imp :=
+      nnrc_to_nnrc_imp_top inputs q.
 
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)
@@ -872,11 +871,8 @@ Section CompDriver.
             let q := nnrc_to_nnrc_core q in
             compile_nnrc_core dv q
           | Dv_nnrc_to_nnrc_imp inputs dv =>
-            let q_opt := nnrc_to_nnrc_imp inputs q in
-            match q_opt with
-            | Some q => compile_nnrc_imp dv q
-            | None => (Q_error "Unable to compile NNRC to NNRCimp") :: nil
-            end
+            let q := nnrc_to_nnrc_imp inputs q in
+            compile_nnrc_imp dv q
           | Dv_nnrc_to_nnrcmr vinit inputs_loc dv =>
             let q := nnrc_to_nnrcmr vinit inputs_loc q in
             compile_nnrcmr dv q
