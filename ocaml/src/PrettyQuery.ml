@@ -147,6 +147,7 @@ let rec pretty_nraenv_aux p sym ff a =
   | QcertCompiler.NRAEnvMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
   | QcertCompiler.NRAEnvFlatMap (a1,a2) -> pretty_nraenv_exp p sym sym.chiflat ff a1 (Some a2)
   | QcertCompiler.NRAEnvJoin (a1,a2,a3) -> pretty_infix_dependent p 5 sym pretty_nraenv_aux sym.join ff a1 a2 a3
+  | QcertCompiler.NRAEnvNaturalJoin (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.join ff a1 a2
   | QcertCompiler.NRAEnvProject (atts,a1) ->
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.bpi (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
   | QcertCompiler.NRAEnvGroupBy (g,atts,a1) ->
