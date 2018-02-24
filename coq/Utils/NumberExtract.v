@@ -19,13 +19,14 @@ Require Import JsAst.JsNumber.
 Require Import EquivDec.
 Require Import Extraction.
 
+(** BUG !!! B755_zero false = +0 ; B755_zero true = -0 *)
+(** BUG !!! SAME FOR INFINITY *)
 Extract Inductive Fappli_IEEE.binary_float => float [
   "(fun s -> if s then (0.) else (-0.))"
   "(fun s -> if s then infinity else neg_infinity)"
   "nan"
   "(fun (s, m, e) -> failwith ""FIXME: No extraction from binary float allowed yet."")"
 ]. 
-
 Extract Inlined Constant nan => "nan".
 Extract Inlined Constant zero => "0.".
 Extract Inlined Constant neg_zero => "(-0.)".
@@ -43,13 +44,10 @@ Extract Inlined Constant fmod => "mod_float".
 Extract Inlined Constant sign => "(fun f -> float_of_int (compare f 0.))".
 *)
 
-Extract Inlined Constant from_string => "(fun s -> float_of_string s)".
-Extract Inlined Constant to_string => "(fun x -> Util.char_list_of_string (Util.qcert_string_of_float x))".
-
 (** Defines additional operations on FLOATs *)
 (** Unary operations *)
 
-Axiom sqrt : number -> number.
+Axiom sqrt : number -> number. (** In Flocq *)
 Extract Inlined Constant sqrt => "(fun x -> sqrt x)".
 
 Axiom exp : number -> number.
@@ -64,13 +62,13 @@ Extract Inlined Constant log10 => "(fun x -> log10 x)".
 Axiom ceil : number -> number.
 Extract Inlined Constant ceil => "(fun x -> ceil x)".
 
-Axiom sum : list number -> number.
+Axiom sum : list number -> number. (** Note: + is NOT associative, so check the specification for the evaluation order *)
 Extract Inlined Constant sum => "(fun x -> Util.float_sum x)".
 
-Axiom arithmean : list number -> number.
+Axiom arithmean : list number -> number. (** Note: + is NOT associative, so check the specification for the evaluation order *)
 Extract Inlined Constant arithmean => "(fun x -> Util.float_arithmean x)".
 
-Axiom number_eq : number -> number -> bool.
+Axiom number_eq : number -> number -> bool. (* TODO by Jerome pattern matching on B754 *)
 Extract Inlined Constant number_eq => "(fun x y -> x = y)".
 
 Conjecture number_eq_correct :
@@ -91,7 +89,7 @@ Proof.
 Defined.
   
 Extract Constant number_eq_dec => "(fun n1 n2 -> 0 = compare n1 n2)".
-Extract Constant lt_bool => "(<)".
+Extract Constant lt_bool => "(<)". (* First compare exponent, if same, check mantissa *)
 
 (** Binary operations *)
 Extract Inlined Constant add => "(fun x y -> x +. y)".
@@ -101,7 +99,7 @@ Extract Inlined Constant div => "(fun x y -> x /. y)".
 
 Axiom number_pow : number -> number -> number.
 Extract Inlined Constant number_pow => "(fun x y -> x ** y)".
-Axiom number_min : number -> number -> number.
+Axiom number_min : number -> number -> number. (** Check in JS spec what happens for min/max *)
 Extract Inlined Constant number_min => "(fun x y -> min x y)".
 Axiom number_max : number -> number -> number.
 Extract Inlined Constant number_max => "(fun x y -> max x y)".
@@ -134,9 +132,15 @@ Section Additional.
 End Additional.
 
 Require Import ZArith.
-Axiom number_of_int : Z -> number.
+Axiom number_of_int : Z -> number. (** Binary normalize *)
 Extract Inlined Constant number_of_int => "(fun x -> float_of_int x)".
 
-Axiom truncate : number -> Z.
+Axiom truncate : number -> Z. (** Do like parsing ... *)
 Extract Inlined Constant truncate=> "(fun x -> truncate x)".
+
+(*** NOTE: For floor/ceiling, could be *)
+
+Require Flocq.Appli.Fappli_IEEE Flocq.Appli.Fappli_IEEE_bits.
+Require Import BinPos.
+Require Import ZArith.
 

@@ -39,6 +39,8 @@ Section DatatoJSON.
 
   Section toData.
     Context {ftojson:foreign_to_JSON}.
+    Require Import JsAst.JsNumber.
+    Require Import NumberExtract.
 
     (* JSON to CAMP data model (META Variant) *)
 
@@ -54,6 +56,14 @@ Section DatatoJSON.
         | jarray c => dcoll (map json_to_data_pre c)
         | jobject nil => drec nil
         | jobject ((s1,j')::nil) =>
+          if (string_dec s1 "nat") then
+            match j' with
+            | jnumber n =>
+              dnat (truncate n)
+            | _ =>
+              drec ((s1, json_to_data_pre j')::nil)
+            end
+          else
           if (string_dec s1 "left") then dleft (json_to_data_pre j')
           else if (string_dec s1 "right") then dright (json_to_data_pre j')
                else drec ((s1, json_to_data_pre j')::nil)
