@@ -430,20 +430,6 @@ Section NNRCtoJavaScript.
       := let fprefix := "" in
          nnrcToJSFunStubConstants e i eol quotel params fname fprefix.
 
-    (* Free variables are assumed to be constant lookups *)
-    (* Java equivalent: JavaScriptBackend.closeFreeVars *)
-    Definition closeFreeVars (input:string) (e:nnrc) (params:list string) : nnrc :=
-      let all_free_vars := bdistinct (nnrc_global_vars e) in
-      let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
-          if (in_dec string_dec fv params)
-          then e'
-          else
-            (* note that this is a bit hacky, and relies on the NNRCLet translation to turn this into "vc$", 
-               matching up with the translation of NNRCGetConstant *)
-            (NNRCLet ("c$" ++ fv) (NNRCUnop (OpDot fv) (NNRCVar input)) e')
-      in
-      fold_left wrap_one_free_var all_free_vars e.
-
     (* Java equivalent: JavaScriptBackend.nrcToJSFun *)
     Definition nnrcToJSFun
                (input_v:string)
@@ -453,7 +439,7 @@ Section NNRCtoJavaScript.
                (quotel:string)
                (ivs : list string)
                (fname:string)
-      := let e' := closeFreeVars input_v e ivs in
+      := let e' := closeFreeVars jsSafeSeparator jsIdentifierSanitize (NNRCVar input_v) e ivs in
          nnrcToJSFunStubConstantsAsFunction e' i eol quotel ivs fname.
 
     Definition nnrcToJSMethod
@@ -464,7 +450,7 @@ Section NNRCtoJavaScript.
                (quotel:string)
                (ivs : list string)
                (fname:string)
-      := let e' := closeFreeVars input_v e ivs in
+      := let e' := closeFreeVars jsSafeSeparator jsIdentifierSanitize (NNRCVar input_v) e ivs in
          nnrcToJSFunStubConstantsAsMethod e' i eol quotel ivs fname.
 
     (* Java equivalent: JavaScriptBackend.generateJavaScript *)

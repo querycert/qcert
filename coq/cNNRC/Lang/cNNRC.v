@@ -501,7 +501,7 @@ Section cNNRC.
   End Semantics.
 
   (** * Toplevel *)
-  
+
   (** The Top-level evaluation function is used externally by the
       Q*cert compiler. It takes a cNNRC expression and an global
       environment as input. *)

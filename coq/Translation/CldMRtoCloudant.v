@@ -151,7 +151,7 @@ Section CldMRtoCloudant.
       let init_indent := 1 in
       let '(j0, v0, t0) := nnrcToJSunshadow e_def 1 init_indent eol quotel nil nil in
       nnrcToJSFunStub e_def harness init_indent eol quotel nil "db_default".
-    
+
 	(* Java equivalent: CloudantBackend.nrcToJSGen *)
     Definition nnrcToJSGen (harness:bool) (e_closure:(list var) * nnrc) (eol:string) (quotel:string) :=
       let init_indent := 1 in

@@ -1192,6 +1192,109 @@ Section cNNRCShadow.
     
   End core.
 
-  
+  Section Constants.
+    Open Scope string_scope.
+    
+    Fixpoint nnrc_subst_var_to_const (constants:list string) (e:nnrc) : nnrc 
+      := match e with
+         | NNRCGetConstant y => NNRCGetConstant y
+         | NNRCVar y => if in_dec string_eqdec y constants
+                        then NNRCGetConstant y
+                        else NNRCVar y
+         | NNRCConst d => NNRCConst d
+         | NNRCBinop bop e1 e2 => NNRCBinop bop
+                                            (nnrc_subst_var_to_const constants e1)
+                                            (nnrc_subst_var_to_const constants e2)
+         | NNRCUnop uop e1 => NNRCUnop uop (nnrc_subst_var_to_const constants e1)
+         | NNRCLet y e1 e2 => 
+           NNRCLet y 
+                   (nnrc_subst_var_to_const constants e1) 
+                   (if in_dec string_eqdec y constants
+                    then e2
+                    else nnrc_subst_var_to_const constants e2)
+         | NNRCFor y e1 e2 => 
+           NNRCFor y 
+                   (nnrc_subst_var_to_const constants e1) 
+                   (if in_dec string_eqdec y constants
+                    then e2
+                    else nnrc_subst_var_to_const constants e2)
+         | NNRCIf e1 e2 e3 =>  NNRCIf
+                                 (nnrc_subst_var_to_const constants e1)
+                                 (nnrc_subst_var_to_const constants e2)
+                                 (nnrc_subst_var_to_const constants e3)
+         | NNRCEither ed xl el xr er =>
+           NNRCEither (nnrc_subst_var_to_const constants ed)
+                      xl
+                      (if in_dec string_eqdec xl constants
+                       then el
+                       else nnrc_subst_var_to_const constants el)
+                      xr
+                      (if in_dec string_eqdec xr constants
+                       then er
+                       else nnrc_subst_var_to_const constants er)
+         | NNRCGroupBy g sl e1 => NNRCGroupBy g sl (nnrc_subst_var_to_const constants e1)
+         end.
+    
+    Fixpoint nnrc_subst_const_to_var (constants:list string) (e:nnrc) : nnrc 
+      := match e with
+         | NNRCGetConstant y =>
+           if in_dec string_eqdec y constants
+           then NNRCVar ("c$"++y)
+           else NNRCGetConstant y
+         | NNRCVar y => NNRCVar y
+         | NNRCConst d => NNRCConst d
+         | NNRCBinop bop e1 e2 =>
+           NNRCBinop bop
+                     (nnrc_subst_const_to_var constants e1)
+                     (nnrc_subst_const_to_var constants e2)
+         | NNRCUnop uop e1 =>
+           NNRCUnop uop (nnrc_subst_const_to_var constants e1)
+         | NNRCLet y e1 e2 => 
+           NNRCLet y 
+                   (nnrc_subst_const_to_var constants e1)
+                   (nnrc_subst_const_to_var constants e2)
+         | NNRCFor y e1 e2 => 
+           NNRCFor y 
+                   (nnrc_subst_const_to_var constants e1) 
+                   (nnrc_subst_const_to_var constants e2)
+         | NNRCIf e1 e2 e3 =>
+           NNRCIf
+             (nnrc_subst_const_to_var constants e1)
+             (nnrc_subst_const_to_var constants e2)
+             (nnrc_subst_const_to_var constants e3)
+         | NNRCEither ed xl el xr er =>
+           NNRCEither (nnrc_subst_const_to_var constants ed)
+                      xl
+                      (nnrc_subst_const_to_var constants el)
+                      xr
+                      (nnrc_subst_const_to_var constants er)
+         | NNRCGroupBy g sl e1 =>
+           NNRCGroupBy g sl (nnrc_subst_const_to_var constants e1)
+         end.
+
+    (* Free variables are assumed to be constant lookups *)
+    (* Java equivalent: JavaScriptBackend.closeFreeVars *)
+    Definition closeFreeVars
+               (safeSeparator:string)
+               (identifierSanitize:string -> string)
+               (input_e:nnrc)
+               (e:nnrc)
+               (params:list string) : nnrc :=
+      let all_free_vars := bdistinct (nnrc_global_vars e) in
+      let avoid := map (fun x => "c$" ++ x) all_free_vars in
+      let unshadowed_e := unshadow safeSeparator identifierSanitize avoid e in
+      let unconsted_e := nnrc_subst_const_to_var avoid unshadowed_e in
+      let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
+          if (in_dec string_dec fv all_free_vars)
+          then e'
+          else
+            (* note that this is a bit hacky, and relies on the NNRCLet translation to turn this into "vc$", 
+               matching up with the translation of NNRCGetConstant *)
+            (NNRCLet ("c$" ++ fv) (NNRCUnop (OpDot fv) input_e) e')
+      in
+      fold_left wrap_one_free_var all_free_vars unconsted_e.
+
+  End Constants.
+
 End cNNRCShadow.
 
