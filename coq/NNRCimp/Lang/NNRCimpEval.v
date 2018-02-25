@@ -34,6 +34,7 @@ Section NNRCimpEval.
   Require Import Utils.
   Require Import CommonRuntime.
   Require Import NNRCimp.
+  Require Import NNRCimpVars.
 
   Context {fruntime:foreign_runtime}.
 
@@ -285,6 +286,21 @@ Section NNRCimpEval.
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
+    Lemma nnrc_imp_expr_eval_same σc pd₁ pd₂ s :
+      lookup_equiv_on (nnrc_imp_expr_free_vars s) pd₁ pd₂ ->
+      nnrc_imp_expr_eval σc pd₁ s = nnrc_imp_expr_eval σc pd₂ s.
+    Proof.
+      revert pd₁ pd₂.
+      induction s; simpl; intros; eauto 3.
+      - rewrite H; simpl; tauto.
+      - apply lookup_equiv_on_dom_app in H; destruct H as [leo1 leo2].
+        rewrite (IHs1 _ _ leo1).
+        rewrite (IHs2 _ _ leo2).
+        trivial.
+      - rewrite (IHs _ _ H); trivial.
+      - rewrite (IHs _ _ H); trivial.
+    Qed.
+    
   End props.
 
 End NNRCimpEval.

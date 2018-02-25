@@ -30,14 +30,14 @@ Section DataNorm.
   Context (h:brand_relation_t).
   Fixpoint normalize_data (d:data) : data :=
     match d with
-      | drec rl =>
-        drec (rec_sort (map (fun x => (fst x, normalize_data (snd x))) rl))
-      | dcoll l => dcoll (map normalize_data l)
-      | dleft l => dleft (normalize_data l)
-      | dright l  => dright (normalize_data l)
-      | dbrand b d => dbrand (canon_brands h b) (normalize_data d)
-      | dforeign fd => dforeign (foreign_data_normalize fd)
-      | _ => d
+    | drec rl =>
+      drec (rec_sort (map (fun x => (fst x, normalize_data (snd x))) rl))
+    | dcoll l => dcoll (map normalize_data l)
+    | dleft l => dleft (normalize_data l)
+    | dright l  => dright (normalize_data l)
+    | dbrand b d => dbrand (canon_brands h b) (normalize_data d)
+    | dforeign fd => dforeign (foreign_data_normalize fd)
+    | _ => d
     end.
 
   Inductive data_normalized : data -> Prop :=
@@ -98,7 +98,7 @@ Section DataNorm.
         apply (H (fst a) (snd a)).
         left; destruct a; reflexivity.
         assert (forall (x : string) (y : data),
-                  In (x, y) r -> data_normalized (normalize_data y)); intros.
+                   In (x, y) r -> data_normalized (normalize_data y)); intros.
         apply (H x0 y); right; assumption.
         apply (IHr H0).
         assumption.
@@ -128,8 +128,8 @@ Section DataNorm.
       + rewrite map_id.
         rewrite rec_sorted_id; trivial.
       + revert H2. apply Forall_impl_in.
-         destruct a; unfold id; simpl; intros.
-         f_equal; eauto.
+        destruct a; unfold id; simpl; intros.
+        f_equal; eauto.
     - inversion 1; subst. rewrite (IHd H1); trivial.
     - inversion 1; subst. rewrite (IHd H1); trivial.
     - inversion 1; subst.
@@ -142,10 +142,10 @@ Section DataNorm.
   Qed.
 
   Lemma map_normalize_normalized_eq c :
-        Forall (fun x => data_normalized (snd x)) c ->
-        (map
-           (fun x0 : string * data => (fst x0, normalize_data (snd x0)))
-           c) = c.
+    Forall (fun x => data_normalized (snd x)) c ->
+    (map
+       (fun x0 : string * data => (fst x0, normalize_data (snd x0)))
+       c) = c.
   Proof.
     induction c; simpl; trivial.
     destruct a; inversion 1; simpl in *; subst.
@@ -236,6 +236,14 @@ Section DataNorm.
   Proof.
     intros F; econstructor; trivial.
     apply Forall_sorted; trivial.
+  Qed.
+
+  Lemma data_normalized_dcoll_Forall l :
+    data_normalized (dcoll l) <-> Forall data_normalized l.
+  Proof.
+    split; intros H.
+    - invcs H; trivial.
+    - constructor; trivial.
   Qed.
   
 End DataNorm.

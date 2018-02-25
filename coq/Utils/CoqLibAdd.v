@@ -829,7 +829,59 @@ Section CoqLibAdd.
     - left; congruence.
   Defined.
 
-  
+  Section equiv.
+    
+    Lemma Equivalence_by_iff {A} (R1 R2:A->A->Prop):
+      (forall a b, R1 a b <-> R2 a b) ->
+      Equivalence R1 <-> Equivalence R2.
+    Proof.
+      revert R1 R2.
+      cut (forall R1 R2,  (forall a b : A, R1 a b <-> R2 a b) -> Equivalence R1 -> Equivalence R2).
+      - intros HH R1 R2 H; split.
+        + apply HH; trivial.
+        + apply HH. split; apply H.
+      - intros R1 R2 H ?.
+        constructor; red; intros.
+        + apply H; reflexivity.
+        + apply H; symmetry; apply H; trivial.
+        + apply H; etransitivity; apply H; eauto.
+    Qed.
+
+    Lemma EqDec_by_iff {A} (R1 R2:A->A->Prop)
+          {equiv1:Equivalence R1} {equiv2:Equivalence R2} :
+      (forall a b, R1 a b <-> R2 a b) ->
+      EqDec A R1 -> EqDec A R2.
+    Proof.
+      red.
+      intros eqs dec; intros.
+      destruct (x == y).
+      - left. apply eqs; trivial.
+      - right. intro eq1; apply eqs in eq1. apply (c eq1).
+    Defined.
+
+    Lemma EqDec_by_iff' {A} (R1 R2:A->A->Prop)
+          {equiv1:Equivalence R1} {equiv2:Equivalence R2} :
+      (forall a b, R1 a b <-> R2 a b) ->
+      EqDec A R2 -> EqDec A R1.
+    Proof.
+      red.
+      intros eqs dec; intros.
+      destruct (x == y).
+      - left. apply eqs; trivial.
+      - right. intro eq1; apply eqs in eq1. apply (c eq1).
+    Defined.
+
+    Lemma Equivalence_pullback {A B} (R:B->B->Prop) (f:A->B):
+      Equivalence R ->
+      Equivalence (fun x y => R (f x) (f y)).
+    Proof.
+      constructor; red; intros.
+      - reflexivity.
+      - symmetry; trivial.
+      - etransitivity; eauto.
+    Qed.
+          
+  End equiv.
 End CoqLibAdd.
 
 (** * Tactics *)
@@ -922,4 +974,8 @@ Class ToString (A:Type)
   := {
       toString (a:A) : string
     }.
+
+Ltac string_eqdec_to_equiv :=
+  replace string_eqdec with (equiv_dec (EqDec:=string_eqdec)) in * by trivial.
+
 

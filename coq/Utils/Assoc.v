@@ -253,6 +253,26 @@ Section Assoc.
         congruence.
     Qed.
 
+    Lemma Forall_update_first P (l:list (A*B)) x v : 
+      Forall P l ->
+      P (x,v) ->
+      Forall P (update_first l x v).
+    Proof.
+      induction l; simpl; trivial; intros.
+      invcs H.
+      destruct a.
+      match_destr; subst; eauto.
+    Qed.
+
+    Lemma update_first_in_or {l : list (A * B)} {z} {x} {v} :
+      In z (update_first l x v) ->
+      In z l \/ z = (x,v).
+    Proof.
+      induction l; simpl; intuition.
+      destruct a.
+      match_destr_in H; subst; simpl in *; intuition.
+    Qed.
+
     Lemma lookup_some_nodup_perm {l l'} a v:
       NoDup (domain l) -> 
       Permutation l l' ->
@@ -381,6 +401,56 @@ Section Assoc.
     eapply in_dom.
     apply cut_down_to_in; simpl.
     eauto.
+  Qed.
+
+  Lemma cut_down_to_lookup_some
+        {A B} {dec:EqDec A eq}
+        (l:list (A*B)) l2 a y :
+    lookup dec (cut_down_to l l2) a = Some y -> 
+    lookup dec l a = Some y /\ In a l2 .
+  Proof.
+    unfold cut_down_to.
+    induction l; simpl; try discriminate.
+    destruct a0; intros.
+    case_eq (existsb (fun z : A => fst (a0, b) ==b z) l2); intros eqq1
+    ; rewrite eqq1 in H.
+    - apply existsb_exists in eqq1.
+      destruct eqq1 as [? [??]].
+      simpl in *.
+      unfold equiv_decb in H1.
+      match_destr_in H1.
+      red in e; subst.
+      match_destr.
+      + invcs H.
+        red in e; subst; tauto.
+      + auto.
+    - destruct (IHl H).
+      rewrite H0.
+      match_destr; try tauto.
+      rewrite existsb_not_forallb, negb_false_iff, forallb_forall in eqq1.
+      red in e; subst.
+      specialize (eqq1 _ H1).
+      simpl in eqq1.
+      unfold equiv_decb in eqq1.
+      match_destr_in eqq1.
+      red in c; congruence.
+  Qed.
+
+  Lemma cut_down_to_lookup_in
+        {A B} {dec:EqDec A eq}
+        (l:list (A*B)) l2 a  :
+    In a l2 ->
+    lookup dec (cut_down_to l l2) a = lookup dec l a.
+  Proof.
+    intros inn.
+    induction l; simpl; trivial.
+    destruct a0; simpl.
+    case_eq (existsb (fun z : A =>a0 ==b z) l2); intros eqq1; simpl; rewrite IHl; trivial.
+    rewrite existsb_not_forallb, negb_false_iff, forallb_forall in eqq1.
+    specialize (eqq1 _ inn).
+    unfold equiv_decb in eqq1.
+    match_destr_in eqq1.
+    destruct (dec a a0); congruence.
   Qed.
 
   Global Instance domain_incl_proper A B : Proper (@incl (A*B) ==> @incl A) (@domain A B).
@@ -1196,6 +1266,73 @@ Section Assoc.
     Qed.
     
   End Lookup_diff.
+
+  Section Lookup_equiv_on.
+
+    Definition lookup_equiv_on {A B} {dec:EqDec A eq}
+               (dom:list A) (l1 l2:list (A*B))
+      := forall x, In x dom -> lookup dec l1 x = lookup dec l2 x.
+    
+    Lemma cut_down_to_lookup_equiv_on {A B} {dec:EqDec A eq}
+          (l:list (A*B)) l2 :
+      lookup_equiv_on l2 (cut_down_to l l2) l.
+    Proof.
+      red.
+      apply cut_down_to_lookup_in.
+    Qed.
+    
+    Lemma lookup_equiv_on_is_cut_down_equiv  {A B} {dec:EqDec A eq}
+          (dom:list A) (l1 l2:list (A*B))
+      : lookup_equiv_on dom l1 l2
+        <->
+        lookup_equiv (cut_down_to l1 dom) (cut_down_to l2 dom).
+    Proof.
+      unfold lookup_equiv, lookup_equiv_on; split; intros.
+      -  case_eq (lookup dec (cut_down_to l2 dom) x).
+         + intros ? xlo.
+           apply cut_down_to_lookup_some in xlo.
+           destruct xlo as [xloeq inx].
+           rewrite <- H in xloeq by trivial.
+           rewrite cut_down_to_lookup_in; trivial.
+         + case_eq (lookup dec (cut_down_to l1 dom) x); trivial.
+           intros ? xlo1 xlo2.
+           apply cut_down_to_lookup_some in xlo1.
+           destruct xlo1 as [xloeq inx].
+           rewrite H in xloeq by trivial.
+           rewrite cut_down_to_lookup_in in xlo2 by trivial.
+           congruence.
+      - specialize (H x).
+        repeat rewrite cut_down_to_lookup_in in H by trivial.
+        trivial.
+    Qed.
+
+    Global Instance lookup_equiv_on_equiv {A B} {dec:EqDec A eq} l
+      : Equivalence (@lookup_equiv_on A B dec l).
+    Proof.
+      apply (Equivalence_by_iff _ _ (lookup_equiv_on_is_cut_down_equiv l)).
+      apply Equivalence_pullback.
+      apply lookup_equiv_equiv.
+    Qed.
+
+    Lemma lookup_equiv_on_dom_incl  {A B} {dec:EqDec A eq}
+          (dom1 dom2:list A) (l1 l2:list (A*B))
+      : incl dom2 dom1 ->
+        lookup_equiv_on dom1 l1 l2 ->
+        lookup_equiv_on dom2 l1 l2.
+    Proof.
+      unfold lookup_equiv_on; intuition.
+    Qed.
+
+    Lemma lookup_equiv_on_dom_app  {A B} {dec:EqDec A eq}
+          (dom1 dom2:list A) (l1 l2:list (A*B))
+      : lookup_equiv_on (dom1++dom2) l1 l2 ->
+        lookup_equiv_on dom1 l1 l2 
+        /\ lookup_equiv_on dom2 l1 l2.
+    Proof.
+      unfold lookup_equiv_on; intuition.
+    Qed.
+
+  End Lookup_equiv_on.
 
   Section Substlist.
     

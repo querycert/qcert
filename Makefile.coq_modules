@@ -176,6 +176,8 @@ MODULES = \
 	NNRC/NNRCOptim \
 	NNRCimp/Lang/NNRCimp \
 	NNRCimp/Lang/NNRCimpSize \
+	NNRCimp/Lang/NNRCimpVars \
+	NNRCimp/Lang/NNRCimpNorm \
 	NNRCimp/Lang/NNRCimpSem \
 	NNRCimp/Lang/NNRCimpEval \
 	NNRCimp/Lang/NNRCimpSemEval \

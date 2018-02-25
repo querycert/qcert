@@ -17,5 +17,6 @@
 Require Export CommonRuntime.
 Require Export NNRCimp.
 Require Export NNRCimpSize.
+Require Export NNRCimpVars.
 Require Export NNRCimpEval.
 
