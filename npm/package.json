@@ -1,7 +1,7 @@
 {
 	"name": "qcert",
 	"version": "1.0.6",
-	"description": "The Q*Cert compiler",
+	"description": "The Q*cert compiler",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/querycert/qcert"
