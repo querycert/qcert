@@ -1239,7 +1239,7 @@ Section cNNRCShadow.
       := match e with
          | NNRCGetConstant y =>
            if in_dec string_eqdec y constants
-           then NNRCVar ("c$"++y)
+           then NNRCVar y
            else NNRCGetConstant y
          | NNRCVar y => NNRCVar y
          | NNRCConst d => NNRCConst d
@@ -1281,16 +1281,12 @@ Section cNNRCShadow.
                (e:nnrc)
                (params:list string) : nnrc :=
       let all_free_vars := bdistinct (nnrc_global_vars e) in
-      let avoid := map (fun x => "c$" ++ x) all_free_vars in
-      let unshadowed_e := unshadow safeSeparator identifierSanitize avoid e in
-      let unconsted_e := nnrc_subst_const_to_var avoid unshadowed_e in
+      let unshadowed_e := unshadow safeSeparator identifierSanitize all_free_vars e in
+      let unconsted_e := nnrc_subst_const_to_var all_free_vars unshadowed_e in
       let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
           if (in_dec string_dec fv all_free_vars)
-          then e'
-          else
-            (* note that this is a bit hacky, and relies on the NNRCLet translation to turn this into "vc$", 
-               matching up with the translation of NNRCGetConstant *)
-            (NNRCLet ("c$" ++ fv) (NNRCUnop (OpDot fv) input_e) e')
+          then (NNRCLet fv (NNRCUnop (OpDot fv) input_e) e')
+          else e'
       in
       fold_left wrap_one_free_var all_free_vars unconsted_e.
 
