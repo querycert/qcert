@@ -34,6 +34,7 @@ MODULES = \
 	Utils/Bag \
 	Utils/Var \
 	Utils/Closure \
+	Utils/Result \
 	Utils/JSON \
 	Utils/OptimizerStep \
 	Utils/OptimizerLogger \
