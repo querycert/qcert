@@ -244,20 +244,22 @@ Section NNRCtoNNRCimp.
         rewrite eqe1; simpl.
         eauto 2.
     Defined.
-    
+
     Lemma nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s :
       stratifiedLevel nnrcStmt s  ->
       { s' | nnrc_stmt_to_nnrc_imp_stmt fvs s = Some s'}.
     Proof.
-      unfold nnrc_stmt_to_nnrc_imp_stmt.
-      intros strats.
-      destruct (nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some
-                  (fresh_var "ret" fvs :: fvs)
-                  (Term_assign (fresh_var "ret" fvs)) _ strats) as [s' eqs'].
-      rewrite eqs'.
+      case_eq (nnrc_stmt_to_nnrc_imp_stmt fvs s).
+      - eauto.
+      - unfold nnrc_stmt_to_nnrc_imp_stmt.
+        intros cpf strats.
+        destruct (nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some
+                    ((fresh_var "ret" fvs)::fvs)
+                    (Term_assign (fresh_var "ret" fvs)) _ strats) as [s' eqs'].
+      rewrite eqs' in cpf.
       eauto 2.
     Defined.
-
+    
     Definition stratified_nnrc_stmt_to_nnrc_imp_stmt fvs (s:nnrc)
                (strats:stratifiedLevel nnrcStmt s) : nnrc_imp
       := proj1_sig (nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s strats).
