@@ -576,6 +576,10 @@ Notation "{| e1 | '$' x ∈ e2 |}" := (NNRCFor x%string e2 e1) (at level 50, for
 Notation "'let' '$' x ':=' e2 'in' e1" := (NNRCLet x%string e2 e1) (at level 50, format "'[hv' 'let'  '$' x  ':='  '[' e2 ']'  '/' 'in'  '[' e1 ']' ']'") : nnrc_scope.
 Notation "e1 ? e2 : e3" := (NNRCIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  e2 '/' :  e3 ']'") : nnrc_scope.
 
+Notation "r1 ‵+ r2" := (NNRCBinop (OpArithBinary ArithPlus) r1 r2) (right associativity, at level 65): nnrc_scope.
+Notation "r1 ‵* r2" := (NNRCBinop (OpArithBinary ArithMult) r1 r2) (right associativity, at level 65): nnrc_scope.
+Notation "‵abs r" := (NNRCUnop (OpArithUnary ArithAbs) r) (right associativity, at level 64): nnrc_scope.
+
 Tactic Notation "nnrc_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "NNRCGetConstant"%string
