@@ -134,7 +134,7 @@ Section NNRCtoNNRCimp.
                  nnrc_stmt_to_nnrc_imp_stmt_aux (v::fvs) terminator s2
            with
            | Some s1', Some s2' =>
-             Some (NNRCimpLetMut v None (NNRCimpSeq s1' s2'))
+             Some (NNRCimpLetMut v s1' s2')
            | _, _ => None
            end
          | NNRCFor v e s =>
@@ -143,7 +143,7 @@ Section NNRCtoNNRCimp.
                  nnrc_stmt_to_nnrc_imp_stmt_aux (tmp::v::fvs) (Term_push tmp) s
            with
            | Some e', Some s' =>
-             Some (NNRCimpBuildCollFor
+             Some (NNRCimpLetMut
                      tmp
                      (NNRCimpFor v e' s')
                      (terminate terminator (NNRCimpVar tmp)))
@@ -157,10 +157,9 @@ Section NNRCtoNNRCimp.
            with
            | Some e', Some s1', Some s2' =>
              Some (NNRCimpLetMut
-                     tmp None
-                     (NNRCimpSeq
+                     tmp 
                         (NNRCimpIf e' s1' s2')
-                        (terminate terminator (NNRCimpVar tmp))))
+                        (terminate terminator (NNRCimpVar tmp)))
            | _, _, _ => None
            end
          | NNRCEither e x1 s1 x2 s2 =>
@@ -171,10 +170,9 @@ Section NNRCtoNNRCimp.
            with
            | Some e', Some s1', Some s2' =>
              Some (NNRCimpLetMut
-                     tmp None
-                     (NNRCimpSeq
+                     tmp 
                         (NNRCimpEither e' x1 s1' x2 s2')
-                        (terminate terminator (NNRCimpVar tmp))))
+                        (terminate terminator (NNRCimpVar tmp)))
            | _, _, _ => None
            end
          | NNRCGroupBy _ _ _

@@ -73,88 +73,84 @@ Section NNRCimpNorm.
   Local Open Scope string.
 
   Lemma nnrc_imp_stmt_eval_normalized
-        (σ:pd_bindings) (ψ:mc_bindings) (s:nnrc_imp_stmt)
-        (σ':pd_bindings) (ψ':mc_bindings) :
-    nnrc_imp_stmt_eval h σc σ ψ s = Some (σ', ψ') ->
+        (σ:pd_bindings) (ψc:mc_bindings) (ψd:md_bindings)
+        (s:nnrc_imp_stmt)
+        (σ':pd_bindings) (ψc':mc_bindings) (ψd':md_bindings) :
+    nnrc_imp_stmt_eval h σc σ ψc ψd s = Some (σ', ψc', ψd') ->
     Forall (data_normalized h) (map snd σc) ->
     (forall x, In (Some x) (map snd σ) -> data_normalized h x)  ->
-    Forall (Forall (data_normalized h)) (map snd ψ) ->
+    Forall (Forall (data_normalized h)) (map snd ψc) ->
+    (forall x, In (Some x) (map snd ψd) -> data_normalized h x)  ->
     (forall x, In (Some x) (map snd σ') -> data_normalized h x)  /\
-    Forall (Forall (data_normalized h)) (map snd ψ').
+    Forall (Forall (data_normalized h)) (map snd ψc') /\
+    (forall x, In (Some x) (map snd ψd') -> data_normalized h x).
   Proof.
     intros eqq Fσc.
-    revert σ ψ σ' ψ' eqq.
-    nnrc_imp_stmt_cases (induction s) Case; intros σ ψ σ' ψ' eqq Fσ Fψ'; simpl in *.
+    revert σ ψc ψd σ' ψc' ψd' eqq.
+    nnrc_imp_stmt_cases (induction s) Case; intros  σ ψc ψd σ' ψc' ψd' eqq Fσ Fψc' Fψd'; simpl in *.
     - Case "NNRCimpSeq".
-      match_case_in eqq; [intros ? eqq1 | intros eqq1]
+      match_case_in eqq; [intros [[??]?] eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      destruct p.
-      destruct (IHs1 _ _ _ _ eqq1); eauto.
-    -  Case "NNRCimpLetMut".
-       destruct o.
-       + match_case_in eqq; [intros ? eqq1 | intros eqq1]
+      destruct (IHs1 _ _ _ _ _ _  eqq1) as [?[??]]; eauto.
+    -  Case "NNRCimpLet".
+       match_case_in eqq; [intros ? eqq1 | intros eqq1]
          ; rewrite eqq1 in eqq; try discriminate.
          match_case_in eqq; [intros ? eqq2 | intros eqq2]
          ; rewrite eqq2 in eqq; try discriminate.
-         destruct p.
+         destruct p as [[??]?].
          destruct p; try discriminate.
          invcs eqq.
          apply nnrc_imp_expr_eval_normalized in eqq1; eauto.
-         specialize (IHs _ _ _ _ eqq2).
+         specialize (IHs _ _ _ _ _ _ eqq2).
          cut_to IHs.
          * intuition.
            apply H; simpl; eauto.
          * simpl; intuition.
            invcs H0; auto.
          * eauto.
-       + match_case_in eqq; [intros ? eqq1 | intros eqq1]
-         ; rewrite eqq1 in eqq; try discriminate.
-         destruct p.
-         destruct p; try discriminate.
-         invcs eqq.
-         specialize (IHs _ _ _ _ eqq1).
-         cut_to IHs.
-         * intuition.
-           apply H; simpl; eauto.
-         * simpl; intuition.
-           invcs H0; auto.
          * eauto.
-    - Case "NNRCimpBuildCollFor".
+    - Case "NNRCimpLetMut".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      destruct p.
+      destruct p as [[??]?].
+      destruct m0; try discriminate.
+      destruct p0.
+      match_case_in eqq; [intros ? eqq2 | intros eqq2]
+      ; rewrite eqq2 in eqq; try discriminate.
+      destruct p0 as [[??]?].
+      destruct p0; try discriminate.
+      invcs eqq.
+      specialize (IHs1 _ _ _ _ _ _ eqq1).
+      specialize (IHs2 _ _ _ _ _ _ eqq2).
+      simpl in *.
+      cut_to IHs1.
+      + cut_to IHs2; intuition.
+      + intuition.
+      + intuition.
+      + intuition; try discriminate.
+    - Case "NNRCimpLetMutColl".
+      match_case_in eqq; [intros ? eqq1 | intros eqq1]
+      ; rewrite eqq1 in eqq; try discriminate.
+      destruct p as [[??]?].
       destruct m; try discriminate.
       destruct p0.
       match_case_in eqq; [intros ? eqq2 | intros eqq2]
       ; rewrite eqq2 in eqq; try discriminate.
-      destruct p0.
+      destruct p0 as [[??]?].
       destruct p0; try discriminate.
       invcs eqq.
-      specialize (IHs1 _ _ _ _ eqq1).
-      specialize (IHs2 _ _ _ _ eqq2).
+      specialize (IHs1 _ _ _ _ _ _ eqq1).
+      specialize (IHs2 _ _ _ _ _ _ eqq2).
       simpl in *.
       cut_to IHs1.
-      + cut_to IHs2; intuition.
-        * invcs H0.
-          invcs H2.
+      + cut_to IHs2; simpl; intuition.
+        * invcs H3.
+          invcs H1.
           constructor; trivial.
-        * invcs H0; intuition.
+        * invcs H1; trivial.
       + intuition.
       + intuition.
-    - Case "NNRCimpPush".
-      match_case_in eqq; [intros ? eqq1 | intros eqq1]
-      ; rewrite eqq1 in eqq; try discriminate.
-      match_case_in eqq; [intros ? eqq2 | intros eqq2]
-      ; rewrite eqq2 in eqq; try discriminate.
-      invcs eqq.
-      intuition.
-      rewrite Forall_map in *.
-      apply Forall_update_first; simpl; trivial.
-      constructor.
-      + eapply nnrc_imp_expr_eval_normalized; eauto.
-      +  apply lookup_in in eqq2.
-         rewrite Forall_forall in Fψ'.
-         apply (Fψ' _ eqq2).
+      + intuition; try discriminate.
     - Case "NNRCimpAssign".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
@@ -167,26 +163,41 @@ Section NNRCimpNorm.
       simpl in *; subst.
       apply update_first_in_or in inn.
       destruct inn.
-      + eapply Fσ.
+      + eapply Fψd'.
         apply in_map_iff; eexists; split; eauto; simpl; eauto.
       + invcs H.
         eapply nnrc_imp_expr_eval_normalized; eauto.
+    - Case "NNRCimpPush".
+      match_case_in eqq; [intros ? eqq1 | intros eqq1]
+      ; rewrite eqq1 in eqq; try discriminate.
+      match_case_in eqq; [intros ? eqq2 | intros eqq2]
+      ; rewrite eqq2 in eqq; try discriminate.
+      invcs eqq.
+      intuition.
+      rewrite Forall_map in *.
+      apply Forall_update_first; simpl; trivial.
+      constructor.
+      + eapply nnrc_imp_expr_eval_normalized; eauto.
+      +  apply lookup_in in eqq2.
+         rewrite Forall_forall in Fψc'.
+         apply (Fψc' _ eqq2).
     - Case "NNRCimpFor".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       destruct d; try discriminate.
       apply nnrc_imp_expr_eval_normalized in eqq1; eauto 2.
-      revert σ ψ σ' ψ' eqq Fσ Fψ' eqq1.
-      induction l; intros σ ψ σ' ψ' eqq Fσ Fψ' eqq1; simpl.
+      revert σ ψc ψd σ' ψc' ψd' eqq Fσ Fψc' Fψd' eqq1.
+      induction l; intros σ ψc ψd σ' ψc' ψd' eqq Fσ Fψc' Fψd' eqq1; simpl.
       + invcs eqq; intuition.
       + match_case_in eqq; [intros ? eqq2 | intros eqq2]
         ; rewrite eqq2 in eqq; try discriminate.
-        destruct p; destruct p; try discriminate.
+        destruct p as [[??]?]; destruct p; try discriminate.
         apply data_normalized_dcoll in eqq1.
         apply IHs in eqq2; simpl in *.
-        * apply (IHl _ _ _ _ eqq); intuition.
+        * apply (IHl _ _ _ _ _ _ eqq); intuition.
         * intuition.
           invcs H2; intuition.
+        * intuition.
         * intuition.
     - Case "NNRCimpIf".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
@@ -203,12 +214,12 @@ Section NNRCimpNorm.
       destruct d; try discriminate;
         (match_case_in eqq; [intros ? eqq2 | intros eqq2]
          ; rewrite eqq2 in eqq; try discriminate
-         ; destruct p; destruct p; try discriminate; invcs eqq)
+         ; destruct p as [[??]?]; destruct p; try discriminate; invcs eqq)
         ; invcs Fd.
-      + specialize (IHs1 _ _ _ _ eqq2).
+      + specialize (IHs1 _ _ _ _ _ _ eqq2).
         cut_to IHs1; simpl in *; intuition.
         invcs H1; intuition.
-      + specialize (IHs2 _ _ _ _ eqq2).
+      + specialize (IHs2 _ _ _ _ _ _ eqq2).
         cut_to IHs2; simpl in *; intuition.
         invcs H1; intuition.
   Qed.
@@ -217,3 +228,8 @@ End NNRCimpNorm.
 
 Hint Resolve nnrc_imp_expr_eval_normalized.
 Hint Resolve nnrc_imp_stmt_eval_normalized.
+
+Arguments nnrc_imp_expr_eval_normalized {fruntime h σc σ e o}.
+
+Arguments nnrc_imp_stmt_eval_normalized {fruntime h σc σ ψc ψd s σ' ψc' ψd'}.
+

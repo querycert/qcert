@@ -480,11 +480,11 @@ let rec nnrc_imp_stmt_to_sexp s : sexp =
   match s with
   | NNRCimpSeq (s1, s2) ->
     STerm ("NNRCimpSeq", [ nnrc_imp_stmt_to_sexp s1; nnrc_imp_stmt_to_sexp s2])
-  | NNRCimpLetMut (v, None, s) -> STerm ("NNRCimpLetMut", [SString (string_of_char_list v); nnrc_imp_stmt_to_sexp s])
-  | NNRCimpLetMut (v, Some e, s) -> STerm ("NNRCimpLetMut", [SString (string_of_char_list v); nnrc_imp_expr_to_sexp e; nnrc_imp_stmt_to_sexp s])
-  | NNRCimpBuildCollFor (v, s1, s2) -> STerm ("NNRCimpBuildCollFor", [SString (string_of_char_list v); nnrc_imp_stmt_to_sexp s1; nnrc_imp_stmt_to_sexp s2])
-  | NNRCimpPush (v, e) -> STerm ("NNRCimpPush", [SString (string_of_char_list v); nnrc_imp_expr_to_sexp e])
+  | NNRCimpLet (v, e, s) -> STerm ("NNRCimpLet", [SString (string_of_char_list v); nnrc_imp_expr_to_sexp e; nnrc_imp_stmt_to_sexp s])
+  | NNRCimpLetMut (v, s1, s2) -> STerm ("NNRCimpLetMut", [SString (string_of_char_list v); nnrc_imp_stmt_to_sexp s1; nnrc_imp_stmt_to_sexp s2])
+  | NNRCimpLetMutColl (v, s1, s2) -> STerm ("NNRCimpLetMutColl", [SString (string_of_char_list v); nnrc_imp_stmt_to_sexp s1; nnrc_imp_stmt_to_sexp s2])
   | NNRCimpAssign (v, e) -> STerm ("NNRCimpAssign", [SString (string_of_char_list v); nnrc_imp_expr_to_sexp e])
+  | NNRCimpPush (v, e) -> STerm ("NNRCimpPush", [SString (string_of_char_list v); nnrc_imp_expr_to_sexp e])
   | NNRCimpFor (v, e, s) -> STerm ("NNRCimpFor", [SString (string_of_char_list v); nnrc_imp_expr_to_sexp e; nnrc_imp_stmt_to_sexp s])
   | NNRCimpIf (e, s1, s2) -> STerm ("NNRCimpIf", [nnrc_imp_expr_to_sexp e; nnrc_imp_stmt_to_sexp s1; nnrc_imp_stmt_to_sexp s2])
   | NNRCimpEither (e,v1,s1,v2,s2) -> STerm ("NNRCimpEither",
@@ -513,11 +513,11 @@ let rec sexp_to_nnrc_imp_expr (se:sexp) =
 let rec sexp_to_nnrc_imp_stmt (se:sexp) =
   match se with
   | STerm ("NNRCimpSeq", [s1; s2]) -> NNRCimpSeq (sexp_to_nnrc_imp_stmt s1, sexp_to_nnrc_imp_stmt s1)
-  | STerm ("NNRCimpLetMut", [SString v; s]) -> NNRCimpLetMut (char_list_of_string v, None, sexp_to_nnrc_imp_stmt s)
-  | STerm ("NNRCimpLetMut", [SString v; e; s]) -> NNRCimpLetMut (char_list_of_string v, Some (sexp_to_nnrc_imp_expr e), sexp_to_nnrc_imp_stmt s)
-  | STerm ("NNRCimpBuildCollFor", [SString v; s1; s2]) -> NNRCimpBuildCollFor (char_list_of_string v, sexp_to_nnrc_imp_stmt s1, sexp_to_nnrc_imp_stmt s2)
-  | STerm ("NNRCimpPush", [SString v; e]) -> NNRCimpPush (char_list_of_string v, sexp_to_nnrc_imp_expr e)
+  | STerm ("NNRCimpLet", [SString v; e; s]) -> NNRCimpLet (char_list_of_string v, (sexp_to_nnrc_imp_expr e), sexp_to_nnrc_imp_stmt s)
+  | STerm ("NNRCimpLetMut", [SString v; s1; s2]) -> NNRCimpLetMut (char_list_of_string v, sexp_to_nnrc_imp_stmt s1, sexp_to_nnrc_imp_stmt s2)
+  | STerm ("NNRCimpLetMutColl", [SString v; s1; s2]) -> NNRCimpLetMutColl (char_list_of_string v, sexp_to_nnrc_imp_stmt s1, sexp_to_nnrc_imp_stmt s2)
   | STerm ("NNRCimpAssign", [SString v; e]) -> NNRCimpAssign (char_list_of_string v, sexp_to_nnrc_imp_expr e)
+  | STerm ("NNRCimpPush", [SString v; e]) -> NNRCimpPush (char_list_of_string v, sexp_to_nnrc_imp_expr e)
   | STerm ("NNRCimpFor", [SString v; e; s]) -> NNRCimpFor (char_list_of_string v, sexp_to_nnrc_imp_expr e, sexp_to_nnrc_imp_stmt s)
   | STerm ("NNRCimpIf", [e; s1; s2]) -> NNRCimpIf (sexp_to_nnrc_imp_expr e, sexp_to_nnrc_imp_stmt s1, sexp_to_nnrc_imp_stmt s2)
   | STerm ("NNRCimpEither", (SString v1) :: (SString v2) :: [e;s1;s2]) ->

@@ -91,61 +91,69 @@ Section NNRCimpSemEval.
       }
   Qed.
 
-  Ltac destr H :=
-    let eqq := fresh "eqq" in
-    first [(match_case_in H;
-            [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
-          | (match_case_in H;
-             [intros ? eqq | intros eqq]; rewrite eqq in H; try discriminate)
-          | (match_case_in H;
-             [intros eqq | intros ? ? eqq]; try rewrite eqq in H; try discriminate)
-          | (match_case_in H;
-             [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
-          ]; subst.
+      Ltac destr H :=
+      let eqq := fresh "eqq" in
+      first [
+          match goal with
+            [H:  _ * _ |- _ ] => destruct H
+          end |
+          (match_case_in H;
+              [intros [???] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+            | (match_case_in H;
+               [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+            | (match_case_in H;
+               [intros ?? eqq | intros eqq]; rewrite eqq in H; try discriminate)
+            | (match_case_in H;
+               [intros ? eqq | intros eqq]; rewrite eqq in H; try discriminate)
+            | (match_case_in H;
+               [intros eqq | intros ? ? eqq]; try rewrite eqq in H; try discriminate)
+            | (match_case_in H;
+               [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
+            ]; subst.
 
-  Lemma nnrc_imp_stmt_sem_eval σ₁ ψ₁ s σ₂ ψ₂ :
-    [ h , σc ⊢ s, σ₁, ψ₁ ⇓ σ₂, ψ₂ ] <-> nnrc_imp_stmt_eval h σc σ₁ ψ₁ s = Some (σ₂, ψ₂).
+  Lemma nnrc_imp_stmt_sem_eval σ₁ ψc₁ ψd₁ s σ₂ ψc₂ ψd₂ :
+    [ h , σc ⊢ s, σ₁, ψc₁ , ψd₁ ⇓ σ₂, ψc₂ , ψd₂ ] <-> nnrc_imp_stmt_eval h σc σ₁ ψc₁ ψd₁ s = Some (σ₂, ψc₂, ψd₂).
   Proof.
-    split; revert σ₁ ψ₁ σ₂ ψ₂.
+    split; revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
     - {
-        nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; simpl; trivial.
+        nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; invcs sem; simpl; trivial.
         - Case "NNRCimpSeq".
           erewrite IHs1 by eauto.
           eauto.
-        - Case "NNRCimpLetMut".
-          apply nnrc_imp_expr_sem_eval in H6; rewrite H6.
+        - Case "NNRCimpLet".
+          apply nnrc_imp_expr_sem_eval in H8; rewrite H8.
           erewrite IHs by eauto.
           simpl; trivial.
         - Case "NNRCimpLetMut".
-          erewrite IHs by eauto.
-          simpl; trivial.
-        - Case "NNRCimpBuildCollFor".
           erewrite IHs1 by eauto; simpl.
           erewrite IHs2 by eauto; simpl; trivial.
-        - Case "NNRCimpPush".
-          rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6.
-          rewrite H1; simpl; trivial.
+        - Case "NNRCimpLetMutColl".
+          erewrite IHs1 by eauto; simpl.
+          erewrite IHs2 by eauto; simpl; trivial.
         - Case "NNRCimpAssign".
-          rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6.
+          rewrite nnrc_imp_expr_sem_eval in H8; rewrite H8.
+          rewrite H1; simpl; trivial.
+        - Case "NNRCimpPush".
+          rewrite nnrc_imp_expr_sem_eval in H8; rewrite H8.
           rewrite H1; simpl; trivial.
         - Case "NNRCimpFor".
-          rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6; clear H6.
-          revert σ₁ ψ₁ σ₂ ψ₂ H7.
-          induction dl; intros σ₁ ψ₁ σ₂ ψ₂ seval; invcs seval; trivial.
+          rewrite nnrc_imp_expr_sem_eval in H8; rewrite H8; clear H8.
+          revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ H9.
+          induction dl; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ seval; invcs seval; trivial.
           erewrite IHs by eauto; simpl.
           eauto.
         - Case "NNRCimpIf".
-          rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6.
+          rewrite nnrc_imp_expr_sem_eval in H8; rewrite H8.
           eauto.
         - Case "NNRCimpIf".
-          rewrite nnrc_imp_expr_sem_eval in H6; rewrite H6.
+          rewrite nnrc_imp_expr_sem_eval in H8; rewrite H8.
           eauto.
         - Case "NNRCimpEither".
-          rewrite nnrc_imp_expr_sem_eval in H8; rewrite H8.
+          rewrite nnrc_imp_expr_sem_eval in H10; rewrite H10.
           erewrite IHs1 by eauto.
           simpl; trivial.
         - Case "NNRCimpEither".
-          rewrite nnrc_imp_expr_sem_eval in H8; rewrite H8.
+          rewrite nnrc_imp_expr_sem_eval in H10; rewrite H10.
           erewrite IHs2 by eauto.
           simpl; trivial.
       }
@@ -155,27 +163,28 @@ Section NNRCimpSemEval.
         Hint Resolve nnrc_imp_stmt_sem_env_cons_same.
         Hint Resolve nnrc_imp_stmt_sem_mcenv_cons_same.
 
-        nnrc_imp_stmt_cases (induction s) Case; simpl; intros σ₁ ψ₁ σ₂ ψ₂ sem; repeat destr sem.
+        nnrc_imp_stmt_cases (induction s) Case; simpl; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; repeat destr sem.
         - Case "NNRCimpSeq".
           eauto.
-        - Case "NNRCimpLetMut".
+        - Case "NNRCimpLet".
           invcs sem.
-          destruct p0.
           apply nnrc_imp_expr_sem_eval in eqq.
           eauto.
         - Case "NNRCimpLetMut".
           invcs sem.
-          destruct p0.
+          apply IHs1 in eqq.
+          apply nnrc_imp_stmt_sem_mdenv_cons_same in eqq.
           eauto.
-        - Case "NNRCimpBuildCollFor".
-          destruct p0; repeat destr sem; invcs sem.
-          destruct p1.
-          eauto 7.
-        - Case "NNRCimpPush".
+        - Case "NNRCimpLetMutColl".
           invcs sem.
-          apply nnrc_imp_expr_sem_eval in eqq.
+          apply IHs1 in eqq.
+          apply nnrc_imp_stmt_sem_mcenv_cons_same in eqq.
           eauto.
         - Case "NNRCimpAssign".
+          invcs sem.
+          apply nnrc_imp_expr_sem_eval in eqq.
+          eauto.
+        - Case "NNRCimpPush".
           invcs sem.
           apply nnrc_imp_expr_sem_eval in eqq.
           eauto.
@@ -184,9 +193,9 @@ Section NNRCimpSemEval.
           apply nnrc_imp_expr_sem_eval in eqq.
           econstructor; eauto.
           clear eqq.
-          revert σ₁ ψ₁ σ₂ ψ₂ sem.
-          induction l; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; eauto 1.
-          repeat destr H0; destruct p0.
+          revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem.
+          induction l; intros σ₁  ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; invcs sem; eauto 1.
+          repeat destr H0.
           eauto.
         - Case "NNRCimpIf".
           apply nnrc_imp_expr_sem_eval in eqq.
@@ -195,7 +204,7 @@ Section NNRCimpSemEval.
         - Case "NNRCimpEither".
           apply nnrc_imp_expr_sem_eval in eqq.
           destruct d; try discriminate;
-            repeat destr sem; invcs sem; destruct p0; eauto.
+            repeat destr sem; invcs sem; eauto.
       }
   Qed.
 
@@ -210,10 +219,11 @@ Section NNRCimpSemEval.
       simpl in H.
       rewrite H; trivial.
     - destr hyp.
-      apply nnrc_imp_stmt_sem_eval in eqq.
+      destruct p.
       destruct p; try discriminate.
       destruct p.
       destruct o; try discriminate.
+      apply nnrc_imp_stmt_sem_eval in eqq.
       invcs hyp.
       generalize (nnrc_imp_stmt_sem_env_stack eqq).
       simpl; intros eqq2; invcs eqq2.
@@ -221,7 +231,10 @@ Section NNRCimpSemEval.
       generalize (nnrc_imp_stmt_sem_mcenv_stack eqq).
       simpl; intros eqq2.
       symmetry in eqq2; apply domain_nil in eqq2; subst.
-      constructor; trivial.
+      generalize (nnrc_imp_stmt_sem_mdenv_stack eqq).
+      simpl; intros eqq2.
+      symmetry in eqq2; apply domain_nil in eqq2; subst.
+      constructor; simpl; trivial.
   Qed.
 
 End NNRCimpSemEval.

@@ -80,86 +80,90 @@ Section NNRCimpEval.
          end.
 
     Fixpoint nnrc_imp_stmt_eval
-             (σc:bindings) (σ:pd_bindings) (ψ:mc_bindings)
-             (s:nnrc_imp_stmt) : option (pd_bindings*mc_bindings)
+             (σc:bindings) (σ:pd_bindings) (ψc:mc_bindings) (ψd:md_bindings)
+             (s:nnrc_imp_stmt) : option (pd_bindings*mc_bindings*md_bindings)
       := match s with
          | NNRCimpSeq s₁ s₂ =>
-           match nnrc_imp_stmt_eval σc σ ψ s₁ with
-           | Some (σ₁, ψ₁) => nnrc_imp_stmt_eval σc σ₁ ψ₁ s₂
+           match nnrc_imp_stmt_eval σc σ ψc ψd s₁ with
+           | Some (σ₁, ψc₁, ψd₁) => nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s₂
            | None => None
            end
 
-         | NNRCimpLetMut v (Some e) s₀ =>
+         | NNRCimpLet v e s₀ =>
            match nnrc_imp_expr_eval σc σ e with
            | Some d =>
-             match nnrc_imp_stmt_eval σc ((v,Some d)::σ) ψ s₀ with
-             | Some (_::σ₁, ψ₁) => Some (σ₁, ψ₁)
+             match nnrc_imp_stmt_eval σc ((v,Some d)::σ) ψc ψd s₀ with
+             | Some (_::σ₁, ψc₁, ψd₁) => Some (σ₁, ψc₁,ψd₁)
              | _ => None
              end
            | None => None
            end
 
-         | NNRCimpLetMut v None s₀ =>
-           match nnrc_imp_stmt_eval σc ((v,None)::σ) ψ s₀ with
-           | Some (_::σ₁, ψ₁) => Some (σ₁, ψ₁)
-           | _ => None
-           end
-
-         | NNRCimpBuildCollFor v s₁ s₂ =>
-           match nnrc_imp_stmt_eval σc σ ((v,nil)::ψ) s₁ with
-           | Some (σ₁, ((_,dl)::ψ₁)) =>
-             match nnrc_imp_stmt_eval σc ((v,Some (dcoll dl))::σ₁) ψ₁ s₂ with
-             | Some ((_::σ₂),ψ₂) => Some (σ₂,ψ₂)
+         | NNRCimpLetMut v s₁ s₂ =>
+           match nnrc_imp_stmt_eval σc σ ψc ((v,None)::ψd) s₁ with
+           | Some (σ₁, ψc₁, (_,d)::ψd₁) =>
+             match nnrc_imp_stmt_eval σc ((v,d)::σ₁) ψc₁ ψd₁ s₂ with
+             | Some (_::σ₂, ψc₂, ψd₂) => Some (σ₂, ψc₂,ψd₂)
              | _ => None
              end
            | _ => None
            end
 
-         | NNRCimpPush v e =>
-           match nnrc_imp_expr_eval σc σ e, lookup string_dec ψ v with
-           | Some d, Some dl => Some (σ, update_first string_dec ψ v (d::dl))
-           | _, _ => None
+         | NNRCimpLetMutColl v s₁ s₂ =>
+           match nnrc_imp_stmt_eval σc σ ((v,nil)::ψc) ψd s₁ with
+           | Some (σ₁, ((_,dl)::ψc₁), ψd₁) =>
+             match nnrc_imp_stmt_eval σc ((v,Some (dcoll dl))::σ₁) ψc₁ ψd₁ s₂ with
+             | Some ((_::σ₂), ψc₂, ψd₂) => Some (σ₂,ψc₂,ψd₂)
+             | _ => None
+             end
+           | _ => None
            end
 
          | NNRCimpAssign v e =>
-           match nnrc_imp_expr_eval σc σ e, lookup string_dec σ v with
-           | Some d, Some _ => Some (update_first string_dec σ v (Some d), ψ)
+           match nnrc_imp_expr_eval σc σ e, lookup string_dec ψd v with
+           | Some d, Some _ => Some (σ, ψc, update_first string_dec ψd v (Some d))
+           | _, _ => None
+           end
+
+         | NNRCimpPush v e =>
+           match nnrc_imp_expr_eval σc σ e, lookup string_dec ψc v with
+           | Some d, Some dl => Some (σ, update_first string_dec ψc v (d::dl), ψd)
            | _, _ => None
            end
 
          | NNRCimpFor v e s₀ =>
            match nnrc_imp_expr_eval σc σ e with
            | Some (dcoll c1) =>
-             let fix for_fun (dl:list data) σ₁ ψ₁ :=
+             let fix for_fun (dl:list data) σ₁ ψc₁ ψd₁ :=
                  match dl with
-                 | nil => Some (σ₁, ψ₁)
+                 | nil => Some (σ₁, ψc₁, ψd₁)
                  | d::dl' =>
-                   match nnrc_imp_stmt_eval σc ((v,Some d)::σ₁) ψ₁ s₀ with
-                   | Some (_::σ₂, ψ₂) => for_fun dl' σ₂ ψ₂
+                   match nnrc_imp_stmt_eval σc ((v,Some d)::σ₁) ψc₁ ψd₁ s₀ with
+                   | Some (_::σ₂, ψc₂, ψd₂) => for_fun dl' σ₂ ψc₂ ψd₂
                    | _ => None
                    end
                  end in
-             for_fun c1 σ ψ
+             for_fun c1 σ ψc ψd
            | _ => None
            end
 
          | NNRCimpIf e s₁ s₂ =>
            match nnrc_imp_expr_eval σc σ e  with
-           | Some (dbool true) => nnrc_imp_stmt_eval σc σ ψ s₁
-           | Some (dbool false) => nnrc_imp_stmt_eval σc σ ψ s₂
+           | Some (dbool true) => nnrc_imp_stmt_eval σc σ ψc ψd s₁
+           | Some (dbool false) => nnrc_imp_stmt_eval σc σ ψc ψd s₂
            | _ => None
            end
 
          | NNRCimpEither e x₁ s₁ x₂ s₂ =>
            match nnrc_imp_expr_eval σc σ e with
            | Some (dleft d) =>
-             match nnrc_imp_stmt_eval σc ((x₁,Some d)::σ) ψ s₁ with
-             | Some (_::σ₂, ψ₂) => Some (σ₂, ψ₂)
+             match nnrc_imp_stmt_eval σc ((x₁,Some d)::σ) ψc ψd s₁ with
+             | Some (_::σ₂, ψc₂, ψd₂) => Some (σ₂, ψc₂, ψd₂)
              | _ => None
              end
            | Some (dright d) =>
-             match nnrc_imp_stmt_eval σc ((x₂,Some d)::σ) ψ s₂ with
-             | Some (_::σ₂, ψ₂) => Some (σ₂, ψ₂)
+             match nnrc_imp_stmt_eval σc ((x₂,Some d)::σ) ψc ψd s₂ with
+             | Some (_::σ₂, ψc₂, ψd₂) => Some (σ₂, ψc₂, ψd₂)
              | _ => None
              end
            | _ => None
@@ -169,8 +173,8 @@ Section NNRCimpEval.
     Definition nnrc_imp_eval_top (q:nnrc_imp) (σc:bindings) : option data
       :=
         let (s, ret) := q in
-        match nnrc_imp_stmt_eval σc ((ret, None)::nil) nil s with
-        | Some ((_, Some dd)::_, _) => Some dd
+        match nnrc_imp_stmt_eval σc ((ret, None)::nil) nil nil s with
+        | Some ((_, Some dd)::_, _, _) => Some dd
         | _ => None
         end.
 
@@ -180,8 +184,16 @@ Section NNRCimpEval.
 
     Ltac destr H :=
       let eqq := fresh "eqq" in
-      first [(match_case_in H;
-              [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+      first [
+          match goal with
+            [H:  _ * _ |- _ ] => destruct H
+          end |
+          (match_case_in H;
+              [intros [???] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+            | (match_case_in H;
+               [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+            | (match_case_in H;
+               [intros ?? eqq | intros eqq]; rewrite eqq in H; try discriminate)
             | (match_case_in H;
                [intros ? eqq | intros eqq]; rewrite eqq in H; try discriminate)
             | (match_case_in H;
@@ -190,40 +202,39 @@ Section NNRCimpEval.
                [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
             ]; subst.
 
-    Lemma nnrc_imp_stmt_eval_env_stack {s σc σ₁ ψ₁ σ₂ ψ₂} :
-      nnrc_imp_stmt_eval σc σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain σ₁ = domain σ₂.
+    Lemma nnrc_imp_stmt_eval_env_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
+      nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) -> domain σ₁ = domain σ₂.
     Proof.
-      revert σ₁ ψ₁ σ₂ ψ₂.
-      nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; simpl in sem; repeat destr sem.
+      revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
+      nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; simpl in sem; repeat destr sem.
       - Case "NNRCimpSeq".
         transitivity (domain p); eauto.
-      - Case "NNRCimpLetMut".
+      - Case "NNRCimpLet".
         invcs sem.
-        specialize (IHs _ _ _ _ eqq0).
+        specialize (IHs _ _ _ _ _ _ eqq0).
         simpl in IHs; invcs IHs; trivial.
       - Case "NNRCimpLetMut".
         invcs sem.
-        specialize (IHs _ _ _ _ eqq).
-        simpl in IHs; invcs IHs; trivial.
-      - Case "NNRCimpBuildCollFor".
-        destruct p0; repeat destr sem.
-        specialize (IHs1 _ _ _ _ eqq).
-        specialize (IHs2 _ _ _ _ eqq0).
+        specialize (IHs2 _ _ _ _ _ _ eqq0).
+        simpl in IHs2; invcs IHs2; trivial.
+        eauto.
+      - Case "NNRCimpLetMutColl".
+        specialize (IHs1 _ _ _ _ _ _ eqq).
+        specialize (IHs2 _ _ _ _ _ _ eqq0).
         simpl in IHs2; invcs IHs2.
         congruence.
+      - Case "NNRCimpAssign".
+        invcs sem; trivial.
       - Case "NNRCimpPush".
         invcs sem; trivial.
-      - Case "NNRCimpAssign".
-        invcs sem.
-        rewrite domain_update_first; trivial.
       - Case  "NNRCimpFor".
         destruct d; try discriminate.
         clear eqq.
-        revert σ₁ ψ₁ σ₂ ψ₂ sem.
-        induction l; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; trivial.
+        revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem.
+        induction l; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂  sem; invcs sem; trivial.
         repeat destr H0.
-        specialize (IHl _ _ _ _ H0).
-        specialize (IHs _ _ _ _ eqq).
+        specialize (IHl _ _ _ _ _ _ H0).
+        specialize (IHs _ _ _ _ _ _ eqq).
         simpl in IHs; invcs IHs.
         congruence.
       - Case "NNRCimpIf".
@@ -232,46 +243,46 @@ Section NNRCimpEval.
       - Case "NNRCimpEither".
         destruct d; try discriminate;
           repeat destr sem; invcs sem.
-        + specialize (IHs1 _ _ _ _ eqq0);
+        + specialize (IHs1 _ _ _ _ _ _ eqq0);
             simpl in IHs1; invcs IHs1; trivial.
-        + specialize (IHs2 _ _ _ _ eqq0);
+        + specialize (IHs2 _ _ _ _ _ _ eqq0);
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
-    Lemma nnrc_imp_stmt_eval_mcenv_stack {s σc σ₁ ψ₁ σ₂ ψ₂} :
-      nnrc_imp_stmt_eval σc σ₁ ψ₁ s = Some (σ₂ , ψ₂ ) -> domain ψ₁ = domain ψ₂.
+    Lemma nnrc_imp_stmt_eval_mcenv_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
+      nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) -> domain ψc₁ = domain ψc₂.
     Proof.
-      revert σ₁ ψ₁ σ₂ ψ₂.
-      nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψ₁ σ₂ ψ₂ sem; simpl in sem; repeat destr sem.
+      revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
+      nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; simpl in sem; repeat destr sem.
       - Case "NNRCimpSeq".
-        transitivity (domain m); eauto.
-      - Case "NNRCimpLetMut".
+        transitivity (domain m0); eauto.
+      - Case "NNRCimpLet".
         invcs sem.
-        specialize (IHs _ _ _ _ eqq0).
+        specialize (IHs _ _ _ _ _ _ eqq0).
         simpl in IHs; invcs IHs; trivial.
       - Case "NNRCimpLetMut".
         invcs sem.
-        specialize (IHs _ _ _ _ eqq).
-        simpl in IHs; invcs IHs; trivial.
-      - Case "NNRCimpBuildCollFor".
-        destruct p0; repeat destr sem.
-        specialize (IHs1 _ _ _ _ eqq).
-        specialize (IHs2 _ _ _ _ eqq0).
+        specialize (IHs1 _ _ _ _ _ _ eqq).
+        specialize (IHs2 _ _ _ _ _ _ eqq0).
+        etransitivity; eauto.
+      - Case "NNRCimpLetMutColl".
+        specialize (IHs1 _ _ _ _ _ _ eqq).
+        specialize (IHs2 _ _ _ _ _ _ eqq0).
         simpl in IHs1; invcs IHs1.
         congruence.
+      - Case "NNRCimpAssign".
+        invcs sem; trivial.
       - Case "NNRCimpPush".
         invcs sem.
         rewrite domain_update_first; trivial.
-      - Case "NNRCimpAssign".
-        invcs sem; trivial.
       - Case  "NNRCimpFor".
         destruct d; try discriminate.
         clear eqq.
-        revert σ₁ ψ₁ σ₂ ψ₂ sem.
-        induction l; intros σ₁ ψ₁ σ₂ ψ₂ sem; invcs sem; trivial.
+        revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem.
+        induction l; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂  sem; invcs sem; trivial.
         repeat destr H0.
-        specialize (IHl _ _ _ _ H0).
-        specialize (IHs _ _ _ _ eqq).
+        specialize (IHl _ _ _ _ _ _ H0).
+        specialize (IHs _ _ _ _ _ _ eqq).
         simpl in IHs; invcs IHs.
         congruence.
       - Case "NNRCimpIf".
@@ -280,9 +291,58 @@ Section NNRCimpEval.
       - Case "NNRCimpEither".
         destruct d; try discriminate;
           repeat destr sem; invcs sem.
-        + specialize (IHs1 _ _ _ _ eqq0);
+        + specialize (IHs1 _ _ _ _ _ _ eqq0);
             simpl in IHs1; invcs IHs1; trivial.
-        + specialize (IHs2 _ _ _ _ eqq0);
+        + specialize (IHs2 _ _ _ _ _ _ eqq0);
+            simpl in IHs2; invcs IHs2; trivial.
+    Qed.
+
+    Lemma nnrc_imp_stmt_eval_mdenv_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
+      nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) -> domain ψd₁ = domain ψd₂.
+    Proof.
+      revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
+      nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; simpl in sem; repeat destr sem.
+      - Case "NNRCimpSeq".
+        transitivity (domain m); eauto.
+      - Case "NNRCimpLet".
+        invcs sem.
+        specialize (IHs _ _ _ _ _ _ eqq0).
+        simpl in IHs; invcs IHs; trivial.
+      - Case "NNRCimpLetMut".
+        invcs sem.
+        specialize (IHs1 _ _ _ _ _ _ eqq).
+        specialize (IHs2 _ _ _ _ _ _ eqq0).
+        simpl in IHs1; invcs IHs1; trivial.
+        etransitivity; eauto.
+      - Case "NNRCimpLetMutColl".
+        specialize (IHs1 _ _ _ _ _ _ eqq).
+        specialize (IHs2 _ _ _ _ _ _ eqq0).
+        simpl in IHs1; invcs IHs1.
+        congruence.
+      - Case "NNRCimpAssign".
+        invcs sem.
+        rewrite domain_update_first; trivial.
+      - Case "NNRCimpPush".
+        invcs sem; trivial.
+      - Case  "NNRCimpFor".
+        destruct d; try discriminate.
+        clear eqq.
+        revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem.
+        induction l; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂  sem; invcs sem; trivial.
+        repeat destr H0.
+        specialize (IHl _ _ _ _ _ _ H0).
+        specialize (IHs _ _ _ _ _ _ eqq).
+        simpl in IHs; invcs IHs.
+        congruence.
+      - Case "NNRCimpIf".
+        destruct d; try discriminate.
+        destruct b; eauto.
+      - Case "NNRCimpEither".
+        destruct d; try discriminate;
+          repeat destr sem; invcs sem.
+        + specialize (IHs1 _ _ _ _ _ _ eqq0);
+            simpl in IHs1; invcs IHs1; trivial.
+        + specialize (IHs2 _ _ _ _ _ _ eqq0);
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
@@ -305,5 +365,6 @@ Section NNRCimpEval.
 
 End NNRCimpEval.
 
-Arguments nnrc_imp_stmt_eval_env_stack {fruntime h s σc σ₁ ψ₁ σ₂ ψ₂}.
-Arguments nnrc_imp_stmt_eval_mcenv_stack {fruntime h s σc σ₁ ψ₁ σ₂ ψ₂}.
+Arguments nnrc_imp_stmt_eval_env_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
+Arguments nnrc_imp_stmt_eval_mcenv_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
+Arguments nnrc_imp_stmt_eval_mdenv_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.

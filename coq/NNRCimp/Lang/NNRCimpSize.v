@@ -38,10 +38,11 @@ Section NNRCimpSize.
     Fixpoint nnrc_imp_stmt_size (n:nnrc_imp_stmt) : nat
     := match n with
        | NNRCimpSeq s₁ s₂ => S (nnrc_imp_stmt_size s₁ + nnrc_imp_stmt_size s₂)
-       | NNRCimpLetMut v eo s => S ((match eo with Some e => nnrc_imp_expr_size e | None => 0 end) + nnrc_imp_stmt_size s)
-       | NNRCimpBuildCollFor _ s₁ s₂ => S (nnrc_imp_stmt_size s₁ + nnrc_imp_stmt_size s₂)
-       | NNRCimpPush _ e => S (nnrc_imp_expr_size e)
+       | NNRCimpLet v e s => S (nnrc_imp_expr_size e + nnrc_imp_stmt_size s)
+       | NNRCimpLetMut v eo s => S (nnrc_imp_stmt_size s + nnrc_imp_stmt_size s)
+       | NNRCimpLetMutColl _ s₁ s₂ => S (nnrc_imp_stmt_size s₁ + nnrc_imp_stmt_size s₂)
        | NNRCimpAssign _ e => S (nnrc_imp_expr_size e)
+       | NNRCimpPush _ e => S (nnrc_imp_expr_size e)
        | NNRCimpFor v n₁ n₂ => S (nnrc_imp_expr_size n₁ + nnrc_imp_stmt_size n₂)
        | NNRCimpIf n₁ n₂ n₃ => S (nnrc_imp_expr_size n₁ + nnrc_imp_stmt_size n₂ + nnrc_imp_stmt_size n₃)
        | NNRCimpEither nd vl nl vr nr => S (nnrc_imp_expr_size nd + nnrc_imp_stmt_size nl + nnrc_imp_stmt_size nr)

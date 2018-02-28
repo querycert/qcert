@@ -257,17 +257,18 @@ let rec pretty_nnrc_imp_stmt p sym ff stmt =
       fprintf ff "@[<hv 0>%a;@;<1 0>%a@]"
         (pretty_nnrc_imp_stmt 0 sym) s1
         (pretty_nnrc_imp_stmt 0 sym) s2
-  | QcertCompiler.NNRCimpLetMut (v,None,n2) ->
-      fprintf ff "@[<hv 0>@[<hv 2>let $v%s@]@;<1 0>@[<hv 2>in@ %a@]@]"
-        (Util.string_of_char_list v)
-        (pretty_nnrc_imp_stmt p sym) n2
-  | QcertCompiler.NNRCimpLetMut (v,Some n1,n2) ->
+  | QcertCompiler.NNRCimpLet (v,n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
         (Util.string_of_char_list v)
         (pretty_nnrc_imp_expr p sym) n1
         (pretty_nnrc_imp_stmt p sym) n2
-  | NNRCimpBuildCollFor (v, s1, s2) ->
-      fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ {}@]@;<1 0>@[<hv 2>in@ @[<hv 0>%a;@;<1 0>%a@]@]@]"
+  | QcertCompiler.NNRCimpLetMut (v, s1, s2) ->
+      fprintf ff "@[<hv 0>@[<hv 2>let $v%s from @a @]@;<1 0>@[<hv 2>in@ @[<hv 0>%a;@;<1 0>%a@]@]@]"
+        (Util.string_of_char_list v)
+        (pretty_nnrc_imp_stmt p sym) s1
+        (pretty_nnrc_imp_stmt p sym) s2
+  | QcertCompiler.NNRCimpLetMutColl (v, s1, s2) ->
+      fprintf ff "@[<hv 0>@[<hv 2>let_coll $v%s from @a {}@]@;<1 0>@[<hv 2>in@ @[<hv 0>%a;@;<1 0>%a@]@]@]"
         (Util.string_of_char_list v)
         (pretty_nnrc_imp_stmt p sym) s1
         (pretty_nnrc_imp_stmt p sym) s2

@@ -49,15 +49,20 @@ Section NNRCimp.
 
     Inductive nnrc_imp_stmt :=
     | NNRCimpSeq : nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt                    (**r sequence ([s₁; s₂]]) *)
-    | NNRCimpLetMut : var -> option (nnrc_imp_expr) -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v (:= e₁)? { s₂ }]) *)
+    (* This creates a mutable data holder, and evaluates the first
+       statement with it bound to the given variable.  It then freezes
+       the variable (makes it contain normal data) and evaluates the second
+       statement with the variable bound to the normal data version *)
+    | NNRCimpLet : var -> nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v (:= e₁)? { s₂ }]) *)
+    | NNRCimpLetMut : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v (:= e₁)? { s₂ }]) *)
     (* This creates a mutable collection, and evaluates the first
        statement with it bound to the given variable.  It then freezes
        the collection (makes it a normal bag) and evaluates the second
        statement with the variable bound to the bag version *)
-    | NNRCimpBuildCollFor : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r mutable collection declaration ([coll $v { s1 }; s2]) *)
+    | NNRCimpLetMutColl : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r mutable collection declaration ([coll $v { s1 }; s2]) *)
+    | NNRCimpAssign : var -> nnrc_imp_expr -> nnrc_imp_stmt                           (**r variable assignent ([$v := e]) *)
     (* pushes to a variable that holds a mutable collection *)
     | NNRCimpPush : var -> nnrc_imp_expr -> nnrc_imp_stmt                             (**r push item in mutable collection ([push e in $v]) *)
-    | NNRCimpAssign : var -> nnrc_imp_expr -> nnrc_imp_stmt                           (**r variable assignent ([$v := e]) *)
     | NNRCimpFor : var -> nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt             (**r for loop ([for ($v in e₁) { s₂ }]) *)
     | NNRCimpIf : nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r conditional ([if e₁ { s₂ } else { s₃ }]) *)
     | NNRCimpEither : nnrc_imp_expr                                                   (**r case expression ([either e case left $v₁ { s₁ } case right $v₂ { s₂ }]) *)
@@ -77,6 +82,7 @@ Section NNRCimp.
   (* bindings that may or may not be initialized (defined) *)
     Definition pd_bindings := list (string*option data).
     Definition mc_bindings := list (string*list data).
+    Definition md_bindings := list (string*option data).
 
   End Env.
     
@@ -94,10 +100,11 @@ Tactic Notation "nnrc_imp_expr_cases" tactic(first) ident(c) :=
 Tactic Notation "nnrc_imp_stmt_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "NNRCimpSeq"%string
+  | Case_aux c "NNRCimpLet"%string
   | Case_aux c "NNRCimpLetMut"%string
-  | Case_aux c "NNRCimpBuildCollFor"%string
-  | Case_aux c "NNRCimpPush"%string
+  | Case_aux c "NNRCimpLetMutColl"%string
   | Case_aux c "NNRCimpAssign"%string
+  | Case_aux c "NNRCimpPush"%string
   | Case_aux c "NNRCimpFor"%string
   | Case_aux c "NNRCimpIf"%string
   | Case_aux c "NNRCimpEither"%string].
