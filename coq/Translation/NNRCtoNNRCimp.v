@@ -339,20 +339,6 @@ Section NNRCtoNNRCimp.
     Local Open Scope string.
     Require Import List.
 
-    Ltac match_option
-      := let eqq := fresh "eqq" in
-         match goal with
-           [|- context [match ?x with | Some _ => _ | None => _ end]] =>
-           case_eq x end; [ intros ? eqq | intros eqq]; rewrite eqq;
-         trivial; try discriminate.
-
-    Ltac match_option_in H
-      := let eqq := fresh "eqq" in
-         match type of H with
-           context [match ?x with | Some _ => _ | None => _ end] =>
-           case_eq x end; [ intros ? eqq | intros eqq]; rewrite eqq in H;
-         trivial; try discriminate.
-
     Ltac expr_push_finisher ev x
       := match_destr_in ev
          ; simpl in ev
