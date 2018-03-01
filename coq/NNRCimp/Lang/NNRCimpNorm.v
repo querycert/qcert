@@ -94,21 +94,21 @@ Section NNRCimpNorm.
       destruct (IHs1 _ _ _ _ _ _  eqq1) as [?[??]]; eauto.
     -  Case "NNRCimpLet".
        match_case_in eqq; [intros ? eqq1 | intros eqq1]
-         ; rewrite eqq1 in eqq; try discriminate.
-         match_case_in eqq; [intros ? eqq2 | intros eqq2]
-         ; rewrite eqq2 in eqq; try discriminate.
-         destruct p as [[??]?].
-         destruct p; try discriminate.
-         invcs eqq.
-         apply nnrc_imp_expr_eval_normalized in eqq1; eauto.
-         specialize (IHs _ _ _ _ _ _ eqq2).
-         cut_to IHs.
-         * intuition.
-           apply H; simpl; eauto.
-         * simpl; intuition.
-           invcs H0; auto.
-         * eauto.
-         * eauto.
+       ; rewrite eqq1 in eqq; try discriminate.
+       match_case_in eqq; [intros ? eqq2 | intros eqq2]
+       ; rewrite eqq2 in eqq; try discriminate.
+       destruct p as [[??]?].
+       destruct p; try discriminate.
+       invcs eqq.
+       apply nnrc_imp_expr_eval_normalized in eqq1; eauto.
+       specialize (IHs _ _ _ _ _ _ eqq2).
+       cut_to IHs.
+       * intuition.
+         apply H; simpl; eauto.
+       * simpl; intuition.
+         invcs H0; auto.
+       * eauto.
+       * eauto.
     - Case "NNRCimpLetMut".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
@@ -176,11 +176,12 @@ Section NNRCimpNorm.
       intuition.
       rewrite Forall_map in *.
       apply Forall_update_first; simpl; trivial.
-      constructor.
-      + eapply nnrc_imp_expr_eval_normalized; eauto.
+      apply Forall_app.
       +  apply lookup_in in eqq2.
          rewrite Forall_forall in Fψc'.
          apply (Fψc' _ eqq2).
+      + constructor; trivial.
+        eapply nnrc_imp_expr_eval_normalized; eauto.
     - Case "NNRCimpFor".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
@@ -222,6 +223,22 @@ Section NNRCimpNorm.
       + specialize (IHs2 _ _ _ _ _ _ eqq2).
         cut_to IHs2; simpl in *; intuition.
         invcs H1; intuition.
+  Qed.
+
+  Lemma nnrc_imp_eval_normalized {q:nnrc_imp} {d} :
+    nnrc_imp_eval_top h σc q = Some d ->
+    Forall (data_normalized h) (map snd σc) ->
+    data_normalized h d.
+  Proof.
+    unfold nnrc_imp_eval_top; intros ev Fσc.
+    destruct q.
+    match_case_in ev; [intros [[??]?] eqq | intros eqq]
+    ; rewrite eqq in ev; try discriminate.
+    destruct m0; try discriminate.
+    destruct p0.
+    destruct o; try discriminate.
+    invcs ev.
+    apply nnrc_imp_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate.
   Qed.
   
 End NNRCimpNorm.

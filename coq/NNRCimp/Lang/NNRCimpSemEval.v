@@ -209,7 +209,7 @@ Section NNRCimpSemEval.
   Qed.
 
   Lemma nnrc_imp_sem_eval q d :
-    [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h q σc = Some d.
+    [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h σc q = Some d.
   Proof.
     destruct q.
     unfold nnrc_imp_eval_top.
@@ -220,20 +220,21 @@ Section NNRCimpSemEval.
       rewrite H; trivial.
     - destr hyp.
       destruct p.
-      destruct p; try discriminate.
-      destruct p.
+      destruct m; try discriminate.
+      destruct p0.
       destruct o; try discriminate.
       apply nnrc_imp_stmt_sem_eval in eqq.
       invcs hyp.
       generalize (nnrc_imp_stmt_sem_env_stack eqq).
       simpl; intros eqq2; invcs eqq2.
-      symmetry in H1; apply domain_nil in H1; subst.
+      symmetry in H0; apply domain_nil in H0; subst.
       generalize (nnrc_imp_stmt_sem_mcenv_stack eqq).
       simpl; intros eqq2.
       symmetry in eqq2; apply domain_nil in eqq2; subst.
       generalize (nnrc_imp_stmt_sem_mdenv_stack eqq).
       simpl; intros eqq2.
-      symmetry in eqq2; apply domain_nil in eqq2; subst.
+      invcs eqq2.
+      symmetry in H1; apply domain_nil in H1; subst.
       constructor; simpl; trivial.
   Qed.
 

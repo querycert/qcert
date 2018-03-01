@@ -126,6 +126,32 @@ Section NNRC.
       apply (group_by_table_correct_some g sl incoll outcoll H0).
     Qed.
 
+    Lemma nnrc_group_by_correct_none cenv env
+          (g:string) (sl:list string)
+          (e:nnrc) :
+      nnrc_core_eval h cenv env e = None ->
+      nnrc_core_eval h cenv env (nnrc_group_by g sl e) = None.
+    Proof.
+      intros.
+      unfold nnrc_group_by; simpl.
+      rewrite H; simpl; clear H.
+      trivial.
+    Qed.
+
+    Lemma nnrc_group_by_correct_some_ncoll cenv env
+          (g:string) (sl:list string)
+          (e:nnrc) d :
+      (forall x, d <> dcoll x) ->
+      nnrc_core_eval h cenv env e = Some d ->
+      nnrc_core_eval h cenv env (nnrc_group_by g sl e) = None.
+    Proof.
+      intros.
+      unfold nnrc_group_by; simpl.
+      rewrite H0; simpl; clear H0.
+      destruct d; simpl; trivial.
+      eelim H; eauto.
+    Qed.
+
   End Macros.
 
   (** * Evaluation Semantics *)

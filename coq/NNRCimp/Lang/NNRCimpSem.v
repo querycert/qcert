@@ -88,6 +88,8 @@ Section NNRCimpSem.
     Reserved Notation  "[ s₁ , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]".
     Reserved Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]".
 
+    Require Import List.
+    
     Inductive nnrc_imp_stmt_sem : nnrc_imp_stmt -> pd_bindings -> mc_bindings -> md_bindings -> pd_bindings -> mc_bindings -> md_bindings -> Prop :=
     | sem_NNRCimpSeq s₁ s₂ σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ σ₃ ψc₃ ψd₃ :
         [ s₁, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] ->
@@ -117,7 +119,7 @@ Section NNRCimpSem.
     | sem_NNRCimpPush v e σ ψc ψd mc d :
         lookup string_dec ψc v = Some mc ->
         [ σ ⊢ e ⇓ d ] ->
-        [ NNRCimpPush v e, σ , ψc , ψd ⇓ σ , update_first string_dec ψc v (d::mc), ψd]
+        [ NNRCimpPush v e, σ , ψc , ψd ⇓ σ , update_first string_dec ψc v (mc++d::nil), ψd]
 
     | sem_NNRCimpFor v e s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ dl :
         [ σ₁ ⊢ e ⇓ (dcoll dl) ] ->
@@ -163,7 +165,7 @@ Section NNRCimpSem.
     Inductive nnrc_imp_sem_top : nnrc_imp -> data -> Prop
       :=
       | sem_NNRCimpTop (q: nnrc_imp) d :
-          [ (fst q), ((snd q),None)::nil , nil, nil ⇓ ((snd q), Some d)::nil, nil, nil ] ->
+          [ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), Some d)::nil ] ->
           [ ⊢ q ⇓ d  ]
     where
     "[ ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top q d ) : nnrc_imp.

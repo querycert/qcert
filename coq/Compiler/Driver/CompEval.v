@@ -16,6 +16,8 @@
 
 Section CompEval.
   Require Import String.
+  Require Import Equivalence.
+  Require Import EquivDec.
 
   (* Common *)
   Require Import CommonSystem.
@@ -114,7 +116,7 @@ Section CompEval.
 
     (* Language: nnrc_imp *)
     Definition eval_nnrc_imp (q:nnrc_imp) (cenv: bindings) : option data :=
-      NNRCimpEval.nnrc_imp_eval_top h q cenv.
+      NNRCimpEval.nnrc_imp_eval_top h cenv q.
 
     (* Language: nnrcmr *)
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=
@@ -217,6 +219,27 @@ Section CompEval.
       | (Ev_out_returned_debug _, Ev_out_returned_debug _) => True
       | (_,_) => False
       end.
+
+    Require Import Utils.
+    Global Instance equal_outputs_equiv : Equivalence equal_outputs.
+    Proof.
+      unfold equal_outputs.
+      constructor; red.
+      - destruct x; trivial.
+        match_destr; congruence.
+      -  destruct x; destruct y; trivial.
+         repeat match_destr; congruence.
+      -  destruct x; destruct y; destruct z; trivial;
+         repeat match_destr; congruence.
+    Qed.
+
+    Global Instance equal_outputs_eqdec : EqDec eval_output equal_outputs.
+    Proof.
+      repeat red.
+      unfold equiv, equal_outputs, complement.
+      destruct x; destruct y; simpl; eauto.
+      match_destr; eauto.
+    Defined.
 
   End EvalDriver.
 

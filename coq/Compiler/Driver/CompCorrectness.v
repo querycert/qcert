@@ -1459,6 +1459,7 @@ Section CompCorrectness.
       simpl in H0.
       elim H0; clear H0; intros; [rewrite <- H0; simpl| ].
       - trivial_same_query.
+        reflexivity.
       - destruct dv; simpl in *; contradiction.
     Qed.
 

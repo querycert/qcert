@@ -52,7 +52,7 @@ Section NNRCimpEval.
 
     Fixpoint nnrc_imp_expr_eval
              (σc:bindings) (σ:pd_bindings) (e:nnrc_imp_expr)
-      : option data
+    : option data
       := match e with
          | NNRCimpGetConstant v =>
            edot σc v
@@ -79,6 +79,8 @@ Section NNRCimpEval.
            end
          end.
 
+    Require Import List.
+    
     Fixpoint nnrc_imp_stmt_eval
              (σc:bindings) (σ:pd_bindings) (ψc:mc_bindings) (ψd:md_bindings)
              (s:nnrc_imp_stmt) : option (pd_bindings*mc_bindings*md_bindings)
@@ -127,7 +129,7 @@ Section NNRCimpEval.
 
          | NNRCimpPush v e =>
            match nnrc_imp_expr_eval σc σ e, lookup string_dec ψc v with
-           | Some d, Some dl => Some (σ, update_first string_dec ψc v (d::dl), ψd)
+           | Some d, Some dl => Some (σ, update_first string_dec ψc v (dl++d::nil), ψd)
            | _, _ => None
            end
 
@@ -170,13 +172,12 @@ Section NNRCimpEval.
            end
          end.
 
-    Definition nnrc_imp_eval_top (q:nnrc_imp) (σc:bindings) : option data
-      :=
-        let (s, ret) := q in
-        match nnrc_imp_stmt_eval σc ((ret, None)::nil) nil nil s with
-        | Some ((_, Some dd)::_, _, _) => Some dd
-        | _ => None
-        end.
+    Definition nnrc_imp_eval_top σc (q:nnrc_imp) :=
+      let (s, ret) := q in
+      match nnrc_imp_stmt_eval σc nil nil ((ret, None)::nil) s with
+      | Some (_, _, (_,Some d)::_) => Some d
+      | _ => None
+      end.
 
   End Evaluation.
 
@@ -189,26 +190,30 @@ Section NNRCimpEval.
             [H:  _ * _ |- _ ] => destruct H
           end |
           (match_case_in H;
-              [intros [???] eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros ?? eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros ? eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros eqq | intros ? ? eqq]; try rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
-            ]; subst.
+           [intros [???] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+          | (match_case_in H;
+             [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+          | (match_case_in H;
+             [intros ?? eqq | intros eqq]; rewrite eqq in H; try discriminate)
+          | (match_case_in H;
+             [intros ? eqq | intros eqq]; rewrite eqq in H; try discriminate)
+          | (match_case_in H;
+             [intros eqq | intros ? ? eqq]; try rewrite eqq in H; try discriminate)
+          | (match_case_in H;
+             [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
+        ]; subst.
+
 
     Lemma nnrc_imp_stmt_eval_env_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
-      nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) -> domain σ₁ = domain σ₂.
+      nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) ->
+      σ₁ = σ₂.
     Proof.
       revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; simpl in sem; repeat destr sem.
       - Case "NNRCimpSeq".
-        transitivity (domain p); eauto.
+        apply IHs1 in eqq.
+        apply IHs2 in sem.
+        congruence.
       - Case "NNRCimpLet".
         invcs sem.
         specialize (IHs _ _ _ _ _ _ eqq0).
@@ -248,8 +253,16 @@ Section NNRCimpEval.
         + specialize (IHs2 _ _ _ _ _ _ eqq0);
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
+    
+    Lemma nnrc_imp_stmt_eval_env_domain_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
+      nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) -> domain σ₁ = domain σ₂.
+    Proof.
+      intros eqq.
+      generalize (nnrc_imp_stmt_eval_env_stack eqq); intros.
+      congruence.
+    Qed.
 
-    Lemma nnrc_imp_stmt_eval_mcenv_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
+    Lemma nnrc_imp_stmt_eval_mcenv_domain_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
       nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) -> domain ψc₁ = domain ψc₂.
     Proof.
       revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
@@ -297,7 +310,7 @@ Section NNRCimpEval.
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
-    Lemma nnrc_imp_stmt_eval_mdenv_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
+    Lemma nnrc_imp_stmt_eval_mdenv_domain_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
       nnrc_imp_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) -> domain ψd₁ = domain ψd₂.
     Proof.
       revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
@@ -360,11 +373,22 @@ Section NNRCimpEval.
       - rewrite (IHs _ _ H); trivial.
       - rewrite (IHs _ _ H); trivial.
     Qed.
-    
+
+    Lemma nnrc_imp_expr_eval_group_by_unfold σc σ g sl e :
+      nnrc_imp_expr_eval σc σ (NNRCimpGroupBy g sl e) = 
+      match nnrc_imp_expr_eval σc σ e with
+      | Some (dcoll dl) => lift dcoll (group_by_nested_eval_table g sl dl)
+      | _ => None
+      end.
+    Proof.
+      reflexivity.
+    Qed.
+
   End props.
 
 End NNRCimpEval.
 
 Arguments nnrc_imp_stmt_eval_env_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
-Arguments nnrc_imp_stmt_eval_mcenv_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
-Arguments nnrc_imp_stmt_eval_mdenv_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
+Arguments nnrc_imp_stmt_eval_env_domain_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
+Arguments nnrc_imp_stmt_eval_mcenv_domain_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
+Arguments nnrc_imp_stmt_eval_mdenv_domain_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
