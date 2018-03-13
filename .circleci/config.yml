@@ -24,11 +24,11 @@ jobs:
     - run: sudo add-apt-repository -y ppa:avsm/ppa
     - run: sudo apt-get -qq update
     - run: sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
-    - run: opam init -a
+    - run: export TERM=dumb && opam init -a
     - run: opam switch 4.05.0
     - run: eval `opam config env`
     - run:
-        command: opam install -y ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx coq.8.7.1
+        command: export TERM=dumb && opam install -y ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx coq.8.7.1
         no_output_timeout: 1200s
     - run: if [[ ! -d ~/spark-2.1.2-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.2/spark-2.1.2-bin-hadoop2.7.tgz && tar xf spark-2.1.2-bin-hadoop2.7.tgz ; fi
     - save_cache:
