@@ -8,12 +8,13 @@ jobs:
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
     docker:
-    - image: circleci/node:8
+    - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
       command: /sbin/init
     steps:
     - run: echo 'export PATH=~/qcert/bin/:~/spark-2.1.2-bin-hadoop2.7/bin/:$PATH' >> $BASH_ENV 
     - checkout
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
+    - run: export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
     - restore_cache:
         keys:
         - v1-dep-{{ .Branch }}-
