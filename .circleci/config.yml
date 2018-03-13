@@ -5,7 +5,6 @@ jobs:
     parallelism: 1
     shell: /bin/bash --login
     environment:
-      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
     docker:
     - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
@@ -24,10 +23,10 @@ jobs:
     - run: sudo apt-get -qq update
     - run: sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
     - run: export TERM=dumb && opam init -a
-    - run: export TERM=dumb && opam switch 4.05.0
+    - run: export TERM=dumb && opam switch 4.06.1
     - run: eval `opam config env`
     - run:
-        command: export TERM=dumb && opam install -y ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx coq.8.7.1
+        command: export TERM=dumb && opam install -y ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx coq.8.7.2
         no_output_timeout: 1200s
     - run: if [[ ! -d ~/spark-2.1.2-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.2/spark-2.1.2-bin-hadoop2.7.tgz && tar xf spark-2.1.2-bin-hadoop2.7.tgz ; fi
     - save_cache:
@@ -43,10 +42,6 @@ jobs:
         path: /tmp/circleci-test-results
     # Save artifacts
     - store_artifacts:
-        path: /tmp/circleci-artifacts
-    - store_artifacts:
         path: samples/spark2/test01_nnrc/irs
     - store_artifacts:
         path: samples/spark2/test01_nnrcmr/irs
-    - store_artifacts:
-        path: /tmp/circleci-test-results

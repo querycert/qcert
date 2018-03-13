@@ -24,7 +24,7 @@ compilation pipeline has been mechanically checked for correctness.
 
 To build Q\*cert from the source, you will need:
 
-- OCaml 4.05.0 or later (http://ocaml.org/) along with the following libraries:
+- OCaml 4.06.1 or later (http://ocaml.org/) along with the following libraries:
   - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - camlp5, a pre-processor (https://camlp5.github.io)
