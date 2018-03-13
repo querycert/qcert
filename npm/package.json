@@ -1,6 +1,6 @@
 {
 	"name": "qcert",
-	"version": "1.0.6",
+	"version": "1.0.6-dev",
 	"description": "The Q*cert compiler",
 	"repository": {
 		"type": "git",
@@ -28,8 +28,7 @@
 		},
 		{
 			"name": "Jerome Simeon",
-			"email": "simeon@us.ibm.com",
-			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-simeon"
+			"email": "jerome@clause.io"
 		}
 	],
 	"main": "./dist/index.js",
