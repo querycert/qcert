@@ -612,7 +612,7 @@ Section Stratify.
     Theorem stratify_stratified (e: nnrc) : stratified (stratify e).
     Proof.
       unfold stratify.
-      case_eq (stratify_aux e nnrcStmt nil); intros ? ? eqq1.
+      case_eq (stratify_aux e nnrcStmt (nnrc_free_vars e)); intros ? ? eqq1.
       destruct (stratify_aux_stratified eqq1).
       apply mk_expr_from_vars_stratified; simpl; eauto.
     Qed.
@@ -684,7 +684,7 @@ Section Stratify.
 
   Section BoundVars.
 
-        Lemma stratify1_aux_nbound_vars {e required_kind bound_vars n l sdefs} :
+    Lemma stratify1_aux_nbound_vars {e required_kind bound_vars n l sdefs} :
       stratify1_aux e required_kind bound_vars sdefs = (n,l) ->
       forall x, In x (domain l) -> In x bound_vars -> In x (domain sdefs).
     Proof.
@@ -1373,13 +1373,25 @@ Section Stratify.
       apply stratify_aux_free_vars_and_growing.
     Qed.
     
-    Corollary stratify_aux_free_vars
-              {e required_level bound_vars n sdefs} :
-      stratify e required_level bound_vars = (n,sdefs) ->
-      incl (nnrc_free_vars e) bound_vars ->
-      equivlist (nnrc_free_vars n ++ (concat (map nnrc_free_vars (codomain sdefs)))) (nnrc_free_vars e ++ domain sdefs).
+    Theorem stratify_free_vars e :
+      equivlist (nnrc_free_vars (stratify e)) (nnrc_free_vars e).
     Proof.
-      apply stratify_aux_free_vars_and_growing.
+      unfold stratify.
+      case_eq (stratify_aux e nnrcStmt (nnrc_free_vars e)); intros n sdefs eqq1.
+      destruct (stratify_aux_free_vars_and_growing eqq1 (incl_refl _))
+        as [equiv1 gfc1].
+      intros x.
+      specialize (equiv1 x).
+      list_simpler.
+      split; intros inn.
+      - generalize (mk_expr_from_vars_growing_fv_free_fw gfc1 _ _ inn).
+        intuition.
+      - apply (mk_expr_from_vars_growing_fv_free_bk). 
+        destruct equiv1 as [_ equiv1b].
+        cut_to equiv1b; [ | tauto].
+        split; [tauto | ].
+        generalize (stratify_aux_nbound_vars eqq1); intros disj.
+        specialize (disj x); tauto.
     Qed.
 
   End FreeVars.
