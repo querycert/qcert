@@ -5,12 +5,15 @@ jobs:
     parallelism: 1
     shell: /bin/bash --login
     environment:
-      PATH: ~/qcert/bin/:~/spark-2.1.2-bin-hadoop2.7/bin/:$PATH
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
     docker:
     - image: circleci/node:8
       command: /sbin/init
     steps:
+    - run: echo 'export PATH=~/qcert/bin/:~/spark-2.1.2-bin-hadoop2.7/bin/:$PATH' >> $BASH_ENV 
     - checkout
+    - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
     - run:
         working_directory: ~/querycert/qcert
         command: export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
@@ -40,7 +43,15 @@ jobs:
     - run: eval `opam config env` && make SPARK=yes
     - run: make tests
     - run: cd samples/spark2 && ./run.sh
+    # Save test results
+    - store_test_results:
+        path: /tmp/circleci-test-results
+    # Save artifacts
+    - store_artifacts:
+        path: /tmp/circleci-artifacts
     - store_artifacts:
         path: samples/spark2/test01_nnrc/irs
     - store_artifacts:
         path: samples/spark2/test01_nnrcmr/irs
+    - store_artifacts:
+        path: /tmp/circleci-test-results
