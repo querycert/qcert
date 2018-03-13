@@ -16,9 +16,6 @@ jobs:
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
     - run:
         working_directory: ~/querycert/qcert
-        command: export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
-    - run:
-        working_directory: ~/querycert/qcert
         command: echo -e "export PATH=~/qcert/bin/:~/spark-2.1.2-bin-hadoop2.7/bin/:$PATH" >> $BASH_ENV
     - restore_cache:
         keys:
