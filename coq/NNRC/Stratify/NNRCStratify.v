@@ -323,6 +323,14 @@ Section Stratify.
 
   End tests.
 
+  Lemma Forall_app_iff {A} (P:A->Prop) l1 l2 :
+      Forall P (l1 ++ l2) <-> Forall P l1 /\ Forall P l2.
+    Proof.
+      split; intros.
+      - apply Forall_app_inv in H; trivial.
+      - apply Forall_app; tauto.
+    Qed.
+
   Ltac list_simpler :=
     repeat progress (
              try match goal with
@@ -341,6 +349,7 @@ Section Stratify.
              ; repeat rewrite map_app in *
              ; repeat rewrite concat_app in *
              ; repeat rewrite in_app_iff in *
+             ; repeat rewrite Forall_app_iff in *
            ).
   Section Effective.
 
@@ -1776,102 +1785,113 @@ Section Stratify.
           {e required_level bound_vars n}
           {sdefs1 sdefs2:list (var*nnrc)} :
       stratify1_aux e required_level bound_vars sdefs1 = (n, sdefs2) ->
-      nnrcIsCore e ->
-      Forall nnrcIsCore (codomain sdefs1) ->
+      nnrcIsCore e /\ Forall nnrcIsCore (codomain sdefs1) <->
       nnrcIsCore n /\ Forall nnrcIsCore (codomain sdefs2).
     Proof.
-      intros eqq1 core1 core2.
+      intros eqq1.
       destruct required_level; simpl in *
       ; invcs eqq1; list_simpler; simpl; intuition.
-      apply Forall_app; simpl; intuition.
+      invcs H2; trivial.
     Qed.
 
     Lemma mk_expr_from_vars_preserves_core nws :
-      nnrcIsCore (fst nws) ->
-      Forall nnrcIsCore (codomain (snd nws)) ->
+      (nnrcIsCore (fst nws) /\ Forall nnrcIsCore (codomain (snd nws))) <->
       nnrcIsCore (mk_expr_from_vars nws).
     Proof.
       unfold mk_expr_from_vars.
       destruct nws as [e sdefs].
       revert e.
-      induction sdefs; simpl in *; trivial; intros.
-      invcs H0.
-      intuition.
+      induction sdefs; simpl in *.
+      - intuition.
+      - intros e; split; intros eqqs.
+        + destruct eqqs as [isc1 isc2].
+          invcs isc2.
+          split; trivial.
+          rewrite <- IHsdefs; tauto.
+        + destruct eqqs as [isc1 isc2].
+           rewrite <- IHsdefs in isc2.
+           intuition.
     Qed.
     
     Lemma stratify_aux_preserves_core
           {e required_level bound_vars n sdefs} :
       stratify_aux e required_level bound_vars = (n,sdefs) ->
-      nnrcIsCore e ->
+      nnrcIsCore e <->
       nnrcIsCore n /\ Forall nnrcIsCore (codomain sdefs).
     Proof.
       Hint Resolve Forall_nil.
       revert required_level bound_vars n sdefs.
-      induction e; intros required_level bound_vars n sdefs eqq1 isc
-      ; simpl in *; invcs eqq1; simpl; try auto 3.
+      induction e; intros required_level bound_vars n sdefs eqq1
+      ; simpl in *; invcs eqq1; simpl.
+      - intuition.
+      - intuition.
+      - intuition.
       - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
         match_case_in H0; intros ? ? eqq2; rewrite eqq2 in H0.
         invcs H0; simpl in *.
-        destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
-        destruct (IHe2 _ _ _ _ eqq2); [tauto | ].
         list_simpler.
+        destruct (IHe1 _ _ _ _ eqq1).
+        destruct (IHe2 _ _ _ _ eqq2).
         intuition.
-        apply Forall_app; trivial.
       - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
         invcs H0; simpl in *.
-        destruct (IHe _ _ _ _ eqq1); [tauto | ].
+        destruct (IHe _ _ _ _ eqq1).
         intuition.
-      - apply (stratify1_aux_preserves_core H0); [ | constructor].
-        simpl; split.
-        + case_eq (stratify_aux e1 nnrcStmt bound_vars); intros ? ? eqq1; simpl.
-          destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
-          apply mk_expr_from_vars_preserves_core; auto.
-        + case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2; simpl.
-          destruct (IHe2 _ _ _ _ eqq2); [tauto | ].
-          apply mk_expr_from_vars_preserves_core; auto.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
-        apply (stratify1_aux_preserves_core H0); trivial.
-        simpl; split; trivial.
+      - rewrite <- (stratify1_aux_preserves_core H0).
+        simpl.
+        repeat rewrite <- mk_expr_from_vars_preserves_core.
+        case_eq (stratify_aux e1 nnrcStmt bound_vars); intros ? ? eqq1; simpl.
         case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2; simpl.
-        destruct (IHe2 _ _ _ _ eqq2); [tauto | ].
-        apply mk_expr_from_vars_preserves_core; auto.
+        destruct (IHe1 _ _ _ _ eqq1).
+        destruct (IHe2 _ _ _ _ eqq2).
+        intuition.
       - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
-        apply (stratify1_aux_preserves_core H0); trivial.
-        simpl; split; trivial.
+        destruct (IHe1 _ _ _ _ eqq1).
+        rewrite <- (stratify1_aux_preserves_core H0).
+        simpl.
+        case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2; simpl.
+        destruct (IHe2 _ _ _ _ eqq2).
+        rewrite <- mk_expr_from_vars_preserves_core.
+        simpl; intuition.
+      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
+        destruct (IHe1 _ _ _ _ eqq1).
+        rewrite <- (stratify1_aux_preserves_core H0).
+        simpl.
         case_eq (stratify_aux e2 nnrcStmt bound_vars); intros ? ? eqq2; simpl.
         case_eq (stratify_aux e3 nnrcStmt bound_vars); intros ? ? eqq3; simpl.
-        destruct (IHe2 _ _ _ _ eqq2); [tauto | ].
-        destruct (IHe3 _ _ _ _ eqq3); [tauto | ].
-        split; apply mk_expr_from_vars_preserves_core; auto.
+        destruct (IHe2 _ _ _ _ eqq2).
+        destruct (IHe3 _ _ _ _ eqq3).
+        repeat rewrite <- mk_expr_from_vars_preserves_core.
+        intuition.
       - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
-        apply (stratify1_aux_preserves_core H0); trivial.
-        simpl; split; trivial.
+        destruct (IHe1 _ _ _ _ eqq1).
+        rewrite <- (stratify1_aux_preserves_core H0).
+        simpl.
         case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2; simpl.
         case_eq (stratify_aux e3 nnrcStmt (v0::bound_vars)); intros ? ? eqq3; simpl.
-        destruct (IHe2 _ _ _ _ eqq2); [tauto | ].
-        destruct (IHe3 _ _ _ _ eqq3); [tauto | ].
-        split; apply mk_expr_from_vars_preserves_core; auto.
-      - intuition.
+        destruct (IHe2 _ _ _ _ eqq2).
+        destruct (IHe3 _ _ _ _ eqq3).
+        repeat rewrite <- mk_expr_from_vars_preserves_core.
+        intuition.
+      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
+        rewrite <- (stratify1_aux_preserves_core H0).
+        simpl; intuition.
     Qed.
 
     Theorem stratify_preserves_core e :
-      nnrcIsCore e ->  nnrcIsCore (stratify e).
+      nnrcIsCore e <->  nnrcIsCore (stratify e).
     Proof.
-      intros e_is_core.
       unfold stratify.
       case_eq (stratify_aux e nnrcStmt (nnrc_free_vars e)); intros ? ? eqq1.
+      rewrite <- mk_expr_from_vars_preserves_core.
       apply stratify_aux_preserves_core in eqq1; trivial.
-      apply mk_expr_from_vars_preserves_core; simpl; tauto.
     Qed.
 
     Definition stratified_core (e:nnrc_core) : Prop
       := stratified (proj1_sig e).
     
     Definition stratify_core (e:nnrc_core) : nnrc_core
-      := exist _ _ (stratify_preserves_core _ (proj2_sig e)).
+      := exist _ _ (proj1 (stratify_preserves_core _) (proj2_sig e)).
 
     Theorem stratify_stratified_core (e: nnrc_core) : stratified_core (stratify_core e).
     Proof.
