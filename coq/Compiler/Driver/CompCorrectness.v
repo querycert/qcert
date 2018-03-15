@@ -66,6 +66,7 @@ Section CompCorrectness.
   Require Import NRAEnvtocNRAEnv.
   Require Import NRAtocNRAEnv.
   Require Import NNRCtocNNRC.
+  Require Import NNRCtoNNRCimp.
   Require Import NNRCtoDNNRC.
   Require Import NNRCtoNNRCMR.
   Require Import NNRCtoJavaScript.
@@ -220,7 +221,7 @@ Section CompCorrectness.
     | Dv_nnrc_stop => True
     | Dv_nnrc_optim opc dv => False /\ driver_correct_nnrc dv
     | Dv_nnrc_to_nnrc_core dv => True /\ driver_correct_nnrc_core dv
-    | Dv_nnrc_to_nnrc_imp inputs dv => False /\ driver_correct_nnrc_imp dv
+    | Dv_nnrc_to_nnrc_imp inputs dv => True /\ driver_correct_nnrc_imp dv
     | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => False /\ driver_correct_nnrcmr dv
     | Dv_nnrc_to_dnnrc inputs_loc dv => False /\ driver_correct_dnnrc dv
     | Dv_nnrc_to_javascript dv => False /\ driver_correct_javascript dv
@@ -498,17 +499,11 @@ Section CompCorrectness.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nnrc_to_nnrc_core q));
         rewrite Forall_forall in H; auto.
+      - destruct n; destruct H.
+        invcs H1; simpl in *; trivial; contradiction.
       - elim H; intros; contradiction.
-      - elim H1; intros; clear H1.
-        try (rewrite <- H0; simpl; trivial).
-        elim H; intros; clear H1.
-        destruct d; simpl.
-        simpl in H0; contradiction.
-        elim H; intros; clear H H1.
-        simpl in H2.
-        elim H2; intros; contradiction.
+      - elim H; intros; contradiction.
       - elim H; intros; contradiction. (* Failure case for dnnrc to dnnrc_typed -- False on correctness branch *)
-      - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
@@ -1095,6 +1090,18 @@ Section CompCorrectness.
       trivial_same_query.
     Qed.
 
+    Lemma nnrc_to_nnrc_imp_preserves_eval inputs (q:nnrc) :
+      query_preserves_eval (Q_nnrc q) (Q_nnrc_imp (nnrc_to_nnrc_imp inputs q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc.
+      unfold eval_nnrc_imp.
+      unfold nnrc_to_nnrc_imp.
+      rewrite <- nnrc_to_nnrc_imp_correct.
+      trivial_same_query.
+    Qed.
+
     (*
     Lemma nnrc_to_dnnrc_preserves_eval (inputs_loc: vdbindings) (q:nnrc) :
       query_preserves_eval (Q_nnrc q) (Q_dnnrc (nnrc_to_dnnrc inputs_loc q)).
@@ -1273,7 +1280,10 @@ Section CompCorrectness.
         clear H2 H.
         apply nnrc_to_nnrc_core_preserves_eval.
       (* NNRC to NNRCimp arrow *)
-      - elim H; intros; contradiction. (* Not proved *)
+      - destruct n; destruct H.
+        simpl in *.
+        intuition; subst.
+        apply nnrc_to_nnrc_imp_preserves_eval.
       (* NNRC to DNNRC arrow *)
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRC to JavaScript arrow *)
