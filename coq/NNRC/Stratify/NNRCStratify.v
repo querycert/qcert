@@ -218,7 +218,7 @@ Section Stratify.
 
     Definition nnrc_with_substs : Type := nnrc*list (var*nnrc).
 
-    Definition mk_expr_from_vars (nws:nnrc_with_substs)
+    Definition mk_expr_from_vars (nws:nnrc_with_substs) : nnrc
       := fold_right (fun sdef accum => NNRCLet (fst sdef) (snd sdef) accum) (fst nws) (snd nws).
 
     Lemma mk_expr_from_vars_eq e sdefs :
@@ -290,18 +290,19 @@ Section Stratify.
       := mk_expr_from_vars (stratify_aux e nnrcStmt (nnrc_free_vars e)).
 
   End stratify.
+  
   Section tests.
     Local Open Scope nnrc_scope.
     Local Open Scope string_scope.
 
     Example nnrc1 := (‵abs ‵ (dnat 3) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3)).
-(*    Eval vm_compute in (stratify nnrc1). *)
+    Eval vm_compute in (stratify nnrc1). 
 
     Example nnrc2 := NNRCLet "x" nnrc1 (NNRCVar "x").
-(*    Eval vm_compute in (stratify nnrc2). *)
+    Eval vm_compute in (stratify nnrc2). 
 
     Example nnrc3 := (‵abs (NNRCLet "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-(*    Eval vm_compute in (stratify nnrc3). *)
+        Eval vm_compute in (stratify nnrc3). 
 
     Example nnrc4 := (‵abs (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
 (*    Eval vm_compute in (stratify nnrc4). *)
@@ -310,21 +311,21 @@ Section Stratify.
 (*    Eval vm_compute in (stratify nnrc5). *)
 
     Example nnrc6 := (‵abs (NNRCLet "z" (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8))))) (NNRCVar "z")) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-(*    Eval vm_compute in (stratify nnrc6). *)
+    Eval vm_compute in (stratify nnrc6). 
 
     Example nnrc7 := NNRCLet "x" (NNRCLet "y" ‵(dnat 3) (‵(dnat 8) ‵+ (NNRCVar "y"))) (NNRCVar "x").
     
-(*    Eval vm_compute in (stratify nnrc7). *)
+    Eval vm_compute in (stratify nnrc7). 
 
     Example nnrc8 := NNRCLet "x" (NNRCLet "x" ‵(dnat 3) (‵(dnat 8) ‵+ (NNRCVar "x"))) (NNRCVar "x").
     
-(*    Eval vm_compute in (stratify nnrc8). *)
+    Eval vm_compute in (stratify nnrc8). 
 
   End tests.
 
   Section aux.
     
-        Lemma incl_letvars1 v e1 e2 env :
+    Lemma incl_letvars1 v e1 e2 env :
       incl (nnrc_vars (NNRCLet v e1 e2)) env ->
       incl (nnrc_vars e1) env.
     Proof.
@@ -494,7 +495,7 @@ Section Stratify.
       unfold codomain. rewrite map_app; trivial.
     Qed.
 
-    Lemma app_inv_self {A:Type} (l l2:list A) :
+    Lemma app_inv_self_l {A:Type} (l l2:list A) :
       l = l ++ l2 -> l2 = nil.
     Proof.
       intros eqq1.
@@ -502,14 +503,26 @@ Section Stratify.
       apply app_inv_head in eqq2.
       congruence.
     Qed.
+
+    Lemma app_inv_self_r {A:Type} (l l2:list A) :
+      l = l2 ++ l -> l2 = nil.
+    Proof.
+      intros eqq1.
+      assert (eqq2:nil ++ l = l2 ++ l) by (simpl; trivial).
+      apply app_inv_tail in eqq2.
+      congruence.
+    Qed.
+
   End aux.
 
 
     Ltac list_simpler :=
       repeat progress (
       try match goal with
-      | [H: ?l  = ?l ++ _ |- _ ] => apply app_inv_self in H; try subst
-      | [H: ?l ++ _ = ?l ++ _ |- _ ] => apply app_inv_head in H; try subst
+          | [H: ?l  = ?l ++ _ |- _ ] => apply app_inv_self_l in H; try subst
+          | [H: ?l  = _ ++ ?l  |- _ ] => apply app_inv_self_r in H; try subst
+          | [H: ?l ++ _ = ?l ++ _ |- _ ] => apply app_inv_head in H; try subst
+          | [H: _ ++ ?l  = _ ++ ?l |- _ ] => apply app_inv_tail in H; try subst
       | [H: In _ (remove _ _ _) |- _] => apply remove_inv in H; destruct H
       | [H: ?a <> ?v |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ _ _ H)
       | [H: ?v <> ?a |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ a v ) by congruence
@@ -1395,1462 +1408,629 @@ Section Stratify.
     Qed.
 
   End FreeVars.
-  
+
+    Lemma lookup_equiv_cons_same {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
+      lookup_equiv l1 l2 ->
+      forall a,
+        lookup_equiv (a::l1) (a::l2).
+    Proof.
+      unfold lookup_equiv; simpl; destruct a; intros.
+      match_destr.
+    Qed.
+
+    Lemma lookup_equiv_on_cons_same {A B} {dec:EqDec A eq} {l} {l1 l2:list (A*B)} :
+      lookup_equiv_on l l1 l2 ->
+      forall a,
+        lookup_equiv_on l (a::l1) (a::l2).
+    Proof.
+      unfold lookup_equiv_on; simpl; destruct a; intros.
+      match_destr; eauto.
+    Qed.
+
+    Lemma lookup_equiv_app {A B} {dec:EqDec A eq} {l1 l2 l1' l2':list (A*B)} :
+      lookup_equiv l1 l1' ->
+      lookup_equiv l2 l2' ->
+      lookup_equiv (l1++l2) (l1'++l2').
+    Proof.
+      unfold lookup_equiv; simpl; intros.
+      repeat rewrite lookup_app.
+      rewrite H, H0; trivial.
+    Qed.
+
+    Lemma lookup_equiv_appl_same {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
+      lookup_equiv l1 l2 ->
+      forall l,
+        lookup_equiv (l++l1) (l++l2).
+    Proof.
+      intros.
+      eapply lookup_equiv_app; trivial.
+      reflexivity.
+    Qed.
+
+    Lemma lookup_equiv_appr_same {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
+      lookup_equiv l1 l2 ->
+      forall l,
+        lookup_equiv (l1++l) (l2++l).
+    Proof.
+      intros.
+      eapply lookup_equiv_app; trivial.
+      reflexivity.
+    Qed.
+
+  Section Eval_substs.
+    Require Import cNNRCEq.
+    Require Import cNNRCShadow.
+
+    (* This is a monadic fold_left, whereas mk_expr_from_vars is a fold_right.
+        This is because evaluation goes outside in, whereas we build the let-bindings
+        from the inside out.
+     *)
+
+    Fixpoint eval_substs h cenv (sdefs:list (var*nnrc)) (env:bindings): option bindings
+      := match sdefs with
+         | nil => Some env
+         | (v,n)::sdefs' =>
+           olift (fun d => eval_substs h cenv sdefs' ((v,d)::env))
+             (@nnrc_core_eval _ h cenv env n)
+         end.
+
+    Definition eval_nnrc_with_substs h cenv env nws :=
+      olift (fun env' => @nnrc_core_eval _ h cenv env' (fst nws))
+            (eval_substs h cenv (snd nws) env).
+
+    Lemma eval_nnrc_with_substs_eq h cenv env a b :
+      olift (fun env' => @nnrc_core_eval _ h cenv env' a)
+            (eval_substs h cenv b env) = eval_nnrc_with_substs h cenv env (a,b).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma mk_expr_from_vars_eval h cenv env nws :
+      @nnrc_core_eval _ h cenv env
+        (mk_expr_from_vars nws) = 
+      eval_nnrc_with_substs h cenv env nws.
+    Proof.
+      unfold eval_nnrc_with_substs, mk_expr_from_vars.
+      destruct nws as [n sdefs].
+      revert env n.
+      induction sdefs; intros env n; simpl; trivial.
+      destruct a; simpl in *.
+      match_case; intros ? eqq; simpl.
+      rewrite IHsdefs; trivial.
+    Qed.
+
+    Lemma eval_substs_app h cenv (sdefs1 sdefs2:list (var*nnrc)) (env:bindings) :
+      eval_substs h cenv (sdefs1++sdefs2) env = olift (eval_substs h cenv sdefs2) (eval_substs h cenv sdefs1 env).
+    Proof.
+      revert sdefs2 env.
+      induction sdefs1; intros sdefs2 env; simpl; trivial.
+      destruct a; simpl.
+      destruct (nnrc_core_eval h cenv env n); simpl; trivial.
+    Qed.
+
+    Lemma eval_substs_applies {h cenv sdefs env res} :
+      eval_substs h cenv sdefs env = Some res ->
+      {x | res = x++env & domain x = rev (domain sdefs)}.
+    Proof.
+      revert env res.
+      induction sdefs; intros env res eqq; invcs eqq; simpl.
+      - exists nil; simpl; eauto.
+      - destruct a.
+        destruct (nnrc_core_eval h cenv env n); simpl in *; try discriminate.
+        destruct (IHsdefs _ _ H0) as [x ? eqd].
+        exists (x++(v,d)::nil).
+        + subst. rewrite app_ass; simpl; reflexivity.
+        + rewrite domain_app, eqd; simpl; reflexivity.
+    Qed.
+
+    Lemma eval_substs_lookup_equiv_on_env
+          h cenv sdefs {l env1 env2}:
+      lookup_equiv_on l env1 env2 ->
+      incl (concat (map nnrc_free_vars (codomain sdefs))) l ->
+      match eval_substs h cenv sdefs env1, eval_substs h cenv sdefs env2 with
+      | Some e1, Some e2 => lookup_equiv_on l e1 e2
+      | None, None => True
+      | _, _ => False
+      end.
+    Proof.
+      revert env1 env2; induction sdefs; simpl; trivial.
+      destruct a; intros env1 env2 leqq inclu.
+      apply incl_app_iff in inclu.
+      destruct inclu as [inclu1 inclu2].
+      simpl in *.
+      assert (eqqs:nnrc_core_eval h cenv env1 n = nnrc_core_eval h cenv env2 n).
+      { apply nnrc_core_eval_equiv_free_in_env; eauto. } 
+      rewrite <- eqqs.
+      case_eq (nnrc_core_eval h cenv env1 n); simpl; trivial.
+      intros d eqq1.
+      apply IHsdefs; trivial.
+      apply lookup_equiv_on_cons_same; trivial.
+    Qed.
+
+    Lemma eval_substs_lookup_equiv_env {h cenv sdefs env1 env2}:
+      lookup_equiv env1 env2 ->
+      match eval_substs h cenv sdefs env1, eval_substs h cenv sdefs env2 with
+      | Some e1, Some e2 => lookup_equiv e1 e2
+      | None, None => True
+      | _, _ => False
+      end.
+    Proof.
+      revert env1 env2; induction sdefs; simpl; trivial.
+      destruct a; intros env1 env2 leqq.
+      assert (eqqs:nnrc_core_eval h cenv env1 n = nnrc_core_eval h cenv env2 n) by (apply nnrc_core_eval_equiv_env; eauto).
+      rewrite <- eqqs.
+      case_eq (nnrc_core_eval h cenv env1 n); simpl; trivial.
+      intros d eqq1.
+      apply IHsdefs.
+      apply lookup_equiv_cons_same; trivial.      
+    Qed.
+
+    Lemma eval_substs_disjoint_swap_env
+          h cenv sdefs env₁ env₂ x₁ d₁ x₂ d₂ :
+        x₁ <> x₂ ->
+        match eval_substs h cenv sdefs (env₁++(x₁,d₁)::(x₂,d₂)::env₂)
+              ,  eval_substs h cenv sdefs (env₁++(x₂,d₂)::(x₁,d₁)::env₂) with
+        | Some res₁, Some res₂ =>
+          {env' | res₁ = env' ++  env₁++((x₁,d₁)::(x₂,d₂)::env₂) & res₂ = env' ++ env₁ ++ ((x₂,d₂)::(x₁,d₁)::env₂)}
+        | None, None => True
+        | _, _ => False
+        end.
+    Proof.
+      intros neq.
+      revert env₁.
+      induction sdefs; intros env₁ ; simpl.
+      - exists nil; simpl; reflexivity.
+      - destruct a.
+        generalize (nnrc_core_eval_swap_neq (h:=h) cenv env₁ x₁ d₁ x₂ d₂); simpl; intros HH.
+        rewrite HH by trivial.
+        destruct (nnrc_core_eval h cenv (env₁ ++ (x₂, d₂) :: (x₁, d₁) :: env₂) n)
+        ; simpl; trivial.
+        specialize (IHsdefs ((v,d)::env₁)).
+        simpl in IHsdefs.
+        unfold var in *.
+        repeat match_destr.
+        destruct IHsdefs as [env' eqq1 eqq2].
+        exists ( env' ++ (v, d)::nil); rewrite app_ass; simpl; trivial.
+    Qed.
+
+    Lemma eval_substs_disjoint_cons_env h cenv sdefs x d :
+        ~ In x (domain sdefs) ->
+        ~ In x (concat (map nnrc_free_vars (codomain sdefs))) ->
+        forall env,
+        match eval_substs h cenv sdefs env
+              , eval_substs h cenv sdefs ((x,d)::env) with
+        | Some res₁, Some res₂ => {env' | res₁ = env' ++ env & res₂ = env' ++ (x,d)::env}
+        | None, None => True
+        | _, _ => False
+        end.
+    Proof.
+      induction sdefs; simpl; intros nin1 nin2 env.
+      - exists nil; simpl; reflexivity.
+      - destruct a; simpl in *.
+        list_simpler.
+        apply notand in nin1.
+        apply notand in nin2.
+        destruct nin1 as [nin11 nin12].
+        destruct nin2 as [nin21 nin22].
+        assert (nnrc_core_eval h cenv ((x, d) :: env) n =
+                nnrc_core_eval h cenv env n).
+        { apply nnrc_core_eval_equiv_free_in_env.
+          intros ? inn; simpl.
+          match_destr.
+          unfold equiv in *; congruence.
+        }
+        rewrite H; simpl.
+        destruct (nnrc_core_eval h cenv env n); simpl; trivial.
+        specialize (IHsdefs nin12 nin22 ((v, d0) :: env)).
+        generalize (eval_substs_disjoint_swap_env
+                      h cenv sdefs nil env v d0 x d nin11); intros HH.
+        simpl in HH.
+        unfold var in*.
+        repeat match_destr; repeat match_destr_in HH; try tauto.
+        destruct IHsdefs as [env' eqq1 eqq2].
+        destruct HH as [env'' eqq3 eqq4].
+        subst.
+        list_simpler.
+        exists (env'' ++ (v, d0) :: nil); rewrite app_ass; simpl; reflexivity.
+    Qed.
+          
+    Lemma eval_substs_disjoint_middle_some h cenv sdefs env' :
+        disjoint (domain sdefs) (domain env') ->
+        disjoint (concat (map nnrc_free_vars (codomain sdefs))) (domain env') ->
+        forall env,
+          match eval_substs h cenv sdefs env
+                , eval_substs h cenv sdefs (env' ++ env) with
+          | Some res₁, Some res₂ => {env'' | res₁ = env'' ++ env & res₂ = env'' ++ env' ++ env}
+          | None, None => True
+          | _, _ => False
+          end.
+    Proof.
+      induction env'; simpl; intros disj1 disj2 env.
+      - match_case; intros.
+        apply eval_substs_applies in H.
+        destruct H as [env'' ? ?]; subst.
+        exists env''; simpl; trivial.
+      - apply disjoint_cons_inv2 in disj1.
+        destruct disj1 as [disj1 nin1].
+        apply disjoint_cons_inv2 in disj2.
+        destruct disj2 as [disj2 nin2].
+        destruct a; simpl in *.
+        specialize (IHenv' disj1 disj2).
+        specialize (IHenv' env).
+        generalize (eval_substs_disjoint_cons_env h cenv sdefs v d nin1 nin2 (env'++env))
+        ; intros HH.
+        repeat match_option_in HH; 
+          rewrite eqq in *; try tauto.
+        match_option_in IHenv'.
+        destruct IHenv' as [env'1 ? ?].
+        destruct HH as [env'2 ? ?].
+        subst.
+        list_simpler.
+        exists (env'2); trivial.
+    Qed.
+
+    Lemma mk_expr_from_vars_eq_expr {n1 n2} :
+      nnrc_core_eq n1 n2 ->
+      forall sdefs,
+        nnrc_core_eq (mk_expr_from_vars (n1, sdefs)) (mk_expr_from_vars (n2, sdefs)).
+    Proof.
+      unfold mk_expr_from_vars, nnrc_core_eq.
+      intros eqq sdefs; revert n1 n2 eqq.
+      induction sdefs; intros n1 n2 eqq; simpl; trivial; intros.
+      match_case; intros ? inn.
+      apply IHsdefs; trivial.
+      simpl; constructor; trivial.
+      eapply nnrc_core_eval_normalized; try eapply inn; eauto.
+    Qed.
+
+  End Eval_substs.
+
   Section Correct.
 
     Opaque fresh_var.
-
-
     Require Import cNNRCEq.
+    Require Import NNRCEq.
 
-    Lemma mk_expr_from_vars_binop b e1 e2 sdefs :
-      nnrc_core_eq
-        (mk_expr_from_vars (NNRCBinop b e1 e2, sdefs))
-        (NNRCBinop b (mk_expr_from_vars (e1, sdefs)) (mk_expr_from_vars (e2, sdefs))).
-    Proof.
-      unfold mk_expr_from_vars.
-      induction sdefs; simpl.
-      - reflexivity.
-      - rewrite IHsdefs; simpl.
-        red; simpl; intros.
-        match_case.
-    Qed.
+    Require Import cNNRCShadow.
 
-
-    Lemma stratify_aux_correct h cenv env e bound_vars required_kind :
-      incl (nnrc_free_vars e) bound_vars ->
-      Forall (data_normalized h) (map snd cenv) ->
-      Forall (data_normalized h) (map snd env) ->
-      @nnrc_core_eval _ h cenv env (mk_expr_from_vars (stratify_aux e required_kind bound_vars)) =
-      @nnrc_core_eval _ h cenv env e.
-    Proof.
-      revert required_kind bound_vars env.
-      induction e; intros required_kind bound_vars env fbincl Fde FDce; simpl; trivial.
-      - repeat (match_case; intros).
-        rewrite mk_expr_from_vars_binop; trivial.
-        simpl in *.
-        apply incl_app_iff in fbincl.
-        destruct fbincl as [fbincl1 fbincl2].
-        generalize (stratify_aux_nbound_vars H); intros nb1.
-        generalize (stratify_aux_nbound_vars H0); intros nb2.
-        specialize (IHe1 nnrcExpr bound_vars env).
-        cut_to IHe1; trivial.
-        rewrite H in IHe1.
-        rewrite <- IHe1.
-        specialize (IHe2 nnrcExpr (domain l ++ bound_vars) env).
-        cut_to IHe2; trivial; try (apply incl_appr; trivial).
-        rewrite H0 in IHe2.
-        rewrite <- IHe2.
-        repeat rewrite mk_expr_from_vars_app.
-        f_equal.
-        +
-    
-
-
-    Lemma mk_expr_from_vars_app e l1 l2 :
-      mk_expr_from_vars (e, (l1 ++ l2)) =
-      mk_expr_from_vars ((mk_expr_from_vars (e, l2)), l1).
-    Proof.
-      unfold mk_expr_from_vars; simpl.
-      rewrite fold_right_app.
-      trivial.
-    Qed.
-
-
-    
-
-
-
-    Lemma stratify_aux_free_vars {e required_level bound_vars n sdefs} :
-      incl (nnrc_free_vars e) bound_vars ->
-      stratify_aux e required_level bound_vars = (n,sdefs) ->
-      equivlist (nnrc_free_vars n ++ (concat (map nnrc_free_vars (codomain sdefs)))) (nnrc_free_vars e ++ domain sdefs).
-    Proof.
-      unfold equivlist.
-      revert required_level bound_vars sdefs n.
-      induction e; intros required_level bound_vars sdefs n inclb eqq
-      ; simpl in *; invcs eqq; simpl; unfold incl; try tauto.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        match_case_in H0; intros ? ? eqq2; rewrite eqq2 in H0.
-        invcs H0; simpl.
-        apply incl_app_iff in inclb.
-        destruct inclb as [inclb1 inclb2].
-        specialize (IHe1 _ _ _ _ inclb1 eqq1).
-        assert (inclb2':incl (nnrc_free_vars e2) (domain l ++ bound_vars))
-               by (intros ? inn; list_simpler; intuition).
-        specialize (IHe2 _ _ _ _ inclb2' eqq2).
-        list_simpler.
-        intros a. specialize (IHe1 a); specialize (IHe2 a).
-        repeat rewrite in_app_iff in *.
-        intuition.
-      - admit.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        apply incl_app_iff in inclb.
-        destruct inclb as [inclb1 inclb2].
-        specialize (IHe1 _ _ _ _ inclb1 eqq1).
-        destruct (stratify1_aux_sdefs_app H0) as [sdefs' ?]; subst.
-        case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros nn ll eqq2.
-        rewrite eqq2 in *.
-        assert (inclb2':incl (nnrc_free_vars e2) (v::bound_vars)).
-        { unfold incl in *; intros ? inn; simpl.
-          destruct (v == a); unfold equiv, complement in *.
-          - eauto.
-          - right; apply inclb2.
-            list_simpler; trivial.
-        } 
-        specialize (IHe2 _ _ _ _ inclb2' eqq2).
-        intros a.
-        specialize (IHe1 a); specialize (IHe2 a).
-        list_simpler.
-        split; intros inn.
-        * { intuition.
-              - generalize (stratify1_aux_free_vars_incl H0 _ H4); intros inn2.
-                simpl in inn2.
-                repeat rewrite domain_app in inn2.
-                repeat rewrite in_app_iff in inn2.
-                intuition.
-                list_simpler.
-                destruct required_level
-                ; simpl in H0; invcs H0
-                ; (repeat (list_simpler; simpl in *)); intuition.
-                   list_simpler.
-                   generalize (mk_expr_from_vars_growing_fv_free_fw_codomain H0); intros HH2.
-                   destruct HH2.
-                   + revert H1 H11; clear; intuition. apply H1 in H11.
-                     revert H11; clear; intuition.
-                   generalize (mk_expr_from_vars_growing_fv_free_fw gfc2 _ _ H0)
-                   ; intuition.
-             }
-
-                generalize (mk_expr_from_vars_growing_fv_free_fw gfc2 _ _ H3); intros HH.
-                intuition.
-              - destruct required_level
-                ; simpl in H0; invcs H0
-                ; (repeat (list_simpler; simpl in *)); intuition.
-                   list_simpler.
-                   generalize (mk_expr_from_vars_growing_fv_free_fw gfc2 _ _ H0)
-                   ; intuition.
-             }
-             * { 
-                 generalize (stratify_aux_nbound_vars eqq2); intros disj.
-                 apply disjoint_cons_inv2 in disj.
-                 destruct disj as [disj vnin].
-                 destruct required_level
-                ; simpl in H0; invcs H0
-                ; (repeat (list_simpler; simpl in *)); intuition; list_simpler.
-                   - specialize (H H2).
-                     generalize (mk_expr_from_vars_growing_fv_free_bk nn ll a)
-                     ; intros HH.
-                     specialize (inclb2' _ H2).
-                     simpl in inclb2'; destruct inclb2'; [congruence | ].
-                     symmetry in disj.
-                     specialize (disj _ H9).
-                     destruct H.
-                     + intuition.
-                     + generalize (mk_expr_from_vars_has_codomain_vars a ll)
-                       ; intuition.
-                   - specialize (H H2).
-                     generalize (mk_expr_from_vars_growing_fv_free_bk nn ll a)
-                     ; intros HH.
-                     specialize (inclb2' _ H2).
-                     simpl in inclb2'; destruct inclb2'; [congruence | ].
-                     symmetry in disj.
-                     specialize (disj _ H9).
-                     destruct H.
-                     + intuition.
-                     + generalize (mk_expr_from_vars_has_codomain_vars a ll)
-                       ; intuition.
-                    }
-          + rewrite growing_fv_ctxt_app; simpl; split.
-            * eapply growing_fv_ctxt_incl; eauto
-              ; intros ?; repeat rewrite in_app_iff; intuition.
-            * generalize (stratify1_aux_gfc_app_weak H0); intros HH.
-              simpl in HH.
-              { cut_to HH.
-                -
-                  generalize (mk_expr_from_vars_growing_fv_free_fw gfc1); intros HH2.
-                  eapply growing_fv_ctxt_incl; eauto
-                  ; intros ?; repeat rewrite in_app_iff; intuition.
-                  + specialize (incl1 a).
-                    list_simpler.
-                    intuition.
-                  + list_simpler.
-                    admit.
-                - eapply growing_fv_ctxt_incl; eauto
-                  ; intros ?; repeat rewrite in_app_iff; intuition.
-                  specialize (incl1 a).
-                  list_simpler.
-                  destruct incl1 as [incl11 incl12].
-                  cut_to incl12; [ | intuition].
-                  destruct incl12; [intuition | ].
-                  
-                  
-                  destruct required_level; simpl in H0.
-                  invcs H0.
-                ; simpl in H0; invcs H0
-                ; (repeat (list_simpler; simpl in *)).
-                  
-
-
-    Lemma stratify_aux_free_vars {e required_level bound_vars n sdefs} :
-      incl (nnrc_free_vars e) bound_vars ->
-      stratify_aux e required_level bound_vars = (n,sdefs) ->
-      (equivlist (nnrc_free_vars n ++ (concat (map nnrc_free_vars (codomain sdefs)))) (nnrc_free_vars e ++ domain sdefs)
-      /\ growing_fv_ctxt sdefs (nnrc_free_vars e)).
-    Proof.
-      unfold equivlist.
-      revert required_level bound_vars sdefs n.
-      induction e; intros required_level bound_vars sdefs n inclb eqq
-      ; simpl in *; invcs eqq; simpl; unfold incl; try tauto.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        match_case_in H0; intros ? ? eqq2; rewrite eqq2 in H0.
-        invcs H0; simpl.
-        apply incl_app_iff in inclb.
-        destruct inclb as [inclb1 inclb2].
-        destruct (IHe1 _ _ _ _ inclb1 eqq1) as [incl1 gfc1].
-        assert (inclb2':incl (nnrc_free_vars e2) (domain l ++ bound_vars))
-               by (intros ? inn; list_simpler; intuition).
-        destruct (IHe2 _ _ _ _ inclb2' eqq2) as [incl2 gfc2].
-        list_simpler.
-        split.
-        + intros a. specialize (incl1 a); specialize (incl2 a).
-          repeat rewrite in_app_iff in *.
-          intuition.
-        + rewrite growing_fv_ctxt_app; simpl; split.
-          * eapply growing_fv_ctxt_incl; eauto
-            ; intros ?; repeat rewrite in_app_iff; intuition.
-          * eapply growing_fv_ctxt_incl; eauto
-            ; intros ?; repeat rewrite in_app_iff; intuition.
-      - admit.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        apply incl_app_iff in inclb.
-        destruct inclb as [inclb1 inclb2].
-        destruct (IHe1 _ _ _ _ inclb1 eqq1) as [incl1 gfc1].
-        destruct (stratify1_aux_sdefs_app H0) as [sdefs' ?]; subst.
-        case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros nn ll eqq2.
-        rewrite eqq2 in *.
-        assert (inclb2':incl (nnrc_free_vars e2) (v::bound_vars)).
-        { unfold incl in *; intros ? inn; simpl.
-          destruct (v == a); unfold equiv, complement in *.
-          - eauto.
-          - right; apply inclb2.
-            list_simpler; trivial.
-        } 
-        specialize (IHe2 _ _ _ _ inclb2' eqq2).
-        destruct IHe2 as [incl2 gfc2].
-        split.
-        + intros a.
-          specialize (incl1 a); specialize (incl2 a).
-          list_simpler.
-          split; intros inn.
-          * { intuition.
-              - generalize (stratify1_aux_free_vars_incl H0 _ H4); intros inn2.
-                simpl in inn2.
-                repeat rewrite domain_app in inn2.
-                repeat rewrite in_app_iff in inn2.
-                intuition.
-                list_simpler.
-                generalize (mk_expr_from_vars_growing_fv_free_fw gfc2 _ _ H3); intros HH.
-                intuition.
-              - destruct required_level
-                ; simpl in H0; invcs H0
-                ; (repeat (list_simpler; simpl in *)); intuition.
-                   list_simpler.
-                   generalize (mk_expr_from_vars_growing_fv_free_fw gfc2 _ _ H0)
-                   ; intuition.
-             }
-             * { 
-                 generalize (stratify_aux_nbound_vars eqq2); intros disj.
-                 apply disjoint_cons_inv2 in disj.
-                 destruct disj as [disj vnin].
-                 destruct required_level
-                ; simpl in H0; invcs H0
-                ; (repeat (list_simpler; simpl in *)); intuition; list_simpler.
-                   - specialize (H H2).
-                     generalize (mk_expr_from_vars_growing_fv_free_bk nn ll a)
-                     ; intros HH.
-                     specialize (inclb2' _ H2).
-                     simpl in inclb2'; destruct inclb2'; [congruence | ].
-                     symmetry in disj.
-                     specialize (disj _ H9).
-                     destruct H.
-                     + intuition.
-                     + generalize (mk_expr_from_vars_has_codomain_vars a ll)
-                       ; intuition.
-                   - specialize (H H2).
-                     generalize (mk_expr_from_vars_growing_fv_free_bk nn ll a)
-                     ; intros HH.
-                     specialize (inclb2' _ H2).
-                     simpl in inclb2'; destruct inclb2'; [congruence | ].
-                     symmetry in disj.
-                     specialize (disj _ H9).
-                     destruct H.
-                     + intuition.
-                     + generalize (mk_expr_from_vars_has_codomain_vars a ll)
-                       ; intuition.
-                    }
-          + rewrite growing_fv_ctxt_app; simpl; split.
-            * eapply growing_fv_ctxt_incl; eauto
-              ; intros ?; repeat rewrite in_app_iff; intuition.
-            * generalize (stratify1_aux_gfc_app_weak H0); intros HH.
-              simpl in HH.
-              { cut_to HH.
-                -
-                  generalize (mk_expr_from_vars_growing_fv_free_fw gfc1); intros HH2.
-                  eapply growing_fv_ctxt_incl; eauto
-                  ; intros ?; repeat rewrite in_app_iff; intuition.
-                  + specialize (incl1 a).
-                    list_simpler.
-                    intuition.
-                  + list_simpler.
-                    admit.
-                - eapply growing_fv_ctxt_incl; eauto
-                  ; intros ?; repeat rewrite in_app_iff; intuition.
-                  specialize (incl1 a).
-                  list_simpler.
-                  destruct incl1 as [incl11 incl12].
-                  cut_to incl12; [ | intuition].
-                  destruct incl12; [intuition | ].
-                  
-                  
-                  destruct required_level; simpl in H0.
-                  invcs H0.
-                ; simpl in H0; invcs H0
-                ; (repeat (list_simpler; simpl in *)).
-                  
-                 
-            
-
-                 
-    
-    Lemma stratify_aux_free_vars {e required_level bound_vars n sdefs} :
-      stratify_aux e required_level bound_vars = (n,sdefs) ->
-      (incl (nnrc_free_vars n) (nnrc_free_vars e ++ domain sdefs)
-      /\ growing_fv_ctxt sdefs (nnrc_free_vars e)).
-    Proof.
-      unfold incl.
-      revert required_level bound_vars sdefs n.
-      induction e; intros required_level bound_vars sdefs n eqq
-      ; simpl in *; invcs eqq; simpl; unfold incl; try tauto.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        match_case_in H0; intros ? ? eqq2; rewrite eqq2 in H0.
-        invcs H0; simpl.
-        destruct (IHe1 _ _ _ _ eqq1) as [incl1 gfc1].
-        destruct (IHe2 _ _ _ _ eqq2) as [incl2 gfc2].
-        repeat rewrite domain_app in *.
-        split.
-        + intros a inn. specialize (incl1 a); specialize (incl2 a).
-          repeat rewrite in_app_iff in *.
-          intuition.
-        + rewrite growing_fv_ctxt_app; simpl; split.
-          * eapply growing_fv_ctxt_incl; eauto
-            ; intros ?; repeat rewrite in_app_iff; intuition.
-          * eapply growing_fv_ctxt_incl; eauto
-            ; intros ?; repeat rewrite in_app_iff; intuition.
-      - admit.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        destruct (IHe1 _ _ _ _ eqq1) as [incl1 gfc1].
-        destruct (stratify1_aux_sdefs_app H0) as [sdefs' ?]; subst.
-        case_eq (stratify_aux e2 nnrcStmt bound_vars); intros nn ll eqq2.
-        rewrite eqq2 in *.
-        specialize (IHe2 _ _ _ _ eqq2).
-        destruct IHe2 as [incl2 gfc2].
-        split.
-        + intros ? inn.
-          generalize (stratify1_aux_free_vars_incl H0 _ inn); intros inn2.
-          simpl in inn2.
-          specialize (incl1 a).
-          repeat rewrite domain_app in *.
-          repeat rewrite in_app_iff in *.
-          intuition.
-          apply remove_inv in H1.
-          destruct H1 as [inn2 neq].
-          rewrite <- (remove_in_neq _ _ _ neq).
-          generalize (mk_expr_from_vars_growing_fv_free_fw gfc2 _ _ inn2); intros HH.
-          specialize (incl2 a).
-          repeat rewrite in_app_iff in *; intuition.
-        + rewrite growing_fv_ctxt_app; simpl; split.
-          * eapply growing_fv_ctxt_incl; eauto
-            ; intros ?; repeat rewrite in_app_iff; intuition.
-          * generalize (stratify1_aux_gfc_app_weak H0); intros HH.
-            simpl in HH.
-            { cut_to HH.
-              - admit.
-              -  eapply growing_fv_ctxt_incl; eauto
-                 ; intros ?; repeat rewrite in_app_iff; intuition.
-                 
-            
-            
-          * eapply growing_fv_ctxt_incl; eauto
-            ; intros ?; repeat rewrite in_app_iff; intuition.
-          * 
-            eapply growing_fv_ctxt_incl; eauto
-            ; intros ?; repeat rewrite in_app_iff; intuition.
-
-    Qed.
-            
-    Lemma stratify_aux_growing_fv_ctxt {e required_level bound_vars n sdefs} :
-      stratify_aux e required_level bound_vars = (n,sdefs) ->
-      growing_fv_ctxt sdefs (nnrc_free_vars e).
-    Proof.
-      revert required_level bound_vars sdefs n.
-      induction e; intros required_level bound_vars sdefs n eqq
-      ; simpl in *; invcs eqq; simpl; trivial.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        match_case_in H0; intros ? ? eqq2; rewrite eqq2 in H0.
-        invcs  H0.
-        apply growing_fv_ctxt_app.
-        apply IHe1 in eqq1.
-        apply IHe2 in eqq2.
-        split.
-        + eapply growing_fv_ctxt_incl; eauto; intro; rewrite in_app_iff; intuition.
-        + eapply growing_fv_ctxt_incl; eauto; intro; rewrite in_app_iff; intuition.
-      - admit.
-      - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
-        specialize (IHe1 _ _ _ _ eqq1).
-        destruct required_level; simpl in H0; invcs H0.
-        + apply growing_fv_ctxt_app.
-          split.
-          * eapply growing_fv_ctxt_incl; eauto; intro; rewrite in_app_iff; intuition.
-          * simpl.
-            generalize (mk_expr_from_vars_growing_fv_free_fw IHe1); intros HH.
-            split; trivial.
-            intros ? inn.
-            repeat rewrite in_app_iff in *.
-            
-            
-            
-        match_case_in H0; intros ? ? eqq2; rewrite eqq2 in H0.
-
-        
-
-
-    Lemma mk_expr_from_vars_growing_fv_free e sdefs ctxt :
-      disjoint (domain sdefs) (ctxt++nnrc_free_vars e) ->
-      growing_fv_ctxt sdefs (ctxt++(nnrc_free_vars e)) ->
-      forall x,
-        In x (ctxt++nnrc_free_vars (mk_expr_from_vars (e, sdefs))) <->
-        ((In x (ctxt++(nnrc_free_vars e))) /\ ~ In x (domain sdefs)).
-    Proof.
-      unfold mk_expr_from_vars.
-      revert e ctxt; induction sdefs; intros e ctxt disj gfc; simpl; [intuition | ].
-      intros; destruct a; simpl in *.
-      destruct gfc as [incln gfc].
-      apply disjoint_cons_inv1 in disj.
-      destruct disj as [disj nin].
-      repeat rewrite in_app_iff in *.
-      split; intros inn.
-      - destruct inn as [inn|[inn|inn]]; [intuition | .. ].
-        + subst; intuition.
-        + eapply disj; eauto.
-          rewrite in_app_iff; eauto.
-        + intuition; subst.
-          * apply incln in inn.
-            rewrite in_app_iff in inn; intuition.
-          * apply incln in inn.
-            eapply disj; eauto.
-        + apply remove_inv in inn.
-          destruct inn as [inn neq].
-          
-          
-      - subst; intuition.
-      - admit.
-      - admit.
-      - admit.
-      - apply remove_inv in H.
-        destruct H as [inn neq].
-        rewrite mk_expr_from_vars_eq in *.
-        admit.
-      - apply remove_inv in H.
-        destruct H as [inn neq].
-        rewrite mk_expr_from_vars_eq in *.
-        admit.
-        
-        
-
-    Lemma mk_expr_from_vars_preserves_same_free e sdefs :
-          (forall x y, In (x,y) sdefs -> incl (nnrc_free_vars y) (nnrc_free_vars e)) ->
-          incl (nnrc_free_vars (mk_expr_from_vars (e, sdefs)))
-               (nnrc_free_vars e).
-    Proof.
-      unfold mk_expr_from_vars.
-      induction sdefs; simpl; intros incls; [reflexivity | ].
-      red; intros ? inn.
-      rewrite in_app_iff in inn.
-      destruct inn as [inn|inn].
-      - specialize (incls (fst a) (snd a)).
-        destruct a; simpl in *.
-        intuition.
-      - apply remove_inv in inn.
-        destruct inn as [inn Hneq].
-        apply IHsdefs in inn; trivial.
-        eauto.
-    Qed.
-
-    (* critical condition *)
     Lemma stratify1_aux_correct h cenv env e bound_vars required_kind sdefs :
-      incl (nnrc_free_vars e) bound_vars ->
-      disjoint bound_vars (domain sdefs) ->
-      (forall x y, In (x,y) sdefs -> incl (nnrc_free_vars y) (nnrc_free_vars e)) ->
-      @nnrc_core_eval _ h cenv env (mk_expr_from_vars (stratify1_aux e required_kind bound_vars sdefs)) =
-      @nnrc_core_eval _ h cenv env (mk_expr_from_vars (e,sdefs)).
+      eval_nnrc_with_substs h cenv env (stratify1_aux e required_kind bound_vars sdefs) =
+      eval_nnrc_with_substs h cenv env (e,sdefs).
     Proof.
-      destruct required_kind; simpl; trivial.
-      unfold mk_expr_from_vars; simpl.
-      rewrite fold_right_app; simpl.
-      revert e.
-      induction sdefs; simpl; intros e inbfv disj same_free.
-      - match_option.
-        match_destr; try congruence.
-      - match_option.
-        specialize (IHsdefs e).
-        repeat rewrite mk_expr_from_vars_eq in *.
-        generalize (@cNNRCShadow.nnrc_core_eval_remove_free_env _ h cenv
-                                                                nil); simpl; intros HH.
-        repeat rewrite HH.
-        + apply IHsdefs; intuition.
-          * apply disjoint_cons_inv2 in disj.
-            intuition.
-          * eapply same_free; right; eauto.
-        + intro inn.
-          apply mk_expr_from_vars_preserves_same_free in inn.
-          * apply inbfv in inn.
-            apply disjoint_cons_inv2 in disj.
-            intuition.
-          * intuition; eauto.
-        + intro inn.
-          apply mk_expr_from_vars_preserves_same_free in inn.
-          * simpl in inn.
-            match_destr_in inn; try congruence.
-            rewrite app_nil_r in inn.
-            apply inbfv in inn.
-            apply disjoint_cons_inv2 in disj.
-            intuition.
-          * intros ? ? inn2.
-            simpl; match_destr; try congruence.
-            rewrite app_nil_r.
-            eapply same_free; eauto.
-    Qed.
-
-
-
-
-
-    (*
-
-    Lemma stratify1_aux_free_vars {e required_kind bound_vars sdefs n l} :
-      stratify1_aux e required_kind bound_vars sdefs = (n,l) ->
-      bound_vars ++ (domain sdefs)
-      equivlist (nnrc_free_vars e ++ domain sdefs) (nnrc_free_vars n ++ domain l).
-    Proof.
-      destruct required_kind; simpl; trivial; intros eqq; invcs eqq; simpl; trivial.
-      - rewrite domain_app.
-      - reflexivity.
       intros.
-      rewrite domain_app, in_app_iff in inn.
-      destruct inn; trivial.
-      - simpl in *.
-        destruct H0; try tauto.
-        subst.
-        apply fresh_var_fresh in H.
-        tauto.
-
+      destruct required_kind; simpl; trivial.
+      unfold eval_nnrc_with_substs; simpl.
+      rewrite eval_substs_app; simpl.
+      destruct (eval_substs h cenv sdefs env); simpl; trivial.
+      destruct (nnrc_core_eval h cenv b e); simpl; trivial.
+      match_destr.
+      congruence.
     Qed.
-      
-    Lemma stratify_aux_free_vars {e required_kind bound_vars n l} :
-      stratify_aux e required_kind bound_vars = (n,l) ->
-      equivlist (nnrc_free_vars n) (nnrc_free_vars e ++ domain l).
-*)
 
-
-
-
-
-
-    Lemma stratify_aux_free_vars_incl {fe n sdefs} :
-      incl (nnrc_free_vars n) (fe ++ (domain sdefs)) ->
-      (forall x y, In (x,y) sdefs -> incl (nnrc_free_vars y) fe) ->
-      incl (nnrc_free_vars (mk_expr_from_vars (n,sdefs))) fe.
+    Lemma disjoint_rev_r {A} (l1 l2: list A) :
+      disjoint l1 (rev l2) <-> disjoint l1 l2.
     Proof.
-      unfold mk_expr_from_vars.
-      revert fe n.
-      induction sdefs; intros fe n incl1 incl2; simpl in *.
-      - rewrite app_nil_r in incl1; trivial.
-      - intros ? inn.
-        rewrite in_app_iff in inn.
-        destruct inn as [inn|inn].
-        + destruct a as [aa ab].
-          specialize (incl2 aa ab); intuition.
-        + apply remove_inv in inn.
-          destruct inn as [inn neq].
-          eapply IHsdefs; try eapply inn; eauto.
-          intros ? inn2.
-          specialize (incl1 _ inn2).
-          rewrite in_app_iff in incl1; simpl in incl1.
-          rewrite in_app_iff.
-          intuition.
-          subst.
-          
+      intros.
+      assert (eqq:equivlist (rev l2) l2).
+      { rewrite <- Permutation_rev; reflexivity. }
+      apply equivlist_incls in eqq.
+      split; intros disj.
+      - eapply disjoint_incl in disj; eauto; tauto.
+      - eapply disjoint_incl; eauto; tauto.
+    Qed.
 
-          
-    In a (nnrc_free_vars (mk_expr_from_vars (stratify_aux e nnrcStmt bound_vars))) = nnrc_free_vars e
+    Lemma disjoint_rev_l {A} (l1 l2: list A) :
+      disjoint (rev l1) l2 <-> disjoint l1 l2.
+    Proof.
+      split; intros disj; symmetry; symmetry in disj.
+      - apply disjoint_rev_r; auto.
+      - apply disjoint_rev_r in disj; auto.
+    Qed.
 
+    Lemma incl_remove {A} dec x (l1 l2:list (A)) :
+      incl (remove dec x l1) l2 <-> incl l1 (x::l2).
+    Proof.
+      unfold incl; simpl; intuition.
+      - destruct (dec x a); subst; eauto 2.
+        right; apply (H a).
+        apply remove_in_neq; congruence.
+      - apply remove_inv in H0.
+        destruct H0 as [inn neq].
+        destruct (H _ inn); congruence.
+    Qed.
+
+    Lemma eval_substs_normalized {h cenv env sdefs env'} :
+      eval_substs h cenv sdefs env = Some env' ->
+      Forall (data_normalized h) (map snd cenv) ->
+      Forall (data_normalized h) (map snd env) ->
+      Forall (data_normalized h) (map snd env').
+    Proof.
+      revert env env'.
+      induction sdefs; simpl; intros env env' eqq1 FDce FDe.
+      - invcs eqq1; trivial.
+      - destruct a.
+        apply some_olift in eqq1.
+        destruct eqq1 as [d eqq2 eqq3].
+        apply nnrc_core_eval_normalized in eqq2; trivial.
+        symmetry in eqq3.
+        apply (IHsdefs _ _ eqq3); trivial.
+        constructor; trivial.
+    Qed.
     
-    Lemma stratify_aux_free_vars_incl {e required_level bound_vars n sdefs} :
-      stratify_aux e required_level bound_vars = (n, sdefs) ->
-      (incl (nnrc_free_vars n) (nnrc_free_vars e ++ (domain sdefs))
-    /\ (forall x y, In (x,y) sdefs -> incl (nnrc_free_vars y) (nnrc_free_vars e))).
-    Proof.
-      revert required_level bound_vars sdefs n.
-      induction e; intros required_level bound_vars sdefs n eqq
-      ; simpl in *; invcs eqq; simpl.
-      - intuition.
-      - intuition.
-      - intuition.
-      - match_case_in H0; intros ? ? eqq1
-        ; rewrite eqq1 in H0.
-         match_case_in H0; intros ? ? eqq2
-         ; rewrite eqq2 in H0.
-         invcs H0; simpl.
-         destruct (IHe1 _ _ _ _ eqq1) as [IHe11 IHe12].
-         destruct (IHe2 _ _ _ _ eqq2) as [IHe21 IHe22].
-         split
-         ; unfold incl in *; [intros ? inn | intros ? ? inn1 ? inn2]
-          ; repeat rewrite domain_app in *
-          ; repeat rewrite in_app_iff in *.
-        + destruct inn as [inn|inn].
-          * specialize (IHe11 _ inn).
-            rewrite in_app_iff in IHe11.
-            intuition.
-          * specialize (IHe21 _ inn).
-            rewrite in_app_iff in IHe21.
-            intuition.
-        + intuition eauto.
-      -  match_case_in H0; intros ? ? eqq1
-         ; rewrite eqq1 in H0.
-         invcs H0; simpl.
-         eauto.
-      - match_case_in H0; intros ? ? eqq1
-        ; rewrite eqq1 in H0; simpl.
-        specialize (IHe1 _ _ _ _ eqq1).
-        destruct IHe1 as [IHe11 IHe12].
-        destruct (stratify1_aux_sdefs_app H0); subst.
-        apply stratify1_aux_free_vars_incl in H0.
-        simpl in H0.
-        split; [intros ? inn | intros ? ? inn1 ? inn2]
-        ; repeat rewrite domain_app
-        ; repeat rewrite in_app_iff.
-        + specialize (H0 _ inn).
-          rewrite domain_app in H0.
-          repeat rewrite in_app_iff in H0.
-          intuition.
-          * specialize (IHe11 _ H0).
-            rewrite in_app_iff in IHe11.
-            intuition.
-          *  apply remove_inv in H0.
-             destruct H0 as [inn2 neq].
-             rewrite <- remove_in_neq by trivial.
-
-
-             case_eq ((stratify_aux e2 nnrcStmt bound_vars)); intros ? ? eqq2
-             ; rewrite eqq2 in *.
-             specialize (IHe2 _ _ _ _ eqq2).
-             destruct IHe2 as [IHe21 IHe22].
-             
-             
-             specialize (mk_expr_from_vars_preserves_same_free n1 l0)
-             ; intros incl2.
-             { cut_to incl2.
-               - admit.
-               - intros ? ? inn3 ? inn4.
-                 specialize (IHe22 _ _ inn3 _ inn4).
-             
-             
-          
-          generalize (
-          
-SearchAbout remove.
-          
-
-          
-          
-          generalize (mk_expr_from_vars_preserves_same_free 
-          
-              
-        specialize (stratify1_aux_nbound_vars H0); intros HH.
-        eapply disjoint_with_exclusion; eauto.
-      - match_case_in H0; intros ? ? eqq1
-        ; rewrite eqq1 in H0.
-        specialize (IHe1 _ _ _ _ eqq1).
-        specialize (stratify1_aux_nbound_vars H0); intros HH.
-        eapply disjoint_with_exclusion; eauto.
-      - match_case_in H0; intros ? ? eqq1
-        ; rewrite eqq1 in H0.
-        specialize (IHe1 _ _ _ _ eqq1).
-        specialize (stratify1_aux_nbound_vars H0); intros HH.
-        eapply disjoint_with_exclusion; eauto.
-      - match_case_in H0; intros ? ? eqq1
-        ; rewrite eqq1 in H0.
-        specialize (IHe1 _ _ _ _ eqq1).
-        specialize (stratify1_aux_nbound_vars H0); intros HH.
-        eapply disjoint_with_exclusion; eauto.
-      - match_case_in H0; intros ? ? eqq1
-         ; rewrite eqq1 in H0.
-         invcs H0.
-         eauto.
-    Qed.
-    Lemma stratify_aux_correct h cenv env e bound_vars required_kind :
+    Lemma stratify_aux_correct_core h cenv env e bound_vars required_kind :
       incl (nnrc_free_vars e) bound_vars ->
       Forall (data_normalized h) (map snd cenv) ->
       Forall (data_normalized h) (map snd env) ->
       @nnrc_core_eval _ h cenv env (mk_expr_from_vars (stratify_aux e required_kind bound_vars)) =
       @nnrc_core_eval _ h cenv env e.
     Proof.
+      rewrite mk_expr_from_vars_eval.
+      unfold eval_nnrc_with_substs.
       revert required_kind bound_vars env.
-      induction e; intros required_kind bound_vars env fbincl Fde FDce; simpl; trivial.
-      - repeat (match_case; intros).
-        rewrite mk_expr_from_vars_binop; trivial.
-        simpl in *.
+      induction e; intros required_kind bound_vars env fbincl FDce Fde; simpl; trivial.
+      - repeat (match_case; intros); simpl.
+        simpl in fbincl.
         apply incl_app_iff in fbincl.
         destruct fbincl as [fbincl1 fbincl2].
+        rewrite <- (IHe1 nnrcExpr bound_vars) by trivial.
+        rewrite <- (IHe2 nnrcExpr (domain l ++ bound_vars)); trivial;
+          try (apply incl_appr; trivial); simpl.
+        clear IHe1 IHe2.
+        rewrite H, H0; simpl.
+        rewrite eval_substs_app.
+        unfold olift.
+        case_eq (eval_substs h cenv l env); simpl; trivial
+        ; intros ? eqq1.
+        destruct (eval_substs_applies eqq1) as [env' ? eqdom]; subst.
+        generalize (eval_substs_disjoint_middle_some h cenv l0 env'); intros HH.
+        generalize (stratify_aux_free_vars H fbincl1); intros fequiv1.
+        generalize (stratify_aux_free_vars H0); intros fequiv2.
+        cut_to fequiv2; try (apply incl_appr; trivial).
         generalize (stratify_aux_nbound_vars H); intros nb1.
         generalize (stratify_aux_nbound_vars H0); intros nb2.
-        specialize (IHe1 nnrcExpr bound_vars env).
-        cut_to IHe1; trivial.
-        rewrite H in IHe1.
-        rewrite <- IHe1.
-        specialize (IHe2 nnrcExpr (domain l ++ bound_vars) env).
-        cut_to IHe2; trivial; try (apply incl_appr; trivial).
-        rewrite H0 in IHe2.
-        rewrite <- IHe2.
-        repeat rewrite mk_expr_from_vars_app.
+        apply disjoint_app_r in nb2.
+        destruct nb2 as [nb2 nb3].
+        assert (disj1: disjoint (domain l0) (domain env')).
+        { unfold var in *.
+          rewrite eqdom, disjoint_rev_r; tauto.
+        }
+        assert (disj2:disjoint (concat (map nnrc_free_vars (codomain l0))) (domain env')).
+        {
+          intros x inn1 inn2.
+          generalize (fequiv2 x); list_simpler; intros [impf _].
+          cut_to impf; [| tauto].
+          rewrite eqdom, <- in_rev in inn2.
+          destruct impf as [inn3|inn3]; eauto.
+        }
+        specialize (HH disj1 disj2 env).
+        unfold var in *.
+        repeat match_option_in HH; try rewrite olift2_none_r; try tauto.
+        destruct HH as [env'' eeqq1 eeqq2].
+        subst.
         f_equal.
-        +
-
-          
-
-
-          
-          
-        + 
-
-          
-          
-        + 
-        
-        SearchAbout fold_right.
-            Definition mk_expr_from_vars (nws:nnrc_with_substs)
-      := fold_right (fun sdef accum => NNRCLet (fst sdef) (snd sdef) accum) (fst nws) (snd nws).
-
-      - 
-
-        Lemma nnrc_core_eval_remove_free_env {h:list (string*string)} c l v x l' e :
-          disjoint (domain l3) (nnrc_free_vars e) ->
-          nnrc_core_eval h c (l ++ l3 ++ l') e = nnrc_core_eval h c (l ++ l') e.
-  Proof.
-
-        
-        
-        rewrite IHe1.
-        
-        
-        rewrite IHe1.
-        
-
-
-      
-    Section tests.
-    Local Open Scope nnrc_scope.
-    Local Open Scope string_scope.
-
-    Eval vm_compute in (stratify nnrc1).
-
-    Eval vm_compute in (stratify nnrc2).
-    Eval vm_compute in (stratify nnrc2).
-
-    Example nnrcC1 := (NNRCFor "x"%string ‵(dnat 1) ‵(dnat 2)) ‵+ (NNRCFor "y"%string ‵(dnat 3) ‵(dnat 4)).
-    Eval vm_compute in (stratify nnrcC1).
-    
-(*    Example nnrc3 := (‵abs (NNRCLet "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))). *)
-    Eval vm_compute in (stratify nnrc3). 
-
-    Example nnrc4 := (‵abs (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-(*    Eval vm_compute in (stratify nnrc4). *)
-
-    Example nnrc5 := (‵abs (NNRCLet "z" (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) (NNRCVar "z")) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-(*    Eval vm_compute in (stratify nnrc5). *)
-
-    Example nnrc6 := (‵abs (NNRCLet "z" (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8))))) (NNRCVar "z")) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-(*    Eval vm_compute in (stratify nnrc6). *)
-
-    Example nnrc7 := NNRCLet "x" (NNRCLet "y" ‵(dnat 3) (‵(dnat 8) ‵+ (NNRCVar "y"))) (NNRCVar "x").
-    
-(*    Eval vm_compute in (stratify nnrc7). *)
-
-    Example nnrc8 := NNRCLet "x" (NNRCLet "x" ‵(dnat 3) (‵(dnat 8) ‵+ (NNRCVar "x"))) (NNRCVar "x").
-    
-(*    Eval vm_compute in (stratify nnrc8). *)
-
-  End tests.
-        Definition stratify1_aux
-               (body:nnrc)
-               (required_kind:nnrcKind)
-               (bound_vars:list var)
-               (sdefs:list (var*nnrc))
-      : nnrc_with_substs
-      := match required_kind with
-         | nnrcExpr =>
-           let fvar := fresh_var "stratify" bound_vars in
-           (NNRCVar fvar, (fvar, body)::sdefs)
-         | _ => (body, sdefs)
-         end.
-    
-    Fixpoint stratify_aux (e: nnrc) (required_kind:nnrcKind) (bound_vars:list var): nnrc_with_substs
-      := match e with
-         | NNRCG
-                    
-    
-         
-
-
-
-
-
-        Definition stratify1_aux
-               (body:nnrc)
-               (required_kind:nnrcKind)
-               (bindings:list var)
-               (holey_expr:nnrc->list var->nnrc) :=
-      match required_kind with
-      | nnrcExpr =>
-        let fvar := fresh_var "stratify" bindings in
-        let bindings1 := fvar::bindings in
-        NNRCLet fvar body (holey_expr (NNRCVar fvar) bindings1)
-      | _ => holey_expr body bindings
-      end.
-    
-    (* stratify that produces a given type *)
-    (* holey_expr : {n:nnrc | stratifiedLevel_spec required_kind n} -> list var -> nnrc *)
-    Fixpoint stratify_aux (e: nnrc) (required_kind:nnrcKind) (bound_vars:list var) (holey_expr:nnrc->list var->nnrc): nnrc
-      := match e with
-         | NNRCGetConstant c =>
-           (holey_expr (NNRCGetConstant c) bound_vars)
-         | NNRCVar _ => holey_expr e bound_vars
-         | NNRCConst _ => holey_expr e bound_vars
-         | NNRCBinop b e1 e2 =>
-           stratify_aux e1 nnrcExpr bound_vars
-                        (fun e1n bound_vars1 =>
-                           stratify_aux e2 nnrcExpr bound_vars1
-                                        (fun e2n bound_vars2 =>
-                                           (holey_expr (NNRCBinop b e1n e2n) bound_vars2)))
-         | NNRCUnop u e1 =>
-           stratify_aux e1 nnrcExpr bound_vars
-                        (fun e1n bound_vars1 => 
-                           (holey_expr (NNRCUnop u e1n) bound_vars1))
-         | NNRCLet x e1 e2 =>
-           stratify_aux e1 nnrcStmt bound_vars
-                        (fun e1n bound_vars1 =>
-                           let body := NNRCLet x e1n
-                                               (stratify_aux e2 nnrcStmt (x::bound_vars1) (fun e _ => e)) in
-                           stratify1_aux body required_kind bound_vars1 holey_expr)
-         | NNRCFor x e1 e2 => 
-           stratify_aux e1 nnrcExpr bound_vars
-                        (fun e1n bound_vars1 =>
-                           let body := NNRCFor x e1n
-                                               (stratify_aux e2 nnrcStmt (x::bound_vars1) (fun e _ => e ))
-                           in
-                           stratify1_aux body required_kind bound_vars1 holey_expr)
-         | NNRCIf e1 e2 e3 => 
-           stratify_aux e1 nnrcExpr bound_vars
-                        (fun e1n bound_vars1 =>
-                           let body := (NNRCIf e1n
-                                               (stratify_aux e2 nnrcStmt bound_vars1 (fun e _ => e ))
-                                               (stratify_aux e3 nnrcStmt bound_vars1 (fun e _ => e ))) in
-                           stratify1_aux body required_kind bound_vars1 holey_expr)
-         | NNRCEither e1 x2 e2 x3 e3 => 
-           stratify_aux e1 nnrcExpr bound_vars
-                        (fun e1n bound_vars1 =>
-                           let body := NNRCEither e1n
-                                                  x2 (stratify_aux e2 nnrcStmt (x2::bound_vars1) (fun e _ => e ))
-                                                  x3 (stratify_aux e3 nnrcStmt (x3::bound_vars1) (fun e _ => e )) in
-                           stratify1_aux body required_kind bound_vars1 holey_expr)
-         | NNRCGroupBy s ls e1 =>
-           stratify_aux e1 nnrcExpr bound_vars
-                        (fun e1n bound_vars1 =>
-                           let body := (NNRCGroupBy s ls e1n) in
-                           stratify1_aux body required_kind bound_vars1 holey_expr)
-         end.
-
-    (*
-    Definition holey_preserver
-               h cenv (holey_expr:nnrc->list var -> nnrc) 
-      := forall moreenv e e' env,
-        Forall (data_normalized h) (map snd env) ->
-        Forall (data_normalized h) (map snd moreenv) ->
-        incl (nnrc_free_vars e) (domain env) ->
-        nnrc_core_eval h cenv env e = nnrc_core_eval h cenv env e' ->
-        disjoint moreenv env ->
-        nnrc_core_eval h cenv (moreenv++env) (holey_expr e (domain env))
-        = nnrc_core_eval h cenv (moreenv++env) (holey_expr e' (domain moreenv++(domain env))).
-*)
-
-    Inductive holey_some_preserver h cenv : (nnrc->list var -> nnrc) -> Prop
-      :=
-      | holey_some_preserver_base holey_expr v d e env :
-           Forall (data_normalized h) (map snd env) ->
-           incl (nnrc_free_vars e) (domain env) ->
-           ~ In v (domain env) ->
-           nnrc_core_eval h cenv env e = Some d ->
-           nnrc_core_eval h cenv env (holey_expr e (domain env))
-           = nnrc_core_eval h cenv ((v,d)::env) (holey_expr (NNRCVar v) (v::(domain env))) -> holey_some_preserver h cenv holey_expr
-      | holey_some_preserver_ind
-          holey_expr
-    .
-    
-    Definition holey_some_preserver
-               h cenv (holey_expr:nnrc->list var -> nnrc) 
-      := forall v d e env,
-        Forall (data_normalized h) (map snd env) ->
-        incl (nnrc_free_vars e) (domain env) ->
-        ~ In v (domain env) ->
-        nnrc_core_eval h cenv env e = Some d ->
-        nnrc_core_eval h cenv env (holey_expr e (domain env))
-        = nnrc_core_eval h cenv ((v,d)::env) (holey_expr (NNRCVar v) (v::(domain env)))
-    .
-
-    Definition holey_none_preserver
-               h cenv (holey_expr:nnrc->list var -> nnrc) 
-      := forall e env,
-        Forall (data_normalized h) (map snd env)
-        -> nnrc_core_eval h cenv env e = None
-        -> nnrc_core_eval h cenv env (holey_expr e (domain env)) = None.
-
-(*
-    
-
-    Definition holey_preserver
-               h cenv (holey_expr:nnrc->list var -> nnrc)
-      := forall e env,
-        Forall (data_normalized h) (map snd env) ->        
-        match nnrc_core_eval h cenv env e with
-        | Some d =>
-          forall moreenv e',
-            Forall (data_normalized h) (map snd moreenv) ->
-            nnrc_core_eval h cenv (moreenv++env) e' = Some d ->
-            disjoint (domain moreenv) (domain env) ->
-            nnrc_core_eval h cenv env (holey_expr e (domain env))
-            = nnrc_core_eval h cenv (moreenv++env) (holey_expr e' (domain moreenv++(domain env)))
-        | None => nnrc_core_eval h cenv env (holey_expr e (domain env)) = None
-        end.
-     *)
-
-    Lemma stratify1_aux_core_correct
-          h cenv (env:bindings)
-          (e:nnrc) (required_level:nnrcKind)
-          (holey_expr:nnrc->list var->nnrc) :
-      Forall (data_normalized h) (map snd cenv) ->
-      Forall (data_normalized h) (map snd env) ->
-      incl (nnrc_free_vars e) (domain env) ->
-      holey_some_preserver h cenv holey_expr ->
-      holey_none_preserver h cenv holey_expr ->
-      nnrc_core_eval h cenv env (stratify1_aux e required_level (domain env) holey_expr) =
-      nnrc_core_eval h cenv env (holey_expr e (domain env)).
-    Proof.
-      intros cenv_normalized env_normalized inclfe hsp hnp.
-      destruct required_level; simpl; trivial.
-      symmetry.
-      match_option.
-      - apply hsp; trivial.
-        eapply fresh_var_fresh; eauto.
-      - apply hnp; trivial.
-    Qed.
-    
-    Lemma holey_preserver_binop1 h cenv b e1 holey_expr :
-          holey_some_preserver h cenv holey_expr ->
-          holey_some_preserver h cenv
-          (fun (e2n : nnrc) (bound_vars2 : list var) =>
-             holey_expr (NNRCBinop b e1 e2n) bound_vars2).
-    Proof.
-      unfold holey_some_preserver; intros hsp; intros.
-      apply hsp.
-      
-(*      
-
-      generalize (hp e env H); intros hp1.
-      generalize (hp ((NNRCBinop b e1 e)) env H); intros hp2.
-      match_option; intros.
-      - rewrite eqq in *.
-        match_option_in hp2.
-        + apply hp2; trivial.
-          simpl in eqq0.
-          apply some_olift2 in eqq0.
-          destruct eqq0 as [? [??[??]]].
-          simpl.
-          eapply nnrc_core_eval_some_env_extend_disjoint in e0; eauto.
-          rewrite e0.
-          rewrite H1; simpl.
-          rewrite H3 in eqq; invcs eqq.
-          congruence.
-        + rewrite hp2.
-          simpl in eqq0.
-          rewrite eqq in eqq0.
-          unfold olift2 in eqq0.
-          match_option_in eqq0.
-          * admit.
-          * specialize (hp (NNRCBinop b e1 e') (moreenv++env)).
-            simpl in hp.
-
-            eapply (nnrc_core_eval_some_env_extend_disjoint in eqq1; eauto.
-
-            rewrite eqq1 in hp.
-          
-          generalize (hp ((NNRCBinop b e1 e')) (moreenv++env)); intros hp3.
-          match_case_in hp3.
-          simpl in hp3.
-          rewrite eqq in eqq0.
-          
-
-          
-
-      - 
-    Qed.
- *)
-    Admitted.
-    
-    Lemma stratify_aux_core_correct
-          h cenv (env:bindings)
-          (e:nnrc) (required_level:nnrcKind)
-          (holey_expr:nnrc->list var->nnrc) :
-      holey_preserver h cenv holey_expr ->
-      nnrc_eq (stratify_aux e required_level (domain env) holey_expr)
-              (holey_expr e (domain env)).
-              
-      Forall (data_normalized h) (map snd cenv) ->
-      Forall (data_normalized h) (map snd env) ->
-      holey_preserver h cenv holey_expr ->
-      nnrc_core_eval h cenv env (stratify_aux e required_level (domain env) holey_expr) =
-      nnrc_core_eval h cenv env (holey_expr e (domain env)).
-    Proof.
-      revert required_level env holey_expr.
-      nnrc_cases (induction e) Case; intros required_level env holey_expr cenv_normalized env_normalize hp; simpl; trivial.
-      - Case "NNRCBinop"%string.
-        admit.
-        (*
-        rewrite IHe1; trivial.
-        + rewrite IHe2; trivial.
-          * red; intros.
-            { specialize (hp e env).
-              match_option; intros.
-              - 
-admit. (*            
-            apply (hsp moreenv).
-            apply hsp; trivial.
-            simpl.
-            rewrite H0; trivial.
-          * 
-        + red; intros.
-          repeat rewrite IHe2; trivial.
-          * apply hp; simpl; trivial.
-            rewrite H0; trivial.
-          * red; intros.
-            apply hp; trivial.
-            simpl; rewrite H2; trivial.
-          * red; intros.
-            apply hp; trivial.
-            simpl; rewrite H2; trivial. *)
-*)
-      - Case "NNRCUnop"%string.
-        admit.
-      - Case "NNRCLet"%string.
-        rewrite IHe1; trivial.
-        + rewrite stratify1_aux_core_correct; trivial.
-           generalize (hp (NNRCLet v e1
-                                   (stratify_aux e2 nnrcStmt (v :: domain env) (fun (e : nnrc) (_ : list var) => e))) env env_normalize); intros hp1.
-           generalize (hp (NNRCLet v e1 e2) env env_normalize); intros hp2.
-           match_option_in hp2; match_option_in hp1.
-          * admit.
-          * rewrite hp1.
-            admit.
-          * rewrite hp2.
-            admit.
-          * rewrite hp1, hp2; trivial.
-        + red; unfold stratify1_aux; intros.
-          destruct required_level; simpl.
-          match_option; intros.
-          * rewrite H1.
-            {  rewrite IHe2; trivial.
-              - specialize (IHe2 nnrcStmt (((v, d) :: moreenv ++ env0))).
-                simpl in IHe2.
-                repeat rewrite domain_app in IHe2.
-                rewrite IHe2; trivial.
-                replace (((v, d) :: moreenv ++ env)) with (((v, d) :: nil ++ moreenv ++ env)) by (simpl; trivial).
-                rewrite <- nnrc_core_eval_some_env_extend_disjoint.
-                + 
-              repeat match_option.
-              - 
-            
-          * simpl.
+        + apply nnrc_core_eval_equiv_free_in_env; intros.
+          destruct (eval_substs_applies eqq) as [env''' ? eqdom2]; subst.
+          list_simpler.
+          rewrite lookup_app.
+          rewrite (lookup_nin_none _ (l:=env''')); trivial.
+          rewrite eqdom2, <- in_rev.
+          generalize (fequiv1 x); list_simpler; intros [impf _].
+          cut_to impf; [| tauto].
+          destruct impf as [inn3|inn3]; eauto.
+        + apply nnrc_core_eval_equiv_free_in_env; intros.
+          repeat rewrite lookup_app.
+          match_destr.
+          rewrite (lookup_nin_none _ (l:=env')); trivial.
+          rewrite eqdom, <- in_rev.
+          generalize (fequiv2 x); list_simpler; intros [impf _].
+          cut_to impf; [| tauto].
+          destruct impf as [inn3|inn3]; eauto.
+      - repeat (match_case; intros); simpl in *.
+        specialize (IHe nnrcExpr _ _ fbincl FDce Fde).
+        rewrite <- IHe; simpl.
+        rewrite H.
+        simpl.
+        unfold olift.
+        match_option.
+      - rewrite eval_nnrc_with_substs_eq.
+        rewrite <- surjective_pairing.
+        rewrite stratify1_aux_correct.
+        unfold eval_nnrc_with_substs; simpl.
+        simpl in fbincl.
+        apply incl_app_iff in fbincl.
+        destruct fbincl as [fbincl1 fbincl2].
+        apply incl_remove in fbincl2.
+        specialize (IHe1 nnrcStmt _ _ fbincl1 FDce Fde).
+        rewrite mk_expr_from_vars_eval.
+        unfold eval_nnrc_with_substs; rewrite IHe1.
+        match_option.
+        assert (Fde2:Forall (data_normalized h) (map snd ((v, d) :: env))).
+        { simpl; constructor; trivial.
+          eapply nnrc_core_eval_normalized; try eapply eqq; eauto.
+        }
+        specialize (IHe2 nnrcStmt _ _ fbincl2 FDce Fde2).
+        rewrite mk_expr_from_vars_eval.
+        unfold eval_nnrc_with_substs; rewrite IHe2.
+        trivial.
+      - rewrite eval_nnrc_with_substs_eq.
+        rewrite <- surjective_pairing.
+        case_eq (stratify_aux e1 nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
+        rewrite stratify1_aux_correct.
+        unfold eval_nnrc_with_substs; simpl.
+        simpl in fbincl.
+        apply incl_app_iff in fbincl.
+        destruct fbincl as [fbincl1 fbincl2].
+        apply incl_remove in fbincl2.
+        specialize (IHe1 nnrcExpr _ _ fbincl1 FDce Fde).
+        rewrite <- IHe1; clear IHe1.
+        rewrite eqq1; simpl.
+        case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
+        intros env'' eqq2.
+        match_option.
+        destruct d; simpl; trivial.
+        f_equal.
+        apply lift_map_ext; intros.
+        assert (Fde2:Forall (data_normalized h) (map snd ((v, x) :: env''))).
+        { apply eval_substs_normalized in eqq2; trivial.
+          simpl; constructor; trivial.
+          apply nnrc_core_eval_normalized in eqq; trivial.
+          eapply data_normalized_dcoll_in; eauto.
+        }
+        specialize (IHe2 nnrcStmt _ _ fbincl2 FDce Fde2).
+        rewrite mk_expr_from_vars_eval.
+        unfold eval_nnrc_with_substs; rewrite IHe2.
+        destruct (eval_substs_applies eqq2) as [env' ? eqdom]; subst.
+        apply nnrc_core_eval_equiv_free_in_env; intros z zin.
+        simpl.
+        destruct (equiv_dec z v); trivial.
+        unfold equiv, complement in *.
+        rewrite lookup_app.
+        generalize (stratify_aux_free_vars eqq1); intros fequiv1.
+        generalize (stratify_aux_nbound_vars eqq1); intros nb1.
+        assert (ninz:~ In z (domain env')).
+        {         
+          rewrite <- disjoint_rev_l in nb1.
+          rewrite <- eqdom in nb1.
+          specialize (nb1 z).
+          intros nin2; apply nb1; trivial.
+          specialize (fbincl2 _ zin).
+          simpl in fbincl2; intuition.
+        }
+        rewrite (lookup_nin_none _ ninz); trivial.
+      - rewrite eval_nnrc_with_substs_eq.
+        rewrite <- surjective_pairing.
+        case_eq (stratify_aux e1 nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
+        rewrite stratify1_aux_correct.
+        unfold eval_nnrc_with_substs; simpl.
+        simpl in fbincl.
+        apply incl_app_iff in fbincl.
+        destruct fbincl as [fbincl1 fbincl2].
+        apply incl_app_iff in fbincl2.
+        destruct fbincl2 as [fbincl2 fbincl3].
+        specialize (IHe1 nnrcExpr _ _ fbincl1 FDce Fde).
+        rewrite <- IHe1; clear IHe1.
+        rewrite eqq1; simpl.
+        case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
+        intros env'' eqq2.
+        apply olift_ext; intros d eqq3.
+        destruct d; simpl; trivial.
+        assert(Fde'':Forall (data_normalized h) (map snd env'')).
+        { apply eval_substs_normalized in eqq2; trivial. }
+        destruct (eval_substs_applies eqq2) as [env' ? eqdom]; subst.
+        generalize (stratify_aux_free_vars eqq1); intros fequiv1.
+        generalize (stratify_aux_nbound_vars eqq1); intros nb1.
+        rewrite <- disjoint_rev_l in nb1.
+        rewrite <- eqdom in nb1.
+       destruct b.
+        + rewrite mk_expr_from_vars_eval.
+           unfold eval_nnrc_with_substs; rewrite IHe2; trivial.
+           apply nnrc_core_eval_equiv_free_in_env; intros z zin.
+           rewrite lookup_app.
+           assert (ninz:~ In z (domain env')).
+           {         
+             specialize (nb1 z).
+             intros nin2; apply nb1; trivial.
+             specialize (fbincl2 _ zin).
+             simpl in fbincl2; intuition.
+           }
+           rewrite (lookup_nin_none _ ninz); trivial.
+        + rewrite mk_expr_from_vars_eval.
+           unfold eval_nnrc_with_substs; rewrite IHe3; trivial.
+           apply nnrc_core_eval_equiv_free_in_env; intros z zin.
+           rewrite lookup_app.
+           assert (ninz:~ In z (domain env')).
+           {         
+             specialize (nb1 z).
+             intros nin2; apply nb1; trivial.
+             specialize (fbincl3 _ zin).
+             simpl in fbincl2; intuition.
+           }
+           rewrite (lookup_nin_none _ ninz); trivial.
+      - rewrite eval_nnrc_with_substs_eq.
+        rewrite <- surjective_pairing.
+        case_eq (stratify_aux e1 nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
+        rewrite stratify1_aux_correct.
+        unfold eval_nnrc_with_substs; simpl.
+        simpl in fbincl.
+        apply incl_app_iff in fbincl.
+        destruct fbincl as [fbincl1 fbincl2].
+        apply incl_app_iff in fbincl2.
+        destruct fbincl2 as [fbincl2 fbincl3].
+        apply incl_remove in fbincl2.
+        apply incl_remove in fbincl3.
+        specialize (IHe1 nnrcExpr _ _ fbincl1 FDce Fde).
+        rewrite <- IHe1; clear IHe1.
+        rewrite eqq1; simpl.
+        case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
+        intros env'' eqq2.
+        apply olift_ext; intros d eqq3.
+        assert(Fde'':Forall (data_normalized h) (map snd env'')).
+        { apply eval_substs_normalized in eqq2; trivial. }
+        destruct (eval_substs_applies eqq2) as [env' ? eqdom]; subst.
+        generalize (stratify_aux_free_vars eqq1); intros fequiv1.
+        generalize (stratify_aux_nbound_vars eqq1); intros nb1.
+        rewrite <- disjoint_rev_l in nb1.
+        rewrite <- eqdom in nb1.
+        destruct d; simpl; trivial.
+        + rewrite mk_expr_from_vars_eval.
+           unfold eval_nnrc_with_substs; rewrite IHe2; simpl; trivial.
+          * apply nnrc_core_eval_equiv_free_in_env; intros z zin.
+            simpl. destruct (equiv_dec z v); simpl; trivial.
+            unfold equiv, complement in *.
+            rewrite lookup_app.
+            assert (ninz:~ In z (domain env')).
+            {         
+             specialize (nb1 z).
+             intros nin2; apply nb1; trivial.
+             specialize (fbincl2 _ zin).
+             simpl in fbincl2; intuition.
+           }
+            rewrite (lookup_nin_none _ ninz); trivial.
+          * constructor; trivial.
+            apply nnrc_core_eval_normalized in eqq3; trivial.
+            invcs eqq3; trivial.
+        + rewrite mk_expr_from_vars_eval.
+           unfold eval_nnrc_with_substs; rewrite IHe3; simpl; trivial.
+          * apply nnrc_core_eval_equiv_free_in_env; intros z zin.
+            simpl. destruct (equiv_dec z v0); simpl; trivial.
+            unfold equiv, complement in *.
+            rewrite lookup_app.
+            assert (ninz:~ In z (domain env')).
+            {         
+             specialize (nb1 z).
+             intros nin2; apply nb1; trivial.
+             specialize (fbincl3 _ zin).
+             simpl in fbincl3; intuition.
+           }
+            rewrite (lookup_nin_none _ ninz); trivial.
+          * constructor; trivial.
+            apply nnrc_core_eval_normalized in eqq3; trivial.
+            invcs eqq3; trivial.
+      - rewrite eval_nnrc_with_substs_eq.
+        rewrite <- surjective_pairing.
+        case_eq (stratify_aux e nnrcExpr bound_vars); intros e' sdefs1 eqq1.
+        rewrite stratify1_aux_correct.
+        unfold eval_nnrc_with_substs; simpl.
+        unfold olift.
+        match_option.
     Qed.
 
-    Lemma stratify_aux_core_correct
-          h cenv (env:bindings)
-          (e:nnrc) (required_level:nnrcKind)
-          (holey_bindings:list var) (holey_expr:nnrc->list var->nnrc) :
-      Forall (data_normalized h) (map snd cenv) ->
-      Forall (data_normalized h) (map snd env) ->
-      holey_preserver h cenv holey_expr holey_bindings ->
-      nnrc_core_eval h cenv env (stratify_aux e required_level holey_bindings holey_expr) =
-      nnrc_core_eval h cenv env (holey_expr e holey_bindings).
+    Lemma stratify_correct_core e :
+      nnrc_core_eq (stratify e) e.
     Proof.
-      revert required_level env holey_bindings holey_expr.
-      induction e; intros required_level env holey_bindings holey_expr cenv_normalized env_normalize hp; simpl; trivial.
-      - admit.
-      - apply IHe; trivial.
-        repeat red; intros.
-        apply hp; trivial.
-        simpl; rewrite H; trivial.
-      - rewrite IHe1; trivial.
-        + { destruct required_level.
-            - simpl.
-              case_eq (nnrc_core_eval h cenv env e1); intros.
-              + admit.
-              + 
-              
-              rewrite hp; trivial.
-              
-
-    
-    (* our holey contexts preserve contextual equivalence *)
-    Definition holey_preserver
-               h cenv (holey_expr:nnrc->list var -> nnrc) (holey_bindings:list var)
-      :=
-        forall e env d ,
-          incl (domain env) holey_bindings ->
-          nnrc_core_eval h cenv env e = Some d ->
-        forall holey_bindings',
-          incl holey_bindings holey_bindings' ->
-          nnrc_core_eval h cenv env (holey_expr e holey_bindings) =
-          nnrc_core_eval h cenv env (holey_expr (NNRCConst d) holey_bindings).
-
-    Lemma stratify_aux_core_correct
-          h cenv (env:bindings)
-          (e:nnrc) (required_level:nnrcKind)
-          (holey_bindings:list var) (holey_expr:nnrc->list var->nnrc) d :
-      Forall (data_normalized h) (map snd cenv) ->
-      Forall (data_normalized h) (map snd env) ->
-      holey_preserver h cenv holey_expr holey_bindings ->
-      nnrc_core_eval h cenv env e = Some d ->
-      nnrc_core_eval h cenv env (stratify_aux e required_level holey_bindings holey_expr) =
-      nnrc_core_eval h cenv env (holey_expr (NNRCConst d) holey_bindings).
-    Proof.
-      revert required_level d env holey_bindings holey_expr.
-      induction e; intros required_level dd env holey_bindings holey_expr cenv_normalized env_normalized holey_preserver evale; simpl in *.
-      - admit.
-      - admit.
-      - admit.
-      - admit.
-      - admit.
-      - match_case_in evale; [ intros ? eqq | intros eqq]; rewrite eqq in evale; try discriminate.
-        rewrite IHe1 with (d:=d); trivial.
-        + destruct required_level; simpl.
-          * {
-              match_case; intros; trivial.
-              - admit.
-              - rewrite (IHe2 _ dd) in H; trivial.
-                + simpl in H; discriminate.
-                + admit.
-                + repeat red; intros.
-                  apply (holey_preserver _ env0).
-                case_eq (nnrc_core_eval h cenv env (holey_expr (NNRCConst dd) holey_bindings)); trivial; intros.
-                
-              simpl in H.
-              apply h
-              apply (holey_preserver _ env _ ((fresh_var "stratify" holey_bindings, d0) :: env)).
-            } 
-        eapply IHe1.
-        rewrite IHe1.
-        apply (holey_preserver env).
-        
-        
-    Definition holey_preserver
-               h cenv holey_expr (holey_bindings:list var) :=
-      forall env e e',
-        Forall (data_normalized h) (map snd env) ->
-        incl (nnrc_vars e) holey_bindings ->
-        nnrc_core_eval h cenv env e =
-        nnrc_core_eval h cenv env e' ->
-        forall holey_bindings', sublist holey_bindings holey_bindings' ->
-                                nnrc_core_eval h cenv env (holey_expr e holey_bindings') =
-                                nnrc_core_eval h cenv env (holey_expr e' holey_bindings').
-
-    Lemma holey_preserver_unop h cenv holey_expr u holey_bindings :
-      holey_preserver h cenv holey_expr holey_bindings ->
-      holey_preserver h cenv
-                      (fun (e1n : nnrc) (bindings1 : list var) => holey_expr (NNRCUnop u e1n) bindings1)
-                      holey_bindings.
-    Proof.
-      intros hp.
-      red; intros.
-      rewrite hp; trivial.
-      simpl.
-      rewrite H1; trivial.
+      red; intros h cenv env FDce FDe.
+      apply stratify_aux_correct_core; trivial.
+      reflexivity.
     Qed.
 
-    (*
-    Lemma holey_preserver_bindings_cons h cenv holey_expr holey_bindings v :
-      holey_preserver h cenv holey_expr holey_bindings ->
-      holey_preserver h cenv holey_expr (v :: holey_bindings).
+    Lemma stratify_correct e :
+      nnrc_eq (stratify e) e.
     Proof.
-      intros hp.
-      red; intros.
-      rewrite hp; trivial.
-      - 
-      rewrite <- H2.
-      constructor; reflexivity.
+      red; intros h cenv env FDce FDe.
+      unfold nnrc_eval.
+      apply stratify_aux_correct; trivial.
+      reflexivity.
     Qed.
-
-    Lemma holey_preserver_bindings_app h cenv holey_expr holey_bindings morebindings :
-      holey_preserver h cenv holey_expr holey_bindings ->
-      holey_preserver h cenv holey_expr (morebindings ++ holey_bindings).
-    Proof.
-      revert holey_bindings.
-      induction morebindings; intros holey_bindings H; simpl; trivial.
-      apply holey_preserver_bindings_cons; auto.
-    Qed.
-
-    Lemma holey_preserver_bindings_sublist h cenv holey_expr holey_bindings holey_bindings' :
-      sublist holey_bindings holey_bindings' ->
-      holey_preserver h cenv holey_expr holey_bindings ->
-      holey_preserver h cenv holey_expr holey_bindings'.
-    Proof.
-      red; intros.
-      apply H0; trivial.
-      rewrite H; trivial.
-    Qed.
-   *)
-    
-(*    Lemma holey_preserver_let2 h cenv v e1 holey_expr holey_bindings :
-      Forall (data_normalized h) (map snd cenv) ->
-      holey_preserver h cenv holey_expr holey_bindings ->
-      ~In v holey_bindings ->
-      holey_preserver h cenv
-    (fun e2 (bindings1 : list var) =>
-       NNRCLet v e1 (holey_expr e2 bindings1)) holey_bindings.
-    Proof.
-      red; intros ? hp; intros.
-      simpl.
-      match_case; intros.
-      apply hp; trivial.
-      - simpl.
-        constructor; trivial.
-        eapply nnrc_core_eval_normalized; try eapply H5; eauto.
-      - 
-    Qed.
-    
-      rewrite hp; trivial.
-      simpl.
-      rewrite H3.
-      trivial.
-      
-
-      (fun e b =>
-         NNRCLet v e1 e)
-        
-      (fun e b => (stratify_aux e required_level b holey_expr))
-      
-    Stratified.holey_preserver h cenv
-    (fun (e1n : nnrc) (bindings1 : list var) =>
-       NNRCLet v e1n
-               (stratify_aux e2 required_level bindings1 holey_expr))
-    holey_bindings
-   *)
-
-    Lemma stratify_aux_core_correct
-          h cenv (env:bindings)
-          (e:nnrc) (required_level:nnrcKind)
-          (holey_bindings:list var) (holey_expr:nnrc->list var->nnrc) d :
-      Forall (data_normalized h) (map snd cenv) ->
-      Forall (data_normalized h) (map snd env) ->
-      incl (nnrc_vars e) holey_bindings ->
-      incl (domain env) holey_bindings ->
-      Proper (eq ==> equivlist ==> eq) holey_expr ->
-      holey_preserver h cenv holey_expr holey_bindings ->
-      nnrc_core_eval h cenv env e = Some d ->
-      nnrc_core_eval h cenv env (holey_expr (NNRCConst d) holey_bindings) =
-      nnrc_core_eval h cenv env (stratify_aux e required_level holey_bindings holey_expr).
-    Proof.
-      revert required_level d env holey_bindings holey_expr.
-      induction e; intros required_level dd env holey_bindings holey_expr cenv_normalized env_normalized inclvars incldomain holey_proper holey_preserver evale; simpl in *.
-      - admit.
-      - admit.
-      - admit.
-      - admit.
-      - admit.
-      - apply (holey_preserver env nil).
-        
-      - apply (holey_preserver env nil); try reflexivity; simpl; auto 1.
-        rewrite evale.
-        f_equal; apply normalize_normalized_eq.
-        rewrite Forall_forall in cenv_normalized.
-        eapply cenv_normalized.
-        unfold edot in evale.
-        apply assoc_lookupr_in in evale.
-        rewrite in_map_iff.
-        exists (v,dd); tauto.
-      - apply (holey_preserver env nil); try reflexivity; simpl; auto 1.
-        rewrite evale.
-        f_equal; apply normalize_normalized_eq.
-        rewrite Forall_forall in env_normalized.
-        eapply env_normalized.
-        unfold edot in evale.
-        apply lookup_in in evale.
-        rewrite in_map_iff.
-        exists (v,dd); tauto.
-      -  intros.
-         apply (holey_preserver env nil); simpl; try reflexivity; auto 1.
-         invcs evale.
-        rewrite normalize_idem; trivial.
-      - (* Binary operator *) admit.
-      - apply some_olift in evale.
-        destruct evale as [ed eqq1 eqq2].
-        erewrite <- IHe; try eapply eqq1; trivial.
-        + apply (holey_preserver env nil); try reflexivity; simpl; auto 1.
-          assert (edn:  data_normalized h ed)
-            by (eapply nnrc_core_eval_normalized; try eapply eqq1; eauto).
-          assert (ddn:  data_normalized h dd)
-            by (eapply unary_op_eval_normalized; try eapply eqq2; eauto).
-          repeat rewrite normalize_normalized_eq; trivial.
-        + repeat red; intros; subst. apply holey_proper; trivial.
-        + apply holey_preserver_unop; trivial.
-      - (* Let case *)
-        match_case_in evale; [intros ld ldeval | intros ldeval];
-          rewrite ldeval in evale; try discriminate.
-        assert (ldn:data_normalized h ld)
-          by (eapply nnrc_core_eval_normalized; try eapply ldeval; eauto).
-        erewrite <- IHe1; try eapply ldeval; trivial.
-        + simpl. rewrite <- IHe2 with (d:=dd); trivial.
-          * {
-              transitivity (nnrc_core_eval h cenv ((v, normalize_data h ld) :: env)
-                                           (holey_expr (NNRCConst dd) (v :: holey_bindings))).
-              - admit.
-(*                
-               apply (holey_preserver env ((v, normalize_data h ld) :: nil)); try reflexivity; auto 1; simpl.
-              + simpl; repeat constructor.
-                apply normalize_normalizes.
-              + red; intuition.
-              + eapply disjoint_incl; try eapply disjbound.
-                red; simpl; intuition.
-   *)
-              - f_equal.
-                apply holey_proper; trivial.
-                red; simpl; intuition; subst.
-                apply inclvars.
-                unfold nnrc_vars; rewrite in_app_iff; simpl; intuition.
-            } 
-          * constructor; trivial; simpl.
-            apply normalize_normalizes.
-          * eapply incl_letvars2; eauto.
-          * admit.
-(*            { apply disjoint_cons1.
-              - symmetry in disjbound.
-                apply disjoint_cons_inv1 in disjbound.
-                rewrite disjoint_app_l in disjbound.
-                symmetry; intuition.
-              - match_destr_in nshadow.
-            }  *)
-          * rewrite normalize_normalized_eq; trivial.
-        + eapply incl_letvars1; eauto.
-        + repeat red; intros; subst.
-          f_equal.
-          apply holey_bindings_stratify_aux_equiv; trivial.
-        + red; intros envv moreenvv ee ee' dnenvv dnmorenvv disje disjme eeeq holey_bindings' hbsub; simpl.
-          rewrite <- eeeq.
-          match_case; intros.
-          assert (dnd:data_normalized h d)
-            by (eapply nnrc_core_eval_normalized; try eapply H; trivial).
-          { 
-          transitivity (
-              nnrc_core_eval h cenv (moreenvv ++ (v, d) :: envv)
-                             (stratify_aux e2 required_level (domain moreenvv ++ holey_bindings') holey_expr)).
-          - repeat rewrite <- IHe2 with (d:=d); trivial.
-            + apply (holey_preserver ((v, d) :: envv) moreenvv); trivial.
-              * constructor; trivial.
-              * admit. (* I can prove this *) 
-              (* simpl.
-                apply disjoint_cons1; trivial.
-                red in disje.
-                symmetry in disje.
-                apply disje.
-                symmetry in disjbound.
-                apply disjoint_cons_inv1 in disjbound.
-                rewrite disjoint_app_l in disjbound.
-                symmetry; intuition.
-   *)
-            + rewrite map_app.
-              apply Forall_app; simpl; trivial.
-              constructor; trivial.
-            + admit.
-            + admit.
-            + apply holey_preserver_bindings_app; trivial.
-              eapply holey_preserver_bindings_sublist; eauto.
-            + 
-
-
-              
-          apply holey_preserver.
-          
-          transitivity
-            (nnrc_core_eval h cenv ((v, d) :: moreenvv ++ envv)
-                            (stratify_aux e2 required_level (domain moreenvv ++ holey_bindings') holey_expr)).
-          * { 
-              transitivity
-                (nnrc_core_eval h cenv (moreenvv ++ (v, d) :: envv) (stratify_aux e2 required_level (domain moreenvv ++ v :: holey_bindings') holey_expr)).
-              - repeat rewrite <- IHe2 with (d:=d); trivial.
-                + apply (holey_preserver ((v, d) :: envv) moreenvv); intros; simpl; trivial.
-                  * constructor; trivial.
-                  * apply sublist_skip; trivial.
-                + rewrite map_app.
-                  apply Forall_app; simpl; trivial.
-                  constructor; trivial.
-                + apply holey_preserver_bindings_app.
-                  apply holey_preserver_bindings_cons.
-                  eapply holey_preserver_bindings_sublist; eauto.
-                + admit.
-                + simpl; constructor; trivial.
-                + apply holey_preserver_bindings_cons.
-                  eapply holey_preserver_bindings_sublist; eauto.
-                + 
-            }
-          * {
-              f_equal.
-              apply holey_bindings_stratify_aux_equiv; trivial.
-              apply Permutation_equivlist.
-              rewrite Permutation_middle; reflexivity.
-            }
-        - 
-            
-          
-
-          
-          generalize (holey_preserver_stratify holey_preserver required_level); intros hpstratify.
-          red in hpstratify.
-          
-          rewrite  hpstratify.
-            
-        (holey_expr e holey_bindings')   
-        
-    Qed.
-    Lemma stratify_core_correct h cenv (env:bindings) (e:nnrc) :
-      nnrc_core_eval h cenv env e = nnrc_core_eval h cenv env (stratify e).
-                                              
-    Fixpoint nnrc_core_eval (env:bindings) (e:nnrc) : option data :=
-      
-        Lemma stratify_aux_stratified
-          (e: nnrc) (bindings:list var) (holey_expr:nnrc->list var->nnrc) :
-      (forall he hb, stratifiedLevel_spec 0 he -> stratified (holey_expr he hb)) ->
-      stratified (stratify_aux e bindings holey_expr).
-
-   *)
 
   End Correct.
 
