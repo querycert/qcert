@@ -1065,20 +1065,15 @@ Section NNRCtoNNRCimp.
 
   Theorem nnrc_to_nnrc_imp_correct
           h σc (s:nnrc) (globals:list var) :
-    Forall (data_normalized h) (codomain σc) ->
     @nnrc_eval_top _ h s σc = nnrc_imp_eval_top h σc (nnrc_to_nnrc_imp_top globals s).
   Proof.
     unfold nnrc_to_nnrc_imp_top, stratified_nnrc_stmt_to_nnrc_imp_stmt.
     destruct ((nnrc_stmt_to_nnrc_imp_stmt_stratified_some
                  globals (stratify s) (stratify_stratified s))); simpl.
+    rewrite <- (nnrc_to_nnrc_imp_some_correct _ _ e).
     unfold nnrc_eval_top.
-    intros.
-    rewrite <- (stratify_correct s); simpl; trivial.
-    - rewrite <- (nnrc_to_nnrc_imp_some_correct _ _ e).
-      reflexivity.
-    - unfold codomain in *.
-      rewrite Forall_map in *.
-      apply dnrec_sort_content; trivial.
+    rewrite stratify_correct.
+    trivial.
   Qed.
   
 End NNRCtoNNRCimp.

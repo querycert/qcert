@@ -1496,8 +1496,6 @@ Section Stratify.
     
     Lemma stratify_aux_correct h cenv env e bound_vars required_kind :
       incl (nnrc_free_vars e) bound_vars ->
-      Forall (data_normalized h) (map snd cenv) ->
-      Forall (data_normalized h) (map snd env) ->
       @nnrc_eval _ h cenv env (mk_expr_from_vars (stratify_aux e required_kind bound_vars)) =
       @nnrc_eval _ h cenv env e.
     Proof.
@@ -1505,7 +1503,7 @@ Section Stratify.
       unfold eval_nnrc_with_substs.
       unfold nnrc_eval.
       revert required_kind bound_vars env.
-      induction e; intros required_kind bound_vars env fbincl FDce Fde; simpl; trivial.
+      induction e; intros required_kind bound_vars env fbincl; simpl; trivial.
       - repeat (match_case; intros); simpl.
         simpl in fbincl.
         apply incl_app_iff in fbincl.
@@ -1566,7 +1564,7 @@ Section Stratify.
           cut_to impf; [| tauto].
           destruct impf as [inn3|inn3]; eauto.
       - repeat (match_case; intros); simpl in *.
-        specialize (IHe nnrcExpr _ _ fbincl FDce Fde).
+        specialize (IHe nnrcExpr _ env fbincl).
         rewrite <- IHe; simpl.
         rewrite H.
         simpl.
@@ -1580,16 +1578,12 @@ Section Stratify.
         apply incl_app_iff in fbincl.
         destruct fbincl as [fbincl1 fbincl2].
         apply incl_remove in fbincl2.
-        specialize (IHe1 nnrcStmt _ _ fbincl1 FDce Fde).
+        specialize (IHe1 nnrcStmt _ env fbincl1).
         unfold nnrc_eval; simpl; repeat rewrite <- nnrc_to_nnrc_base_eq.
         rewrite mk_expr_from_vars_eval.
         unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe1.
         match_option.
-        assert (Fde2:Forall (data_normalized h) (map snd ((v, d) :: env))).
-        { simpl; constructor; trivial.
-          eapply nnrc_core_eval_normalized; try eapply eqq; eauto.
-        }
-        specialize (IHe2 nnrcStmt _ _ fbincl2 FDce Fde2).
+        specialize (IHe2 nnrcStmt _ ((v,d)::env) fbincl2).
         repeat rewrite <- nnrc_to_nnrc_base_eq.
         rewrite mk_expr_from_vars_eval.
         unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2.
@@ -1603,7 +1597,7 @@ Section Stratify.
         apply incl_app_iff in fbincl.
         destruct fbincl as [fbincl1 fbincl2].
         apply incl_remove in fbincl2.
-        specialize (IHe1 nnrcExpr _ _ fbincl1 FDce Fde).
+        specialize (IHe1 nnrcExpr _ env fbincl1).
         rewrite <- IHe1; clear IHe1.
         rewrite eqq1; simpl.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
@@ -1613,14 +1607,7 @@ Section Stratify.
         destruct d; simpl; trivial.
         f_equal.
         apply lift_map_ext; intros.
-        assert (Fde2:Forall (data_normalized h) (map snd ((v, x) :: env''))).
-        { apply eval_substs_normalized in eqq2; trivial.
-          simpl; constructor; trivial.
-          unfold nnrc_eval in eqq.
-          apply nnrc_core_eval_normalized in eqq; trivial.
-          eapply data_normalized_dcoll_in; eauto.
-        }
-        specialize (IHe2 nnrcStmt _ _ fbincl2 FDce Fde2).
+        specialize (IHe2 nnrcStmt _ ((v,x)::env'') fbincl2 ).
         repeat rewrite <- nnrc_to_nnrc_base_eq.
         rewrite mk_expr_from_vars_eval.
         unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2.
@@ -1653,7 +1640,7 @@ Section Stratify.
         destruct fbincl as [fbincl1 fbincl2].
         apply incl_app_iff in fbincl2.
         destruct fbincl2 as [fbincl2 fbincl3].
-        specialize (IHe1 nnrcExpr _ _ fbincl1 FDce Fde).
+        specialize (IHe1 nnrcExpr _ env fbincl1).
         rewrite <- IHe1; clear IHe1.
         rewrite eqq1; simpl.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
@@ -1661,8 +1648,6 @@ Section Stratify.
         unfold nnrc_eval; simpl; repeat rewrite <- nnrc_to_nnrc_base_eq.
         apply olift_ext; intros d eqq3.
         destruct d; simpl; trivial.
-        assert(Fde'':Forall (data_normalized h) (map snd env'')).
-        { apply eval_substs_normalized in eqq2; trivial. }
         destruct (eval_substs_applies eqq2) as [env' ? eqdom]; subst.
         generalize (stratify_aux_free_vars eqq1); intros fequiv1.
         generalize (stratify_aux_nbound_vars eqq1); intros nb1.
@@ -1707,15 +1692,13 @@ Section Stratify.
         destruct fbincl2 as [fbincl2 fbincl3].
         apply incl_remove in fbincl2.
         apply incl_remove in fbincl3.
-        specialize (IHe1 nnrcExpr _ _ fbincl1 FDce Fde).
+        specialize (IHe1 nnrcExpr _ env fbincl1).
         rewrite <- IHe1; clear IHe1.
         rewrite eqq1; simpl.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
         intros env'' eqq2.
         unfold nnrc_eval; simpl; repeat rewrite <- nnrc_to_nnrc_base_eq.
         apply olift_ext; intros d eqq3.
-        assert(Fde'':Forall (data_normalized h) (map snd env'')).
-        { apply eval_substs_normalized in eqq2; trivial. }
         destruct (eval_substs_applies eqq2) as [env' ? eqdom]; subst.
         generalize (stratify_aux_free_vars eqq1); intros fequiv1.
         generalize (stratify_aux_nbound_vars eqq1); intros nb1.
@@ -1738,10 +1721,6 @@ Section Stratify.
               simpl in fbincl2; intuition.
             }
             rewrite (lookup_nin_none _ ninz); trivial.
-          * constructor; trivial.
-            unfold nnrc_eval in eqq3.
-            apply nnrc_core_eval_normalized in eqq3; trivial.
-            invcs eqq3; trivial.
         + repeat rewrite <- nnrc_to_nnrc_base_eq.
           rewrite mk_expr_from_vars_eval.
           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe3; simpl; trivial.
@@ -1758,22 +1737,30 @@ Section Stratify.
               simpl in fbincl3; intuition.
             }
             rewrite (lookup_nin_none _ ninz); trivial.
-          * constructor; trivial.
-            unfold nnrc_eval in eqq3.
-            apply nnrc_core_eval_normalized in eqq3; trivial.
-            invcs eqq3; trivial.
       - rewrite eval_nnrc_with_substs_eq_core.
         rewrite <- surjective_pairing.
         case_eq (stratify_aux e nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
         rewrite stratify1_aux_correct.
         unfold eval_nnrc_with_substs; simpl.
-        specialize (IHe nnrcExpr _ _ fbincl FDce Fde).
+        specialize (IHe nnrcExpr _ env fbincl).
         rewrite <- IHe; clear IHe.
         rewrite eqq1; simpl.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
     Qed.
 
-    Theorem stratify_correct e :
+    Theorem stratify_correct h cenv env e :
+      @nnrc_eval _ h cenv env (stratify e) =
+      @nnrc_eval _ h cenv env e.
+    Proof.
+      apply stratify_aux_correct; trivial.
+      reflexivity.
+    Qed.
+
+    (* Note that this is weaker then stratify_correct, since 
+       it requires that the environments be normalized.
+       However, it looks prettier :-)
+     *) 
+    Theorem stratify_correct_eq e :
       nnrc_eq (stratify e) e.
     Proof.
       red; intros h cenv env FDce FDe.
