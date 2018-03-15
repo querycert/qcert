@@ -947,6 +947,20 @@ Ltac match_case
 Ltac match_case_in H
   := match type of H with context [match ?x with _ => _ end] => case_eq x end; trivial; try discriminate.
 
+Ltac match_option
+  := let eqq := fresh "eqq" in
+     match goal with
+       [|- context [match ?x with | Some _ => _ | None => _ end]] =>
+       case_eq x end; [ intros ? eqq | intros eqq]; try rewrite eqq;
+     trivial; try discriminate.
+
+Ltac match_option_in H
+  := let eqq := fresh "eqq" in
+     match type of H with
+       context [match ?x with | Some _ => _ | None => _ end] =>
+       case_eq x end; [ intros ? eqq | intros eqq]; rewrite eqq in H;
+     trivial; try discriminate.
+
 
 Ltac cut_to H :=
   match type of H with

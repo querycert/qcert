@@ -69,9 +69,20 @@ Section Assoc.
       destruct l; simpl in *; intuition discriminate.
     Qed.
 
+    Lemma codomain_nil (l:list (A*B)) :
+      codomain l = nil <-> l = nil.
+    Proof.
+      destruct l; simpl in *; intuition discriminate.
+    Qed.
+
     Lemma domain_rev (l:list (A*B)) : domain (rev l) = rev (domain l).
     Proof.
       unfold domain. apply map_rev.
+    Qed.
+
+    Lemma codomain_rev (l:list (A*B)) : codomain (rev l) = rev (codomain l).
+    Proof.
+      unfold codomain. apply map_rev.
     Qed.
 
     Lemma domain_update_first l a v: domain (update_first l a v) = domain l.
@@ -682,6 +693,18 @@ Section Assoc.
     unfold domain. rewrite map_app; trivial.
   Qed.
 
+  Lemma codomain_length  {A B:Type} (l:list (A*B)) :
+    length (codomain l) = length l.
+  Proof.
+    apply map_length.
+  Qed.
+  
+  Lemma codomain_app {A B:Type} (l₁ l₂:list (A*B)) :
+    codomain (l₁ ++ l₂) = codomain l₁ ++ codomain l₂.
+  Proof.
+    unfold codomain. rewrite map_app; trivial.
+  Qed.
+
   Section distinctdom.
     (* CLEANUP: could generalize bdistinct to work over an equivalence
    relation and then use the fst projection of an equivalence relation *)
@@ -903,6 +926,45 @@ Section Assoc.
         apply lookup_incl_part in eqq.
         destruct eqq; intuition.
     Defined.
+
+    Lemma lookup_equiv_cons_same  {l1 l2:list (A*B)} :
+      lookup_equiv l1 l2 ->
+      forall a,
+        lookup_equiv (a::l1) (a::l2).
+    Proof.
+      unfold lookup_equiv; simpl; destruct a; intros.
+      match_destr.
+    Qed.
+
+    Lemma lookup_equiv_app {l1 l2 l1' l2':list (A*B)} :
+      lookup_equiv l1 l1' ->
+      lookup_equiv l2 l2' ->
+      lookup_equiv (l1++l2) (l1'++l2').
+    Proof.
+      unfold lookup_equiv; simpl; intros.
+      repeat rewrite lookup_app.
+      rewrite H, H0; trivial.
+    Qed.
+
+    Lemma lookup_equiv_appl_same {l1 l2:list (A*B)} :
+      lookup_equiv l1 l2 ->
+      forall l,
+        lookup_equiv (l++l1) (l++l2).
+    Proof.
+      intros.
+      eapply lookup_equiv_app; trivial.
+      reflexivity.
+    Qed.
+
+    Lemma lookup_equiv_appr_same {l1 l2:list (A*B)} :
+      lookup_equiv l1 l2 ->
+      forall l,
+        lookup_equiv (l1++l) (l2++l).
+    Proof.
+      intros.
+      eapply lookup_equiv_app; trivial.
+      reflexivity.
+    Qed.
 
     Lemma lookup_incl_cons_l_nin (l1 l2:list (A*B)) x y :
       lookup_incl l1 l2 ->
@@ -1331,6 +1393,16 @@ Section Assoc.
     Proof.
       unfold lookup_equiv_on; intuition.
     Qed.
+
+    Lemma lookup_equiv_on_cons_same {A B} {dec:EqDec A eq} {l} {l1 l2:list (A*B)} :
+      lookup_equiv_on l l1 l2 ->
+      forall a,
+        lookup_equiv_on l (a::l1) (a::l2).
+    Proof.
+      unfold lookup_equiv_on; simpl; destruct a; intros.
+      match_destr; eauto.
+    Qed.
+
 
   End Lookup_equiv_on.
 

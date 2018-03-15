@@ -610,6 +610,38 @@ Section cNNRCVars.
     induction e; simpl; repeat match_destr; congruence.
   Qed.
 
+  Lemma incl_letvars1 v e1 e2 env :
+    incl (nnrc_vars (NNRCLet v e1 e2)) env ->
+    incl (nnrc_vars e1) env.
+  Proof.
+    intros inclvars.
+    transitivity env; unfold incl, nnrc_vars in *;
+      simpl in *; auto 2; intros.
+    apply inclvars.
+    rewrite in_app_iff in H.
+    repeat rewrite in_app_iff.
+    simpl; rewrite in_app_iff.
+    destruct H; try tauto.
+  Qed.
+  
+  Lemma incl_letvars2 v e1 e2 env :
+    incl (nnrc_vars (NNRCLet v e1 e2)) env ->
+    incl (nnrc_vars e2) (env).
+  Proof.
+    intros inclvars.
+    transitivity env; unfold incl, nnrc_vars in *;
+      simpl in *; auto 2; intros.
+    apply inclvars.
+    rewrite in_app_iff in H.
+    repeat rewrite in_app_iff.
+    simpl; rewrite in_app_iff.
+    destruct H; try tauto.
+    destruct (a == v).
+    - red in e; subst; auto.
+    - left; right.
+      apply remove_in_neq; auto.
+  Qed.
+  
   Section core.
     (* Proof for operations that preserve core NNRC property *)
     Lemma nnrc_subst_preserve_core n1 n2 v1 :

@@ -20,6 +20,7 @@ Section CompEval.
   Require Import EquivDec.
 
   (* Common *)
+  Require Import Utils.
   Require Import CommonSystem.
   Require Import TypingRuntime.
 
@@ -220,7 +221,6 @@ Section CompEval.
       | (_,_) => False
       end.
 
-    Require Import Utils.
     Global Instance equal_outputs_equiv : Equivalence equal_outputs.
     Proof.
       unfold equal_outputs.
