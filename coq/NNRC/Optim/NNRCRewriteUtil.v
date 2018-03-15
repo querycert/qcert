@@ -24,6 +24,7 @@ Section NNRCRewriteUtil.
   Require Import Utils.
   Require Import CommonRuntime.
   Require Import cNNRCRuntime.
+  Require Import NNRCRuntime.
 
   Context {fruntime:foreign_runtime}.
 
@@ -52,8 +53,8 @@ Section NNRCRewriteUtil.
 
   Lemma split_really_fresh_app (x:var) l1 l2 l3 l4 :
     ~ False /\
-       ~ In x (l1 ++ l2) /\
-       ~ In x (l3 ++ l4) ->
+    ~ In x (l1 ++ l2) /\
+    ~ In x (l3 ++ l4) ->
     ((~In x l1) /\ (~In x l2)) /\
     ((~In x l3) /\ (~In x l4)).
   Proof.
@@ -66,8 +67,8 @@ Section NNRCRewriteUtil.
   
   Lemma split_really_fresh_app2 (x:var) l1 l2 l3 l4 :
     ~ False /\
-       ~ In x (l1 ++ l2) /\
-       ~ In x (l3 ++ l4) ->
+    ~ In x (l1 ++ l2) /\
+    ~ In x (l3 ++ l4) ->
     (~ False /\ (~In x l1) /\ (~In x l3)) /\
     (~ False /\ (~In x l2) /\ (~In x l4)).
   Proof.
@@ -123,12 +124,12 @@ Section NNRCRewriteUtil.
       congruence.
       assumption.
   Qed.
-      
+  
   Lemma split_really_fresh_app3 (v x:var) l1 l2 l3 l4 :
     ~ False /\
-       ~
-       In x (l1 ++ remove equiv_dec v l2) /\
-       ~ (v = x \/ In x (l3 ++ l4)) ->
+    ~
+      In x (l1 ++ remove equiv_dec v l2) /\
+    ~ (v = x \/ In x (l3 ++ l4)) ->
     (v <> x) /\ (~ False /\ (~In x l1) /\ (~In x l3)) /\
     (~ False /\ (~In x l2) /\ (~In x l4)).
   Proof.
@@ -244,8 +245,8 @@ Section NNRCRewriteUtil.
         destruct (nnrc_core_eval h cenv ((x1,a)::env) e2_2); try reflexivity.
         unfold lift in *; simpl in *.
         destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x1, d) :: env) e2_2)
-            l); destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x2, d) :: env) e2_2)
-            l); congruence.
+                           l); destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x2, d) :: env) e2_2)
+                                                  l); congruence.
       + (* v =/= x1 and substitution moves forward *)
         destruct d0; try reflexivity; simpl.
         induction l; try reflexivity; simpl.
@@ -264,8 +265,8 @@ Section NNRCRewriteUtil.
         destruct (nnrc_core_eval h cenv ((x2, d) :: (v, a) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2))); try reflexivity.
         unfold lift in *; simpl in *.
         destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x1, d) :: env) e2_2)
-            l); destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x2, d) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2)))
-            l); congruence.
+                           l); destruct (lift_map (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x2, d) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2)))
+                                                  l); congruence.
     - Case "NNRCIf"%string.
       simpl in *.
       generalize (split_really_fresh_app2 x2 _ _ _ _ H1); clear H1; intros.
@@ -287,25 +288,25 @@ Section NNRCRewriteUtil.
       rewrite <- remove_in_neq in H1,H2 by congruence.
       match_destr. match_destr.
       + match_destr; unfold equiv, complement in *; subst.
-         * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil x1 d0 nil); simpl;
+        * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil x1 d0 nil); simpl;
             intros re1; rewrite re1.
-            generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x1,d0)::nil)); simpl;
+          generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x1,d0)::nil)); simpl;
             intros re2; rewrite re2 by trivial.
-            trivial.
-         * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d0); simpl;
+          trivial.
+        * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d0); simpl;
             intros re1; repeat rewrite re1 by trivial.
-            rewrite IHe2_2; trivial.
-            simpl; intuition.
+          rewrite IHe2_2; trivial.
+          simpl; intuition.
       + match_destr; unfold equiv, complement in *; subst.
-         * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil x1 d0 nil); simpl;
+        * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil x1 d0 nil); simpl;
             intros re1; rewrite re1.
-            generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x1,d0)::nil)); simpl;
+          generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x1,d0)::nil)); simpl;
             intros re2; rewrite re2 by trivial.
-            trivial.
-         * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v0 d0); simpl;
+          trivial.
+        * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v0 d0); simpl;
             intros re1; repeat rewrite re1 by trivial.
-            rewrite IHe2_3; trivial.
-            simpl; intuition.
+          rewrite IHe2_3; trivial.
+          simpl; intuition.
     - Case "NNRCGroupBy"%string.
       reflexivity.
   Qed.
@@ -319,12 +320,12 @@ Section NNRCRewriteUtil.
   (* Java equivalent: NnrcOptimizer.use_sum *)
   Definition use_sum u1 u2 :=
     match (u1,u2) with
-      | (UsedMany,_) => UsedMany
-      | (_,UsedMany) => UsedMany
-      | (UsedOnce,UsedOnce) => UsedMany
-      | (UsedOnce,NotUsed) => UsedOnce
-      | (NotUsed,UsedOnce) => UsedOnce
-      | (NotUsed,NotUsed) => NotUsed
+    | (UsedMany,_) => UsedMany
+    | (_,UsedMany) => UsedMany
+    | (UsedOnce,UsedOnce) => UsedMany
+    | (UsedOnce,NotUsed) => UsedOnce
+    | (NotUsed,UsedOnce) => UsedOnce
+    | (NotUsed,NotUsed) => NotUsed
     end.
 
   Lemma use_sum_once u1 u2:
@@ -337,7 +338,7 @@ Section NNRCRewriteUtil.
       right; split; reflexivity.
       left; split; reflexivity.
     - elim H; intros;
-      elim H0; intros; rewrite H1; rewrite H2; reflexivity.
+        elim H0; intros; rewrite H1; rewrite H2; reflexivity.
   Qed.
   
   Lemma use_sum_not u1 u2:
@@ -353,9 +354,9 @@ Section NNRCRewriteUtil.
   (* Java equivalent: NnrcOptimizer.use_alt *)
   Definition use_alt u1 u2 :=
     match (u1,u2) with
-      | (UsedOnce,UsedOnce) => UsedOnce
-      | (NotUsed,NotUsed) => NotUsed
-      | _ => UsedMany
+    | (UsedOnce,UsedOnce) => UsedOnce
+    | (NotUsed,NotUsed) => NotUsed
+    | _ => UsedMany
     end.
 
   Lemma use_alt_once u1 u2:
@@ -366,7 +367,7 @@ Section NNRCRewriteUtil.
     - destruct u1; destruct u2; unfold use_alt in H; simpl in H; try congruence.
       split; reflexivity.
     - elim H; intros;
-      elim H0; rewrite H0; rewrite H1; reflexivity.
+        elim H0; rewrite H0; rewrite H1; reflexivity.
   Qed.
   
   Lemma use_alt_not u1 u2:
@@ -377,17 +378,17 @@ Section NNRCRewriteUtil.
     - destruct u1; destruct u2; unfold use_alt in H; simpl in H; try congruence.
       split; reflexivity.
     - elim H; intros;
-      elim H0; rewrite H0; rewrite H1; reflexivity.
+        elim H0; rewrite H0; rewrite H1; reflexivity.
   Qed.
   
   (* Java equivalent: NnrcOptimizer.use_exp *)
   Definition use_exp u1 u2 :=
     match (u1,u2) with
-      | (UsedMany,_) => UsedMany
-      | (_,UsedMany) => UsedMany
-      | (_,UsedOnce) => UsedMany
-      | (UsedOnce,NotUsed) => UsedOnce
-      | (NotUsed,NotUsed) => NotUsed
+    | (UsedMany,_) => UsedMany
+    | (_,UsedMany) => UsedMany
+    | (_,UsedOnce) => UsedMany
+    | (UsedOnce,NotUsed) => UsedOnce
+    | (NotUsed,NotUsed) => NotUsed
     end.
   
   Lemma use_exp_once u1 u2:
@@ -410,36 +411,36 @@ Section NNRCRewriteUtil.
   (* Java equivalent: NnrcOptimizer.use_count *)
   Fixpoint use_count (x:var) (e:nnrc) : var_use :=
     match e with
-      | NNRCGetConstant x' => NotUsed
-      | NNRCVar x' => (if x == x' then UsedOnce else NotUsed)
-      | NNRCConst _ => NotUsed
-      | NNRCBinop _ e1 e2 =>
-        use_sum (use_count x e1) (use_count x e2)
-      | NNRCUnop _ e1 => use_count x e1
-      | NNRCLet x' e1 e2 =>
-        if (x == x') then use_count x e1
-        else use_sum (use_count x e1) (use_count x e2)
-      | NNRCFor x' e1 e2 =>
-        use_exp (use_count x e1) (if x == x' then NotUsed else  (use_count x e2))
-      | NNRCIf e1 e2 e3 =>
-        use_sum (use_count x e1) (use_alt (use_count x e2) (use_count x e3))
-      | NNRCEither ed xl el xr er =>
-        use_sum
-                   (use_count x ed)
-                   (use_alt
-                      (if x == xl then NotUsed else use_count x el)
-                      (if x == xr then NotUsed else use_count x er))
-      | NNRCGroupBy _ _ e1 => use_count x e1
+    | NNRCGetConstant x' => NotUsed
+    | NNRCVar x' => (if x == x' then UsedOnce else NotUsed)
+    | NNRCConst _ => NotUsed
+    | NNRCBinop _ e1 e2 =>
+      use_sum (use_count x e1) (use_count x e2)
+    | NNRCUnop _ e1 => use_count x e1
+    | NNRCLet x' e1 e2 =>
+      if (x == x') then use_count x e1
+      else use_sum (use_count x e1) (use_count x e2)
+    | NNRCFor x' e1 e2 =>
+      use_exp (use_count x e1) (if x == x' then NotUsed else  (use_count x e2))
+    | NNRCIf e1 e2 e3 =>
+      use_sum (use_count x e1) (use_alt (use_count x e2) (use_count x e3))
+    | NNRCEither ed xl el xr er =>
+      use_sum
+        (use_count x ed)
+        (use_alt
+           (if x == xl then NotUsed else use_count x el)
+           (if x == xr then NotUsed else use_count x er))
+    | NNRCGroupBy _ _ e1 => use_count x e1
     end.
 
   Lemma NotUsed_nfree v e :
     use_count v e = NotUsed <-> ~ In v (nnrc_free_vars e).
   Proof.
     induction e; simpl; trivial;
-    repeat rewrite use_exp_not;
-    repeat rewrite use_sum_not;
-    repeat rewrite use_alt_not;
-    repeat rewrite nin_app_or.
+      repeat rewrite use_exp_not;
+      repeat rewrite use_sum_not;
+      repeat rewrite use_alt_not;
+      repeat rewrite nin_app_or.
     - intuition.
     - match_destr; intuition congruence.
     - intuition.
@@ -447,22 +448,22 @@ Section NNRCRewriteUtil.
     - match_destr; unfold equiv, complement in *; subst.
       + intuition. eapply remove_In; eauto.
       + rewrite use_sum_not.
-         rewrite <- remove_in_neq; trivial.
-         intuition.
+        rewrite <- remove_in_neq; trivial.
+        intuition.
     - match_destr; unfold equiv, complement in *; subst.
       + intuition. eapply remove_In; eauto.
       + rewrite <- remove_in_neq; trivial.
-         intuition.
+        intuition.
     - intuition.
     - match_destr; match_destr; unfold equiv, complement in *; subst.
       + subst; intuition; eapply remove_In; eauto.
       + rewrite <- (remove_in_neq _ _ v1) by congruence.
-         intuition; eapply remove_In; eauto.
+        intuition; eapply remove_In; eauto.
       + rewrite <- (remove_in_neq _ _ v0) by congruence.
         intuition; eapply remove_In; eauto.
       + rewrite <- (remove_in_neq _ _ v0) by congruence.
-         rewrite <- (remove_in_neq _ _ v1) by congruence.
-         intuition.
+        rewrite <- (remove_in_neq _ _ v1) by congruence.
+        intuition.
   Qed.
   
   Lemma not_used_ignored {h:list(string*string)} {cenv}
@@ -474,5 +475,108 @@ Section NNRCRewriteUtil.
     generalize (@nnrc_core_eval_remove_free_env _ h cenv nil v d env); simpl; auto.
   Qed.
 
+  Fixpoint nnrc_var_must_be_evaluated (e:nnrc) (x:var) : Prop :=
+    match e with
+    | NNRCGetConstant _ => False
+    | NNRCVar v => v = x
+    | NNRCConst _ => False
+    | NNRCBinop _ e1 e2 =>
+      nnrc_var_must_be_evaluated e1 x
+      \/ nnrc_var_must_be_evaluated e2 x
+    | NNRCUnop u e1 =>
+      nnrc_var_must_be_evaluated e1 x
+    | NNRCLet v e1 e2 =>
+      nnrc_var_must_be_evaluated e1 x
+      \/ (v <> x /\ nnrc_var_must_be_evaluated e2 x)
+    | NNRCFor v e1 e2 =>
+      nnrc_var_must_be_evaluated e1 x
+    | NNRCIf e1 e2 e3 =>
+      nnrc_var_must_be_evaluated e1 x
+    | NNRCEither e1 v2 e2 v3 e3 =>
+      nnrc_var_must_be_evaluated e1 x
+    | NNRCGroupBy g sl e1 =>
+      nnrc_var_must_be_evaluated e1 x
+    end.
+
+  Lemma nnrc_var_must_be_evaluated_dec (e:nnrc) (x:var) :
+    { nnrc_var_must_be_evaluated e x} + {~  nnrc_var_must_be_evaluated e x}.
+  Proof.
+    induction e; simpl; eauto 3.
+    - destruct (v == x); eauto.
+    - destruct IHe1; [ tauto | ].
+      destruct IHe2; [ eauto | ].
+      right; tauto.
+    - destruct IHe1; [ tauto | ].
+      destruct (x == v); unfold equiv, complement in *.
+      + right.
+        subst; intuition.
+      + destruct IHe2.
+        * left.
+          intuition.
+        * right; intuition.
+  Defined.
+
+  Lemma nnrc_must_use_preserves_failure {h:brand_relation_t} cenv e1 x e2 env :
+    disjoint (nnrc_bound_vars e2) (nnrc_free_vars e1) ->
+    nnrc_var_must_be_evaluated e2 x ->
+    @nnrc_eval _ h cenv env e1 = None ->
+    @nnrc_eval _ h cenv env (nnrc_subst e2 x e1) = None.
+  Proof.
+    revert x env.
+    induction e2; simpl; try tauto; intros x env disj me eve
+    ; unfold nnrc_eval; simpl
+    ; repeat rewrite <- nnrc_to_nnrc_base_eq.
+    - match_destr; congruence.
+    - rewrite disjoint_app_l in disj.
+      destruct disj.
+      destruct me.
+      + rewrite IHe2_1; simpl; trivial.
+      + rewrite IHe2_2; simpl; trivial.
+        apply olift2_none_r.
+    - rewrite IHe2; simpl; trivial.
+    - apply disjoint_cons_inv1 in disj.
+      rewrite disjoint_app_l in disj.
+      destruct disj as [[??]?].
+      destruct me as [me | [neq me]].
+      + rewrite IHe2_1; simpl; trivial.
+      + match_option.
+        match_destr; [congruence | ].
+        rewrite <- nnrc_to_nnrc_base_eq.
+        apply IHe2_2; trivial.
+        specialize (@nnrc_eval_remove_free_env fruntime h cenv nil v d env).
+        simpl; intros re.
+        rewrite re; trivial.
+    - apply disjoint_cons_inv1 in disj.
+      rewrite disjoint_app_l in disj.
+      destruct disj as [[??]?].
+      rewrite IHe2_1; trivial.
+    - repeat rewrite disjoint_app_l in disj.
+      destruct disj as [?[??]].
+      rewrite IHe2_1; trivial.
+    - apply disjoint_cons_inv1 in disj.
+      destruct disj as [disj ?].
+      apply disjoint_cons_inv1 in disj.
+      repeat rewrite disjoint_app_l in disj.
+      destruct disj as [[?[??]]?].
+      rewrite IHe2_1; trivial.
+    - rewrite IHe2; trivial.
+  Qed.
+  
+  Lemma let_inline_disjoint_arrow_must_use x e1 e2 :
+    disjoint (nnrc_bound_vars e2) (nnrc_free_vars e1) ->
+    nnrc_var_must_be_evaluated e2 x ->
+    nnrc_eq
+      (NNRCLet x e1 e2)
+      (nnrc_subst e2 x e1).
+  Proof.
+    red; simpl; intros.
+    unfold nnrc_eval; simpl.
+    repeat rewrite <- nnrc_to_nnrc_base_eq.
+    match_option.
+    - rewrite <- nnrc_to_nnrc_base_eq.
+      apply nnrc_eval_cons_subst_disjoint; trivial.
+    - rewrite nnrc_must_use_preserves_failure; trivial.
+  Qed.
+  
 End NNRCRewriteUtil.
 

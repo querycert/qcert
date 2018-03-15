@@ -178,33 +178,33 @@ Section Stratify.
     Section dec.
       Lemma stratifiedLevel_dec k (e:nnrc):
         {stratifiedLevel k e} + {~ stratifiedLevel k e}.
-    Proof.
-      revert k.
-      induction e; intros k; simpl; try tauto;
-        repeat apply sumbool_and; try auto 2; try tauto
-        ; try solve [
-                apply nnrcKind_eqdec
-              |  apply eqdec_neq].
-    Defined.
+      Proof.
+        revert k.
+        induction e; intros k; simpl; try tauto;
+          repeat apply sumbool_and; try auto 2; try tauto
+          ; try solve [
+                  apply nnrcKind_eqdec
+                |  apply eqdec_neq].
+      Defined.
 
-    Lemma stratifiedLevel_spec_dec k (e:nnrc):
-      {stratifiedLevel_spec k e} + {~ stratifiedLevel_spec k e}.
-    Proof.
-      destruct (stratifiedLevel_dec k e);
-        [left|right]; rewrite <- stratifiedLevel_correct; trivial.
-    Defined.
+      Lemma stratifiedLevel_spec_dec k (e:nnrc):
+        {stratifiedLevel_spec k e} + {~ stratifiedLevel_spec k e}.
+      Proof.
+        destruct (stratifiedLevel_dec k e);
+          [left|right]; rewrite <- stratifiedLevel_correct; trivial.
+      Defined.
 
-    Theorem stratified_dec (e:nnrc) :
-      {stratified e} + {~ stratified e}.
-    Proof.
-      apply stratifiedLevel_dec.
-    Defined.
+      Theorem stratified_dec (e:nnrc) :
+        {stratified e} + {~ stratified e}.
+      Proof.
+        apply stratifiedLevel_dec.
+      Defined.
 
-    Theorem stratified_spec_dec (e:nnrc) :
-      {stratified_spec e} + {~ stratified_spec e}.
-    Proof.
-      apply stratifiedLevel_spec_dec.
-    Defined.
+      Theorem stratified_spec_dec (e:nnrc) :
+        {stratified_spec e} + {~ stratified_spec e}.
+      Proof.
+        apply stratifiedLevel_spec_dec.
+      Defined.
 
     End dec.
 
@@ -296,245 +296,52 @@ Section Stratify.
     Local Open Scope string_scope.
 
     Example nnrc1 := (‵abs ‵ (dnat 3) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3)).
-    Eval vm_compute in (stratify nnrc1). 
+    (* Eval vm_compute in (stratify nnrc1).  *)
 
     Example nnrc2 := NNRCLet "x" nnrc1 (NNRCVar "x").
-    Eval vm_compute in (stratify nnrc2). 
+    (* Eval vm_compute in (stratify nnrc2). *)
 
     Example nnrc3 := (‵abs (NNRCLet "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-        Eval vm_compute in (stratify nnrc3). 
+    (* Eval vm_compute in (stratify nnrc3). *)
 
     Example nnrc4 := (‵abs (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-(*    Eval vm_compute in (stratify nnrc4). *)
+    (*    Eval vm_compute in (stratify nnrc4). *)
 
     Example nnrc5 := (‵abs (NNRCLet "z" (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8)))) ‵+ ‵(dnat 5)) (NNRCVar "z")) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-(*    Eval vm_compute in (stratify nnrc5). *)
+    (*    Eval vm_compute in (stratify nnrc5). *)
 
     Example nnrc6 := (‵abs (NNRCLet "z" (NNRCFor "x" ((‵(dnat 1) ‵+ ‵(dnat 2))) (((NNRCVar "x" ‵+ ‵(dnat 8))))) (NNRCVar "z")) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
-    Eval vm_compute in (stratify nnrc6). 
+    (* Eval vm_compute in (stratify nnrc6). *)
 
     Example nnrc7 := NNRCLet "x" (NNRCLet "y" ‵(dnat 3) (‵(dnat 8) ‵+ (NNRCVar "y"))) (NNRCVar "x").
     
-    Eval vm_compute in (stratify nnrc7). 
+    (* Eval vm_compute in (stratify nnrc7). *)
 
     Example nnrc8 := NNRCLet "x" (NNRCLet "x" ‵(dnat 3) (‵(dnat 8) ‵+ (NNRCVar "x"))) (NNRCVar "x").
     
-    Eval vm_compute in (stratify nnrc8). 
+    (* Eval vm_compute in (stratify nnrc8). *)
 
   End tests.
 
-  Section aux.
-    
-    Lemma incl_letvars1 v e1 e2 env :
-      incl (nnrc_vars (NNRCLet v e1 e2)) env ->
-      incl (nnrc_vars e1) env.
-    Proof.
-      intros inclvars.
-      transitivity env; unfold incl, nnrc_vars in *;
-        simpl in *; auto 2; intros.
-      apply inclvars.
-      rewrite in_app_iff in H.
-      repeat rewrite in_app_iff.
-      simpl; rewrite in_app_iff.
-      destruct H; try tauto.
-    Qed.
-    
-    Lemma incl_letvars2 v e1 e2 env :
-      incl (nnrc_vars (NNRCLet v e1 e2)) env ->
-      incl (nnrc_vars e2) (env).
-    Proof.
-      intros inclvars.
-      transitivity env; unfold incl, nnrc_vars in *;
-        simpl in *; auto 2; intros.
-      apply inclvars.
-      rewrite in_app_iff in H.
-      repeat rewrite in_app_iff.
-      simpl; rewrite in_app_iff.
-      destruct H; try tauto.
-      destruct (a == v).
-      - red in e; subst; auto.
-      - left; right.
-        apply remove_in_neq; auto.
-    Qed.
-
-        Require Import NNRCEq.
-    Require Import NNRCShadow.
-
-    Fixpoint nnrc_var_must_be_evaluated (e:nnrc) (x:var) : Prop :=
-      match e with
-      | NNRCGetConstant _ => False
-      | NNRCVar v => v = x
-      | NNRCConst _ => False
-      | NNRCBinop _ e1 e2 =>
-         nnrc_var_must_be_evaluated e1 x
-        \/ nnrc_var_must_be_evaluated e2 x
-      | NNRCUnop u e1 =>
-        nnrc_var_must_be_evaluated e1 x
-      | NNRCLet v e1 e2 =>
-        nnrc_var_must_be_evaluated e1 x
-        \/ (v <> x /\ nnrc_var_must_be_evaluated e2 x)
-      | NNRCFor v e1 e2 =>
-        nnrc_var_must_be_evaluated e1 x
-      | NNRCIf e1 e2 e3 =>
-        nnrc_var_must_be_evaluated e1 x
-      | NNRCEither e1 v2 e2 v3 e3 =>
-        nnrc_var_must_be_evaluated e1 x
-      | NNRCGroupBy g sl e1 =>
-        nnrc_var_must_be_evaluated e1 x
-      end.
-
-    Lemma nnrc_var_must_be_evaluated_dec (e:nnrc) (x:var) :
-      { nnrc_var_must_be_evaluated e x} + {~  nnrc_var_must_be_evaluated e x}.
-    Proof.
-      induction e; simpl; eauto 3.
-      - destruct (v == x); eauto.
-      - destruct IHe1; [ tauto | ].
-        destruct IHe2; [ eauto | ].
-        right; tauto.
-      - destruct IHe1; [ tauto | ].
-        destruct (x == v); unfold equiv, complement in *.
-        + right.
-          subst; intuition.
-        + destruct IHe2.
-          * left.
-            intuition.
-          * right; intuition.
-    Defined.
-
-    Lemma nnrc_must_use_preserves_failure {h:brand_relation_t} cenv e1 x e2 env :
-      disjoint (nnrc_bound_vars e2) (nnrc_free_vars e1) ->
-      nnrc_var_must_be_evaluated e2 x ->
-      @nnrc_eval _ h cenv env e1 = None ->
-      @nnrc_eval _ h cenv env (nnrc_subst e2 x e1) = None.
-    Proof.
-      revert x env.
-      induction e2; simpl; try tauto; intros x env disj me eve
-      ; unfold nnrc_eval; simpl
-        ; repeat rewrite <- nnrc_to_nnrc_base_eq.
-      - match_destr; congruence.
-      - rewrite disjoint_app_l in disj.
-        destruct disj.
-        destruct me.
-        + rewrite IHe2_1; simpl; trivial.
-        + rewrite IHe2_2; simpl; trivial.
-          apply olift2_none_r.
-      - rewrite IHe2; simpl; trivial.
-      - apply disjoint_cons_inv1 in disj.
-        rewrite disjoint_app_l in disj.
-        destruct disj as [[??]?].
-        destruct me as [me | [neq me]].
-        + rewrite IHe2_1; simpl; trivial.
-        + match_option.
-          match_destr; [congruence | ].
-          rewrite <- nnrc_to_nnrc_base_eq.
-          apply IHe2_2; trivial.
-          specialize (@nnrc_eval_remove_free_env fruntime h cenv nil v d env).
-          simpl; intros re.
-          rewrite re; trivial.
-      - apply disjoint_cons_inv1 in disj.
-        rewrite disjoint_app_l in disj.
-        destruct disj as [[??]?].
-        rewrite IHe2_1; trivial.
-      - repeat rewrite disjoint_app_l in disj.
-        destruct disj as [?[??]].
-        rewrite IHe2_1; trivial.
-      - apply disjoint_cons_inv1 in disj.
-        destruct disj as [disj ?].
-        apply disjoint_cons_inv1 in disj.
-        repeat rewrite disjoint_app_l in disj.
-        destruct disj as [[?[??]]?].
-        rewrite IHe2_1; trivial.
-      - rewrite IHe2; trivial.
-    Qed.
-        
-    Lemma let_inline_disjoint_arrow_must_use x e1 e2 :
-      disjoint (nnrc_bound_vars e2) (nnrc_free_vars e1) ->
-      nnrc_var_must_be_evaluated e2 x ->
-      nnrc_eq
-        (NNRCLet x e1 e2)
-        (nnrc_subst e2 x e1).
-    Proof.
-      red; simpl; intros.
-      unfold nnrc_eval; simpl.
-      repeat rewrite <- nnrc_to_nnrc_base_eq.
-      match_option.
-      - rewrite <- nnrc_to_nnrc_base_eq.
-        apply nnrc_eval_cons_subst_disjoint; trivial.
-      - rewrite nnrc_must_use_preserves_failure; trivial.
-    Qed.
-
-    Lemma incl_app_iff {A:Type} (l m n : list A) :
-      incl l n /\ incl m n <-> incl (l ++ m) n.
-    Proof.
-      unfold incl; intuition.
-      rewrite in_app_iff in H.
-      intuition.
-    Qed.
-
-    Lemma disjoint_with_exclusion {A:Type} (l l1 l2:list A) :
-      disjoint l1 l2 ->
-      (forall x,
-          In x l -> In x (l1 ++ l2) -> In x l1) ->
-      disjoint l l2.
-    Proof.
-      unfold disjoint; intros disj excl x inn1 inn2.
-      specialize (excl x inn1).
-      rewrite in_app_iff in excl.
-      intuition; eauto.
-    Qed.
-  
-    Lemma codomain_length  {A B:Type} (l:list (A*B)) :
-      length (codomain l) = length l.
-    Proof.
-      apply map_length.
-    Qed.
-    
-    Lemma codomain_app {A B:Type} (l₁ l₂:list (A*B)) :
-      codomain (l₁ ++ l₂) = codomain l₁ ++ codomain l₂.
-    Proof.
-      unfold codomain. rewrite map_app; trivial.
-    Qed.
-
-    Lemma app_inv_self_l {A:Type} (l l2:list A) :
-      l = l ++ l2 -> l2 = nil.
-    Proof.
-      intros eqq1.
-      assert (eqq2:l ++ nil = l ++ l2) by (rewrite app_nil_r; trivial).
-      apply app_inv_head in eqq2.
-      congruence.
-    Qed.
-
-    Lemma app_inv_self_r {A:Type} (l l2:list A) :
-      l = l2 ++ l -> l2 = nil.
-    Proof.
-      intros eqq1.
-      assert (eqq2:nil ++ l = l2 ++ l) by (simpl; trivial).
-      apply app_inv_tail in eqq2.
-      congruence.
-    Qed.
-
-  End aux.
-
-
-    Ltac list_simpler :=
-      repeat progress (
-      try match goal with
-          | [H: ?l  = ?l ++ _ |- _ ] => apply app_inv_self_l in H; try subst
-          | [H: ?l  = _ ++ ?l  |- _ ] => apply app_inv_self_r in H; try subst
-          | [H: ?l ++ _ = ?l ++ _ |- _ ] => apply app_inv_head in H; try subst
-          | [H: _ ++ ?l  = _ ++ ?l |- _ ] => apply app_inv_tail in H; try subst
-      | [H: In _ (remove _ _ _) |- _] => apply remove_inv in H; destruct H
-      | [H: ?a <> ?v |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ _ _ H)
-      | [H: ?v <> ?a |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ a v ) by congruence
-      | [H: ?a = ?v -> False |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ _ _ H)
-      | [H: ?v = ?a -> False |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ a v) by congruence
-      end
-      ; repeat rewrite domain_app in *
-      ; repeat rewrite codomain_app in *
-      ; repeat rewrite map_app in *
-      ; repeat rewrite concat_app in *
-      ; repeat rewrite in_app_iff in *).
-      
+  Ltac list_simpler :=
+    repeat progress (
+             try match goal with
+                 | [H: ?l  = ?l ++ _ |- _ ] => apply app_inv_self_l in H; try subst
+                 | [H: ?l  = _ ++ ?l  |- _ ] => apply app_inv_self_r in H; try subst
+                 | [H: ?l ++ _ = ?l ++ _ |- _ ] => apply app_inv_head in H; try subst
+                 | [H: _ ++ ?l  = _ ++ ?l |- _ ] => apply app_inv_tail in H; try subst
+                 | [H: In _ (remove _ _ _) |- _] => apply remove_inv in H; destruct H
+                 | [H: ?a <> ?v |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ _ _ H)
+                 | [H: ?v <> ?a |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ a v ) by congruence
+                 | [H: ?a = ?v -> False |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ _ _ H)
+                 | [H: ?v = ?a -> False |- context [In ?a (remove _ ?v _)]] => rewrite <- (remove_in_neq _ a v) by congruence
+                 end
+             ; repeat rewrite domain_app in *
+             ; repeat rewrite codomain_app in *
+             ; repeat rewrite map_app in *
+             ; repeat rewrite concat_app in *
+             ; repeat rewrite in_app_iff in *
+           ).
   Section Effective.
 
     Lemma stratify1_aux_stratified {body required_level bv sdefs1 n sdefs2} :
@@ -620,7 +427,7 @@ Section Stratify.
         invcs H0; simpl in *.
         destruct (IHe _ _ _ _ eqq1).
         apply (stratify1_aux_stratified H1); simpl; eauto 2.
-      Qed.
+    Qed.
 
     Theorem stratify_stratified (e: nnrc) : stratified (stratify e).
     Proof.
@@ -720,14 +527,14 @@ Section Stratify.
       ; try apply disjoint_nil_l.
       - match_case_in H0; intros ? ? eqq1
         ; rewrite eqq1 in H0.
-         match_case_in H0; intros ? ? eqq2
-         ; rewrite eqq2 in H0.
-         invcs H0.
-         rewrite domain_app, disjoint_app_l.
-         split; eauto.
-         specialize (IHe2 _ _ _ _ eqq2).
-         rewrite disjoint_app_r in IHe2.
-         intuition.
+        match_case_in H0; intros ? ? eqq2
+        ; rewrite eqq2 in H0.
+        invcs H0.
+        rewrite domain_app, disjoint_app_l.
+        split; eauto.
+        specialize (IHe2 _ _ _ _ eqq2).
+        rewrite disjoint_app_r in IHe2.
+        intuition.
       -  match_case_in H0; intros ? ? eqq1
          ; rewrite eqq1 in H0.
          invcs H0.
@@ -752,7 +559,7 @@ Section Stratify.
         eapply disjoint_with_exclusion; eauto.
         intuition; list_simpler; intuition.
       - match_case_in H0; intros ? ? eqq1
-         ; rewrite eqq1 in H0.
+        ; rewrite eqq1 in H0.
         invcs H0.
         specialize (stratify1_aux_nbound_vars H1); intros HH.
         eapply disjoint_with_exclusion; eauto.
@@ -796,8 +603,8 @@ Section Stratify.
     Qed.
 
     Lemma growing_fv_ctxt_app sdefs1 sdefs2 ctxt :
-          growing_fv_ctxt (sdefs1 ++ sdefs2) ctxt <->
-          (growing_fv_ctxt sdefs1 ctxt /\ growing_fv_ctxt sdefs2 (ctxt ++ domain sdefs1)).
+      growing_fv_ctxt (sdefs1 ++ sdefs2) ctxt <->
+      (growing_fv_ctxt sdefs1 ctxt /\ growing_fv_ctxt sdefs2 (ctxt ++ domain sdefs1)).
     Proof.
       revert ctxt sdefs2; induction sdefs1; intros ctxt sdefs2; simpl.
       - rewrite app_nil_r. intuition.
@@ -809,7 +616,7 @@ Section Stratify.
         intuition.
     Qed.
 
-        Lemma mk_expr_from_vars_growing_fv_free_fw {sdefs ctxt} :
+    Lemma mk_expr_from_vars_growing_fv_free_fw {sdefs ctxt} :
       growing_fv_ctxt sdefs ctxt ->
       forall e x,
         In x (nnrc_free_vars (mk_expr_from_vars (e, sdefs))) ->
@@ -828,8 +635,8 @@ Section Stratify.
     Qed.
 
     Lemma mk_expr_from_vars_growing_fv_free_fw_codomain {sdefs e x} :
-        In x (nnrc_free_vars (mk_expr_from_vars (e, sdefs))) ->
-        ((In x (nnrc_free_vars e) \/ In x (concat (map nnrc_free_vars (codomain sdefs))))).
+      In x (nnrc_free_vars (mk_expr_from_vars (e, sdefs))) ->
+      ((In x (nnrc_free_vars e) \/ In x (concat (map nnrc_free_vars (codomain sdefs))))).
     Proof.
       revert e x ; induction sdefs; intros e x inn; [intuition | ].
       destruct a.
@@ -842,8 +649,8 @@ Section Stratify.
     Qed.
 
     Lemma mk_expr_from_vars_growing_fv_free_bk e sdefs x :
-        ((In x (nnrc_free_vars e) \/ In x (concat (map nnrc_free_vars (codomain sdefs)))) /\ ~ In x (domain sdefs)) ->
-        In x (nnrc_free_vars (mk_expr_from_vars (e, sdefs))).
+      ((In x (nnrc_free_vars e) \/ In x (concat (map nnrc_free_vars (codomain sdefs)))) /\ ~ In x (domain sdefs)) ->
+      In x (nnrc_free_vars (mk_expr_from_vars (e, sdefs))).
     Proof.
       unfold mk_expr_from_vars.
       revert e x; induction sdefs; intros e x inn; [intuition | ].
@@ -884,8 +691,8 @@ Section Stratify.
     Lemma stratify1_aux_gfc {e required_level bound_vars n sdefs1 sdefs2} :
       stratify1_aux e required_level bound_vars sdefs1 = (n, sdefs2) ->
       forall ctxt,
-      growing_fv_ctxt sdefs1 ctxt ->
-      growing_fv_ctxt sdefs2 (ctxt++nnrc_free_vars e).
+        growing_fv_ctxt sdefs1 ctxt ->
+        growing_fv_ctxt sdefs2 (ctxt++nnrc_free_vars e).
     Proof.
       destruct required_level; simpl; intros HH gfc; invcs HH.
       - rewrite growing_fv_ctxt_app; simpl.
@@ -910,8 +717,8 @@ Section Stratify.
     Lemma stratify1_aux_gfc_app {e required_level bound_vars n sdefs1 sdefs2} :
       stratify1_aux e required_level bound_vars sdefs1 = (n, sdefs1++sdefs2) ->
       forall ctxt,
-      growing_fv_ctxt sdefs1 ctxt ->
-      growing_fv_ctxt sdefs2 (ctxt++nnrc_free_vars e).
+        growing_fv_ctxt sdefs1 ctxt ->
+        growing_fv_ctxt sdefs2 (ctxt++nnrc_free_vars e).
     Proof.
       destruct required_level; simpl; intros HH gfc; invcs HH.
       - apply app_inv_head in H1.
@@ -936,8 +743,8 @@ Section Stratify.
 
     Lemma mk_expr_from_vars_has_codomain_vars a l n :
       In a (concat (map nnrc_free_vars (codomain l))) ->
-         ~ In a (domain l) ->
-         In a (nnrc_free_vars (mk_expr_from_vars (n, l))).
+      ~ In a (domain l) ->
+      In a (nnrc_free_vars (mk_expr_from_vars (n, l))).
     Proof.
       unfold mk_expr_from_vars.
       revert a n.
@@ -948,7 +755,7 @@ Section Stratify.
     Qed.
 
     Lemma stratify1_aux_free_vars {e required_level bound_vars n}
-                                     {sdefs1 sdefs2:list (var*nnrc)} :
+          {sdefs1 sdefs2:list (var*nnrc)} :
       stratify1_aux e required_level bound_vars sdefs1 = (n, sdefs1++sdefs2) ->
       equivlist (nnrc_free_vars n ++ (concat (map nnrc_free_vars (codomain sdefs2)))) (nnrc_free_vars e ++ (domain sdefs2)).
     Proof.
@@ -976,7 +783,7 @@ Section Stratify.
         destruct inclb as [inclb1 inclb2].
         destruct (IHe1 _ _ _ _ eqq1 inclb1) as [IHe1i IHe1g].
         assert (inclb2':incl (nnrc_free_vars e2) (domain l ++ bound_vars))
-               by (intros ? inn; list_simpler; intuition).
+          by (intros ? inn; list_simpler; intuition).
         specialize (IHe2 _ _ _ _ eqq2 inclb2') as [IHe2i IHe2g].
         list_simpler.
         split. 
@@ -1186,14 +993,14 @@ Section Stratify.
                     apply inclb; list_simpler.
                     revert inn; clear; tauto.
                   }
-                destruct IHe2i as [IHe2if IHe2ib].
-                cut_to IHe2ib; try tauto.
-                generalize (mk_expr_from_vars_growing_fv_free_bk n1 l0 a); intros HH2.
-                cut_to HH2; [ | revert IHe2ib adisj; clear; tauto].
-                destruct HH as [HHf HHb].
-                cut_to HHb; [ | list_simpler].
-                * revert HHb; clear; tauto.
-                * revert HH2; clear; tauto.
+                  destruct IHe2i as [IHe2if IHe2ib].
+                  cut_to IHe2ib; try tauto.
+                  generalize (mk_expr_from_vars_growing_fv_free_bk n1 l0 a); intros HH2.
+                  cut_to HH2; [ | revert IHe2ib adisj; clear; tauto].
+                  destruct HH as [HHf HHb].
+                  cut_to HHb; [ | list_simpler].
+                  * revert HHb; clear; tauto.
+                  * revert HH2; clear; tauto.
                 + assert (adisj:~ In a (domain l1)).
                   { generalize (stratify_aux_nbound_vars eqq3); intros disj.
                     specialize (disj a).
@@ -1201,14 +1008,14 @@ Section Stratify.
                     apply inclb; list_simpler.
                     revert inn; clear; tauto.
                   }
-                destruct IHe3i as [IHe3if IHe3ib].
-                cut_to IHe3ib; try tauto.
-                generalize (mk_expr_from_vars_growing_fv_free_bk n2 l1 a); intros HH3.
-                cut_to HH3; [ | revert IHe3ib adisj; clear; tauto].
-                destruct HH as [HHf HHb].
-                cut_to HHb; [ | list_simpler].
-                * revert HHb; clear; tauto.
-                * revert HH3; clear; tauto.
+                  destruct IHe3i as [IHe3if IHe3ib].
+                  cut_to IHe3ib; try tauto.
+                  generalize (mk_expr_from_vars_growing_fv_free_bk n2 l1 a); intros HH3.
+                  cut_to HH3; [ | revert IHe3ib adisj; clear; tauto].
+                  destruct HH as [HHf HHb].
+                  cut_to HHb; [ | list_simpler].
+                  * revert HHb; clear; tauto.
+                  * revert HH3; clear; tauto.
             }
         + rewrite growing_fv_ctxt_app; split.
           * eapply growing_fv_ctxt_incl; eauto
@@ -1295,15 +1102,15 @@ Section Stratify.
                     apply inclb; list_simpler.
                     revert H; clear; tauto.
                   }
-                destruct IHe2i as [IHe2if IHe2ib].
-                cut_to IHe2ib; try tauto.
-                generalize (mk_expr_from_vars_growing_fv_free_bk n1 l0 a); intros HH2.
-                cut_to HH2; [ | revert IHe2ib adisj; clear; tauto].
-                destruct HH as [HHf HHb].
-                cut_to HHb; [ | list_simpler].
-                * revert HHb; clear; tauto.
-                * revert HH2; clear; tauto.
-                * list_simpler; revert H; clear; tauto.
+                  destruct IHe2i as [IHe2if IHe2ib].
+                  cut_to IHe2ib; try tauto.
+                  generalize (mk_expr_from_vars_growing_fv_free_bk n1 l0 a); intros HH2.
+                  cut_to HH2; [ | revert IHe2ib adisj; clear; tauto].
+                  destruct HH as [HHf HHb].
+                  cut_to HHb; [ | list_simpler].
+                  * revert HHb; clear; tauto.
+                  * revert HH2; clear; tauto.
+                  * list_simpler; revert H; clear; tauto.
                 + assert (adisj:~ In a (domain l1)).
                   { generalize (stratify_aux_nbound_vars eqq3); intros disj.
                     specialize (disj a).
@@ -1312,15 +1119,15 @@ Section Stratify.
                     apply inclb; list_simpler.
                     revert H; clear; tauto.
                   }
-                destruct IHe3i as [IHe3if IHe3ib].
-                cut_to IHe3ib; try tauto.
-                generalize (mk_expr_from_vars_growing_fv_free_bk n2 l1 a); intros HH3.
-                cut_to HH3; [ | revert IHe3ib adisj; clear; tauto].
-                destruct HH as [HHf HHb].
-                cut_to HHb; [ | list_simpler].
-                * revert HHb; clear; tauto.
-                * revert HH3; clear; tauto.
-                * list_simpler; revert H; clear; tauto.
+                  destruct IHe3i as [IHe3if IHe3ib].
+                  cut_to IHe3ib; try tauto.
+                  generalize (mk_expr_from_vars_growing_fv_free_bk n2 l1 a); intros HH3.
+                  cut_to HH3; [ | revert IHe3ib adisj; clear; tauto].
+                  destruct HH as [HHf HHb].
+                  cut_to HHb; [ | list_simpler].
+                  * revert HHb; clear; tauto.
+                  * revert HH3; clear; tauto.
+                  * list_simpler; revert H; clear; tauto.
             }
         + rewrite growing_fv_ctxt_app; split.
           * eapply growing_fv_ctxt_incl; eauto
@@ -1369,7 +1176,7 @@ Section Stratify.
     Qed.
 
     Corollary stratify_aux_free_vars
-          {e required_level bound_vars n sdefs} :
+              {e required_level bound_vars n sdefs} :
       stratify_aux e required_level bound_vars = (n,sdefs) ->
       incl (nnrc_free_vars e) bound_vars ->
       equivlist (nnrc_free_vars n ++ (concat (map nnrc_free_vars (codomain sdefs)))) (nnrc_free_vars e ++ domain sdefs).
@@ -1378,7 +1185,7 @@ Section Stratify.
     Qed.
 
     Corollary stratify_aux_free_vars_gfc
-          {e required_level bound_vars n sdefs} :
+              {e required_level bound_vars n sdefs} :
       stratify_aux e required_level bound_vars = (n,sdefs) ->
       incl (nnrc_free_vars e) bound_vars ->
       growing_fv_ctxt sdefs (nnrc_free_vars e).
@@ -1409,54 +1216,6 @@ Section Stratify.
 
   End FreeVars.
 
-    Lemma lookup_equiv_cons_same {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
-      lookup_equiv l1 l2 ->
-      forall a,
-        lookup_equiv (a::l1) (a::l2).
-    Proof.
-      unfold lookup_equiv; simpl; destruct a; intros.
-      match_destr.
-    Qed.
-
-    Lemma lookup_equiv_on_cons_same {A B} {dec:EqDec A eq} {l} {l1 l2:list (A*B)} :
-      lookup_equiv_on l l1 l2 ->
-      forall a,
-        lookup_equiv_on l (a::l1) (a::l2).
-    Proof.
-      unfold lookup_equiv_on; simpl; destruct a; intros.
-      match_destr; eauto.
-    Qed.
-
-    Lemma lookup_equiv_app {A B} {dec:EqDec A eq} {l1 l2 l1' l2':list (A*B)} :
-      lookup_equiv l1 l1' ->
-      lookup_equiv l2 l2' ->
-      lookup_equiv (l1++l2) (l1'++l2').
-    Proof.
-      unfold lookup_equiv; simpl; intros.
-      repeat rewrite lookup_app.
-      rewrite H, H0; trivial.
-    Qed.
-
-    Lemma lookup_equiv_appl_same {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
-      lookup_equiv l1 l2 ->
-      forall l,
-        lookup_equiv (l++l1) (l++l2).
-    Proof.
-      intros.
-      eapply lookup_equiv_app; trivial.
-      reflexivity.
-    Qed.
-
-    Lemma lookup_equiv_appr_same {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
-      lookup_equiv l1 l2 ->
-      forall l,
-        lookup_equiv (l1++l) (l2++l).
-    Proof.
-      intros.
-      eapply lookup_equiv_app; trivial.
-      reflexivity.
-    Qed.
-
   Section Eval_substs.
     Require Import NNRCEq.
     Require Import NNRCShadow.
@@ -1471,7 +1230,7 @@ Section Stratify.
          | nil => Some env
          | (v,n)::sdefs' =>
            olift (fun d => eval_substs h cenv sdefs' ((v,d)::env))
-             (@nnrc_eval _ h cenv env n)
+                 (@nnrc_eval _ h cenv env n)
          end.
 
     Definition eval_nnrc_with_substs h cenv env nws :=
@@ -1494,7 +1253,7 @@ Section Stratify.
 
     Lemma mk_expr_from_vars_eval h cenv env nws :
       @nnrc_eval _ h cenv env
-        (mk_expr_from_vars nws) = 
+                 (mk_expr_from_vars nws) = 
       eval_nnrc_with_substs h cenv env nws.
     Proof.
       unfold eval_nnrc_with_substs, mk_expr_from_vars.
@@ -1575,14 +1334,14 @@ Section Stratify.
 
     Lemma eval_substs_disjoint_swap_env
           h cenv sdefs env₁ env₂ x₁ d₁ x₂ d₂ :
-        x₁ <> x₂ ->
-        match eval_substs h cenv sdefs (env₁++(x₁,d₁)::(x₂,d₂)::env₂)
-              ,  eval_substs h cenv sdefs (env₁++(x₂,d₂)::(x₁,d₁)::env₂) with
-        | Some res₁, Some res₂ =>
-          {env' | res₁ = env' ++  env₁++((x₁,d₁)::(x₂,d₂)::env₂) & res₂ = env' ++ env₁ ++ ((x₂,d₂)::(x₁,d₁)::env₂)}
-        | None, None => True
-        | _, _ => False
-        end.
+      x₁ <> x₂ ->
+      match eval_substs h cenv sdefs (env₁++(x₁,d₁)::(x₂,d₂)::env₂)
+            ,  eval_substs h cenv sdefs (env₁++(x₂,d₂)::(x₁,d₁)::env₂) with
+      | Some res₁, Some res₂ =>
+        {env' | res₁ = env' ++  env₁++((x₁,d₁)::(x₂,d₂)::env₂) & res₂ = env' ++ env₁ ++ ((x₂,d₂)::(x₁,d₁)::env₂)}
+      | None, None => True
+      | _, _ => False
+      end.
     Proof.
       intros neq.
       revert env₁.
@@ -1602,9 +1361,9 @@ Section Stratify.
     Qed.
 
     Lemma eval_substs_disjoint_cons_env h cenv sdefs x d :
-        ~ In x (domain sdefs) ->
-        ~ In x (concat (map nnrc_free_vars (codomain sdefs))) ->
-        forall env,
+      ~ In x (domain sdefs) ->
+      ~ In x (concat (map nnrc_free_vars (codomain sdefs))) ->
+      forall env,
         match eval_substs h cenv sdefs env
               , eval_substs h cenv sdefs ((x,d)::env) with
         | Some res₁, Some res₂ => {env' | res₁ = env' ++ env & res₂ = env' ++ (x,d)::env}
@@ -1641,17 +1400,17 @@ Section Stratify.
         list_simpler.
         exists (env'' ++ (v, d0) :: nil); rewrite app_ass; simpl; reflexivity.
     Qed.
-          
+    
     Lemma eval_substs_disjoint_middle_some h cenv sdefs env' :
-        disjoint (domain sdefs) (domain env') ->
-        disjoint (concat (map nnrc_free_vars (codomain sdefs))) (domain env') ->
-        forall env,
-          match eval_substs h cenv sdefs env
-                , eval_substs h cenv sdefs (env' ++ env) with
-          | Some res₁, Some res₂ => {env'' | res₁ = env'' ++ env & res₂ = env'' ++ env' ++ env}
-          | None, None => True
-          | _, _ => False
-          end.
+      disjoint (domain sdefs) (domain env') ->
+      disjoint (concat (map nnrc_free_vars (codomain sdefs))) (domain env') ->
+      forall env,
+        match eval_substs h cenv sdefs env
+              , eval_substs h cenv sdefs (env' ++ env) with
+        | Some res₁, Some res₂ => {env'' | res₁ = env'' ++ env & res₂ = env'' ++ env' ++ env}
+        | None, None => True
+        | _, _ => False
+        end.
     Proof.
       induction env'; simpl; intros disj1 disj2 env.
       - match_case; intros.
@@ -1714,38 +1473,6 @@ Section Stratify.
       unfold nnrc_eval; simpl.
       match_destr.
       congruence.
-    Qed.
-
-    Lemma disjoint_rev_r {A} (l1 l2: list A) :
-      disjoint l1 (rev l2) <-> disjoint l1 l2.
-    Proof.
-      intros.
-      assert (eqq:equivlist (rev l2) l2).
-      { rewrite <- Permutation_rev; reflexivity. }
-      apply equivlist_incls in eqq.
-      split; intros disj.
-      - eapply disjoint_incl in disj; eauto; tauto.
-      - eapply disjoint_incl; eauto; tauto.
-    Qed.
-
-    Lemma disjoint_rev_l {A} (l1 l2: list A) :
-      disjoint (rev l1) l2 <-> disjoint l1 l2.
-    Proof.
-      split; intros disj; symmetry; symmetry in disj.
-      - apply disjoint_rev_r; auto.
-      - apply disjoint_rev_r in disj; auto.
-    Qed.
-
-    Lemma incl_remove {A} dec x (l1 l2:list (A)) :
-      incl (remove dec x l1) l2 <-> incl l1 (x::l2).
-    Proof.
-      unfold incl; simpl; intuition.
-      - destruct (dec x a); subst; eauto 2.
-        right; apply (H a).
-        apply remove_in_neq; congruence.
-      - apply remove_inv in H0.
-        destruct H0 as [inn neq].
-        destruct (H _ inn); congruence.
     Qed.
 
     Lemma eval_substs_normalized {h cenv env sdefs env'} :
@@ -1941,33 +1668,33 @@ Section Stratify.
         generalize (stratify_aux_nbound_vars eqq1); intros nb1.
         rewrite <- disjoint_rev_l in nb1.
         rewrite <- eqdom in nb1.
-       destruct b.
+        destruct b.
         + rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2; trivial.
-           apply nnrc_core_eval_equiv_free_in_env; intros z zin.
-           rewrite lookup_app.
-           assert (ninz:~ In z (domain env')).
-           {         
-             specialize (nb1 z).
-             intros nin2; apply nb1; trivial.
-             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
-             specialize (fbincl2 _ zin).
-             simpl in fbincl2; intuition.
-           }
-           rewrite (lookup_nin_none _ ninz); trivial.
+          unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2; trivial.
+          apply nnrc_core_eval_equiv_free_in_env; intros z zin.
+          rewrite lookup_app.
+          assert (ninz:~ In z (domain env')).
+          {         
+            specialize (nb1 z).
+            intros nin2; apply nb1; trivial.
+            rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
+            specialize (fbincl2 _ zin).
+            simpl in fbincl2; intuition.
+          }
+          rewrite (lookup_nin_none _ ninz); trivial.
         + rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe3; trivial.
-           apply nnrc_core_eval_equiv_free_in_env; intros z zin.
-           rewrite lookup_app.
-           assert (ninz:~ In z (domain env')).
-           {         
-             specialize (nb1 z).
-             intros nin2; apply nb1; trivial.
-             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
-             specialize (fbincl3 _ zin).
-             simpl in fbincl2; intuition.
-           }
-           rewrite (lookup_nin_none _ ninz); trivial.
+          unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe3; trivial.
+          apply nnrc_core_eval_equiv_free_in_env; intros z zin.
+          rewrite lookup_app.
+          assert (ninz:~ In z (domain env')).
+          {         
+            specialize (nb1 z).
+            intros nin2; apply nb1; trivial.
+            rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
+            specialize (fbincl3 _ zin).
+            simpl in fbincl2; intuition.
+          }
+          rewrite (lookup_nin_none _ ninz); trivial.
       - rewrite eval_nnrc_with_substs_eq_core.
         rewrite <- surjective_pairing.
         case_eq (stratify_aux e1 nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
@@ -1997,19 +1724,19 @@ Section Stratify.
         destruct d; simpl; trivial.
         + repeat rewrite <- nnrc_to_nnrc_base_eq.
           rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2; simpl; trivial.
+          unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2; simpl; trivial.
           * apply nnrc_core_eval_equiv_free_in_env; intros z zin.
             simpl. destruct (equiv_dec z v); simpl; trivial.
             unfold equiv, complement in *.
             rewrite lookup_app.
             assert (ninz:~ In z (domain env')).
             {         
-             specialize (nb1 z).
-             intros nin2; apply nb1; trivial.
-             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
-             specialize (fbincl2 _ zin).
-             simpl in fbincl2; intuition.
-           }
+              specialize (nb1 z).
+              intros nin2; apply nb1; trivial.
+              rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
+              specialize (fbincl2 _ zin).
+              simpl in fbincl2; intuition.
+            }
             rewrite (lookup_nin_none _ ninz); trivial.
           * constructor; trivial.
             unfold nnrc_eval in eqq3.
@@ -2017,19 +1744,19 @@ Section Stratify.
             invcs eqq3; trivial.
         + repeat rewrite <- nnrc_to_nnrc_base_eq.
           rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe3; simpl; trivial.
+          unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe3; simpl; trivial.
           * apply nnrc_core_eval_equiv_free_in_env; intros z zin.
             simpl. destruct (equiv_dec z v0); simpl; trivial.
             unfold equiv, complement in *.
             rewrite lookup_app.
             assert (ninz:~ In z (domain env')).
             {         
-             specialize (nb1 z).
-             intros nin2; apply nb1; trivial.
-             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
-             specialize (fbincl3 _ zin).
-             simpl in fbincl3; intuition.
-           }
+              specialize (nb1 z).
+              intros nin2; apply nb1; trivial.
+              rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
+              specialize (fbincl3 _ zin).
+              simpl in fbincl3; intuition.
+            }
             rewrite (lookup_nin_none _ ninz); trivial.
           * constructor; trivial.
             unfold nnrc_eval in eqq3.
@@ -2046,7 +1773,7 @@ Section Stratify.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
     Qed.
 
-    Lemma stratify_correct e :
+    Theorem stratify_correct e :
       nnrc_eq (stratify e) e.
     Proof.
       red; intros h cenv env FDce FDe.
@@ -2059,8 +1786,8 @@ Section Stratify.
   Section Core.
 
     Lemma stratify1_aux_preserves_core 
-       {e required_level bound_vars n}
-       {sdefs1 sdefs2:list (var*nnrc)} :
+          {e required_level bound_vars n}
+          {sdefs1 sdefs2:list (var*nnrc)} :
       stratify1_aux e required_level bound_vars sdefs1 = (n, sdefs2) ->
       nnrcIsCore e ->
       Forall nnrcIsCore (codomain sdefs1) ->
@@ -2084,7 +1811,7 @@ Section Stratify.
       invcs H0.
       intuition.
     Qed.
-      
+    
     Lemma stratify_aux_preserves_core
           {e required_level bound_vars n sdefs} :
       stratify_aux e required_level bound_vars = (n,sdefs) ->
@@ -2110,11 +1837,11 @@ Section Stratify.
       - apply (stratify1_aux_preserves_core H0); [ | constructor].
         simpl; split.
         + case_eq (stratify_aux e1 nnrcStmt bound_vars); intros ? ? eqq1; simpl.
-        destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
-        apply mk_expr_from_vars_preserves_core; auto.
+          destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
+          apply mk_expr_from_vars_preserves_core; auto.
         + case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2; simpl.
-        destruct (IHe2 _ _ _ _ eqq2); [tauto | ].
-        apply mk_expr_from_vars_preserves_core; auto.
+          destruct (IHe2 _ _ _ _ eqq2); [tauto | ].
+          apply mk_expr_from_vars_preserves_core; auto.
       - match_case_in H0; intros ? ? eqq1; rewrite eqq1 in H0.
         destruct (IHe1 _ _ _ _ eqq1); [tauto | ].
         apply (stratify1_aux_preserves_core H0); trivial.
@@ -2155,7 +1882,7 @@ Section Stratify.
 
     Definition stratified_core (e:nnrc_core) : Prop
       := stratified (proj1_sig e).
-            
+    
     Definition stratify_core (e:nnrc_core) : nnrc_core
       := exist _ _ (stratify_preserves_core _ (proj2_sig e)).
 

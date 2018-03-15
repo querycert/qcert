@@ -35,6 +35,24 @@ Section ListAdd.
   Section Misc.
     Context {A:Type}.
 
+    Lemma app_inv_self_l (l l2:list A) :
+      l = l ++ l2 -> l2 = nil.
+    Proof.
+      intros eqq1.
+      assert (eqq2:l ++ nil = l ++ l2) by (rewrite app_nil_r; trivial).
+      apply app_inv_head in eqq2.
+      congruence.
+    Qed.
+
+    Lemma app_inv_self_r (l l2:list A) :
+      l = l2 ++ l -> l2 = nil.
+    Proof.
+      intros eqq1.
+      assert (eqq2:nil ++ l = l2 ++ l) by (simpl; trivial).
+      apply app_inv_tail in eqq2.
+      congruence.
+    Qed.
+
     Definition singleton (x:A) : list A := x::nil.
     
     Lemma is_nil_dec (l:list A) : {l = nil} + {l <> nil}.
@@ -867,6 +885,19 @@ Section ListAdd.
             contradiction.
     Qed.
 
+    Lemma incl_remove x (l1 l2:list A) :
+      incl (remove eqdec x l1) l2 <-> incl l1 (x::l2).
+    Proof.
+      unfold incl; simpl; intuition.
+      - destruct (eqdec x a); subst; eauto 2.
+        right; apply (H a).
+        apply remove_in_neq; congruence.
+      - apply remove_inv in H0.
+        destruct H0 as [inn neq].
+        destruct (H _ inn); congruence.
+    Qed.
+
+
     Fixpoint remove_all (x : A) (l : list A) : list A :=
       match l with
       | nil => nil
@@ -1101,6 +1132,14 @@ Section ListAdd.
     Proof.
       unfold incl.
       constructor; red; intuition.
+    Qed.
+
+    Lemma incl_app_iff {A:Type} (l m n : list A) :
+      incl l n /\ incl m n <-> incl (l ++ m) n.
+    Proof.
+      unfold incl; intuition.
+      rewrite in_app_iff in H.
+      intuition.
     Qed.
 
     Lemma set_inter_contained {A} dec (l l':list A):
@@ -1560,7 +1599,6 @@ Section ListAdd.
       intuition; eauto.
     Qed.
 
-
     Lemma NoDup_app {A:Type} {a b:list A} :
       disjoint a b -> NoDup a -> NoDup b -> NoDup (a++b).
     Proof.
@@ -1618,6 +1656,38 @@ Section ListAdd.
       unfold disjoint; simpl; intuition; subst; eauto.
     Qed.
 
+    Lemma disjoint_with_exclusion {A:Type} (l l1 l2:list A) :
+      disjoint l1 l2 ->
+      (forall x,
+          In x l -> In x (l1 ++ l2) -> In x l1) ->
+      disjoint l l2.
+    Proof.
+      unfold disjoint; intros disj excl x inn1 inn2.
+      specialize (excl x inn1).
+      rewrite in_app_iff in excl.
+      intuition; eauto.
+    Qed.
+    
+    Lemma disjoint_rev_r {A} (l1 l2: list A) :
+      disjoint l1 (rev l2) <-> disjoint l1 l2.
+    Proof.
+      intros.
+      assert (eqq:equivlist (rev l2) l2).
+      { rewrite <- Permutation_rev; reflexivity. }
+      apply equivlist_incls in eqq.
+      split; intros disj.
+      - eapply disjoint_incl in disj; eauto; tauto.
+      - eapply disjoint_incl; eauto; tauto.
+    Qed.
+
+    Lemma disjoint_rev_l {A} (l1 l2: list A) :
+      disjoint (rev l1) l2 <-> disjoint l1 l2.
+    Proof.
+      split; intros disj; symmetry; symmetry in disj.
+      - apply disjoint_rev_r; auto.
+      - apply disjoint_rev_r in disj; auto.
+    Qed.
+    
   End Disjoint.
 
   (** * Zip of two lists *)
