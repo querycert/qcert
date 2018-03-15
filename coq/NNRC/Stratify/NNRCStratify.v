@@ -1458,8 +1458,8 @@ Section Stratify.
     Qed.
 
   Section Eval_substs.
-    Require Import cNNRCEq.
-    Require Import cNNRCShadow.
+    Require Import NNRCEq.
+    Require Import NNRCShadow.
 
     (* This is a monadic fold_left, whereas mk_expr_from_vars is a fold_right.
         This is because evaluation goes outside in, whereas we build the let-bindings
@@ -1471,22 +1471,29 @@ Section Stratify.
          | nil => Some env
          | (v,n)::sdefs' =>
            olift (fun d => eval_substs h cenv sdefs' ((v,d)::env))
-             (@nnrc_core_eval _ h cenv env n)
+             (@nnrc_eval _ h cenv env n)
          end.
 
     Definition eval_nnrc_with_substs h cenv env nws :=
-      olift (fun env' => @nnrc_core_eval _ h cenv env' (fst nws))
+      olift (fun env' => @nnrc_eval _ h cenv env' (fst nws))
             (eval_substs h cenv (snd nws) env).
 
     Lemma eval_nnrc_with_substs_eq h cenv env a b :
-      olift (fun env' => @nnrc_core_eval _ h cenv env' a)
+      olift (fun env' => @nnrc_eval _ h cenv env' a)
+            (eval_substs h cenv b env) = eval_nnrc_with_substs h cenv env (a,b).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma eval_nnrc_with_substs_eq_core h cenv env a b :
+      olift (fun env' => @nnrc_core_eval _ h cenv env' (nnrc_to_nnrc_base a))
             (eval_substs h cenv b env) = eval_nnrc_with_substs h cenv env (a,b).
     Proof.
       reflexivity.
     Qed.
 
     Lemma mk_expr_from_vars_eval h cenv env nws :
-      @nnrc_core_eval _ h cenv env
+      @nnrc_eval _ h cenv env
         (mk_expr_from_vars nws) = 
       eval_nnrc_with_substs h cenv env nws.
     Proof.
@@ -1494,6 +1501,7 @@ Section Stratify.
       destruct nws as [n sdefs].
       revert env n.
       induction sdefs; intros env n; simpl; trivial.
+      unfold nnrc_eval in *.
       destruct a; simpl in *.
       match_case; intros ? eqq; simpl.
       rewrite IHsdefs; trivial.
@@ -1505,7 +1513,7 @@ Section Stratify.
       revert sdefs2 env.
       induction sdefs1; intros sdefs2 env; simpl; trivial.
       destruct a; simpl.
-      destruct (nnrc_core_eval h cenv env n); simpl; trivial.
+      destruct (@nnrc_eval _ h cenv env n); simpl; trivial.
     Qed.
 
     Lemma eval_substs_applies {h cenv sdefs env res} :
@@ -1516,7 +1524,7 @@ Section Stratify.
       induction sdefs; intros env res eqq; invcs eqq; simpl.
       - exists nil; simpl; eauto.
       - destruct a.
-        destruct (nnrc_core_eval h cenv env n); simpl in *; try discriminate.
+        destruct (@nnrc_eval _ h cenv env n); simpl in *; try discriminate.
         destruct (IHsdefs _ _ H0) as [x ? eqd].
         exists (x++(v,d)::nil).
         + subst. rewrite app_ass; simpl; reflexivity.
@@ -1538,10 +1546,10 @@ Section Stratify.
       apply incl_app_iff in inclu.
       destruct inclu as [inclu1 inclu2].
       simpl in *.
-      assert (eqqs:nnrc_core_eval h cenv env1 n = nnrc_core_eval h cenv env2 n).
-      { apply nnrc_core_eval_equiv_free_in_env; eauto. } 
+      assert (eqqs:@nnrc_eval _ h cenv env1 n = @nnrc_eval _ h cenv env2 n).
+      { apply nnrc_eval_equiv_free_in_env; eauto. } 
       rewrite <- eqqs.
-      case_eq (nnrc_core_eval h cenv env1 n); simpl; trivial.
+      case_eq (@nnrc_eval _ h cenv env1 n); simpl; trivial.
       intros d eqq1.
       apply IHsdefs; trivial.
       apply lookup_equiv_on_cons_same; trivial.
@@ -1557,9 +1565,9 @@ Section Stratify.
     Proof.
       revert env1 env2; induction sdefs; simpl; trivial.
       destruct a; intros env1 env2 leqq.
-      assert (eqqs:nnrc_core_eval h cenv env1 n = nnrc_core_eval h cenv env2 n) by (apply nnrc_core_eval_equiv_env; eauto).
+      assert (eqqs:@nnrc_eval _ h cenv env1 n = @nnrc_eval _ h cenv env2 n) by (apply nnrc_eval_equiv_env; eauto).
       rewrite <- eqqs.
-      case_eq (nnrc_core_eval h cenv env1 n); simpl; trivial.
+      case_eq (@nnrc_eval _ h cenv env1 n); simpl; trivial.
       intros d eqq1.
       apply IHsdefs.
       apply lookup_equiv_cons_same; trivial.      
@@ -1581,9 +1589,9 @@ Section Stratify.
       induction sdefs; intros env₁ ; simpl.
       - exists nil; simpl; reflexivity.
       - destruct a.
-        generalize (nnrc_core_eval_swap_neq (h:=h) cenv env₁ x₁ d₁ x₂ d₂); simpl; intros HH.
+        generalize (@nnrc_eval_swap_neq _ h cenv env₁ x₁ d₁ x₂ d₂); simpl; intros HH.
         rewrite HH by trivial.
-        destruct (nnrc_core_eval h cenv (env₁ ++ (x₂, d₂) :: (x₁, d₁) :: env₂) n)
+        destruct (@nnrc_eval _ h cenv (env₁ ++ (x₂, d₂) :: (x₁, d₁) :: env₂) n)
         ; simpl; trivial.
         specialize (IHsdefs ((v,d)::env₁)).
         simpl in IHsdefs.
@@ -1612,15 +1620,15 @@ Section Stratify.
         apply notand in nin2.
         destruct nin1 as [nin11 nin12].
         destruct nin2 as [nin21 nin22].
-        assert (nnrc_core_eval h cenv ((x, d) :: env) n =
-                nnrc_core_eval h cenv env n).
-        { apply nnrc_core_eval_equiv_free_in_env.
+        assert (@nnrc_eval _ h cenv ((x, d) :: env) n =
+                @nnrc_eval _ h cenv env n).
+        { apply nnrc_eval_equiv_free_in_env.
           intros ? inn; simpl.
           match_destr.
           unfold equiv in *; congruence.
         }
         rewrite H; simpl.
-        destruct (nnrc_core_eval h cenv env n); simpl; trivial.
+        destruct (@nnrc_eval _ h cenv env n); simpl; trivial.
         specialize (IHsdefs nin12 nin22 ((v, d0) :: env)).
         generalize (eval_substs_disjoint_swap_env
                       h cenv sdefs nil env v d0 x d nin11); intros HH.
@@ -1670,11 +1678,11 @@ Section Stratify.
     Qed.
 
     Lemma mk_expr_from_vars_eq_expr {n1 n2} :
-      nnrc_core_eq n1 n2 ->
+      nnrc_eq n1 n2 ->
       forall sdefs,
-        nnrc_core_eq (mk_expr_from_vars (n1, sdefs)) (mk_expr_from_vars (n2, sdefs)).
+        nnrc_eq (mk_expr_from_vars (n1, sdefs)) (mk_expr_from_vars (n2, sdefs)).
     Proof.
-      unfold mk_expr_from_vars, nnrc_core_eq.
+      unfold mk_expr_from_vars, nnrc_eq, nnrc_eval.
       intros eqq sdefs; revert n1 n2 eqq.
       induction sdefs; intros n1 n2 eqq; simpl; trivial; intros.
       match_case; intros ? inn.
@@ -1702,7 +1710,8 @@ Section Stratify.
       unfold eval_nnrc_with_substs; simpl.
       rewrite eval_substs_app; simpl.
       destruct (eval_substs h cenv sdefs env); simpl; trivial.
-      destruct (nnrc_core_eval h cenv b e); simpl; trivial.
+      destruct (@nnrc_eval _ h cenv b e); simpl; trivial.
+      unfold nnrc_eval; simpl.
       match_destr.
       congruence.
     Qed.
@@ -1751,21 +1760,23 @@ Section Stratify.
       - destruct a.
         apply some_olift in eqq1.
         destruct eqq1 as [d eqq2 eqq3].
+        unfold nnrc_eval in eqq2.
         apply nnrc_core_eval_normalized in eqq2; trivial.
         symmetry in eqq3.
         apply (IHsdefs _ _ eqq3); trivial.
         constructor; trivial.
     Qed.
     
-    Lemma stratify_aux_correct_core h cenv env e bound_vars required_kind :
+    Lemma stratify_aux_correct h cenv env e bound_vars required_kind :
       incl (nnrc_free_vars e) bound_vars ->
       Forall (data_normalized h) (map snd cenv) ->
       Forall (data_normalized h) (map snd env) ->
-      @nnrc_core_eval _ h cenv env (mk_expr_from_vars (stratify_aux e required_kind bound_vars)) =
-      @nnrc_core_eval _ h cenv env e.
+      @nnrc_eval _ h cenv env (mk_expr_from_vars (stratify_aux e required_kind bound_vars)) =
+      @nnrc_eval _ h cenv env e.
     Proof.
       rewrite mk_expr_from_vars_eval.
       unfold eval_nnrc_with_substs.
+      unfold nnrc_eval.
       revert required_kind bound_vars env.
       induction e; intros required_kind bound_vars env fbincl FDce Fde; simpl; trivial.
       - repeat (match_case; intros); simpl.
@@ -1808,7 +1819,8 @@ Section Stratify.
         destruct HH as [env'' eeqq1 eeqq2].
         subst.
         f_equal.
-        + apply nnrc_core_eval_equiv_free_in_env; intros.
+        + repeat rewrite <- nnrc_to_nnrc_base_eq.
+          apply nnrc_eval_equiv_free_in_env; intros.
           destruct (eval_substs_applies eqq) as [env''' ? eqdom2]; subst.
           list_simpler.
           rewrite lookup_app.
@@ -1817,7 +1829,8 @@ Section Stratify.
           generalize (fequiv1 x); list_simpler; intros [impf _].
           cut_to impf; [| tauto].
           destruct impf as [inn3|inn3]; eauto.
-        + apply nnrc_core_eval_equiv_free_in_env; intros.
+        + repeat rewrite <- nnrc_to_nnrc_base_eq.
+          apply nnrc_eval_equiv_free_in_env; intros.
           repeat rewrite lookup_app.
           match_destr.
           rewrite (lookup_nin_none _ (l:=env')); trivial.
@@ -1832,7 +1845,7 @@ Section Stratify.
         simpl.
         unfold olift.
         match_option.
-      - rewrite eval_nnrc_with_substs_eq.
+      - rewrite eval_nnrc_with_substs_eq_core.
         rewrite <- surjective_pairing.
         rewrite stratify1_aux_correct.
         unfold eval_nnrc_with_substs; simpl.
@@ -1841,18 +1854,20 @@ Section Stratify.
         destruct fbincl as [fbincl1 fbincl2].
         apply incl_remove in fbincl2.
         specialize (IHe1 nnrcStmt _ _ fbincl1 FDce Fde).
+        unfold nnrc_eval; simpl; repeat rewrite <- nnrc_to_nnrc_base_eq.
         rewrite mk_expr_from_vars_eval.
-        unfold eval_nnrc_with_substs; rewrite IHe1.
+        unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe1.
         match_option.
         assert (Fde2:Forall (data_normalized h) (map snd ((v, d) :: env))).
         { simpl; constructor; trivial.
           eapply nnrc_core_eval_normalized; try eapply eqq; eauto.
         }
         specialize (IHe2 nnrcStmt _ _ fbincl2 FDce Fde2).
+        repeat rewrite <- nnrc_to_nnrc_base_eq.
         rewrite mk_expr_from_vars_eval.
-        unfold eval_nnrc_with_substs; rewrite IHe2.
+        unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2.
         trivial.
-      - rewrite eval_nnrc_with_substs_eq.
+      - rewrite eval_nnrc_with_substs_eq_core.
         rewrite <- surjective_pairing.
         case_eq (stratify_aux e1 nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
         rewrite stratify1_aux_correct.
@@ -1866,6 +1881,7 @@ Section Stratify.
         rewrite eqq1; simpl.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
         intros env'' eqq2.
+        unfold nnrc_eval; simpl; repeat rewrite <- nnrc_to_nnrc_base_eq.
         match_option.
         destruct d; simpl; trivial.
         f_equal.
@@ -1873,12 +1889,14 @@ Section Stratify.
         assert (Fde2:Forall (data_normalized h) (map snd ((v, x) :: env''))).
         { apply eval_substs_normalized in eqq2; trivial.
           simpl; constructor; trivial.
+          unfold nnrc_eval in eqq.
           apply nnrc_core_eval_normalized in eqq; trivial.
           eapply data_normalized_dcoll_in; eauto.
         }
         specialize (IHe2 nnrcStmt _ _ fbincl2 FDce Fde2).
+        repeat rewrite <- nnrc_to_nnrc_base_eq.
         rewrite mk_expr_from_vars_eval.
-        unfold eval_nnrc_with_substs; rewrite IHe2.
+        unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2.
         destruct (eval_substs_applies eqq2) as [env' ? eqdom]; subst.
         apply nnrc_core_eval_equiv_free_in_env; intros z zin.
         simpl.
@@ -1893,11 +1911,12 @@ Section Stratify.
           rewrite <- eqdom in nb1.
           specialize (nb1 z).
           intros nin2; apply nb1; trivial.
+          rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
           specialize (fbincl2 _ zin).
           simpl in fbincl2; intuition.
         }
         rewrite (lookup_nin_none _ ninz); trivial.
-      - rewrite eval_nnrc_with_substs_eq.
+      - rewrite eval_nnrc_with_substs_eq_core.
         rewrite <- surjective_pairing.
         case_eq (stratify_aux e1 nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
         rewrite stratify1_aux_correct.
@@ -1912,6 +1931,7 @@ Section Stratify.
         rewrite eqq1; simpl.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
         intros env'' eqq2.
+        unfold nnrc_eval; simpl; repeat rewrite <- nnrc_to_nnrc_base_eq.
         apply olift_ext; intros d eqq3.
         destruct d; simpl; trivial.
         assert(Fde'':Forall (data_normalized h) (map snd env'')).
@@ -1923,30 +1943,32 @@ Section Stratify.
         rewrite <- eqdom in nb1.
        destruct b.
         + rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs; rewrite IHe2; trivial.
+           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2; trivial.
            apply nnrc_core_eval_equiv_free_in_env; intros z zin.
            rewrite lookup_app.
            assert (ninz:~ In z (domain env')).
            {         
              specialize (nb1 z).
              intros nin2; apply nb1; trivial.
+             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
              specialize (fbincl2 _ zin).
              simpl in fbincl2; intuition.
            }
            rewrite (lookup_nin_none _ ninz); trivial.
         + rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs; rewrite IHe3; trivial.
+           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe3; trivial.
            apply nnrc_core_eval_equiv_free_in_env; intros z zin.
            rewrite lookup_app.
            assert (ninz:~ In z (domain env')).
            {         
              specialize (nb1 z).
              intros nin2; apply nb1; trivial.
+             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
              specialize (fbincl3 _ zin).
              simpl in fbincl2; intuition.
            }
            rewrite (lookup_nin_none _ ninz); trivial.
-      - rewrite eval_nnrc_with_substs_eq.
+      - rewrite eval_nnrc_with_substs_eq_core.
         rewrite <- surjective_pairing.
         case_eq (stratify_aux e1 nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
         rewrite stratify1_aux_correct.
@@ -1963,6 +1985,7 @@ Section Stratify.
         rewrite eqq1; simpl.
         case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
         intros env'' eqq2.
+        unfold nnrc_eval; simpl; repeat rewrite <- nnrc_to_nnrc_base_eq.
         apply olift_ext; intros d eqq3.
         assert(Fde'':Forall (data_normalized h) (map snd env'')).
         { apply eval_substs_normalized in eqq2; trivial. }
@@ -1972,8 +1995,9 @@ Section Stratify.
         rewrite <- disjoint_rev_l in nb1.
         rewrite <- eqdom in nb1.
         destruct d; simpl; trivial.
-        + rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs; rewrite IHe2; simpl; trivial.
+        + repeat rewrite <- nnrc_to_nnrc_base_eq.
+          rewrite mk_expr_from_vars_eval.
+           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe2; simpl; trivial.
           * apply nnrc_core_eval_equiv_free_in_env; intros z zin.
             simpl. destruct (equiv_dec z v); simpl; trivial.
             unfold equiv, complement in *.
@@ -1982,15 +2006,18 @@ Section Stratify.
             {         
              specialize (nb1 z).
              intros nin2; apply nb1; trivial.
+             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
              specialize (fbincl2 _ zin).
              simpl in fbincl2; intuition.
            }
             rewrite (lookup_nin_none _ ninz); trivial.
           * constructor; trivial.
+            unfold nnrc_eval in eqq3.
             apply nnrc_core_eval_normalized in eqq3; trivial.
             invcs eqq3; trivial.
-        + rewrite mk_expr_from_vars_eval.
-           unfold eval_nnrc_with_substs; rewrite IHe3; simpl; trivial.
+        + repeat rewrite <- nnrc_to_nnrc_base_eq.
+          rewrite mk_expr_from_vars_eval.
+           unfold eval_nnrc_with_substs, nnrc_eval; rewrite IHe3; simpl; trivial.
           * apply nnrc_core_eval_equiv_free_in_env; intros z zin.
             simpl. destruct (equiv_dec z v0); simpl; trivial.
             unfold equiv, complement in *.
@@ -1999,35 +2026,30 @@ Section Stratify.
             {         
              specialize (nb1 z).
              intros nin2; apply nb1; trivial.
+             rewrite <- nnrc_to_nnrc_base_free_vars_same in zin.
              specialize (fbincl3 _ zin).
              simpl in fbincl3; intuition.
            }
             rewrite (lookup_nin_none _ ninz); trivial.
           * constructor; trivial.
+            unfold nnrc_eval in eqq3.
             apply nnrc_core_eval_normalized in eqq3; trivial.
             invcs eqq3; trivial.
-      - rewrite eval_nnrc_with_substs_eq.
+      - rewrite eval_nnrc_with_substs_eq_core.
         rewrite <- surjective_pairing.
-        case_eq (stratify_aux e nnrcExpr bound_vars); intros e' sdefs1 eqq1.
+        case_eq (stratify_aux e nnrcExpr bound_vars); intros e1' sdefs1 eqq1.
         rewrite stratify1_aux_correct.
         unfold eval_nnrc_with_substs; simpl.
-        unfold olift.
-        match_option.
-    Qed.
-
-    Lemma stratify_correct_core e :
-      nnrc_core_eq (stratify e) e.
-    Proof.
-      red; intros h cenv env FDce FDe.
-      apply stratify_aux_correct_core; trivial.
-      reflexivity.
+        specialize (IHe nnrcExpr _ _ fbincl FDce Fde).
+        rewrite <- IHe; clear IHe.
+        rewrite eqq1; simpl.
+        case_eq (eval_substs h cenv sdefs1 env); simpl; trivial.
     Qed.
 
     Lemma stratify_correct e :
       nnrc_eq (stratify e) e.
     Proof.
       red; intros h cenv env FDce FDe.
-      unfold nnrc_eval.
       apply stratify_aux_correct; trivial.
       reflexivity.
     Qed.
