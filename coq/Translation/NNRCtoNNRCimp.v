@@ -1015,9 +1015,9 @@ Section NNRCtoNNRCimp.
     Qed.
     
     Lemma nnrc_to_nnrc_imp_some_correct
-          h σc {s:nnrc} {globals} {si:nnrc_imp} {ret:var} :
+          h σc {s:nnrc} {globals} {si:nnrc_imp} :
       nnrc_stmt_to_nnrc_imp_stmt globals s = Some si ->
-      @nnrc_eval _ h σc nil s = nnrc_imp_eval_top h σc si.
+      @nnrc_eval_top _ h s σc = nnrc_imp_eval_top h σc si.
     Proof.
       unfold nnrc_stmt_to_nnrc_imp_stmt, nnrc_imp_eval_top.
       intros eqsi.
@@ -1026,7 +1026,7 @@ Section NNRCtoNNRCimp.
       invcs eqsi.
       generalize (nnrc_stmt_to_nnrc_imp_stmt_aux_some_correct
                     eqq
-                    h σc nil nil
+                    h (rec_sort σc) nil nil
                     ((fresh_var "ret" (globals ++ nnrc_bound_vars s), None) :: nil)
                  ); intros HH.
       simpl in HH.
@@ -1060,7 +1060,6 @@ Section NNRCtoNNRCimp.
     End tests.
 
   End from_stratified.
-
 
   
 End NNRCtoNNRCimp.

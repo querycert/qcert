@@ -38,7 +38,6 @@ Section NNRCimpSem.
   Context {fruntime:foreign_runtime}.
 
   Context (h:brand_relation_t).
-  Context (σc:list (string*data)).
 
   (* NB: normal variables and (unfrozen) mutable collection variables have *different namespaces*
          Thus, when translating to another language without this distinction, care must be avoided to avoid
@@ -49,6 +48,7 @@ Section NNRCimpSem.
   Local Open Scope string.
 
   Section Denotation.
+      Context (σc:list (string*data)).
 
     Reserved Notation  "[ σ ⊢ e ⇓ d ]".
 
@@ -160,29 +160,30 @@ Section NNRCimpSem.
     Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
     Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
 
-    Reserved Notation "[ ⊢ q ⇓ d  ]".
-
-    Inductive nnrc_imp_sem_top : nnrc_imp -> data -> Prop
-      :=
-      | sem_NNRCimpTop (q: nnrc_imp) d :
-          [ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), Some d)::nil ] ->
-          [ ⊢ q ⇓ d  ]
-    where
-    "[ ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top q d ) : nnrc_imp.
-
-    Notation "[ ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top q d ) : nnrc_imp.
-
   End Denotation.
 
-  Notation "[ σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem σ e d) : nnrc_imp.
-  Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
-  Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
-  Notation "[ ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top q d ) : nnrc_imp.
+  Reserved Notation "[ σc ⊢ q ⇓ d  ]".
+
+  Notation "[ σc ; σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem σc σ e d) : nnrc_imp.
+  Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
+  Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
+
+  Inductive nnrc_imp_sem_top : bindings -> nnrc_imp -> data -> Prop
+      :=
+      | sem_NNRCimpTop (σc:bindings) (q: nnrc_imp) d :
+          [ (rec_sort σc) ⊢ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), Some d)::nil ] ->
+          [ σc ⊢ q ⇓ d  ]
+    where
+    "[ σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top σc q d ) : nnrc_imp.
+
+  Notation "[ σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top σc q d ) : nnrc_imp.
 
   Section props.
 
+    Context (σc:list (string*data)).
+    
     Lemma nnrc_imp_stmt_sem_env_stack {s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}:
-      [ s, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] -> domain σ₁ = domain σ₂.
+      [ σc ⊢ s, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] -> domain σ₁ = domain σ₂.
     Proof.
       revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; invcs sem.
@@ -227,7 +228,7 @@ Section NNRCimpSem.
     Qed.
 
     Lemma nnrc_imp_stmt_sem_mcenv_stack {s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}:
-      [ s, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] -> domain ψc₁ = domain ψc₂.
+      [ σc ⊢ s, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] -> domain ψc₁ = domain ψc₂.
     Proof.
       revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; invcs sem.
@@ -272,7 +273,7 @@ Section NNRCimpSem.
     Qed.
 
     Lemma nnrc_imp_stmt_sem_mdenv_stack {s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}:
-      [ s, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] -> domain ψd₁ = domain ψd₂.
+      [ σc ⊢ s, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] -> domain ψd₁ = domain ψd₂.
     Proof.
       revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
       nnrc_imp_stmt_cases (induction s) Case; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; invcs sem.
@@ -318,8 +319,8 @@ Section NNRCimpSem.
 
     Lemma nnrc_imp_stmt_sem_env_cons_same
           {s v₁ od₁ σ₁ ψc₁ ψd₁ v₂ od₂ σ₂ ψc₂ ψd₂} :
-      [ s, (v₁, od₁) :: σ₁, ψc₁ , ψd₁ ⇓ (v₂, od₂) :: σ₂, ψc₂ , ψd₂] ->
-      [ s, (v₁, od₁) :: σ₁, ψc₁ , ψd₁ ⇓ (v₁, od₂) :: σ₂, ψc₂ , ψd₂].
+      [ σc ⊢ s, (v₁, od₁) :: σ₁, ψc₁ , ψd₁ ⇓ (v₂, od₂) :: σ₂, ψc₂ , ψd₂] ->
+      [ σc ⊢ s, (v₁, od₁) :: σ₁, ψc₁ , ψd₁ ⇓ (v₁, od₂) :: σ₂, ψc₂ , ψd₂].
     Proof.
       intros sem.
       generalize (nnrc_imp_stmt_sem_env_stack sem).
@@ -329,8 +330,8 @@ Section NNRCimpSem.
 
     Lemma nnrc_imp_stmt_sem_mcenv_cons_same
           {s v₁ od₁ σ₁ ψc₁ ψd₁ v₂ od₂ σ₂ ψc₂ ψd₂} :
-      [ s,  σ₁, (v₁, od₁)::ψc₁ , ψd₁ ⇓ σ₂, (v₂, od₂) :: ψc₂ , ψd₂] ->
-      [ s, σ₁, (v₁, od₁)::ψc₁ , ψd₁ ⇓ σ₂, (v₁, od₂)::ψc₂ , ψd₂].
+      [ σc ⊢ s,  σ₁, (v₁, od₁)::ψc₁ , ψd₁ ⇓ σ₂, (v₂, od₂) :: ψc₂ , ψd₂] ->
+      [ σc ⊢ s, σ₁, (v₁, od₁)::ψc₁ , ψd₁ ⇓ σ₂, (v₁, od₂)::ψc₂ , ψd₂].
     Proof.
       intros sem.
       generalize (nnrc_imp_stmt_sem_mcenv_stack sem).
@@ -340,8 +341,8 @@ Section NNRCimpSem.
 
     Lemma nnrc_imp_stmt_sem_mdenv_cons_same
           {s v₁ od₁ σ₁ ψc₁ ψd₁ v₂ od₂ σ₂ ψc₂ ψd₂} :
-      [ s,  σ₁, ψc₁ , (v₁, od₁)::ψd₁ ⇓ σ₂, ψc₂ , (v₂, od₂) :: ψd₂] ->
-      [ s, σ₁, ψc₁ , (v₁, od₁)::ψd₁ ⇓ σ₂, ψc₂ ,  (v₁, od₂)::ψd₂].
+      [ σc ⊢ s,  σ₁, ψc₁ , (v₁, od₁)::ψd₁ ⇓ σ₂, ψc₂ , (v₂, od₂) :: ψd₂] ->
+      [ σc ⊢ s, σ₁, ψc₁ , (v₁, od₁)::ψd₁ ⇓ σ₂, ψc₂ ,  (v₁, od₂)::ψd₂].
     Proof.
       intros sem.
       generalize (nnrc_imp_stmt_sem_mdenv_stack sem).
@@ -352,6 +353,7 @@ Section NNRCimpSem.
   End props.
 
 End NNRCimpSem.
+
 Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem h σc σ e d) : nnrc_imp.
 Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
 Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter h σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.

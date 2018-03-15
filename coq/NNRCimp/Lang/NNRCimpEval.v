@@ -174,7 +174,7 @@ Section NNRCimpEval.
 
     Definition nnrc_imp_eval_top σc (q:nnrc_imp) :=
       let (s, ret) := q in
-      match nnrc_imp_stmt_eval σc nil nil ((ret, None)::nil) s with
+      match nnrc_imp_stmt_eval (rec_sort σc) nil nil ((ret, None)::nil) s with
       | Some (_, _, (_,Some d)::_) => Some d
       | _ => None
       end.

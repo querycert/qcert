@@ -27,12 +27,11 @@ Section NNRCimpNorm.
 
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
-  Context (σc:bindings).
   
   (** NNRCimp evaluation preserves data normalization. *)
 
   Lemma nnrc_imp_expr_eval_normalized
-        (σ:pd_bindings) (e:nnrc_imp_expr) o :
+        {σc:bindings} {σ:pd_bindings} {e:nnrc_imp_expr} {o} :
     nnrc_imp_expr_eval h σc σ e = Some o ->
     Forall (data_normalized h) (map snd σc) ->
     (forall x, In (Some x) (map snd σ) -> data_normalized h x)  ->
@@ -73,9 +72,10 @@ Section NNRCimpNorm.
   Local Open Scope string.
 
   Lemma nnrc_imp_stmt_eval_normalized
-        (σ:pd_bindings) (ψc:mc_bindings) (ψd:md_bindings)
-        (s:nnrc_imp_stmt)
-        (σ':pd_bindings) (ψc':mc_bindings) (ψd':md_bindings) :
+        {σc:bindings}
+        {σ:pd_bindings} {ψc:mc_bindings} {ψd:md_bindings}
+        {s:nnrc_imp_stmt}
+        {σ':pd_bindings} {ψc':mc_bindings} {ψd':md_bindings} :
     nnrc_imp_stmt_eval h σc σ ψc ψd s = Some (σ', ψc', ψd') ->
     Forall (data_normalized h) (map snd σc) ->
     (forall x, In (Some x) (map snd σ) -> data_normalized h x)  ->
@@ -203,14 +203,14 @@ Section NNRCimpNorm.
     - Case "NNRCimpIf".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      generalize (nnrc_imp_expr_eval_normalized _ _ _ eqq1); intros Fd.
+      generalize (nnrc_imp_expr_eval_normalized eqq1); intros Fd.
       cut_to Fd; eauto 2.
       destruct d; try discriminate.
       destruct b; try discriminate; eauto.
     - Case "NNRCimpEither".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      generalize (nnrc_imp_expr_eval_normalized _ _ _ eqq1); intros Fd.
+      generalize (nnrc_imp_expr_eval_normalized eqq1); intros Fd.
       cut_to Fd; eauto 2.
       destruct d; try discriminate;
         (match_case_in eqq; [intros ? eqq2 | intros eqq2]
@@ -225,7 +225,7 @@ Section NNRCimpNorm.
         invcs H1; intuition.
   Qed.
 
-  Lemma nnrc_imp_eval_normalized {q:nnrc_imp} {d} :
+  Lemma nnrc_imp_eval_normalized  {σc:bindings} {q:nnrc_imp} {d} :
     nnrc_imp_eval_top h σc q = Some d ->
     Forall (data_normalized h) (map snd σc) ->
     data_normalized h d.
@@ -239,6 +239,8 @@ Section NNRCimpNorm.
     destruct o; try discriminate.
     invcs ev.
     apply nnrc_imp_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate.
+    rewrite Forall_map in *.
+    apply dnrec_sort_content; trivial.
   Qed.
   
 End NNRCimpNorm.
@@ -247,6 +249,5 @@ Hint Resolve nnrc_imp_expr_eval_normalized.
 Hint Resolve nnrc_imp_stmt_eval_normalized.
 
 Arguments nnrc_imp_expr_eval_normalized {fruntime h σc σ e o}.
-
 Arguments nnrc_imp_stmt_eval_normalized {fruntime h σc σ ψc ψd s σ' ψc' ψd'}.
 

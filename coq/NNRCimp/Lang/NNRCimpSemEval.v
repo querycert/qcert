@@ -40,12 +40,11 @@ Section NNRCimpSemEval.
   Context {fruntime:foreign_runtime}.
 
   Context (h:brand_relation_t).
-  Context (σc:list (string*data)).
 
   Local Open Scope nnrc_imp.
   Local Open Scope string.
 
-  Lemma nnrc_imp_expr_sem_eval σ e d :
+  Lemma nnrc_imp_expr_sem_eval σc σ e d :
     [ h , σc ; σ ⊢ e ⇓ d ] <-> nnrc_imp_expr_eval h σc σ e = Some d.
   Proof.
     split; revert σ d.
@@ -111,7 +110,7 @@ Section NNRCimpSemEval.
                [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
             ]; subst.
 
-  Lemma nnrc_imp_stmt_sem_eval σ₁ ψc₁ ψd₁ s σ₂ ψc₂ ψd₂ :
+  Lemma nnrc_imp_stmt_sem_eval σc σ₁ ψc₁ ψd₁ s σ₂ ψc₂ ψd₂ :
     [ h , σc ⊢ s, σ₁, ψc₁ , ψd₁ ⇓ σ₂, ψc₂ , ψd₂ ] <-> nnrc_imp_stmt_eval h σc σ₁ ψc₁ ψd₁ s = Some (σ₂, ψc₂, ψd₂).
   Proof.
     split; revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂.
@@ -208,7 +207,7 @@ Section NNRCimpSemEval.
       }
   Qed.
 
-  Lemma nnrc_imp_sem_eval q d :
+  Lemma nnrc_imp_sem_eval σc q d :
     [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h σc q = Some d.
   Proof.
     destruct q.
