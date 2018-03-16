@@ -53,13 +53,13 @@ Section NNRCimp.
        statement with it bound to the given variable.  It then freezes
        the variable (makes it contain normal data) and evaluates the second
        statement with the variable bound to the normal data version *)
-    | NNRCimpLet : var -> nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v (:= e₁)? { s₂ }]) *)
-    | NNRCimpLetMut : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v (:= e₁)? { s₂ }]) *)
+    | NNRCimpLet : var -> nnrc_imp_expr -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v := e₁; s₂]) *)
+    | NNRCimpLetMut : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt (**r variable declaration ([var $v; s₁; s₂]) *)
     (* This creates a mutable collection, and evaluates the first
        statement with it bound to the given variable.  It then freezes
        the collection (makes it a normal bag) and evaluates the second
        statement with the variable bound to the bag version *)
-    | NNRCimpLetMutColl : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r mutable collection declaration ([coll $v { s1 }; s2]) *)
+    | NNRCimpLetMutColl : var -> nnrc_imp_stmt -> nnrc_imp_stmt -> nnrc_imp_stmt    (**r mutable collection declaration ([var $v := {}; s1 ; s2]) *)
     | NNRCimpAssign : var -> nnrc_imp_expr -> nnrc_imp_stmt                           (**r variable assignent ([$v := e]) *)
     (* pushes to a variable that holds a mutable collection *)
     | NNRCimpPush : var -> nnrc_imp_expr -> nnrc_imp_stmt                             (**r push item in mutable collection ([push e in $v]) *)
