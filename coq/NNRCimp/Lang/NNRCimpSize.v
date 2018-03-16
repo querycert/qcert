@@ -68,4 +68,15 @@ Section NNRCimpSize.
       apply nnrc_imp_stmt_size_nzero.
     Qed.
 
+    Section Core.
+      Program Definition nnrc_imp_core_size (q:nnrc_imp_core) : nat
+        := nnrc_imp_size q.
+
+      Lemma nnrc_imp_core_size_nzero (q:nnrc_imp_core) :
+        nnrc_imp_core_size q <> 0.
+      Proof.
+        apply nnrc_imp_size_nzero.
+      Qed.
+    End Core.
+
 End NNRCimpSize.

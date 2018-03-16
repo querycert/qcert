@@ -1182,7 +1182,7 @@ Section NNRCtoNNRCimp.
       apply stratify_preserves_core.
     Qed.
 
-    Program Definition nnrc_core_to_nnrc_imp_core
+    Program Definition nnrc_core_to_nnrc_imp_core_top
             (globals:list var) (s:nnrc_core) : nnrc_imp_core
       :=nnrc_to_nnrc_imp_top globals s.
     Next Obligation.
@@ -1190,6 +1190,18 @@ Section NNRCtoNNRCimp.
       apply nnrc_to_nnrc_imp_top_preserves_core; trivial.
     Qed.
 
+    Theorem nnrc_core_to_nnrc_imp_core_correct
+          h σc (s:nnrc_core) (globals:list var) :
+    @nnrc_core_eval_top _ h s σc = nnrc_imp_core_eval_top h σc (nnrc_core_to_nnrc_imp_core_top globals s).
+    Proof.
+      destruct s as [q pf].
+      generalize (nnrc_to_nnrc_imp_correct h σc q globals); intros HH.
+      unfold nnrc_eval_top in HH.
+      rewrite <- nnrc_to_nnrc_ext_eq in HH by trivial.
+      unfold nnrc_core_eval_top, lift_nnrc_core; simpl.
+      rewrite HH.
+      reflexivity.
+    Qed.
   End Core.
 
 End NNRCtoNNRCimp.

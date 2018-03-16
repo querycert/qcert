@@ -116,6 +116,7 @@ let languages =
     QcertCompiler.L_nnrc;
     QcertCompiler.L_nnrc_core;
     QcertCompiler.L_nnrc_imp;
+    QcertCompiler.L_nnrc_imp_core;
     QcertCompiler.L_nnrcmr;
     QcertCompiler.L_cldmr;
     QcertCompiler.L_dnnrc;

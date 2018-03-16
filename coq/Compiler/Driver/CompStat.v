@@ -127,6 +127,11 @@ Section CompStat.
       (("nnrcmr_length", dnat (Z_of_nat (List.length q.(mr_chain))))
          :: nil).
 
+  Definition stat_nnrc_imp_core (q: nnrc_imp_core) : data :=
+    drec
+      (("nnrc_imp_core_size", dnat (Z_of_nat (nnrc_imp_core_size q)))
+         :: nil).
+
   Definition stat_nnrc_imp (q: nnrc_imp) : data :=
     drec
       (("nnrc_imp_size", dnat (Z_of_nat (nnrc_imp_size q)))
@@ -255,6 +260,11 @@ Section CompStat.
       (("nnrcmr_no_optim", stat_nnrcmr q)
          :: ("nnrcmr_optim", stat_nnrcmr q')
          :: ("nnrcmr_optim_time", dstring t)
+         :: nil).
+
+  Definition stat_tree_nnrc_imp_core (q: nnrc_imp_core) : data :=
+    drec
+      (("nnrc_imp_core", stat_nnrc_imp_core q)
          :: nil).
 
   Definition stat_tree_nnrc_imp (q: nnrc_imp) : data :=
@@ -432,6 +442,7 @@ Section CompStat.
         | Q_nraenv q => stat_nraenv q
         | Q_nnrc_core q => stat_nnrc_core q
         | Q_nnrc q => stat_nnrc q
+        | Q_nnrc_imp_core q => stat_nnrc_imp_core q
         | Q_nnrc_imp q => stat_nnrc_imp q
         | Q_nnrcmr q => stat_nnrcmr q
         | Q_cldmr q => stat_cldmr q
@@ -463,6 +474,7 @@ Section CompStat.
         | Q_nraenv q => stat_tree_nraenv q
         | Q_nnrc_core q => stat_tree_nnrc_core q
         | Q_nnrc q => stat_tree_nnrc q
+        | Q_nnrc_imp_core q => stat_tree_nnrc_imp_core q
         | Q_nnrc_imp q => stat_tree_nnrc_imp q
         | Q_nnrcmr q => stat_tree_nnrcmr q
         | Q_cldmr q => stat_tree_cldmr q

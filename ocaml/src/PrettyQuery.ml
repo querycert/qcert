@@ -312,6 +312,11 @@ let pretty_nnrc_imp greek margin annot hierarchy link_runtime q =
     flush_str_formatter ()
   end
 
+(** Pretty cNNRCimp *)
+
+let pretty_nnrc_imp_core greek margin annot hierarchy link_runtime q =
+  pretty_nnrc_imp greek margin annot hierarchy link_runtime q
+
 (** Pretty NNRCMR *)
 
 let pretty_fun sym ff (x, n) =
