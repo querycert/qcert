@@ -181,6 +181,11 @@ Section NNRCimpEval.
 
   End Evaluation.
 
+  Section Core.
+    Program Definition nnrc_imp_core_eval_top σc (q:nnrc_imp_core)
+      := nnrc_imp_eval_top σc q.
+  End Core.
+
   Section props.
 
     Ltac destr H :=

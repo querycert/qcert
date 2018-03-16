@@ -71,21 +71,197 @@ Section NNRCimp.
     .
 
     (** [nnrc_imp] is composed of the statement evaluating the query
-        and the variable containing the resulut of the evaluation *)
+        and the variable containing the result of the evaluation *)
     Definition nnrc_imp : Set := (nnrc_imp_stmt * var).
 
   End Syntax.
 
-  Section Env.
-      Context {fruntime:foreign_runtime}.
+  Section dec.
+    Context {fruntime:foreign_runtime}.
+
+    Global Instance nnrc_imp_expr_eqdec : EqDec nnrc_imp_expr eq.
+    Proof.
+      change (forall x y : nnrc_imp_expr,  {x = y} + {x <> y}).
+      decide equality;
+        try solve [apply binary_op_eqdec | apply unary_op_eqdec
+                   | apply data_eqdec | apply string_eqdec].
+      - decide equality; apply string_dec.
+    Defined.
+
+    Global Instance nnrc_imp_stmt_eqdec : EqDec nnrc_imp_stmt eq.
+    Proof.
+      change (forall x y : nnrc_imp_stmt,  {x = y} + {x <> y}).
+      decide equality;
+        try solve [apply nnrc_imp_expr_eqdec | apply string_eqdec].
+    Defined.
+
+    Global Instance nnrc_imp_eqdec : EqDec nnrc_imp eq.
+    Proof.
+      intros [s1 r1] [s2 r2].
+      destruct (r1 == r2).
+      - destruct (s1 == s2).
+        + left; congruence.
+        + right; congruence.
+      - right; congruence.
+    Defined.
+  End dec.
+
+  Section Core.
+
+    Context {fruntime:foreign_runtime}.
+
+    Fixpoint nnrc_imp_exprIsCore (e:nnrc_imp_expr) : Prop :=
+      match e with
+      | NNRCimpGetConstant _ => True
+      | NNRCimpVar _ => True
+      | NNRCimpConst _ => True
+      | NNRCimpBinop _ e1 e2 => nnrc_imp_exprIsCore e1 /\ nnrc_imp_exprIsCore e2
+      | NNRCimpUnop _ e1 => nnrc_imp_exprIsCore e1
+      | NNRCimpGroupBy _ _ _ => False
+      end.
+
+    Fixpoint nnrc_imp_stmtIsCore (s:nnrc_imp_stmt) : Prop :=
+      match s with
+      | NNRCimpSeq s1 s2 =>
+        nnrc_imp_stmtIsCore s1 /\ nnrc_imp_stmtIsCore s2
+      | NNRCimpLet _ e s1 =>
+        nnrc_imp_exprIsCore e /\ nnrc_imp_stmtIsCore s1
+      | NNRCimpLetMut _ s1 s2 =>
+        nnrc_imp_stmtIsCore s1 /\ nnrc_imp_stmtIsCore s2
+      | NNRCimpLetMutColl _ s1 s2 =>
+        nnrc_imp_stmtIsCore s1 /\ nnrc_imp_stmtIsCore s2
+      | NNRCimpAssign _ e =>
+        nnrc_imp_exprIsCore e
+      | NNRCimpPush _ e =>
+        nnrc_imp_exprIsCore e
+      | NNRCimpFor _ e s1 =>
+        nnrc_imp_exprIsCore e /\ nnrc_imp_stmtIsCore s1
+      | NNRCimpIf e s1 s2 =>
+        nnrc_imp_exprIsCore e /\ nnrc_imp_stmtIsCore s1 /\ nnrc_imp_stmtIsCore s2
+      | NNRCimpEither e _ s1 _ s2 =>
+        nnrc_imp_exprIsCore e /\ nnrc_imp_stmtIsCore s1 /\ nnrc_imp_stmtIsCore s2
+      end .
+
+    Definition nnrc_impIsCore (sr:nnrc_imp) := nnrc_imp_stmtIsCore (fst sr).
+
+    Definition nnrc_imp_core : Set := {sr:nnrc_imp | nnrc_impIsCore sr}.
+
+    Definition nnrc_imp_core_to_nnrc_imp (sr:nnrc_imp_core) : nnrc_imp :=
+      proj1_sig sr.
+
+    Section ext.
+
+      Lemma nnrc_imp_exprIsCore_ext (e:nnrc_imp_expr) (pf1 pf2:nnrc_imp_exprIsCore e) : pf1 = pf2.
+      Proof.
+        induction e; simpl in *;
+          try (destruct pf1; destruct pf2; trivial);
+          try f_equal; auto.
+      Qed.
+
+      Lemma nnrc_imp_stmtIsCore_ext (s:nnrc_imp_stmt) (pf1 pf2:nnrc_imp_stmtIsCore s) : pf1 = pf2.
+      Proof.
+        induction s; simpl in *;
+          try (destruct pf1; destruct pf2; trivial);
+          try (destruct a; destruct a0);
+          try f_equal; eauto;
+            try eapply nnrc_imp_exprIsCore_ext; eauto
+            ; try f_equal; eauto.
+      Qed.
+
+      Lemma nnrc_impIsCore_ext (e:nnrc_imp) (pf1 pf2:nnrc_impIsCore e) : pf1 = pf2.
+      Proof.
+        apply nnrc_imp_stmtIsCore_ext.
+      Qed.
+
+      Lemma nnrc_imp_core_ext e (pf1 pf2:nnrc_impIsCore e) :
+        exist _ e pf1 = exist _ e pf2.
+      Proof.
+        f_equal; apply nnrc_impIsCore_ext.
+      Qed.
+
+      Lemma nnrc_imp_core_fequal (e1 e2:nnrc_imp_core) :
+        proj1_sig e1 = proj1_sig e2 -> e1 = e2.
+      Proof.
+        destruct e1; destruct e2; simpl; intros eqq.
+        destruct eqq.
+        apply nnrc_imp_core_ext.
+      Qed.
+
+    End ext.
+    
+    Section dec.
+
+      Lemma nnrc_imp_exprIsCore_dec (e:nnrc_imp_expr) :
+        {nnrc_imp_exprIsCore e} + {~ nnrc_imp_exprIsCore e}.
+      Proof.
+        induction e; simpl; try eauto 3.
+        destruct IHe1.
+        - destruct IHe2; [left|right]; intuition.
+        - right; intuition.
+      Defined.
+
+      Lemma nnrc_imp_stmtIsCore_dec (s:nnrc_imp_stmt) :
+        {nnrc_imp_stmtIsCore s} + {~ nnrc_imp_stmtIsCore s}.
+      Proof.
+        induction s; simpl.
+        - destruct IHs1.
+          + destruct IHs2; [left|right]; intuition.
+          + right; intuition.
+        - destruct (nnrc_imp_exprIsCore_dec n).
+          + destruct IHs; [left|right]; intuition.
+          + right; intuition.
+        - destruct IHs1.
+          + destruct IHs2; [left|right]; intuition.
+          + right; intuition.
+        - destruct IHs1.
+          + destruct IHs2; [left|right]; intuition.
+          + right; intuition.
+        - apply (nnrc_imp_exprIsCore_dec n).
+        - apply (nnrc_imp_exprIsCore_dec n).
+        - destruct (nnrc_imp_exprIsCore_dec n).
+          + destruct IHs; [left|right]; intuition.
+          + right; intuition.
+        - destruct (nnrc_imp_exprIsCore_dec n).
+          + destruct IHs1.
+            * destruct IHs2; [left|right]; intuition.
+            * right; intuition.
+          + right; intuition.
+        - destruct (nnrc_imp_exprIsCore_dec n).
+          + destruct IHs1.
+            * destruct IHs2; [left|right]; intuition.
+            * right; intuition.
+          + right; intuition.
+      Defined.
+
+      Lemma nnrc_impIsCore_dec (sr:nnrc_imp) :
+        {nnrc_impIsCore sr} + {~ nnrc_impIsCore sr}.
+      Proof.
+        apply nnrc_imp_stmtIsCore_dec.
+      Defined.
+
+      Global Instance nnrc_imp_core_eqdec : EqDec nnrc_imp_core eq.
+    Proof.
+      intros x y.
+      destruct x as [x xpf]; destruct y as [y ypf].
+      destruct (x == y).
+      - left. apply nnrc_imp_core_fequal; simpl; trivial.
+      - right. inversion 1; congruence.
+    Defined.
+
+    End dec.
+
+End Core.
+
+Section Env.
+  Context {fruntime:foreign_runtime}.
 
   (* bindings that may or may not be initialized (defined) *)
-    Definition pd_bindings := list (string*option data).
-    Definition mc_bindings := list (string*list data).
-    Definition md_bindings := list (string*option data).
+  Definition pd_bindings := list (string*option data).
+  Definition mc_bindings := list (string*list data).
+  Definition md_bindings := list (string*option data).
 
-  End Env.
-    
+End Env.
+
 End NNRCimp.
 
 Tactic Notation "nnrc_imp_expr_cases" tactic(first) ident(c) :=

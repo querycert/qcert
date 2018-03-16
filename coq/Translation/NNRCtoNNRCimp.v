@@ -256,7 +256,7 @@ Section NNRCtoNNRCimp.
         eauto 2.
     Defined.
     
-    Definition stratified_nnrc_stmt_to_nnrc_imp_stmt fvs (s:nnrc)
+    Definition stratified_nnrc_stmt_to_nnrc_imp fvs (s:nnrc)
                (strats:stratifiedLevel nnrcStmt s) : nnrc_imp
       := proj1_sig (nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s strats).
 
@@ -264,7 +264,7 @@ Section NNRCtoNNRCimp.
       nnrc_imp
       := let nnrc_stratified := NNRCStratify.stratify q in
          let nnrc_stratified_pf := NNRCStratify.stratify_stratified q in
-         stratified_nnrc_stmt_to_nnrc_imp_stmt globals nnrc_stratified nnrc_stratified_pf.
+         stratified_nnrc_stmt_to_nnrc_imp globals nnrc_stratified nnrc_stratified_pf.
 
     (* Given a terminator and the returned states, 
        determine what value was computed by the statement 
@@ -1067,7 +1067,7 @@ Section NNRCtoNNRCimp.
           h σc (s:nnrc) (globals:list var) :
     @nnrc_eval_top _ h s σc = nnrc_imp_eval_top h σc (nnrc_to_nnrc_imp_top globals s).
   Proof.
-    unfold nnrc_to_nnrc_imp_top, stratified_nnrc_stmt_to_nnrc_imp_stmt.
+    unfold nnrc_to_nnrc_imp_top, stratified_nnrc_stmt_to_nnrc_imp.
     destruct ((nnrc_stmt_to_nnrc_imp_stmt_stratified_some
                  globals (stratify s) (stratify_stratified s))); simpl.
     rewrite <- (nnrc_to_nnrc_imp_some_correct _ _ e).
@@ -1075,5 +1075,121 @@ Section NNRCtoNNRCimp.
     rewrite stratify_correct.
     trivial.
   Qed.
-  
+
+  Section Core.
+
+    Lemma nnrc_expr_to_nnrc_imp_expr_preserves_core {e:nnrc} {ei:nnrc_imp_expr} :
+      nnrc_expr_to_nnrc_imp_expr e = Some ei ->
+      nnrcIsCore e <-> nnrc_imp_exprIsCore ei.
+    Proof.
+      revert ei.
+      induction e; intros ei eqq; invcs eqq; simpl; try tauto.
+      - apply some_lift2 in H0.
+        destruct H0 as [? [? ? [??]]]; subst; simpl.
+        rewrite IHe1, IHe2; eauto.
+        tauto.
+      - apply some_lift in H0.
+        destruct H0 as [??]; subst.
+        rewrite IHe; eauto.
+        tauto.
+      - apply some_lift in H0.
+        destruct H0 as [??]; subst.
+        simpl; tauto.
+    Qed.
+
+    Lemma nnrc_imp_stmtIsCore_terminate terminator s :
+          nnrc_imp_stmtIsCore (terminate terminator s)
+          = nnrc_imp_exprIsCore s.
+    Proof.
+      destruct terminator; simpl; trivial.
+    Qed.
+
+    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_preserves_core {fvs: list var} {term: terminator} {s: nnrc} {si:nnrc_imp_stmt} :
+      nnrc_stmt_to_nnrc_imp_stmt_aux fvs term s = Some si ->
+      nnrcIsCore s <-> nnrc_imp_stmtIsCore si.
+    Proof.
+      revert fvs term si.
+      induction s; intros fvs terminator si eqq; simpl; invcs eqq; simpl
+      ; try rewrite nnrc_imp_stmtIsCore_terminate; simpl; try tauto.
+      - match_option_in H0.
+        invcs H0.
+        rewrite nnrc_imp_stmtIsCore_terminate.
+        apply some_lift2 in eqq.
+        destruct eqq as [? [? eqq1 [eqq2 ?]]]; subst; simpl.
+        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq1).
+        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq2).
+        tauto.
+      - match_option_in H0.
+        invcs H0.
+        rewrite nnrc_imp_stmtIsCore_terminate.
+        apply some_lift in eqq.
+        destruct eqq as [? eqq1]; subst.
+        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq1).
+        tauto.
+      - repeat (match_option_in H0); invcs H0; simpl.
+        rewrite (IHs1 _ _ _ eqq).
+        rewrite (IHs2 _ _ _ eqq0).
+        tauto.
+      - repeat (match_option_in H0); invcs H0; simpl.
+        rewrite nnrc_imp_stmtIsCore_terminate.
+        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq).
+        rewrite (IHs2 _ _ _ eqq0); simpl.
+        tauto.
+      - repeat (match_option_in H0); invcs H0; simpl.
+        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq).
+        rewrite (IHs2 _ _ _ eqq0); simpl.
+        rewrite (IHs3 _ _ _ eqq1); simpl.
+        tauto.
+      - repeat (match_option_in H0); invcs H0; simpl.
+        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq).
+        rewrite (IHs2 _ _ _ eqq0); simpl.
+        rewrite (IHs3 _ _ _ eqq1); simpl.
+        tauto.
+      - repeat (match_option_in H0); invcs H0; simpl.
+        apply some_lift in eqq.
+        destruct eqq as [? eqq1]; subst; simpl.
+        rewrite nnrc_imp_stmtIsCore_terminate; simpl.
+        tauto.
+    Qed.
+
+    Lemma nnrc_stmt_to_nnrc_imp_stmt_preserves_core {globals: list var} {s: nnrc} {si:nnrc_imp_stmt} {ret:var} :
+      nnrc_stmt_to_nnrc_imp_stmt globals s = Some (si,ret) ->
+      nnrcIsCore s <-> nnrc_imp_stmtIsCore si.
+    Proof.
+      unfold nnrc_stmt_to_nnrc_imp_stmt.
+      match_option; intros eqq1.
+      invcs eqq1.
+      apply nnrc_stmt_to_nnrc_imp_stmt_aux_preserves_core in eqq.
+      trivial.
+    Qed.
+
+    Lemma stratified_nnrc_stmt_to_nnrc_imp_preserves_core
+            (fvs: list var) (s: nnrc) (strat_pf:stratifiedLevel nnrcStmt s) :
+      nnrcIsCore s <-> nnrc_impIsCore (stratified_nnrc_stmt_to_nnrc_imp fvs s strat_pf).
+    Proof.
+      unfold stratified_nnrc_stmt_to_nnrc_imp.
+      destruct (nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s strat_pf) as [sr eqq]; simpl.
+      destruct sr.
+      apply (nnrc_stmt_to_nnrc_imp_stmt_preserves_core eqq).
+    Qed.
+
+    Theorem nnrc_to_nnrc_imp_top_preserves_core
+            (globals: list var) (s: nnrc) :
+      nnrcIsCore s <-> nnrc_impIsCore (nnrc_to_nnrc_imp_top globals s).
+    Proof.
+      unfold nnrc_to_nnrc_imp_top.
+      rewrite <- stratified_nnrc_stmt_to_nnrc_imp_preserves_core.
+      apply stratify_preserves_core.
+    Qed.
+
+    Program Definition nnrc_core_to_nnrc_imp_core
+            (globals:list var) (s:nnrc_core) : nnrc_imp_core
+      :=nnrc_to_nnrc_imp_top globals s.
+    Next Obligation.
+      destruct s; simpl.
+      apply nnrc_to_nnrc_imp_top_preserves_core; trivial.
+    Qed.
+
+  End Core.
+
 End NNRCtoNNRCimp.

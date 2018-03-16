@@ -207,7 +207,7 @@ Section NNRCimpSemEval.
       }
   Qed.
 
-  Lemma nnrc_imp_sem_eval σc q d :
+  Theorem nnrc_imp_sem_eval σc q d :
     [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h σc q = Some d.
   Proof.
     destruct q.
@@ -236,5 +236,14 @@ Section NNRCimpSemEval.
       symmetry in H1; apply domain_nil in H1; subst.
       constructor; simpl; trivial.
   Qed.
+
+  Section Core.
+    Theorem nnrc_imp_core_sem_eval σc q d :
+      [ h , σc ⊢ q ⇓ᶜ d ] <-> nnrc_imp_core_eval_top h σc q = Some d.
+    Proof.
+      destruct q; simpl.
+      apply nnrc_imp_sem_eval.
+    Qed.
+  End Core.
 
 End NNRCimpSemEval.

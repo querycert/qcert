@@ -178,6 +178,11 @@ Section NNRCimpSem.
 
   Notation "[ σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top σc q d ) : nnrc_imp.
 
+  Section Core.
+    Program Definition nnrc_imp_core_sem_top σc (q:nnrc_imp_core) (d:data) : Prop
+      := nnrc_imp_sem_top σc q d.
+  End Core.
+
   Section props.
 
     Context (σc:list (string*data)).
@@ -358,6 +363,8 @@ Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem h σc σ e d) : nn
 Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
 Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter h σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
 Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top h σc q d ) : nnrc_imp.
+
+Notation "[ h , σc ⊢ q ⇓ᶜ d  ]" := (nnrc_imp_core_sem_top h σc q d ) : nnrc_imp.
 
 Arguments nnrc_imp_stmt_sem_env_stack {fruntime h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
 Arguments nnrc_imp_stmt_sem_mcenv_stack {fruntime h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
