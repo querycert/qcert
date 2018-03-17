@@ -1786,6 +1786,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_nnrc_core -> Q_nnrc_core (sexp_to_nnrc se)
   | L_nnrc -> Q_nnrc (sexp_to_nnrc se)
+  | L_nnrc_imp_core -> Q_nnrc_imp_core (sexp_to_nnrc_imp se)
   | L_nnrc_imp -> Q_nnrc_imp (sexp_to_nnrc_imp se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
   | L_cldmr -> Q_cldmr (sexp_to_cldmr se)
@@ -1825,6 +1826,7 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_nnrc_core q -> nnrc_to_sexp q
   | Q_nnrc q -> nnrc_to_sexp q
+  | Q_nnrc_imp_core q -> nnrc_imp_to_sexp q
   | Q_nnrc_imp q -> nnrc_imp_to_sexp q
   | Q_nnrcmr q -> nnrcmr_to_sexp q
   | Q_cldmr q -> cldmr_to_sexp q
