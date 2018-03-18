@@ -19,7 +19,6 @@ Section TUnaryOperators.
   Require Import List.
   Require Import ZArith.
   Require Import JsAst.JsNumber.
-  Require Import NumberExtract.
   Require Import Compare_dec.
   Require Import Program.
   Require Import RelationClasses.
@@ -528,7 +527,7 @@ Section TUnaryOperators.
       inversion eqq2; clear eqq2; subst.
       destruct (is_nil_dec d1); simpl.
       + subst; simpl; eauto.
-      + exists (dnumber (div x (number_of_int (Z_of_nat (length d1))))).
+      + exists (dnumber (number_div x (number_of_int (Z_of_nat (length d1))))).
          split; [ | constructor ].
          unfold narithmean.
          rewrite eqq1; simpl.
@@ -539,7 +538,7 @@ Section TUnaryOperators.
       destruct x0; simpl in x; try congruence.
       induction dl. rewrite Forall_forall in H.
       unfold lifted_nmin; simpl.
-      exists (dnumber zero). auto.
+      exists (dnumber infinity). auto.
       inversion H. subst.
       specialize (IHdl H3).
       elim IHdl; clear IHdl; intros.
@@ -554,7 +553,7 @@ Section TUnaryOperators.
       simpl.
       destruct (lift_map (ondnumber (fun x3 : number => x3)) dl); try congruence.
       simpl.
-      exists (dnumber (fold_right (fun x3 y : number => number_min x3 y) x1 l)).
+      exists (dnumber (number_min x1 (number_list_min l))).
       split; [reflexivity|auto].
     - Case "type_OpNumberBagMax"%string.
       dependent induction H.
@@ -562,7 +561,7 @@ Section TUnaryOperators.
       destruct x0; simpl in x; try congruence.
       induction dl. rewrite Forall_forall in H.
       unfold lifted_nmax; simpl.
-      exists (dnumber zero). auto.
+      exists (dnumber neg_infinity). auto.
       inversion H. subst.
       specialize (IHdl H3).
       elim IHdl; clear IHdl; intros.
@@ -577,7 +576,7 @@ Section TUnaryOperators.
       simpl.
       destruct (lift_map (ondnumber (fun x3 : number => x3)) dl); try congruence.
       simpl.
-      exists (dnumber (fold_right (fun x3 y : number => number_max x3 y) x1 l)).
+      exists (dnumber (number_max x1 (number_list_max l))).
       split; [reflexivity|auto].
     - Case "type_OpForeignUnary"%string.
       eapply foreign_unary_op_typing_sound; eauto.

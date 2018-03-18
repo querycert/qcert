@@ -19,7 +19,6 @@ MODULES = \
 	Utils/CoqLibAdd \
 	Utils/ListAdd \
 	Utils/StringAdd \
-	Utils/NumberExtract \
 	Utils/SortingAdd \
 	Utils/Lattice \
 	Utils/Monoid \
@@ -352,6 +351,7 @@ MODULES = \
 	Compiler/EnhancedCompiler \
 	Compiler/TrivialCompiler \
 	Compiler/CompilerExports \
+	Extraction/ExtrOcamlNumberNatIntZInt \
 	Tests/TDataTest \
 	Tests/NRATest \
 	Tests/NRAEnvTest \
@@ -364,5 +364,4 @@ MODULES = \
 	Tests/SQLTest \
 	Tests/LambdaNRATest \
 	Tests/CompilerTest \
-	Tests/HelloWorld
-
+	Tests/HelloWorld \

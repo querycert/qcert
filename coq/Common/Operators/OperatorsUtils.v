@@ -118,28 +118,26 @@ Section OperatorsUtils.
   Definition lifted_max (l : list data) : option data :=
     lift dnat (lift bnummax (lifted_zbag l)).
 
-  Require Import JsAst.JsNumber.
-  Require Import NumberExtract.
   Fixpoint nsum (ln:list data) : option number
     := match ln with
          | nil => Some zero
-         | dnumber f::ln => lift (add f) (nsum ln)
+         | dnumber f::ln => lift (number_add f) (nsum ln)
          | _ => None
        end.
 
   Definition narithmean (ln:list data) : option number
     := match ln with
          | nil  => Some zero
-         | _ => lift (fun x => div x (number_of_int (Z_of_nat (length ln)))) (nsum ln)
+         | _ => lift (fun x => number_div x (number_of_int (Z_of_nat (length ln)))) (nsum ln)
        end.
 
   Definition lifted_nbag (l : list data) : option (list number) :=
     lift_map (ondnumber (fun x => x)) l.
 
   Definition lifted_nmin (l : list data) : option data :=
-    lift dnumber (lift listmin (lifted_nbag l)).
+    lift dnumber (lift number_list_min (lifted_nbag l)).
   Definition lifted_nmax (l : list data) : option data :=
-    lift dnumber (lift listmax (lifted_nbag l)).
+    lift dnumber (lift number_list_max (lifted_nbag l)).
 
 End OperatorsUtils.
 

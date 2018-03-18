@@ -15,11 +15,11 @@
  *)
 
 Section UnaryOperatorsSem.
-
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
   Require Import ZArith.
+  Require Import JsAst.JsNumber.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
@@ -36,8 +36,6 @@ Section UnaryOperatorsSem.
 
   Context {fdata:foreign_data}.
   
-  Require Import JsAst.JsNumber.
-  Require Import NumberExtract.
   Definition nat_arith_unary_op_eval (op:nat_arith_unary_op) (z:Z) :=
     match op with
     | NatAbs => Z.abs z
@@ -47,14 +45,14 @@ Section UnaryOperatorsSem.
 
   Definition number_arith_unary_op_eval (op:number_arith_unary_op) (f:number) :=
     match op with
-    | NumberNeg => neg f
-    | NumberSqrt => sqrt f
-    | NumberExp => exp f
-    | NumberLog => log f
-    | NumberLog10 => log10 f
-    | NumberCeil => ceil f
-    | NumberFloor => floor f
-    | NumberAbs => absolute f
+    | NumberNeg => number_neg f
+    | NumberSqrt => number_sqrt f
+    | NumberExp => number_exp f
+    | NumberLog => number_log f
+    | NumberLog10 => number_log10 f
+    | NumberCeil => number_ceil f
+    | NumberFloor => number_floor f
+    | NumberAbs => number_absolute f
     end.
 
   Context (h:brand_relation_t).
@@ -174,7 +172,7 @@ Section UnaryOperatorsSem.
       end
     | OpNumberTruncate =>
       match d with
-      | dnumber f => Some (dnat (truncate f))
+      | dnumber f => Some (dnat (number_truncate f))
       | _ => None
       end
     | OpNumberSum =>

@@ -20,7 +20,6 @@ Section DataLift.
   Require Import List.
   Require Import Utils.
   Require Import JsAst.JsNumber.
-  Require Import NumberExtract.
   Require Import ForeignData.
   Require Import Data.
 

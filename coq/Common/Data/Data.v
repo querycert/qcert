@@ -22,7 +22,6 @@ Section Data.
   Require Import Bool.
   Require Import EquivDec.
   Require Import JsAst.JsNumber.
-  Require Import NumberExtract.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.

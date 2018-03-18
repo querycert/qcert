@@ -24,7 +24,6 @@ Require Import CommonRuntime.
 Require Import ForeignDataTyping.
 Require Import NNRCtoJavaScript.
 Require Import JsAst.JsNumber.
-Require Import NumberExtract.
 
 Section DatatoSparkDF.
 

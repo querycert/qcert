@@ -15,6 +15,7 @@
  *)
 
 Section DatatoJSON.
+  Require Import JsAst.JsNumber.
   Require Import List.
   Require Import String.
   Require Import ZArith.
@@ -39,8 +40,6 @@ Section DatatoJSON.
 
   Section toData.
     Context {ftojson:foreign_to_JSON}.
-    Require Import JsAst.JsNumber.
-    Require Import NumberExtract.
 
     (* JSON to CAMP data model (META Variant) *)
 
@@ -59,7 +58,7 @@ Section DatatoJSON.
           if (string_dec s1 "nat") then
             match j' with
             | jnumber n =>
-              dnat (truncate n)
+              dnat (number_truncate n)
             | _ =>
               drec ((s1, json_to_data_pre j')::nil)
             end
@@ -138,8 +137,6 @@ Section DatatoJSON.
 
   Section toJSON.
     Context {ftojson:foreign_to_JSON}.
-    Require Import JsAst.JsNumber.
-    Require Import NumberExtract.
     
     Fixpoint data_enhanced_to_json (d:data) : json :=
       match d with

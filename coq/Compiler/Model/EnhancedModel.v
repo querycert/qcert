@@ -18,7 +18,6 @@ Require Import List.
 Require Import EquivDec.
 Require Import Utils.
 Require Import JsAst.JsNumber.
-Require Import NumberExtract.
 Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
@@ -715,8 +714,8 @@ Next Obligation.
       * reflexivity.
     + destruct (nsum dl); simpl in *; try discriminate.
       unfold lifted_nmin, lifted_nmax in *.
-      destruct ((lift listmin (lifted_nbag dl))); simpl in *; try discriminate.
-      destruct ((lift listmax (lifted_nbag dl))); simpl in *; try discriminate.
+      destruct ((lift number_list_min (lifted_nbag dl))); simpl in *; try discriminate.
+      destruct ((lift number_list_max (lifted_nbag dl))); simpl in *; try discriminate.
       invcs H2.
       constructor.
       * repeat constructor.

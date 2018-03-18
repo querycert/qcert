@@ -125,36 +125,6 @@ let get_data_raise x io =
 (* Support for Enhanced operators *)
 (**********************************)
 
-let float_sum l =
-  List.fold_left (+.) 0. l
-
-(* note that this is inefficient, becase it uses two passes over the list *)
-let float_arithmean l =
-  let ll = List.length l in
-  if(ll == 0)
-  then 0.
-  else List.fold_left (+.) 0. l /. (float ll)
-
-let rec float_listmin_aux l x =
-  match l with
-  | [] -> x
-  | c :: ls -> float_listmin_aux ls (if x<c then x else c)
-
-let float_listmin l =
-  match l with
-  | [] -> infinity
-  | c :: ls -> float_listmin_aux ls c
-
-let rec float_listmax_aux l x =
-  match l with
-  | [] -> x
-  | c :: ls -> float_listmax_aux ls (if x>c then x else c)
-
-let float_listmax l =
-  match l with
-  | [] -> neg_infinity
-  | c :: ls -> float_listmax_aux ls c
-
 let qcert_string_of_float f =
   let ocaml_string = string_of_float f in
   let last_char = ocaml_string.[(String.length ocaml_string)-1] in

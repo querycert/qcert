@@ -57,11 +57,6 @@ val outname : string -> string -> string
 (* Support for Enhanced operators *)
 (**********************************)
 
-val float_sum : float list -> float
-val float_arithmean : float list -> float
-val float_listmin : float list -> float
-val float_listmax : float list -> float
-
 val qcert_string_of_float : float -> string
 val string_of_enhanced_float : float -> char list
 val string_of_enhanced_string : string -> char list

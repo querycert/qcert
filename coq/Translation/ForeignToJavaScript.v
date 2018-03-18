@@ -19,7 +19,6 @@ Require Import String.
 Require Import Utils.
 Require Import ForeignRuntime.
 Require Import JsAst.JsNumber.
-Require Import NumberExtract.
 
 Local Open Scope string_scope.
 

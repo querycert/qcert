@@ -15,6 +15,7 @@
  *)
 
 Section BinaryOperatorsSem.
+  Require Import JsAst.JsNumber.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
@@ -42,14 +43,12 @@ Section BinaryOperatorsSem.
     | NatRem => Z.rem z1 z2
     end.
 
-  Require Import JsAst.JsNumber.
-  Require Import NumberExtract.
   Definition number_arith_binary_op_eval (op:number_arith_binary_op) (f1 f2:number) : number :=
     match op with
-    | NumberPlus => add f1 f2
-    | NumberMinus => sub f1 f2
-    | NumberMult => mult f1 f2
-    | NumberDiv => div f1 f2
+    | NumberPlus => number_add f1 f2
+    | NumberMinus => number_sub f1 f2
+    | NumberMult => number_mult f1 f2
+    | NumberDiv => number_div f1 f2
     | NumberPow => number_pow f1 f2
     | NumberMin => number_min f1 f2
     | NumberMax => number_max f1 f2
