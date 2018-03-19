@@ -44,7 +44,7 @@ Section ForeigntoJava.
        := mk_java_json_primitive (Z_to_string10 n).
      
      Definition mk_java_json_number n : java_json
-       := mk_java_json_primitive (to_string n).
+       := mk_java_json_primitive (float_to_string n).
      
      Definition mk_java_json_bool (b:bool) : java_json
        := mk_java_json_primitive 

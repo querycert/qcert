@@ -63,8 +63,8 @@ Definition float_triple_to_b64 (ft:float_triple) : float :=
     Fappli_IEEE.B754_zero _ _ false
   end.
 
-Parameter from_string : string -> float.
-Parameter to_string : float -> string.
+Definition float_from_string : string -> float := from_string.
+Definition float_to_string : float -> string := to_string.
 
 Definition float_neg : float -> float := neg.
 Definition float_floor : float -> float := floor. (* Note: this is an axiom in JsAst.JsNumber *)

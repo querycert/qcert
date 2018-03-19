@@ -50,7 +50,7 @@ Section OperatorsUtils.
     := { toString := nat_to_string10}.
 
   Global Instance ToString_float : ToString float
-    := { toString := to_string}.
+    := { toString := float_to_string}.
 
   Global Instance ToString_bool : ToString bool
     := { toString := boolToString}.
