@@ -122,7 +122,7 @@ Section TOperatorsInferSub.
         | left _, left _ => Some (Nat, Nat, Nat)
         | _, _ => None
         end
-      | OpNumberBinary _ =>
+      | OpFloatBinary _ =>
         match subtype_dec τ₁ Nat, subtype_dec τ₂ Nat with
         | left _, left _ => Some (Nat, Nat, Nat)
         | _, _ => None
@@ -236,24 +236,24 @@ Section TOperatorsInferSub.
         if subtype_dec τ₁ (Coll Nat)
         then Some (Nat, Coll Nat)
         else None
-      | OpNumberOfNat =>
+      | OpFloatOfNat =>
         if subtype_dec τ₁ Nat
-        then Some (Number, Nat)
+        then Some (Float, Nat)
         else None
-      | OpNumberUnary op =>
-        if subtype_dec τ₁ Number
-        then Some (Number, Number)
+      | OpFloatUnary op =>
+        if subtype_dec τ₁ Float
+        then Some (Float, Float)
         else None
-      | OpNumberTruncate =>
-        if subtype_dec τ₁ Number
-        then Some (Nat, Number)
+      | OpFloatTruncate =>
+        if subtype_dec τ₁ Float
+        then Some (Nat, Float)
         else None
-      | OpNumberSum
-      | OpNumberBagMin
-      | OpNumberBagMax
-      | OpNumberMean =>
-        if subtype_dec τ₁ (Coll Number)
-        then Some (Number, Coll Number)
+      | OpFloatSum
+      | OpFloatBagMin
+      | OpFloatBagMax
+      | OpFloatMean =>
+        if subtype_dec τ₁ (Coll Float)
+        then Some (Float, Coll Float)
         else None
       | OpForeignUnary fu =>
         foreign_unary_op_typing_infer_sub fu τ₁

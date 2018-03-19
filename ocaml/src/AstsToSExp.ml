@@ -72,7 +72,7 @@ let rec data_to_sexp (d : QData.qdata) : sexp =
   begin match d with
   | Dunit -> STerm ("dunit", [])
   | Dnat n -> SInt n
-  | Dnumber f -> SFloat f
+  | Dfloat f -> SFloat f
   | Dbool b -> SBool b
   | Dstring s -> SString (string_of_char_list s)
   | Dcoll dl -> STerm ("dcoll", List.map data_to_sexp dl)
@@ -90,7 +90,7 @@ let rec sexp_to_data (se:sexp) : QData.qdata =
   | STerm ("dunit", []) -> Dunit
   | SBool b -> Dbool b
   | SInt n -> Dnat n
-  | SFloat f -> Dnumber f
+  | SFloat f -> Dfloat f
   | SString s -> Dstring (char_list_of_string s)
   | STerm ("dcoll", sel) ->
       Dcoll (List.map sexp_to_data sel)
@@ -120,8 +120,8 @@ and sexp_to_drec (sel:sexp) : (char list * QData.qdata) =
 let nat_arithbop_to_sexp (b:nat_arith_binary_op) : sexp =
   STerm (PrettyCommon.string_of_nat_arith_binary_op b,[])
   
-let number_arithbop_to_sexp (b:number_arith_binary_op) : sexp =
-  STerm (PrettyCommon.string_of_number_arith_binary_op b,[])
+let float_arithbop_to_sexp (b:float_arith_binary_op) : sexp =
+  STerm (PrettyCommon.string_of_float_arith_binary_op b,[])
   
 let sexp_to_nat_arithbop (se:sexp) : nat_arith_binary_op =
   begin match se with
@@ -130,9 +130,9 @@ let sexp_to_nat_arithbop (se:sexp) : nat_arith_binary_op =
       raise  (Qcert_Error "Not well-formed S-expr inside arith binary_op")
   end
   
-let sexp_to_number_arithbop (se:sexp) : number_arith_binary_op =
+let sexp_to_float_arithbop (se:sexp) : float_arith_binary_op =
   begin match se with
-  | STerm (s,[]) -> PrettyCommon.number_arith_binary_op_of_string s
+  | STerm (s,[]) -> PrettyCommon.float_arith_binary_op_of_string s
   | _ ->
       raise  (Qcert_Error "Not well-formed S-expr inside arith binary_op")
   end
@@ -146,7 +146,7 @@ let binary_op_to_sexp (b:binary_op) : sexp =
   | OpAnd -> STerm ("OpAnd",[])
   | OpOr -> STerm ("OpOr",[])
   | OpNatBinary ab -> STerm ("OpNatBinary",[nat_arithbop_to_sexp ab])
-  | OpNumberBinary ab -> STerm ("OpNumberBinary",[number_arithbop_to_sexp ab])
+  | OpFloatBinary ab -> STerm ("OpFloatBinary",[float_arithbop_to_sexp ab])
   | OpLt -> STerm ("OpLt",[])
   | OpLe -> STerm ("OpLe",[])
   | OpBagDiff -> STerm ("OpBagDiff",[])
@@ -166,7 +166,7 @@ let sexp_to_binary_op (se:sexp) : binary_op =
   | STerm ("OpAnd",[]) -> OpAnd
   | STerm ("OpOr",[]) -> OpOr
   | STerm ("OpNatBinary",[se']) -> OpNatBinary (sexp_to_nat_arithbop se')
-  | STerm ("OpNumberBinary",[se']) -> OpNumberBinary (sexp_to_number_arithbop se')
+  | STerm ("OpFloatBinary",[se']) -> OpFloatBinary (sexp_to_float_arithbop se')
   | STerm ("OpLt",[]) -> OpLt
   | STerm ("OpLe",[]) -> OpLe
   | STerm ("OpBagDiff",[]) -> OpBagDiff
@@ -208,12 +208,12 @@ let sexp_to_nat_arith_unary_op (se:sexp) : nat_arith_unary_op =
       raise  (Qcert_Error "Not well-formed S-expr inside arith unary_op")
   end
 
-let number_arith_unary_op_to_sexp (b:number_arith_unary_op) : sexp =
-  STerm (PrettyCommon.string_of_number_arith_unary_op b,[])
+let float_arith_unary_op_to_sexp (b:float_arith_unary_op) : sexp =
+  STerm (PrettyCommon.string_of_float_arith_unary_op b,[])
 
-let sexp_to_number_arith_unary_op (se:sexp) : number_arith_unary_op =
+let sexp_to_float_arith_unary_op (se:sexp) : float_arith_unary_op =
   begin match se with
-  | STerm (s,[]) -> PrettyCommon.number_arith_unary_op_of_string s
+  | STerm (s,[]) -> PrettyCommon.float_arith_unary_op_of_string s
   | _ ->
       raise  (Qcert_Error "Not well-formed S-expr inside arith unary_op")
   end
@@ -247,13 +247,13 @@ let unary_op_to_sexp (u:unary_op) : sexp =
   | OpNatMean -> STerm ("OpNatMean",[])
   | OpNatMin -> STerm ("OpNatMin",[])
   | OpNatMax -> STerm ("OpNatMax",[])
-  | OpNumberOfNat -> STerm ("OpNumberOfNat",[])
-  | OpNumberUnary au -> STerm ("OpNumberUnary", [number_arith_unary_op_to_sexp au])
-  | OpNumberTruncate -> STerm ("OpNumberTruncate",[])
-  | OpNumberSum -> STerm ("OpNumberSum",[])
-  | OpNumberMean -> STerm ("OpNumberMean",[])
-  | OpNumberBagMin -> STerm ("OpNumberBagMin",[])
-  | OpNumberBagMax -> STerm ("OpNumberBagMax",[])
+  | OpFloatOfNat -> STerm ("OpFloatOfNat",[])
+  | OpFloatUnary au -> STerm ("OpFloatUnary", [float_arith_unary_op_to_sexp au])
+  | OpFloatTruncate -> STerm ("OpFloatTruncate",[])
+  | OpFloatSum -> STerm ("OpFloatSum",[])
+  | OpFloatMean -> STerm ("OpFloatMean",[])
+  | OpFloatBagMin -> STerm ("OpFloatBagMin",[])
+  | OpFloatBagMax -> STerm ("OpFloatBagMax",[])
   | OpForeignUnary fuop -> SString (PrettyCommon.string_of_foreign_unary_op (Obj.magic fuop))
   end
 
@@ -298,15 +298,15 @@ let sexp_to_unary_op (se:sexp) : unary_op =
   | STerm ("OpNatMin",[]) -> OpNatMin
   | STerm ("OpNatMax",[]) -> OpNatMax
   | SString s -> OpForeignUnary (Obj.magic (PrettyCommon.foreign_unary_op_of_string s))
-  | STerm ("OpNumberUnary", [se']) ->
-      let au = sexp_to_number_arith_unary_op se' in
-      OpNumberUnary au
-  | STerm ("OpNumberOfNat",[]) -> OpNumberOfNat
-  | STerm ("OpNumberTruncate",[]) -> OpNumberTruncate
-  | STerm ("OpNumberSum",[]) -> OpNumberSum
-  | STerm ("OpNumberMean",[]) -> OpNumberMean
-  | STerm ("OpNumberBagMin",[]) -> OpNumberBagMin
-  | STerm ("OpNumberBagMax",[]) -> OpNumberBagMax
+  | STerm ("OpFloatUnary", [se']) ->
+      let au = sexp_to_float_arith_unary_op se' in
+      OpFloatUnary au
+  | STerm ("OpFloatOfNat",[]) -> OpFloatOfNat
+  | STerm ("OpFloatTruncate",[]) -> OpFloatTruncate
+  | STerm ("OpFloatSum",[]) -> OpFloatSum
+  | STerm ("OpFloatMean",[]) -> OpFloatMean
+  | STerm ("OpFloatBagMin",[]) -> OpFloatBagMin
+  | STerm ("OpFloatBagMax",[]) -> OpFloatBagMax
   (* WARNING: Those are not printed, only parsed *)
   | STerm ("OpTimeToSscale",[]) -> Enhanced.Ops.Unary.coq_OpTimeToSscale
   | STerm ("OpTimeFromString",[]) -> Enhanced.Ops.Unary.coq_OpTimeFromString
@@ -1141,7 +1141,7 @@ and sexp_to_sql_expr expr =
   | SString s ->
       QSQL.sql_expr_const (Dstring (char_list_of_string s))
   | SFloat f ->
-      QSQL.sql_expr_const (Dnumber f)
+      QSQL.sql_expr_const (Dfloat f)
   | SInt i ->
       QSQL.sql_expr_const (Dnat i)
   | STerm ("dunit",[]) ->
@@ -1235,7 +1235,7 @@ and sexp_to_sql_const_list const_list =
   | (SString s) :: const_list' ->
       (Dstring (char_list_of_string s)) :: (sexp_to_sql_const_list const_list')
   | (SFloat f) :: const_list' ->
-      (Dnumber f) :: (sexp_to_sql_const_list const_list')
+      (Dfloat f) :: (sexp_to_sql_const_list const_list')
   | (SInt i) :: const_list' ->
       (Dnat i) :: (sexp_to_sql_const_list const_list')
   | _ ->
@@ -1626,7 +1626,7 @@ let rec sexp_to_sqlpp_expr (stmt : sexp)  =
   | SString s ->
       QSQLPP.sqlpp_sqlpp_literal (Dstring (char_list_of_string s))
   | SFloat f ->
-      QSQLPP.sqlpp_sqlpp_literal (Dnumber f)
+      QSQLPP.sqlpp_sqlpp_literal (Dfloat f)
   | SInt i ->
       QSQLPP.sqlpp_sqlpp_literal (Dnat i)
   | SBool b ->

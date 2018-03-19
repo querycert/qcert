@@ -97,7 +97,7 @@ expr:
 | i = INT
     { QLambdaNRA.laconst (QData.dnat (Util.coq_Z_of_int i)) }
 | f = FLOAT
-    { QLambdaNRA.laconst (QData.dnumber f) }
+    { QLambdaNRA.laconst (QData.dfloat f) }
 | s = STRING
     { QLambdaNRA.laconst (QData.dstring (Util.char_list_of_string s)) }
 (* Expressions *)

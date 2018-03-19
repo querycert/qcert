@@ -20,6 +20,7 @@ MODULES = \
 	Utils/ListAdd \
 	Utils/StringAdd \
 	Utils/SortingAdd \
+	Utils/Float \
 	Utils/Lattice \
 	Utils/Monoid \
 	Utils/Lift \
@@ -351,7 +352,7 @@ MODULES = \
 	Compiler/EnhancedCompiler \
 	Compiler/TrivialCompiler \
 	Compiler/CompilerExports \
-	Extraction/ExtrOcamlNumberNatIntZInt \
+	Extraction/ExtrOcamlFloatNatIntZInt \
 	Tests/TDataTest \
 	Tests/NRATest \
 	Tests/NRAEnvTest \

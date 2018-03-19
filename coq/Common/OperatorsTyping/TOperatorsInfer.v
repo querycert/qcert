@@ -43,7 +43,7 @@ Section TOperatorsInfer.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
-  Hint Rewrite Bottom_proj Top_proj Unit_proj Nat_proj Number_proj Bool_proj String_proj : type_canon.
+  Hint Rewrite Bottom_proj Top_proj Unit_proj Nat_proj Float_proj Bool_proj String_proj : type_canon.
     
   (* An additional utility function for sortable types *)
   Definition tunrecsortable (sl:list string) (τ:rtype) : option rtype.
@@ -93,7 +93,7 @@ Section TOperatorsInfer.
               | [H: ` _ = Top₀ |- _ ] => apply Top_canon in H
               | [H: ` _ = Unit₀ |- _ ] => apply Unit_canon in H
               | [H: ` _ = Nat₀ |- _ ] => apply Nat_canon in H
-              | [H: ` _ = Number₀ |- _ ] => apply Number_canon in H
+              | [H: ` _ = Float₀ |- _ ] => apply Float_canon in H
               | [H: ` _ = Bool₀ |- _ ] => apply Bool_canon in H
               | [H: ` _ = String₀ |- _ ] => apply String_canon in H
               | [H: ` _ = Coll₀ ?A |- _] =>
@@ -155,9 +155,9 @@ Section TOperatorsInfer.
         | (Nat₀, Nat₀) => Some Nat
         | _ => None
         end
-      | OpNumberBinary _ =>
+      | OpFloatBinary _ =>
         match (`τ₁, `τ₂) with
-        | (Number₀, Number₀) => Some Number
+        | (Float₀, Float₀) => Some Float
         | _ => None
         end
       | OpForeignBinary fb =>
@@ -333,27 +333,27 @@ Section TOperatorsInfer.
         | Coll₀ Nat₀ => Some Nat
         | _ => None
         end
-      | OpNumberOfNat =>
+      | OpFloatOfNat =>
         match `τ₁ with
-        | Nat₀ => Some Number
+        | Nat₀ => Some Float
         | _ => None
         end
-      | OpNumberUnary op =>
+      | OpFloatUnary op =>
         match `τ₁ with
-        | Number₀ => Some Number
+        | Float₀ => Some Float
         | _ => None
         end
-      | OpNumberTruncate =>
+      | OpFloatTruncate =>
         match `τ₁ with
-        | Number₀ => Some Nat
+        | Float₀ => Some Nat
         | _ => None
         end
-      | OpNumberSum
-      | OpNumberMean
-      | OpNumberBagMin
-      | OpNumberBagMax =>
+      | OpFloatSum
+      | OpFloatMean
+      | OpFloatBagMin
+      | OpFloatBagMax =>
         match `τ₁ with
-        | Coll₀ Number₀ => Some Number
+        | Coll₀ Float₀ => Some Float
         | _ => None
         end
       | OpForeignUnary fu =>

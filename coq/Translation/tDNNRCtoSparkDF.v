@@ -62,7 +62,7 @@ Section tDNNRCtoSparkDF.
     | Top₀ => "StringType"
     | Unit₀ => "NullType"
     | Nat₀ => "LongType"
-    | Number₀ => "DoubleType"
+    | Float₀ => "DoubleType"
     | Bool₀ => "BooleanType"
     | String₀ => "StringType"
     | Coll₀ e => "ArrayType(" ++ rtype_to_spark_DataType e ++ ")"
@@ -95,7 +95,7 @@ Section tDNNRCtoSparkDF.
     | Top₀ => "TOP?"
     | Unit₀ => "Unit"
     | Nat₀ => "Long"
-    | Number₀ => "Double"
+    | Float₀ => "Double"
     | Bool₀ => "Boolean"
     | String₀ => "String"
     | Coll₀ r => "Array[" ++ rtype_to_scala_type r ++ "]"
@@ -241,15 +241,15 @@ Section tDNNRCtoSparkDF.
     | OpNatMin => prefix "anummin"
     | OpNatMean => prefix "arithMean"
     | OpForeignUnary o => foreign_to_scala_unary_op o x
-    | OpNumberSum => postfix "sum"
+    | OpFloatSum => postfix "sum"
 
     (* TODO *)
-    | OpNumberOfNat => prefix "NUMBER OF NAT??"
-    | OpNumberUnary _ => prefix "NUMBER ARITH??"
-    | OpNumberTruncate => prefix "TRUNCATE??"
-    | OpNumberBagMax => prefix "MAX??"
-    | OpNumberBagMin => prefix "MIN??"
-    | OpNumberMean => prefix "MEAN??"
+    | OpFloatOfNat => prefix "FLOAT OF NAT??"
+    | OpFloatUnary _ => prefix "FLOAT ARITH??"
+    | OpFloatTruncate => prefix "TRUNCATE??"
+    | OpFloatBagMax => prefix "MAX??"
+    | OpFloatBagMin => prefix "MIN??"
+    | OpFloatMean => prefix "MEAN??"
     | OpOrderBy scl => "SORT???" (* XXX Might be nice to try and support -JS XXX *)
     | OpRecRemove _ => "ARECREMOVE???"
     | OpSingleton => "SINGLETON???"
@@ -292,13 +292,13 @@ Section tDNNRCtoSparkDF.
     | OpNatBinary NatMult => infix "*"
     | OpNatBinary NatPlus => infix "+"
     | OpNatBinary NatRem => infix "%" (* TODO double check the exact semantics of this *)
-    | OpNumberBinary NumberDiv => infix "/"
-    | OpNumberBinary NumberMax => infix "max"
-    | OpNumberBinary NumberMin => infix "min"
-    | OpNumberBinary NumberMinus => infix "-"
-    | OpNumberBinary NumberMult => infix "*"
-    | OpNumberBinary NumberPlus => infix "+"
-    | OpNumberBinary NumberRem => infix "%" (* TODO double check the exact semantics of this *)
+    | OpFloatBinary FloatDiv => infix "/"
+    | OpFloatBinary FloatMax => infix "max"
+    | OpFloatBinary FloatMin => infix "min"
+    | OpFloatBinary FloatMinus => infix "-"
+    | OpFloatBinary FloatMult => infix "*"
+    | OpFloatBinary FloatPlus => infix "+"
+    | OpFloatBinary FloatRem => infix "%" (* TODO double check the exact semantics of this *)
 
     (* TODO *)
     | OpForeignBinary op => "FOREIGNBINARYOP???"
@@ -307,7 +307,7 @@ Section tDNNRCtoSparkDF.
   (* TODO Move this somewhere, I think rewriting needs something similar *)
   Definition primitive_type (t: rtype) :=
     match proj1_sig t with
-    | ⊥₀ | ⊤₀ | Unit₀ | Nat₀ | Number₀ | String₀ | Bool₀ => true
+    | ⊥₀ | ⊤₀ | Unit₀ | Nat₀ | Float₀ | String₀ | Bool₀ => true
     | Coll₀ _ | Rec₀ _ _ | Either₀ _ _ | Arrow₀ _ _ | Brand₀ _ => false
     (* TODO foreign? *)
     | Foreign₀ _ => false

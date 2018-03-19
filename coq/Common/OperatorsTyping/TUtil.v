@@ -328,7 +328,7 @@ Section TUtil.
     reflexivity.
   Qed.
 
-  Lemma Number_proj : Number₀ = ` Number.
+  Lemma Float_proj : Float₀ = ` Float.
   Proof.
     reflexivity.
   Qed.
@@ -373,7 +373,7 @@ Section TUtil.
     apply rtype_ext.
   Qed.
 
-  Lemma Number_canon {τ₁:rtype} :` τ₁ = Number₀ -> τ₁ = Number.
+  Lemma Float_canon {τ₁:rtype} :` τ₁ = Float₀ -> τ₁ = Float.
   Proof.
     destruct τ₁; simpl; intros; subst.
     apply rtype_ext.
@@ -582,6 +582,7 @@ Section TUtil.
       induction d1; simpl; intros.
       - induction d2; simpl in *.
         assumption.
+<<<<<<< HEAD
         revert H.
         elim (EquivDec.equiv_dec a a0); unfold EquivDec.equiv_dec; intros.
         rewrite <- a1.
@@ -594,6 +595,24 @@ Section TUtil.
         apply IHd1.
         rewrite remove_one_comm; assumption.
     Qed.      
+=======
+      + destruct (lift_map
+         (fun x : data =>
+          match x with
+          | dunit => None
+          | dnat _ => None
+          | dfloat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r1 => Some (drec (rec_sort (nil ++ r1)))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end) l); simpl in *; congruence.
+  Qed.
+>>>>>>> Consolidate Float support ; rename number to float in data model, etc
     
     Lemma forall_typed_bminus {τ} d1 d2:
       Forall (fun d : data => data_type d τ) d1 ->

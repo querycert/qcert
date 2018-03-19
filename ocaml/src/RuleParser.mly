@@ -223,7 +223,7 @@ data:
 | DBOOL FALSE
     { QData.dbool false }
 | DFLOAT f = FLOAT
-    { QData.dnumber f }
+    { QData.dfloat f }
 | DNAT i = INT
     { QData.dnat (Util.coq_Z_of_int i) }
 | DSTRING s = STRING
@@ -293,7 +293,7 @@ const:
 | i = INT
     { QData.dnat (Util.coq_Z_of_int i) }
 | f = FLOAT
-    { QData.dnumber f }
+    { QData.dfloat f }
 | s = STRING
     { QData.dstring (Util.char_list_of_string s) }
 | TRUE
@@ -303,19 +303,19 @@ const:
 
 bop:
 | FLOATPLUS
-  { QOps.Binary.NumberArith.opnumberplus }
+  { QOps.Binary.FloatArith.opfloatplus }
 | FLOATMINUS
-  { QOps.Binary.NumberArith.opnumberminus }
+  { QOps.Binary.FloatArith.opfloatminus }
 | FLOATMULT
-  { QOps.Binary.NumberArith.opnumbermult }
+  { QOps.Binary.FloatArith.opfloatmult }
 | FLOATDIV
-  { QOps.Binary.NumberArith.opnumberdiv }
+  { QOps.Binary.FloatArith.opfloatdiv }
 | FLOATPOW
-  { QOps.Binary.NumberArith.opnumberpow }
+  { QOps.Binary.FloatArith.opfloatpow }
 | FLOATMIN
-  { QOps.Binary.NumberArith.opnumbermin }
+  { QOps.Binary.FloatArith.opfloatmin }
 | FLOATMAX
-  { QOps.Binary.NumberArith.opnumbermax }
+  { QOps.Binary.FloatArith.opfloatmax }
 
 | TIMEAS
   { Enhanced.Ops.Binary.time_as }
@@ -402,25 +402,25 @@ sql_date_component:
 
 uop:
 | FLOATNEG
-  { QOps.Unary.NumberArith.opnumberneg }
+  { QOps.Unary.FloatArith.opfloatneg }
 | FLOATSQRT
-  { QOps.Unary.NumberArith.opnumbersqrt }
+  { QOps.Unary.FloatArith.opfloatsqrt }
 | FLOATEXP
-  { QOps.Unary.NumberArith.opnumberexp }
+  { QOps.Unary.FloatArith.opfloatexp }
 | FLOATLOG
-  { QOps.Unary.NumberArith.opnumberlog }
+  { QOps.Unary.FloatArith.opfloatlog }
 | FLOATLOG10
-  { QOps.Unary.NumberArith.opnumberlog10 }
+  { QOps.Unary.FloatArith.opfloatlog10 }
 | FLOATOFINT
-  { QOps.Unary.opnumberofnat }
+  { QOps.Unary.opfloatofnat }
 | FLOATCEIL
-  { QOps.Unary.NumberArith.opnumberceil }
+  { QOps.Unary.FloatArith.opfloatceil }
 | FLOATFLOOR
-  { QOps.Unary.NumberArith.opnumberfloor }
+  { QOps.Unary.FloatArith.opfloatfloor }
 | FLOATTRUNCATE
-  { QOps.Unary.opnumbertruncate }
+  { QOps.Unary.opfloattruncate }
 | FLOATABS
-  { QOps.Unary.NumberArith.opnumberabs }
+  { QOps.Unary.FloatArith.opfloatabs }
 | AIDOP
     { QOps.Unary.opidentity }
 | ANEG
@@ -471,13 +471,13 @@ uop:
 | ASINGLETON
     { QOps.Unary.opsingleton }
 | AFLOATSUM
-    { QOps.Unary.opnumbersum }
+    { QOps.Unary.opfloatsum }
 | AFLOATARITHMEAN
-    { QOps.Unary.opnumbermean }
+    { QOps.Unary.opfloatmean }
 | AFLOATLISTMIN
-    { QOps.Unary.opnumbermin }
+    { QOps.Unary.opfloatmin }
 | AFLOATLISTMAX
-    { QOps.Unary.opnumbermax }
+    { QOps.Unary.opfloatmax }
 | TIMEFROMSTRING
     { Enhanced.Ops.Unary.time_from_string }
 | TIMEDURATIONFROMSTRING

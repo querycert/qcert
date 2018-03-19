@@ -187,7 +187,7 @@ Section mj.
        | τ, ⊥₀ => τ
        | Unit₀, Unit₀ => Unit₀
        | Nat₀, Nat₀ => Nat₀
-       | Number₀, Number₀ => Number₀
+       | Float₀, Float₀ => Float₀
        | Bool₀, Bool₀ => Bool₀
        | String₀, String₀ => String₀
        | Coll₀ τ₁', Coll₀ τ₂' => Coll₀ (rtype_join₀ τ₁' τ₂')
@@ -212,7 +212,7 @@ Section mj.
        | τ, ⊤₀ => τ
        | Unit₀, Unit₀ => Unit₀
        | Nat₀, Nat₀ => Nat₀
-       | Number₀, Number₀ => Number₀
+       | Float₀, Float₀ => Float₀
        | Bool₀, Bool₀ => Bool₀
        | String₀, String₀ => String₀
        | Coll₀ τ₁', Coll₀ τ₂' => Coll₀ (rtype_meet₀ τ₁' τ₂')
@@ -2259,17 +2259,17 @@ Lemma rtype_join_Nat_neq_r τ: τ <> ⊥ -> τ <> Nat -> rtype_join τ Nat = ⊤
    prover1 τ.
  Qed.
 
-Lemma rtype_join_Number_eq : rtype_join Number Number = Number.
+Lemma rtype_join_Float_eq : rtype_join Float Float = Float.
 Proof.
   prover0.
 Qed.
 
-Lemma rtype_join_Number_neq_l τ: τ <> ⊥ -> τ <> Number -> rtype_join Number τ = ⊤.
+Lemma rtype_join_Float_neq_l τ: τ <> ⊥ -> τ <> Float -> rtype_join Float τ = ⊤.
  Proof.                                                              
    prover1 τ.
  Qed.
 
-Lemma rtype_join_Number_neq_r τ: τ <> ⊥ -> τ <> Number -> rtype_join τ Number = ⊤.
+Lemma rtype_join_Float_neq_r τ: τ <> ⊥ -> τ <> Float -> rtype_join τ Float = ⊤.
  Proof.                                                              
    prover1 τ.
  Qed.
@@ -2551,17 +2551,17 @@ Lemma rtype_meet_Nat_neq_r τ: τ <> ⊤ -> τ <> Nat -> rtype_meet τ Nat = ⊥
    prover1 τ.
  Qed.
 
-Lemma rtype_meet_Number_eq : rtype_meet Number Number = Number.
+Lemma rtype_meet_Float_eq : rtype_meet Float Float = Float.
 Proof.
   prover0.
 Qed.
 
-Lemma rtype_meet_Number_neq_l τ: τ <> ⊤ -> τ <> Number -> rtype_meet Number τ = ⊥.
+Lemma rtype_meet_Float_neq_l τ: τ <> ⊤ -> τ <> Float -> rtype_meet Float τ = ⊥.
  Proof.                                                              
    prover1 τ.
  Qed.
 
-Lemma rtype_meet_Number_neq_r τ: τ <> ⊤ -> τ <> Number -> rtype_meet τ Number = ⊥.
+Lemma rtype_meet_Float_neq_r τ: τ <> ⊤ -> τ <> Float -> rtype_meet τ Float = ⊥.
  Proof.                                                              
    prover1 τ.
  Qed.
@@ -2826,8 +2826,8 @@ Hint Rewrite @rtype_join_Unit_eq : rtype_join.
 Hint Rewrite @rtype_join_Unit_neq_l @rtype_join_Unit_neq_r using discriminate: rtype_join.
 Hint Rewrite @rtype_join_Nat_eq : rtype_join.
 Hint Rewrite @rtype_join_Nat_neq_l @rtype_join_Nat_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Number_eq : rtype_join.
-Hint Rewrite @rtype_join_Number_neq_l @rtype_join_Number_neq_r using discriminate: rtype_join.
+Hint Rewrite @rtype_join_Float_eq : rtype_join.
+Hint Rewrite @rtype_join_Float_neq_l @rtype_join_Float_neq_r using discriminate: rtype_join.
 Hint Rewrite @rtype_join_Bool_eq : rtype_join.
 Hint Rewrite @rtype_join_Bool_neq_l @rtype_join_Bool_neq_r using discriminate: rattype_join.
 Hint Rewrite @rtype_join_String_eq : rtype_join.
@@ -2850,8 +2850,8 @@ Hint Rewrite @rtype_meet_Unit_eq : rtype_meet.
 Hint Rewrite @rtype_meet_Unit_neq_l @rtype_meet_Unit_neq_r using discriminate: rtype_meet.
 Hint Rewrite @rtype_meet_Nat_eq : rtype_meet.
 Hint Rewrite @rtype_meet_Nat_neq_l @rtype_meet_Nat_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Number_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Number_neq_l @rtype_meet_Number_neq_r using discriminate: rtype_meet.
+Hint Rewrite @rtype_meet_Float_eq : rtype_meet.
+Hint Rewrite @rtype_meet_Float_neq_l @rtype_meet_Float_neq_r using discriminate: rtype_meet.
 Hint Rewrite @rtype_meet_Bool_eq : rtype_meet.
 Hint Rewrite @rtype_meet_Bool_neq_l @rtype_meet_Bool_neq_r using discriminate: rtype_meet.
 Hint Rewrite @rtype_meet_String_eq : rtype_meet.

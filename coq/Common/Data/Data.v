@@ -21,19 +21,21 @@ Section Data.
   Require Import ZArith.
   Require Import Bool.
   Require Import EquivDec.
-  Require Import JsAst.JsNumber.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
 
   (** Data is:
-     - nil - used for undefined results.
+     - unit - used for undefined results.
      - nat - an integer
-     - number - a floating point number
+     - float - a floating point number (IEEE 754 double precision)
      - bool - true or false
      - string - a character string
      - coll - a bag
-     - drec - a record
+     - rec - a record
+     - left - left sum value
+     - right - right sum value
+     - foreign - foreign data
    *)
 
   Unset Elimination Schemes.
@@ -43,7 +45,7 @@ Section Data.
   Inductive data : Set :=
   | dunit : data
   | dnat : Z -> data
-  | dnumber : number -> data
+  | dfloat : float -> data
   | dbool : bool -> data
   | dstring : string -> data
   | dcoll : list data -> data
@@ -60,7 +62,7 @@ Section Data.
   Definition data_rect (P : data -> Type)
              (funit : P dunit)
              (fnat : forall n : Z, P (dnat n))
-             (fnumber : forall n : number, P (dnumber n))
+             (ffloat : forall f : float, P (dfloat f))
              (fbool : forall b : bool, P (dbool b))
              (fstring : forall s : string, P (dstring s))
              (fcoll : forall c : list data, Forallt P c -> P (dcoll c))
@@ -74,7 +76,7 @@ Section Data.
     match d as d0 return (P d0) with
       | dunit => funit
       | dnat x => fnat x
-      | dnumber x => fnumber x
+      | dfloat x => ffloat x
       | dbool x => fbool x
       | dstring x => fstring x
       | dcoll x => fcoll x ((fix F2 (c : list data) : Forallt P c :=
@@ -96,7 +98,7 @@ Section Data.
   Definition data_ind (P : data -> Prop)
              (funit : P dunit)
              (fnat : forall n : Z, P (dnat n))
-             (fnumber : forall n : number, P (dnumber n))
+             (ffloat : forall n : float, P (dfloat n))
              (fbool : forall b : bool, P (dbool b))
              (fstring : forall s : string, P (dstring s))
              (fcoll : forall c : list data, Forall P c -> P (dcoll c))
@@ -110,7 +112,7 @@ Section Data.
     match d as d0 return (P d0) with
       | dunit => funit
       | dnat x => fnat x
-      | dnumber x => fnumber x
+      | dfloat x => ffloat x
       | dbool x => fbool x
       | dstring x => fstring x
       | dcoll x => fcoll x ((fix F2 (c : list data) : Forall P c :=
@@ -134,7 +136,7 @@ Section Data.
   Lemma dataInd2 (P : data -> Prop)
         (f : P dunit)
         (f0 : forall n : Z, P (dnat n))
-        (fn : forall n : number, P (dnumber n))
+        (fn : forall f : float, P (dfloat f))
         (fb : forall b : bool, P (dbool b))
         (f1 : forall s : string, P (dstring s))
         (f2 : forall c : list data, (forall x, In x c -> P x) -> P (dcoll c))
@@ -167,7 +169,7 @@ Section Data.
     - destruct (Z_eq_dec n z).
       + left; f_equal; trivial.
       + right;intro;apply n0;inversion H; trivial.
-    - destruct (number_eq_dec n n0).
+    - destruct (float_eq_dec f f0).
       + left; f_equal; trivial.
       + right;intro;apply c;inversion H; reflexivity.
     - destruct (bool_dec b b0).
@@ -235,6 +237,9 @@ Class ConstLiteral {fdata:foreign_data} (A:Type)
 
 Global Instance ConstLiteral_nat {fdata:foreign_data} : ConstLiteral Z
   := dnat.
+
+Global Instance ConstLiteral_float {fdata:foreign_data} : ConstLiteral float
+  := dfloat.
 
 Global Instance ConstLiteral_bool {ftype:foreign_data} : ConstLiteral bool 
   := dbool.

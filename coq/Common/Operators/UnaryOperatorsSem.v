@@ -19,7 +19,6 @@ Section UnaryOperatorsSem.
   Require Import List.
   Require Import Compare_dec.
   Require Import ZArith.
-  Require Import JsAst.JsNumber.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import ForeignData.
@@ -43,16 +42,16 @@ Section UnaryOperatorsSem.
     | NatSqrt => Z.sqrt z
     end.
 
-  Definition number_arith_unary_op_eval (op:number_arith_unary_op) (f:number) :=
+  Definition float_arith_unary_op_eval (op:float_arith_unary_op) (f:float) :=
     match op with
-    | NumberNeg => number_neg f
-    | NumberSqrt => number_sqrt f
-    | NumberExp => number_exp f
-    | NumberLog => number_log f
-    | NumberLog10 => number_log10 f
-    | NumberCeil => number_ceil f
-    | NumberFloor => number_floor f
-    | NumberAbs => number_absolute f
+    | FloatNeg => float_neg f
+    | FloatSqrt => float_sqrt f
+    | FloatExp => float_exp f
+    | FloatLog => float_log f
+    | FloatLog10 => float_log10 f
+    | FloatCeil => float_ceil f
+    | FloatFloor => float_floor f
+    | FloatAbs => float_absolute f
     end.
 
   Context (h:brand_relation_t).
@@ -160,35 +159,29 @@ Section UnaryOperatorsSem.
       end
     | OpNatMean => 
       lift dnat (lift_oncoll darithmean d)
-    | OpNumberOfNat =>
+    | OpFloatOfNat =>
       match d with
-      | dnat n => Some (dnumber (number_of_int n))
+      | dnat n => Some (dfloat (float_of_int n))
       | _ => None
       end
-    | OpNumberUnary op =>
+    | OpFloatUnary op =>
       match d with
-      | dnumber n => Some (dnumber (number_arith_unary_op_eval op n))
+      | dfloat n => Some (dfloat (float_arith_unary_op_eval op n))
       | _ => None
       end
-    | OpNumberTruncate =>
+    | OpFloatTruncate =>
       match d with
-      | dnumber f => Some (dnat (number_truncate f))
+      | dfloat f => Some (dnat (float_truncate f))
       | _ => None
       end
-    | OpNumberSum =>
-      lift dnumber (lift_oncoll nsum d)
-    | OpNumberMean =>
-      lift dnumber (lift_oncoll narithmean d)
-    | OpNumberBagMin =>
-      match d with
-      | dcoll l => lifted_nmin l
-      | _ => None
-      end
-    | OpNumberBagMax =>
-      match d with
-      | dcoll l => lifted_nmax l
-      | _ => None
-      end
+    | OpFloatSum =>
+      lift_oncoll lifted_fsum d
+    | OpFloatMean =>
+      lift_oncoll lifted_farithmean d
+    | OpFloatBagMin =>
+      lift_oncoll lifted_fmin d
+    | OpFloatBagMax =>
+      lift_oncoll lifted_fmax d
     | OpForeignUnary fu => foreign_unary_op_interp h fu d
     end.
 
@@ -331,24 +324,24 @@ Section UnaryOperatorsSem.
       apply some_lift in H.
       destruct H as [???]; subst.
       eauto.
-    - Case "OpNumberSum"%string.
+    - Case "OpFloatSum"%string.
       destruct d; simpl; try discriminate.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
       eauto.
-    - Case "OpNumberMean"%string.
+    - Case "OpFloatMean"%string.
       destruct d; simpl; try discriminate.
       intros.
       apply some_lift in H.
       destruct H as [???]; subst.
       eauto.
-    - Case "OpNumberBagMin"%string.
+    - Case "OpFloatBagMin"%string.
       destruct d; simpl; try discriminate.
       unfold lifted_min.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
       eauto.
-    - Case "OpNumberBagMax"%string.
+    - Case "OpFloatBagMax"%string.
       destruct d; simpl; try discriminate.
       unfold lifted_min.
       intros ll; apply some_lift in ll.

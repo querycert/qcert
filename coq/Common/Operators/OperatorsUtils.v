@@ -26,7 +26,6 @@ Section OperatorsUtils.
   Require Import Data.
   Require Import DataLift.
   Require Import Iterators.
-  Require Import JsAst.JsNumber.
 
   Import ListNotations.
 
@@ -50,7 +49,7 @@ Section OperatorsUtils.
   Global Instance ToString_nat : ToString nat
     := { toString := nat_to_string10}.
 
-  Global Instance ToString_number : ToString number
+  Global Instance ToString_float : ToString float
     := { toString := to_string}.
 
   Global Instance ToString_bool : ToString bool
@@ -63,7 +62,7 @@ Section OperatorsUtils.
     := match d with
            | dunit => "UNIT"%string
            | dnat n => toString n
-           | dnumber n => toString n
+           | dfloat n => toString n
            | dbool b => toString b
            | dstring s => stringToString s
            | dcoll l => bracketString 
@@ -118,26 +117,17 @@ Section OperatorsUtils.
   Definition lifted_max (l : list data) : option data :=
     lift dnat (lift bnummax (lifted_zbag l)).
 
-  Fixpoint nsum (ln:list data) : option number
-    := match ln with
-         | nil => Some zero
-         | dnumber f::ln => lift (number_add f) (nsum ln)
-         | _ => None
-       end.
+  Definition lifted_fbag (l : list data) : option (list float) :=
+    lift_map (ondfloat (fun x => x)) l.
 
-  Definition narithmean (ln:list data) : option number
-    := match ln with
-         | nil  => Some zero
-         | _ => lift (fun x => number_div x (number_of_int (Z_of_nat (length ln)))) (nsum ln)
-       end.
-
-  Definition lifted_nbag (l : list data) : option (list number) :=
-    lift_map (ondnumber (fun x => x)) l.
-
-  Definition lifted_nmin (l : list data) : option data :=
-    lift dnumber (lift number_list_min (lifted_nbag l)).
-  Definition lifted_nmax (l : list data) : option data :=
-    lift dnumber (lift number_list_max (lifted_nbag l)).
+  Definition lifted_fsum (l:list data) : option data :=
+    lift dfloat (lift float_list_sum (lifted_fbag l)).
+  Definition lifted_farithmean (l:list data) : option data :=
+    lift dfloat (lift float_list_arithmean (lifted_fbag l)).
+  Definition lifted_fmin (l : list data) : option data :=
+    lift dfloat (lift float_list_min (lifted_fbag l)).
+  Definition lifted_fmax (l : list data) : option data :=
+    lift dfloat (lift float_list_max (lifted_fbag l)).
 
 End OperatorsUtils.
 

@@ -19,7 +19,6 @@ Section DataLift.
   Require Import String.
   Require Import List.
   Require Import Utils.
-  Require Import JsAst.JsNumber.
   Require Import ForeignData.
   Require Import Data.
 
@@ -96,9 +95,9 @@ Section DataLift.
     | _ => None
     end.
 
-  Definition ondnumber {A} (f : number -> A) (d : data) :=
+  Definition ondfloat {A} (f : float -> A) (d : data) :=
     match d with
-    | dnumber n => Some (f n)
+    | dfloat n => Some (f n)
     | _ => None
     end.
 

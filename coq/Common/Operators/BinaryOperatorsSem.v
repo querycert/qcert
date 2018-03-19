@@ -15,7 +15,6 @@
  *)
 
 Section BinaryOperatorsSem.
-  Require Import JsAst.JsNumber.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
@@ -43,15 +42,15 @@ Section BinaryOperatorsSem.
     | NatRem => Z.rem z1 z2
     end.
 
-  Definition number_arith_binary_op_eval (op:number_arith_binary_op) (f1 f2:number) : number :=
+  Definition float_arith_binary_op_eval (op:float_arith_binary_op) (f1 f2:float) : float :=
     match op with
-    | NumberPlus => number_add f1 f2
-    | NumberMinus => number_sub f1 f2
-    | NumberMult => number_mult f1 f2
-    | NumberDiv => number_div f1 f2
-    | NumberPow => number_pow f1 f2
-    | NumberMin => number_min f1 f2
-    | NumberMax => number_max f1 f2
+    | FloatPlus => float_add f1 f2
+    | FloatMinus => float_sub f1 f2
+    | FloatMult => float_mult f1 f2
+    | FloatDiv => float_div f1 f2
+    | FloatPow => float_pow f1 f2
+    | FloatMin => float_min f1 f2
+    | FloatMax => float_max f1 f2
     end.
 
   Context (h:brand_relation_t).
@@ -93,9 +92,9 @@ Section BinaryOperatorsSem.
         | dnat n1, dnat n2 => Some (dnat (nat_arith_binary_op_eval op n1 n2))
         | _, _ => None
         end
-    | OpNumberBinary op =>
+    | OpFloatBinary op =>
         match d1, d2 with
-        | dnumber f1, dnumber f2 => Some (dnumber (number_arith_binary_op_eval op f1 f2))
+        | dfloat f1, dfloat f2 => Some (dfloat (float_arith_binary_op_eval op f1 f2))
         | _, _ => None
         end
     | OpForeignBinary fb => foreign_binary_op_interp h fb d1 d2

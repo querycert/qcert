@@ -296,7 +296,7 @@ Section tDNNRCOptimizer.
   Fixpoint spark_equality_matches_qcert_equality_for_type (r: rtype₀) :=
     match r with
     | Nat₀
-    | Number₀ (* XXX TO CHECK *)
+    | Float₀ (* XXX TO CHECK *)
     | Bool₀
     | String₀ => true
     | Rec₀ Closed fs =>

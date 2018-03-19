@@ -82,7 +82,7 @@ expr:
 | i = INT
     { QOQL.oconst (QData.dnat (Util.coq_Z_of_int i)) }
 | f = FLOAT
-    { QOQL.oconst (QData.dnumber f) }
+    { QOQL.oconst (QData.dfloat f) }
 | s = STRING
     { QOQL.oconst (QData.dstring (Util.char_list_of_string s)) }
 (* Select from where ... *)
@@ -113,11 +113,11 @@ expr:
 | SUM LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opnatsum e }
 | FLOAT_SUM LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnumbersum e }
+    { QOQL.ounop QOps.Unary.opfloatsum e }
 | AVG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opnatmean e }
 | FAVG LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnumbermean e }
+    { QOQL.ounop QOps.Unary.opfloatmean e }
 | COUNT LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opcount e }
 | MAX LPAREN e = expr RPAREN

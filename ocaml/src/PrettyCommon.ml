@@ -256,7 +256,7 @@ let rec pretty_data ff d =
   begin match d with
   | QcertCompiler.Dunit -> fprintf ff "null"
   | QcertCompiler.Dnat n -> fprintf ff "%d" n
-  | QcertCompiler.Dnumber f -> fprintf ff "%f" f
+  | QcertCompiler.Dfloat f -> fprintf ff "%f" f
   | QcertCompiler.Dbool true -> fprintf ff "true"
   | QcertCompiler.Dbool false -> fprintf ff "false"
   | QcertCompiler.Dstring s -> fprintf ff "\"%s\"" (Util.string_of_char_list s)
@@ -290,7 +290,7 @@ let rec pretty_rtype_aux sym ff rt =
   | QcertCompiler.Top_UU2080_ ->  fprintf ff "%a" pretty_sym sym.top
   | QcertCompiler.Unit_UU2080_ -> fprintf ff "Unit"
   | QcertCompiler.Nat_UU2080_ -> fprintf ff "Nat"
-  | QcertCompiler.Number_UU2080_ -> fprintf ff "Number"
+  | QcertCompiler.Float_UU2080_ -> fprintf ff "Float"
   | QcertCompiler.Bool_UU2080_ -> fprintf ff "Bool"
   | QcertCompiler.String_UU2080_ -> fprintf ff "String"
   | QcertCompiler.Coll_UU2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
@@ -421,32 +421,32 @@ let nat_arith_unary_op_of_string s =
 let pretty_nat_arith_unary_op p sym callb ff ua a =
   pretty_unary_exp sym callb (string_of_nat_arith_unary_op ua) ff a
 
-let string_of_number_arith_unary_op ua =
+let string_of_float_arith_unary_op ua =
   begin match ua with
-  | QcertCompiler.NumberNeg -> "Fneg"
-  | QcertCompiler.NumberSqrt -> "Fsqrt"
-  | QcertCompiler.NumberExp -> "Fexp"
-  | QcertCompiler.NumberLog -> "Flog"
-  | QcertCompiler.NumberLog10 -> "Flog10"
-  | QcertCompiler.NumberCeil -> "Fceil"
-  | QcertCompiler.NumberFloor -> "Ffloor"
-  | QcertCompiler.NumberAbs -> "Fabs"
+  | QcertCompiler.FloatNeg -> "Fneg"
+  | QcertCompiler.FloatSqrt -> "Fsqrt"
+  | QcertCompiler.FloatExp -> "Fexp"
+  | QcertCompiler.FloatLog -> "Flog"
+  | QcertCompiler.FloatLog10 -> "Flog10"
+  | QcertCompiler.FloatCeil -> "Fceil"
+  | QcertCompiler.FloatFloor -> "Ffloor"
+  | QcertCompiler.FloatAbs -> "Fabs"
   end
 
-let number_arith_unary_op_of_string s =
+let float_arith_unary_op_of_string s =
   begin match s with
-  | "Fneg" -> QcertCompiler.NumberNeg
-  | "Fsqrt" -> QcertCompiler.NumberSqrt
-  | "Fexp" -> QcertCompiler.NumberExp
-  | "Flog" -> QcertCompiler.NumberLog
-  | "Flog10" -> QcertCompiler.NumberLog10
-  | "Fceil" -> QcertCompiler.NumberCeil
-  | "Ffloor" -> QcertCompiler.NumberFloor
+  | "Fneg" -> QcertCompiler.FloatNeg
+  | "Fsqrt" -> QcertCompiler.FloatSqrt
+  | "Fexp" -> QcertCompiler.FloatExp
+  | "Flog" -> QcertCompiler.FloatLog
+  | "Flog10" -> QcertCompiler.FloatLog10
+  | "Fceil" -> QcertCompiler.FloatCeil
+  | "Ffloor" -> QcertCompiler.FloatFloor
   | _ -> raise Not_found
   end
 
-let pretty_number_arith_unary_op p sym callb ff ua a =
-  pretty_unary_exp sym callb (string_of_number_arith_unary_op ua) ff a
+let pretty_float_arith_unary_op p sym callb ff ua a =
+  pretty_unary_exp sym callb (string_of_float_arith_unary_op ua) ff a
 
 let sql_date_component_to_string part =
   begin match part with
@@ -531,13 +531,13 @@ let pretty_unary_op p sym callb ff u a =
   | QcertCompiler.OpNatMean -> pretty_unary_exp sym callb "avg" ff a
   | QcertCompiler.OpNatMin -> pretty_unary_exp sym callb "min" ff a
   | QcertCompiler.OpNatMax -> pretty_unary_exp sym callb "max" ff a
-  | QcertCompiler.OpNumberOfNat -> pretty_unary_exp sym callb "Fof_int" ff a
-  | QcertCompiler.OpNumberUnary ua -> pretty_number_arith_unary_op p sym callb ff ua a
-  | QcertCompiler.OpNumberTruncate -> pretty_unary_exp sym callb "Ftruncate" ff a
-  | QcertCompiler.OpNumberSum -> pretty_unary_exp sym callb "Fsum" ff a
-  | QcertCompiler.OpNumberMean -> pretty_unary_exp sym callb "Favg" ff a
-  | QcertCompiler.OpNumberBagMin -> pretty_unary_exp sym callb "Flist_min" ff a
-  | QcertCompiler.OpNumberBagMax -> pretty_unary_exp sym callb "Flist_max" ff a
+  | QcertCompiler.OpFloatOfNat -> pretty_unary_exp sym callb "Fof_int" ff a
+  | QcertCompiler.OpFloatUnary ua -> pretty_float_arith_unary_op p sym callb ff ua a
+  | QcertCompiler.OpFloatTruncate -> pretty_unary_exp sym callb "Ftruncate" ff a
+  | QcertCompiler.OpFloatSum -> pretty_unary_exp sym callb "Fsum" ff a
+  | QcertCompiler.OpFloatMean -> pretty_unary_exp sym callb "Favg" ff a
+  | QcertCompiler.OpFloatBagMin -> pretty_unary_exp sym callb "Flist_min" ff a
+  | QcertCompiler.OpFloatBagMax -> pretty_unary_exp sym callb "Flist_max" ff a
   | QcertCompiler.OpForeignUnary fu -> pretty_foreign_unary_op p sym callb ff (Obj.magic fu) a
   end
 
@@ -575,44 +575,44 @@ let pretty_nat_arith_binary_op p sym callb ff ba a1 a2 =
   | QcertCompiler.NatRem -> pretty_infix_exp p 19 sym callb ("%",1) ff a1 a2
   end
 
-let string_of_number_arith_binary_op ba =
+let string_of_float_arith_binary_op ba =
   begin match ba with
-  | QcertCompiler.NumberPlus -> "float_plus"
-  | QcertCompiler.NumberMinus -> "float_minus"
-  | QcertCompiler.NumberMult -> "float_mult"
-  | QcertCompiler.NumberDiv -> "float_div"
-  | QcertCompiler.NumberPow -> "float_pow"
-  | QcertCompiler.NumberMin -> "float_min"
-  | QcertCompiler.NumberMax -> "float_max"
+  | QcertCompiler.FloatPlus -> "float_plus"
+  | QcertCompiler.FloatMinus -> "float_minus"
+  | QcertCompiler.FloatMult -> "float_mult"
+  | QcertCompiler.FloatDiv -> "float_div"
+  | QcertCompiler.FloatPow -> "float_pow"
+  | QcertCompiler.FloatMin -> "float_min"
+  | QcertCompiler.FloatMax -> "float_max"
   end
 
-let number_arith_binary_op_of_string ba =
+let float_arith_binary_op_of_string ba =
   begin match ba with
-  | "float_plus" -> QcertCompiler.NumberPlus
-  | "float_minus" -> QcertCompiler.NumberMinus
-  | "float_mult" -> QcertCompiler.NumberMult
-  | "float_div" -> QcertCompiler.NumberDiv
-  | "float_pow" -> QcertCompiler.NumberPow
-  | "float_min" -> QcertCompiler.NumberMin
-  | "float_max" -> QcertCompiler.NumberMax
+  | "float_plus" -> QcertCompiler.FloatPlus
+  | "float_minus" -> QcertCompiler.FloatMinus
+  | "float_mult" -> QcertCompiler.FloatMult
+  | "float_div" -> QcertCompiler.FloatDiv
+  | "float_pow" -> QcertCompiler.FloatPow
+  | "float_min" -> QcertCompiler.FloatMin
+  | "float_max" -> QcertCompiler.FloatMax
   | _ -> raise Not_found
   end
 
-let pretty_number_arith_binary_op p sym callb ff ba a1 a2 =
+let pretty_float_arith_binary_op p sym callb ff ba a1 a2 =
   begin match ba with
-  | QcertCompiler.NumberPlus ->
+  | QcertCompiler.FloatPlus ->
      pretty_infix_exp p 18 sym callb ("F+",1) ff a1 a2
-  | QcertCompiler.NumberMinus ->
+  | QcertCompiler.FloatMinus ->
      pretty_infix_exp p 18 sym callb ("F-",1) ff a1 a2
-  | QcertCompiler.NumberMult ->
+  | QcertCompiler.FloatMult ->
      pretty_infix_exp p 18 sym callb ("F*",1) ff a1 a2
-  | QcertCompiler.NumberDiv ->
+  | QcertCompiler.FloatDiv ->
      pretty_infix_exp p 18 sym callb ("F/",1) ff a1 a2
-  | QcertCompiler.NumberPow ->
+  | QcertCompiler.FloatPow ->
      pretty_infix_exp p 18 sym callb ("F^",1) ff a1 a2
-  | QcertCompiler.NumberMin ->
+  | QcertCompiler.FloatMin ->
      pretty_infix_exp p 20 sym callb ("Fmin",3) ff a1 a2
-  | QcertCompiler.NumberMax ->
+  | QcertCompiler.FloatMax ->
      pretty_infix_exp p 20 sym callb ("Fmax",3) ff a1 a2
   end
 
@@ -703,7 +703,7 @@ let string_of_binary_op b =
   | QcertCompiler.OpAnd -> "aand"
   | QcertCompiler.OpOr -> "aor"
   | QcertCompiler.OpNatBinary ba -> string_of_nat_arith_binary_op ba
-  | QcertCompiler.OpNumberBinary ba -> string_of_number_arith_binary_op ba
+  | QcertCompiler.OpFloatBinary ba -> string_of_float_arith_binary_op ba
   | QcertCompiler.OpLt -> "alt"
   | QcertCompiler.OpLe -> "ale"
   | QcertCompiler.OpBagDiff -> "aminus"
@@ -723,7 +723,7 @@ let pretty_binary_op p sym callb ff b a1 a2 =
   | QcertCompiler.OpAnd -> pretty_infix_exp p 19 sym callb sym.wedge ff a1 a2
   | QcertCompiler.OpOr -> pretty_infix_exp p 18 sym callb sym.vee ff a1 a2
   | QcertCompiler.OpNatBinary ba -> (pretty_nat_arith_binary_op p sym callb) ff ba a1 a2
-  | QcertCompiler.OpNumberBinary ba -> (pretty_number_arith_binary_op p sym callb) ff ba a1 a2
+  | QcertCompiler.OpFloatBinary ba -> (pretty_float_arith_binary_op p sym callb) ff ba a1 a2
   | QcertCompiler.OpLt -> pretty_infix_exp p 17 sym callb ("<",1) ff a1 a2
   | QcertCompiler.OpLe -> pretty_infix_exp p 17 sym callb sym.leq ff a1 a2
   | QcertCompiler.OpBagDiff -> pretty_infix_exp p 18 sym callb ("\\",1) ff a1 a2

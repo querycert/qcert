@@ -191,16 +191,16 @@ Section NNRCtoJavaScript.
       | NatSqrt =>"Math.sqrt(" ++ e ++ ")"
       end.
 
-    Definition number_uarithToJs (fu:number_arith_unary_op) (d:string) : string :=
+    Definition float_uarithToJs (fu:float_arith_unary_op) (d:string) : string :=
       match fu with
-      | NumberNeg => "-" ++ "(" ++ d ++ ")"
-      | NumberSqrt =>"Math.sqrt(" ++ "-" ++ d ++ ")"
-      | NumberExp => "Math.exp(" ++ d ++ ")" 
-      | NumberLog => "Math.log2(" ++ d ++ ")"
-      | NumberLog10 => "Math.log10(" ++ d ++ ")"
-      | NumberCeil => "Math.ceil(" ++ d ++ ")" 
-      | NumberFloor => "Math.floor(" ++ d ++ ")" 
-      | NumberAbs => "Math.abs(" ++ d ++ ")"
+      | FloatNeg => "-" ++ "(" ++ d ++ ")"
+      | FloatSqrt =>"Math.sqrt(" ++ "-" ++ d ++ ")"
+      | FloatExp => "Math.exp(" ++ d ++ ")" 
+      | FloatLog => "Math.log2(" ++ d ++ ")"
+      | FloatLog10 => "Math.log10(" ++ d ++ ")"
+      | FloatCeil => "Math.ceil(" ++ d ++ ")" 
+      | FloatFloor => "Math.floor(" ++ d ++ ")" 
+      | FloatAbs => "Math.abs(" ++ d ++ ")"
       end.
 
     (* Java equivalent: JavaScriptBackend.barithToJs *)
@@ -215,15 +215,15 @@ Section NNRCtoJavaScript.
       | NatMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
       end.
     
-    Definition mumber_barithToJs (fb:number_arith_binary_op) (d1 d2:string) : string :=
+    Definition mumber_barithToJs (fb:float_arith_binary_op) (d1 d2:string) : string :=
       match fb with
-      | NumberPlus => "(" ++ d1 ++ ") + (" ++ d2 ++ ")"
-      | NumberMinus =>  "(" ++ d1 ++ ") - (" ++ d2 ++ ")"
-      | NumberMult =>  "(" ++ d1 ++ ") * (" ++ d2 ++ ")"
-      | NumberDiv =>  "(" ++ d1 ++ ") / (" ++ d2 ++ ")"
-      | NumberPow => "Math.pow(" ++ d1 ++ ", " ++ d2 ++ ")"
-      | NumberMin => "Math.min(" ++ d1 ++ ", " ++ d2 ++ ")"
-      | NumberMax => "Math.max(" ++ d1 ++ ", " ++ d2 ++ ")"
+      | FloatPlus => "(" ++ d1 ++ ") + (" ++ d2 ++ ")"
+      | FloatMinus =>  "(" ++ d1 ++ ") - (" ++ d2 ++ ")"
+      | FloatMult =>  "(" ++ d1 ++ ") * (" ++ d2 ++ ")"
+      | FloatDiv =>  "(" ++ d1 ++ ") / (" ++ d2 ++ ")"
+      | FloatPow => "Math.pow(" ++ d1 ++ ", " ++ d2 ++ ")"
+      | FloatMin => "Math.min(" ++ d1 ++ ", " ++ d2 ++ ")"
+      | FloatMax => "Math.max(" ++ d1 ++ ", " ++ d2 ++ ")"
       end.
 
     Definition like_clause_to_javascript (lc:like_clause)
@@ -288,13 +288,13 @@ Section NNRCtoJavaScript.
                      | OpNatMin => "Math.min.apply(Math," ++ e1 ++ ")"
                      | OpNatMax => "Math.max.apply(Math," ++ e1 ++ ")"
                      | OpNatMean => "Math.floor(arithMean(" ++ e1 ++ "))" (* Casts to Z using Math.floor() *)
-                     | OpNumberOfNat => e1
-                     | OpNumberUnary u => number_uarithToJs u e1
-                     | OpNumberTruncate => "Math.trunc(" ++ e1 ++ ")" 
-                     | OpNumberSum => "sum(" ++ e1 ++ ")"
-                     | OpNumberMean => "arithMean(" ++ e1 ++ ")"
-                     | OpNumberBagMin => "Math.min.apply(Math," ++ e1 ++ ")"
-                     | OpNumberBagMax => "Math.max.apply(Math," ++ e1 ++ ")"
+                     | OpFloatOfNat => e1
+                     | OpFloatUnary u => float_uarithToJs u e1
+                     | OpFloatTruncate => "Math.trunc(" ++ e1 ++ ")" 
+                     | OpFloatSum => "sum(" ++ e1 ++ ")"
+                     | OpFloatMean => "arithMean(" ++ e1 ++ ")"
+                     | OpFloatBagMin => "Math.min.apply(Math," ++ e1 ++ ")"
+                     | OpFloatBagMax => "Math.max.apply(Math," ++ e1 ++ ")"
                      | OpForeignUnary fu
                        => foreign_to_javascript_unary_op i eol quotel fu e1
                      end in
@@ -317,7 +317,7 @@ Section NNRCtoJavaScript.
                      | OpContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpStringConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
                      | OpNatBinary b => nat_barithToJs b e1 e2
-                     | OpNumberBinary b => mumber_barithToJs b e1 e2
+                     | OpFloatBinary b => mumber_barithToJs b e1 e2
                      | OpForeignBinary fb
                        => foreign_to_javascript_binary_op i eol quotel fb e1 e2
                      end in

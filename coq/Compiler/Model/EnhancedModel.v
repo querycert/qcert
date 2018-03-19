@@ -17,7 +17,6 @@
 Require Import List.
 Require Import EquivDec.
 Require Import Utils.
-Require Import JsAst.JsNumber.
 Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
@@ -599,7 +598,7 @@ Definition enhanced_numeric_sum (typ:enhanced_numeric_type) : unary_op
      | enhanced_numeric_int
        => OpNatSum
      | enhanced_numeric_float
-       => OpNumberSum
+       => OpFloatSum
      end.
 
 Definition enhanced_numeric_min (typ:enhanced_numeric_type) : unary_op
@@ -607,7 +606,7 @@ Definition enhanced_numeric_min (typ:enhanced_numeric_type) : unary_op
      | enhanced_numeric_int
        => OpNatMin
      | enhanced_numeric_float
-       => OpNumberBagMin
+       => OpFloatBagMin
      end.
 
 Definition enhanced_numeric_max (typ:enhanced_numeric_type) : unary_op
@@ -615,7 +614,7 @@ Definition enhanced_numeric_max (typ:enhanced_numeric_type) : unary_op
      | enhanced_numeric_int
        => OpNatMax
      | enhanced_numeric_float
-       => OpNumberBagMax
+       => OpFloatBagMax
      end.
 
 Definition enhanced_numeric_arith_mean (typ:enhanced_numeric_type) : unary_op
@@ -623,7 +622,7 @@ Definition enhanced_numeric_arith_mean (typ:enhanced_numeric_type) : unary_op
      | enhanced_numeric_int
        => OpNatMean
      | enhanced_numeric_float
-       => OpNumberMean
+       => OpFloatMean
      end.
 
 Definition enhanced_reduce_op_interp
@@ -686,21 +685,21 @@ Next Obligation.
     + unfold lifted_min in *.
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
-    + unfold lifted_nmin in *.
+    + unfold lifted_fmin in *.
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
   - destruct typ; simpl in *.
     + unfold lifted_max in * .
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
-    + unfold lifted_nmax in * .
+    + unfold lifted_fmax in * .
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
   - destruct typ; simpl in *.
     + unfold lifted_max in * .
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
-    + unfold lifted_nmax in * .
+    + unfold lifted_fmax in * .
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
   - destruct typ; simpl in *.
@@ -712,13 +711,15 @@ Next Obligation.
       constructor.
       * repeat constructor.
       * reflexivity.
-    + destruct (nsum dl); simpl in *; try discriminate.
-      unfold lifted_nmin, lifted_nmax in *.
-      destruct ((lift number_list_min (lifted_nbag dl))); simpl in *; try discriminate.
-      destruct ((lift number_list_max (lifted_nbag dl))); simpl in *; try discriminate.
+    + case_eq (lifted_fsum dl); intros; simpl in *; rewrite H in *; try discriminate.
+      unfold lifted_fmin, lifted_fmax in *.
+      destruct ((lift float_list_min (lifted_fbag dl))); simpl in *; try discriminate.
+      destruct ((lift float_list_max (lifted_fbag dl))); simpl in *; try discriminate.
       invcs H2.
       constructor.
       * repeat constructor.
+        apply some_lift in H; destruct H as [? eqq ?]; subst.
+        constructor.
       * reflexivity.
 Qed.
 
@@ -727,19 +728,19 @@ Definition enhanced_to_reduce_op (uop:unary_op) : option NNRCMR.reduce_op
      | OpCount => Some (NNRCMR.RedOpForeign RedOpCount)
      | OpNatSum =>
        Some (NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_int))
-     | OpNumberSum =>
+     | OpFloatSum =>
        Some (NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_float))
      | OpNatMin =>
        Some (NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_int))
-     | OpNumberBagMin =>
+     | OpFloatBagMin =>
        Some (NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_float))
      | OpNatMax =>
        Some (NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_int))
-     | OpNumberBagMax =>
+     | OpFloatBagMax =>
        Some (NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_float))
      | OpNatMean =>
        Some (NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_int))
-     | OpNumberMean =>
+     | OpFloatMean =>
        Some (NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_float))
      | _ => None
      end.
@@ -750,19 +751,19 @@ Definition enhanced_of_reduce_op (rop:NNRCMR.reduce_op) : option unary_op
      | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_int) =>
        Some (OpNatSum)
      | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_float) =>
-       Some (OpNumberSum)
+       Some (OpFloatSum)
      | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_int) =>
        Some (OpNatMin)
      | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_float) =>
-       Some (OpNumberBagMin)
+       Some (OpFloatBagMin)
      | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_int) =>
        Some (OpNatMax)
      | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_float) =>
-       Some (OpNumberBagMax)
+       Some (OpFloatBagMax)
      | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_int) =>
        Some (OpNatMean)
      | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_float) =>
-       Some (OpNumberMean)
+       Some (OpFloatMean)
      | NNRCMR.RedOpForeign (RedOpStats _) =>
        None (* XXX TODO? XXX *)
      end.
@@ -869,14 +870,14 @@ Require Import NNRCRuntime NNRCMRRuntime NNRCMRRewrite.
                                                      (NNRCUnop (OpDot "count"%string) (NNRCVar x)))))
             | enhanced_numeric_float =>
               let zero := NNRCConst (dnat 0) in
-              let zerof := NNRCConst (dnumber JsAst.JsNumber.zero) in
+              let zerof := NNRCConst (dfloat float_zero) in
               let x := "stats"%string in
               MapScalar (x, NNRCUnop OpBag
                                     (NNRCIf (NNRCBinop OpEqual (NNRCUnop (OpDot "count"%string) (NNRCVar x)) zero)
                                            zerof
-                                           (NNRCBinop (OpNumberBinary NumberDiv)
+                                           (NNRCBinop (OpFloatBinary FloatDiv)
                                                      (NNRCUnop (OpDot "sum"%string) (NNRCVar x))
-                                                     (NNRCUnop (OpNumberOfNat)
+                                                     (NNRCUnop (OpFloatOfNat)
                                                        (NNRCUnop (OpDot "count"%string) (NNRCVar x))))))
             end
         in
@@ -941,9 +942,9 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
 Instance enhanced_foreign_cloudant : foreign_cloudant
   := mk_foreign_cloudant
        enhanced_foreign_runtime
-       (OpNumberSum)
-       (OpNumberBagMin)
-       (OpNumberBagMax).
+       (OpFloatSum)
+       (OpFloatBagMin)
+       (OpFloatBagMax).
 
 Definition enhanced_to_cloudant_reduce_op
            (rop:enhanced_reduce_op) : CldMR.cld_reduce_op

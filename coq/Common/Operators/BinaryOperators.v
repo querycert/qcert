@@ -33,15 +33,15 @@ Section BinaryOperators.
      | NatMin      (**r smallest *)
      | NatMax.     (**r biggest *)
   
-  Inductive number_arith_binary_op
+  Inductive float_arith_binary_op
     := 
-    | NumberPlus   (**r addition *)
-    | NumberMinus  (**r substraction *)
-    | NumberMult   (**r multiplication *)
-    | NumberDiv    (**r division *)
-    | NumberPow    (**r exponent *)
-    | NumberMin    (**r min *)
-    | NumberMax    (**r max *)
+    | FloatPlus   (**r addition *)
+    | FloatMinus  (**r substraction *)
+    | FloatMult   (**r multiplication *)
+    | FloatDiv    (**r division *)
+    | FloatPow    (**r exponent *)
+    | FloatMin    (**r min *)
+    | FloatMax    (**r max *)
   .
 
   Inductive binary_op : Set :=
@@ -59,7 +59,7 @@ Section BinaryOperators.
   | OpContains : binary_op                        (**r is an element in a collection *)
   | OpStringConcat : binary_op                    (**r string concatenation *)
   | OpNatBinary : nat_arith_binary_op -> binary_op        (**r arithmetic operators on integers *)
-  | OpNumberBinary : number_arith_binary_op -> binary_op  (**r arithmetic operators on floats *)
+  | OpFloatBinary : float_arith_binary_op -> binary_op  (**r arithmetic operators on floats *)
   | OpForeignBinary
       (fb : foreign_binary_op_type) : binary_op   (**r foreign binary operators *)
   .
@@ -70,9 +70,9 @@ Section BinaryOperators.
     decide equality.
   Defined.
 
-  Global Instance number_arith_binary_op_eqdec : EqDec number_arith_binary_op eq.
+  Global Instance float_arith_binary_op_eqdec : EqDec float_arith_binary_op eq.
   Proof.
-    change (forall x y : number_arith_binary_op,  {x = y} + {x <> y}).
+    change (forall x y : float_arith_binary_op,  {x = y} + {x <> y}).
     decide equality.
   Defined.
 
@@ -81,7 +81,7 @@ Section BinaryOperators.
     change (forall x y : binary_op,  {x = y} + {x <> y}).
     decide equality.
     apply nat_arith_binary_op_eqdec.
-    apply number_arith_binary_op_eqdec.
+    apply float_arith_binary_op_eqdec.
     apply foreign_binary_op_dec.
   Defined.
 
@@ -101,17 +101,17 @@ Section BinaryOperators.
             end
        }.
 
-  Global Instance ToString_number_arith_binary_op : ToString number_arith_binary_op
+  Global Instance ToString_float_arith_binary_op : ToString float_arith_binary_op
     := {toString :=
-          fun (op:number_arith_binary_op) =>
+          fun (op:float_arith_binary_op) =>
             match op with
-            | NumberPlus => "NumberPlus"
-            | NumberMinus => "NumberMinus"
-            | NumberMult => "NumberMult"
-            | NumberDiv => "NumberDiv"
-            | NumberPow => "NumberPow"
-            | NumberMin => "NumberMin"
-            | NumberMax => "NumberMax"
+            | FloatPlus => "FloatPlus"
+            | FloatMinus => "FloatMinus"
+            | FloatMult => "FloatMult"
+            | FloatDiv => "FloatDiv"
+            | FloatPow => "FloatPow"
+            | FloatMin => "FloatMin"
+            | FloatMax => "FloatMax"
             end
        }.
 
@@ -133,7 +133,7 @@ Section BinaryOperators.
             | OpContains  => "OpContains"
             | OpStringConcat  => "OpStringConcat"
             | OpNatBinary aop => "(OpNatBinary " ++ (toString aop) ++ ")"
-            | OpNumberBinary aop => "(OpNumberBinary " ++ (toString aop) ++ ")"
+            | OpFloatBinary aop => "(OpFloatBinary " ++ (toString aop) ++ ")"
             | OpForeignBinary fb => toString fb
             end
        }.
@@ -156,6 +156,6 @@ Tactic Notation "binary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpContains"%string
   | Case_aux c "OpStringConcat"%string
   | Case_aux c "OpNatBinary"%string
-  | Case_aux c "OpNumberBinary"%string
+  | Case_aux c "OpFloatBinary"%string
   | Case_aux c "OpForeignBinary"%string].
 

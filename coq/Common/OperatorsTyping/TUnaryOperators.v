@@ -18,7 +18,6 @@ Section TUnaryOperators.
   Require Import String.
   Require Import List.
   Require Import ZArith.
-  Require Import JsAst.JsNumber.
   Require Import Compare_dec.
   Require Import Program.
   Require Import RelationClasses.
@@ -100,20 +99,20 @@ Section TUnaryOperators.
         unary_op_type OpNatMax (Coll Nat) Nat
     | type_OpNatMean:
         unary_op_type OpNatMean (Coll Nat) Nat
-    | type_OpNumberOfNat:
-        unary_op_type OpNumberOfNat Nat Number
-    | type_OpNumberUnary (u:number_arith_unary_op) :
-        unary_op_type (OpNumberUnary u) Number Number
-    | type_OpNumberTruncate:
-        unary_op_type OpNumberTruncate Number Nat
-    | type_OpNumberSum:
-        unary_op_type OpNumberSum (Coll Number) Number
-    | type_OpNumberMean:
-        unary_op_type OpNumberMean (Coll Number) Number
-    | type_OpNumberMin:
-        unary_op_type OpNumberBagMin (Coll Number) Number
-    | type_OpNumberMax:
-        unary_op_type OpNumberBagMax (Coll Number) Number
+    | type_OpFloatOfNat:
+        unary_op_type OpFloatOfNat Nat Float
+    | type_OpFloatUnary (u:float_arith_unary_op) :
+        unary_op_type (OpFloatUnary u) Float Float
+    | type_OpFloatTruncate:
+        unary_op_type OpFloatTruncate Float Nat
+    | type_OpFloatSum:
+        unary_op_type OpFloatSum (Coll Float) Float
+    | type_OpFloatMean:
+        unary_op_type OpFloatMean (Coll Float) Float
+    | type_OpFloatMin:
+        unary_op_type OpFloatBagMin (Coll Float) Float
+    | type_OpFloatMax:
+        unary_op_type OpFloatBagMax (Coll Float) Float
     | type_OpForeignUnary {fu τin τout} :
         foreign_unary_op_typing_has_type fu τin τout ->
         unary_op_type (OpForeignUnary fu) τin τout.
@@ -147,13 +146,13 @@ Section TUnaryOperators.
     | Case_aux c "type_OpNatMin"%string
     | Case_aux c "type_OpNatMax"%string
     | Case_aux c "type_OpNatMean"%string
-    | Case_aux c "type_OpNumberOfNat"%string
-    | Case_aux c "type_OpNumberUnary"%string
-    | Case_aux c "type_OpNumberTruncate"%string
-    | Case_aux c "type_OpNumberSum"%string
-    | Case_aux c "type_OpNumberMean"%string
-    | Case_aux c "type_OpNumberBagMin"%string
-    | Case_aux c "type_OpNumberBagMax"%string
+    | Case_aux c "type_OpFloatOfNat"%string
+    | Case_aux c "type_OpFloatUnary"%string
+    | Case_aux c "type_OpFloatTruncate"%string
+    | Case_aux c "type_OpFloatSum"%string
+    | Case_aux c "type_OpFloatMean"%string
+    | Case_aux c "type_OpFloatBagMin"%string
+    | Case_aux c "type_OpFloatBagMax"%string
     | Case_aux c "type_OpForeignUnary"%string].
 
   (** Type soundness lemmas for individual operators *)
@@ -494,90 +493,79 @@ Section TUnaryOperators.
          unfold darithmean.
          rewrite eqq1; simpl.
          destruct d1; simpl; congruence.
-    - Case "type_OpNumberOfNat"%string.
+    - Case "type_OpFloatOfNat"%string.
       dependent induction H; simpl.
       eauto.
-    - Case "type_OpNumberUnary"%string.
+    - Case "type_OpFloatUnary"%string.
       dependent induction H; simpl.
       eauto.
-    - Case "type_OpNumberTruncate"%string.
+    - Case "type_OpFloatTruncate"%string.
       dependent induction H; simpl.
       eauto.
-    - Case "type_OpNumberSum"%string.
-      dependent induction H. revert r x H. induction dl; simpl; [eauto|intros].
-      inversion H; subst. destruct (IHdl r x H3) as [x0 [x0eq x0d]].
-      destruct H2; try solve[simpl in x; discriminate].
-      simpl in *.
-      destruct (some_lift x0eq); subst.
-      rewrite e. simpl. eauto.
-    - Case "type_OpNumberMean"%string.
-      assert(nsum_pf:exists x : data, lift dnumber (lift_oncoll nsum d1) = Some x /\ x ▹ Number).
-      {dependent induction H. revert r x H. induction dl; simpl; [eauto|intros].
-      inversion H; subst. destruct (IHdl r x H3) as [x0 [x0eq x0d]].
-      destruct H2; try solve[simpl in x; discriminate].
-      simpl in *.
-      destruct (some_lift x0eq); subst.
-      rewrite e. simpl. eauto.
-      }
-      destruct nsum_pf as [x [xeq xtyp]].
-      dtype_inverter.
-      apply some_lift in xeq.
-      destruct xeq as [? eqq1 eqq2].
-      simpl in eqq1.
-      inversion eqq2; clear eqq2; subst.
-      destruct (is_nil_dec d1); simpl.
-      + subst; simpl; eauto.
-      + exists (dnumber (number_div x (number_of_int (Z_of_nat (length d1))))).
-         split; [ | constructor ].
-         unfold narithmean.
-         rewrite eqq1; simpl.
-         destruct d1; simpl; congruence.
-    - Case "type_OpNumberBagMin"%string.
+    - Case "type_OpFloatSum"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
-      induction dl. rewrite Forall_forall in H.
-      unfold lifted_nmin; simpl.
-      exists (dnumber infinity). auto.
-      inversion H. subst.
-      specialize (IHdl H3).
-      elim IHdl; clear IHdl; intros.
-      elim H0; clear H0; intros.
-      unfold lifted_nmin in *.
-      unfold lift in *.
-      unfold lifted_nbag in *.
-      assert (Number = (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) Number₀ e))
-        by (apply rtype_fequal; reflexivity).
-      rewrite <- H4 in H2.
-      destruct (data_type_Number_inv H2); subst.
+      induction dl; unfold lifted_fsum; simpl; [eauto|intros].
+      inversion H; subst.
+      destruct (IHdl H3) as [x0 [x0eq x0d]].
+      inversion H2.
+      subst.
+      unfold lifted_fsum in *.
+      simpl in *.
+      destruct (some_lift x0eq); subst.
       simpl.
-      destruct (lift_map (ondnumber (fun x3 : number => x3)) dl); try congruence.
-      simpl.
-      exists (dnumber (number_min x1 (number_list_min l))).
-      split; [reflexivity|auto].
-    - Case "type_OpNumberBagMax"%string.
+      unfold lifted_fbag in *; simpl.
+      destruct (some_lift e0); subst.
+      rewrite e1; simpl; eauto.
+    - Case "type_OpFloatMean"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
-      induction dl. rewrite Forall_forall in H.
-      unfold lifted_nmax; simpl.
-      exists (dnumber neg_infinity). auto.
-      inversion H. subst.
-      specialize (IHdl H3).
-      elim IHdl; clear IHdl; intros.
-      elim H0; clear H0; intros.
-      unfold lifted_nmax in *.
-      unfold lift in *.
-      unfold lifted_nbag in *.
-      assert (Number = (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) Number₀ e))
-        by (apply rtype_fequal; reflexivity).
-      rewrite <- H4 in H2.
-      destruct (data_type_Number_inv H2); subst.
+      induction dl; unfold lifted_farithmean; simpl; [eauto|intros].
+      inversion H; subst.
+      destruct (IHdl H3) as [x0 [x0eq x0d]].
+      inversion H2.
+      subst.
+      unfold lifted_farithmean in *.
+      simpl in *.
+      destruct (some_lift x0eq); subst.
       simpl.
-      destruct (lift_map (ondnumber (fun x3 : number => x3)) dl); try congruence.
+      unfold lifted_fbag in *; simpl.
+      destruct (some_lift e0); subst.
+      rewrite e1; simpl; eauto.
+    - Case "type_OpFloatBagMin"%string.
+      dependent induction H.
+      destruct r.
+      destruct x0; simpl in x; try congruence.
+      induction dl; unfold lifted_fmin; simpl; [eauto|intros].
+      inversion H; subst.
+      destruct (IHdl H3) as [x0 [x0eq x0d]].
+      inversion H2.
+      subst.
+      unfold lifted_fmin in *.
+      simpl in *.
+      destruct (some_lift x0eq); subst.
       simpl.
-      exists (dnumber (number_max x1 (number_list_max l))).
-      split; [reflexivity|auto].
+      unfold lifted_fbag in *; simpl.
+      destruct (some_lift e0); subst.
+      rewrite e1; simpl; eauto.
+    - Case "type_OpFloatBagMax"%string.
+      dependent induction H.
+      destruct r.
+      destruct x0; simpl in x; try congruence.
+      induction dl; unfold lifted_fmax; simpl; [eauto|intros].
+      inversion H; subst.
+      destruct (IHdl H3) as [x0 [x0eq x0d]].
+      inversion H2.
+      subst.
+      unfold lifted_fmax in *.
+      simpl in *.
+      destruct (some_lift x0eq); subst.
+      simpl.
+      unfold lifted_fbag in *; simpl.
+      destruct (some_lift e0); subst.
+      rewrite e1; simpl; eauto.
     - Case "type_OpForeignUnary"%string.
       eapply foreign_unary_op_typing_sound; eauto.
   Qed.
@@ -611,12 +599,12 @@ Tactic Notation "unary_op_type_cases" tactic(first) ident(c) :=
   | Case_aux c "type_OpNatMin"%string
   | Case_aux c "type_OpNatMax"%string
   | Case_aux c "type_OpNatMean"%string
-  | Case_aux c "type_OpNumberOfNat"%string
-  | Case_aux c "type_OpNumberUnary"%string
-  | Case_aux c "type_OpNumberTruncate"%string
-  | Case_aux c "type_OpNumberSum"%string
-  | Case_aux c "type_OpNumberMean"%string
-  | Case_aux c "type_OpNumberBagMin"%string
-  | Case_aux c "type_OpNumberBagMax"%string
+  | Case_aux c "type_OpFloatOfNat"%string
+  | Case_aux c "type_OpFloatUnary"%string
+  | Case_aux c "type_OpFloatTruncate"%string
+  | Case_aux c "type_OpFloatSum"%string
+  | Case_aux c "type_OpFloatMean"%string
+  | Case_aux c "type_OpFloatBagMin"%string
+  | Case_aux c "type_OpFloatBagMax"%string
   | Case_aux c "type_OpForeignUnary"%string].
 

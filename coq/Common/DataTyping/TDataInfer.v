@@ -40,7 +40,7 @@ Section TDataInfer.
     := match d with
          | dunit => Some Unit
          | dnat n => Some Nat
-         | dnumber n => Some Number
+         | dfloat n => Some Float
          | dbool b => Some Bool
          | dstring s => Some String
          | dcoll ld =>

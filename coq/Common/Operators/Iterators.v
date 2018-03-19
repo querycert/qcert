@@ -52,7 +52,7 @@ Section Iterators.
             match d1 with
             | dunit => None
             | dnat _ => None
-            | dnumber _ => None
+            | dfloat _ => None
             | dbool _ => None
             | dstring _ => None
             | dcoll _ => None
@@ -69,7 +69,7 @@ Section Iterators.
                  match d0 with
                  | dunit => None
                  | dnat _ => None
-                 | dnumber _ => None
+                 | dfloat _ => None
                  | dbool _ => None
                  | dstring _ => None
                  | dcoll _ => None

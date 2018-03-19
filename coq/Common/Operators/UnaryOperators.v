@@ -36,15 +36,15 @@ Section UnaryOperators.
      | NatLog2 (**r base2 logarithm *)
      | NatSqrt (**r square root *)
   .
-  Inductive number_arith_unary_op
-    := NumberNeg   (**r negative *)
-     | NumberSqrt  (**r square root *)
-     | NumberExp   (**r exponent *)
-     | NumberLog   (**r logarithm base 2 *)
-     | NumberLog10 (**r logarithm base 10 *)
-     | NumberCeil  (**r ceiling *)
-     | NumberFloor (**r floor *)
-     | NumberAbs   (**r absolute value *)
+  Inductive float_arith_unary_op
+    := FloatNeg   (**r negative *)
+     | FloatSqrt  (**r square root *)
+     | FloatExp   (**r exponent *)
+     | FloatLog   (**r logarithm base 2 *)
+     | FloatLog10 (**r logarithm base 10 *)
+     | FloatCeil  (**r ceiling *)
+     | FloatFloor (**r floor *)
+     | FloatAbs   (**r absolute value *)
   .
 
   Inductive unary_op : Set :=
@@ -69,18 +69,18 @@ Section UnaryOperators.
   | OpBrand : brands -> unary_op                      (**r brands a value *)
   | OpUnbrand : unary_op                              (**r content of a branded value *)
   | OpCast : brands -> unary_op                       (**r coerce a branded value into one of its sub-brands *)
-  | OpNatUnary : nat_arith_unary_op -> unary_op       (**r arithmetic operations on natural numbers *)
-  | OpNatSum : unary_op                               (**r sum of natural numbers in a bag *)
-  | OpNatMin : unary_op                               (**r minimum of natural numbers in a bag *)
-  | OpNatMax : unary_op                               (**r maximum of natural numbers in a bag *)
-  | OpNatMean : unary_op                              (**r arithmetic mean of natural numbers in a bag *)
-  | OpNumberOfNat : unary_op                          (**r coercion from natural number to float *)
-  | OpNumberUnary : number_arith_unary_op -> unary_op (**r arithmetic operations on floats *)
-  | OpNumberTruncate : unary_op                       (**r truncate *)
-  | OpNumberSum : unary_op                            (**r sum *) 
-  | OpNumberMean : unary_op                           (**r arithmetic mean *)
-  | OpNumberBagMin : unary_op                         (**r minimum *)
-  | OpNumberBagMax : unary_op                         (**r maximum *)
+  | OpNatUnary : nat_arith_unary_op -> unary_op       (**r arithmetic operations on natural floats *)
+  | OpNatSum : unary_op                               (**r sum of natural floats in a bag *)
+  | OpNatMin : unary_op                               (**r minimum of natural floats in a bag *)
+  | OpNatMax : unary_op                               (**r maximum of natural floats in a bag *)
+  | OpNatMean : unary_op                              (**r arithmetic mean of natural floats in a bag *)
+  | OpFloatOfNat : unary_op                          (**r coercion from natural float to float *)
+  | OpFloatUnary : float_arith_unary_op -> unary_op (**r arithmetic operations on floats *)
+  | OpFloatTruncate : unary_op                       (**r truncate *)
+  | OpFloatSum : unary_op                            (**r sum *) 
+  | OpFloatMean : unary_op                           (**r arithmetic mean *)
+  | OpFloatBagMin : unary_op                         (**r minimum *)
+  | OpFloatBagMax : unary_op                         (**r maximum *)
   | OpForeignUnary
       (fu:foreign_unary_op_type) : unary_op           (**r foreign unary operators *)
   .
@@ -91,9 +91,9 @@ Section UnaryOperators.
     decide equality.
   Defined.
 
-  Global Instance number_arith_unary_op_eqdec : EqDec number_arith_unary_op eq.
+  Global Instance float_arith_unary_op_eqdec : EqDec float_arith_unary_op eq.
   Proof.
-    change (forall x y : number_arith_unary_op,  {x = y} + {x <> y}).
+    change (forall x y : float_arith_unary_op,  {x = y} + {x <> y}).
     decide equality.
   Defined.
 
@@ -117,7 +117,7 @@ Section UnaryOperators.
     - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
     - apply nat_arith_unary_op_eqdec.
-    - apply number_arith_unary_op_eqdec.
+    - apply float_arith_unary_op_eqdec.
     - apply foreign_unary_op_dec.
   Defined.
 
@@ -133,18 +133,18 @@ Section UnaryOperators.
             end
        }.
 
-  Global Instance ToString_number_arith_unary_op : ToString number_arith_unary_op
+  Global Instance ToString_float_arith_unary_op : ToString float_arith_unary_op
     := {toString :=
-          fun (op:number_arith_unary_op) =>
+          fun (op:float_arith_unary_op) =>
             match op with
-            | NumberNeg => "NumberNeg"
-            | NumberSqrt => "NumberSqrt"
-            | NumberExp => "NumberExp"
-            | NumberLog => "NumberLog"
-            | NumberLog10 => "NumberLog10"
-            | NumberCeil => "NumberCeil"
-            | NumberFloor => "NumberFloor"
-            | NumberAbs => "NumberAbs"
+            | FloatNeg => "FloatNeg"
+            | FloatSqrt => "FloatSqrt"
+            | FloatExp => "FloatExp"
+            | FloatLog => "FloatLog"
+            | FloatLog10 => "FloatLog10"
+            | FloatCeil => "FloatCeil"
+            | FloatFloor => "FloatFloor"
+            | FloatAbs => "FloatAbs"
             end
        }.
 
@@ -204,13 +204,13 @@ Section UnaryOperators.
             | OpNatMin => "OpNatMin"
             | OpNatMax => "OpNatMax"
             | OpNatMean => "OpNatMean"
-            | OpNumberOfNat => "OpNumberOfNat"
-            | OpNumberUnary aop => "(OpNumberUnary " ++ toString aop ++ ")"
-            | OpNumberTruncate => "OpNumberTruncate"
-            | OpNumberSum => "OpNumberSum"
-            | OpNumberMean => "OpNumberMean"
-            | OpNumberBagMin => "OpNumberBagMin"
-            | OpNumberBagMax => "OpNumberBagMax"
+            | OpFloatOfNat => "OpFloatOfNat"
+            | OpFloatUnary aop => "(OpFloatUnary " ++ toString aop ++ ")"
+            | OpFloatTruncate => "OpFloatTruncate"
+            | OpFloatSum => "OpFloatSum"
+            | OpFloatMean => "OpFloatMean"
+            | OpFloatBagMin => "OpFloatBagMin"
+            | OpFloatBagMax => "OpFloatBagMax"
             | OpForeignUnary fu => toString fu
             end
        }.
@@ -244,13 +244,13 @@ Tactic Notation "unary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpNatMin"%string
   | Case_aux c "OpNatMax"%string
   | Case_aux c "OpNatMean"%string
-  | Case_aux c "OpNumberOfNat"%string
-  | Case_aux c "OpNumberUnary"%string
-  | Case_aux c "OpNumberTruncate"%string
-  | Case_aux c "OpNumberSum"%string
-  | Case_aux c "OpNumberMean"%string
-  | Case_aux c "OpNumberBagMin"%string
-  | Case_aux c "OpNumberBagMax"%string
+  | Case_aux c "OpFloatOfNat"%string
+  | Case_aux c "OpFloatUnary"%string
+  | Case_aux c "OpFloatTruncate"%string
+  | Case_aux c "OpFloatSum"%string
+  | Case_aux c "OpFloatMean"%string
+  | Case_aux c "OpFloatBagMin"%string
+  | Case_aux c "OpFloatBagMax"%string
   | Case_aux c "OpForeignUnary"%string
   ].
 
