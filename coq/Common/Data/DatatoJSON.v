@@ -61,10 +61,9 @@ Section DatatoJSON.
             | _ =>
               drec ((s1, json_to_data_pre j')::nil)
             end
-          else
-          if (string_dec s1 "left") then dleft (json_to_data_pre j')
-          else if (string_dec s1 "right") then dright (json_to_data_pre j')
-               else drec ((s1, json_to_data_pre j')::nil)
+          else if (string_dec s1 "left") then dleft (json_to_data_pre j')
+               else if (string_dec s1 "right") then dright (json_to_data_pre j')
+                    else drec ((s1, json_to_data_pre j')::nil)
         | jobject ((s1,jarray j1)::(s2,j2)::nil) =>
           if (string_dec s1 "type") then
             if (string_dec s2 "data") then
@@ -140,7 +139,7 @@ Section DatatoJSON.
     Fixpoint data_enhanced_to_json (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber (float_of_int n)
+      | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
       | dfloat n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
@@ -156,7 +155,7 @@ Section DatatoJSON.
     Fixpoint data_to_json (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber (float_of_int n)
+      | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
       | dfloat n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
