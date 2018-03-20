@@ -266,7 +266,7 @@ Section NNRCtoJavaScript.
                      | OpFlatten => "flatten(" ++ e1 ++ ")"
                      | OpDistinct => "distinct(" ++ e1 ++ ")"
                      | OpOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
-                     | OpCount => e1 ++ ".length"
+                     | OpCount => "{" ++ quotel ++ "nat" ++ quotel ++ " : " ++ e1 ++ ".length" ++ "}" (* XXX makes sure the result of count is tagged as nat *)
                      | OpToString => "toString(" ++ e1 ++ ")"
                      | OpSubstring start olen =>
                        "(" ++ e1 ++ ").substring(" ++ toString start ++
@@ -308,8 +308,8 @@ Section NNRCtoJavaScript.
                      | OpRecMerge => "mergeConcat(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpAnd => "(" ++ e1 ++ " && " ++ e2 ++ ")"
                      | OpOr => "(" ++ e1 ++ " || " ++ e2 ++ ")"
-                     | OpLt => "(" ++ e1 ++ " < " ++ e2 ++ ")"
-                     | OpLe => "(" ++ e1 ++ " <= " ++ e2 ++ ")"
+                     | OpLt => "(compare(" ++ e1 ++ "," ++ e2 ++ ") < 0)" (* XXX Use compare! *)
+                     | OpLe => "(compare(" ++ e1 ++ "," ++ e2 ++ ") <= 0)" (* XXX Use compare! *)
                      | OpBagUnion => "bunion(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpBagDiff => "bminus(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpBagMin => "bmin(" ++ e1 ++ ", " ++ e2 ++ ")"

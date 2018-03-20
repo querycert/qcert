@@ -66,9 +66,9 @@ Section TBinaryOperators.
     | type_OpOr :
         binary_op_type OpOr Bool Bool Bool
     | type_OpLt :
-        binary_op_type OpLt Nat Nat Bool
+        binary_op_type OpLt Nat Nat Bool  (* XXX Should it be generalized? *)
     | type_OpLe :
-        binary_op_type OpLe Nat Nat Bool
+        binary_op_type OpLe Nat Nat Bool  (* XXX Should it be generalized? *)
     | type_OpBagUnion {τ} :
         binary_op_type OpBagUnion (Coll τ) (Coll τ) (Coll τ)
     | type_OpBagDiff {τ} :

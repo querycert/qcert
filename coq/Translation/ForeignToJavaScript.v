@@ -34,45 +34,5 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
              (quotel:string) (fb:foreign_binary_op_type)
              (d1 d2:string) : string
        }.
-  
-  Section toJavascript.
-    Require Import Data.
-    Require Import JSON.
-    Context {fdata:foreign_data}.
-    Context {ftjson:foreign_to_JSON}.
-
-    Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
-      match d with
-      | dunit => jnil
-      | dnat n => jnumber (float_of_int n)
-      | dfloat n => jnumber n
-      | dbool b => jbool b
-      | dstring s => jstring s
-      | dcoll c => jarray (map (data_enhanced_to_js quotel) c)
-      | drec r => jobject (map (fun x => (fst x, (data_enhanced_to_js quotel) (snd x))) r)
-      | dleft d' => jobject (("left"%string, data_enhanced_to_js quotel d')::nil)
-      | dright d' => jobject (("right"%string, data_enhanced_to_js quotel d')::nil)
-      | dbrand b (drec r) => jobject (("$class "%string, jarray (map jstring b))::(map (fun x => (fst x, data_enhanced_to_js quotel (snd x))) r))
-      | dbrand b d' => jobject (("$class"%string, jarray (map jstring b))::("$data"%string, (data_enhanced_to_js quotel d'))::nil)
-      | dforeign fd => foreign_to_JSON_from_data fd
-      end.
-
-    Fixpoint data_to_js (quotel:string) (d:data) : json :=
-      match d with
-      | dunit => jnil
-      | dnat n => jnumber (float_of_int n)
-      | dfloat n => jnumber n
-      | dbool b => jbool b
-      | dstring s => jstring s
-      | dcoll c => jarray (map (data_to_js quotel) c)
-      | drec r => jobject (map (fun x => (fst x, (data_to_js quotel) (snd x))) r)
-      | dleft d' => jobject (("left"%string, data_to_js quotel d')::nil)
-      | dright d' => jobject (("right"%string, data_to_js quotel d')::nil)
-      | dbrand b d' => jobject (("type"%string, jarray (map jstring b))::("data"%string, (data_to_js quotel d'))::nil)
-      | dforeign fd => foreign_to_JSON_from_data fd
-      end.
-
-  End toJavascript.
-
 End ForeigntoJavaScript.
 
