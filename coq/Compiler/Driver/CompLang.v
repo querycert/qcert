@@ -41,6 +41,7 @@ Section CompLang.
     | L_cldmr : language
     | L_dnnrc : language
     | L_dnnrc_typed : language
+    | L_js_ast : language
     | L_javascript : language
     | L_java : language
     | L_spark_rdd : language
@@ -86,6 +87,7 @@ Section CompLang.
       | "cldmr"%string => L_cldmr
       | "dnnrc"%string => L_dnnrc
       | "dnnrc_typed"%string => L_dnnrc_typed
+      | "js_ast"%string => L_js_ast
       | "js"%string | "rhino"%string | "javascript"%string => L_javascript
       | "java"%string => L_java
       | "spark_rdd"%string => L_spark_rdd
@@ -116,6 +118,7 @@ Section CompLang.
       | L_cldmr => "cldmr"%string
       | L_dnnrc => "dnnrc"%string
       | L_dnnrc_typed => "dnnrc_typed"%string
+      | L_js_ast => "js_ast"%string
       | L_javascript => "js"%string
       | L_java => "java"%string
       | L_spark_rdd => "spark_rdd"%string
@@ -176,6 +179,7 @@ Section CompLang.
         :: (L_cldmr,DistrEnd,"CldMR", "Named Nested Relational Calculus with Cloudant Map/Reduce")
         :: (L_dnnrc,DistrEnd,"DNNRC", "Distributed Named Nested Relational Calculus")
         :: (L_dnnrc_typed,DistrEnd,"tDNNRC", "Typed Distributed Named Nested Relational Calculus")
+        :: (L_js_ast,BackEnd,"JsAst", "JavaScript AST")
         :: (L_javascript,BackEnd,"JavaScript", "JavaScript")
         :: (L_java,BackEnd,"Java", "Java")
         :: (L_spark_rdd,BackEnd,"SparkRDD", "Spark (RDDs API)")
@@ -261,6 +265,7 @@ Section CompLang.
     Require Import tDNNRCRuntime.
     Require Import CAMPRuntime.
     (** Target languages *)
+    Require Import JsAst.JsSyntax.
     Require Import JavaScriptRuntime.
     Require Import JavaRuntime.
     Require Import SparkRDDRuntime.
@@ -298,6 +303,7 @@ Section CompLang.
     Definition cldmr := cldmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
+    Definition js_ast := funcdecl.
     Definition javascript := javascript.
     Definition java := java.
     Definition spark_rdd := spark_rdd.
@@ -324,6 +330,7 @@ Section CompLang.
     | Q_cldmr : cldmr -> query
     | Q_dnnrc : dnnrc -> query
     | Q_dnnrc_typed : dnnrc_typed -> query
+    | Q_js_ast : js_ast -> query
     | Q_javascript : javascript -> query
     | Q_java : java -> query
     | Q_spark_rdd : spark_rdd -> query
@@ -352,6 +359,7 @@ Section CompLang.
       | Case_aux c "Q_cldmr"%string
       | Case_aux c "Q_dnnrc"%string
       | Case_aux c "Q_dnnrc_typed"%string
+      | Case_aux c "Q_js_ast"%string
       | Case_aux c "Q_javascript"%string
       | Case_aux c "Q_java"%string
       | Case_aux c "Q_spark_rdd"%string
@@ -380,6 +388,7 @@ Section CompLang.
       | Q_cldmr _ => L_cldmr
       | Q_dnnrc _ => L_dnnrc
       | Q_dnnrc_typed _ => L_dnnrc_typed
+      | Q_js_ast _ => L_js_ast
       | Q_javascript _ => L_javascript
       | Q_java _ => L_java
       | Q_spark_rdd _ => L_spark_rdd
@@ -414,6 +423,7 @@ Section CompLang.
       | L_cldmr => cldmr
       | L_dnnrc => dnnrc
       | L_dnnrc_typed => dnnrc_typed
+      | L_js_ast => js_ast
       | L_javascript => javascript
       | L_java => java
       | L_spark_rdd => spark_rdd
@@ -446,6 +456,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_cldmr"%string
   | Case_aux c "L_dnnrc"%string
   | Case_aux c "L_dnnrc_typed"%string
+  | Case_aux c "L_js_ast"%string
   | Case_aux c "L_javascript"%string
   | Case_aux c "L_java"%string
   | Case_aux c "L_spark_rdd"%string

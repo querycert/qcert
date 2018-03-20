@@ -43,6 +43,7 @@ val pretty_nnrcmr : QcertCompiler.nnrcmr pretty_fun
 val pretty_cldmr : QcertCompiler.cldmr pretty_fun
 val pretty_dnnrc : QcertCompiler.dnnrc pretty_fun
 val pretty_dnnrc_typed : QcertCompiler.dnnrc_typed pretty_fun
+val pretty_js_ast : QcertCompiler.js_ast pretty_fun
 val pretty_javascript : QcertCompiler.javascript pretty_fun
 val pretty_java : QcertCompiler.java pretty_fun
 val pretty_spark_rdd : QcertCompiler.spark_rdd pretty_fun

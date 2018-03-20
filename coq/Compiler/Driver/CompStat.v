@@ -42,6 +42,7 @@ Section CompStat.
   Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (** Target languages *)
+  Require Import JsAst.JsSyntax.
   Require Import JavaScriptRuntime.
   Require Import JavaRuntime.
   Require Import SparkRDDRuntime.
@@ -105,6 +106,11 @@ Section CompStat.
   Definition stat_javascript (q: javascript) : data :=
     drec
       (("javascript_stat", dstring "no stat available")
+         :: nil).
+
+  Definition stat_js_ast (q: js_ast) : data :=
+    drec
+      (("js_ast_stat", dstring "no stat available") (* TODO *)
          :: nil).
 
   Definition stat_dnnrc_typed (q: dnnrc_typed) : data :=
@@ -232,6 +238,11 @@ Section CompStat.
   Definition stat_tree_java (q: java) : data :=
     drec
       (("java", stat_java q)
+         :: nil).
+
+  Definition stat_tree_js_ast (q: js_ast) : data :=
+    drec
+      (("js_ast", stat_js_ast q)
          :: nil).
 
   Definition stat_tree_javascript (q: javascript) : data :=
@@ -448,6 +459,7 @@ Section CompStat.
         | Q_cldmr q => stat_cldmr q
         | Q_dnnrc q => stat_dnnrc q
         | Q_dnnrc_typed q => stat_dnnrc_typed q
+        | Q_js_ast q => stat_js_ast q
         | Q_javascript q => stat_javascript q
         | Q_java q => stat_java q
         | Q_spark_rdd q => stat_spark_rdd q
@@ -480,6 +492,7 @@ Section CompStat.
         | Q_cldmr q => stat_tree_cldmr q
         | Q_dnnrc q => stat_tree_dnnrc q
         | Q_dnnrc_typed q => stat_tree_dnnrc_typed q
+        | Q_js_ast q => stat_tree_js_ast q
         | Q_javascript q => stat_tree_javascript q
         | Q_java q => stat_tree_java q
         | Q_spark_rdd q => stat_tree_spark_rdd q

@@ -42,6 +42,7 @@ Section CompCorrectness.
   Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (* Target languages *)
+  Require Import JsAst.JsSyntax.
   Require Import JavaScriptRuntime.
   Require Import JavaRuntime.
   Require Import SparkRDDRuntime.
@@ -69,6 +70,7 @@ Section CompCorrectness.
   Require Import NNRCtoNNRCimp.
   Require Import NNRCtoDNNRC.
   Require Import NNRCtoNNRCMR.
+  Require Import NNRCimptoJsSyntax.
   Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
   Require Import cNNRCtoCAMP.
@@ -129,6 +131,11 @@ Section CompCorrectness.
   (** Note: True/False is indicated for each edge in the compiler pipeline *)
   (** Note: For now optimization is not recorded as correct *)
   
+  Definition driver_correct_js_ast (dv: js_ast_driver) :=
+    match dv with
+    | Dv_js_ast_stop => True
+    end.
+
   Definition driver_correct_javascript (dv: javascript_driver) :=
     match dv with
     | Dv_javascript_stop => True
@@ -176,6 +183,7 @@ Section CompCorrectness.
   Definition driver_correct_nnrc_imp (dv: nnrc_imp_driver) :=
     match dv with
     | Dv_nnrc_imp_stop => True
+    | Dv_nnrc_imp_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 
   Definition driver_correct_nnrc_imp_core (dv: nnrc_imp_core_driver) :=
@@ -308,6 +316,7 @@ Section CompCorrectness.
     | Dv_cldmr dv => driver_correct_cldmr dv
     | Dv_dnnrc dv => driver_correct_dnnrc dv
     | Dv_dnnrc_typed dv => driver_correct_dnnrc_typed dv
+    | Dv_js_ast dv => driver_correct_js_ast dv
     | Dv_javascript dv => driver_correct_javascript dv
     | Dv_java dv => driver_correct_java dv
     | Dv_spark_rdd dv => driver_correct_spark_rdd dv
@@ -436,6 +445,7 @@ Section CompCorrectness.
     | (Dv_cldmr _, Q_cldmr _) => True
     | (Dv_dnnrc _, Q_dnnrc _) => True
     | (Dv_dnnrc_typed _, Q_dnnrc_typed _) => True
+    | (Dv_js_ast _, Q_js_ast _) => True
     | (Dv_javascript _, Q_javascript _) => True
     | (Dv_java _, Q_java _) => True
     | (Dv_spark_rdd _, Q_spark_rdd _) => True
@@ -510,12 +520,11 @@ Section CompCorrectness.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nnrc_to_nnrc_core q));
         rewrite Forall_forall in H; auto.
-      - destruct n; destruct H.
-        invcs H1; simpl in *; trivial; contradiction.
+      - destruct n; simpl in *; intuition; subst; simpl; trivial.
+      - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction. (* Failure case for dnnrc to dnnrc_typed -- False on correctness branch *)
-      - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
     Qed.
@@ -671,7 +680,9 @@ Section CompCorrectness.
       rewrite Forall_forall; intros.
       simpl in H0.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *; contradiction.
+      destruct dv; simpl in *.
+      - contradiction.
+      - elim H; contradiction.
     Qed.
 
     Lemma correct_driver_succeeds_nnrc_imp_core:
@@ -792,6 +803,18 @@ Section CompCorrectness.
       elim H; intros; contradiction.
     Qed.
       
+    Lemma correct_driver_succeeds_js_ast:
+      forall dv, driver_correct (Dv_js_ast dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_js_ast dv) (Q_js_ast q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; contradiction.
+    Qed.
+
     Lemma correct_driver_succeeds_javascript:
       forall dv, driver_correct (Dv_javascript dv) ->
                  (forall q, Forall query_not_error
@@ -910,6 +933,7 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_cldmr; auto.
       - apply correct_driver_succeeds_dnnrc; auto.
       - apply correct_driver_succeeds_dnnrc_typed; auto.
+      - apply correct_driver_succeeds_js_ast; auto.
       - apply correct_driver_succeeds_javascript; auto.
       - apply correct_driver_succeeds_java; auto.
       - apply correct_driver_succeeds_spark_rdd; auto.
@@ -1323,10 +1347,14 @@ Section CompCorrectness.
         apply nnrc_to_nnrc_core_preserves_eval.
       (* NNRC to NNRCimp arrow *)
       - destruct n; destruct H.
-        simpl in *.
-        intuition; subst.
-        apply nnrc_to_nnrc_imp_preserves_eval.
+        + simpl in *.
+          intuition; subst.
+          apply nnrc_to_nnrc_imp_preserves_eval.
+        + simpl in *.
+          elim H0; intros; contradiction. (* Not proved *)
       (* NNRC to DNNRC arrow *)
+      - elim H; intros; contradiction. (* Not proved *)
+      (* NNRC to js_ast arrow *)
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRC to JavaScript arrow *)
       - elim H; intros; contradiction. (* Not proved *)
@@ -1337,7 +1365,6 @@ Section CompCorrectness.
       (* NNRCMR to DNNRC arrow *)
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRCMR to CldMR arrow *)
-      - elim H; intros; contradiction. (* Not proved *)
     Qed.
 
     Lemma correct_driver_preserves_eval_camp_rule:
@@ -1512,7 +1539,9 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl| ].
       - trivial_same_query.
         reflexivity.
-      - destruct dv; simpl in *; contradiction.
+      - destruct dv; simpl in *.
+        + contradiction.
+        + elim H; contradiction.
     Qed.
 
     Lemma correct_driver_preserves_eval_nnrc_imp_core:
@@ -1683,6 +1712,20 @@ Section CompCorrectness.
         elim H; intros; contradiction.
     Qed.
 
+    Lemma correct_driver_preserves_eval_js_ast:
+      forall dv, driver_correct (Dv_js_ast dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_js_ast q))
+                                   (compile (Dv_js_ast dv) (Q_js_ast q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
+    Qed.
+
     Lemma correct_driver_preserves_eval_javascript:
       forall dv, driver_correct (Dv_javascript dv) ->
                  (forall q, Forall (query_preserves_eval (Q_javascript q))
@@ -1793,6 +1836,7 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_cldmr; auto.
       - apply correct_driver_preserves_eval_dnnrc; auto.
       - apply correct_driver_preserves_eval_dnnrc_typed; auto.
+      - apply correct_driver_preserves_eval_js_ast; auto.
       - apply correct_driver_preserves_eval_javascript; auto.
       - apply correct_driver_preserves_eval_java; auto.
       - apply correct_driver_preserves_eval_spark_rdd; auto.

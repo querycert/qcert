@@ -121,6 +121,7 @@ let languages =
     QcertCompiler.L_cldmr;
     QcertCompiler.L_dnnrc;
     QcertCompiler.L_dnnrc_typed;
+    QcertCompiler.L_js_ast;
     QcertCompiler.L_javascript;
     QcertCompiler.L_java;
     QcertCompiler.L_spark_rdd;

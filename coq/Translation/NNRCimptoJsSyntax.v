@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCtoNNRCimp.
+Section NNRCimptoJsSyntax.
   Require Import String.
   Require Import List.
   Require Import Bool.
@@ -471,4 +471,4 @@ Section NNRCtoNNRCimp.
   (*   simpl. *)
   (* Qed. *)
 
-End NNRCtoNNRCimp.
+End NNRCimptoJsSyntax.

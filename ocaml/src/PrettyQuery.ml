@@ -639,7 +639,12 @@ let pretty_dnnrc_typed greek margin annot hierarchy link_runtime q =
   in
   let plug = pretty_plug_dataframe greek in
   pretty_dnnrc_base ann plug greek margin annot q
-    
+
+(** Pretty JavaScript Ast *)
+
+let pretty_js_ast greek margin annot hierarchy link_runtime q =
+  "(* There is no pretty printer for JavaScript AST at the moment. *)\n"  (* XXX TODO XXX *)
+
 (** Pretty JavaScript *)
 
 let pretty_javascript greek margin annot hierarchy link_runtime q =
