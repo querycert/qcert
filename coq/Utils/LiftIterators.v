@@ -30,6 +30,7 @@ Section LiftIterators.
   Require Import CoqLibAdd.
   Require Import ListAdd.
   Require Import Lift.
+  Require Import Sublist.
 
   (** * Lift iterators *)
 
@@ -71,7 +72,7 @@ Section LiftIterators.
       unfold lift.
       rewrite IHl; reflexivity.
     Qed.
-  
+    
     Lemma lift_map_map {A B} (f:A -> B) l:
       lift_map (fun d : A => Some (f d)) l = Some (map f l).
     Proof.
@@ -80,7 +81,7 @@ Section LiftIterators.
       unfold lift.
       rewrite IHl; reflexivity.
     Qed.
-  
+    
     Lemma lift_map_map_merge {A} {B} {C} (f1:A -> B) (f2:B -> option C) (l: list A):
       (lift_map (fun d => f2 (f1 d)) l) =
       lift_map f2 (map f1 l).
@@ -158,6 +159,63 @@ Section LiftIterators.
       match_destr. rewrite IHl; trivial.
     Qed.
 
+    Lemma lift_map_Forall_exists {A B} (f:A->option B) l :
+      Forall (fun x => exists y, f x = Some y) l ->
+      exists l', lift_map f l = Some l'
+                 /\ Forall2 (fun old new => f old = Some new) l l'.
+    Proof.
+      induction l; simpl; intros F.
+      - eauto.
+      - invcs F.
+        destruct H1 as [? eqq1].
+        destruct (IHl H2) as [? [eqq2 Feq]].
+        rewrite eqq1, eqq2; simpl.
+        eauto.
+    Qed.
+
+    Lemma lift_map_Forall_exists_strong {A B} (f:A->option B) l :
+      Forallt (fun x => {y | f x = Some y}) l ->
+      { l' | lift_map f l = Some l'
+             & Forall2 (fun old new => f old = Some new) l l'}.
+    Proof.
+      induction l; simpl; intros F.
+      - eauto.
+      - invcs F.
+        destruct X as [? eqq1].
+        destruct (IHl X0) as [? eqq2 Feq].
+        rewrite eqq1, eqq2; simpl.
+        eauto.
+    Qed.
+
+    Lemma lift_map_Forall_exists_and {A B} {P:B->Prop} (f:A->option B) l :
+      Forall (fun x => exists y, f x = Some y /\ P y) l ->
+      exists l', lift_map f l = Some l'
+                 /\ Forall P l'.
+    Proof.
+      induction l; simpl; intros F.
+      - eauto.
+      - invcs F.
+        destruct H1 as [? [eqq1 Px]].
+        destruct (IHl H2) as [? [eqq2 Feq]].
+        rewrite eqq1, eqq2; simpl.
+        eauto.
+    Qed.
+
+    Lemma lift_map_Forall_exists_and_strong {A B} {P:B->Prop} (f:A->option B) l :
+      Forallt (fun x => {y | f x = Some y & P y}) l ->
+      { l' | lift_map f l = Some l'
+             & Forall P l'}.
+    Proof.
+      induction l; simpl; intros F.
+      - eauto.
+      - invcs F.
+        destruct X as [? eqq1 Px].
+        destruct (IHl X0) as [? eqq2 Feq].
+        rewrite eqq1, eqq2; simpl.
+        eauto.
+    Qed.
+
+    
   End lift_map.
 
   (** ** Lifted flat-map *)
@@ -261,7 +319,38 @@ Section LiftIterators.
 
     Definition orfilter {A} (f:A -> option bool) (ol:option (list A)) : option (list A) :=
       olift (lift_filter f) ol.
- 
+
+    Lemma lift_filter_Forall_exists {A} (f:A->option bool) l :
+      Forall (fun x => exists y, f x = Some y) l ->
+      exists l', lift_filter f l = Some l'
+                 /\ sublist l' l.
+    Proof.
+      induction l; simpl; intros F.
+      - eauto.
+      - invcs F.
+        destruct H1 as [? eqq1].
+        destruct (IHl H2) as [? [eqq2 Feq]].
+        rewrite eqq1, eqq2; simpl.
+        destruct x; simpl
+        ; eexists; split; try reflexivity.
+        + constructor; trivial.
+        + constructor; trivial.
+    Qed.
+
+    Lemma lift_filter_Forall_exists_strong {A} (f:A->option bool) l :
+      Forallt (fun x => { y | f x = Some y}) l ->
+      { l' : list A | lift_filter f l = Some l' & sublist l' l}.
+    Proof.
+      induction l; simpl; intros F.
+      - eauto.
+      - invcs F.
+        destruct H0 as [? eqq1].
+        destruct (IHl X) as [? eqq2 Feq].
+        rewrite eqq1, eqq2; simpl.
+        destruct x; simpl
+        ; eexists; constructor; try reflexivity; trivial.
+    Qed.
+
   End lift_filter.
 
   (** ** Lifted append *)
