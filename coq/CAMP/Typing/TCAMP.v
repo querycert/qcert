@@ -262,7 +262,7 @@ Section TCAMP.
       unfold tdot in *.
       unfold edot in *.
       unfold op2tpr.
-      destruct (Forall2_lookupr_some _ _ _ _ tconst H1) as [? [eqq1 eqq2]].
+      destruct (Forall2_lookupr_some tconst H1) as [? [eqq1 eqq2]].
       rewrite eqq1.
       eauto.
     (* penv *)

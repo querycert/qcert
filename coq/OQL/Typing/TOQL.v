@@ -87,10 +87,10 @@ Section TOQL.
     - exists (normalize_data brand_relation_brands c).
       split; [reflexivity|assumption].
     - unfold bindings_type in H1.
-      apply (Forall2_lookupr_some _ _ _ _ H1).
+      apply (Forall2_lookupr_some H1).
       assumption.
     - unfold bindings_type in H0.
-      apply (Forall2_lookupr_some _ _ _ _ H0).
+      apply (Forall2_lookupr_some H0).
       assumption.
     - elim (IHoql_expr_type1 _ _ H0 H1); intros.
       elim (IHoql_expr_type2 _ _ H0 H1); intros.
@@ -108,23 +108,6 @@ Section TOQL.
       exists x0; auto.
   Qed.
 
-  Lemma bindings_type_app {m:basic_model}  l1 l2 r1 r2 :
-    bindings_type l1 r1 -> bindings_type l2 r2 ->
-    bindings_type (l1 ++ l2) (r1 ++ r2) .
-  Proof.
-    unfold bindings_type.
-    apply Forall2_app; trivial; tauto.
-  Qed.
-
-  Lemma bindings_type_rec_concat_sort {m:basic_model}  l1 l2 r1 r2 :
-    bindings_type l1 r1 -> bindings_type l2 r2 ->
-    bindings_type (rec_concat_sort l1 l2) (rec_concat_sort r1 r2) .
-  Proof.
-    intros.
-    apply bindings_type_sort.
-    apply bindings_type_app; trivial.
-  Qed.
-  
   Lemma typed_oql_query_program_yields_typed_data {m:basic_model} {τc τdefls} {τenv τout} c (defls env:list (string*data)) (q:oql_query_program):
     bindings_type c τc ->
     bindings_type defls τdefls ->

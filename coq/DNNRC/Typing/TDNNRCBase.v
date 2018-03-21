@@ -134,59 +134,6 @@ Section TDNNRCBase.
 
   (** Main lemma for the type correctness of DNNRC *)
 
-  Lemma dForall2_lookupr_none  (l : list (string * ddata)) (l' : list (string * drtype)) (s:string):
-    (Forall2
-       (fun (d : string * ddata) (r : string * drtype) =>
-          fst d = fst r /\ ddata_type (snd d) (snd r)) l l') ->
-    assoc_lookupr ODT_eqdec l' s = None -> 
-    assoc_lookupr ODT_eqdec l s = None.
-  Proof.
-    intros.
-    induction H; simpl in *.
-    reflexivity.
-    destruct x; destruct y; simpl in *.
-    elim H; intros; clear H.
-    rewrite H2 in *; clear H2 H3.
-    revert H0 IHForall2.
-    elim (assoc_lookupr string_eqdec l' s); try congruence.
-    elim (string_eqdec s s1); intros; try congruence.
-    specialize (IHForall2 H0); rewrite IHForall2.
-    reflexivity.
-  Qed.    
-
-  Lemma dForall2_lookupr_some  (l : list (string * ddata)) (l' : list (string * drtype)) (s:string) (d':drtype):
-    (Forall2
-       (fun (d : string * ddata) (r : string * drtype) =>
-          fst d = fst r /\ ddata_type (snd d) (snd r)) l l') ->
-    assoc_lookupr ODT_eqdec l' s = Some d' -> 
-    (exists d'', assoc_lookupr ODT_eqdec l s = Some d'' /\ ddata_type d'' d').
-  Proof.
-    intros.
-    induction H; simpl in *.
-    - elim H0; intros; congruence.
-    - destruct x; destruct y; simpl in *.
-      assert ((exists d, assoc_lookupr string_eqdec l' s = Some d) \/
-              assoc_lookupr string_eqdec l' s = None)
-        by (destruct (assoc_lookupr string_eqdec l' s);
-            [left; exists d1; reflexivity|right; reflexivity]).
-      elim H2; intros; clear H2.
-      elim H3; intros; clear H3.
-      revert H0 IHForall2.
-      rewrite H2; intros.
-      elim (IHForall2 H0); intros; clear IHForall2.
-      elim H3; intros; clear H3.
-      rewrite H4. exists x0. split;[reflexivity|assumption].
-      clear IHForall2; assert (assoc_lookupr string_eqdec l s = None)
-          by apply (dForall2_lookupr_none l l' s H1 H3).
-      rewrite H3 in *; rewrite H2 in *; clear H2 H3.
-      elim H; intros; clear H.
-      rewrite H2 in *; clear H2.
-      revert H0; elim (string_eqdec s s1); intros.
-      exists d; split; try reflexivity.
-      inversion H0; rewrite H2 in *; assumption.
-      congruence.
-  Qed.      
-
   Theorem typed_dnnrc_base_yields_typed_data {A:Set} {plug_type:Set} {τc} {τ} `{tplug:TAlgPlug plug_type} (cenv env:dbindings) (tenv:tdbindings) (e:@dnnrc_base _ A plug_type) :
     dbindings_type cenv τc ->
     dbindings_type env tenv ->
@@ -198,7 +145,7 @@ Section TDNNRCBase.
     dependent induction H0; simpl; intros.
     - unfold tdot in *.
       unfold edot in *.
-      destruct (dForall2_lookupr_some _ _ _ _ Hcenv H) as [? [eqq1 eqq2]].
+      destruct (Forall2_lookupr_some Hcenv H) as [? [eqq1 eqq2]].
       rewrite eqq1.
       eauto.
     - unfold dbindings_type in *.

@@ -61,6 +61,23 @@ Section TBindings.
     apply sorted_forall_same_domain; trivial.
   Qed.
 
+  Lemma bindings_type_app l1 l2 r1 r2 :
+    bindings_type l1 r1 -> bindings_type l2 r2 ->
+    bindings_type (l1 ++ l2) (r1 ++ r2) .
+  Proof.
+    unfold bindings_type.
+    apply Forall2_app; trivial; tauto.
+  Qed.
+
+  Lemma bindings_type_rec_concat_sort l1 l2 r1 r2 :
+    bindings_type l1 r1 -> bindings_type l2 r2 ->
+    bindings_type (rec_concat_sort l1 l2) (rec_concat_sort r1 r2) .
+  Proof.
+    intros.
+    apply bindings_type_sort.
+    apply bindings_type_app; trivial.
+  Qed.
+  
   Hint Resolve data_type_normalized.
   Lemma bindings_type_Forall_normalized c τc :
     bindings_type c τc ->

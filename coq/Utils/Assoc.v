@@ -365,7 +365,48 @@ Section Assoc.
     
   End Defn.
 
-  Lemma lookup_map_same_domain {A B C:Type} dec (f:(A*B)->(A*C)) l v :
+  Lemma Forall2_lookup_none {K A B} {P:A->B->Prop}
+        {l : list (K * A)} {l' : list (K * B)} :
+    (Forall2
+       (fun (d : K * A) (r : K * B) =>
+          fst d = fst r /\ P (snd d) (snd r)) l l') ->
+    forall {dec s},
+    lookup dec l' s = None -> 
+    lookup dec l s = None.
+  Proof.
+    intros.
+    induction H; simpl in *.
+    reflexivity.
+    destruct x; destruct y; simpl in *.
+    elim H; intros; clear H.
+    rewrite H2 in *; clear H2 H3.
+    revert H0 IHForall2.
+    elim (dec s k0); intros; try congruence.
+    auto.
+  Qed.    
+
+  Lemma Forall2_lookup_some {K A B} {P:A->B->Prop}
+        {l : list (K * A)} {l' : list (K * B)} :
+    (Forall2
+       (fun (d : K * A) (r : K * B) =>
+          fst d = fst r /\ P (snd d) (snd r)) l l') ->
+    forall {dec} {s:K} {d':B},
+    lookup dec l' s = Some d' -> 
+    (exists d'', lookup dec l s = Some d'' /\ P d'' d').
+  Proof.
+    intros H.
+    induction H; intros; simpl in *.
+    - discriminate.
+    - destruct x; destruct y; simpl in *.
+      destruct H; subst.
+      destruct (dec s k0).
+      + invcs H1; eauto.
+      + destruct (IHForall2 _ _ _ H1) as [?[??]].
+        eauto.
+  Qed.
+  
+  Lemma lookup_map_same_domain {A B C:Type} dec
+        (f:(A*B)->(A*C)) l v :
     domain l = domain (map f l) ->
     lookup dec (map f l) v = lift (fun x => snd (f (v,x))) (lookup dec l v).
   Proof.
@@ -637,6 +678,61 @@ Section Assoc.
     destruct (dec a a); congruence.
     rewrite (IHl H0).
     reflexivity.
+  Qed.
+
+  Lemma Forall2_lookupr_none {K A B} {P:A->B->Prop} {l : list (K * A)} {l' : list (K * B)} :
+    (Forall2
+       (fun (d : K * A) (r : K * B) =>
+          fst d = fst r /\ P (snd d) (snd r)) l l') ->
+    forall {Q1 Q2} {dec s},
+    @assoc_lookupr K B Q1 Q2 dec l' s = None -> 
+    assoc_lookupr dec l s = None.
+  Proof.
+    intros.
+    induction H; simpl in *.
+    reflexivity.
+    destruct x; destruct y; simpl in *.
+    elim H; intros; clear H.
+    rewrite H2 in *; clear H2 H3.
+    revert H0 IHForall2.
+    elim (assoc_lookupr dec l' s); try congruence.
+    elim (dec s k0); intros; try congruence.
+    specialize (IHForall2 H0); rewrite IHForall2.
+    reflexivity.
+  Qed.    
+
+  Lemma Forall2_lookupr_some  {K A B} {P:A->B->Prop} {l : list (K * A)} {l' : list (K * B)} :
+    (Forall2
+       (fun (d : K * A) (r : K * B) =>
+          fst d = fst r /\ P (snd d) (snd r)) l l') ->
+    forall {Q1 Q2} {dec} {s:K} {d':B},
+    @assoc_lookupr K B Q1 Q2 dec l' s = Some d' -> 
+    (exists d'', assoc_lookupr dec l s = Some d'' /\ P d'' d').
+  Proof.
+    intros.
+    induction H; simpl in *.
+    - elim H0; intros; congruence.
+    - destruct x; destruct y; simpl in *.
+      assert ((exists d, assoc_lookupr dec l' s = Some d) \/
+              assoc_lookupr dec l' s = None)
+        by (destruct (assoc_lookupr dec l' s);
+            [left; exists b0; reflexivity|right; reflexivity]).
+      elim H2; intros; clear H2.
+      elim H3; intros; clear H3.
+      revert H0 IHForall2.
+      rewrite H2; intros.
+      elim (IHForall2 H0); intros; clear IHForall2.
+      elim H3; intros; clear H3.
+      rewrite H4. exists x0. split;[reflexivity|assumption].
+      clear IHForall2; assert (assoc_lookupr dec l s = None)
+          by apply (Forall2_lookupr_none H1 H3).
+      rewrite H3 in *; rewrite H2 in *; clear H2 H3.
+      elim H; intros; clear H.
+      rewrite H2 in *; clear H2.
+      revert H0; elim (dec s k0); intros.
+      + exists a; split; try reflexivity.
+        inversion H0; rewrite H2 in *; assumption.
+      + congruence.
   Qed.
 
   Definition permutation_dec {A:Type} `{EqDec A eq} (l l':list A) 

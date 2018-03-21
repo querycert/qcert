@@ -299,59 +299,6 @@ Section TOperators.
     specialize (IHd1 H1 H0); assumption.
   Qed.
 
-  Lemma Forall2_lookupr_none  (l : list (string * data)) (l' : list (string * rtype)) (s:string):
-    (Forall2
-       (fun (d : string * data) (r : string * rtype) =>
-          fst d = fst r /\ data_type (snd d) (snd r)) l l') ->
-    assoc_lookupr ODT_eqdec l' s = None -> 
-    assoc_lookupr ODT_eqdec l s = None.
-  Proof.
-    intros.
-    induction H; simpl in *.
-    reflexivity.
-    destruct x; destruct y; simpl in *.
-    elim H; intros; clear H.
-    rewrite H2 in *; clear H2 H3.
-    revert H0 IHForall2.
-    elim (assoc_lookupr string_eqdec l' s); try congruence.
-    elim (string_eqdec s s1); intros; try congruence.
-    specialize (IHForall2 H0); rewrite IHForall2.
-    reflexivity.
-  Qed.    
-
-  Lemma Forall2_lookupr_some  (l : list (string * data)) (l' : list (string * rtype)) (s:string) (d':rtype):
-    (Forall2
-       (fun (d : string * data) (r : string * rtype) =>
-          fst d = fst r /\ data_type (snd d) (snd r)) l l') ->
-    assoc_lookupr ODT_eqdec l' s = Some d' -> 
-    (exists d'', assoc_lookupr ODT_eqdec l s = Some d'' /\ data_type d'' d').
-  Proof.
-    intros.
-    induction H; simpl in *.
-    - elim H0; intros; congruence.
-    - destruct x; destruct y; simpl in *.
-      assert ((exists d, assoc_lookupr string_eqdec l' s = Some d) \/
-              assoc_lookupr string_eqdec l' s = None)
-        by (destruct (assoc_lookupr string_eqdec l' s);
-            [left; exists r0; reflexivity|right; reflexivity]).
-      elim H2; intros; clear H2.
-      elim H3; intros; clear H3.
-      revert H0 IHForall2.
-      rewrite H2; intros.
-      elim (IHForall2 H0); intros; clear IHForall2.
-      elim H3; intros; clear H3.
-      rewrite H4. exists x0. split;[reflexivity|assumption].
-      clear IHForall2; assert (assoc_lookupr string_eqdec l s = None)
-          by apply (Forall2_lookupr_none l l' s H1 H3).
-      rewrite H3 in *; rewrite H2 in *; clear H2 H3.
-      elim H; intros; clear H.
-      rewrite H2 in *; clear H2.
-      revert H0; elim (string_eqdec s s1); intros.
-      exists d; split; try reflexivity.
-      inversion H0; rewrite H2 in *; assumption.
-      congruence.
-  Qed.      
-
   Lemma rec_concat_with_drec_concat_well_typed  dl dl0 τ₁ τ₂:
     is_list_sorted ODT_lt_dec (domain τ₁) = true ->
     is_list_sorted ODT_lt_dec (domain τ₂) = true ->

@@ -413,7 +413,7 @@ Section TcNRAEnv.
     (* type_cNRAEnvGetConstant *)
     - unfold tdot in *.
       unfold edot in *.
-      destruct (Forall2_lookupr_some _ _ _ _ dt_c H) as [? [eqq1 eqq2]].
+      destruct (Forall2_lookupr_some dt_c H) as [? [eqq1 eqq2]].
       rewrite eqq1.
       eauto.
     (* type_cNRAEnvID *)

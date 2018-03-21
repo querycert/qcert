@@ -371,7 +371,7 @@ Section TNRA.
     - Case "NRAGetConstant"%string.
       unfold tdot in *.
       unfold edot in *.
-      destruct (Forall2_lookupr_some _ _ _ _ Hcenv H) as [? [eqq1 eqq2]].
+      destruct (Forall2_lookupr_some Hcenv H) as [? [eqq1 eqq2]].
       rewrite eqq1.
       eauto.
     - Case "NRAID"%string.
