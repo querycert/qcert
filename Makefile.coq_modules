@@ -183,7 +183,9 @@ MODULES = \
 	NNRCimp/Lang/NNRCimpSem \
 	NNRCimp/Lang/NNRCimpEval \
 	NNRCimp/Lang/NNRCimpSemEval \
+	NNRCimp/Typing/TNNRCimp \
 	NNRCimp/NNRCimpRuntime \
+	NNRCimp/NNRCimpTypes \
 	NNRCimp/NNRCimpSystem \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \

@@ -14,11 +14,5 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
-Require Export NNRCimp.
-Require Export NNRCimpSize.
-Require Export NNRCimpVars.
-Require Export NNRCimpEval.
-Require Export NNRCimpSem.
-Require Export NNRCimpSemEval.
-Require Export NNRCimpNorm.
+Require Export CommonTypes.
+Require Export TNNRCimp.
