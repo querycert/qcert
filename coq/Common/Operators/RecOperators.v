@@ -41,7 +41,7 @@ Section RecOperators.
     Proof.
       reflexivity.
     Qed.
-  
+    
     Lemma rproject_nil_r {A} (l:list (string*A)) :
       @rproject A l [] = [].
     Proof.
@@ -71,7 +71,7 @@ Section RecOperators.
       - rewrite <- samedom in i; intuition.
       - rewrite IHl; intuition.
     Qed.
-  
+    
     Lemma rproject_app {B} (l1 l2:list (string*B)) sl:
       rproject (l1 ++ l2) sl = (rproject l1 sl) ++ (rproject l2 sl).
     Proof.
@@ -114,7 +114,7 @@ Section RecOperators.
         + apply sublist_cons; auto.
         + apply sublist_skip; auto.
     Qed.
-  
+    
     Lemma rproject_remove_all {B} s sl (l1:list(string*B)):
       rproject l1 (remove_all s sl) =
       filter (fun x => nequiv_decb s (fst x)) (rproject l1 sl).
@@ -231,7 +231,7 @@ Section RecOperators.
       apply (assoc_lookupr_nodup_sublist H9 H2); assumption.
       rewrite H8; rewrite H9; reflexivity.
     Qed.
-  
+    
     Lemma rproject_equivlist {B} (l:list (string*B)) sl1 sl2 :
       equivlist sl1 sl2 ->
       rproject l sl1 = rproject l sl2.
@@ -262,6 +262,30 @@ Section RecOperators.
       reflexivity.
     Qed.
 
+    Lemma rproject_domain_in {A} s (l1:list (string*A)) l2 :
+      In s (domain l1) /\ In s l2 <->
+      In s (domain (rproject l1 l2)).
+    Proof.
+      split; intros.
+      - destruct H as [inn1 inn2].
+        unfold rproject.
+        apply in_domain_in in inn1.
+        destruct inn1 as [x inn1].
+        apply (in_dom (b:=x)).
+        apply filter_In; split; trivial; simpl.
+        match_destr.
+        tauto.
+      - apply in_domain_in in H.
+        destruct H as [x inn].
+        unfold rproject in inn.
+        apply filter_In in inn.
+        simpl in inn.
+        destruct inn as [inn1 inn2].
+        match_destr_in inn2.
+        split; trivial.
+        eapply in_dom; eauto.
+    Qed.
+    
   End RecProject.
 
   Section RecConcat.
@@ -277,7 +301,7 @@ Section RecOperators.
 
     (* [orecconcat] is correct and complete wrt. the [rec_concat_sem]
        semantics. *)
-      
+    
     Definition orecconcat (a:data) (x:data) :=
       match a with
       | drec r2 =>
@@ -394,7 +418,7 @@ Section RecOperators.
       apply StrictOrder_Transitive.
       apply StrictOrder_Transitive.
     Qed.
-  
+    
     Lemma sorted_projected_subset_is_sublist (s1 s2:list string):
       is_list_sorted ODT_lt_dec s1 = true ->
       is_list_sorted ODT_lt_dec s2 = true ->
@@ -425,7 +449,7 @@ Section RecOperators.
     
     (* This is a form of projection that guarantees that the projection
        list is first sorted then pruned to the domain of its input. *)
-  
+    
     Definition srproject {A} (l:list (string*A)) (s:list string) : list (string*A) :=
       let ps := (projected_subset (sorted_vector s) (domain l)) in
       rproject l ps.
@@ -515,7 +539,7 @@ Section RecOperators.
       right; apply (IHs1 H).
       right; apply (IHs1 H).
     Qed.
- 
+    
     Lemma sproject_in_dec {A} (x:string) (s1:list string) (l:list (string*A)) :
       In x (domain l) ->
       (if (in_dec string_dec x s1) then true else false) =

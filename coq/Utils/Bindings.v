@@ -83,7 +83,7 @@ Section Bindings.
   Proof.
     destruct (trichotemy x y) as [[?|?]|?]; intuition.
   Qed.
- 
+  
   (* Starting here ... *)
 
   Definition rec_field_lt {A} (a b:K*A) :=
@@ -337,7 +337,7 @@ Section Bindings.
     apply (rec_sorted_skip_first (p::l) a); assumption.
     assumption.
   Qed.
-    
+  
   Lemma rec_sorted_id {A} (l:list (K*A)) :
     is_list_sorted ODT_lt_dec (domain l) = true ->
     rec_sort l = l.
@@ -1303,7 +1303,7 @@ Section Bindings.
           destruct a; destruct b; simpl in *; subst.
           specialize (fstonly k0 a a0). congruence.
   Qed.
-   
+  
   Lemma rec_sort_insert_filter_fst_false {A:Type} f  
         (a:K*A) (l:list (K*A)) 
         (fstonly:forall a b c, f (a,b) = f (a,c)) :
@@ -1319,7 +1319,7 @@ Section Bindings.
       + match_destr; simpl.
         rewrite IHl; trivial.
   Qed.
-   
+  
   Lemma rec_sort_filter_fst_commute {A:Type} f (l:list (K*A))
         (fstonly:forall a b c, f (a,b) = f (a,c)) :
     filter f (rec_sort l)
@@ -1333,7 +1333,7 @@ Section Bindings.
       + eapply insertion_sort_Sorted.
     - rewrite <- IHl, rec_sort_insert_filter_fst_false; trivial.
   Qed.
-   
+  
   Lemma forallb_rec_sort {A} f (l:list (K*A)) :
     forallb f l = true ->
     forallb f (rec_sort l) = true.
@@ -1494,7 +1494,7 @@ Section Bindings.
           intuition.
       - generalize (nodup_in_eq H1 H3 H5); intros; subst; reflexivity.
     Qed.
-  
+    
     Lemma compatible_asymmetric_over {A} `{EqDec A eq} {l:list(K*A)} :
       compatible l l = true ->
       asymmetric_over rec_field_lt l.
@@ -1530,7 +1530,7 @@ Section Bindings.
   End CompatSort.
 
   Section sublist.
-        
+    
     Lemma sublist_rec_concat_sort_bounded {A} r srl :
       incl (domain r) (domain srl) ->
       domain (@rec_concat_sort A r srl) = domain (rec_sort srl).
@@ -1617,6 +1617,39 @@ Section Bindings.
     Qed.
   End rev.
 
+  Lemma insertion_sort_nin_inv {B} (s:K) (x₁:B) l₁ x₂  l₂:
+    ~ In s (domain l₁) ->
+    ~ In s (domain l₂) ->
+    insertion_sort_insert rec_field_lt_dec (s, x₁) l₁ =
+    insertion_sort_insert rec_field_lt_dec (s, x₂) l₂ ->
+    x₁ = x₂ /\ l₁ = l₂.
+  Proof.
+    intros nin1 nin2 eqq1.
+    generalize (insertion_sort_insert_nin_perm l₁ (s,x₁) nin1); intros perm1.
+    generalize (insertion_sort_insert_nin_perm l₂ (s,x₂) nin2); intros perm2.
+    rewrite eqq1 in perm1.
+    rewrite <- perm1 in perm2.
+    apply Permutation_cons_nin_map with (f:=fst) in perm2; simpl; trivial.
+    destruct perm2 as [eqq2 perm2].
+    invcs eqq2.
+    split; trivial.
+    apply insertion_sort_insert_nin_eq_inv in eqq1; trivial
+    ; intros inn; apply in_dom in inn; tauto.
+  Qed.
+
+  Lemma rec_sort_cons_nin_inv {B} (s:K) (x₁:B) l₁ x₂  l₂:
+    ~ In s (domain l₁) ->
+    ~ In s (domain l₂) ->
+    rec_sort ((s, x₁) :: l₁) =
+    rec_sort ((s, x₂) :: l₂) ->
+    x₁ = x₂ /\ rec_sort l₁ = rec_sort l₂.
+  Proof.
+    simpl.
+    intros.
+    eapply insertion_sort_nin_inv; eauto
+    ; rewrite drec_sort_equiv_domain; trivial.
+  Qed.
+
 End Bindings.
 
 Section map.
@@ -1633,7 +1666,7 @@ Section map.
 End map.
 
 Section BindingsString.
-    
+  
   Require Import String.
   Require Import StringAdd.
 
@@ -1881,7 +1914,7 @@ Section MergeBindings.
     rewrite rec_concat_sort_idem; try assumption; reflexivity.
   Qed.
 
-  (* merge_idem isn't true unless l is without duplicates! Here is a
+(* merge_idem isn't true unless l is without duplicates! Here is a
      counter example.
    Open Scope string.
    Definition tup1 := ("a",1) :: ("b",2) :: ("a", 3) :: nil.
@@ -1889,7 +1922,7 @@ Section MergeBindings.
    Eval compute in (merge_bindings tup1 tup2).
    Definition tup3 := [("a", 3); ("b", 2); ("c", 2)].
    Eval compute in (compatible tup1 tup3).
-   *)
+ *)
 
 End MergeBindings.
 

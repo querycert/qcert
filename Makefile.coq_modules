@@ -89,6 +89,7 @@ MODULES = \
 	Common/OperatorsTyping/ForeignOperatorsTyping \
 	Common/OperatorsTyping/TUtil \
 	Common/OperatorsTyping/TSortBy \
+	Common/OperatorsTyping/TGroupBy \
 	Common/OperatorsTyping/TUnaryOperators \
 	Common/OperatorsTyping/TBinaryOperators \
 	Common/OperatorsTyping/TOperatorsEq \

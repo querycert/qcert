@@ -35,18 +35,18 @@ Section SortingAdd.
     (* if elements are not comparable, the left one is dropped *)
     Fixpoint insertion_sort_insert a l 
       := match l with
-           | nil => a :: nil
-           | b::xs => if (R_dec a b) 
-                      then a::b::xs
-                      else if (R_dec b a) then
-                             b::insertion_sort_insert a xs
-                           else b::xs
+         | nil => a :: nil
+         | b::xs => if (R_dec a b) 
+                    then a::b::xs
+                    else if (R_dec b a) then
+                           b::insertion_sort_insert a xs
+                         else b::xs
          end.
 
     Fixpoint insertion_sort (l:list A) 
       := match l with
-           | nil => nil
-           | a::xs => insertion_sort_insert a (insertion_sort xs)
+         | nil => nil
+         | a::xs => insertion_sort_insert a (insertion_sort xs)
          end.
 
     Lemma insertion_sort_insert_Sorted a (l:list A) :
@@ -55,9 +55,9 @@ Section SortingAdd.
       Hint Constructors LocallySorted.
       repeat rewrite Sorted_LocallySorted_iff.
       induction l; inversion 1; subst; simpl in *;
-      repeat match goal with
+        repeat match goal with
                | [|- context [R_dec ?x ?y]] => destruct (R_dec x y)
-             end; eauto.
+               end; eauto.
     Qed.
 
     Lemma insertion_sort_Sorted (l:list A) : Sorted R (insertion_sort l).
@@ -72,11 +72,11 @@ Section SortingAdd.
 
     Fixpoint is_list_sorted (l:list A) :=
       match l with
-        | nil => true
-        | x::xs => match xs with
-                     | nil => true
-                     | y::ls => if R_dec x y then is_list_sorted xs else false
-                   end
+      | nil => true
+      | x::xs => match xs with
+                 | nil => true
+                 | y::ls => if R_dec x y then is_list_sorted xs else false
+                 end
       end.
 
     Lemma is_list_sorted_Sorted_iff l: 
@@ -147,12 +147,12 @@ Section SortingAdd.
       <->
       (is_list_sorted r = true 
        /\ match r with
-            | nil => True
-            | y::_ => R a y
+          | nil => True
+          | y::_ => R a y
           end).
     Proof.
       simpl; destruct r; intuition;
-      destruct (R_dec a a0); intuition congruence.
+        destruct (R_dec a a0); intuition congruence.
     Qed.
 
     Lemma is_list_sorted_cons_inv {a r} :
@@ -212,7 +212,7 @@ Section SortingAdd.
       induction l; simpl; intuition.
       apply insertion_sort_insert_not_nil in H; intuition.
     Qed.
- 
+    
     Lemma insertion_sort_insert_swap a a0 l  `{StrictOrder A R}:
       R a a0 ->
       insertion_sort_insert a (insertion_sort_insert a0 l) = 
@@ -371,95 +371,95 @@ Section SortingAdd.
       apply asymmetric_asymmetric_over; trivial.
     Qed.
 
-      Lemma insertion_sort_insert_insertion_nin  {A:Type} lt dec
-        `{StrictOrder A lt}
-        (trich:forall a b, {lt a b} + {eq a b} + {lt b a})
-        (a:A) a0 l :
-   ~ lt a0 a ->
-   ~ lt a a0 ->
-   insertion_sort_insert dec a0
-     (insertion_sort_insert dec a l)
-   = @insertion_sort_insert A lt dec a l.
-  Proof.
-    revert a a0. induction l; simpl; intros.
-    - repeat (match_destr; try congruence).
-    - repeat (match_destr; try congruence);
-      simpl; repeat (match_destr; try congruence); trivial.
-      + rewrite l0 in l1. intuition.
-      + rewrite IHl; trivial.
-      + destruct (trich a a0) as [[?|?]|?];
-        try congruence.
-      + destruct (trich a a0) as [[?|?]|?];
-        try congruence.
-  Qed.
+    Lemma insertion_sort_insert_insertion_nin  {A:Type} lt dec
+          `{StrictOrder A lt}
+          (trich:forall a b, {lt a b} + {eq a b} + {lt b a})
+          (a:A) a0 l :
+      ~ lt a0 a ->
+      ~ lt a a0 ->
+      insertion_sort_insert dec a0
+                            (insertion_sort_insert dec a l)
+      = @insertion_sort_insert A lt dec a l.
+    Proof.
+      revert a a0. induction l; simpl; intros.
+      - repeat (match_destr; try congruence).
+      - repeat (match_destr; try congruence);
+          simpl; repeat (match_destr; try congruence); trivial.
+        + rewrite l0 in l1. intuition.
+        + rewrite IHl; trivial.
+        + destruct (trich a a0) as [[?|?]|?];
+            try congruence.
+        + destruct (trich a a0) as [[?|?]|?];
+            try congruence.
+    Qed.
 
- Lemma insertion_sort_insert_cons_app {A:Type} lt dec
-        `{StrictOrder A lt}
-        (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) a l l2 :
-    insertion_sort dec (insertion_sort_insert dec a l ++ l2) = @insertion_sort A lt dec (a::l ++ l2).
-  Proof.
-    revert a l2.
-    induction l; simpl; trivial; intros.
-    destruct (dec a0 a); simpl; trivial.
-    destruct (dec a a0); simpl; trivial.
-    - rewrite IHl; simpl. apply insertion_sort_insert_swap; eauto.
-    - rewrite insertion_sort_insert_insertion_nin; eauto.
-  Qed.
+    Lemma insertion_sort_insert_cons_app {A:Type} lt dec
+          `{StrictOrder A lt}
+          (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) a l l2 :
+      insertion_sort dec (insertion_sort_insert dec a l ++ l2) = @insertion_sort A lt dec (a::l ++ l2).
+    Proof.
+      revert a l2.
+      induction l; simpl; trivial; intros.
+      destruct (dec a0 a); simpl; trivial.
+      destruct (dec a a0); simpl; trivial.
+      - rewrite IHl; simpl. apply insertion_sort_insert_swap; eauto.
+      - rewrite insertion_sort_insert_insertion_nin; eauto.
+    Qed.
 
- Lemma insertion_sort_insertion_sort_app1 {A} lt dec `{StrictOrder A lt}
-        (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) l1 l2 :
-    insertion_sort dec (insertion_sort dec l1 ++ l2) =
-    @insertion_sort A lt dec (l1 ++ l2).
-  Proof.
-    revert l2.
-    induction l1; simpl; trivial; intros.
-    rewrite insertion_sort_insert_cons_app; trivial.
-    simpl.
-    rewrite IHl1; trivial.
-  Qed.
+    Lemma insertion_sort_insertion_sort_app1 {A} lt dec `{StrictOrder A lt}
+          (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) l1 l2 :
+      insertion_sort dec (insertion_sort dec l1 ++ l2) =
+      @insertion_sort A lt dec (l1 ++ l2).
+    Proof.
+      revert l2.
+      induction l1; simpl; trivial; intros.
+      rewrite insertion_sort_insert_cons_app; trivial.
+      simpl.
+      rewrite IHl1; trivial.
+    Qed.
 
-  
+    
     Lemma insertion_sort_trich_equiv {A:Type} lt dec
-        (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) (l:list A)
-  : equivlist (@insertion_sort A lt dec l) l.
-   Proof.
-     intros; split; intros.
-     - apply in_insertion_sort in H; trivial.
-     - eapply insertion_sort_in in H; eauto.
-       intros.
-       destruct (trich x0 y) as [[?|?]|?]; intuition.
-   Qed.
+          (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) (l:list A)
+      : equivlist (@insertion_sort A lt dec l) l.
+    Proof.
+      intros; split; intros.
+      - apply in_insertion_sort in H; trivial.
+      - eapply insertion_sort_in in H; eauto.
+        intros.
+        destruct (trich x0 y) as [[?|?]|?]; intuition.
+    Qed.
 
-   Lemma insertion_sort_insert_forall_lt 
-   {A:Type} lt dec (a:A) (l:list A) :
-     Forall (lt a) l ->
-     @insertion_sort_insert A lt dec a l = a :: l.
-   Proof.
-     destruct l; simpl; trivial.
-     inversion 1; subst.
-     match_destr; intuition.
-   Qed.
+    Lemma insertion_sort_insert_forall_lt 
+          {A:Type} lt dec (a:A) (l:list A) :
+      Forall (lt a) l ->
+      @insertion_sort_insert A lt dec a l = a :: l.
+    Proof.
+      destruct l; simpl; trivial.
+      inversion 1; subst.
+      match_destr; intuition.
+    Qed.
 
-   Lemma sort_insert_filter_true {A:Type} f lt dec `{StrictOrder A lt}
-         (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) 
-         (a:A) (l:list A) :
-     StronglySorted lt l ->
-     f a = true ->
-         filter f (@insertion_sort_insert A lt dec a l)
-     = insertion_sort_insert dec a (filter f l).
-   Proof.
-     revert a.
-     induction l; simpl; intros b lsort fb.
-     - rewrite fb; trivial.
-     - inversion lsort; subst.
-       case_eq (f a); simpl; intros fa.
-       +  destruct (dec b a); simpl.
-         * rewrite fb.
-           simpl. match_destr.
-         * rewrite <- IHl; trivial.
-           match_destr; simpl; rewrite fa; trivial.
-       + match_destr.
-         * simpl. rewrite fb, fa.
+    Lemma sort_insert_filter_true {A:Type} f lt dec `{StrictOrder A lt}
+          (trich:forall a b, {lt a b} + {eq a b} + {lt b a}) 
+          (a:A) (l:list A) :
+      StronglySorted lt l ->
+      f a = true ->
+      filter f (@insertion_sort_insert A lt dec a l)
+      = insertion_sort_insert dec a (filter f l).
+    Proof.
+      revert a.
+      induction l; simpl; intros b lsort fb.
+      - rewrite fb; trivial.
+      - inversion lsort; subst.
+        case_eq (f a); simpl; intros fa.
+        +  destruct (dec b a); simpl.
+           * rewrite fb.
+             simpl. match_destr.
+           * rewrite <- IHl; trivial.
+             match_destr; simpl; rewrite fa; trivial.
+        + match_destr.
+          * simpl. rewrite fb, fa.
             rewrite insertion_sort_insert_forall_lt; trivial.
             apply Forall_filter.
             revert H3.
@@ -468,47 +468,47 @@ Section SortingAdd.
           * rewrite <- IHl; trivial.
             match_destr; simpl; rewrite fa; trivial.
             destruct (trich a b) as [[?|?]|?]; try congruence.
-   Qed.
-   
-   Lemma sort_insert_filter_false {A:Type} f lt dec (a:A) (l:list A) :
-     f a = false ->
-     filter f (@insertion_sort_insert A lt dec a l) =
-     filter f l.
-   Proof.
-     revert a.
-     induction l; simpl; intros ? fa.
-     - rewrite fa; trivial.
-     - match_destr; simpl.
-       + rewrite fa; trivial.
-       + match_destr; simpl.
-         rewrite IHl; trivial.
-   Qed.
-   
-   Lemma sort_filter_commute {A:Type} f lt dec
-         `{StrictOrder A lt} 
-         (trich:forall a b, {lt a b} + {eq a b} + {lt b a})
-         (l:list A) :
-     filter f (@insertion_sort A lt dec l)
-     = insertion_sort dec (filter f l).
-   Proof.
-     induction l; simpl; trivial.
-     case_eq (f a); intros fa; simpl.
-     - rewrite <- IHl, sort_insert_filter_true; trivial.
-       eapply Sorted_StronglySorted.
-       + apply StrictOrder_Transitive.
-       + eapply insertion_sort_Sorted.
-     - rewrite <- IHl, sort_insert_filter_false; trivial.
-   Qed.
+    Qed.
+    
+    Lemma sort_insert_filter_false {A:Type} f lt dec (a:A) (l:list A) :
+      f a = false ->
+      filter f (@insertion_sort_insert A lt dec a l) =
+      filter f l.
+    Proof.
+      revert a.
+      induction l; simpl; intros ? fa.
+      - rewrite fa; trivial.
+      - match_destr; simpl.
+        + rewrite fa; trivial.
+        + match_destr; simpl.
+          rewrite IHl; trivial.
+    Qed.
+    
+    Lemma sort_filter_commute {A:Type} f lt dec
+          `{StrictOrder A lt} 
+          (trich:forall a b, {lt a b} + {eq a b} + {lt b a})
+          (l:list A) :
+      filter f (@insertion_sort A lt dec l)
+      = insertion_sort dec (filter f l).
+    Proof.
+      induction l; simpl; trivial.
+      case_eq (f a); intros fa; simpl.
+      - rewrite <- IHl, sort_insert_filter_true; trivial.
+        eapply Sorted_StronglySorted.
+        + apply StrictOrder_Transitive.
+        + eapply insertion_sort_Sorted.
+      - rewrite <- IHl, sort_insert_filter_false; trivial.
+    Qed.
 
-   Lemma Forall_insertion_sort {A R R_dec} {P} l :
-     Forall P l -> Forall P (@insertion_sort A R R_dec l).
-   Proof.
-     repeat rewrite Forall_forall.
-     intros fp x inx.
-     apply in_insertion_sort in inx.
-     auto.
-   Qed.
-   
+    Lemma Forall_insertion_sort {A R R_dec} {P} l :
+      Forall P l -> Forall P (@insertion_sort A R R_dec l).
+    Proof.
+      repeat rewrite Forall_forall.
+      intros fp x inx.
+      apply in_insertion_sort in inx.
+      auto.
+    Qed.
+    
   End In.
 
   (** * Properties of [map] on sorted lists *)
@@ -545,7 +545,39 @@ Section SortingAdd.
       rewrite <- IHl.
       erewrite map_insertion_sort_insert; eauto.
     Qed.
+
   End Map.
 
+  Lemma insertion_sort_insert_nin_eq_inv {A R} dec (a:A) l₁ l₂ :
+    insertion_sort_insert (R:=R) dec a l₁ = insertion_sort_insert dec a l₂ ->
+    ~ In a l₁ ->
+    ~ In a l₂ ->
+    l₁ = l₂.
+  Proof.
+    revert l₂.
+    induction l₁; destruct l₂; simpl; intros eqq; trivial.
+    - intuition.
+      destruct (dec a a0); simpl in *.
+      + invcs eqq.
+      + destruct (dec a0 a); invcs eqq; tauto.
+    - intuition.
+      destruct (dec a a0); simpl in *.
+      + invcs eqq.
+      + destruct (dec a0 a); invcs eqq; tauto.
+    - intuition.
+      destruct (dec a a0); simpl in *.
+      + invcs eqq.
+        destruct (dec a a1); simpl.
+        * invcs H4; trivial.
+        * destruct (dec a1 a); invcs H4; tauto.
+      + destruct (dec a0 a).
+        * destruct (dec a a1); invcs eqq; try tauto.
+          destruct (dec a1 a); invcs H4; try tauto.
+          f_equal; eauto.
+        * { destruct (dec a a1).
+            - invcs eqq; tauto.
+            - destruct (dec a1 a); invcs eqq; try tauto.
+          } 
+  Qed.
 End SortingAdd.
 

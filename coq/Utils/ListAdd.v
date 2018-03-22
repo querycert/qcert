@@ -141,9 +141,29 @@ Section ListAdd.
       simpl.
       trivial.
     Qed.
-    
+
   End Misc.
 
+  Lemma Permutation_cons_nin_map {A B} (f:A->B) x l₁ y l₂ :
+    Permutation (x::l₁) (y::l₂) ->
+    f x = f y ->
+    ~ In (f x) (map f l₁) ->
+    x = y /\ Permutation l₁ l₂.
+  Proof.
+    intros perm nin1 nin2.
+    assert (inn1:In y (y :: l₂)) by (simpl; tauto).
+    rewrite <- perm in inn1.
+    simpl in inn1.
+    invcs inn1.
+    - apply Permutation_cons_inv in perm.
+      tauto.
+    - elim nin2.
+      apply in_map_iff.
+      exists y.
+      rewrite nin1.
+      tauto.
+  Qed.
+  
   (** * Properties of folds *)
   
   Section Fold.
