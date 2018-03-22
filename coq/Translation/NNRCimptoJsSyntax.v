@@ -52,6 +52,9 @@ Section NNRCimptoJsSyntax.
   Definition math_min e1 e2 := (* TODO: review *)
     expr_call (expr_member (expr_identifier "Math") "min") (e1::e2::nil).
 
+  Definition math_pow e1 e2 := (* TODO: review *)
+    expr_call (expr_member (expr_identifier "Math") "pow") (e1::e2::nil).
+
   Definition math_max e1 e2 := (* TODO: review *)
     expr_call (expr_member (expr_identifier "Math") "max") (e1::e2::nil).
 
@@ -68,11 +71,26 @@ Section NNRCimptoJsSyntax.
   Definition math_abs e := (* TODO: review *)
     expr_call (expr_member (expr_identifier "Math") "abs") (e::nil).
 
-  Definition math_log2 e := (* TODO: review *)
+  Definition math_log e := (* TODO: review *)
     expr_call (expr_member (expr_identifier "Math") "log2") (e::nil).
+
+  Definition math_log10 e := (* TODO: review *)
+    expr_call (expr_member (expr_identifier "Math") "log10") (e::nil).
 
   Definition math_sqrt e := (* TODO: review *)
     expr_call (expr_member (expr_identifier "Math") "sqrt") (e::nil).
+
+  Definition math_exp e := (* TODO: review *)
+    expr_call (expr_member (expr_identifier "Math") "exp") (e::nil).
+
+  Definition math_ceil e := (* TODO: review *)
+    expr_call (expr_member (expr_identifier "Math") "ceil") (e::nil).
+
+  Definition math_floor e := (* TODO: review *)
+    expr_call (expr_member (expr_identifier "Math") "floor") (e::nil).
+
+  Definition math_trunc e := (* TODO: review *)
+    expr_call (expr_member (expr_identifier "Math") "trunc") (e::nil).
 
 
   (** Runtime  functions *)
@@ -162,6 +180,15 @@ Section NNRCimptoJsSyntax.
   Definition runtime_sum e :=
     call_runtime "sum" (e::nil).
 
+  Definition runtime_mean e :=
+    call_runtime "mean" (e::nil).
+
+  Definition runtime_min_apply e :=
+    call_runtime "minapply" (e::nil).
+
+  Definition runtime_max_apply e :=
+    call_runtime "maxapply" (e::nil).
+
   Definition runtime_brand b e :=
     call_runtime "brand" ((brands_to_js_ast b)::e::nil).
 
@@ -171,7 +198,48 @@ Section NNRCimptoJsSyntax.
   Definition runtime_cast b e :=
     call_runtime "cast" ((brands_to_js_ast b)::e::nil).
 
+  Definition runtime_nat_plus e1 e2 :=
+    call_runtime "natplus" (e1::e2::nil).
 
+  Definition runtime_nat_minus e1 e2 :=
+    call_runtime "natminus" (e1::e2::nil).
+
+  Definition runtime_nat_mult e1 e2 :=
+    call_runtime "natmult" (e1::e2::nil).
+
+  Definition runtime_nat_div e1 e2 :=
+    call_runtime "natdiv" (e1::e2::nil).
+
+  Definition runtime_nat_rem e1 e2 :=
+    call_runtime "natrem" (e1::e2::nil).
+
+  Definition runtime_nat_min e1 e2 :=
+    call_runtime "natmin" (e1::e2::nil).
+
+  Definition runtime_nat_max e1 e2 :=
+    call_runtime "natmax" (e1::e2::nil).
+
+  Definition runtime_nat_abs e :=
+    call_runtime "natabs" (e::nil).
+
+  Definition runtime_nat_log2 e :=
+    call_runtime "natlog2" (e::nil).
+
+  Definition runtime_nat_sqrt e :=
+    call_runtime "natsqrt" (e::nil).
+
+  Definition runtime_nat_sum e :=
+    call_runtime "natsum" (e::nil).
+
+  Definition runtime_nat_min_apply e :=
+    call_runtime "natminapply" (e::nil).
+  
+  Definition runtime_nat_max_apply e :=
+    call_runtime "natmaxapply" (e::nil).
+  
+  Definition runtime_nat_mean e :=
+    call_runtime "natmean" (e::nil).
+  
   (** Data model *)
 
   Definition mk_rec (l: list (string * expr)) : expr :=
@@ -250,22 +318,39 @@ Section NNRCimptoJsSyntax.
       runtime_contains e1' e2'
     | OpStringConcat =>
       expr_binary_op e1' binary_op_add e2'
-    | OpArithBinary opa =>
+    | OpNatBinary opa =>
       match opa with
-      | ArithPlus =>
+      | NatPlus =>
+        runtime_nat_plus e1' e2'
+      | NatMinus =>
+        runtime_nat_plus e1' e2'
+      | NatMult =>
+        runtime_nat_mult e1' e2'
+      | NatDiv =>
+        runtime_nat_div e1' e2'
+      | NatRem =>
+        runtime_nat_rem e1' e2'
+      | NatMin =>
+        runtime_nat_min e1' e2'
+      | NatMax =>
+        runtime_nat_max e1' e2'
+      end
+    | OpFloatBinary opa =>
+      match opa with
+      | FloatPlus =>
         expr_binary_op e1' binary_op_add e2'
-      | ArithMinus =>
+      | FloatMinus =>
         expr_binary_op e1' binary_op_sub e2'
-      | ArithMult =>
+      | FloatMult =>
         expr_binary_op e1' binary_op_mult e2'
-      | ArithMin =>
-        math_min e1' e2'
-      | ArithMax =>
-        math_max e1' e2'
-      | ArithDivide =>
+      | FloatDiv =>
         expr_binary_op e1' binary_op_div e2'
-      | ArithRem =>
-        expr_binary_op e1' binary_op_mod e2'
+      | FloatPow =>
+        math_pow e1' e2'
+      | FloatMin =>
+        math_min e1' e2'
+      | FloatMax =>
+        math_max e1' e2'
       end
     | OpForeignBinary opf => (* XXX TODO XXX *)
       expr_literal (literal_string "XXX TODO:  XXX")
@@ -297,14 +382,14 @@ Section NNRCimptoJsSyntax.
       runtime_sort e' scl
     | OpCount =>
       expr_member e' "length"
-    | OpSum =>
-      runtime_sum e'
-    | OpNumMin =>
-      math_min_apply e'
-    | OpNumMax =>
-      math_max_apply e'
-    (* | OpNumMean => *)
-    (*   "Math.floor(arithMean(" ++ e1 ++ "))" (* Casts to Z using Math.floor() *) *)
+    | OpNatSum =>
+      runtime_nat_sum e'
+    | OpNatMin =>
+      runtime_nat_min_apply e'
+    | OpNatMax =>
+      runtime_nat_max_apply e'
+    | OpNatMean =>
+      runtime_nat_mean e'
     | OpToString =>
       toString e'
     (* | OpSubstring start olen => *)
@@ -327,12 +412,33 @@ Section NNRCimptoJsSyntax.
       runtime_unbrand e'
     | OpCast b =>
       runtime_cast b e'
-    | OpArithUnary u =>
+    | OpNatUnary u =>
       match u with
-      | ArithAbs => math_abs e'
-      | ArithLog2 => math_log2 e'
-      | ArithSqrt =>math_sqrt e'
+      | NatAbs => runtime_nat_abs e'
+      | NatLog2 => runtime_nat_log2 e'
+      | NatSqrt => runtime_nat_sqrt e'
       end
+    | OpFloatUnary u =>
+      match u with
+      | FloatNeg => expr_unary_op unary_op_neg e'
+      | FloatSqrt => math_sqrt e'
+      | FloatExp => math_exp e'
+      | FloatLog => math_log e'
+      | FloatLog10 => math_log10 e'
+      | FloatCeil => math_ceil e'
+      | FloatFloor => math_floor e'
+      | FloatAbs => math_abs e'
+      end
+    | OpFloatTruncate =>
+      math_trunc e'
+    | OpFloatSum =>
+      runtime_sum e'
+    | OpFloatMean =>
+      runtime_mean e'
+    | OpFloatBagMin =>
+      runtime_min_apply e'
+    | OpFloatBagMax =>
+      runtime_max_apply e'
     | OpForeignUnary fu =>
       expr_literal (literal_string "XXX TODO: mk_binary_op foreign XXX") (* XXX TODO XXX *)
     | _ =>
