@@ -1019,7 +1019,7 @@ Section NNRCtoNNRCimp.
       nnrc_stmt_to_nnrc_imp_stmt globals s = Some si ->
       @nnrc_eval_top _ h s σc = nnrc_imp_eval_top h σc si.
     Proof.
-      unfold nnrc_stmt_to_nnrc_imp_stmt, nnrc_imp_eval_top.
+      unfold nnrc_stmt_to_nnrc_imp_stmt, nnrc_imp_eval_top, nnrc_imp_eval.
       intros eqsi.
       destruct si.
       match_option_in eqsi.
@@ -1047,7 +1047,7 @@ Section NNRCtoNNRCimp.
       - unfold incl; simpl; intros.
         repeat rewrite in_app_iff; intuition.
     Qed.
-    
+
     Section tests.
       Local Open Scope nnrc_scope.
       Local Open Scope string_scope.

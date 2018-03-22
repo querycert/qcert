@@ -90,25 +90,25 @@ Section NNRCimpSemEval.
       }
   Qed.
 
-      Ltac destr H :=
-      let eqq := fresh "eqq" in
-      first [
-          match goal with
-            [H:  _ * _ |- _ ] => destruct H
-          end |
-          (match_case_in H;
-              [intros [???] eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros ?? eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros ? eqq | intros eqq]; rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros eqq | intros ? ? eqq]; try rewrite eqq in H; try discriminate)
-            | (match_case_in H;
-               [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
-            ]; subst.
+  Ltac destr H :=
+    let eqq := fresh "eqq" in
+    first [
+        match goal with
+          [H:  _ * _ |- _ ] => destruct H
+        end |
+        (match_case_in H;
+         [intros [???] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+        | (match_case_in H;
+           [intros [??] eqq | intros eqq]; rewrite eqq in H; try discriminate)
+        | (match_case_in H;
+           [intros ?? eqq | intros eqq]; rewrite eqq in H; try discriminate)
+        | (match_case_in H;
+           [intros ? eqq | intros eqq]; rewrite eqq in H; try discriminate)
+        | (match_case_in H;
+           [intros eqq | intros ? ? eqq]; try rewrite eqq in H; try discriminate)
+        | (match_case_in H;
+           [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
+      ]; subst.
 
   Lemma nnrc_imp_stmt_sem_eval σc σ₁ ψc₁ ψd₁ s σ₂ ψc₂ ψd₂ :
     [ h , σc ⊢ s, σ₁, ψc₁ , ψd₁ ⇓ σ₂, ψc₂ , ψd₂ ] <-> nnrc_imp_stmt_eval h σc σ₁ ψc₁ ψd₁ s = Some (σ₂, ψc₂, ψd₂).
@@ -208,10 +208,10 @@ Section NNRCimpSemEval.
   Qed.
 
   Theorem nnrc_imp_sem_eval σc q d :
-    [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval_top h σc q = Some d.
+    [ h , σc ⊢ q ⇓ d ] <-> nnrc_imp_eval h σc q = Some d.
   Proof.
     destruct q.
-    unfold nnrc_imp_eval_top.
+    unfold nnrc_imp_eval.
     split; intros hyp.
     - invcs hyp.
       apply nnrc_imp_stmt_sem_eval in H.
@@ -221,9 +221,8 @@ Section NNRCimpSemEval.
       destruct p.
       destruct m; try discriminate.
       destruct p0.
-      destruct o; try discriminate.
-      apply nnrc_imp_stmt_sem_eval in eqq.
       invcs hyp.
+      apply nnrc_imp_stmt_sem_eval in eqq.
       generalize (nnrc_imp_stmt_sem_env_stack eqq).
       simpl; intros eqq2; invcs eqq2.
       symmetry in H0; apply domain_nil in H0; subst.
@@ -237,13 +236,31 @@ Section NNRCimpSemEval.
       constructor; simpl; trivial.
   Qed.
 
+  Theorem nnrc_imp_sem_eval_top σc q d :
+    [ h , σc ⊢ q ⇓ Some d ] <-> nnrc_imp_eval_top h σc q = Some d.
+  Proof.
+    destruct q.
+    unfold nnrc_imp_eval_top, nnrc_imp_sem_top.
+    rewrite nnrc_imp_sem_eval.
+    unfold olift.
+    match_destr; unfold id; simpl; intuition congruence.
+  Qed.
+
   Section Core.
     Theorem nnrc_imp_core_sem_eval σc q d :
-      [ h , σc ⊢ q ⇓ᶜ d ] <-> nnrc_imp_core_eval_top h σc q = Some d.
+      [ h , σc ⊢ q ⇓ᶜ d ] <-> nnrc_imp_core_eval h σc q = Some d.
     Proof.
       destruct q; simpl.
       apply nnrc_imp_sem_eval.
     Qed.
+
+    Theorem nnrc_imp_core_sem_eval_top σc q d :
+      [ h , σc ⊢ q ⇓ᶜ Some d ] <-> nnrc_imp_core_eval_top h σc q = Some d.
+    Proof.
+      destruct q; simpl.
+      apply nnrc_imp_sem_eval_top.
+    Qed.
+
   End Core.
 
 End NNRCimpSemEval.

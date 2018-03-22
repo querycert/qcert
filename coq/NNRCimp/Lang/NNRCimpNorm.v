@@ -224,23 +224,35 @@ Section NNRCimpNorm.
         cut_to IHs2; simpl in *; intuition.
         invcs H1; intuition.
   Qed.
-
+  
   Lemma nnrc_imp_eval_normalized  {σc:bindings} {q:nnrc_imp} {d} :
-    nnrc_imp_eval_top h σc q = Some d ->
+    nnrc_imp_eval h σc q = Some d ->
     Forall (data_normalized h) (map snd σc) ->
-    data_normalized h d.
+    forall x, d = Some x -> data_normalized h x.
   Proof.
-    unfold nnrc_imp_eval_top; intros ev Fσc.
+    unfold nnrc_imp_eval; intros ev Fσc.
     destruct q.
     match_case_in ev; [intros [[??]?] eqq | intros eqq]
     ; rewrite eqq in ev; try discriminate.
     destruct m0; try discriminate.
     destruct p0.
-    destruct o; try discriminate.
     invcs ev.
+    destruct d; try discriminate.
+    intros ? eqq2; invcs eqq2.
     apply nnrc_imp_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate.
     rewrite Forall_map in *.
     apply dnrec_sort_content; trivial.
+  Qed.
+
+    Lemma nnrc_imp_eval_top_normalized  {σc:bindings} {q:nnrc_imp} {d} :
+    nnrc_imp_eval_top h σc q = Some d ->
+    Forall (data_normalized h) (map snd σc) ->
+    data_normalized h d.
+  Proof.
+    unfold nnrc_imp_eval_top; intros ev Fσc.
+    unfold olift, id in ev.
+    match_option_in ev.
+    eapply nnrc_imp_eval_normalized; eauto.
   Qed.
   
 End NNRCimpNorm.

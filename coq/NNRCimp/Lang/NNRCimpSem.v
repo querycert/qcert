@@ -48,7 +48,7 @@ Section NNRCimpSem.
   Local Open Scope string.
 
   Section Denotation.
-      Context (σc:list (string*data)).
+    Context (σc:list (string*data)).
 
     Reserved Notation  "[ σ ⊢ e ⇓ d ]".
 
@@ -155,7 +155,7 @@ Section NNRCimpSem.
              [ s, σ₁ , ψc₁ , ψd₁ ⇓[v<-d::dl] σ₃, ψc₃, ψd₃]
     where
     "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp
-    and "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
+                                                                                                  and "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
 
     Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
     Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
@@ -168,19 +168,28 @@ Section NNRCimpSem.
   Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
   Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
 
-  Inductive nnrc_imp_sem_top : bindings -> nnrc_imp -> data -> Prop
-      :=
-      | sem_NNRCimpTop (σc:bindings) (q: nnrc_imp) d :
-          [ (rec_sort σc) ⊢ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), Some d)::nil ] ->
-          [ σc ⊢ q ⇓ d  ]
-    where
-    "[ σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top σc q d ) : nnrc_imp.
+  Inductive nnrc_imp_sem : bindings -> nnrc_imp -> option data -> Prop
+    :=
+    | sem_NNRCimp (σc:bindings) (q: nnrc_imp) o :
+        [ (rec_sort σc) ⊢ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), o)::nil ] ->
+        [ σc ⊢ q ⇓ o  ]
+  where
+  "[ σc ⊢ q ⇓ o  ]" := (nnrc_imp_sem σc q o ) : nnrc_imp.
 
-  Notation "[ σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top σc q d ) : nnrc_imp.
+  Definition nnrc_imp_sem_top (σc:bindings) (q:nnrc_imp) (d:data) : Prop
+    := [ σc ⊢ q ⇓ Some d  ].
+
+  Notation "[ σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem σc q d ) : nnrc_imp.
 
   Section Core.
-    Program Definition nnrc_imp_core_sem_top σc (q:nnrc_imp_core) (d:data) : Prop
-      := nnrc_imp_sem_top σc q d.
+    Program Definition nnrc_imp_core_sem σc (q:nnrc_imp_core) (d:option data) : Prop
+      := nnrc_imp_sem σc q d.
+
+    Notation "[ σc ⊢ q ⇓ᶜ d  ]" := (nnrc_imp_core_sem σc q d ) : nnrc_imp.
+
+    Definition nnrc_imp_core_sem_top (σc:bindings) (q:nnrc_imp_core) (d:data) : Prop
+      := [ σc ⊢ q ⇓ᶜ Some d  ].
+
   End Core.
 
   Section props.
@@ -362,9 +371,9 @@ End NNRCimpSem.
 Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrc_imp_expr_sem h σc σ e d) : nnrc_imp.
 Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
 Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrc_imp_stmt_sem_iter h σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrc_imp.
-Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem_top h σc q d ) : nnrc_imp.
+Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem h σc q d ) : nnrc_imp.
 
-Notation "[ h , σc ⊢ q ⇓ᶜ d  ]" := (nnrc_imp_core_sem_top h σc q d ) : nnrc_imp.
+Notation "[ h , σc ⊢ q ⇓ᶜ d  ]" := (nnrc_imp_core_sem h σc q d ) : nnrc_imp.
 
 Arguments nnrc_imp_stmt_sem_env_stack {fruntime h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
 Arguments nnrc_imp_stmt_sem_mcenv_stack {fruntime h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.

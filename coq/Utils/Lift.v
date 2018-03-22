@@ -178,6 +178,29 @@ Section Lift.
       if b then Some (a::nil) else Some nil
     end.
 
+  Definition lift2P {A B:Type} (P:A->B->Prop) (xo:option A) (yo:option B) : Prop
+    := match xo, yo with
+       | Some x, Some y => P x y
+       | None, None => True
+       | _ , _ => False
+       end.
+
+  (* Right Biased lift2P: if A is None, that is fine. *)
+  Definition lift2Pl {A B:Type} (P:A->B->Prop) (xo:option A) (yo:option B) : Prop
+    := match xo, yo with
+       | Some x, Some y => P x y
+       | None, _ => True
+       | _ , _ => False
+       end.
+
+  (* Right Biased lift2P: if B is None, that is fine. *)
+  Definition lift2Pr {A B:Type} (P:A->B->Prop) (xo:option A) (yo:option B) : Prop
+    := match xo, yo with
+       | Some x, Some y => P x y
+       | _, None => True
+       | _ , _ => False
+       end.
+
 End Lift.
 
 Hint Rewrite @olift_some : alg.
