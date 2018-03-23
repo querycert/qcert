@@ -52,7 +52,7 @@ public final class GlobalRule extends PatternRule {
 	/**
 	 * Implement according to logic in rule_to_pattern in Coq code
          | rule_global p ps =>
-           punop AFlatten
+           punop OpFlatten
                  (makeSingleton
                     (pletEnv
                        (WW p)
@@ -64,7 +64,7 @@ public final class GlobalRule extends PatternRule {
 		CampPattern op = getOperand().convertToPattern();
 		CampPattern ww = CampMacros.WW(getPattern());
 		CampPattern single = CampMacros.makeSingleton(new LetEnvPattern(ww, op));
-		return new UnaryPattern(UnaryOperator.AFlatten, single);
+		return new UnaryPattern(UnaryOperator.OpFlatten, single);
 	}
 
 	/* (non-Javadoc)

@@ -202,6 +202,8 @@ public class ODMFrontEnd {
 			switch (tag) {
 			case "Nat":
 				return model.getType("int");
+			case "Float":
+				return model.getType("float");
 			case "String":
 				return model.loadNativeClass(String.class);
 			default:

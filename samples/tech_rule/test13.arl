@@ -6,7 +6,7 @@ import tests.entities.*;
 ruleset IlrContext{
   rule test13 {
     when {
-      c : Customer(this.age <= 35);
+      c : Customer(this.age <= 35.0);
     }
     then {
     System.out.println("Customer =" + c.name);

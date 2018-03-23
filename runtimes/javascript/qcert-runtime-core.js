@@ -214,7 +214,9 @@ function toStringQ(v, quote) {
 	}
 	return result + "]";
     }
-    var fs = Object.keys(v);
+    if(v.hasOwnProperty('nat')){
+	return "" + v.nat;
+    }
     var result2 = "{";
     var first = true;
     for (var key in v) {

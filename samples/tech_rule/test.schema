@@ -46,29 +46,29 @@
       { "typeName": "tests_Entity", "typeDef": {} },
       {
         "typeName": "tests_entities_Customer",
-        "typeDef": { "cid": "Nat", "age": "Nat", "name": "String" }
+        "typeDef": { "cid": "Float", "age": "Float", "name": "String" }
       },
       {
         "typeName": "tests_entities_Purchase",
         "typeDef": {
-          "cid": "Nat",
-          "pid": "Nat",
+          "cid": "Float",
+          "pid": "Float",
           "name": "String",
-          "quantity": "Nat"
+          "quantity": "Float"
         }
       },
       {
         "typeName": "tests_entities_MainEntity",
         "typeDef": {
-          "id": "Nat",
-          "doubleAttribute": "Nat",
+          "id": "Float",
+          "doubleAttribute": "Float",
           "stringId": "String"
         }
       },
       {
         "typeName": "tests_branding_Client",
         "typeDef": {
-          "capitalization": "Nat",
+          "capitalization": "Float",
           "name": "String",
           "id": "String"
         }

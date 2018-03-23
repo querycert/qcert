@@ -19,91 +19,91 @@ package org.qcert.camp.pattern;
  * Enumerates the possible binary operators
  */
 public enum BinaryOperator {
-	ArithPlus,
-	ArithMinus,
-	ArithMult,
-	ArithMin,
-	ArithMax,
-	ArithDivide,
-	ArithRem,
-	AEq, 
-	AConcat, 
-	AMergeConcat, 
-	AAnd, 
-	AOr, 
-	ALt, 
-	ALe, 
-	AUnion, 
-	AMinus, 
-	AMin, 
-	AMax, 
-	AContains, 
-	ASConcat, 
-    AFloatPlus, 
-    AFloatMinus,
-    AFloatMult,  
-    AFloatDiv,  
-    AFloatPow,  
-    AFloatMin,  
-    AFloatMax,  
-    AFloatNe, 
-    AFloatLt,  
-    AFloatLe,  
-    AFloatGt,  
-    AFloatGe,  
-    ATimeAs, 
-    ATimeShift, 
-    ATimeNe,
-    ATimeLt,
-    ATimeLe,
-    ATimeGt,
-    ATimeGe,
-    ATimeDurationFromScale, 
-    ATimeDurationBetween;
-	
-	public boolean isBoolean() {
-		switch (this) {
-		case AEq:
-		case AAnd:
-		case AContains:
-		case AFloatGe:
-		case AFloatGt:
-		case AFloatLe:
-		case AFloatLt:
-		case AFloatNe:
-		case ALe:
-		case ALt:
-		case AOr:
-		case ATimeGe:
-		case ATimeGt:
-		case ATimeLe:
-		case ATimeLt:
-		case ATimeNe:
-			return true;
-		default:
-			return false;
-		}
-	}
+    NatPlus,
+    NatMinus,
+    NatMult,
+    NatMin,
+    NatMax,
+    NatDiv,
+    NatRem,
+    OpEqual,
+    OpRecConcat,
+    OpRecMerge,
+    OpAnd,
+    OpOr,
+    OpLt,
+    OpLe,
+    OpBagUnion,
+    OpBagMinus,
+    OpBagMin,
+    OpBagMax,
+    OpContains,
+    OpStringConcat,
+    FloatPlus,
+    FloatMinus,
+    FloatMult,
+    FloatDiv,
+    FloatPow,
+    FloatMin,
+    FloatMax,
+    FloatNe,
+    FloatLt,
+    FloatLe,
+    FloatGt,
+    FloatGe,
+    TimeAs,
+    TimeShift,
+    TimeNe,
+    TimeLt,
+    TimeLe,
+    TimeGt,
+    TimeGe,
+    TimeDurationFromScale,
+    TimeDurationBetween;
 
-	public boolean isArithmetic() {
-		switch (this) {
-		case AFloatDiv:
-		case AFloatMax:
-		case AFloatMin:
-		case AFloatMinus:
-		case AFloatMult:
-		case AFloatPlus:
-		case AFloatPow:
-		case ArithDivide:
-		case ArithMax:
-		case ArithMin:
-		case ArithMinus:
-		case ArithMult:
-		case ArithPlus:
-		case ArithRem:
-			return true;
-		default:
-			return false;
-		}
+    public boolean isBoolean() {
+	switch (this) {
+	case OpEqual:
+	case OpAnd:
+	case OpContains:
+	case OpLe:
+	case OpLt:
+	case OpOr:
+	case FloatGe:
+	case FloatGt:
+	case FloatLe:
+	case FloatLt:
+	case FloatNe:
+	case TimeGe:
+	case TimeGt:
+	case TimeLe:
+	case TimeLt:
+	case TimeNe:
+	    return true;
+	default:
+	    return false;
 	}
+    }
+
+    public boolean isArithmetic() {
+	switch (this) {
+	case FloatDiv:
+	case FloatMax:
+	case FloatMin:
+	case FloatMinus:
+	case FloatMult:
+	case FloatPlus:
+	case FloatPow:
+	case NatDiv:
+	case NatMax:
+	case NatMin:
+	case NatMinus:
+	case NatMult:
+	case NatPlus:
+	case NatRem:
+	    return true;
+	default:
+	    return false;
+	}
+    }
 }
