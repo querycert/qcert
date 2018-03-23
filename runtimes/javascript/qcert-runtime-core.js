@@ -458,21 +458,21 @@ function natLog2(v) {
     return { "nat" : Math.floor(Math.log2(v.nat)) }; // Default Z.log2 is log_inf, biggest integer lower than log2
 }
 function natSqrt(v) {
-    return { "nat" : Math.floor(Math.sqrt(v.nat)) }; // Default Z.log2 is log_inf, biggest integer lower than log2
+    return { "nat" : Math.floor(Math.sqrt(v.nat)) }; // See Z.sqrt biggest integer lower than sqrt
 }
-function natSum(v) {
+function natSum(b) {
     var result = 0;
     for (var i=0; i<b.length; i++)
 	result += b[i].nat;
     return { "nat" : result };
 }
-function natMinApply(v) {
+function natMinApply(b) {
     var numbers = [ ];
     for (var i=0; i<b.length; i++)
 	numbers.push(b[i].nat);
     return { "nat" : Math.min.apply(Math,numbers) };
 }
-function natMaxApply(v) {
+function natMaxApply(b) {
     var numbers = [ ];
     for (var i=0; i<b.length; i++)
 	numbers.push(b[i].nat);
