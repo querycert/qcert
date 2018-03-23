@@ -61,12 +61,11 @@ Section TNNRC.
        *)
       Lemma type_NNRCGroupBy_inv {τl k pf} Γ g sl e :
         nnrc_type Γ (NNRCGroupBy g sl e) (GroupBy_type g sl k τl pf) ->
-        ~ In g sl ->
         sublist sl (domain τl) /\ nnrc_type Γ e (Coll (Rec k τl pf)).
       Proof.
         Opaque rec_sort.
         unfold GroupBy_type, nnrc_type; simpl.
-        unfold nnrc_group_by; intros typ nin.
+        unfold nnrc_group_by; intros typ.
         invcs typ.
         invcs H5.
         invcs H2.
@@ -81,18 +80,17 @@ Section TNNRC.
         invcs H7.
         invcs H5.
         invcs H10.
-        simpl in H2.
-        invcs H2.
-        rtype_equalizer; subst.
-        invcs H9.
         invcs H3.
-        destruct τ₁0; simpl in H; try discriminate.
-        destruct τ₁0; simpl in H; try discriminate.
+        destruct τ₂1; simpl in H; try discriminate.
+        destruct τ₂1; simpl in H; try discriminate.
         invcs H.
         rtype_equalizer; subst.
         invcs H7.
+        invcs H9.
+        simpl in H2; invcs H2.
+        rtype_equalizer; subst.
         invcs H3.
-        destruct p; simpl in *; subst.
+        destruct p; simpl in H; subst.
         invcs H8.
         apply Coll_right_inv in H7; subst.
         invcs H3; simpl in H2; invcs H2.
@@ -116,15 +114,21 @@ Section TNNRC.
         invcs H1.
         invcs H6.
         rtype_equalizer; subst.
-        unfold rec_concat_sort in H1; simpl in H1.
-        apply rec_sort_cons_nin_inv in H1.
-        - destruct H1 as [eqq1 eqq2].
-          invcs eqq1.
-          rtype_equalizer; subst.
-          split; trivial.
-          erewrite Rec_pr_irrel; try eassumption.
-        - rewrite <- rproject_domain_in; tauto.
-        - rewrite <- rproject_domain_in; tauto.
+        assert (inn:assoc_lookupr ODT_eqdec (rec_concat_sort (rproject τ1 sl) [(s, Coll (Rec k1 τ1 pf5))]) s = Some (Coll (Rec k1 τ1 pf5))).
+        { unfold rec_concat_sort; rewrite assoc_lookupr_drec_sort; simpl.
+          rewrite @assoc_lookupr_app; simpl.
+          destruct (string_eqdec s s); congruence.
+        }
+        assert (inn2:assoc_lookupr ODT_eqdec (rec_concat_sort (rproject τl sl) [(s, Coll (Rec k τl pf))]) s = Some (Coll (Rec k τl pf))).
+        { unfold rec_concat_sort; rewrite assoc_lookupr_drec_sort; simpl.
+          rewrite @assoc_lookupr_app; simpl.
+          destruct (string_eqdec s s); congruence.
+        }
+        rewrite H1, inn2 in inn.
+        invcs inn.
+        rtype_equalizer; subst.
+        split; trivial.
+        erewrite Rec_pr_irrel; try eassumption.
         Transparent rec_sort.
       Qed.
       

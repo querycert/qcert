@@ -24,6 +24,7 @@ Section GroupBy.
   Require Import RecOperators.
 
   Context {fdata:foreign_data}.
+  Import ListNotations.
 
   Fixpoint add_in_groups (key: data) (d: data) (l: list (data * (list data))) : list (data * (list data)) :=
     match l with
@@ -129,7 +130,7 @@ Section GroupBy.
   Definition group_to_partitions (g:string) (group: data * list data) : option data :=
     match (fst group) with
     | drec keys =>
-      Some (drec (rec_sort ((g,(dcoll (snd group)))::keys)))
+      Some (drec (rec_concat_sort keys [(g, dcoll (snd group))]))
     | _ => None
     end.
 
@@ -357,8 +358,7 @@ Section GroupBy.
       | drec r2 =>
         Some
           (drec
-             (insertion_sort_insert rec_field_lt_dec 
-                                    (g, dcoll l1) (rec_sort r2)))
+             (rec_concat_sort r2 [(g, dcoll l1)]))
       | dleft _ => None
       | dright _ => None
       | dbrand _ _ => None
@@ -408,7 +408,7 @@ Section GroupBy.
           unfold to_partitions; simpl; try reflexivity.
     Qed.
 
-    Lemma test l0 g sl l1 l2 incoll :
+    Lemma groupby_test_lemma l0 g sl l1 l2 incoll :
       olift (to_partitions g)
             (lift (fun t' : list (data * list data) => (drec l2, l1) :: t')
                   (lift_map
@@ -433,8 +433,7 @@ Section GroupBy.
       lift
         (fun t' : list data =>
            drec
-             (insertion_sort_insert rec_field_lt_dec 
-                                    (g, dcoll l1) (rec_sort l2)) :: t')
+             (rec_concat_sort l2 [(g, dcoll l1)]) :: t')
         (lift_map
            (fun d1 : data =>
               olift2
@@ -454,7 +453,7 @@ Section GroupBy.
                      | dbool _ => None
                      | dstring _ => None
                      | dcoll _ => None
-                     | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+                     | drec r2 => Some (drec (rec_concat_sort r1 r2))
                      | dleft _ => None
                      | dright _ => None
                      | dbrand _ _ => None
@@ -465,6 +464,7 @@ Section GroupBy.
                    | dbrand _ _ => None
                    | dforeign _ => None
                    end)
+                (Some d1) 
                 (olift (fun d0 : data => Some (drec ((g, d0) :: nil)))
                        (olift
                           (fun d0 : data =>
@@ -507,8 +507,7 @@ Section GroupBy.
                                            | dright _ => None
                                            | dbrand _ _ => None
                                            | dforeign _ => None
-                                           end (Some d1))) incoll)))) 
-                (Some d1)) l0).
+                                           end (Some d1))) incoll))))) l0).
     Proof.
       intros.
       induction l0; simpl.
@@ -518,153 +517,72 @@ Section GroupBy.
         destruct (group_of_key
                     (fun d : data =>
                        match d with
-                       | dunit => None
-                       | dnat _ => None
-                       | dfloat _ => None
-                       | dbool _ => None
-                       | dstring _ => None
-                       | dcoll _ => None
                        | drec r => Some (drec (rproject r sl))
-                       | dleft _ => None
-                       | dright _ => None
-                       | dbrand _ _ => None
-                       | dforeign _ => None
+                       | _ => None
                        end) a incoll); intros; simpl; try reflexivity.
         case_eq (match a with
-                 | dunit => None
-                 | dnat _ => None
-                 | dfloat _ => None
-                 | dbool _ => None
-                 | dstring _ => None
-                 | dcoll _ => None
                  | drec r2 =>
                    Some
                      (drec
-                        (insertion_sort_insert rec_field_lt_dec 
-                                               (g, dcoll l) (rec_sort r2)))
-                 | dleft _ => None
-                 | dright _ => None
-                 | dbrand _ _ => None
-                 | dforeign _ => None
+                        (rec_concat_sort r2 [(g, dcoll l)]))
+                 | _ => None
                  end); intros.
-        + simpl in *. 
+        + simpl in *.
           destruct (lift_map
                       (fun k : data =>
                          olift (fun group : list data => Some (k, group))
                                (group_of_key
                                   (fun d0 : data =>
                                      match d0 with
-                                     | dunit => None
-                                     | dnat _ => None
-                                     | dfloat _ => None
-                                     | dbool _ => None
-                                     | dstring _ => None
-                                     | dcoll _ => None
                                      | drec r => Some (drec (rproject r sl))
-                                     | dleft _ => None
-                                     | dright _ => None
-                                     | dbrand _ _ => None
-                                     | dforeign _ => None
-                                     end) k incoll)) l0); simpl in *;
-            destruct (lift_map
-                        (fun d1 : data =>
-                           olift2
-                             (fun d0 d2 : data =>
-                                match d0 with
-                                | dunit => None
-                                | dnat _ => None
-                                | dfloat _ => None
-                                | dbool _ => None
-                                | dstring _ => None
-                                | dcoll _ => None
-                                | drec r1 =>
-                                  match d2 with
-                                  | dunit => None
-                                  | dnat _ => None
-                                  | dfloat _ => None
-                                  | dbool _ => None
-                                  | dstring _ => None
-                                  | dcoll _ => None
-                                  | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
-                                  | dleft _ => None
-                                  | dright _ => None
-                                  | dbrand _ _ => None
-                                  | dforeign _ => None
-                                  end
-                                | dleft _ => None
-                                | dright _ => None
-                                | dbrand _ _ => None
-                                | dforeign _ => None
-                                end)
-                             (olift (fun d0 : data => Some (drec ((g, d0) :: nil)))
-                                    (olift
-                                       (fun d0 : data =>
-                                          lift_oncoll
-                                            (fun l3 : list data => lift dcoll (oflatten l3))
-                                            d0)
-                                       (lift dcoll
-                                             (lift_map
-                                                (fun d0 : data =>
-                                                   olift
-                                                     (fun d2 : data =>
-                                                        match d2 with
-                                                        | dunit => None
-                                                        | dnat _ => None
-                                                        | dfloat _ => None
-                                                        | dbool true => Some (dcoll (d0 :: nil))
-                                                        | dbool false => Some (dcoll nil)
-                                                        | dstring _ => None
-                                                        | dcoll _ => None
-                                                        | drec _ => None
-                                                        | dleft _ => None
-                                                        | dright _ => None
-                                                        | dbrand _ _ => None
-                                                        | dforeign _ => None
-                                                        end)
-                                                     (olift2
-                                                        (fun d2 d3 : data =>
-                                                           unbdata
-                                                             (fun x y : data =>
-                                                                if data_eq_dec x y
-                                                                then true
-                                                                else false) d2 d3)
-                                                        match d0 with
-                                                        | dunit => None
-                                                        | dnat _ => None
-                                                        | dfloat _ => None
-                                                        | dbool _ => None
-                                                        | dstring _ => None
-                                                        | dcoll _ => None
-                                                        | drec r => Some (drec (rproject r sl))
-                                                        | dleft _ => None
-                                                        | dright _ => None
-                                                        | dbrand _ _ => None
-                                                        | dforeign _ => None
-                                                        end (Some d1))) incoll)))) 
-                             (Some d1)) l0); simpl in *; try reflexivity; simpl in *; try congruence;
-              unfold to_partitions in *;
-              unfold group_to_partitions in *; simpl in *;
-                rewrite H in *; simpl;
-                  destruct (lift_map
-                              (fun group : data * list data =>
-                                 match fst group with
-                                 | dunit => None
-                                 | dnat _ => None
-                                 | dfloat _ => None
-                                 | dbool _ => None
-                                 | dstring _ => None
-                                 | dcoll _ => None
-                                 | drec keys =>
-                                   Some
-                                     (drec
-                                        (insertion_sort_insert rec_field_lt_dec
-                                                               (g, dcoll (snd group)) (rec_sort keys)))
-                                 | dleft _ => None
-                                 | dright _ => None
-                                 | dbrand _ _ => None
-                                 | dforeign _ => None
-                                 end) l3); simpl in *; try congruence.
-        + generalize (group_of_key_destruct_drec_inv g sl a l0 l incoll H); intros.
+                                     | _ => None
+                                     end) k incoll)) l0); simpl in *
+          ; destruct ((lift_map
+          (fun d1 : data =>
+           match
+             olift (fun d0 : data => Some (drec [(g, d0)]))
+               (olift
+                  (fun d0 : data =>
+                   lift_oncoll (fun l4 : list data => lift dcoll (oflatten l4)) d0)
+                  (lift dcoll
+                     (lift_map
+                        (fun d0 : data =>
+                         olift
+                           (fun d2 : data =>
+                            match d2 with
+                            | dbool true => Some (dcoll [d0])
+                            | dbool false => Some (dcoll [])
+                            | _ => None
+                            end)
+                           (olift2
+                              (fun d2 d3 : data =>
+                               unbdata
+                                 (fun x y : data => if data_eq_dec x y then true else false)
+                                 d2 d3)
+                              match d0 with
+                              | drec r => Some (drec (rproject r sl))
+                              | _ => None
+                              end (Some d1))) incoll)))
+           with
+           | Some d2 =>
+               match d1 with
+               | drec r1 =>
+                   match d2 with
+                   | drec r2 => Some (drec (rec_concat_sort r1 r2))
+                   | _ => None
+                   end
+               | _ => None
+               end
+           | None => None
+           end) l0)); simpl in *
+          ; unfold to_partitions in *; simpl in *; trivial; try discriminate.
+          * destruct (lift_map (group_to_partitions g) l3); simpl in *; try discriminate.
+            invcs IHl0.
+            destruct a; try discriminate; invcs H.
+            simpl; trivial.
+          * destruct (lift_map (group_to_partitions g) l3); simpl in *; try discriminate.
+            destruct a; simpl; try discriminate; trivial.
++ generalize (group_of_key_destruct_drec_inv g sl a l0 l incoll H); intros.
           auto.
           destruct (lift_map
                       (fun k : data =>
@@ -739,7 +657,7 @@ Section GroupBy.
                           | dbool _ => None
                           | dstring _ => None
                           | dcoll _ => None
-                          | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+                          | drec r2 => Some (drec (rec_concat_sort r1 r2))
                           | dleft _ => None
                           | dright _ => None
                           | dbrand _ _ => None
@@ -750,6 +668,7 @@ Section GroupBy.
                         | dbrand _ _ => None
                         | dforeign _ => None
                         end)
+                     (Some d1) 
                      (olift (fun d0 : data => Some (drec ((g, d0) :: nil)))
                             (olift
                                (fun d0 : data =>
@@ -793,8 +712,7 @@ Section GroupBy.
                                                 | dright _ => None
                                                 | dbrand _ _ => None
                                                 | dforeign _ => None
-                                                end (Some d1))) incoll)))) 
-                     (Some d1)) c1)
+                                                end (Some d1))) incoll))))) c1)
       | Some (drec _) => None
       | Some (dleft _) => None
       | Some (dright _) => None
@@ -852,8 +770,7 @@ Section GroupBy.
                | drec r2 =>
                  Some
                    (drec
-                      (insertion_sort_insert rec_field_lt_dec 
-                                             (g, dcoll l1) (rec_sort r2)))
+                      (rec_concat_sort r2 [(g, dcoll l1)]))
                | dleft _ => None
                | dright _ => None
                | dbrand _ _ => None
@@ -862,7 +779,7 @@ Section GroupBy.
       - destruct d; simpl in *; try congruence.
         invcs H0.
         clear Htest H.
-        rewrite <- (test l0 g sl l1 l2 incoll).
+        rewrite (groupby_test_lemma l0 g sl l1 l2 incoll).
         unfold lift.
         destruct (lift_map
                     (fun k : data =>
@@ -936,7 +853,7 @@ Section GroupBy.
                           | dbool _ => None
                           | dstring _ => None
                           | dcoll _ => None
-                          | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+                          | drec r2 => Some (drec (rec_concat_sort r1 r2))
                           | dleft _ => None
                           | dright _ => None
                           | dbrand _ _ => None
@@ -947,6 +864,7 @@ Section GroupBy.
                         | dbrand _ _ => None
                         | dforeign _ => None
                         end)
+                     (Some d1) 
                      (olift (fun d0 : data => Some (drec ((g, d0) :: nil)))
                             (olift
                                (fun d0 : data =>
@@ -990,8 +908,7 @@ Section GroupBy.
                                                 | dright _ => None
                                                 | dbrand _ _ => None
                                                 | dforeign _ => None
-                                                end (Some d1))) incoll)))) 
-                     (Some d1)) c1)
+                                                end (Some d1))) incoll))))) c1)
       | Some (drec _) => None
       | Some (dleft _) => None
       | Some (dright _) => None
@@ -1139,14 +1056,14 @@ Section GroupBy.
       intros dn1 dn2 eqq.
       destruct a as [d1 dl1]; unfold fst in *.
       destruct d1; try discriminate.
-      assert (deq:d = drec (rec_sort ((s, dcoll (snd (drec l, dl1))) :: l)))
-        by (invcs eqq; trivial).
-      clear eqq.
-      subst d.
+      simpl in eqq.
+      invcs eqq.
       apply dnrec_sort.
-      invcs dn1.
-      constructor; simpl in *; trivial.
-      constructor; trivial.
+      simpl in *.
+      apply Forall_app; trivial.
+      - invcs dn1; trivial.
+      - constructor; simpl; trivial.
+        constructor; trivial.
     Qed.
 
     Lemma group_by_nested_eval_keys_partition_normalized l0 s l o :

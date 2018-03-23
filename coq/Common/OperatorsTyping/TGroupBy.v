@@ -37,6 +37,8 @@ Section TGroupBy.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
+  Import ListNotations.
+  
   Definition GroupBy_type
              (g : string) 
              (sl : list string) 
@@ -46,8 +48,8 @@ Section TGroupBy.
     : rtype
     := Coll
          (Rec Closed
-              (rec_sort
-                 ((g, Coll (Rec k τl pf)) :: rproject τl sl)) rec_sort_pf).
+              (rec_concat_sort
+                 (rproject τl sl) [(g, Coll (Rec k τl pf))]) rec_sort_pf).
 
   Lemma typed_group_to_partitions_yields_typed_data
         {key:data} {values:list data} {τkeys pf τvalues} :
@@ -56,7 +58,7 @@ Section TGroupBy.
     forall g,
     exists d' : data,
       group_to_partitions g (key,values) = Some d'
-      /\  d' ▹ Rec Closed (rec_sort ((g,Coll τvalues)::τkeys)) rec_sort_pf.
+      /\  d' ▹ Rec Closed (rec_concat_sort τkeys [(g,Coll τvalues)]) rec_sort_pf.
   Proof.
     Opaque rec_sort.
     intros.
@@ -67,11 +69,12 @@ Section TGroupBy.
     rtype_equalizer; subst.
     intuition; subst.
     eapply dtrec; try reflexivity.
-    - generalize (drec_sort_sorted  ((g,Coll τvalues)::rl)); simpl; trivial.
+    - generalize (drec_sort_sorted  (rl ++ [(g,Coll τvalues)])); simpl; trivial.
     - apply rec_sort_Forall2; simpl.
-      + f_equal.
+      + repeat rewrite domain_app; f_equal.
         apply sorted_forall_same_domain; trivial.
-      + constructor; trivial; simpl.
+      + apply Forall2_app; trivial; simpl.
+        constructor; simpl; trivial.
         split; trivial.
         constructor; trivial.
         Transparent rec_sort.
@@ -86,7 +89,7 @@ Section TGroupBy.
               Forall (fun v => v ▹ τvalues) (snd kv)) l ->
     exists dl' : list data,
       to_partitions g l = Some dl'
-      /\ Forall (fun d' => d' ▹ Rec Closed (rec_sort ((g,Coll τvalues)::τkeys)) rec_sort_pf) dl'.
+      /\ Forall (fun d' => d' ▹ Rec Closed (rec_concat_sort τkeys [(g,Coll τvalues)]) rec_sort_pf) dl'.
   Proof.
     unfold to_partitions; intros F.
     apply lift_map_Forall_exists_and.
@@ -145,7 +148,7 @@ Section TGroupBy.
     Forall (fun d => exists y, eval_key d = Some y /\ y ▹ Rec Closed τkeys pf) l ->
     exists dl' : list data,
       group_by_nested_eval_keys_partition g eval_key l = Some dl'
-      /\ Forall (fun d' => d' ▹ Rec Closed (rec_sort ((g,Coll τ)::τkeys)) rec_sort_pf) dl'.
+      /\ Forall (fun d' => d' ▹ Rec Closed (rec_concat_sort τkeys [(g,Coll τ)]) rec_sort_pf) dl'.
   Proof.
     intros F1 F2.
     unfold group_by_nested_eval_keys_partition.

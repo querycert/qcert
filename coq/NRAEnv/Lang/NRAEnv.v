@@ -246,6 +246,7 @@ Section NRAEnv.
         (cNRAEnvMap
            (cNRAEnvBinop
               OpRecConcat
+              cNRAEnvID
               (cNRAEnvUnop
                  (OpRec g)
                  (cNRAEnvAppEnv
@@ -257,8 +258,7 @@ Section NRAEnv.
                     (cNRAEnvBinop OpRecConcat
                                   (cNRAEnvUnop (OpRec "$key")
                                                cNRAEnvID)
-                                  cNRAEnvEnv)))
-              cNRAEnvID)
+                                  cNRAEnvEnv))))
            (cNRAEnvUnop OpDistinct (macro_cNRAEnvProject sl op_pregroup)))
         (cNRAEnvUnop (OpRec "$pregroup") e).
 

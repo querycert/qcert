@@ -69,7 +69,7 @@ Section NNRC.
 
     (** <<e groupby[g,keys] ==
          let $group0 := e
-         in { [ g: ♯flatten({ $group3 = π[keys] ? {$group3} {}
+         in { $group2 × [ g: ♯flatten({ $group3 = π[keys] ? {$group3} {}
                             | $group3 ∈ $group0 }) ]
             | $group2 ∈ ♯distinct({ π[keys]($group1)
                                   | $group1 ∈ $group0 }) }>>
@@ -86,6 +86,7 @@ Section NNRC.
                  (NNRCUnop OpDistinct
                            (NNRCFor t1 (NNRCVar t0) (NNRCUnop (OpRecProject sl) (NNRCVar t1))))
                  (NNRCBinop OpRecConcat
+                            (NNRCVar t2)
                             (NNRCUnop (OpRec g)
                                       (NNRCUnop OpFlatten
                                                 (NNRCFor t3 (NNRCVar t0)
@@ -94,8 +95,7 @@ Section NNRC.
                                                                                       (NNRCVar t3))
                                                                             (NNRCVar t2))
                                                                  (NNRCUnop OpBag (NNRCVar t3))
-                                                                 (NNRCConst (dcoll nil))))))
-                            (NNRCVar t2))).
+                                                                 (NNRCConst (dcoll nil)))))))).
 
     (** This definition is equivalent to a nested evaluation group by algorithm. *)
 
@@ -107,9 +107,8 @@ Section NNRC.
       nnrc_core_eval h cenv env (nnrc_group_by g sl e) = lift dcoll (group_by_nested_eval_table g sl incoll).
     Proof.
       intros.
-      unfold nnrc_group_by; simpl.
-      rewrite H; simpl; clear H.
-      apply (group_by_table_correct g sl incoll).
+      rewrite <- (group_by_table_correct g sl incoll); simpl.
+      rewrite H; trivial.
     Qed.
     
     Lemma nnrc_group_by_correct_some cenv env

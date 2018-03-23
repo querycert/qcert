@@ -59,6 +59,9 @@ Section NNRCSugar.
                                                         :: fresh_var "tappe$" (vid :: venv :: nil)
                                                         :: nil))))))
                 (NNRCBinop OpRecConcat
+                           (NNRCVar
+                              (fresh_var "tmap$"
+                                         (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil)))
                            (NNRCUnop (OpRec g)
                                      (NNRCLet
                                         (fresh_var "tappe$"
@@ -147,10 +150,7 @@ Section NNRCSugar.
                                                                                                       :: fresh_var "tappe$"
                                                                                                       (vid :: venv :: nil)
                                                                                                       :: nil) :: nil))))
-                                                        (NNRCConst (dcoll nil)))))))
-                           (NNRCVar
-                              (fresh_var "tmap$"
-                                         (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil)))))).
+                                                        (NNRCConst (dcoll nil)))))))))).
   
   Lemma pick_fresh_distinct_second v v1 v2 rest:
     exists v3,
@@ -165,57 +165,27 @@ Section NNRCSugar.
   Lemma build_group_ext (x:data) (o1 o2:option data) :
     o1 = o2 ->
     match o1 with
-    | Some dunit => None
-    | Some (dnat _) => None
-    | Some (dfloat _) => None
-    | Some (dbool _) => None
-    | Some (dstring _) => None
-    | Some (dcoll _) => None
-    | Some (drec r1) =>
+    | Some d2 =>
       match x with
-      | dunit => None
-      | dnat _ => None
-      | dfloat _ => None
-      | dbool _ => None
-      | dstring _ => None
-      | dcoll _ => None
-      | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
-      | dleft _ => None
-      | dright _ => None
-      | dbrand _ _ => None
-      | dforeign _ => None
+      | drec r1 =>
+        match d2 with
+        | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+        |  _ => None
+        end
+      | _ => None
       end
-    | Some (dleft _) => None
-    | Some (dright _) => None
-    | Some (dbrand _ _) => None
-    | Some (dforeign _) => None
     | None => None
     end =
     match o2 with
-    | Some dunit => None
-    | Some (dnat _) => None
-    | Some (dfloat _) => None
-    | Some (dbool _) => None
-    | Some (dstring _) => None
-    | Some (dcoll _) => None
-    | Some (drec r1) =>
+    | Some d2 =>
       match x with
-      | dunit => None
-      | dnat _ => None
-      | dfloat _ => None
-      | dbool _ => None
-      | dstring _ => None
-      | dcoll _ => None
-      | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
-      | dleft _ => None
-      | dright _ => None
-      | dbrand _ _ => None
-      | dforeign _ => None
+      | drec r1 =>
+        match d2 with
+        | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+        |  _ => None
+        end
+      | _ => None
       end
-    | Some (dleft _) => None
-    | Some (dright _) => None
-    | Some (dbrand _ _) => None
-    | Some (dforeign _) => None
     | None => None
     end.
   Proof.
@@ -258,8 +228,8 @@ Section NNRCSugar.
                               (Ascii.Ascii false false true false false true
                                            false false) EmptyString)))))
                (@cons string vid (@cons string v0 (@nil string)))) =
-            fresh_var "tmap$" (vid :: v0 :: nil)).
-    reflexivity.
+            fresh_var "tmap$" (vid :: v0 :: nil))
+    by reflexivity.
     rewrite H1 in H; clear H1.
     rewrite <- H; clear H.
     destruct (equiv_dec v1 v1); try congruence; clear e0.
@@ -267,20 +237,11 @@ Section NNRCSugar.
     destruct (lift_map
                 (fun d1 : data =>
                    match d1 with
-                   | dunit => None
-                   | dnat _ => None
-                   | dfloat _ => None
-                   | dbool _ => None
-                   | dstring _ => None
-                   | dcoll _ => None
                    | drec r => Some (drec (rproject r sl))
-                   | dleft _ => None
-                   | dright _ => None
-                   | dbrand _ _ => None
-                   | dforeign _ => None
+                   | _ => None
                    end) l); try reflexivity; simpl.
     f_equal.
-    apply lift_map_ext; intros. simpl.
+    apply lift_map_ext; intros; simpl.
     destruct (equiv_dec v0 v1); try congruence; clear c; simpl.
     destruct (equiv_dec (fresh_var "tappe$" (v1 :: v0 :: nil))
                         (fresh_var "tappe$" (v1 :: v0 :: nil))); try congruence;
