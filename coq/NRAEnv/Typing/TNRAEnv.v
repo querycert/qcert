@@ -44,7 +44,7 @@ Section TNRAEnv.
     Context (τconstants:list (string*rtype)).
 
     (* An explicit typing rule for groupby *)
-    Lemma type_NNRCGroupBy {k τl pf} τcenv τenv τin g sl e :
+    Lemma type_NRAEnvGroupBy {k τl pf} τcenv τenv τin g sl e :
       sublist sl (domain τl) ->
       e ▷ₓ τin >=> (Coll (Rec k τl pf)) ⊣ τcenv ; τenv ->
                                                   (NRAEnvGroupBy g sl e) ▷ₓ τin >=>  (GroupBy_type g sl k τl pf) ⊣ τcenv ; τenv.
@@ -67,30 +67,34 @@ Section TNRAEnv.
     (* note that additional constraint, since otherwise the grouped elements will
           be ignored, which allows more freedom in the typing
      *)
-    Lemma type_NNRCGroupBy_inv {τl k pf} τcenv τenv τin g sl e:
-      ((NRAEnvGroupBy g sl e) ▷ₓ τin >=>  (GroupBy_type g sl k τl pf) ⊣ τcenv ; τenv) ->
-      sublist sl (domain τl) /\ e ▷ₓ τin >=> (Coll (Rec k τl pf)) ⊣ τcenv ; τenv.
+    Lemma type_NRAEnvGroupBy_inv {τ} τcenv τenv τin g sl e:
+      ((NRAEnvGroupBy g sl e) ▷ₓ τin >=> τ ⊣ τcenv ; τenv) ->
+      exists k τl pf,
+          τ = (GroupBy_type g sl k τl pf) /\
+          sublist sl (domain τl) /\ e ▷ₓ τin >=> (Coll (Rec k τl pf)) ⊣ τcenv ; τenv.
     Proof.
       unfold GroupBy_type, nraenv_type; simpl.
       unfold macro_cNRAEnvGroupBy, macro_cNRAEnvProject; intros typ.
       nraenv_core_inverter; subst.
       destruct x; destruct x0; simpl in *; subst.
-      assert (inn1:assoc_lookupr ODT_eqdec (rec_concat_sort τ₁ [(s, s1)]) s =
-                   assoc_lookupr ODT_eqdec (rec_concat_sort (rproject τl sl) [(s, Coll (Rec k τl pf))]) s)
-        by congruence.
-      unfold rec_concat_sort in inn1.
-      repeat rewrite assoc_lookupr_drec_sort in inn1; simpl in inn1.
-      repeat rewrite @assoc_lookupr_app in inn1; simpl in inn1.
-      destruct (string_eqdec s s); try congruence.
-      invcs inn1.
       unfold tdot, edot, rec_concat_sort in *.
       repeat rewrite assoc_lookupr_drec_sort in *.
       simpl in *.
-      invcs H9; invcs H10; invcs H0.
-      invcs H13.
-      rtype_equalizer; subst.
-      split; trivial.
-      erewrite Rec_pr_irrel; try eassumption.
+      invcs H0; invcs H8; invcs H9.
+      invcs H13; rtype_equalizer; subst.
+      destruct (Coll_inside _ _ H12) as [? eqq1].
+      rewrite <- eqq1 in H12.
+      destruct (Rec₀_eq_proj1_Rec eqq1).
+      apply Coll_right_inv in H12.
+      subst.
+      invcs H3.
+      apply Rec₀_eq_proj1_Rec in H0.
+      destruct H0 as [??]; subst; clear H.
+      do 3 eexists.
+      erewrite Rec_pr_irrel.
+      split; try reflexivity.
+      erewrite Rec_pr_irrel.
+      eauto.
     Qed.
 
   End groupby.
