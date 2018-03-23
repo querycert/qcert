@@ -184,7 +184,6 @@ function sum(b) {
 	result += b[i];
     return result;
 }
-
 function arithMean(b) {
     var len = b.length;
     if(len == 0) {
@@ -193,7 +192,6 @@ function arithMean(b) {
 	return sum(b)/len;
     }
 }
-
 function toString(v) {
     return toStringQ(v, "");
 }
@@ -425,4 +423,66 @@ function mkWorld(v) {
 // from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FRegular_Expressions
 function escapeRegExp(string){
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+// Nat operations
+
+function natPlus(v1, v2) {
+    return { "nat" : v1.nat + v2.nat };
+}
+function natMinus(v1, v2) {
+    return { "nat" : v1.nat - v2.nat };
+}
+function natMult(v1, v2) {
+    return { "nat" : v1.nat * v2.nat };
+}
+function natDiv(v1, v2) {
+    return { "nat" : Math.floor(v1.nat / v2.nat) };
+}
+function natDiv(v1, v2) {
+    return { "nat" : Math.floor(v1.nat / v2.nat) };
+}
+function natRem(v1, v2) {
+    return { "nat" : Math.floor(v1.nat % v2.nat) };
+}
+function natMin(v1, v2) {
+    return { "nat" : Math.min(v1.nat,v2.nat) };
+}
+function natMax(v1, v2) {
+    return { "nat" : Math.max(v1.nat,v2.nat) };
+}
+function natAbs(v) {
+    return { "nat" : Math.abs(v.nat) };
+}
+function natLog2(v) {
+    return { "nat" : Math.floor(Math.log2(v.nat)) }; // Default Z.log2 is log_inf, biggest integer lower than log2
+}
+function natSqrt(v) {
+    return { "nat" : Math.floor(Math.sqrt(v.nat)) }; // Default Z.log2 is log_inf, biggest integer lower than log2
+}
+function natSum(v) {
+    var result = 0;
+    for (var i=0; i<b.length; i++)
+	result += b[i].nat;
+    return { "nat" : result };
+}
+function natMinApply(v) {
+    var numbers = [ ];
+    for (var i=0; i<b.length; i++)
+	numbers.push(b[i].nat);
+    return { "nat" : Math.min.apply(Math,numbers) };
+}
+function natMaxApply(v) {
+    var numbers = [ ];
+    for (var i=0; i<b.length; i++)
+	numbers.push(b[i].nat);
+    return { "nat" : Math.max.apply(Math,numbers) };
+}
+function natArithMean(b) {
+    var len = b.length;
+    if(len == 0) {
+	return { "nat" : 0 };
+    } else {
+	return { "nat" : Math.floor(natSum(b)/len) };
+    }
 }

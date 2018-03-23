@@ -186,9 +186,9 @@ Section NNRCtoJavaScript.
     (* Java equivalent: JavaScriptBackend.uarithToJS *)
     Definition uarithToJs (u:nat_arith_unary_op) (e:string) :=
       match u with
-      | NatAbs => "Math.abs (" ++ e ++ ")"
-      | NatLog2 => "Math.log2(" ++ e ++ ")"
-      | NatSqrt =>"Math.sqrt(" ++ e ++ ")"
+      | NatAbs => "natAbs(" ++ e ++ ")"
+      | NatLog2 => "natLog2(" ++ e ++ ")"
+      | NatSqrt =>"natSqrt(" ++ e ++ ")"
       end.
 
     Definition float_uarithToJs (fu:float_arith_unary_op) (d:string) : string :=
@@ -206,13 +206,13 @@ Section NNRCtoJavaScript.
     (* Java equivalent: JavaScriptBackend.barithToJs *)
     Definition nat_barithToJs (b:nat_arith_binary_op) (e1 e2:string) :=
       match b with
-      | NatPlus => e1 ++ "+" ++ e2
-      | NatMinus => e1 ++ "-" ++ e2
-      | NatMult => e1 ++ "*" ++ e2
-      | NatDiv => e1 ++ "/" ++ e2
-      | NatRem => e1 ++ "%" ++ e2
-      | NatMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
-      | NatMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatPlus => "natPlus(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMinus => "natMinus(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMult => "natMult(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatDiv => "natDiv(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatRem => "natRem(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMin => "natMin(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMax => "natMax(" ++ e1 ++ ", " ++ e2 ++ ")"
       end.
     
     Definition mumber_barithToJs (fb:float_arith_binary_op) (d1 d2:string) : string :=
@@ -284,11 +284,11 @@ Section NNRCtoJavaScript.
                      | OpUnbrand => "unbrand(" ++ e1 ++ ")"
                      | OpCast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
                      | OpNatUnary u => uarithToJs u e1
-                     | OpNatSum => "sum(" ++ e1 ++ ")"
-                     | OpNatMin => "Math.min.apply(Math," ++ e1 ++ ")"
-                     | OpNatMax => "Math.max.apply(Math," ++ e1 ++ ")"
-                     | OpNatMean => "Math.floor(arithMean(" ++ e1 ++ "))" (* Casts to Z using Math.floor() *)
-                     | OpFloatOfNat => e1
+                     | OpNatSum => "natSum(" ++ e1 ++ ")"
+                     | OpNatMin => "natMinApply(" ++ e1 ++ ")"
+                     | OpNatMax => "natMaxApply(" ++ e1 ++ ")"
+                     | OpNatMean => "natArithMean(" ++ e1 ++ ")"
+                     | OpFloatOfNat => "(" ++ e1 ++ ").nat"
                      | OpFloatUnary u => float_uarithToJs u e1
                      | OpFloatTruncate => "Math.trunc(" ++ e1 ++ ")" 
                      | OpFloatSum => "sum(" ++ e1 ++ ")"

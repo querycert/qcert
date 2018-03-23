@@ -139,7 +139,7 @@ Section NNRCimptoJsSyntax.
     call_runtime "concat" (e1::e2::nil).
 
   Definition runtime_mergeConcat e1 e2 :=
-    call_runtime "concat" (e1::e2::nil).
+    call_runtime "mergeConcat" (e1::e2::nil).
 
   Definition runtime_bunion e1 e2 :=
     call_runtime "bunion" (e1::e2::nil).
@@ -181,13 +181,7 @@ Section NNRCimptoJsSyntax.
     call_runtime "sum" (e::nil).
 
   Definition runtime_mean e :=
-    call_runtime "mean" (e::nil).
-
-  Definition runtime_min_apply e :=
-    call_runtime "minapply" (e::nil).
-
-  Definition runtime_max_apply e :=
-    call_runtime "maxapply" (e::nil).
+    call_runtime "arithMean" (e::nil).
 
   Definition runtime_brand b e :=
     call_runtime "brand" ((brands_to_js_ast b)::e::nil).
@@ -199,46 +193,46 @@ Section NNRCimptoJsSyntax.
     call_runtime "cast" ((brands_to_js_ast b)::e::nil).
 
   Definition runtime_nat_plus e1 e2 :=
-    call_runtime "natplus" (e1::e2::nil).
+    call_runtime "natPlus" (e1::e2::nil).
 
   Definition runtime_nat_minus e1 e2 :=
-    call_runtime "natminus" (e1::e2::nil).
+    call_runtime "natMinus" (e1::e2::nil).
 
   Definition runtime_nat_mult e1 e2 :=
-    call_runtime "natmult" (e1::e2::nil).
+    call_runtime "natMult" (e1::e2::nil).
 
   Definition runtime_nat_div e1 e2 :=
-    call_runtime "natdiv" (e1::e2::nil).
+    call_runtime "natDiv" (e1::e2::nil).
 
   Definition runtime_nat_rem e1 e2 :=
-    call_runtime "natrem" (e1::e2::nil).
+    call_runtime "natRem" (e1::e2::nil).
 
   Definition runtime_nat_min e1 e2 :=
-    call_runtime "natmin" (e1::e2::nil).
+    call_runtime "natMin" (e1::e2::nil).
 
   Definition runtime_nat_max e1 e2 :=
-    call_runtime "natmax" (e1::e2::nil).
+    call_runtime "natMax" (e1::e2::nil).
 
   Definition runtime_nat_abs e :=
-    call_runtime "natabs" (e::nil).
+    call_runtime "natAbs" (e::nil).
 
   Definition runtime_nat_log2 e :=
-    call_runtime "natlog2" (e::nil).
+    call_runtime "natLog2" (e::nil).
 
   Definition runtime_nat_sqrt e :=
-    call_runtime "natsqrt" (e::nil).
+    call_runtime "natSqrt" (e::nil).
 
   Definition runtime_nat_sum e :=
-    call_runtime "natsum" (e::nil).
+    call_runtime "natSum" (e::nil).
 
   Definition runtime_nat_min_apply e :=
-    call_runtime "natminapply" (e::nil).
+    call_runtime "natMinApply" (e::nil).
   
   Definition runtime_nat_max_apply e :=
-    call_runtime "natmaxapply" (e::nil).
+    call_runtime "natMaxApply" (e::nil).
   
   Definition runtime_nat_mean e :=
-    call_runtime "natmean" (e::nil).
+    call_runtime "natArithMean" (e::nil).
   
   (** Data model *)
 
@@ -436,9 +430,9 @@ Section NNRCimptoJsSyntax.
     | OpFloatMean =>
       runtime_mean e'
     | OpFloatBagMin =>
-      runtime_min_apply e'
+      math_min_apply e'
     | OpFloatBagMax =>
-      runtime_max_apply e'
+      math_max_apply e'
     | OpForeignUnary fu =>
       expr_literal (literal_string "XXX TODO: mk_binary_op foreign XXX") (* XXX TODO XXX *)
     | _ =>
