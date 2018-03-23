@@ -52,7 +52,7 @@ public final class NotRule extends PatternRule {
 	/**
 	 * Implement according to logic in rule_to_pattern in Coq code
          | rule_not p ps =>
-           punop AFlatten
+           punop OpFlatten
                  (makeSingleton
                     (pletEnv
                        (notholds p RETURN BINDINGS)
@@ -63,7 +63,7 @@ public final class NotRule extends PatternRule {
 	public CampPattern convertToPattern() {
 		CampPattern not = CampMacros.notholds(CampMacros.RETURN(getPattern(), CampMacros.BINDINGS()));
 		CampPattern single = CampMacros.makeSingleton(new LetEnvPattern(not, getOperand().convertToPattern()));
-		return new UnaryPattern(UnaryOperator.AFlatten, single);
+		return new UnaryPattern(UnaryOperator.OpFlatten, single);
 	}
 
 	/* (non-Javadoc)

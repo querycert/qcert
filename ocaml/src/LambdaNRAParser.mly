@@ -97,7 +97,7 @@ expr:
 | i = INT
     { QLambdaNRA.laconst (QData.dnat (Util.coq_Z_of_int i)) }
 | f = FLOAT
-    { QLambdaNRA.laconst (Enhanced.Data.dfloat f) }
+    { QLambdaNRA.laconst (QData.dfloat f) }
 | s = STRING
     { QLambdaNRA.laconst (QData.dstring (Util.char_list_of_string s)) }
 (* Expressions *)
@@ -110,7 +110,7 @@ expr:
 | e = expr ARROW a = IDENT
     { QLambdaNRA.laarrow (Util.char_list_of_string a) e }
 | e = expr DOT AVG LPAREN RPAREN
-    { QLambdaNRA.launop QOps.Unary.opnummean e }
+    { QLambdaNRA.launop QOps.Unary.opfloatmean e }
 | STRUCT LPAREN r = reclist RPAREN
     { QLambdaNRA.lastruct r }
 | e = expr DOT a = IDENT LPAREN el=params RPAREN

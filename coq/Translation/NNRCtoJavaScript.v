@@ -184,25 +184,48 @@ Section NNRCtoJavaScript.
       := jsonToJS quotel (sortCriteriaToJson scl).
     
     (* Java equivalent: JavaScriptBackend.uarithToJS *)
-    Definition uarithToJs (u:arith_unary_op) (e:string) :=
+    Definition uarithToJs (u:nat_arith_unary_op) (e:string) :=
       match u with
-      | ArithAbs => "Math.abs (" ++ e ++ ")"
-      | ArithLog2 => "Math.log2(" ++ e ++ ")"
-      | ArithSqrt =>"Math.sqrt(" ++ e ++ ")"
+      | NatAbs => "natAbs(" ++ e ++ ")"
+      | NatLog2 => "natLog2(" ++ e ++ ")"
+      | NatSqrt =>"natSqrt(" ++ e ++ ")"
+      end.
+
+    Definition float_uarithToJs (fu:float_arith_unary_op) (d:string) : string :=
+      match fu with
+      | FloatNeg => "-" ++ "(" ++ d ++ ")"
+      | FloatSqrt =>"Math.sqrt(" ++ "-" ++ d ++ ")"
+      | FloatExp => "Math.exp(" ++ d ++ ")" 
+      | FloatLog => "Math.log2(" ++ d ++ ")"
+      | FloatLog10 => "Math.log10(" ++ d ++ ")"
+      | FloatCeil => "Math.ceil(" ++ d ++ ")" 
+      | FloatFloor => "Math.floor(" ++ d ++ ")" 
+      | FloatAbs => "Math.abs(" ++ d ++ ")"
       end.
 
     (* Java equivalent: JavaScriptBackend.barithToJs *)
-    Definition barithToJs (b:arith_binary_op) (e1 e2:string) :=
+    Definition nat_barithToJs (b:nat_arith_binary_op) (e1 e2:string) :=
       match b with
-      | ArithPlus => e1 ++ "+" ++ e2
-      | ArithMinus => e1 ++ "-" ++ e2
-      | ArithMult => e1 ++ "*" ++ e2
-      | ArithDivide => e1 ++ "/" ++ e2
-      | ArithRem => e1 ++ "%" ++ e2
-      | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
-      | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatPlus => "natPlus(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMinus => "natMinus(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMult => "natMult(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatDiv => "natDiv(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatRem => "natRem(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMin => "natMin(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | NatMax => "natMax(" ++ e1 ++ ", " ++ e2 ++ ")"
       end.
     
+    Definition mumber_barithToJs (fb:float_arith_binary_op) (d1 d2:string) : string :=
+      match fb with
+      | FloatPlus => "(" ++ d1 ++ ") + (" ++ d2 ++ ")"
+      | FloatMinus =>  "(" ++ d1 ++ ") - (" ++ d2 ++ ")"
+      | FloatMult =>  "(" ++ d1 ++ ") * (" ++ d2 ++ ")"
+      | FloatDiv =>  "(" ++ d1 ++ ") / (" ++ d2 ++ ")"
+      | FloatPow => "Math.pow(" ++ d1 ++ ", " ++ d2 ++ ")"
+      | FloatMin => "Math.min(" ++ d1 ++ ", " ++ d2 ++ ")"
+      | FloatMax => "Math.max(" ++ d1 ++ ", " ++ d2 ++ ")"
+      end.
+
     Definition like_clause_to_javascript (lc:like_clause)
       := match lc with
          | like_literal literal => "escapeRegExp(" ++ quotel_double ++ literal ++ quotel_double ++ ")"
@@ -243,11 +266,7 @@ Section NNRCtoJavaScript.
                      | OpFlatten => "flatten(" ++ e1 ++ ")"
                      | OpDistinct => "distinct(" ++ e1 ++ ")"
                      | OpOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
-                     | OpCount => e1 ++ ".length"
-                     | OpSum => "sum(" ++ e1 ++ ")"
-                     | OpNumMin => "Math.min.apply(Math," ++ e1 ++ ")"
-                     | OpNumMax => "Math.max.apply(Math," ++ e1 ++ ")"
-                     | OpNumMean => "Math.floor(arithMean(" ++ e1 ++ "))" (* Casts to Z using Math.floor() *)
+                     | OpCount => "{" ++ quotel ++ "nat" ++ quotel ++ " : " ++ e1 ++ ".length" ++ "}" (* XXX makes sure the result of count is tagged as nat *)
                      | OpToString => "toString(" ++ e1 ++ ")"
                      | OpSubstring start olen =>
                        "(" ++ e1 ++ ").substring(" ++ toString start ++
@@ -264,7 +283,18 @@ Section NNRCtoJavaScript.
                      | OpBrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
                      | OpUnbrand => "unbrand(" ++ e1 ++ ")"
                      | OpCast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
-                     | OpArithUnary u => uarithToJs u e1
+                     | OpNatUnary u => uarithToJs u e1
+                     | OpNatSum => "natSum(" ++ e1 ++ ")"
+                     | OpNatMin => "natMinApply(" ++ e1 ++ ")"
+                     | OpNatMax => "natMaxApply(" ++ e1 ++ ")"
+                     | OpNatMean => "natArithMean(" ++ e1 ++ ")"
+                     | OpFloatOfNat => "(" ++ e1 ++ ").nat"
+                     | OpFloatUnary u => float_uarithToJs u e1
+                     | OpFloatTruncate => "Math.trunc(" ++ e1 ++ ")" 
+                     | OpFloatSum => "sum(" ++ e1 ++ ")"
+                     | OpFloatMean => "arithMean(" ++ e1 ++ ")"
+                     | OpFloatBagMin => "Math.min.apply(Math," ++ e1 ++ ")"
+                     | OpFloatBagMax => "Math.max.apply(Math," ++ e1 ++ ")"
                      | OpForeignUnary fu
                        => foreign_to_javascript_unary_op i eol quotel fu e1
                      end in
@@ -278,15 +308,16 @@ Section NNRCtoJavaScript.
                      | OpRecMerge => "mergeConcat(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpAnd => "(" ++ e1 ++ " && " ++ e2 ++ ")"
                      | OpOr => "(" ++ e1 ++ " || " ++ e2 ++ ")"
-                     | OpLt => "(" ++ e1 ++ " < " ++ e2 ++ ")"
-                     | OpLe => "(" ++ e1 ++ " <= " ++ e2 ++ ")"
+                     | OpLt => "(compare(" ++ e1 ++ "," ++ e2 ++ ") < 0)" (* XXX Use compare! *)
+                     | OpLe => "(compare(" ++ e1 ++ "," ++ e2 ++ ") <= 0)" (* XXX Use compare! *)
                      | OpBagUnion => "bunion(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpBagDiff => "bminus(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpBagMin => "bmin(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpBagMax => "bmax(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpStringConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
-                     | OpArithBinary b => barithToJs b e1 e2
+                     | OpNatBinary b => nat_barithToJs b e1 e2
+                     | OpFloatBinary b => mumber_barithToJs b e1 e2
                      | OpForeignBinary fb
                        => foreign_to_javascript_binary_op i eol quotel fb e1 e2
                      end in

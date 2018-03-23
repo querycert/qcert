@@ -49,6 +49,9 @@ Section OperatorsUtils.
   Global Instance ToString_nat : ToString nat
     := { toString := nat_to_string10}.
 
+  Global Instance ToString_float : ToString float
+    := { toString := float_to_string}.
+
   Global Instance ToString_bool : ToString bool
     := { toString := boolToString}.
 
@@ -59,6 +62,7 @@ Section OperatorsUtils.
     := match d with
            | dunit => "UNIT"%string
            | dnat n => toString n
+           | dfloat n => toString n
            | dbool b => toString b
            | dstring s => stringToString s
            | dcoll l => bracketString 
@@ -112,6 +116,18 @@ Section OperatorsUtils.
     lift dnat (lift bnummin (lifted_zbag l)).
   Definition lifted_max (l : list data) : option data :=
     lift dnat (lift bnummax (lifted_zbag l)).
+
+  Definition lifted_fbag (l : list data) : option (list float) :=
+    lift_map (ondfloat (fun x => x)) l.
+
+  Definition lifted_fsum (l:list data) : option data :=
+    lift dfloat (lift float_list_sum (lifted_fbag l)).
+  Definition lifted_farithmean (l:list data) : option data :=
+    lift dfloat (lift float_list_arithmean (lifted_fbag l)).
+  Definition lifted_fmin (l : list data) : option data :=
+    lift dfloat (lift float_list_min (lifted_fbag l)).
+  Definition lifted_fmax (l : list data) : option data :=
+    lift dfloat (lift float_list_max (lifted_fbag l)).
 
 End OperatorsUtils.
 

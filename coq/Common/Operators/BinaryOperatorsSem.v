@@ -31,16 +31,26 @@ Section BinaryOperatorsSem.
   Require Export BinaryOperators.
   
   (* Algebra Unary/Binary Ops *)
-
-  Definition arith_binary_op_eval (op:arith_binary_op) (z1 z2:Z) : Z :=
+  Definition nat_arith_binary_op_eval (op:nat_arith_binary_op) (z1 z2:Z) : Z :=
     match op with
-    | ArithPlus => Z.add z1 z2
-    | ArithMinus=> Z.sub z1 z2
-    | ArithMult => Z.mul z1 z2
-    | ArithMin => Z.min z1 z2
-    | ArithMax => Z.max z1 z2
-    | ArithDivide=> Z.quot z1 z2
-    | ArithRem => Z.rem z1 z2
+    | NatPlus => Z.add z1 z2
+    | NatMinus=> Z.sub z1 z2
+    | NatMult => Z.mul z1 z2
+    | NatMin => Z.min z1 z2
+    | NatMax => Z.max z1 z2
+    | NatDiv=> Z.quot z1 z2
+    | NatRem => Z.rem z1 z2
+    end.
+
+  Definition float_arith_binary_op_eval (op:float_arith_binary_op) (f1 f2:float) : float :=
+    match op with
+    | FloatPlus => float_add f1 f2
+    | FloatMinus => float_sub f1 f2
+    | FloatMult => float_mult f1 f2
+    | FloatDiv => float_div f1 f2
+    | FloatPow => float_pow f1 f2
+    | FloatMin => float_min f1 f2
+    | FloatMax => float_max f1 f2
     end.
 
   Context (h:brand_relation_t).
@@ -77,9 +87,14 @@ Section BinaryOperatorsSem.
                  if in_dec data_eq_dec d1 l
                  then dbool true else dbool false) d2
     | OpStringConcat => unsdstring append d1 d2
-    | OpArithBinary op =>
+    | OpNatBinary op =>
         match d1, d2 with
-        | dnat n1, dnat n2 => Some (dnat (arith_binary_op_eval op n1 n2))
+        | dnat n1, dnat n2 => Some (dnat (nat_arith_binary_op_eval op n1 n2))
+        | _, _ => None
+        end
+    | OpFloatBinary op =>
+        match d1, d2 with
+        | dfloat f1, dfloat f2 => Some (dfloat (float_arith_binary_op_eval op f1 f2))
         | _, _ => None
         end
     | OpForeignBinary fb => foreign_binary_op_interp h fb d1 d2

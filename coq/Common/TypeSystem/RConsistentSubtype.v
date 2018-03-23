@@ -1280,6 +1280,9 @@ Proof.
        solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
        solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
        solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
+       solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
+       solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
+       solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
 Qed.
 
 Corollary consistent_rtype_join2:

@@ -47,6 +47,8 @@ Module QData(runtime:CompilerRuntime).
     := Data.dunit.
   Definition dnat z : qdata 
     := Data.dnat z.
+  Definition dfloat n : qdata 
+    := Data.dfloat n.
   Definition dbool b : qdata 
     := Data.dbool b.
   Definition dstring s : qdata 

@@ -7,7 +7,7 @@ ruleset t1 {
     when {
       total:
         aggregate {
-	  e:Customer(age <= 35);
+	  e:Customer(age <= 35.0);
 	} do { count {e}; }
     } then {
       System.out.println("totalCustomers <= 35: " + total);

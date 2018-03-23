@@ -48,15 +48,22 @@ Section DatatoJSON.
       | None => 
         match j with
         | jnil => dunit
-        | jnumber n => dnat n
+        | jnumber n => dfloat n
         | jbool b => dbool b
         | jstring s => dstring s
         | jarray c => dcoll (map json_to_data_pre c)
         | jobject nil => drec nil
         | jobject ((s1,j')::nil) =>
-          if (string_dec s1 "left") then dleft (json_to_data_pre j')
-          else if (string_dec s1 "right") then dright (json_to_data_pre j')
-               else drec ((s1, json_to_data_pre j')::nil)
+          if (string_dec s1 "nat") then
+            match j' with
+            | jnumber n =>
+              dnat (float_truncate n)
+            | _ =>
+              drec ((s1, json_to_data_pre j')::nil)
+            end
+          else if (string_dec s1 "left") then dleft (json_to_data_pre j')
+               else if (string_dec s1 "right") then dright (json_to_data_pre j')
+                    else drec ((s1, json_to_data_pre j')::nil)
         | jobject ((s1,jarray j1)::(s2,j2)::nil) =>
           if (string_dec s1 "type") then
             if (string_dec s2 "data") then
@@ -90,7 +97,7 @@ Section DatatoJSON.
       | None => 
         match j with
         | jnil => dright dunit
-        | jnumber n => dnat n
+        | jnumber n => dfloat n
         | jbool b => dbool b
         | jstring s => dstring s
         | jarray c => dcoll (map json_enhanced_to_data_pre c)
@@ -128,35 +135,41 @@ Section DatatoJSON.
 
   Section toJSON.
     Context {ftojson:foreign_to_JSON}.
-
-    Fixpoint data_enhanced_to_json (d:data) : json :=
+    
+    Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber n
+      | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
+      | dfloat n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
-      | dcoll c => jarray (map data_enhanced_to_json c)
-      | drec r => jobject (map (fun x => (fst x, data_enhanced_to_json (snd x))) r)
-      | dleft d' => jobject (("left"%string, data_enhanced_to_json d')::nil)
-      | dright d' => jobject (("right"%string, data_enhanced_to_json d')::nil)
-      | dbrand b (drec r) => jobject (("$class "%string, jarray (map jstring b))::(map (fun x => (fst x, data_enhanced_to_json (snd x))) r))
-      | dbrand b d' => jobject (("$class"%string, jarray (map jstring b))::("$data"%string, (data_enhanced_to_json d'))::nil)
+      | dcoll c => jarray (map (data_enhanced_to_js quotel) c)
+      | drec r => jobject (map (fun x => (fst x, (data_enhanced_to_js quotel) (snd x))) r)
+      | dleft d' => jobject (("left"%string, data_enhanced_to_js quotel d')::nil)
+      | dright d' => jobject (("right"%string, data_enhanced_to_js quotel d')::nil)
+      | dbrand b (drec r) => jobject (("$class "%string, jarray (map jstring b))::(map (fun x => (fst x, data_enhanced_to_js quotel (snd x))) r))
+      | dbrand b d' => jobject (("$class"%string, jarray (map jstring b))::("$data"%string, (data_enhanced_to_js quotel d'))::nil)
       | dforeign fd => foreign_to_JSON_from_data fd
       end.
 
-    Fixpoint data_to_json (d:data) : json :=
+    Fixpoint data_enhanced_to_json (d:data) : json := data_enhanced_to_js "" d.
+
+    Fixpoint data_to_js (quotel:string) (d:data) : json :=
       match d with
       | dunit => jnil
-      | dnat n => jnumber n
+      | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
+      | dfloat n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
-      | dcoll c => jarray (map data_to_json c)
-      | drec r => jobject (map (fun x => (fst x, data_to_json (snd x))) r)
-      | dleft d' => jobject (("left"%string, data_to_json d')::nil)
-      | dright d' => jobject (("right"%string, data_to_json d')::nil)
-      | dbrand b d' => jobject (("type"%string, jarray (map jstring b))::("data"%string, (data_to_json d'))::nil)
+      | dcoll c => jarray (map (data_to_js quotel) c)
+      | drec r => jobject (map (fun x => (fst x, data_to_js quotel (snd x))) r)
+      | dleft d' => jobject (("left"%string, data_to_js quotel d')::nil)
+      | dright d' => jobject (("right"%string, data_to_js quotel d')::nil)
+      | dbrand b d' => jobject (("type"%string, jarray (map jstring b))::("data"%string, (data_to_js quotel d'))::nil)
       | dforeign fd => foreign_to_JSON_from_data fd
       end.
+
+    Fixpoint data_to_json (d:data) : json := data_to_js "" d.
   End toJSON.
 
   Section RoundTripping.

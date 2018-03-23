@@ -117,7 +117,12 @@ Section TOperatorsInferSub.
         | left _, left _ => Some (String, String, String)
         | _, _ => None
         end
-      | OpArithBinary _ =>
+      | OpNatBinary _ =>
+        match subtype_dec τ₁ Nat, subtype_dec τ₂ Nat with
+        | left _, left _ => Some (Nat, Nat, Nat)
+        | _, _ => None
+        end
+      | OpFloatBinary _ =>
         match subtype_dec τ₁ Nat, subtype_dec τ₂ Nat with
         | left _, left _ => Some (Nat, Nat, Nat)
         | _, _ => None
@@ -184,13 +189,6 @@ Section TOperatorsInferSub.
       | OpCount =>
         let τ₁' := τ₁ ⊔ (Coll ⊥) in
         lift (fun τ => (Nat, τ₁')) (tuncoll τ₁')
-      | OpSum
-      | OpNumMin
-      | OpNumMax
-      | OpNumMean =>
-        if subtype_dec τ₁ (Coll Nat)
-        then Some (Nat, Coll Nat)
-        else None
       | OpToString =>
         Some (String, τ₁)
       | OpSubstring _ _ =>
@@ -227,9 +225,35 @@ Section TOperatorsInferSub.
           | Brand₀ _ => Some (Option (Brand b), τ₁)
           | _ => None
           end
-      | OpArithUnary op =>
+      | OpNatUnary op =>
         if subtype_dec τ₁ Nat
         then Some (Nat, Nat)
+        else None
+      | OpNatSum
+      | OpNatMin
+      | OpNatMax
+      | OpNatMean =>
+        if subtype_dec τ₁ (Coll Nat)
+        then Some (Nat, Coll Nat)
+        else None
+      | OpFloatOfNat =>
+        if subtype_dec τ₁ Nat
+        then Some (Float, Nat)
+        else None
+      | OpFloatUnary op =>
+        if subtype_dec τ₁ Float
+        then Some (Float, Float)
+        else None
+      | OpFloatTruncate =>
+        if subtype_dec τ₁ Float
+        then Some (Nat, Float)
+        else None
+      | OpFloatSum
+      | OpFloatBagMin
+      | OpFloatBagMax
+      | OpFloatMean =>
+        if subtype_dec τ₁ (Coll Float)
+        then Some (Float, Coll Float)
         else None
       | OpForeignUnary fu =>
         foreign_unary_op_typing_infer_sub fu τ₁

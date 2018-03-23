@@ -20,6 +20,7 @@ MODULES = \
 	Utils/ListAdd \
 	Utils/StringAdd \
 	Utils/SortingAdd \
+	Utils/Float \
 	Utils/Lattice \
 	Utils/Monoid \
 	Utils/Lift \
@@ -259,6 +260,8 @@ MODULES = \
 	OQL/OQLRuntime \
 	OQL/OQLTypes \
 	OQL/OQLSystem \
+	JavaScriptAst/Lang/JavaScriptAst \
+	JavaScriptAst/JavaScriptAstRuntime \
 	JavaScript/Lang/JavaScript \
 	JavaScript/JavaScriptRuntime \
 	Java/Lang/Java \
@@ -319,7 +322,6 @@ MODULES = \
 	Translation/TOQLtoNRAEnv \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
-	Compiler/Model/FloatModelPart \
 	Compiler/Model/StringModelPart \
 	Compiler/Model/DateTimeModelPart \
 	Compiler/Model/SqlDateModelPart \
@@ -350,6 +352,7 @@ MODULES = \
 	Compiler/EnhancedCompiler \
 	Compiler/TrivialCompiler \
 	Compiler/CompilerExports \
+	Extraction/ExtrOcamlFloatNatIntZInt \
 	Tests/TDataTest \
 	Tests/NRATest \
 	Tests/NRAEnvTest \
@@ -362,5 +365,4 @@ MODULES = \
 	Tests/SQLTest \
 	Tests/LambdaNRATest \
 	Tests/CompilerTest \
-	Tests/HelloWorld
-
+	Tests/HelloWorld \

@@ -66,19 +66,19 @@ public class CampMacros {
 		return new LetItPattern(CampPattern.ENV, CampPattern.IT);
 	}
 
-	/** A convenient macro for AConcat */
+	/** A convenient macro for OpRecConcat */
 	public static BinaryPattern concat(CampPattern left, CampPattern right) {
-		return new BinaryPattern(BinaryOperator.AConcat, left, right);
+		return new BinaryPattern(BinaryOperator.OpRecConcat, left, right);
 	}
 	
 	/** A convenient macro for 'dot' */
 	public static UnaryPattern dot(CampPattern receiver, String field) {
-		return new UnaryPattern(UnaryOperator.ADot, field, receiver);
+		return new UnaryPattern(UnaryOperator.OpDot, field, receiver);
 	}
 	
 	/** A convenient macro for equality of two patterns */
 	public static BinaryPattern eq(CampPattern left, CampPattern right) {
-		return new BinaryPattern(BinaryOperator.AEq, left, right);
+		return new BinaryPattern(BinaryOperator.OpEqual, left, right);
 	}
 	
 	/** A macro equivalent to the fetchRef function in Coq, with 'keyval' implicitly bound to 'it':
@@ -129,10 +129,10 @@ public class CampMacros {
 	}
 
 	/** A convenient macro equivalent to makeSingleton in Coq code
-      Definition makeSingleton (p:pat) : pat := punop AColl p.
+      Definition makeSingleton (p:pat) : pat := punop OpBag p.
 	 */
 	public static CampPattern makeSingleton(CampPattern p) {
-		return new UnaryPattern(UnaryOperator.AColl, p);
+		return new UnaryPattern(UnaryOperator.OpBag, p);
 	}
 
 	/** A macro equivalent to the matches function in Coq:
@@ -155,9 +155,9 @@ public class CampMacros {
 		return new LetEnvPattern(new AssertPattern(asserted), successor);
 	}
 
-	/** A convenient macro for ARec */
+	/** A convenient macro for OpRec */
 	public static UnaryPattern rec(String name, CampPattern value) {
-		return new UnaryPattern(UnaryOperator.ARec, name, value);
+		return new UnaryPattern(UnaryOperator.OpRec, name, value);
 	}
 
 	/** A macro equivalent to the 'RETURN' notion in Coq (which is an infix for pletEnv) */
@@ -167,7 +167,7 @@ public class CampMacros {
 
 	/** Convenience macro for toString */
 	public static UnaryPattern stringify(CampPattern arg) {
-		return new UnaryPattern(UnaryOperator.AToString, arg);
+		return new UnaryPattern(UnaryOperator.OpToString, arg);
 	}
 
 	/** A macro equivalent to the pbdot (unbrand dot) function in Coq but with the 'p' argument elided (partially applied)
@@ -184,23 +184,23 @@ public class CampMacros {
 
 	/** Convenience macro for unbranding "it" */
 	public static UnaryPattern unbrandIt() {
-		return new UnaryPattern(UnaryOperator.AUnbrand, CampPattern.IT);
+		return new UnaryPattern(UnaryOperator.OpUnbrand, CampPattern.IT);
 	}
 
 	/** A macro equivalent to the VARIABLES notation, fronting for returnVariables function:
 	 *   Definition returnVariables (sl:list string) : pat
-     *      := punop (ARecProject sl) penv.
+     *      := punop (OpRecProject sl) penv.
 	 */
 	public static CampPattern variables(List<String> variableNames) {
-		return new UnaryPattern(UnaryOperator.ARecProject, variableNames, CampPattern.ENV);
+		return new UnaryPattern(UnaryOperator.OpRecProject, variableNames, CampPattern.ENV);
 	}
 
 	/** A macro equivalent to the varWith function in Coq:
-	 * Definition pvarwith f : pat -> pat := punop (ARec f).
+	 * Definition pvarwith f : pat -> pat := punop (OpRec f).
 	 * @see org.qcert.camp.translator.CampASTNode#expand()
 	 */
 	public static CampPattern varWith(String variableName, CampPattern operand) {
-		return new UnaryPattern(UnaryOperator.ARec, variableName, operand);
+		return new UnaryPattern(UnaryOperator.OpRec, variableName, operand);
 	}
 
 	/** A macro equivalent to the WW macro in coq, used in rule expansion
@@ -211,12 +211,12 @@ public class CampMacros {
 	}
 
 	/** A macro equivalent to the cast sugar in Coq:
-	 * Definition pcast' b p:= pletIt (punop (ACast b) p) psome.
+	 * Definition pcast' b p:= pletIt (punop (OpCast b) p) psome.
      * Definition pcast b := pcast' b pit.
-     * ... := pletIt (punop (ACast b) pit) psome
+     * ... := pletIt (punop (OpCast b) pit) psome
 	 */
 	private static CampPattern cast(String typeName) {
-		CampPattern punopCast = new UnaryPattern(UnaryOperator.ACast, Collections.singletonList(typeName), CampPattern.IT);
+		CampPattern punopCast = new UnaryPattern(UnaryOperator.OpCast, Collections.singletonList(typeName), CampPattern.IT);
 		return new LetItPattern(punopCast, CampPattern.LEFT);
 	}
 
@@ -224,20 +224,20 @@ public class CampMacros {
   	  Fixpoint flattenn (n:nat) (p:pat)
          := match n with
        	  | 0 => p
-       	  | S m =>flattenn m (punop AFlatten p)
+       	  | S m =>flattenn m (punop OpFlatten p)
       end.
 	 */
 	private static CampPattern flattenn(CampPattern pattern, int count) {
 		if (count == 0)
 			return pattern;
-		return flattenn(new UnaryPattern(UnaryOperator.AFlatten, pattern), count - 1);
+		return flattenn(new UnaryPattern(UnaryOperator.OpFlatten, pattern), count - 1);
 	}
 
 	/** A macro equivalent to the mapsnone macro on coq
-      Definition mapsnone p := (passert (pbinop AEq (punop ACount (pmap p)) 0)).
+      Definition mapsnone p := (passert (pbinop OpEqual (punop OpCount (pmap p)) 0)).
 	 **/
 	private static CampPattern mapsnone(CampPattern p) {
-		CampPattern count = new UnaryPattern(UnaryOperator.ACount, new MapPattern(p));
+		CampPattern count = new UnaryPattern(UnaryOperator.OpCount, new MapPattern(p));
 		return new AssertPattern(eq(count, new ConstPattern(0)));
 	}
 
@@ -259,25 +259,25 @@ public class CampMacros {
 	 * Fragment of the full fetchRef definition consisting of
 	 * (pand ((pletIt punbrand (keyatt #-> pit) |p-eq| (lookup tempvar))) pit)
 	 *   Definition pand (p1 p2:pat):= pletEnv (passert p1) p2.
-         Definition punbrand' p := punop AUnbrand p.
+         Definition punbrand' p := punop OpUnbrand p.
          Definition punbrand := punbrand' pit.
          Notation "s #-> p" := (pdot s p)
-         Definition pdot f : pat -> pat := pletIt (punop (ADot f) pit).
+         Definition pdot f : pat -> pat := pletIt (punop (OpDot f) pit).
 	 */
 	private static CampPattern pandClause(CampPattern lookup, String keyatt) {
 		CampPattern pdot = dot(CampPattern.IT, keyatt);
 		CampPattern punbrand = unbrandIt(); // p is bound to 'it' in this treatment
 		CampPattern letItUnbrandPdot = new LetItPattern(punbrand, pdot);
-		CampPattern eq = new BinaryPattern(BinaryOperator.AEq, letItUnbrandPdot, lookup);
+		CampPattern eq = new BinaryPattern(BinaryOperator.OpEqual, letItUnbrandPdot, lookup);
 		return new LetEnvPattern(new AssertPattern(eq), CampPattern.IT);
 	}
 
 	/** A macro equivalent to the psingleton function in Coq:
-       Definition psingleton' p := pletIt (punop ASingleton p) psome.
+       Definition psingleton' p := pletIt (punop OpSingleton p) psome.
        Definition psingleton := psingleton' pit.
 	 */
 	private static CampPattern singleton() {
-		CampPattern unsing = new UnaryPattern(UnaryOperator.ASingleton, CampPattern.IT);
+		CampPattern unsing = new UnaryPattern(UnaryOperator.OpSingleton, CampPattern.IT);
 		return new LetItPattern(unsing, CampPattern.LEFT);
 	}
 

@@ -30,7 +30,6 @@ Require Import ForeignCloudant.
 Require Import ForeignToCloudant.
 Require Import CompilerRuntime.
 Require Import CompilerModel.
-Require Import FloatModelPart.
 Require Import StringModelPart. 
 Require Import DateTimeModelPart.
 Require Import SqlDateModelPart.
@@ -76,7 +75,6 @@ Definition enforce_binary_op_schema
 
 Inductive enhanced_data : Set
   :=
-  | enhancedfloat : FLOAT -> enhanced_data
   | enhancedstring : STRING -> enhanced_data
   | enhancedtimescale : time_scale -> enhanced_data
   | enhancedtimeduration : TIME_DURATION -> enhanced_data
@@ -89,7 +87,6 @@ Inductive enhanced_type : Set
   :=
   | enhancedTop : enhanced_type
   | enhancedBottom : enhanced_type
-  | enhancedFloat : enhanced_type
   | enhancedString : enhanced_type
   | enhancedTimeScale : enhanced_type
   | enhancedTimeDuration : enhanced_type
@@ -102,7 +99,6 @@ Definition enhanced_type_to_string (et:enhanced_type) : string :=
   match et with
   | enhancedTop => "ETop"
   | enhancedBottom => "EBottom"
-  | enhancedFloat => "EFloat"
   | enhancedString => "EString"
   | enhancedTimeScale => "ETimeScale"
   | enhancedTimeDuration => "ETimeDuration"
@@ -115,7 +111,6 @@ Definition string_to_enhanced_type (s:string) : option enhanced_type :=
   match s with
   | "ETop"%string => Some enhancedTop
   | "EBottom"%string => Some enhancedBottom
-  | "EFloat"%string => Some enhancedFloat
   | "EString"%string => Some enhancedString
   | "ETimeScale"%string => Some enhancedTimeScale
   | "ETimeDuration"%string => Some enhancedTimeDuration
@@ -127,7 +122,6 @@ Definition string_to_enhanced_type (s:string) : option enhanced_type :=
 
 Require Import RelationClasses Equivalence.
 
-Existing Instance float_foreign_data.
 Existing Instance time_scale_foreign_data.
 Existing Instance time_duration_foreign_data.
 Existing Instance time_point_foreign_data.
@@ -140,9 +134,6 @@ Next Obligation.
   red.
   unfold equiv, complement.
   destruct x; destruct y; simpl; try solve [right; inversion 1].
-  - destruct (@foreign_data_dec float_foreign_data f f0); simpl; intros.
-    + left; congruence.
-    + right; congruence.
   - case_eq (STRING_eq s s0).
     + left; intros.
       f_equal.
@@ -177,7 +168,6 @@ Defined.
 Next Obligation.
   (* normalized? *)
   destruct a.
-  - exact (@foreign_data_normalized float_foreign_data f).
   - exact True.
   - exact (@foreign_data_normalized time_scale_foreign_data t).
   - exact (@foreign_data_normalized time_duration_foreign_data t).
@@ -187,7 +177,6 @@ Next Obligation.
 Defined.
 Next Obligation.
   destruct a.
-  - exact (@foreign_data_normalize_normalizes float_foreign_data f).
   - simpl; trivial.
   - exact (@foreign_data_normalize_normalizes time_scale_foreign_data t).
   - exact (@foreign_data_normalize_normalizes time_duration_foreign_data t).
@@ -198,7 +187,6 @@ Defined.
 Next Obligation.
   constructor.
   destruct 1.
-  - exact (@toString _ (@foreign_data_tostring float_foreign_data) f).
   - exact (STRING_tostring s).
   - exact (toString t).
   - exact (@toString _ (@foreign_data_tostring time_duration_foreign_data) t).
@@ -207,7 +195,6 @@ Next Obligation.
   - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
 Defined.
 
-Definition denhancedfloat f := dforeign (enhancedfloat f).
 Definition denhancedstring s := dforeign (enhancedstring s).
 Definition denhancedtimescale ts := dforeign (enhancedtimescale ts).
 Definition denhancedtimeduration td := dforeign (enhancedtimeduration td).
@@ -218,59 +205,20 @@ Definition denhancedsqldateinterval td := dforeign (enhancedsqldateinterval td).
 
 Require Import JSON.
 
-Axiom JENHANCED_float : FLOAT -> string.
-Extract Constant JENHANCED_float => "(fun f -> Util.string_of_enhanced_float f)".
-
 Axiom JENHANCED_string : STRING -> string.
 Extract Constant JENHANCED_string => "(fun s -> Util.string_of_enhanced_string s)".
 
-Definition jenhancedfloat f := JENHANCED_float f.
 Definition jenhancedstring s := JENHANCED_string s.
 
 Inductive enhanced_unary_op
   :=
-  | enhanced_unary_float_op : float_unary_op -> enhanced_unary_op
   | enhanced_unary_time_op : time_unary_op -> enhanced_unary_op
   | enhanced_unary_sql_date_op : sql_date_unary_op -> enhanced_unary_op.
-
-Definition ondfloat {A} (f : FLOAT -> A) (d : data) : option A
-  := match d with
-     | dforeign (enhancedfloat fd) => Some (f fd)
-     | _ => None
-     end.
 
 Definition ondsqldate {A} (f : SQL_DATE -> A) (d : data) : option A
   := match d with
      | dforeign (enhancedsqldate fd) => Some (f fd)
      | _ => None
-     end.
-
-Definition rondfloat (f: FLOAT -> FLOAT) (d:data) : option data
-  := lift denhancedfloat (ondfloat f d).
-
-Definition ondcollfloat {A} (f : list FLOAT -> A) (d : data) : option A
-  := lift_oncoll (fun x => lift f (lift_map (fun z => ondfloat id z) x)) d.
-
-Definition rondcollfloat (f: list FLOAT -> FLOAT) (d:data) : option data
-  := lift denhancedfloat (ondcollfloat f d).
-
-Definition float_unary_op_interp (op:float_unary_op) (d:data) : option data
-
-  := match op with
-     | uop_float_neg => rondfloat FLOAT_neg d
-     | uop_float_sqrt => rondfloat FLOAT_sqrt d
-     | uop_float_exp => rondfloat FLOAT_exp d
-     | uop_float_log => rondfloat FLOAT_log d
-     | uop_float_log10 => rondfloat FLOAT_log10 d
-     | uop_float_of_int => lift denhancedfloat (ondnat FLOAT_of_int d)
-     | uop_float_ceil => rondfloat FLOAT_ceil d
-     | uop_float_floor => rondfloat FLOAT_floor d
-     | uop_float_truncate => lift dnat (ondfloat FLOAT_truncate d)
-     | uop_float_abs => rondfloat FLOAT_abs d
-     | uop_float_sum => rondcollfloat FLOAT_sum d
-     | uop_float_arithmean => rondcollfloat FLOAT_arithmean d
-     | uop_float_listmin => rondcollfloat FLOAT_listmin d
-     | uop_float_listmax => rondcollfloat FLOAT_listmax d
      end.
 
 Definition ondstring {A} (f : String.string -> A) (d : data) : option A
@@ -308,7 +256,6 @@ Definition enhanced_unary_op_interp
            (op:enhanced_unary_op)
            (d:data) : option data
   := match op with
-     | enhanced_unary_float_op f => float_unary_op_interp f d
      | enhanced_unary_time_op f => time_unary_op_interp f d
      | enhanced_unary_sql_date_op f => sql_date_unary_op_interp f d
      end.
@@ -324,29 +271,16 @@ Next Obligation.
   decide equality.
   - decide equality.
   - decide equality.
-  - decide equality.
     decide equality.
 Defined.
 Next Obligation.
   constructor; intros op.
   destruct op.
-  - exact (float_unary_op_tostring f).
   - exact (time_unary_op_tostring t).
   - exact (sql_date_unary_op_tostring s).
 Defined.
 Next Obligation.
   destruct op; simpl in H.
-  - destruct f; simpl in H;
-      unfold rondfloat, rondcollfloat, lift in H;
-      destruct d; simpl in H; try discriminate;
-        simpl in H; try unfold lift in H;
-        try (destruct f; invcs H;
-          repeat constructor).
-    + destruct z; invcs H; repeat constructor.
-    + match_destr_in H; invcs H; repeat constructor.
-    + match_destr_in H; invcs H; repeat constructor.
-    + match_destr_in H; invcs H; repeat constructor.
-    + match_destr_in H; invcs H; repeat constructor.
   - destruct t; simpl in H;
       unfold ondtimepoint, ondstring, denhancedtimepoint, denhancedtimeduration, lift in H; simpl in H;
         destruct d; simpl in H; try discriminate.
@@ -361,41 +295,11 @@ Next Obligation.
     + invcs H; repeat constructor.
 Qed.
 
-Definition ondfloat2 {A} (f : FLOAT -> FLOAT -> A) (d1 d2 : data) : option A
-  := match d1, d2 with
-     | dforeign (enhancedfloat fd1), dforeign (enhancedfloat fd2) => Some (f fd1 fd2)
-     | _, _ => None
-     end.
-
-Definition rondfloat2 (f: FLOAT -> FLOAT -> FLOAT) (d1 d2:data) : option data
-  := lift denhancedfloat (ondfloat2 f d1 d2).
-
-Definition rondboolfloat2 (f: FLOAT -> FLOAT -> bool) (d1 d2:data) : option data
-  := lift dbool (ondfloat2 f d1 d2).
-
 Inductive enhanced_binary_op
   :=
-  | enhanced_binary_float_op : float_binary_op -> enhanced_binary_op
   | enhanced_binary_time_op : time_binary_op -> enhanced_binary_op
   | enhanced_binary_sql_date_op : sql_date_binary_op -> enhanced_binary_op
 .
-
-Definition float_binary_op_interp
-           (op:float_binary_op) (d1 d2:data) : option data
-  := match op with
-     | bop_float_plus => rondfloat2 FLOAT_plus d1 d2
-     | bop_float_minus => rondfloat2 FLOAT_minus d1 d2
-     | bop_float_mult => rondfloat2 FLOAT_mult d1 d2
-     | bop_float_div => rondfloat2 FLOAT_div d1 d2
-     | bop_float_pow => rondfloat2 FLOAT_pow d1 d2
-     | bop_float_min => rondfloat2 FLOAT_min d1 d2
-     | bop_float_max => rondfloat2 FLOAT_max d1 d2
-     | bop_float_ne => rondboolfloat2 FLOAT_ne d1 d2
-     | bop_float_lt => rondboolfloat2 FLOAT_lt d1 d2
-     | bop_float_le => rondboolfloat2 FLOAT_le d1 d2
-     | bop_float_gt => rondboolfloat2 FLOAT_gt d1 d2
-     | bop_float_ge => rondboolfloat2 FLOAT_ge d1 d2
-     end.
 
 Definition ondtimepoint2 {A} (f : TIME_POINT -> TIME_POINT -> A) (d1 d2 : data) : option A
   := match d1, d2 with
@@ -475,7 +379,6 @@ Definition enhanced_binary_op_interp
            (op:enhanced_binary_op)
            (d1 d2:data) : option data
   := match op with
-     | enhanced_binary_float_op f => float_binary_op_interp f d1 d2
      | enhanced_binary_time_op f => time_binary_op_interp f d1 d2
      | enhanced_binary_sql_date_op f => sql_date_binary_op_interp f d1 d2
      end.
@@ -489,25 +392,15 @@ Next Obligation.
   decide equality.
   - decide equality.
   - decide equality.
-  - decide equality.
 Defined.
 Next Obligation.
   constructor; intros op.
   destruct op.
-  - exact (float_binary_op_tostring f).
   - exact (time_binary_op_tostring t).
   - exact (sql_date_binary_op_tostring s).
 Defined.
 Next Obligation.
   destruct op; simpl in H.
-  - destruct f; simpl in H;
-    unfold rondfloat2, rondboolfloat2, lift in H
-    ; destruct d1; simpl in H; try discriminate
-    ; destruct f; simpl in H; try discriminate
-    ; destruct d2; simpl in H; try discriminate
-    ; destruct f0; simpl in H; try discriminate
-    ; invcs H
-    ; repeat constructor.
   - destruct t; simpl in H;
       unfold rondtimepoint2, rondbooltimepoint2, denhancedtimeduration, lift in H
       ; destruct d1; simpl in H; try discriminate
@@ -537,7 +430,6 @@ Instance enhanced_foreign_runtime :
 Definition enhanced_to_java_data
            (quotel:String.string) (fd:enhanced_data) : java_json
   := match fd with
-     | enhancedfloat f => mk_java_json (FLOAT_tostring f)
      | enhancedstring s => mk_java_json (STRING_tostring s)
      | enhancedtimescale ts => mk_java_json (time_scale_to_java_string ts)
      | enhancedtimeduration td => mk_java_json (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) td)
@@ -551,8 +443,6 @@ Definition enhanced_to_java_unary_op
              (quotel:String.string) (fu:enhanced_unary_op)
              (d:java_json) : java_json
   := match fu with
-     | enhanced_unary_float_op op =>
-       float_to_java_unary_op indent eol quotel op d
      | enhanced_unary_time_op op =>
        time_to_java_unary_op indent eol quotel op d
      | enhanced_unary_sql_date_op op =>
@@ -564,8 +454,6 @@ Definition enhanced_to_java_binary_op
            (quotel:String.string) (fb:enhanced_binary_op)
            (d1 d2:java_json) : java_json
   := match fb with
-     | enhanced_binary_float_op op =>
-       float_to_java_binary_op indent eol quotel op d1 d2
      | enhanced_binary_time_op op =>
        time_to_java_binary_op indent eol quotel op d1 d2
      | enhanced_binary_sql_date_op op =>
@@ -583,7 +471,6 @@ Instance enhanced_foreign_to_java :
 Definition enhanced_to_javascript_data
            (quotel:String.string) (fd:enhanced_data) : String.string
   := match fd with
-     | enhancedfloat f => FLOAT_tostring f
      | enhancedstring s => STRING_tostring s
      | enhancedtimescale ts => toString ts
      | enhancedtimeduration td => (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) td)
@@ -598,8 +485,6 @@ Definition enhanced_to_javascript_unary_op
              (quotel:String.string) (fu:enhanced_unary_op)
              (d:String.string) : String.string
   := match fu with
-     | enhanced_unary_float_op op =>
-       float_to_javascript_unary_op indent eol quotel op d
      | enhanced_unary_time_op op =>
        time_to_javascript_unary_op indent eol quotel op d
      | enhanced_unary_sql_date_op op =>
@@ -612,8 +497,6 @@ Definition enhanced_to_javascript_binary_op
            (quotel:String.string) (fb:enhanced_binary_op)
            (d1 d2:String.string) : String.string
   := match fb with
-     | enhanced_binary_float_op op =>
-       float_to_javascript_binary_op indent eol quotel op d1 d2
      | enhanced_binary_time_op op =>
        time_to_javascript_binary_op indent eol quotel op d1 d2
      | enhanced_binary_sql_date_op op =>
@@ -629,8 +512,6 @@ Instance enhanced_foreign_to_javascript :
 
 Definition enhanced_to_scala_unary_op (op: enhanced_unary_op) (d: string) : string :=
   match op with
-    | enhanced_unary_float_op op =>
-      float_to_scala_unary_op op d
     | enhanced_unary_time_op op => "EnhancedModel: Time ops not supported for now."
     | enhanced_unary_sql_date_op op => "EnhancedModel: SQL date ops not supported for now."
   end.
@@ -661,7 +542,6 @@ Next Obligation.
 Defined.
 Next Obligation.
   destruct fd.
-  - exact (jstring (jenhancedfloat f)).
   - exact (jstring (jenhancedstring s)).
   - exact (jstring (toString t)).
   - exact (jstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
@@ -716,33 +596,33 @@ Definition enhanced_reduce_op_tostring (op:enhanced_reduce_op) : string
 Definition enhanced_numeric_sum (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => OpSum
+       => OpNatSum
      | enhanced_numeric_float
-       => OpForeignUnary (enhanced_unary_float_op uop_float_sum)
+       => OpFloatSum
      end.
 
 Definition enhanced_numeric_min (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => OpNumMin
+       => OpNatMin
      | enhanced_numeric_float
-       => OpForeignUnary (enhanced_unary_float_op uop_float_listmin)
+       => OpFloatBagMin
      end.
 
 Definition enhanced_numeric_max (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => OpNumMax
+       => OpNatMax
      | enhanced_numeric_float
-       => OpForeignUnary (enhanced_unary_float_op uop_float_listmax)
+       => OpFloatBagMax
      end.
 
 Definition enhanced_numeric_arith_mean (typ:enhanced_numeric_type) : unary_op
   := match typ with
      | enhanced_numeric_int
-       => OpNumMean
+       => OpNatMean
      | enhanced_numeric_float
-       => OpForeignUnary (enhanced_unary_float_op uop_float_arithmean)
+       => OpFloatMean
      end.
 
 Definition enhanced_reduce_op_interp
@@ -799,38 +679,29 @@ Next Obligation.
   - destruct typ; simpl in *.
     + apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
-    + unfold rondcollfloat, ondcollfloat, lift in H2.
-      simpl in H2.
-      match_destr_in H2.
-      invcs H2.
-      repeat constructor.
+    + apply some_lift in H2; destruct H2 as [? eqq ?];
+        subst; constructor.
   - destruct typ; simpl in *.
     + unfold lifted_min in *.
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
-    + unfold rondcollfloat, ondcollfloat, lift in H2.
-      simpl in H2.
-      match_destr_in H2.
-      invcs H2.
-      repeat constructor.
+    + unfold lifted_fmin in *.
+      apply some_lift in H2; destruct H2 as [? eqq ?];
+        subst; constructor.
   - destruct typ; simpl in *.
     + unfold lifted_max in * .
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
-    + unfold rondcollfloat, ondcollfloat, lift in H2.
-      simpl in H2.
-      match_destr_in H2.
-      invcs H2.
-      repeat constructor.
+    + unfold lifted_fmax in * .
+      apply some_lift in H2; destruct H2 as [? eqq ?];
+        subst; constructor.
   - destruct typ; simpl in *.
     + unfold lifted_max in * .
       apply some_lift in H2; destruct H2 as [? eqq ?];
         subst; constructor.
-    + unfold rondcollfloat, ondcollfloat, lift in H2.
-      simpl in H2.
-      match_destr_in H2.
-      invcs H2.
-      repeat constructor.
+    + unfold lifted_fmax in * .
+      apply some_lift in H2; destruct H2 as [? eqq ?];
+        subst; constructor.
   - destruct typ; simpl in *.
     + destruct (dsum dl); simpl in *; try discriminate.
       unfold lifted_min, lifted_max in *.
@@ -840,44 +711,36 @@ Next Obligation.
       constructor.
       * repeat constructor.
       * reflexivity.
-    + unfold rondcollfloat, ondcollfloat, lift in H2.
-      simpl in H2.
-      destruct ( match lift_map (fun z : data => ondfloat id z) dl with
-           | Some a' => Some (FLOAT_sum a')
-           | None => None
-           end); try discriminate.
-      destruct ( match lift_map (fun z : data => ondfloat id z) dl with
-               | Some a' => Some (FLOAT_listmin a')
-               | None => None
-                 end); try discriminate.
-      destruct ( match lift_map (fun z : data => ondfloat id z) dl with
-               | Some a' => Some (FLOAT_listmax a')
-               | None => None
-                 end); try discriminate.
+    + case_eq (lifted_fsum dl); intros; simpl in *; rewrite H in *; try discriminate.
+      unfold lifted_fmin, lifted_fmax in *.
+      destruct ((lift float_list_min (lifted_fbag dl))); simpl in *; try discriminate.
+      destruct ((lift float_list_max (lifted_fbag dl))); simpl in *; try discriminate.
       invcs H2.
       constructor.
       * repeat constructor.
+        apply some_lift in H; destruct H as [? eqq ?]; subst.
+        constructor.
       * reflexivity.
 Qed.
 
 Definition enhanced_to_reduce_op (uop:unary_op) : option NNRCMR.reduce_op
   := match uop with
      | OpCount => Some (NNRCMR.RedOpForeign RedOpCount)
-     | OpSum =>
+     | OpNatSum =>
        Some (NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_int))
-     | OpForeignUnary (enhanced_unary_float_op uop_float_sum) =>
+     | OpFloatSum =>
        Some (NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_float))
-     | OpNumMin =>
+     | OpNatMin =>
        Some (NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_int))
-     | OpForeignUnary (enhanced_unary_float_op uop_float_listmin) =>
+     | OpFloatBagMin =>
        Some (NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_float))
-     | OpNumMax =>
+     | OpNatMax =>
        Some (NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_int))
-     | OpForeignUnary (enhanced_unary_float_op uop_float_listmax) =>
+     | OpFloatBagMax =>
        Some (NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_float))
-     | OpNumMean =>
+     | OpNatMean =>
        Some (NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_int))
-     | OpForeignUnary (enhanced_unary_float_op uop_float_arithmean) =>
+     | OpFloatMean =>
        Some (NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_float))
      | _ => None
      end.
@@ -886,21 +749,21 @@ Definition enhanced_of_reduce_op (rop:NNRCMR.reduce_op) : option unary_op
   := match rop with
      | NNRCMR.RedOpForeign RedOpCount => Some OpCount
      | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_int) =>
-       Some (OpSum)
+       Some (OpNatSum)
      | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_float) =>
-       Some (OpForeignUnary (enhanced_unary_float_op uop_float_sum))
+       Some (OpFloatSum)
      | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_int) =>
-       Some (OpNumMin)
+       Some (OpNatMin)
      | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_float) =>
-       Some (OpForeignUnary (enhanced_unary_float_op uop_float_listmin))
+       Some (OpFloatBagMin)
      | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_int) =>
-       Some (OpNumMax)
+       Some (OpNatMax)
      | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_float) =>
-       Some (OpForeignUnary (enhanced_unary_float_op uop_float_listmax))
+       Some (OpFloatBagMax)
      | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_int) =>
-       Some (OpNumMean)
+       Some (OpNatMean)
      | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_float) =>
-       Some (OpForeignUnary (enhanced_unary_float_op uop_float_arithmean))
+       Some (OpFloatMean)
      | NNRCMR.RedOpForeign (RedOpStats _) =>
        None (* XXX TODO? XXX *)
      end.
@@ -910,8 +773,6 @@ Program Instance enhanced_foreign_to_reduce_op : foreign_to_reduce_op
 Next Obligation.
   unfold NNRCMR.reduce_op_eval.
   destruct uop; simpl in *; invcs H; try reflexivity.
-  destruct fu; try discriminate.
-  destruct f; invcs H1; reflexivity.
 Qed.
 Next Obligation.
   unfold NNRCMR.reduce_op_eval.
@@ -1004,19 +865,19 @@ Require Import NNRCRuntime NNRCMRRuntime NNRCMRRewrite.
               MapScalar (x, NNRCUnop OpBag
                                     (NNRCIf (NNRCBinop OpEqual (NNRCUnop (OpDot "count"%string) (NNRCVar x)) zero)
                                            zero
-                                           (NNRCBinop (OpArithBinary ArithDivide)
+                                           (NNRCBinop (OpNatBinary NatDiv)
                                                      (NNRCUnop (OpDot "sum"%string) (NNRCVar x))
                                                      (NNRCUnop (OpDot "count"%string) (NNRCVar x)))))
             | enhanced_numeric_float =>
               let zero := NNRCConst (dnat 0) in
-              let zerof := NNRCConst (denhancedfloat FLOAT_CONST0) in
+              let zerof := NNRCConst (dfloat float_zero) in
               let x := "stats"%string in
               MapScalar (x, NNRCUnop OpBag
                                     (NNRCIf (NNRCBinop OpEqual (NNRCUnop (OpDot "count"%string) (NNRCVar x)) zero)
                                            zerof
-                                           (NNRCBinop (OpForeignBinary (enhanced_binary_float_op bop_float_div))
+                                           (NNRCBinop (OpFloatBinary FloatDiv)
                                                      (NNRCUnop (OpDot "sum"%string) (NNRCVar x))
-                                                     (NNRCUnop (OpForeignUnary (enhanced_unary_float_op uop_float_of_int))
+                                                     (NNRCUnop (OpFloatOfNat)
                                                        (NNRCUnop (OpDot "count"%string) (NNRCVar x))))))
             end
         in
@@ -1081,9 +942,9 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
 Instance enhanced_foreign_cloudant : foreign_cloudant
   := mk_foreign_cloudant
        enhanced_foreign_runtime
-       (OpForeignUnary (enhanced_unary_float_op uop_float_sum))
-       (OpForeignUnary (enhanced_unary_float_op uop_float_listmin))
-       (OpForeignUnary (enhanced_unary_float_op uop_float_listmax)).
+       (OpFloatSum)
+       (OpFloatBagMin)
+       (OpFloatBagMax).
 
 Definition enhanced_to_cloudant_reduce_op
            (rop:enhanced_reduce_op) : CldMR.cld_reduce_op
@@ -1271,7 +1132,6 @@ Definition enhanced_type_join (t1 t2:enhanced_type)
   := match t1, t2 with
      | enhancedBottom, _ => t2
      | _, enhancedBottom => t1
-     | enhancedFloat, enhancedFloat => enhancedFloat
      | enhancedString, enhancedString => enhancedString
      | enhancedTimeScale, enhancedTimeScale => enhancedTimeScale
      | enhancedTimeDuration, enhancedTimeDuration => enhancedTimeDuration
@@ -1285,7 +1145,6 @@ Definition enhanced_type_meet (t1 t2:enhanced_type)
   := match t1, t2 with
      | enhancedTop, _ => t2
      | _, enhancedTop => t1
-     | enhancedFloat, enhancedFloat => enhancedFloat
      | enhancedString, enhancedString => enhancedString
      | enhancedTimeScale, enhancedTimeScale => enhancedTimeScale
      | enhancedTimeDuration, enhancedTimeDuration => enhancedTimeDuration
@@ -1382,7 +1241,6 @@ Defined.
 
 Inductive enhanced_has_type : enhanced_data -> enhanced_type -> Prop :=
 | enhanced_has_type_top fd : enhanced_has_type fd enhancedTop
-| enhanced_has_type_float (f:FLOAT) : enhanced_has_type (enhancedfloat f) enhancedFloat
 | enhanced_has_type_string (s:STRING) : enhanced_has_type (enhancedstring s) enhancedString
 | enhanced_has_type_timescale (ts:time_scale) : enhanced_has_type (enhancedtimescale ts) enhancedTimeScale
 | enhanced_has_type_timepoint (tp:TIME_POINT) : enhanced_has_type (enhancedtimepoint tp) enhancedTimePoint
@@ -1393,7 +1251,6 @@ Inductive enhanced_has_type : enhanced_data -> enhanced_type -> Prop :=
 
 Definition enhanced_infer_type (d:enhanced_data) : option enhanced_type
   := match d with
-     | enhancedfloat _ => Some enhancedFloat
      | enhancedstring _ => Some enhancedString
      | enhancedtimescale _ => Some enhancedTimeScale
      | enhancedtimeduration _ => Some enhancedTimeDuration
@@ -1414,7 +1271,6 @@ Next Obligation.
   inversion H; subst;
     simpl; trivial.
   - destruct d; simpl; constructor.
-  - constructor.
   - constructor.
   - constructor.
   - constructor.
@@ -1513,18 +1369,11 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_data_typing.
 End EnhancedRuntime.
 
-Definition Float {br:brand_relation} : rtype := Foreign enhancedFloat.
 Definition TimeScale {br:brand_relation} : rtype := Foreign enhancedTimeScale.
 Definition TimeDuration {br:brand_relation} : rtype := Foreign enhancedTimeDuration.
 Definition TimePoint {br:brand_relation} : rtype := Foreign enhancedTimePoint.
 Definition SqlDate {br:brand_relation} : rtype := Foreign enhancedSqlDate.
 Definition SqlDateInterval {br:brand_relation} : rtype := Foreign enhancedSqlDateInterval.
-
-Definition isFloat {model : brand_model}  (τ:rtype) :=
-  match proj1_sig τ with
-  | Foreign₀ enhancedFloat => true
-  | _ => false
-  end.
 
 Definition isTimePoint {model : brand_model} (τ:rtype) :=
   match proj1_sig τ with
@@ -1568,30 +1417,11 @@ Definition isString {model : brand_model} (τ:rtype) :=
   | _ => false
   end.
 
-Inductive float_unary_op_has_type {model:brand_model} :
-  float_unary_op -> rtype -> rtype -> Prop
-  :=
-  | tuop_float_neg : float_unary_op_has_type uop_float_neg Float Float
-  | tuop_float_sqrt : float_unary_op_has_type uop_float_sqrt Float Float
-  | tuop_float_exp : float_unary_op_has_type uop_float_exp Float Float
-  | tuop_float_log : float_unary_op_has_type uop_float_log Float Float
-  | tuop_float_log10 : float_unary_op_has_type uop_float_log10 Float Float
-  | tuop_float_of_int : float_unary_op_has_type uop_float_of_int Nat Float
-  | tuop_float_ceil : float_unary_op_has_type uop_float_ceil Float Float
-  | tuop_float_floor : float_unary_op_has_type uop_float_floor Float Float
-  | tuop_float_truncate : float_unary_op_has_type uop_float_truncate Float Nat
-  | tuop_float_abs : float_unary_op_has_type uop_float_abs Float Float
-  | tuop_float_sum : float_unary_op_has_type uop_float_sum (Coll Float) Float
-  | tuop_float_arithmean : float_unary_op_has_type uop_float_arithmean (Coll Float) Float
-  | tuop_float_listmin : float_unary_op_has_type uop_float_listmin (Coll Float) Float
-  | tuop_float_listmax : float_unary_op_has_type uop_float_listmax (Coll Float) Float
-
-.
-
   Definition tuncoll {model:brand_model} (τ:rtype) : option rtype.
   Proof.
     destruct τ.
     destruct x.
+    - exact None.
     - exact None.
     - exact None.
     - exact None.
@@ -1605,111 +1435,6 @@ Inductive float_unary_op_has_type {model:brand_model} :
     - exact None.
     - exact None.
   Defined.
-
-Definition float_unary_op_type_infer {model : brand_model} (op:float_unary_op) (τ₁:rtype) : option rtype :=
-  match op with
-  | uop_float_neg
-  | uop_float_sqrt
-  | uop_float_exp
-  | uop_float_log
-  | uop_float_log10
-  | uop_float_ceil
-  | uop_float_floor
-  | uop_float_abs =>
-    if isFloat τ₁
-    then Some Float
-    else None
-  | uop_float_of_int =>
-    if isNat τ₁
-    then Some Float
-    else None
-  | uop_float_truncate =>
-    if isFloat τ₁
-    then Some Nat
-    else None
-  | uop_float_sum
-  | uop_float_arithmean
-  | uop_float_listmin
-  | uop_float_listmax =>
-    match tuncoll τ₁ return (option rtype) with
-    | Some τ =>
-      if isFloat τ
-      then Some Float
-      else None
-    | None => None
-    end
-  end.
-
-Definition float_unary_op_type_infer_sub {model : brand_model} (op:float_unary_op) (τ₁:rtype) : option (rtype*rtype) :=
-  match op with
-  | uop_float_neg
-  | uop_float_sqrt
-  | uop_float_exp
-  | uop_float_log
-  | uop_float_log10
-  | uop_float_ceil
-  | uop_float_floor
-  | uop_float_abs =>
-    enforce_unary_op_schema (τ₁,Float) Float
-  | uop_float_of_int =>
-    enforce_unary_op_schema (τ₁,Nat) Float
-  | uop_float_truncate =>
-    enforce_unary_op_schema (τ₁,Float) Nat
-  | uop_float_sum
-  | uop_float_arithmean
-  | uop_float_listmin
-  | uop_float_listmax =>
-    enforce_unary_op_schema (τ₁,Coll Float) Float
-  end.
-
-Lemma rondcollfloat_typed_some
-      {model:brand_model}
-      (f: list FLOAT -> FLOAT)
-      (d:data) :
-    d ▹ Coll Float ->
-    exists z,
-      rondcollfloat f d = Some z
-      /\  z ▹ Float.
-Proof.
-  intros dt.
-  invcs dt.
-  assert (eqq:r = Foreign enhancedFloat)
-    by (apply rtype_fequal; simpl; trivial).
-  clear H.
-  subst.
-  revert H1.
-  unfold rondcollfloat, lift; simpl; unfold lift; simpl.
-  induction dl; simpl; intros F.
-  - eexists; split; try reflexivity; repeat econstructor.
-  - invcs F.
-    invcs H1.
-    invcs H3.
-    simpl.
-    destruct (IHdl H2) as [? [eqq typ]]; clear IHdl H2.
-    unfold lift.
-    destruct (lift_map (fun z : data => ondfloat id z) dl); simpl;
-      invcs eqq.
-    eexists; split; try reflexivity; repeat econstructor.
-Qed.
-
-Lemma float_unary_op_typing_sound {model : brand_model}
-      (fu : float_unary_op) (τin τout : rtype) :
-  float_unary_op_has_type fu τin τout ->
-  forall din : data,
-    din ▹ τin ->
-    exists dout : data,
-      float_unary_op_interp fu din = Some dout /\ dout ▹ τout.
-Proof.
-  inversion 1; subst;
-    try solve[inversion 1; subst;
-      try invcs H0;
-      try invcs H3;
-      simpl; unfold rondcollfloat, rondfloat; simpl;
-      eexists; split; try reflexivity;
-    repeat constructor
-             | intros; simpl;
-               apply (rondcollfloat_typed_some _ _ H0)].
-Qed.
 
 Inductive time_unary_op_has_type {model:brand_model} :
   time_unary_op -> rtype -> rtype -> Prop
@@ -1751,7 +1476,7 @@ Proof.
     try solve[inversion 1; subst;
       try invcs H0;
       try invcs H3;
-      simpl; unfold rondcollfloat, denhancedtimeduration, rondfloat; simpl;
+      simpl; unfold denhancedtimeduration; simpl;
       eexists; split; try reflexivity;
       repeat constructor].
 Qed.
@@ -1803,9 +1528,6 @@ Qed.
 
   Inductive enhanced_unary_op_has_type {model:brand_model} : enhanced_unary_op -> rtype -> rtype -> Prop
     :=
-    | tenhanced_unary_float_op fu τin τout:
-        float_unary_op_has_type fu τin τout ->
-        enhanced_unary_op_has_type (enhanced_unary_float_op fu) τin τout
     | tenhanced_unary_time_op fu τin τout:
         time_unary_op_has_type fu τin τout ->
         enhanced_unary_op_has_type (enhanced_unary_time_op fu) τin τout
@@ -1815,7 +1537,6 @@ Qed.
 
   Definition enhanced_unary_op_typing_infer {model:brand_model} (fu:enhanced_unary_op) (τ:rtype) : option rtype :=
     match fu with
-    | enhanced_unary_float_op op => float_unary_op_type_infer op τ
     | enhanced_unary_time_op op => time_unary_op_type_infer op τ
     | enhanced_unary_sql_date_op op => sql_date_unary_op_type_infer op τ
     end.
@@ -1829,27 +1550,6 @@ Qed.
   Proof.
     intros.
     destruct fu; simpl.
-    - destruct f; simpl in *;
-      destruct τ₁; simpl in *; try congruence;
-      destruct x; simpl in *; try congruence;
-      unfold isFloat, isNat in *;
-      try (destruct ft; simpl in *; try congruence;
-      inversion H; subst; clear H; constructor;
-      rewrite Foreign_canon;
-      constructor);
-      try (destruct x; simpl in *; try congruence;
-      destruct ft; simpl in *; try congruence;
-      inversion H; subst; clear H;
-      constructor;
-      assert ((exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true)
-                     (Coll₀ (Foreign₀ enhancedFloat)) e) = Coll Float)
-        by (apply rtype_fequal; reflexivity);
-      rewrite H; clear H; constructor).
-      + rewrite Nat_canon;
-        inversion H; subst; clear H;
-        constructor;
-        constructor;
-        reflexivity.
     - destruct t; simpl in *.
       + destruct τ₁; simpl in *; try congruence;
         destruct x; simpl in *; try congruence;
@@ -1890,30 +1590,9 @@ Qed.
   Proof.
     intros.
     destruct fu; simpl in *.
-    - destruct f; simpl in *;
-      destruct τ₁; simpl in *; try congruence;
-      destruct x; simpl in *; try congruence;
-      unfold isFloat, isNat in *;
-      try (destruct ft; simpl in *; try congruence;
-      inversion H; subst; clear H;
-      rewrite Foreign_canon in H0;
-      inversion H0; subst; clear H0;
-      inversion H1; subst; clear H1;
-      reflexivity);
-      try (destruct x; simpl in *; try congruence;
-        destruct ft; simpl in *; try congruence;
-        inversion H; subst; clear H;
-        inversion H0; subst; clear H0;
-        inversion H1; subst; clear H1;
-        reflexivity).
-      + inversion H; subst; clear H.
-        inversion H0; subst; clear H0.
-        inversion H1; subst; clear H1.
-        reflexivity.
     - destruct t; simpl in *;
       destruct τ₁; simpl in *; try congruence;
-      destruct x; simpl in *; try congruence;
-      unfold isFloat, isNat in *.
+      destruct x; simpl in *; try congruence.
       + destruct ft; simpl in *; try congruence;
         inversion H; subst; clear H;
         rewrite Foreign_canon in H0;
@@ -1932,8 +1611,7 @@ Qed.
         reflexivity.
     - destruct s; simpl in *;
       destruct τ₁; simpl in *; try congruence;
-      destruct x; simpl in *; try congruence;
-      unfold isFloat, isNat in *.
+      destruct x; simpl in *; try congruence.
       + destruct ft; simpl in *; try congruence;
         inversion H; subst; clear H;
         rewrite Foreign_canon in H0;
@@ -1961,18 +1639,9 @@ Qed.
   Proof.
     intros.
     destruct fu; simpl in *.
-    - destruct f; simpl in *;
-      destruct τ₁; simpl in *; try congruence;
-      destruct x; simpl in *; try congruence;
-      unfold isFloat, isNat in *;
-      unfold not; intros;
-      inversion H0; subst; simpl in *;
-      inversion H2; subst; simpl in *;
-      congruence.
     - destruct t; simpl in *;
       destruct τ₁; simpl in *; try congruence;
       destruct x; simpl in *; try congruence;
-      unfold isFloat, isNat in *;
       unfold not; intros;
       inversion H0; subst; clear H0;
       inversion H2; subst; clear H2.
@@ -1980,7 +1649,6 @@ Qed.
     - destruct s; simpl in *;
       destruct τ₁; simpl in *; try congruence;
       destruct x; simpl in *; try congruence;
-      unfold isFloat, isNat in *;
       unfold not; intros;
       inversion H0; subst; clear H0;
       inversion H2; subst; clear H2.
@@ -1989,7 +1657,6 @@ Qed.
 
   Definition enhanced_unary_op_typing_infer_sub {model:brand_model} (fu:enhanced_unary_op) (τ:rtype) : option (rtype*rtype) :=
     match fu with
-    | enhanced_unary_float_op op => float_unary_op_type_infer_sub op τ
     | enhanced_unary_time_op op => time_unary_op_type_infer_sub op τ
     | enhanced_unary_sql_date_op op => sql_date_unary_op_type_infer_sub op τ
     end.
@@ -2004,7 +1671,6 @@ Lemma enhanced_unary_op_typing_sound {model : brand_model}
 Proof.
   intros.
   destruct H.
-  - eapply float_unary_op_typing_sound; eauto.
   - eapply time_unary_op_typing_sound; eauto.
   - eapply sql_date_unary_op_typing_sound; eauto.
 Qed.
@@ -2025,96 +1691,6 @@ Instance enhanced_foreign_unary_op_typing
        ; foreign_unary_op_typing_infer_complete := enhanced_unary_op_typing_infer_complete
        ; foreign_unary_op_typing_infer_sub := enhanced_unary_op_typing_infer_sub
      }.
-
-Inductive float_binary_op_has_type {model:brand_model} :
-  float_binary_op -> rtype -> rtype -> rtype -> Prop
-  :=
-  | tbop_float_plus :
-      float_binary_op_has_type bop_float_plus Float Float Float 
-  | tbop_float_minus :
-      float_binary_op_has_type bop_float_minus Float Float Float 
-  | tbop_float_mult :
-      float_binary_op_has_type bop_float_mult  Float Float Float 
-  | tbop_float_div :
-      float_binary_op_has_type bop_float_div Float Float Float 
-  | tbop_float_pow :
-      float_binary_op_has_type bop_float_pow Float Float Float 
-  | tbop_float_min :
-      float_binary_op_has_type bop_float_min Float Float Float 
-  | tbop_float_max :
-      float_binary_op_has_type bop_float_max Float Float Float 
-  | tbop_float_ne :
-      float_binary_op_has_type bop_float_ne Float Float Bool 
-  | tbop_float_lt :
-      float_binary_op_has_type bop_float_lt Float Float Bool 
-  | tbop_float_le :
-      float_binary_op_has_type bop_float_le Float Float Bool 
-  | tbop_float_gt :
-      float_binary_op_has_type bop_float_gt Float Float Bool 
-  | tbop_float_ge :
-      float_binary_op_has_type bop_float_ge Float Float Bool
-.
-
-Definition float_binary_op_type_infer {model : brand_model} (op:float_binary_op) (τ₁ τ₂:rtype) :=
-  match op with
-  | bop_float_plus
-  | bop_float_minus
-  | bop_float_mult
-  | bop_float_div
-  | bop_float_pow
-  | bop_float_min
-  | bop_float_max =>
-    if isFloat τ₁ && isFloat τ₂
-    then Some Float
-    else None
-  | bop_float_ne
-  | bop_float_lt
-  | bop_float_le
-  | bop_float_gt
-  | bop_float_ge =>
-    if isFloat τ₁ && isFloat τ₂
-    then Some Bool
-    else None
-  end.
-
-Lemma float_binary_op_typing_sound {model : brand_model}
-      (fb : float_binary_op) (τin₁ τin₂ τout : rtype) :
-  float_binary_op_has_type fb τin₁ τin₂ τout ->
-  forall din₁ din₂ : data,
-    din₁ ▹ τin₁ ->
-    din₂ ▹ τin₂ ->
-    exists dout : data,
-      float_binary_op_interp fb din₁ din₂ = Some dout /\ dout ▹ τout.
-Proof.
-    inversion 1; subst;
-      inversion 1; subst;
-        inversion 1; subst;
-      try invcs H0;
-      try invcs H1;
-      invcs H3;
-      invcs H4;
-      simpl; unfold rondfloat2; simpl;
-        eexists; split; try reflexivity;
-          repeat constructor.
-Qed.
-
-Definition float_binary_op_type_infer_sub {model : brand_model} (op:float_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype):=
-  match op with
-  | bop_float_plus
-  | bop_float_minus
-  | bop_float_mult
-  | bop_float_div
-  | bop_float_pow
-  | bop_float_min
-  | bop_float_max =>
-    enforce_binary_op_schema (τ₁, Float) (τ₂, Float) Float
-  | bop_float_ne
-  | bop_float_lt
-  | bop_float_le
-  | bop_float_gt
-  | bop_float_ge =>
-    enforce_binary_op_schema (τ₁, Float) (τ₂, Float) Bool
-  end.
 
 Inductive time_binary_op_has_type {model:brand_model} :
   time_binary_op -> rtype -> rtype -> rtype -> Prop
@@ -2181,7 +1757,7 @@ Proof.
         eexists; split; try reflexivity;
           repeat constructor.
 Qed.
-         
+
 Definition time_binary_op_type_infer_sub {model : brand_model} (op:time_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype) :=
   match op with
   | bop_time_as =>
@@ -2281,9 +1857,6 @@ Definition sql_date_binary_op_type_infer_sub {model : brand_model} (op:sql_date_
 Inductive enhanced_binary_op_has_type {model:brand_model} :
   enhanced_binary_op -> rtype -> rtype -> rtype -> Prop
     :=
-    | tenhanced_binary_float_op fb τin₁ τin₂ τout:
-        float_binary_op_has_type fb τin₁ τin₂ τout ->
-        enhanced_binary_op_has_type (enhanced_binary_float_op fb) τin₁ τin₂ τout
     | tenhanced_binary_time_op fb τin₁ τin₂ τout:
         time_binary_op_has_type fb τin₁ τin₂ τout ->
         enhanced_binary_op_has_type (enhanced_binary_time_op fb) τin₁ τin₂ τout
@@ -2293,7 +1866,6 @@ Inductive enhanced_binary_op_has_type {model:brand_model} :
 
 Definition enhanced_binary_op_typing_infer {model:brand_model} (op:enhanced_binary_op) (τ₁ τ₂:rtype) :=
   match op with
-  | enhanced_binary_float_op fb => float_binary_op_type_infer fb τ₁ τ₂
   | enhanced_binary_time_op fb => time_binary_op_type_infer fb τ₁ τ₂
   | enhanced_binary_sql_date_op fb => sql_date_binary_op_type_infer fb τ₁ τ₂
   end.
@@ -2307,17 +1879,6 @@ Lemma enhanced_binary_op_typing_infer_correct
 Proof.
   intros.
   destruct fb; simpl.
-  - destruct f; simpl in *;
-    destruct τ₁; destruct τ₂; simpl in *; try discriminate
-    ; unfold isFloat in *
-    ; destruct x; simpl in H; try discriminate
-    ; destruct ft; simpl in H; try discriminate
-    ; destruct x0; simpl in H; try discriminate
-    ; destruct ft; simpl in H; try discriminate
-    ; invcs H
-    ; constructor
-    ; repeat rewrite Foreign_canon
-    ; constructor.
   - destruct t; simpl in *;
     destruct τ₁; destruct τ₂; simpl in *; try discriminate;
          unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *
@@ -2354,18 +1915,6 @@ Lemma enhanced_binary_op_typing_infer_least
 Proof.
   intros.
   destruct fb; simpl.
-  - destruct f; simpl in *;
-    destruct τ₁; destruct τ₂; simpl in *; try discriminate
-    ;  unfold isFloat in *
-    ; destruct x; simpl in H; try discriminate
-    ; destruct ft; simpl in H; try discriminate
-    ; destruct x0; simpl in H; try discriminate
-    ; try (destruct ft; simpl in H; try discriminate)
-    ; invcs H
-    ; repeat rewrite Foreign_canon in H0
-    ; invcs H0
-    ; invcs H1
-    ; reflexivity.
   - destruct t; simpl in *;
     destruct τ₁; destruct τ₂; simpl in *; try discriminate
     ; unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *
@@ -2401,8 +1950,6 @@ Lemma enhanced_binary_op_typing_infer_complete
 Proof.
   destruct fb; simpl; intros.
   - intro HH; invcs HH.
-    destruct f; simpl in *; invcs H1; simpl in H; try discriminate.
-  - intro HH; invcs HH.
     destruct t; simpl in *; invcs H1; simpl in H; try discriminate.
   - intro HH; invcs HH.
     destruct s; simpl in *; invcs H1; simpl in H; try discriminate.
@@ -2410,7 +1957,6 @@ Qed.
 
 Definition enhanced_binary_op_typing_infer_sub {model:brand_model} (op:enhanced_binary_op) (τ₁ τ₂:rtype) :=
   match op with
-  | enhanced_binary_float_op fb => float_binary_op_type_infer_sub fb τ₁ τ₂
   | enhanced_binary_time_op fb => time_binary_op_type_infer_sub fb τ₁ τ₂
   | enhanced_binary_sql_date_op fb => sql_date_binary_op_type_infer_sub fb τ₁ τ₂
   end.
@@ -2426,7 +1972,6 @@ Lemma enhanced_binary_op_typing_sound {model : brand_model}
 Proof.
   intros.
   destruct H.
-  - eapply float_binary_op_typing_sound; eauto.
   - eapply time_binary_op_typing_sound; eauto.
   - eapply sql_date_binary_op_typing_sound; eauto.
 Qed.
@@ -2526,16 +2071,10 @@ Module CompEnhanced.
   End Model.
 
     Module Data.
-      Definition dfloat (f : FLOAT) : data
-        := dforeign (enhancedfloat f).
       Definition dstringblob (s : STRING) : data
         := dforeign (enhancedstring s).
-
-      Definition jfloat (f : FLOAT) : json
-        := jstring (jenhancedfloat f).
       Definition jstringblob (s : STRING) : json
         := jstring (jenhancedstring s).
-
       Definition scale_kind := time_scale.
 
       (* intended for generated coq code, to stand out and be more
@@ -2597,36 +2136,6 @@ Module CompEnhanced.
 
     Module Ops.
       Module Unary.
-        Definition float_neg
-          := OpForeignUnary (enhanced_unary_float_op uop_float_neg).
-        Definition float_sqrt
-          := OpForeignUnary (enhanced_unary_float_op uop_float_sqrt).
-        Definition float_exp
-          := OpForeignUnary (enhanced_unary_float_op uop_float_exp).
-        Definition float_log
-          := OpForeignUnary (enhanced_unary_float_op uop_float_log).
-        Definition float_log10
-          := OpForeignUnary (enhanced_unary_float_op uop_float_log10).
-        Definition float_of_int
-          := OpForeignUnary (enhanced_unary_float_op uop_float_of_int).
-        Definition float_ceil
-          := OpForeignUnary (enhanced_unary_float_op uop_float_ceil).
-        Definition float_floor
-          := OpForeignUnary (enhanced_unary_float_op uop_float_floor).
-        Definition float_truncate
-          := OpForeignUnary (enhanced_unary_float_op uop_float_truncate).
-        Definition float_abs
-          := OpForeignUnary (enhanced_unary_float_op uop_float_abs).
-
-        Definition float_sum
-          := OpForeignUnary (enhanced_unary_float_op uop_float_sum).
-        Definition float_arithmean
-          := OpForeignUnary (enhanced_unary_float_op uop_float_arithmean).
-        Definition float_listmin
-          := OpForeignUnary (enhanced_unary_float_op uop_float_listmin).
-        Definition float_listmax
-          := OpForeignUnary (enhanced_unary_float_op uop_float_listmax).
-
         Definition time_to_scale
           := OpForeignUnary (enhanced_unary_time_op uop_time_to_scale).
         Definition time_from_string
@@ -2642,22 +2151,6 @@ Module CompEnhanced.
           := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_interval_from_string).
 
         (* for coq style syntax *)
-        Definition OpFloatNeg := float_neg.
-        Definition OpFloatSqrt := float_sqrt.
-        Definition OpFloatExp := float_exp.
-        Definition OpFloatLog := float_log.
-        Definition OpFloatLog10 := float_log10.
-        Definition OpFloatOfInt := float_of_int.
-        Definition OpFloatCeil := float_ceil.
-        Definition OpFloatFloor := float_floor.
-        Definition OpFloatTruncate := float_truncate.
-        Definition OpFloatAbs := float_abs.
-
-        Definition OpFloatSum := float_sum.
-        Definition OpFloatArithMean := float_arithmean.
-        Definition OpFloatListMin := float_listmin.
-        Definition OpFloatListMax := float_listmax.
-
         Definition OpTimeToSscale := time_to_scale.
         Definition OpTimeFromString := time_from_string.
         Definition OpTimeDurationFromString := time_duration_from_string.
@@ -2669,31 +2162,6 @@ Module CompEnhanced.
       End Unary.
       
       Module Binary.
-        Definition float_plus
-          := OpForeignBinary (enhanced_binary_float_op bop_float_plus).
-        Definition float_minus
-          := OpForeignBinary (enhanced_binary_float_op bop_float_minus).
-        Definition float_mult 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_mult).
-        Definition float_div 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_div).
-        Definition float_pow 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_pow).
-        Definition float_min 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_min).
-        Definition float_max 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_max).
-        Definition float_ne 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_ne).
-        Definition float_lt 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_lt).
-        Definition float_le 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_le).
-        Definition float_gt 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_gt).
-        Definition float_ge 
-          := OpForeignBinary (enhanced_binary_float_op bop_float_ge).
-
         (* for ocaml *)
         Definition time_as
           := OpForeignBinary (enhanced_binary_time_op bop_time_as).
@@ -2734,19 +2202,6 @@ Module CompEnhanced.
           := OpForeignBinary (enhanced_binary_sql_date_op (bop_sql_date_interval_between)).
         
         (* for coq style syntax *)
-        Definition OpFloatPlus := float_plus.
-        Definition OpFloatMinus := float_minus.
-        Definition OpFloatMult  := float_mult .
-        Definition OpFloatDiv  := float_div .
-        Definition OpFloatPow  := float_pow .
-        Definition OpFloatMin  := float_min .
-        Definition OpFloatMax  := float_max .
-        Definition OpFloatNe  := float_ne .
-        Definition OpFloatLt  := float_lt .
-        Definition OpFloatLe  := float_le .
-        Definition OpFloatGt  := float_gt .
-        Definition OpFloatGe  := float_ge .
-
         Definition OpTimeAs := time_as.
         Definition OpTimeShift := time_shift.
         Definition OpTimeNe := time_ne.

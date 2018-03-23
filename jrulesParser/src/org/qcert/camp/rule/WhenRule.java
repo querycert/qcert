@@ -53,7 +53,7 @@ public final class WhenRule extends PatternRule {
 	/**
 	 * Implement according to logic in rule_to_pattern in Coq code
          | rule_when p ps =>
-           punop AFlatten
+           punop OpFlatten
                  (WW
                     (pmap
                        (pletEnv
@@ -65,7 +65,7 @@ public final class WhenRule extends PatternRule {
 	public CampPattern convertToPattern() {
 		CampPattern op = getOperand().convertToPattern();
 		CampPattern map = new MapPattern(new LetEnvPattern(getPattern(), op));
-		return new UnaryPattern(UnaryOperator.AFlatten, CampMacros.WW(map));
+		return new UnaryPattern(UnaryOperator.OpFlatten, CampMacros.WW(map));
 	}
 
 	/* (non-Javadoc)

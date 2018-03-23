@@ -31,46 +31,69 @@ Section UnaryOperators.
   Context {fdata:foreign_data}.
   Context {fuop:foreign_unary_op}.
   
-  Inductive arith_unary_op
-    := ArithAbs  (**r absolute value *) 
-     | ArithLog2 (**r base2 logarithm *)
-     | ArithSqrt (**r square root *)
+  Inductive nat_arith_unary_op
+    := NatAbs  (**r absolute value *) 
+     | NatLog2 (**r base2 logarithm *)
+     | NatSqrt (**r square root *)
+  .
+  Inductive float_arith_unary_op
+    := FloatNeg   (**r negative *)
+     | FloatSqrt  (**r square root *)
+     | FloatExp   (**r exponent *)
+     | FloatLog   (**r logarithm base 2 *)
+     | FloatLog10 (**r logarithm base 10 *)
+     | FloatCeil  (**r ceiling *)
+     | FloatFloor (**r floor *)
+     | FloatAbs   (**r absolute value *)
   .
 
   Inductive unary_op : Set :=
-  | OpIdentity : unary_op                      (**r identity, returns its value *)
-  | OpNeg : unary_op                           (**r boolean negation *)
-  | OpRec : string -> unary_op                 (**r create a record with a single field *)
-  | OpDot : string -> unary_op                 (**r record field access *)
-  | OpRecRemove : string -> unary_op           (**r record remove the given fields *)
-  | OpRecProject : list string -> unary_op     (**r record projects on the given fields *)
-  | OpBag : unary_op                           (**r create a singleton bag *)
-  | OpSingleton : unary_op                     (**r value within a singleton bag *)
-  | OpFlatten : unary_op                       (**r flattens a bag of bags *)
-  | OpDistinct: unary_op                       (**r distinct values in a bag *)
-  | OpOrderBy : SortCriterias -> unary_op      (**r sorts a collection of records *)
-  | OpCount : unary_op                         (**r bag count *)
-  | OpSum : unary_op                           (**r sum of natural numbers in a bag *)
-  | OpNumMin : unary_op                        (**r minimum of natural numbers in a bag *)
-  | OpNumMax : unary_op                        (**r maximum of natural numbers in a bag *)
-  | OpNumMean : unary_op                       (**r arithmetic mean of natural numbers in a bag *)
-  | OpToString : unary_op                      (**r convert any data to a string *)
-  | OpSubstring : Z -> option Z -> unary_op    (**r returns the substring starting with the nth character, for m characters (or the rest of the string) *)
+  | OpIdentity : unary_op                             (**r identity, returns its value *)
+  | OpNeg : unary_op                                  (**r boolean negation *)
+  | OpRec : string -> unary_op                        (**r create a record with a single field *)
+  | OpDot : string -> unary_op                        (**r record field access *)
+  | OpRecRemove : string -> unary_op                  (**r record remove the given fields *)
+  | OpRecProject : list string -> unary_op            (**r record projects on the given fields *)
+  | OpBag : unary_op                                  (**r create a singleton bag *)
+  | OpSingleton : unary_op                            (**r value within a singleton bag *)
+  | OpFlatten : unary_op                              (**r flattens a bag of bags *)
+  | OpDistinct: unary_op                              (**r distinct values in a bag *)
+  | OpOrderBy : SortCriterias -> unary_op             (**r sorts a collection of records *)
+  | OpCount : unary_op                                (**r bag count *)
+  | OpToString : unary_op                             (**r convert any data to a string *)
+  | OpSubstring : Z -> option Z -> unary_op           (**r returns the substring starting with the nth character, for m characters (or the rest of the string) *)
   | OpLike (pattern:string)
-              (escape:option ascii) : unary_op (**r like expression (as in sql) *)
-  | OpLeft : unary_op                          (**r create a left value *)
-  | OpRight : unary_op                         (**r create a right value *)
-  | OpBrand : brands -> unary_op               (**r brands a value *)
-  | OpUnbrand : unary_op                       (**r content of a branded value *)
-  | OpCast : brands -> unary_op                (**r coerce a branded value into one of its sub-brands *)
-  | OpArithUnary : arith_unary_op -> unary_op  (**r arithmetic operations *)
+              (escape:option ascii) : unary_op        (**r like expression (as in sql) *)
+  | OpLeft : unary_op                                 (**r create a left value *)
+  | OpRight : unary_op                                (**r create a right value *)
+  | OpBrand : brands -> unary_op                      (**r brands a value *)
+  | OpUnbrand : unary_op                              (**r content of a branded value *)
+  | OpCast : brands -> unary_op                       (**r coerce a branded value into one of its sub-brands *)
+  | OpNatUnary : nat_arith_unary_op -> unary_op       (**r arithmetic operations on natural floats *)
+  | OpNatSum : unary_op                               (**r sum of natural floats in a bag *)
+  | OpNatMin : unary_op                               (**r minimum of natural floats in a bag *)
+  | OpNatMax : unary_op                               (**r maximum of natural floats in a bag *)
+  | OpNatMean : unary_op                              (**r arithmetic mean of natural floats in a bag *)
+  | OpFloatOfNat : unary_op                          (**r coercion from natural float to float *)
+  | OpFloatUnary : float_arith_unary_op -> unary_op (**r arithmetic operations on floats *)
+  | OpFloatTruncate : unary_op                       (**r truncate *)
+  | OpFloatSum : unary_op                            (**r sum *) 
+  | OpFloatMean : unary_op                           (**r arithmetic mean *)
+  | OpFloatBagMin : unary_op                         (**r minimum *)
+  | OpFloatBagMax : unary_op                         (**r maximum *)
   | OpForeignUnary
-      (fu:foreign_unary_op_type) : unary_op    (**r foreign unary operators *)
+      (fu:foreign_unary_op_type) : unary_op           (**r foreign unary operators *)
   .
 
-  Global Instance arith_unary_op_eqdec : EqDec arith_unary_op eq.
+  Global Instance nat_arith_unary_op_eqdec : EqDec nat_arith_unary_op eq.
   Proof.
-    change (forall x y : arith_unary_op,  {x = y} + {x <> y}).
+    change (forall x y : nat_arith_unary_op,  {x = y} + {x <> y}).
+    decide equality.
+  Defined.
+
+  Global Instance float_arith_unary_op_eqdec : EqDec float_arith_unary_op eq.
+  Proof.
+    change (forall x y : float_arith_unary_op,  {x = y} + {x <> y}).
     decide equality.
   Defined.
 
@@ -93,19 +116,35 @@ Section UnaryOperators.
     - apply equiv_dec.
     - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
-    - apply arith_unary_op_eqdec.
+    - apply nat_arith_unary_op_eqdec.
+    - apply float_arith_unary_op_eqdec.
     - apply foreign_unary_op_dec.
   Defined.
 
   Local Open Scope string.
 
-  Global Instance ToString_arith_unary_op : ToString arith_unary_op
+  Global Instance ToString_nat_arith_unary_op : ToString nat_arith_unary_op
     := {toString :=
-          fun (op:arith_unary_op) =>
+          fun (op:nat_arith_unary_op) =>
             match op with
-            | ArithAbs => "ArithAbs"
-            | ArithLog2 => "ArithLog2"
-            | ArithSqrt => "Sqrt"
+            | NatAbs => "NatAbs"
+            | NatLog2 => "NatLog2"
+            | NatSqrt => "NatSqrt"
+            end
+       }.
+
+  Global Instance ToString_float_arith_unary_op : ToString float_arith_unary_op
+    := {toString :=
+          fun (op:float_arith_unary_op) =>
+            match op with
+            | FloatNeg => "FloatNeg"
+            | FloatSqrt => "FloatSqrt"
+            | FloatExp => "FloatExp"
+            | FloatLog => "FloatLog"
+            | FloatLog10 => "FloatLog10"
+            | FloatCeil => "FloatCeil"
+            | FloatFloor => "FloatFloor"
+            | FloatAbs => "FloatAbs"
             end
        }.
 
@@ -140,10 +179,6 @@ Section UnaryOperators.
                 ++ (bracketString "[" (joinStrings "," (List.map ToString_SortCriteria ls)) "]")
                 ++ ")"
             | OpCount => "OpCount"
-            | OpSum => "OpSum"
-            | OpNumMin => "OpNumMin"
-            | OpNumMax => "OpNumMax"
-            | OpNumMean => "OpNumMean"
             | OpToString => "OpToString"
             | OpSubstring start len =>
               "(OpSubstring " ++ (toString start)
@@ -164,7 +199,18 @@ Section UnaryOperators.
             | OpBrand b => "(OpBrand " ++ (@toString _ ToString_brands b)++ ")"
             | OpUnbrand => "OpUnbrand"
             | OpCast b => "(OpCast " ++ (@toString _ ToString_brands b) ++ ")"
-            | OpArithUnary aop => "(OpArithUnary " ++ toString aop ++ ")"
+            | OpNatUnary aop => "(OpNatUnary " ++ toString aop ++ ")"
+            | OpNatSum => "OpNatSum"
+            | OpNatMin => "OpNatMin"
+            | OpNatMax => "OpNatMax"
+            | OpNatMean => "OpNatMean"
+            | OpFloatOfNat => "OpFloatOfNat"
+            | OpFloatUnary aop => "(OpFloatUnary " ++ toString aop ++ ")"
+            | OpFloatTruncate => "OpFloatTruncate"
+            | OpFloatSum => "OpFloatSum"
+            | OpFloatMean => "OpFloatMean"
+            | OpFloatBagMin => "OpFloatBagMin"
+            | OpFloatBagMax => "OpFloatBagMax"
             | OpForeignUnary fu => toString fu
             end
        }.
@@ -185,10 +231,6 @@ Tactic Notation "unary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpDistinct"%string
   | Case_aux c "OpOrderBy"%string
   | Case_aux c "OpCount"%string
-  | Case_aux c "OpSum"%string
-  | Case_aux c "OpNumMin"%string
-  | Case_aux c "OpNumMax"%string
-  | Case_aux c "OpNumMean"%string
   | Case_aux c "OpToString"%string
   | Case_aux c "OpSubstring"%string
   | Case_aux c "OpLike"%string
@@ -197,7 +239,18 @@ Tactic Notation "unary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpBrand"%string
   | Case_aux c "OpUnbrand"%string
   | Case_aux c "OpCast"%string 
-  | Case_aux c "OpArithUnary"%string
+  | Case_aux c "OpNatUnary"%string
+  | Case_aux c "OpNatSum"%string
+  | Case_aux c "OpNatMin"%string
+  | Case_aux c "OpNatMax"%string
+  | Case_aux c "OpNatMean"%string
+  | Case_aux c "OpFloatOfNat"%string
+  | Case_aux c "OpFloatUnary"%string
+  | Case_aux c "OpFloatTruncate"%string
+  | Case_aux c "OpFloatSum"%string
+  | Case_aux c "OpFloatMean"%string
+  | Case_aux c "OpFloatBagMin"%string
+  | Case_aux c "OpFloatBagMax"%string
   | Case_aux c "OpForeignUnary"%string
   ].
 

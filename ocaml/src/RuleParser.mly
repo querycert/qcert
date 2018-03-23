@@ -49,7 +49,7 @@
 
 %token FLOATPLUS FLOATMINUS FLOATMULT FLOATDIV
 %token FLOATPOW FLOATMIN FLOATMAX
-%token FLOATNE FLOATLT FLOATLE FLOATGT FLOATGE
+(* %token FLOATNE FLOATLT FLOATLE FLOATGT FLOATGE *)
 
 %token AFLOATSUM AFLOATARITHMEAN AFLOATLISTMIN AFLOATLISTMAX
 
@@ -223,7 +223,7 @@ data:
 | DBOOL FALSE
     { QData.dbool false }
 | DFLOAT f = FLOAT
-    { Enhanced.Data.dfloat f }
+    { QData.dfloat f }
 | DNAT i = INT
     { QData.dnat (Util.coq_Z_of_int i) }
 | DSTRING s = STRING
@@ -293,7 +293,7 @@ const:
 | i = INT
     { QData.dnat (Util.coq_Z_of_int i) }
 | f = FLOAT
-    { Enhanced.Data.dfloat f }
+    { QData.dfloat f }
 | s = STRING
     { QData.dstring (Util.char_list_of_string s) }
 | TRUE
@@ -303,29 +303,19 @@ const:
 
 bop:
 | FLOATPLUS
-  { Enhanced.Ops.Binary.float_plus }
+  { QOps.Binary.FloatArith.opfloatplus }
 | FLOATMINUS
-  { Enhanced.Ops.Binary.float_minus }
+  { QOps.Binary.FloatArith.opfloatminus }
 | FLOATMULT
-  { Enhanced.Ops.Binary.float_mult }
+  { QOps.Binary.FloatArith.opfloatmult }
 | FLOATDIV
-  { Enhanced.Ops.Binary.float_div }
+  { QOps.Binary.FloatArith.opfloatdiv }
 | FLOATPOW
-  { Enhanced.Ops.Binary.float_pow }
+  { QOps.Binary.FloatArith.opfloatpow }
 | FLOATMIN
-  { Enhanced.Ops.Binary.float_min }
+  { QOps.Binary.FloatArith.opfloatmin }
 | FLOATMAX
-  { Enhanced.Ops.Binary.float_max }
-| FLOATNE
-  { Enhanced.Ops.Binary.float_ne }
-| FLOATLT
-  { Enhanced.Ops.Binary.float_lt }
-| FLOATLE
-  { Enhanced.Ops.Binary.float_le }
-| FLOATGT
-  { Enhanced.Ops.Binary.float_gt }
-| FLOATGE
-  { Enhanced.Ops.Binary.float_ge }
+  { QOps.Binary.FloatArith.opfloatmax }
 
 | TIMEAS
   { Enhanced.Ops.Binary.time_as }
@@ -412,25 +402,25 @@ sql_date_component:
 
 uop:
 | FLOATNEG
-  { Enhanced.Ops.Unary.float_neg }
+  { QOps.Unary.FloatArith.opfloatneg }
 | FLOATSQRT
-  { Enhanced.Ops.Unary.float_sqrt }
+  { QOps.Unary.FloatArith.opfloatsqrt }
 | FLOATEXP
-  { Enhanced.Ops.Unary.float_exp }
+  { QOps.Unary.FloatArith.opfloatexp }
 | FLOATLOG
-  { Enhanced.Ops.Unary.float_log }
+  { QOps.Unary.FloatArith.opfloatlog }
 | FLOATLOG10
-  { Enhanced.Ops.Unary.float_log10 }
+  { QOps.Unary.FloatArith.opfloatlog10 }
 | FLOATOFINT
-  { Enhanced.Ops.Unary.float_of_int }
+  { QOps.Unary.opfloatofnat }
 | FLOATCEIL
-  { Enhanced.Ops.Unary.float_ceil }
+  { QOps.Unary.FloatArith.opfloatceil }
 | FLOATFLOOR
-  { Enhanced.Ops.Unary.float_floor }
+  { QOps.Unary.FloatArith.opfloatfloor }
 | FLOATTRUNCATE
-  { Enhanced.Ops.Unary.float_truncate }
+  { QOps.Unary.opfloattruncate }
 | FLOATABS
-  { Enhanced.Ops.Unary.float_abs }
+  { QOps.Unary.FloatArith.opfloatabs }
 | AIDOP
     { QOps.Unary.opidentity }
 | ANEG
@@ -444,7 +434,7 @@ uop:
 | ADISTINCT
     { QOps.Unary.opdistinct }
 | ASUM
-    { QOps.Unary.opsum }
+    { QOps.Unary.opnatsum }
 | ATOSTRING
     { QOps.Unary.optostring }
 | ASUBSTRING LPAREN s = INT RPAREN
@@ -457,11 +447,11 @@ uop:
 | ALIKE LPAREN s = STRING ESCAPE esc = STRING RPAREN
     { QOps.Unary.oplike (Util.char_list_of_string s) (Some (esc.[0])) }
 | ANUMMIN
-    { QOps.Unary.opnummin }
+    { QOps.Unary.opnatmin }
 | ANUMMAX
-    { QOps.Unary.opnummax }
+    { QOps.Unary.opnatmax }
 | AARITHMEAN
-    { QOps.Unary.opnummean }
+    { QOps.Unary.opnatmean }
 | LPAREN AUARITH ARITHABS RPAREN
     { QOps.Unary.ZArith.opabs }
 | LPAREN AUARITH ARITHLOG2 RPAREN
@@ -481,13 +471,13 @@ uop:
 | ASINGLETON
     { QOps.Unary.opsingleton }
 | AFLOATSUM
-    { Enhanced.Ops.Unary.float_sum }
+    { QOps.Unary.opfloatsum }
 | AFLOATARITHMEAN
-    { Enhanced.Ops.Unary.float_arithmean }
+    { QOps.Unary.opfloatmean }
 | AFLOATLISTMIN
-    { Enhanced.Ops.Unary.float_listmin }
+    { QOps.Unary.opfloatmin }
 | AFLOATLISTMAX
-    { Enhanced.Ops.Unary.float_listmax }
+    { QOps.Unary.opfloatmax }
 | TIMEFROMSTRING
     { Enhanced.Ops.Unary.time_from_string }
 | TIMEDURATIONFROMSTRING

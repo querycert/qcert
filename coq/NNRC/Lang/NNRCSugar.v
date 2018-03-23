@@ -167,6 +167,7 @@ Section NNRCSugar.
     match o1 with
     | Some dunit => None
     | Some (dnat _) => None
+    | Some (dfloat _) => None
     | Some (dbool _) => None
     | Some (dstring _) => None
     | Some (dcoll _) => None
@@ -174,6 +175,7 @@ Section NNRCSugar.
       match x with
       | dunit => None
       | dnat _ => None
+      | dfloat _ => None
       | dbool _ => None
       | dstring _ => None
       | dcoll _ => None
@@ -192,6 +194,7 @@ Section NNRCSugar.
     match o2 with
     | Some dunit => None
     | Some (dnat _) => None
+    | Some (dfloat _) => None
     | Some (dbool _) => None
     | Some (dstring _) => None
     | Some (dcoll _) => None
@@ -199,6 +202,7 @@ Section NNRCSugar.
       match x with
       | dunit => None
       | dnat _ => None
+      | dfloat _ => None
       | dbool _ => None
       | dstring _ => None
       | dcoll _ => None
@@ -265,6 +269,7 @@ Section NNRCSugar.
                    match d1 with
                    | dunit => None
                    | dnat _ => None
+                   | dfloat _ => None
                    | dbool _ => None
                    | dstring _ => None
                    | dcoll _ => None

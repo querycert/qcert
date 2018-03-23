@@ -360,6 +360,7 @@ Section NRA.
              match nra_eval e d1 with
              | Some dunit => None
              | Some (dnat _) => None
+             | Some (dfloat _) => None
              | Some (dbool b) => Some b
              | Some (dstring _) => None
              | Some (dcoll _) => None
@@ -383,6 +384,7 @@ Section NRA.
                   match nra_eval e d1 with
                   | Some dunit => None
                   | Some (dnat _) => None
+                  | Some (dfloat _) => None
                   | Some (dbool b) => Some b
                   | Some (dstring _) => None
                   | Some (dcoll _) => None
@@ -483,6 +485,7 @@ Section NRA.
                   match nra_eval e1 d1 with
                   | Some dunit => None
                   | Some (dnat _) => None
+                  | Some (dfloat _) => None
                   | Some (dbool b) => Some b
                   | Some (dstring _) => None
                   | Some (dcoll _) => None
@@ -566,6 +569,7 @@ Section NRA.
               match nra_eval e a with
               | Some dunit => None
               | Some (dnat _) => None
+              | Some (dfloat _) => None
               | Some (dbool _) => None
               | Some (dstring _) => None
               | Some (dcoll y) => omap_concat a y
@@ -588,6 +592,7 @@ Section NRA.
                    match nra_eval e d0 with
                    | Some dunit => None
                    | Some (dnat _) => None
+                   | Some (dfloat _) => None
                    | Some (dbool b) => Some b
                    | Some (dstring _) => None
                    | Some (dcoll _) => None
@@ -613,6 +618,7 @@ Section NRA.
                     match nra_eval e d0 with
                     | Some dunit => None
                     | Some (dnat _) => None
+                    | Some (dfloat _) => None
                     | Some (dbool b) => Some b
                     | Some (dstring _) => None
                     | Some (dcoll _) => None
@@ -632,6 +638,7 @@ Section NRA.
                     match nra_eval e d0 with
                     | Some dunit => None
                     | Some (dnat _) => None
+                    | Some (dfloat _) => None
                     | Some (dbool b) => Some b
                     | Some (dstring _) => None
                     | Some (dcoll _) => None

@@ -20,69 +20,69 @@ package org.qcert.camp.pattern;
  * Enumerates the possible unary operators and describes what parameters they take 
  */
 public enum UnaryOperator {
-	ArithAbs, 
-	ArithLog2, 
-	ArithSqrt, 
-	AIdOp,
-	ANeg, 
-	AColl,  
-	ASingleton,  
-	AFlatten,
-	ADistinct,
-	ARec(ParameterKind.String),
-	ADot(ParameterKind.String),
-	ARecRemove(ParameterKind.String),
-	ARecProject(ParameterKind.StringList),
-	ACount,
-	ASum, 
-	ANumMin, 
-	ANumMax,
-	AArithMean,  
-	AToString,  
-	ALeft,  
-	ARight,  
-	ABrand(ParameterKind.StringList),
-	AUnbrand,  
-	ACast(ParameterKind.StringList),
-    AFloatNeg,
-    AFloatSqrt,
-    AFloatExp,
-    AFloatLog,
-    AFloatLog10,
-    AFloatOfInt,
-    AFloatCeil,
-    AFloatFloor,
-    AFloatTruncate,
-    AFloatAbs,
-    AFloatSum,
-    AFloatArithMean,
-    AFloatListMin,
-    AFloatListMax,
-    ATimeToSscale,
-    ATimeFromString,
-    ATimeDurationFromString;
+    NatAbs,
+    NatLog2,
+    NatSqrt,
+    OpIdentity,
+    OpNeg,
+    OpBag,
+    OpSingleton,
+    OpFlatten,
+    OpDistinct,
+    OpRec(ParameterKind.String),
+    OpDot(ParameterKind.String),
+    OpRecRemove(ParameterKind.String),
+    OpRecProject(ParameterKind.StringList),
+    OpCount,
+    OpNatSum,
+    OpNatMin,
+    OpNatMax,
+    OpNatMean,
+    OpToString,
+    OpLeft,
+    OpRight,
+    OpBrand(ParameterKind.StringList),
+    OpUnbrand,  
+    OpCast(ParameterKind.StringList),
+    OpFloatOfNat,
+    OpFloatTruncate,
+    FloatNeg,
+    FloatSqrt,
+    FloatExp,
+    FloatLog,
+    FloatLog10,
+    FloatCeil,
+    FloatFloor,
+    FloatAbs,
+    OpFloatSum,
+    OpFloatMean,
+    OpFloatBagMin,
+    OpFloatBagMax,
+    TimeToSscale,
+    TimeFromString,
+    TimeDurationFromString;
 
-	/** The kind of parameter taken by this operator */
-	private ParameterKind parameterKind;
-	
-	/** Alternate constructor for the usual case of no parameter */
-	UnaryOperator() {
-		this(ParameterKind.None);
-	}
+    /** The kind of parameter taken by this operator */
+    private ParameterKind parameterKind;
 
-	/** Constructor */
-	UnaryOperator(ParameterKind parameterKind) {
-		this.parameterKind = parameterKind;
-	}
+    /** Alternate constructor for the usual case of no parameter */
+    UnaryOperator() {
+	this(ParameterKind.None);
+    }
 
-	/**
-	 * @return the parameterKind
-	 */
-	public ParameterKind getParameterKind() {
-		return parameterKind;
-	}
+    /** Constructor */
+    UnaryOperator(ParameterKind parameterKind) {
+	this.parameterKind = parameterKind;
+    }
 
-	/** Enumerate the kinds of parameters */
-	public enum ParameterKind {None, String, StringList }
+    /**
+     * @return the parameterKind
+     */
+    public ParameterKind getParameterKind() {
+	return parameterKind;
+    }
+
+    /** Enumerate the kinds of parameters */
+    public enum ParameterKind {None, String, StringList }
 }
 

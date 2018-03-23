@@ -14,25 +14,6 @@
  * limitations under the License.
  *)
 
-(** Gathers all exports needed to access the utility modules. *)
-
-Require Export CoqLibAdd.
-Require Export ListAdd.
-Require Export StringAdd.
-Require Export SortingAdd.
-Require Export Float.
-Require Export Digits.
-Require Export Lattice.
-Require Export Lift.
-Require Export LiftIterators.
-Require Export Assoc.
-Require Export Sublist.
-Require Export Compat.
-Require Export Fresh.
-Require Export Bindings.
-Require Export Bag.
-Require Export Var.
-Require Export JSON.
-Require Export OptimizerStep.
-Require Export OptimizerLogger.
+Require Export CommonRuntime.
+Require Export JavaScriptAst.
 

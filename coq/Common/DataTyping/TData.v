@@ -29,15 +29,17 @@ Section TData.
   Require Import CommonData.
   Require Import ForeignDataTyping.
 
-  (* Data is:
-     - nil -- used also for undefined results at the moment, but
-       eventually should be still be used for classic 'null' values in
-       relational.
-     - nat - a number
+  (** Data is:
+     - unit - used for undefined results.
+     - nat - an integer
+     - float - a floating point number (IEEE 754 double precision)
      - bool - true or false
      - string - a character string
-     - coll - a collection of data (homogeneous?)
-     - drec - a record, i.e., mapping from names to data.
+     - coll - a bag
+     - rec - a record
+     - left - left sum value
+     - right - right sum value
+     - foreign - foreign data
    *)
 
   Context {fdata:foreign_data}.
@@ -52,6 +54,7 @@ Section TData.
   | dttop d : data_normalized brand_relation_brands d -> data_type d Top
   | dtunit : data_type dunit Unit
   | dtnat n : data_type (dnat n) Nat
+  | dtfloat n : data_type (dfloat n) Float
   | dtbool b : data_type (dbool b) Bool
   | dtstring s : data_type (dstring s) String               
   | dtcoll dl r : Forall (fun d => data_type d r) dl ->
@@ -226,6 +229,15 @@ Section inv.
     eauto; simpl; try discriminate.
   Qed.
 
+  Lemma data_type_dfloat_inv {n τ}:
+    isTop τ = false ->
+    dfloat n ▹ τ -> τ = Float.
+  Proof.
+    induction τ using rtype_rect; 
+    try solve [intros ? HH; assert False; [inversion HH|intuition]];
+    eauto; simpl; try discriminate.
+  Qed.
+
   Lemma data_type_dbool_inv {b τ}:
     isTop τ = false ->
     dbool b ▹ τ -> τ = Bool.
@@ -312,6 +324,15 @@ Section inv.
   Lemma data_type_Nat_inv {d}:
     d ▹ Nat ->
     {n | d = dnat n}.
+  Proof.
+    induction d;
+    try solve [intros HH; assert False; [inversion HH|intuition]];
+    eauto; simpl; try discriminate.
+  Qed.
+
+  Lemma data_type_Float_inv {d}:
+    d ▹ Float ->
+    {n | d = dfloat n}.
   Proof.
     induction d;
     try solve [intros HH; assert False; [inversion HH|intuition]];
@@ -430,6 +451,11 @@ End inv.
       match τ with
         | Nat => fail 1
         | _ => generalize (data_type_dnat_inv H1 H); intros ?; try subst
+      end
+    | [H: dfloat _ ▹ ?τ,  H1: isTop ?τ = false  |- _ ] => 
+      match τ with
+        | Float => fail 1
+        | _ => generalize (data_type_dfloat_inv H1 H); intros ?; try subst
       end
     | [H: dbool _ ▹ ?τ,  H1: isTop ?τ = false  |- _ ] => 
       match τ with
@@ -891,6 +917,8 @@ Ltac dtype_inverter
               apply data_type_Unit_inv in H; try subst d
             | [H:?d ▹ Nat |- _ ] =>
               apply data_type_Nat_inv in H; destruct H; try subst d
+            | [H:?d ▹ Float |- _ ] =>
+              apply data_type_Float_inv in H; destruct H; try subst d
             | [H:?d ▹ Bool |- _ ] =>
               apply data_type_Bool_inv in H;  destruct H; try subst d
             | [H:?d ▹ String |- _ ] =>
@@ -1070,7 +1098,7 @@ Global Instance data_type_subtype_prop
         try solve[inversion 1; subst; intros; 
                   try solve [intros; dtype_inverter; eauto 2
                             | eelim data_type_not_bottom; eauto
-                            | unfold Top, Bottom, Unit, Nat, Bool, String, Coll, Rec in *;
+                            | unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec in *;
                               eauto 2; try r_ext]].
     - clear IHτ₂. intros.
       inversion H; rtype_equalizer.
@@ -1204,7 +1232,7 @@ Global Instance data_type_subtype_prop
         try solve[inversion 1; subst; intros; 
                   try solve [intros; dtype_inverter_with_either; try discriminate; eauto 2
                             | eelim data_type_not_bottom; eauto
-                            | unfold Top, Bottom, Unit, Nat, Bool, String, Coll, Rec in *;
+                            | unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec in *;
                               eauto 2; try r_ext]].
     - intros; dtype_inverter.
       inversion H; clear H; subst.

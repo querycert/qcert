@@ -24,37 +24,55 @@ Section BinaryOperators.
   Context {fdata:foreign_data}.
   Context {fbop:foreign_binary_op}.
 
-  Inductive arith_binary_op
-    := ArithPlus     (**r addition *)
-     | ArithMinus    (**r substraction *)
-     | ArithMult     (**r multiplication *)
-     | ArithMin      (**r smallest *)
-     | ArithMax      (**r biggest *)
-     | ArithDivide   (**r division *)
-     | ArithRem.     (**r remainder *)
+  Inductive nat_arith_binary_op
+    := NatPlus     (**r addition *)
+     | NatMinus    (**r substraction *)
+     | NatMult     (**r multiplication *)
+     | NatDiv      (**r division *)
+     | NatRem      (**r remainder *)
+     | NatMin      (**r smallest *)
+     | NatMax.     (**r biggest *)
   
-  Inductive binary_op : Set :=
-  | OpEqual : binary_op                          (**r equality *)
-  | OpRecConcat : binary_op                      (**r record concatenation *)
-  | OpRecMerge : binary_op                       (**r record merge-concatenation *)
-  | OpAnd : binary_op                            (**r boolean conjunction *)
-  | OpOr : binary_op                             (**r boolean disjunction *)
-  | OpLt : binary_op                             (**r less than *)
-  | OpLe : binary_op                             (**r less than or equal to *)
-  | OpBagUnion : binary_op                       (**r bag union *)
-  | OpBagDiff : binary_op                        (**r bag difference *)
-  | OpBagMin : binary_op                         (**r bag min *)
-  | OpBagMax : binary_op                         (**r bag max *)
-  | OpContains : binary_op                       (**r is an element in a collection *)
-  | OpStringConcat : binary_op                   (**r string concatenation *)
-  | OpArithBinary : arith_binary_op -> binary_op (**r arithmetic operators *)
-  | OpForeignBinary
-      (fb : foreign_binary_op_type) : binary_op  (**r foreign binary operators *)
+  Inductive float_arith_binary_op
+    := 
+    | FloatPlus   (**r addition *)
+    | FloatMinus  (**r substraction *)
+    | FloatMult   (**r multiplication *)
+    | FloatDiv    (**r division *)
+    | FloatPow    (**r exponent *)
+    | FloatMin    (**r min *)
+    | FloatMax    (**r max *)
   .
 
-  Global Instance arith_binary_op_eqdec : EqDec arith_binary_op eq.
+  Inductive binary_op : Set :=
+  | OpEqual : binary_op                           (**r equality *)
+  | OpRecConcat : binary_op                       (**r record concatenation *)
+  | OpRecMerge : binary_op                        (**r record merge-concatenation *)
+  | OpAnd : binary_op                             (**r boolean conjunction *)
+  | OpOr : binary_op                              (**r boolean disjunction *)
+  | OpLt : binary_op                              (**r less than *)
+  | OpLe : binary_op                              (**r less than or equal to *)
+  | OpBagUnion : binary_op                        (**r bag union *)
+  | OpBagDiff : binary_op                         (**r bag difference *)
+  | OpBagMin : binary_op                          (**r bag min *)
+  | OpBagMax : binary_op                          (**r bag max *)
+  | OpContains : binary_op                        (**r is an element in a collection *)
+  | OpStringConcat : binary_op                    (**r string concatenation *)
+  | OpNatBinary : nat_arith_binary_op -> binary_op        (**r arithmetic operators on integers *)
+  | OpFloatBinary : float_arith_binary_op -> binary_op  (**r arithmetic operators on floats *)
+  | OpForeignBinary
+      (fb : foreign_binary_op_type) : binary_op   (**r foreign binary operators *)
+  .
+
+  Global Instance nat_arith_binary_op_eqdec : EqDec nat_arith_binary_op eq.
   Proof.
-    change (forall x y : arith_binary_op,  {x = y} + {x <> y}).
+    change (forall x y : nat_arith_binary_op,  {x = y} + {x <> y}).
+    decide equality.
+  Defined.
+
+  Global Instance float_arith_binary_op_eqdec : EqDec float_arith_binary_op eq.
+  Proof.
+    change (forall x y : float_arith_binary_op,  {x = y} + {x <> y}).
     decide equality.
   Defined.
 
@@ -62,23 +80,38 @@ Section BinaryOperators.
   Proof.
     change (forall x y : binary_op,  {x = y} + {x <> y}).
     decide equality.
-    apply arith_binary_op_eqdec.
+    apply nat_arith_binary_op_eqdec.
+    apply float_arith_binary_op_eqdec.
     apply foreign_binary_op_dec.
   Defined.
 
   Local Open Scope string.
 
-  Global Instance ToString_arith_binary_op : ToString arith_binary_op
+  Global Instance ToString_nat_binary_op : ToString nat_arith_binary_op
     := {toString :=
-          fun (op:arith_binary_op) =>
+          fun (op:nat_arith_binary_op) =>
             match op with
-            | ArithPlus => "ArithPlus"
-            | ArithMinus => "ArithMinus"
-            | ArithMult => "ArithMult"
-            | ArithMin => "ArithMin"
-            | ArithMax => "ArithMax"
-            | ArithDivide => "ArithDivide"
-            | ArithRem => "ArithRem"
+            | NatPlus => "NatPlus"
+            | NatMinus => "NatMinus"
+            | NatMult => "NatMult"
+            | NatMin => "NatMin"
+            | NatMax => "NatMax"
+            | NatDiv => "NatDiv"
+            | NatRem => "NatRem"
+            end
+       }.
+
+  Global Instance ToString_float_arith_binary_op : ToString float_arith_binary_op
+    := {toString :=
+          fun (op:float_arith_binary_op) =>
+            match op with
+            | FloatPlus => "FloatPlus"
+            | FloatMinus => "FloatMinus"
+            | FloatMult => "FloatMult"
+            | FloatDiv => "FloatDiv"
+            | FloatPow => "FloatPow"
+            | FloatMin => "FloatMin"
+            | FloatMax => "FloatMax"
             end
        }.
 
@@ -99,7 +132,8 @@ Section BinaryOperators.
             | OpBagMax => "OpBagMax"
             | OpContains  => "OpContains"
             | OpStringConcat  => "OpStringConcat"
-            | OpArithBinary aop => "(OpArithBinary " ++ (toString aop) ++ ")"
+            | OpNatBinary aop => "(OpNatBinary " ++ (toString aop) ++ ")"
+            | OpFloatBinary aop => "(OpFloatBinary " ++ (toString aop) ++ ")"
             | OpForeignBinary fb => toString fb
             end
        }.
@@ -121,6 +155,7 @@ Tactic Notation "binary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpBagMax"%string
   | Case_aux c "OpContains"%string
   | Case_aux c "OpStringConcat"%string
-  | Case_aux c "OpArithBinary"%string
+  | Case_aux c "OpNatBinary"%string
+  | Case_aux c "OpFloatBinary"%string
   | Case_aux c "OpForeignBinary"%string].
 

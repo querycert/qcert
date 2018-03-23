@@ -307,6 +307,7 @@ Section Dataframe.
              match x with
              | dunit => None
              | dnat _ => None
+             | dfloat _ => None
              | dbool _ => None
              | dstring _ => None
              | dcoll _ => None

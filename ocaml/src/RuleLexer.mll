@@ -32,11 +32,11 @@
 	  "AFloatPow", FLOATPOW;
 	  "AFloatMin", FLOATMIN;
 	  "AFloatMax", FLOATMAX;
-	  "AFloatNe", FLOATNE;
+(*	  "AFloatNe", FLOATNE;
 	  "AFloatLt", FLOATLT;
 	  "AFloatLe", FLOATLE;
 	  "AFloatGt", FLOATGT;
-	  "AFloatGe", FLOATGE;
+	  "AFloatGe", FLOATGE;*)
 	  "ATimeAs", TIMEAS;
 	  "ATimeShift", TIMESHIFT;
 	  "ATimeNe", TIMENE;

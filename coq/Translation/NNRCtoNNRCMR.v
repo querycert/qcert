@@ -96,6 +96,7 @@ Section NNRCtoNNRCMR.
                      match d with
                      | dunit => None
                      | dnat _ => None
+                     | dfloat _ => None
                      | dbool _ => None
                      | dstring _ => None
                      | dcoll coll => Some (Ddistr coll)

@@ -31,12 +31,31 @@ Module QOperators(runtime:CompilerRuntime).
 
     Module ZArith.
       Definition opabs : op 
-        := UnaryOperators.OpArithUnary UnaryOperators.ArithAbs.
+        := UnaryOperators.OpNatUnary UnaryOperators.NatAbs.
       Definition oplog2 : op 
-        := UnaryOperators.OpArithUnary UnaryOperators.ArithLog2.
+        := UnaryOperators.OpNatUnary UnaryOperators.NatLog2.
       Definition opsqrt : op 
-        := UnaryOperators.OpArithUnary UnaryOperators.ArithSqrt.
+        := UnaryOperators.OpNatUnary UnaryOperators.NatSqrt.
     End ZArith.
+
+    Module FloatArith.
+     Definition opfloatneg : op 
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatNeg.
+     Definition opfloatsqrt : op 
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatSqrt.
+     Definition opfloatexp : op 
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatExp.
+     Definition opfloatlog : op 
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatLog.
+     Definition opfloatlog10 : op 
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatLog10.
+     Definition opfloatceil : op 
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatCeil.
+     Definition opfloatfloor : op 
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatFloor.
+     Definition opfloatabs : op
+       := UnaryOperators.OpFloatUnary UnaryOperators.FloatAbs.
+    End FloatArith.
 
     Definition opidentity : op 
       := UnaryOperators.OpIdentity.
@@ -60,14 +79,6 @@ Module QOperators(runtime:CompilerRuntime).
       := UnaryOperators.OpDistinct.
     Definition opcount : op 
       := UnaryOperators.OpCount.
-    Definition opsum : op 
-      := UnaryOperators.OpSum.
-    Definition opnummin : op 
-      := UnaryOperators.OpNumMin.
-    Definition opnummax : op 
-      := UnaryOperators.OpNumMax.
-    Definition opnummean : op 
-      := UnaryOperators.OpNumMean.
     Definition optostring : op 
       := UnaryOperators.OpToString.
     Definition opsubstring : Z -> option Z -> op 
@@ -84,6 +95,26 @@ Module QOperators(runtime:CompilerRuntime).
       := UnaryOperators.OpUnbrand.
     Definition opcast : BrandRelation.brands -> op 
       := UnaryOperators.OpCast.
+    Definition opnatsum : op 
+      := UnaryOperators.OpNatSum.
+    Definition opnatmin : op 
+      := UnaryOperators.OpNatMin.
+    Definition opnatmax : op 
+      := UnaryOperators.OpNatMax.
+    Definition opnatmean : op 
+      := UnaryOperators.OpNatMean.
+    Definition opfloatofnat : op 
+      := UnaryOperators.OpFloatOfNat.
+    Definition opfloattruncate : op 
+      := UnaryOperators.OpFloatTruncate.
+    Definition opfloatsum : op 
+      := UnaryOperators.OpFloatSum.
+    Definition opfloatmin : op 
+      := UnaryOperators.OpFloatBagMin.
+    Definition opfloatmax : op 
+      := UnaryOperators.OpFloatBagMax.
+    Definition opfloatmean : op 
+      := UnaryOperators.OpFloatMean.
 
   (* Note that foreign operators should be encapuslated and 
      exported as part of the model *)
@@ -98,20 +129,37 @@ Module QOperators(runtime:CompilerRuntime).
 
     Module ZArith.
       Definition opplus : op 
-        := BinaryOperators.OpArithBinary BinaryOperators.ArithPlus.
+        := BinaryOperators.OpNatBinary BinaryOperators.NatPlus.
       Definition opminus : op 
-        := BinaryOperators.OpArithBinary BinaryOperators.ArithMinus.
+        := BinaryOperators.OpNatBinary BinaryOperators.NatMinus.
       Definition opmult : op 
-        := BinaryOperators.OpArithBinary BinaryOperators.ArithMult.
+        := BinaryOperators.OpNatBinary BinaryOperators.NatMult.
       Definition opmin : op 
-        := BinaryOperators.OpArithBinary BinaryOperators.ArithMin.
+        := BinaryOperators.OpNatBinary BinaryOperators.NatMin.
       Definition opmax : op 
-        := BinaryOperators.OpArithBinary BinaryOperators.ArithMax.
+        := BinaryOperators.OpNatBinary BinaryOperators.NatMax.
       Definition opdiv : op 
-        := BinaryOperators.OpArithBinary BinaryOperators.ArithDivide.
+        := BinaryOperators.OpNatBinary BinaryOperators.NatDiv.
       Definition oprem : op 
-        := BinaryOperators.OpArithBinary BinaryOperators.ArithRem.
+        := BinaryOperators.OpNatBinary BinaryOperators.NatRem.
     End ZArith.
+    
+    Module FloatArith.
+      Definition opfloatplus : op 
+        := BinaryOperators.OpFloatBinary BinaryOperators.FloatPlus.
+      Definition opfloatminus : op 
+        := BinaryOperators.OpFloatBinary BinaryOperators.FloatMinus.
+      Definition opfloatmult : op 
+        := BinaryOperators.OpFloatBinary BinaryOperators.FloatMult.
+      Definition opfloatmin : op 
+        := BinaryOperators.OpFloatBinary BinaryOperators.FloatMin.
+      Definition opfloatmax : op 
+        := BinaryOperators.OpFloatBinary BinaryOperators.FloatMax.
+      Definition opfloatdiv : op 
+        := BinaryOperators.OpFloatBinary BinaryOperators.FloatDiv.
+      Definition opfloatpow : op 
+        := BinaryOperators.OpFloatBinary BinaryOperators.FloatPow.
+    End FloatArith.
     
     Definition opequal : op 
       := BinaryOperators.OpEqual.

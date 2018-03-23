@@ -38,6 +38,7 @@ Section RTypeNorm.
     | Top₀ => Top₀
     | Unit₀ => Unit₀
     | Nat₀ => Nat₀
+    | Float₀ => Float₀
     | Bool₀ => Bool₀
     | String₀ => String₀
     | Coll₀ r' => Coll₀ (normalize_rtype₀ r')

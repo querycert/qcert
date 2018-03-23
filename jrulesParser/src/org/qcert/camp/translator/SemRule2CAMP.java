@@ -335,10 +335,10 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 				if (isFloatingPoint(fromType))
 					return convertedVal;
 				else
-					return new UnaryPattern(UnaryOperator.AFloatOfInt, convertedVal);
+					return new UnaryPattern(UnaryOperator.OpFloatOfNat, convertedVal);
 			else
 				if (isFloatingPoint(fromType))
-					return new UnaryPattern(UnaryOperator.AFloatTruncate, convertedVal);
+					return new UnaryPattern(UnaryOperator.OpFloatTruncate, convertedVal);
 				else
 					return convertedVal;
 		}
@@ -371,9 +371,9 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 		SemValue right = operator.getRightValue();
 		switch (operator.getKind()) {
 		case AND:
-			return translateBinaryOp(BinaryOperator.AAnd, left, right);
+			return translateBinaryOp(BinaryOperator.OpAnd, left, right);
 		case OR:
-			return translateBinaryOp(BinaryOperator.AOr, left, right);
+			return translateBinaryOp(BinaryOperator.OpOr, left, right);
 		default:
 			return notImplemented(operator);
 		}
@@ -507,7 +507,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 			} else if (isToString(ast)) {
 				return CampMacros.stringify(ast.getCurrentObject().accept(this));
 			} else if (isTranslatableEquals(ast)) {
-				return translateBinaryOp(BinaryOperator.AEq, ast.getCurrentObject(), args.get(0));
+				return translateBinaryOp(BinaryOperator.OpEqual, ast.getCurrentObject(), args.get(0));
 			} else if (isValueOf(ast)) {
 				return args.get(0).accept(this);
 			} else if (isXValue(ast)) {
@@ -516,7 +516,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 				SemValue receiver = ast.getCurrentObject();
 				if (receiver instanceof SemInterval)
 					return translateIntervalContains((SemInterval) receiver, args.get(0));
-				return translateBinaryOp(BinaryOperator.AContains, args.get(0), ast.getCurrentObject());
+				return translateBinaryOp(BinaryOperator.OpContains, args.get(0), ast.getCurrentObject());
 			} else if (isFormatEntities(ast)){
 				return CampMacros.variables(getVariableNames(args));
 			} else if (isTimeStringToEpochMillis(ast)) {
@@ -533,34 +533,34 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 			return translateAdd(ast);
 		}
 		case EQUALS: {
-			return translateBinaryOp(BinaryOperator.AEq, args.get(0), args.get(1));
+			return translateBinaryOp(BinaryOperator.OpEqual, args.get(0), args.get(1));
 		}
 		case NOT_EQUALS: {
 			return translateNotEquals(ast);
 		}
 		case LESS_OR_EQUALS_THAN: {
-			return translateBinaryOp(BinaryOperator.ALe, args.get(0), args.get(1));
+			return translateBinaryOp(BinaryOperator.OpLe, args.get(0), args.get(1));
 		}
 		case LESS_THAN: {
-			return translateBinaryOp(BinaryOperator.ALt, args.get(0), args.get(1));
+			return translateBinaryOp(BinaryOperator.OpLt, args.get(0), args.get(1));
 		}
 		case GREATER_OR_EQUALS_THAN: {
-			return translateBinaryOp(BinaryOperator.ALe, args.get(1), args.get(0));
+			return translateBinaryOp(BinaryOperator.OpLe, args.get(1), args.get(0));
 		}
 		case GREATER_THAN: {
-			return translateBinaryOp(BinaryOperator.ALt, args.get(1), args.get(0));
+			return translateBinaryOp(BinaryOperator.OpLt, args.get(1), args.get(0));
 		}
 		case AND: {
-			return translateBinaryOp(BinaryOperator.AAnd, args.get(0), args.get(1));
+			return translateBinaryOp(BinaryOperator.OpAnd, args.get(0), args.get(1));
 		}
 		case SUB: {
-			return translateBinaryOp(BinaryOperator.ArithMinus, args.get(0), args.get(1));
+			return translateBinaryOp(BinaryOperator.NatMinus, args.get(0), args.get(1));
 		}
 		case DIV: {
-			return translateBinaryOp(BinaryOperator.ArithDivide, args.get(0), args.get(1));
+			return translateBinaryOp(BinaryOperator.NatDiv, args.get(0), args.get(1));
 		}
 		case MUL: {
-			return translateBinaryOp(BinaryOperator.ArithMult, args.get(0), args.get(1));
+			return translateBinaryOp(BinaryOperator.NatMult, args.get(0), args.get(1));
 		}
 		// TODO appropriate subset of the following
 		case BIT_NOT:
@@ -691,14 +691,14 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	 */
 	private UnaryOperator aggregateOpToFloat(UnaryOperator op) {
 		switch (op) {
-		case ANumMax:
-			return UnaryOperator.AFloatListMax;
-		case AArithMean:
-			return UnaryOperator.AFloatArithMean;
-		case ANumMin:
-			return UnaryOperator.AFloatListMin;
-		case ASum:
-			return UnaryOperator.AFloatSum;
+		case OpNatMax:
+			return UnaryOperator.OpFloatBagMax;
+		case OpNatMin:
+			return UnaryOperator.OpFloatBagMin;
+		case OpNatMean:
+			return UnaryOperator.OpFloatMean;
+		case OpNatSum:
+			return UnaryOperator.OpFloatSum;
 		default:
 			return op;
 		}
@@ -915,17 +915,17 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 			over = simplify(over);
 		UnaryOperator op = null;
 		if (tName.startsWith("java.util.ArrayList"))
-			op = UnaryOperator.AIdOp;
+			op = UnaryOperator.OpIdentity;
 		else if ("count".equals(tName))
-			op = UnaryOperator.ACount;
+			op = UnaryOperator.OpCount;
 		else if ("min".equals(tName))
-			op = UnaryOperator.ANumMin;
+			op = UnaryOperator.OpNatMin;
 		else if ("max".equals(tName))
-			op = UnaryOperator.ANumMax;
+			op = UnaryOperator.OpNatMax;
 		else if ("sum".equals(tName))
-			op = UnaryOperator.ASum;
+			op = UnaryOperator.OpNatSum;
 		else if ("mean".equals(tName))
-			op = UnaryOperator.AArithMean;
+			op = UnaryOperator.OpNatMean;
 		else
 			notImplemented("Aggregation operator " + tName);
 		boolean isFloat;
@@ -939,8 +939,8 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 		}
 		if (isFloat)
 			op = aggregateOpToFloat(op);
-		else if (op == UnaryOperator.AArithMean) {
-			op = UnaryOperator.AFloatArithMean;
+		else if (op == UnaryOperator.OpNatMean) {
+			op = UnaryOperator.OpFloatMean;
 			over = factory.cast(SemCast.Kind.HARD, factory.getObjectModel().getType(SemTypeKind.DOUBLE), over);
 		}
 		return new Object[] {over, op};
@@ -1422,23 +1422,23 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	private BinaryOperator opByType(BinaryOperator op, SemType type1, SemType type2) {
 		if (isFloatingPoint(type1) && isFloatingPoint(type2)) {
 			switch (op) {
-			case ArithDivide:
-				return BinaryOperator.AFloatDiv;
-			case ArithMax:
-				return BinaryOperator.AFloatMax;
-			case ArithMin:
-				return BinaryOperator.AFloatMin;
-			case ArithMinus:
-				return BinaryOperator.AFloatMinus;
-			case ArithMult:
-				return BinaryOperator.AFloatMult;
-			case ArithPlus:
-				return BinaryOperator.AFloatPlus;
-			case ALe:
-				return BinaryOperator.AFloatLe;
-			case ALt:
-				return BinaryOperator.AFloatLt;
-			case ArithRem:
+			case NatDiv:
+				return BinaryOperator.FloatDiv;
+			case NatMax:
+				return BinaryOperator.FloatMax;
+			case NatMin:
+				return BinaryOperator.FloatMin;
+			case NatMinus:
+				return BinaryOperator.FloatMinus;
+			case NatMult:
+				return BinaryOperator.FloatMult;
+			case NatPlus:
+				return BinaryOperator.FloatPlus;
+			case OpLe:
+				return BinaryOperator.FloatLe;
+			case OpLt:
+				return BinaryOperator.FloatLt;
+			case NatRem:
 				// Punting on this.  In theory we should translate it but Java's semantics are
 				// different than IEEE and possibly / probably some other languages.
 			default:
@@ -1568,10 +1568,10 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 				arg2.getType().getKind() == SemTypeKind.STRING && easyToString(arg1.getType().getKind())) {
 			CampPattern stringArg1 = CampMacros.stringify(arg1.accept(this));
 			CampPattern stringArg2 = CampMacros.stringify(arg2.accept(this));
-			return new BinaryPattern(BinaryOperator.ASConcat, stringArg1, stringArg2);
+			return new BinaryPattern(BinaryOperator.OpStringConcat, stringArg1, stringArg2);
 		}
 		else if (arg1.getType().getKind() == SemTypeKind.INT && arg2.getType().getKind() == SemTypeKind.INT)
-			return translateBinaryOp(BinaryOperator.ArithPlus, arg1, arg2);
+			return translateBinaryOp(BinaryOperator.NatPlus, arg1, arg2);
 		return notImplemented(ast);
 	}
 
@@ -1625,10 +1625,10 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	 */
 	private CampPattern translateContainsAny(SemValue x, SemValue y) {
 		boolean started = checkPassertStart();
-		CampPattern countIntersect = new UnaryPattern(UnaryOperator.ACount,
-				new BinaryPattern(BinaryOperator.AMin, x.accept(this), y.accept(this)));
-		CampPattern eq0 = new BinaryPattern(BinaryOperator.AEq, new ConstPattern(0), countIntersect);
-		CampPattern negation = new UnaryPattern(UnaryOperator.ANeg, eq0);
+		CampPattern countIntersect = new UnaryPattern(UnaryOperator.OpCount,
+				new BinaryPattern(BinaryOperator.OpBagMin, x.accept(this), y.accept(this)));
+		CampPattern eq0 = new BinaryPattern(BinaryOperator.OpEqual, new ConstPattern(0), countIntersect);
+		CampPattern negation = new UnaryPattern(UnaryOperator.OpNeg, eq0);
 		return checkPassertEnd(negation, started);
 	}
 
@@ -1642,9 +1642,9 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	private CampPattern translateIntervalContains(SemInterval interval, SemValue value) {
 		SemValue lower = interval.getLowerBound();
 		SemValue higher = interval.getHigherBound();
-		CampPattern geLower = translateBinaryOp(BinaryOperator.ALe, lower, value);
-		CampPattern leHigher = translateBinaryOp(BinaryOperator.ALe, value, higher);
-		return new BinaryPattern(BinaryOperator.AAnd, geLower, leHigher);
+		CampPattern geLower = translateBinaryOp(BinaryOperator.OpLe, lower, value);
+		CampPattern leHigher = translateBinaryOp(BinaryOperator.OpLe, value, higher);
+		return new BinaryPattern(BinaryOperator.OpAnd, geLower, leHigher);
 	}
 
 	/**
@@ -1655,7 +1655,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	private CampPattern translateNotEquals(SemMethodInvocation ast) {
 		boolean started = checkPassertStart();
 		List<SemValue> args = ast.getArguments();
-		CampPattern ans = new UnaryPattern(UnaryOperator.ANeg, translateBinaryOp(BinaryOperator.AEq, args.get(0), 
+		CampPattern ans = new UnaryPattern(UnaryOperator.OpNeg, translateBinaryOp(BinaryOperator.OpEqual, args.get(0), 
 				args.get(1)));
 		return checkPassertEnd(ans, started);
 	}
@@ -1703,7 +1703,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 		List<SemValue> args = ast.getArguments();
 		CampPattern collection = (args.size() > 0 ? args.get(0) : ast.getCurrentObject()).accept(this);
 		/* Produce a bag count operation on the collection */
-		return new UnaryPattern(UnaryOperator.ACount, collection);
+		return new UnaryPattern(UnaryOperator.OpCount, collection);
 	}
 
 	/**
@@ -1725,7 +1725,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 			if (argIter.hasNext())
 				translation = translation.withSecond(intFrom(argIter.next()));
 			ConstPattern constant = new ConstPattern(translation.toString());
-			return new UnaryPattern(UnaryOperator.ATimeFromString, constant);
+			return new UnaryPattern(UnaryOperator.TimeFromString, constant);
 		}
 		if (TIME_TYPE.equals(ast.getType().getDisplayName()) && args.size() == 1) {
 			long epochMilli = longFrom(args.get(0));
@@ -1752,7 +1752,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 			if (pattern == null)
 				pattern = pat;
 			else {
-				pattern = new BinaryPattern(BinaryOperator.AAnd, pattern, pat);
+				pattern = new BinaryPattern(BinaryOperator.OpAnd, pattern, pat);
 			}
 		}
 		return checkPassertEnd(pattern, started);

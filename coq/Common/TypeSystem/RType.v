@@ -53,6 +53,7 @@ Section RType.
     | Top₀ : rtype₀
     | Unit₀ : rtype₀
     | Nat₀ : rtype₀
+    | Float₀ : rtype₀
     | Bool₀ : rtype₀
     | String₀ : rtype₀
     | Coll₀ (r:rtype₀) : rtype₀
@@ -72,6 +73,7 @@ Section RType.
                (fbottom : P ⊥₀)
                (funit : P Unit₀)
                (fnat : P Nat₀)
+               (ffloat : P Float₀)
                (fbool : P Bool₀)
                (fstring : P String₀)
                (fcol : forall t : rtype₀, P t -> P (Coll₀ t))
@@ -87,6 +89,7 @@ Section RType.
         | ⊥₀ => fbottom
         | Unit₀ => funit
         | Nat₀ => fnat
+        | Float₀ => ffloat
         | Bool₀ => fbool
         | String₀ => fstring
         | Coll₀ x => fcol x (F x)
@@ -106,6 +109,7 @@ Section RType.
                (fbottom : P ⊥₀)
                (funit : P Unit₀)
                (fnat : P Nat₀)
+               (ffloat : P Float₀)
                (fbool : P Bool₀)
                (fstring : P String₀)
                (fcol : forall t : rtype₀, P t -> P (Coll₀ t))
@@ -121,6 +125,7 @@ Section RType.
         | ⊥₀ => fbottom
         | Unit₀ => funit
         | Nat₀ => fnat
+        | Float₀ => ffloat
         | Bool₀ => fbool
         | String₀ => fstring
         | Coll₀ x => fcol x (F x)
@@ -265,6 +270,7 @@ Section RType.
     Program Definition Top : rtype := Top₀.
     Program Definition Unit : rtype := Unit₀.
     Program Definition Nat : rtype := Nat₀.
+    Program Definition Float : rtype := Float₀.
     Program Definition Bool : rtype := Bool₀.
     Program Definition String : rtype := String₀.
     Definition Coll (τ:rtype): rtype := 
@@ -334,6 +340,7 @@ Section RType.
             (fbottom : P ⊥)
             (funit : P Unit)
             (fnat : P Nat)
+            (ffloat : P Float)
             (fbool : P Bool)
             (fstring : P String)
             (fcol : forall t : rtype, P t -> P (Coll t))
@@ -350,9 +357,10 @@ Section RType.
       Hint Constructors Forallt.
       destruct τ as [τ₀ wfτ].
       revert wfτ. (* ftop fbottom funit fnat fbool fstring fcol frec. *)
-      unfold Top, Bottom, Unit, Nat, Bool, String, Coll, Rec, Either, Arrow in *.
+      unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec, Either, Arrow in *.
       (* Ltac r_ext := solve [erewrite (rtype_ext); eauto]. *)
       induction τ₀; simpl; intros.
+      - erewrite rtype_ext; eauto.
       - erewrite rtype_ext; eauto.
       - erewrite rtype_ext; eauto.
       - erewrite rtype_ext; eauto.
@@ -416,6 +424,7 @@ Section RType.
             (fbottom : P ⊥)
             (funit : P Unit)
             (fnat : P Nat)
+            (ffloat : P Float)
             (fbool : P Bool)
             (fstring : P String)
             (fcol : forall t : rtype, P t -> P (Coll t))
@@ -431,9 +440,10 @@ Section RType.
       Hint Constructors Forallt.
       destruct τ as [τ₀ wfτ].
       revert wfτ. (* ftop fbottom funit fnat fbool fstring fcol frec. *)
-      unfold Top, Bottom, Unit, Nat, Bool, String, Coll, Rec in *.
+      unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec in *.
       (* Ltac r_ext := solve [erewrite (rtype_ext); eauto]. *)
       induction τ₀; simpl; intros.
+      - erewrite rtype_ext; eauto.
       - erewrite rtype_ext; eauto.
       - erewrite rtype_ext; eauto.
       - erewrite rtype_ext; eauto.
@@ -856,6 +866,13 @@ Section other.
     simpl; trivial.
   Qed.
 
+  Lemma  Float_canon pf:
+    (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) Float₀ pf) = Float.
+  Proof.
+    apply rtype_fequal.
+    simpl; trivial.
+  Qed.
+
   Lemma  String_canon pf:
     (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) String₀ pf) = String.
   Proof.
@@ -1068,6 +1085,7 @@ Tactic Notation "rtype_rect_cases" tactic(first) ident(c) :=
   | Case_aux c "Bottom"%string
   | Case_aux c "Unit"%string
   | Case_aux c "Nat"%string
+  | Case_aux c "Float"%string
   | Case_aux c "Bool"%string
   | Case_aux c "String"%string
   | Case_aux c "Coll"%string

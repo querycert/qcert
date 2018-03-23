@@ -6,7 +6,7 @@ import tests.entities.*;
 ruleset test01 {
   rule R01 {
     when {
-      c:Customer(age == 32);
+      c:Customer(age == 32.0);
       evaluate (n: c.name);
     } then {
       System.out.println("Customer =" + n);
