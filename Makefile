@@ -206,13 +206,13 @@ cleanall-runners:
 	- @rm -rf bin/lib
 	- @rm -f bin/javaRunners.jar
 
-## Tests
+## Test
 
 tests:
-	@$(MAKE) -C samples
+	@$(MAKE) -C test
 
 clean-tests:
-	@$(MAKE) -C samples clean
+	@$(MAKE) -C test clean
 
 cleanall-tests: clean-tests
 

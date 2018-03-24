@@ -118,7 +118,7 @@ Once the compiler is built, you can try it on a sample query, for
 instance:
 
 ```
-$ cat samples/oql/persons1.oql 
+$ cat test/oql/persons1.oql 
 /* Simple select-from-where */
 select p
 from p in Customers
@@ -129,11 +129,11 @@ Calling the compiler on that sample with OQL as source language and
 JavaScript as target language can be done as follows:
 
 ```
-$ bin/qcert -source oql -target js samples/oql/persons1.oql
+$ bin/qcert -source oql -target js test/oql/persons1.oql
 ```
 
 which should produce a JavaScript file called
-`samples/oql/persons1.js`.
+`test/oql/persons1.js`.
 
 
 ### Run that compiled query
@@ -150,11 +150,11 @@ follows:
 ```
 $ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
        -runtime runtimes/javascript/qcert-runtime.js \
-       -input samples/oql/persons.input \
-       samples/oql/persons1.js
+       -input test/oql/persons.input \
+       test/oql/persons1.js
 ```
 
-The input data in [`data/persons.json`](samples/data/persons.json)
+The input data in [`data/persons.json`](test/data/persons.json)
 contains a collection of persons and a collection of companies in JSON
 format. If you run persons1, it should return all persons whose age is
 32:
@@ -273,34 +273,34 @@ The simplest way to call the compiler is by simply providing a source
 and target language.
 
 For instance, compiling from SQL to JavaScript (on the example query
-`samples/sql/org2.sql`) can be done by calling:
+`test/sql/org2.sql`) can be done by calling:
 
 ```
-$ bin/qcert -source sql -target javascript samples/sql/org2.sql
+$ bin/qcert -source sql -target javascript test/sql/org2.sql
 ```
 
 Compiling from λ-NRA to Java (on the example query
-`samples/lambda_nra/persons6.lnra`) can be done by calling:
+`test/lambda_nra/persons6.lnra`) can be done by calling:
 
 ```
-$ bin/qcert -source lambda_nra -target java samples/lambda_nra/persons6.lnra
+$ bin/qcert -source lambda_nra -target java test/lambda_nra/persons6.lnra
 ```
 
 By default the compiled code will be placed in the same directory as
 your input query (in this example in
-`samples/lambda_nra/persons6.java`).
+`test/lambda_nra/persons6.java`).
 
 You can change the target directory by using the `-dir` option on the
 command line, for instance:
 
 ```
-$ bin/qcert -source lambda_nra -target java -dir . samples/lambda_nra/persons6.lnra
+$ bin/qcert -source lambda_nra -target java -dir . test/lambda_nra/persons6.lnra
 ```
 
 You can also compile multiple queries at once, for instance:
 
 ```
-$ bin/qcert -source oql -target javascript samples/oql/*.oql
+$ bin/qcert -source oql -target javascript test/oql/*.oql
 ```
 
 
@@ -313,7 +313,7 @@ above to `nnrc_core (Core Named Nested Relational Calculus), you
 should see:
 
 ```
-$ bin/qcert -source sql -target nnrc_core samples/sql/org2.sql
+$ bin/qcert -source sql -target nnrc_core test/sql/org2.sql
 Compiling from sql to nnrc_core:
   sql -> nraenv -> nraenv -> nnrc -> nnrc -> nnrc_core
 ```
@@ -327,7 +327,7 @@ You can force the use of a specific intermediate language by using the
 `-path` option on the command line, for instance:
 
 ```
-$ bin/qcert -source sql -path nraenv_core -target nnrc_core samples/sql/org2.sql
+$ bin/qcert -source sql -path nraenv_core -target nnrc_core test/sql/org2.sql
 Compiling from sql to nnrc_core:
   sql -> nraenv -> nraenv -> nraenv_core -> nraenv -> nraenv -> nnrc -> nnrc -> nnrc_core
 ```
@@ -336,7 +336,7 @@ You can also fully specify the compilation path by using the
 `-exact-path` option on the command line, for instance:
 
 ```
-$ bin/qcert -exact-path -source sql -path nraenv -path nraenv_core -target nnrc_core samples/sql/org2.sql
+$ bin/qcert -exact-path -source sql -path nraenv -path nraenv_core -target nnrc_core test/sql/org2.sql
 Compiling from sql to nnrc_core:
   sql -> nraenv -> nraenv_core -> nnrc_core
 ```
@@ -345,10 +345,10 @@ If the specified path does not exist, the compiler will return a
 compilation error:
 
 ```
-$ bin/qcert -exact-path -source sql -path nraenv -target javascript samples/sql/org2.sql
+$ bin/qcert -exact-path -source sql -path nraenv -target javascript test/sql/org2.sql
 Compiling from sql to js:
   sql -> nraenv -> js
-Fatal error: exception Util.Qcert_Error("In file [samples/sql/org2.sql] Cannot compile to error (No compilation path from nraenv to js)")
+Fatal error: exception Util.Qcert_Error("In file [test/sql/org2.sql] Cannot compile to error (No compilation path from nraenv to js)")
 ```
 
 ### Reference semantics
@@ -361,15 +361,15 @@ You can get the result of a query according to that reference
 semantics by using the `-eval` option on the command line, along with
 the `-input` option to specify a JSON input. For instance, the
 reference semantics for the λ-NRA example
-`samples/lambda_nra/persons6_lambda_nra.json` on the input data in
-`samples/lambda_nra/persons.input` can be obtained by calling:
+`test/lambda_nra/persons6_lambda_nra.json` on the input data in
+`test/lambda_nra/persons.input` can be obtained by calling:
 
 ```
-$ bin/qcert -source lambda_nra -target lambda_nra samples/lambda_nra/persons6.lnra \
-            -eval -input samples/lambda_nra/persons.input 
+$ bin/qcert -source lambda_nra -target lambda_nra test/lambda_nra/persons6.lnra \
+            -eval -input test/lambda_nra/persons.input 
 Compiling from lambda_nra to lambda_nra:
   lambda_nra
-$ cat samples/lambda_nra/persons6_lambda_nra.json 
+$ cat test/lambda_nra/persons6_lambda_nra.json 
 ["John Doe", "Jane Doe", "Jill Does"]
 ```
 
@@ -377,11 +377,11 @@ The reference semantics for that same example after compilation to the
 Named Nested Relational Calculus can be obtained by calling:
 
 ```
-$ bin/qcert -source lambda_nra -target nnrc samples/lambda_nra/persons6.lnra \
-            -eval -input samples/lambda_nra/persons.input 
+$ bin/qcert -source lambda_nra -target nnrc test/lambda_nra/persons6.lnra \
+            -eval -input test/lambda_nra/persons.input 
 Compiling from lambda_nra to nnrc:
   lambda_nra -> nraenv -> nraenv -> nnrc -> nnrc
-$ cat samples/lambda_nra/persons6_nnrc.json 
+$ cat test/lambda_nra/persons6_nnrc.json 
 ["John Doe", "Jane Doe", "Jill Does"]
 ```
 
@@ -389,13 +389,13 @@ You can also get the reference semantics for all the languages on the
 compilation path by using the `-eval-all` option on the command line:
 
 ```
-$ bin/qcert -source lambda_nra -target nnrc samples/lambda_nra/persons6.lnra \
-            -eval -input samples/lambda_nra/persons.input -eval-all 
+$ bin/qcert -source lambda_nra -target nnrc test/lambda_nra/persons6.lnra \
+            -eval -input test/lambda_nra/persons.input -eval-all 
 Compiling from lambda_nra to nnrc:
   lambda_nra -> nraenv -> nraenv -> nnrc -> nnrc
-$ cat samples/lambda_nra/persons6_lnra_nraenv.json 
+$ cat test/lambda_nra/persons6_lnra_nraenv.json 
 ["John Doe", "Jane Doe", "Jill Does"]
-$ cat samples/lambda_nra/persons6_lnra_nraenv_nraenv.json 
+$ cat test/lambda_nra/persons6_lnra_nraenv_nraenv.json 
 ["John Doe", "Jane Doe", "Jill Does"]
 ```
 
@@ -425,11 +425,11 @@ follows:
 ```
 $ java -cp bin/*:bin/lib/* testing.runners.RunJavascript \
        -runtime runtimes/javascript/qcert-runtime.js \
-       -input samples/oql/persons.input \
-       samples/oql/persons1.js
+       -input test/oql/persons.input \
+       test/oql/persons1.js
 ```
 
-The input data in [`oql/persons.json`](samples/oql/persons.json)
+The input data in [`oql/persons.json`](test/oql/persons.json)
 contains a collection of persons and a collection of companies in JSON
 format and can be used for all the tests. If you run the query
 `persons1`, it should return all persons whose age is 32:
@@ -446,7 +446,7 @@ format and can be used for all the tests. If you run the query
 First compile a query to Java, for instance:
 
 ```
-$ bin/qcert -source oql -target java samples/oql/persons1.oql
+$ bin/qcert -source oql -target java test/oql/persons1.oql
 ```
 
 To run the resulting Java code, you must first compile it by calling
@@ -458,14 +458,14 @@ query. From the command line, you can do it as follows, first to
 compile the Java code:
 
 ```
-$ javac -cp runtimes/java/bin:bin/lib/* oql/persons1.java
+$ javac -cp runtimes/java/bin:bin/lib/* test/oql/persons1.java
 ```
 
 Then to run the compiled `persons1` Class:
 
 ```
-$ java -cp runtimes/java/bin:bin/*:bin/lib/*:samples/oql testing.runners.RunJava \
-       -input samples/oql/persons.input \
+$ java -cp runtimes/java/bin:bin/*:bin/lib/*:test/oql testing.runners.RunJava \
+       -input test/oql/persons.input \
        persons1
 [{"type":["Customer"],"data":{"name":"John Doe","age":32,"cid":123}},
  {"type":["Customer"],"data":{"name":"Jane Doe","age":32,"cid":124}},
@@ -485,11 +485,11 @@ TO BE WRITTEN
 
 ### Spark DataFrames Target
 
-We provide a Spark example in `samples/spark2`. To compile and run it, do:
+We provide a Spark example in `test/spark2`. To compile and run it, do:
 
 ```
 $ make spark2-runtime
-$ cd samples/spark2/
+$ cd test/spark2/
 $ run.sh
 ```
 

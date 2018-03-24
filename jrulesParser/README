@@ -75,11 +75,11 @@ to package up the Java services for use by the qcert command line tool and the q
 
 Demonstration
 
-1.  To build all the ARL samples to js and then run them, type 'make all_run' (here).  This also generates
+1.  To build all the ARL tests to js and then run them, type 'make all_run' (here).  This also generates
 additional files for testing in the qcert.html web form (see below).  One test (test06.arl) is currently
 failing.  We believe this may be due to an ODM bug but are not sure.
 
-This way of building uses a separate batch program to translate the samples to the CAMP language before
+This way of building uses a separate batch program to translate the tests to the CAMP language before
 invoking qcert.  Think of this as an installation validation test.  The remaining demonstration steps show off
 how we intend JRules to be used in practice.
 
@@ -95,7 +95,7 @@ as part of the command line.  We use 'designer_rule' rather than "business rule"
 business rules must be built by an ODM Designer product.  It is the output artifact of that build that is
 consumed by qcert.
 
-Various sample ARL files (technical rules) are provided in the data subdirectory (with file extension .arl).
+Various test ARL files (technical rules) are provided in the data subdirectory (with file extension .arl).
 For these rules, you must specify a schema using the -schema directive.  Use the provided file testSchema.json
 in the data subdirectory.
 
