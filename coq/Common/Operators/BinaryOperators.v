@@ -34,7 +34,7 @@ Section BinaryOperators.
      | NatMax.     (**r biggest *)
   
   Inductive float_arith_binary_op
-    := 
+    :=
     | FloatPlus   (**r addition *)
     | FloatMinus  (**r substraction *)
     | FloatMult   (**r multiplication *)
@@ -44,24 +44,33 @@ Section BinaryOperators.
     | FloatMax    (**r max *)
   .
 
+  Inductive float_compare_binary_op
+    :=
+    | FloatLt     (**r less than *)
+    | FloatLe     (**r less than or equal to *)
+    | FloatGt     (**r greater than *)
+    | FloatGe     (**r greater than or equal to *)
+  .
+
   Inductive binary_op : Set :=
-  | OpEqual : binary_op                           (**r equality *)
-  | OpRecConcat : binary_op                       (**r record concatenation *)
-  | OpRecMerge : binary_op                        (**r record merge-concatenation *)
-  | OpAnd : binary_op                             (**r boolean conjunction *)
-  | OpOr : binary_op                              (**r boolean disjunction *)
-  | OpLt : binary_op                              (**r less than *)
-  | OpLe : binary_op                              (**r less than or equal to *)
-  | OpBagUnion : binary_op                        (**r bag union *)
-  | OpBagDiff : binary_op                         (**r bag difference *)
-  | OpBagMin : binary_op                          (**r bag min *)
-  | OpBagMax : binary_op                          (**r bag max *)
-  | OpContains : binary_op                        (**r is an element in a collection *)
-  | OpStringConcat : binary_op                    (**r string concatenation *)
+  | OpEqual : binary_op                                   (**r equality *)
+  | OpRecConcat : binary_op                               (**r record concatenation *)
+  | OpRecMerge : binary_op                                (**r record merge-concatenation *)
+  | OpAnd : binary_op                                     (**r boolean conjunction *)
+  | OpOr : binary_op                                      (**r boolean disjunction *)
+  | OpLt : binary_op                                      (**r less than *)
+  | OpLe : binary_op                                      (**r less than or equal to *)
+  | OpBagUnion : binary_op                                (**r bag union *)
+  | OpBagDiff : binary_op                                 (**r bag difference *)
+  | OpBagMin : binary_op                                  (**r bag min *)
+  | OpBagMax : binary_op                                  (**r bag max *)
+  | OpContains : binary_op                                (**r is an element in a collection *)
+  | OpStringConcat : binary_op                            (**r string concatenation *)
   | OpNatBinary : nat_arith_binary_op -> binary_op        (**r arithmetic operators on integers *)
-  | OpFloatBinary : float_arith_binary_op -> binary_op  (**r arithmetic operators on floats *)
+  | OpFloatBinary : float_arith_binary_op -> binary_op    (**r arithmetic operators on floats *)
+  | OpFloatCompare : float_compare_binary_op -> binary_op (**r comparison operators on floats *)
   | OpForeignBinary
-      (fb : foreign_binary_op_type) : binary_op   (**r foreign binary operators *)
+      (fb : foreign_binary_op_type) : binary_op         (**r foreign binary operators *)
   .
 
   Global Instance nat_arith_binary_op_eqdec : EqDec nat_arith_binary_op eq.
@@ -76,12 +85,19 @@ Section BinaryOperators.
     decide equality.
   Defined.
 
+  Global Instance float_compare_binary_op_eqdec : EqDec float_compare_binary_op eq.
+  Proof.
+    change (forall x y : float_compare_binary_op,  {x = y} + {x <> y}).
+    decide equality.
+  Defined.
+
   Global Instance binary_op_eqdec : EqDec binary_op eq.
   Proof.
     change (forall x y : binary_op,  {x = y} + {x <> y}).
     decide equality.
     apply nat_arith_binary_op_eqdec.
     apply float_arith_binary_op_eqdec.
+    apply float_compare_binary_op_eqdec.
     apply foreign_binary_op_dec.
   Defined.
 
@@ -115,6 +131,17 @@ Section BinaryOperators.
             end
        }.
 
+  Global Instance ToString_float_compare_binary_op : ToString float_compare_binary_op
+    := {toString :=
+          fun (op:float_compare_binary_op) =>
+            match op with
+            | FloatLt => "FloatLt"
+            | FloatLe => "FloatLe"
+            | FloatGt => "FloatGt"
+            | FloatGe => "FloatGe"
+            end
+       }.
+
   Global Instance ToString_binary_op : ToString binary_op
     := {toString :=
           fun (op:binary_op) =>
@@ -134,6 +161,7 @@ Section BinaryOperators.
             | OpStringConcat  => "OpStringConcat"
             | OpNatBinary aop => "(OpNatBinary " ++ (toString aop) ++ ")"
             | OpFloatBinary aop => "(OpFloatBinary " ++ (toString aop) ++ ")"
+            | OpFloatCompare aop => "(OpFloatCompare " ++ (toString aop) ++ ")"
             | OpForeignBinary fb => toString fb
             end
        }.
@@ -157,5 +185,6 @@ Tactic Notation "binary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpStringConcat"%string
   | Case_aux c "OpNatBinary"%string
   | Case_aux c "OpFloatBinary"%string
+  | Case_aux c "OpFloatCompare"%string
   | Case_aux c "OpForeignBinary"%string].
 

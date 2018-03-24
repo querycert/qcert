@@ -299,6 +299,10 @@ Section tDNNRCtoSparkDF.
     | OpFloatBinary FloatMult => infix "*"
     | OpFloatBinary FloatPlus => infix "+"
     | OpFloatBinary FloatRem => infix "%" (* TODO double check the exact semantics of this *)
+    | OpFloatCompare FloatLt => infix "<"
+    | OpFloatCompare FloatLe => infix "<="
+    | OpFloatCompare FloatGt => infix ">"
+    | OpFloatCompare FloatGe => infix ">="
 
     (* TODO *)
     | OpForeignBinary op => "FOREIGNBINARYOP???"

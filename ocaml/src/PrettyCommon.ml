@@ -598,6 +598,23 @@ let float_arith_binary_op_of_string ba =
   | _ -> raise Not_found
   end
 
+let string_of_float_compare_binary_op ba =
+  begin match ba with
+  | QcertCompiler.FloatLt -> "FloatLt"
+  | QcertCompiler.FloatLe -> "FloatLe"
+  | QcertCompiler.FloatGt -> "FloatGt"
+  | QcertCompiler.FloatGe -> "FloatGe"
+  end
+
+let float_compare_binary_op_of_string s =
+  begin match s with
+  | "FloatLt" -> QcertCompiler.FloatLt
+  | "FloatLe" -> QcertCompiler.FloatLe
+  | "FloatGt" -> QcertCompiler.FloatGt
+  | "FloatGe" -> QcertCompiler.FloatGe
+  | _ -> raise Not_found
+  end
+
 let pretty_float_arith_binary_op p sym callb ff ba a1 a2 =
   begin match ba with
   | QcertCompiler.FloatPlus ->
@@ -614,6 +631,18 @@ let pretty_float_arith_binary_op p sym callb ff ba a1 a2 =
      pretty_infix_exp p 20 sym callb ("Fmin",3) ff a1 a2
   | QcertCompiler.FloatMax ->
      pretty_infix_exp p 20 sym callb ("Fmax",3) ff a1 a2
+  end
+
+let pretty_float_compare_binary_op p sym callb ff ba a1 a2 =
+  begin match ba with
+  | QcertCompiler.FloatLt ->
+    pretty_infix_exp p 18 sym callb ("F<",1) ff a1 a2
+  | QcertCompiler.FloatLe ->
+    pretty_infix_exp p 18 sym callb ("F<=",1) ff a1 a2
+  | QcertCompiler.FloatGt ->
+    pretty_infix_exp p 18 sym callb ("F>",1) ff a1 a2
+  | QcertCompiler.FloatGe ->
+    pretty_infix_exp p 18 sym callb ("F>=",1) ff a1 a2
   end
 
 let string_of_foreign_binary_op fb =
@@ -704,6 +733,7 @@ let string_of_binary_op b =
   | QcertCompiler.OpOr -> "aor"
   | QcertCompiler.OpNatBinary ba -> string_of_nat_arith_binary_op ba
   | QcertCompiler.OpFloatBinary ba -> string_of_float_arith_binary_op ba
+  | QcertCompiler.OpFloatCompare ba -> string_of_float_compare_binary_op ba
   | QcertCompiler.OpLt -> "alt"
   | QcertCompiler.OpLe -> "ale"
   | QcertCompiler.OpBagDiff -> "aminus"
@@ -724,6 +754,7 @@ let pretty_binary_op p sym callb ff b a1 a2 =
   | QcertCompiler.OpOr -> pretty_infix_exp p 18 sym callb sym.vee ff a1 a2
   | QcertCompiler.OpNatBinary ba -> (pretty_nat_arith_binary_op p sym callb) ff ba a1 a2
   | QcertCompiler.OpFloatBinary ba -> (pretty_float_arith_binary_op p sym callb) ff ba a1 a2
+  | QcertCompiler.OpFloatCompare ba -> (pretty_float_compare_binary_op p sym callb) ff ba a1 a2
   | QcertCompiler.OpLt -> pretty_infix_exp p 17 sym callb ("<",1) ff a1 a2
   | QcertCompiler.OpLe -> pretty_infix_exp p 17 sym callb sym.leq ff a1 a2
   | QcertCompiler.OpBagDiff -> pretty_infix_exp p 18 sym callb ("\\",1) ff a1 a2

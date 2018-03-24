@@ -234,7 +234,6 @@ public class BinaryOperators {
 	public static JsonElement float_le(JsonElement e1, JsonElement e2) {
 		return new JsonPrimitive(asDouble(e1)<=asDouble(e2));
 	}
-	
 	public static JsonElement float_gt(JsonElement e1, JsonElement e2) {
 		return new JsonPrimitive(asDouble(e1)>asDouble(e2));
 	}

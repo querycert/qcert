@@ -231,7 +231,7 @@ Section NNRCtoJava.
       | FloatFloor => "float_floor"
       | FloatAbs => "float_abs"
       end.
-  
+
     Definition nat_barithToJavaMethod (b:nat_arith_binary_op)  :=
       match b with
       | NatPlus => "plus"
@@ -252,6 +252,14 @@ Section NNRCtoJava.
          | FloatPow => "float_pow"
          | FloatMin => "float_min"
          | FloatMax => "float_max"
+         end.
+
+    Definition float_bcompareToJavaMethod (fb:float_compare_binary_op)
+      := match fb with
+         | FloatLt => "float_lt"
+         | FloatLe => "float_le"
+         | FloatGt => "float_gt"
+         | FloatGe => "float_ge"
          end.
 
     Definition like_clause_to_java (lc:like_clause)
@@ -344,6 +352,7 @@ Section NNRCtoJava.
                      | OpStringConcat => mk_java_binary_op0 "stringConcat" e1 e2
                      | OpNatBinary b => mk_java_binary_op0 (nat_barithToJavaMethod b) e1 e2
                      | OpFloatBinary b => mk_java_binary_op0 (float_barithToJavaMethod b) e1 e2
+                     | OpFloatCompare b => mk_java_binary_op0 (float_bcompareToJavaMethod b) e1 e2
                      | OpForeignBinary fb
                        => foreign_to_java_binary_op i eol quotel fb e1 e2
                      end in

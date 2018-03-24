@@ -217,13 +217,21 @@ Section NNRCtoJavaScript.
     
     Definition mumber_barithToJs (fb:float_arith_binary_op) (d1 d2:string) : string :=
       match fb with
-      | FloatPlus => "(" ++ d1 ++ ") + (" ++ d2 ++ ")"
-      | FloatMinus =>  "(" ++ d1 ++ ") - (" ++ d2 ++ ")"
-      | FloatMult =>  "(" ++ d1 ++ ") * (" ++ d2 ++ ")"
-      | FloatDiv =>  "(" ++ d1 ++ ") / (" ++ d2 ++ ")"
+      | FloatPlus => "(" ++ d1 ++ " + " ++ d2 ++ ")"
+      | FloatMinus =>  "(" ++ d1 ++ " - " ++ d2 ++ ")"
+      | FloatMult =>  "(" ++ d1 ++ " * " ++ d2 ++ ")"
+      | FloatDiv =>  "(" ++ d1 ++ " / " ++ d2 ++ ")"
       | FloatPow => "Math.pow(" ++ d1 ++ ", " ++ d2 ++ ")"
       | FloatMin => "Math.min(" ++ d1 ++ ", " ++ d2 ++ ")"
       | FloatMax => "Math.max(" ++ d1 ++ ", " ++ d2 ++ ")"
+      end.
+
+    Definition mumber_bcompareToJs (fb:float_compare_binary_op) (d1 d2:string) : string :=
+      match fb with
+      | FloatLt => "(" ++ d1 ++ " < " ++ d2 ++ ")"
+      | FloatLe => "(" ++ d1 ++ " <= " ++ d2 ++ ")"
+      | FloatGt => "(" ++ d1 ++ " > " ++ d2 ++ ")"
+      | FloatGe => "(" ++ d1 ++ " >= " ++ d2 ++ ")"
       end.
 
     Definition like_clause_to_javascript (lc:like_clause)
@@ -318,6 +326,7 @@ Section NNRCtoJavaScript.
                      | OpStringConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
                      | OpNatBinary b => nat_barithToJs b e1 e2
                      | OpFloatBinary b => mumber_barithToJs b e1 e2
+                     | OpFloatCompare b => mumber_bcompareToJs b e1 e2
                      | OpForeignBinary fb
                        => foreign_to_javascript_binary_op i eol quotel fb e1 e2
                      end in

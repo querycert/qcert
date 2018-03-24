@@ -160,6 +160,11 @@ Section TOperatorsInfer.
         | (Float₀, Float₀) => Some Float
         | _ => None
         end
+      | OpFloatCompare _ =>
+        match (`τ₁, `τ₂) with
+        | (Float₀, Float₀) => Some Bool
+        | _ => None
+        end
       | OpForeignBinary fb =>
         foreign_binary_op_typing_infer fb τ₁ τ₂
       end.

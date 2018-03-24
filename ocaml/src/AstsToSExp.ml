@@ -123,6 +123,9 @@ let nat_arithbop_to_sexp (b:nat_arith_binary_op) : sexp =
 let float_arithbop_to_sexp (b:float_arith_binary_op) : sexp =
   STerm (PrettyCommon.string_of_float_arith_binary_op b,[])
   
+let float_comparebop_to_sexp (b:float_compare_binary_op) : sexp =
+  STerm (PrettyCommon.string_of_float_compare_binary_op b,[])
+  
 let sexp_to_nat_arithbop (se:sexp) : nat_arith_binary_op =
   begin match se with
   | STerm (s,[]) -> PrettyCommon.nat_arith_binary_op_of_string s
@@ -137,6 +140,13 @@ let sexp_to_float_arithbop (se:sexp) : float_arith_binary_op =
       raise  (Qcert_Error "Not well-formed S-expr inside arith binary_op")
   end
 
+let sexp_to_float_comparebop (se:sexp) : float_compare_binary_op =
+  begin match se with
+  | STerm (s,[]) -> PrettyCommon.float_compare_binary_op_of_string s
+  | _ ->
+      raise  (Qcert_Error "Not well-formed S-expr inside compare binary_op")
+  end
+
 let binary_op_to_sexp (b:binary_op) : sexp =
   begin match b with
   | OpEqual -> STerm ("OpEqual",[])
@@ -147,6 +157,7 @@ let binary_op_to_sexp (b:binary_op) : sexp =
   | OpOr -> STerm ("OpOr",[])
   | OpNatBinary ab -> STerm ("OpNatBinary",[nat_arithbop_to_sexp ab])
   | OpFloatBinary ab -> STerm ("OpFloatBinary",[float_arithbop_to_sexp ab])
+  | OpFloatCompare ab -> STerm ("OpFloatBinary",[float_comparebop_to_sexp ab])
   | OpLt -> STerm ("OpLt",[])
   | OpLe -> STerm ("OpLe",[])
   | OpBagDiff -> STerm ("OpBagDiff",[])
@@ -167,8 +178,13 @@ let sexp_to_binary_op (se:sexp) : binary_op =
   | STerm ("OpOr",[]) -> OpOr
   | STerm ("OpNatBinary",[se']) -> OpNatBinary (sexp_to_nat_arithbop se')
   | STerm ("OpFloatBinary",[se']) -> OpFloatBinary (sexp_to_float_arithbop se')
+  | STerm ("OpFloatCompare",[se']) -> OpFloatCompare (sexp_to_float_comparebop se')
   | STerm ("OpLt",[]) -> OpLt
   | STerm ("OpLe",[]) -> OpLe
+  | STerm ("FloatLt",[]) -> OpFloatCompare FloatLt
+  | STerm ("FloatLe",[]) -> OpFloatCompare FloatLe
+  | STerm ("FloatGt",[]) -> OpFloatCompare FloatGt
+  | STerm ("FloatGe",[]) -> OpFloatCompare FloatGe
   | STerm ("OpBagDiff",[]) -> OpBagDiff
   | STerm ("OpBagMin",[]) -> OpBagMin
   | STerm ("OpBagMax",[]) -> OpBagMax

@@ -112,7 +112,7 @@ Parameter float_pow : float -> float -> float.
 Parameter float_min : float -> float -> float. (** TODO: Check in JavaScript spec what happens for min/max *)
 Parameter float_max : float -> float -> float.
 Parameter float_ne : float -> float -> bool.
-Definition float_lt (n1 n2 : float) := lt_bool.
+Definition float_lt (n1 n2 : float) := lt_bool n1 n2.
 Parameter float_le : float -> float -> bool.
 Parameter float_gt : float -> float -> bool.
 Parameter float_ge : float -> float -> bool.

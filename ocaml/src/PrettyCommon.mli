@@ -124,9 +124,11 @@ val float_arith_unary_op_of_string : string -> QcertCompiler.float_arith_unary_o
 val string_of_foreign_binary_op : QcertCompiler.enhanced_binary_op -> string
 val string_of_nat_arith_binary_op : QcertCompiler.nat_arith_binary_op -> string
 val string_of_float_arith_binary_op : QcertCompiler.float_arith_binary_op -> string
+val string_of_float_compare_binary_op : QcertCompiler.float_compare_binary_op -> string
 
 val nat_arith_binary_op_of_string : string -> QcertCompiler.nat_arith_binary_op
 val float_arith_binary_op_of_string : string -> QcertCompiler.float_arith_binary_op
+val float_compare_binary_op_of_string : string -> QcertCompiler.float_compare_binary_op
 val foreign_binary_op_of_string : string -> QcertCompiler.enhanced_binary_op
 
 val string_of_binary_op : QcertCompiler.binary_op -> string

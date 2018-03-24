@@ -53,6 +53,14 @@ Section BinaryOperatorsSem.
     | FloatMax => float_max f1 f2
     end.
 
+  Definition float_compare_binary_op_eval (op:float_compare_binary_op) (f1 f2:float) : bool :=
+    match op with
+    | FloatLt => float_lt f1 f2
+    | FloatLe => float_le f1 f2
+    | FloatGt => float_gt f1 f2
+    | FloatGe => float_ge f1 f2
+    end.
+
   Context (h:brand_relation_t).
   Context {fdata:foreign_data}.
   Context {fbop:foreign_binary_op}.
@@ -95,6 +103,11 @@ Section BinaryOperatorsSem.
     | OpFloatBinary op =>
         match d1, d2 with
         | dfloat f1, dfloat f2 => Some (dfloat (float_arith_binary_op_eval op f1 f2))
+        | _, _ => None
+        end
+    | OpFloatCompare op =>
+        match d1, d2 with
+        | dfloat f1, dfloat f2 => Some (dbool (float_compare_binary_op_eval op f1 f2))
         | _, _ => None
         end
     | OpForeignBinary fb => foreign_binary_op_interp h fb d1 d2

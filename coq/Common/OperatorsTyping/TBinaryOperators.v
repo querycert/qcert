@@ -85,6 +85,8 @@ Section TBinaryOperators.
         binary_op_type (OpNatBinary b) Nat Nat Nat
     | type_OpFloatBinary (b:float_arith_binary_op) :
         binary_op_type (OpFloatBinary b) Float Float Float
+    | type_OpFloatCompare (b:float_compare_binary_op) :
+        binary_op_type (OpFloatCompare b) Float Float Bool
     | type_OpForeignBinary {fb τin₁ τin₂ τout} :
         foreign_binary_op_typing_has_type fb τin₁ τin₂ τout ->
         binary_op_type (OpForeignBinary fb) τin₁ τin₂ τout.
@@ -109,6 +111,7 @@ Section TBinaryOperators.
     | Case_aux c "type_OpStringConcat"%string
     | Case_aux c "type_OpNatBinary"%string
     | Case_aux c "type_OpFloatBinary"%string
+    | Case_aux c "type_OpFloatCompare"%string
     | Case_aux c "type_OpForeignBinary"%string].
 
   (** Type soundness lemmas for individual operators *)
@@ -696,6 +699,9 @@ Section TBinaryOperators.
     - Case "type_OpFloatBinary"%string.
       dependent induction H; dependent induction H0; simpl.
       eauto.
+    - Case "type_OpFloatCompare"%string.
+      dependent induction H; dependent induction H0; simpl.
+      eauto.
     - Case "type_OpForeignBinary"%string.
       eapply foreign_binary_op_typing_sound; eauto.
   Qed.
@@ -741,5 +747,6 @@ End TBinaryOperators.
     | Case_aux c "type_OpStringConcat"%string
     | Case_aux c "type_OpNatBinary"%string
     | Case_aux c "type_OpFloatBinary"%string
+    | Case_aux c "type_OpFloatCompare"%string
     | Case_aux c "type_OpForeignBinary"%string].
 

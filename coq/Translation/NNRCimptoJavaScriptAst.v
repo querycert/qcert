@@ -346,6 +346,17 @@ Section NNRCimptoJavaScriptAst.
       | FloatMax =>
         math_max e1' e2'
       end
+    | OpFloatCompare opa =>
+      match opa with
+      | FloatLt =>
+        expr_binary_op e1' binary_op_lt e2'
+      | FloatLe =>
+        expr_binary_op e1' binary_op_le e2'
+      | FloatGt =>
+        expr_binary_op e1' binary_op_gt e2'
+      | FloatGe =>
+        expr_binary_op e1' binary_op_ge e2'
+      end
     | OpForeignBinary opf => (* XXX TODO XXX *)
       expr_literal (literal_string "XXX TODO:  XXX")
     end.

@@ -87,6 +87,8 @@ public enum BinaryOperator {
 
     public boolean isArithmetic() {
 	switch (this) {
+	case OpLe:
+	case OpLt:
 	case FloatDiv:
 	case FloatMax:
 	case FloatMin:
@@ -94,6 +96,11 @@ public enum BinaryOperator {
 	case FloatMult:
 	case FloatPlus:
 	case FloatPow:
+	case FloatGe:
+	case FloatGt:
+	case FloatLe:
+	case FloatLt:
+	case FloatNe:
 	case NatDiv:
 	case NatMax:
 	case NatMin:

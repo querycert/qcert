@@ -123,8 +123,13 @@ Section TOperatorsInferSub.
         | _, _ => None
         end
       | OpFloatBinary _ =>
-        match subtype_dec τ₁ Nat, subtype_dec τ₂ Nat with
-        | left _, left _ => Some (Nat, Nat, Nat)
+        match subtype_dec τ₁ Float, subtype_dec τ₂ Float with
+        | left _, left _ => Some (Float, Float, Float)
+        | _, _ => None
+        end
+      | OpFloatCompare _ =>
+        match subtype_dec τ₁ Float, subtype_dec τ₂ Float with
+        | left _, left _ => Some (Float, Float, Bool)
         | _, _ => None
         end
       | OpForeignBinary fb =>
