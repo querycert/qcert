@@ -25,7 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
- * Contains utilities to convert JSON-formatted schemas into a more convenient form.  We use a simple hierarchy of type representations.
+ * Contains utilities to convert JSON-formatted schemas into a more convenient form.  We use a simple inheritance of type representations.
  * <p>A <b>Type</b> is one of the following (the general case represented by a marker interface)
  * <ul><li>a <b>PrimitiveType</b> (containing a string type name), 
  * <li>a <b>ListType</b> (containing an element Type),

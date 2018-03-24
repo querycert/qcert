@@ -30,21 +30,21 @@ type pretty_config =
     { mutable margin : int;
       mutable charset : charkind;
       mutable type_annotations : bool;
-      mutable hierarchy : QData.json;
+      mutable inheritance : QData.json;
       mutable link_js_runtime : bool; }
 
 let make_pretty_config greek margin annot =
   { margin = margin;
     charset = if greek then Greek else Ascii;
     type_annotations = annot;
-    hierarchy = QcertCompiler.Jarray [];
+    inheritance = QcertCompiler.Jarray [];
     link_js_runtime = false; }
 
 let default_pretty_config () =
   { margin = 120;
     charset = Greek;
     type_annotations = false;
-    hierarchy = QcertCompiler.Jarray [];
+    inheritance = QcertCompiler.Jarray [];
     link_js_runtime = false; }
 
 let set_ascii conf () = conf.charset <- Ascii
@@ -63,8 +63,8 @@ let get_type_annotations conf = conf.type_annotations
 let set_margin conf i = conf.margin <- i
 let get_margin conf = conf.margin
 
-let set_hierarchy conf h = conf.hierarchy <- h
-let get_hierarchy conf = conf.hierarchy
+let set_inheritance conf h = conf.inheritance <- h
+let get_inheritance conf = conf.inheritance
 
 let set_link_js_runtime conf () = conf.link_js_runtime <- true
 let link_js_runtime conf = conf.link_js_runtime

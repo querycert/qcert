@@ -58,18 +58,18 @@ object QcertRuntime {
     Console.out.println(Console.RESET)
   }
 
-  type BrandHierarchy = Map[String, Set[String]]
-  def makeHierarchy(args: (String, String)*) : BrandHierarchy = {
-    val brandHierarchy = mutable.HashMap[String, mutable.HashSet[String]]()
-    def addToBrandHierarchy(p : (String, String)) = p match {
+  type BrandInheritance = Map[String, Set[String]]
+  def makeInheritance(args: (String, String)*) : BrandInheritance = {
+    val brandInheritance = mutable.HashMap[String, mutable.HashSet[String]]()
+    def addToBrandInheritance(p : (String, String)) = p match {
       case (sub, sup) =>
-        brandHierarchy.get(sub) match {
-          case None => brandHierarchy += sub -> mutable.HashSet(sup)
+        brandInheritance.get(sub) match {
+          case None => brandInheritance += sub -> mutable.HashSet(sup)
           case Some(hs) => hs += sup
         }
     }
-    args.foreach(addToBrandHierarchy)
-    brandHierarchy.mapValues(_.toSet).toMap
+    args.foreach(addToBrandInheritance)
+    brandInheritance.mapValues(_.toSet).toMap
   }
 
   def blobToQcertString(x: String): String = x // TODO
@@ -103,22 +103,22 @@ object QcertRuntime {
     udf((x: Any) => QcertRuntime.toQcertString(x), StringType)
 
   // TODO
-  // We might want to change all of these to pass around a runtime support object with the hierarchy, gson parser, ...
+  // We might want to change all of these to pass around a runtime support object with the inheritance, gson parser, ...
   // basically everything that's currently in the QcertRuntime abstract class
 
-  def isSubBrand(brandHierarchy: BrandHierarchy, sub: String, sup: String): Boolean = {
+  def isSubBrand(brandInheritance: BrandInheritance, sub: String, sup: String): Boolean = {
     if (sub == sup || sup == "Any")
       return true
-    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(brandHierarchy, dsup, sup))
+    brandInheritance.getOrElse(sub, Seq()).exists(dsup => isSubBrand(brandInheritance, dsup, sup))
   }
 
-  def castUDFHelper(h: BrandHierarchy, bs: String*) = (ts: mutable.WrappedArray[String]) =>
+  def castUDFHelper(h: BrandInheritance, bs: String*) = (ts: mutable.WrappedArray[String]) =>
     bs.forall((brand: String) =>
       ts.exists((typ: String) =>
         isSubBrand(h, typ, brand)))
 
-  // TODO Can we somehow avoid passing the hierarchy at every call site?
-  def castUDF(h: BrandHierarchy, bs: String*) =
+  // TODO Can we somehow avoid passing the inheritance at every call site?
+  def castUDF(h: BrandInheritance, bs: String*) =
     udf(QcertRuntime.castUDFHelper(h, bs:_*), BooleanType)
 
   def reshape(v: Any, t: DataType): Any = (v, t) match {
@@ -203,11 +203,11 @@ object QcertRuntime {
     * @param bs The brands we are casting to.
     * @return Either a right, if the cast fails, or a branded value wrapped in left.
     */
-  def cast(brandHierarchy: BrandHierarchy, v: BrandedValue, bs: Brand*): Either = {
+  def cast(brandInheritance: BrandInheritance, v: BrandedValue, bs: Brand*): Either = {
     // TODO use castUDF helper
     if (!bs.forall((brand: Brand) =>
       v.getSeq(1 /* $type */).exists((typ: Brand) =>
-        isSubBrand(brandHierarchy, typ, brand))))
+        isSubBrand(brandInheritance, typ, brand))))
       none()
     else
       left(v)

@@ -43,7 +43,7 @@ public class SchemaTransformer {
 	 */
 	public static JsonObject convertSchemas(List<Statement> statements) {
 		JsonObject ans = new JsonObject();
-		ans.add("hierarchy", new JsonArray());
+		ans.add("inheritance", new JsonArray());
 		ans.add("brandTypes", new JsonArray());
 		ans.add("typeDefs", new JsonArray());
 		JsonObject globals = new JsonObject();

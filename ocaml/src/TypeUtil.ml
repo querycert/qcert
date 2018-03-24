@@ -131,13 +131,13 @@ let schema_of_io_json (io:QData.json) =
     sch_io_schema = Some content_schema;
     sch_globals = globs }
 
-let hierarchy_of_schema sc =
+let inheritance_of_schema sc =
   begin match sc.sch_io_schema with
   | None -> []
   | Some (h,_,_,_) -> fst h
   end
 
-let raw_hierarchy_of_schema sc =
+let raw_inheritance_of_schema sc =
   begin match sc.sch_io_schema with
   | None -> QcertCompiler.Jarray []
   | Some (h,_,_,_) -> snd h

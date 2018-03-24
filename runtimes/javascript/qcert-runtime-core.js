@@ -320,7 +320,7 @@ function cast(brands,v) {
 	return enhanced_cast(brands,v);
     var type = v.type;
     mustBeArray(type);
-    if (brands.length == 1 && brands[0] == "Any") { /* cast to top of hierarchy is built-in */
+    if (brands.length == 1 && brands[0] == "Any") { /* cast to top of inheritance is built-in */
     	return left(v);
     }
     brands:

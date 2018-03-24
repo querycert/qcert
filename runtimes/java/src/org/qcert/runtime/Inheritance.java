@@ -24,16 +24,16 @@ import java.util.Set;
 
 import com.google.gson.*;
 
-public class Hierarchy {
-	public Hierarchy(Map<String, Set<String>> h) {
-		this.hierarchy = h;
+public class Inheritance {
+	public Inheritance(Map<String, Set<String>> h) {
+		this.inheritance = h;
 	}
 
-	public Hierarchy(JsonArray h) {
-		this.hierarchy = mkHierarchy(h);
+	public Inheritance(JsonArray h) {
+		this.inheritance = mkInheritance(h);
 	}
 
-	private static Map<String, Set<String>> mkHierarchy(JsonArray h) {
+	private static Map<String, Set<String>> mkInheritance(JsonArray h) {
 		final Map<String, Set<String>> res = new HashMap<String, Set<String>>();
 		for(int i = 0; i < h.size(); i ++) {
 			final JsonObject elem = h.get(i).getAsJsonObject();
@@ -61,7 +61,7 @@ public class Hierarchy {
 				if(onechild.equals(oneparent)) {
 					continue PARENT;
 				}
-				Set<String> childsParents = hierarchy.get(onechild);
+				Set<String> childsParents = inheritance.get(onechild);
 				if(childsParents != null && childsParents.contains(oneparent)) {
 					continue PARENT;
 				}
@@ -73,5 +73,5 @@ public class Hierarchy {
 	}
 
 	// maps children to parents
-	private Map<String, Set<String>> hierarchy;
+	private Map<String, Set<String>> inheritance;
 }

@@ -30,7 +30,7 @@ Section TNRATest.
    **************)
   Require Import TrivialModel.
 
-  (* Empty hierarchy *)
+  (* Empty inheritance *)
   Definition myBR : brand_relation
     := mkBrand_relation nil (eq_refl _) (eq_refl _) .
 

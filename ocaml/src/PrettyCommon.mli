@@ -40,8 +40,8 @@ val get_type_annotations : pretty_config -> bool
 val set_margin : pretty_config -> int -> unit
 val get_margin : pretty_config -> int
 
-val set_hierarchy : pretty_config -> QData.json -> unit
-val get_hierarchy : pretty_config -> QData.json
+val set_inheritance : pretty_config -> QData.json -> unit
+val get_inheritance : pretty_config -> QData.json
 
 val set_link_js_runtime : pretty_config -> unit -> unit
 val link_js_runtime : pretty_config -> bool

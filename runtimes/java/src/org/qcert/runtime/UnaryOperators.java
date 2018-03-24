@@ -239,11 +239,11 @@ public class UnaryOperators {
 		return e.getAsJsonObject().get("data");
 	}
 	
-	public static JsonElement cast(Hierarchy hierarchy, Collection<String> brands, JsonElement e) {
+	public static JsonElement cast(Inheritance inheritance, Collection<String> brands, JsonElement e) {
 		final JsonObject er = e.getAsJsonObject();
 		final JsonArray typs = er.get("type").getAsJsonArray();
 		Set<String> actualBrands = collToBrands(typs);
-		if(hierarchy.isAssignableFrom(brands, actualBrands)) {
+		if(inheritance.isAssignableFrom(brands, actualBrands)) {
 			return left(e);
 		} else {
 			return right(e);

@@ -101,8 +101,8 @@ let compile_query (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) (pa
 (* Emit *)
 
 let emit_string (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
-  let h = TypeUtil.raw_hierarchy_of_schema schema in
-  PrettyCommon.set_hierarchy pretty_conf h; (* Add hierarchy to pretty printing configuration for Cloudant code emition *)
+  let h = TypeUtil.raw_inheritance_of_schema schema in
+  PrettyCommon.set_inheritance pretty_conf h; (* Add inheritance to pretty printing configuration for Cloudant code emition *)
   let s = QcertOut.output_query pretty_conf q in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in

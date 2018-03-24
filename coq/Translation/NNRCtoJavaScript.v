@@ -164,7 +164,7 @@ Section NNRCtoJavaScript.
     Definition dataEnhancedToJS (quotel:string) (d : data) : string :=
       jsonToJS quotel (data_enhanced_to_js quotel d).
 
-    Definition hierarchyToJS (quotel:string) (h:list (string*string)) :=
+    Definition inheritanceToJS (quotel:string) (h:list (string*string)) :=
       dataToJS quotel (dcoll (map (fun x => drec (("sub",dstring (fst x)) :: ("sup", (dstring (snd x))) :: nil)) h)).
 
   End DataJS.

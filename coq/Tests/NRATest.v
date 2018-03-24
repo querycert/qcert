@@ -78,7 +78,7 @@ Section NRATest.
 
   Definition one_to_ten := (natcoll 10).
 
-  (* Input derivation hierarchy *)
+  (* Input derivation inheritance *)
 
   Definition h := (@nil (string*string)).
   

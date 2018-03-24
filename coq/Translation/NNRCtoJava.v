@@ -316,7 +316,7 @@ Section NNRCtoJava.
                      | OpRight => mk_java_unary_op0 "right" e1
                      | OpBrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1
                      | OpUnbrand => mk_java_unary_op0 "unbrand" e1
-                     | OpCast b => mk_java_unary_opn "cast" ["hierarchy"; (mk_java_string_collection b)] e1
+                     | OpCast b => mk_java_unary_opn "cast" ["inheritance"; (mk_java_string_collection b)] e1
                      | OpNatUnary u => mk_java_unary_op0 (uarithToJavaMethod u) e1
                      | OpNatSum =>  mk_java_unary_op0 "sum" e1
                      | OpNatMin => mk_java_unary_op0 "list_min" e1
@@ -445,8 +445,8 @@ Section NNRCtoJava.
     
     Definition nnrcToJavaFun (i:nat) (input_v:string) (e:nnrc) (eol:string) (quotel:string) (ivs : list (string * string)) (fname:string) :=
       let e' := closeFreeVars input_v e ivs in
-      let '(j0, v0, t0) := nnrcToJavaunshadow e' 1 (i + 1) eol quotel ("constants"::"hierarchy"::(List.map fst ivs)) ivs in
-      (indent i) ++ "public JsonElement " ++ fname ++ "(Hierarchy hierarchy, "++ (makeJavaParams ivs) ++ ") {" ++ eol
+      let '(j0, v0, t0) := nnrcToJavaunshadow e' 1 (i + 1) eol quotel ("constants"::"inheritance"::(List.map fst ivs)) ivs in
+      (indent i) ++ "public JsonElement " ++ fname ++ "(Inheritance inheritance, "++ (makeJavaParams ivs) ++ ") {" ++ eol
                  ++ j0
                  ++ (indent i) ++ "  return " ++ (from_java_json v0) ++ ";" ++ eol
                  ++ (indent i) ++ "}" ++ eol.

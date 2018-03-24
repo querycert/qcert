@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 
-import org.qcert.runtime.Hierarchy;
+import org.qcert.runtime.Inheritance;
 import org.qcert.runtime.JavaQuery;
 
 import com.google.gson.*;
@@ -35,7 +35,7 @@ public class JavaTestRunner {
 	}
 
 	public static Object runQuery(JavaQuery query, JsonObject combinedInput) {
-	        JsonArray hierarchy = combinedInput.get("schema").getAsJsonObject().getAsJsonArray("hierarchy");
+	        JsonArray inheritance = combinedInput.get("schema").getAsJsonObject().getAsJsonArray("inheritance");
 		JsonElement input = combinedInput.get("input").getAsJsonObject().get("WORLD");
 		final ZonedDateTime now;
 		JsonPrimitive primnow = combinedInput.getAsJsonPrimitive("now");
@@ -45,17 +45,17 @@ public class JavaTestRunner {
   		        final String strnow = (String) (primnow.getAsString());
 			now = ZonedDateTime.parse(strnow);
 		}
-		return runQuery(query, hierarchy, input, now);
+		return runQuery(query, inheritance, input, now);
 	}
 
 
-	public static Object runQuery(JavaQuery query, JsonArray hierarchy, JsonElement input, ZonedDateTime now) {
-		return runQuery(query, new Hierarchy(hierarchy), input, now);
+	public static Object runQuery(JavaQuery query, JsonArray inheritance, JsonElement input, ZonedDateTime now) {
+		return runQuery(query, new Inheritance(inheritance), input, now);
 	}
 
 
-	public static Object runQuery(JavaQuery query, Hierarchy hierarchy, JsonElement input, ZonedDateTime now) {
-		return query.query(hierarchy, mkConstants(input, now));
+	public static Object runQuery(JavaQuery query, Inheritance inheritance, JsonElement input, ZonedDateTime now) {
+		return query.query(inheritance, mkConstants(input, now));
 	}
 
 	private static JsonObject mkConstants(JsonElement input, ZonedDateTime now) {

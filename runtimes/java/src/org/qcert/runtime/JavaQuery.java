@@ -21,9 +21,9 @@ import com.google.gson.*;
 public interface JavaQuery {
 	/**
 	 * 
-	 * @param hierarchy a Map from classes to the set of their ancestors
+	 * @param inheritance a Map from classes to the set of their ancestors
 	 * @param world a ({@link com.google.gson})json encoding of the world.
 	 * @return a ({@link com.google.gson})json encoding of the result of running this query
 	 */
-	JsonElement query(Hierarchy hierarchy, JsonElement world);
+	JsonElement query(Inheritance inheritance, JsonElement world);
 }

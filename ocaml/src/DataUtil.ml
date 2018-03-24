@@ -31,7 +31,7 @@ type io_input = QData.json
 type io_output = QData.json
 type io_schema = QData.json
 
-type io_hierarchy = QData.json
+type io_inheritance = QData.json
 type io_brandTypes = QData.json
 type io_typeDefs = QData.json
 type io_globals = QData.json
@@ -42,12 +42,12 @@ type vrtype_content = QData.json
 type content_input = (char list * QData.qdata) list
 type content_output = QData.qdata
 
-type content_hierarchy = (char list * char list) list
-type full_content_hierarchy = (content_hierarchy * io_hierarchy)
+type content_inheritance = (char list * char list) list
+type full_content_inheritance = (content_inheritance * io_inheritance)
 type content_brandTypes = (string * string) list
 type content_typeDefs = (string * rtype_content) list
 type content_globals = (string * vrtype_content) list
-type content_schema = full_content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
+type content_schema = full_content_inheritance * io_brandTypes option * io_typeDefs option * io_globals option
 
 (* Optimization support *)
 type optim_phase =
@@ -140,7 +140,7 @@ let get_io_components (od:QData.json option) : QData.json option * QData.json op
 
 (* Schema processing first *)
 
-let build_hierarchy h =
+let build_inheritance h =
   begin match h with
   | QcertCompiler.Jarray l ->
       List.map (function
@@ -149,10 +149,10 @@ let build_hierarchy h =
         | [(['s';'u';'p'], QcertCompiler.Jstring sup); (['s';'u';'b'], QcertCompiler.Jstring sub)] ) ->
             (sub, sup)
         | _ ->
-            raise (Qcert_Error "Ill-formed hierarchy"))
+            raise (Qcert_Error "Ill-formed inheritance"))
         l
   | _ ->
-      raise (Qcert_Error "Ill-formed hierarchy")
+      raise (Qcert_Error "Ill-formed inheritance")
   end
 
 let build_brandTypes bts =
@@ -193,16 +193,16 @@ let build_globals globals =
       raise (Qcert_Error "Ill-formed globals")
   end
 
-let missing_hierarchy_default = QData.jarray []  (* Empty array i.e., empty hierarchy *)
+let missing_inheritance_default = QData.jarray []  (* Empty array i.e., empty inheritance *)
 
 let build_schema (j:QData.json) =
   begin match j with
   | QcertCompiler.Jobject r ->
-      let hierarchy = get_field_defaults "inheritance" r missing_hierarchy_default in
+      let inheritance = get_field_defaults "inheritance" r missing_inheritance_default in
       let brandTypes = get_field_opt "brandTypes" r in
       let typeDefs = get_field_opt "typeDefs" r in
       let globals = get_field_opt "globals" r in
-      ((build_hierarchy hierarchy,hierarchy),
+      ((build_inheritance inheritance,inheritance),
        brandTypes,
        typeDefs,
        globals)
@@ -210,7 +210,7 @@ let build_schema (j:QData.json) =
       raise (Qcert_Error "Ill-formed model")
   end
 
-let get_hierarchy io_schema =
+let get_inheritance io_schema =
   let (h,_,_,_) = build_schema io_schema in fst h
 
 let build_input format h input =

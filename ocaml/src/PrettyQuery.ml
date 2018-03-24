@@ -31,48 +31,48 @@ let pretty_query pconf (pretty_q:'a pretty_fun) (q:'a) =
   let greek = get_charset_bool pconf in
   let margin = get_margin pconf in
   let annot = get_type_annotations pconf in
-  let hierarchy = get_hierarchy pconf in
+  let inheritance = get_inheritance pconf in
   let link_runtime = link_js_runtime pconf in
-  pretty_q greek margin annot hierarchy link_runtime q
+  pretty_q greek margin annot inheritance link_runtime q
 
 (** Pretty CAMPRule *)
 
-let pretty_camp_rule greek margin annot hierarchy link_runtime q =
+let pretty_camp_rule greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for CAMPRule at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty TechRule *)
 
-let pretty_tech_rule greek margin annot hierarchy link_runtime q =
+let pretty_tech_rule greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for TechRule at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty DesignerRule *)
 
-let pretty_designer_rule greek margin annot hierarchy link_runtime q =
+let pretty_designer_rule greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for TechRule at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty CAMP *)
 
-let pretty_camp greek margin annot hierarchy link_runtime q =
+let pretty_camp greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for CAMP at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty OQL *)
 
-let pretty_oql greek margin annot hierarchy link_runtime q =
+let pretty_oql greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for OQL at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty SQL *)
 
-let pretty_sql greek margin annot hierarchy link_runtime q =
+let pretty_sql greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for SQL at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty SQL++ *)
 
-let pretty_sqlpp greek margin annot hierarchy link_runtime q =
+let pretty_sqlpp greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for SQL++ at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty LambdaNRA *)
 
-let pretty_lambda_nra greek margin annot hierarchy link_runtime q =
+let pretty_lambda_nra greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for LambdaNRA at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty NRA *)
@@ -113,7 +113,7 @@ and pretty_nra_exp p sym thissym ff a1 oa2 =
 	fprintf ff "@[<hv 2>%a%a%a%a(@,%a@;<0 -2>)@]" pretty_sym thissym pretty_sym sym.langle (pretty_nra_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nra_aux 0 sym) a2
 
 
-let pretty_nra greek margin annot hierarchy link_runtime q =
+let pretty_nra greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
@@ -179,7 +179,7 @@ and pretty_infix_dependent pouter pinner sym callb thissym ff a1 a2 a3 =
     fprintf ff "@[<hov 0>%a@ %a%a%a%a@ %a@]" (callb pinner sym) a1 pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (callb pinner sym) a2
 
 
-let pretty_nraenv greek margin annot hierarchy link_runtime q =
+let pretty_nraenv greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
@@ -190,8 +190,8 @@ let pretty_nraenv greek margin annot hierarchy link_runtime q =
 
 (** Pretty cNRAEnv *)
 
-let pretty_nraenv_core greek margin annot hierarchy link_runtime q =
-  pretty_nraenv greek margin annot hierarchy link_runtime (QDriver.nraenv_core_to_nraenv q)
+let pretty_nraenv_core greek margin annot inheritance link_runtime q =
+  pretty_nraenv greek margin annot inheritance link_runtime (QDriver.nraenv_core_to_nraenv q)
     
 (** Pretty NNRC *)
 
@@ -225,7 +225,7 @@ let rec pretty_nnrc_aux p sym ff n =
   | QcertCompiler.NNRCGroupBy (g,atts,n1) ->
       fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrc_aux 0 sym) n1
 
-let pretty_nnrc greek margin annot hierarchy link_runtime q =
+let pretty_nnrc greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
@@ -236,8 +236,8 @@ let pretty_nnrc greek margin annot hierarchy link_runtime q =
 
 (** Pretty cNNRC *)
 
-let pretty_nnrc_core greek margin annot hierarchy link_runtime q =
-  pretty_nnrc greek margin annot hierarchy link_runtime q
+let pretty_nnrc_core greek margin annot inheritance link_runtime q =
+  pretty_nnrc greek margin annot inheritance link_runtime q
 
 (** Pretty NNRCimp *)
 
@@ -303,7 +303,7 @@ let pretty_nnrc_imp_aux p sym ff ((s, ret): QcertCompiler.nnrc_imp) =
     (Util.string_of_char_list ret)
 
 
-let pretty_nnrc_imp greek margin annot hierarchy link_runtime q =
+let pretty_nnrc_imp greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
@@ -314,8 +314,8 @@ let pretty_nnrc_imp greek margin annot hierarchy link_runtime q =
 
 (** Pretty cNNRCimp *)
 
-let pretty_nnrc_imp_core greek margin annot hierarchy link_runtime q =
-  pretty_nnrc_imp greek margin annot hierarchy link_runtime q
+let pretty_nnrc_imp_core greek margin annot inheritance link_runtime q =
+  pretty_nnrc_imp greek margin annot inheritance link_runtime q
 
 (** Pretty NNRCMR *)
 
@@ -421,7 +421,7 @@ let pretty_nnrcmr_aux sym ff mrl =
   pretty_mr_chain sym ff mrl.QcertCompiler.mr_chain;
   fprintf ff "@[%a@]" (pretty_mr_last sym) mrl.QcertCompiler.mr_last
 
-let pretty_nnrcmr greek margin annot hierarchy link_runtime mr_chain =
+let pretty_nnrcmr greek margin annot inheritance link_runtime mr_chain =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
@@ -500,7 +500,7 @@ let pretty_cldmr_aux sym ff mrl =
   pretty_cldmr_chain sym ff mrl.QcertCompiler.cldmr_chain;
   fprintf ff "@[%a@]" (pretty_cldmr_last sym) mrl.QcertCompiler.cldmr_last
 
-let pretty_cldmr greek margin annot hierarchy link_runtime q =
+let pretty_cldmr greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
@@ -624,14 +624,14 @@ let pretty_plug_dataframe greek ff a =
   let sym = if greek then greeksym else textsym in
   pretty_dataframe_aux 0 sym ff a
 
-let pretty_dnnrc greek margin annot hierarchy link_runtime q =
+let pretty_dnnrc greek margin annot inheritance link_runtime q =
   let ann = pretty_annotate_ignore in
   let plug = pretty_plug_dataframe greek in
   pretty_dnnrc_base ann plug greek margin annot q
 
 (** Pretty tDNNRC *)
 
-let pretty_dnnrc_typed greek margin annot hierarchy link_runtime q =
+let pretty_dnnrc_typed greek margin annot inheritance link_runtime q =
   let ann =
     if annot
     then pretty_annotate_annotated_rtype greek pretty_annotate_ignore
@@ -642,41 +642,41 @@ let pretty_dnnrc_typed greek margin annot hierarchy link_runtime q =
 
 (** Pretty JavaScript Ast *)
 
-let pretty_js_ast greek margin annot hierarchy link_runtime q =
+let pretty_js_ast greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for JavaScript AST at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty JavaScript *)
 
-let pretty_javascript greek margin annot hierarchy link_runtime q =
+let pretty_javascript greek margin annot inheritance link_runtime q =
   Util.string_of_char_list q
 
 (** Pretty Java *)
 
-let pretty_java greek margin annot hierarchy link_runtime q =
+let pretty_java greek margin annot inheritance link_runtime q =
   Util.string_of_char_list q
 
 (** Pretty SparkRDD *)
 
-let pretty_spark_rdd greek margin annot hierarchy link_runtime q =
+let pretty_spark_rdd greek margin annot inheritance link_runtime q =
   Util.string_of_char_list q
 
 (** Pretty SparkDF *)
 
-let pretty_spark_df greek margin annot hierarchy link_runtime q =
+let pretty_spark_df greek margin annot inheritance link_runtime q =
   Util.string_of_char_list q
 
 (** Pretty Cloudant *)
 
-let pretty_cloudant greek margin annot hierarchy link_runtime q =
-  CloudantUtil.string_of_cloudant (CloudantUtil.link_js_runtime_top link_runtime hierarchy q)
+let pretty_cloudant greek margin annot inheritance link_runtime q =
+  CloudantUtil.string_of_cloudant (CloudantUtil.link_js_runtime_top link_runtime inheritance q)
 
 (** Pretty CloudantWhisk *)
 
-let pretty_cloudant_whisk greek margin annot hierarchy link_runtime q =
+let pretty_cloudant_whisk greek margin annot inheritance link_runtime q =
   "(* There is no pretty printer for CloudantWhisk at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty Error *)
 
-let pretty_error greek margin annot hierarchy link_runtime q =
+let pretty_error greek margin annot inheritance link_runtime q =
   "Error: "^(Util.string_of_char_list q)
 

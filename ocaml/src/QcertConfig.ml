@@ -56,8 +56,8 @@ type global_config = {
     mutable gconf_prefix : string;
   }
 
-let hierarchy_of_conf gconf =
-  TypeUtil.hierarchy_of_schema (gconf.gconf_schema)
+let inheritance_of_conf gconf =
+  TypeUtil.inheritance_of_schema (gconf.gconf_schema)
 
 let parse_io f =
   begin match f with
@@ -119,7 +119,7 @@ let complete_configuration gconf =
     | None -> ()
     end
   in
-  let h = hierarchy_of_conf gconf in
+  let h = inheritance_of_conf gconf in
   let _input =
     begin match io_input with
     | Some io -> gconf.gconf_input <- (build_input META h io)

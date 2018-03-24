@@ -22,13 +22,13 @@ open QcertCompiler.EnhancedCompiler
 
 (* Javascript js_runtime (for inlining in Cloudant) *)
 
-let print_hierarchy d =
+let print_inheritance d =
   Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") (QData.json_to_qdata [] d))
 
 let quote_js_runtime s h =
   let s = "var inheritance = %INHERITANCE%;\n" ^ s in
   let hs =
-    try print_hierarchy h with
+    try print_inheritance h with
     | _ -> "[]"
   in
   let s = Util.global_replace "%INHERITANCE%" hs s in

@@ -31,7 +31,7 @@ type io_input = QData.json
 type io_output = QData.json
 type io_schema = QData.json
 
-type io_hierarchy = QData.json
+type io_inheritance = QData.json
 type io_brandTypes = QData.json
 type io_typeDefs = QData.json
 type io_globals = QData.json
@@ -42,12 +42,12 @@ type vrtype_content = QData.json
 type content_input = (char list * QData.qdata) list
 type content_output = QData.qdata
 
-type content_hierarchy = (char list * char list) list
-type full_content_hierarchy = (content_hierarchy * io_hierarchy)
+type content_inheritance = (char list * char list) list
+type full_content_inheritance = (content_inheritance * io_inheritance)
 type content_brandTypes = (string * string) list
 type content_typeDefs = (string * rtype_content) list
 type content_globals = (string * vrtype_content) list
-type content_schema = full_content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
+type content_schema = full_content_inheritance * io_brandTypes option * io_typeDefs option * io_globals option
 
 (* Optimization support *)
 type optim_phase =
@@ -61,8 +61,8 @@ type optim_config = optim_language list
 
 val get_io_components : io_json option -> io_input option * io_output option * io_schema option
 
-val build_input : serialization_format -> content_hierarchy -> io_input -> content_input
-val build_output : content_hierarchy -> io_output -> content_output
+val build_input : serialization_format -> content_inheritance -> io_input -> content_input
+val build_output : content_inheritance -> io_output -> content_output
 val build_schema : io_schema -> content_schema
 val build_brandTypes : io_brandTypes -> content_brandTypes
 val build_typeDefs : io_typeDefs -> content_typeDefs
