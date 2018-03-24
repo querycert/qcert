@@ -307,6 +307,7 @@ MODULES = \
 	Translation/CldMRtoCloudant \
 	Translation/NNRCtoNNRCimp \
 	Translation/NNRCimptoJavaScriptAst \
+	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \
 	Translation/NNRCtoJavaScript \
 	Translation/NNRCMRtoSparkRDD \

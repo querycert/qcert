@@ -130,15 +130,16 @@ Section CompCorrectness.
   (** Note: All stops are assumed correct (i.e., not moving does not change semantics) *)
   (** Note: True/False is indicated for each edge in the compiler pipeline *)
   (** Note: For now optimization is not recorded as correct *)
-  
-  Definition driver_correct_js_ast (dv: js_ast_driver) :=
-    match dv with
-    | Dv_js_ast_stop => True
-    end.
 
   Definition driver_correct_javascript (dv: javascript_driver) :=
     match dv with
     | Dv_javascript_stop => True
+    end.
+
+  Definition driver_correct_js_ast (dv: js_ast_driver) :=
+    match dv with
+    | Dv_js_ast_stop => True
+    | Dv_js_ast_to_javascript dv => False /\ driver_correct_javascript dv
     end.
 
   Definition driver_correct_java (dv: java_driver) :=
@@ -802,18 +803,6 @@ Section CompCorrectness.
       simpl in H.
       elim H; intros; contradiction.
     Qed.
-      
-    Lemma correct_driver_succeeds_js_ast:
-      forall dv, driver_correct (Dv_js_ast dv) ->
-                 (forall q, Forall query_not_error
-                                   (compile (Dv_js_ast dv) (Q_js_ast q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *; contradiction.
-    Qed.
 
     Lemma correct_driver_succeeds_javascript:
       forall dv, driver_correct (Dv_javascript dv) ->
@@ -826,7 +815,21 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *; contradiction.
     Qed.
-      
+
+    Lemma correct_driver_succeeds_js_ast:
+      forall dv, driver_correct (Dv_js_ast dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_js_ast dv) (Q_js_ast q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; [ contradiction | ].
+      destruct H.
+      contradiction.
+    Qed.
+
     Lemma correct_driver_succeeds_java:
       forall dv, driver_correct (Dv_java dv) ->
                  (forall q, Forall query_not_error
@@ -1724,6 +1727,7 @@ Section CompCorrectness.
       elim H0; intros.
       - rewrite <- H1; simpl; trivial_same_query.
       - contradiction.
+      - destruct H; contradiction.
     Qed.
 
     Lemma correct_driver_preserves_eval_javascript:

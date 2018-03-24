@@ -72,6 +72,7 @@ Section CompDriver.
   Require Import NNRCtocNNRC.
   Require Import NNRCtoNNRCimp.
   Require Import NNRCimptoJavaScriptAst.
+  Require Import JavaScriptAsttoJavaScript.
   Require Import NNRCtoDNNRC.
   Require Import NNRCtoNNRCMR.
   Require Import NNRCtoJavaScript.
@@ -228,6 +229,9 @@ Section CompDriver.
     Definition nnrc_imp_to_js_ast (inputs: list var) (q: nnrc_imp) : js_ast :=
       nnrc_imp_to_js_ast_top inputs q.
 
+    Definition js_ast_to_javascript (q: js_ast) : javascript :=
+      js_ast_to_js_top q.
+
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)
     Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
@@ -298,11 +302,12 @@ Section CompDriver.
 
   (** Drivers *)
 
-  Inductive js_ast_driver : Set :=
-    | Dv_js_ast_stop : js_ast_driver.
-
   Inductive javascript_driver : Set :=
     | Dv_javascript_stop : javascript_driver.
+
+  Inductive js_ast_driver : Set :=
+    | Dv_js_ast_stop : js_ast_driver
+    | Dv_js_ast_to_javascript : javascript_driver -> js_ast_driver.
 
   Inductive java_driver : Set :=
     | Dv_java_stop : java_driver.
@@ -536,14 +541,15 @@ Section CompDriver.
   Definition name_of_driver dv :=
     name_of_language (language_of_driver dv).
 
-  Definition driver_length_js_ast (dv: js_ast_driver) :=
-  match dv with
-  | Dv_js_ast_stop => 1
-  end.
-
   Definition driver_length_javascript (dv: javascript_driver) :=
   match dv with
   | Dv_javascript_stop => 1
+  end.
+
+  Definition driver_length_js_ast (dv: js_ast_driver) :=
+  match dv with
+  | Dv_js_ast_stop => 1
+  | Dv_js_ast_to_javascript dv => 1 + driver_length_javascript dv
   end.
 
   Definition driver_length_java (dv: java_driver) :=
@@ -734,14 +740,6 @@ Section CompDriver.
 
   (** Compilation functions*)
   Section CompDriverCompile.
-    Definition compile_js_ast (dv: js_ast_driver) (q: js_ast) : list query :=
-      let queries :=
-          match dv with
-          | Dv_js_ast_stop => nil
-          end
-      in
-      (Q_js_ast q) :: queries.
-
     Definition compile_javascript (dv: javascript_driver) (q: javascript) : list query :=
       let queries :=
           match dv with
@@ -749,6 +747,17 @@ Section CompDriver.
           end
       in
       (Q_javascript q) :: queries.
+
+    Definition compile_js_ast (dv: js_ast_driver) (q: js_ast) : list query :=
+      let queries :=
+          match dv with
+          | Dv_js_ast_stop => nil
+          | Dv_js_ast_to_javascript dv =>
+            let q := js_ast_to_js_top q in
+            compile_javascript dv q
+          end
+      in
+      (Q_js_ast q) :: queries.
 
     Definition compile_java (dv: java_driver) (q: java) : list query :=
       let queries :=
@@ -1689,7 +1698,38 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-    | L_js_ast
+    | L_js_ast =>
+      match dv with
+      | Dv_javascript dv =>
+          Dv_js_ast (Dv_js_ast_to_javascript dv)
+      | Dv_nraenv _
+      | Dv_camp_rule _
+      | Dv_tech_rule _
+      | Dv_designer_rule _
+      | Dv_camp _
+      | Dv_oql _
+      | Dv_sql _
+      | Dv_sqlpp _
+      | Dv_lambda_nra _
+      | Dv_nra _
+      | Dv_nraenv_core _
+      | Dv_nnrc_core _
+      | Dv_nnrc _
+      | Dv_nnrc_imp_core _
+      | Dv_nnrc_imp _
+      | Dv_nnrcmr _
+      | Dv_cldmr _
+      | Dv_dnnrc _
+      | Dv_js_ast _
+      | Dv_spark_df _
+      | Dv_dnnrc_typed _
+      | Dv_java _
+      | Dv_spark_rdd _
+      | Dv_cloudant _ =>
+          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
+      end
     | L_javascript
     | L_java
     | L_spark_rdd
@@ -1892,6 +1932,7 @@ Section CompDriver.
     | Dv_dnnrc_typed (Dv_dnnrc_typed_optim dv) => (L_dnnrc_typed, Some (Dv_dnnrc_typed dv))
     | Dv_dnnrc_typed (Dv_dnnrc_typed_to_spark_df rtype _ dv) => (L_dnnrc_typed, Some (Dv_spark_df dv))
     | Dv_js_ast (Dv_js_ast_stop) => (L_js_ast, None)
+    | Dv_js_ast (Dv_js_ast_to_javascript dv) => (L_js_ast, Some (Dv_javascript dv))
     | Dv_javascript (Dv_javascript_stop) => (L_javascript, None)
     | Dv_java (Dv_java_stop) => (L_java, None)
     | Dv_spark_rdd (Dv_spark_rdd_stop) => (L_spark_rdd, None)
@@ -1918,18 +1959,32 @@ Section CompDriver.
     eapply pop_transition_lt_len; eauto.
   Defined.
 
-  Lemma target_language_of_driver_is_postfix_js_ast:
-      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_js_ast dv))) (Dv_js_ast dv)).
-  Proof.
-    destruct dv.
-    reflexivity.
-  Qed.
-
   Lemma target_language_of_driver_is_postfix_javascript:
       (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_javascript dv))) (Dv_javascript dv)).
   Proof.
     destruct dv.
     reflexivity.
+  Qed.
+
+  Lemma target_language_of_driver_is_postfix_js_ast:
+      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_js_ast dv))) (Dv_js_ast dv)).
+  Proof.
+    destruct dv;
+    try reflexivity;
+    rewrite target_language_of_driver_equation;
+    simpl.
+    - eapply is_postfix_plus_one with
+      (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 EmptyString
+                 nil
+                 EmptyString
+                 nil
+                 EmptyString
+                 nil) (lang:=L_js_ast)
+      ; [ eapply target_language_of_driver_is_postfix_javascript | | ]
+      ; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_java:
@@ -4532,6 +4587,11 @@ Section CompDriver.
         L_nnrc_imp
           :: L_js_ast
           :: nil
+      | L_nnrc_imp, L_javascript =>
+        L_nnrc_imp
+          :: L_js_ast
+          :: L_javascript
+          :: nil
       (* From nnrc_imp_core *)
       | L_nnrc_imp_core, L_nnrc_imp_core =>
         L_nnrc_imp_core
@@ -4544,6 +4604,12 @@ Section CompDriver.
         L_nnrc_imp_core
           :: L_nnrc_imp
           :: L_js_ast
+          :: nil
+      | L_nnrc_imp_core, L_javascript =>
+        L_nnrc_imp_core
+          :: L_nnrc_imp
+          :: L_js_ast
+          :: L_javascript
           :: nil
       (* From nnrcmr: *)
       | L_nnrcmr, L_nnrcmr =>
@@ -4708,6 +4774,10 @@ Section CompDriver.
       (* From javascript ast *)
       | L_js_ast, L_js_ast =>
         L_js_ast :: nil
+      | L_js_ast, L_javascript =>
+        L_js_ast
+          :: L_javascript
+          :: nil
       (* From javascript *)
       | L_javascript, L_javascript =>
         L_javascript :: nil
@@ -4788,16 +4858,6 @@ Section CompDriver.
       eapply exists_path_from_source_target_trans; eauto.
     Qed.
 
-    Lemma exists_path_from_source_target_completeness_js_ast :
-        (forall dv,
-            exists_path_from_source_target L_js_ast (target_language_of_driver (Dv_js_ast dv))).
-    Proof.
-      destruct dv
-    ; simpl; try reflexivity; intros.
-    Qed.
-
-    Hint Resolve exists_path_from_source_target_completeness_js_ast : exists_path_hints.
-
     Lemma exists_path_from_source_target_completeness_javascript :
         (forall dv,
             exists_path_from_source_target L_javascript (target_language_of_driver (Dv_javascript dv))).
@@ -4824,6 +4884,15 @@ Section CompDriver.
          ; simpl
          ; trivial
          ; try solve [etransitivity; eauto with exists_path_hints; reflexivity].
+
+    Lemma exists_path_from_source_target_completeness_js_ast :
+        (forall dv,
+            exists_path_from_source_target L_js_ast (target_language_of_driver (Dv_js_ast dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_js_ast : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_nnrc_imp :
       (forall dv,
