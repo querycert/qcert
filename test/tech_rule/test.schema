@@ -1,105 +1,74 @@
 {
-  "inheritance": [
-    { "sub": "tests.entities.MainEntity", "sup": "tests.Entity" },
-    { "sub": "tests.entities.Purchase", "sup": "tests.Entity" },
-    { "sub": "tests.entities.Customer", "sup": "tests.Entity" },
-    { "sub": "tests.branding.Marketer", "sup": "tests.Entity" },
-    { "sub": "tests.branding.ProductRep", "sup": "tests.branding.Marketer" },
-    { "sub": "tests.branding.ProductRep", "sup": "tests.Entity" },
-    { "sub": "tests.branding.Product", "sup": "tests.Entity" },
-    { "sub": "tests.branding.Client", "sup": "tests.Entity" }
-  ],
-  "model": {
-    "modelName": "testing",
+    "inheritance": [
+	{ "sub": "tests.entities.MainEntity", "sup": "tests.Entity" },
+	{ "sub": "tests.entities.Purchase", "sup": "tests.Entity" },
+	{ "sub": "tests.entities.Customer", "sup": "tests.Entity" },
+	{ "sub": "tests.branding.Marketer", "sup": "tests.Entity" },
+	{ "sub": "tests.branding.ProductRep", "sup": "tests.branding.Marketer" },
+	{ "sub": "tests.branding.ProductRep", "sup": "tests.Entity" },
+	{ "sub": "tests.branding.Product", "sup": "tests.Entity" },
+	{ "sub": "tests.branding.Client", "sup": "tests.Entity" }
+    ],
     "brandTypes": [
-      { "brand": "tests.Entity", "typeName": "tests_Entity" },
-      {
-        "brand": "tests.entities.Customer",
-        "typeName": "tests_entities_Customer"
-      },
-      {
-        "brand": "tests.entities.Purchase",
-        "typeName": "tests_entities_Purchase"
-      },
-      {
-        "brand": "tests.entities.MainEntity",
-        "typeName": "tests_entities_MainEntity"
-      },
-      {
-        "brand": "tests.branding.Client",
-        "typeName": "tests_branding_Client"
-      },
-      {
-        "brand": "tests.branding.Marketer",
-        "typeName": "tests_branding_Marketer"
-      },
-      {
-        "brand": "tests.branding.Product",
-        "typeName": "tests_branding_Product"
-      },
-      {
-        "brand": "tests.branding.ProductRep",
-        "typeName": "tests_branding_ProductRep"
-      }
+	{ "brand": "tests.Entity", "typeName": "tests_Entity" },
+	{ "brand": "tests.entities.Customer",
+          "typeName": "tests_entities_Customer"	},
+	{ "brand": "tests.entities.Purchase",
+          "typeName": "tests_entities_Purchase" },
+	{ "brand": "tests.entities.MainEntity",
+          "typeName": "tests_entities_MainEntity" },
+	{ "brand": "tests.branding.Client",
+            "typeName": "tests_branding_Client" },
+	{ "brand": "tests.branding.Marketer",
+          "typeName": "tests_branding_Marketer"	},
+	{ "brand": "tests.branding.Product",
+          "typeName": "tests_branding_Product" },
+      { "brand": "tests.branding.ProductRep",
+        "typeName": "tests_branding_ProductRep" }
     ],
     "typeDefs": [
-      { "typeName": "tests_Entity", "typeDef": {} },
-      {
-        "typeName": "tests_entities_Customer",
-        "typeDef": { "cid": "Float", "age": "Float", "name": "String" }
-      },
-      {
-        "typeName": "tests_entities_Purchase",
-        "typeDef": {
-          "cid": "Float",
-          "pid": "Float",
-          "name": "String",
-          "quantity": "Float"
-        }
-      },
-      {
-        "typeName": "tests_entities_MainEntity",
-        "typeDef": {
-          "id": "Float",
-          "doubleAttribute": "Float",
-          "stringId": "String"
-        }
-      },
-      {
-        "typeName": "tests_branding_Client",
-        "typeDef": {
-          "capitalization": "Float",
-          "name": "String",
-          "id": "String"
-        }
-      },
-      {
-        "typeName": "tests_branding_Marketer",
-        "typeDef": {
-          "clients": { "$coll": "String" },
-          "name": "String",
-          "id": "String"
-        }
-      },
-      {
-        "typeName": "tests_branding_Product",
-        "typeDef": { "name": "String", "client": "String", "id": "String" }
-      },
-      {
-        "typeName": "tests_branding_ProductRep",
-        "typeDef": {
-          "clients": { "$coll": "String" },
-          "name": "String",
-          "id": "String",
-          "products": { "$coll": "String" }
-        }
-      }
-    ]
-  },
-  "globals": {
-    "WORLD": {
-      "dist": "distr",
-      "type": { "$coll": { "$brand": [ "tests.Entity" ] } }
+	{ "typeName": "tests_Entity", "typeDef": { } },
+	{ "typeName": "tests_entities_Customer",
+          "typeDef": { "cid": "Float", "age": "Float", "name": "String" } },
+	{ "typeName": "tests_entities_Purchase",
+          "typeDef": {
+	      "cid": "Float",
+	      "pid": "Float",
+	      "name": "String",
+	      "quantity": "Float"
+          } },
+	{ "typeName": "tests_entities_MainEntity",
+          "typeDef": {
+	      "id": "Float",
+	      "doubleAttribute": "Float",
+	      "stringId": "String"
+          } },
+	{ "typeName": "tests_branding_Client",
+          "typeDef": {
+	      "capitalization": "Float",
+	      "name": "String",
+	      "id": "String"
+          } },
+	{ "typeName": "tests_branding_Marketer",
+          "typeDef": {
+	      "clients": { "$coll": "String" },
+	      "name": "String",
+	      "id": "String"
+          } },
+	{ "typeName": "tests_branding_Product",
+          "typeDef": { "name": "String", "client": "String", "id": "String" } },
+	{ "typeName": "tests_branding_ProductRep",
+          "typeDef": {
+	      "clients": { "$coll": "String" },
+	      "name": "String",
+	      "id": "String",
+	      "products": { "$coll": "String" }
+          } }
+    ],
+    "globals": {
+	"WORLD": {
+	    "dist": "distr",
+	    "type": { "$coll": { "$brand": [ "tests.Entity" ] } }
+	}
     }
-  }
 }

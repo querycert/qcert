@@ -102,7 +102,7 @@ oql-world-tests-js:
                           oql/world$(N).js;)
 
 oql-persons-tests:
-	@$(foreach N,$(OQLPERSONSNUM), \
+	$(foreach N,$(OQLPERSONSNUM), \
             $(foreach T,$(OQLTARGETS), \
 	       $(QCERTCOMP) -source oql -target $(T) oql/persons$(N).oql \
                             -eval -input oql/persons.input \

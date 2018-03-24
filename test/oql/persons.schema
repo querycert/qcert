@@ -17,7 +17,7 @@
 		 { "typeName": "tests_entities_Customer", "typeDef": { "cid": "Nat", "age": "Nat", "name": "String"}},
 		 { "typeName": "tests_entities_Purchase", "typeDef": { "cid": "Nat", "pid": "Nat", "name": "String", "quantity": "Nat"}},
 		 { "typeName": "tests_branding_Client", "typeDef": { "capitalization": "Nat", "name": "String", "id": "String"}},
-		 { "typeName": "tests_branding_Marketer", "typeDef": { "clients": { "$coll" : "String"}, "name": "String", "id": "Nat"}},
+		 { "typeName": "tests_branding_Marketer", "typeDef": { "clients": { "$coll" : "String"}, "name": "String", "id": "String"}},
 		 { "typeName": "tests_branding_Product", "typeDef": { "name": "String", "client": "String", "id": "String"}},
 		 { "typeName": "tests_branding_ProductRep", "typeDef": { "clients": { "$coll" : "String"}, "name": "String", "id": "String", "products": { "$coll" : "String"}}}],
     "globals" :

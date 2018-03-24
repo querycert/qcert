@@ -198,7 +198,7 @@ let missing_hierarchy_default = QData.jarray []  (* Empty array i.e., empty hier
 let build_schema (j:QData.json) =
   begin match j with
   | QcertCompiler.Jobject r ->
-      let hierarchy = get_field_defaults "hierarchy" r missing_hierarchy_default in
+      let hierarchy = get_field_defaults "inheritance" r missing_hierarchy_default in
       let brandTypes = get_field_opt "brandTypes" r in
       let typeDefs = get_field_opt "typeDefs" r in
       let globals = get_field_opt "globals" r in
