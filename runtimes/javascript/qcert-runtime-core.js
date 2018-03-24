@@ -201,8 +201,12 @@ function toStringQ(v, quote) {
     var t = typeof v;
     if (t == "string")
 	return quote + v + quote;
-    if (t == "number" || t == "boolean")
+    if (t == "boolean")
 	return "" + v;
+    if (t == "number") {
+	if (Math.floor(v) == v) return (new Number(v)).toFixed(1); // Make sure there is always decimal point
+	else return "" + v;
+    }
     if ({}.toString.apply(v) == "[object Array]") {
 	v = v.slice();
 	v.sort();
