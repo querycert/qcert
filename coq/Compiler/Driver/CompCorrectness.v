@@ -42,7 +42,7 @@ Section CompCorrectness.
   Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (* Target languages *)
-  Require Import JsAst.JsSyntax.
+  Require Import JavaScriptAstRuntime.
   Require Import JavaScriptRuntime.
   Require Import JavaRuntime.
   Require Import SparkRDDRuntime.
@@ -70,7 +70,7 @@ Section CompCorrectness.
   Require Import NNRCtoNNRCimp.
   Require Import NNRCtoDNNRC.
   Require Import NNRCtoNNRCMR.
-  Require Import NNRCimptoJsSyntax.
+  Require Import NNRCimptoJavaScriptAst.
   Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
   Require Import cNNRCtoCAMP.

@@ -15,7 +15,7 @@
  *)
 
 Section JavaScriptAst.
-  Require Import JsAst.JsSyntax.
+  Require Export JsAst.JsSyntax.
   Definition ajavascript := prog.
 
 End JavaScriptAst.

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCimptoJsSyntax.
+Section NNRCimptoJavaScriptAst.
   Require Import String.
   Require Import List.
   Require Import Bool.
@@ -26,7 +26,7 @@ Section NNRCimptoJsSyntax.
   Require Import Utils.
   Require Import CommonRuntime.
   Require Import NNRCimpRuntime.
-  Require Import JsAst.JsSyntax.
+  Require Import JavaScriptAstRuntime.
   Require Import JSON.
   Require Import DatatoJSON.
 
@@ -571,4 +571,4 @@ Section NNRCimptoJsSyntax.
   (*   simpl. *)
   (* Qed. *)
 
-End NNRCimptoJsSyntax.
+End NNRCimptoJavaScriptAst.

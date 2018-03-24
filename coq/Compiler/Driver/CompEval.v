@@ -43,7 +43,7 @@ Section CompEval.
   Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (** Target languages *)
-  Require Import JsAst.JsSyntax.
+  Require Import JavaScriptAstRuntime.
   Require Import JavaScriptRuntime.
   Require Import JavaRuntime.
   Require Import SparkRDDRuntime.

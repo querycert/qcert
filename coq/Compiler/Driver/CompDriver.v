@@ -44,7 +44,7 @@ Section CompDriver.
   Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (* Target languages *)
-  Require Import JsAst.JsSyntax.
+  Require Import JavaScriptAstRuntime.
   Require Import JavaScriptRuntime.
   Require Import JavaRuntime.
   Require Import SparkRDDRuntime.
@@ -71,7 +71,7 @@ Section CompDriver.
   Require Import NRAtocNRAEnv.
   Require Import NNRCtocNNRC.
   Require Import NNRCtoNNRCimp.
-  Require Import NNRCimptoJsSyntax.
+  Require Import NNRCimptoJavaScriptAst.
   Require Import NNRCtoDNNRC.
   Require Import NNRCtoNNRCMR.
   Require Import NNRCtoJavaScript.
