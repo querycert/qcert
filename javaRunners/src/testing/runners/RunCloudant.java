@@ -87,7 +87,7 @@ public class RunCloudant {
 			JsonObject elem = iterator.next().getAsJsonObject();
 			realResult.add(elem.get("value"));
 		}
-		return Utils.compareForValidity(compare, realResult);
+		return QUtil.compareForValidity(compare, realResult);
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class RunCloudant {
 	 */
 	private static void validateOutput(String result, JsonArray expected) {
 		JsonParser parser = new JsonParser();
-		if (!Utils.compareForValidity(expected, parser.parse(result).getAsJsonArray()))
+		if (!QUtil.compareForValidity(expected, parser.parse(result).getAsJsonArray()))
 			Assert.fail("Results were incorrect");
 	}
     
@@ -374,11 +374,11 @@ public class RunCloudant {
 		// Must have a -input option for the input JSON
 		if ("-input".equals(arg)) {
 		    inputFile = args[i+1]; i++;
-		    ioParts = Utils.parseJsonFileToObject(inputFile);
+		    ioParts = QUtil.parseJsonFileToObject(inputFile);
 		} else if ("-keep-db".equals(arg)) {
 		    keepDB = true;
 		} else {
-		    JsonObject designs_and_post = Utils.parseJsonFileToObject(arg);
+		    JsonObject designs_and_post = QUtil.parseJsonFileToObject(arg);
 		    /* Run the test */
 		    runCloudantLast(client,
 				    designs_and_post.get("designs").getAsJsonArray(),
