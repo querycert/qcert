@@ -158,7 +158,7 @@ Section tDNNRCtoSparkDF.
     | CToString c =>
       "toQcertStringUDF(" ++ code_of_column c ++ ")"
     | CUDFCast bs c =>
-      "castUDF(" ++ joinStrings ", " ("HIERARCHY"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+      "castUDF(" ++ joinStrings ", " ("INHERITANCE"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
     | CUDFUnbrand t c =>
       "unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
@@ -226,7 +226,7 @@ Section tDNNRCtoSparkDF.
     | OpRight => prefix "right"
     | OpBrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
     | OpCast bs =>
-      "cast(HIERARCHY, " ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
+      "cast(INHERITANCE, " ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
     | OpUnbrand =>
       match lift_tlocal required_type with
       | Some (exist _ r _) =>
@@ -405,7 +405,7 @@ Section tDNNRCtoSparkDF.
       | None => "CANTCASTTODISTRIBUTEDTYPE"
       end.
 
-  Definition initBrandHierarchy : string :=
+  Definition initBrandInheritance : string :=
     let lines :=
         map (fun p => "(""" ++ fst p ++ """ -> """ ++ snd p ++ """)")
             brand_relation_brands in
@@ -438,7 +438,7 @@ Section tDNNRCtoSparkDF.
 
       ++ "object " ++ name ++ " {" ++ eol
       ++ "def main(args: Array[String]): Unit = {" ++ eol
-      ++ "val HIERARCHY = QcertRuntime.makeHierarchy(" ++ initBrandHierarchy ++ ")" ++ eol
+      ++ "val INHERITANCE = QcertRuntime.makeInheritance(" ++ initBrandInheritance ++ ")" ++ eol
       ++ "val sparkContext = new SparkContext()" ++ eol
       ++ "org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.WARN)" ++ eol
       ++ "val sparkSession = SparkSession.builder().getOrCreate()" ++ eol
