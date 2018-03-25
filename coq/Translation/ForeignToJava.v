@@ -26,47 +26,22 @@ Section ForeigntoJava.
 
   (* data of this type is a java expression that constructs a json element *)
          
-    Inductive java_json : Set
-      := mk_java_json : string -> java_json.
+  Inductive java_json : Set
+    := mk_java_json : string -> java_json.
 
-    Definition from_java_json (obj:java_json)
-      := match obj with
-         | mk_java_json s => s
-         end.
-
-    Definition java_json_NULL : java_json
-       := mk_java_json "JsonNull.INSTANCE".
- 
-     Definition mk_java_json_primitive (obj:string) : java_json
-       := mk_java_json ("new JsonPrimitive(" ++ obj ++ ")").
-     
-     Definition mk_java_json_nat n : java_json
-       := mk_java_json_primitive (Z_to_string10 n).
-     
-     Definition mk_java_json_number n : java_json
-       := mk_java_json_primitive (float_to_string n).
-     
-     Definition mk_java_json_bool (b:bool) : java_json
-       := mk_java_json_primitive 
-            (if b then "true" else "false").
-     
-     Definition mk_java_json_string quotel (s:string)
-       := mk_java_json_primitive
-            (bracketString quotel s quotel).    
-
-      Class foreign_to_java {fruntime:foreign_runtime}: Type
-      := mk_foreign_to_java {
-             foreign_to_java_data
-               (quotel:string) (fd:foreign_data_type) : java_json
-             ; foreign_to_java_unary_op
-             (indent:nat) (eol:string)
-             (quotel:string) (fu:foreign_unary_op_type)
-             (d:java_json) : java_json
-         ; foreign_to_java_binary_op
-             (indent:nat) (eol:string)
-             (quotel:string) (fb:foreign_binary_op_type)
-             (d1 d2:java_json) : java_json
-           }.
+  Class foreign_to_java {fruntime:foreign_runtime}: Type
+    := mk_foreign_to_java {
+           foreign_to_java_data
+             (quotel:string) (fd:foreign_data_type) : java_json
+           ; foreign_to_java_unary_op
+               (indent:nat) (eol:string)
+               (quotel:string) (fu:foreign_unary_op_type)
+               (d:java_json) : java_json
+           ; foreign_to_java_binary_op
+               (indent:nat) (eol:string)
+               (quotel:string) (fb:foreign_binary_op_type)
+               (d1 d2:java_json) : java_json
+         }.
       
 End ForeigntoJava.
 

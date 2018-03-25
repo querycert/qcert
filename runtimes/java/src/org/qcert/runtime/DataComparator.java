@@ -39,6 +39,7 @@ public final class DataComparator implements Comparator<JsonElement> {
 		DT_NULL,
 		DT_BOOL,
 		DT_LONG,
+		DT_BOXED_LONG,
 		DT_DOUBLE,
 		DT_STRING,
 		DT_REC,
@@ -76,7 +77,8 @@ public final class DataComparator implements Comparator<JsonElement> {
 		} else if(obj.isJsonArray()) {
 			return DType.DT_COLL;
 		} else if(obj.isJsonObject()) {
-			return DType.DT_REC;
+		        if(((JsonObject) obj).has("nat")) { return DType.DT_BOXED_LONG; }
+			else { return DType.DT_REC;}
 		} else {
 			throw new RuntimeException("Unknown json type: " + obj + " of type " + obj.getClass());
 		}	
@@ -189,7 +191,10 @@ public final class DataComparator implements Comparator<JsonElement> {
 		if (typ1 == DType.DT_LAZYNUM) {
 		    switch (typ2) {
 		    case DT_LONG:
-			return Long.compare(o1.getAsLong(), o2.getAsLong());
+		        return Long.compare(o1.getAsLong(),o2.getAsLong());
+		    case DT_BOXED_LONG:
+ 	 	        return Long.compare(((JsonObject) o1).get("nat").getAsLong(),
+					    ((JsonObject) o2).get("nat").getAsLong());
 		    case DT_DOUBLE:
 			return Double.compare(o1.getAsDouble(), o2.getAsDouble());
 		    case DT_LAZYNUM:
@@ -201,7 +206,10 @@ public final class DataComparator implements Comparator<JsonElement> {
 		} else if (typ2 == DType.DT_LAZYNUM) {
 		    switch (typ1) {
 		    case DT_LONG:
-			return Long.compare(o1.getAsLong(), o2.getAsLong());
+		        return Long.compare(o1.getAsLong(),o2.getAsLong());
+		    case DT_BOXED_LONG:
+ 	 	        return Long.compare(((JsonObject) o1).get("nat").getAsLong(),
+					    ((JsonObject) o2).get("nat").getAsLong());
 		    case DT_DOUBLE:
 			return Double.compare(o1.getAsDouble(), o2.getAsDouble());
 		    }
@@ -241,7 +249,10 @@ public final class DataComparator implements Comparator<JsonElement> {
 				return str1.compareTo(str2); 
 			}
 		case DT_LONG:
-			return Long.compare(o1.getAsLong(), o2.getAsLong());
+		        return Long.compare(o1.getAsLong(),o2.getAsLong());
+		case DT_BOXED_LONG:
+ 	 	        return Long.compare(((JsonObject) o1).get("nat").getAsLong(),
+					    ((JsonObject) o2).get("nat").getAsLong());
 		case DT_DOUBLE:
 			return Double.compare(o1.getAsDouble(), o2.getAsDouble());
 		case DT_COLL:

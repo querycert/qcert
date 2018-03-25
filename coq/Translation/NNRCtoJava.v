@@ -106,6 +106,11 @@ Section NNRCtoJava.
   End javaUtil.
 
   Section DataJava.
+    Definition from_java_json (obj:java_json)
+      := match obj with
+         | mk_java_json s => s
+         end.
+
 
     (* Given a list of strings that construct objects, create a JsonArray holding them *)
     Definition mk_java_json_array (l:list java_json) : java_json
@@ -124,17 +129,38 @@ Section NNRCtoJava.
                                          ")") l))
             ++ ".toJsonObject()").
                
+    Definition mk_java_json_primitive (obj:string) : java_json
+      := mk_java_json ("new JsonPrimitive(" ++ obj ++ ")").
+    
+    Definition mk_java_json_string quotel (s:string)
+      := mk_java_json_primitive
+           (bracketString quotel s quotel).    
+
     Definition mk_java_json_brands (quotel:string) (b:brands) : java_json
       := mk_java_json_array (map (mk_java_json_string quotel) b).
 
+    Definition java_json_NULL : java_json
+       := mk_java_json "JsonNull.INSTANCE".
+ 
     Import ListNotations.
+
+     Definition mk_java_json_nat quotel n : java_json
+       := mk_java_json_object quotel
+                              [("nat", (mk_java_json_primitive (Z_to_string10 n)))].
+     
+     Definition mk_java_json_number n : java_json
+       := mk_java_json_primitive (float_to_string n).
+     
+     Definition mk_java_json_bool (b:bool) : java_json
+       := mk_java_json_primitive 
+            (if b then "true" else "false").
 
     Context {ftojavajson:foreign_to_java}.
 
     Fixpoint mk_java_json_data (quotel:string) (d : data) : java_json
       := match d with
          | dunit => java_json_NULL
-         | dnat n => mk_java_json_nat n
+         | dnat n => mk_java_json_nat quotel n
          | dfloat n => mk_java_json_number n
          | dbool b => mk_java_json_bool b
          | dstring s => mk_java_json_string quotel s

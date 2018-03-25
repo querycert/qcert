@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 import java.io.IOException;
 
 /* The Q*cert runtime */
-import org.qcert.runtime.Hierarchy;
+import org.qcert.runtime.Inheritance;
 import org.qcert.runtime.JavaQuery;
 
 /* GSON to import data */
@@ -51,9 +51,9 @@ public class RunJava {
     }
 
     public static Object runQuery(JavaQuery query, JsonObject input) {
-	/* Passes empty class hierarchy for now */
-	Hierarchy emptyHierarchy = new Hierarchy(new JsonArray());
-	return query.query(emptyHierarchy, input);
+	/* Passes empty class inheritance for now */
+	Inheritance emptyInheritance = new Inheritance(new JsonArray());
+	return query.query(emptyInheritance, input);
     }
 
     // Main
