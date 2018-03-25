@@ -15,11 +15,13 @@
  *)
 
 Section TNRATest.
-  Require Import List String.
+  Require Import List.
+  Require Import String.
 
-  Require Import Utils CommonSystem.
+  Require Import Utils.
+  Require Import CommonSystem.
   Require Import NRASystem.
-  
+
   Require Import NRATest.
 
   Local Open Scope string_scope.

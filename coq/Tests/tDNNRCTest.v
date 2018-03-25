@@ -20,10 +20,14 @@ Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
 
-Require Import Utils CommonRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
 
-Require Import LambdaNRA LambdaNRAEq LambdaNRAtoNRAEnv.
+Require Import LambdaNRA.
+Require Import LambdaNRAEq.
+Require Import LambdaNRAtoNRAEnv.
 Require Import TrivialCompiler.
+
 Import TrivialCompiler.
 
 Section tDNNRCTests.

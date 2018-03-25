@@ -27,11 +27,13 @@ Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section CAMPTest.
-
   Require Import Utils.
-  Require Import CommonSystem CAMPRuntime CAMPRuleRuntime.
-  Local Open Scope camp_scope.
+  Require Import CommonSystem.
+  Require Import CAMPRuntime.
+  Require Import CAMPRuleRuntime.
   Require Import TrivialModel.
+  
+  Local Open Scope camp_scope.
   
   (* This was copy/pastes from sample-rules (with [] added in at the top level *)
   Example exampleWM : list data 

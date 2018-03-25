@@ -17,8 +17,10 @@
 (* Notations *)
 
 Require Import List.
+Require Import Utils.
+Require Import CommonRuntime.
+
 Import ListNotations.
-Require Import Utils CommonRuntime.
 
 Delimit Scope data_scope with data.
 

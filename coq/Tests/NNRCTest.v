@@ -17,7 +17,8 @@
 (* Notations *)
 
 Require Import List.
-Require Import Utils CommonRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
 
 Delimit Scope data_scope with data.
 
@@ -29,18 +30,18 @@ Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_sco
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
 
-Section NRAEnvTest.
-  Require Import String ZArith.
-  Open Scope Z_scope.
+Section NNRCTest.
+  Require Import String.
+  Require Import ZArith.
 
   Require Import NNRCRuntime.
   Require Import cNNRC.
+  Require Import TrivialModel.
 
   Local Open Scope string_scope.
   Local Open Scope nnrc_scope.
   Local Open Scope data_scope.
-  Require Import TrivialModel.
-
+  Open Scope Z_scope.
 
   Example db1
     := dcoll
@@ -75,4 +76,4 @@ Section NRAEnvTest.
   (* Eval vm_compute in
      (nnrc_eval_top nil natural_join nil). *)
   
-End NRAEnvTest.
+End NNRCTest.

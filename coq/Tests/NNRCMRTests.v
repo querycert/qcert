@@ -24,10 +24,12 @@ Require Import List.
 Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
-Section MRCompilerTest.
+Section NNRCMRTest.
 
-  Require Import CommonSystem CAMPRuntime.
-  Local Open Scope rule_scope.
+  Require Import CommonSystem.
+  Require Import CAMPRuntime.
+  Require Import CAMPRuleRuntime.
+  Local Open Scope camp_rule_scope.
   Require Import TrivialModel.
   
 Example R01 :=

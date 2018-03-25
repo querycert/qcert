@@ -20,14 +20,17 @@ Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
 
-Require Import Utils CommonRuntime.
-
-Require Import LambdaNRA LambdaNRAEq LambdaNRAtoNRAEnv.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import LambdaNRA.
+Require Import LambdaNRAEq.
+Require Import LambdaNRAtoNRAEnv.
 Require Import TrivialCompiler.
+
 Import TrivialCompiler.
 
 (* Examples from [CZ96] Figure 2. 'as is' *)
-Section LambdaNRATests.
+Section LambdaNRATest.
 
   (* Prep *)
   Definition h : brand_relation_t := nil.
@@ -223,7 +226,7 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
   (* Eval vm_compute in (eval_q h A4 db2). *)
   (* Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda A4)) db2). *)
 
-End LambdaNRATests.
+End LambdaNRATest.
 
 Section LambdaNRALinq.
 
