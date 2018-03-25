@@ -49,17 +49,17 @@ ifneq ($(JRULES),)
 endif
 
 .PHONY: oql-tests \
-	oql-world-tests oql-world-tests-js \
-	oql-persons-tests oql-persons-tests-js \
-	oql-employees-tests oql-employees-tests-js \
+	oql-world-tests oql-world-tests-js oql-world-tests-java \
+	oql-persons-tests oql-persons-tests-js oql-persons-tests-java \
+	oql-employees-tests oql-employees-tests-js oql-employees-tests-java \
 	lambda_nra-tests \
-	lambda_nra-persons-tests lambda_nra-persons-tests-js \
+	lambda_nra-persons-tests lambda_nra-persons-tests-js lambda_nra-persons-tests-java \
 	camp-tests \
-	camp-world-tests camp-world-tests-js \
+	camp-world-tests camp-world-tests-js camp-world-tests-java \
 	sql-tests \
-	sql-org-tests sql-org-tests-js \
+	sql-org-tests sql-org-tests-js sql-org-tests-java \
 	tech_rule-tests \
-	tech_rule-test-tests \
+	tech_rule-test-tests tech_rule-test-tests-js tech_rule-test-tests-java \
 	designer_rule-tests \
 	designer_rule-test-tests \
 	clean
@@ -82,6 +82,11 @@ ifneq ($(JAVA),)
 	@$(MAKE) oql-persons-tests-js
 	@$(MAKE) oql-employees-tests-js
 endif
+ifneq ($(JAVA),)
+	@$(MAKE) oql-world-tests-java
+	@$(MAKE) oql-persons-tests-java
+	@$(MAKE) oql-employees-tests-java
+endif
 
 oql-world-tests:
 	@$(foreach N,$(OQLWORLDNUM), \
@@ -100,6 +105,16 @@ oql-world-tests-js:
                           -schema oql/world.schema \
                           -output oql/world$(N).out \
                           oql/world$(N).js;)
+oql-world-tests-java:
+	@$(foreach N,$(OQLWORLDNUM), \
+	       $(QCERTCOMP) -source oql -target java oql/world$(N).oql \
+                            -eval-validate -schema oql/world.schema; \
+	       $(JAVAC) -cp $(CPATH) oql/world$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):oql testing.runners.RunJava \
+                          -input oql/world.input \
+                          -schema oql/world.schema \
+                          -output oql/world$(N).out \
+                          world$(N);)
 
 oql-persons-tests:
 	@$(foreach N,$(OQLPERSONSNUM), \
@@ -118,6 +133,16 @@ oql-persons-tests-js:
                           -schema oql/persons.schema \
                           -output oql/persons$(N).out \
                           oql/persons$(N).js;)
+oql-persons-tests-java:
+	@$(foreach N,$(OQLPERSONSNUM), \
+	       $(QCERTCOMP) -source oql -target java oql/persons$(N).oql \
+                            -eval-validate -schema oql/persons.schema; \
+	       $(JAVAC) -cp $(CPATH) oql/persons$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):oql testing.runners.RunJava \
+                          -input oql/persons.input \
+                          -schema oql/persons.schema \
+                          -output oql/persons$(N).out \
+                          persons$(N);)
 
 oql-employees-tests:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
@@ -136,6 +161,16 @@ oql-employees-tests-js:
                           -schema oql/employees.schema \
                           -output oql/employees$(N).out \
                           oql/employees$(N).js;)
+oql-employees-tests-java:
+	@$(foreach N,$(OQLEMPLOYEESNUM), \
+	       $(QCERTCOMP) -source oql -target java oql/employees$(N).oql \
+                            -eval-validate -schema oql/employees.schema; \
+	       $(JAVAC) -cp $(CPATH) oql/employees$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):oql testing.runners.RunJava \
+                          -input oql/employees.input \
+                          -schema oql/employees.schema \
+                          -output oql/employees$(N).out \
+                          employees$(N);)
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7
@@ -148,6 +183,9 @@ lambda_nra-tests:
 	@$(MAKE) lambda_nra-persons-tests
 ifneq ($(JAVA),)
 	@$(MAKE) lambda_nra-persons-tests-js
+endif
+ifneq ($(JAVA),)
+	@$(MAKE) lambda_nra-persons-tests-java
 endif
 
 lambda_nra-persons-tests:
@@ -167,6 +205,16 @@ lambda_nra-persons-tests-js:
                           -schema lambda_nra/persons.schema \
                           -output lambda_nra/persons$(N).out \
                           lambda_nra/persons$(N).js;)
+lambda_nra-persons-tests-java:
+	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
+	       $(QCERTCOMP) -source lambda_nra -target java lambda_nra/persons$(N).lnra \
+                            -eval-validate -schema lambda_nra/persons.schema; \
+	       $(JAVAC) -cp $(CPATH) lambda_nra/persons$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):lambda_nra testing.runners.RunJava \
+                          -input lambda_nra/persons.input \
+                          -schema lambda_nra/persons.schema \
+                          -output lambda_nra/persons$(N).out \
+                          persons$(N);)
 
 ## CAMP
 CAMPWORLDNUM=1
@@ -180,6 +228,9 @@ camp-tests:
 ifneq ($(JAVA),)
 	@$(MAKE) camp-world-tests-js
 endif
+ifneq ($(JAVA),)
+	@$(MAKE) camp-world-tests-java
+endif
 
 camp-world-tests:
 	@$(foreach N,$(CAMPWORLDNUM), \
@@ -188,7 +239,6 @@ camp-world-tests:
                             -eval -input camp/world.input \
                             -schema camp/world.schema \
                             -eval-validate -output camp/world$(N).out;))
-
 camp-world-tests-js:
 	@$(foreach N,$(CAMPWORLDNUM), \
 	       $(QCERTCOMP) -source camp -target js camp/world$(N).camp \
@@ -199,6 +249,16 @@ camp-world-tests-js:
                           -schema camp/world.schema \
                           -output camp/world$(N).out \
                           camp/world$(N).js;)
+camp-world-tests-java:
+	@$(foreach N,$(CAMPWORLDNUM), \
+	       $(QCERTCOMP) -source camp -target java camp/world$(N).camp \
+                            -eval-validate -schema camp/world.schema; \
+	       $(JAVAC) -cp $(CPATH) camp/world$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):camp testing.runners.RunJava \
+                          -input camp/world.input \
+                          -schema camp/world.schema \
+                          -output camp/world$(N).out \
+                          world$(N);)
 
 ## SQL
 SQLORGNUM=1 2 3 4 5 6 7 8
@@ -211,6 +271,9 @@ sql-tests:
 	@$(MAKE) sql-org-tests
 ifneq ($(JAVA),)
 	@$(MAKE) sql-org-tests-js
+endif
+ifneq ($(JAVA),)
+	@$(MAKE) sql-org-tests-java
 endif
 
 sql-org-tests:
@@ -230,6 +293,17 @@ sql-org-tests-js:
                           -schema sql/org.schema \
                           -output sql/org$(N).out \
                           sql/org$(N).js;)
+sql-org-tests-java:
+	@$(foreach N,$(SQLORGNUM), \
+	       $(QCERTCOMP) -source sql -target java sql/org$(N).sql \
+                            -eval-validate -schema sql/org.schema; \
+	       $(JAVAC) -cp $(CPATH) sql/org$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):sql testing.runners.RunJava \
+                          -input sql/org.input \
+                          -schema sql/org.schema \
+                          -output sql/org$(N).out \
+                          org$(N);)
+
 
 ## TECHRULE
 TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22 #20
@@ -242,6 +316,9 @@ tech_rule-tests:
 	@$(MAKE) tech_rule-test-tests
 ifneq ($(JAVA),)
 	@$(MAKE) tech_rule-test-tests-js
+endif
+ifneq ($(JAVA),)
+	@$(MAKE) tech_rule-test-tests-java
 endif
 
 tech_rule-test-tests:
@@ -261,6 +338,16 @@ tech_rule-test-tests-js:
                           -schema tech_rule/test.schema \
                           -output tech_rule/test$(N).out \
                           tech_rule/test$(N).js;)
+tech_rule-test-tests-java:
+	@$(foreach N,$(TECHRULETESTNUM), \
+	       $(QCERTCOMP) -source tech_rule -target java tech_rule/test$(N).arl \
+                            -eval-validate -schema tech_rule/test.schema; \
+	       $(JAVAC) -cp $(CPATH) tech_rule/test$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):tech_rule testing.runners.RunJava \
+                          -input tech_rule/test.input \
+                          -schema tech_rule/test.schema \
+                          -output tech_rule/test$(N).out \
+                          test$(N);)
 
 ## DESIGNERRULE
 DESIGNERRULETESTNUM=
@@ -297,21 +384,33 @@ clean:
 	@rm -f */*.txt
 	@rm -f oql/*.json
 	@rm -f oql/*.js
+	@rm -f oql/*.java
+	@rm -f oql/*.class
 	@rm -f sql/*.json
 	@rm -f sql/*.js
+	@rm -f sql/*.java
+	@rm -f sql/*.class
 	@rm -f tech_rule/*.json
 	@rm -f tech_rule/*.js
+	@rm -f tech_rule/*.java
+	@rm -f tech_rule/*.class
 	@rm -f tech_rule/*_camp.camp
 	@rm -f tech_rule/*_rule.camp
 	@rm -f designer_rule/*.json
 	@rm -f designer_rule/*.js
+	@rm -f designer_rule/*.java
+	@rm -f designer_rule/*.class
 	@rm -f designer_rule/*_camp.camp
 	@rm -f designer_rule/*_rule.camp
 	@rm -f camp/*.json
 	@rm -f camp/*.js
+	@rm -f camp/*.java
+	@rm -f camp/*.class
 	@rm -f camp/*_camp.camp
 	@rm -f lambda_nra/*.json
 	@rm -f lambda_nra/*.js
+	@rm -f lambda_nra/*.java
+	@rm -f lambda_nra/*.class
 
 cleanall: clean
 	@rm -f *~ */*~

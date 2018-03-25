@@ -84,7 +84,7 @@ public class RunSparkRDD {
 	 */
 	private static String createOldFormatIoFile(File ioFile, JsonObject io) throws Exception {
 		PrintWriter wtr = new PrintWriter(new FileWriter(ioFile));
-		wtr.format("var inheritance = %s;%n", io.get("schema").getAsJsonObject().get("hierarchy"));
+		wtr.format("var inheritance = %s;%n", io.get("schema").getAsJsonObject().get("inheritance"));
 		wtr.format("var input = %s;%n", io.get("input").getAsJsonObject().get("WORLD"));
 		wtr.format("var output = %s;%n", io.get("output"));
 		wtr.close();
@@ -99,10 +99,10 @@ public class RunSparkRDD {
 	 */
         private static void runSpark(File root, String ioFile, String className, String ruleName, String runtime) throws Exception {
 		System.out.println("Submitting job to spark");
-		String jar = new File(root, Utils.SCALA_JAR_NAME).getAbsolutePath();
+		String jar = new File(root, QUtil.SCALA_JAR_NAME).getAbsolutePath();
 		Map<String, String> env = new HashMap<>(System.getenv());
-		String cmd = Utils.isWindows() ? "spark-submit.cmd" : "spark-submit";
-		JsonObject io = Utils.parseJsonFileToObject(ioFile);
+		String cmd = QUtil.isWindows() ? "spark-submit.cmd" : "spark-submit";
+		JsonObject io = QUtil.parseJsonFileToObject(ioFile);
 		String ioString = createOldFormatIoFile(new File(root, "iofile"), io);
 		String resultFile = new File(root, "execution.results").getAbsolutePath();
 		String submitted = String.format(SPARK_SUBMIT_TEMPLATE, cmd, className, jar, runtime, ioFile, resultFile);
@@ -119,7 +119,7 @@ public class RunSparkRDD {
 			throw new RunnerException("Spark execution exit code = " + result, output, stderr);
 		}
 		JsonArray expected = io.get("output").getAsJsonArray();
- 		validate(Utils.parseJsonFileToArray(resultFile).toString(), expected);
+ 		validate(QUtil.parseJsonFileToArray(resultFile).toString(), expected);
 	}
 
 	// Main
@@ -142,12 +142,9 @@ public class RunSparkRDD {
 			else if ("-runtime".equals(arg)) { runtimeFile = args[i+1]; i++; }
 			else {
 				// Load input JSON, which may include schema (inheritance) and output
-				JsonArray output;	
+				QIO qio = null;
 				if (inputFile != null) {
-					JsonArray[] outputHolder = new JsonArray[1];
-					String funCall = Utils.loadIO(inputFile, outputHolder);
-					engine.eval(funCall);
-					output = outputHolder[0];
+				    qio = new QIO(null, inputFile, null);
 				} else {
 					throw new IllegalArgumentException("Input Data File Missing");
 				}
@@ -157,24 +154,36 @@ public class RunSparkRDD {
 				} else {
 					throw new IllegalArgumentException("Runtime File Missing");
 				}
+				JsonElement output = (qio.getOutput())[0];
+				String funCall = QUtil.jsFunFromQIO(qio);
+				engine.eval(funCall);
 				engine.eval(new java.io.FileReader(arg));
 				// Evaluate the compiler query + stringify the result
 				engine.eval("var result = JSON.stringify(query(world));");
 				// Get the result
 				String result = (String) engine.get("result");
-				// Print the result
-				System.out.println(result);
+				// Get the result
+				String resultAsSting= (String) engine.eval("JSON.stringify(result)");
 				// Validate the result
-				if (output != null) {
-					if (validate(result, output))
-						System.out.println("As expected.");
-					else
-						System.out.println("Result was not as expected.  Expected result: " + output);
+				if (output == null) {
+				    // Print the result
+				    System.out.println(resultAsSting);
+				} else {
+				    engine.eval("var expected = "+output+";");
+				    Boolean valid = (Boolean)engine.eval("equal(result, expected)");
+				    if (valid) {
+					System.out.println("["+arg+" js] OK");
+				    } else {
+					System.out.println("["+arg+" js] ERROR");
+					System.out.println("Actual:");
+					System.out.println(resultAsSting);
+					System.out.println("Expected:");
+					System.out.println(output);
+				    }
 				}
 			}
 		}
 	}
-
 	// Validate a result when output has been provided as a JsonArray (optional)
 	private static boolean validate(String result, JsonArray expected) {
 		JsonArray actual = new JsonParser().parse(result).getAsJsonArray().get(0).getAsJsonArray();
@@ -188,5 +197,4 @@ public class RunSparkRDD {
 				return false;
 		return true;
 	}
-
 }

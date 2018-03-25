@@ -105,6 +105,12 @@ public class RuntimeUtils {
 	}
 
 	public static long asLong(JsonElement e) {
+	    if(e.isJsonObject()) {
+		if (((JsonObject) e).has("nat"))
+		    return ((JsonObject) e).get("nat").getAsLong();
+		else
+		    return e.getAsLong();
+	    } else
 		return e.getAsLong();
 	}
 	public static boolean asBoolean(JsonElement e) {

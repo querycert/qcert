@@ -65,7 +65,7 @@ public class UnaryOperators {
 		return dst;
 	}
 	public static JsonElement count(JsonElement e) {
-		return new JsonPrimitive(e.getAsJsonArray().size());
+	        return rec("nat",new JsonPrimitive(e.getAsJsonArray().size()));
 	}
 	
 	public static JsonElement flatten(JsonElement e) {
@@ -137,14 +137,12 @@ public class UnaryOperators {
 	private static void tostring(StringBuilder sb, JsonPrimitive jp) {
 	    if (jp.isString()) {
 		sb.append(jp.getAsString());
+	    } else if (jp.isNumber()) {
+		sb.append(jp.getAsDouble());
 	    } else {
 		sb.append(jp.toString());
 	    }
 	}
-	
-//	public static void tostring(StringBuilder sb, Number n) {
-//		sb.append(n);
-//	}
 	
 	public static void tostring(StringBuilder sb, JsonArray ec) {
 		String elemstrings[] = new String[ec.size()];
@@ -171,6 +169,9 @@ public class UnaryOperators {
 	}
 
 	private static <V> void tostring(StringBuilder sb, JsonObject o){
+	    if (o.has("nat")) {
+		sb.append(o.get("nat").getAsLong());
+	    } else {
 		sb.append("{");
 		
 		boolean isFirst = true;
@@ -185,6 +186,7 @@ public class UnaryOperators {
 			tostring(sb,entry.getValue());
 		}
 		sb.append("}");
+	    }
 	}
 
 	private static void tostring(StringBuilder sb, JsonElement e) {
@@ -313,7 +315,11 @@ public class UnaryOperators {
 		return new JsonPrimitive(Math.log10(e.getAsDouble()));
 	}
 	public static JsonElement float_of_int(JsonElement e) {
-		return new JsonPrimitive(e.getAsLong());
+	        if(e.isJsonObject()) {
+		    if (((JsonObject) e).has("nat")) {
+			return new JsonPrimitive(((JsonObject) e).get("nat").getAsLong());
+		    } else return new JsonPrimitive(e.getAsLong());
+		} else return new JsonPrimitive(e.getAsLong());
 	}
 	public static JsonElement float_ceil(JsonElement e) {
 		return new JsonPrimitive(Math.ceil(e.getAsDouble()));
