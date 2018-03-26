@@ -164,7 +164,6 @@ Section TNNRCimp.
         [  (x,None)::Γ, Δc , Δd  ⊢ s₂ ]  ->
         [  Γ , Δc , Δd  ⊢ NNRCimpLetMut x s₁ s₂ ]
     | type_NNRCimpLetMutColl Γ Δc Δd τ x s₁ s₂ :
-        nnrc_imp_stmt_must_assign s₁ x ->
         [  Γ , (x,τ)::Δc , Δd  ⊢ s₁ ]  ->
         [  (x,Some (Coll τ))::Γ, Δc , Δd  ⊢ s₂ ]  ->
         [  Γ , Δc , Δd  ⊢ NNRCimpLetMutColl x s₁ s₂ ]
@@ -607,11 +606,11 @@ Section TNNRCimp.
         as [σ' [ψc' [ψd' [eqq1 [typσ' [typψc' typψd']]]]]].
       unfold var in *; rewrite eqq1.
       invcs typψc' ; simpl in *.
-      destruct x0; destruct H3; simpl in *; subst.
+      destruct x0; destruct H2; simpl in *; subst.
       assert (typσcons:pd_bindings_type ((x,Some (dcoll l0))::σ') ((x, Some (Coll τ)) :: Γ)).
       { unfold pd_bindings_type in *; simpl; constructor; trivial; simpl; split; auto.
         constructor; trivial. }
-      destruct (IHtyps2 _ _ _ typσcons H4 typψd')
+      destruct (IHtyps2 _ _ _ typσcons H3 typψd')
         as [σ'' [ψc'' [ψd'' [eqq2 [typσ'' [typψc'' typψd'']]]]]].
       rewrite eqq2.
       invcs typσ''.
