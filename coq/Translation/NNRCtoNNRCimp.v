@@ -188,7 +188,7 @@ Section NNRCtoNNRCimp.
            end
          end.
 
-    Definition nnrc_stmt_to_nnrc_imp_stmt (globals: list var) (stmt: nnrc) :
+    Definition nnrc_stmt_to_nnrc_imp (globals: list var) (stmt: nnrc) :
       option (nnrc_imp_stmt * var)
       :=
         let fvs := globals ++ nnrc_bound_vars stmt in
@@ -201,7 +201,7 @@ Section NNRCtoNNRCimp.
     Definition nnrc_stratified_to_nnrc_imp_top (globals: list var) (q: nnrc) :
       option nnrc_imp
       :=
-        nnrc_stmt_to_nnrc_imp_stmt globals q.
+        nnrc_stmt_to_nnrc_imp globals q.
 
     Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some fvs term s :
       stratifiedLevel nnrcStmt s  ->
@@ -243,11 +243,11 @@ Section NNRCtoNNRCimp.
 
     Lemma nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s :
       stratifiedLevel nnrcStmt s  ->
-      { s' | nnrc_stmt_to_nnrc_imp_stmt fvs s = Some s'}.
+      { s' | nnrc_stmt_to_nnrc_imp fvs s = Some s'}.
     Proof.
-      case_eq (nnrc_stmt_to_nnrc_imp_stmt fvs s).
+      case_eq (nnrc_stmt_to_nnrc_imp fvs s).
       - eauto.
-      - unfold nnrc_stmt_to_nnrc_imp_stmt.
+      - unfold nnrc_stmt_to_nnrc_imp.
         intros cpf strats.
         destruct (nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some
                     ((fresh_var "ret" (fvs ++ nnrc_bound_vars s))::fvs ++ nnrc_bound_vars s)
@@ -1016,10 +1016,10 @@ Section NNRCtoNNRCimp.
     
     Theorem nnrc_to_nnrc_imp_some_correct
           h σc {s:nnrc} {globals} {si:nnrc_imp} :
-      nnrc_stmt_to_nnrc_imp_stmt globals s = Some si ->
+      nnrc_stmt_to_nnrc_imp globals s = Some si ->
       @nnrc_eval_top _ h s σc = nnrc_imp_eval_top h σc si.
     Proof.
-      unfold nnrc_stmt_to_nnrc_imp_stmt, nnrc_imp_eval_top, nnrc_imp_eval.
+      unfold nnrc_stmt_to_nnrc_imp, nnrc_imp_eval_top, nnrc_imp_eval.
       intros eqsi.
       destruct si.
       match_option_in eqsi.
@@ -1153,10 +1153,10 @@ Section NNRCtoNNRCimp.
     Qed.
 
     Lemma nnrc_stmt_to_nnrc_imp_stmt_preserves_core {globals: list var} {s: nnrc} {si:nnrc_imp_stmt} {ret:var} :
-      nnrc_stmt_to_nnrc_imp_stmt globals s = Some (si,ret) ->
+      nnrc_stmt_to_nnrc_imp globals s = Some (si,ret) ->
       nnrcIsCore s <-> nnrc_imp_stmtIsCore si.
     Proof.
-      unfold nnrc_stmt_to_nnrc_imp_stmt.
+      unfold nnrc_stmt_to_nnrc_imp.
       match_option; intros eqq1.
       invcs eqq1.
       apply nnrc_stmt_to_nnrc_imp_stmt_aux_preserves_core in eqq.

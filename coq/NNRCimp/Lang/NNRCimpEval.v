@@ -174,13 +174,13 @@ Section NNRCimpEval.
 
     Definition nnrc_imp_eval σc (q:nnrc_imp) : option (option data) :=
       let (s, ret) := q in
-      match nnrc_imp_stmt_eval (rec_sort σc) nil nil ((ret, None)::nil) s with
+      match nnrc_imp_stmt_eval σc nil nil ((ret, None)::nil) s with
       | Some (_, _, (_,o)::_) => Some o
       | _ => None
       end.
 
     Definition nnrc_imp_eval_top σc (q:nnrc_imp) :=
-      olift id (nnrc_imp_eval σc q).
+      olift id (nnrc_imp_eval (rec_sort σc) q).
 
   End Evaluation.
 
@@ -189,7 +189,7 @@ Section NNRCimpEval.
       := nnrc_imp_eval σc q.
 
     Program Definition nnrc_imp_core_eval_top σc (q:nnrc_imp_core)
-      :=  olift id (nnrc_imp_core_eval σc q).
+      :=  olift id (nnrc_imp_core_eval (rec_sort σc) q).
     
   End Core.
 

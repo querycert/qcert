@@ -205,7 +205,7 @@ Section TNNRCimp.
   
   Definition nnrc_imp_type Γc (si:nnrc_imp) τ
     := let (s, ret) := si in
-       [ (rec_sort Γc) ; nil , nil , (ret, τ)::nil  ⊢ s ].
+       [ Γc ; nil , nil , (ret, τ)::nil  ⊢ s ].
 
   Notation "[ Γc ⊢ si ▷ τ ]" := (nnrc_imp_type Γc si τ) : nnrc_imp.
 
@@ -704,15 +704,12 @@ Section TNNRCimp.
     destruct si as [q ret]; simpl.
     intros typσc typq.
     destruct (@typed_nnrc_imp_stmt_yields_typed_data
-                (rec_sort σc) nil nil [(ret, None)]
-                (rec_sort Γc) nil nil [(ret, τ)] q)
-      as [σ' [ψc' [ψd' [eqq1 [typσ' [typψc' typψd']]]]]].
-    - apply bindings_type_sort; trivial.
-    - constructor.
-    - constructor.
+                σc nil nil [(ret, None)]
+                Γc nil nil [(ret, τ)] q)
+      as [σ' [ψc' [ψd' [eqq1 [typσ' [typψc' typψd']]]]]]
+    ; trivial; try solve[constructor].
     - constructor; trivial.
       simpl; intuition discriminate.
-    - trivial.
     - rewrite eqq1.
       invcs typψd'.
       destruct x; simpl in *.
@@ -749,6 +746,35 @@ Section TNNRCimp.
     eauto.
   Qed.
 
+  Theorem typed_nnrc_imp_top_yields_typed_data {σc} {Γc} {τ} {si:nnrc_imp}:
+    bindings_type σc Γc ->
+    [ rec_sort Γc ⊢ si ▷ τ ] ->
+    forall d, 
+      nnrc_imp_eval_top brand_relation_brands σc si = Some d
+      -> d ▹ τ.
+    Proof.
+      intros bt typ.
+      destruct (typed_nnrc_imp_yields_typed_data (bindings_type_sort _ _ bt) typ)
+               as [o [eqq dtyp]].
+      unfold nnrc_imp_eval_top.
+      rewrite eqq; unfold id; simpl; tauto.
+    Qed.
+
+    Theorem typed_nnrc_imp_top_yields_typed_data_used {σc} {Γc} {τ} {si:nnrc_imp}:
+    nnrc_imp_stmt_must_assign (fst si) (snd si) ->
+    bindings_type σc Γc ->
+    [ rec_sort Γc ⊢ si ▷ τ ] ->
+    exists d,
+      nnrc_imp_eval_top brand_relation_brands σc si = Some d
+      /\ d ▹ τ.
+    Proof.
+      intros ma bt typ.
+      destruct (typed_nnrc_imp_yields_typed_data_used ma (bindings_type_sort _ _ bt) typ) as [o [eqq dtyp]].
+      unfold nnrc_imp_eval_top.
+      rewrite eqq; unfold id; simpl.
+      eauto.
+    Qed.
+      
   Section sem.
     (* restates type soundness theorems in terms of the semantics.  
        This enables nicer notation :-) *)
@@ -840,4 +866,4 @@ End TNNRCimp.
 
 Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γc Γ e τ) : nnrc_imp.
 Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrc_imp_stmt_type Γc Γ Δc  Δd s) : nnrc_imp.
-Notation "[ h, Γc ⊢ si ▷ τ ]" := (nnrc_imp_stmt_type Γc si τ) : nnrc_imp.
+Notation "[ h, Γc ⊢ si ▷ τ ]" := (nnrc_imp_type Γc si τ) : nnrc_imp.

@@ -240,8 +240,6 @@ Section NNRCimpNorm.
     destruct d; try discriminate.
     intros ? eqq2; invcs eqq2.
     apply nnrc_imp_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate.
-    rewrite Forall_map in *.
-    apply dnrec_sort_content; trivial.
   Qed.
 
     Lemma nnrc_imp_eval_top_normalized  {σc:bindings} {q:nnrc_imp} {d} :
@@ -253,6 +251,8 @@ Section NNRCimpNorm.
     unfold olift, id in ev.
     match_option_in ev.
     eapply nnrc_imp_eval_normalized; eauto.
+    rewrite Forall_map in *.
+    apply dnrec_sort_content; trivial.
   Qed.
   
 End NNRCimpNorm.

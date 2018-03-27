@@ -171,13 +171,13 @@ Section NNRCimpSem.
   Inductive nnrc_imp_sem : bindings -> nnrc_imp -> option data -> Prop
     :=
     | sem_NNRCimp (σc:bindings) (q: nnrc_imp) o :
-        [ (rec_sort σc) ⊢ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), o)::nil ] ->
+        [ σc ⊢ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), o)::nil ] ->
         [ σc ⊢ q ⇓ o  ]
   where
   "[ σc ⊢ q ⇓ o  ]" := (nnrc_imp_sem σc q o ) : nnrc_imp.
 
   Definition nnrc_imp_sem_top (σc:bindings) (q:nnrc_imp) (d:data) : Prop
-    := [ σc ⊢ q ⇓ Some d  ].
+    := [ (rec_sort σc) ⊢ q ⇓ Some d  ].
 
   Notation "[ σc ⊢ q ⇓ d  ]" := (nnrc_imp_sem σc q d ) : nnrc_imp.
 
@@ -188,7 +188,7 @@ Section NNRCimpSem.
     Notation "[ σc ⊢ q ⇓ᶜ d  ]" := (nnrc_imp_core_sem σc q d ) : nnrc_imp.
 
     Definition nnrc_imp_core_sem_top (σc:bindings) (q:nnrc_imp_core) (d:data) : Prop
-      := [ σc ⊢ q ⇓ᶜ Some d  ].
+      := [ (rec_sort σc) ⊢ q ⇓ᶜ Some d  ].
 
   End Core.
 

@@ -237,7 +237,7 @@ Section NNRCimpSemEval.
   Qed.
 
   Theorem nnrc_imp_sem_eval_top σc q d :
-    [ h , σc ⊢ q ⇓ Some d ] <-> nnrc_imp_eval_top h σc q = Some d.
+    [ h , (rec_sort σc) ⊢ q ⇓ Some d ] <-> nnrc_imp_eval_top h σc q = Some d.
   Proof.
     destruct q.
     unfold nnrc_imp_eval_top, nnrc_imp_sem_top.
@@ -255,7 +255,7 @@ Section NNRCimpSemEval.
     Qed.
 
     Theorem nnrc_imp_core_sem_eval_top σc q d :
-      [ h , σc ⊢ q ⇓ᶜ Some d ] <-> nnrc_imp_core_eval_top h σc q = Some d.
+      [ h , (rec_sort σc) ⊢ q ⇓ᶜ Some d ] <-> nnrc_imp_core_eval_top h σc q = Some d.
     Proof.
       destruct q; simpl.
       apply nnrc_imp_sem_eval_top.
