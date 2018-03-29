@@ -25,9 +25,10 @@ Section Closure.
   Context {code_is_closed : list string -> C -> Prop}.
 
   Record closure :=
-    { closure_params: list (string * option T);
-      closure_output : option T;
-      closure_body : C; }.
+    mkClosure
+      { closure_params: list (string * option T);
+        closure_output : option T;
+        closure_body : C; }.
 
   Definition closure_is_closed (f:closure) : Prop :=
     code_is_closed (map fst f.(closure_params)) f.(closure_body).
