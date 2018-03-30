@@ -15,6 +15,7 @@
  *)
 
 Require Export Data.
+Require Export QResult.
 Require Export DataLift.
 Require Export DataNorm.
 Require Export DatatoJSON.
@@ -23,4 +24,3 @@ Require Export DData.
 Require Export DDataNorm.
 Require Export Constants.
 Require Export DConstants.
-

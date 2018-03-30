@@ -140,19 +140,25 @@ let get_io_components (od:QData.json option) : QData.json option * QData.json op
 
 (* Schema processing first *)
 
+let check_inheritance h =
+  QcertUtil.lift_qerror QType.make_brand_relation h
+
 let build_inheritance h =
   begin match h with
   | QcertCompiler.Jarray l ->
+    let raw_h =
       List.map (function
-        | QcertCompiler.Jobject
-            ( [(['s';'u';'b'], QcertCompiler.Jstring sub); (['s';'u';'p'], QcertCompiler.Jstring sup)]
-        | [(['s';'u';'p'], QcertCompiler.Jstring sup); (['s';'u';'b'], QcertCompiler.Jstring sub)] ) ->
+          | QcertCompiler.Jobject
+              ( [(['s';'u';'b'], QcertCompiler.Jstring sub); (['s';'u';'p'], QcertCompiler.Jstring sup)]
+              | [(['s';'u';'p'], QcertCompiler.Jstring sup); (['s';'u';'b'], QcertCompiler.Jstring sub)] ) ->
             (sub, sup)
-        | _ ->
+          | _ ->
             raise (Qcert_Error "Ill-formed inheritance"))
         l
+    in
+    check_inheritance raw_h
   | _ ->
-      raise (Qcert_Error "Ill-formed inheritance")
+    raise (Qcert_Error "Ill-formed inheritance")
   end
 
 let build_brandTypes bts =

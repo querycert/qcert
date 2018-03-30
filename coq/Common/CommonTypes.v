@@ -28,4 +28,4 @@ Require Export TOperatorsInfer.
 Require Export TOperatorsInferSub.
 Require Export TGroupBy.
 Require Export ForeignTyping.
-
+Require Export Schema.

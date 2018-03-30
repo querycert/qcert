@@ -57,9 +57,10 @@ MODULES = \
 	Common/TypeSystem/RTypeLattice \
 	Common/TypeSystem/TBrandModelProp \
 	Common/TypeSystem/Types \
-	Common/Data/ForeignData \
-	Common/Data/ForeignDataToJSON \
-	Common/Data/Data \
+	Common/DataModel/ForeignData \
+	Common/DataModel/ForeignDataToJSON \
+	Common/DataModel/Data \
+	Common/Results/QResult \
 	Common/Data/DataLift \
 	Common/Data/DataNorm \
 	Common/Data/DatatoJSON \
@@ -75,6 +76,7 @@ MODULES = \
 	Common/DataTyping/TDataInfer \
 	Common/DataTyping/TBindings \
 	Common/DataTyping/TDBindings \
+	Common/Schema/Schema \
 	Common/Operators/ForeignOperators \
 	Common/Operators/RecOperators \
 	Common/Operators/Iterators \

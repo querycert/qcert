@@ -18,6 +18,25 @@ open Util
 
 open QcertCompiler.EnhancedCompiler
 
+let qcert_error_of_qerror e =
+  begin match e with
+ | QcertCompiler.CompilationError cl -> "[CompilationError] " ^ (string_of_char_list cl)
+ | QcertCompiler.TypeError cl -> "[TypeError] " ^ (string_of_char_list cl)
+ | QcertCompiler.UserError d -> "[UserError] " ^ (string_of_char_list (QData.qdataToJS [] d))
+  end
+
+let lift_qerror f x =
+  begin match f x with
+    | QcertCompiler.Success y -> y
+    | QcertCompiler.Failure e -> raise (Qcert_Error (qcert_error_of_qerror e))
+  end
+
+let lift_qerror_as_option f x =
+  begin match f x with
+    | QcertCompiler.Success y -> Some y
+    | QcertCompiler.Failure e -> Format.eprintf "[Warning] %s@." (qcert_error_of_qerror e) ; None
+  end
+
 let language_of_name name =
   let name =
     char_list_of_string (String.lowercase_ascii name)

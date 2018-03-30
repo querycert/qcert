@@ -27,7 +27,7 @@ Section HelloWorld.
 
   Section example.
     Require Import String.
-    Require Import Qcert.Common.Data.Data.
+    Require Import Qcert.Common.DataModel.Data.
     Require Import Qcert.NRAEnv.Lang.NRAEnv.
   
     Definition a1 :=

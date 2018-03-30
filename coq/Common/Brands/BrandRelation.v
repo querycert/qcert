@@ -101,7 +101,7 @@ Section brand_relation_types.
 
   End brand_relation_dec.
 End brand_relation_types.
-  
+
 Class brand_relation :=
   mkBrand_relation {
       brand_relation_brands : list (string*string);
@@ -134,6 +134,7 @@ Section brand_relation_prop.
     intro inn.
     apply (brand_relation_assym a a); trivial.
   Qed.
+
   
 End brand_relation_prop.
 

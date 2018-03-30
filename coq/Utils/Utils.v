@@ -33,6 +33,7 @@ Require Export Bindings.
 Require Export Bag.
 Require Export Var.
 Require Export Closure.
+Require Export Result.
 Require Export JSON.
 Require Export OptimizerStep.
 Require Export OptimizerLogger.

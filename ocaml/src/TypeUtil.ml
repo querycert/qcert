@@ -48,7 +48,7 @@ let rtype_content_to_vrtype (br: (char list * char list) list) (j:vrtype_content
 let make_brand_context (br: (char list * char list) list) brand_types (type_defs : (string * rtype_content) list) =
   List.map (fun (x,y) -> (Util.char_list_of_string x, rtype_content_to_rtype br (lookup_brand_type y type_defs))) brand_types
 
-let content_schema_to_model (mc: content_schema) : QType.brand_model option =
+let content_schema_to_model (mc: content_schema) : QType.brand_model =
   let (h, brand_types, type_defs, _) = mc in
   let brand_types =
     begin match brand_types with
@@ -63,7 +63,7 @@ let content_schema_to_model (mc: content_schema) : QType.brand_model option =
     end
   in
   let brand_context = make_brand_context (fst h) brand_types type_defs in
-  QType.make_brand_model (fst h) brand_context
+  QcertUtil.lift_qerror (QType.make_brand_model (fst h)) brand_context
 
 let localization_of_string (x:char list) =
   begin match Util.string_of_char_list x with
@@ -101,12 +101,7 @@ let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDri
 (*  List.map (fun (x,y) -> let (z,k) =  in (Util.char_list_of_string x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals *)
 
 let process_schema mc =
-  let bm = 
-    begin match content_schema_to_model mc with
-    | Some bm -> bm
-    | None -> raise (Failure "...Brand model creation failed")
-    end
-  in
+  let bm = content_schema_to_model mc in
   let globs = content_schema_to_globals bm mc in
   (bm,globs)
 

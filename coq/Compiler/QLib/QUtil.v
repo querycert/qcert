@@ -44,5 +44,14 @@ Module QUtil(runtime:CompilerRuntime).
   Definition mkDistWorld env := mkDistWorld env.
 
   Definition qcert_version := qcert_version.
+
+  Section results.
+    Definition qerror {fdata:foreign_data} : Set := QResult.qerror.
+    Definition qresult {fdata:foreign_data} (A:Set) : Set := QResult.qresult A.
+
+    Definition qsuccess {fdata:foreign_data} (A:Set) : A -> qresult A := QResult.qsuccess.
+    Definition qfailure {fdata:foreign_data} (A:Set) : qerror -> qresult A := QResult.qfailure.
+  End results.
+  
 End QUtil.
 

@@ -89,7 +89,7 @@ ifneq ($(JAVA),)
 endif
 
 oql-world-tests:
-	@$(foreach N,$(OQLWORLDNUM), \
+	$(foreach N,$(OQLWORLDNUM), \
             $(foreach T,$(OQLTARGETS), \
 	       $(QCERTCOMP) -source oql -target $(T) oql/world$(N).oql \
                             -eval -input oql/world.input \

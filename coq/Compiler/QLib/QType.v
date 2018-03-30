@@ -23,6 +23,7 @@ Require Import DatatoJSON.
 Require DatatoSparkDF.
 Require Data.
 Require TUtil.
+Require Schema.
 
 Module QType(runtime:CompilerRuntime).
 
@@ -70,12 +71,6 @@ Module QType(runtime:CompilerRuntime).
   Definition brand {m:brand_relation} : list String.string -> qtype
     := RType.Brand.
 
-  (* Additional support for brand models extraction -- will have to be tested/consolidated *)
-
-  Definition brand_model : Set := brand_model.
-  Definition make_brand_model := make_brand_model_fails.
-  Definition typing_runtime : Set := typing_runtime.
-
   (* Additional support for json to rtype conversion *)
   
   Definition json_to_rtype {m:brand_relation} := json_to_rtype.  
@@ -103,6 +98,14 @@ Module QType(runtime:CompilerRuntime).
   
   Definition data_to_sjson (m:brand_model) : data -> qtype -> option String.string
     := @DatatoSparkDF.data_to_sjson _ _ m _.
+
+  (* Additional support for brand models extraction -- will have to be tested/consolidated *)
+
+  Definition brand_relation : Set := brand_relation.
+  Definition make_brand_relation := Schema.mk_brand_relation.
+  Definition brand_model : Set := brand_model.
+  Definition make_brand_model := Schema.make_brand_model_from_decls_fails.
+  Definition typing_runtime : Set := typing_runtime.
 
 End QType.
 
