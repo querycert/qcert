@@ -16,9 +16,9 @@ jobs:
     - run: export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
     - restore_cache:
         keys:
-        - v1-dep-{{ .Branch }}-
-        - v1-dep-master-
-        - v1-dep-
+        - v2-dep-{{ .Branch }}-
+        - v2-dep-master-
+        - v2-dep-
     - run: sudo add-apt-repository -y ppa:avsm/ppa
     - run: sudo apt-get -qq update
     - run: sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
@@ -32,7 +32,7 @@ jobs:
     - run: export TERM=dumb && opam install -y coq-flocq coq-jsast
     - run: if [[ ! -d ~/spark-2.1.2-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.2/spark-2.1.2-bin-hadoop2.7.tgz && tar xf spark-2.1.2-bin-hadoop2.7.tgz ; fi
     - save_cache:
-        key: v1-dep-{{ .Branch }}-{{ epoch }}
+        key: v2-dep-{{ .Branch }}-{{ epoch }}
         paths:
         - ~/.opam
         - ~/spark-2.1.2-bin-hadoop2.7
