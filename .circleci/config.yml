@@ -36,7 +36,7 @@ jobs:
         paths:
         - ~/.opam
         - ~/spark-2.1.2-bin-hadoop2.7
-    - run: eval `opam config env` && make SPARK=yes
+    - run: eval `opam config env` && make -j2 SPARK=yes
     - run: make tests
     - run: cd test/spark2 && ./run.sh
     # Save test results
