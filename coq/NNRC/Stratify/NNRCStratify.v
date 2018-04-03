@@ -1201,13 +1201,15 @@ Section Stratify.
     Proof.
       apply stratify_aux_free_vars_and_growing.
     Qed.
-    
-    Theorem stratify_free_vars e :
-      equivlist (nnrc_free_vars (stratify e)) (nnrc_free_vars e).
+
+    Lemma mk_expr_stratify_aux_free_vars e required_kind bound_vars :
+      incl (nnrc_free_vars e) bound_vars ->
+      equivlist (nnrc_free_vars (mk_expr_from_vars (stratify_aux e required_kind bound_vars))) (nnrc_free_vars e).
     Proof.
       unfold stratify.
-      case_eq (stratify_aux e nnrcStmt (nnrc_free_vars e)); intros n sdefs eqq1.
-      destruct (stratify_aux_free_vars_and_growing eqq1 (incl_refl _))
+      intros inclb.
+      case_eq (stratify_aux e required_kind bound_vars); intros n sdefs eqq1.
+      destruct (stratify_aux_free_vars_and_growing eqq1 inclb)
         as [equiv1 gfc1].
       intros x.
       specialize (equiv1 x).
@@ -1220,7 +1222,14 @@ Section Stratify.
         cut_to equiv1b; [ | tauto].
         split; [tauto | ].
         generalize (stratify_aux_nbound_vars eqq1); intros disj.
-        specialize (disj x); tauto.
+        specialize (disj x); intuition.
+    Qed.
+    
+    Theorem stratify_free_vars e :
+      equivlist (nnrc_free_vars (stratify e)) (nnrc_free_vars e).
+    Proof.
+      apply mk_expr_stratify_aux_free_vars.
+      reflexivity.
     Qed.
 
   End FreeVars.

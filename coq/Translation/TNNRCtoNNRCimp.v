@@ -30,13 +30,14 @@ Section TNNRCtoNNRCimp.
   Require Import NNRCSystem.
   Require Import NNRCimpSystem.
   Require Import NNRCtoNNRCimp.
+  Require Import TNNRCStratify.
+
+  Local Open Scope nnrc_imp.
+
+  Context {m:basic_model}.
+  Context (τconstants:tbindings).
 
   Section from_stratified.
-
-    Context {m:basic_model}.
-    Context (τconstants:tbindings).
-
-    Local Open Scope nnrc_imp.
 
     Definition pd_tbindings_lift (σ:tbindings) : pd_tbindings
       := map_codomain Some σ.
@@ -315,5 +316,26 @@ Section TNNRCtoNNRCimp.
     End counterexample.
 
   End from_stratified.
+
+  Lemma tnnrc_stmt_to_nnrc_imp_stmt_stratified_some_correct_fw {Γc:tbindings} {globals s τ} :
+    nnrc_type Γc nil s τ ->
+    forall pf,
+      [ h, Γc ⊢ ` (nnrc_stmt_to_nnrc_imp_stmt_stratified_some globals s pf) ▷ τ ].
+  Proof.
+    intros typ pf.
+    destruct (nnrc_stmt_to_nnrc_imp_stmt_stratified_some globals s pf); simpl.
+    eapply tnnrc_stmt_to_nnrc_imp_some_correct_fw; eauto.
+  Qed.
+  
+  Theorem tnnrc_to_nnrc_imp_correct_fw {Γc:tbindings} {globals s τ} :
+    nnrc_type Γc nil s τ ->
+    [ h, Γc ⊢ (nnrc_to_nnrc_imp_top globals s) ▷ τ ].
+  Proof.
+    intros typ.
+    unfold nnrc_to_nnrc_imp_top.
+    apply tnnrc_stmt_to_nnrc_imp_stmt_stratified_some_correct_fw.
+    apply -> stratify_preserves_types.
+    trivial.
+  Qed.
 
 End TNNRCtoNNRCimp.
