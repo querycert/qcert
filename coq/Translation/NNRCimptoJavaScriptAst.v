@@ -261,7 +261,7 @@ Section NNRCimptoJavaScriptAst.
     match json with
     | jnil => expr_literal literal_null
     | jnumber n =>
-      expr_literal (literal_string "XXX TODO: json_to_js_ast number XXX")
+      expr_literal (literal_number n)
     | jbool b =>
       expr_literal (literal_bool b)
     | jstring s =>
@@ -512,8 +512,7 @@ Section NNRCimptoJavaScriptAst.
       scope
         ((stat_for_in_var nil x None c
            (stat_block
-              ((stat_expr (expr_assign (expr_identifier x) None
-                                       (array_get c (expr_identifier x))))
+              ((stat_var_decl ((x, Some (array_get c (expr_identifier x))) :: nil))
                  :: (nnrc_imp_stmt_to_js_ast s)
                  :: nil)))
            :: nil)
@@ -523,8 +522,7 @@ Section NNRCimptoJavaScriptAst.
       scope
         ((stat_for_in_var nil x None c
            (stat_block
-              ((stat_expr (expr_assign (expr_identifier x) None
-                                       (array_get c (expr_identifier x))))
+              ((stat_var_decl ((x, Some (array_get c (expr_identifier x))) :: nil))
                  :: (nnrc_imp_stmt_to_js_ast s)
                  :: nil)))
            :: nil)

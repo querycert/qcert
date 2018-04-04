@@ -55,7 +55,7 @@ Section ToString.
     match name with
     | propname_identifier n => n
     | propname_string s => quotel ++ s ++ quotel
-    | propname_number n => "XXX TODO: propname_number XXX" (* XXX TODO XXX *)
+    | propname_number n => to_string n
     end.
 
 
@@ -73,17 +73,17 @@ Section ToString.
           List.map
             (fun (prop: (propname * propbody)) =>
                let (name, body) := prop in
-               eol ++ (indent (i+2)) ++
+               eol ++ (indent (i+1)) ++
                match body with
                | propbody_val e =>
-                 string_of_propname name ++ ": " ++ "(" ++ string_of_expr e (i+2) ++ ")"
+                 string_of_propname name ++ ": " ++ "(" ++ string_of_expr e (i+1) ++ ")"
                | propbody_get funcbody =>
                  "get " ++ string_of_propname name ++ "() {" ++
-                        string_of_funcbody funcbody (i+2) ++
+                        string_of_funcbody funcbody (i+1) ++
                  "}"
                | propbody_set args funcbody =>
                  "set " ++ string_of_propname name ++ "("++ comma_list args ++") {" ++
-                        string_of_funcbody funcbody (i+2) ++
+                        string_of_funcbody funcbody (i+1) ++
                  "}"
                end)
             o
@@ -96,7 +96,7 @@ Section ToString.
           List.map
             (fun eopt =>
                match eopt with
-               | Some e => string_of_expr e (i+2)
+               | Some e => string_of_expr e (i+1)
                | None => "null"
                end)
             a
@@ -110,20 +110,20 @@ Section ToString.
         end
     in
     "(function "++name++"("++ comma_list args ++") {"++eol++
-               indent (i+2)++string_of_funcbody body (i+2) ++eol++
+               indent (i+1)++string_of_funcbody body (i+1) ++eol++
                indent i ++"})"
   | expr_access e1 e2 =>
-    string_of_expr e1 i ++ "[" ++ string_of_expr e1 (i+2) ++ "]"
+    string_of_expr e1 i ++ "[" ++ string_of_expr e1 (i+1) ++ "]"
   | expr_member e s =>
     string_of_expr e i ++ "." ++ s
   | expr_new e args =>
-    let args := List.map (fun e => string_of_expr e (i+2)) args in
+    let args := List.map (fun e => string_of_expr e (i+1)) args in
     "new " ++ string_of_expr e i ++ "(" ++ comma_list args ++ ")"
   | expr_call f args =>
-    let args := List.map (fun e => string_of_expr e (i+2)) args in
+    let args := List.map (fun e => string_of_expr e (i+1)) args in
     string_of_expr f i ++ "(" ++ comma_list args ++ ")"
   | expr_unary_op op e =>
-    let e := string_of_expr e (i+2) in
+    let e := string_of_expr e (i+1) in
     match op with
     | unary_op_delete => "(delete " ++ e ++ ")"
     | unary_op_void => "(void " ++ e ++ ")"
@@ -138,8 +138,8 @@ Section ToString.
     | unary_op_not => "(!" ++ e ++ ")"
     end
   | expr_binary_op e1 op e2 =>
-    let e1 := string_of_expr e1 (i+2) in
-    let e2 := string_of_expr e2 (i+2) in
+    let e1 := string_of_expr e1 (i+1) in
+    let e2 := string_of_expr e2 (i+1) in
     match op with
     | binary_op_mult => "(" ++ e1 ++ " * " ++ e2 ++ ")"
     | binary_op_div => "(" ++ e1 ++ " / " ++ e2 ++ ")"
@@ -167,13 +167,13 @@ Section ToString.
     | binary_op_coma => "(" ++ e1 ++ ", " ++ e2 ++ ")"
     end
   | expr_conditional e1 e2 e3 =>
-    let e1 := string_of_expr e1 (i+2) in
-    let e2 := string_of_expr e2 (i+2) in
-    let e3 := string_of_expr e3 (i+2) in
+    let e1 := string_of_expr e1 (i+1) in
+    let e2 := string_of_expr e2 (i+1) in
+    let e3 := string_of_expr e3 (i+1) in
     "(" ++ e1 ++ " ? " ++ e2 ++ " : " ++ e3 ++ ")"
   | expr_assign e1 None e2 =>
-    let e1 := string_of_expr e1 (i+2) in
-    let e2 := string_of_expr e2 (i+2) in
+    let e1 := string_of_expr e1 (i+1) in
+    let e2 := string_of_expr e2 (i+1) in
     e1 ++ " = " ++ e2
   | _ => "XXX TODO XXX"
     end
@@ -191,7 +191,7 @@ Section ToString.
       lbl ++ ":" ++ string_of_stat s i
     | stat_block l =>
       let seq :=
-          List.map (fun s => string_of_stat s (i+2)) l
+          List.map (fun s => string_of_stat s (i+1)) l
       in
       "{" ++ eol ++
           joinStrings (";"++eol) seq ++ eol ++
@@ -204,7 +204,7 @@ Section ToString.
              "var " ++ x ++
              match e_opt with
              | Some e =>
-               " = " ++ string_of_expr e (i + 2)
+               " = " ++ string_of_expr e (i+1)
              | None => ""
              end
           )
@@ -212,11 +212,11 @@ Section ToString.
     in
     joinStrings (";"++eol) decls
   | stat_if e s1 s2_opt =>
-    "if (" ++ string_of_expr e (i+2) ++ ") { " ++ eol ++
-    string_of_stat s1 (i+2) ++ eol ++
+    "if (" ++ string_of_expr e (i+1) ++ ") { " ++ eol ++
+    string_of_stat s1 (i+1) ++ eol ++
     indent i ++ "} else {" ++ eol ++
     match s2_opt with
-    | Some s2 => string_of_stat s2 (i+2) ++ eol
+    | Some s2 => string_of_stat s2 (i+1) ++ eol
     | None => ""
     end ++
     indent i ++ "}"
@@ -227,7 +227,7 @@ Section ToString.
   | stat_return None =>
     "return ;"
   | stat_return (Some e) =>
-    "return " ++ (string_of_expr e (i+2)) ++ ";"
+    "return " ++ (string_of_expr e (i+1)) ++ ";"
   (* | stat_break : label -> stat *)
   (* | stat_continue : label ->  stat *)
   (* | stat_try : stat -> option (string * stat) -> option stat -> stat (* Note: try s1 [catch (x) s2] [finally s3] *) *)
@@ -236,13 +236,13 @@ Section ToString.
   (* | stat_for_in : label_set -> expr -> expr -> stat -> stat (* Note: for (e1 in e2) stat *) *)
   | stat_for_in_var lbl x e1_opt e2 s =>
     (* lbl ++ *) (* TODO: print labels *)
-    "for (" ++ x ++
+    "for (var " ++ x ++
         match e1_opt with
-        | Some e => " = " ++ string_of_expr e (i+2)
+        | Some e => " = " ++ string_of_expr e (i+1)
         | None => ""
         end ++
-        " in " ++ string_of_expr e2 (i+2)  ++ ") {" ++ eol ++
-        string_of_stat s (i+2) ++ eol ++
+        " in " ++ string_of_expr e2 (i+1)  ++ ") {" ++ eol ++
+        string_of_stat s (i+1) ++ eol ++
     indent i ++ "}" ++ eol
  (*  Note: for (var x [= e1] in e2) stat *)
   (* | stat_debugger : stat *)
