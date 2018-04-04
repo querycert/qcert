@@ -227,13 +227,13 @@ Section NNRCimptoJavaScriptAst.
 
   Definition runtime_nat_min_apply e :=
     call_runtime "natMinApply" (e::nil).
-  
+
   Definition runtime_nat_max_apply e :=
     call_runtime "natMaxApply" (e::nil).
-  
+
   Definition runtime_nat_mean e :=
     call_runtime "natArithMean" (e::nil).
-  
+
   (** Data model *)
 
   Definition mk_rec (l: list (string * expr)) : expr :=
@@ -267,9 +267,19 @@ Section NNRCimptoJavaScriptAst.
     | jstring s =>
       expr_literal (literal_string s)
     | jarray a =>
-      expr_literal (literal_string "XXX TODO: json_to_js_ast array XXX")
+      let a :=
+          List.map
+            (fun v => Some (json_to_js_ast v))
+            a
+      in
+      expr_array a
     | jobject o =>
-      expr_literal (literal_string "XXX TODO: json_to_js_ast object XXX")
+      expr_object
+        (List.map
+           (fun (prop: (string * JSON.json)) =>
+              let (x, v) := prop in
+              (propname_identifier x, propbody_val (json_to_js_ast v)))
+           o)
     end.
 
   Definition data_to_js_ast (d: data) : expr :=
