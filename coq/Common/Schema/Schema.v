@@ -42,7 +42,7 @@ Section Schema.
         else
           qfailure (CompilationError "Brand relation is not transitive")
       else
-        qfailure (CompilationError "Brand relation is not symmetric").
+        qfailure (CompilationError "Brand relation is not assymetric").
     Next Obligation.
       unfold holds, is_true; match_destr.
       congruence.
