@@ -29,6 +29,7 @@ Section NNRCimpishtoJavaScriptAst.
   Require Import JavaScriptAstRuntime.
   Require Import JSON.
   Require Import DatatoJSON.
+  Require Import JsAst.JsNumber.
   Import ListNotations.
 
   Context {fruntime:foreign_runtime}.
@@ -497,22 +498,21 @@ Section NNRCimpishtoJavaScriptAst.
       stat_expr (expr_assign (expr_identifier x) None (nnrc_impish_expr_to_js_ast e))
     | NNRCimpishPush x e =>
       stat_expr (array_push (expr_identifier x) (nnrc_impish_expr_to_js_ast e))
-    | NNRCimpishFor x (NNRCimpishVar c) s =>
-      (* for (var x in c) { x = c[x]; s} *)
-      let c := expr_identifier c in
-      scope
-        [ stat_for_in_var nil x None c (* XXX change to use a loop index! *)
-            (stat_block
-               [ stat_var_decl [ (x, Some (array_get c (expr_identifier x))) ];
-                   nnrc_impish_stmt_to_js_ast s ]) ]
     | NNRCimpishFor x e s =>
-      (* TODO: for (var src = e, i = 0; i < src.length; i++) { var x = src[i]; s } *)
-      (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
-      let c := nnrc_impish_expr_to_js_ast e in
+      (* for (var src = e, i = 0; i < src.length; i++) { var x = src[i]; s } *)
+      let e := nnrc_impish_expr_to_js_ast e in
+      let src_id := "src"%string in (* XXX TODO: fresh XXX *)
+      let i_id := "i"%string in (* XXX TODO: fresh XXX *)
+      let src := expr_identifier src_id in
+      let i := expr_identifier i_id in
       scope
-        [ stat_for_in_var nil x None c (* XXX change to use a loop index! *)
+        [ stat_for_var
+            nil
+            [ (src_id, Some e); (i_id, Some (expr_literal (literal_number zero))) ]
+            (Some (expr_binary_op i binary_op_lt (expr_member src "length")))
+            (Some (expr_unary_op unary_op_post_incr i))
             (stat_block
-               [ stat_var_decl [ (x, Some (array_get c (expr_identifier x))) ];
+               [ stat_var_decl [ (x, Some (array_get src i)) ];
                    nnrc_impish_stmt_to_js_ast s ]) ]
     | NNRCimpishIf e s1 s2 =>
       stat_if
