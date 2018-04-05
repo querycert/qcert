@@ -29,6 +29,7 @@ Section NNRCimptoJavaScriptAst.
   Require Import JavaScriptAstRuntime.
   Require Import JSON.
   Require Import DatatoJSON.
+  Import ListNotations.
 
   Context {fruntime:foreign_runtime}.
   Context {ftojson:foreign_to_JSON}.
@@ -38,59 +39,59 @@ Section NNRCimptoJavaScriptAst.
   (** Standard library *)
 
   Definition toString e := (* TODO: review *)
-    expr_call (expr_identifier "toString") (e::nil).
+    expr_call (expr_identifier "toString") [ e ].
 
   Definition empty_array := expr_array nil. (* TODO: review *)
 
   Definition array_push e1 e2 := (* TODO: review *)
     (* use [array_proto_push_function_object] ? *)
-    expr_call (expr_member e1 "push") (e2::nil).
+    expr_call (expr_member e1 "push") [ e2 ].
 
   Definition array_get e1 e2 := (* TODO: review *)
     expr_access e1 e2.
 
   Definition math_min e1 e2 := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "min") (e1::e2::nil).
+    expr_call (expr_member (expr_identifier "Math") "min") [ e1; e2 ].
 
   Definition math_pow e1 e2 := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "pow") (e1::e2::nil).
+    expr_call (expr_member (expr_identifier "Math") "pow") [ e1; e2 ].
 
   Definition math_max e1 e2 := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "max") (e1::e2::nil).
+    expr_call (expr_member (expr_identifier "Math") "max") [ e1; e2 ].
 
   Definition math_min_apply e := (* TODO: review *)
     expr_call
       (expr_member (expr_member (expr_identifier "Math") "min") "apply")
-      ((expr_identifier "Math")::e::nil).
+      [ expr_identifier "Math"; e ].
 
   Definition math_max_apply e := (* TODO: review *)
     expr_call
       (expr_member (expr_member (expr_identifier "Math") "max") "apply")
-      ((expr_identifier "Math")::e::nil).
+      [ expr_identifier "Math"; e ].
 
   Definition math_abs e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "abs") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "abs") [ e ].
 
   Definition math_log e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "log2") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "log2") [ e ].
 
   Definition math_log10 e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "log10") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "log10") [ e ].
 
   Definition math_sqrt e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "sqrt") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "sqrt") [ e ].
 
   Definition math_exp e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "exp") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "exp") [ e ].
 
   Definition math_ceil e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "ceil") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "ceil") [ e ].
 
   Definition math_floor e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "floor") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "floor") [ e ].
 
   Definition math_trunc e := (* TODO: review *)
-    expr_call (expr_member (expr_identifier "Math") "trunc") (e::nil).
+    expr_call (expr_member (expr_identifier "Math") "trunc") [ e ].
 
 
   (** Runtime  functions *)
@@ -106,12 +107,10 @@ Section NNRCimptoJavaScriptAst.
     match c with
     | Ascending =>
       expr_object
-        ((propname_identifier "asc", propbody_val (expr_literal (literal_string lbl)))
-           :: nil)
+        [ (propname_identifier "asc", propbody_val (expr_literal (literal_string lbl))) ]
     | Descending =>
       expr_object
-        ((propname_identifier "desc", propbody_val (expr_literal (literal_string lbl)))
-           :: nil)
+        [ (propname_identifier "desc", propbody_val (expr_literal (literal_string lbl))) ]
     end.
 
   Definition sortCriterias_to_js_ast (scl: SortCriterias) :=
@@ -124,115 +123,115 @@ Section NNRCimptoJavaScriptAst.
     expr_call (expr_identifier f) args.
 
   Definition runtime_either e :=
-    call_runtime "either" (e::nil).
+    call_runtime "either" [ e ].
 
   Definition runtime_toLeft e :=
-    call_runtime "toLeft" (e::nil).
+    call_runtime "toLeft" [ e ].
 
   Definition runtime_toRight e :=
-    call_runtime "toRight" (e::nil).
+    call_runtime "toRight" [ e ].
 
   Definition runtime_equal e1 e2 :=
-    call_runtime "equal" (e1::e2::nil).
+    call_runtime "equal" [ e1; e2 ].
 
   Definition runtime_concat e1 e2 :=
-    call_runtime "concat" (e1::e2::nil).
+    call_runtime "concat" [ e1; e2 ].
 
   Definition runtime_mergeConcat e1 e2 :=
-    call_runtime "mergeConcat" (e1::e2::nil).
+    call_runtime "mergeConcat" [ e1; e2 ].
 
   Definition runtime_bunion e1 e2 :=
-    call_runtime "bunion" (e1::e2::nil).
+    call_runtime "bunion" [ e1; e2 ].
 
   Definition runtime_bminus e1 e2 :=
-    call_runtime "bminus" (e1::e2::nil).
+    call_runtime "bminus" [ e1; e2 ].
 
   Definition runtime_bmin e1 e2 :=
-    call_runtime "bmin" (e1::e2::nil).
+    call_runtime "bmin" [ e1; e2 ].
 
   Definition runtime_bmax e1 e2 :=
-    call_runtime "bmax" (e1::e2::nil).
+    call_runtime "bmax" [ e1; e2 ].
 
   Definition runtime_contains e1 e2 :=
-    call_runtime "contains" (e1::e2::nil).
+    call_runtime "contains" [ e1; e2 ].
 
   Definition runtime_deref e s :=
-    call_runtime "deref" (e::(expr_literal (literal_string s))::nil).
+    call_runtime "deref" [ e; expr_literal (literal_string s) ].
 
   Definition runtime_remove e s :=
-    call_runtime "remove" (e::(expr_literal (literal_string s))::nil).
+    call_runtime "remove" [ e; expr_literal (literal_string s) ].
 
   Definition runtime_project e sl :=
-    call_runtime "project" (e::(brands_to_js_ast sl)::nil).
+    call_runtime "project" [ e; brands_to_js_ast sl ].
 
   Definition runtime_singleton e :=
-    call_runtime "singleton" (e::nil).
+    call_runtime "singleton" [ e ].
 
   Definition runtime_flatten e :=
-    call_runtime "flatten" (e::nil).
+    call_runtime "flatten" [ e ].
 
   Definition runtime_distinct e :=
-    call_runtime "distinct" (e::nil).
+    call_runtime "distinct" [ e ].
 
   Definition runtime_sort e scl :=
-    call_runtime "sort" (e::(sortCriterias_to_js_ast scl)::nil).
+    call_runtime "sort" [ e; sortCriterias_to_js_ast scl ].
 
   Definition runtime_sum e :=
-    call_runtime "sum" (e::nil).
+    call_runtime "sum" [ e ].
 
   Definition runtime_mean e :=
-    call_runtime "arithMean" (e::nil).
+    call_runtime "arithMean" [ e ].
 
   Definition runtime_brand b e :=
-    call_runtime "brand" ((brands_to_js_ast b)::e::nil).
+    call_runtime "brand" [ brands_to_js_ast b; e ].
 
   Definition runtime_unbrand e :=
-    call_runtime "unbrand" (e::nil).
+    call_runtime "unbrand" [ e ].
 
   Definition runtime_cast b e :=
-    call_runtime "cast" ((brands_to_js_ast b)::e::nil).
+    call_runtime "cast" [ brands_to_js_ast b; e ].
 
   Definition runtime_nat_plus e1 e2 :=
-    call_runtime "natPlus" (e1::e2::nil).
+    call_runtime "natPlus" [ e1; e2 ].
 
   Definition runtime_nat_minus e1 e2 :=
-    call_runtime "natMinus" (e1::e2::nil).
+    call_runtime "natMinus" [ e1; e2 ].
 
   Definition runtime_nat_mult e1 e2 :=
-    call_runtime "natMult" (e1::e2::nil).
+    call_runtime "natMult" [ e1; e2 ].
 
   Definition runtime_nat_div e1 e2 :=
-    call_runtime "natDiv" (e1::e2::nil).
+    call_runtime "natDiv" [ e1; e2 ].
 
   Definition runtime_nat_rem e1 e2 :=
-    call_runtime "natRem" (e1::e2::nil).
+    call_runtime "natRem" [ e1; e2 ].
 
   Definition runtime_nat_min e1 e2 :=
-    call_runtime "natMin" (e1::e2::nil).
+    call_runtime "natMin" [ e1; e2 ].
 
   Definition runtime_nat_max e1 e2 :=
-    call_runtime "natMax" (e1::e2::nil).
+    call_runtime "natMax" [ e1; e2 ].
 
   Definition runtime_nat_abs e :=
-    call_runtime "natAbs" (e::nil).
+    call_runtime "natAbs" [ e ].
 
   Definition runtime_nat_log2 e :=
-    call_runtime "natLog2" (e::nil).
+    call_runtime "natLog2" [ e ].
 
   Definition runtime_nat_sqrt e :=
-    call_runtime "natSqrt" (e::nil).
+    call_runtime "natSqrt" [ e ].
 
   Definition runtime_nat_sum e :=
-    call_runtime "natSum" (e::nil).
+    call_runtime "natSum" [ e ].
 
   Definition runtime_nat_min_apply e :=
-    call_runtime "natMinApply" (e::nil).
+    call_runtime "natMinApply" [ e ].
 
   Definition runtime_nat_max_apply e :=
-    call_runtime "natMaxApply" (e::nil).
+    call_runtime "natMaxApply" [ e ].
 
   Definition runtime_nat_mean e :=
-    call_runtime "natArithMean" (e::nil).
+    call_runtime "natArithMean" [ e ].
 
   (** Data model *)
 
@@ -248,14 +247,10 @@ Section NNRCimptoJavaScriptAst.
     expr_array (List.map (fun e => Some e) l).
 
   Definition mk_left (e: expr) : expr :=
-    expr_object
-        ((propname_identifier "left", propbody_val e)
-           :: nil).
+    expr_object [ (propname_identifier "left", propbody_val e) ].
 
   Definition mk_right (e: expr) : expr :=
-    expr_object
-        ((propname_identifier "right", propbody_val e)
-           :: nil).
+    expr_object [(propname_identifier "right", propbody_val e) ].
 
   Fixpoint json_to_js_ast (json: json) : expr :=
     match json with
@@ -378,7 +373,7 @@ Section NNRCimptoJavaScriptAst.
     | OpNeg =>
       expr_unary_op unary_op_not e'
     | OpRec s =>
-      mk_rec ((s, e') :: nil)
+      mk_rec [ (s, e') ]
     | OpDot s =>
       runtime_deref e' s
     | OpRecRemove s =>
@@ -386,7 +381,7 @@ Section NNRCimptoJavaScriptAst.
     | OpRecProject sl =>
       runtime_project e' sl
     | OpBag =>
-      mk_bag (e'::nil)
+      mk_bag [ e' ]
     | OpSingleton =>
       runtime_singleton e'
     | OpFlatten =>
@@ -483,25 +478,21 @@ Section NNRCimptoJavaScriptAst.
     match stmt with
     | NNRCimpSeq s1 s2 =>
       stat_block
-        ((nnrc_imp_stmt_to_js_ast s1)
-           :: (nnrc_imp_stmt_to_js_ast s2)
-           :: nil)
+        [ nnrc_imp_stmt_to_js_ast s1;
+          nnrc_imp_stmt_to_js_ast s2 ]
     | NNRCimpLet x e s =>
       scope
-        ((stat_var_decl ((x, Some (nnrc_imp_expr_to_js_ast e))::nil))
-           :: nil)
+        [ stat_var_decl [ (x, Some (nnrc_imp_expr_to_js_ast e)) ] ]
     | NNRCimpLetMut x s1 s2 =>
       scope
-        ((stat_var_decl ((x, None)::nil))
-           :: (nnrc_imp_stmt_to_js_ast s1)
-           :: (nnrc_imp_stmt_to_js_ast s2)
-           :: nil)
+        [ stat_var_decl [ (x, None) ];
+          nnrc_imp_stmt_to_js_ast s1;
+          nnrc_imp_stmt_to_js_ast s2 ]
     | NNRCimpLetMutColl x s1 s2 =>
       scope
-        ((stat_var_decl ((x, Some (empty_array))::nil))
-           :: (nnrc_imp_stmt_to_js_ast s1)
-           :: (nnrc_imp_stmt_to_js_ast s2)
-           :: nil)
+        [ stat_var_decl [ (x, Some (empty_array)) ];
+          nnrc_imp_stmt_to_js_ast s1;
+          nnrc_imp_stmt_to_js_ast s2 ]
     | NNRCimpAssign x e =>
       stat_expr (expr_assign (expr_identifier x) None (nnrc_imp_expr_to_js_ast e))
     | NNRCimpPush x e =>
@@ -510,22 +501,19 @@ Section NNRCimptoJavaScriptAst.
       (* for (var x in c) { x = c[x]; s} *)
       let c := expr_identifier c in
       scope
-        ((stat_for_in_var nil x None c
-           (stat_block
-              ((stat_var_decl ((x, Some (array_get c (expr_identifier x))) :: nil))
-                 :: (nnrc_imp_stmt_to_js_ast s)
-                 :: nil)))
-           :: nil)
+        [ stat_for_in_var nil x None c (* XXX change to use a loop index! *)
+            (stat_block
+               [ stat_var_decl [ (x, Some (array_get c (expr_identifier x))) ];
+                   nnrc_imp_stmt_to_js_ast s ]) ]
     | NNRCimpFor x e s =>
+      (* TODO: for (var src = e, i = 0; i < src.length; i++) { var x = src[i]; s } *)
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
       let c := nnrc_imp_expr_to_js_ast e in
       scope
-        ((stat_for_in_var nil x None c
-           (stat_block
-              ((stat_var_decl ((x, Some (array_get c (expr_identifier x))) :: nil))
-                 :: (nnrc_imp_stmt_to_js_ast s)
-                 :: nil)))
-           :: nil)
+        [ stat_for_in_var nil x None c (* XXX change to use a loop index! *)
+            (stat_block
+               [ stat_var_decl [ (x, Some (array_get c (expr_identifier x))) ];
+                   nnrc_imp_stmt_to_js_ast s ]) ]
     | NNRCimpIf e s1 s2 =>
       stat_if
         (nnrc_imp_expr_to_js_ast e)
@@ -536,58 +524,37 @@ Section NNRCimptoJavaScriptAst.
       stat_if
         (runtime_either e')
         (scope (* var x1 = toLeft(e); s1 *)
-           ((stat_var_decl ((x1, Some (runtime_toLeft e')):: nil))
-              :: (nnrc_imp_stmt_to_js_ast s1)
-              :: nil))
+           [ stat_var_decl [ (x1, Some (runtime_toLeft e')) ];
+             nnrc_imp_stmt_to_js_ast s1 ])
         (Some (scope (* var x2 = toRight(e); s2 *)
-                 ((stat_var_decl ((x2, Some (runtime_toRight e')):: nil))
-                    :: (nnrc_imp_stmt_to_js_ast s2)
-                    :: nil)))
+                 [ stat_var_decl [ (x2, Some (runtime_toRight e')) ];
+                   nnrc_imp_stmt_to_js_ast s2 ]))
     | NNRCimpEither e x1 s1 x2 s2 =>
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
       let e' := nnrc_imp_expr_to_js_ast e in
       stat_if
         (runtime_either e')
         (scope (* var x1 = toLeft(e); s1 *)
-           ((stat_var_decl ((x1, Some (runtime_toLeft e')):: nil))
-              :: (nnrc_imp_stmt_to_js_ast s1)
-              :: nil))
+           [ stat_var_decl [ (x1, Some (runtime_toLeft e')) ];
+             nnrc_imp_stmt_to_js_ast s1 ])
         (Some (scope (* var x2 = toRight(e); s2 *)
-                 ((stat_var_decl ((x2, Some (runtime_toRight e')):: nil))
-                    :: (nnrc_imp_stmt_to_js_ast s2)
-                    :: nil)))
+                 [ stat_var_decl [ (x2, Some (runtime_toRight e')) ];
+                   nnrc_imp_stmt_to_js_ast s2 ]))
     end.
 
   Definition nnrc_imp_to_js_ast_top globals (q: nnrc_imp): funcdecl :=
     let (stmt, ret) := q in
     let body :=
       stat_block
-        ((stat_var_decl ((ret, None)::nil))
-           :: (nnrc_imp_stmt_to_js_ast stmt)
-           :: (stat_return (Some (expr_identifier ret)))
-           :: nil)
+        [ stat_var_decl [ (ret, None) ];
+          nnrc_imp_stmt_to_js_ast stmt;
+          stat_return (Some (expr_identifier ret)) ]
     in
-    let prog := prog_intro strictness_true ((element_stat body)::nil) in
+    let prog := prog_intro strictness_true [ element_stat body ] in
     funcdecl_intro
       "query"
       globals
       (funcbody_intro prog (prog_to_string prog))
   .
-
-  (* (* Examples *) *)
-  (* Definition ex1 := *)
-  (*   let ret := "ret"%string in *)
-  (*   let body := *)
-  (*     NNRCimpLet "x"%string (NNRCimpConst (dnat 42)) *)
-  (*                (NNRCimpAssign ret (NNRCimpVar "x"%string)) *)
-  (*   in *)
-  (*   (body, ret). *)
-  (* Definition js1 := (nnrc_imp_to_js_ast_top nil ex1). *)
-  (* Remark print1: Some js1 = None. *)
-  (* Proof. *)
-  (*   unfold js1. *)
-  (*   unfold nnrc_imp_to_js_ast_top. *)
-  (*   simpl. *)
-  (* Qed. *)
 
 End NNRCimptoJavaScriptAst.
