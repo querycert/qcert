@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCimpVars.
+Section NNRCimpishVars.
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -28,19 +28,19 @@ Section NNRCimpVars.
   Require Import Decidable.
   Require Import Utils.
   Require Import CommonRuntime.
-  Require Import NNRCimp.
+  Require Import NNRCimpish.
 
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
   
-  Fixpoint nnrc_imp_expr_free_vars (e:nnrc_imp_expr) : list var
+  Fixpoint nnrc_impish_expr_free_vars (e:nnrc_impish_expr) : list var
     := match e with 
-       | NNRCimpGetConstant _ => nil
-       | NNRCimpVar v => v :: nil
-       | NNRCimpConst _ => nil
-       | NNRCimpBinop _ e₁ e₂ => nnrc_imp_expr_free_vars e₁ ++ nnrc_imp_expr_free_vars e₂
-       | NNRCimpUnop _ e₁ => nnrc_imp_expr_free_vars e₁ 
-       | NNRCimpGroupBy _ _ e₁ => nnrc_imp_expr_free_vars e₁
+       | NNRCimpishGetConstant _ => nil
+       | NNRCimpishVar v => v :: nil
+       | NNRCimpishConst _ => nil
+       | NNRCimpishBinop _ e₁ e₂ => nnrc_impish_expr_free_vars e₁ ++ nnrc_impish_expr_free_vars e₂
+       | NNRCimpishUnop _ e₁ => nnrc_impish_expr_free_vars e₁ 
+       | NNRCimpishGroupBy _ _ e₁ => nnrc_impish_expr_free_vars e₁
        end.
 
-End NNRCimpVars.
+End NNRCimpishVars.

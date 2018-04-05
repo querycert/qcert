@@ -14,5 +14,11 @@
  * limitations under the License.
  *)
 
-Require Export CommonTypes.
-Require Export TNNRCimp.
+Require Export CommonRuntime.
+Require Export NNRCimpish.
+Require Export NNRCimpishSize.
+Require Export NNRCimpishVars.
+Require Export NNRCimpishEval.
+Require Export NNRCimpishSem.
+Require Export NNRCimpishSemEval.
+Require Export NNRCimpishNorm.

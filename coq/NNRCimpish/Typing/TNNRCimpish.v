@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TNNRCimp.
+Section TNNRCimpish.
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -23,12 +23,12 @@ Section TNNRCimp.
   Require Import Morphisms.
   Require Import Utils.
   Require Import CommonSystem.
-  Require Import NNRCimp.
-  Require Import NNRCimpEval.
-  Require Import NNRCimpSem.
-  Require Import NNRCimpSemEval.
+  Require Import NNRCimpish.
+  Require Import NNRCimpishEval.
+  Require Import NNRCimpishSem.
+  Require Import NNRCimpishSemEval.
 
-  (** Typing rules for NNRCimp *)
+  (** Typing rules for NNRCimpish *)
   Context {m:basic_model}.
 
   Definition pd_tbindings := list (string*option rtype).
@@ -79,34 +79,34 @@ Section TNNRCimp.
 
     Reserved Notation "[ Γ  ⊢ e ▷ τ ]".
 
-    Inductive nnrc_imp_expr_type : pd_tbindings -> nnrc_imp_expr -> rtype -> Prop :=
-    | type_NNRCimpGetConstant {τ} Γ s :
+    Inductive nnrc_impish_expr_type : pd_tbindings -> nnrc_impish_expr -> rtype -> Prop :=
+    | type_NNRCimpishGetConstant {τ} Γ s :
         tdot Γc s = Some τ ->
-        [ Γ ⊢ NNRCimpGetConstant s ▷ τ ]
-    | type_NNRCimpVar {τ} Γ v :
+        [ Γ ⊢ NNRCimpishGetConstant s ▷ τ ]
+    | type_NNRCimpishVar {τ} Γ v :
         lookup equiv_dec Γ v = Some (Some τ) ->
-        [ Γ ⊢ NNRCimpVar v ▷ τ ]
-    | type_NNRCimpConst {τ} Γ c :
+        [ Γ ⊢ NNRCimpishVar v ▷ τ ]
+    | type_NNRCimpishConst {τ} Γ c :
         normalize_data brand_relation_brands c ▹ τ ->
-        [ Γ ⊢ NNRCimpConst c ▷ τ ]
-    | type_NNRCimpBinop  {τ₁ τ₂ τ} Γ b e₁ e₂ :
+        [ Γ ⊢ NNRCimpishConst c ▷ τ ]
+    | type_NNRCimpishBinop  {τ₁ τ₂ τ} Γ b e₁ e₂ :
         binary_op_type b τ₁ τ₂ τ ->
         [ Γ ⊢ e₁ ▷ τ₁ ] ->
         [ Γ ⊢ e₂ ▷ τ₂ ] ->
-        [ Γ ⊢ NNRCimpBinop b e₁ e₂ ▷ τ ]
-    | type_NNRCimpUnop {τ₁ τ} Γ u e :
+        [ Γ ⊢ NNRCimpishBinop b e₁ e₂ ▷ τ ]
+    | type_NNRCimpishUnop {τ₁ τ} Γ u e :
         unary_op_type u τ₁ τ ->
         [ Γ ⊢ e ▷ τ₁ ] ->
-        [ Γ ⊢ NNRCimpUnop u e ▷ τ ]
-    | type_NNRCimpGroupBy {τl k pf} Γ g sl e :
+        [ Γ ⊢ NNRCimpishUnop u e ▷ τ ]
+    | type_NNRCimpishGroupBy {τl k pf} Γ g sl e :
         sublist sl (domain τl) ->
         [ Γ ⊢ e ▷ Coll (Rec k τl pf) ] ->
-        [ Γ ⊢ NNRCimpGroupBy g sl e ▷ GroupBy_type g sl k τl pf ]
+        [ Γ ⊢ NNRCimpishGroupBy g sl e ▷ GroupBy_type g sl k τl pf ]
     where
-    "[ Γ ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γ e τ) : nnrc_imp
+    "[ Γ ⊢ e ▷ τ ]" := (nnrc_impish_expr_type Γ e τ) : nnrc_impish
     .
 
-    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γ e τ) : nnrc_imp.
+    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrc_impish_expr_type Γ e τ) : nnrc_impish.
 
     (* Observation: all the contexts are stacklike in their domain,
        and there is no reason to allow strong updates, since there is a phase
@@ -119,103 +119,103 @@ Section TNNRCimp.
        In particular, if not must_assign, and it is well-typed,
        then we can replace it with a Seq
      *)
-    Fixpoint nnrc_imp_stmt_must_assign (s:nnrc_imp_stmt) (x:var) : Prop
+    Fixpoint nnrc_impish_stmt_must_assign (s:nnrc_impish_stmt) (x:var) : Prop
       := match s with
-         | NNRCimpSeq s₁ s₂ =>
-           nnrc_imp_stmt_must_assign s₁ x \/ nnrc_imp_stmt_must_assign s₂ x
-         | NNRCimpLet v e₁ s₂ =>
-           nnrc_imp_stmt_must_assign s₂ x
-         | NNRCimpLetMut v s₁ s₂ =>
-           (v <> x /\ nnrc_imp_stmt_must_assign s₁ x) \/ nnrc_imp_stmt_must_assign s₂ x
-         | NNRCimpLetMutColl v s₁ s₂ =>
-           nnrc_imp_stmt_must_assign s₁ x \/ nnrc_imp_stmt_must_assign s₂ x
-         | NNRCimpAssign v e =>
+         | NNRCimpishSeq s₁ s₂ =>
+           nnrc_impish_stmt_must_assign s₁ x \/ nnrc_impish_stmt_must_assign s₂ x
+         | NNRCimpishLet v e₁ s₂ =>
+           nnrc_impish_stmt_must_assign s₂ x
+         | NNRCimpishLetMut v s₁ s₂ =>
+           (v <> x /\ nnrc_impish_stmt_must_assign s₁ x) \/ nnrc_impish_stmt_must_assign s₂ x
+         | NNRCimpishLetMutColl v s₁ s₂ =>
+           nnrc_impish_stmt_must_assign s₁ x \/ nnrc_impish_stmt_must_assign s₂ x
+         | NNRCimpishAssign v e =>
            v = x
-         | NNRCimpPush v e =>
+         | NNRCimpishPush v e =>
            False
-         | NNRCimpFor v e s₀ => (* Since the loop may not execute *)
+         | NNRCimpishFor v e s₀ => (* Since the loop may not execute *)
            False
-         | NNRCimpIf e s₁ s₂ =>
-           nnrc_imp_stmt_must_assign s₁ x /\ nnrc_imp_stmt_must_assign s₂ x
-         | NNRCimpEither e x₁ s₁ x₂ s₂ =>
-           nnrc_imp_stmt_must_assign s₁ x /\ nnrc_imp_stmt_must_assign s₂ x
+         | NNRCimpishIf e s₁ s₂ =>
+           nnrc_impish_stmt_must_assign s₁ x /\ nnrc_impish_stmt_must_assign s₂ x
+         | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
+           nnrc_impish_stmt_must_assign s₁ x /\ nnrc_impish_stmt_must_assign s₂ x
          end.
 
     Reserved Notation "[  Γ , Δc , Δd  ⊢ s ]".
 
-    Inductive nnrc_imp_stmt_type :
+    Inductive nnrc_impish_stmt_type :
       pd_tbindings -> mc_tbindings -> md_tbindings ->
-      nnrc_imp_stmt -> Prop :=
-    | type_NNRCimpSeq Γ Δc Δd s₁ s₂ :
+      nnrc_impish_stmt -> Prop :=
+    | type_NNRCimpishSeq Γ Δc Δd s₁ s₂ :
         [  Γ , Δc , Δd  ⊢ s₁ ] -> 
         [  Γ , Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpSeq s₁ s₂ ]
-    | type_NNRCimpLet Γ Δc Δd τ x e₁ s₂ :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishSeq s₁ s₂ ]
+    | type_NNRCimpishLet Γ Δc Δd τ x e₁ s₂ :
         [  Γ  ⊢ e₁ ▷ τ ] -> 
         [  (x,Some τ)::Γ , Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpLet x e₁ s₂ ]
-    | type_NNRCimpLetMutDef Γ Δc Δd τ x s₁ s₂ :
-        nnrc_imp_stmt_must_assign s₁ x ->
+        [  Γ , Δc , Δd  ⊢ NNRCimpishLet x e₁ s₂ ]
+    | type_NNRCimpishLetMutDef Γ Δc Δd τ x s₁ s₂ :
+        nnrc_impish_stmt_must_assign s₁ x ->
         [  Γ , Δc , (x,τ)::Δd  ⊢ s₁ ]  ->
         [  (x,Some τ)::Γ, Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpLetMut x s₁ s₂ ]
-    | type_NNRCimpLetMutNotUsed Γ Δc Δd x s₁ s₂ :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishLetMut x s₁ s₂ ]
+    | type_NNRCimpishLetMutNotUsed Γ Δc Δd x s₁ s₂ :
         [  Γ , Δc , (x,⊤)::Δd  ⊢ s₁ ]  ->
         [  (x,None)::Γ, Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpLetMut x s₁ s₂ ]
-    | type_NNRCimpLetMutColl Γ Δc Δd τ x s₁ s₂ :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishLetMut x s₁ s₂ ]
+    | type_NNRCimpishLetMutColl Γ Δc Δd τ x s₁ s₂ :
         [  Γ , (x,τ)::Δc , Δd  ⊢ s₁ ]  ->
         [  (x,Some (Coll τ))::Γ, Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpLetMutColl x s₁ s₂ ]
-    | type_NNRCimpAssign Γ Δc Δd τ τd x e :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishLetMutColl x s₁ s₂ ]
+    | type_NNRCimpishAssign Γ Δc Δd τ τd x e :
         [ Γ ⊢ e ▷ τ ] ->
         lookup string_dec Δd x = Some τd ->
         τ ≤ τd -> 
-        [  Γ , Δc , Δd  ⊢ NNRCimpAssign x e ]
-    | type_NNRCimpPush Γ Δc Δd τ τd x e :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishAssign x e ]
+    | type_NNRCimpishPush Γ Δc Δd τ τd x e :
         [ Γ ⊢ e ▷ τ ] ->
         lookup string_dec Δc x = Some τd ->
         τ ≤ τd -> 
-        [  Γ , Δc , Δd  ⊢ NNRCimpPush x e ]
-    | type_NNRCimpFor Γ Δc Δd τ x e₁ s₂ :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishPush x e ]
+    | type_NNRCimpishFor Γ Δc Δd τ x e₁ s₂ :
         [  Γ  ⊢ e₁ ▷ Coll τ ] -> 
         [  (x,Some τ)::Γ , Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpFor x e₁ s₂ ]
-    | type_NNRCimpIf Γ Δc Δd e s₁ s₂ :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishFor x e₁ s₂ ]
+    | type_NNRCimpishIf Γ Δc Δd e s₁ s₂ :
         [  Γ  ⊢ e ▷ Bool] -> 
         [  Γ , Δc , Δd  ⊢ s₁ ] -> 
         [  Γ , Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpIf e s₁ s₂ ]
-    | type_NNRCimpEither Γ Δc Δd τl τr e x₁ s₁ x₂ s₂ :
+        [  Γ , Δc , Δd  ⊢ NNRCimpishIf e s₁ s₂ ]
+    | type_NNRCimpishEither Γ Δc Δd τl τr e x₁ s₁ x₂ s₂ :
         [  Γ  ⊢ e ▷ Either τl τr] -> 
         [  (x₁,Some τl)::Γ , Δc , Δd  ⊢ s₁ ] -> 
         [  (x₂,Some τr)::Γ , Δc , Δd  ⊢ s₂ ]  ->
-        [  Γ , Δc , Δd  ⊢ NNRCimpEither e x₁ s₁ x₂ s₂ ]
+        [  Γ , Δc , Δd  ⊢ NNRCimpishEither e x₁ s₁ x₂ s₂ ]
     where
-    "[ Γ , Δc , Δd  ⊢ s ]" := (nnrc_imp_stmt_type Γ Δc  Δd s) : nnrc_imp
+    "[ Γ , Δc , Δd  ⊢ s ]" := (nnrc_impish_stmt_type Γ Δc  Δd s) : nnrc_impish
     .
 
-    Notation "[ Γ , Δc , Δd  ⊢ s ]" := (nnrc_imp_stmt_type Γ Δc  Δd s) : nnrc_imp.
+    Notation "[ Γ , Δc , Δd  ⊢ s ]" := (nnrc_impish_stmt_type Γ Δc  Δd s) : nnrc_impish.
   End typ.
 
-  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γc Γ e τ) : nnrc_imp.
-  Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrc_imp_stmt_type Γc Γ Δc  Δd s) : nnrc_imp.
+  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrc_impish_expr_type Γc Γ e τ) : nnrc_impish.
+  Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrc_impish_stmt_type Γc Γ Δc  Δd s) : nnrc_impish.
 
-  Local Open Scope nnrc_imp.
+  Local Open Scope nnrc_impish.
   
-  Definition nnrc_imp_type Γc (si:nnrc_imp) τ
+  Definition nnrc_impish_type Γc (si:nnrc_impish) τ
     := let (s, ret) := si in
        [ Γc ; nil , nil , (ret, τ)::nil  ⊢ s ].
 
-  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrc_imp_type Γc si τ) : nnrc_imp.
+  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrc_impish_type Γc si τ) : nnrc_impish.
 
   
-  Lemma typed_nnrc_imp_expr_yields_typed_data {σc Γc} {σ Γ} {e τ} :
+  Lemma typed_nnrc_impish_expr_yields_typed_data {σc Γc} {σ Γ} {e τ} :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
     [ Γc ; Γ  ⊢ e ▷ τ ] ->
     exists d,
-      nnrc_imp_expr_eval brand_relation_brands σc σ e = Some d
+      nnrc_impish_expr_eval brand_relation_brands σc σ e = Some d
       /\ d ▹ τ.
   Proof.
     intros Γctyp Γtyp etyp.
@@ -241,24 +241,24 @@ Section TNNRCimp.
   Qed.
 
   (* Computationally friendly version of this theorem *)
-  Theorem typed_nnrc_imp_expr_yields_typed_data_compute {σc Γc} {σ Γ} {e τ} :
+  Theorem typed_nnrc_impish_expr_yields_typed_data_compute {σc Γc} {σ Γ} {e τ} :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
     [ Γc ; Γ  ⊢ e ▷ τ ] ->
     {d |
-     nnrc_imp_expr_eval brand_relation_brands σc σ e = Some d
+     nnrc_impish_expr_eval brand_relation_brands σc σ e = Some d
      & d ▹ τ}.
   Proof.
     intros Γctyp Γtyp etyp.
-    generalize (typed_nnrc_imp_expr_yields_typed_data Γctyp Γtyp etyp); intros HH.
-    destruct (nnrc_imp_expr_eval brand_relation_brands σc σ e).
+    generalize (typed_nnrc_impish_expr_yields_typed_data Γctyp Γtyp etyp); intros HH.
+    destruct (nnrc_impish_expr_eval brand_relation_brands σc σ e).
     - exists d; destruct HH as [?[??]]; simpl; congruence.
     - cut False; [contradiction | ].
       destruct HH as [?[??]]; simpl; congruence.
   Defined.
 
-  Lemma nnrc_imp_stmt_md_preserves_some {s σc σ ψc ψd σ' ψc' ψd'} :
-    nnrc_imp_stmt_eval brand_relation_brands σc σ ψc ψd s =
+  Lemma nnrc_impish_stmt_md_preserves_some {s σc σ ψc ψd σ' ψc' ψd'} :
+    nnrc_impish_stmt_eval brand_relation_brands σc σ ψc ψd s =
     Some (σ', ψc', ψd') ->
     Forall2 (preserves_Some snd) ψd ψd'.
   Proof.
@@ -331,35 +331,35 @@ Section TNNRCimp.
       ; eauto.
   Qed.
 
-  Lemma nnrc_imp_stmt_md_preserves_some2 {s σc σ ψc ψd σ' ψc' ψd'} :
-    nnrc_imp_stmt_eval brand_relation_brands σc σ ψc ψd s =
+  Lemma nnrc_impish_stmt_md_preserves_some2 {s σc σ ψc ψd σ' ψc' ψd'} :
+    nnrc_impish_stmt_eval brand_relation_brands σc σ ψc ψd s =
     Some (σ', ψc', ψd') ->
     Forall2 (fun d1 d2 => fst d1 = fst d2 /\ flip (preserves_Some id) (snd d1) (snd d2)) ψd' ψd.
   Proof.
     intros eqq1.
-    generalize (nnrc_imp_stmt_md_preserves_some eqq1); intros F.
-    generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq1); intros domeq1.
+    generalize (nnrc_impish_stmt_md_preserves_some eqq1); intros F.
+    generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq1); intros domeq1.
     clear eqq1.
     induction F; simpl; trivial.
     invcs domeq1.
     constructor; eauto.
   Qed.
 
-  Lemma nnrc_imp_stmt_preserves_md_some_cons {s x σc σ ψc i ψd σ' ψc' o l} :
-    nnrc_imp_stmt_eval brand_relation_brands σc σ ψc ((x, Some i) :: ψd) s =
+  Lemma nnrc_impish_stmt_preserves_md_some_cons {s x σc σ ψc i ψd σ' ψc' o l} :
+    nnrc_impish_stmt_eval brand_relation_brands σc σ ψc ((x, Some i) :: ψd) s =
     Some (σ', ψc', (x, o) :: l) ->
     exists d, o = Some d.
   Proof.
     intros eqq.
-    generalize (nnrc_imp_stmt_md_preserves_some eqq); intros HH.
+    generalize (nnrc_impish_stmt_md_preserves_some eqq); intros HH.
     invcs HH.
     unfold preserves_Some in *.
     destruct o; simpl in *; eauto.
   Qed.
 
-  Lemma nnrc_imp_stmt_must_assign_assigns {s x σc σ ψc ψd σ' ψc' ψd'} :
-    nnrc_imp_stmt_must_assign s x ->
-    nnrc_imp_stmt_eval brand_relation_brands σc σ ψc ψd s =
+  Lemma nnrc_impish_stmt_must_assign_assigns {s x σc σ ψc ψd σ' ψc' ψd'} :
+    nnrc_impish_stmt_must_assign s x ->
+    nnrc_impish_stmt_eval brand_relation_brands σc σ ψc ψd s =
     Some (σ', ψc', ψd') ->
     In x (domain ψd) ->
     exists d, lookup string_dec ψd' x = Some (Some d).
@@ -368,7 +368,7 @@ Section TNNRCimp.
     induction s; simpl; intros σ ψc ψd σ' ψc' ψd' ma eqq1 inn; simpl.
     - match_option_in eqq1.
       destruct p as [[??]?].
-      generalize (nnrc_imp_stmt_md_preserves_some2 eqq1); intros F.
+      generalize (nnrc_impish_stmt_md_preserves_some2 eqq1); intros F.
       destruct ma.
       + destruct (IHs1 _ _ _ _ _ _ H eqq inn).
         destruct (Forall2_lookup_some F H0) as [dd [??]].
@@ -376,7 +376,7 @@ Section TNNRCimp.
         destruct (H2 _ (eq_refl _)); subst.
         eauto.
       + apply (IHs2 _ _ _ _ _ _ H eqq1).
-        generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq)
+        generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq)
         ; intros domeq1.
         congruence.
     - repeat match_option_in eqq1.
@@ -392,11 +392,11 @@ Section TNNRCimp.
       destruct p0 as [[??]?].
       destruct p0; try discriminate.
       invcs eqq1.
-      generalize (nnrc_imp_stmt_md_preserves_some2 eqq0); intros F.
+      generalize (nnrc_impish_stmt_md_preserves_some2 eqq0); intros F.
       destruct ma as [[neq ma]|ma].
       + destruct (IHs1 _ _ _ _ _ _ ma eqq); [simpl;eauto | ].
         simpl in H.
-        generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq)
+        generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq)
         ; intros domeq.
         simpl in domeq; invcs domeq.
         match_destr_in H.
@@ -406,7 +406,7 @@ Section TNNRCimp.
           destruct (H1 _ (eq_refl _)); subst.
           eauto.
       + apply (IHs2 _ _ _ _ _ _ ma eqq0).
-        generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq)
+        generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq)
         ; intros domeq1.
         simpl in domeq1; invcs domeq1.
         congruence.
@@ -418,7 +418,7 @@ Section TNNRCimp.
       destruct p0 as [[??]?].
       destruct p0; try discriminate.
       invcs eqq1.
-      generalize (nnrc_imp_stmt_md_preserves_some2 eqq0); intros F.
+      generalize (nnrc_impish_stmt_md_preserves_some2 eqq0); intros F.
       destruct ma as [ma|ma].
       + destruct (IHs1 _ _ _ _ _ _ ma eqq); [simpl;eauto | ].
         destruct (Forall2_lookup_some F H) as [dd [??]].
@@ -426,7 +426,7 @@ Section TNNRCimp.
         destruct (H1 _ (eq_refl _)); subst.
         eauto.
       + destruct (IHs2 _ _ _ _ _ _ ma eqq0); [simpl;eauto | ]; eauto.
-        generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq)
+        generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq)
         ; intros domeq1.
         simpl in domeq1; invcs domeq1.
         congruence.
@@ -451,14 +451,14 @@ Section TNNRCimp.
       ; eauto.
   Qed.
   
-  Lemma nnrc_imp_stmt_must_assign_assigns_cons {s x σc σ ψc i ψd σ' ψc' o l} :
-    nnrc_imp_stmt_must_assign s x ->
-    nnrc_imp_stmt_eval brand_relation_brands σc σ ψc ((x, i) :: ψd) s =
+  Lemma nnrc_impish_stmt_must_assign_assigns_cons {s x σc σ ψc i ψd σ' ψc' o l} :
+    nnrc_impish_stmt_must_assign s x ->
+    nnrc_impish_stmt_eval brand_relation_brands σc σ ψc ((x, i) :: ψd) s =
     Some (σ', ψc', (x, o) :: l) ->
     exists d, o = Some d.
   Proof.
     intros ma eqq1.
-    generalize (nnrc_imp_stmt_must_assign_assigns ma eqq1); simpl.
+    generalize (nnrc_impish_stmt_must_assign_assigns ma eqq1); simpl.
     intuition.
     destruct (string_dec x x); [ | congruence].
     destruct H as [? eqq2].
@@ -526,14 +526,14 @@ Section TNNRCimp.
 
   (** Main lemma for the type correctness of NNNRC *)
 
-  Theorem typed_nnrc_imp_stmt_yields_typed_data {σc σ ψc ψd} {Γc Γ Δc Δd}  (s:nnrc_imp_stmt) :
+  Theorem typed_nnrc_impish_stmt_yields_typed_data {σc σ ψc ψd} {Γc Γ Δc Δd}  (s:nnrc_impish_stmt) :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
     mc_bindings_type ψc Δc ->
     md_bindings_type ψd Δd ->
     [  Γc ; Γ , Δc , Δd  ⊢ s ] ->
     (exists σ' ψc' ψd',
-        (nnrc_imp_stmt_eval brand_relation_brands σc σ ψc ψd s) = Some (σ', ψc', ψd')
+        (nnrc_impish_stmt_eval brand_relation_brands σc σ ψc ψd s) = Some (σ', ψc', ψd')
         /\ pd_bindings_type σ' Γ
         /\ mc_bindings_type ψc' Δc
         /\ md_bindings_type ψd' Δd).
@@ -550,7 +550,7 @@ Section TNNRCimp.
       rewrite eqq2.
       do 3 eexists; split; try reflexivity.
       eauto. 
-    - destruct ( typed_nnrc_imp_expr_yields_typed_data typσc typσ H)
+    - destruct ( typed_nnrc_impish_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
       assert (typσcons:pd_bindings_type ((x,Some d)::σ) ((x, Some τ) :: Γ)).
@@ -570,7 +570,7 @@ Section TNNRCimp.
       unfold var in *; rewrite eqq1.
       invcs typψd' ; simpl in *.
       destruct x0; destruct H3; simpl in *; subst.
-      destruct (nnrc_imp_stmt_must_assign_assigns_cons H eqq1) as [d ?]
+      destruct (nnrc_impish_stmt_must_assign_assigns_cons H eqq1) as [d ?]
       ; subst.
       
       assert (typσcons:pd_bindings_type ((x,Some d)::σ') ((x, Some τ) :: Γ)).
@@ -616,7 +616,7 @@ Section TNNRCimp.
       invcs typσ''.
       do 3 eexists; split; try reflexivity.
       eauto.
-    - destruct ( typed_nnrc_imp_expr_yields_typed_data typσc typσ H)
+    - destruct ( typed_nnrc_impish_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
       destruct (md_bindings_type_lookup_back typψd H0) as [? [eqq1 ?]].
@@ -625,7 +625,7 @@ Section TNNRCimp.
       intuition.
       eapply md_bindings_type_update_first_same; eauto.
       rewrite <- H1; trivial.
-    - destruct ( typed_nnrc_imp_expr_yields_typed_data typσc typσ H)
+    - destruct ( typed_nnrc_impish_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
       destruct (mc_bindings_type_lookup_back typψc H0) as [dd [eqq1 typdd]].
@@ -636,7 +636,7 @@ Section TNNRCimp.
       apply Forall_app; trivial.
       constructor; trivial.
       rewrite <- H1; trivial.
-    - destruct ( typed_nnrc_imp_expr_yields_typed_data typσc typσ H)
+    - destruct ( typed_nnrc_impish_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
       invcs typd; rtype_equalizer; subst.
@@ -657,7 +657,7 @@ Section TNNRCimp.
         unfold var in *; rewrite eqq2.
         do 3 eexists; split; try reflexivity.
         eauto.
-    - destruct ( typed_nnrc_imp_expr_yields_typed_data typσc typσ H)
+    - destruct ( typed_nnrc_impish_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
       invcs typd.
@@ -672,7 +672,7 @@ Section TNNRCimp.
         ; unfold var in *; rewrite eqq2.
         do 3 eexists; split; try reflexivity
         ; eauto.
-    - destruct ( typed_nnrc_imp_expr_yields_typed_data typσc typσ H)
+    - destruct ( typed_nnrc_impish_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
       invcs typd; rtype_equalizer; subst.
@@ -694,16 +694,16 @@ Section TNNRCimp.
         ; eauto.
   Qed.
 
-  Theorem typed_nnrc_imp_yields_typed_data {σc} {Γc} {τ} {si:nnrc_imp}:
+  Theorem typed_nnrc_impish_yields_typed_data {σc} {Γc} {τ} {si:nnrc_impish}:
     bindings_type σc Γc ->
     [ Γc ⊢ si ▷ τ ] ->
     exists o,
-      nnrc_imp_eval brand_relation_brands σc si = Some o
+      nnrc_impish_eval brand_relation_brands σc si = Some o
       /\ forall d, o = Some d -> d ▹ τ.
   Proof.
     destruct si as [q ret]; simpl.
     intros typσc typq.
-    destruct (@typed_nnrc_imp_stmt_yields_typed_data
+    destruct (@typed_nnrc_impish_stmt_yields_typed_data
                 σc nil nil [(ret, None)]
                 Γc nil nil [(ret, τ)] q)
       as [σ' [ψc' [ψd' [eqq1 [typσ' [typψc' typψd']]]]]]
@@ -717,60 +717,60 @@ Section TNNRCimp.
       intros; subst; intuition.
   Qed.
 
-  Theorem typed_nnrc_imp_yields_typed_data_used {σc} {Γc} {τ} {si:nnrc_imp}:
-    nnrc_imp_stmt_must_assign (fst si) (snd si) ->
+  Theorem typed_nnrc_impish_yields_typed_data_used {σc} {Γc} {τ} {si:nnrc_impish}:
+    nnrc_impish_stmt_must_assign (fst si) (snd si) ->
     bindings_type σc Γc ->
     [ Γc ⊢ si ▷ τ ] ->
     exists d,
-      nnrc_imp_eval brand_relation_brands σc si = Some (Some d)
+      nnrc_impish_eval brand_relation_brands σc si = Some (Some d)
       /\ d ▹ τ.
   Proof.
     intros.
-    destruct (typed_nnrc_imp_yields_typed_data H0 H1) as [d [eqq1 typ]].
+    destruct (typed_nnrc_impish_yields_typed_data H0 H1) as [d [eqq1 typ]].
     rewrite eqq1.
     destruct si.
-    unfold nnrc_imp_eval in eqq1.
+    unfold nnrc_impish_eval in eqq1.
     match_option_in eqq1.
     destruct p as [[??]?].
     destruct m1; try discriminate.
     destruct p0.
     invcs eqq1.
-    generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq)
+    generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq)
     ; intros domeq1.
     simpl in domeq1; invcs domeq1.
     symmetry in H4; apply domain_nil in H4; subst.
-    destruct (nnrc_imp_stmt_must_assign_assigns H eqq) as [dd inn];
+    destruct (nnrc_impish_stmt_must_assign_assigns H eqq) as [dd inn];
       simpl in *; try tauto.
     match_destr_in inn.
     invcs inn.
     eauto.
   Qed.
 
-  Theorem typed_nnrc_imp_top_yields_typed_data {σc} {Γc} {τ} {si:nnrc_imp}:
+  Theorem typed_nnrc_impish_top_yields_typed_data {σc} {Γc} {τ} {si:nnrc_impish}:
     bindings_type σc Γc ->
     [ rec_sort Γc ⊢ si ▷ τ ] ->
     forall d, 
-      nnrc_imp_eval_top brand_relation_brands σc si = Some d
+      nnrc_impish_eval_top brand_relation_brands σc si = Some d
       -> d ▹ τ.
     Proof.
       intros bt typ.
-      destruct (typed_nnrc_imp_yields_typed_data (bindings_type_sort _ _ bt) typ)
+      destruct (typed_nnrc_impish_yields_typed_data (bindings_type_sort _ _ bt) typ)
                as [o [eqq dtyp]].
-      unfold nnrc_imp_eval_top.
+      unfold nnrc_impish_eval_top.
       rewrite eqq; unfold id; simpl; tauto.
     Qed.
 
-    Theorem typed_nnrc_imp_top_yields_typed_data_used {σc} {Γc} {τ} {si:nnrc_imp}:
-    nnrc_imp_stmt_must_assign (fst si) (snd si) ->
+    Theorem typed_nnrc_impish_top_yields_typed_data_used {σc} {Γc} {τ} {si:nnrc_impish}:
+    nnrc_impish_stmt_must_assign (fst si) (snd si) ->
     bindings_type σc Γc ->
     [ rec_sort Γc ⊢ si ▷ τ ] ->
     exists d,
-      nnrc_imp_eval_top brand_relation_brands σc si = Some d
+      nnrc_impish_eval_top brand_relation_brands σc si = Some d
       /\ d ▹ τ.
     Proof.
       intros ma bt typ.
-      destruct (typed_nnrc_imp_yields_typed_data_used ma (bindings_type_sort _ _ bt) typ) as [o [eqq dtyp]].
-      unfold nnrc_imp_eval_top.
+      destruct (typed_nnrc_impish_yields_typed_data_used ma (bindings_type_sort _ _ bt) typ) as [o [eqq dtyp]].
+      unfold nnrc_impish_eval_top.
       rewrite eqq; unfold id; simpl.
       eauto.
     Qed.
@@ -779,7 +779,7 @@ Section TNNRCimp.
     (* restates type soundness theorems in terms of the semantics.  
        This enables nicer notation :-) *)
 
-    Theorem typed_nnrc_imp_yields_typed_data_sem {σc} {Γc} {τ} {si:nnrc_imp}:
+    Theorem typed_nnrc_impish_yields_typed_data_sem {σc} {Γc} {τ} {si:nnrc_impish}:
       bindings_type σc Γc ->
       [ Γc ⊢ si ▷ τ ] ->
       exists o,
@@ -787,14 +787,14 @@ Section TNNRCimp.
         /\ forall d, o = Some d -> d ▹ τ.
     Proof.
       intros typΓc typsi.
-      destruct (typed_nnrc_imp_yields_typed_data typΓc typsi)
+      destruct (typed_nnrc_impish_yields_typed_data typΓc typsi)
         as [o [ev F]].
-      apply nnrc_imp_sem_eval in ev.
+      apply nnrc_impish_sem_eval in ev.
       eauto.
     Qed.
 
-    Theorem typed_nnrc_imp_yields_typed_data_used_sem {σc} {Γc} {τ} {si:nnrc_imp}:
-      nnrc_imp_stmt_must_assign (fst si) (snd si) ->
+    Theorem typed_nnrc_impish_yields_typed_data_used_sem {σc} {Γc} {τ} {si:nnrc_impish}:
+      nnrc_impish_stmt_must_assign (fst si) (snd si) ->
       bindings_type σc Γc ->
       [ Γc ⊢ si ▷ τ ] ->
       exists d,
@@ -802,18 +802,18 @@ Section TNNRCimp.
         /\ d ▹ τ.
     Proof.
       intros ma typΓc typsi.
-      destruct (typed_nnrc_imp_yields_typed_data_used ma typΓc typsi)
+      destruct (typed_nnrc_impish_yields_typed_data_used ma typΓc typsi)
         as [o [ev F]].
-      apply nnrc_imp_sem_eval in ev.
+      apply nnrc_impish_sem_eval in ev.
       eauto.
     Qed.
   End sem.
   
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrc_imp_expr_type_lookup_equiv_prop {m:basic_model} :
-    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_imp_expr_type.
+  Global Instance nnrc_impish_expr_type_lookup_equiv_prop {m:basic_model} :
+    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_impish_expr_type.
   Proof.
-    cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrc_imp_expr_type);
+    cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrc_impish_expr_type);
       unfold Proper, respectful, lookup_equiv, iff, impl; intros; subst;
         [intuition; eauto | ].
     rename y1 into e.
@@ -825,12 +825,12 @@ Section TNNRCimp.
     rewrite <- H0; trivial.
   Qed.
 
-  Global Instance nnrc_imp_stmt_type_lookup_equiv_prop :
-    Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> iff) nnrc_imp_stmt_type.
+  Global Instance nnrc_impish_stmt_type_lookup_equiv_prop :
+    Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> iff) nnrc_impish_stmt_type.
   Proof.
-    Hint Constructors nnrc_imp_stmt_type.
+    Hint Constructors nnrc_impish_stmt_type.
     
-    cut (Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> impl) nnrc_imp_stmt_type)
+    cut (Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> impl) nnrc_impish_stmt_type)
     ; unfold Proper, respectful, iff, impl; intros; subst;
       [unfold lookup_equiv in *; intuition; eauto | ].
     rename y3 into s.
@@ -862,8 +862,8 @@ Section TNNRCimp.
       + rewrite <- Δceqq; eauto.
   Qed.
   
-End TNNRCimp.
+End TNNRCimpish.
 
-Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γc Γ e τ) : nnrc_imp.
-Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrc_imp_stmt_type Γc Γ Δc  Δd s) : nnrc_imp.
-Notation "[ h, Γc ⊢ si ▷ τ ]" := (nnrc_imp_type Γc si τ) : nnrc_imp.
+Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrc_impish_expr_type Γc Γ e τ) : nnrc_impish.
+Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrc_impish_stmt_type Γc Γ Δc  Δd s) : nnrc_impish.
+Notation "[ h, Γc ⊢ si ▷ τ ]" := (nnrc_impish_type Γc si τ) : nnrc_impish.

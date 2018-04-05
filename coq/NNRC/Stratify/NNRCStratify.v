@@ -16,7 +16,7 @@
 
 (* NNRC is an expression oriented language.  
    We want to be able to compile it to statement oriented languages like
-   nnrc_imp.  As an inbetween step, we can stratify the language, 
+   nnrc_impish.  As an inbetween step, we can stratify the language, 
    separating expressions and statements.
  *)
 

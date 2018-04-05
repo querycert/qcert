@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCtoNNRCimp.
+Section NNRCtoNNRCimpish.
   Require Import String.
   Require Import List.
   Require Import Bool.
@@ -29,7 +29,7 @@ Section NNRCtoNNRCimp.
   Require Import NNRC.
   Require Import cNNRCNorm.
   Require Import cNNRCVars.
-  Require Import NNRCimpRuntime.
+  Require Import NNRCimpishRuntime.
   Require Import NNRCStratify.
   Require Import Fresh.
 
@@ -37,28 +37,28 @@ Section NNRCtoNNRCimp.
 
   Section from_stratified.
 
-    Fixpoint nnrc_expr_to_nnrc_imp_expr (e: nnrc) :
-      option nnrc_imp_expr
+    Fixpoint nnrc_expr_to_nnrc_impish_expr (e: nnrc) :
+      option nnrc_impish_expr
       := match e with
-         | NNRCGetConstant c => Some (NNRCimpGetConstant c)
-         | NNRCVar x => Some (NNRCimpVar x)
-         | NNRCConst d => Some (NNRCimpConst d)
+         | NNRCGetConstant c => Some (NNRCimpishGetConstant c)
+         | NNRCVar x => Some (NNRCimpishVar x)
+         | NNRCConst d => Some (NNRCimpishConst d)
          | NNRCBinop b e1 e2 =>
-           lift2 (NNRCimpBinop b)
-                 (nnrc_expr_to_nnrc_imp_expr e1)
-                 (nnrc_expr_to_nnrc_imp_expr e2)
+           lift2 (NNRCimpishBinop b)
+                 (nnrc_expr_to_nnrc_impish_expr e1)
+                 (nnrc_expr_to_nnrc_impish_expr e2)
          | NNRCUnop u e1 =>
-           lift (NNRCimpUnop u)
-                (nnrc_expr_to_nnrc_imp_expr e1)
+           lift (NNRCimpishUnop u)
+                (nnrc_expr_to_nnrc_impish_expr e1)
          | NNRCGroupBy s ls e1 =>
-           lift (NNRCimpGroupBy s ls)
-                (nnrc_expr_to_nnrc_imp_expr e1)
+           lift (NNRCimpishGroupBy s ls)
+                (nnrc_expr_to_nnrc_impish_expr e1)
          | _ => None
          end.
 
-    Lemma nnrc_expr_to_nnrc_imp_expr_stratified_some e :
+    Lemma nnrc_expr_to_nnrc_impish_expr_stratified_some e :
       stratifiedLevel nnrcExpr e  ->
-      { e' | nnrc_expr_to_nnrc_imp_expr e = Some e'}.
+      { e' | nnrc_expr_to_nnrc_impish_expr e = Some e'}.
     Proof.
       induction e; simpl; intuition; eauto 2; try discriminate.
       - destruct H; destruct H2.
@@ -69,9 +69,9 @@ Section NNRCtoNNRCimp.
         simpl; eauto.
     Defined.
 
-    Definition stratified_nnrc_expr_to_nnrc_imp_expr (e:nnrc)
-               (strate:stratifiedLevel nnrcExpr e) : nnrc_imp_expr
-      := proj1_sig (nnrc_expr_to_nnrc_imp_expr_stratified_some e strate).
+    Definition stratified_nnrc_expr_to_nnrc_impish_expr (e:nnrc)
+               (strate:stratifiedLevel nnrcExpr e) : nnrc_impish_expr
+      := proj1_sig (nnrc_expr_to_nnrc_impish_expr_stratified_some e strate).
 
     Definition pd_bindings_lift (σ:bindings) : pd_bindings
       := map_codomain Some σ.
@@ -82,10 +82,10 @@ Section NNRCtoNNRCimp.
       apply lookup_map_codomain.
     Qed.
 
-    Lemma nnrc_expr_to_nnrc_imp_expr_some_correct (e:nnrc) (ei:nnrc_imp_expr) :
-      nnrc_expr_to_nnrc_imp_expr e = Some ei ->
+    Lemma nnrc_expr_to_nnrc_impish_expr_some_correct (e:nnrc) (ei:nnrc_impish_expr) :
+      nnrc_expr_to_nnrc_impish_expr e = Some ei ->
       forall h σc σ,
-        @nnrc_eval _ h σc σ e = nnrc_imp_expr_eval h σc (pd_bindings_lift σ) ei.
+        @nnrc_eval _ h σc σ e = nnrc_impish_expr_eval h σc (pd_bindings_lift σ) ei.
     Proof.
       revert ei.
       unfold nnrc_eval.
@@ -105,7 +105,7 @@ Section NNRCtoNNRCimp.
         apply some_lift in eqq.
         destruct eqq as [??]; subst.
         simpl nnrc_to_nnrc_base.
-        simpl nnrc_imp_expr_eval.
+        simpl nnrc_impish_expr_eval.
         rewrite <- (IHe _ e0).
         case_eq (nnrc_core_eval h σc σ (nnrc_to_nnrc_base e));
           [intros ? eqq | intros eqq].
@@ -115,13 +115,13 @@ Section NNRCtoNNRCimp.
           rewrite eqq; trivial.
     Qed.
 
-    Corollary nnrc_expr_to_nnrc_imp_expr_some_correct'
-              (e:nnrc) (ei:nnrc_imp_expr) :
-      nnrc_expr_to_nnrc_imp_expr e = Some ei ->
+    Corollary nnrc_expr_to_nnrc_impish_expr_some_correct'
+              (e:nnrc) (ei:nnrc_impish_expr) :
+      nnrc_expr_to_nnrc_impish_expr e = Some ei ->
       forall h σc σ,
-        @nnrc_core_eval _ h σc σ (nnrc_to_nnrc_base e) = nnrc_imp_expr_eval h σc (pd_bindings_lift σ) ei.
+        @nnrc_core_eval _ h σc σ (nnrc_to_nnrc_base e) = nnrc_impish_expr_eval h σc (pd_bindings_lift σ) ei.
     Proof.
-      apply nnrc_expr_to_nnrc_imp_expr_some_correct.
+      apply nnrc_expr_to_nnrc_impish_expr_some_correct.
     Qed.
 
     Inductive terminator :=
@@ -129,51 +129,51 @@ Section NNRCtoNNRCimp.
     | Term_push : var -> terminator
     .
 
-    Definition terminate (terminator: terminator) (e: nnrc_imp_expr) :=
+    Definition terminate (terminator: terminator) (e: nnrc_impish_expr) :=
       match terminator with
-      | Term_assign result => NNRCimpAssign result e
-      | Term_push result => NNRCimpPush result e
+      | Term_assign result => NNRCimpishAssign result e
+      | Term_push result => NNRCimpishPush result e
       end.
 
-    Fixpoint nnrc_stmt_to_nnrc_imp_stmt_aux (fvs: list var) (terminator: terminator) (stmt: nnrc) :
-      option nnrc_imp_stmt
+    Fixpoint nnrc_stmt_to_nnrc_impish_stmt_aux (fvs: list var) (terminator: terminator) (stmt: nnrc) :
+      option nnrc_impish_stmt
       := match stmt with
          | NNRCLet v s1 s2 =>
-           match nnrc_stmt_to_nnrc_imp_stmt_aux fvs (Term_assign v) s1,
-                 nnrc_stmt_to_nnrc_imp_stmt_aux fvs terminator s2
+           match nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_assign v) s1,
+                 nnrc_stmt_to_nnrc_impish_stmt_aux fvs terminator s2
            with
            | Some s1', Some s2' =>
-             Some (NNRCimpLetMut v s1' s2')
+             Some (NNRCimpishLetMut v s1' s2')
            | _, _ => None
            end
          | NNRCFor v e s =>
            let tmp := fresh_var "tmp" fvs in
-           match nnrc_expr_to_nnrc_imp_expr e,
-                 nnrc_stmt_to_nnrc_imp_stmt_aux (tmp::fvs) (Term_push tmp) s
+           match nnrc_expr_to_nnrc_impish_expr e,
+                 nnrc_stmt_to_nnrc_impish_stmt_aux (tmp::fvs) (Term_push tmp) s
            with
            | Some e', Some s' =>
-             Some (NNRCimpLetMutColl
+             Some (NNRCimpishLetMutColl
                      tmp
-                     (NNRCimpFor v e' s')
-                     (terminate terminator (NNRCimpVar tmp)))
+                     (NNRCimpishFor v e' s')
+                     (terminate terminator (NNRCimpishVar tmp)))
            | _, _ => None
            end
          | NNRCIf e s1 s2 =>
-           match nnrc_expr_to_nnrc_imp_expr e,
-                 nnrc_stmt_to_nnrc_imp_stmt_aux fvs terminator s1,
-                 nnrc_stmt_to_nnrc_imp_stmt_aux fvs terminator s2
+           match nnrc_expr_to_nnrc_impish_expr e,
+                 nnrc_stmt_to_nnrc_impish_stmt_aux fvs terminator s1,
+                 nnrc_stmt_to_nnrc_impish_stmt_aux fvs terminator s2
            with
            | Some e', Some s1', Some s2' =>
-             Some (NNRCimpIf e' s1' s2')
+             Some (NNRCimpishIf e' s1' s2')
            | _, _, _ => None
            end
          | NNRCEither e x1 s1 x2 s2 =>
-           match nnrc_expr_to_nnrc_imp_expr e,
-                 nnrc_stmt_to_nnrc_imp_stmt_aux fvs terminator s1,
-                 nnrc_stmt_to_nnrc_imp_stmt_aux fvs terminator s2
+           match nnrc_expr_to_nnrc_impish_expr e,
+                 nnrc_stmt_to_nnrc_impish_stmt_aux fvs terminator s1,
+                 nnrc_stmt_to_nnrc_impish_stmt_aux fvs terminator s2
            with
            | Some e', Some s1', Some s2' =>
-             Some (NNRCimpEither e' x1 s1' x2 s2')
+             Some (NNRCimpishEither e' x1 s1' x2 s2')
            | _, _, _ => None
            end
          | NNRCGroupBy _ _ _
@@ -182,89 +182,89 @@ Section NNRCtoNNRCimp.
          | NNRCConst _
          | NNRCBinop _ _ _
          | NNRCUnop _ _ =>
-           match nnrc_expr_to_nnrc_imp_expr stmt with
+           match nnrc_expr_to_nnrc_impish_expr stmt with
            | Some e => Some (terminate terminator e)
            | None => None
            end
          end.
 
-    Definition nnrc_stmt_to_nnrc_imp (globals: list var) (stmt: nnrc) :
-      option (nnrc_imp_stmt * var)
+    Definition nnrc_stmt_to_nnrc_impish (globals: list var) (stmt: nnrc) :
+      option (nnrc_impish_stmt * var)
       :=
         let fvs := globals ++ nnrc_bound_vars stmt in
         let ret := fresh_var "ret" fvs in
-        match nnrc_stmt_to_nnrc_imp_stmt_aux (ret::fvs) (Term_assign ret) stmt with
+        match nnrc_stmt_to_nnrc_impish_stmt_aux (ret::fvs) (Term_assign ret) stmt with
         | Some stmt => Some (stmt, ret)
         | None => None
         end.
 
-    Definition nnrc_stratified_to_nnrc_imp_top (globals: list var) (q: nnrc) :
-      option nnrc_imp
+    Definition nnrc_stratified_to_nnrc_impish_top (globals: list var) (q: nnrc) :
+      option nnrc_impish
       :=
-        nnrc_stmt_to_nnrc_imp globals q.
+        nnrc_stmt_to_nnrc_impish globals q.
 
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some fvs term s :
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_aux_stratified_some fvs term s :
       stratifiedLevel nnrcStmt s  ->
-      { s' | nnrc_stmt_to_nnrc_imp_stmt_aux fvs term s = Some s'}.
+      { s' | nnrc_stmt_to_nnrc_impish_stmt_aux fvs term s = Some s'}.
     Proof.
       revert fvs term;
         induction s; intros fvs term; simpl; intuition; eauto 2; try discriminate
-        ; try unfold nnrc_stmt_to_nnrc_imp_stmt; simpl; eauto 2.
-      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H0) as [e1 eqe1].
-        destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H1) as [e2 eqe2].
+        ; try unfold nnrc_stmt_to_nnrc_impish_stmt; simpl; eauto 2.
+      - destruct (nnrc_expr_to_nnrc_impish_expr_stratified_some _ H0) as [e1 eqe1].
+        destruct (nnrc_expr_to_nnrc_impish_expr_stratified_some _ H1) as [e2 eqe2].
         rewrite eqe1, eqe2; simpl.
         eauto 2.
-      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e eqe].
+      - destruct (nnrc_expr_to_nnrc_impish_expr_stratified_some _ H) as [e eqe].
         rewrite eqe; simpl.
         eauto 2.
       - destruct (IHs1 fvs (Term_assign v) H)  as [s1' eqs1'].
         destruct (IHs2 fvs term H2)  as [s2' eqs2'].
         rewrite eqs1', eqs2'; simpl.
         eauto 2.
-      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e1 eqe1].
+      - destruct (nnrc_expr_to_nnrc_impish_expr_stratified_some _ H) as [e1 eqe1].
         destruct (IHs2 (fresh_var "tmp" fvs :: fvs)
                        (Term_push (fresh_var "tmp" fvs)) H2)  as [s1' eqs1'].
         rewrite eqe1, eqs1'; simpl.
         eauto 2.
-      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e1 eqe1].
+      - destruct (nnrc_expr_to_nnrc_impish_expr_stratified_some _ H) as [e1 eqe1].
         destruct (IHs2 fvs term H1)  as [s2' eqs2'].
         destruct (IHs3 fvs term H3)  as [s3' eqs3'].
         rewrite eqe1, eqs2', eqs3'; simpl.
         eauto 2.
-      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H) as [e1 eqe1].
+      - destruct (nnrc_expr_to_nnrc_impish_expr_stratified_some _ H) as [e1 eqe1].
         destruct (IHs2 fvs term H1)  as [s2' eqs2'].
         destruct (IHs3 fvs term H3)  as [s3' eqs3'].
         rewrite eqe1, eqs2', eqs3'; simpl.
         eauto 2.
-      - destruct (nnrc_expr_to_nnrc_imp_expr_stratified_some _ H1) as [e1 eqe1].
+      - destruct (nnrc_expr_to_nnrc_impish_expr_stratified_some _ H1) as [e1 eqe1].
         rewrite eqe1; simpl.
         eauto 2.
     Defined.
 
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s :
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_stratified_some fvs s :
       stratifiedLevel nnrcStmt s  ->
-      { s' | nnrc_stmt_to_nnrc_imp fvs s = Some s'}.
+      { s' | nnrc_stmt_to_nnrc_impish fvs s = Some s'}.
     Proof.
-      case_eq (nnrc_stmt_to_nnrc_imp fvs s).
+      case_eq (nnrc_stmt_to_nnrc_impish fvs s).
       - eauto.
-      - unfold nnrc_stmt_to_nnrc_imp.
+      - unfold nnrc_stmt_to_nnrc_impish.
         intros cpf strats.
-        destruct (nnrc_stmt_to_nnrc_imp_stmt_aux_stratified_some
+        destruct (nnrc_stmt_to_nnrc_impish_stmt_aux_stratified_some
                     ((fresh_var "ret" (fvs ++ nnrc_bound_vars s))::fvs ++ nnrc_bound_vars s)
                     (Term_assign (fresh_var "ret" (fvs ++ nnrc_bound_vars s))) _ strats) as [s' eqs'].
         rewrite eqs' in cpf.
         eauto 2.
     Defined.
     
-    Definition stratified_nnrc_stmt_to_nnrc_imp fvs (s:nnrc)
-               (strats:stratifiedLevel nnrcStmt s) : nnrc_imp
-      := proj1_sig (nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s strats).
+    Definition stratified_nnrc_stmt_to_nnrc_impish fvs (s:nnrc)
+               (strats:stratifiedLevel nnrcStmt s) : nnrc_impish
+      := proj1_sig (nnrc_stmt_to_nnrc_impish_stmt_stratified_some fvs s strats).
 
-    Definition nnrc_to_nnrc_imp_top (globals: list var) (q: nnrc) :
-      nnrc_imp
+    Definition nnrc_to_nnrc_impish_top (globals: list var) (q: nnrc) :
+      nnrc_impish
       := let nnrc_stratified := NNRCStratify.stratify q in
          let nnrc_stratified_pf := NNRCStratify.stratify_stratified q in
-         stratified_nnrc_stmt_to_nnrc_imp globals nnrc_stratified nnrc_stratified_pf.
+         stratified_nnrc_stmt_to_nnrc_impish globals nnrc_stratified nnrc_stratified_pf.
 
     (* Given a terminator and the returned states, 
        determine what value was computed by the statement 
@@ -295,21 +295,21 @@ Section NNRCtoNNRCimp.
       | Term_push v => In v (domain mc)
       end.
     
-    Lemma nnrc_imp_stmt_eval_terminator h σc pd mc md term e :
+    Lemma nnrc_impish_stmt_eval_terminator h σc pd mc md term e :
       safe_terminator_result term mc md ->
-      match nnrc_imp_stmt_eval h σc pd mc md (terminate term e) with
+      match nnrc_impish_stmt_eval h σc pd mc md (terminate term e) with
       | Some (pd', mc', md') =>
         match get_terminator_result term mc' md' with
-        | Some res => nnrc_imp_expr_eval h σc pd e = Some res
+        | Some res => nnrc_impish_expr_eval h σc pd e = Some res
         | None => False
         end
-      | None => nnrc_imp_expr_eval h σc pd e = None
+      | None => nnrc_impish_expr_eval h σc pd e = None
       end.
     Proof.
       destruct term; simpl; intros inn;
         destruct (in_dom_lookup string_dec inn) as [dd eqdd];
         rewrite eqdd
-        ; destruct (nnrc_imp_expr_eval h σc pd e); simpl; trivial
+        ; destruct (nnrc_impish_expr_eval h σc pd e); simpl; trivial
         ; replace string_dec with
               (@equiv_dec string (@eq string) (@eq_equivalence string) string_eqdec) by trivial
         ;  rewrite lookup_update_eq_in by trivial
@@ -317,9 +317,9 @@ Section NNRCtoNNRCimp.
       rewrite rev_app_distr; simpl; trivial.
     Qed.
 
-    Lemma nnrc_expr_to_nnrc_imp_expr_free_vars e ei :
-      nnrc_expr_to_nnrc_imp_expr e = Some ei ->
-      nnrc_free_vars e = nnrc_imp_expr_free_vars ei.
+    Lemma nnrc_expr_to_nnrc_impish_expr_free_vars e ei :
+      nnrc_expr_to_nnrc_impish_expr e = Some ei ->
+      nnrc_free_vars e = nnrc_impish_expr_free_vars ei.
     Proof.
       revert ei.
       induction e; simpl; intros ei eqq; invcs eqq; simpl; trivial.
@@ -346,14 +346,14 @@ Section NNRCtoNNRCimp.
          ; invcs ev
          ; eauto.
     
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_push1_assign_eq_mc 
-          s {si:nnrc_imp_stmt} {h σc pd mc md pd' mc' md'}:
-      nnrc_imp_stmt_eval h σc pd mc md si = Some (pd', mc', md') ->
-      (forall x fvs, nnrc_stmt_to_nnrc_imp_stmt_aux fvs (Term_push x) s = Some si ->
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_aux_push1_assign_eq_mc 
+          s {si:nnrc_impish_stmt} {h σc pd mc md pd' mc' md'}:
+      nnrc_impish_stmt_eval h σc pd mc md si = Some (pd', mc', md') ->
+      (forall x fvs, nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_push x) s = Some si ->
                      forall mc2 old, mc = (x,old)::mc2 ->
                                      exists n, mc' = ((x,old++n::nil)::mc2))
       /\ 
-      (forall x fvs, nnrc_stmt_to_nnrc_imp_stmt_aux fvs (Term_assign x) s = Some si ->
+      (forall x fvs, nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_assign x) s = Some si ->
                      mc' = mc).
     Proof.
       revert si pd mc md pd' mc' md'.
@@ -362,9 +362,9 @@ Section NNRCtoNNRCimp.
         (split; intros x fvs eqsi
          ; [ intros mc2 old ?; subst; rename mc2 into mc | ])
         ; simpl in eqsi; invcs eqsi
-        ; try solve [unfold nnrc_imp_stmt_eval in ev
+        ; try solve [unfold nnrc_impish_stmt_eval in ev
                      ; expr_push_finisher ev x
-                    | unfold nnrc_imp_stmt_eval in ev
+                    | unfold nnrc_impish_stmt_eval in ev
                       ; repeat match_destr_in ev
                       ; invcs ev; trivial].
       - Case "NNRCBinop".
@@ -453,7 +453,7 @@ Section NNRCtoNNRCimp.
                   match dl with
                   | nil => Some (σ₁, ψc₁, ψd₁)
                   | d :: dl' =>
-                    match nnrc_imp_stmt_eval h σc ((v, Some d) :: σ₁) ψc₁ ψd₁ n0 with
+                    match nnrc_impish_stmt_eval h σc ((v, Some d) :: σ₁) ψc₁ ψd₁ n0 with
                     | Some (nil, _, _) => None
                     | Some (_ :: σ₂, ψc₂, ψd₂) => for_fun dl' σ₂ ψc₂ ψd₂
                     | None => None
@@ -521,7 +521,7 @@ Section NNRCtoNNRCimp.
                   match dl with
                   | nil => Some (σ₁, ψc₁, ψd₁)
                   | d :: dl' =>
-                    match nnrc_imp_stmt_eval h σc ((v, Some d) :: σ₁) ψc₁ ψd₁ n0 with
+                    match nnrc_impish_stmt_eval h σc ((v, Some d) :: σ₁) ψc₁ ψd₁ n0 with
                     | Some (nil, _, _) => None
                     | Some (_ :: σ₂, ψc₂, ψd₂) => for_fun dl' σ₂ ψc₂ ψd₂
                     | None => None
@@ -603,48 +603,48 @@ Section NNRCtoNNRCimp.
       - Case "NNRCGroupBy".
         match_option_in H0.
         invcs H0.
-        unfold nnrc_imp_stmt_eval in ev.
+        unfold nnrc_impish_stmt_eval in ev.
         expr_push_finisher ev x.
       - Case "NNRCGroupBy".
         match_option_in H0.
         invcs H0.
-        unfold nnrc_imp_stmt_eval in ev.
+        unfold nnrc_impish_stmt_eval in ev.
         repeat match_destr_in ev.
         invcs ev; trivial.
     Qed.
 
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_assign_eq 
-          {s:nnrc} {fvs} {si:nnrc_imp_stmt} {h σc pd mc md x pd' mc' md'}:
-      nnrc_imp_stmt_eval h σc pd mc md si = Some (pd', mc', md') ->
-      nnrc_stmt_to_nnrc_imp_stmt_aux fvs (Term_assign x) s = Some si ->
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_aux_assign_eq 
+          {s:nnrc} {fvs} {si:nnrc_impish_stmt} {h σc pd mc md x pd' mc' md'}:
+      nnrc_impish_stmt_eval h σc pd mc md si = Some (pd', mc', md') ->
+      nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_assign x) s = Some si ->
       mc' = mc.
     Proof.
       intros eqsi ev.
-      destruct (nnrc_stmt_to_nnrc_imp_stmt_aux_push1_assign_eq_mc s eqsi).
+      destruct (nnrc_stmt_to_nnrc_impish_stmt_aux_push1_assign_eq_mc s eqsi).
       eauto.
     Qed.
     
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_push1 
-          {s:nnrc} {fvs} {si:nnrc_imp_stmt} {h σc pd mc md x pd' mc' md' old}:
-      nnrc_imp_stmt_eval h σc pd ((x,old)::mc) md si = Some (pd', mc', md') ->
-      nnrc_stmt_to_nnrc_imp_stmt_aux fvs (Term_push x) s = Some si ->
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_aux_push1 
+          {s:nnrc} {fvs} {si:nnrc_impish_stmt} {h σc pd mc md x pd' mc' md' old}:
+      nnrc_impish_stmt_eval h σc pd ((x,old)::mc) md si = Some (pd', mc', md') ->
+      nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_push x) s = Some si ->
       exists n, mc' = ((x,old++n::nil)::mc).
     Proof.
       intros eqsi ev.
-      destruct (nnrc_stmt_to_nnrc_imp_stmt_aux_push1_assign_eq_mc s eqsi).
+      destruct (nnrc_stmt_to_nnrc_impish_stmt_aux_push1_assign_eq_mc s eqsi).
       eauto.
     Qed.
 
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_some_correct
-          {s:nnrc} {fvs term} {si:nnrc_imp_stmt} :
-      nnrc_stmt_to_nnrc_imp_stmt_aux fvs term s = Some si ->
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_aux_some_correct
+          {s:nnrc} {fvs term} {si:nnrc_impish_stmt} :
+      nnrc_stmt_to_nnrc_impish_stmt_aux fvs term s = Some si ->
       forall h σc σ mc md,
         incl (domain σ) fvs ->
         incl (domain mc) fvs ->
         incl (nnrc_bound_vars s) fvs ->
         safe_terminator_result term mc md ->
         let ne := @nnrc_eval _ h σc σ s in
-        match nnrc_imp_stmt_eval h σc (pd_bindings_lift σ) mc md si with
+        match nnrc_impish_stmt_eval h σc (pd_bindings_lift σ) mc md si with
         | None => ne = None
         | Some (pd', mc', md') =>
           match get_terminator_result term mc' md' with
@@ -659,10 +659,10 @@ Section NNRCtoNNRCimp.
       nnrc_cases (induction s) Case; intros fvs term si eqsi σ mc md inclσ inclmc inclbvars safe_term.
       - Case "NNRCGetConstant".
         invcs eqsi; simpl; intros.
-        apply nnrc_imp_stmt_eval_terminator; trivial.
+        apply nnrc_impish_stmt_eval_terminator; trivial.
       - Case "NNRCVar".
         invcs eqsi.
-        generalize (nnrc_imp_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpVar v) safe_term); intros eterm.
+        generalize (nnrc_impish_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpishVar v) safe_term); intros eterm.
         match_destr; simpl in *.
         + destruct p as [[??]?].
           match_destr.
@@ -670,25 +670,25 @@ Section NNRCtoNNRCimp.
         + rewrite lookup_pd_bindings_lift, olift_id_lift_some in eterm; trivial.
       - Case "NNRCConst".
         invcs eqsi.
-        apply nnrc_imp_stmt_eval_terminator; trivial.
+        apply nnrc_impish_stmt_eval_terminator; trivial.
       - Case "NNRCBinop".
         simpl in *.
-        case_eq (nnrc_expr_to_nnrc_imp_expr s1); [intros s1' s1'eq | intros s1'eq]
+        case_eq (nnrc_expr_to_nnrc_impish_expr s1); [intros s1' s1'eq | intros s1'eq]
         ; rewrite s1'eq in eqsi; try discriminate.
-        case_eq (nnrc_expr_to_nnrc_imp_expr s2); [intros s2' s2'eq | intros s2'eq]
+        case_eq (nnrc_expr_to_nnrc_impish_expr s2); [intros s2' s2'eq | intros s2'eq]
         ; rewrite s2'eq in eqsi; try discriminate.
         simpl in eqsi; invcs eqsi.
-        generalize (nnrc_imp_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpBinop b s1' s2') safe_term); intros eterm.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq).
-        rewrite (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s2'eq).
+        generalize (nnrc_impish_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpishBinop b s1' s2') safe_term); intros eterm.
+        rewrite (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s2'eq).
         eauto.
       - Case "NNRCUnop".
         simpl in *.
-        case_eq (nnrc_expr_to_nnrc_imp_expr s); [intros s1' s1'eq | intros s1'eq]
+        case_eq (nnrc_expr_to_nnrc_impish_expr s); [intros s1' s1'eq | intros s1'eq]
         ; rewrite s1'eq in eqsi; try discriminate.
         simpl in eqsi; invcs eqsi.
-        generalize (nnrc_imp_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpUnop u s1' ) safe_term); intros eterm.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq).
+        generalize (nnrc_impish_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpishUnop u s1' ) safe_term); intros eterm.
+        rewrite (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq).
         eauto.
       - Case "NNRCLet".
         simpl in *.
@@ -709,9 +709,9 @@ Section NNRCtoNNRCimp.
           unfold id in eqq4; apply some_olift in eqq4; simpl in eqq4.
           destruct eqq4 as [? eqq4 ?]; subst.
           rewrite IHs1.
-          generalize (nnrc_imp_stmt_eval_env_stack eqq3); intros; subst.
-          generalize (nnrc_imp_stmt_eval_mcenv_domain_stack eqq3); intros eqq5.
-          generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq3); intros eqq6.
+          generalize (nnrc_impish_stmt_eval_env_stack eqq3); intros; subst.
+          generalize (nnrc_impish_stmt_eval_mcenv_domain_stack eqq3); intros eqq5.
+          generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq3); intros eqq6.
           destruct m0; simpl in *; try discriminate.
           destruct p; simpl in *.
           invcs eqq6.
@@ -729,7 +729,7 @@ Section NNRCtoNNRCimp.
                 [intros ? eqq8 | intros eqq8]
                 ; rewrite eqq8 in IHs2; try tauto.
               rewrite IHs2.
-              generalize (nnrc_imp_stmt_eval_env_stack eqq7); intros; subst.
+              generalize (nnrc_impish_stmt_eval_env_stack eqq7); intros; subst.
               rewrite eqq8; trivial.
             }
           * simpl; intuition.
@@ -747,14 +747,14 @@ Section NNRCtoNNRCimp.
           rewrite in_app_iff; intuition.
       - Case "NNRCFor".
         simpl in *.
-        case_eq (nnrc_expr_to_nnrc_imp_expr s1); [intros s1' s1'eq | intros s1'eq]
+        case_eq (nnrc_expr_to_nnrc_impish_expr s1); [intros s1' s1'eq | intros s1'eq]
         ; rewrite s1'eq in eqsi; try discriminate.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq).
         match_case_in eqsi; [ intros ? eqq1 | intros eqq1]
         ; rewrite eqq1 in eqsi; try discriminate.
         invcs eqsi.
         simpl.
-        destruct (nnrc_imp_expr_eval h σc (pd_bindings_lift σ) s1'); trivial.
+        destruct (nnrc_impish_expr_eval h σc (pd_bindings_lift σ) s1'); trivial.
         destruct d; trivial.
         clear s1' IHs1 s1'eq.
         specialize (IHs2 _ _ _ eqq1).
@@ -768,7 +768,7 @@ Section NNRCtoNNRCimp.
                        match dl with
                        | nil => Some (σ₁, ψc₁, ψd₁)
                        | d :: dl' =>
-                         match nnrc_imp_stmt_eval h σc ((v, Some d) :: σ₁) ψc₁ ψd₁ n with
+                         match nnrc_impish_stmt_eval h σc ((v, Some d) :: σ₁) ψc₁ ψd₁ n with
                          | Some (nil, _, _) => None
                          | Some (_ :: σ₂, ψc₂, ψd₂) => for_fun dl' σ₂ ψc₂ ψd₂
                          | None => None
@@ -778,8 +778,8 @@ Section NNRCtoNNRCimp.
                   | Some (σ₁, nil, _) => None
                   | Some (σ₁, (_, dl) :: ψc₁, ψd₁) =>
                     match
-                      nnrc_imp_stmt_eval h σc ((fresh_var "tmp" fvs, Some (dcoll dl)) :: σ₁) ψc₁ ψd₁
-                                         (terminate term (NNRCimpVar (fresh_var "tmp" fvs)))
+                      nnrc_impish_stmt_eval h σc ((fresh_var "tmp" fvs, Some (dcoll dl)) :: σ₁) ψc₁ ψd₁
+                                         (terminate term (NNRCimpishVar (fresh_var "tmp" fvs)))
                     with
                     | Some (nil, _, _) => None
                     | Some (_ :: σ₂, ψc₂, ψd₂) => Some (σ₂, ψc₂, ψd₂)
@@ -809,14 +809,14 @@ Section NNRCtoNNRCimp.
         } 
         revert σ mc md inclσ inclmc safe_term.
         induction l; simpl; intros.
-        + generalize (nnrc_imp_stmt_eval_terminator h σc ((fresh_var "tmp" fvs, Some (dcoll old)) :: pd_bindings_lift σ) mc md term (NNRCimpVar (fresh_var "tmp" fvs)) safe_term); intros eterm.
+        + generalize (nnrc_impish_stmt_eval_terminator h σc ((fresh_var "tmp" fvs, Some (dcoll old)) :: pd_bindings_lift σ) mc md term (NNRCimpishVar (fresh_var "tmp" fvs)) safe_term); intros eterm.
           unfold var in *.
           match_case_in eterm; [intros ? eqq2 | intros eqq2]
           ; rewrite eqq2 in eterm; try tauto.
           * destruct p as [[??]?].
             match_case_in eterm; [intros ? eqq3 | intros eqq3]
             ; rewrite eqq3 in eterm; try tauto.
-            generalize (nnrc_imp_stmt_eval_env_stack eqq2); intros; subst.
+            generalize (nnrc_impish_stmt_eval_env_stack eqq2); intros; subst.
             rewrite eqq3.
             simpl in eterm.
             rewrite app_nil_r.
@@ -839,8 +839,8 @@ Section NNRCtoNNRCimp.
               [intros ? eqq8 | intros eqq8]
               ; rewrite eqq8 in IHs2; try tauto.
             rewrite IHs2.
-            generalize (nnrc_imp_stmt_eval_env_stack eqq7); intros; subst.            
-            generalize (nnrc_imp_stmt_eval_mcenv_domain_stack eqq7); intros mceqq.
+            generalize (nnrc_impish_stmt_eval_env_stack eqq7); intros; subst.            
+            generalize (nnrc_impish_stmt_eval_mcenv_domain_stack eqq7); intros mceqq.
             destruct m; simpl in mceqq; try discriminate.
             destruct p; simpl in *.
             invcs mceqq.
@@ -857,7 +857,7 @@ Section NNRCtoNNRCimp.
               rewrite rev_involutive; simpl; trivial.
             }
             rewrite eqq0'.
-            generalize (nnrc_stmt_to_nnrc_imp_stmt_aux_push1 eqq7 eqq1); intros [? eqqq].
+            generalize (nnrc_stmt_to_nnrc_impish_stmt_aux_push1 eqq7 eqq1); intros [? eqqq].
             invcs eqqq.
             rewrite eqq0' in H0.
             assert (eqqq':d::l1 = rev (old ++ x :: nil)).
@@ -909,7 +909,7 @@ Section NNRCtoNNRCimp.
                     } 
                 + apply none_lift in IHl.
                   rewrite IHl; simpl; trivial.
-              - generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq7); intros mdeqq.
+              - generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq7); intros mdeqq.
                 unfold safe_terminator_result in *; rewrite <- mdeqq; trivial.
             }
           * unfold incl in *; simpl in *; intuition.
@@ -920,16 +920,16 @@ Section NNRCtoNNRCimp.
           * simpl; intuition.
       - Case "NNRCIf".
         simpl in *.
-        case_eq (nnrc_expr_to_nnrc_imp_expr s1); [intros s1' s1'eq | intros s1'eq]
+        case_eq (nnrc_expr_to_nnrc_impish_expr s1); [intros s1' s1'eq | intros s1'eq]
         ; rewrite s1'eq in eqsi; try discriminate.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq).
         match_case_in eqsi; [ intros ? eqq1 | intros eqq1]
         ; rewrite eqq1 in eqsi; try discriminate.
         match_case_in eqsi; [ intros ? eqq2 | intros eqq2]
         ; rewrite eqq2 in eqsi; try discriminate.
         invcs eqsi.
         simpl.
-        destruct (nnrc_imp_expr_eval h σc (pd_bindings_lift σ) s1' )
+        destruct (nnrc_impish_expr_eval h σc (pd_bindings_lift σ) s1' )
         ; simpl; trivial.
         destruct d; simpl; trivial.
         destruct b.
@@ -943,16 +943,16 @@ Section NNRCtoNNRCimp.
           rewrite in_app_iff; intuition.
       - Case "NNRCEither".
         simpl in *.
-        case_eq (nnrc_expr_to_nnrc_imp_expr s1); [intros s1' s1'eq | intros s1'eq]
+        case_eq (nnrc_expr_to_nnrc_impish_expr s1); [intros s1' s1'eq | intros s1'eq]
         ; rewrite s1'eq in eqsi; try discriminate.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq).
         match_case_in eqsi; [ intros ? eqq1 | intros eqq1]
         ; rewrite eqq1 in eqsi; try discriminate.
         match_case_in eqsi; [ intros ? eqq2 | intros eqq2]
         ; rewrite eqq2 in eqsi; try discriminate.
         invcs eqsi.
         simpl.
-        destruct (nnrc_imp_expr_eval h σc (pd_bindings_lift σ) s1' )
+        destruct (nnrc_impish_expr_eval h σc (pd_bindings_lift σ) s1' )
         ; simpl; trivial.
         destruct d; simpl; trivial.
         + specialize (IHs2 _ _ _ eqq1).
@@ -962,7 +962,7 @@ Section NNRCtoNNRCimp.
             ; rewrite eqq3 in IHs2
             ; simpl in eqq3; unfold var in *; rewrite eqq3; trivial.
             destruct p as [[??]?].
-            generalize (nnrc_imp_stmt_eval_env_stack eqq3); intros; subst.
+            generalize (nnrc_impish_stmt_eval_env_stack eqq3); intros; subst.
             eauto.
           * simpl; unfold incl in *.
             simpl in *; intuition.
@@ -976,7 +976,7 @@ Section NNRCtoNNRCimp.
             ; rewrite eqq3 in IHs3
             ; simpl in eqq3; unfold var in *; rewrite eqq3; trivial.
             destruct p as [[??]?].
-            generalize (nnrc_imp_stmt_eval_env_stack eqq3); intros; subst.
+            generalize (nnrc_impish_stmt_eval_env_stack eqq3); intros; subst.
             eauto.
           * simpl; unfold incl in *.
             simpl in *; intuition.
@@ -985,17 +985,17 @@ Section NNRCtoNNRCimp.
             simpl; repeat rewrite in_app_iff; intuition.
       - Case "NNRCGroupBy".
         simpl in eqsi.
-        case_eq (nnrc_expr_to_nnrc_imp_expr s0); [intros s1' s1'eq | intros s1'eq]
+        case_eq (nnrc_expr_to_nnrc_impish_expr s0); [intros s1' s1'eq | intros s1'eq]
         ; rewrite s1'eq in eqsi; simpl in eqsi; try discriminate.
         invcs eqsi.
-        generalize (nnrc_imp_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpGroupBy s l s1') safe_term); intros eterm.
+        generalize (nnrc_impish_stmt_eval_terminator h σc (pd_bindings_lift σ) mc md term (NNRCimpishGroupBy s l s1') safe_term); intros eterm.
         simpl nnrc_to_nnrc_base.
         match_destr_in eterm.
         + destruct p as [[??]?].
           match_destr.
           simpl nnrc_to_nnrc_base.
           simpl in eterm.
-          rewrite <- (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq) in eterm.
+          rewrite <- (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq) in eterm.
           match_case_in eterm; [intros ? eqq1 | intros eqq1]
           ; rewrite eqq1 in eterm
           ; simpl in eqq1; try discriminate.
@@ -1005,26 +1005,26 @@ Section NNRCtoNNRCimp.
           match_case_in eterm; [intros ? eqq1 | intros eqq1]
           ; rewrite eqq1 in eterm
           ; simpl in eqq1.
-          * rewrite <- (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq) in eqq1.
+          * rewrite <- (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq) in eqq1.
             destruct d;
               (try solve[
                      eapply nnrc_group_by_correct_some_ncoll; eauto; intros; discriminate]).
             erewrite nnrc_group_by_correct; eauto.
-          * rewrite <- (nnrc_expr_to_nnrc_imp_expr_some_correct' _ _ s1'eq) in eqq1.
+          * rewrite <- (nnrc_expr_to_nnrc_impish_expr_some_correct' _ _ s1'eq) in eqq1.
             eapply nnrc_group_by_correct_none; eauto.
     Qed.
     
-    Theorem nnrc_to_nnrc_imp_some_correct
-          h σc {s:nnrc} {globals} {si:nnrc_imp} :
-      nnrc_stmt_to_nnrc_imp globals s = Some si ->
-      @nnrc_eval_top _ h s σc = nnrc_imp_eval_top h σc si.
+    Theorem nnrc_to_nnrc_impish_some_correct
+          h σc {s:nnrc} {globals} {si:nnrc_impish} :
+      nnrc_stmt_to_nnrc_impish globals s = Some si ->
+      @nnrc_eval_top _ h s σc = nnrc_impish_eval_top h σc si.
     Proof.
-      unfold nnrc_stmt_to_nnrc_imp, nnrc_imp_eval_top, nnrc_imp_eval.
+      unfold nnrc_stmt_to_nnrc_impish, nnrc_impish_eval_top, nnrc_impish_eval.
       intros eqsi.
       destruct si.
       match_option_in eqsi.
       invcs eqsi.
-      generalize (nnrc_stmt_to_nnrc_imp_stmt_aux_some_correct
+      generalize (nnrc_stmt_to_nnrc_impish_stmt_aux_some_correct
                     eqq
                     h (rec_sort σc) nil nil
                     ((fresh_var "ret" (globals ++ nnrc_bound_vars s), None) :: nil)
@@ -1034,7 +1034,7 @@ Section NNRCtoNNRCimp.
       cut_to HH; try solve [ unfold incl; simpl; tauto].
       - match_option_in HH.
         destruct p as [[??]?].
-        generalize (nnrc_imp_stmt_eval_mdenv_domain_stack eqq0); intros mceqq.
+        generalize (nnrc_impish_stmt_eval_mdenv_domain_stack eqq0); intros mceqq.
         simpl in mceqq.
         destruct m0; try discriminate.
         simpl in mceqq; invcs mceqq.
@@ -1056,21 +1056,21 @@ Section NNRCtoNNRCimp.
       (*    Eval vm_compute in (stratify nnrc1). *)
 
       Example nnrc2 := NNRCLet "x" (NNRCLet "x" (‵ (dnat 3) ‵+ ‵(dnat 5)) (NNRCVar "x")) (NNRCVar "x").
-      (* Eval vm_compute in (nnrc_to_nnrc_imp_top nil nnrc2). *)
+      (* Eval vm_compute in (nnrc_to_nnrc_impish_top nil nnrc2). *)
     End tests.
 
   End from_stratified.
 
   Require Import NNRCEq.
 
-  Theorem nnrc_to_nnrc_imp_correct
+  Theorem nnrc_to_nnrc_impish_correct
           h σc (s:nnrc) (globals:list var) :
-    @nnrc_eval_top _ h s σc = nnrc_imp_eval_top h σc (nnrc_to_nnrc_imp_top globals s).
+    @nnrc_eval_top _ h s σc = nnrc_impish_eval_top h σc (nnrc_to_nnrc_impish_top globals s).
   Proof.
-    unfold nnrc_to_nnrc_imp_top, stratified_nnrc_stmt_to_nnrc_imp.
-    destruct ((nnrc_stmt_to_nnrc_imp_stmt_stratified_some
+    unfold nnrc_to_nnrc_impish_top, stratified_nnrc_stmt_to_nnrc_impish.
+    destruct ((nnrc_stmt_to_nnrc_impish_stmt_stratified_some
                  globals (stratify s) (stratify_stratified s))); simpl.
-    rewrite <- (nnrc_to_nnrc_imp_some_correct _ _ e).
+    rewrite <- (nnrc_to_nnrc_impish_some_correct _ _ e).
     unfold nnrc_eval_top.
     rewrite stratify_correct.
     trivial.
@@ -1078,9 +1078,9 @@ Section NNRCtoNNRCimp.
 
   Section Core.
 
-    Lemma nnrc_expr_to_nnrc_imp_expr_preserves_core {e:nnrc} {ei:nnrc_imp_expr} :
-      nnrc_expr_to_nnrc_imp_expr e = Some ei ->
-      nnrcIsCore e <-> nnrc_imp_exprIsCore ei.
+    Lemma nnrc_expr_to_nnrc_impish_expr_preserves_core {e:nnrc} {ei:nnrc_impish_expr} :
+      nnrc_expr_to_nnrc_impish_expr e = Some ei ->
+      nnrcIsCore e <-> nnrc_impish_exprIsCore ei.
     Proof.
       revert ei.
       induction e; intros ei eqq; invcs eqq; simpl; try tauto.
@@ -1097,105 +1097,105 @@ Section NNRCtoNNRCimp.
         simpl; tauto.
     Qed.
 
-    Lemma nnrc_imp_stmtIsCore_terminate terminator s :
-          nnrc_imp_stmtIsCore (terminate terminator s)
-          = nnrc_imp_exprIsCore s.
+    Lemma nnrc_impish_stmtIsCore_terminate terminator s :
+          nnrc_impish_stmtIsCore (terminate terminator s)
+          = nnrc_impish_exprIsCore s.
     Proof.
       destruct terminator; simpl; trivial.
     Qed.
 
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_aux_preserves_core {fvs: list var} {term: terminator} {s: nnrc} {si:nnrc_imp_stmt} :
-      nnrc_stmt_to_nnrc_imp_stmt_aux fvs term s = Some si ->
-      nnrcIsCore s <-> nnrc_imp_stmtIsCore si.
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_aux_preserves_core {fvs: list var} {term: terminator} {s: nnrc} {si:nnrc_impish_stmt} :
+      nnrc_stmt_to_nnrc_impish_stmt_aux fvs term s = Some si ->
+      nnrcIsCore s <-> nnrc_impish_stmtIsCore si.
     Proof.
       revert fvs term si.
       induction s; intros fvs terminator si eqq; simpl; invcs eqq; simpl
-      ; try rewrite nnrc_imp_stmtIsCore_terminate; simpl; try tauto.
+      ; try rewrite nnrc_impish_stmtIsCore_terminate; simpl; try tauto.
       - match_option_in H0.
         invcs H0.
-        rewrite nnrc_imp_stmtIsCore_terminate.
+        rewrite nnrc_impish_stmtIsCore_terminate.
         apply some_lift2 in eqq.
         destruct eqq as [? [? eqq1 [eqq2 ?]]]; subst; simpl.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq1).
-        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq2).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_preserves_core eqq1).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_preserves_core eqq2).
         tauto.
       - match_option_in H0.
         invcs H0.
-        rewrite nnrc_imp_stmtIsCore_terminate.
+        rewrite nnrc_impish_stmtIsCore_terminate.
         apply some_lift in eqq.
         destruct eqq as [? eqq1]; subst.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq1).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_preserves_core eqq1).
         tauto.
       - repeat (match_option_in H0); invcs H0; simpl.
         rewrite (IHs1 _ _ _ eqq).
         rewrite (IHs2 _ _ _ eqq0).
         tauto.
       - repeat (match_option_in H0); invcs H0; simpl.
-        rewrite nnrc_imp_stmtIsCore_terminate.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq).
+        rewrite nnrc_impish_stmtIsCore_terminate.
+        rewrite (nnrc_expr_to_nnrc_impish_expr_preserves_core eqq).
         rewrite (IHs2 _ _ _ eqq0); simpl.
         tauto.
       - repeat (match_option_in H0); invcs H0; simpl.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_preserves_core eqq).
         rewrite (IHs2 _ _ _ eqq0); simpl.
         rewrite (IHs3 _ _ _ eqq1); simpl.
         tauto.
       - repeat (match_option_in H0); invcs H0; simpl.
-        rewrite (nnrc_expr_to_nnrc_imp_expr_preserves_core eqq).
+        rewrite (nnrc_expr_to_nnrc_impish_expr_preserves_core eqq).
         rewrite (IHs2 _ _ _ eqq0); simpl.
         rewrite (IHs3 _ _ _ eqq1); simpl.
         tauto.
       - repeat (match_option_in H0); invcs H0; simpl.
         apply some_lift in eqq.
         destruct eqq as [? eqq1]; subst; simpl.
-        rewrite nnrc_imp_stmtIsCore_terminate; simpl.
+        rewrite nnrc_impish_stmtIsCore_terminate; simpl.
         tauto.
     Qed.
 
-    Lemma nnrc_stmt_to_nnrc_imp_stmt_preserves_core {globals: list var} {s: nnrc} {si:nnrc_imp_stmt} {ret:var} :
-      nnrc_stmt_to_nnrc_imp globals s = Some (si,ret) ->
-      nnrcIsCore s <-> nnrc_imp_stmtIsCore si.
+    Lemma nnrc_stmt_to_nnrc_impish_stmt_preserves_core {globals: list var} {s: nnrc} {si:nnrc_impish_stmt} {ret:var} :
+      nnrc_stmt_to_nnrc_impish globals s = Some (si,ret) ->
+      nnrcIsCore s <-> nnrc_impish_stmtIsCore si.
     Proof.
-      unfold nnrc_stmt_to_nnrc_imp.
+      unfold nnrc_stmt_to_nnrc_impish.
       match_option; intros eqq1.
       invcs eqq1.
-      apply nnrc_stmt_to_nnrc_imp_stmt_aux_preserves_core in eqq.
+      apply nnrc_stmt_to_nnrc_impish_stmt_aux_preserves_core in eqq.
       trivial.
     Qed.
 
-    Lemma stratified_nnrc_stmt_to_nnrc_imp_preserves_core
+    Lemma stratified_nnrc_stmt_to_nnrc_impish_preserves_core
             (fvs: list var) (s: nnrc) (strat_pf:stratifiedLevel nnrcStmt s) :
-      nnrcIsCore s <-> nnrc_impIsCore (stratified_nnrc_stmt_to_nnrc_imp fvs s strat_pf).
+      nnrcIsCore s <-> nnrc_impishIsCore (stratified_nnrc_stmt_to_nnrc_impish fvs s strat_pf).
     Proof.
-      unfold stratified_nnrc_stmt_to_nnrc_imp.
-      destruct (nnrc_stmt_to_nnrc_imp_stmt_stratified_some fvs s strat_pf) as [sr eqq]; simpl.
+      unfold stratified_nnrc_stmt_to_nnrc_impish.
+      destruct (nnrc_stmt_to_nnrc_impish_stmt_stratified_some fvs s strat_pf) as [sr eqq]; simpl.
       destruct sr.
-      apply (nnrc_stmt_to_nnrc_imp_stmt_preserves_core eqq).
+      apply (nnrc_stmt_to_nnrc_impish_stmt_preserves_core eqq).
     Qed.
 
-    Theorem nnrc_to_nnrc_imp_top_preserves_core
+    Theorem nnrc_to_nnrc_impish_top_preserves_core
             (globals: list var) (s: nnrc) :
-      nnrcIsCore s <-> nnrc_impIsCore (nnrc_to_nnrc_imp_top globals s).
+      nnrcIsCore s <-> nnrc_impishIsCore (nnrc_to_nnrc_impish_top globals s).
     Proof.
-      unfold nnrc_to_nnrc_imp_top.
-      rewrite <- stratified_nnrc_stmt_to_nnrc_imp_preserves_core.
+      unfold nnrc_to_nnrc_impish_top.
+      rewrite <- stratified_nnrc_stmt_to_nnrc_impish_preserves_core.
       apply stratify_preserves_core.
     Qed.
 
-    Program Definition nnrc_core_to_nnrc_imp_core_top
-            (globals:list var) (s:nnrc_core) : nnrc_imp_core
-      :=nnrc_to_nnrc_imp_top globals s.
+    Program Definition nnrc_core_to_nnrc_impish_core_top
+            (globals:list var) (s:nnrc_core) : nnrc_impish_core
+      :=nnrc_to_nnrc_impish_top globals s.
     Next Obligation.
       destruct s; simpl.
-      apply nnrc_to_nnrc_imp_top_preserves_core; trivial.
+      apply nnrc_to_nnrc_impish_top_preserves_core; trivial.
     Qed.
 
-    Theorem nnrc_core_to_nnrc_imp_core_correct
+    Theorem nnrc_core_to_nnrc_impish_core_correct
           h σc (s:nnrc_core) (globals:list var) :
-    @nnrc_core_eval_top _ h s σc = nnrc_imp_core_eval_top h σc (nnrc_core_to_nnrc_imp_core_top globals s).
+    @nnrc_core_eval_top _ h s σc = nnrc_impish_core_eval_top h σc (nnrc_core_to_nnrc_impish_core_top globals s).
     Proof.
       destruct s as [q pf].
-      generalize (nnrc_to_nnrc_imp_correct h σc q globals); intros HH.
+      generalize (nnrc_to_nnrc_impish_correct h σc q globals); intros HH.
       unfold nnrc_eval_top in HH.
       rewrite <- nnrc_to_nnrc_ext_eq in HH by trivial.
       unfold nnrc_core_eval_top, lift_nnrc_core; simpl.
@@ -1204,4 +1204,4 @@ Section NNRCtoNNRCimp.
     Qed.
   End Core.
 
-End NNRCtoNNRCimp.
+End NNRCtoNNRCimpish.

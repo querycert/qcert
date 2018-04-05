@@ -48,7 +48,7 @@ Module QEval(runtime:CompilerRuntime).
 
   Definition eval_nnrc : nnrc -> constant_env -> option data := @eval_nnrc _ h.
 
-  Definition eval_nnrc_imp : nnrc_imp -> constant_env -> option data := @eval_nnrc_imp _ h.
+  Definition eval_nnrc_impish : nnrc_impish -> constant_env -> option data := @eval_nnrc_impish _ h.
 
   Definition eval_nnrcmr : nnrcmr -> dconstant_env -> option data := @eval_nnrcmr _ _ h.
   Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.

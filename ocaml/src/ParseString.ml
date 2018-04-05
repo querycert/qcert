@@ -59,7 +59,7 @@ let parse_io_sexp_from_string s : QData.qdata = parse_string parse_io_sexp s
 let parse_camp_sexp_from_string s : QLang.camp = parse_string parse_camp_sexp s
 let parse_nraenv_sexp_from_string s : QLang.nraenv_core = parse_string parse_nraenv_sexp s
 let parse_nnrc_sexp_from_string s : QLang.nnrc = parse_string parse_nnrc_sexp s
-let parse_nnrc_imp_sexp_from_string s : QLang.nnrc_imp = parse_string parse_nnrc_imp_sexp s
+let parse_nnrc_impish_sexp_from_string s : QLang.nnrc_impish = parse_string parse_nnrc_impish_sexp s
 let parse_nnrcmr_sexp_from_string s : QLang.nnrcmr = parse_string parse_nnrcmr_sexp s
 let parse_cldmr_sexp_from_string s : QLang.cldmr = parse_string parse_cldmr_sexp s
 

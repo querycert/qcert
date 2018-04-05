@@ -180,17 +180,17 @@ MODULES = \
 	NNRC/Optim/TNNRCRewrite \
 	NNRC/Optim/NNRCOptimizer \
 	NNRC/NNRCOptim \
-	NNRCimp/Lang/NNRCimp \
-	NNRCimp/Lang/NNRCimpSize \
-	NNRCimp/Lang/NNRCimpVars \
-	NNRCimp/Lang/NNRCimpNorm \
-	NNRCimp/Lang/NNRCimpSem \
-	NNRCimp/Lang/NNRCimpEval \
-	NNRCimp/Lang/NNRCimpSemEval \
-	NNRCimp/Typing/TNNRCimp \
-	NNRCimp/NNRCimpRuntime \
-	NNRCimp/NNRCimpTypes \
-	NNRCimp/NNRCimpSystem \
+	NNRCimpish/Lang/NNRCimpish \
+	NNRCimpish/Lang/NNRCimpishSize \
+	NNRCimpish/Lang/NNRCimpishVars \
+	NNRCimpish/Lang/NNRCimpishNorm \
+	NNRCimpish/Lang/NNRCimpishSem \
+	NNRCimpish/Lang/NNRCimpishEval \
+	NNRCimpish/Lang/NNRCimpishSemEval \
+	NNRCimpish/Typing/TNNRCimpish \
+	NNRCimpish/NNRCimpishRuntime \
+	NNRCimpish/NNRCimpishTypes \
+	NNRCimpish/NNRCimpishSystem \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \
@@ -308,9 +308,9 @@ MODULES = \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \
 	Translation/CldMRtoCloudant \
-	Translation/NNRCtoNNRCimp \
-	Translation/TNNRCtoNNRCimp \
-	Translation/NNRCimptoJavaScriptAst \
+	Translation/NNRCtoNNRCimpish \
+	Translation/TNNRCtoNNRCimpish \
+	Translation/NNRCimpishtoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \
 	Translation/NNRCtoJavaScript \
