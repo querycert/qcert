@@ -113,7 +113,7 @@ Section ToString.
                indent (i+1)++string_of_funcbody body (i+1) ++eol++
                indent i ++"})"
   | expr_access e1 e2 =>
-    string_of_expr e1 i ++ "[" ++ string_of_expr e1 (i+1) ++ "]"
+    string_of_expr e1 i ++ "[" ++ string_of_expr e2 (i+1) ++ "]"
   | expr_member e s =>
     string_of_expr e i ++ "." ++ s
   | expr_new e args =>
@@ -212,7 +212,7 @@ Section ToString.
     in
     joinStrings (";"++eol) decls
   | stat_if e s1 s2_opt =>
-    "if (" ++ string_of_expr e (i+1) ++ ") { " ++ eol ++
+    "if (" ++ string_of_expr e (i+1) ++ ") {" ++ eol ++
     string_of_stat s1 (i+1) ++ eol ++
     indent i ++ "} else {" ++ eol ++
     match s2_opt with
@@ -314,7 +314,7 @@ Section ToString.
        : string :=
     "function " ++ f.(funcdecl_name) ++ "(" ++ comma_list f.(funcdecl_parameters) ++ ") {"++ eol
     ++ string_of_funcbody f.(funcdecl_body) 2 ++ eol
-    ++ "}"
+    ++ "}" ++ eol
   .
 
 End ToString.

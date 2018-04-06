@@ -30,6 +30,7 @@ Section NNRCimpishtoJavaScriptAst.
   Require Import JSON.
   Require Import DatatoJSON.
   Require Import JsAst.JsNumber.
+  Require Import Fresh.
   Import ListNotations.
 
   Context {fruntime:foreign_runtime}.
@@ -234,6 +235,14 @@ Section NNRCimpishtoJavaScriptAst.
   Definition runtime_nat_mean e :=
     call_runtime "natArithMean" [ e ].
 
+  Definition runtime_compare e1 e2 :=
+    call_runtime "compare" [ e1; e2 ].
+
+  Definition runtime_count e := (* XXX Do we want to add this in runtime lib? XXX *)
+    expr_object
+      [ (propname_identifier "nat",
+         propbody_val (expr_member e "length")) ].
+
   (** Data model *)
 
   Definition mk_rec (l: list (string * expr)) : expr :=
@@ -303,9 +312,13 @@ Section NNRCimpishtoJavaScriptAst.
     | OpOr =>
       expr_binary_op e1' binary_op_or e2'
     | OpLt =>
-      expr_binary_op e1' binary_op_lt e2'
+      expr_binary_op (runtime_compare e1' e2')
+                     binary_op_lt
+                     (expr_literal (literal_number zero))
     | OpLe =>
-      expr_binary_op e1' binary_op_le e2'
+      expr_binary_op (runtime_compare e1' e2')
+                     binary_op_le
+                     (expr_literal (literal_number zero))
     | OpBagUnion =>
       runtime_bunion e1' e2'
     | OpBagDiff =>
@@ -392,7 +405,7 @@ Section NNRCimpishtoJavaScriptAst.
     | OpOrderBy scl =>
       runtime_sort e' scl
     | OpCount =>
-      expr_member e' "length"
+      runtime_count e'
     | OpNatSum =>
       runtime_nat_sum e'
     | OpNatMin =>
@@ -475,34 +488,40 @@ Section NNRCimpishtoJavaScriptAst.
       expr_literal (literal_string "XXX TODO: nnrc_impish_expr_to_js_ast groupby XXX")
     end.
 
-  Fixpoint nnrc_impish_stmt_to_js_ast (stmt: nnrc_impish_stmt): stat :=
+  Fixpoint nnrc_impish_stmt_to_js_ast (avoid: list string) (stmt: nnrc_impish_stmt): stat :=
     match stmt with
     | NNRCimpishSeq s1 s2 =>
       stat_block
-        [ nnrc_impish_stmt_to_js_ast s1;
-          nnrc_impish_stmt_to_js_ast s2 ]
+        [ nnrc_impish_stmt_to_js_ast avoid s1;
+          nnrc_impish_stmt_to_js_ast avoid s2 ]
     | NNRCimpishLet x e s =>
+      let avoid := x :: avoid in
       scope
         [ stat_var_decl [ (x, Some (nnrc_impish_expr_to_js_ast e)) ] ]
     | NNRCimpishLetMut x s1 s2 =>
+      let avoid := x :: avoid in
       scope
         [ stat_var_decl [ (x, None) ];
-          nnrc_impish_stmt_to_js_ast s1;
-          nnrc_impish_stmt_to_js_ast s2 ]
+          nnrc_impish_stmt_to_js_ast avoid s1;
+          nnrc_impish_stmt_to_js_ast avoid s2 ]
     | NNRCimpishLetMutColl x s1 s2 =>
+      let avoid := x :: avoid in
       scope
         [ stat_var_decl [ (x, Some (empty_array)) ];
-          nnrc_impish_stmt_to_js_ast s1;
-          nnrc_impish_stmt_to_js_ast s2 ]
+          nnrc_impish_stmt_to_js_ast avoid s1;
+          nnrc_impish_stmt_to_js_ast avoid s2 ]
     | NNRCimpishAssign x e =>
       stat_expr (expr_assign (expr_identifier x) None (nnrc_impish_expr_to_js_ast e))
     | NNRCimpishPush x e =>
       stat_expr (array_push (expr_identifier x) (nnrc_impish_expr_to_js_ast e))
     | NNRCimpishFor x e s =>
       (* for (var src = e, i = 0; i < src.length; i++) { var x = src[i]; s } *)
+      let avoid := x :: avoid in
       let e := nnrc_impish_expr_to_js_ast e in
-      let src_id := "src"%string in (* XXX TODO: fresh XXX *)
-      let i_id := "i"%string in (* XXX TODO: fresh XXX *)
+      let src_id := fresh_var "src" avoid in
+      let avoid := src_id :: avoid in
+      let i_id := fresh_var "i" avoid in
+      let avoid := i_id :: avoid in
       let src := expr_identifier src_id in
       let i := expr_identifier i_id in
       scope
@@ -513,22 +532,23 @@ Section NNRCimpishtoJavaScriptAst.
             (Some (expr_unary_op unary_op_post_incr i))
             (stat_block
                [ stat_var_decl [ (x, Some (array_get src i)) ];
-                   nnrc_impish_stmt_to_js_ast s ]) ]
+                   nnrc_impish_stmt_to_js_ast avoid s ]) ]
     | NNRCimpishIf e s1 s2 =>
       stat_if
         (nnrc_impish_expr_to_js_ast e)
-        (nnrc_impish_stmt_to_js_ast s1)
-        (Some (nnrc_impish_stmt_to_js_ast s2))
+        (nnrc_impish_stmt_to_js_ast avoid s1)
+        (Some (nnrc_impish_stmt_to_js_ast avoid s2))
     | NNRCimpishEither (NNRCimpishVar x) x1 s1 x2 s2 =>
+      let avoid := x1 :: x2 :: avoid in
       let e' := expr_identifier x  in
       stat_if
         (runtime_either e')
         (scope (* var x1 = toLeft(e); s1 *)
            [ stat_var_decl [ (x1, Some (runtime_toLeft e')) ];
-             nnrc_impish_stmt_to_js_ast s1 ])
+             nnrc_impish_stmt_to_js_ast avoid s1 ])
         (Some (scope (* var x2 = toRight(e); s2 *)
                  [ stat_var_decl [ (x2, Some (runtime_toRight e')) ];
-                   nnrc_impish_stmt_to_js_ast s2 ]))
+                   nnrc_impish_stmt_to_js_ast avoid s2 ]))
     | NNRCimpishEither e x1 s1 x2 s2 =>
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
       let e' := nnrc_impish_expr_to_js_ast e in
@@ -536,24 +556,29 @@ Section NNRCimpishtoJavaScriptAst.
         (runtime_either e')
         (scope (* var x1 = toLeft(e); s1 *)
            [ stat_var_decl [ (x1, Some (runtime_toLeft e')) ];
-             nnrc_impish_stmt_to_js_ast s1 ])
+             nnrc_impish_stmt_to_js_ast avoid s1 ])
         (Some (scope (* var x2 = toRight(e); s2 *)
                  [ stat_var_decl [ (x2, Some (runtime_toRight e')) ];
-                   nnrc_impish_stmt_to_js_ast s2 ]))
+                   nnrc_impish_stmt_to_js_ast avoid s2 ]))
     end.
 
   Definition nnrc_impish_to_js_ast_top globals (q: nnrc_impish): funcdecl :=
+    let constants := "constants"%string in
     let (stmt, ret) := q in
     let body :=
       stat_block
-        [ stat_var_decl [ (ret, None) ];
-          nnrc_impish_stmt_to_js_ast stmt;
+        [ stat_var_decl
+            (List.map
+               (fun x => (x, Some (runtime_deref (expr_identifier constants) x)))
+               globals);
+          stat_var_decl [ (ret, None) ];
+          nnrc_impish_stmt_to_js_ast globals stmt;
           stat_return (Some (expr_identifier ret)) ]
     in
     let prog := prog_intro strictness_true [ element_stat body ] in
     funcdecl_intro
       "query"
-      globals
+      [ constants ]
       (funcbody_intro prog (prog_to_string prog))
   .
 
