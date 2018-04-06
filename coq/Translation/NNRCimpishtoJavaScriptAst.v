@@ -40,59 +40,71 @@ Section NNRCimpishtoJavaScriptAst.
 
   (** Standard library *)
 
-  Definition toString e := (* TODO: review *)
+  (* TODO: review the standard library *)
+
+  Definition toString e :=
     expr_call (expr_identifier "toString") [ e ].
 
-  Definition empty_array := expr_array nil. (* TODO: review *)
+  Definition empty_array := expr_array nil.
 
-  Definition array_push e1 e2 := (* TODO: review *)
+  Definition array_push e1 e2 :=
     (* use [array_proto_push_function_object] ? *)
     expr_call (expr_member e1 "push") [ e2 ].
 
-  Definition array_get e1 e2 := (* TODO: review *)
+  Definition array_get e1 e2 :=
     expr_access e1 e2.
 
-  Definition math_min e1 e2 := (* TODO: review *)
+  Definition substring e start len_opt :=
+    let start := expr_literal (literal_number (start)) in
+    let args :=
+      match len_opt with
+      | None => [ start ]
+      | Some len => [ start; len ]
+      end
+    in
+    expr_call (expr_member e "substring") args.
+
+  Definition math_min e1 e2 :=
     expr_call (expr_member (expr_identifier "Math") "min") [ e1; e2 ].
 
-  Definition math_pow e1 e2 := (* TODO: review *)
+  Definition math_pow e1 e2 :=
     expr_call (expr_member (expr_identifier "Math") "pow") [ e1; e2 ].
 
-  Definition math_max e1 e2 := (* TODO: review *)
+  Definition math_max e1 e2 :=
     expr_call (expr_member (expr_identifier "Math") "max") [ e1; e2 ].
 
-  Definition math_min_apply e := (* TODO: review *)
+  Definition math_min_apply e :=
     expr_call
       (expr_member (expr_member (expr_identifier "Math") "min") "apply")
       [ expr_identifier "Math"; e ].
 
-  Definition math_max_apply e := (* TODO: review *)
+  Definition math_max_apply e :=
     expr_call
       (expr_member (expr_member (expr_identifier "Math") "max") "apply")
       [ expr_identifier "Math"; e ].
 
-  Definition math_abs e := (* TODO: review *)
+  Definition math_abs e :=
     expr_call (expr_member (expr_identifier "Math") "abs") [ e ].
 
-  Definition math_log e := (* TODO: review *)
+  Definition math_log e :=
     expr_call (expr_member (expr_identifier "Math") "log2") [ e ].
 
-  Definition math_log10 e := (* TODO: review *)
+  Definition math_log10 e :=
     expr_call (expr_member (expr_identifier "Math") "log10") [ e ].
 
-  Definition math_sqrt e := (* TODO: review *)
+  Definition math_sqrt e :=
     expr_call (expr_member (expr_identifier "Math") "sqrt") [ e ].
 
-  Definition math_exp e := (* TODO: review *)
+  Definition math_exp e :=
     expr_call (expr_member (expr_identifier "Math") "exp") [ e ].
 
-  Definition math_ceil e := (* TODO: review *)
+  Definition math_ceil e :=
     expr_call (expr_member (expr_identifier "Math") "ceil") [ e ].
 
-  Definition math_floor e := (* TODO: review *)
+  Definition math_floor e :=
     expr_call (expr_member (expr_identifier "Math") "floor") [ e ].
 
-  Definition math_trunc e := (* TODO: review *)
+  Definition math_trunc e :=
     expr_call (expr_member (expr_identifier "Math") "trunc") [ e ].
 
 
@@ -238,10 +250,13 @@ Section NNRCimpishtoJavaScriptAst.
   Definition runtime_compare e1 e2 :=
     call_runtime "compare" [ e1; e2 ].
 
-  Definition runtime_count e := (* XXX Do we want to add this in runtime lib? XXX *)
+  Definition runtime_count e := (* XXX TODO: Do we want to add this in runtime lib? XXX *)
     expr_object
       [ (propname_identifier "nat",
          propbody_val (expr_member e "length")) ].
+
+  Definition runtime_floatOfNat e := (* XXX TODO: Do we want to add this in runtime lib? XXX *)
+    expr_member e "nat".
 
   (** Data model *)
 
@@ -377,7 +392,7 @@ Section NNRCimpishtoJavaScriptAst.
         expr_binary_op e1' binary_op_ge e2'
       end
     | OpForeignBinary opf => (* XXX TODO XXX *)
-      expr_literal (literal_string "XXX TODO:  XXX")
+      expr_literal (literal_string "XXX TODO: mk_binary_op OpForeignBinary XXX")
     end.
 
   Definition mk_unary_op op (e':expr) :=
@@ -416,16 +431,15 @@ Section NNRCimpishtoJavaScriptAst.
       runtime_nat_mean e'
     | OpToString =>
       toString e'
-    (* | OpSubstring start olen => *)
-    (*   "(" ++ e1 ++ ").substring(" ++ toString start ++ *)
-    (*       match olen with *)
-    (*       | Some len => ", " ++ toString len *)
-    (*       | None => "" *)
-    (*       end ++ ")" *)
-    (* | OpLike pat oescape => *)
+    | OpSubstring start olen =>
+      (* XXX TODO: @jerome how to converte a BinNums.Z to number? *)
+      (* substring e' start olen *)
+      expr_literal (literal_string "XXX TODO: mk_binary_op OpSubstring XXX") (* XXX TODO XXX *)
+    | OpLike pat oescape =>
     (*   let lc := make_like_clause pat oescape in *)
     (*   let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in *)
     (*   regex ++ ".test(" ++ e1 ++ ")" *)
+      expr_literal (literal_string "XXX TODO: mk_binary_op OpLike XXX") (* XXX TODO XXX *)
     | OpLeft =>
       mk_left e'
     | OpRight =>
@@ -463,10 +477,10 @@ Section NNRCimpishtoJavaScriptAst.
       math_min_apply e'
     | OpFloatBagMax =>
       math_max_apply e'
+    | OpFloatOfNat =>
+      runtime_floatOfNat e'
     | OpForeignUnary fu =>
       expr_literal (literal_string "XXX TODO: mk_binary_op foreign XXX") (* XXX TODO XXX *)
-    | _ =>
-      expr_literal (literal_string "XXX TODO: mk_binary_op XXX") (* XXX TODO: cf. before XXX *)
     end.
 
   Fixpoint nnrc_impish_expr_to_js_ast (exp: nnrc_impish_expr): expr :=
