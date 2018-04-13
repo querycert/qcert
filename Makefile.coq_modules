@@ -192,6 +192,17 @@ MODULES = \
 	NNRCimpish/NNRCimpishRuntime \
 	NNRCimpish/NNRCimpishTypes \
 	NNRCimpish/NNRCimpishSystem \
+	NNRCimp/Lang/NNRCimp \
+	NNRCimp/Lang/NNRCimpSize \
+	NNRCimp/Lang/NNRCimpVars \
+	NNRCimp/Lang/NNRCimpNorm \
+	NNRCimp/Lang/NNRCimpSem \
+	NNRCimp/Lang/NNRCimpEval \
+	NNRCimp/Lang/NNRCimpSemEval \
+	NNRCimp/Typing/TNNRCimp \
+	NNRCimp/NNRCimpRuntime \
+	NNRCimp/NNRCimpTypes \
+	NNRCimp/NNRCimpSystem \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \

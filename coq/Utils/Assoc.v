@@ -406,7 +406,26 @@ Section Assoc.
       + destruct (IHForall2 _ _ _ H1) as [?[??]].
         eauto.
   Qed.
-  
+
+  Lemma Forall2_lookup_some_with_key {K A B} {P:K->A->B->Prop}
+        {l : list (K * A)} {l' : list (K * B)} :
+    (Forall2
+       (fun (d : K * A) (r : K * B) =>
+          fst d = fst r /\ P (fst d) (snd d) (snd r)) l l') ->
+    forall {dec} {s:K} {d':B},
+    lookup dec l' s = Some d' -> 
+    (exists d'', lookup dec l s = Some d'' /\ P s d'' d').
+    Proof.
+      intros H.
+      induction H; intros; simpl in *.
+      - discriminate.
+      - destruct x; destruct y; simpl in *.
+        destruct H; subst.
+        destruct (dec s k0).
+      + invcs H1; eauto.
+      + destruct (IHForall2 _ _ _ H1) as [?[??]].
+        eauto.
+    Qed.
   Lemma lookup_map_same_domain {A B C:Type} dec
         (f:(A*B)->(A*C)) l v :
     domain l = domain (map f l) ->

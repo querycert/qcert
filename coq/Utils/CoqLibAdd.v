@@ -989,3 +989,5 @@ Class ToString (A:Type)
 Ltac string_eqdec_to_equiv :=
   replace string_eqdec with (equiv_dec (EqDec:=string_eqdec)) in * by trivial.
 
+Ltac string_dec_to_equiv :=
+  replace string_dec with (equiv_dec (EqDec:=string_dec)) in * by trivial.

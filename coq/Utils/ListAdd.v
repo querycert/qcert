@@ -54,6 +54,57 @@ Section ListAdd.
       congruence.
     Qed.
 
+    Lemma length_app_other_tail {l1 l2 l1' l2' : list A} :
+      length (l1 ++ l2) = length (l1' ++ l2') ->
+      length l2 = length l2' ->
+      length l1 = length l1'.
+    Proof.
+      repeat rewrite app_length.
+      intros eqq1 eqq2.
+      rewrite eqq2 in eqq1.
+      assert (pm:Datatypes.length l1 + Datatypes.length l2' - Datatypes.length l2' =
+                 Datatypes.length l1' + Datatypes.length l2' - Datatypes.length l2').
+      { rewrite eqq1; trivial. }
+      repeat rewrite Nat.add_sub in pm; trivial.
+    Qed.
+
+    Lemma length_app_other_head {l1 l2 l1' l2' : list A} :
+      length (l1 ++ l2) = length (l1' ++ l2') ->
+      length l1 = length l1' ->
+      length l2 = length l2'.
+    Proof.
+      intros eqqs.
+      apply length_app_other_tail.
+      repeat rewrite app_length in *.
+      rewrite plus_comm, eqqs, plus_comm; trivial.
+    Qed.
+
+    Lemma app_inv_head_length {l1 l2 l1' l2' : list A} :
+      l1 ++ l2 = l1' ++ l2' ->
+      length l1 = length l1' ->
+      l1 = l1' /\ l2 = l2'.
+    Proof.
+      revert l1'.
+      induction l1; destruct l1'; try discriminate; simpl; intros eqlen eqq.
+      - subst; eauto.
+      - invcs eqq.
+        invcs eqlen.
+        specialize (IHl1 _ H2 H0).
+        destruct IHl1; subst.
+        tauto.
+    Qed.
+
+    Lemma app_inv_tail_length {l1 l2 l1' l2' : list A} :
+      l1 ++ l2 = l1' ++ l2' ->
+      length l2 = length l2' ->
+      l1 = l1' /\ l2 = l2'.
+    Proof.
+      intros eqq eql.
+      apply app_inv_head_length; trivial.
+      eapply length_app_other_tail; eauto.
+      rewrite eqq; trivial.
+    Qed.
+
     Definition singleton (x:A) : list A := x::nil.
     
     Lemma is_nil_dec (l:list A) : {l = nil} + {l <> nil}.
@@ -596,6 +647,24 @@ Section ListAdd.
             * apply antisymmetry; trivial.
             * apply IHl1; trivial.
       Qed.
+
+      Lemma Forall2_conj {A B} {f1 f2:A->B->Prop} {l1 l2} : 
+        Forall2 f1 l1 l2 -> Forall2 f2 l1 l2 -> Forall2 (fun x y => f1 x y /\ f2 x y) l1 l2.
+      Proof.
+        Hint Constructors Forall2.
+        intros.
+        induction H0; trivial.
+        invcs H; firstorder.
+      Qed.
+
+      Lemma Forall2_Forall_trans {A B} {P:A->Prop} {Q:B->Prop} l l' :
+        Forall2 (fun x y => P x -> Q y) l l' ->
+        Forall P l -> Forall Q l'.
+      Proof.
+        intros f2; induction f2; trivial.
+        intros f1; invcs f1.
+        eauto.
+      Qed.
       
       Lemma Forall2_trans_relations_weak {A B C}
             (R1:A->B->Prop) (R2:B->C->Prop) (R3:A->C->Prop):
@@ -657,7 +726,21 @@ Section ListAdd.
         destruct eqq; subst.
         auto.
       Qed.
-      
+
+      Lemma Forall2_app_inv {A B : Type} {R : A -> B -> Prop} {l1 l2 : list A} {l1' l2' : list B} :
+        Forall2 R (l1 ++ l2) (l1' ++ l2') ->
+        length l1 = length l1' ->
+        Forall2 R l1 l1' /\ Forall2 R l2 l2'.
+      Proof.
+        intros F2 eql.
+        apply Forall2_app_inv_l in F2.
+        destruct F2 as [l1'' [l2'' [F21 [F22 eqq]]]].
+        apply app_inv_head_length in eqq.
+        - destruct eqq; subst; tauto.
+        - rewrite <- eql.
+          apply Forall2_length in F21; trivial.
+      Qed.
+
       Lemma filter_Forall2_same {A B} P f g (l1:list A) (l2:list B) :
         Forall2 P l1 l2 ->
         map f l1 = map g l2 ->
