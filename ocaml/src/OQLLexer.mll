@@ -36,20 +36,13 @@
 	  (* Operators *)
 	  "or", OR;
 	  "and", AND;
-	  "not", NOT;
-	  (* Functions *)
-	  "flatten", FLATTEN;
-	  "avg", AVG;
-	  "favg", FAVG;
-	  "sum", SUM;
-          "float_sum", FLOAT_SUM;
-	  "count", COUNT;
-	  "min", MIN;
-	  "max", MAX;
+	  (* Constructors *)
 	  "struct", STRUCT;
 	  "bag", BAG;
-	   (* Data *)
-	  "nil", NIL
+	  (* Data *)
+	  "nil", NIL;
+	  "true", TRUE;
+	  "false", FALSE
 	]; tbl
     end
     

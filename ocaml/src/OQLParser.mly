@@ -15,7 +15,65 @@
  *)
 
 %{
+  open Util
   open QcertCompiler.EnhancedCompiler
+
+  let static_int e =
+    begin match e with
+    | QcertCompiler.OConst (QcertCompiler.Dnat i) -> i
+    | _ -> raise Not_found
+    end
+    
+  let resolve_call fname el =
+    begin match fname,el with
+    | "not", [e] ->
+	QOQL.ounop QOps.Unary.opneg e
+    | "flatten", [e] ->
+	QOQL.ounop QOps.Unary.opflatten e
+    | "sum", [e] ->
+	QOQL.ounop QOps.Unary.opnatsum e
+    | "fsum", [e] ->
+	QOQL.ounop QOps.Unary.opfloatsum e
+    | "avg", [e] ->
+	QOQL.ounop QOps.Unary.opnatmean e
+    | "favg", [e] ->
+	QOQL.ounop QOps.Unary.opfloatmean e
+    | "count", [e] ->
+	QOQL.ounop QOps.Unary.opcount e
+    | "max", [e] ->
+	QOQL.ounop QOps.Unary.opnatmax e
+    | "min", [e] ->
+	QOQL.ounop QOps.Unary.opnatmin e
+    | "substring", [e1;e2] ->
+	let start =
+	  begin try static_int e2 with
+	  | Not_found ->
+	      raise (Qcert_Error
+		       ("Second parameter of substring should be an integer constant"))
+	  end
+	in
+	QOQL.ounop (QOps.Unary.opsubstring start None) e1
+    | "substring", [e1;e2;e3] ->
+	let start =
+	  begin try static_int e2 with
+	  | Not_found ->
+	      raise (Qcert_Error
+		       ("Second parameter of substring should be an integer constant"))
+	  end
+	in
+	let len =
+	  begin try static_int e3 with
+	  | Not_found ->
+	      raise (Qcert_Error
+		       ("Third parameter of substring should be an integer constant"))
+	  end
+	in
+	QOQL.ounop (QOps.Unary.opsubstring start (Some len)) e1
+    | _, _ ->
+	raise (Qcert_Error
+		 ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))
+    end
+
 %}
 
 %token <int> INT
@@ -26,12 +84,10 @@
 %token SELECT DISTINCT FROM WHERE
 %token AS IN
 
-%token OR AND NOT
+%token OR AND
 %token STRUCT BAG
-%token FLATTEN
-%token FAVG AVG SUM FLOAT_SUM COUNT MIN MAX
 
-%token NIL
+%token NIL TRUE FALSE
 
 %token EQUAL NEQUAL
 %token LT GT LTEQ GTEQ
@@ -79,6 +135,10 @@ expr:
 (* Constants *)
 | NIL
     { QOQL.oconst QData.dunit }
+| TRUE
+    { QOQL.oconst (QData.dbool true) }
+| FALSE
+    { QOQL.oconst (QData.dbool false) }
 | i = INT
     { QOQL.oconst (QData.dnat (Util.coq_Z_of_int i)) }
 | f = FLOAT
@@ -93,7 +153,10 @@ expr:
 | SELECT DISTINCT e = expr FROM fc = from_clause
     { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue QOQL.onoorder }
 | SELECT DISTINCT e = expr FROM fc = from_clause WHERE w = expr
-    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere e) QOQL.onoorder }
+    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere w) QOQL.onoorder }
+(* Call *)
+| fn = IDENT LPAREN el = exprlist RPAREN
+    { resolve_call fn el }
 (* Expressions *)
 | v = IDENT
     { QOQL.ovar (Util.char_list_of_string v) }
@@ -105,25 +168,6 @@ expr:
     { QOQL.ostruct r }
 | BAG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opbag e }
-(* Functions *)
-| NOT LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opneg e }
-| FLATTEN LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opflatten e }
-| SUM LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnatsum e }
-| FLOAT_SUM LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opfloatsum e }
-| AVG LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnatmean e }
-| FAVG LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opfloatmean e }
-| COUNT LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opcount e }
-| MAX LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnatmax e }
-| MIN LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.opnatmin e }
 (* Binary operators *)
 | e1 = expr EQUAL e2 = expr
     { QOQL.obinop QOps.Binary.opequal e1 e2 }
@@ -147,6 +191,15 @@ expr:
     { QOQL.obinop QOps.Binary.opand e1 e2 }
 | e1 = expr OR e2 = expr
     { QOQL.obinop QOps.Binary.opor e1 e2 }
+
+(* expression list *)
+exprlist:
+| 
+    { [] }
+| e = expr
+    { [e] }
+| e = expr COMMA el = exprlist
+    { e :: el }
 
 from_clause:
 | v = IDENT IN e = expr

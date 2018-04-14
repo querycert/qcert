@@ -67,7 +67,7 @@ endif
 ## OQL
 OQLPERSONSNUM=1 2 3 4 5 6 7 8
 OQLWORLDNUM=1 2
-OQLEMPLOYEESNUM=1
+OQLEMPLOYEESNUM=1 2
 OQLTARGETS=oql nraenv nnrc nnrc_impish nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 oql-tests:

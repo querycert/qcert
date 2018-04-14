@@ -492,3 +492,15 @@ function natArithMean(b) {
 	return { "nat" : Math.floor(natSum(b)/len) };
     }
 }
+function count(v) {
+    return { "nat" : v.length };
+}
+function floatOfNat(v) {
+    return v.nat;
+}
+function substring(v, start, len) {
+    return v.substring(start,len);
+}
+function substringNoLength(v, start) {
+    return v.substring(start);
+}

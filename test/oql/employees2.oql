@@ -1,0 +1,4 @@
+select distinct d
+from c in Companies,
+     d in c.departments
+where substring(d,0,1) = "M"

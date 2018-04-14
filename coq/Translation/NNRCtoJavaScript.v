@@ -274,14 +274,15 @@ Section NNRCtoJavaScript.
                      | OpFlatten => "flatten(" ++ e1 ++ ")"
                      | OpDistinct => "distinct(" ++ e1 ++ ")"
                      | OpOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
-                     | OpCount => "{" ++ quotel ++ "nat" ++ quotel ++ " : " ++ e1 ++ ".length" ++ "}" (* XXX makes sure the result of count is tagged as nat *)
+                     | OpCount => "count(" ++ e1 ++ ")"
                      | OpToString => "toString(" ++ e1 ++ ")"
                      | OpSubstring start olen =>
-                       "(" ++ e1 ++ ").substring(" ++ toString start ++
                        match olen with
-                       | Some len => ", " ++ toString len
-                       | None => ""
-                       end ++ ")"
+                       | None =>
+                         "substringNoLength(" ++ e1 ++ "," ++ toString start ++ ")"
+                       | Some len =>
+                         "substring(" ++ e1 ++ "," ++ toString start ++ "," ++ toString len ++ ")"
+                       end
                      | OpLike pat oescape =>
                        let lc := make_like_clause pat oescape in
                        let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in
@@ -296,7 +297,7 @@ Section NNRCtoJavaScript.
                      | OpNatMin => "natMinApply(" ++ e1 ++ ")"
                      | OpNatMax => "natMaxApply(" ++ e1 ++ ")"
                      | OpNatMean => "natArithMean(" ++ e1 ++ ")"
-                     | OpFloatOfNat => "(" ++ e1 ++ ").nat"
+                     | OpFloatOfNat => "floatOfNat(" ++ e1 ++ ")"
                      | OpFloatUnary u => float_uarithToJs u e1
                      | OpFloatTruncate => "Math.trunc(" ++ e1 ++ ")" 
                      | OpFloatSum => "sum(" ++ e1 ++ ")"

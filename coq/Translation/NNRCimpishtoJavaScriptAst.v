@@ -250,14 +250,25 @@ Section NNRCimpishtoJavaScriptAst.
   Definition runtime_compare e1 e2 :=
     call_runtime "compare" [ e1; e2 ].
 
-  Definition runtime_count e := (* XXX TODO: Do we want to add this in runtime lib? XXX *)
-    expr_object
-      [ (propname_identifier "nat",
-         propbody_val (expr_member e "length")) ].
+  Definition runtime_count e :=
+    call_runtime "count"
+                 [ e ].
 
-  Definition runtime_floatOfNat e := (* XXX TODO: Do we want to add this in runtime lib? XXX *)
-    expr_member e "nat".
+  Definition runtime_floatOfNat e :=
+    call_runtime "floatOfNat"
+                 [ e ].
 
+  Definition runtime_substring start len e :=
+    call_runtime "substring"
+                 [ e;
+                   expr_literal (literal_number start);
+                   expr_literal (literal_number len) ].
+  
+  Definition runtime_substringNoLength start e :=
+    call_runtime "substringNoLength"
+                 [ e;
+                   expr_literal (literal_number start) ].
+  
   (** Data model *)
 
   Definition mk_rec (l: list (string * expr)) : expr :=
@@ -432,9 +443,14 @@ Section NNRCimpishtoJavaScriptAst.
     | OpToString =>
       toString e'
     | OpSubstring start olen =>
-      (* XXX TODO: @jerome how to converte a BinNums.Z to number? *)
-      (* substring e' start olen *)
-      expr_literal (literal_string "XXX TODO: mk_binary_op OpSubstring XXX") (* XXX TODO XXX *)
+      let start_num := float_of_int start in
+      match olen with
+      | None =>
+        runtime_substringNoLength start_num e'
+      | Some len =>
+        let len_num := float_of_int len
+        in runtime_substring start_num len_num e'
+      end
     | OpLike pat oescape =>
     (*   let lc := make_like_clause pat oescape in *)
     (*   let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in *)
