@@ -1,6 +1,6 @@
 \begin{tikzpicture}[
    align=center,
-   node distance=1.25em and 1.5em,
+   node distance=1.5em and 2em,
    font=\footnotesize,
    every loop/.style={latex-},
  ]
@@ -68,19 +68,24 @@
        right=of nnrc]
       (nnrcmr) {NNRCMR};
  \node[lang, coqc, hyperlink node=\coqurl{CldMR.Lang}{CldMR}{cldmr},
-       right=of nnrcmr]
+       right=3em of nnrcmr]
       (cldmr) {CldMR};
-
+ \node[lang, coqp, hyperlink node=\coqurl{NNRCimpish.Lang}{NNRCimpish}{nnrc_impish},
+       above=3em of nnrcmr]
+      (nnrcimpish) {NNRCimpish};
+ \node[lang, coqc, hyperlink node=\coqurl{JavaScriptAst.Lang}{JavaScriptAst}{ajavascript},
+       above=3em of cldmr]
+      (ajs) {JavaScript AST};
 
  % Target
  \node[lang, target, hyperlink node=\coqurl{Cloudant.Lang}{Cloudant}{cloudant},
-       right=of cldmr]
+       right=2.5em of cldmr]
       (cloudant) {Cloudant};
  \node[lang, target, hyperlink node=\coqurl{Java.Lang}{Java}{java},
-       above=0.25em of cloudant]
+       above=0.5em of cloudant]
       (java) {Java};
  \node[lang, target, hyperlink node=\coqurl{JavaScript.Lang}{JavaScript}{js},
-       above=0.25em of java]
+       above=1em of java]
       (js) {JavaScript};
  \node[lang, target,
        hyperlink node=\coqurl{SparkRDD.Lang}{SparkRDD}{spark_rdd},
@@ -155,10 +160,10 @@
    \transref{3}{\coqurl{Translation}{NNRCMRtoNNRC}{nnrc_of_nnrcmr_top}};
  \path[trans, tcoqp, dashed] (nnrc) -- (dnnrc)
    \transref{6}{\coqurl{Translation}{NNRCtoDNNRC}{nnrc_to_dnnrc_top}};
- \path[trans, tcoqc] (nnrc)
-   .. controls ([yshift=3em] nnrcmr.north) ..
-   (js.west)
-   \transref{30}{\coqurl{Translation}{NNRCtoJavaScript}{nnrc_to_js_top}};
+ \path[trans, tcoqp] (nnrc) -- (nnrcimpish)
+   \transref{3}{\coqurl{Translation}{NNRCtoNNRCimpish}{nnrc_to_nnrc_impish_top}};
+ \path[trans, tcoqc] (ajs) -- (js)
+   \transref{30}{\coqurl{Translation}{JavaScriptAsttoJavaScript}{js_ast_to_js_top}};
  \path[trans, tcoqc] (nnrc)
    .. controls ([yshift=2em] nnrcmr.north) ..
    (java.west)
@@ -173,6 +178,10 @@
    .. controls ([yshift=-7em] nra.south) and +(0, -1.5) ..
    (camp.south)
    \transref{30}{\coqurl{Translation}{cNNRCtoCAMP}{nnrc_core_to_camp_top}};
+
+ % *NNRCimpish
+ \path[trans, tcoqc] (nnrcimpish) -- (ajs)
+   \transref{6}{\coqurl{Translation}{NNRCimpishtoJavaScriptAst}{nnrc_impish_to_js_ast_top}};
 
  % NNRCMR
  \tikzoptim[ccoqc]{nnrcmr}{\coqurl{NNRCMR.Optim}{NNRCMROptimizer}{run_nnrcmr_optims}}

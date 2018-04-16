@@ -1162,7 +1162,7 @@ Section CompCorrectness.
       unfold eval_nnrc.
       unfold eval_nnrc_impish.
       unfold nnrc_to_nnrc_impish.
-      rewrite <- nnrc_to_nnrc_impish_correct.
+      rewrite <- nnrc_to_nnrc_impish_top_correct.
       trivial_same_query.
     Qed.
 

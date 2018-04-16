@@ -1063,7 +1063,7 @@ Section NNRCtoNNRCimpish.
 
   Require Import NNRCEq.
 
-  Theorem nnrc_to_nnrc_impish_correct
+  Theorem nnrc_to_nnrc_impish_top_correct
           h σc (s:nnrc) (globals:list var) :
     @nnrc_eval_top _ h s σc = nnrc_impish_eval_top h σc (nnrc_to_nnrc_impish_top globals s).
   Proof.
@@ -1195,7 +1195,7 @@ Section NNRCtoNNRCimpish.
     @nnrc_core_eval_top _ h s σc = nnrc_impish_core_eval_top h σc (nnrc_core_to_nnrc_impish_core_top globals s).
     Proof.
       destruct s as [q pf].
-      generalize (nnrc_to_nnrc_impish_correct h σc q globals); intros HH.
+      generalize (nnrc_to_nnrc_impish_top_correct h σc q globals); intros HH.
       unfold nnrc_eval_top in HH.
       rewrite <- nnrc_to_nnrc_ext_eq in HH by trivial.
       unfold nnrc_core_eval_top, lift_nnrc_core; simpl.

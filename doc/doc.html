@@ -253,26 +253,26 @@ operators</li>
     <tr><th>Name</th>
       <th>Language</th>
       <th>On Command Line</th>
-      <th>Code Location</th>
-      <th>Annotated Code</th>
+      <th>Directory</th>
+      <th>Code</th>
       <th>Reference</th></tr>
     <tr><th>TechRule</th>
       <td>ODM technical rules</td>
       <td><code>tech_rule</code></td>
       <td><code>coq/TechRule<code></td>
-      <td><a href="html/Qcert.TechRule.Lang.TechRule.html#tech_rule">Syntax</a></td>
+      <td><a href="html/Qcert.TechRule.Lang.TechRule.html#tech_rule">Source</a></td>
       <td></td></tr>
     <tr><th>DesignerRule</th>
       <td>ODM designer rules</td>
       <td><code>designer_rule</code></td>
       <td><code>coq/DesignerRule<code></td>
-      <td><a href="html/Qcert.DesignerRule.Lang.DesignerRule.html#designer_rule">Syntax</a></td>
+      <td><a href="html/Qcert.DesignerRule.Lang.DesignerRule.html#designer_rule">Source</a></td>
       <td></td></tr>
     <tr><th>&lambda;-NRA</th>
       <td>Lambda NRA</td>
       <td><code>lambda_nra</code></td>
       <td><code>coq/LambdaNRA<code></td>
-      <td><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">Syntax</a>,
+      <td><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">Ast</a>,
           <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">Eval</a>,
 	  <a href="html/Qcert.LambdaNRA.Typing.LambdaNRA.html#lambda_nra_type">Typing</a></td>
       <td><a href="#nraenv">[AHMSS2017]</a></td></tr>
@@ -280,19 +280,19 @@ operators</li>
       <td>Structured Query Language</td>
       <td><code>sql</code></td>
       <td><code>coq/SQL<code></td>
-      <td><a href="html/Qcert.SQL.Lang.SQL.html#sql">Syntax</a></td>
+      <td><a href="html/Qcert.SQL.Lang.SQL.html#sql">Ast</a></td>
       <td></td></tr>
     <tr><th>SQL++</th>
       <td>SQL extended for JSON</td>
       <td><code>sqlpp</code></td>
       <td><code>coq/SQLPP<code></td>
-      <td><a href="html/Qcert.SQLPP.Lang.SQLPP.html#sqlpp">Syntax</a></td>
+      <td><a href="html/Qcert.SQLPP.Lang.SQLPP.html#sqlpp">Ast</a></td>
       <td></td></tr>
     <tr><th>OQL</th>
       <td>Object Query Language</td>
       <td><code>oql</code></td>
       <td><code>coq/OQL<code></td>
-      <td><a href="html/Qcert.OQL.Lang.OQL.html#oql">Syntax</a>,
+      <td><a href="html/Qcert.OQL.Lang.OQL.html#oql">Ast</a>,
           <a href="html/Qcert.OQL.Lang.OQL.html#oql_eval_top">Eval</a></td>
       <td><a href="#oql">[ODMG]</a></td>
       <td></td></tr>
@@ -311,8 +311,8 @@ operators</li>
     <tr><th>Name</th>
       <th>Language</th>
       <th>On Command Line</th>
-      <th>Code Location</th>
-      <th>Annotated Code</th>
+      <th>Directory</th>
+      <th>Code</th>
       <th>Reference</th></tr>
     <tr><th>CAMPRule</th>
       <td>CAMP rules</td>
@@ -364,7 +364,7 @@ operators</li>
           <a href="html/Qcert.NNRC.Typing.TNNRC.html#nnrc_type">Typing</a></td>
       <td></td></tr>
     <tr><th>cNNRC</th>
-      <td>Core Named Nested Relational Calculus</td>
+      <td>Core NNRC</td>
       <td><code>nnrc_core</code></td>
       <td><code>coq/cNNRC<code></td>
       <td><a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">Syntax</a>,
@@ -372,6 +372,15 @@ operators</li>
           <a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">Eval</a>,
           <a href="html/Qcert.cNNRC.Typing.TcNNRC.html#nnrc_core_type">Typing</a></td>
       <td><a href="#nnrc">[BV2007]</a></td></tr>
+    <tr><th>NNRCimpish</th>
+      <td>Lightly Imperative NNRC</td>
+      <td><code>nnrc_impish</code></td>
+      <td><code>coq/NNRCimpish<code></td>
+      <td><a href="html/Qcert.NNRCimpish.Lang.NNRCimpish.html#nnrc_impish">Syntax</a>,
+          <a href="html/Qcert.NNRCimpish.Lang.NNRCimpishSem.html#nnrc_impish_sem_top">Semantics</a>,
+          <a href="html/Qcert.NNRCimpish.Lang.NNRCimpishEval.html#nnrc_impish_eval_top">Eval</a>,
+          <a href="html/Qcert.NNRCimpish.Typing.TNNRCimpish.html#nnrc_impish_type">Typing</a></td>
+      <td></td></tr>
   </table>
   
   <h4>Distributed Intermediate Languages</h4>
@@ -386,8 +395,8 @@ operators</li>
     <tr><th>Name</th>
       <th>Language</th>
       <th>On Command Line</th>
-      <th>Code Location</th>
-      <th>Annotated Code</th>
+      <th>Directory</th>
+      <th>Code</th>
       <th>Reference</th></tr>
     <tr><th>DNNRC</th>
       <td>Distributed Named Nested Relational Calculus</td>
@@ -432,43 +441,44 @@ operators</li>
     <tr><th>Name</th>
       <th>Language</th>
       <th>On Command Line</th>
-      <th>Code Location</th>
-      <th>Annotated Code</th>
+      <th>Directory</th>
+      <th>Code</th>
       <th>Runtime</th>
       <th>Reference</th></tr>
     <tr><th>JavaScript</th>
       <td>JavaScript</td>
       <td><code>javascript</code></td>
       <td><code>coq/JavaScript<code></td>
-      <td><a href="html/Qcert.JavaScript.Lang.JavaScript.html#javascript">Syntax</a></td>
+      <td><a href="html/Qcert.JavaScript.Lang.JavaScriptAst.html#ajavascript">Ast</a>,
+	<a href="html/Qcert.JavaScript.Lang.JavaScript.html#javascript">Target</a></td>
       <td><code>runtimes/javascript</code></td>
       <td></td></tr>
     <tr><th>Java</th>
       <td>Java</td>
       <td><code>java</code></td>
       <td><code>coq/Java<code></td>
-      <td><a href="html/Qcert.Java.Lang.Java.html#java">Syntax</a></td>
+      <td><a href="html/Qcert.Java.Lang.Java.html#java">Target</a></td>
       <td><code>runtimes/java</code></td>
       <td></td></tr>
     <tr><th>Cloudant</th>
       <td>Cloudant Map/Reduce Views</td>
       <td><code>cloudant</code></td>
       <td><code>coq/Cloudant<code></td>
-      <td><a href="html/Qcert.Cloudant.Lang.Cloudant.html#cloudant">Syntax</a></td>
+      <td><a href="html/Qcert.Cloudant.Lang.Cloudant.html#cloudant">Target</a></td>
       <td><code>runtimes/javascript</code></td>
       <td><a href="#cloudant">[Cloudant]</a></td></tr>
     <tr><th>Spark RDDs</th>
       <td>Spark (Resilient Distributed Datasets)</td>
       <td><code>spark_rdd</code></td>
       <td><code>coq/SparkRDD<code></td>
-      <td><a href="html/Qcert.SparkRDD.Lang.SparkRDD.html#spark_rdd">Syntax</a></td>
+      <td><a href="html/Qcert.SparkRDD.Lang.SparkRDD.html#spark_rdd">Target</a></td>
       <td><code>runtimes/javascript</code></td>
       <td><a href="#spark_rdd">[SparkRDD]</a></td></tr>
     <tr><th>Spark DataFrames</th>
       <td>Spark (DataFrames)</td>
       <td><code>spark_df</code></td>
       <td><code>coq/SparkDF<code></td>
-      <td><a href="html/Qcert.SparkDF.Lang.SparkDF.html#spark_df">Syntax</a></td>
+      <td><a href="html/Qcert.SparkDF.Lang.SparkDF.html#spark_df">Target</a></td>
       <td><code>runtimes/spark2</code></td>
       <td><a href="#spark_df">[SparkDF]</a></td></tr>
   </table>
@@ -489,7 +499,7 @@ operators</li>
   <table class="table">
     <tr><th>From</th>
       <th>To</th>
-      <th>Annotated Code</th>
+      <th>Code</th>
       <th>Notes</th>
       <th>Reference</th></tr>
     <tr><td>TechRule</td>
@@ -575,16 +585,17 @@ operators</li>
       <td><br/>By inclusion</td>
       <td></td></tr>
     <tr><td>NNRC</td>
-      <td>cNNRC<br/>DNNRC<br/>NNRCMR<br/>Javascript</br>Java</td>
+      <td>cNNRC<br/>NNRCimpish<br/>DNNRC<br/>NNRCMR<br/>Java</td>
       <td><a href="html/Qcert.Translation.NNRCtocNNRC.html#nnrc_to_nnrc_core_top">Translation</a>,
 	  <a href="html/Qcert.Translation.NNRCtocNNRC.html#nnrc_to_nnrc_core_top_correct">Correctness</a><br/>
+	  <a href="html/Qcert.Translation.NNRCtoNNRCimpish.html#nnrc_to_nnrc_impish_top">Translation</a>,
+	  <a href="html/Qcert.Translation.NNRCtoNNRCimpish.html#nnrc_to_nnrc_impish_top_correct">Correctness</a><br/>
 	  <a href="html/Qcert.Translation.NNRCtoDNNRC.html#nnrc_to_dnnrc_top">Translation</a>,
 	  <a href="html/Qcert.Translation.NNRCtoDNNRC.html#nnrc_to_dnnrc_top_correct">Correctness</a><br/>
 	  <a href="html/Qcert.Translation.NNRCtoNNRCMR.html#nnrc_to_nnrcmr_top">Translation</a><br/>
-	  <a href="html/Qcert.Translation.NNRCtoJavaScript.html#nnrc_to_javascript_top">Translation</a><br/>
 	  <a href="html/Qcert.Translation.NNRCtoJava.html#nnrc_to_java_top">Translation</a>
       </td>
-      <td>By macro-expansion<br/><br/><br/>Code-generation</br>Code-generation</td>
+      <td>By macro-expansion<br/><br/></br>Code-generation</td>
       <td></td></tr>
     <tr><td>cNNRC</td>
       <td>NNRC<br/>CAMP</td>
@@ -595,6 +606,12 @@ operators</li>
 	  <a href="html/Qcert.Translation.TcNNRCtoCAMP.html#nnrc_to_camp_let_type_preserve">Type Preservation</a>
       </td>
       <td>By inclusion</td>
+      <td></td></tr>
+    <tr><td>NNRCimpish</td>
+      <td>Javascript</td>
+      <td><a href="html/Qcert.Translation.NNRCimpishtoJavaScriptAst.html#nnrc_impish_to_js_ast_top">Translation</a>
+      </td>
+      <td>Through Ast</td>
       <td></td></tr>
     <tr><td>DNNRC</td>
       <td>tDNNRC</td>
@@ -634,7 +651,7 @@ operators</li>
   <table class="table">
     <tr><th>Name</th>
       <th>Language</th>
-      <th>Annotated Code</th>
+      <th>Code</th>
       <th>Reference</th></tr>
     <tr><td>NRA<sup>e</sup></td>
       <td>NRA with Environments</td>
