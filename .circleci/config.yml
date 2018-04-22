@@ -19,6 +19,7 @@ jobs:
         - v2-dep-{{ .Branch }}-
         - v2-dep-master-
         - v2-dep-
+    - run: rm -rf ~/.ivy2
     - run: sudo add-apt-repository -y ppa:avsm/ppa
     - run: sudo apt-get -qq update
     - run: sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
@@ -36,8 +37,6 @@ jobs:
         paths:
         - ~/.opam
         - ~/spark-2.1.2-bin-hadoop2.7
-        - ~/.ivy2
-        - ~/.sbt
     - run: eval `opam config env` && make -j2 SPARK=yes
     - run: make tests
     - run: cd test/spark2 && ./run.sh
