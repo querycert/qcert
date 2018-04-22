@@ -18,6 +18,7 @@ Require Import String.
 Require Import CommonRuntime.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
+Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToJSON.
 Require Import ForeignTypeToJSON.
@@ -40,6 +41,7 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_runtime : foreign_runtime.
   Axiom compiler_foreign_to_java : foreign_to_java.
   Axiom compiler_foreign_to_javascript : foreign_to_javascript.
+  Axiom compiler_foreign_to_ajavascript : foreign_to_ajavascript.
   Axiom compiler_foreign_to_scala : foreign_to_scala.
   Axiom compiler_foreign_to_JSON : foreign_to_JSON.
   Axiom compiler_foreign_type_to_JSON : foreign_type_to_JSON.

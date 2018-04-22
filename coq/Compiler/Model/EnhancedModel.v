@@ -20,6 +20,7 @@ Require Import Utils.
 Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
+Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToJSON.
 Require Import ForeignTypeToJSON.
@@ -503,12 +504,39 @@ Definition enhanced_to_javascript_binary_op
        sql_date_to_javascript_binary_op indent eol quotel op d1 d2
      end.
 
+Definition enhanced_to_ajavascript_unary_op
+             (fu:enhanced_unary_op)
+             (e:JsSyntax.expr) : JsSyntax.expr
+  := match fu with
+     | enhanced_unary_time_op op =>
+       time_to_ajavascript_unary_op op e
+     | enhanced_unary_sql_date_op op =>
+       sql_date_to_ajavascript_unary_op op e
+     end.
+
+Definition enhanced_to_ajavascript_binary_op
+           (fb:enhanced_binary_op)
+           (e1 e2:JsSyntax.expr) : JsSyntax.expr
+  := match fb with
+     | enhanced_binary_time_op op =>
+       time_to_ajavascript_binary_op op e1 e2
+     | enhanced_binary_sql_date_op op =>
+       sql_date_to_ajavascript_binary_op op e1 e2
+     end.
+
 Instance enhanced_foreign_to_javascript :
   @foreign_to_javascript enhanced_foreign_runtime
   := mk_foreign_to_javascript
        enhanced_foreign_runtime
        enhanced_to_javascript_unary_op
        enhanced_to_javascript_binary_op.
+
+Instance enhanced_foreign_to_ajavascript :
+  @foreign_to_ajavascript enhanced_foreign_runtime
+  := mk_foreign_to_ajavascript
+       enhanced_foreign_runtime
+       enhanced_to_ajavascript_unary_op
+       enhanced_to_ajavascript_binary_op.
 
 Definition enhanced_to_scala_unary_op (op: enhanced_unary_op) (d: string) : string :=
   match op with
@@ -1343,6 +1371,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_java.
   Definition compiler_foreign_to_javascript : foreign_to_javascript
     := enhanced_foreign_to_javascript.
+  Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
+    := enhanced_foreign_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
   Definition compiler_foreign_to_JSON : foreign_to_JSON
@@ -2030,6 +2060,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_java.
   Definition compiler_model_foreign_to_javascript : foreign_to_javascript
     := enhanced_foreign_to_javascript.
+  Definition compiler_model_foreign_to_ajavascript : foreign_to_ajavascript
+    := enhanced_foreign_to_ajavascript.
   Definition compiler_model_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
   Definition compiler_model_foreign_to_JSON : foreign_to_JSON

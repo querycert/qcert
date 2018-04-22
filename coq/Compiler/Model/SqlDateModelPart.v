@@ -15,12 +15,16 @@
  *)
 
 Require Import String.
+Require Import List.
 Require Import ZArith.
 Require Import EquivDec.
 Require Import Equivalence.
 Require Import Utils.
 Require Import ForeignData.
 Require Import ForeignOperators.
+Require Import JavaScriptAstRuntime.
+
+Import ListNotations.
 
 (*********  <WARNING>*********************)
 (** Extraction to OCaml is currently a stub **)
@@ -181,9 +185,19 @@ Definition sql_date_to_javascript_unary_op
              (quotel:String.string) (fu:sql_date_unary_op)
              (d:String.string) : String.string
   := match fu with
-     | uop_sql_get_date_component part=> "sqlGetDateComponent(" ++ (toString part) ++ ", " ++ d ++ ")"
+     | uop_sql_get_date_component part => "sqlGetDateComponent(" ++ (toString part) ++ ", " ++ d ++ ")"
      | uop_sql_date_from_string => "sqlDateFromString(" ++ d ++ ")"
      | uop_sql_date_interval_from_string => "sqlDateDurationFromString(" ++ d ++ ")"
+     end.
+
+Definition sql_date_to_ajavascript_unary_op
+             (fu:sql_date_unary_op)
+             (e:JsSyntax.expr) : JsSyntax.expr
+  := match fu with
+     | uop_sql_get_date_component part =>
+       call_runtime "sqlGetDateComponent" [ expr_literal (literal_string (toString part)); e ]
+     | uop_sql_date_from_string => call_runtime "sqlDateFromString" [ e ]
+     | uop_sql_date_interval_from_string => call_runtime "sqlDateDurationFromString" [ e ]
      end.
 
 Axiom SQL_DATE_plus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
@@ -267,5 +281,19 @@ Definition sql_date_to_javascript_binary_op
      | bop_sql_date_gt =>  jsFunc "sqlDatePointGt" d1 d2
      | bop_sql_date_ge => jsFunc "sqlDatePointGe" d1 d2
      | bop_sql_date_interval_between => jsFunc "sqlDateDurationBetween" d1 d2
+     end.  
+
+Definition sql_date_to_ajavascript_binary_op
+             (fb:sql_date_binary_op)
+             (e1 e2:JsSyntax.expr) : JsSyntax.expr
+  := match fb with
+     | bop_sql_date_plus => call_runtime "sqlDatePointPlus" [ e1; e2 ]
+     | bop_sql_date_minus => call_runtime "sqlDatePointMinus" [ e1; e2 ]
+     | bop_sql_date_ne =>  call_runtime "sqlDatePointNe" [ e1; e2 ]
+     | bop_sql_date_lt =>  call_runtime "sqlDatePointLt" [ e1; e2 ]
+     | bop_sql_date_le =>  call_runtime "sqlDatePointLe" [ e1; e2 ]
+     | bop_sql_date_gt =>  call_runtime "sqlDatePointGt" [ e1; e2 ]
+     | bop_sql_date_ge => call_runtime "sqlDatePointGe" [ e1; e2 ]
+     | bop_sql_date_interval_between => call_runtime "sqlDateDurationBetween" [ e1; e2 ]
      end.  
 

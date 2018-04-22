@@ -27,13 +27,16 @@ Section NNRCimpishtoJavaScriptAst.
   Require Import CommonRuntime.
   Require Import NNRCimpishRuntime.
   Require Import JavaScriptAstRuntime.
+  Require Import ForeignToJavaScriptAst.
   Require Import JSON.
   Require Import DatatoJSON.
   Require Import JsAst.JsNumber.
   Require Import Fresh.
+
   Import ListNotations.
 
   Context {fruntime:foreign_runtime}.
+  Context {ftoajavascript:foreign_to_ajavascript}.
   Context {ftojson:foreign_to_JSON}.
 
   Definition prog_to_string (x: prog) : string := "". (* XXX TODO: prog_to_string XXX *)
@@ -44,15 +47,6 @@ Section NNRCimpishtoJavaScriptAst.
 
   Definition toString e :=
     expr_call (expr_identifier "toString") [ e ].
-
-  Definition empty_array := expr_array nil.
-
-  Definition array_push e1 e2 :=
-    (* use [array_proto_push_function_object] ? *)
-    expr_call (expr_member e1 "push") [ e2 ].
-
-  Definition array_get e1 e2 :=
-    expr_access e1 e2.
 
   Definition substring e start len_opt :=
     let start := expr_literal (literal_number (start)) in
@@ -107,34 +101,6 @@ Section NNRCimpishtoJavaScriptAst.
   Definition math_trunc e :=
     expr_call (expr_member (expr_identifier "Math") "trunc") [ e ].
 
-
-  (** Runtime  functions *)
-
-  Definition brands_to_js_ast sl : expr :=
-    expr_array
-      (List.map
-         (fun s => Some (expr_literal (literal_string s)))
-         sl).
-
-  Definition sortCriteria_to_js_ast (sc: string * SortDesc) :=
-    let (lbl, c) := sc in
-    match c with
-    | Ascending =>
-      expr_object
-        [ (propname_identifier "asc", propbody_val (expr_literal (literal_string lbl))) ]
-    | Descending =>
-      expr_object
-        [ (propname_identifier "desc", propbody_val (expr_literal (literal_string lbl))) ]
-    end.
-
-  Definition sortCriterias_to_js_ast (scl: SortCriterias) :=
-    expr_array
-      (List.map
-         (fun sc => Some (sortCriteria_to_js_ast sc))
-         scl).
-
-  Definition call_runtime (f: string) (args: list expr) : expr:= (* TODO: review *)
-    expr_call (expr_identifier f) args.
 
   Definition runtime_either e :=
     call_runtime "either" [ e ].
@@ -402,8 +368,8 @@ Section NNRCimpishtoJavaScriptAst.
       | FloatGe =>
         expr_binary_op e1' binary_op_ge e2'
       end
-    | OpForeignBinary opf => (* XXX TODO XXX *)
-      expr_literal (literal_string "XXX TODO: mk_binary_op OpForeignBinary XXX")
+    | OpForeignBinary fb =>
+      foreign_to_ajavascript_binary_op fb e1' e2'
     end.
 
   Definition mk_unary_op op (e':expr) :=
@@ -496,7 +462,7 @@ Section NNRCimpishtoJavaScriptAst.
     | OpFloatOfNat =>
       runtime_floatOfNat e'
     | OpForeignUnary fu =>
-      expr_literal (literal_string "XXX TODO: mk_binary_op foreign XXX") (* XXX TODO XXX *)
+      foreign_to_ajavascript_unary_op fu e'
     end.
 
   Fixpoint nnrc_impish_expr_to_js_ast (exp: nnrc_impish_expr): expr :=

@@ -17,13 +17,15 @@ Require Import List.
 
 Section Closure.
   (** Function closures over code [C] and types [T] *)
-  
   Context {C:Set}.
   Context {T:Set}.
 
-  (** Whether code is closed wrt to parameters *)
-  Context {code_is_closed : list string -> C -> Prop}.
+  (** Assuming we can compute free variables in code *)
+  Context {free_vars : C -> list string}.
 
+  Definition code_closed_for_params (params:list string) (c:C) : Prop :=
+    forall v, In v (free_vars c) -> In v params.
+  
   Record closure :=
     mkClosure
       { closure_params: list (string * option T);
@@ -31,7 +33,7 @@ Section Closure.
         closure_body : C; }.
 
   Definition closure_is_closed (f:closure) : Prop :=
-    code_is_closed (map fst f.(closure_params)) f.(closure_body).
+    code_closed_for_params (map fst f.(closure_params)) f.(closure_body).
 
   Definition closed_closure :=
     { c : closure | closure_is_closed c }.

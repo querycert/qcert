@@ -19,6 +19,7 @@ Require Import CompilerRuntime.
 Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
+Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToJSON.
 Require Import ForeignTypeToJSON.
@@ -40,6 +41,7 @@ Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
   Axiom compiler_model_foreign_to_java : foreign_to_java.
   Axiom compiler_model_foreign_to_javascript : foreign_to_javascript.
+  Axiom compiler_model_foreign_to_ajavascript : foreign_to_ajavascript.
   Axiom compiler_model_foreign_to_scala : foreign_to_scala.
   Axiom compiler_model_foreign_to_JSON : foreign_to_JSON.
   Axiom compiler_model_foreign_type_to_JSON : foreign_type_to_JSON.
@@ -61,6 +63,8 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := basic_model_runtime.
   Definition compiler_foreign_to_javascript : foreign_to_javascript
     := model.compiler_model_foreign_to_javascript.
+  Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
+    := model.compiler_model_foreign_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := model.compiler_model_foreign_to_scala.
   Definition compiler_foreign_to_java : foreign_to_java

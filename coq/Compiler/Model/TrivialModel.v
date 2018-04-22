@@ -17,6 +17,7 @@
 Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
+Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToJSON.
 Require Import ForeignTypeToJSON.
@@ -251,6 +252,12 @@ Defined.
          trivial_foreign_runtime
          _ _.
 
+  Program Instance trivial_foreign_to_ajavascript :
+    @foreign_to_ajavascript trivial_foreign_runtime
+    := mk_foreign_to_ajavascript
+         trivial_foreign_runtime
+         _ _.
+
   Program Instance trivial_foreign_to_scala :
     @foreign_to_scala trivial_foreign_runtime trivial_foreign_type
     := mk_foreign_to_scala
@@ -339,6 +346,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_java.
     Definition compiler_foreign_to_javascript : foreign_to_javascript
       := trivial_foreign_to_javascript.
+    Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
+      := trivial_foreign_to_ajavascript.
     Definition compiler_foreign_to_scala : foreign_to_scala
       := trivial_foreign_to_scala.
     Definition compiler_foreign_to_JSON : foreign_to_JSON
@@ -380,6 +389,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_java.
     Definition compiler_model_foreign_to_javascript : foreign_to_javascript
       := trivial_foreign_to_javascript.
+    Definition compiler_model_foreign_to_ajavascript : foreign_to_ajavascript
+      := trivial_foreign_to_ajavascript.
     Definition compiler_model_foreign_to_scala : foreign_to_scala
       := trivial_foreign_to_scala.
     Definition compiler_model_foreign_to_JSON : foreign_to_JSON

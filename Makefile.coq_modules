@@ -264,6 +264,7 @@ MODULES = \
 	OQL/OQLTypes \
 	OQL/OQLSystem \
 	JavaScriptAst/Lang/JavaScriptAst \
+	JavaScriptAst/Lang/JavaScriptAstUtil \
 	JavaScriptAst/JavaScriptAstRuntime \
 	JavaScript/Lang/JavaScript \
 	JavaScript/JavaScriptRuntime \
@@ -304,6 +305,7 @@ MODULES = \
 	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \
 	Translation/ForeignToJavaScript \
+	Translation/ForeignToJavaScriptAst \
 	Translation/ForeignToJava \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \

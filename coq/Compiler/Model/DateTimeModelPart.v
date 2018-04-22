@@ -15,12 +15,16 @@
  *)
 
 Require Import String.
+Require Import List.
+Require Import ZArith.
 Require Import EquivDec.
 Require Import Equivalence.
+Require Import Utils.
 Require Import ForeignData.
 Require Import ForeignOperators.
-Require Import Utils.
-Require Import ZArith.
+Require Import JavaScriptAstRuntime.
+
+Import ListNotations.
 
 (*********  <WARNING>*********************)
 (** Extraction to OCaml is currently a stub **)
@@ -196,6 +200,7 @@ Definition time_to_java_unary_op
      | uop_time_duration_from_string => mk_java_unary_op0 "time_duration_from_string" d
      end.
 
+(* XXX THOSE ARE MISSING IN THE RUNTIME? *)
 Definition time_to_javascript_unary_op
              (indent:nat) (eol:String.string)
              (quotel:String.string) (fu:time_unary_op)
@@ -203,7 +208,16 @@ Definition time_to_javascript_unary_op
   := match fu with
      | uop_time_to_scale => "timePointToScale(" ++ d ++ ")"
      | uop_time_from_string => "timeFromString(" ++ d ++ ")"
-     | uop_time_duration_from_string => "new TimeDuration(" ++ d ++ ")"
+     | uop_time_duration_from_string => "timeDurationFromString(" ++ d ++ ")"
+     end.
+
+Definition time_to_ajavascript_unary_op
+             (fu:time_unary_op)
+             (e:JsSyntax.expr) : JsSyntax.expr
+  := match fu with
+     | uop_time_to_scale => call_runtime "timePointToScale" [ e ]
+     | uop_time_from_string => call_runtime "timeFromString" [ e ]
+     | uop_time_duration_from_string => call_runtime "timeDurationFromString" [ e ]
      end.
 
 Axiom TIME_POINT_as : TIME_POINT -> time_scale -> TIME_POINT.
@@ -294,5 +308,20 @@ Definition time_to_javascript_binary_op
      | bop_time_ge => jsFunc "timePointGe" d1 d2
      | bop_time_duration_from_scale =>  jsFunc "timeDurationFromScale" d1 d2
      | bop_time_duration_between => jsFunc "timeDurationBetween" d1 d2
+     end.  
+
+Definition time_to_ajavascript_binary_op
+             (fb:time_binary_op)
+             (e1 e2:JsSyntax.expr) : JsSyntax.expr
+  := match fb with
+     | bop_time_as => call_runtime "timePointAs" [ e1; e2 ]
+     | bop_time_shift => call_runtime "timePointShift" [ e1; e2 ]
+     | bop_time_ne =>  call_runtime "timePointNe" [ e1; e2 ]
+     | bop_time_lt =>  call_runtime "timePointLt" [ e1; e2 ]
+     | bop_time_le =>  call_runtime "timePointLe" [ e1; e2 ]
+     | bop_time_gt =>  call_runtime "timePointGt" [ e1; e2 ]
+     | bop_time_ge => call_runtime "timePointGe" [ e1; e2 ]
+     | bop_time_duration_from_scale =>  call_runtime "timeDurationFromScale" [ e1; e2 ]
+     | bop_time_duration_between => call_runtime "timeDurationBetween" [ e1; e2 ]
      end.  
 
