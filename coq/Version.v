@@ -20,7 +20,7 @@ Require Import String.
 
 Section Version.
   (** Variables are defined as strings *)
-  Definition qcert_version := "1.0.9"%string.
+  Definition qcert_version := "1.1.0"%string.
 
 End Version.
 
