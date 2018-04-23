@@ -48,7 +48,6 @@ Require Import Decidable.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import cNNRCRuntime.
-(* Require Import cNNRCShadow. *)
 
 Section NNRC.
   Context {fruntime:foreign_runtime}.

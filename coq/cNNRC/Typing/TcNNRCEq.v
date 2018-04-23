@@ -27,7 +27,6 @@ Require Import CommonSystem.
 Require Import cNNRC.
 Require Import cNNRCEq.
 Require Import TcNNRC.
-(* Require Import TData. *)
 
 Section TcNNRCEq.
   (* Named Nested Relational Calculus *)

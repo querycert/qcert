@@ -23,9 +23,6 @@ Require Import Morphisms.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import cNRAEnv.
-    
-(* Require Import DData. *)
-(* Require Import DDataNorm. *)
 
 Section DNNRCBase.
   Context {fruntime:foreign_runtime}.
