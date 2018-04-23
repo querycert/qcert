@@ -14,23 +14,22 @@
  * limitations under the License.
  *)
 
-Section TGroupBy.
+Require Import String.
+Require Import List.
+Require Import ZArith.
+Require Import Compare_dec.
+Require Import Utils.
+Require Import Types.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import ForeignDataTyping.
+Require Import Operators.
+Require Import TData.
+Require Import TUtil.
+Require Import GroupBy.
 
-  Require Import String.
-  Require Import List.
-  Require Import ZArith.
-  Require Import Compare_dec.
-  Require Import Utils.
-  Require Import Types.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import ForeignDataTyping.
-  Require Import Operators.
-  Require Import TData.
-  Require Import TUtil.
-  
-  Require Import GroupBy.
+Section TGroupBy.
   
   Context {fdata:foreign_data}.
   Context {ftype:foreign_type}.

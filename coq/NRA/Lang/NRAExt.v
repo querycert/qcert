@@ -18,15 +18,15 @@
 some of the additional operators commonly found in the nested
 relational algebra. *)
 
-Section NRAExt.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRA.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRA.
 
+Section NRAExt.
   (* Algebra *)
 
   (* By convention, "static" parameters come first, followed by

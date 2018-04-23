@@ -14,17 +14,17 @@
  * limitations under the License.
  *)
 
-Section TCAMPtoNRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import CommonSystem.
-  Require Import NRASystem.
-  Require Import NRAEnvSystem.
-  Require Import CAMPSystem.
-  Require Import CAMPtoNRAEnv.
-  Require Import TCAMPtoNRA.
-  Require Import TCAMPtocNRAEnv.
+Require Import String.
+Require Import List.
+Require Import CommonSystem.
+Require Import NRASystem.
+Require Import NRAEnvSystem.
+Require Import CAMPSystem.
+Require Import CAMPtoNRAEnv.
+Require Import TCAMPtoNRA.
+Require Import TCAMPtocNRAEnv.
 
+Section TCAMPtoNRAEnv.
   Local Open Scope string_scope.
   Local Open Scope list_scope.
   Local Open Scope camp_scope.

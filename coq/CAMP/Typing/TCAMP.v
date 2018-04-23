@@ -14,16 +14,18 @@
  * limitations under the License.
  *)
 
-Section TCAMP.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import CAMPUtil.
-  Require Import CAMP.
+Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Permutation.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import CAMPUtil.
+Require Import CAMP.
 
+Section TCAMP.
   (** Auxiliary lemmas *)
 
   Lemma rec_sort_is_sorted {A} (l:list (string*A)) :
@@ -106,8 +108,6 @@ Section TCAMP.
   Qed.
 
   Hint Resolve data_type_drec_nil.
-
-  Require Import Bool.
 
   Lemma concat_bindings_type {env₁ env₂ Γ₁ Γ₂} :
     bindings_type env₁ Γ₁ ->
@@ -287,7 +287,6 @@ Section TCAMP.
       + subst; eauto.
   Qed.
 
-  Require Import Permutation.
   Hint Constructors camp_type.
 
   (** Additional lemma used in the correctness for typed translation from NNRC to CAMP *)

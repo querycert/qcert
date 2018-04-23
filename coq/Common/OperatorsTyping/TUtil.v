@@ -14,20 +14,22 @@
  * limitations under the License.
  *)
 
-Section TUtil.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import Eqdep_dec.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import Types.
-  Require Import ForeignData.
-  Require Import CommonData.
-  Require Import Operators.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Program.
+Require Import Eqdep_dec.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Utils.
+Require Import Types.
+Require Import ForeignData.
+Require Import CommonData.
+Require Import Operators.
+Require Import TData.
+Require Import ForeignDataTyping.
 
+Section TUtil.
   (* Lemma/definitions over types involved in the inference *)
   
   Context {fdata:foreign_data}.
@@ -398,8 +400,6 @@ Section TUtil.
   Qed.
 
   Section lift_map.
-    Require Import TData.
-    Require Import ForeignDataTyping.
     Context {fdtyping:foreign_data_typing}.
 
     Lemma omap_product_empty_right τ pf l:
@@ -553,8 +553,6 @@ Section TUtil.
   End lift_map.
 
   Section bagops.
-    Require Import TData.
-    Require Import ForeignDataTyping.
     Context {fdtyping:foreign_data_typing}.
 
     Lemma forall_typed_bunion {τ} d1 d2:

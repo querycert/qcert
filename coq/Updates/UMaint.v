@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+
+Require Import RUtil.
+Require Import RData.
+Require Import RRelation.
+Require Import RAlg.
+Require Import UPropag.
+Require Import UDelta.
+
+Require Import Program.
+
 Section UMaint.
-  Require Import String.
-  Require Import List.
-
-  Require Import RUtil.
-  Require Import RData.
-  Require Import RRelation.
-  Require Import RAlg.
-  Require Import UPropag.
-  Require Import UDelta.
-
-  Require Import Program.
-
   Fixpoint main (op:alg) (δ:Δ) : Δ :=
     match δ with
       | Δid => Δid

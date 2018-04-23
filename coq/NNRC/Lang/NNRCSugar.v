@@ -16,23 +16,23 @@
 
 (** This module contains some additional properties for extended operators in NNRC. Some of those are notably useful later on for proving translations from NRAEnv. *)
 
-Section NNRCSugar.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Arith.
-  Require Import Max.
-  Require Import Bool.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRCRuntime.
-  Require Import NNRC.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Arith.
+Require Import Max.
+Require Import Bool.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRCRuntime.
+Require Import NNRC.
 
+Section NNRCSugar.
   Context {fruntime:foreign_runtime}.
   Context {h:brand_relation_t}.
 

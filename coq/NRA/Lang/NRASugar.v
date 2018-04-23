@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section NRASugar.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import EquivDec.
-  Require Import CommonRuntime.
-  Require Import NRA.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import EquivDec.
+Require Import CommonRuntime.
+Require Import NRA.
 
+Section NRASugar.
   (* Some macros used by extended algebras and patterns *)
 
   Context {fruntime:foreign_runtime}.
@@ -95,6 +95,10 @@ Section NRASugar.
     tauto.
   Qed.
 
+  Definition NRARecEither f :=
+    NRAEither (NRAUnop OpLeft (NRAUnop (OpRec f) NRAID))
+              (NRAUnop OpRight (NRAUnop (OpRec f) NRAID)).
+  
 End NRASugar.
 
 Hint Resolve data_normalized_nra_context_data.  

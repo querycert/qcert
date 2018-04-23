@@ -14,20 +14,20 @@
  * limitations under the License.
  *)
 
-Section TNNRCimpish.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Program.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NNRCimpish.
-  Require Import NNRCimpishEval.
-  Require Import NNRCimpishSem.
-  Require Import NNRCimpishSemEval.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Program.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NNRCimpish.
+Require Import NNRCimpishEval.
+Require Import NNRCimpishSem.
+Require Import NNRCimpishSemEval.
 
+Section TNNRCimpish.
   (** Typing rules for NNRCimpish *)
   Context {m:basic_model}.
 

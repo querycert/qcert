@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
-Section ForeignOperators.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataNorm.
+Require Import EquivDec.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataNorm.
 
-    Class foreign_unary_op {fdata:foreign_data}
-      : Type
+Section ForeignOperators.
+  Class foreign_unary_op {fdata:foreign_data}
+  : Type
     := mk_foreign_unary_op {
            foreign_unary_op_type : Set
            ; foreign_unary_op_dec :> EqDec foreign_unary_op_type eq
@@ -40,8 +40,8 @@ Section ForeignOperators.
                data_normalized br o
          }.
 
-    Class foreign_binary_op {fdata:foreign_data}
-      : Type
+  Class foreign_binary_op {fdata:foreign_data}
+    : Type
     := mk_foreign_binary_op {
            foreign_binary_op_type : Set
            ; foreign_binary_op_dec :> EqDec foreign_binary_op_type eq

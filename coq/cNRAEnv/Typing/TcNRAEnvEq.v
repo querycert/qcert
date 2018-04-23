@@ -14,20 +14,20 @@
  * limitations under the License.
  *)
 
-Section TcNRAEnvEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNRAEnv.
-  Require Import cNRAEnvEq.
-  Require Import TcNRAEnv.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNRAEnv.
+Require Import cNRAEnvEq.
+Require Import TcNRAEnv.
 
+Section TcNRAEnvEq.
   Local Open Scope nraenv_core_scope.
   
   (* Equivalence relation between *typed* algebraic plans.  Two

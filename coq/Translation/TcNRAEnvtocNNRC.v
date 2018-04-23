@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section TcNRAEnvtocNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNRAEnvSystem.
-  Require Import cNNRCSystem.
-  Require Import cNRAEnvtocNNRC.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Compare_dec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNRAEnvSystem.
+Require Import cNNRCSystem.
+Require Import cNRAEnvtocNNRC.
 
+Section TcNRAEnvtocNNRC.
   (** Type preservation for the translation from NRA to NNRC *)
 
   Ltac elim_fresh e

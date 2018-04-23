@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
-Section SQLSize.
-  Require Import String.
-  Require Import ZArith.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import SQL.
+Require Import String.
+Require Import ZArith.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import SQL.
   
+Section SQLSize.
   Context {fruntime:foreign_runtime}.
 
   Section size.

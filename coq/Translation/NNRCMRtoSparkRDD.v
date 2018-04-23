@@ -16,6 +16,7 @@
 
 Require Import List.
 Require Import String.
+Require Import Ascii.
 Require Import EquivDec.
 Require Import Utils.
 Require Import CommonRuntime.
@@ -25,6 +26,8 @@ Require Import NNRCtoJavaScript.
 Require Import ForeignToJavaScript.
 Require Import ForeignToSpark.
 Require Import SparkRDDRuntime.
+Require Import NNRCMROptim.
+Require Import OptimizerLogger.
 
 Local Open Scope string_scope.
 
@@ -40,7 +43,6 @@ Section NNRCMRtoSparkRDD.
 
   Section sanitize.
     Import ListNotations.
-    Require Import Ascii String.
       
     Definition scalaAllowedIdentifierInitialCharacters := ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P";"Q";"R";"S";"T";"U";"V";"W";"X";"Y";"Z";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z"]%char.
 
@@ -547,8 +549,6 @@ Section NNRCMRtoSparkRDD.
     nnrcmrToSparkTopDataFromFile test_name init l eol_newline "'".
 
   Section Top.
-    Require Import NNRCMROptim.
-    Require Import OptimizerLogger.
     Context {nnrc_logger:optimizer_logger string nnrc}.
 
     Definition nnrcmr_to_nnrcmr_spark_rdd_prepare (q: nnrcmr) : nnrcmr :=

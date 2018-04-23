@@ -14,9 +14,9 @@
  * limitations under the License.
  *)
 
-Section JavaScript.
-  Require Import String.
+Require Import String.
 
+Section JavaScript.
   (** Javascript programs are in serialized form *)
   Definition javascript := string.
   Definition js := javascript. (* Just an alias *)

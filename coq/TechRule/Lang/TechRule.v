@@ -23,11 +23,11 @@ Java. *)
 - translating to TechRule:
 - translating from TechRule: CAMPRule *)
 
-Section TechRule.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Export CAMPRuleRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Export CAMPRuleRuntime.
 
+Section TechRule.
   Context {fruntime:foreign_runtime}.
 
   Axiom tech_rule : Set.

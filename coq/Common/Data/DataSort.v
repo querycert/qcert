@@ -23,6 +23,8 @@ Require Import String.
 Require Import List.
 Require Import ZArith.
 Require Import Utils.
+Require Import ForeignData.
+Require Import Data.
 
 Section SortableData.
   Inductive SortDesc : Set := | Descending | Ascending.
@@ -31,7 +33,7 @@ Section SortableData.
 
   (*
   Definition sort_dstring_list := @insertion_sort string StringOrder.lt StringOrder.lt_dec.
-  Definition sort_dnat_list := @insertion_sort Z Z.lt Z_lt_dec.
+  Definition sort_dnat_list := @insertion_sort Z Z.lt Z.lt_dec.
    *)
 
   Inductive sdata :=
@@ -48,7 +50,7 @@ Section SortableData.
   Lemma sdata_eq_dec : forall x y:sdata, {x=y}+{x<>y}.
   Proof.
     destruct x; destruct y; try solve[right; inversion 1].
-    - destruct (Z_eq_dec z z0).
+    - destruct (Z.eq_dec z z0).
       + left; f_equal; trivial.
       + right;intro;apply n;inversion H; trivial.
     - destruct (string_dec s s0).
@@ -108,7 +110,7 @@ Module SortableDataOrder <: OrderedTypeFull with Definition t:=sdata.
   Lemma compare_refl_eq a: compare a a = Eq.
   Proof.
     destruct a; simpl in *; eauto.
-    rewrite Zcompare_refl; trivial.
+    rewrite Z.compare_refl; trivial.
     rewrite StringOrder.compare_refl_eq; trivial.
   Qed.
 
@@ -132,7 +134,7 @@ Module SortableDataOrder <: OrderedTypeFull with Definition t:=sdata.
       rewrite StringOrder.compare_eq_iff; reflexivity.
       congruence.
     - destruct x; destruct y; destruct z; try reflexivity; try congruence.
-      + apply (Zlt_trans z0 z1 z H H0).
+      + apply (Z.lt_trans z0 z1 z H H0).
       + generalize (@StrictOrder_Transitive _ _ (StringOrder.lt_strorder) s s0 s1);
         unfold StringOrder.lt; intros.
         auto.
@@ -371,7 +373,6 @@ Module LexicographicDataOrder <: OrderedTypeFull with Definition t:=list sdata.
 End LexicographicDataOrder.
 
 Section DataSort.
-  Require Import Data.
 
   Global Program Instance ODT_lexdata : (@ODT (list sdata))
     := mkODT _ _ LexicographicDataOrder.lt
@@ -382,9 +383,6 @@ Section DataSort.
     simpl.
     apply LexicographicDataOrder.compare_spec.
   Qed.
-
-  Require Import ForeignData.
-  Require Import Data.
 
   Context {fdata:foreign_data}.
   Definition theotherdot d s :=

@@ -34,22 +34,23 @@ targets. *)
 - translating to NNRC: NRAEnv, cNNRC
 - translating from NNRC: cNNRC, NNRCMR, DNNRC, Java, JavaScript *)
 
-Section NNRC.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Arith.
-  Require Import Max.
-  Require Import Bool.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRCRuntime.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Arith.
+Require Import Max.
+Require Import Bool.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRCRuntime.
+(* Require Import cNNRCShadow. *)
 
+Section NNRC.
   Context {fruntime:foreign_runtime}.
 
   (** * Abstract Syntax *)
@@ -284,7 +285,6 @@ Section NNRC.
   
   Section Properties.
     Context {h:brand_relation_t}.
-    Require Import cNNRCShadow.
     
     Lemma nnrc_to_nnrc_base_free_vars_same e:
       nnrc_free_vars e = nnrc_free_vars (nnrc_to_nnrc_base e).

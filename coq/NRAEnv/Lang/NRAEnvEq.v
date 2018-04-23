@@ -14,16 +14,21 @@
  * limitations under the License.
  *)
 
-Section NRAEnvEq.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNRAEnv.
-  Require Import cNRAEnvEq.
-  Require Import NRAEnv.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNRAEnv.
+Require Import cNRAEnvEq.
+Require Import NRAEnv.
 
+Section NRAEnvEq.
   (* Equivalence for extended algebra *)
 
   Local Open Scope nraenv_core_scope.
@@ -40,12 +45,6 @@ Section NRAEnvEq.
            (x:data)
            (dn_x:data_normalized h x),
         nraenv_eval h c op1 env x = nraenv_eval h c op2 env x.
-
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
 
   Global Instance nraenv_equiv : Equivalence nraenv_eq.
   Proof.
@@ -66,7 +65,6 @@ Section NRAEnvEq.
   Notation "X ≡ₓ Y" := (nraenv_eq X Y) (at level 90) : nraenv_scope. (* ≡ = \equiv *)
   (** Thanks to shallow semantics, lifting between nraenv_core and nraenv is easy *)
   Section eq_lift.
-    Require Import cNRAEnv cNRAEnvEq.
     Open Scope nraenv_core_scope.
 
     Lemma lift_nraenv_core_eq_to_nraenv_eq_r (q1 q2:nraenv_core) :

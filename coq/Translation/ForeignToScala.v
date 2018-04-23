@@ -24,13 +24,13 @@ Local Open Scope string_scope.
 
 Section ForeigntoScala.
 
-Class foreign_to_scala {fruntime:foreign_runtime} {ftype: foreign_type}: Type
-  := mk_foreign_to_scala {
-         foreign_to_scala_unary_op
-           (fu:foreign_unary_op_type)
-           (d:string) : string
-         ; foreign_to_scala_spark_datatype (ft: foreign_type_type) : string
-       }.
-  
+  Class foreign_to_scala {fruntime:foreign_runtime} {ftype: foreign_type}: Type
+    := mk_foreign_to_scala {
+           foreign_to_scala_unary_op
+             (fu:foreign_unary_op_type)
+             (d:string) : string
+           ; foreign_to_scala_spark_datatype (ft: foreign_type_type) : string
+         }.
+
 End ForeigntoScala.
 

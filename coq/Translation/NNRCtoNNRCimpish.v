@@ -14,25 +14,26 @@
  * limitations under the License.
  *)
 
-Section NNRCtoNNRCimpish.
-  Require Import String.
-  Require Import List.
-  Require Import Bool.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Permutation.
-  Require Import Eqdep_dec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
-  Require Import NNRC.
-  Require Import cNNRCNorm.
-  Require Import cNNRCVars.
-  Require Import NNRCimpishRuntime.
-  Require Import NNRCStratify.
-  Require Import Fresh.
+Require Import String.
+Require Import List.
+Require Import Bool.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Permutation.
+Require Import Eqdep_dec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
+Require Import NNRC.
+Require Import NNRCEq.
+Require Import cNNRCNorm.
+Require Import cNNRCVars.
+Require Import NNRCimpishRuntime.
+Require Import NNRCStratify.
+Require Import Fresh.
 
+Section NNRCtoNNRCimpish.
   Context {fruntime:foreign_runtime}.
 
   Section from_stratified.
@@ -337,7 +338,6 @@ Section NNRCtoNNRCimpish.
     Qed.
 
     Local Open Scope string.
-    Require Import List.
 
     Ltac expr_push_finisher ev x
       := match_destr_in ev
@@ -351,7 +351,7 @@ Section NNRCtoNNRCimpish.
       nnrc_impish_stmt_eval h σc pd mc md si = Some (pd', mc', md') ->
       (forall x fvs, nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_push x) s = Some si ->
                      forall mc2 old, mc = (x,old)::mc2 ->
-                                     exists n, mc' = ((x,old++n::nil)::mc2))
+                                     exists n, mc' = ((x,old++n::nil)::mc2))%list
       /\ 
       (forall x fvs, nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_assign x) s = Some si ->
                      mc' = mc).
@@ -460,7 +460,7 @@ Section NNRCtoNNRCimpish.
                     end
                   end) l1 pd ((fresh_var "tmp" fvs, old) :: mc) md =
                Some (pd', (s, l) :: m, md') ->
-                 exists n : list data, (s,l)::m = (fresh_var "tmp" fvs, old ++ n) :: mc)).
+                 exists n : list data, (s,l)::m = (fresh_var "tmp" fvs, old ++ n) :: mc))%list.
         + intros HH.
           apply (HH l nil) in eqq1.
           destruct eqq1 as [? eqq5].
@@ -528,7 +528,7 @@ Section NNRCtoNNRCimpish.
                     end
                   end) l0 pd ((fresh_var "tmp" fvs, old) :: mc) md =
                  Some (pd', (s, l) :: m, md') ->
-                 exists n : list data, (s,l)::m = (fresh_var "tmp" fvs, old ++ n) :: mc)).
+                 exists n : list data, (s,l)::m = (fresh_var "tmp" fvs, old ++ n) :: mc))%list.
         + intros HH.
           apply (HH l nil) in eqq1.
           destruct eqq1 as [? eqq5].
@@ -628,7 +628,7 @@ Section NNRCtoNNRCimpish.
           {s:nnrc} {fvs} {si:nnrc_impish_stmt} {h σc pd mc md x pd' mc' md' old}:
       nnrc_impish_stmt_eval h σc pd ((x,old)::mc) md si = Some (pd', mc', md') ->
       nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_push x) s = Some si ->
-      exists n, mc' = ((x,old++n::nil)::mc).
+      exists n, mc' = ((x,old++n::nil)::mc)%list.
     Proof.
       intros eqsi ev.
       destruct (nnrc_stmt_to_nnrc_impish_stmt_aux_push1_assign_eq_mc s eqsi).
@@ -871,7 +871,7 @@ Section NNRCtoNNRCimpish.
               - unfold var in *.
                 simpl.
                 rewrite rev_involutive.
-                specialize (IHl (old ++ x :: nil)).
+                specialize (IHl (old ++ x :: nil))%list.
                 match goal with
                   [H:match (match ?x with | _ => _ end ) with | _ => _ end |- _] =>
                   let eqq := (fresh "eqq") in
@@ -1060,8 +1060,6 @@ Section NNRCtoNNRCimpish.
     End tests.
 
   End from_stratified.
-
-  Require Import NNRCEq.
 
   Theorem nnrc_to_nnrc_impish_top_correct
           h σc (s:nnrc) (globals:list var) :

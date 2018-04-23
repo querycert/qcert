@@ -17,19 +17,20 @@
 (** This module contains additional definitions and lemmas on
 lists. *)
 
-Section ListAdd.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Bool.
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import RelationClasses.
-  Require Import Omega.
-  Require Import CoqLibAdd Lift.
+Require Import List.
+Require Import ListSet.
+Require Import Bool.
+Require Import Permutation.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import RelationClasses.
+Require Import Omega.
+Require Import CoqLibAdd.
+Require Import Lift.
 
+Section ListAdd.
   (** * Miscellaneous operations on lists *)
   
   Section Misc.

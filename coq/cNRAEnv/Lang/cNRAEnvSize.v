@@ -14,11 +14,11 @@
  * limitations under the License.
  *)
 
-Section cNRAEnvSize.
-  Require Import Omega.
-  Require Import CommonRuntime.
-  Require Import cNRAEnv.
+Require Import Omega.
+Require Import CommonRuntime.
+Require Import cNRAEnv.
 
+Section cNRAEnvSize.
   Context {fruntime:foreign_runtime}.
 
   (* Java equivalent: NraOptimizer.optim_size.cnraenv_size *)

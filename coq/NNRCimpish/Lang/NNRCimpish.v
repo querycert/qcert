@@ -19,21 +19,21 @@
      as an intermediate language between NNRC and more imperative /
      statement oriented backends *)
 
-Section NNRCimpish.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Arith.
-  Require Import Max.
-  Require Import Bool.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Arith.
+Require Import Max.
+Require Import Bool.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
 
+Section NNRCimpish.
   Section Syntax.
 
     Context {fruntime:foreign_runtime}.

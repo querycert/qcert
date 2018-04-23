@@ -14,25 +14,25 @@
  * limitations under the License.
  *)
 
-Section NNRCimpishtoJavaScriptAst.
-  Require Import String.
-  Require Import List.
-  Require Import Bool.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Permutation.
-  Require Import Eqdep_dec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCimpishRuntime.
-  Require Import JavaScriptAstRuntime.
-  Require Import ForeignToJavaScriptAst.
-  Require Import JSON.
-  Require Import DatatoJSON.
-  Require Import JsAst.JsNumber.
-  Require Import Fresh.
+Require Import String.
+Require Import List.
+Require Import Bool.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Permutation.
+Require Import Eqdep_dec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCimpishRuntime.
+Require Import JavaScriptAstRuntime.
+Require Import ForeignToJavaScriptAst.
+Require Import JSON.
+Require Import DatatoJSON.
+Require Import JsAst.JsNumber.
+Require Import Fresh.
 
+Section NNRCimpishtoJavaScriptAst.
   Import ListNotations.
 
   Context {fruntime:foreign_runtime}.

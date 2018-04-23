@@ -14,13 +14,13 @@
  * limitations under the License.
  *)
 
-Section cNRAEnvtoNRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import CommonRuntime.
-  Require Import cNRAEnvRuntime.
-  Require Import NRAEnvRuntime.
+Require Import String.
+Require Import List.
+Require Import CommonRuntime.
+Require Import cNRAEnvRuntime.
+Require Import NRAEnvRuntime.
 
+Section cNRAEnvtoNRAEnv.
   Context {fr:foreign_runtime}.
 
   Section Top.

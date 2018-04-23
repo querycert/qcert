@@ -14,15 +14,14 @@
  * limitations under the License.
  *)
 
+Require Import Bool.
 Require Import String.
 Require Import List.
+Require Import Eqdep_dec.
 Require Import RelationClasses.
-
 Require Import Utils.
-
 Require Import ForeignType.
 Require Import RType.
-
 Require Import BrandRelation.
 
 Section RSubtype.
@@ -87,8 +86,6 @@ Proof.
   eapply SRec_closed_in_domain; eauto.
 Qed.
 
-Require Import Eqdep_dec.
-
   Lemma UIP_refl_dec 
         {A:Type}
         (dec:forall x y:A, {x = y} + {x <> y}) 
@@ -97,7 +94,6 @@ Require Import Eqdep_dec.
   Proof.
     intros. apply (UIP_dec); auto.
   Qed.
-  Require Import Bool.
 
   (** This follows trivially from the consistency of join and subtype.
       However, this version should have better computational properties.*)

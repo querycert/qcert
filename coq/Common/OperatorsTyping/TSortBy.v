@@ -14,21 +14,21 @@
  * limitations under the License.
  *)
 
-Section TSortBy.
-  Require Import String.
-  Require Import List.
-  Require Import ZArith.
-  Require Import Compare_dec.
-  Require Import Utils.
-  Require Import Types.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import ForeignDataTyping.
-  Require Import Operators.
-  Require Import TData.
-  Require Import Program.
+Require Import String.
+Require Import List.
+Require Import ZArith.
+Require Import Compare_dec.
+Require Import Utils.
+Require Import Types.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import ForeignDataTyping.
+Require Import Operators.
+Require Import TData.
+Require Import Program.
 
+Section TSortBy.
   Context {fdata:foreign_data}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.

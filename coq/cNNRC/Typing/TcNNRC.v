@@ -14,17 +14,17 @@
  * limitations under the License.
  *)
 
-Section TcNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Program.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRC.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Program.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRC.
 
+Section TcNNRC.
   (** Typing rules for cNNRC *)
   Context {m:basic_model}.
   Section typ.

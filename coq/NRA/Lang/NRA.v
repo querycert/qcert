@@ -48,14 +48,14 @@ single value as input. *)
   and [EitherConcat]).
 *)
 
-Section NRA.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
 
+Section NRA.
   Context {fruntime:foreign_runtime}.
   
   (** * Abstract Syntax *)

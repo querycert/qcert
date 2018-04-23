@@ -14,24 +14,24 @@
  * limitations under the License.
  *)
 
-Section TNNRCtoNNRCimpish.
-  Require Import String.
-  Require Import List.
-  Require Import Bool.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Permutation.
-  Require Import Eqdep_dec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRCSystem.
-  Require Import NNRCSystem.
-  Require Import NNRCimpishSystem.
-  Require Import NNRCtoNNRCimpish.
-  Require Import TNNRCStratify.
+Require Import String.
+Require Import List.
+Require Import Bool.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Permutation.
+Require Import Eqdep_dec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRCSystem.
+Require Import NNRCSystem.
+Require Import NNRCimpishSystem.
+Require Import NNRCtoNNRCimpish.
+Require Import TNNRCStratify.
 
+Section TNNRCtoNNRCimpish.
   Local Open Scope nnrc_impish.
 
   Context {m:basic_model}.

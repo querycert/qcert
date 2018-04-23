@@ -57,18 +57,18 @@ a representation to take advantage of those. *)
 - Languages translating from CldMR: Cloudant
 *)
 
-Section CldMR.
-  Require Import String.
-  Require Import List.
-  Require Import Sorting.Mergesort.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRCRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import CldMRUtil.
-  Require Import ForeignCloudant.
+Require Import String.
+Require Import List.
+Require Import Sorting.Mergesort.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRCRuntime.
+Require Import NNRCMRRuntime.
+Require Import CldMRUtil.
+Require Import ForeignCloudant.
   
+Section CldMR.
   Local Open Scope list_scope.
 
   Context {fruntime:foreign_runtime}.

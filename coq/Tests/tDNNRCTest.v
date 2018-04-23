@@ -27,19 +27,29 @@ Require Import LambdaNRA.
 Require Import LambdaNRAEq.
 Require Import LambdaNRAtoNRAEnv.
 Require Import TrivialCompiler.
+Require Import LambdaNRATest.
 
 Import TrivialCompiler.
+Require Import CompDriver.
+Require Import CAMPTest.
+Require Import CommonSystem.
+Require Import TrivialModel.
+Require Import TDataTest.
+
+Require Import Program.
+
+Require Import TCAMPTest.
+
+Require Import CompEval.
+
+Require Import NRATest.
 
 Section tDNNRCTests.
-  Require Import LambdaNRATest.
-
-  
+ 
   (* A4 : Persons.map{p => p.name} *)
 
   Definition A4 :=
     LNRAMap (LNRALambda "p" (LNRAUnop (OpDot "name") (LNRAVar "p"))) (LNRATable "Persons").
-
-  Require Import CompDriver.
 
   (* LambdaNRA to DNNRC *)
   Definition a := lambda_nra_to_nraenv A4.
@@ -47,14 +57,6 @@ Section tDNNRCTests.
   Definition c := nnrc_to_dnnrc (("Persons"%string,Vdistr)::nil) b.
 
   (* Typing stuffs for then next steps *)
-  Require Import CAMPTest.
-  Require Import CommonSystem.
-  Require Import TrivialModel.
-  Require Import TDataTest.
-
-  Require Import Program.
-  
-  Require Import TCAMPTest.
   Existing Instance CPModel.
   Definition PersonsType := Tdistr CustomerType.
   Definition tdenv :tdbindings := (("Persons"%string,PersonsType)::nil).
@@ -66,10 +68,6 @@ Section tDNNRCTests.
   Definition e:= lift dnnrc_typed_optim d.
   
   (* Eval stuffs *)
-  Require Import CompEval.
-
-  Require Import NRATest.
-
   Definition env :=
     mkDistConstants (("Persons"%string,Vdistr)::nil) (("Persons"%string,persons)::nil).
   Definition ev :=

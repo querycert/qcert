@@ -14,22 +14,22 @@
  * limitations under the License.
  *)
 
-Section TBindings.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Morphisms.
-  Require Import Basics.
-  Require Import BrandRelation.
-  Require Import Utils.
-  Require Import Types.
-  Require Import ForeignData.
-  Require Import CommonData.
-  Require Import ForeignDataTyping.
-  Require Import TData.
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Morphisms.
+Require Import Basics.
+Require Import BrandRelation.
+Require Import Utils.
+Require Import Types.
+Require Import ForeignData.
+Require Import CommonData.
+Require Import ForeignDataTyping.
+Require Import TData.
 
+Section TBindings.
   Context {ftype:foreign_type}.
   Context {m:brand_model}.
 

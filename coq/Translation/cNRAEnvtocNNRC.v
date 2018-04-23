@@ -14,16 +14,19 @@
  * limitations under the License.
  *)
 
-Section cNRAEnvtocNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Compare_dec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNRAEnvRuntime.
-  Require Import cNNRCRuntime.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Omega.
+Require Import Compare_dec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNRAEnvRuntime.
+Require Import cNNRCRuntime.
+Require Import NNRC.
+Require Import NNRCSize.
 
+Section cNRAEnvtocNNRC.
   Context {fruntime:foreign_runtime}.
 
   (** Translation from NRA+Env to Named Nested Relational Calculus *)
@@ -599,9 +602,6 @@ Section cNRAEnvtocNNRC.
   (** Lemma and proof of linear size translation *)
 
   Section size.
-    Require Import NNRC.
-    Require Import NNRCSize.
-    Require Import Omega.
 
     Theorem nraenv_coreToNNRC_size op vid venv : 
       nnrc_size (nraenv_core_to_nnrc_core op vid venv) <= 10 * nraenv_core_size op.

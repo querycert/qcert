@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
-(* This file defines derived patterns, notations, and concepts *)
-Section TCAMPRule.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Export CAMPRule.
-  Require Import TCAMP.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonSystem.
+Require Export CAMPRule.
+Require Import TCAMP.
 
+Section TCAMPRule.
+  (* This file defines derived patterns, notations, and concepts *)
   Local Open Scope camp_scope.
   Local Open Scope string.
 

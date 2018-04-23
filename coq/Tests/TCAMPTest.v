@@ -23,16 +23,17 @@ Local Open Scope string.
 Require Import List.
 Import ListNotations.
 
+Require Import CAMPTest.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import TrivialModel.
+Require Import Program.
+  
+Require CAMPSystem.
+Require CAMPRuleSystem.
+
 (* This module encodes the examples in sample-rules.txt *)
 Section TCAMPTest.
-
-  Require Import CAMPTest.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import TrivialModel.
-
-  Require Import Program.
-  
   (******* Defining model – should be automatized, but for now *** *)
 
   Existing Instance trivial_foreign_type.
@@ -53,8 +54,8 @@ Section TCAMPTest.
 
   Definition CPTModelTypes :=
     [("Customer", CustomerType)
-      ; ("Entity", EntityType)
-      ; ("Purchase", PurchaseType)].
+     ; ("Entity", EntityType)
+     ; ("Purchase", PurchaseType)].
   
   Definition CPTContext
     := @mkBrand_context trivial_foreign_type CPRModel_relation CPTModelTypes (eq_refl _).
@@ -62,8 +63,6 @@ Section TCAMPTest.
   Instance CPModel : brand_model
     := mkBrand_model CPRModel_relation CPTContext (eq_refl _) (eq_refl _).
 
-  Require Import CAMPSystem CAMPRuleSystem.
-  
   (* Typing for R1 *)
 
   Ltac brand_solver :=
@@ -73,12 +72,12 @@ Section TCAMPTest.
     end.
 
   Lemma R1typed :
-    camp_rule_type (Brand (singleton "Entity")) (Coll String) R1.
+    TCAMPRule.camp_rule_type (Brand (singleton "Entity")) (Coll String) R1.
   Proof.
-    Hint Resolve PTCast.
+    Hint Resolve TCAMPSugar.PTCast.
     
     unfold R1.
-    unfold camp_rule_type; simpl.
+    unfold TCAMPRule.camp_rule_type; simpl.
     econstructor; eauto.
     econstructor.
     repeat econstructor; eauto.
@@ -97,7 +96,7 @@ Section TCAMPTest.
           econstructor; eauto.
         * econstructor.
         * { econstructor.
-            - apply @PTassert.
+            - apply @TCAMP.PTassert.
               econstructor; eauto.
               + econstructor; eauto.
                 * econstructor; eauto.

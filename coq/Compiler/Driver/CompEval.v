@@ -14,52 +14,52 @@
  * limitations under the License.
  *)
 
-Section CompEval.
-  Require Import String.
-  Require Import Equivalence.
-  Require Import EquivDec.
+Require Import String.
+Require Import Equivalence.
+Require Import EquivDec.
 
-  (* Common *)
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import TypingRuntime.
+(* Common *)
+Require Import Utils.
+Require Import CommonSystem.
+Require Import TypingRuntime.
 
-  (** Query languages *)
-  Require Import SQLRuntime.
-  Require Import OQLRuntime.
-  Require Import LambdaNRARuntime.
-  (** Rule languages *)
-  Require Import CAMPRuleRuntime.
-  Require Import TechRuleRuntime.
-  Require Import DesignerRuleRuntime.
-  (** Intermediate languages *)
-  Require Import NRARuntime.
-  Require Import NRAEnvRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCimpishRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import CldMRRuntime.
-  Require Import DNNRCRuntime.
-  Require Import tDNNRCRuntime.
-  Require Import CAMPRuntime.
-  (** Target languages *)
-  Require Import JavaScriptAstRuntime.
-  Require Import JavaScriptRuntime.
-  Require Import JavaRuntime.
-  Require Import SparkRDDRuntime.
-  Require Import SparkDFRuntime.
-  Require Import CloudantRuntime.
+(** Query languages *)
+Require Import SQLRuntime.
+Require Import OQLRuntime.
+Require Import LambdaNRARuntime.
+(** Rule languages *)
+Require Import CAMPRuleRuntime.
+Require Import TechRuleRuntime.
+Require Import DesignerRuleRuntime.
+(** Intermediate languages *)
+Require Import NRARuntime.
+Require Import NRAEnvRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCimpishRuntime.
+Require Import NNRCMRRuntime.
+Require Import CldMRRuntime.
+Require Import DNNRCRuntime.
+Require Import tDNNRCRuntime.
+Require Import CAMPRuntime.
+(** Target languages *)
+Require Import JavaScriptAstRuntime.
+Require Import JavaScriptRuntime.
+Require Import JavaRuntime.
+Require Import SparkRDDRuntime.
+Require Import SparkDFRuntime.
+Require Import CloudantRuntime.
 
-  (* Foreign Support *)
-  Require Import ForeignToReduceOps.
-  Require Import ForeignToSpark.
-  Require Import ForeignCloudant.
-  Require Import ForeignToCloudant.
+(* Foreign Support *)
+Require Import ForeignToReduceOps.
+Require Import ForeignToSpark.
+Require Import ForeignCloudant.
+Require Import ForeignToCloudant.
   
-  (* Compiler Driver *)
-  Require Import CompLang.
-  Require Import CompEnv.
+(* Compiler Driver *)
+Require Import CompLang.
+Require Import CompEnv.
 
+Section CompEval.
   (* Some useful notations *)
   Local Open Scope list_scope.
 

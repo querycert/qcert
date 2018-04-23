@@ -18,23 +18,23 @@
  * Algebra contexts *
  *******************************)
 
-Section NRARewriteContext.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import Arith.
-  Require Import NPeano.
-  Require Import Omega.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRA.
-  Require Import NRAEq.
-  Require Import NRAContext.
-  Require Import NRARewrite.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import Arith.
+Require Import NPeano.
+Require Import Omega.
+Require Import List.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRA.
+Require Import NRAEq.
+Require Import NRAContext.
+Require Import NRARewrite.
 
+Section NRARewriteContext.
   Local Open Scope nra_ctxt.
 
   Context {fruntime:foreign_runtime}.

@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section DesignerRuletoCAMPRule.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import DesignerRuleRuntime.
-  Require Import CAMPRuleRuntime.
+Require Import String.
+Require Import List.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import DesignerRuleRuntime.
+Require Import CAMPRuleRuntime.
   
+Section DesignerRuletoCAMPRule.
   Section Top.
     Context {fr:foreign_runtime}.
 

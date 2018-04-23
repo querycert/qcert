@@ -17,17 +17,17 @@
 (** This module provides support for bindings where the key is a
 natural number. *)
 
+Require Import Arith.
+Require Import NPeano.
+Require Import Bindings.
+
 Section BindingsNat.
     
-  Require Import Arith.
-  Require Import NPeano.
-  Require Import Bindings.
-
   Global Program Instance ODT_nat : (@ODT nat)
-    := mkODT _ _ lt Nat.lt_strorder lt_dec Compare_dec.nat_compare _.
+    := mkODT _ _ lt Nat.lt_strorder lt_dec Nat.compare _.
   Next Obligation.
     simpl.
-    apply Compare_dec.nat_compare_spec.
+    apply Nat.compare_spec.
   Qed.
 
 End BindingsNat.

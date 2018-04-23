@@ -30,16 +30,17 @@ Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_sco
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
 
-Section OQLTest.
-  Require Import String ZArith.
-  Open Scope Z_scope.
+Require Import String.
+Require Import ZArith.
+Require Import OQL.
+Require Import OQLSugar.
+Require Import TrivialModel.
 
-  Require Import OQL OQLSugar.
+Section OQLTest.
+  Open Scope Z_scope.
 
   Local Open Scope string_scope.
   Local Open Scope data_scope.
-
-  Require Import TrivialModel.
 
   (*****************
    * Preliminaries *

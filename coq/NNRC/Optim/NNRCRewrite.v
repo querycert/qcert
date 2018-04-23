@@ -16,20 +16,20 @@
 
 (* This includes some rewrites/simplification rules for the Nested relational calculus *)
 
-Section NNRCRewrite.
-  Require Import String.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRCRuntime.
-  Require Import NNRC.
-  Require Import NNRCShadow.
-  Require Import NNRCEq.
-  Require Import NNRCRewriteUtil.
+Require Import String.
+Require Import List.
+Require Import ListSet.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRCRuntime.
+Require Import NNRC.
+Require Import NNRCShadow.
+Require Import NNRCEq.
+Require Import NNRCRewriteUtil.
 
+Section NNRCRewrite.
   Local Open Scope nnrc_scope.
   (* unshadow(e) ≡ᶜ e *)
 

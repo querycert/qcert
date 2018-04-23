@@ -18,25 +18,25 @@
  * Operators equivalence *
  *************************)
 
-Section OperatorsEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataNorm.
-  Require Import Iterators.
-  Require Import OperatorsUtils.
-  Require Import BinaryOperatorsSem.
-  Require Import UnaryOperatorsSem.
-  Require Import ForeignOperators.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataNorm.
+Require Import Iterators.
+Require Import OperatorsUtils.
+Require Import BinaryOperatorsSem.
+Require Import UnaryOperatorsSem.
+Require Import ForeignOperators.
 
+Section OperatorsEq.
   Context {fdata:foreign_data}.
   Context {fuop:foreign_unary_op}.
   Context {fbop:foreign_binary_op}.

@@ -14,20 +14,20 @@
  * limitations under the License.
  *)
 
-Section cNNRCEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
-  Require Import cNNRCNorm.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
+Require Import cNNRCNorm.
 
+Section cNNRCEq.
   Context {fruntime:foreign_runtime}.
 
   (** Equivalence between expressions in the Named Nested Relational Calculus *)

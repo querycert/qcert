@@ -14,14 +14,15 @@
  * limitations under the License.
  *)
 
-Section CAMPtoNRA.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRARuntime.
-  Require Import CAMPRuntime.
+Require Import String.
+Require Import List.
+Require Import Omega.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRARuntime.
+Require Import CAMPRuntime.
   
+Section CAMPtoNRA.
   Local Open Scope string_scope.
   Local Open Scope list_scope.
 
@@ -382,8 +383,6 @@ Section CAMPtoNRA.
   Qed.
 
   Section size.
-    Require Import Omega.
-
     (** Proof showing linear size translation *)
     Lemma camp_trans_size p :
       nra_size (nra_of_camp p) <= 41 * camp_size p.

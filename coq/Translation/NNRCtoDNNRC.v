@@ -14,17 +14,19 @@
  * limitations under the License.
  *)
 
-Section NNRCtoDNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCSystem.
-  Require Import DNNRCSystem.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCSystem.
+Require Import DNNRCSystem.
+Require Import NRAEnvRuntime.
+Require Import Dataframe.
 
+Section NNRCtoDNNRC.
   Context {fruntime:foreign_runtime}.
   
   Fixpoint nnrc_to_dnnrc_base {A:Set} {plug_type:Set} (annot:A) (ctenv tenv:list (var*dlocalization)) (n:nnrc) : @dnnrc_base _ A plug_type :=
@@ -485,8 +487,6 @@ Section NNRCtoDNNRC.
   Qed.
 
   Section Top.
-    Require Import NRAEnvRuntime.
-    Require Import Dataframe.
     Context {ftype: ForeignType.foreign_type}.
 
     Definition nnrc_to_dnnrc {A:Set} (annot:A) (tenv:vdbindings) (q:nnrc) :=

@@ -14,25 +14,25 @@
  * limitations under the License.
  *)
 
-Section UnaryOperatorsSem.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import ZArith.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataLift.
-  Require Import DataNorm.
-  Require Import DataSort.
-  Require Import ForeignOperators.
-  Require Import Iterators.
-  Require Import RecOperators.
-  Require Import OperatorsUtils.
-  Require Import SortBy.
-  Require Export UnaryOperators.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import ZArith.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataLift.
+Require Import DataNorm.
+Require Import DataSort.
+Require Import ForeignOperators.
+Require Import Iterators.
+Require Import RecOperators.
+Require Import OperatorsUtils.
+Require Import SortBy.
+Require Export UnaryOperators.
 
+Section UnaryOperatorsSem.
   Context {fdata:foreign_data}.
   
   Definition nat_arith_unary_op_eval (op:nat_arith_unary_op) (z:Z) :=

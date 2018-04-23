@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section SQLPP.
-  Require Import String.
-  Require Import ZArith.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonSystem.
+Require Import String.
+Require Import ZArith.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonSystem.
 
+Section SQLPP.
   Context {fruntime:foreign_runtime}.
 
   Unset Elimination Schemes.

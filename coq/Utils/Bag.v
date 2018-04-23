@@ -16,21 +16,23 @@
 
 (** This module provides support for bags (or multisets). *)
 
+Require Import Arith.
+Require Import Min.
+Require Import Max.
+Require Import ZArith.
+Require Import Omega.
+Require Import Permutation.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import List.
+Require Import CoqLibAdd.
+Require Import ListAdd.
+Require Import Sublist.
+Require Import Assoc.
+
 Section Bag.
-  Require Import Arith.
-  Require Import Min.
-  Require Import Max.
-  Require Import Omega.
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import List.
-  Require Import CoqLibAdd.
-  Require Import ListAdd.
-  Require Import Sublist.
-  Require Import Assoc.
 
   Context {A:Type}.
   Context {eqdec:EqDec A eq}.
@@ -1555,21 +1557,20 @@ Section Bag.
 End Bag.
 
 Section NumMinMax.
-  Require Import ZArith.
   Open Scope Z_scope.
 
   Definition bnummin (l:list Z) :=
     match l with
     | nil => 0
     | x0 :: l' =>
-      fold_right (fun x y => Zmin x y) x0 l'
+      fold_right (fun x y => Z.min x y) x0 l'
     end.
 
   Definition bnummax (l:list Z) :=
     match l with
     | nil => 0
     | x0 :: l' =>
-      fold_right (fun x y => Zmax x y) x0 l'
+      fold_right (fun x y => Z.max x y) x0 l'
     end.
   
 End NumMinMax.

@@ -14,13 +14,13 @@
  * limitations under the License.
  *)
 
-Section TechRuletoCAMPRule.
-  Require Import String.
-  Require Import List.
-  Require Import CommonRuntime.
-  Require Import TechRuleRuntime.
-  Require Import CAMPRuleRuntime.
+Require Import String.
+Require Import List.
+Require Import CommonRuntime.
+Require Import TechRuleRuntime.
+Require Import CAMPRuleRuntime.
   
+Section TechRuletoCAMPRule.
   Section Top.
     Context {fr:foreign_runtime}.
 

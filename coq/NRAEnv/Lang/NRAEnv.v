@@ -42,16 +42,16 @@ refer to Guido Moerkotte's "Building Query Compilers", Chapter 7.
 - translating to NRAEnv: LambdaNRA, SQL, OQL, CAMP, cNRAEnv
 - translating from NRAEnv: NNRC, cNRAEnv *)
 
-Section NRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNRAEnv.
-  Require Import cNRAEnvEq.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNRAEnv.
+Require Import cNRAEnvEq.
 
+Section NRAEnv.
   Context {fruntime:foreign_runtime}.
   
   (** * Abstract Syntax *)

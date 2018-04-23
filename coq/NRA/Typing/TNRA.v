@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section TNRA.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRA.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NRA.
 
+Section TNRA.
   (** Typing for NRA *)
   Section typ.
     Context {m:basic_model}.
@@ -555,5 +555,5 @@ Section TNRA.
 End TNRA.
 
 (* Typed algebraic plan *)
-Notation "Op ▷ A >=> B ⊣ C" := (nra_type C Op A B) (at level 70).
+Notation "Op ▷ A >=> B ⊣ C" := (nra_type C Op A B) (at level 70): nra_scope.
 

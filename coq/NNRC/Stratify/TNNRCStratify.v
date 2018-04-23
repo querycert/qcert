@@ -23,21 +23,21 @@ This transformation, called stratify, is in NNRCStratify.
 This module shows that the transformation preserves types.
  *)
 
-Section TStratify.
-  Require Import String.
-  Require Import List.
-  Require Import Bool.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Permutation.
-  Require Import Eqdep_dec.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRCSystem.
-  Require Import NNRCSystem.
-  Require Import NNRCStratify.
+Require Import String.
+Require Import List.
+Require Import Bool.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Permutation.
+Require Import Eqdep_dec.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRCSystem.
+Require Import NNRCSystem.
+Require Import NNRCStratify.
 
+Section TStratify.
   Context {m:basic_model}.
   
   Fixpoint type_substs Γc (Γ:tbindings) (sdefs:list (var*nnrc)) (τdefs:tbindings) : Prop

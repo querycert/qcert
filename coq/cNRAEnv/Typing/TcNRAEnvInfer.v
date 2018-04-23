@@ -16,20 +16,20 @@
 
 (** Type inference for NRA when given the type of the input *)
 
-Section TcNRAEnvInfer.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Eqdep_dec.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNRAEnv.
-  Require Import TcNRAEnv.
-  Require Import Program.
-  Require Import TNRAInfer. (* Only for a few auxiliary Lemmas that should probably be moved *)
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Eqdep_dec.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNRAEnv.
+Require Import TcNRAEnv.
+Require Import Program.
+Require Import TNRAInfer. (* Only for a few auxiliary Lemmas that should probably be moved *)
 
+Section TcNRAEnvInfer.
   (* Type inference for algebraic expressions *)
 
   Context {m:basic_model}.

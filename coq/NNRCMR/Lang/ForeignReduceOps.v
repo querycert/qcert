@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section ForeignReduceOps.
-  Require Import EquivDec.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import EquivDec.
+Require Import List.
+Require Import Utils.
+Require Import CommonRuntime.
 
-    Class foreign_reduce_op {fdata:foreign_data}
-      : Type
+Section ForeignReduceOps.
+  Class foreign_reduce_op {fdata:foreign_data}
+  : Type
     := mk_foreign_reduce_op {
            foreign_reduce_op_type : Set
            ; foreign_reduce_op_dec :> EqDec foreign_reduce_op_type eq
@@ -37,7 +37,6 @@ Section ForeignReduceOps.
                Forall (data_normalized br) dl ->
                data_normalized br o
          }.
-
 
 End ForeignReduceOps.
 

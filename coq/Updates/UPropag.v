@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+
+Require Import RUtil.
+Require Import RBag.
+Require Import RData.
+Require Import RRelation.
+
+Require Import Permutation.
+Require Import Equivalence.
+Require Import Morphisms.
+
 Section UPropag.
-  Require Import String.
-  Require Import List.
-
-  Require Import RUtil.
-  Require Import RBag.
-  Require Import RData.
-  Require Import RRelation.
-
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import Morphisms.
-
   Local Open Scope rbag_scope.
 
   (* Figure 2 in [Griffin and Libkin 95].

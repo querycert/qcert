@@ -14,24 +14,24 @@
  * limitations under the License.
  *)
 
+Require Import List.
+Require Import String.
+
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NRASystem.
+
+Require Import NRATest.
+
+Require Import TrivialModel.
+
 Section TNRATest.
-  Require Import List.
-  Require Import String.
-
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRASystem.
-
-  Require Import NRATest.
-
   Local Open Scope string_scope.
   Local Open Scope nraext_scope.
 
   (**************
    * Input data *
    **************)
-  Require Import TrivialModel.
-
   (* Empty inheritance *)
   Definition myBR : brand_relation
     := mkBrand_relation nil (eq_refl _) (eq_refl _) .

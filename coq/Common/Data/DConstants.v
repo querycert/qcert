@@ -14,15 +14,16 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Utils.
+Require Import ForeignData.
+Require Import Data.
+Require Import DData.
+Require Import Constants.
+
 Section DConstants.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DData.
-  Require Import Constants.
 
   Local Open Scope string.
 

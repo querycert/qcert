@@ -28,15 +28,15 @@
  *)
 
 
-(* This file defines derived patterns, notations, and concepts *)
-Section CAMPRule.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Export CAMPRuntime.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Export CAMPRuntime.
 
+Section CAMPRule.
+  (* This file defines derived patterns, notations, and concepts *)
   Local Open Scope camp_scope.
   Local Open Scope string.
 

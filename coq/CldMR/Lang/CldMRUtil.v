@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import Sorting.Mergesort.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import ZArith.
+Require Import Zdigits.
+Require Import Znat.
+
 (* Utils: key/value manipulation *)
 Section CldMRUtil.
-  Require Import String.
-  Require Import List.
-  Require Import Sorting.Mergesort.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import ZArith.
-  Require Import Zdigits.
-  Require Import Znat.
-
   Context {fruntime:foreign_runtime}.
 
   Definition pack_kv (k v:data) : data :=

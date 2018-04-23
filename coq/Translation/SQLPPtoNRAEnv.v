@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section SQLPPtoNRAEnv.
-  Require Import String.
-  Require Import ZArith.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import SQLPPRuntime.
-  Require Import NRAEnvRuntime.
-  Require Import SQLtoNRAEnv.
+Require Import String.
+Require Import ZArith.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import SQLPPRuntime.
+Require Import NRAEnvRuntime.
+Require Import SQLtoNRAEnv.
 
+Section SQLPPtoNRAEnv.
   Context {fruntime:foreign_runtime}.
 
 (* Translate two expressions and build the binary equality comparison (used as a subroutine for the SPSimpleCase clause) *)

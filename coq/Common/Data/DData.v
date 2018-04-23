@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import ZArith.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
+
 Section DData.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import ZArith.
-  Require Import Bool.
-
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
-
   (** Localized Data is:
      - Dlocal - single, non-distributed value
      - Ddistr - distributed collection of values
@@ -39,7 +39,6 @@ Section DData.
   | Dlocal : data -> ddata
   | Ddistr : list data -> ddata.
 
-  Require Import EquivDec.
   Lemma ddata_eq_dec : EqDec ddata eq.
   Proof.
     repeat red.
@@ -97,7 +96,6 @@ Section DData.
 
   Definition vdbindings := list (string*dlocalization).
 
-  Require Import EquivDec.
   Lemma dlocalization_eq_dec : EqDec dlocalization eq.
   Proof.
     repeat red.

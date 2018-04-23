@@ -14,15 +14,18 @@
  * limitations under the License.
  *)
 
-Section GroupBy.
-  Require Import List.
-  Require Import Utils.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataLift.
-  Require Import Iterators.
-  Require Import RecOperators.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataLift.
+Require Import Iterators.
+Require Import RecOperators.
+Require Import BrandRelation.
+Require Import DataNorm.
 
+Section GroupBy.
   Context {fdata:foreign_data}.
   Import ListNotations.
 
@@ -100,8 +103,6 @@ Section GroupBy.
     destruct (data_eq_dec (drec (rproject l sl)) d); reflexivity.
   Qed.
 
-  Require Import String.
-  
   Definition group_of_key (eval_key: data -> option data) (k:data) (l: list data) :=
     (lift_filter (fun d => key_is_eq_r eval_key d k) l).
 
@@ -926,8 +927,6 @@ Section GroupBy.
   End tableform.
   
   Section normalized.
-    Require Import BrandRelation.
-    Require Import DataNorm.
     Context (h:brand_relation_t).
 
     Lemma bdistinct_normalized l :

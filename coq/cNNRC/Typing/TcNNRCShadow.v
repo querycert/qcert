@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section TcNNRCShadow.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRC.
-  Require Import cNNRCShadow.
-  Require Import TcNNRC.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRC.
+Require Import cNNRCShadow.
+Require Import TcNNRC.
   
+Section TcNNRCShadow.
   Hint Constructors nnrc_core_type.
 
   Context {m:basic_model}.

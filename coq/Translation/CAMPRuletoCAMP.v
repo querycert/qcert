@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section CAMPRuletoCAMP.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import CAMPRuleRuntime.
-  Require Import CAMPRuntime.
+Require Import String.
+Require Import List.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import CAMPRuleRuntime.
+Require Import CAMPRuntime.
   
+Section CAMPRuletoCAMP.
   Section Top.
     Context {fr:foreign_runtime}.
     (** Note: Translation from CAMP Rules to CAMP is really macro-expansion *)

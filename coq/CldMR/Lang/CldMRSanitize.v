@@ -18,18 +18,19 @@
 follows lexical constraints imposed by Cloudant. *)
  
 
-Section CldMRSanitize.
-  Require Import String.
-  Require Import List.
-  Require Import Sorting.Mergesort.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import CldMRUtil.
-  Require Import ForeignCloudant.
+Require Import String.
+Require Import Ascii.
+Require Import List.
+Require Import Sorting.Mergesort.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCMRRuntime.
+Require Import CldMRUtil.
+Require Import ForeignCloudant.
   
+Section CldMRSanitize.
   Local Open Scope list_scope.
 
   Context {fruntime:foreign_runtime}.
@@ -38,7 +39,6 @@ Section CldMRSanitize.
 
   Context (h:list(string*string)).
 
-  Require Import Ascii String List.
   Import ListNotations.
   Definition cldAllowedIdentifierInitialCharacters :=
     ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z"]%char.

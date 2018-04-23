@@ -19,22 +19,22 @@
      as an intermediate language between NNRC and more imperative /
      statement oriented backends *)
 
-Section NNRCimpishSem.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Arith.
-  Require Import Max.
-  Require Import Bool.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCimpish.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Arith.
+Require Import Max.
+Require Import Bool.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCimpish.
 
+Section NNRCimpishSem.
   Context {fruntime:foreign_runtime}.
 
   Context (h:brand_relation_t).
@@ -88,8 +88,6 @@ Section NNRCimpishSem.
     Reserved Notation  "[ s₁ , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]".
     Reserved Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]".
 
-    Require Import List.
-    
     Inductive nnrc_impish_stmt_sem : nnrc_impish_stmt -> pd_bindings -> mc_bindings -> md_bindings -> pd_bindings -> mc_bindings -> md_bindings -> Prop :=
     | sem_NNRCimpishSeq s₁ s₂ σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ σ₃ ψc₃ ψd₃ :
         [ s₁, σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ] ->
@@ -119,7 +117,7 @@ Section NNRCimpishSem.
     | sem_NNRCimpishPush v e σ ψc ψd mc d :
         lookup string_dec ψc v = Some mc ->
         [ σ ⊢ e ⇓ d ] ->
-        [ NNRCimpishPush v e, σ , ψc , ψd ⇓ σ , update_first string_dec ψc v (mc++d::nil), ψd]
+        [ NNRCimpishPush v e, σ , ψc , ψd ⇓ σ , update_first string_dec ψc v (mc++d::nil)%list, ψd]
 
     | sem_NNRCimpishFor v e s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ dl :
         [ σ₁ ⊢ e ⇓ (dcoll dl) ] ->

@@ -14,20 +14,21 @@
  * limitations under the License.
  *)
 
-Section NNRCMRToCldMR.
-  Require Import String.
-  Require Import List.
-  Require Import Sorting.Mergesort.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import ForeignCloudant.
-  Require Import ForeignToCloudant.
-  Require Import CldMRUtil.
-  Require Import CldMR.
+Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import Sorting.Mergesort.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCMRRuntime.
+Require Import ForeignCloudant.
+Require Import ForeignToCloudant.
+Require Import CldMRUtil.
+Require Import CldMR.
   
+Section NNRCMRToCldMR.
   Local Open Scope list_scope.
 
   Context {fruntime:foreign_runtime}.
@@ -352,8 +353,6 @@ Section NNRCMRToCldMR.
     mkMRCldChain
       (mr_chain_to_cldmr_chain avoiddb mrl.(mr_chain))
       (mr_last_to_cldmr_last mrl.(mr_last)).
-
-  Require Import Bool.
 
   Lemma MRtoMRCld_causally_consistent
         avoiddb (mr:mr) :

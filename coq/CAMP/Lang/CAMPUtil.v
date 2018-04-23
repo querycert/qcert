@@ -17,14 +17,14 @@
 (** Encoding and utility functions to support the result of evaluation
 over CAMP patterns. *)
 
-Section CAMPUtil.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
 
+Section CAMPUtil.
   Local Open Scope string.
 
   (** Evaluating a CAMP pattern returns a presult, which includes two

@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section OQLSize.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import OQL.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import OQL.
 
+Section OQLSize.
   Context {fruntime:foreign_runtime}.
 
   Fixpoint oql_expr_size (e:oql_expr) : nat 

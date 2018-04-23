@@ -16,26 +16,26 @@
 
 (* This includes some rewrites/simplification rules for the Nested relational calculus *)
 
-Section NNRCOptimizer.
-  Require Import String.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Arith.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRCSystem.
-  Require Import NNRCSystem.
-  Require Import NNRCRewriteUtil.
-  Require Import NNRCRewrite.
-  Require Import TNNRCRewrite.
-  Require Import OptimizerLogger.
-  Require Import OptimizerStep.
+Require Import String.
+Require Import List.
+Require Import ListSet.
+Require Import Arith.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRCSystem.
+Require Import NNRCSystem.
+Require Import NNRCRewriteUtil.
+Require Import NNRCRewrite.
+Require Import TNNRCRewrite.
+Require Import OptimizerLogger.
+Require Import OptimizerStep.
 
+Section NNRCOptimizer.
   Local Open Scope nnrc_scope.
   Local Open Scope string.
 

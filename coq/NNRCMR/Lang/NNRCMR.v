@@ -23,15 +23,15 @@ some local computation over the result. *)
 - Languages translating from NNRCMR: NNRC, DNNRC, CldMR, SparkRDD
 *)
 
-Section NNRCMR.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRCRuntime.
-  Require Import ForeignReduceOps.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRCRuntime.
+Require Import ForeignReduceOps.
 
+Section NNRCMR.
   Local Open Scope list_scope.
 
   Context {fruntime:foreign_runtime}.

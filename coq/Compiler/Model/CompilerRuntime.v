@@ -36,6 +36,8 @@ Require Import NRAEnv.
 Require Import DNNRC.
 Require Import tDNNRC.
 
+Set Typeclasses Axioms Are Instances.
+
 Module Type CompilerRuntime.
   Axiom compiler_foreign_type : foreign_type.
   Axiom compiler_foreign_runtime : foreign_runtime.

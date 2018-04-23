@@ -30,14 +30,14 @@
 
  *)
 
-Section ODL.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonSystem.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonSystem.
 
+Section ODL.
   Inductive odl_export : Set :=
   | OTypeDcl : odl_type_dcl -> odl_interface_body
   | 

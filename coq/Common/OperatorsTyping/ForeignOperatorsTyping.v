@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section ForeignOperatorsTyping.
+Require Import Utils.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import Types.
+Require Import ForeignDataTyping.
+Require Import TData.
 
-  Require Import Utils.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import Types.
-  Require Import ForeignDataTyping.
-  Require Import TData.
+Section ForeignOperatorsTyping.
 
   Class foreign_unary_op_typing
         {fdata:foreign_data}

@@ -14,22 +14,22 @@
  * limitations under the License.
  *)
 
-Section RecOperators.
-  Require Import List.
-  Require Import ListSet.
-  Require Import String.
-  Require Import ZArith.
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Program.
-  Require Import EquivDec.
-  Require Import Bool.
-  Require Import Utils.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataLift.
+Require Import List.
+Require Import ListSet.
+Require Import String.
+Require Import ZArith.
+Require Import Permutation.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Program.
+Require Import EquivDec.
+Require Import Bool.
+Require Import Utils.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataLift.
 
+Section RecOperators.
   Context {fdata:foreign_data}.
 
   Section RecProject.

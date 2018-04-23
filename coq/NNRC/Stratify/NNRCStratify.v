@@ -20,22 +20,27 @@
    separating expressions and statements.
  *)
 
-Section Stratify.
-  Require Import String.
-  Require Import List.
-  Require Import Bool.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Permutation.
-  Require Import Eqdep_dec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
-  Require Import NNRC.
-  Require Import cNNRCNorm.
-  Require Import cNNRCVars.
+Require Import String.
+Require Import List.
+Require Import Bool.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Permutation.
+Require Import Eqdep_dec.
+Require Import Program.Basics.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
+Require Import cNNRCNorm.
+Require Import cNNRCVars.
+Require Import cNNRCEq.
+Require Import cNNRCShadow.
+Require Import NNRC.
+Require Import NNRCEq.
+Require Import NNRCShadow.
 
+Section Stratify.
   
   Context {fruntime:foreign_runtime}.
 
@@ -587,8 +592,6 @@ Section Stratify.
            /\ growing_fv_ctxt lx (v::ctxt)
          end.
 
-    Require Import Program.Basics.
-    
     Global Instance growing_fv_ctxt_incl :
       Proper (eq ==> (@incl var) ==> impl) growing_fv_ctxt.
     Proof.
@@ -1235,9 +1238,6 @@ Section Stratify.
   End FreeVars.
 
   Section Eval_substs.
-    Require Import NNRCEq.
-    Require Import NNRCShadow.
-
     (* This is a monadic fold_left, whereas mk_expr_from_vars is a fold_right.
         This is because evaluation goes outside in, whereas we build the let-bindings
         from the inside out.
@@ -1473,11 +1473,6 @@ Section Stratify.
   Section Correct.
 
     Opaque fresh_var.
-    Require Import cNNRCEq.
-    Require Import NNRCEq.
-
-    Require Import cNNRCShadow.
-
     Lemma stratify1_aux_correct h cenv env e bound_vars required_kind sdefs :
       eval_nnrc_with_substs h cenv env (stratify1_aux e required_kind bound_vars sdefs) =
       eval_nnrc_with_substs h cenv env (e,sdefs).

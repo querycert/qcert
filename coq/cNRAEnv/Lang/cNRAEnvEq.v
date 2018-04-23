@@ -14,16 +14,21 @@
  * limitations under the License.
  *)
 
-Section cNRAEnvEq.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRARuntime.
-  Require Import cNRAEnv.
-  Require Import cNRAEnvIgnore.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRARuntime.
+Require Import cNRAEnv.
+Require Import cNRAEnvIgnore.
 
+Section cNRAEnvEq.
   Local Open Scope string.
   Local Open Scope nraenv_core_scope.
 
@@ -44,12 +49,6 @@ Section cNRAEnvEq.
       (dn_x:data_normalized h x),
       h ⊢ₑ op1 @ₑ x ⊣ c;env = h ⊢ₑ op2 @ₑ x ⊣ c;env.
 
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  
   Global Instance nraenv_core_equiv : Equivalence nraenv_core_eq.
   Proof.
     constructor.

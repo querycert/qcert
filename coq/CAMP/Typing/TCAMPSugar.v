@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
-Section TCAMPSugar.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import CAMPSugar.
-  Require Export TCAMP.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import CAMPSugar.
+Require Export TCAMP.
 
+Section TCAMPSugar.
   Local Open Scope camp_scope.
 
   Hint Constructors camp_type.

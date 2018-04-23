@@ -14,9 +14,10 @@
  * limitations under the License.
  *)
 
+Require Import EquivDec.
+Require Import Lattice.
+
 Section ForeignType.
-  Require Import EquivDec.
-  Require Import Lattice.
   
   Class foreign_type : Type
     := mk_foreign_type {

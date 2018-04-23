@@ -22,6 +22,7 @@ Require Import EquivDec.
 Require Import Permutation.
 Require Import EquivDec.
 Require Import Eqdep_dec.
+Require Import Program.
 Require Import Utils.
 Require Import CommonSystem.
 Require Import cNNRCSystem.
@@ -48,8 +49,6 @@ Section TcNNRCtoCAMP.
     constructor.
     rewrite <- env_lookup_edot; eauto.
   Qed.
-
-  Require Import Program.
 
   Hint Resolve merge_bindings_nil_r.
   Hint Resolve PTdot.

@@ -14,37 +14,36 @@
  * limitations under the License.
  *)
 
+Require Import List.
+Require Import String.
+Require Import ZArith.
+Require Import Utils.
+Require Import JSON.
+Require Import BrandRelation.
+Require Import RType.
+Require Import RTypeNorm.
+Require Import ForeignType.
+Require Import ForeignTypeToJSON.
+Require Import RTypetoJSON.
+Require Import DType.
+
 Section DTypetoJSON.
-  Require Import List.
-  Require Import String.
-  Require Import ZArith.
-  Require Import Utils.
-  Require Import JSON.
-  Require Import BrandRelation.
-  Require Import RType.
-  Require Import RTypeNorm.
-  Require Import ForeignType.
-  Require Import ForeignTypeToJSON.
-  Require Import RTypetoJSON.
   
   Context {ftype:foreign_type}.
   Context {ftypeToJSON:foreign_type_to_JSON}.
 
   (* JSON to DType *)
-  Section toDType.
-    Require Import DType.
-    Definition json_to_drtype {br:brand_relation} (j:json) : drtype :=
-      match j with
-      | jobject (("$dist"%string,j')::nil) => Tdistr (json_to_rtype j')
-      | _ => Tlocal (json_to_rtype j)
-      end.
+  Definition json_to_drtype {br:brand_relation} (j:json) : drtype :=
+    match j with
+    | jobject (("$dist"%string,j')::nil) => Tdistr (json_to_rtype j')
+    | _ => Tlocal (json_to_rtype j)
+    end.
 
-    Definition json_to_drtype_with_fail {br:brand_relation} (j:json) : option drtype :=
-      match j with
-      | jobject (("$dist"%string,j')::nil) => lift Tdistr (json_to_rtype_with_fail j')
-      | _ => lift Tlocal (json_to_rtype_with_fail j)
-      end.
+  Definition json_to_drtype_with_fail {br:brand_relation} (j:json) : option drtype :=
+    match j with
+    | jobject (("$dist"%string,j')::nil) => lift Tdistr (json_to_rtype_with_fail j')
+    | _ => lift Tlocal (json_to_rtype_with_fail j)
+    end.
 
-  End toDType.
 End DTypetoJSON.
 

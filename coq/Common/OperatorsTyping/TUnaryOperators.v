@@ -14,26 +14,26 @@
  * limitations under the License.
  *)
 
-Section TUnaryOperators.
-  Require Import String.
-  Require Import List.
-  Require Import ZArith.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import RelationClasses.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import Types.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import ForeignDataTyping.
-  Require Import Operators.
-  Require Import TUtil.
-  Require Import TData.
-  Require Import TSortBy.
-  Require Import ForeignOperatorsTyping.
+Require Import String.
+Require Import List.
+Require Import ZArith.
+Require Import Compare_dec.
+Require Import Program.
+Require Import RelationClasses.
+Require Import EquivDec.
+Require Import Utils.
+Require Import Types.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import ForeignDataTyping.
+Require Import Operators.
+Require Import TUtil.
+Require Import TData.
+Require Import TSortBy.
+Require Import ForeignOperatorsTyping.
 
+Section TUnaryOperators.
   (** Typing rules for unary operators *)
 
   Context {fdata:foreign_data}.

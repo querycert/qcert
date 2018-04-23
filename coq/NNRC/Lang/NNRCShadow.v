@@ -14,20 +14,20 @@
  * limitations under the License.
  *)
 
-Section NNRCShadow.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
-  Require Import cNNRCShadow.
-  Require Import NNRC.
-  Require Import NNRCSize.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
+Require Import cNNRCShadow.
+Require Import NNRC.
+Require Import NNRCSize.
 
+Section NNRCShadow.
   Close Scope nnrc_scope.
   
   (* Since we are translating from a language with scoped variables

@@ -16,6 +16,7 @@
 
 Require Import List.
 Require Import String.
+Require Import Ascii.
 Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Utils.
@@ -27,7 +28,6 @@ Local Open Scope string_scope.
 
 Section sanitizer.
   Import ListNotations.
-  Require Import Ascii.
   
   (* java allows identifiers that begin with a unicode letter or underscore.
          We avoid beginning with an underscore or dollar sign to 

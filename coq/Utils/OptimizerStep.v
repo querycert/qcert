@@ -16,14 +16,15 @@
 
 (* This includes some rewrites/simplification rules for the Nested relational calculus *)
 
+Require Import String.
+Require Import List.
+Require Import Setoid.
+Require Import Equivalence.
+Require Import EquivDec.
+Require Import CoqLibAdd.
+Require Import ListAdd.
+
 Section OptimizerStep.
-  Require Import String.
-  Require Import List.
-  Require Import Setoid.
-  Require Import Equivalence.
-  Require Import EquivDec.
-  Require Import CoqLibAdd.
-  Require Import ListAdd.
 
   Record OptimizerStep (lang:Set) : Set :=
     mkOptimizerStep {

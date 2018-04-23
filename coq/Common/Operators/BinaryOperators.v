@@ -14,13 +14,13 @@
  * limitations under the License.
  *)
 
-Section BinaryOperators.
-  Require Import EquivDec.
-  Require Import String.
-  Require Import Utils.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
+Require Import EquivDec.
+Require Import String.
+Require Import Utils.
+Require Import ForeignData.
+Require Import ForeignOperators.
 
+Section BinaryOperators.
   Context {fdata:foreign_data}.
   Context {fbop:foreign_binary_op}.
 

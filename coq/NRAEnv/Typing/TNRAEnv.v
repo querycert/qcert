@@ -14,16 +14,17 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNRAEnvSystem.
+Require Import NRAEnv.
+Require Import NRAEnvEq.
+
 Section TNRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNRAEnvSystem.
-  Require Import NRAEnv.
-  Require Import NRAEnvEq.
 
   Local Open Scope nraenv_scope.
   

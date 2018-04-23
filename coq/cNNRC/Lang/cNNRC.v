@@ -38,15 +38,15 @@ instead of: [e1 = e2 ? e3 : e4], we have: [e1 ? e2 : e3]
 - We add a case expression for either values: [either e left v₁ : e₁ | right v₂ : e₂]
 *)
 
-Section cNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
 
+Section cNNRC.
   Context {fruntime:foreign_runtime}.
   
   (** * Abstract Syntax *)

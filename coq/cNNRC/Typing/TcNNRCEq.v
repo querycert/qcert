@@ -14,21 +14,22 @@
  * limitations under the License.
  *)
 
-Section TcNNRCEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRC.
-  Require Import cNNRCEq.
-  Require Import TcNNRC.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRC.
+Require Import cNNRCEq.
+Require Import TcNNRC.
+(* Require Import TData. *)
 
+Section TcNNRCEq.
   (* Named Nested Relational Calculus *)
 
   (* A different kind of equivalence for rewrites *)
@@ -184,8 +185,6 @@ Section TcNNRCEq.
     
   (* NNRCFor *)
 
-  Require Import TData.
-  
   Lemma dcoll_wt (l:list data) (τ:rtype) (τenv:tbindings) (cenv env:bindings) (e:nnrc):
     bindings_type cenv τcenv ->
     bindings_type env τenv ->

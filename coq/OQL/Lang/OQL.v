@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section OQL.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
 
+Section OQL.
   Context {fruntime:foreign_runtime}.
 
   Definition oql_env := list (string * data).

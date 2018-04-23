@@ -14,16 +14,18 @@
  * limitations under the License.
  *)
 
-Section CAMPtoNRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRARuntime.
-  Require Import NRAEnvRuntime.
-  Require Import CAMPRuntime.
-  Require Import CAMPtoNRA.
+Require Import String.
+Require Import List.
+Require Import Omega.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRARuntime.
+Require Import NRAEnvRuntime.
+Require Import CAMPRuntime.
+Require Import CAMPtoNRA.
+Require Import CAMPtocNRAEnv.
 
+Section CAMPtoNRAEnv.
   Context {fruntime:foreign_runtime}.
 
   (** Functions used to map input/ouput values between CAMP and NRA *)
@@ -85,8 +87,6 @@ Section CAMPtoNRAEnv.
            (NRAEnvMap (nraenv_of_camp p) (NRAEnvUnop OpBag NRAEnvID)).
   
   (** Theorem 4.2: lemma of translation correctness for patterns *)
-
-  Require Import CAMPtocNRAEnv.
 
   Lemma nraenv_of_camp_nraenv_core_of_camp_ident q :
     nraenv_to_nraenv_core (nraenv_of_camp q) = nraenv_core_of_camp q.
@@ -157,8 +157,6 @@ Section CAMPtoNRAEnv.
   End Top.
 
   Section size.
-    Require Import Omega.
-    
     (** Proof showing linear size translation *)
     Lemma camp_trans_size p :
       nraenv_size (nraenv_of_camp p) <= 13 * camp_size p.

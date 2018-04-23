@@ -12,6 +12,8 @@
  * limitations under the License.
  *)
 
+Require Import List.
+
 Section Result.
   Section definition.
     Context (A: Type). (**r Type of success *)
@@ -23,8 +25,6 @@ Section Result.
   End definition.
 
   Section operations.
-    Require Import List.
-
     Definition lift_failure {A B E:Type} (f:A -> Result B E) : (Result A E -> Result B E) :=
       fun r =>
         match r with

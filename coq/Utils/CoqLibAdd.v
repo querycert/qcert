@@ -19,7 +19,9 @@
 
 Require Import Bool.
 Require Import List.
+Require Import String.
 Require Import Sumbool.
+Require Import Omega.
 Require Import Permutation.
 Require Import Morphisms.
 Require Import Setoid.
@@ -27,6 +29,11 @@ Require Import RelationClasses.
 Require Import EquivDec.
 Require Import Equivalence.
 Require Import Peano_dec.
+Require Import ZArith.
+Require Import Zdigits.
+Require Import Znat.
+Require Import Recdef.
+Require Import Compare_dec.
 
 Section CoqLibAdd.
 
@@ -512,8 +519,6 @@ Section CoqLibAdd.
       - right; inversion 1; auto.
     Defined.
 
-    Require String.
-
     Global Instance string_eqdec : EqDec String.string eq := String.string_dec.
     Global Instance pair_eqdec {A B} `{EqDec A eq} `{EqDec B eq} : EqDec (prod A B) eq.
     Proof.
@@ -536,8 +541,6 @@ Section CoqLibAdd.
   (** ** Natural numbers *)
   
   Section Nutil.
-    Require Import Omega.
-
     Lemma min_zero:
       forall (n1 n2:nat), min n1 (S n2) = 0 -> n1 = 0.
     Proof.
@@ -622,7 +625,6 @@ Section CoqLibAdd.
   (** ** Integers *)
 
   Section Zutil.
-    Require Import ZArith Zdigits Znat.
     Open Scope Z_scope.
     
     Definition ZToSignedNat (z:Z) : (bool*nat) :=
@@ -724,7 +726,7 @@ Section CoqLibAdd.
          end.
 
     Lemma iter_fold_left_list {A B} (f:A->A) (l:list B) (a:A)
-      : iter f (length l) a = fold_left (fun x y => f x) l a.
+      : iter f (List.length l) a = fold_left (fun x y => f x) l a.
     Proof.
       revert a.
       induction l; simpl; trivial.
@@ -739,7 +741,7 @@ Section CoqLibAdd.
     Qed.
 
     Lemma iter_fold_right_list {A B} (f:A->A) (l:list B) (a:A)
-      : iter f (length l) a = fold_right (fun x y => f y) a l.
+      : iter f (List.length l) a = fold_right (fun x y => f y) a l.
     Proof.
       rewrite <- (rev_involutive l).
       rewrite fold_left_rev_right.
@@ -771,8 +773,6 @@ Section CoqLibAdd.
   (** * Iterator with a cost functions *)
 
   Section Cost.
-    Require Import Recdef.
-    Require Import Compare_dec.
 
     Context {A:Type}.
     Function iter_cost (optim: A -> A) (cost: A -> nat) (p: A) { measure cost p } :=
@@ -886,8 +886,6 @@ End CoqLibAdd.
 
 (** * Tactics *)
 
-Require String.
-
 Ltac dest_eqdec :=
   match goal with 
   | [|- context [eq_nat_dec ?x ?y]] => destruct (eq_nat_dec x y)
@@ -979,7 +977,6 @@ Ltac cut_to H :=
 
 Ltac invcs H := inversion H; clear H; try subst.
 
-Require Import String.
 Definition brand := string.
 
 (* If there is a default way to convert a type to a string.
@@ -991,5 +988,4 @@ Class ToString (A:Type)
 
 Ltac string_eqdec_to_equiv :=
   replace string_eqdec with (equiv_dec (EqDec:=string_eqdec)) in * by trivial.
-
 

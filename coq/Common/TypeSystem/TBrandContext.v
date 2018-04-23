@@ -14,21 +14,22 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import ListSet.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Morphisms.
+Require Import Basics.
+Require Import EquivDec.
+Require Import Eqdep_dec.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignType.
+Require Import RType.
+
 Section TBrandContext.
-  Require Import String.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Morphisms.
-  Require Import Basics.
-  Require Import EquivDec.
-  Require Import Eqdep_dec.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignType.
-  Require Import RType.
 
   (** Implicitly, everything derives from Any *)
   Definition Any {ftype:foreign_type} {br:brand_relation} := Brand nil. 

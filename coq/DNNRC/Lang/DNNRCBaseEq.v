@@ -14,21 +14,21 @@
  * limitations under the License.
  *)
 
-Section DNNRCBaseEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import DData.
-  Require Import DDataNorm.
-  Require Import DNNRCBase.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import DData.
+Require Import DDataNorm.
+Require Import DNNRCBase.
 
+Section DNNRCBaseEq.
   Context {fruntime:foreign_runtime}.
   Context {A plug_type:Set}.
   Context {eqdec:EqDec A eq}.

@@ -18,25 +18,25 @@
  * Algebra contexts *
  *******************************)
 
-Section cNRAEnvContext.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import String.
-  Require Import NPeano.
-  Require Import Arith.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRARuntime.
-  Require Import NRAOptim.
-  Require Import cNRAEnv.
-  Require Import cNRAEnvIgnore.
-  Require Import cNRAEnvEq.
-  Require Import cNRAEnvContext.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import String.
+Require Import NPeano.
+Require Import Arith.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRARuntime.
+Require Import NRAOptim.
+Require Import cNRAEnv.
+Require Import cNRAEnvIgnore.
+Require Import cNRAEnvEq.
+Require Import cNRAEnvContext.
 
+Section cNRAEnvContext.
 (*
     Lemma aec_substs_prop_part2 c ps1 ps2 :
     Forall2 (fun xy1 xy2 => (fst xy1) = (fst xy2)

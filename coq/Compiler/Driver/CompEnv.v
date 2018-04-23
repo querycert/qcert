@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section QEnv.
-  Require Import String.
-  Require Import List.
-  Require Import String.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import String.
+Require Import List.
+Require Import String.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
 
+Section CompEnv.
   (*********
    * Utils *
    *********)
@@ -38,8 +38,6 @@ Section QEnv.
     | Some (dcoll l) => Some l
     | Some _ => None
     end.
-
-  Require Import DData.
 
   Definition validate_data (oresult oexpected:option data) :=
       match oresult, oexpected with
@@ -77,7 +75,7 @@ Section QEnv.
   Definition validate_lifted_success (res:option data) exp : bool :=
     validate_success (lift_result res) exp.
 
-End QEnv.
+End CompEnv.
 
 (* validate that the answer is correct.  Since the result is unordered,
       we check that the result answer is a permutation of the expected

@@ -23,11 +23,11 @@ Java. *)
 - translating to DesignerRule:
 - translating from DesignerRule: CAMPRule *)
 
-Section DesignerRule.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Export CAMPRuleRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Export CAMPRuleRuntime.
 
+Section DesignerRule.
   Context {fruntime:foreign_runtime}.
 
   Axiom designer_rule : Set.

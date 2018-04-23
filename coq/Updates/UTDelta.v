@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+
+Require Import RUtil RType RData.
+Require Import RAlg.
+Require Import TData TOps TAlg.
+
+Require Import UDelta.
+
+Require Import Program.
+
 Section UTDelta.
-  Require Import String.
-  Require Import List.
-
-  Require Import RUtil RType RData.
-  Require Import RAlg.
-  Require Import TData TOps TAlg.
-
-  Require Import UDelta.
-
-  Require Import Program.
-
   Inductive delta_type : Δ -> rtype -> Prop :=
   | Δtid {τ} :
       delta_type Δid τ

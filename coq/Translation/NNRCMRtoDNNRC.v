@@ -14,20 +14,20 @@
  * limitations under the License.
  *)
 
-Section NNRCMRtoDNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import Sorting.Mergesort.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import ForeignReduceOps.
-  Require Import ForeignToReduceOps.
-  Require Import NNRCSystem.
-  Require Import NNRCMRSystem.
-  Require Import DNNRCSystem.
-  Require Import NNRCtoDNNRC.
+Require Import String.
+Require Import List.
+Require Import Sorting.Mergesort.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import ForeignReduceOps.
+Require Import ForeignToReduceOps.
+Require Import NNRCSystem.
+Require Import NNRCMRSystem.
+Require Import DNNRCSystem.
+Require Import NNRCtoDNNRC.
 
+Section NNRCMRtoDNNRC.
   Local Open Scope string_scope.
 
   Context {fruntime:foreign_runtime}.

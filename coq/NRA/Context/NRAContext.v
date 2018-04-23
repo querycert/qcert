@@ -18,24 +18,24 @@
  * Algebra contexts *
  *******************************)
 
-Section NRAContext.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import Permutation.
-  Require Import String.
-  Require Import NPeano.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Utils.
-  Require Import BindingsNat. (* Part of Utils, but not automatically exported *)
-  Require Import CommonRuntime.
-  Require Import NRA.
-  Require Import NRAEq.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import Permutation.
+Require Import String.
+Require Import NPeano.
+Require Import Arith.
+Require Import Bool.
+Require Import Utils.
+Require Import BindingsNat. (* Part of Utils, but not automatically exported *)
+Require Import CommonRuntime.
+Require Import NRA.
+Require Import NRAEq.
 
+Section NRAContext.
   Local Open Scope nra_scope.
 
   Context {fruntime:foreign_runtime}.

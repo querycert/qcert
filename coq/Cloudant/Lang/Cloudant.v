@@ -31,10 +31,10 @@ parameters.
 - Languages translating from Cloudant: CloudantWhisk
 *)
   
-Section Cloudant.
-  Require Import String.
-  Require Import Utils.
+Require Import String.
+Require Import Utils.
 
+Section Cloudant.
   Record cloudant_design :=
     mkCloudantDesign
       { cloudant_design_inputdb : string;

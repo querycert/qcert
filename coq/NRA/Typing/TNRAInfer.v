@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section TNRAInfer.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Eqdep_dec.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRA.
-  Require Import TNRA.
-  Require Import Program.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Eqdep_dec.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NRA.
+Require Import TNRA.
+Require Import Program.
 
+Section TNRAInfer.
   (** Type inference for NRA when given the type of the input *)
 
   (* Auxiliary lemmas/definitions *)

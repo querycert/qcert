@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-(* This file defines derived patterns, notations, and concepts *)
-Section CAMPRuleSugar.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Export CAMPSugar.
-  Require Export CAMPRule.
+Require Import String.
+Require Import List.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Export CAMPSugar.
+Require Export CAMPRule.
   
+Section CAMPRuleSugar.
+  (* This file defines derived patterns, notations, and concepts *)
   Local Open Scope camp_scope.
   Local Open Scope string.
 

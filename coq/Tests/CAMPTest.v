@@ -16,23 +16,22 @@
 
 (** * Examples manually translated from arl (JRules) *)
 
-Require Import BrandRelation.
-
 Require Import ZArith.
-Local Open Scope Z_scope.
 Require Import String.
-Local Open Scope string.
 Require Import List.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import CAMPRuntime.
+Require Import CAMPRuleRuntime.
+Require Import TrivialModel.
+Require Import CompEnv.
+  
+Local Open Scope Z_scope.
+Local Open Scope string.
 Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section CAMPTest.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import CAMPRuntime.
-  Require Import CAMPRuleRuntime.
-  Require Import TrivialModel.
-  
   Local Open Scope camp_scope.
   
   (* This was copy/pastes from sample-rules (with [] added in at the top level *)
@@ -81,7 +80,6 @@ Section CAMPTest.
           "Customer =John Doe"].
 
   (* Eval vm_compute in R1_result. *)
-  Require Import CompEnv.
   Example R1_verify : validate_success R1_result R1_expected = true.
   Proof. fast_refl. Qed.
 

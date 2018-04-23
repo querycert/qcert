@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section RTypeNorm.
-  Require Import String.
-  Require Import List.
-  Require Import Sorting.
-  Require Import Eqdep_dec.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignType.
-  Require Import RType.
+Require Import String.
+Require Import List.
+Require Import Sorting.
+Require Import Eqdep_dec.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignType.
+Require Import RType.
 
+Section RTypeNorm.
   (** Syntax of types. Note that there is no guarantee yet that records are well formed. i.e., having distinct fields. *)
 
   Context {ftype:foreign_type}.

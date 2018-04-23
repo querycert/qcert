@@ -22,6 +22,9 @@ Require Import EquivDec.
 Require Import List.
 Require Import CoqLibAdd.
 Require Import ListAdd.
+Require Import Permutation.
+Require Import Eqdep_dec.
+Require Import RelationClasses.
 
 Section SortingAdd.
 
@@ -65,10 +68,6 @@ Section SortingAdd.
       Hint Resolve insertion_sort_insert_Sorted.
       induction l; simpl; eauto.
     Qed.
-
-    Require Import Permutation.
-    Require Import Eqdep_dec.
-    Require Import RelationClasses.
 
     Fixpoint is_list_sorted (l:list A) :=
       match l with

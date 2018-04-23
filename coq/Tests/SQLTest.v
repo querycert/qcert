@@ -32,12 +32,16 @@ Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_sco
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
 
+Require Import String.
+Require Import ZArith.
+Require Import SQL.
+Require Import SQLtoNRAEnv.
+Require Import EnhancedModel.
+Require Import CompEval.
+  
 Section SQLTest.
-  Require Import String ZArith.
   Open Scope Z_scope.
 
-  Require Import SQL SQLtoNRAEnv.
-  
   Local Open Scope string_scope.
   Local Open Scope data_scope.
 
@@ -45,9 +49,6 @@ Section SQLTest.
    * Preliminaries *
    *****************)
 
-  Require Import EnhancedModel.
-  Require Import CompEval.
-  
   (* Some useful functions *)
 
   Fixpoint natcoll_aux (n n0:nat) : list data :=

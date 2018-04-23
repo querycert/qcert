@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section NNRCtoNNRCMR.
-  Require Import Arith.
-  Require Import ZArith.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import ForeignToReduceOps.
-  Require Import NNRCRuntime .
+Require Import Arith.
+Require Import ZArith.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCMRRuntime.
+Require Import ForeignToReduceOps.
+Require Import NNRCRuntime .
 
+Section NNRCtoNNRCMR.
   Local Open Scope list_scope.
 
   Context {fruntime:foreign_runtime}.

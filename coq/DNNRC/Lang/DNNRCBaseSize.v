@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section size.
-  Require Import List.
-  Require Import Omega.
-  Require Import CommonRuntime.
-  Require Import DNNRCBase.
+Require Import List.
+Require Import Omega.
+Require Import CommonRuntime.
+Require Import DNNRCBase.
 
+Section size.
   Context {fruntime:foreign_runtime}.
   Context {A plug_type:Set}.
 

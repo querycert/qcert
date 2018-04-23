@@ -14,22 +14,22 @@
  * limitations under the License.
  *)
 
-Section TNNRCEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRCSystem.
-  Require Import NNRC.
-  Require Import NNRCEq.
-  Require Import TNNRC.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRCSystem.
+Require Import NNRC.
+Require Import NNRCEq.
+Require Import TNNRC.
 
+Section TNNRCEq.
   (* A type-safe equivalence for rewrites *)
 
   Context {m:basic_model}.

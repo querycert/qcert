@@ -19,7 +19,6 @@ Require Import String.
 Require Import Utils.
 Require Import CommonRuntime.
 
-
 Local Open Scope string_scope.
 
 Section ForeignCloudant.

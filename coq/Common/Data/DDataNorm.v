@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section DDataNorm.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import ZArith.
-  Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import ZArith.
+Require Import Bool.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataNorm.
+Require Import DData.
 
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataNorm.
-  Require Import DData.
+Section DDataNorm.
 
   Context {fdata:foreign_data}.
   Context (h:brand_relation_t).

@@ -14,15 +14,20 @@
  * limitations under the License.
  *)
 
-Section NRAExt.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import CommonRuntime.
-  Require Import NRA.
-  Require Import NRAEq.
-  Require Import NRAExt.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import CommonRuntime.
+Require Import NRA.
+Require Import NRAEq.
+Require Import NRAExt.
 
+Section NRAExt.
   (* Equivalence for extended algebra *)
 
   Local Open Scope nraext_scope.
@@ -37,12 +42,6 @@ Section NRAExt.
       (x:data)
       (dn_x:data_normalized h x),
       h ⊢ op1 @ₓ x ⊣ c = h ⊢ op2 @ₓ x ⊣ c.
-
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
 
   Global Instance nraext_equiv : Equivalence nraext_eq.
   Proof.

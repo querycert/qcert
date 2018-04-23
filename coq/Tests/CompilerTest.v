@@ -15,24 +15,30 @@
  *)
 
 Require Import ZArith.
-Local Open Scope Z_scope.
 Require Import String.
-Local Open Scope string.
 Require Import List.
-Import ListNotations.
-
 Require Import Utils.
-Require Import CommonSystem CAMPRuntime CAMPRuleRuntime.
+Require Import CommonSystem.
+Require Import CAMPRuntime.
+Require Import CAMPRuleRuntime.
 Require Import TrivialModel.
-
 Require CompilerRuntime.
+Require Import CompLang.
+Require Import CompDriver.
+Require Import CompilerModel.
+Require CAMPSystem.
+Require Import TcNRAEnv.
+Require Import TCAMPtocNRAEnv.
+  
+Local Open Scope Z_scope.
+Local Open Scope string.
+Import ListNotations.
 
 Definition CPRModel := ("MainEntity", "Entity") :: nil.
 Instance CPRModel_relation : brand_relation
   := mkBrand_relation CPRModel (eq_refl _) (eq_refl _).
 
 Module TR := TrivialRuntime.
-Require Import CompLang CompDriver.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section CompilerUntypedTest.
@@ -141,8 +147,6 @@ Section CompilerUntypedTest.
 
   End CompilerBrandModelTest.
 
-  Require Import CompilerModel.
-  
   Module MyBrandModel <: CompilerBrandModel(TrivialForeignType).
     Definition compiler_brand_model := CPModel.
   End MyBrandModel.
@@ -192,10 +196,9 @@ Section CompilerUntypedTest.
   
   Definition tinp1 := (("WORLD", Coll (Brand (singleton "MainEntity")))::nil).
 
-  Require Import CAMPSystem.
   (* This is collapsed using econstructor, but not sure how systematic that would be... -JS *)
   Lemma Example1'_wt τ :
-    camp_type tinp1 nil Example1' τ tout1.
+    TCAMP.camp_type tinp1 nil Example1' τ tout1.
   Proof.
     econstructor; eauto.
     econstructor; eauto.
@@ -252,8 +255,6 @@ Section CompilerUntypedTest.
   Eval compute in (proj1_sig tout1).
   *)
     
-  Require Import TcNRAEnv TCAMPtocNRAEnv.
-  
   Lemma alg5_wt τ :
     algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
@@ -262,9 +263,10 @@ Section CompilerUntypedTest.
     unfold CAMPtocNRAEnv.nraenv_core_of_camp.
     econstructor; eauto.
     econstructor; eauto.
-    Focus 2.
+    2: {
     apply (@nraenv_core_of_camp_type_preserve).
     apply Example1'_wt.
+    }
     repeat econstructor; eauto.
     Grab Existential Variables.
     eauto.

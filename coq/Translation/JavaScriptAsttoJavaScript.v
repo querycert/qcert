@@ -24,7 +24,6 @@ Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JsAst.JsNumber.
 
-
 Local Open Scope string_scope.
 
 Section ToString.

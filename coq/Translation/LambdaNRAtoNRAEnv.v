@@ -21,11 +21,10 @@ Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
 Require Import CommonRuntime.
+Require Import LambdaNRARuntime.
+Require Import NRAEnvRuntime.
 
 Section LambdaNRAtoNRAEnv.
-  Require Import LambdaNRARuntime.
-  Require Import NRAEnvRuntime.
-
   Context {fruntime:foreign_runtime}.
 
   Fixpoint lambda_nra_to_nraenv (op:lambda_nra) : nraenv :=

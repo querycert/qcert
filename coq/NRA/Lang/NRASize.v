@@ -14,11 +14,11 @@
  * limitations under the License.
  *)
 
-Section NRASize.
-  Require Import Omega.
-  Require Import CommonRuntime.
-  Require Import NRA.
+Require Import Omega.
+Require Import CommonRuntime.
+Require Import NRA.
 
+Section NRASize.
   Context {fruntime:foreign_runtime}.
 
   Fixpoint nra_size (a:nra) : nat :=

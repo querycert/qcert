@@ -14,9 +14,9 @@
  * limitations under the License.
  *)
 
-Section SparkRDD.
-  Require Import String.
+Require Import String.
 
+Section SparkRDD.
   (** Spark (RDD API) programs are in serialized form *)
   Definition spark_rdd := string.
   

@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section NNRCimpishSize.
-  Require Import String.
-  Require Import Omega.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCimpish.
+Require Import String.
+Require Import Omega.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCimpish.
 
+Section NNRCimpishSize.
   Context {fruntime:foreign_runtime}.
 
   Fixpoint nnrc_impish_expr_size (n:nnrc_impish_expr) : nat

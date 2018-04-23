@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section TNRAExt.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import CommonSystem.
-  Require Import NRAExt.
-  Require Import TNRA.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import CommonSystem.
+Require Import NRAExt.
+Require Import TNRA.
 
+Section TNRAExt.
   Local Open Scope nraext_scope.
   
   (** Typing for NRA *)

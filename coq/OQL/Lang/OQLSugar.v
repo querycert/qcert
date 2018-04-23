@@ -18,12 +18,11 @@ Require Import String.
 Require Import List.
 Require Import Arith.
 Require Import EquivDec.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import OQL.
 
 Section OQLSugar.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import OQL.
-
   Context {fruntime:foreign_runtime}.
 
   Definition OStruct (el:list (string * oql_expr)) :=

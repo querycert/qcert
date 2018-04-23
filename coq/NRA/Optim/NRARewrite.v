@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section NRARewrite.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRA.
-  Require Import NRAEq.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRA.
+Require Import NRAEq.
   
+Section NRARewrite.
   Local Open Scope nra_scope.
 
   Context {fruntime:foreign_runtime}.

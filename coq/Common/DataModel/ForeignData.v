@@ -14,9 +14,10 @@
  * limitations under the License.
  *)
 
+Require Import EquivDec.
+Require Import CoqLibAdd.
+
 Section ForeignData.
-  Require Import EquivDec.
-  Require Import CoqLibAdd.
   
   Class foreign_data : Type
     := mk_foreign_data {

@@ -30,14 +30,14 @@ Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_sco
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
 
+Require Import String.
+Require Import ZArith.
+
+Require Import NNRCRuntime.
+Require Import cNNRC.
+Require Import TrivialModel.
+
 Section NNRCTest.
-  Require Import String.
-  Require Import ZArith.
-
-  Require Import NNRCRuntime.
-  Require Import cNNRC.
-  Require Import TrivialModel.
-
   Local Open Scope string_scope.
   Local Open Scope nnrc_scope.
   Local Open Scope data_scope.

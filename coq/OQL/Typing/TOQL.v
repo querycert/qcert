@@ -14,17 +14,17 @@
  * limitations under the License.
  *)
 
-Section TOQL.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Program.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import OQL.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Program.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import OQL.
   
+Section TOQL.
   (** Typing for CAMP *)
 
   Section typ.

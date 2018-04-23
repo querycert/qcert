@@ -14,13 +14,13 @@
  * limitations under the License.
  *)
 
+Require Import String.
+
 Section Helpers.
-  Require Import String.
   Definition eol := String (Ascii.ascii_of_nat 10) EmptyString.
 End Helpers.
 
 Require Import List.
-Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Utils.

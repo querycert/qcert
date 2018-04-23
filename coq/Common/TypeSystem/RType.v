@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section RType.
-  Require Import String.
-  Require Import List.
-  Require Import Sorting.
-  Require Import Eqdep_dec.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignType.
+Require Import String.
+Require Import List.
+Require Import Sorting.
+Require Import Eqdep_dec.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignType.
 
+Section RType.
   (* Possibly non-canonical relational types *)
 
   Inductive record_kind : Set

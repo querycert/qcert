@@ -14,17 +14,18 @@
  * limitations under the License.
  *)
 
-Section cNNRCVars.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Max.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
 
+Section cNNRCVars.
   Close Scope nnrc_scope.
   
   (* Since we are translating from a language with scoped variables
@@ -79,8 +80,6 @@ Section cNNRCVars.
     end.
 
   Definition nnrc_vars e := nnrc_free_vars e ++ nnrc_bound_vars e.
-
-  Require Import Arith Max.
 
   (* capture avoiding substitution *)
   (* Java equivalent: NnnrcOptimizer.nnrc_subst *)

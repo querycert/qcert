@@ -23,15 +23,15 @@ Local Open Scope string.
 Require Import List.
 Import ListNotations.
 
+Require Import Utils.
+Require Import CAMPTest.
+Require Import CommonSystem.
+Require Import TrivialModel.
+Require Import Program.
+Require Import TCAMPTest.
+  
 (* This module encodes the examples in sample-rules.txt *)
 Section TDataTest.
-  Require Import Utils.
-  Require Import CAMPTest.
-  Require Import CommonSystem.
-  Require Import TrivialModel.
-
-  Require Import Program.
-  
   (******* Defining model – should be automatized, but for now *** *)
 
   Definition personcoll :=
@@ -53,7 +53,6 @@ Section TDataTest.
     | Some (_,t) => t
     end.
 
-  Require Import TCAMPTest.
   Existing Instance CPModel.
   
   (* Eval vm_compute in (@tuncoll _ _ vd). *)

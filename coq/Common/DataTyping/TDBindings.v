@@ -14,22 +14,24 @@
  * limitations under the License.
  *)
 
-Section TDBindings.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Morphisms.
-  Require Import Basics.
-  Require Import BrandRelation.
-  Require Import Utils.
-  Require Import Types.
-  Require Import ForeignData.
-  Require Import CommonData.
-  Require Import ForeignDataTyping.
-  Require Import TDData.
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Morphisms.
+Require Import Basics.
+Require Import BrandRelation.
+Require Import Utils.
+Require Import Types.
+Require Import ForeignData.
+Require Import CommonData.
+Require Import ForeignDataTyping.
+Require Import TDData.
+Require Import TBindings.
+Require Import EquivDec.
 
+Section TDBindings.
   Context {fdata:foreign_data}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
@@ -107,14 +109,11 @@ Section TDBindings.
   Qed.
 
   Section unlocalize.
-    Require Import TBindings.
     Definition unlocalize_tdbindings (binds:tdbindings) : tbindings :=
       map (fun xy => ((fst xy), unlocalize_drtype (snd xy))) binds.
   End unlocalize.
   
   Section vdbindings.
-    Require Import EquivDec.
-
     Definition dt_to_v (bind:string * drtype) : string * dlocalization :=
       match snd bind with
       | Tlocal _ => (fst bind, Vlocal)

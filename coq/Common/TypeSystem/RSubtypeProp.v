@@ -17,7 +17,6 @@
 Require Import String.
 Require Import List.
 Require Import RelationClasses.
-
 Require Import Utils.
 Require Import ForeignType.
 Require Import RType.

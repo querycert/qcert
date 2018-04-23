@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section TcNNRCInfer.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Program.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNNRC.
-  Require Import TcNNRC.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Program.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNNRC.
+Require Import TcNNRC.
 
+Section TcNNRCInfer.
   Context {m:basic_model}.
   Context (τconstants:tbindings).
 

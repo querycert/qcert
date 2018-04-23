@@ -14,12 +14,44 @@
  * limitations under the License.
  *)
 
-Section CompLang.
-  Require Import String.
-  Require Import Utils.
-  Require Import List.
-  Require Import EquivDec.
+Require Import String.
+Require Import Utils.
+Require Import List.
+Require Import EquivDec.
 
+Require Import CommonSystem.
+
+(** Query languages *)
+Require Import SQLRuntime.
+Require Import SQLPPRuntime.
+Require Import OQLRuntime.
+Require Import LambdaNRARuntime.
+(** Rule languages *)
+Require Import CAMPRuleRuntime.
+Require Import TechRuleRuntime.
+Require Import DesignerRuleRuntime.
+(** Intermediate languages *)
+Require Import NRARuntime.
+Require Import NRAEnvRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCimpishRuntime.
+Require Import NNRCMRRuntime.
+Require Import CldMRRuntime.
+Require Import DNNRCRuntime.
+Require Import tDNNRCRuntime.
+Require Import CAMPRuntime.
+(** Target languages *)
+Require Import JavaScriptAstRuntime.
+Require Import JavaScriptRuntime.
+Require Import JavaRuntime.
+Require Import SparkRDDRuntime.
+Require Import SparkDFRuntime.
+Require Import CloudantRuntime.
+
+Require Import NNRCMRtoDNNRC.
+Require Import DNNRCTypes.
+
+Section CompLang.
   Section Lang.
     Inductive language : Set :=
     | L_camp_rule : language
@@ -243,38 +275,6 @@ Section CompLang.
   End Lang.
 
   Section Query.
-    Require Import CommonSystem.
-
-    (** Query languages *)
-    Require Import SQLRuntime.
-    Require Import SQLPPRuntime.
-    Require Import OQLRuntime.
-    Require Import LambdaNRARuntime.
-    (** Rule languages *)
-    Require Import CAMPRuleRuntime.
-    Require Import TechRuleRuntime.
-    Require Import DesignerRuleRuntime.
-    (** Intermediate languages *)
-    Require Import NRARuntime.
-    Require Import NRAEnvRuntime.
-    Require Import NNRCRuntime.
-    Require Import NNRCimpishRuntime.
-    Require Import NNRCMRRuntime.
-    Require Import CldMRRuntime.
-    Require Import DNNRCRuntime.
-    Require Import tDNNRCRuntime.
-    Require Import CAMPRuntime.
-    (** Target languages *)
-    Require Import JavaScriptAstRuntime.
-    Require Import JavaScriptRuntime.
-    Require Import JavaRuntime.
-    Require Import SparkRDDRuntime.
-    Require Import SparkDFRuntime.
-    Require Import CloudantRuntime.
-
-    Require Import NNRCMRtoDNNRC.
-    Require Import DNNRCTypes.
-  
     Definition vdbindings := vdbindings.
 
     (* Languages *)

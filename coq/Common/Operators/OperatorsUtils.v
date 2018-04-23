@@ -16,17 +16,17 @@
 
 (* Utilities methods used for defining the semantics of the operators *)
 
-Section OperatorsUtils.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import ZArith.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataLift.
-  Require Import Iterators.
+Require Import String.
+Require Import List.
+Require Import Utils.
+Require Import ZArith.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataLift.
+Require Import Iterators.
 
+Section OperatorsUtils.
   Import ListNotations.
 
   Context {fdata:foreign_data}.

@@ -14,23 +14,23 @@
  * limitations under the License.
  *)
 
-Section TNRARewrite.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRA.
-  Require Import NRAExt.
-  Require Import NRAEq.
-  Require Import NRARewrite.
-  Require Import TNRA.
-  Require Import TNRAEq.
-  Require Import Program.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NRA.
+Require Import NRAExt.
+Require Import NRAEq.
+Require Import NRARewrite.
+Require Import TNRA.
+Require Import TNRAEq.
+Require Import Program.
   
+Section TNRARewrite.
   Local Open Scope nra_scope.
 
   (* An attempt at proving some of the relational algebra's

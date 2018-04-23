@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section TOQLtoNRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Omega.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import OQLSystem.
-  Require Import NRAEnvSystem.
-  Require Import OQLtoNRAEnv.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Omega.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import OQLSystem.
+Require Import NRAEnvSystem.
+Require Import OQLtoNRAEnv.
 
+Section TOQLtoNRAEnv.
   Context {m:basic_model}.
 
     Lemma oql_to_nraenv_expr_type_preserve_f τconstant τdefls pfd τenv pfe e τout:

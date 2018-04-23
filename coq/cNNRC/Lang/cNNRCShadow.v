@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section cNNRCShadow.
-  Require Import Bool.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
-  Require Export cNNRCVars.
+Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
+Require Export cNNRCVars.
 
+Section cNNRCShadow.
   Context {fruntime:foreign_runtime}.
 
   Fixpoint shadow_free (e:nnrc) : bool :=

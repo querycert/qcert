@@ -14,13 +14,14 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import Setoid.
+Require Import Equivalence.
+Require Import CoqLibAdd.
+Require Import OptimizerStep.
+
 Section OptimizerLogger.
-  Require Import String.
-  Require Import List.
-  Require Import Setoid.
-  Require Import Equivalence.
-  Require Import CoqLibAdd.
-  Require Import OptimizerStep.
   
   Class optimizer_logger (Name:Set) (D:Set) 
     := mk_optimizer_logger {

@@ -14,17 +14,17 @@
  * limitations under the License.
  *)
 
-Section NNRCimpishNorm.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCimpish.
-  Require Import NNRCimpishEval.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCimpish.
+Require Import NNRCimpishEval.
 
+Section NNRCimpishNorm.
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
   

@@ -14,28 +14,29 @@
  * limitations under the License.
  *)
 
+Require Import List.
+Require Import String.
+Require Import Permutation.
+
+(* Common *)
+Require Import Utils.
+Require Import CommonSystem.
+Require Import TypingRuntime.
+Require Import ForeignReduceOps.
+
+Require Import OptimizerLogger.
+Require Import CompLang CompEnv.
+
+Require Import NNRCOptimizer.
+Require Import NRAEnvOptimizer.
+Require Import OptimizerStep.
+
 Section CompConfig.
-  Require Import List.
-  Require Import String.
-
-  (* Common *)
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import TypingRuntime.
-  Require Import ForeignReduceOps.
-
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {bm:brand_model}.
 
-  Require Import OptimizerLogger.
-  Require Import CompLang CompEnv.
-
   Section optim.
-    Require Import NNRCOptimizer.
-    Require Import NRAEnvOptimizer.
-    Require Import OptimizerStep.
-
     (* CompLang.type_of_language does not suffice, since some language
        (the core ones) have optimizations specified in a different language
        (via conversion) *)
@@ -78,8 +79,6 @@ Section CompConfig.
       | Some opc => opc
       | None => get_default_optim_config l
       end.
-
-    Require Import Permutation.
 
     Remark optim_config_list_default_in_sync :
       Permutation

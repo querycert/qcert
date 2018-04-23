@@ -17,20 +17,21 @@
 (** Support for creating and reasoning about fresh names (represented
 as strings). *)
 
+Require Import String.
+Require Import List.
+Require Import Permutation.
+Require Import Arith Min.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Omega.
+Require Import CoqLibAdd.
+Require Import ListAdd.
+Require Import StringAdd.
+Require Import Digits.
+Require Import Lift.
+Require Import Sublist.
+
 Section Fresh.
-  Require Import String.
-  Require Import List.
-  Require Import Permutation.
-  Require Import Arith Min.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Omega.
-  Require Import CoqLibAdd.
-  Require Import ListAdd.
-  Require Import StringAdd.
-  Require Import Digits.
-  Require Import Lift.
-  Require Import Sublist.
   
   Section finder.
     Context {A:Type}.

@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section DataframeSize.
-  Require Import List.
-  Require Import Omega.
-  Require Import CommonSystem.
-  Require Import Dataframe.
+Require Import List.
+Require Import Omega.
+Require Import CommonSystem.
+Require Import Dataframe.
 
+Section DataframeSize.
   Context {fruntime:foreign_runtime}.
   Context {ftype: foreign_type}.
 

@@ -114,6 +114,7 @@ MODULES = \
 	NRA/Typing/TNRAInfer \
         NRA/Typing/TNRAEq \
         NRA/Typing/TNRAExt \
+	NRA/Typing/TNRAUtil \
 	NRA/Context/NRAContext \
 	NRA/NRARuntime \
 	NRA/NRATypes \

@@ -14,22 +14,22 @@
  * limitations under the License.
  *)
 
-Section BinaryOperatorsSem.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import ZArith.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
-  Require Import DataLift.
-  Require Import DataNorm.
-  Require Import ForeignOperators.
-  Require Import OperatorsUtils.
-  Require Import Iterators.
-  Require Export BinaryOperators.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import ZArith.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
+Require Import DataLift.
+Require Import DataNorm.
+Require Import ForeignOperators.
+Require Import OperatorsUtils.
+Require Import Iterators.
+Require Export BinaryOperators.
   
+Section BinaryOperatorsSem.
   (* Algebra Unary/Binary Ops *)
   Definition nat_arith_binary_op_eval (op:nat_arith_binary_op) (z1 z2:Z) : Z :=
     match op with

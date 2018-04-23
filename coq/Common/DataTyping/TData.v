@@ -14,21 +14,21 @@
  * limitations under the License.
  *)
 
-Section TData.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Morphisms.
-  Require Import Basics.
-  Require Import BrandRelation.
-  Require Import Utils.
-  Require Import Types.
-  Require Import ForeignData.
-  Require Import CommonData.
-  Require Import ForeignDataTyping.
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Morphisms.
+Require Import Basics.
+Require Import BrandRelation.
+Require Import Utils.
+Require Import Types.
+Require Import ForeignData.
+Require Import CommonData.
+Require Import ForeignDataTyping.
 
+Section TData.
   (** Data is:
      - unit - used for undefined results.
      - nat - an integer

@@ -26,6 +26,8 @@ Require Import Morphisms.
 Require Import Setoid.
 Require Import EquivDec.
 Require Import Peano_dec.
+Require Import String.
+Require Import Ascii.
 Require Import CoqLibAdd.
 Require Import ListAdd.
 Require Import StringAdd.
@@ -778,7 +780,7 @@ Section Assoc.
   Qed.
 
   Lemma domain_length  {A B:Type} (l:list (A*B)) :
-    length (domain l) = length l.
+    List.length (domain l) = List.length l.
   Proof.
     apply map_length.
   Qed.
@@ -790,7 +792,7 @@ Section Assoc.
   Qed.
 
   Lemma codomain_length  {A B:Type} (l:list (A*B)) :
-    length (codomain l) = length l.
+    List.length (codomain l) = List.length l.
   Proof.
     apply map_length.
   Qed.
@@ -1515,7 +1517,6 @@ Section Assoc.
   End Substlist.
 
   Section Conv.
-    Require Import List Ascii String.
     Import ListNotations.
     
     Definition ascii_mk_lower_substtable

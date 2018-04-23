@@ -16,18 +16,18 @@
 
 (* Unary operators *)
 
-Section UnaryOperators.
-  Require Import Ascii.
-  Require Import String.
-  Require Import ZArith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import DataSort.
-  Require Import ForeignOperators.
-  Require Import OperatorsUtils.
+Require Import Ascii.
+Require Import String.
+Require Import ZArith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import DataSort.
+Require Import ForeignOperators.
+Require Import OperatorsUtils.
 
+Section UnaryOperators.
   Context {fdata:foreign_data}.
   Context {fuop:foreign_unary_op}.
   

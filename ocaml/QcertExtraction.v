@@ -19,7 +19,7 @@
 (* Configuration of the extraction *)
 
 Require Extraction.
-Extraction Language Ocaml.
+Extraction Language OCaml.
 Require Import ExtrOcamlBasic ExtrOcamlString ExtrOcamlNatInt ExtrOcamlZInt.
 Require Import ExtrOcamlFloatNatIntZInt.
 Extraction Blacklist String List.

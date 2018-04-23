@@ -14,17 +14,20 @@
  * limitations under the License.
  *)
 
-Section TCAMPtoNRA.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRASystem.
-  Require Import CAMPSystem.
-  Require Import CAMPtoNRA.
+Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NRASystem.
+Require Import CAMPSystem.
+Require Import CAMPtoNRA.
+Require Import Eqdep_dec.
 
+Section TCAMPtoNRA.
   Local Open Scope string_scope.
   Local Open Scope list_scope.
+  Local Open Scope nra_scope.
 
   (** Auxiliary definitions and lemmas for the types corresponding to the encoding of input/output(s) of Patterns in the NRA *)
 
@@ -207,10 +210,11 @@ Section TCAMPtoNRA.
            intros.
            eapply ATunnest_two.
          * econstructor.
-           Focus 2.
+           2: {
            eapply ATunnest_two.
            econstructor; eauto. econstructor; eauto.
            econstructor. reflexivity. reflexivity.
+           }
            simpl.
            econstructor; eauto.
            simpl.
@@ -293,9 +297,6 @@ Section TCAMPtoNRA.
   Proof.
      inversion 1; congruence.
   Qed.
-
-  Require Import Eqdep_dec.
-  Require Import Bool RList.
 
   Lemma UIP_refl_dec 
         {A:Type}

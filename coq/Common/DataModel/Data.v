@@ -14,16 +14,18 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import ZArith.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import EquivDec.
+
 Section Data.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import ZArith.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
 
   (** Data is:
      - unit - used for undefined results.
@@ -166,7 +168,7 @@ Section Data.
   Proof.
     induction x; destruct y; try solve[right; inversion 1].
     - left; trivial.
-    - destruct (Z_eq_dec n z).
+    - destruct (Z.eq_dec n z).
       + left; f_equal; trivial.
       + right;intro;apply n0;inversion H; trivial.
     - destruct (float_eq_dec f f0).
@@ -202,8 +204,6 @@ Section Data.
   Defined.
 
   (* begin hide *)
-  Require Import EquivDec.
-
   Global Instance data_eqdec : EqDec data eq := data_eq_dec.
   (* begin hide *)
 

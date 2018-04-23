@@ -18,23 +18,24 @@
  * Algebra contexts *
  *******************************)
 
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import Arith.
+Require Import List.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRARuntime.
+Require Import cNRAEnvRuntime.
+Require Import NRAContext.
+Require Import NRARewriteContext.
+Require Import cNRAEnvContext.
+Require Import cNRAEnvContextLift.
+Require Import NRAEnvRewrite.
+
 Section NRAEnvRewriteContext.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import Arith.
-  Require Import List.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRARuntime.
-  Require Import cNRAEnvRuntime.
-  Require Import NRAContext.
-  Require Import NRARewriteContext.
-  Require Import cNRAEnvContext.
-  Require Import cNRAEnvContextLift.
-  Require Import NRAEnvRewrite.
   
   Local Open Scope nraenv_core_ctxt.
 

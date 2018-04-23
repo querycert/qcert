@@ -18,26 +18,26 @@
  * Operators typed equivalence *
  *******************************)
 
-Section TOperatorsEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import Types.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import ForeignDataTyping.
-  Require Import ForeignOperatorsTyping.
-  Require Import Operators.
-  Require Import TData.
-  Require Import TUnaryOperators.
-  Require Import TBinaryOperators.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import Types.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import ForeignDataTyping.
+Require Import ForeignOperatorsTyping.
+Require Import Operators.
+Require Import TData.
+Require Import TUnaryOperators.
+Require Import TBinaryOperators.
 
+Section TOperatorsEq.
   (* Two well-typed operators are type equivalent iff they return the
      same value for every well-typed input.
    *)

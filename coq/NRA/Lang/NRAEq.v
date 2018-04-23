@@ -18,18 +18,18 @@
  * Algebra constructors proper *
  *******************************)
 
-Section NRAEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRA.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRA.
 
+Section NRAEq.
   Local Open Scope nra_scope.
 
   Context {fruntime:foreign_runtime}.

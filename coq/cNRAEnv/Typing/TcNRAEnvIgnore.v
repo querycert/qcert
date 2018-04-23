@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section TcNRAEnvIgnore.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRA.
-  Require Import NRAEq.
-  Require Import cNRAEnv.
-  Require Import cNRAEnvEq.
-  Require Import cNRAEnvIgnore.
-  Require Import TcNRAEnv.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NRA.
+Require Import NRAEq.
+Require Import cNRAEnv.
+Require Import cNRAEnvEq.
+Require Import cNRAEnvIgnore.
+Require Import TcNRAEnv.
 
+Section TcNRAEnvIgnore.
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
 

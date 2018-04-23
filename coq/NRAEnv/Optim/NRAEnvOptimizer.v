@@ -14,24 +14,24 @@
  * limitations under the License.
  *)
 
-Section NRAEnvOptimizer.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import String.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNRAEnvSystem.
-  Require Import NRAEnvSystem.
-  Require Import OptimizerStep.
-  Require Import OptimizerLogger.
-  Require Import NRAEnvRewrite.
-  Require Import TNRAEnvRewrite.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import String.
+Require Import List.
+Require Import ListSet.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNRAEnvSystem.
+Require Import NRAEnvSystem.
+Require Import OptimizerStep.
+Require Import OptimizerLogger.
+Require Import NRAEnvRewrite.
+Require Import TNRAEnvRewrite.
 
+Section NRAEnvOptimizer.
   Open Scope nraenv_scope.
   
   (* *************************** *)

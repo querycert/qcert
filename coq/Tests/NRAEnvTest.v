@@ -30,18 +30,17 @@ Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_sco
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
 
-Section NRAEnvTest.
-  Require Import String ZArith.
-  Open Scope Z_scope.
+Require Import String ZArith.
+Require Import NRAEnvRuntime.
+Require Import cNRAEnv.
+Require Import TrivialModel.
 
-  Require Import NRAEnvRuntime.
-  Require Import cNRAEnv.
+Section NRAEnvTest.
+  Open Scope Z_scope.
 
   Local Open Scope string_scope.
   Local Open Scope nraenv_core_scope.
   Local Open Scope data_scope.
-  Require Import TrivialModel.
-
 
   Example merge_env_example
     := [| ("A", dconst 1); ("B", dconst 3) |].

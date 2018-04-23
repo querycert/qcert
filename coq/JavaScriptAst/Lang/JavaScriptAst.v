@@ -14,8 +14,9 @@
  * limitations under the License.
  *)
 
+Require Export JsAst.JsSyntax.
+
 Section JavaScriptAst.
-  Require Export JsAst.JsSyntax.
   Definition ajavascript := prog.
 
 End JavaScriptAst.

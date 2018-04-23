@@ -14,17 +14,17 @@
  * limitations under the License.
  *)
 
-Section SQLtoNRAEnv.
-  Require Import String.
-  Require Import ZArith.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import SQLRuntime.
-  Require Import NRAEnvRuntime.
+Require Import String.
+Require Import ZArith.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import SQLRuntime.
+Require Import NRAEnvRuntime.
 
+Section SQLtoNRAEnv.
   Context {fruntime:foreign_runtime}.
 
   Definition sql_order_to_nraenv (acc:nraenv) (opt_order:option sql_order_spec) :=

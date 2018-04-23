@@ -14,13 +14,13 @@
  * limitations under the License.
  *)
 
-Section NNRCtocNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import CommonRuntime.
-  Require Import NNRC.
-  Require Import cNNRC.
+Require Import String.
+Require Import List.
+Require Import CommonRuntime.
+Require Import NNRC.
+Require Import cNNRC.
 
+Section NNRCtocNNRC.
   Context {fr:foreign_runtime}.
 
   Section Top.

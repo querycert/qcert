@@ -14,101 +14,100 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import Morphisms.
+
+(* Common libraries *)
+Require Import Utils.
+Require Import CommonSystem.
+Require Import TypingRuntime.
+
+(* Query languages *)
+Require Import SQLRuntime.
+Require Import SQLPPRuntime.
+Require Import OQLRuntime.
+Require Import LambdaNRARuntime.
+(* Rule languages *)
+Require Import CAMPRuleRuntime.
+Require Import TechRuleRuntime.
+Require Import DesignerRuleRuntime.
+(* Intermediate languages *)
+Require Import NRARuntime.
+Require Import NRAEnvRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCimpishRuntime.
+Require Import NNRCMRRuntime.
+Require Import CldMRRuntime.
+Require Import DNNRCRuntime.
+Require Import tDNNRCRuntime.
+Require Import CAMPRuntime.
+(* Target languages *)
+Require Import JavaScriptAstRuntime.
+Require Import JavaScriptRuntime.
+Require Import JavaRuntime.
+Require Import SparkRDDRuntime.
+Require Import SparkDFRuntime.
+Require Import CloudantRuntime.
+
+(* Translations *)
+Require Import OQLtoNRAEnv.
+Require Import SQLtoNRAEnv.
+Require Import SQLPPtoNRAEnv.
+Require Import LambdaNRAtoNRAEnv.
+Require Import CAMPRuletoCAMP.
+Require Import TechRuletoCAMPRule.
+Require Import DesignerRuletoCAMPRule.
+Require Import CAMPtoNRA.
+Require Import CAMPtocNRAEnv.
+Require Import CAMPtoNRAEnv.
+Require Import NRAtocNNRC.
+Require Import cNRAEnvtocNNRC.
+Require Import NRAEnvtoNNRC.
+Require Import cNRAEnvtoNRA.
+Require Import cNRAEnvtoNRAEnv.
+Require Import NRAEnvtocNRAEnv.
+Require Import NRAtocNRAEnv.
+Require Import NNRCtocNNRC.
+Require Import NNRCtoNNRCimpish.
+Require Import NNRCimpishtoJavaScriptAst.
+Require Import JavaScriptAsttoJavaScript.
+Require Import NNRCtoDNNRC.
+Require Import NNRCtoNNRCMR.
+Require Import NNRCtoJavaScript.
+Require Import NNRCtoJava.
+Require Import cNNRCtoCAMP.
+Require Import cNNRCtoNNRC.
+Require Import NNRCMRtoNNRC.
+Require Import NNRCMRtoSparkRDD.
+Require Import NNRCMRtoCldMR.
+Require Import NNRCMRtoDNNRC.
+Require Import CldMRtoCloudant.
+Require Import DNNRCtotDNNRC.
+Require Import tDNNRCtoSparkDF.
+
+(* Optimizers *)
+Require Import NRAEnvOptim.
+Require Import NNRCOptim.
+Require Import NNRCMROptim.
+Require Import tDNNRCOptim.
+Require Import OptimizerLogger.
+
+(* Foreign Datatypes Support *)
+Require Import ForeignToReduceOps.
+Require Import ForeignToSpark.
+Require Import ForeignCloudant.
+Require Import ForeignToCloudant.
+Require Import ForeignToJava.
+Require Import ForeignToJavaScript.
+Require Import ForeignToJavaScriptAst.
+Require Import ForeignToScala.
+
+(** Compiler Driver *)
+Require Import CompLang.
+Require Import CompEnv.
+Require Import CompConfig.
+
 Section CompDriver.
-
-  Require Import String.
-  Require Import Morphisms.
-
-  (* Common libraries *)
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import TypingRuntime.
-
-  (* Query languages *)
-  Require Import SQLRuntime.
-  Require Import SQLPPRuntime.
-  Require Import OQLRuntime.
-  Require Import LambdaNRARuntime.
-  (* Rule languages *)
-  Require Import CAMPRuleRuntime.
-  Require Import TechRuleRuntime.
-  Require Import DesignerRuleRuntime.
-  (* Intermediate languages *)
-  Require Import NRARuntime.
-  Require Import NRAEnvRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCimpishRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import CldMRRuntime.
-  Require Import DNNRCRuntime.
-  Require Import tDNNRCRuntime.
-  Require Import CAMPRuntime.
-  (* Target languages *)
-  Require Import JavaScriptAstRuntime.
-  Require Import JavaScriptRuntime.
-  Require Import JavaRuntime.
-  Require Import SparkRDDRuntime.
-  Require Import SparkDFRuntime.
-  Require Import CloudantRuntime.
-
-  (* Translations *)
-  Require Import OQLtoNRAEnv.
-  Require Import SQLtoNRAEnv.
-  Require Import SQLPPtoNRAEnv.
-  Require Import LambdaNRAtoNRAEnv.
-  Require Import CAMPRuletoCAMP.
-  Require Import TechRuletoCAMPRule.
-  Require Import DesignerRuletoCAMPRule.
-  Require Import CAMPtoNRA.
-  Require Import CAMPtocNRAEnv.
-  Require Import CAMPtoNRAEnv.
-  Require Import NRAtocNNRC.
-  Require Import cNRAEnvtocNNRC.
-  Require Import NRAEnvtoNNRC.
-  Require Import cNRAEnvtoNRA.
-  Require Import cNRAEnvtoNRAEnv.
-  Require Import NRAEnvtocNRAEnv.
-  Require Import NRAtocNRAEnv.
-  Require Import NNRCtocNNRC.
-  Require Import NNRCtoNNRCimpish.
-  Require Import NNRCimpishtoJavaScriptAst.
-  Require Import JavaScriptAsttoJavaScript.
-  Require Import NNRCtoDNNRC.
-  Require Import NNRCtoNNRCMR.
-  Require Import NNRCtoJavaScript.
-  Require Import NNRCtoJava.
-  Require Import cNNRCtoCAMP.
-  Require Import cNNRCtoNNRC.
-  Require Import NNRCMRtoNNRC.
-  Require Import NNRCMRtoSparkRDD.
-  Require Import NNRCMRtoCldMR.
-  Require Import NNRCMRtoDNNRC.
-  Require Import CldMRtoCloudant.
-  Require Import DNNRCtotDNNRC.
-  Require Import tDNNRCtoSparkDF.
-
-  (* Optimizers *)
-  Require Import NRAEnvOptim.
-  Require Import NNRCOptim.
-  Require Import NNRCMROptim.
-  Require Import tDNNRCOptim.
-  Require Import OptimizerLogger.
-
-  (* Foreign Datatypes Support *)
-  Require Import ForeignToReduceOps.
-  Require Import ForeignToSpark.
-  Require Import ForeignCloudant.
-  Require Import ForeignToCloudant.
-  Require Import ForeignToJava.
-  Require Import ForeignToJavaScript.
-  Require Import ForeignToJavaScriptAst.
-  Require Import ForeignToScala.
-
-  (** Compiler Driver *)
-  Require Import CompLang.
-  Require Import CompEnv.
-  Require Import CompConfig.
-
   (* Some useful notations *)
   Local Open Scope list_scope.
 

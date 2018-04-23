@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section NRAExtRewrite.
-  Require Import List.
-  Require Import CommonRuntime.
-  Require Import NRA.
-  Require Import NRAEq.
-  Require Import NRAExt.
-  Require Import NRAExtEq.
-  Require Import NRARewrite.
+Require Import List.
+Require Import CommonRuntime.
+Require Import NRA.
+Require Import NRAEq.
+Require Import NRAExt.
+Require Import NRAExtEq.
+Require Import NRARewrite.
 
+Section NRAExtRewrite.
   Local Open Scope nra_scope.
   Local Open Scope nraext_scope.
 

@@ -21,7 +21,8 @@ Require Import Orders.
 Require Import Ascii.
 Require Import List.
 Require Import String.
-Require Import Arith Min.
+Require Import Arith.
+Require Import Min.
 Require Import Equivalence.
 Require Import EquivDec.
 Require Import Compare_dec.
@@ -38,7 +39,7 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
 
   (* This could be done more directly, but this suffices *)
   Definition compare (a b:ascii) : comparison :=
-    nat_compare (nat_of_ascii a) (nat_of_ascii b).
+    Nat.compare (nat_of_ascii a) (nat_of_ascii b).
 
   Definition lt (a b:ascii) := compare a b = Lt.
 
@@ -46,8 +47,8 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
   Proof.
     split; repeat red; unfold lt, compare; intros;
       repeat match goal with 
-             | [H:nat_compare _ _ = Lt |- _ ] => apply nat_compare_lt in H
-             | [|- nat_compare _ _ = Lt ] => apply nat_compare_lt
+             | [H:Nat.compare _ _ = Lt |- _ ] => apply nat_compare_lt in H
+             | [|- Nat.compare _ _ = Lt ] => apply nat_compare_lt
              end; omega.
   Qed.
 
@@ -59,7 +60,7 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
   Lemma compare_eq_iff a b: compare a b = Eq <-> a = b.
   Proof.
     unfold AsciiOrder.compare.
-    generalize (nat_compare_eq_iff (nat_of_ascii a) (nat_of_ascii b)).
+    generalize (Nat.compare_eq_iff (nat_of_ascii a) (nat_of_ascii b)).
     destruct 1; split; intros; subst.
     - specialize (H H1).
       apply (f_equal ascii_of_nat) in H.
@@ -72,7 +73,7 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
     forall x y : t, CompareSpec (eq x y) (lt x y) (lt y x) (compare x y).
   Proof.
     intros. unfold eq, lt, compare. 
-    generalize (nat_compare_spec (nat_of_ascii x) (nat_of_ascii y)); intros nc.
+    generalize (Nat.compare_spec (nat_of_ascii x) (nat_of_ascii y)); intros nc.
     inversion nc.
     - apply (f_equal ascii_of_nat) in H0.
       repeat rewrite ascii_nat_embedding in H0.
@@ -107,7 +108,7 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
   Lemma compare_refl_eq a: compare a a = Eq.
   Proof.
     unfold AsciiOrder.compare.
-    rewrite (nat_compare_eq_iff (nat_of_ascii a) (nat_of_ascii a)); trivial.
+    rewrite (Nat.compare_eq_iff (nat_of_ascii a) (nat_of_ascii a)); trivial.
   Qed.
 
 End AsciiOrder.
@@ -309,7 +310,6 @@ Section ToString.
     repeat rewrite  list_to_string_to_list in fe; trivial.
   Qed.
 
-  Require List.
   Lemma string_reverse_helper_reverse_append s acc:
     string_reverse_helper s acc = list_to_string (List.rev_append (string_to_list s) (string_to_list acc)).
   Proof.
@@ -567,8 +567,6 @@ End MapString.
 (** Support for 'like' on strings *)
 
 Section Join.
-  Require Import List.
-  Require Import CoqLibAdd.
 
   Fixpoint joinStrings (delim:string) (l:list string) : string
     := match l with
@@ -580,9 +578,6 @@ Section Join.
 End Join.
 
 Section Like.
-  Require Import List.
-  Require Import CoqLibAdd.
-  
   (* This is intended to be like the SQL like operation *)
   (*  Definition string_like (s:pattern) *)
 

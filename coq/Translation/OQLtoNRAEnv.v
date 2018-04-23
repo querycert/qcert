@@ -14,17 +14,17 @@
  * limitations under the License.
  *)
 
-Section OQLtoNRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import Arith Omega.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import OQL.
-  Require Import NRAEnvRuntime.
+Require Import String.
+Require Import List.
+Require Import Arith Omega.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import OQL.
+Require Import NRAEnvRuntime.
 
+Section OQLtoNRAEnv.
   Context {fruntime:foreign_runtime}.
 
   Section query_var.

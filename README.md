@@ -41,7 +41,7 @@ can just add the corresponding libraries:
 ```
 $ opam repo add coq-released https://coq.inria.fr/opam/released
 $ opam install ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
-$ opam install coq.8.7.2 coq-flocq coq-jsast
+$ opam install coq.8.8.0 coq-flocq coq-jsast
 ```
 
 ### Java (Recommended)

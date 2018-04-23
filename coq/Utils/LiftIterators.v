@@ -16,22 +16,22 @@
 
 (** This module provides support for monadic iterators over bags. *)
 
-Section LiftIterators.
-  Require Import Arith.
-  Require Import Min.
-  Require Import Max.
-  Require Import Omega.
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import List.
-  Require Import CoqLibAdd.
-  Require Import ListAdd.
-  Require Import Lift.
-  Require Import Sublist.
+Require Import Arith.
+Require Import Min.
+Require Import Max.
+Require Import Omega.
+Require Import Permutation.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import List.
+Require Import CoqLibAdd.
+Require Import ListAdd.
+Require Import Lift.
+Require Import Sublist.
 
+Section LiftIterators.
   (** * Lift iterators *)
 
   (** ** Lifted map *)

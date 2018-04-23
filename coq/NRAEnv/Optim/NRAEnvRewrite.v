@@ -14,15 +14,16 @@
  * limitations under the License.
  *)
 
+Require Import List.
+Require Import String.
+Require Import ListSet.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRARuntime.
+Require Import NRAOptim.
+Require Import cNRAEnvRuntime.
+
 Section ROptimEnv.
-  Require Import List.
-  Require Import String.
-  Require Import ListSet.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRARuntime.
-  Require Import NRAOptim.
-  Require Import cNRAEnvRuntime.
 
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)

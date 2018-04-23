@@ -14,13 +14,14 @@
  * limitations under the License.
  *)
 
+Require Import ZArith.
+Require Import String.
+Require Import List.
+Require Import Utils.
+Require Import ForeignData.
+Require Import Data.
+
 Section DataLift.
-  Require Import ZArith.
-  Require Import String.
-  Require Import List.
-  Require Import Utils.
-  Require Import ForeignData.
-  Require Import Data.
 
   Context {fdata:foreign_data}.
 

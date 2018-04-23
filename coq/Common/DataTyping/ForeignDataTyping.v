@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section ForeignDataTyping.
+Require Import Utils.
+Require Import ForeignData.
+Require Import CommonData.
+Require Import Types.
 
-  Require Import Utils.
-  Require Import ForeignData.
-  Require Import CommonData.
-  Require Import Types.
+Section ForeignDataTyping.
   
   Class foreign_data_typing
         {fdata:foreign_data}

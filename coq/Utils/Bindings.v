@@ -19,23 +19,27 @@ lists for which the keys are ordered and without duplicates.
 
 Bindings are used as a representation for records and environments. *)
 
-Section Bindings.
 
-  Require Import List.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import EquivDec.
-  Require Import RelationClasses.
-  Require Import Orders.
-  Require Import Permutation.
-  Require Import CoqLibAdd.
-  Require Import ListAdd.
-  Require Import SortingAdd.
-  Require Import Assoc.
-  Require Import Sublist.
+Require Import List.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Permutation.
+Require Import Equivalence.
+Require Import EquivDec.
+Require Import RelationClasses.
+Require Import Orders.
+Require Import Permutation.
+Require Import CoqLibAdd.
+Require Import ListAdd.
+Require Import SortingAdd.
+Require Import Assoc.
+Require Import Sublist.
+Require Import Compat.
+Require Import String.
+Require Import StringAdd.
+
+Section Bindings.
 
   Class ODT {K:Type}
     := mkODT { ODT_eqdec:>EqDec K eq;
@@ -1457,7 +1461,6 @@ Section Bindings.
   End Forall.
   
   Section CompatSort.
-    Require Import Compat.
 
     Lemma compatible_app_compatible {A} `{EqDec A eq} {l1 l2:list (K*A)} :
       is_list_sorted ODT_lt_dec (domain l1) = true ->
@@ -1652,7 +1655,7 @@ Section Bindings.
 
 End Bindings.
 
-Section map.
+Section Map.
 
   Lemma map_rec_sort {A B C D} `{odta:ODT A} `{odtb:ODT B} (f:A*C->B*D) (l:list(A*C))
         (consistent:forall x y, rec_field_lt x y <->
@@ -1663,19 +1666,16 @@ Section map.
     apply map_insertion_sort.
     trivial.
   Qed.
-End map.
+End Map.
 
 Section BindingsString.
   
-  Require Import String.
-  Require Import StringAdd.
-
   Global Program Instance ODT_string : (@ODT string)
     := mkODT _ _ StringOrder.lt _ StringOrder.lt_dec StringOrder.compare StringOrder.compare_spec.
 
 End BindingsString.
 
-Section edot.
+Section Edot.
   (* note: right-rec so that new fields hide old fields *)
   Definition edot {A} (r:list (string*A)) (a:string) : option A :=
     assoc_lookupr ODT_eqdec r a.
@@ -1694,7 +1694,7 @@ Section edot.
     apply (@assoc_lookupr_insertion_sort_fresh string ODT_string); trivial.
   Qed.
 
-End edot.
+End Edot.
 
 Hint Unfold rec_sort rec_concat_sort.
 Hint Resolve drec_sort_sorted drec_concat_sort_sorted.

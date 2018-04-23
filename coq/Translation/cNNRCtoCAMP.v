@@ -14,19 +14,24 @@
  * limitations under the License.
  *)
 
-Section cNNRCtoCAMP.
-  Require Import String.
-  Require Import Bool.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Morphisms.
-  Require Import Omega.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import CAMPRuntime.
-  Require Import cNNRCRuntime.
+Require Import String.
+Require Import Bool.
+Require Import List.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Morphisms.
+Require Import Datatypes.
+Require Import Permutation.
+Require Import Eqdep_dec.
+Require Import Omega.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import CAMPRuntime.
+Require Import cNNRCRuntime.
+Require Import NNRCSize.
+Require Import CAMPSize.
 
+Section cNNRCtoCAMP.
   Context {fruntime:foreign_runtime}.
 
   (** Auxiliary definitions and lemmas *)
@@ -107,8 +112,6 @@ Section cNNRCtoCAMP.
 
   Definition nnrc_to_camp_env {A:Type} (env:list (string*A)) : list (string * A)
     := map (fun xy => (loop_var (fst xy), snd xy)) env.
-
-  Require Import Eqdep_dec.
 
   Lemma env_lookup_edot {A} (env:list (string*A)) (v:string) :
     NoDup (domain env) ->
@@ -227,8 +230,6 @@ Section cNNRCtoCAMP.
     discriminate.
   Qed.
 
-  Require Import Omega.
-
   Lemma bcount_false1 {A} (l1 l2: list A) :
     (bcount l2 <= bcount l1)%nat ->
     Z.of_nat (S (bcount l1)) = Z.of_nat (bcount l2) ->
@@ -330,8 +331,6 @@ Section cNNRCtoCAMP.
   Proof.
     reflexivity.
   Qed.
-
-  Require Import Permutation.
 
   (** our translation will never yield a recoverable error.
    There are only two sources of recoverable errors in the pattern lanugage:
@@ -787,8 +786,6 @@ Section cNNRCtoCAMP.
   Section trans_let.
 
     Section fresh.
-      Require Import Datatypes List.
-
       Definition option_to_list {A:Type} (o:option A) 
         := match o with
            | Some x => x::nil
@@ -824,7 +821,6 @@ Section cNNRCtoCAMP.
     Definition fresh_bindings (vars:list string) (p:camp) :=
       forall x, In (let_var x) vars -> ~ In (let_var x) (let_vars p).
 
-    Require Import Morphisms.
     Instance fresh_bindings_equiv_proper :
       Proper (equivlist ==> eq ==> iff) fresh_bindings.
     Proof.
@@ -1958,9 +1954,6 @@ Section cNNRCtoCAMP.
       rewrite nnrc_core_unshadow_eval in H0. trivial.
     Qed.
     
-    Require Import NNRCSize.
-    Require Import CAMPSize.
-
     (** Lemma and proof for the linear size of the translation *)
 
     Lemma nnrc_subst_var_size n v v' :

@@ -27,6 +27,9 @@ Require Import ForeignData.
 Require Import Data.
 Require Import DataSort.
 Require Import Iterators.
+Require Import DataNorm.
+Require Import ForeignData.
+Require Import Utils.
 
 Section SortBy.
   Context {fdata:foreign_data}.
@@ -94,9 +97,6 @@ Section SortBy.
 End SortBy.
 
 Section SortByProps.
-  Require Import DataNorm.
-  Require Import ForeignData.
-  Require Import Utils.
   Context {fdata:foreign_data}.
 
   Lemma dict_field_le_anti :

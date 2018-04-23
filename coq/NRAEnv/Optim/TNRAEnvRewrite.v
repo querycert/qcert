@@ -20,20 +20,21 @@
 
 (* those equivalences are for all well-typed expressions *)
 
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import ListSet.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNRAEnvSystem.
+Require Import NRAEnvRewrite.
+
 Section TNRAEnvRewrite.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import Bool.
-  Require Import String.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import cNRAEnvSystem.
-  Require Import NRAEnvRewrite.
 
   Local Open Scope nraenv_core_scope.
 
@@ -1141,7 +1142,7 @@ Section TNRAEnvRewrite.
                       | None => None
                       end) dout); intros; rewrite H in *; simpl in *.
         * case_eq (oflatten l); intros; rewrite H2 in *; simpl in *.
-          Focus 2.
+          2:{
           rewrite oflatten_cons_none; try assumption.
           destruct (match brand_relation_brands ⊢ₑ q₂ @ₑ dout0 ⊣ c;env with
                | Some (dbool b) => Some b
@@ -1249,7 +1250,7 @@ Section TNRAEnvRewrite.
                   | None => None
                   end) dout); try reflexivity.
           clear H1 H2; case_eq (oflatten l2); intros; rewrite H1 in *; try congruence.
-          rewrite oflatten_cons_none; assumption.
+          rewrite oflatten_cons_none; assumption. }
           rewrite (oflatten_cons [dout0] l l0 H2); simpl in *.
           destruct (brand_relation_brands ⊢ₑ q₂ @ₑ dout0 ⊣ c;env); try reflexivity.
           destruct d; try reflexivity; simpl in *.
@@ -1488,7 +1489,7 @@ Section TNRAEnvRewrite.
                       | None => None
                       end) dout); intros; rewrite H in *; simpl in *.
         * case_eq (oflatten l); intros; rewrite H2 in *; simpl in *.
-          Focus 2.
+          2: {
           rewrite oflatten_cons_none; try assumption.
           destruct (lift_map
            (fun x0 : data =>
@@ -1533,7 +1534,7 @@ Section TNRAEnvRewrite.
             | None => None
             end) dout); try congruence.
           clear H; case_eq (oflatten l0); intros; rewrite H in *; try congruence.
-          rewrite oflatten_cons_none; assumption.
+          rewrite oflatten_cons_none; assumption. }
           destruct (lift_map
                  (fun x0 : data =>
                   match
@@ -3133,10 +3134,8 @@ Section TNRAEnvRewrite.
       rewrite H; reflexivity.
       econstructor; eauto.
       econstructor; eauto.
-      Focus 2.
-      rewrite <- H0. eauto.
-      simpl.
-      apply dtrec_full. auto.
+      2: { rewrite <- H0; eauto. }
+      simpl; apply dtrec_full; auto.
     - intros.
       simpl.
       unfold omap_product; simpl.

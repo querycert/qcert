@@ -14,13 +14,16 @@
  * limitations under the License.
  *)
 
-Section JSON.
-  Require Import List.
-  Require Import String.
-  Require Import ZArith.
-  Require Import CoqLibAdd.
-  Require Import JsAst.JsNumber.
+Require Import List.
+Require Import Ascii.
+Require Import String.
+Require Import ZArith.
+Require Import JsAst.JsNumber.
+Require Import CoqLibAdd.
+Require Import StringAdd.
+Require Import Digits.
 
+Section JSON.
   Unset Elimination Schemes.
 
   Inductive json : Set :=
@@ -108,10 +111,6 @@ Section JSON.
   Qed.
 
   Section toString.
-    Require Import Ascii.
-    Require Import String.
-    Require Import StringAdd.
-    Require Import Digits.
 
     Local Open Scope string.
 

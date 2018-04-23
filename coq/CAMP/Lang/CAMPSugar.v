@@ -14,15 +14,16 @@
  * limitations under the License.
  *)
 
-(* This file defines derived patterns, notations, and concepts *)
-Section CAMPSugar.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.  
-  Require Export CAMP.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import ZArith.
+Require Import Utils.
+Require Import CommonRuntime.  
+Require Export CAMP.
 
+Section CAMPSugar.
+  (* This file defines derived patterns, notations, and concepts *)
   Context {fruntime:foreign_runtime}.
 
   (* Some success/failure macros *)
@@ -180,8 +181,6 @@ Section CAMPSugar.
     pletEnv (punop OpCount pit ≐ punop OpCount (pmap p))
             (pmap p).
 
-  Require Import ZArith.
-  
   (* p does not hold for any element in the list *)
   (* Java equivalent: CampBasicFunctionRule.mapsnone *)
   Definition mapsnone p := (punop OpCount (pmap p) ≐ ‵(0%Z)).

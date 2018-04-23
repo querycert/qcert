@@ -16,22 +16,23 @@
 
 (** Support for defining and reasoning about sub-lists. *)
 
-Section Sublist.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Bool.
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import RelationClasses.
-  Require Import Omega.
-  Require Import CoqLibAdd.
-  Require Import ListAdd.
-  Require Import SortingAdd.
-  Require Import Assoc.
+Require Import List.
+Require Import ListSet.
+Require Import Bool.
+Require Import Permutation.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import RelationClasses.
+Require Import Omega.
+Require Import CoqLibAdd.
+Require Import ListAdd.
+Require Import SortingAdd.
+Require Import Assoc.
+Require Import Program.Basics.
 
+Section Sublist.
   (** * Sublists *)
   
   Section sublist.
@@ -125,8 +126,6 @@ Section Sublist.
       apply sublist_antisymm; trivial.
     Qed.
     
-    Require Import Morphisms.
-    Require Import Program.Basics.
     Global Instance sublist_NoDup : Proper (sublist --> impl) (@NoDup A).
     Proof.
       repeat red; unfold flip.

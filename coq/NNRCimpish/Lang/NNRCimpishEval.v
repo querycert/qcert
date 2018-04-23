@@ -19,23 +19,23 @@
      as an intermediate language between NNRC and more imperative /
      statement oriented backends *)
 
-Section NNRCimpishEval.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Arith.
-  Require Import Max.
-  Require Import Bool.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCimpish.
-  Require Import NNRCimpishVars.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Arith.
+Require Import Max.
+Require Import Bool.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCimpish.
+Require Import NNRCimpishVars.
 
+Section NNRCimpishEval.
   Context {fruntime:foreign_runtime}.
 
   Context (h:brand_relation_t).
@@ -79,8 +79,6 @@ Section NNRCimpishEval.
            end
          end.
 
-    Require Import List.
-    
     Fixpoint nnrc_impish_stmt_eval
              (σc:bindings) (σ:pd_bindings) (ψc:mc_bindings) (ψd:md_bindings)
              (s:nnrc_impish_stmt) : option (pd_bindings*mc_bindings*md_bindings)
@@ -129,7 +127,7 @@ Section NNRCimpishEval.
 
          | NNRCimpishPush v e =>
            match nnrc_impish_expr_eval σc σ e, lookup string_dec ψc v with
-           | Some d, Some dl => Some (σ, update_first string_dec ψc v (dl++d::nil), ψd)
+           | Some d, Some dl => Some (σ, update_first string_dec ψc v (dl++d::nil)%list, ψd)
            | _, _ => None
            end
 

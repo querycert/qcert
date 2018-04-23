@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section DataNorm.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import BrandRelation.
-  Require Import ForeignData.
-  Require Import Data.
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Utils.
+Require Import BrandRelation.
+Require Import ForeignData.
+Require Import Data.
 
+Section DataNorm.
   Context {fdata:foreign_data}.
   Context (h:brand_relation_t).
   Fixpoint normalize_data (d:data) : data :=

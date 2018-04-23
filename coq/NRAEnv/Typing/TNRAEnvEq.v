@@ -14,20 +14,22 @@
  * limitations under the License.
  *)
 
-Section TNRAEnvEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRAEnv.
-  Require Import NRAEnvEq.
-  Require Import TNRAEnv.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import cNRAEnv.
+Require Import TcNRAEnvEq.
+Require Import NRAEnv.
+Require Import NRAEnvEq.
+Require Import TNRAEnv.
 
+Section TNRAEnvEq.
   Local Open Scope nraenv_scope.
   
   (* Equivalence relation between *typed* algebraic plans.  Two
@@ -116,7 +118,6 @@ Section TNRAEnvEq.
 
   (** Thanks to shallow semantics, lifting between nraenv_core and nraenv is easy *)
   Section eq_lift.
-    Require Import cNRAEnv TcNRAEnvEq.
     Open Scope nraenv_core_scope.
 
     Lemma lift_tnraenv_core_eq_to_tnraenv_eq_r (q1 q2:nraenv_core) :
@@ -192,8 +193,6 @@ Section TNRAEnvEq.
    * Proper stuff *
    ****************)
 
-  Require Import NRAEnvEq.
-  
   Global Instance  tnraenv_rewrites_to_pre : PreOrder tnraenv_rewrites_to.
   Proof.
     constructor; red; intros.

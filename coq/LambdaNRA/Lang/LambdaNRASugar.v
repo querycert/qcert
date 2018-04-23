@@ -18,12 +18,11 @@ Require Import String.
 Require Import List.
 Require Import Arith.
 Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import LambdaNRA.
 
 Section LambdaNRASugar.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import LambdaNRA.
-
   Context {fruntime:foreign_runtime}.
 
   Definition LNRAStruct (el:list (string * lambda_nra)) :=

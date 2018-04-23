@@ -14,16 +14,17 @@
  * limitations under the License.
  *)
 
-Section cNRAEnvIgnore.
-  Require Import Bool.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRA.
-  Require Import NRAEq.
-  Require Import cNRAEnv.
+Require Import Bool.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRA.
+Require Import NRASugar.
+Require Import NRAEq.
+Require Import cNRAEnv.
 
+Section cNRAEnvIgnore.
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
 
@@ -451,7 +452,6 @@ Section cNRAEnvIgnore.
       rewrite (IHe H h x x1 x2); reflexivity.
   Qed.
 
-  Require Import NRASugar.
   Lemma nraenv_core_is_nra_deenv (h:list (string*string)) c (e:nraenv_core) (d1 d2:data) :
     nraenv_core_is_nra e ->
         h ⊢ (nra_of_nraenv_core e) @ₐ (nra_context_data d1 d2) ⊣ c =

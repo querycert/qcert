@@ -14,24 +14,28 @@
  * limitations under the License.
  *)
 
-Section TOperators.
-  Require Import String.
-  Require Import List.
-  Require Import ZArith.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import Types.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import ForeignDataTyping.
-  Require Import Operators.
-  Require Import TUtil.
-  Require Import TData.
-  Require Import TDataSort.
-  Require Import ForeignOperatorsTyping.
+Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import ZArith.
+Require Import Compare_dec.
+Require Import RelationClasses.
+Require Import EquivDec.
+Require Import Permutation.
+Require Import Program.
+Require Import Utils.
+Require Import Types.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import ForeignDataTyping.
+Require Import Operators.
+Require Import TUtil.
+Require Import TData.
+Require Import TDataSort.
+Require Import ForeignOperatorsTyping.
 
+Section TOperators.
   (** Typing rules for unary operators *)
 
   Section u.
@@ -183,7 +187,6 @@ Section TOperators.
 
   (** Main type-soundness lemma for binary operators *)
 
-  Require Import RelationClasses EquivDec.
   Existing Instance rec_field_lt_strict.
 
   (* key idea: any overlap must have the same data.
@@ -342,8 +345,6 @@ Section TOperators.
       + apply in_dom in H7. intuition.
       + congruence.
   Qed. 
-
-  Require Import Bool.
 
   Lemma Forall2_compat_mapTopNotSub {x x0 rl rl0 t2} t1:
     is_list_sorted ODT_lt_dec (domain rl) = true ->
@@ -636,8 +637,6 @@ Section TOperators.
     generalize (fold_right_app_map_singleton b); simpl.
     auto.
   Qed.
-
-  Require Import Permutation.
 
   (** Main type-soundness lemma for unary operators *)
   Lemma typed_unop_yields_typed_data {τ₁ τout} (d1:data) (u:unary_op) :

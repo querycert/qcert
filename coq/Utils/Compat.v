@@ -18,21 +18,21 @@
 association lists. Two association lists are compatible if the values
 for their common keys are equal. *)
 
-Section Compat.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Permutation.
-  Require Import Equivalence.
-  Require Import EquivDec.
-  Require Import RelationClasses.
-  Require Import Orders.
-  Require Import CoqLibAdd.
-  Require Import ListAdd.
-  Require Import SortingAdd.
-  Require Import Assoc.
+Require Import List.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Permutation.
+Require Import Equivalence.
+Require Import EquivDec.
+Require Import RelationClasses.
+Require Import Orders.
+Require Import CoqLibAdd.
+Require Import ListAdd.
+Require Import SortingAdd.
+Require Import Assoc.
 
+Section Compat.
   Context {A B:Type} `{EqDec A eq} `{EqDec B eq}.
 
   Definition compatible_with  {A B:Type} `{EqDec A eq} `{EqDec B eq} 

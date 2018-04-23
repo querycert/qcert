@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section ForeignToReduceOps.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NNRCMRRuntime.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NNRCMRRuntime.
 
+Section ForeignToReduceOps.
   Class foreign_to_reduce_op
         {fruntime:foreign_runtime}
         {fredop:foreign_reduce_op}

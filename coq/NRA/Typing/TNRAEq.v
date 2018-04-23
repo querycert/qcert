@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section TNRAEq.
-  Require Import Equivalence.
-  Require Import Morphisms.
-  Require Import Setoid.
-  Require Import EquivDec.
-  Require Import Program.
-  Require Import List.
-  Require Import String.
-  Require Import CommonSystem.
-  Require Import NRA.
-  Require Import NRAEq.
-  Require Import TNRA.
+Require Import Equivalence.
+Require Import Morphisms.
+Require Import Setoid.
+Require Import EquivDec.
+Require Import Program.
+Require Import List.
+Require Import String.
+Require Import CommonSystem.
+Require Import NRA.
+Require Import NRAEq.
+Require Import TNRA.
 
+Section TNRAEq.
   Local Open Scope nra_scope.
 
   (* Equivalence relation between *typed* algebraic plans.  Two

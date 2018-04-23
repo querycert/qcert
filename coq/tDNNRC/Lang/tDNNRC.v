@@ -14,11 +14,11 @@
  * limitations under the License.
  *)
 
-Section tDNNRC.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import DNNRCSystem.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import DNNRCSystem.
   
+Section tDNNRC.
   Context {fruntime:foreign_runtime}.
   Context {ftype: ForeignType.foreign_type}.
   Context {br:brand_relation}.

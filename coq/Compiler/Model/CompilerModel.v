@@ -37,6 +37,8 @@ Require Import NRAEnv.
 Require Import DNNRC.
 Require Import tDNNRC.
 
+Set Typeclasses Axioms Are Instances.
+
 Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
   Axiom compiler_model_foreign_to_java : foreign_to_java.

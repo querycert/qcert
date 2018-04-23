@@ -23,15 +23,21 @@ Local Open Scope string.
 Require Import List.
 Import ListNotations.
 
+Require Import CommonSystem.
+Require Import CAMPRuntime.
+Require Import CAMPRuleRuntime.
+Require Import TrivialModel.
+Require Import CompEnv.
+Require Import CompDriver.
+Require Import CompEval.
+Require Import NNRCShadow.
+Require Import NNRC.
+Require Import NNRCtoNNRCMR.
+  
 (* This module encodes the examples in sample-rules.txt *)
 Section NNRCMRTest.
 
-  Require Import CommonSystem.
-  Require Import CAMPRuntime.
-  Require Import CAMPRuleRuntime.
-  Local Open Scope camp_rule_scope.
-  Require Import TrivialModel.
-  
+Local Open Scope camp_rule_scope.
 Example R01 :=
   rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (passert (pbinop AEq (pbdot "age" (pit)) (#` 32))));;
   rule_return (pbinop ASConcat (toString (#` "Customer =")) (toString (pletIt ((lookup "c")) (pbdot "name" (pit)))))
@@ -71,7 +77,6 @@ Definition test01Types :=
 
 Definition test01BrandContext := mkBrand_context test01Types (eq_refl _).
 
-Require Import CompEnv.
 Local Obligation Tactic := fast_refl.
 Program Instance test01BrandModel : brand_model 
  := mkBrand_model test01BrandRelation test01BrandContext (eq_refl _) (eq_refl _).
@@ -100,10 +105,7 @@ Example Result_R01_JRules := List.map dconst [
   "Customer =Jane Doe";
   "Customer =Jill Does"
 ].
-Require Import CompDriver.
 Example R01_nrcmr := rule_to_nnrcmr R01.
-Require Import CompEval.
-Require Import RuletoNRA.
 Example Result_R01_Coq := lift_rule_failure (@eval_nnrcmr_world _ _ test01BrandRelationList R01_nrcmr exampleWM).
 Eval vm_compute in Result_R01_Coq.
 Example R01_verify : validate_success Result_R01_Coq Result_R01_JRules = true.
@@ -115,7 +117,6 @@ Eval vm_compute in R01_nrcmr.
 *)
 
 (* MR chain compiler *)
-Require Import NNRCShadow.
 
 Example nrc_R01 := (rule_to_nraenv_to_nnrc_optim R01).
 (* Eval vm_compute in nrc_R01. *)
@@ -137,8 +138,6 @@ Example nrcmr_R01_optimized :=
      let b = { x = one | x in venv } in
      { not(y) | y in b }
 *)
-Require Import NNRC.
-Require Import NNRCtoNNRCMR.
 Example ex06 :=
   NNRCLet "x1" (NNRCUnop AColl (NNRCConst (dnat 1)))
           (NNRCLet "x2" (NNRCFor "x3" (NNRCVar "x0")

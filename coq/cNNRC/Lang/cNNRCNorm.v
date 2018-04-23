@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
-Section cNNRCNorm.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
 
+Section cNNRCNorm.
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
   Context (c:bindings).

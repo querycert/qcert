@@ -14,11 +14,11 @@
  * limitations under the License.
  *)
 
-Section CAMPSize.
-  Require Import Omega.
-  Require Import CommonRuntime.
-  Require Import CAMP.
+Require Import Omega.
+Require Import CommonRuntime.
+Require Import CAMP.
 
+Section CAMPSize.
   Context {fruntime:foreign_runtime}.
 
   Fixpoint camp_size (p:camp) : nat

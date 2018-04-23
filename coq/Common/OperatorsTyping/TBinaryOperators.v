@@ -14,25 +14,26 @@
  * limitations under the License.
  *)
 
-Section TBinaryOperators.
-  Require Import String.
-  Require Import List.
-  Require Import ZArith.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import RelationClasses.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import Types.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import ForeignDataTyping.
-  Require Import Operators.
-  Require Import TUtil.
-  Require Import TData.
-  Require Import ForeignOperatorsTyping.
+Require Import Bool.
+Require Import String.
+Require Import List.
+Require Import ZArith.
+Require Import Compare_dec.
+Require Import Program.
+Require Import RelationClasses.
+Require Import EquivDec.
+Require Import Utils.
+Require Import Types.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import ForeignDataTyping.
+Require Import Operators.
+Require Import TUtil.
+Require Import TData.
+Require Import ForeignOperatorsTyping.
 
+Section TBinaryOperators.
   (** Typing rules for binary operators *)
 
   Context {fdata:foreign_data}.
@@ -448,8 +449,6 @@ Section TBinaryOperators.
       + apply in_dom in H7. intuition.
       + congruence.
   Qed. 
-
-  Require Import Bool.
 
   Lemma Forall2_compat_mapTopNotSub {x x0 rl rl0 t2} t1:
     is_list_sorted ODT_lt_dec (domain rl) = true ->

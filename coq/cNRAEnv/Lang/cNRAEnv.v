@@ -36,14 +36,15 @@ environment. *)
   and [EitherConcat]).
 *)
 
-Section cNRAEnv.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import NRARuntime.
 
+Section cNRAEnv.
   Context {fruntime:foreign_runtime}.
 
   (** * Abstract Syntax *)
@@ -820,15 +821,9 @@ Section cNRAEnv.
     (** Functions used to map dual input env/data into single input *)
     (* Input encoding *)
 
-    Require Import NRARuntime.
-  
     Local Open Scope string_scope.
     Local Open Scope list_scope.
 
-    Definition NRARecEither f :=
-      NRAEither (NRAUnop OpLeft (NRAUnop (OpRec f) NRAID))
-                (NRAUnop OpRight (NRAUnop (OpRec f) NRAID)).
-  
     Fixpoint nra_of_nraenv_core (ae:nraenv_core) : nra :=
       match ae with
       | cNRAEnvGetConstant s =>

@@ -14,9 +14,9 @@
  * limitations under the License.
  *)
 
-Section SparkDF.
-  Require Import String.
+Require Import String.
 
+Section SparkDF.
   (** Spark (Dataframe API) programs are in serialized form *)
   Definition spark_df := string.
   

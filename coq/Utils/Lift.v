@@ -18,9 +18,9 @@
 operations over option types. They are used extensively through the
 code to propagate errors. *)
 
-Section Lift.
+Require Import List.
 
-  Require Import List.
+Section Lift.
 
   (** * Lifting over option types *)
 

@@ -30,11 +30,12 @@ Notation "[| x1 ; .. ; xn |]" := (drec (cons x1 .. (cons xn nil) ..)) : data_sco
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
 
+Require Import String ZArith.
+Require Import NRARuntime.
+Require Import TrivialModel.
+  
 Section NRATest.
-  Require Import String ZArith.
   Open Scope Z_scope.
-
-  Require Import NRARuntime.
 
   Local Open Scope string_scope.
   Local Open Scope nraext_scope.
@@ -44,8 +45,6 @@ Section NRATest.
    * Preliminaries *
    *****************)
 
-  Require Import TrivialModel.
-  
   (* Some useful functions *)
 
   Fixpoint natcoll_aux (n n0:nat) : list data :=

@@ -14,28 +14,28 @@
  * limitations under the License.
  *)
 
-Section TOperatorsInfer.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import Eqdep_dec.
-  Require Import Bool.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import Types.
-  Require Import CommonData.
-  Require Import ForeignData.
-  Require Import ForeignOperators.
-  Require Import ForeignDataTyping.
-  Require Import Operators.
-  Require Import TUtil.
-  Require Import TData.
-  Require Import ForeignOperatorsTyping.
-  Require Import TSortBy.
-  Require Import TUnaryOperators.
-  Require Import TBinaryOperators.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Program.
+Require Import Eqdep_dec.
+Require Import Bool.
+Require Import EquivDec.
+Require Import Utils.
+Require Import Types.
+Require Import CommonData.
+Require Import ForeignData.
+Require Import ForeignOperators.
+Require Import ForeignDataTyping.
+Require Import Operators.
+Require Import TUtil.
+Require Import TData.
+Require Import ForeignOperatorsTyping.
+Require Import TSortBy.
+Require Import TUnaryOperators.
+Require Import TBinaryOperators.
 
+Section TOperatorsInfer.
   (* Lemma/definitions over types involved in the inference *)
   
   Context {fdata:foreign_data}.

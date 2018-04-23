@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
-Section NNRCSize.
-  Require Import String.
-  Require Import Omega.
-  Require Import EquivDec.
-  Require Import Decidable.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRC.
-  Require Import cNNRCShadow.
+Require Import String.
+Require Import Omega.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRC.
+Require Import cNNRCShadow.
 
+Section NNRCSize.
   Context {fruntime:foreign_runtime}.
 
   (* Java equivalent: NnnrcOptimizer.rew_size.nnrc_size *)

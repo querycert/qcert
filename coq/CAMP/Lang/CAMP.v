@@ -33,15 +33,15 @@
 - Languages translating from CAMP: NRA, cNRAEnv, NRAEnv
 *)
   
-Section CAMP.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import CAMPUtil.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import CAMPUtil.
   
+Section CAMP.
   Local Open Scope string.
 
   Context {fruntime:foreign_runtime}.

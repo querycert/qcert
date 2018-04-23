@@ -14,9 +14,9 @@
  * limitations under the License.
  *)
 
-Section Java.
-  Require Import String.
+Require Import String.
 
+Section Java.
   (** Java programs are in serialized form *)
   Definition java := string.
   

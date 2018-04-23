@@ -16,51 +16,51 @@
 
 Require Extraction.
 Require Import String.
+Require Import ZArith.
+
+(** Query languages *)
+Require Import SQLRuntime.
+Require Import SQLPPRuntime.
+Require Import OQLRuntime.
+Require Import LambdaNRARuntime.
+(** Rule languages *)
+Require Import CAMPRuleRuntime.
+Require Import TechRuleRuntime.
+Require Import DesignerRuleRuntime.
+(** Intermediate languages *)
+Require Import NRARuntime.
+Require Import NRAEnvRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCimpishRuntime.
+Require Import NNRCMRRuntime.
+Require Import CldMRRuntime.
+Require Import DNNRCRuntime.
+Require Import tDNNRCRuntime.
+Require Import CAMPRuntime.
+(** Target languages *)
+Require Import JavaScriptAstRuntime.
+Require Import JavaScriptRuntime.
+Require Import JavaRuntime.
+Require Import SparkRDDRuntime.
+Require Import SparkDFRuntime.
+Require Import CloudantRuntime.
+
+Require Import CompilerRuntime.
+Require Import CommonSystem.
+
+Require Import ForeignToJavaScript.
+Require Import NNRCtoJavaScript.
+Require Import OptimizerLogger.
+Require Import CompLang.
+Require Import CompDriver.
+Require Import ForeignCloudant.
 
 Definition time {A: Type} {B: Type} (compile: A -> B) (q: A) := ("no timing info"%string, compile q).
 Extract Inlined Constant time => "(fun f x -> Util.time f x)".
 
 Section CompStat.
-
-  (** Query languages *)
-  Require Import SQLRuntime.
-  Require Import SQLPPRuntime.
-  Require Import OQLRuntime.
-  Require Import LambdaNRARuntime.
-  (** Rule languages *)
-  Require Import CAMPRuleRuntime.
-  Require Import TechRuleRuntime.
-  Require Import DesignerRuleRuntime.
-  (** Intermediate languages *)
-  Require Import NRARuntime.
-  Require Import NRAEnvRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCimpishRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import CldMRRuntime.
-  Require Import DNNRCRuntime.
-  Require Import tDNNRCRuntime.
-  Require Import CAMPRuntime.
-  (** Target languages *)
-  Require Import JavaScriptAstRuntime.
-  Require Import JavaScriptRuntime.
-  Require Import JavaRuntime.
-  Require Import SparkRDDRuntime.
-  Require Import SparkDFRuntime.
-  Require Import CloudantRuntime.
-
-  Require Import CompilerRuntime.
-  Require Import CommonSystem.
-
-  Require Import NNRCtoJavaScript.
-
-  Require Import OptimizerLogger.
-
-  Require Import CompLang CompDriver.
-
   Local Open Scope list_scope.
 
-  Require Import ForeignCloudant.
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {ftjson:foreign_to_JSON}.
@@ -70,12 +70,9 @@ Section CompStat.
   Context {nnrc_logger:optimizer_logger string nnrc}.
   Context {fredop:foreign_reduce_op}.
 
-  Require Import ZArith.
   Local Open Scope string_scope.
 
   (* Stat for an individual query *)
-
-  Require Import ForeignToJavaScript.
   Context {ftojs:foreign_to_javascript}.
 
   Definition stat_error (q: string) : data :=

@@ -14,17 +14,17 @@
  * limitations under the License.
  *)
 
-Section TLambdaNRA.
-  Require Import String.
-  Require Import List.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import LambdaNRA.
+Require Import String.
+Require Import List.
+Require Import Compare_dec.
+Require Import Program.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import LambdaNRA.
 
+Section TLambdaNRA.
   (** Typing for LambdaNRA *)
   Section typ.
     Context {m:basic_model}.

@@ -18,9 +18,9 @@ Require Import String.
 Require Import Bool.
 Require Import List.
 Require Import Permutation.
-Require Import Morphisms RelationClasses.
+Require Import Morphisms.
+Require Import RelationClasses.
 Require Import EquivDec.
-
 Require Import Utils.
 Require Import ForeignType.
 Require Import RType.

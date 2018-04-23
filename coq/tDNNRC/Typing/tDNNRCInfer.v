@@ -14,19 +14,19 @@
  * limitations under the License.
  *)
 
-Section tDNNRCInfer.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Program.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import DNNRCSystem.
-  Require Import tDNNRC.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Bool.
+Require Import Program.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import DNNRCSystem.
+Require Import tDNNRC.
 
+Section tDNNRCInfer.
   (** Type inference for NNNRC when given the type of the environment *)
 
   Section helpers.

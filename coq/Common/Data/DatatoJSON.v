@@ -14,16 +14,17 @@
  * limitations under the License.
  *)
 
+Require Import List.
+Require Import String.
+Require Import ZArith.
+Require Import Utils.
+Require Import JSON.
+Require Import ForeignData.
+Require Import ForeignDataToJSON.
+Require Import Data.
+Require Import DataNorm.
+
 Section DatatoJSON.
-  Require Import List.
-  Require Import String.
-  Require Import ZArith.
-  Require Import Utils.
-  Require Import JSON.
-  Require Import ForeignData.
-  Require Import ForeignDataToJSON.
-  Require Import Data.
-  Require Import DataNorm.
 
   Context {fdata:foreign_data}.
   Fixpoint json_brands (d:list json) : option (list string) :=

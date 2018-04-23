@@ -14,23 +14,24 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import Permutation.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Morphisms.
+Require Import Basics.
+Require Import Utils.
+Require Import ForeignType.
+Require Import RType.
+Require Import RSubtype.
+Require Export TBrandModel.
+Require Import RSubtypeProp.
+Require Import RTypeLattice.
+Require Import RTypeMeetJoin.
+
 Section TBrandModelProp.
-  Require Import String.
-  Require Import List.
-  Require Import Permutation.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Morphisms.
-  Require Import Basics.
-  Require Import Utils.
-  Require Import ForeignType.
-  Require Import RType.
-  Require Import RSubtype.
-  Require Export TBrandModel.
-  Require Import RSubtypeProp.
-  Require Import RTypeLattice.
-  Require Import RTypeMeetJoin.
 
   Context {ftype:foreign_type}.
   Context {m:brand_model}.

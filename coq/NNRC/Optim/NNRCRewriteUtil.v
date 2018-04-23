@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section NNRCRewriteUtil.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Program.
-  Require Import Peano_dec.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRCRuntime.
-  Require Import NNRCRuntime.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Program.
+Require Import Peano_dec.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRCRuntime.
+Require Import NNRCRuntime.
 
+Section NNRCRewriteUtil.
   Context {fruntime:foreign_runtime}.
 
   Lemma not_in_over_app {A} (x:A) (l1 l2:list A) :

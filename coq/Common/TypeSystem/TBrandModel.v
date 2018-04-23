@@ -14,26 +14,25 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import ListSet.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Morphisms.
+Require Import Basics.
+Require Import EquivDec.
+Require Import Eqdep_dec.
+Require Import Utils.
+Require Import ForeignType.
+Require Import RType.
+Require Export BrandRelation.
+Require Export TBrandContext.
+Require Import RSubtype.
+Require Import RConsistentSubtype.
+
 Section TBrandModel.
-  Require Import String.
-  Require Import List.
-  Require Import ListSet.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Morphisms.
-  Require Import Basics.
-  Require Import EquivDec.
-  Require Import Eqdep_dec.
-
-  Require Import Utils.
-
-  Require Import ForeignType.
-  Require Import RType.
-  Require Export BrandRelation.
-  Require Export TBrandContext.
-  Require Import RSubtype.
-  Require Import RConsistentSubtype.
 
   Definition sub_brand_context {br:brand_relation} {ftype:foreign_type} (m1 m2:brand_context) :=
     subtype (brand_context_Rec m1) (brand_context_Rec m2).

@@ -14,14 +14,15 @@
  * limitations under the License.
  *)
 
-Section NRAEnvIgnore.
-  Require Import Bool.
-  Require Import List.
-  Require Import String.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import NRAEnv.
+Require Import Bool.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNRAEnvIgnore.
+Require Import NRAEnv.
 
+Section NRAEnvIgnore.
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
 
@@ -360,8 +361,6 @@ Section NRAEnvIgnore.
       rewrite <- IHe1 in H; rewrite <- IHe2 in H0; rewrite <- IHe3 in H1.
       auto.
   Qed.
-
-  Require Import cNRAEnvIgnore.
 
   Lemma nraenv_ignores_env_nraenv_core_eq (e:nraenv) :
     nraenv_ignores_env e ->

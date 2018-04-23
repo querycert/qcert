@@ -14,16 +14,20 @@
  * limitations under the License.
  *)
 
-Section DNNRCBase.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Morphisms.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import DData.
+Require Import String.
+Require Import List.
+Require Import Decidable.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNRAEnv.
+    
+(* Require Import DData. *)
+(* Require Import DDataNorm. *)
 
+Section DNNRCBase.
   Context {fruntime:foreign_runtime}.
   
   (** Named Nested Relational Calculus *)
@@ -291,7 +295,6 @@ Section DNNRCBase.
       end.
 
     (* evaluation preserves normalization *)
-    Require Import DDataNorm.
 
     Lemma Forall_dcoll_map_lift l:
       Forall (fun x : string * (list data) => data_normalized h (dcoll (snd x))) l ->
@@ -547,10 +550,6 @@ Section DNNRCBase.
       inversion H2; assumption.
     Qed.
          
-    Require Import String.
-    Require Import Decidable.
-    Require Import List.
-    
     Fixpoint dnnrc_base_subst_var_to_const (constants:list string) (e:dnnrc_base) : dnnrc_base
       := match e with
          | DNNRCGetConstant a y => DNNRCGetConstant a y
@@ -596,8 +595,6 @@ Section DNNRCBase.
   End GenDNNRCBase.
 
   Section NraEnvPlug.
-    Require Import cNRAEnv.
-    
     Definition nraenv_eval h aconstant_env op :=
       let aenv := drec nil in (* empty local environment to start, which is an empty record *)
       let aid := dcoll ((drec nil)::nil) in (* to be checked *)

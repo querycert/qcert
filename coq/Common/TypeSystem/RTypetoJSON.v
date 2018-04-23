@@ -14,13 +14,18 @@
  * limitations under the License.
  *)
 
+Require Import List.
+Require Import String.
+Require Import ZArith.
+Require Import Utils.
+Require Import JSON.
+Require Import BrandRelation.
+Require Import RType.
+Require Import RTypeNorm.
+Require Import ForeignType.
+Require Import ForeignTypeToJSON.
+
 Section RTypeToJSON.
-  Require Import List.
-  Require Import String.
-  Require Import ZArith.
-  Require Import Utils.
-  Require Import JSON.
-  Require Import BrandRelation.
 
   Fixpoint json_brands (d:list json) : option (list string) :=
     match d with
@@ -33,10 +38,6 @@ Section RTypeToJSON.
     | _ => None
     end.
 
-  Require Import RType.
-  Require Import RTypeNorm.
-  Require Import ForeignType.
-  Require Import ForeignTypeToJSON.
   Context {ftype:foreign_type}.
   Context {ftypeToJSON:foreign_type_to_JSON}.
 

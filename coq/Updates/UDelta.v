@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+
+Require Import RUtil.
+Require Import RData.
+Require Import RRelation.
+Require Import RAlg.
+Require Import ROps.
+
 Section UDelta.
-  Require Import String.
-  Require Import List.
-
-  Require Import RUtil.
-  Require Import RData.
-  Require Import RRelation.
-  Require Import RAlg.
-  Require Import ROps.
-
   Require Import Program.
 
   Inductive Δ : Set :=

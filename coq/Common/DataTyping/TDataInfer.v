@@ -14,22 +14,23 @@
  * limitations under the License.
  *)
 
-Section TDataInfer.
-  Require Import String.
-  Require Import List.
-  Require Import Sumbool.
-  Require Import Arith.
-  Require Import Bool.
-  Require Import Eqdep_dec.
-  Require Import RelationClasses.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import Types.
-  Require Import ForeignData.
-  Require Import CommonData.
-  Require Import ForeignDataTyping.
-  Require Import TData.
+Require Import String.
+Require Import List.
+Require Import Sumbool.
+Require Import Arith.
+Require Import Bool.
+Require Import Eqdep_dec.
+Require Import RelationClasses.
+Require Import EquivDec.
+Require Import Utils.
+Require Import Types.
+Require Import ForeignData.
+Require Import CommonData.
+Require Import ForeignDataTyping.
+Require Import TData.
+Require Import RConsistentSubtype.
 
+Section TDataInfer.
   Context {fdata:foreign_data}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
@@ -421,8 +422,6 @@ Section TDataInfer.
     apply infer_data_type_correct in i.
     eapply data_type_normalized; eauto.
   Qed.
-
-  Require Import RConsistentSubtype.
 
   Section dt_dec.
     (** We can compute if the data_type relation holds using 

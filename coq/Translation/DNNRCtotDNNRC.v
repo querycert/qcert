@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
+Require Import DNNRCSystem.
+Require Import tDNNRCSystem.
+
 Section DNNRCtotDNNRC.
 
   Section Top.
-    Require Import DNNRCSystem.
-    Require Import tDNNRCSystem.
-    
     Context {ftype: ForeignType.foreign_type}.
     Context {fr:foreign_runtime}.
     Context {bm:brand_model}.

@@ -14,24 +14,20 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
+Require Import Data.
+Require Import ForeignData.
+
 Section Constants.
-
-  Require Import String.
-  Require Import List.
   
-  Section World.
-    Require Import Data.
-    Require Import ForeignData.
+  Context {fdata:foreign_data}.
 
-    Context {fdata:foreign_data}.
-
-    Definition WORLD:string := "WORLD"%string.
+  Definition WORLD:string := "WORLD"%string.
     
-    (* Declares single input collection containing world *)
-    Definition mkWorld (world:list data) : list (string*data)
-      := (WORLD,(dcoll world))::nil.
-
-  End World.
+  (* Declares single input collection containing world *)
+  Definition mkWorld (world:list data) : list (string*data)
+    := (WORLD,(dcoll world))::nil.
 
 End Constants.
 

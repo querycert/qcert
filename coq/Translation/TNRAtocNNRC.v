@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section TNRAtocNNRC.
-  Require Import String.
-  Require Import List.
-  Require Import EquivDec.
-  Require Import Compare_dec.
-  Require Import Program.
-  Require Import Utils.
-  Require Import CommonSystem.
-  Require Import NRASystem.
-  Require Import cNNRCSystem.
-  Require Import NRAtocNNRC.
+Require Import String.
+Require Import List.
+Require Import EquivDec.
+Require Import Compare_dec.
+Require Import Program.
+Require Import Utils.
+Require Import CommonSystem.
+Require Import NRASystem.
+Require Import cNNRCSystem.
+Require Import NRAtocNNRC.
 
+Section TNRAtocNNRC.
   (** Type preservation for the translation from NRA to NNRC *)
 
   Ltac elim_fresh e
@@ -37,6 +37,8 @@ Section TNRAtocNNRC.
   
   Context {m:basic_model}.
   Context (τconstants:tbindings).
+
+  Local Open Scope nra_scope.
 
   Theorem tnra_sem_correct {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
     lookup equiv_dec tenv vid = Some τin ->

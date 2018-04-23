@@ -14,18 +14,18 @@
  * limitations under the License.
  *)
 
-Section NNRCMRRewrite.
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import EquivDec.
-  Require Import Utils.
-  Require Import CommonRuntime.
-  Require Import cNNRCRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCMR.
-  Require Import ForeignReduceOps.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import EquivDec.
+Require Import Utils.
+Require Import CommonRuntime.
+Require Import cNNRCRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCMR.
+Require Import ForeignReduceOps.
 
+Section NNRCMRRewrite.
   Local Open Scope list_scope.
 
   Context {fruntime:foreign_runtime}.
