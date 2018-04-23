@@ -30,7 +30,7 @@ To build Q\*cert from the source, you will need:
   - camlp5, a pre-processor (https://camlp5.github.io)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
   - js\_of\_ocaml, a compiler from OCaml to JavaScript
-- Coq 8.7.2 (https://coq.inria.fr/) along with the following libraries:
+- Coq 8.8.0 (https://coq.inria.fr/) along with the following libraries:
   - flocq, a library for floating point numbers
   - jsast, a minimal AST for JavaScript
 
