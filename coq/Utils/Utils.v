@@ -31,10 +31,10 @@ Require Export Compat.
 Require Export Fresh.
 Require Export Bindings.
 Require Export Bag.
+Require Export GroupByDomain.
 Require Export Var.
 Require Export Closure.
 Require Export Result.
 Require Export JSON.
 Require Export OptimizerStep.
 Require Export OptimizerLogger.
-

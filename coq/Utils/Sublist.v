@@ -30,7 +30,7 @@ Require Import CoqLibAdd.
 Require Import ListAdd.
 Require Import SortingAdd.
 Require Import Assoc.
-Require Import Program.Basics.
+Require Import Program.
 
 Section Sublist.
   (** * Sublists *)
@@ -658,6 +658,183 @@ Section Sublist.
     match_destr_in H2.
   Defined.
 
+  Lemma concat_sublist {A} (ls:list (list A)) : 
+    Forall (fun x : list A => sublist x (concat ls)) ls.
+  Proof.
+    induction ls; simpl; trivial.
+    constructor.
+    - apply sublist_app_l.
+    - revert IHls.
+      apply Forall_impl; intros ? subl.
+      rewrite subl.
+      apply sublist_app_r.
+  Qed.
+
+  Lemma sublist_perm_head {A:Type} {l1 l2 : list A} :
+    sublist l1 l2 ->
+    exists t,
+      Permutation (l1++t) l2.
+  Proof.
+    intros subl; induction subl.
+    - exists nil; simpl; reflexivity.
+    - destruct IHsubl as [t perm].
+      simpl.
+      exists t.
+      rewrite <- perm.
+      reflexivity.
+    - destruct IHsubl as [t perm].
+      exists (x::t).
+      rewrite <- perm.
+      rewrite <- Permutation_cons_app; reflexivity.
+  Qed.
+
+  Lemma Permutation_sublist_pullback_r {A:Type} {l1 l1' l2:list A} : 
+    sublist l1 l1' ->
+    Permutation l1 l2 ->
+    exists l2',
+      Permutation l1' l2' /\
+      sublist l2 l2'.
+  Proof.
+    intros subl perm.
+    revert l1' subl.
+    revert l1 l2 perm.
+    change (forall l1 l2 : list A,
+               Permutation l1 l2 ->
+               (fun l1 l2 => forall l1' : list A, sublist l1 l1' -> exists l2' : list A, Permutation l1' l2' /\ sublist l2 l2') l1 l2).
+    apply Permutation_ind_bis; simpl; intros.
+    - exists l1'; split; trivial.
+    - dependent induction H1.
+      + destruct (H0 _ H1) as [ll [perm subl]].
+        exists (x::ll).
+        split.
+        * eauto.
+        * constructor; trivial.
+      + destruct (IHsublist x l l' H H0 (eq_refl _)) as [ll [perm subl]].
+        exists (x0::ll).
+        split.
+        * eauto.
+        * constructor; trivial.
+    - revert l' H H0 H1.
+      induction l1'; intros l' perm IH subl.
+      + invcs subl.
+      + specialize (IHl1' _ perm IH).
+        invcs subl.
+        * clear IHl1'.
+          { revert l' H0 perm IH.
+            induction l1'; intros l' subl perm1 IH1.
+            - invcs subl.
+            - invcs subl.
+              + destruct (IH1 _ H0) as [ll [perm2 subl2]].
+                exists (a0::a::ll); split.
+                * rewrite perm_swap, perm2; trivial.
+                * do 2 constructor; trivial.
+              + destruct (IHl1' _ H1 perm1 IH1) as [ll [perm2 subl2]].
+                exists (a0::ll); split.
+                * rewrite <- perm2, perm_swap; trivial.
+                * constructor; trivial.
+          } 
+        * destruct (IHl1' H1) as [ll [perm2 subl2]].
+          exists (a::ll).
+          { split.
+            - constructor; trivial.
+            - constructor; trivial.
+          }
+    - destruct (H0 _ H3) as [ll [perm1 subl1]].
+      destruct (H2 _ subl1) as [ll' [perm2 subl2]].
+      exists ll'.
+      split; trivial.
+      rewrite <- perm2; trivial.
+  Qed.
+
+  Lemma Permutation_filter_pullback_r {A:Type} {f:A->bool} {l1 l2} :
+    Permutation (filter f l1) l2 ->
+    exists l2',
+      l2 = filter f l2' /\ Permutation l1 l2'.
+  Proof.
+    cut (forall l1 l2 : list A,
+            Permutation l1 l2 ->
+            (fun l1 l2 => forall l1', l1 = filter f l1' ->
+                                      exists l2',
+                                        l2 = filter f l2' /\ Permutation l1' l2') l1 l2).
+    { intros H; intros.
+      specialize (H _ _ H0); simpl in H.
+      specialize (H _ (eq_refl _)).
+      eauto.
+    } 
+    apply Permutation_ind_bis; simpl; intros.
+    - exists l1'; split; trivial.
+    - induction l1'; simpl in *; try discriminate.
+      match_case_in H1; intros eqq; rewrite eqq in H1.
+      + invcs H1.
+        destruct (H0 _ (eq_refl _))
+          as [ll [? perm]]; subst.
+        exists (a::ll); split; simpl.
+        * rewrite eqq; trivial.
+        * constructor; trivial.
+      + destruct (IHl1' H1) 
+          as [ll [? perm]]; subst.
+        exists (a::ll); split; simpl.
+        * rewrite eqq; trivial.
+        * constructor; trivial.
+    - induction l1'; simpl in *; try discriminate.
+      match_case_in H1; intros eqq1; rewrite eqq1 in H1.
+      + invcs H1.
+        clear IHl1'.
+        revert l H H0 H4.
+        induction l1'; simpl in *; try discriminate; intros.
+        { match_case_in H4; intros eqq2; rewrite eqq2 in *.
+          + invcs H4.
+            destruct (H0 _ (eq_refl _))
+              as [ll [? perm]]; subst.
+            exists (a0::a::ll); split; simpl.
+            * rewrite eqq1, eqq2; trivial.
+            * rewrite perm_swap, perm; trivial. 
+          + destruct (IHl1' _ H H0 H4) 
+              as [ll [? perm]]; subst.
+            exists (a0::ll); split; simpl.
+            * rewrite eqq2; trivial.
+            * rewrite perm_swap, perm; trivial.
+        }
+      + { destruct (IHl1' H1) 
+            as [ll [? perm]]; subst.
+          exists (a::ll); split.
+          + simpl; rewrite eqq1; trivial.
+          + constructor; trivial.
+        }
+    - subst.
+      destruct (H0 _ (eq_refl _))
+        as [ll [? perm]]; subst.
+      destruct (H2 _ (eq_refl _))
+        as [ll2 [? perm2]]; subst.
+      exists ll2; split; trivial.
+      rewrite perm; trivial.
+  Qed.
+
+  Lemma filter_perm_head {A:Type} {f:A->bool} {l1 l2} :
+    Permutation (filter f l1) l2 ->
+    exists t,
+      Permutation l1 (l2++t).
+  Proof.
+    intros.
+    generalize (filter_sublist f l1); intros subl.
+    destruct (sublist_perm_head subl)
+      as [x perm].
+    rewrite H in perm.
+    symmetry in perm.
+    eauto.
+  Qed.
+
+  Lemma Permutation_filter {A : Type} (f : A -> bool) (l l' : list A) :
+    Permutation l l' -> Permutation (filter f l) (filter f l').
+  Proof.
+    revert l l'.
+    apply Permutation_ind_bis; simpl; intros.
+    - trivial.
+    - match_case; eauto.
+    - repeat match_case; eauto 2; intros.
+      rewrite perm_swap; eauto.
+    - rewrite H0, H2; trivial.
+  Qed.
+
 End Sublist.
 Hint Immediate sublist_nil_l.
-

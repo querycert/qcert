@@ -17,16 +17,16 @@
 (** This module contains definitions and properties of association
 lists. *)
 
+Require Import String.
 Require Import List.
 Require Import Sumbool.
 Require Import Bool.
 Require Import Permutation.
-Require Import Equivalence.
 Require Import Morphisms.
 Require Import Setoid.
 Require Import EquivDec.
+Require Import Equivalence.
 Require Import Peano_dec.
-Require Import String.
 Require Import Ascii.
 Require Import CoqLibAdd.
 Require Import ListAdd.
@@ -111,6 +111,14 @@ Section Assoc.
       eauto.
     Qed.
 
+    Lemma in_codom {l : list (A * B)} {a : A} {b : B} :
+      In (a, b) l -> In b (codomain l).
+    Proof.
+      intros.
+      apply in_map_iff.
+      exists (a,b); tauto.
+    Qed.
+
     Lemma in_domain_in : forall {l} {a}, In a (domain l) -> exists b, In (a,b) l.
     Proof.
       induction l; simpl. intuition.
@@ -173,6 +181,20 @@ Section Assoc.
       rewrite leq.
       symmetry.
       apply Permutation_middle.
+    Qed.
+
+    Lemma  lookup_split {l:list (A*B)} {a b} :
+      lookup l a = Some b ->
+      exists l1 l2 : list (A*B), l = l1 ++ (a,b) :: l2 /\ ~ In a (domain l1). 
+    Proof.
+      induction l; simpl; try discriminate; intros lo.
+      destruct a0.
+      match_destr_in lo; unfold equiv, complement in *.
+      - invcs lo.
+        exists nil, l; simpl; tauto.
+      - destruct (IHl lo) as [l1 [l2 [? nin]]]; subst.
+        exists ((a0,b0)::l1), l2; simpl.
+        intuition.
     Qed.
 
     Global Instance dom_perm : Proper (@Permutation (A*B) ==> @Permutation A) domain.
@@ -266,6 +288,110 @@ Section Assoc.
         congruence.
     Qed.
 
+    Lemma in_in_split_domain_or (l:list (list (A*B))) a :
+      (exists l1 la l2, l = l1++la::l2 /\ In a (domain la) /\ ~ In a (domain (concat l1)))
+      \/ Forall (fun x => ~ In a (domain x)) l.
+    Proof.
+      destruct (in_in_split_or (map domain l) a (dec:=dec)).
+      - left.
+        destruct H as [l1 [la [l2 [eqq [inn nin]]]]].
+        destruct (map_app_break _ eqq)
+          as [m1 [m2 [eqq1 [eqq2 eqq3]]]]; subst.
+        destruct m2; simpl in *; try discriminate.
+        unfold domain in *.
+        rewrite <- concat_map in nin.
+        invcs eqq3.
+        exists m1, l, m2; eauto.
+      - right.
+        rewrite Forall_map in H; trivial.
+    Qed.
+
+    Lemma in_in_split_domain_first {l:list (list (A*B))} {a} :
+      In a (domain (concat l)) ->
+      exists l1 la l2, l = l1++la::l2 /\ In a (domain la) /\ ~ In a (domain (concat l1)).
+    Proof.
+      intros inn.
+      destruct (in_in_split_domain_or l a)
+        as [[l1 [la [l3 [eqq1 [inn1 nin1]]]]]|nin].
+      - exists l1, la, l3; eauto.
+      - unfold domain in inn.
+        rewrite concat_map in inn.
+        apply concat_In in inn.
+        destruct inn as [ll [inn1 inn2]].
+        rewrite Forall_forall in nin.
+        apply in_map_iff in inn1.
+        destruct inn1 as [ll'  [eqq1 inn3]]; subst.
+        elim (nin ll'); eauto.
+    Qed.
+
+    Lemma update_app_in  (l1 l2:list (A*B)) v d :
+      In v (domain l1) -> 
+      update_first (l1++l2) v d = update_first l1 v d ++ l2.
+    Proof.
+      revert l2;
+        induction l1; simpl; intros l2.
+      - tauto.
+      - destruct a; simpl.
+        intros [eqq | inn].
+        + subst.
+          match_destr; try congruence.
+        + rewrite (IHl1 _ inn).
+          match_destr.
+    Qed.
+
+    Lemma update_app_nin (l1 l2:list (A*B)) v d :
+      ~ In v (domain l1) -> 
+      update_first (l1++l2) v d = l1 ++ update_first l2 v d.
+    Proof.
+      revert l2;
+        induction l1; simpl; intros l2.
+      - tauto.
+      - destruct a; simpl.
+        intros H; apply Decidable.not_or in H.
+        destruct H as [neq nin].
+        destruct (dec v a); [congruence | ].
+        rewrite (IHl1 _ nin); trivial.
+    Qed.
+
+    Lemma update_app_nin2  (l1 l2:list (A*B)) v d :
+      ~ In v (domain l2) -> 
+      update_first (l1++l2) v d = update_first l1 v d ++ l2.
+    Proof.
+      intros nin2.
+      destruct (in_dec dec v (domain l1)).
+      - rewrite update_app_in; trivial.
+      - rewrite update_app_nin; trivial.
+        repeat rewrite nin_update; trivial
+        ; apply lookup_nin_none; trivial.
+    Qed.
+
+    Lemma update_first_concat_disjoint_push (ls:list (list (A*B))) v d:
+      all_disjoint (map domain ls) ->
+      (update_first (concat ls) v d) =
+      (concat (map (fun x => update_first x v d) ls)).
+    Proof.
+      induction ls; simpl; trivial.
+      intros disj.
+      invcs disj.
+      rewrite <- (IHls H2).
+      destruct (in_dec dec v (domain a)) as [inn|nin].
+      - rewrite update_app_in by trivial.
+        f_equal.
+        rewrite nin_update; trivial.
+        apply lookup_nin_none.
+        unfold domain; rewrite concat_map.
+        intros inn2.
+        apply concat_In in inn2.
+        destruct inn2 as [? [inn2 inn3]].
+        rewrite Forall_forall in H1.
+        specialize (H1 _ inn2).
+        eapply H1; eauto.
+      - rewrite update_app_nin by trivial.
+        f_equal.
+        rewrite nin_update; trivial.
+        apply lookup_nin_none; trivial.
+    Qed.
+
     Lemma Forall_update_first P (l:list (A*B)) x v : 
       Forall P l ->
       P (x,v) ->
@@ -284,6 +410,26 @@ Section Assoc.
       induction l; simpl; intuition.
       destruct a.
       match_destr_in H; subst; simpl in *; intuition.
+    Qed.
+
+    Lemma update_first_update_first_eq (l:list (A*B)) v d1 d2 :
+      update_first (update_first l v d1) v d2 = update_first l v d2.
+    Proof.
+      induction l; simpl; trivial.
+      destruct a.
+      match_destr; simpl; subst; trivial
+      ; match_destr; congruence.
+    Qed.
+    
+    Lemma update_first_update_first_neq_swap (l:list (A*B)) v1 d1 v2 d2 :
+      v1 <> v2 ->
+      update_first (update_first l v1 d1) v2 d2 =
+      update_first (update_first l v2 d2) v1 d1.
+    Proof.
+      intros neq.
+      induction l; simpl; trivial.
+      destruct a.
+      repeat (match_destr; simpl; subst; try congruence).
     Qed.
 
     Lemma lookup_some_nodup_perm {l l'} a v:
@@ -333,6 +479,59 @@ Section Assoc.
       - repeat rewrite nin_update; auto. eapply lookup_none_perm; eauto.
     Qed.
 
+    Lemma lookup_update_eq_in {l:list (A*B)} {a} {n:B} :
+      In a (domain l) ->
+      lookup (update_first l a n) a = Some n.
+    Proof.
+      revert a n.
+      induction l; simpl; intuition; simpl in *; subst.
+      - destruct (dec a a); simpl; intuition.
+        destruct (dec a a); simpl; intuition.
+      - case_eq (dec a a0); simpl; intros; try rewrite e in *; subst; rewrite H; auto.
+    Qed.
+    
+    Lemma lookup_update_neq {l a a'} {n:B} : a<>a' -> lookup (update_first l a n) a' = lookup l a'.
+    Proof.
+      revert a a' n. induction l; simpl; intuition.
+      destruct (dec a a0); subst; simpl.
+      - destruct (dec a' a0); try congruence.
+      - destruct (dec a' a0); simpl; auto.
+    Qed.
+
+    Lemma in_update_break_first  {l:list (A*B)} {a v} :
+      lookup l a = Some v -> forall vv,
+        exists l1 l2,
+          l = l1++(a,v)::l2 /\
+          update_first l a vv = l1++(a,vv)::l2
+          /\ ~ In a (domain l1).
+    Proof.
+      induction l; simpl; intuition (try discriminate).
+      destruct a0. destruct (dec a a0); intuition; subst.
+      - inversion H; subst.
+        exists nil; exists l; simpl; intuition.
+      - destruct (H0 vv) as [l1 [l2 [leq1 leq2]]].
+        subst. exists ((a0,b)::l1); exists l2; simpl; intuition.
+        congruence.
+    Qed.
+
+    Lemma in_domain_split_or (l:list (A*B)) a :
+      (exists l1 b l2, l = l1++(a,b)::l2 /\ ~ In a (domain l1))
+      \/ ~ In a (domain l).
+    Proof.
+      induction l; simpl; [ right; tauto | ].
+      destruct a0.
+      destruct (dec a a0) as [inn1|neq1]; unfold equiv, complement in *.
+      - left; subst.
+        exists nil, b, l; simpl; tauto.
+      - destruct IHl as [[l1 [b' [l2 [eqq inn2]]]]|nin2]; simpl.
+        + left; subst.
+          exists ((a0,b)::l1), b', l2.
+          repeat split; trivial.
+          simpl; intuition.
+        + right.
+          intuition.
+    Qed.
+
     Lemma lookup_app {l1 l2} x:
       lookup (l1++l2) x = 
       match lookup l1 x with
@@ -367,14 +566,25 @@ Section Assoc.
     
   End Defn.
 
+  Lemma map_codomain_update_first {A B C} (f:B->C) dec (l:list (A*B)) v d :
+      map_codomain f (update_first dec l v d) =
+      update_first dec (map_codomain f l) v (f d).
+    Proof.
+      induction l; simpl; trivial.
+      destruct a; simpl.
+      destruct (dec v a); simpl; trivial.
+      rewrite IHl; trivial.
+    Qed.
+
+
   Lemma Forall2_lookup_none {K A B} {P:A->B->Prop}
         {l : list (K * A)} {l' : list (K * B)} :
     (Forall2
        (fun (d : K * A) (r : K * B) =>
           fst d = fst r /\ P (snd d) (snd r)) l l') ->
     forall {dec s},
-    lookup dec l' s = None -> 
-    lookup dec l s = None.
+      lookup dec l' s = None -> 
+      lookup dec l s = None.
   Proof.
     intros.
     induction H; simpl in *.
@@ -393,8 +603,8 @@ Section Assoc.
        (fun (d : K * A) (r : K * B) =>
           fst d = fst r /\ P (snd d) (snd r)) l l') ->
     forall {dec} {s:K} {d':B},
-    lookup dec l' s = Some d' -> 
-    (exists d'', lookup dec l s = Some d'' /\ P d'' d').
+      lookup dec l' s = Some d' -> 
+      (exists d'', lookup dec l s = Some d'' /\ P d'' d').
   Proof.
     intros H.
     induction H; intros; simpl in *.
@@ -413,19 +623,19 @@ Section Assoc.
        (fun (d : K * A) (r : K * B) =>
           fst d = fst r /\ P (fst d) (snd d) (snd r)) l l') ->
     forall {dec} {s:K} {d':B},
-    lookup dec l' s = Some d' -> 
-    (exists d'', lookup dec l s = Some d'' /\ P s d'' d').
-    Proof.
-      intros H.
-      induction H; intros; simpl in *.
-      - discriminate.
-      - destruct x; destruct y; simpl in *.
-        destruct H; subst.
-        destruct (dec s k0).
+      lookup dec l' s = Some d' -> 
+      (exists d'', lookup dec l s = Some d'' /\ P s d'' d').
+  Proof.
+    intros H.
+    induction H; intros; simpl in *.
+    - discriminate.
+    - destruct x; destruct y; simpl in *.
+      destruct H; subst.
+      destruct (dec s k0).
       + invcs H1; eauto.
       + destruct (IHForall2 _ _ _ H1) as [?[??]].
         eauto.
-    Qed.
+  Qed.
   Lemma lookup_map_same_domain {A B C:Type} dec
         (f:(A*B)->(A*C)) l v :
     domain l = domain (map f l) ->
@@ -449,6 +659,15 @@ Section Assoc.
     simpl.
     apply map_ext; trivial.
   Qed.
+
+  Lemma domain_map_codomain {A B C} (f:B->C) (l:list (A*B)) :
+    domain (map_codomain f l) = domain l.
+  Proof.
+    unfold domain, map_codomain.
+    rewrite map_map; simpl.
+    rewrite map_eta_fst_domain; trivial.
+  Qed.
+
   
   Lemma cut_down_to_incl_to
         {A B} {dec:EqDec A eq}
@@ -706,8 +925,8 @@ Section Assoc.
        (fun (d : K * A) (r : K * B) =>
           fst d = fst r /\ P (snd d) (snd r)) l l') ->
     forall {Q1 Q2} {dec s},
-    @assoc_lookupr K B Q1 Q2 dec l' s = None -> 
-    assoc_lookupr dec l s = None.
+      @assoc_lookupr K B Q1 Q2 dec l' s = None -> 
+      assoc_lookupr dec l s = None.
   Proof.
     intros.
     induction H; simpl in *.
@@ -727,8 +946,8 @@ Section Assoc.
        (fun (d : K * A) (r : K * B) =>
           fst d = fst r /\ P (snd d) (snd r)) l l') ->
     forall {Q1 Q2} {dec} {s:K} {d':B},
-    @assoc_lookupr K B Q1 Q2 dec l' s = Some d' -> 
-    (exists d'', assoc_lookupr dec l s = Some d'' /\ P d'' d').
+      @assoc_lookupr K B Q1 Q2 dec l' s = Some d' -> 
+      (exists d'', assoc_lookupr dec l s = Some d'' /\ P d'' d').
   Proof.
     intros.
     induction H; simpl in *.
@@ -746,7 +965,7 @@ Section Assoc.
       elim H3; intros; clear H3.
       rewrite H4. exists x0. split;[reflexivity|assumption].
       clear IHForall2; assert (assoc_lookupr dec l s = None)
-          by apply (Forall2_lookupr_none H1 H3).
+        by apply (Forall2_lookupr_none H1 H3).
       rewrite H3 in *; rewrite H2 in *; clear H2 H3.
       elim H; intros; clear H.
       rewrite H2 in *; clear H2.
@@ -895,7 +1114,7 @@ Section Assoc.
       unfold equiv_decb in *; simpl in * .
       match_destr_in eqq.
       match_destr.
-      unfold Equivalence.equiv in *.
+      unfold equiv in *.
       subst.
       rewrite <- IHl in H.
       apply assoc_lookupr_none_nin in H.
@@ -966,12 +1185,12 @@ Section Assoc.
       - left. intros; try discriminate.
       - destruct a; simpl in *.
         case_eq (lookup dec y a); intros.
-        + destruct (decb b b0); unfold Equivalence.equiv in * .
+        + destruct (decb b b0); unfold equiv in * .
           * { destruct IHx.
               - inversion nd; trivial.
               - left.
                 intros ? ? eqq; subst.
-                match_destr_in eqq; unfold Equivalence.equiv in * .
+                match_destr_in eqq; unfold equiv in * .
                 + inversion eqq; clear eqq; subst.
                   auto.
                 + auto.
@@ -1028,7 +1247,7 @@ Section Assoc.
       EqDec (list (A*B)) lookup_equiv.
     Proof.
       red.
-      unfold Equivalence.equiv, complement.
+      unfold equiv, complement.
       intros x y.
       destruct (lookup_incl_dec x y).
       - destruct (lookup_incl_dec y x).
@@ -1043,6 +1262,13 @@ Section Assoc.
         apply lookup_incl_part in eqq.
         destruct eqq; intuition.
     Defined.
+
+    Global Instance lookup_equiv_lookup 
+      : Proper (lookup_equiv ==> eq ==> eq) (@lookup A B dec).
+    Proof.
+      intros ??????; subst.
+      apply H.
+    Qed.
 
     Lemma lookup_equiv_cons_same  {l1 l2:list (A*B)} :
       lookup_equiv l1 l2 ->
@@ -1089,7 +1315,7 @@ Section Assoc.
       lookup_incl l1 ((x,y)::l2).
     Proof.
       unfold lookup_incl; simpl; intros.
-      match_destr; unfold Equivalence.equiv in *; subst.
+      match_destr; unfold equiv in *; subst.
       - apply lookup_in in H1.
         apply in_dom in H1.
         intuition.
@@ -1157,6 +1383,47 @@ Section Assoc.
         eapply lookup_none_perm in H1; eauto.
     Qed.
 
+    Lemma update_first_NoDup_perm_invs (f g:B->B) {l1 l2} {a:A} {v1 v2:B} :
+      NoDup (domain l1) -> 
+      Permutation (update_first dec l1 a (f v1)) (update_first dec l2 a (g v2)) ->
+      lookup dec l1 a = Some v1 ->
+      lookup dec l2 a = Some v2 ->
+      (forall x y, f x = g y -> x = y) ->
+      Permutation l1 l2 /\ v1 = v2 /\ f v1 = g v2.
+    Proof.
+      intros nodup perm lo1 lo2 inj.
+      assert (perm2: Permutation (domain l1) (domain l2)).
+      { erewrite <- (domain_update_first dec l1)
+        ; erewrite <- (domain_update_first dec l2).
+        apply Permutation_map; eauto.
+      }
+      destruct (in_update_break dec lo1 (f v1))
+        as [m1 [m2 [meqq mueqq]]].
+      rewrite mueqq in perm.
+      destruct (in_update_break dec lo2 (g v2))
+        as [n1 [n2 [neqq nueqq]]].
+      rewrite nueqq in perm.
+      repeat rewrite <- Permutation_middle in perm.
+      rewrite meqq in nodup.
+      rewrite <- Permutation_middle in nodup.
+      assert (lequiv:lookup_equiv ((a, f v1) :: m1 ++ m2) ((a, g v2) :: n1 ++ n2)).
+      { apply lookup_equiv_perm_nodup; trivial. }
+      assert (lo:lookup dec ((a, f v1) :: m1 ++ m2) a = Some (f v1)).
+      { simpl; match_destr; congruence. }
+      rewrite lequiv in lo.
+      simpl in lo.
+      match_destr_in lo; [| congruence].
+      invcs lo.
+      symmetry in H0.
+      specialize (inj _ _ H0).
+      subst.
+      split; [ | tauto].
+      rewrite H0 in perm.
+      apply Permutation_cons_inv in perm.
+      repeat rewrite <- Permutation_middle.
+      eauto.
+    Qed.
+
     Lemma assoc_lookupr_lookup_nodup x (ls:list (A*B)):
       NoDup (domain ls) ->
       assoc_lookupr dec ls x = lookup dec ls x.
@@ -1169,6 +1436,32 @@ Section Assoc.
       - rewrite <- Permutation_rev. reflexivity.
     Qed.
 
+    Lemma NoDup_lookup_equiv_equivlist (l1 l2:list (A*B)) :
+      NoDup (domain l1) ->
+      NoDup (domain l2) ->
+      lookup_equiv l1 l2 ->
+      equivlist l1 l2.
+    Proof.
+      unfold equivlist, lookup_equiv.
+      intros nd1 nd2 loeq.
+      intros [a b]; split; intros inn
+      ; apply lookup_in with (dec0:=dec)
+      ; apply (in_lookup_nodup) with (dec0:=dec) in inn; trivial
+      ; congruence.
+    Qed.
+
+    Lemma NoDup_lookup_equiv_Permutation (l1 l2:list (A*B)) :
+      NoDup (domain l1) ->
+      NoDup (domain l2) ->
+      lookup_equiv l1 l2 ->
+      Permutation l1 l2.
+    Proof.
+      intros nd1 nd2 le.
+      apply NoDup_Permutation';
+        try (apply NoDup_domain_NoDup; trivial).
+      apply NoDup_lookup_equiv_equivlist; trivial.
+    Qed.
+    
     Definition assoc_lookupr_equiv 
                (l1 l2:list (A*B))
       := forall x : A, assoc_lookupr dec l1 x = assoc_lookupr dec l2 x.
@@ -1493,6 +1786,16 @@ Section Assoc.
       apply lookup_equiv_equiv.
     Qed.
 
+    Lemma lookup_equiv_on_lookup_equiv {A B : Type} (dec : EqDec A eq)
+          (l1 l2 : list (A * B)) :
+      lookup_equiv l1 l2 <-> (forall dom, lookup_equiv_on dom l1 l2).
+    Proof.
+      unfold lookup_equiv, lookup_equiv_on.
+      split; intros.
+      - intuition.
+      - apply (H (x::nil)); simpl; eauto.
+    Qed.
+
     Lemma lookup_equiv_on_dom_incl  {A B} {dec:EqDec A eq}
           (dom1 dom2:list A) (l1 l2:list (A*B))
       : incl dom2 dom1 ->
@@ -1502,6 +1805,16 @@ Section Assoc.
       unfold lookup_equiv_on; intuition.
     Qed.
 
+    Lemma lookup_equiv_on_dom_app_f  {A B} {dec:EqDec A eq}
+          {dom1 dom2:list A} {l1 l2:list (A*B)}
+      : lookup_equiv_on dom1 l1 l2 ->
+        lookup_equiv_on dom2 l1 l2 -> 
+        lookup_equiv_on (dom1++dom2) l1 l2.
+    Proof.
+      unfold lookup_equiv_on; intros.
+      rewrite in_app_iff in *; intuition.
+    Qed.
+    
     Lemma lookup_equiv_on_dom_app  {A B} {dec:EqDec A eq}
           (dom1 dom2:list A) (l1 l2:list (A*B))
       : lookup_equiv_on (dom1++dom2) l1 l2 ->
@@ -1520,8 +1833,85 @@ Section Assoc.
       match_destr; eauto.
     Qed.
 
+    Global Instance lookup_equiv_on_incl_prop {A B} {dec:EqDec A eq} :
+      Proper ((@incl A) --> eq ==> eq ==> Basics.impl) (@lookup_equiv_on A B dec).
+    Proof.
+      intros ??????????; subst.
+      eapply lookup_equiv_on_dom_incl; eauto.
+    Qed.
+
+    Lemma lookup_equiv_on_update_first {A B} {dec:EqDec A eq} fvs (l₁ l₂:list (A*B)) v d :
+      lookup_equiv_on fvs l₁ l₂ ->
+      lookup_equiv_on fvs (update_first equiv_dec l₁ v d)
+                      (update_first equiv_dec l₂ v d).
+    Proof.
+      unfold lookup_equiv_on; intros.
+      specialize (H _ H0).
+      destruct (x == v); unfold equiv, complement in *.
+      - subst.
+        case_eq ( lookup dec l₁ v); intros.
+        + repeat rewrite lookup_update_eq_in; trivial.
+          * rewrite H in H1; eapply lookup_in_domain; eauto.
+          * eapply lookup_in_domain; eauto.
+        + unfold equiv_dec in *
+          ; repeat rewrite nin_update; congruence.
+      - repeat rewrite lookup_update_neq by congruence.
+        trivial.
+    Qed.
 
   End Lookup_equiv_on.
+
+  Section alldisjoint.
+    
+    Lemma all_disjoint_domain_has_same_eq {A B} {ls:list (list (A*B))} :
+      all_disjoint (map domain ls) ->
+      forall l1 l2,
+        In l1 ls ->
+        In l2 ls ->
+        forall x,
+          In x (domain l1) -> In x (domain l2) -> l1 = l2.
+    Proof.
+      induction ls; simpl; try contradiction.
+      intros ad l1 l2 inn1 inn2 x innx1 innx2.
+      invcs ad.
+      specialize (IHls H2).
+      rewrite Forall_forall in H1.
+      destruct inn1 as [? | inn1]; destruct inn2 as [? | inn2]; subst.
+      - trivial.
+      - eelim (H1 (domain l2)); try eassumption.
+        apply in_map; trivial.
+      - eelim (H1 (domain l1)); try eassumption.
+        apply in_map; trivial.
+      - eauto.
+    Qed.
+
+  End alldisjoint.
+
+  Section concat.
+
+    Lemma concat_lookup_some_break {A B:Type} {dec:EqDec A eq} {ls:list (list (A*B))} {x:A} {v:B} :
+      lookup dec (List.concat ls) x = Some v ->
+      exists ll1 ll ll2, ls = ll1++ll::ll2
+                         /\ lookup dec ll x = Some v
+                         /\ ~ In x (domain (concat ll1)).
+    Proof.
+      intros lo.
+      induction ls; simpl in *; try discriminate.
+      rewrite lookup_app in lo.
+      match_option_in lo.
+      - invcs lo.
+        exists nil, a, ls; simpl; eauto.
+      - destruct (IHls lo) as [ll1[ll [ll2 [? [inn nin]]]]]; subst.
+        exists (a::ll1), ll, ll2; simpl.
+        repeat split; trivial.
+        rewrite domain_app, in_app_iff.
+        intros [inn2|inn2].
+        + apply lookup_none_nin in eqq.
+          contradiction.
+        + contradiction.
+    Qed.
+
+  End concat.
 
   Section Substlist.
     

@@ -19,6 +19,7 @@ operations over option types. They are used extensively through the
 code to propagate errors. *)
 
 Require Import List.
+Require Import RelationClasses.
 
 Section Lift.
 
@@ -200,6 +201,32 @@ Section Lift.
        | _, None => True
        | _ , _ => False
        end.
+
+      Global Instance lift2P_refl {A:Type} R {refl:@Reflexive A R} : Reflexive (lift2P R).
+    Proof.
+      unfold lift2P; intros x.
+      destruct x; eauto. 
+    Qed.
+
+    Global Instance lift2P_sym {A:Type} R {refl:@Symmetric A R} : Symmetric (lift2P R).
+    Proof.
+      unfold lift2P; intros  x y.
+      destruct x; destruct y; eauto.
+    Qed.
+
+    Global Instance lift2P_trans {A:Type} R {refl:@Transitive A R} : Transitive (lift2P R).
+    Proof.
+      unfold lift2P; intros x y z.
+      destruct x; destruct y; destruct z; try contradiction; eauto.
+    Qed.
+
+    Global Instance lift2P_equiv {A:Type} R {refl:@Equivalence A R} : Equivalence (lift2P R).
+    Proof.
+      constructor.
+      - red; intros; reflexivity.
+      - red; intros; symmetry; trivial.
+      - red; intros; etransitivity; eauto.
+    Qed.
 
 End Lift.
 

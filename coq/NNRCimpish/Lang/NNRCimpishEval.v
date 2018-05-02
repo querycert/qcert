@@ -369,21 +369,52 @@ Section NNRCimpishEval.
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
-    Lemma nnrc_impish_expr_eval_same σc pd₁ pd₂ s :
-      lookup_equiv_on (nnrc_impish_expr_free_vars s) pd₁ pd₂ ->
-      nnrc_impish_expr_eval σc pd₁ s = nnrc_impish_expr_eval σc pd₂ s.
+    Lemma nnrc_impish_expr_eval_same σc pd₁ pd₂ e :
+      lookup_equiv_on (nnrc_impish_expr_free_vars e) pd₁ pd₂ ->
+      nnrc_impish_expr_eval σc pd₁ e = nnrc_impish_expr_eval σc pd₂ e.
     Proof.
       revert pd₁ pd₂.
-      induction s; simpl; intros; eauto 3.
+      induction e; simpl; intros; eauto 3.
       - rewrite H; simpl; tauto.
       - apply lookup_equiv_on_dom_app in H; destruct H as [leo1 leo2].
-        rewrite (IHs1 _ _ leo1).
-        rewrite (IHs2 _ _ leo2).
+        rewrite (IHe1 _ _ leo1).
+        rewrite (IHe2 _ _ leo2).
         trivial.
-      - rewrite (IHs _ _ H); trivial.
-      - rewrite (IHs _ _ H); trivial.
+      - rewrite (IHe _ _ H); trivial.
+      - rewrite (IHe _ _ H); trivial.
     Qed.
 
+    Local Close Scope string.
+
+    Lemma nnrc_impish_expr_eval_free_env σc (l1 l2 l3:pd_bindings) e :
+      disjoint (nnrc_impish_expr_free_vars e) (domain l2) ->
+      nnrc_impish_expr_eval σc (l1 ++ l2 ++ l3) e
+      =
+      nnrc_impish_expr_eval σc (l1 ++ l3) e.
+    Proof.
+      induction e; simpl; eauto; intros.
+      - repeat rewrite lookup_app.
+        repeat match_option.
+        specialize (H v); simpl in H.
+        apply lookup_in_domain in eqq0.
+        intuition.
+      - apply disjoint_app_l in H.
+        rewrite IHe1, IHe2; tauto.
+      - rewrite IHe; tauto.
+      - rewrite IHe; tauto.
+    Qed.
+
+    Lemma nnrc_impish_expr_eval_free_env_tail σc (l1 l2:pd_bindings) e :
+      disjoint (nnrc_impish_expr_free_vars e) (domain l2) ->
+      nnrc_impish_expr_eval σc (l1 ++ l2) e
+      =
+      nnrc_impish_expr_eval σc l1 e.
+    Proof.
+      intros.
+      generalize (nnrc_impish_expr_eval_free_env σc l1 l2 nil).
+      repeat rewrite app_nil_r; auto.
+    Qed.
+    
     Lemma nnrc_impish_expr_eval_group_by_unfold σc σ g sl e :
       nnrc_impish_expr_eval σc σ (NNRCimpishGroupBy g sl e) = 
       match nnrc_impish_expr_eval σc σ e with

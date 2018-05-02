@@ -44,4 +44,23 @@ Section NNRCimpVars.
        | NNRCimpGroupBy _ _ e₁ => nnrc_imp_expr_free_vars e₁
        end.
 
+    Fixpoint nnrc_imp_stmt_free_vars (s:nnrc_imp_stmt) : list var
+      := match s with
+         | NNRCimpSeq s₁ s₂ =>
+           nnrc_imp_stmt_free_vars s₁ ++ nnrc_imp_stmt_free_vars s₂
+         | NNRCimpAssign v e =>
+           v::(nnrc_imp_expr_free_vars e)
+         | NNRCimpLet v eo s₀ =>
+           match eo with
+           | Some e => nnrc_imp_expr_free_vars e
+           | None => nil
+           end ++ remove string_eqdec v (nnrc_imp_stmt_free_vars s₀)
+         | NNRCimpFor v e s₀ =>
+           nnrc_imp_expr_free_vars e ++ remove string_eqdec v (nnrc_imp_stmt_free_vars s₀)
+         | NNRCimpIf e s₁ s₂ =>
+           nnrc_imp_expr_free_vars e ++ nnrc_imp_stmt_free_vars s₁ ++ nnrc_imp_stmt_free_vars s₂
+         | NNRCimpEither e x₁ s₁ x₂ s₂ =>
+           nnrc_imp_expr_free_vars e ++ remove string_eqdec x₁ (nnrc_imp_stmt_free_vars s₁) ++ remove string_eqdec x₂ (nnrc_imp_stmt_free_vars s₂)
+       end.
+
 End NNRCimpVars.

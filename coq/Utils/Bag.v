@@ -481,7 +481,7 @@ Section Bag.
         eauto.
     Qed.
 
-    Lemma groupby_domain {l a} : In a (domain (groupby l)) <-> In a l.
+    Lemma domain_groupby {l a} : In a (domain (groupby l)) <-> In a l.
     Proof.
       revert a.
       induction l; simpl; intuition; subst.
@@ -496,26 +496,6 @@ Section Bag.
         + right; eapply IHl; eauto.
     Qed.
     
-    Lemma lookup_update_eq_in {B:Type}{l:list (A*B)} {a} {n:B} :
-      In a (domain l) ->
-      lookup equiv_dec (update_first equiv_dec l a n) a = Some n.
-    Proof.
-      revert a n.
-      induction l; simpl; intuition; simpl in *; subst.
-      - destruct (equiv_dec a a); simpl; intuition.
-        destruct (equiv_dec a a); simpl; intuition.
-      - case_eq (equiv_dec a a0); simpl; intros; try rewrite e in *; subst; rewrite H; auto.
-    Qed.
-    
-    Lemma lookup_update_neq {B:Type }{l a a'} {n:B} : a<>a' -> lookup equiv_dec (update_first equiv_dec l a n) a' = lookup equiv_dec l a'.
-    Proof.
-      revert a a' n. induction l; simpl; intuition.
-      destruct (equiv_dec a a0); subst; simpl.
-      rewrite e in *.
-      - destruct (equiv_dec a' a0); try congruence.
-      - destruct (equiv_dec a' a0); simpl; auto.
-    Qed.
-  
     Lemma groupby_mult_in {l d n} : In (d, n) (groupby l) -> mult l d = n.
     Proof.
       revert n. induction l; simpl; intuition.

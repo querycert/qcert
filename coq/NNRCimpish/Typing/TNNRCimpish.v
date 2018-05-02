@@ -432,7 +432,7 @@ Section TNNRCimpish.
         congruence.
     - repeat match_option_in eqq1.
       invcs eqq1.
-      generalize (lookup_update_eq_in inn (n:=Some d)); intros HH.
+      generalize (lookup_update_eq_in equiv_dec inn (n:=Some d)); intros HH.
       unfold equiv_dec, string_eqdec in *.
       eauto.
     - contradiction.

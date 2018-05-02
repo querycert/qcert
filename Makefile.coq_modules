@@ -27,6 +27,8 @@ MODULES = \
 	Utils/LiftIterators \
 	Utils/Assoc \
 	Utils/Sublist \
+	Utils/GroupByDomain \
+	Utils/Interleaved \
 	Utils/Compat \
 	Utils/Bindings \
 	Utils/BindingsNat \
@@ -188,6 +190,7 @@ MODULES = \
 	NNRCimpish/Lang/NNRCimpishSem \
 	NNRCimpish/Lang/NNRCimpishEval \
 	NNRCimpish/Lang/NNRCimpishSemEval \
+	NNRCimpish/Lang/NNRCimpishCrossShadow \
 	NNRCimpish/Typing/TNNRCimpish \
 	NNRCimpish/NNRCimpishRuntime \
 	NNRCimpish/NNRCimpishTypes \
@@ -324,6 +327,7 @@ MODULES = \
 	Translation/CldMRtoCloudant \
 	Translation/NNRCtoNNRCimpish \
 	Translation/TNNRCtoNNRCimpish \
+	Translation/NNRCimpishtoNNRCimp \
 	Translation/NNRCimpishtoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \

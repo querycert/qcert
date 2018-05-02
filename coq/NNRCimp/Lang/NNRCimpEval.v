@@ -34,7 +34,7 @@ Require Import Utils.
 Require Import CommonRuntime.
 Require Import NNRCimp.
 Require Import NNRCimpVars.
-  
+
 Section NNRCimpEval.
 
   Context {fruntime:foreign_runtime}.
@@ -97,10 +97,10 @@ Section NNRCimpEval.
              
          | NNRCimpLet v eo s₀ =>
            let evals := (fun init =>
-                   match nnrc_imp_stmt_eval σc s₀ ((v,init)::σ) with
-                   | Some (_::σ') => Some σ'
-                   | _ => None
-                   end) in
+                           match nnrc_imp_stmt_eval σc s₀ ((v,init)::σ) with
+                           | Some (_::σ') => Some σ'
+                           | _ => None
+                           end) in
            match eo with
            | Some e => olift evals (lift Some (nnrc_imp_expr_eval σc σ e))
            | None => evals None
@@ -257,6 +257,14 @@ Section NNRCimpEval.
       end.
     Proof.
       reflexivity.
+    Qed.
+
+    Global Instance nnrc_imp_expr_eval_proper 
+      : Proper (eq ==> lookup_equiv ==> eq ==> eq) nnrc_imp_expr_eval.
+    Proof.
+      intros ?????????; subst.
+      apply nnrc_imp_expr_eval_same.
+      apply lookup_equiv_on_lookup_equiv; trivial.
     Qed.
 
   End props.

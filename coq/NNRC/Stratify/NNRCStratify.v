@@ -575,6 +575,7 @@ Section Stratify.
       - match_case_in H0; intros ? ? eqq1
         ; rewrite eqq1 in H0.
         invcs H0.
+        specialize (IHe _ _ _ _ eqq1).
         specialize (stratify1_aux_nbound_vars H1); intros HH.
         eapply disjoint_with_exclusion; eauto.
         intuition; list_simpler; intuition.

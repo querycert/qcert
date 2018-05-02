@@ -21,14 +21,15 @@ Require Import List.
 Require Import ListSet.
 Require Import Bool.
 Require Import Permutation.
-Require Import Equivalence.
 Require Import Morphisms.
 Require Import Setoid.
 Require Import EquivDec.
+Require Import Equivalence.
 Require Import RelationClasses.
 Require Import Omega.
 Require Import CoqLibAdd.
 Require Import Lift.
+Require Import Program.Basics.
 
 Section ListAdd.
   (** * Miscellaneous operations on lists *)
@@ -194,8 +195,74 @@ Section ListAdd.
       trivial.
     Qed.
 
-  End Misc.
+    Lemma in_split_first {dec:EqDec A eq} (x : A) (l : list A) :
+      In x l -> exists l1 l2 : list A, l = l1 ++ x :: l2 /\ ~ In x l1.
+    Proof.
+      induction l; simpl; try contradiction.
+      destruct (a == x); unfold equiv, complement in *.
+      - subst; exists nil, l; simpl; tauto.
+      - intros [eqq|inn].
+        + congruence.
+        + destruct (IHl inn) as [l1 [l2 [eqq nin]]]; subst.
+          exists (a::l1), l2; split; trivial.
+          simpl.
+          tauto.
+    Qed.
 
+    Lemma concat_In y (l:list (list A)) : In y (concat l) <-> (exists x : list A, In x l /\ In y x).
+    Proof.
+      rewrite <- in_flat_map.
+      rewrite flat_map_concat_map.
+      rewrite map_id.
+      reflexivity.
+    Qed.
+
+    Lemma in_in_split_or {dec:EqDec A eq} (l:list (list A)) a :
+      (exists l1 la l2, l = l1++la::l2 /\ In a la /\ ~ In a (concat l1))
+      \/ Forall (fun x => ~ In a x) l.
+    Proof.
+      induction l; simpl; [ right; trivial | ].
+      destruct (in_dec dec a a0) as [inn1|nin1].
+      - left.
+        destruct (in_split_first _ _ inn1)
+          as [? [? [??]]]; subst.
+        exists (nil). 
+        exists (x ++ a::x0).
+        exists l.
+        simpl; eauto.
+      - destruct IHl as [[l1 [la [l2 [eqq [inn2 nin2]]]]]|nin2].
+        + left; subst.
+          exists (a0::l1), la, l2.
+          repeat split; trivial.
+          rewrite concat_In.
+          simpl.
+          intros [? [inn3 inn4]].
+          destruct inn3.
+          * subst; eauto.
+          * apply nin2.
+            apply concat_In; eauto.
+        + right.
+          constructor; trivial.
+    Qed.
+
+    Lemma Permutation_in_nin_inv {l1:list A} {l1' l2 l2'} :
+      Permutation (l1::l1') (l2::l2') -> forall a,
+        In a l1 -> ~ In a (concat l2') ->
+        l1 = l2 /\ Permutation l1' l2'.
+    Proof.
+      intros perm a inn nin.
+      assert (inn1:In l1 (l2::l2')).
+      { rewrite <- perm; simpl; eauto. }
+      simpl in inn1.
+      destruct inn1 as [eqq|inn1].
+      - subst; split; trivial.
+        apply Permutation_cons_inv in perm; trivial.
+      - elim nin.
+        apply concat_In; eauto.
+    Qed.
+    
+  End Misc.
+  
   Lemma Permutation_cons_nin_map {A B} (f:A->B) x l₁ y l₂ :
     Permutation (x::l₁) (y::l₂) ->
     f x = f y ->
@@ -283,6 +350,15 @@ Section ListAdd.
         + right. now inversion_clear 1.
     Defined.
 
+    Global Instance Forall_perm {A P} : Proper ((@Permutation A) ==> iff) (@Forall A P).
+    Proof.
+      intros ? ? perm.
+      repeat rewrite Forall_forall.
+      split; intros H ? inn.
+      - rewrite <- perm in inn; eauto.
+      - rewrite perm in inn; eauto.
+    Qed.
+    
   End Forall.
 
   (** * Properties of [filter] *)
@@ -1238,6 +1314,12 @@ Section ListAdd.
       constructor; red; intuition.
     Qed.
 
+    Lemma incl_cons_iff {A : Type} (a : A) (l m : list A) :
+      incl (a :: l) m <-> In a m /\ incl l m.
+    Proof.
+      unfold incl; simpl; intuition; subst; tauto.
+    Qed.
+    
     Lemma incl_app_iff {A:Type} (l m n : list A) :
       incl l n /\ incl m n <-> incl (l ++ m) n.
     Proof.
@@ -1451,6 +1533,13 @@ Section ListAdd.
         match_destr_in ne. congruence.
     Defined.
 
+    Global Instance Forall_equiv_proper {P} : Proper (equivlist ==> iff) (@Forall A P).
+    Proof.
+      intros ? ? eqs.
+      repeat rewrite Forall_forall.
+      firstorder.
+    Qed.
+    
   End Equivalence.
 
   Global Instance map_equivlist {A B} : Proper (eq ==> equivlist ==> equivlist) (@map A B).
@@ -1878,5 +1967,165 @@ Section ListAdd.
 
   End Seq.
 
+  Definition not_nil {A:Type} (l:list A)
+    := match l with
+       | nil => false
+       | _ => true
+       end.
+  
+  Definition filter_nil {A:Type} := filter (@not_nil A).
+  
+  Section concat.
+
+    Global Instance Permutation_concat {A} :
+      Proper ((@Permutation (list A)) ==> (@Permutation A)) (@concat A).
+    Proof.
+      repeat red.
+      apply Permutation_ind_bis; simpl; intros.
+      - trivial.
+      - apply Permutation_app; trivial.
+      - repeat rewrite <- app_ass.
+        apply Permutation_app; trivial.
+        apply Permutation_app_swap.
+      - etransitivity; eauto.
+    Qed.
+
+    Lemma concat_filter {A : Type} (f : A -> bool) (l : list (list A)) :
+      filter f (concat l) = concat (map (filter f) l).
+    Proof.
+      induction l; simpl; trivial.
+      rewrite filter_app, IHl; trivial.
+    Qed.
+
+    Lemma concat_filter_nil {A:Type} (ls:list (list A)) :
+      concat (filter_nil ls) = concat ls.
+    Proof.
+      induction ls; simpl; trivial.
+      destruct a; simpl; trivial.
+      rewrite IHls; trivial.
+    Qed.
+
+    Lemma concat_nil_r {A:Type} (ls:list (list A)) :
+      concat ls = nil <-> Forall (eq nil) ls.
+    Proof.
+      split; intros eqq.
+      - induction ls; simpl.
+        + constructor.
+        +  destruct a; try discriminate.
+           intuition.
+      - induction ls; simpl; trivial.
+        invcs eqq; simpl.
+        auto.
+    Qed.
+
+  End concat.
+
+  Section alldisjoint.
+
+    Definition all_disjoint {A} := ForallOrdPairs (@disjoint A).
+
+    Lemma all_disjoint2_facts {A} (x y:list A) (l:list (list A)) :
+      all_disjoint (x::y::l) ->
+      disjoint x y.
+    Proof.
+      intros ad; red in ad.
+      repeat match goal with
+             | [ H : Forall _ (_::_) |- _ ] => invcs H
+             | [ H : ForallOrdPairs _ (_::_) |- _ ] => invcs H
+             end; tauto.
+    Qed.      
+
+    Lemma all_disjoint3_facts {A} (x y z:list A) (l:list (list A)) :
+      all_disjoint (x::y::z::l) ->
+      disjoint x y
+      /\ disjoint x z
+      /\ disjoint y z.
+    Proof.
+      intros ad; red in ad.
+      repeat match goal with
+             | [ H : Forall _ (_::_) |- _ ] => invcs H
+             | [ H : ForallOrdPairs _ (_::_) |- _ ] => invcs H
+             end; tauto.
+    Qed.
+
+    Lemma all_disjoint3_iff {A} (x y z:list A) :
+      all_disjoint (x::y::z::nil) <->
+      disjoint x y
+      /\ disjoint x z
+      /\ disjoint y z.
+    Proof.
+      split; unfold all_disjoint; intros ad.
+      - repeat match goal with
+               | [ H : Forall _ (_::_) |- _ ] => invcs H
+               | [ H : ForallOrdPairs _ (_::_) |- _ ] => invcs H
+               end; tauto.
+      - repeat constructor; try tauto.
+    Qed.
+
+    Lemma all_disjoint_has_same_eq {A} {ls:list (list A)} :
+      all_disjoint ls ->
+      forall l1 l2,
+        In l1 ls ->
+        In l2 ls ->
+        forall x,
+          In x l1 -> In x l2 -> l1 = l2.
+    Proof.
+      induction ls; simpl; try contradiction.
+      intros ad l1 l2 inn1 inn2 x innx1 innx2.
+      invcs ad.
+      specialize (IHls H2).
+      rewrite Forall_forall in H1.
+      destruct inn1 as [? | inn1]; destruct inn2 as [? | inn2]; subst.
+      - trivial.
+      - elim (H1 _ inn2 _ innx1 innx2).
+      - elim (H1 _ inn1 _ innx2 innx1).
+      - eauto.
+    Qed.
+
+    
+    Global Instance all_disjoint_perm_proper {A} : Proper ((@Permutation (list A)) ==> iff) all_disjoint.
+    Proof.
+      cut (Proper ((@Permutation (list A)) ==> impl) all_disjoint)
+      ; unfold Proper, respectful, impl.
+      { split; [eauto | ]; symmetry in H0; eauto. }
+      change (forall x y : list (list A), Permutation x y -> (fun x y => all_disjoint x -> all_disjoint y) x y).
+      apply Permutation_ind_bis; unfold all_disjoint in *; intros.
+      - trivial.
+      - invcs H1.
+        constructor.
+        + rewrite <- H; trivial.
+        + eauto.
+      - invcs H1.
+        invcs H4.
+        invcs H5.
+        constructor.
+        + constructor.
+          * symmetry; trivial.
+          * rewrite <- H; trivial.
+        + constructor.
+          * rewrite <- H; trivial.
+          * eauto.
+      - eauto.
+    Qed.
+
+    Lemma all_disjoint_cons_inv {A} {a:A} {l1 l2} :
+      all_disjoint ((a :: l1) :: l2) -> all_disjoint (l1::l2) /\ ~ In a (concat l2).
+    Proof.
+      intros disj; invcs disj.
+      split.
+      - constructor; trivial.
+        revert H1; apply Forall_impl; intros ? disj.
+        apply disjoint_cons_inv1 in disj; tauto.
+      - rewrite Forall_forall in H1.
+        rewrite concat_In.
+        intros [x [inn1 inn2]].
+        specialize (H1 _ inn1).
+        apply (H1 a); simpl; eauto.
+    Qed.
+
+  End alldisjoint.
+
 End ListAdd.
+
+Hint Resolve disjoint_nil_l disjoint_nil_r.
 
