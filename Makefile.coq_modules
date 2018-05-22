@@ -328,7 +328,7 @@ MODULES = \
 	Translation/NNRCtoNNRCimpish \
 	Translation/TNNRCtoNNRCimpish \
 	Translation/NNRCimpishtoNNRCimp \
-	Translation/NNRCimpishtoJavaScriptAst \
+	Translation/NNRCimptoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \
 	Translation/NNRCtoJavaScript \

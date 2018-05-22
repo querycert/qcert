@@ -70,7 +70,8 @@ Require Import NNRCtocNNRC.
 Require Import NNRCtoNNRCimpish.
 Require Import NNRCtoDNNRC.
 Require Import NNRCtoNNRCMR.
-Require Import NNRCimpishtoJavaScriptAst.
+Require Import NNRCimpishtoNNRCimp.
+Require Import NNRCimptoJavaScriptAst.
 Require Import NNRCtoJavaScript.
 Require Import NNRCtoJava.
 Require Import cNNRCtoCAMP.
@@ -184,10 +185,16 @@ Section CompCorrectness.
     | Dv_dnnrc_to_dnnrc_typed _ dv => False /\ driver_correct_dnnrc_typed dv
     end.
 
+  Definition driver_correct_nnrc_imp (dv: nnrc_imp_driver) :=
+    match dv with
+    | Dv_nnrc_imp_stop => True
+    | Dv_nnrc_imp_to_js_ast _ dv => False /\ driver_correct_js_ast dv
+    end.
+
   Definition driver_correct_nnrc_impish (dv: nnrc_impish_driver) :=
     match dv with
     | Dv_nnrc_impish_stop => True
-    | Dv_nnrc_impish_to_js_ast _ dv => False /\ driver_correct_js_ast dv
+    | Dv_nnrc_impish_to_nnrc_imp dv => False /\ driver_correct_nnrc_imp dv (* XXX TODO: @avi XXX *)
     end.
 
   Definition driver_correct_nnrc_impish_core (dv: nnrc_impish_core_driver) :=
@@ -316,6 +323,7 @@ Section CompCorrectness.
     | Dv_nnrc dv => driver_correct_nnrc dv
     | Dv_nnrc_impish_core dv => driver_correct_nnrc_impish_core dv
     | Dv_nnrc_impish dv => driver_correct_nnrc_impish dv
+    | Dv_nnrc_imp dv => driver_correct_nnrc_imp dv
     | Dv_nnrcmr dv => driver_correct_nnrcmr dv
     | Dv_cldmr dv => driver_correct_cldmr dv
     | Dv_dnnrc dv => driver_correct_dnnrc dv
@@ -340,7 +348,7 @@ Section CompCorrectness.
     Qed.
 
     Ltac elim_qerror :=
-      match goal with 
+      match goal with
       | [H:context [forall _ : string, compile _ _ <> (Q_error _ :: nil)] |- _ ] =>
         try (unfold compile in H; simpl in H; simpl;
              assert False by apply (error_msg_to_false _ H); contradiction)
@@ -349,7 +357,7 @@ Section CompCorrectness.
     Ltac prove_same_outputs :=
       unfold eval_camp_rule, eval_camp,
       eval_nra, eval_nraenv, eval_nraenv_core,
-      eval_nnrc, eval_nnrc_core, eval_nnrc_impish, eval_nnrcmr,
+      eval_nnrc, eval_nnrc_core, eval_nnrc_impish, eval_nnrc_imp, eval_nnrcmr,
       eval_cldmr, eval_dnnrc, eval_dnnrc_typed;
       try match goal with
       | [ |- equal_outputs (lift_output (camp_rule_eval_top ?h ?c (lift_input ?i)))
@@ -443,6 +451,7 @@ Section CompCorrectness.
     | (Dv_nnrc _, Q_nnrc _) => True
     | (Dv_nnrc_impish_core _, Q_nnrc_impish_core _) => True
     | (Dv_nnrc_impish _, Q_nnrc_impish _) => True
+    | (Dv_nnrc_imp _, Q_nnrc_imp _) => True
     | (Dv_nnrcmr _, Q_nnrcmr _) => True
     | (Dv_cldmr _, Q_cldmr _) => True
     | (Dv_dnnrc _, Q_dnnrc _) => True
@@ -455,7 +464,7 @@ Section CompCorrectness.
     | (Dv_cloudant _, Q_cloudant _) => True
     | (_, _) => False
     end.
-    
+
     Lemma correct_driver_succeeds_cnd:
       (forall dv, driver_correct (Dv_camp dv)
                   -> (forall q, Forall query_not_error
@@ -547,7 +556,7 @@ Section CompCorrectness.
       specialize (H2 c H3 (camp_rule_to_camp q)).
       rewrite Forall_forall in H2; auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_tech_rule:
       forall dv, driver_correct (Dv_tech_rule dv) ->
                  (forall q, Forall query_not_error
@@ -588,7 +597,7 @@ Section CompCorrectness.
       specialize (H1 dv H q).
       rewrite Forall_forall in H1; auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_nraenv:
       forall dv, driver_correct (Dv_nraenv dv) ->
                  (forall q, Forall query_not_error
@@ -604,7 +613,7 @@ Section CompCorrectness.
       specialize (H0 dv H q).
       rewrite Forall_forall in H0; auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_nraenv_core:
       forall dv, driver_correct (Dv_nraenv_core dv) ->
                  (forall q, Forall query_not_error
@@ -619,7 +628,7 @@ Section CompCorrectness.
       specialize (H0 dv H q).
       rewrite Forall_forall in H0; auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_nnrc_core:
       forall dv, driver_correct (Dv_nnrc_core dv) ->
                  (forall q, Forall query_not_error
@@ -636,7 +645,7 @@ Section CompCorrectness.
       specialize (H0 dv H q).
       rewrite Forall_forall in H0; auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_nnrc:
       forall dv, driver_correct (Dv_nnrc dv) ->
                  (forall q, Forall query_not_error
@@ -654,7 +663,7 @@ Section CompCorrectness.
       specialize (H0 dv H q).
       rewrite Forall_forall in H0; auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_nnrcmr:
       forall dv, driver_correct (Dv_nnrcmr dv) ->
                  (forall q, Forall query_not_error
@@ -672,7 +681,21 @@ Section CompCorrectness.
       specialize (H1 dv H q).
       rewrite Forall_forall in H1; auto.
     Qed.
-      
+
+    Lemma correct_driver_succeeds_nnrc_imp:
+      forall dv, driver_correct (Dv_nnrc_imp dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_nnrc_imp dv) (Q_nnrc_imp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *.
+      - contradiction.
+      - elim H; contradiction.
+    Qed.
+
     Lemma correct_driver_succeeds_nnrc_impish:
       forall dv, driver_correct (Dv_nnrc_impish dv) ->
                  (forall q, Forall query_not_error
@@ -714,7 +737,7 @@ Section CompCorrectness.
       specialize (H0 dv H q).
       rewrite Forall_forall in H0; auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_oql:
       forall dv, driver_correct (Dv_oql dv) ->
                  (forall q, Forall query_not_error
@@ -733,7 +756,7 @@ Section CompCorrectness.
       rewrite Forall_forall in H.
       auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_sql:
       forall dv, driver_correct (Dv_sql dv) ->
                  (forall q, Forall query_not_error
@@ -752,7 +775,7 @@ Section CompCorrectness.
       rewrite Forall_forall in H.
       auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_sqlpp:
       forall dv, driver_correct (Dv_sqlpp dv) ->
                  (forall q, Forall query_not_error
@@ -771,7 +794,7 @@ Section CompCorrectness.
       rewrite Forall_forall in H.
       auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_lambda_nra:
       forall dv, driver_correct (Dv_lambda_nra dv) ->
                  (forall q, Forall query_not_error
@@ -790,7 +813,7 @@ Section CompCorrectness.
       rewrite Forall_forall in H.
       auto.
     Qed.
-      
+
     Lemma correct_driver_succeeds_cldmr:
       forall dv, driver_correct (Dv_cldmr dv) ->
                  (forall q, Forall query_not_error
@@ -842,7 +865,7 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *; contradiction.
     Qed.
-      
+
     Lemma correct_driver_succeeds_spark_rdd:
       forall dv, driver_correct (Dv_spark_rdd dv) ->
                  (forall q, Forall query_not_error
@@ -854,7 +877,7 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *; contradiction.
     Qed.
-      
+
     Lemma correct_driver_succeeds_spark_df:
       forall dv, driver_correct (Dv_spark_df dv) ->
                  (forall q, Forall query_not_error
@@ -866,7 +889,7 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *; contradiction.
     Qed.
-      
+
     Lemma correct_driver_succeeds_cloudant:
       forall dv, driver_correct (Dv_cloudant dv) ->
                  (forall q, Forall query_not_error
@@ -878,7 +901,7 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *; contradiction.
     Qed.
-      
+
     Lemma correct_driver_succeeds_dnnrc:
       forall dv, driver_correct (Dv_dnnrc dv) ->
                  (forall q, Forall query_not_error
@@ -910,7 +933,7 @@ Section CompCorrectness.
       elim H; intros; contradiction.
       elim H; intros; contradiction.
     Qed.
-      
+
     Theorem compile_with_correct_driver_succeeds (dv:driver) (q:query) :
       driver_correct dv ->
       driver_matches_query dv q ->
@@ -933,6 +956,7 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_nnrc; auto.
       - apply correct_driver_succeeds_nnrc_impish_core; auto.
       - apply correct_driver_succeeds_nnrc_impish; auto.
+      - apply correct_driver_succeeds_nnrc_imp; auto.
       - apply correct_driver_succeeds_nnrcmr; auto.
       - apply correct_driver_succeeds_cldmr; auto.
       - apply correct_driver_succeeds_dnnrc; auto.
@@ -944,13 +968,13 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_spark_df; auto.
       - apply correct_driver_succeeds_cloudant; auto.
     Qed.
-    
+
     Definition query_preserves_eval (q1 q2:query) : Prop :=
       forall ev_in, equal_outputs (eval_query h q1 ev_in) (eval_query h q2 ev_in).
 
     Ltac trivial_same_query :=
       unfold query_preserves_eval; intros; simpl; prove_same_outputs.
-    
+
     Global Instance query_equiv : Equivalence query_preserves_eval.
     Proof.
       constructor.
@@ -984,7 +1008,7 @@ Section CompCorrectness.
           contradiction.
         + contradiction.
     Qed.
-    
+
     Lemma camp_rule_to_camp_preserves_eval (q:camp_rule) :
       query_preserves_eval (Q_camp_rule q) (Q_camp (camp_rule_to_camp q)).
     Proof.
@@ -996,7 +1020,7 @@ Section CompCorrectness.
       rewrite camp_rule_to_camp_top_correct.
       trivial_same_query.
     Qed.
-        
+
     Lemma camp_to_nraenv_core_preserves_eval (q:camp) :
       query_preserves_eval (Q_camp q) (Q_nraenv_core (camp_to_nraenv_core q)).
     Proof.
@@ -1008,7 +1032,7 @@ Section CompCorrectness.
       rewrite camp_to_nraenv_core_top_correct.
       trivial_same_query.
     Qed.
-        
+
     Lemma camp_to_nraenv_preserves_eval (q:camp) :
       query_preserves_eval (Q_camp q) (Q_nraenv (camp_to_nraenv q)).
     Proof.
@@ -1020,7 +1044,7 @@ Section CompCorrectness.
       rewrite camp_to_nraenv_top_correct.
       trivial_same_query.
     Qed.
-        
+
     Lemma camp_to_nra_preserves_eval (q:camp) :
       query_preserves_eval (Q_camp q) (Q_nra (camp_to_nra q)).
     Proof.
@@ -1195,7 +1219,7 @@ Section CompCorrectness.
       rewrite oql_to_nraenv_top_correct.
       trivial_same_query.
     Qed.
-        
+
     Lemma lambda_nra_to_nraenv_preserves_eval (q:lambda_nra) :
       query_preserves_eval (Q_lambda_nra q) (Q_nraenv (lambda_nra_to_nraenv q)).
     Proof.
@@ -1207,7 +1231,7 @@ Section CompCorrectness.
       rewrite lambda_nra_to_nraenv_top_correct.
       trivial_same_query.
     Qed.
-        
+
     Lemma correct_driver_preserves_eval_cnd:
       (forall dv, driver_correct (Dv_camp dv)
                   -> (forall q, Forall (query_preserves_eval (Q_camp q))
@@ -1532,6 +1556,22 @@ Section CompCorrectness.
       auto.
     Qed.
 
+    Lemma correct_driver_preserves_eval_nnrc_imp:
+      forall dv, driver_correct (Dv_nnrc_imp dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nnrc_imp q))
+                                   (compile (Dv_nnrc_imp dv) (Q_nnrc_imp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl| ].
+      - trivial_same_query.
+        reflexivity.
+      - destruct dv; simpl in *.
+        + contradiction.
+        + elim H; contradiction.
+    Qed.
+
     Lemma correct_driver_preserves_eval_nnrc_impish:
       forall dv, driver_correct (Dv_nnrc_impish dv) ->
                  (forall q, Forall (query_preserves_eval (Q_nnrc_impish q))
@@ -1547,6 +1587,7 @@ Section CompCorrectness.
         + contradiction.
         + elim H; contradiction.
     Qed.
+
 
     Lemma correct_driver_preserves_eval_nnrc_impish_core:
       forall dv, driver_correct (Dv_nnrc_impish_core dv) ->
@@ -1772,7 +1813,7 @@ Section CompCorrectness.
       - rewrite <- H1; simpl; trivial_same_query.
       - contradiction.
     Qed.
-    
+
     Lemma correct_driver_preserves_eval_spark_df:
       forall dv, driver_correct (Dv_spark_df dv) ->
                  (forall q, Forall (query_preserves_eval (Q_spark_df q))
@@ -1786,7 +1827,7 @@ Section CompCorrectness.
       - rewrite <- H1; simpl; trivial_same_query.
       - contradiction.
     Qed.
-    
+
     Lemma correct_driver_preserves_eval_cloudant:
       forall dv, driver_correct (Dv_cloudant dv) ->
                  (forall q, Forall (query_preserves_eval (Q_cloudant q))
@@ -1800,7 +1841,7 @@ Section CompCorrectness.
       - rewrite <- H1; simpl; trivial_same_query.
       - contradiction.
     Qed.
-    
+
     (** This is an initial version of correctness theorem for the
 compiler driver as a whole. *)
 
@@ -1837,6 +1878,7 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_nnrc; auto.
       - apply correct_driver_preserves_eval_nnrc_impish_core; auto.
       - apply correct_driver_preserves_eval_nnrc_impish; auto.
+      - apply correct_driver_preserves_eval_nnrc_imp; auto.
       - apply correct_driver_preserves_eval_nnrcmr; auto.
       - apply correct_driver_preserves_eval_cldmr; auto.
       - apply correct_driver_preserves_eval_dnnrc; auto.
@@ -1848,8 +1890,7 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_spark_df; auto.
       - apply correct_driver_preserves_eval_cloudant; auto.
     Qed.
-    
+
   End eval_preserved.
 
 End CompCorrectness.
-

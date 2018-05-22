@@ -36,6 +36,7 @@ Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRCimpishRuntime.
+Require Import NNRCimpRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
@@ -54,7 +55,7 @@ Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignCloudant.
 Require Import ForeignToCloudant.
-  
+
 (* Compiler Driver *)
 Require Import CompLang.
 Require Import CompEnv.
@@ -64,7 +65,7 @@ Section CompEval.
   Local Open Scope list_scope.
 
   (* Context *)
-  
+
   Context {fruntime:foreign_runtime}.   (* Necessary for everything, including data *)
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
   Context {fcloudant:foreign_cloudant}. (* Necessary for CldMR evaluation *)
@@ -124,6 +125,10 @@ Section CompEval.
     Definition eval_nnrc_impish (q:nnrc_impish) (cenv: bindings) : option data :=
       NNRCimpishEval.nnrc_impish_eval_top h cenv q.
 
+    (* Language: nnrc_imp *)
+    Definition eval_nnrc_imp (q:nnrc_imp) (cenv: bindings) : option data :=
+      NNRCimpEval.nnrc_imp_eval_top h cenv q.
+
     (* Language: nnrcmr *)
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=
       NNRCMR.nnrcmr_eval_top h init_vinit q dcenv.
@@ -178,6 +183,7 @@ Section CompEval.
       | Q_nnrc q => lift_output (eval_nnrc q (lift_input ev_in))
       | Q_nnrc_impish_core q => lift_output (eval_nnrc_impish_core q (lift_input ev_in))
       | Q_nnrc_impish q => lift_output (eval_nnrc_impish q (lift_input ev_in))
+      | Q_nnrc_imp q => lift_output (eval_nnrc_imp q (lift_input ev_in))
       | Q_nnrcmr q => lift_output (eval_nnrcmr q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
       | Q_cldmr q => lift_output (eval_cldmr q (lift_input ev_in))
       | Q_dnnrc q => lift_output (eval_dnnrc q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
@@ -208,6 +214,7 @@ Section CompEval.
       | Q_nnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc_impish_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc_impish _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nnrc_imp _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_dnnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
@@ -261,30 +268,30 @@ Section CompEval.
       eval_camp_rule r (mkWorld world).
     Definition eval_camp_rule_world_debug (debug:bool) (r:camp_rule) (world:list data) : string :=
       eval_camp_rule_debug debug r (mkWorld world).
-    
+
     Definition eval_camp_world (q:camp) (world:list data) : option data :=
       eval_camp q (mkWorld world).
     Definition eval_camp_world_debug (debug:bool) (q:camp) (world:list data) : string :=
       eval_camp_debug debug q (mkWorld world).
-    
+
     Definition eval_oql_world (q:oql) (world:list data) : option data :=
       eval_oql q (mkWorld world).
-    
+
     Definition eval_lambda_nra_world (q:lambda_nra) (world:list data) : option data :=
       eval_lambda_nra q (mkWorld world).
-    
+
     Definition eval_nra_world (q:nra) (world:list data) : option data :=
       eval_nra q (mkWorld world).
-    
+
     Definition eval_nraenv_core_world (q:nraenv_core) (world:list data) : option data :=
       eval_nraenv_core q (mkWorld world).
-    
+
     Definition eval_nraenv_world (q:nraenv) (world:list data) : option data :=
       eval_nraenv q (mkWorld world).
-    
+
     Definition eval_nnrc_core_world (q:nnrc_core) (world:list data) : option data :=
       eval_nnrc_core q (mkWorld world).
-    
+
     Definition eval_nnrc_world (q:nnrc) (world:list data) : option data :=
       eval_nnrc q (mkWorld world).
 
@@ -294,20 +301,21 @@ Section CompEval.
     Definition eval_nnrc_impish_world (q:nnrc_impish) (world:list data) : option data :=
       eval_nnrc_impish q (mkWorld world).
 
+    Definition eval_nnrc_imp_world (q:nnrc_imp) (world:list data) : option data :=
+      eval_nnrc_imp q (mkWorld world).
+
     Definition eval_nnrcmr_world (q:nnrcmr) (world:list data) : option data :=
       eval_nnrcmr q (mkDistWorld world). (* XXX Creates a distributed WORLD collection XXX *)
-    
+
     Definition eval_cldmr_world (q:cldmr) (world:list data) : option data :=
       eval_cldmr q (mkWorld world).
-    
+
     Definition eval_dnnrc_world (q:dnnrc) (world:list data) : option data :=
       eval_dnnrc q (mkDistWorld world).
-    
+
     Definition eval_dnnrc_typed_world (q:dnnrc) (world:list data) : option data :=
       eval_dnnrc q (mkDistWorld world).
-    
+
   End EvalWorld.
 
 End CompEval.
-
-

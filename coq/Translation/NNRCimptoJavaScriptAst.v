@@ -24,7 +24,7 @@ Require Import Permutation.
 Require Import Eqdep_dec.
 Require Import Utils.
 Require Import CommonRuntime.
-Require Import NNRCimpishRuntime.
+Require Import NNRCimpRuntime.
 Require Import JavaScriptAstRuntime.
 Require Import ForeignToJavaScriptAst.
 Require Import JSON.
@@ -32,7 +32,7 @@ Require Import DatatoJSON.
 Require Import JsAst.JsNumber.
 Require Import Fresh.
 
-Section NNRCimpishtoJavaScriptAst.
+Section NNRCimptoJavaScriptAst.
   Import ListNotations.
 
   Context {fruntime:foreign_runtime}.
@@ -229,12 +229,12 @@ Section NNRCimpishtoJavaScriptAst.
                  [ e;
                    expr_literal (literal_number start);
                    expr_literal (literal_number len) ].
-  
+
   Definition runtime_substringNoLength start e :=
     call_runtime "substringNoLength"
                  [ e;
                    expr_literal (literal_number start) ].
-  
+
   (** Data model *)
 
   Definition mk_rec (l: list (string * expr)) : expr :=
@@ -465,55 +465,55 @@ Section NNRCimpishtoJavaScriptAst.
       foreign_to_ajavascript_unary_op fu e'
     end.
 
-  Fixpoint nnrc_impish_expr_to_js_ast (exp: nnrc_impish_expr): expr :=
+  Fixpoint nnrc_imp_expr_to_js_ast (exp: nnrc_imp_expr): expr :=
     match exp with
-    | NNRCimpishGetConstant x =>
+    | NNRCimpGetConstant x =>
       expr_identifier x
-    | NNRCimpishVar x =>
+    | NNRCimpVar x =>
       expr_identifier x
-    | NNRCimpishConst d =>
+    | NNRCimpConst d =>
       data_to_js_ast d
-    | NNRCimpishBinop op e1 e2 =>
-      let e1' := nnrc_impish_expr_to_js_ast e1 in
-      let e2' := nnrc_impish_expr_to_js_ast e2 in
+    | NNRCimpBinop op e1 e2 =>
+      let e1' := nnrc_imp_expr_to_js_ast e1 in
+      let e2' := nnrc_imp_expr_to_js_ast e2 in
       mk_binary_op op e1' e2'
-    | NNRCimpishUnop op e =>
-      let e' := nnrc_impish_expr_to_js_ast e in
+    | NNRCimpUnop op e =>
+      let e' := nnrc_imp_expr_to_js_ast e in
       mk_unary_op op e'
-    | NNRCimpishGroupBy _ _ _ => (* XXX TODO XXX *)
-      expr_literal (literal_string "XXX TODO: nnrc_impish_expr_to_js_ast groupby XXX")
+    | NNRCimpGroupBy _ _ _ => (* XXX TODO XXX *)
+      expr_literal (literal_string "XXX TODO: nnrc_imp_expr_to_js_ast groupby XXX")
     end.
 
-  Fixpoint nnrc_impish_stmt_to_js_ast (avoid: list string) (stmt: nnrc_impish_stmt): stat :=
+  Fixpoint nnrc_imp_stmt_to_js_ast (avoid: list string) (stmt: nnrc_imp_stmt): stat :=
     match stmt with
-    | NNRCimpishSeq s1 s2 =>
+    | NNRCimpSeq s1 s2 =>
       stat_block
-        [ nnrc_impish_stmt_to_js_ast avoid s1;
-          nnrc_impish_stmt_to_js_ast avoid s2 ]
-    | NNRCimpishLet x e s =>
+        [ nnrc_imp_stmt_to_js_ast avoid s1;
+          nnrc_imp_stmt_to_js_ast avoid s2 ]
+    | NNRCimpLet x e s =>
       let avoid := x :: avoid in
       scope
-        [ stat_var_decl [ (x, Some (nnrc_impish_expr_to_js_ast e)) ] ]
-    | NNRCimpishLetMut x s1 s2 =>
-      let avoid := x :: avoid in
-      scope
-        [ stat_var_decl [ (x, None) ];
-          nnrc_impish_stmt_to_js_ast avoid s1;
-          nnrc_impish_stmt_to_js_ast avoid s2 ]
-    | NNRCimpishLetMutColl x s1 s2 =>
-      let avoid := x :: avoid in
-      scope
-        [ stat_var_decl [ (x, Some (empty_array)) ];
-          nnrc_impish_stmt_to_js_ast avoid s1;
-          nnrc_impish_stmt_to_js_ast avoid s2 ]
-    | NNRCimpishAssign x e =>
-      stat_expr (expr_assign (expr_identifier x) None (nnrc_impish_expr_to_js_ast e))
-    | NNRCimpishPush x e =>
-      stat_expr (array_push (expr_identifier x) (nnrc_impish_expr_to_js_ast e))
-    | NNRCimpishFor x e s =>
+        [ stat_var_decl [ (x, lift nnrc_imp_expr_to_js_ast e) ] ]
+    (* | NNRCimpLetMut x s1 s2 => *)
+    (*   let avoid := x :: avoid in *)
+    (*   scope *)
+    (*     [ stat_var_decl [ (x, None) ]; *)
+    (*       nnrc_imp_stmt_to_js_ast avoid s1; *)
+    (*       nnrc_imp_stmt_to_js_ast avoid s2 ] *)
+    (* | NNRCimpLetMutColl x s1 s2 => *)
+    (*   let avoid := x :: avoid in *)
+    (*   scope *)
+    (*     [ stat_var_decl [ (x, Some (empty_array)) ]; *)
+    (*       nnrc_imp_stmt_to_js_ast avoid s1; *)
+    (*       nnrc_imp_stmt_to_js_ast avoid s2 ] *)
+    | NNRCimpAssign x e =>
+      stat_expr (expr_assign (expr_identifier x) None (nnrc_imp_expr_to_js_ast e))
+    (* | NNRCimpPush x e => *)
+    (*   stat_expr (array_push (expr_identifier x) (nnrc_imp_expr_to_js_ast e)) *)
+    | NNRCimpFor x e s =>
       (* for (var src = e, i = 0; i < src.length; i++) { var x = src[i]; s } *)
       let avoid := x :: avoid in
-      let e := nnrc_impish_expr_to_js_ast e in
+      let e := nnrc_imp_expr_to_js_ast e in
       let src_id := fresh_var "src" avoid in
       let avoid := src_id :: avoid in
       let i_id := fresh_var "i" avoid in
@@ -528,37 +528,37 @@ Section NNRCimpishtoJavaScriptAst.
             (Some (expr_unary_op unary_op_post_incr i))
             (stat_block
                [ stat_var_decl [ (x, Some (array_get src i)) ];
-                   nnrc_impish_stmt_to_js_ast avoid s ]) ]
-    | NNRCimpishIf e s1 s2 =>
+                   nnrc_imp_stmt_to_js_ast avoid s ]) ]
+    | NNRCimpIf e s1 s2 =>
       stat_if
-        (nnrc_impish_expr_to_js_ast e)
-        (nnrc_impish_stmt_to_js_ast avoid s1)
-        (Some (nnrc_impish_stmt_to_js_ast avoid s2))
-    | NNRCimpishEither (NNRCimpishVar x) x1 s1 x2 s2 =>
+        (nnrc_imp_expr_to_js_ast e)
+        (nnrc_imp_stmt_to_js_ast avoid s1)
+        (Some (nnrc_imp_stmt_to_js_ast avoid s2))
+    | NNRCimpEither (NNRCimpVar x) x1 s1 x2 s2 =>
       let avoid := x1 :: x2 :: avoid in
       let e' := expr_identifier x  in
       stat_if
         (runtime_either e')
         (scope (* var x1 = toLeft(e); s1 *)
            [ stat_var_decl [ (x1, Some (runtime_toLeft e')) ];
-             nnrc_impish_stmt_to_js_ast avoid s1 ])
+             nnrc_imp_stmt_to_js_ast avoid s1 ])
         (Some (scope (* var x2 = toRight(e); s2 *)
                  [ stat_var_decl [ (x2, Some (runtime_toRight e')) ];
-                   nnrc_impish_stmt_to_js_ast avoid s2 ]))
-    | NNRCimpishEither e x1 s1 x2 s2 =>
+                   nnrc_imp_stmt_to_js_ast avoid s2 ]))
+    | NNRCimpEither e x1 s1 x2 s2 =>
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
-      let e' := nnrc_impish_expr_to_js_ast e in
+      let e' := nnrc_imp_expr_to_js_ast e in
       stat_if
         (runtime_either e')
         (scope (* var x1 = toLeft(e); s1 *)
            [ stat_var_decl [ (x1, Some (runtime_toLeft e')) ];
-             nnrc_impish_stmt_to_js_ast avoid s1 ])
+             nnrc_imp_stmt_to_js_ast avoid s1 ])
         (Some (scope (* var x2 = toRight(e); s2 *)
                  [ stat_var_decl [ (x2, Some (runtime_toRight e')) ];
-                   nnrc_impish_stmt_to_js_ast avoid s2 ]))
+                   nnrc_imp_stmt_to_js_ast avoid s2 ]))
     end.
 
-  Definition nnrc_impish_to_js_ast_top globals (q: nnrc_impish): funcdecl :=
+  Definition nnrc_imp_to_js_ast_top globals (q: nnrc_imp): funcdecl :=
     let constants := "constants"%string in
     let (stmt, ret) := q in
     let body :=
@@ -568,7 +568,7 @@ Section NNRCimpishtoJavaScriptAst.
                (fun x => (x, Some (runtime_deref (expr_identifier constants) x)))
                globals);
           stat_var_decl [ (ret, None) ];
-          nnrc_impish_stmt_to_js_ast globals stmt;
+          nnrc_imp_stmt_to_js_ast globals stmt;
           stat_return (Some (expr_identifier ret)) ]
     in
     let prog := prog_intro strictness_true [ element_stat body ] in
@@ -578,4 +578,4 @@ Section NNRCimpishtoJavaScriptAst.
       (funcbody_intro prog (prog_to_string prog))
   .
 
-End NNRCimpishtoJavaScriptAst.
+End NNRCimptoJavaScriptAst.
