@@ -493,7 +493,8 @@ Section NNRCimptoJavaScriptAst.
     | NNRCimpLet x e s =>
       let avoid := x :: avoid in
       scope
-        [ stat_var_decl [ (x, lift nnrc_imp_expr_to_js_ast e) ] ]
+        [ stat_var_decl [ (x, lift nnrc_imp_expr_to_js_ast e) ];
+          nnrc_imp_stmt_to_js_ast avoid s ]
     (* | NNRCimpLetMut x s1 s2 => *)
     (*   let avoid := x :: avoid in *)
     (*   scope *)
