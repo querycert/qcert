@@ -48,6 +48,9 @@ val nnrc_to_sexp : QLang.nnrc -> sexp
 val sexp_to_nnrc_impish : sexp -> QLang.nnrc_impish
 val nnrc_impish_to_sexp : QLang.nnrc_impish -> sexp
 
+val sexp_to_nnrc_imp : sexp -> QLang.nnrc_imp
+val nnrc_imp_to_sexp : QLang.nnrc_imp -> sexp
+
 val sexp_to_nnrcmr : sexp -> QLang.nnrcmr
 val nnrcmr_to_sexp : QLang.nnrcmr -> sexp
 
