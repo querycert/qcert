@@ -33,7 +33,7 @@ jobs:
         key: v2-dep-{{ .Branch }}-{{ epoch }}
         paths:
         - ~/.opam
-    - run: eval `opam config env`
+    - run: eval `opam config env` && make -j2
     - run: make tests
     # Save test results
     - store_test_results:
