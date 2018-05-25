@@ -134,11 +134,11 @@ Section JSON.
          | jstring s => stringToJS quotel s
          | jarray ls =>
            let ss := map (jsonToJS quotel) ls in
-           "[" ++ (joinStrings ", " ss) ++ "]"
+           "[" ++ (concat ", " ss) ++ "]"
          | jobject ls =>
            let ss := (map (fun kv => let '(k,v) := kv in
                                      "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (jsonToJS quotel v)) ls) in
-           "{" ++ (joinStrings ", " ss) ++ "}"
+           "{" ++ (concat ", " ss) ++ "}"
          end.
 
   End toString.

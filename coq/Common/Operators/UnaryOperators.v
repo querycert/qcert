@@ -168,7 +168,7 @@ Section UnaryOperators.
             | OpDot s => "(OpDot " ++ s ++ ")"
             | OpRecRemove s => "(OpRecRemove " ++ s ++ ")"
             | OpRecProject ls => "(OpRecProject "
-                                      ++ (bracketString "[" (joinStrings "," ls) "]")
+                                      ++ (bracketString "[" (concat "," ls) "]")
                                       ++ ")"
             | OpBag => "OpBag"
             | OpSingleton => "OpSingleton"
@@ -176,7 +176,7 @@ Section UnaryOperators.
             | OpDistinct => "OpDistinct"
             | OpOrderBy ls =>
               "(OpOrderBy"
-                ++ (bracketString "[" (joinStrings "," (List.map ToString_SortCriteria ls)) "]")
+                ++ (bracketString "[" (concat "," (List.map ToString_SortCriteria ls)) "]")
                 ++ ")"
             | OpCount => "OpCount"
             | OpToString => "OpToString"

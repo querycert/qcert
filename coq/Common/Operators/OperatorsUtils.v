@@ -16,8 +16,8 @@
 
 (* Utilities methods used for defining the semantics of the operators *)
 
-Require Import String.
 Require Import List.
+Require Import String.
 Require Import Utils.
 Require Import ZArith.
 Require Import BrandRelation.
@@ -56,8 +56,8 @@ Section OperatorsUtils.
     := { toString := boolToString}.
 
   Instance ToString_brands : ToString brands
-    := { toString := fun b => (joinStrings " & " b)}.
-    
+    := { toString := fun b => (concat " & " b)}.
+
   Fixpoint dataToString (d:data) : string
     := match d with
            | dunit => "UNIT"%string
@@ -67,12 +67,12 @@ Section OperatorsUtils.
            | dstring s => stringToString s
            | dcoll l => bracketString 
                           "["%string
-                          (joinStrings ", "
+                          (concat ", "
                                        (string_sort (map dataToString l)))
                           "]"%string
            | drec lsd => bracketString
              "{"%string
-                (joinStrings "," 
+                (concat "," 
                              (map (fun xy => let '(x,y):=xy in 
                                              (append (stringToString x) (append "->"%string
                                              (dataToString y)))
@@ -107,7 +107,7 @@ Section OperatorsUtils.
   Definition darithmean (ns:list data) : option Z
     := match ns with
          | nil  => Some (0%Z)
-         | _ => lift (fun x => Z.quot x (Z_of_nat (length ns))) (dsum ns)
+         | _ => lift (fun x => Z.quot x (Z_of_nat (List.length ns))) (dsum ns)
        end.
 
   Definition lifted_zbag (l : list data) : option (list Z) :=

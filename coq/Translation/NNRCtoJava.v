@@ -116,17 +116,17 @@ Section NNRCtoJava.
     Definition mk_java_json_array (l:list java_json) : java_json
        := mk_java_json ("RuntimeUtils.createJsonArray"
                           ++ bracketString "("
-                          (joinStrings ", " (map from_java_json l))
+                          (map_concat ", " from_java_json l)
                           ")").
     
     Definition mk_java_json_object (quotel:string) (l:list (string*java_json)) : java_json
        := mk_java_json ("new RuntimeUtils.JsonObjectBuilder()" 
-            ++ (joinStrings "" (map (fun elem =>
-                                       bracketString
-                                         ".add("
-                                         (quotel ++ (fst elem) ++ quotel ++ ", " ++
-                                                 (from_java_json (snd elem)))
-                                         ")") l))
+                          ++ (map_concat "" (fun elem =>
+                                               bracketString
+                                                 ".add("
+                                                 (quotel ++ (fst elem) ++ quotel ++ ", " ++
+                                                         (from_java_json (snd elem)))
+                                                 ")") l)
             ++ ".toJsonObject()").
                
     Definition mk_java_json_primitive (obj:string) : java_json
@@ -224,13 +224,13 @@ Section NNRCtoJava.
            ("UnaryOperators."
               ++ opname
               ++ "("
-              ++ (joinStrings ", " (List.app sn [(from_java_json e)]))
+              ++ (concat ", " (List.app sn [(from_java_json e)]))
               ++ ")").
 
     Definition mk_java_collection(typ:string) (s:list string) : string
       := "new RuntimeUtils.CollectionBuilder<" ++ typ ++ ">("
            ++ (nat_to_string10 (Datatypes.length s)) ++ ")"
-           ++ joinStrings "" (map (fun elem => ".add(" ++ elem ++ ")") s)
+           ++ map_concat "" (fun elem => ".add(" ++ elem ++ ")") s
            ++ ".result()".
 
     Definition mk_java_string_collection(s:list string) : string
@@ -337,7 +337,7 @@ Section NNRCtoJava.
                        end
                      | OpLike pat oescape =>
                        let lc := make_like_clause pat oescape in
-                       mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (joinStrings "," (map like_clause_to_java lc)) ++ "}") e1
+                       mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (map_concat "," like_clause_to_java lc) ++ "}") e1
                      | OpLeft => mk_java_unary_op0 "left" e1
                      | OpRight => mk_java_unary_op0 "right" e1
                      | OpBrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1
@@ -456,7 +456,7 @@ Section NNRCtoJava.
       nnrcToJava n t i eol quotel ivs.
 
     Definition makeJavaParams (ivs: list(string*string)) :=
-      joinStrings ", " (map (fun elem => "JsonElement " ++ snd elem) ivs).
+      map_concat ", " (fun elem => "JsonElement " ++ snd elem) ivs.
 
     (* Free variables are assumed to be constant lookups *)
     Definition closeFreeVars (input:string) (e:nnrc) (ivs:list(string*string)) : nnrc :=

@@ -567,14 +567,13 @@ End MapString.
 (** Support for 'like' on strings *)
 
 Section Join.
-
-  Fixpoint joinStrings (delim:string) (l:list string) : string
-    := match l with
-       | nil => EmptyString
-       | x::nil => x
-       | x::ls => append x (append delim (joinStrings delim ls))
-       end.
-
+  Definition map_concat {A} separator (f:A -> string) (elems:list A) : string :=
+    match elems with
+    | nil => ""
+    | e :: elems' =>
+      (fold_left (fun acc e => acc ++ separator ++ (f e)) elems' (f e))%string
+    end.
+  
 End Join.
 
 Section Like.

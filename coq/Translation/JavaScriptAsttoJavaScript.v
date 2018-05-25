@@ -37,7 +37,7 @@ Section ToString.
     | S j => "  " ++ (indent j)
     end.
 
-  Definition comma_list l := joinStrings ", " l.
+  Definition comma_list l := concat ", " l.
 
   Definition string_of_literal
              (c: literal)
@@ -193,7 +193,7 @@ Section ToString.
           List.map (fun s => string_of_stat s (i+1)) l
       in
       "{" ++ eol ++
-          joinStrings (";"++eol) seq ++ eol ++
+          concat (";"++eol) seq ++ eol ++
       indent i ++ "}"
     | stat_var_decl l =>
       let decls :=
@@ -209,7 +209,7 @@ Section ToString.
           )
           l
     in
-    joinStrings (";"++eol) decls
+    concat (";"++eol) decls
   | stat_if e s1 s2_opt =>
     "if (" ++ string_of_expr e (i+1) ++ ") {" ++ eol ++
     string_of_stat s1 (i+1) ++ eol ++
@@ -295,7 +295,7 @@ Section ToString.
     match p with
     | prog_intro _ elems =>
       let elems' := List.map (fun e => string_of_element e i) elems in
-      joinStrings eol elems'
+      concat eol elems'
     end
 
   with string_of_funcbody

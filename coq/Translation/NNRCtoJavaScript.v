@@ -155,7 +155,7 @@ Section NNRCtoJavaScript.
 
     (* Java equivalent: JavaScriptBackend.brandsToJS *)
     Definition brandsToJs (quotel:string) (b:brands)
-      := bracketString "[" (joinStrings "," (map (fun x => bracketString quotel x quotel) b)) "]".
+      := bracketString "[" (map_concat "," (fun x => bracketString quotel x quotel) b) "]".
 
     (* Java equivalent: JavaScriptBackend.dataToJS *)
     Definition dataToJS (quotel:string) (d : data) : string :=
@@ -285,7 +285,7 @@ Section NNRCtoJavaScript.
                        end
                      | OpLike pat oescape =>
                        let lc := make_like_clause pat oescape in
-                       let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in
+                       let regex := "new RegExp([" ++ (map_concat "," like_clause_to_javascript lc) ++ "].join(" ++ quotel ++ quotel ++ "))" in
                        regex ++ ".test(" ++ e1 ++ ")"
                      | OpLeft => "{" ++ quotel ++ "left" ++ quotel ++ " : " ++ e1 ++ "}"
                      | OpRight => "{" ++ quotel ++ "right" ++ quotel ++ " : " ++ e1 ++ "}"
@@ -414,7 +414,7 @@ Section NNRCtoJavaScript.
 
     (* Java equivalent: JavaScriptBackend.makeJSParams *)
     Definition makeJSParams (ivs: list string) :=
-      joinStrings ", " ivs.
+      concat ", " ivs.
 
     (* Java equivalent: JavaScriptBackend.paramsToStringedParams *)
     Definition paramsToStringedParams (params : list string) :=

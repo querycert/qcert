@@ -70,7 +70,7 @@ Section tDNNRCtoSparkDF.
       let known_fields: list string :=
           map (fun p => "StructField(""" ++ fst p ++ """, " ++ rtype_to_spark_DataType (snd p) ++ ")")
               fields in
-      let known_struct := "StructType(Seq(" ++ joinStrings ", " known_fields ++ "))" in
+      let known_struct := "StructType(Seq(" ++ String.concat ", " known_fields ++ "))" in
       "StructType(Seq(StructField(""$blob"", StringType), StructField(""$known"", " ++ known_struct ++ ")))"
     | Either₀ l r =>
       "StructType(Seq(StructField(""$left"", " ++ rtype_to_spark_DataType l ++ "), StructField(""$right"", " ++ rtype_to_spark_DataType r ++ ")))"
@@ -124,12 +124,12 @@ Section tDNNRCtoSparkDF.
     | Coll₀ r, dcoll xs =>
       let element_type := rtype_to_scala_type r in
       let elements := map (fun x => scala_literal_data x r) xs in
-      "Array[" ++ element_type ++ "](" ++ joinStrings ", " elements ++ ")"
+      "Array[" ++ element_type ++ "](" ++ String.concat ", " elements ++ ")"
     | Rec₀ _ fts, drec fds =>
       let blob := quote_string (data_to_blob d) in
       let known_schema :=
           "StructType(Seq("
-            ++ joinStrings ", "
+            ++ String.concat ", "
             (map (fun ft =>
                     "StructField(""" ++ fst ft ++ """, " ++ rtype_to_spark_DataType (snd ft) ++ ")")
                  fts)
@@ -138,7 +138,7 @@ Section tDNNRCtoSparkDF.
                                    | Some d => scala_literal_data d (snd ft)
                                    | None => "FIELD_IN_TYPE_BUT_NOT_IN_DATA"
                                    end) fts in
-      let known := "srow(" ++ joinStrings ", " (known_schema :: fields) ++ ")" in
+      let known := "srow(" ++ String.concat ", " (known_schema :: fields) ++ ")" in
       "srow(StructType(Seq(StructField(""$blob"", StringType), StructField(""$known"", " ++ known_schema ++ "))), " ++ blob ++ ", " ++ known ++ ")"
     (* TODO Some of these can't happen, some are just not implemented *)
     | _, _ => "UNIMPLEMENTED_SCALA_LITERAL_DATA"
@@ -158,7 +158,7 @@ Section tDNNRCtoSparkDF.
     | CToString c =>
       "toQcertStringUDF(" ++ code_of_column c ++ ")"
     | CUDFCast bs c =>
-      "castUDF(" ++ joinStrings ", " ("INHERITANCE"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+      "castUDF(" ++ String.concat ", " ("INHERITANCE"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
     | CUDFUnbrand t c =>
       "unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
@@ -169,7 +169,7 @@ Section tDNNRCtoSparkDF.
     | DSSelect cs d =>
       let columns :=
           map (fun nc => code_of_column (snd nc) ++ ".as(""" ++ fst nc ++ """)") cs in
-      code_of_dataframe d ++ ".select(" ++ joinStrings ", " columns ++ ")"
+      code_of_dataframe d ++ ".select(" ++ String.concat ", " columns ++ ")"
     | DSFilter c d => code_of_dataframe d ++ ".filter(" ++ code_of_column c ++ ")"
     | DSCartesian d1 d2 => code_of_dataframe d1 ++ ".join(" ++ (code_of_dataframe d2) ++ ")"
     | DSExplode s d1 => code_of_dataframe d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
@@ -205,7 +205,7 @@ Section tDNNRCtoSparkDF.
         prefix ("dot[" ++ rtype_to_scala_type (proj1_sig r) ++ "](""" ++ n ++ """)")
       | None => "NONLOCAL EXPECTED TYPE IN DOT"
       end
-    | OpRecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
+    | OpRecProject fs => prefix ("recProject(" ++ String.concat ", " (map quote_string fs) ++ ")")
     | OpBag => prefix "Array"
     | OpFlatten => postfix "flatten.sorted(QcertOrdering)"
     | OpDistinct => postfix "distinct"
@@ -224,9 +224,9 @@ Section tDNNRCtoSparkDF.
 *)
     | OpLeft => prefix "left"
     | OpRight => prefix "right"
-    | OpBrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
+    | OpBrand bs => "brand(" ++ String.concat ", " (x::(map quote_string bs)) ++ ")"
     | OpCast bs =>
-      "cast(INHERITANCE, " ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
+      "cast(INHERITANCE, " ++ x ++ ", " ++ String.concat ", " (map quote_string bs) ++ ")"
     | OpUnbrand =>
       match lift_tlocal required_type with
       | Some (exist _ r _) =>
@@ -409,7 +409,7 @@ Section tDNNRCtoSparkDF.
     let lines :=
         map (fun p => "(""" ++ fst p ++ """ -> """ ++ snd p ++ """)")
             brand_relation_brands in
-    joinStrings ", " lines.
+    String.concat ", " lines.
 
   (* Walk through toplevel constant bindings and emit local scala bindings `val
     NAME = ...`. We read distributed collections as files in Spark's JSON format

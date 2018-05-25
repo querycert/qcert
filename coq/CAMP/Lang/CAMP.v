@@ -314,7 +314,7 @@ Section CAMP.
       := mk_err (" because the given field (" ++ s ++
                                               ") is not a valid constant") (pgetConstant s) bind it
                 ++ " The set of constants for this execution is: " ++
-                (bracketString "{" (joinStrings "; " (domain constant_env)) "}")
+                (bracketString "{" (String.concat "; " (domain constant_env)) "}")
                 ++ "\n".
 
     (** The alternative traced evaluation is defined as follows. *)
