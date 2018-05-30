@@ -43,6 +43,76 @@ Section NNRCimpishVars.
        | NNRCimpishGroupBy _ _ e₁ => nnrc_impish_expr_free_vars e₁
        end.
 
+  
+  Fixpoint nnrc_impish_stmt_free_env_vars (s:nnrc_impish_stmt) : list var
+    := match s with
+       | NNRCimpishSeq s₁ s₂ =>
+         nnrc_impish_stmt_free_env_vars s₁ ++ nnrc_impish_stmt_free_env_vars s₂
+       | NNRCimpishLet v e s₀ =>
+         nnrc_impish_expr_free_vars e ++ remove equiv_dec v (nnrc_impish_stmt_free_env_vars s₀)
+       | NNRCimpishLetMut v s₁ s₂ =>
+         nnrc_impish_stmt_free_env_vars s₁ ++ remove equiv_dec v (nnrc_impish_stmt_free_env_vars s₂)
+       | NNRCimpishLetMutColl v s₁ s₂ =>
+         nnrc_impish_stmt_free_env_vars s₁ ++ remove equiv_dec v (nnrc_impish_stmt_free_env_vars s₂)
+       | NNRCimpishAssign v e =>
+         nnrc_impish_expr_free_vars e
+       | NNRCimpishPush v e =>
+         nnrc_impish_expr_free_vars e
+       | NNRCimpishFor v e s₀ =>
+         nnrc_impish_expr_free_vars e ++ remove equiv_dec v (nnrc_impish_stmt_free_env_vars s₀)
+       | NNRCimpishIf e s₁ s₂ =>
+         nnrc_impish_expr_free_vars e ++
+                                    nnrc_impish_stmt_free_env_vars s₁ ++ nnrc_impish_stmt_free_env_vars s₂
+       | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
+         nnrc_impish_expr_free_vars e ++
+                                    remove equiv_dec x₁ (nnrc_impish_stmt_free_env_vars s₁) ++
+                                    remove equiv_dec x₂ (nnrc_impish_stmt_free_env_vars s₂)
+       end.
+
+  Fixpoint nnrc_impish_stmt_free_mcenv_vars (s:nnrc_impish_stmt) : list var
+    := match s with
+       | NNRCimpishSeq s₁ s₂ =>
+         nnrc_impish_stmt_free_mcenv_vars s₁ ++ nnrc_impish_stmt_free_mcenv_vars s₂
+       | NNRCimpishLet v e s₀ =>
+         nnrc_impish_stmt_free_mcenv_vars s₀
+       | NNRCimpishLetMut v s₁ s₂ =>
+         nnrc_impish_stmt_free_mcenv_vars s₁ ++ nnrc_impish_stmt_free_mcenv_vars s₂
+       | NNRCimpishLetMutColl v s₁ s₂ =>
+         remove equiv_dec v (nnrc_impish_stmt_free_mcenv_vars s₁) ++ nnrc_impish_stmt_free_mcenv_vars s₂
+       | NNRCimpishAssign v e =>
+         nil
+       | NNRCimpishPush v e =>
+         v::nil
+       | NNRCimpishFor v e s₀ =>
+         nnrc_impish_stmt_free_mcenv_vars s₀
+       | NNRCimpishIf e s₁ s₂ =>
+         nnrc_impish_stmt_free_mcenv_vars s₁ ++ nnrc_impish_stmt_free_mcenv_vars s₂
+       | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
+         nnrc_impish_stmt_free_mcenv_vars s₁ ++ nnrc_impish_stmt_free_mcenv_vars s₂
+       end.
+
+  Fixpoint nnrc_impish_stmt_free_mdenv_vars (s:nnrc_impish_stmt) : list var
+    := match s with
+       | NNRCimpishSeq s₁ s₂ =>
+         nnrc_impish_stmt_free_mdenv_vars s₁ ++ nnrc_impish_stmt_free_mdenv_vars s₂
+       | NNRCimpishLet v e s₀ =>
+         nnrc_impish_stmt_free_mdenv_vars s₀
+       | NNRCimpishLetMut v s₁ s₂ =>
+         remove equiv_dec v (nnrc_impish_stmt_free_mdenv_vars s₁) ++ nnrc_impish_stmt_free_mdenv_vars s₂
+       | NNRCimpishLetMutColl v s₁ s₂ =>
+         nnrc_impish_stmt_free_mdenv_vars s₁ ++ nnrc_impish_stmt_free_mdenv_vars s₂
+       | NNRCimpishAssign v e =>
+         v::nil
+       | NNRCimpishPush v e =>
+         nil
+       | NNRCimpishFor v e s₀ =>
+         nnrc_impish_stmt_free_mdenv_vars s₀
+       | NNRCimpishIf e s₁ s₂ =>
+         nnrc_impish_stmt_free_mdenv_vars s₁ ++ nnrc_impish_stmt_free_mdenv_vars s₂
+       | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
+         nnrc_impish_stmt_free_mdenv_vars s₁ ++ nnrc_impish_stmt_free_mdenv_vars s₂
+       end.
+
   Fixpoint nnrc_impish_stmt_bound_env_vars (s:nnrc_impish_stmt) : list var
     := match s with
        | NNRCimpishSeq s₁ s₂ =>
@@ -87,7 +157,7 @@ Section NNRCimpishVars.
          nnrc_impish_stmt_bound_mcenv_vars s₁ ++ nnrc_impish_stmt_bound_mcenv_vars s₂
        end.
 
-    Fixpoint nnrc_impish_stmt_bound_mdenv_vars (s:nnrc_impish_stmt) : list var
+  Fixpoint nnrc_impish_stmt_bound_mdenv_vars (s:nnrc_impish_stmt) : list var
     := match s with
        | NNRCimpishSeq s₁ s₂ =>
          nnrc_impish_stmt_bound_mdenv_vars s₁ ++ nnrc_impish_stmt_bound_mdenv_vars s₂
@@ -107,6 +177,6 @@ Section NNRCimpishVars.
          nnrc_impish_stmt_bound_mdenv_vars s₁ ++ nnrc_impish_stmt_bound_mdenv_vars s₂
        | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
          nnrc_impish_stmt_bound_mdenv_vars s₁ ++ nnrc_impish_stmt_bound_mdenv_vars s₂
-         end.
+       end.
   
 End NNRCimpishVars.

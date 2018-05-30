@@ -1077,7 +1077,6 @@ Section ListAdd.
         destruct (H _ inn); congruence.
     Qed.
 
-
     Fixpoint remove_all (x : A) (l : list A) : list A :=
       match l with
       | nil => nil
@@ -1154,6 +1153,16 @@ Section ListAdd.
       destruct (eqdec a v); congruence.
     Qed.
 
+    Lemma in_replace_all {v v':A} {l} {x} : 
+      In x (replace_all l v v') ->
+      x = v' \/ (x <> v /\ In x l).
+    Proof.
+      unfold replace_all; intros.
+      apply in_map_iff in H.
+      destruct H as [? [eqq inn]].
+      match_destr_in eqq; unfold equiv, complement in *; subst; eauto.
+    Qed.
+    
     Lemma replace_all_remove_neq l v0 v n:
       v <> v0 -> n <> v0 ->
       remove eqdec v0 
@@ -1186,6 +1195,44 @@ Section ListAdd.
           destruct (eqdec v' a); intuition.
     Qed.
 
+    Lemma replace_all_app (l1 l2:list A) v v' :
+      replace_all (l1 ++ l2) v v' = replace_all l1 v v' ++ replace_all l2 v v'.
+    Proof.
+      apply map_app.
+    Qed.
+
+    Lemma replace_all_nin_eq (l:list A) v v' :
+      ~ In v l -> replace_all l v v' = l.
+    Proof.
+      induction l; simpl; trivial.
+      match_destr; intuition; congruence.
+    Qed.
+
+    Lemma replace_all_remove_eq (l:list A) v v' :
+      replace_all (remove equiv_dec v l) v v' = remove equiv_dec v l.
+    Proof.
+      apply replace_all_nin_eq.
+      apply remove_In.
+    Qed.
+
+    Lemma remove_replace_all_comm (l:list A) v0 v v'  :
+      v0 <> v ->
+      v0 <> v' ->
+      remove equiv_dec v0 (replace_all l v v') =
+      replace_all (remove equiv_dec v0 l) v v'.
+    Proof.
+      intros.
+      induction l; simpl; trivial.
+      destruct (equiv_dec a v).
+      - rewrite e in *; clear e a.
+        destruct (eqdec v v); try congruence.
+        repeat (match_destr; [congruence | ]).
+        simpl; match_destr; congruence.
+      - destruct (eqdec a v); try congruence.
+        match_destr.
+        simpl; match_destr; try congruence.
+    Qed.
+    
     Definition flat_replace_all l (v:A) n
       := flat_map (fun x => if eqdec x v then n else (x::nil)) l.
 
@@ -1254,7 +1301,7 @@ Section ListAdd.
       - eauto.
     Qed.
     
-    Lemma replace_all_remove_eq (l : list A) (v n : A) :
+    Lemma replace_all_remove_eq' (l : list A) (v n : A) :
       map (fun x : A => if eqdec x v then n else x) (remove eqdec v l) = (remove eqdec v l).
     Proof.
       apply replace_all_nin.
@@ -1408,6 +1455,22 @@ Section ListAdd.
       unfold Proper, respectful, equivlist; intros; subst; firstorder.
     Qed.
 
+    Global Instance equivlist_cons_proper :
+      Proper (eq ==> equivlist ==> equivlist) (@cons A).
+    Proof.
+      unfold Proper, respectful, equivlist; simpl; intros ? a ? l1 l2 eqq x; subst.
+      split; intros [?|inn]; subst; eauto 2
+      ; right; apply eqq; trivial.
+    Qed.
+    
+    Global Instance incl_cons_proper :
+      Proper (eq ==> (@incl A) ==> (@incl A)) (@cons A).
+    Proof.
+      unfold Proper, respectful, incl; simpl; intros ? a ? l1 l2 eqq x; subst.
+      intros [?|inn]; subst; eauto 2
+      ; right; apply eqq; trivial.
+    Qed.
+    
     Lemma equivlist_dec {dec:EqDec A eq} (l1 l2:list A) :
       {equivlist l1 l2} + {~ equivlist l1 l2}.
     Proof.
@@ -1879,6 +1942,52 @@ Section ListAdd.
       split; intros disj; symmetry; symmetry in disj.
       - apply disjoint_rev_r; auto.
       - apply disjoint_rev_r in disj; auto.
+    Qed.
+
+    Lemma  disjoint_remove_swap {A} dec (v:A) l1 l2 :
+      disjoint (remove dec v l1) l2 <-> disjoint l1 (remove dec v l2).
+    Proof.
+      unfold disjoint; split; intros H x inn1 inn2.
+      - apply remove_inv in inn2.
+        apply (H x); try tauto.
+        apply remove_in_neq; tauto.
+      - apply remove_inv in inn1.
+        apply (H x); try tauto.
+        apply remove_in_neq; tauto.
+    Qed.
+
+    Global Instance disjoint_equivs {A} : Proper (equivlist ==> equivlist ==> iff) (@disjoint A).
+    Proof.
+      cut (Proper (equivlist ==> equivlist==> Basics.impl) (@disjoint A)).
+      {
+        unfold Proper, respectful, equivlist; unfold Basics.impl; split; [eauto | ].
+        symmetry in H0, H1; eauto.
+      }
+      unfold Proper, respectful, Basics.impl; intros l1 l1' eqq1 l2 l2' eqq2.
+      unfold equivlist, disjoint in *.
+      intros disj x inn1 inn2.
+      rewrite <- eqq1 in inn1.
+      rewrite <- eqq2 in inn2.
+      eauto.
+    Qed.
+
+    Global Instance disjoint_incl_proper {A} : Proper ((@incl A) --> (@incl A) --> Basics.impl) (@disjoint A).
+    Proof.
+      unfold Proper, respectful, Basics.impl, Basics.flip; intros l1 l1' eqq1 l2 l2' eqq2.
+      unfold incl, disjoint in *.
+      intros disj x inn1 inn2.
+      eauto.
+    Qed.
+
+    Lemma disjoint_replace_all {A:Type} {dec:EqDec A eq} (v v':A) l l' : 
+      disjoint l l' ->
+      ~ In v' l ->
+      disjoint l (replace_all l' v v').
+    Proof.
+      unfold disjoint, replace_all; intros.
+      apply in_map_iff in H2.
+      destruct H2 as [? [eqq inn]].
+      match_destr_in eqq; unfold equiv, complement in *; subst; eauto.
     Qed.
     
   End Disjoint.

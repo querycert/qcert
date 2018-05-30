@@ -186,6 +186,7 @@ MODULES = \
 	NNRCimpish/Lang/NNRCimpish \
 	NNRCimpish/Lang/NNRCimpishSize \
 	NNRCimpish/Lang/NNRCimpishVars \
+	NNRCimpish/Lang/NNRCimpishRename \
 	NNRCimpish/Lang/NNRCimpishNorm \
 	NNRCimpish/Lang/NNRCimpishSem \
 	NNRCimpish/Lang/NNRCimpishEval \

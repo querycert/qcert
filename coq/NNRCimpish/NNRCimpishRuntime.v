@@ -22,3 +22,5 @@ Require Export NNRCimpishEval.
 Require Export NNRCimpishSem.
 Require Export NNRCimpishSemEval.
 Require Export NNRCimpishNorm.
+Require Export NNRCimpishRename.
+Require Export NNRCimpishCrossShadow.

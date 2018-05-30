@@ -567,14 +567,14 @@ Section Assoc.
   End Defn.
 
   Lemma map_codomain_update_first {A B C} (f:B->C) dec (l:list (A*B)) v d :
-      map_codomain f (update_first dec l v d) =
-      update_first dec (map_codomain f l) v (f d).
-    Proof.
-      induction l; simpl; trivial.
-      destruct a; simpl.
-      destruct (dec v a); simpl; trivial.
-      rewrite IHl; trivial.
-    Qed.
+    map_codomain f (update_first dec l v d) =
+    update_first dec (map_codomain f l) v (f d).
+  Proof.
+    induction l; simpl; trivial.
+    destruct a; simpl.
+    destruct (dec v a); simpl; trivial.
+    rewrite IHl; trivial.
+  Qed.
 
 
   Lemma Forall2_lookup_none {K A B} {P:A->B->Prop}
@@ -1041,6 +1041,19 @@ Section Assoc.
     unfold codomain. rewrite map_app; trivial.
   Qed.
 
+  Lemma app_inv_head_domain {A B:Type} {l1 l2 l1' l2' : list (A*B)} :
+    l1 ++ l2 = l1' ++ l2' ->
+    domain l1' = domain l1 ->
+    l1 = l1' /\ l2 = l2'.
+  Proof.
+    intros eqq domeq.
+    apply app_inv_head_length in eqq; trivial.
+    rewrite <- domain_length.
+    unfold domain in *.
+    rewrite <- domeq.
+    rewrite map_length; trivial.
+  Qed.
+  
   Section distinctdom.
     (* CLEANUP: could generalize bdistinct to work over an equivalence
    relation and then use the fst projection of an equivalence relation *)

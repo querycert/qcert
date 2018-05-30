@@ -558,11 +558,11 @@ Section cNNRCVars.
     - intros; f_equal; intuition.
     - intuition. f_equal; auto.
       destruct (string_eqdec v0 v); unfold equiv in *; subst.
-      + rewrite (replace_all_remove_eq (nnrc_free_vars e2) v n); trivial.
+      + rewrite (replace_all_remove_eq' (nnrc_free_vars e2) v n); trivial.
       + rewrite H2. apply replace_all_remove_neq; auto.
     - intuition. f_equal; auto.
       destruct (string_eqdec v0 v); unfold equiv in *; subst.
-      + rewrite (replace_all_remove_eq (nnrc_free_vars e2) v n); trivial.
+      + rewrite (replace_all_remove_eq' (nnrc_free_vars e2) v n); trivial.
       + rewrite H2. apply replace_all_remove_neq; auto.
     - intros. rewrite nin_app_or in H; destruct H as [? HH].
       rewrite nin_app_or in HH; intuition. 
@@ -575,8 +575,8 @@ Section cNNRCVars.
       rewrite IHe1; trivial.
       f_equal.
       match_destr; match_destr; unfold equiv in *; subst;
-        try rewrite (replace_all_remove_eq (nnrc_free_vars e2) v n);
-        try rewrite (replace_all_remove_eq (nnrc_free_vars e3) v n);
+        try rewrite (replace_all_remove_eq' (nnrc_free_vars e2) v n);
+        try rewrite (replace_all_remove_eq' (nnrc_free_vars e3) v n);
         trivial;
         repeat rewrite <- (replace_all_remove_neq) by congruence;
         try rewrite IHe2 by congruence;

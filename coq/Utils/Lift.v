@@ -20,6 +20,7 @@ code to propagate errors. *)
 
 Require Import List.
 Require Import RelationClasses.
+Require Import EquivDec.
 
 Section Lift.
 
@@ -202,31 +203,77 @@ Section Lift.
        | _ , _ => False
        end.
 
-      Global Instance lift2P_refl {A:Type} R {refl:@Reflexive A R} : Reflexive (lift2P R).
-    Proof.
-      unfold lift2P; intros x.
-      destruct x; eauto. 
-    Qed.
+  Global Instance lift2P_refl {A:Type} R {refl:@Reflexive A R} : Reflexive (lift2P R).
+  Proof.
+    unfold lift2P; intros x.
+    destruct x; eauto. 
+  Qed.
 
-    Global Instance lift2P_sym {A:Type} R {refl:@Symmetric A R} : Symmetric (lift2P R).
-    Proof.
-      unfold lift2P; intros  x y.
-      destruct x; destruct y; eauto.
-    Qed.
+  Global Instance lift2P_sym {A:Type} R {refl:@Symmetric A R} : Symmetric (lift2P R).
+  Proof.
+    unfold lift2P; intros  x y.
+    destruct x; destruct y; eauto.
+  Qed.
 
-    Global Instance lift2P_trans {A:Type} R {refl:@Transitive A R} : Transitive (lift2P R).
-    Proof.
-      unfold lift2P; intros x y z.
-      destruct x; destruct y; destruct z; try contradiction; eauto.
-    Qed.
+  Global Instance lift2P_trans {A:Type} R {refl:@Transitive A R} : Transitive (lift2P R).
+  Proof.
+    unfold lift2P; intros x y z.
+    destruct x; destruct y; destruct z; try contradiction; eauto.
+  Qed.
 
-    Global Instance lift2P_equiv {A:Type} R {refl:@Equivalence A R} : Equivalence (lift2P R).
-    Proof.
-      constructor.
-      - red; intros; reflexivity.
-      - red; intros; symmetry; trivial.
-      - red; intros; etransitivity; eauto.
-    Qed.
+  Global Instance lift2P_equiv {A:Type} R {refl:@Equivalence A R} : Equivalence (lift2P R).
+  Proof.
+    constructor.
+    - red; intros; reflexivity.
+    - red; intros; symmetry; trivial.
+    - red; intros; etransitivity; eauto.
+  Qed.
+
+  (* lazy lifting *)
+  Definition mk_lazy_lift {A B:Type} {dec:EqDec A eq} (f:B->A->A->B) b a1 a2
+    := if a1 == a2
+       then b
+       else f b a1 a2.
+
+  Lemma mk_lazy_lift_id {A B:Type} {dec:EqDec A eq} (f:B->A->A->B) b a :
+    mk_lazy_lift f b a a = b.
+  Proof.
+    unfold mk_lazy_lift.
+    destruct (equiv_dec a a); congruence.
+  Qed.
+  
+  Lemma mk_lazy_lift_prop
+        {A B:Type} {dec:EqDec A eq} (f:B->A->A->B) {P} {s v1 v2} :
+    (v1 = v2 -> P s) -> (v1 <> v2 -> P (f s v1 v2)) -> P (mk_lazy_lift f s v1 v2).
+  Proof.
+    unfold mk_lazy_lift.
+    destruct (equiv_dec v1 v2); tauto.
+  Qed.
+
+  Lemma mk_lazy_lift_prop_inv
+        {A B:Type} {dec:EqDec A eq} (f:B->A->A->B) {P:B->Prop} {s v1 v2} :
+    P (mk_lazy_lift f s v1 v2) -> {v1 = v2 /\ P s} + {v1 <> v2 /\ P (f s v1 v2)}.
+  Proof.
+    unfold mk_lazy_lift.
+    destruct (equiv_dec v1 v2); eauto.
+  Qed.
+
+  Lemma mk_lazy_lift_prop_invt
+        {A B:Type} {dec:EqDec A eq} (f:B->A->A->B) {P:B->Type} {s v1 v2} :
+    P (mk_lazy_lift f s v1 v2) -> (P s + {v1=v2}) + (P (f s v1 v2) + {v1<>v2}).
+  Proof.
+    unfold mk_lazy_lift.
+    destruct (equiv_dec v1 v2); tauto.
+  Qed.
+
+  Lemma mk_lazy_lift_under
+        {A B C:Type} {dec:EqDec A eq} {f1:B->C} {f2:B->A->A->B}:
+    (forall s v v', f1 (f2 s v v') = f1 s) ->
+    forall s v v',  f1 (mk_lazy_lift f2 s v v') = f1 s.
+  Proof.
+    unfold mk_lazy_lift; intros.
+    destruct (equiv_dec v v'); eauto.
+  Qed.
 
 End Lift.
 

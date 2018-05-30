@@ -369,6 +369,36 @@ Section NNRCimpishEval.
             simpl in IHs2; invcs IHs2; trivial.
     Qed.
 
+    Lemma nnrc_impish_stmt_eval_domain_stack {s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂} :
+      nnrc_impish_stmt_eval σc σ₁ ψc₁ ψd₁ s = Some (σ₂ , ψc₂, ψd₂ ) ->
+      σ₁ = σ₂
+      /\ domain ψc₁ = domain ψc₂
+      /\ domain ψd₁ = domain ψd₂.
+    Proof.
+      repeat split.
+      - eapply nnrc_impish_stmt_eval_env_stack; eauto.
+      - eapply nnrc_impish_stmt_eval_mcenv_domain_stack; eauto.
+      - eapply nnrc_impish_stmt_eval_mdenv_domain_stack; eauto.
+    Qed.
+
+    Local Close Scope string.
+    
+    Lemma nnrc_impish_expr_eval_group_by_unfold σc σ g sl e :
+      nnrc_impish_expr_eval σc σ (NNRCimpishGroupBy g sl e) = 
+      match nnrc_impish_expr_eval σc σ e with
+      | Some (dcoll dl) => lift dcoll (group_by_nested_eval_table g sl dl)
+      | _ => None
+      end.
+    Proof.
+      reflexivity.
+    Qed.
+
+  End props.
+
+  Section eval_eqs.
+
+    Local Close Scope string.
+
     Lemma nnrc_impish_expr_eval_same σc pd₁ pd₂ e :
       lookup_equiv_on (nnrc_impish_expr_free_vars e) pd₁ pd₂ ->
       nnrc_impish_expr_eval σc pd₁ e = nnrc_impish_expr_eval σc pd₂ e.
@@ -383,9 +413,7 @@ Section NNRCimpishEval.
       - rewrite (IHe _ _ H); trivial.
       - rewrite (IHe _ _ H); trivial.
     Qed.
-
-    Local Close Scope string.
-
+    
     Lemma nnrc_impish_expr_eval_free_env σc (l1 l2 l3:pd_bindings) e :
       disjoint (nnrc_impish_expr_free_vars e) (domain l2) ->
       nnrc_impish_expr_eval σc (l1 ++ l2 ++ l3) e
@@ -415,17 +443,572 @@ Section NNRCimpishEval.
       repeat rewrite app_nil_r; auto.
     Qed.
     
-    Lemma nnrc_impish_expr_eval_group_by_unfold σc σ g sl e :
-      nnrc_impish_expr_eval σc σ (NNRCimpishGroupBy g sl e) = 
-      match nnrc_impish_expr_eval σc σ e with
-      | Some (dcoll dl) => lift dcoll (group_by_nested_eval_table g sl dl)
-      | _ => None
-      end.
+    Lemma nnrc_impish_expr_eval_unused_env c l σ e v d :
+      (In v (domain l) 
+       \/ ~ In v (nnrc_impish_expr_free_vars e)) ->
+      nnrc_impish_expr_eval c (l ++ (v, d) :: σ) e
+      = nnrc_impish_expr_eval c (l ++ σ) e.
     Proof.
-      reflexivity.
+      intros inn.
+      apply nnrc_impish_expr_eval_same.
+      unfold lookup_equiv_on; simpl; intros.
+      repeat rewrite lookup_app.
+      match_case; intros.
+      simpl.
+      match_destr; unfold equiv in *.
+      subst.
+      apply lookup_none_nin in H0.
+      tauto.
     Qed.
 
-  End props.
+    Section swap.
+      
+      Lemma nnrc_impish_expr_eval_swap_env c l σ e v₁ v₂ d₁ d₂:
+        v₁ <> v₂ ->
+        nnrc_impish_expr_eval c (l++(v₁,d₁)::(v₂,d₂)::σ) e =
+        nnrc_impish_expr_eval c (l++(v₂,d₂)::(v₁,d₁)::σ) e.
+      Proof.
+        intros neq.
+        apply nnrc_impish_expr_eval_same.
+        unfold lookup_equiv_on; simpl; intros.
+        repeat rewrite lookup_app.
+        match_destr.
+        simpl.
+        repeat match_destr.
+        congruence.
+      Qed.
+
+      Lemma nnrc_impish_stmt_eval_swap_env c l σ ψc ψd s v₁ v₂ d₁ d₂:
+        v₁ <> v₂ ->
+        lift2P
+          (fun '(σ₁', ψc₁', ψd₁') '(σ₂', ψc₂', ψd₂') =>
+             (forall l' d₁' d₂' σ'',
+                 domain l' = domain l ->
+                 σ₁' = l' ++ (v₁,d₁')::(v₂,d₂')::σ'' ->
+                 σ₂' = l' ++ (v₂,d₂')::(v₁,d₁')::σ'')
+             /\ ψc₁' = ψc₂'
+             /\ ψd₁' = ψd₂'
+          )
+          (nnrc_impish_stmt_eval c (l++(v₁,d₁)::(v₂,d₂)::σ) ψc ψd s)
+          (nnrc_impish_stmt_eval c (l++(v₂,d₂)::(v₁,d₁)::σ) ψc ψd s).
+      Proof.
+        intros neq.
+        revert l σ ψc ψd d₁ d₂.
+        nnrc_impish_stmt_cases (induction s) Case
+        ; simpl; intros l σ ψc ψd d₁ d₂.
+        - Case "NNRCimpishSeq"%string.
+          specialize (IHs1 l σ ψc ψd d₁ d₂).
+          unfold lift2P in *.
+          repeat match_option_in IHs1; try contradiction.
+          destruct p as [[??]?].
+          destruct p0 as [[??]?].
+          destruct IHs1 as [eqs1 [eqs2 eqs3]].
+          subst.
+          apply nnrc_impish_stmt_eval_domain_stack in eqq.
+          destruct eqq as [eqd1 [eqd2 eqd3]].
+          subst.
+          specialize (eqs1 _ _ _ _ (eq_refl _) (eq_refl _)).
+          subst.
+          specialize (IHs2 l σ m1 m2 d₁ d₂).
+          repeat match_option_in IHs2; try contradiction.
+        - Case "NNRCimpishLet"%string.
+          rewrite nnrc_impish_expr_eval_swap_env by trivial.
+          match_destr; simpl; trivial.
+          unfold lift2P in *.
+          specialize (IHs ((v, Some d) :: l) σ ψc ψd d₁ d₂).
+          simpl in IHs.
+          unfold var in *.
+          repeat match_option_in IHs; try contradiction.
+          destruct p as [[??]?].
+          destruct p0 as [[??]?].
+          destruct IHs as [eqs1 [eqs2 eqs3]].
+          subst.
+          apply nnrc_impish_stmt_eval_domain_stack in eqq.
+          destruct eqq as [eqd1 [eqd2 eqd3]].
+          subst.
+          specialize (eqs1 ((v,Some d)::l) _ _ _ (eq_refl _) (eq_refl _)).
+          subst; simpl.
+          repeat split; trivial; intros.
+          apply app_inv_head_domain in H0; trivial.
+          destruct H0 as [eql1 eql2].
+          invcs eql2; trivial.
+        - Case "NNRCimpishLetMut"%string.
+          specialize (IHs1 l σ ψc ((v, None) :: ψd) d₁ d₂).
+          unfold lift2P in *.
+          repeat match_option_in IHs1; try contradiction.
+          destruct p as [[??]?].
+          destruct p0 as [[??]?].
+          destruct IHs1 as [eqs1 [eqs2 eqs3]]; subst.
+          apply nnrc_impish_stmt_eval_domain_stack in eqq.
+          destruct eqq as [eqd1 [eqd2 eqd3]]; subst.
+          destruct m2; try discriminate.
+          destruct p; simpl in *.
+          simpl in eqd3; invcs eqd3.
+          specialize (eqs1 _ _ _ _ (eq_refl _) (eq_refl _)); subst.
+          specialize (IHs2 ((s, o) :: l) σ m1 m2 d₁ d₂).
+          simpl in *.
+          unfold var in *.
+          repeat match_option_in IHs2; try contradiction.
+          destruct p as [[??]?].
+          destruct p0 as [[??]?].
+          apply nnrc_impish_stmt_eval_domain_stack in eqq.
+          destruct eqq as [eqd1' [eqd2' eqd3']]; subst.
+          destruct IHs2 as [eqs1' [eqs2' eqs3']]; subst.
+          specialize (eqs1' ((s,o)::l) _ _ _ (eq_refl _) (eq_refl _)); subst; simpl.
+          repeat split; trivial; intros.
+          apply app_inv_head_domain in H0; trivial.
+          destruct H0 as [eql1 eql2].
+          invcs eql2; trivial.
+        - Case "NNRCimpishLetMutColl"%string.
+          specialize (IHs1 l σ ((v,nil)::ψc) ψd d₁ d₂).
+          unfold lift2P in *.
+          repeat match_option_in IHs1; try contradiction.
+          destruct p as [[??]?].
+          destruct p0 as [[??]?].
+          destruct IHs1 as [eqs1 [eqs2 eqs3]]; subst.
+          apply nnrc_impish_stmt_eval_domain_stack in eqq.
+          destruct eqq as [eqd1 [eqd2 eqd3]]; subst.
+          destruct m1; try discriminate.
+          destruct p; simpl in *.
+          simpl in eqd3; invcs eqd3.
+          specialize (eqs1 _ _ _ _ (eq_refl _) (eq_refl _)); subst.
+          specialize (IHs2 ((v, (Some (dcoll l0))) :: l) σ m1 m2 d₁ d₂).
+          simpl in *.
+          unfold var in *.
+          repeat match_option_in IHs2; try contradiction.
+          destruct p as [[??]?].
+          destruct p0 as [[??]?].
+          apply nnrc_impish_stmt_eval_domain_stack in eqq.
+          destruct eqq as [eqd1' [eqd2' eqd3']]; subst.
+          destruct IHs2 as [eqs1' [eqs2' eqs3']]; subst.
+          specialize (eqs1' ((v,Some (dcoll l0))::l) _ _ _ (eq_refl _) (eq_refl _)); subst; simpl.
+          repeat split; trivial; intros.
+          apply app_inv_head_domain in H1; trivial.
+          destruct H1 as [eql1 eql2].
+          invcs eql2; trivial.
+        - Case "NNRCimpishAssign"%string.
+          rewrite nnrc_impish_expr_eval_swap_env by trivial.
+          destruct (nnrc_impish_expr_eval c (l ++ (v₂, d₂) :: (v₁, d₁) :: σ) n); simpl; trivial.
+          match_destr; simpl; trivial.
+          repeat split; trivial; intros.
+          apply app_inv_head_domain in H0; trivial.
+          destruct H0 as [eql1 eql2].
+          invcs eql2; trivial.
+        - Case "NNRCimpishPush"%string.
+          rewrite nnrc_impish_expr_eval_swap_env by trivial.
+          destruct (nnrc_impish_expr_eval c (l ++ (v₂, d₂) :: (v₁, d₁):: σ) n); simpl; trivial.
+          match_destr; simpl; trivial.
+          repeat split; trivial; intros.
+          apply app_inv_head_domain in H0; trivial.
+          destruct H0 as [eql1 eql2].
+          invcs eql2; trivial.
+        - Case "NNRCimpishFor"%string.
+          rewrite nnrc_impish_expr_eval_swap_env by trivial.
+          destruct (nnrc_impish_expr_eval c (l ++ (v₂, d₂) :: (v₁, d₁) :: σ) n); simpl; trivial.
+          match_destr; simpl; trivial.
+          revert l σ ψc ψd d₁ d₂
+          ; induction l0
+          ; intros l σ ψc ψd d₁ d₂; simpl.
+          + repeat split; trivial; intros.
+            apply app_inv_head_domain in H0; trivial.
+            destruct H0 as [eql1 eql2].
+            invcs eql2; trivial.
+          + specialize (IHs ((v, Some a) :: l) σ ψc ψd d₁ d₂).
+            simpl in IHs.
+            unfold lift2P in *.
+            unfold var in *.
+            repeat match_option_in IHs; try contradiction.
+            destruct p as [[??]?].
+            destruct p0 as [[??]?].
+            destruct IHs as [eqs1 [eqs2 eqs3]].
+            subst.
+            apply nnrc_impish_stmt_eval_domain_stack in eqq.
+            destruct eqq as [eqd1 [eqd2 eqd3]].
+            subst.
+            specialize (eqs1 ((v,Some a)::l) _ _ _ (eq_refl _) (eq_refl _)).
+            subst; simpl.
+            specialize (IHl0 l σ m1 m2 d₁ d₂).
+            simpl in *.
+            unfold lift2P in *.
+            unfold var in *.
+            repeat match_option_in IHl0; try contradiction.
+        - Case "NNRCimpishIf"%string.
+          rewrite nnrc_impish_expr_eval_swap_env by trivial.
+          match_destr; simpl; trivial.
+          destruct d; simpl; trivial.
+          destruct b; eauto.
+        - Case "NNRCimpishEither"%string.
+          rewrite nnrc_impish_expr_eval_swap_env by trivial.
+          match_destr; simpl; trivial.
+          destruct d; simpl; trivial.
+          + unfold lift2P in *.
+            specialize (IHs1 ((v, Some d) :: l) σ ψc ψd d₁ d₂).
+            simpl in IHs1.
+            unfold var in *.
+            repeat match_option_in IHs1; try contradiction.
+            destruct p as [[??]?].
+            destruct p0 as [[??]?].
+            destruct IHs1 as [eqs1 [eqs2 eqs3]].
+            subst.
+            apply nnrc_impish_stmt_eval_domain_stack in eqq.
+            destruct eqq as [eqd1 [eqd2 eqd3]].
+            subst.
+            specialize (eqs1 ((v,Some d)::l) _ _ _ (eq_refl _) (eq_refl _)).
+            subst; simpl.
+            repeat split; trivial; intros.
+            apply app_inv_head_domain in H0; trivial.
+            destruct H0 as [eql1 eql2].
+            invcs eql2; trivial.
+          + unfold lift2P in *.
+            specialize (IHs2 ((v0, Some d) :: l) σ ψc ψd d₁ d₂).
+            simpl in IHs2.
+            unfold var in *.
+            repeat match_option_in IHs2; try contradiction.
+            destruct p as [[??]?].
+            destruct p0 as [[??]?].
+            destruct IHs2 as [eqs1 [eqs2 eqs3]].
+            subst.
+            apply nnrc_impish_stmt_eval_domain_stack in eqq.
+            destruct eqq as [eqd1 [eqd2 eqd3]].
+            subst.
+            specialize (eqs1 ((v0,Some d)::l) _ _ _ (eq_refl _) (eq_refl _)).
+            subst; simpl.
+            repeat split; trivial; intros.
+            apply app_inv_head_domain in H0; trivial.
+            destruct H0 as [eql1 eql2].
+            invcs eql2; trivial.
+      Qed.
+
+    End swap.
+
+    Section unused.
+
+      
+      Ltac disect_tac H stac
+        := 
+          unfold var in *
+          ; cut_to H; unfold domain in *; [ | solve[stac]..]
+          ; unfold lift2P in H
+          ; (repeat match_option_in H; try contradiction).
+
+      Ltac rename_inv_tac1 stac
+        :=    unfold var in *
+              ; repeat rewrite or_assoc
+              ; try match goal with
+                    | [ H: domain (_ ++ _) = domain _ |- _ ] =>
+                      rewrite domain_app in H
+                      ; unfold domain in H
+                      ; symmetry in H; apply map_app_break in H
+                      ; destruct H as [? [?[?[??]]]]; subst; simpl in *
+                    | [ H: map (_ ++ _) = map _ |- _ ] =>
+                      rewrite map_app in H
+                      ; symmetry in H; apply map_app_break in H
+                      ; destruct H as [? [?[?[??]]]]; subst; simpl in *
+                    | [ H: _ :: _ = map _ ?x |- _ ] =>
+                      destruct x; try discriminate; simpl in H; invcs H
+                    | [ H: _ :: _ = domain ?x |- _ ] =>
+                      destruct x; try discriminate; simpl in H; invcs H
+                    | [H: _ * _ * _ |- _ ] => destruct H as [[??]?]; simpl in *
+                    | [H: _ * _ |- _ ] => destruct H as [??]; simpl in *
+                    | [H : nnrc_impish_stmt_eval _ ?p1 _ _ _ = Some (?p2,_,_) |- _ ] =>
+                      match p1 with
+                      | p2 => fail 1
+                      | _ => generalize (nnrc_impish_stmt_eval_domain_stack H)
+                             ; intros [?[??]]
+                      end
+                    | [H: ~ (_ \/ _) |- _] => apply not_or in H
+                    | [H: _ /\ _ |- _ ] => destruct H
+                    | [H: ?x = ?x |- _] => clear H
+                    | [ H: forall a b c, _ -> ?x :: ?x1 ++ ?dd :: ?x2 = _ ++ _ :: _ -> _ |- _] =>
+                      specialize (H (x::x1) (snd dd) x2); simpl in H
+                      ; match dd with
+                        | (_,_) => idtac
+                        | _ => destruct dd
+                        end
+                      ; simpl in *
+                      ; cut_to H; [ | eauto 3 | reflexivity]
+                    | [ H: forall a b c, _ -> ?x1 ++ ?dd :: ?x2 = _ ++ _ :: _ -> _ |- _] =>
+                      specialize (H x1 (snd dd) x2)
+                      ; match dd with
+                        | (_,_) => idtac
+                        | _ => destruct dd
+                        end
+                      ; simpl in *
+                      ; cut_to H; [ | eauto 3 | reflexivity]
+                    | [H : ?x ++ _ = ?y ++ _ |- _ ] =>
+                      let HH := fresh in
+                      assert (HH:domain y = domain x) by (unfold domain in *; intuition congruence)
+                      ; apply app_inv_head_domain in H;[clear HH|apply HH]
+                    | [H: _ :: _ = _ :: _ |- _] => invcs H
+                    | [H: ?x = (_,_) |- _ ] =>
+                      match x with
+                      | (_,_) => idtac
+                      | _ => destruct x; simpl in H
+                      end
+                      ; invcs H
+                    | [H: (_,_) = ?x |- _ ] =>
+                      match x with
+                      | (_,_) => fail 1
+                      | _ => destruct x; simpl in H
+                      end
+                      ; invcs H
+                    | [|- _ /\ _ ] => try split; [| tauto]
+                    | [ |- lift2P _ (match ?x with
+                                       _ => _
+                                     end)
+                                  (match ?x with
+                                     _ => _
+                                   end) ] => destruct x; try reflexivity
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (nnrc_impish_stmt_eval _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s)
+                                                        _ ] => specialize (H l σ ψc ψd d)
+                                                               ; disect_tac H stac
+
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (match nnrc_impish_stmt_eval _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
+                                                           | Some _ => _
+                                                           | None => _
+                                                           end) _ ] => specialize (H l σ ψc ψd d)
+                                                                       ; disect_tac H stac
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (match nnrc_impish_stmt_eval _ (?x :: ?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
+                                                           | Some _ => _
+                                                           | None => _
+                                                           end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
+                                                                       ; disect_tac H stac
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (nnrc_impish_stmt_eval _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s)
+                                                        _ ] => specialize (H l σ ψc ψd d)
+                                                               ; disect_tac H stac
+
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (match nnrc_impish_stmt_eval _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s with
+                                                           | Some _ => _
+                                                           | None => _
+                                                           end) _ ] => specialize (H l σ ψc ψd d)
+                                                                       ; disect_tac H stac
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (match nnrc_impish_stmt_eval _ ?σ ?ψc (?x::?l ++ (_, ?d) :: ?ψd) ?s with
+                                                           | Some _ => _
+                                                           | None => _
+                                                           end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
+                                                                       ; disect_tac H stac
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (nnrc_impish_stmt_eval _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s)
+                                                        _ ] => specialize (H l σ ψc ψd d)
+                                                               ; disect_tac H stac
+
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (match nnrc_impish_stmt_eval _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
+                                                           | Some _ => _
+                                                           | None => _
+                                                           end) _ ] => specialize (H l σ ψc ψd d)
+                                                                       ; disect_tac H stac
+                    | [H:forall l es ec ed d, _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ ?s) _
+                                                          
+                                              |- lift2P _ (match nnrc_impish_stmt_eval _ ?σ (?x::?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
+                                                           | Some _ => _
+                                                           | None => _
+                                                           end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
+                                                                       ; disect_tac H stac
+
+                                                                                    
+                    | [H : ~ In _ (remove equiv_dec _ _) |- _ ] =>
+                      apply not_in_remove_impl_not_in in H; [| congruence]
+                    | [H : In _ (remove equiv_dec _ _) -> False |- _ ] =>
+                      apply not_in_remove_impl_not_in in H; [| congruence]
+                    | [H1: ?x = Some ?y,
+                           H2: ?x = Some ?z |- _ ] =>
+                      rewrite H1 in H2; invcs H2
+                    | [|- ?x = ?y \/ _ ] => destruct (x == y); unfold equiv, complement in *
+                                            ; [left; trivial | right]
+                    end
+              ; try subst; simpl in *; intros
+              ; try congruence
+      .
+      Ltac unused_inv_tac := repeat progress (try rename_inv_tac1 ltac:( unused_inv_tac ; intuition unused_inv_tac); try rewrite nnrc_impish_expr_eval_unused_env by tauto).
+
+      Lemma nnrc_impish_stmt_eval_unused_env c l σ ψc ψd s v d:
+        (In v (domain l) \/
+         ~ In v (nnrc_impish_stmt_free_env_vars s)) ->
+        lift2P
+          (fun '(σ₁', ψc₁', ψd₁') '(σ₂', ψc₂', ψd₂') =>
+             (forall l' d' σ'',
+                 domain l' = domain l ->
+                 σ₁' = l' ++ (v,d')::σ'' ->
+                 σ₂' = l' ++ σ''
+                 /\ ψc₁' = ψc₂'
+                 /\ ψd₁' = ψd₂'
+                 /\ d = d')
+          )
+          (nnrc_impish_stmt_eval c (l++(v,d)::σ) ψc ψd s)
+          (nnrc_impish_stmt_eval c (l++σ) ψc ψd s).
+      Proof.
+        revert l σ ψc ψd d.
+        nnrc_impish_stmt_cases (induction s) Case
+        ; simpl; intros l σ ψc ψd d inn
+        ; repeat rewrite in_app_iff in inn
+        ; unused_inv_tac.
+        - Case "NNRCimpishFor"%string.
+          revert l σ ψc ψd d inn
+          ; induction l0
+          ; intros l σ ψc ψd d inn; simpl.
+          + unused_inv_tac.
+          + unused_inv_tac.
+            specialize (IHl0 l σ m m0 d inn).
+            unused_inv_tac.
+      Qed.
+
+      Lemma nnrc_impish_stmt_eval_unused_mdenv c l σ ψc ψd s v d:
+        (In v (domain l) \/
+         ~ In v (nnrc_impish_stmt_free_mdenv_vars s)) ->
+        lift2P
+          (fun '(σ₁', ψc₁', ψd₁') '(σ₂', ψc₂', ψd₂') =>
+             (forall l' d' ψd'',
+                 domain l' = domain l ->
+                 ψd₁' = l' ++ (v,d')::ψd'' ->
+                 σ₁' = σ₂'
+                 /\ ψc₁' = ψc₂'
+                 /\ ψd₂' = l' ++ ψd''
+                 /\ d = d')
+          )
+          (nnrc_impish_stmt_eval c σ ψc (l++(v,d)::ψd)   s)
+          (nnrc_impish_stmt_eval c σ  ψc (l++ψd) s).
+      Proof.
+        revert l σ ψc ψd d.
+        nnrc_impish_stmt_cases (induction s) Case
+        ; simpl; intros l σ ψc ψd d inn
+        ; repeat rewrite in_app_iff in inn
+        ; unused_inv_tac.
+        - Case "NNRCimpishAssign"%string.
+          repeat rewrite lookup_app.
+          case_eq (lookup string_dec l v0); intros.
+          + repeat split; trivial.
+            assert (In v0 (domain l)) by (eapply lookup_in_domain; eauto).
+            rewrite update_app_in in H1 by trivial.
+            rewrite update_app_in by trivial.
+            apply app_inv_head_domain in H1.
+            * destruct H1 as [? eqq].
+              invcs eqq; trivial.
+            * rewrite domain_update_first; trivial.
+            * generalize (lookup_in_domain _ _ H); intros.
+              rewrite update_app_in in H1 by trivial.
+              apply app_inv_head_domain in H1
+              ; [| rewrite domain_update_first; trivial].
+              destruct H1 as [eqq1 eqq2].
+              invcs eqq2; trivial.
+          + apply lookup_none_nin in H.
+            repeat rewrite update_app_nin by trivial.
+            simpl.
+            destruct (string_dec v0 v)
+            ; [subst; tauto | ].
+            match_destr; try reflexivity.
+            simpl.
+            repeat split; trivial.
+            apply app_inv_head_domain in H1.
+            * destruct H1 as [? eqq].
+              invcs eqq; trivial.
+            * congruence.
+            *  apply app_inv_head_domain in H1; trivial.
+               destruct H1 as [eqq1 eqq2].
+               invcs eqq2; trivial.
+        - Case "NNRCimpishFor"%string.
+          revert l σ ψc ψd d inn
+          ; induction l0
+          ; intros l σ ψc ψd d inn; simpl.
+          + unused_inv_tac.
+          + unused_inv_tac.
+            specialize (IHl0 x1 σ m x2 o).
+            cut_to IHl0; unused_inv_tac.
+            unfold lift2P in IHl0.
+            repeat match_option_in IHl0.
+            unused_inv_tac.
+      Qed.
+
+      Lemma nnrc_impish_stmt_eval_unused_mcenv c l σ ψc ψd s v d:
+        (In v (domain l) \/
+         ~ In v (nnrc_impish_stmt_free_mcenv_vars s)) ->
+        lift2P
+          (fun '(σ₁', ψc₁', ψd₁') '(σ₂', ψc₂', ψd₂') =>
+             (forall l' d' ψc'',
+                 domain l' = domain l ->
+                 ψc₁' = l' ++ (v,d')::ψc'' ->
+                 σ₁' = σ₂'
+                 /\ ψc₂' = l' ++ ψc''
+                 /\ ψd₁' = ψd₂'
+                 /\ d = d')
+          )
+          (nnrc_impish_stmt_eval c σ (l++(v,d)::ψc) ψd s)
+          (nnrc_impish_stmt_eval c σ (l++ψc) ψd s).
+      Proof.
+        revert l σ ψc ψd d.
+        nnrc_impish_stmt_cases (induction s) Case
+        ; simpl; intros l σ ψc ψd d inn
+        ; repeat rewrite in_app_iff in inn
+        ; unused_inv_tac.
+        - Case "NNRCimpishPush"%string.
+          repeat rewrite lookup_app.
+          case_eq (lookup string_dec l v0); intros.
+          + repeat split; trivial.
+            assert (In v0 (domain l)) by (eapply lookup_in_domain; eauto).
+            rewrite update_app_in in H1 by trivial.
+            rewrite update_app_in by trivial.
+            apply app_inv_head_domain in H1.
+            * destruct H1 as [? eqq].
+              invcs eqq; trivial.
+            * rewrite domain_update_first; trivial.
+            * generalize (lookup_in_domain _ _ H); intros.
+              rewrite update_app_in in H1 by trivial.
+              apply app_inv_head_domain in H1
+              ; [| rewrite domain_update_first; trivial].
+              destruct H1 as [eqq1 eqq2].
+              invcs eqq2; trivial.
+          + apply lookup_none_nin in H.
+            simpl.
+            repeat rewrite update_app_nin by trivial.
+            simpl.
+            destruct (string_dec v0 v)
+            ; [subst; tauto | ].
+            match_destr; try reflexivity.
+            simpl.
+            repeat split; trivial.
+            rewrite update_app_nin by trivial.
+            rewrite update_app_nin in H1 by trivial.
+            simpl in H1.
+            destruct (string_dec v0 v); try congruence.
+            apply app_inv_head_domain in H1; trivial.
+            * destruct H1 as [? eqq].
+              simpl in *; subst.
+              invcs eqq; trivial.
+            * rewrite update_app_nin in H1 by trivial.
+              apply app_inv_head_domain in H1; trivial.
+              destruct H1 as [eqq1 eqq2].
+              simpl in eqq2.
+              match_destr_in eqq2; try congruence.
+        - Case "NNRCimpishFor"%string.
+          revert l σ ψc ψd d inn
+          ; induction l0
+          ; intros l σ ψc ψd d inn; simpl.
+          + unused_inv_tac.
+          + unused_inv_tac.
+            specialize (IHl0 x1 σ x2 m0 l1).
+            cut_to IHl0; unused_inv_tac.
+            unfold lift2P in IHl0.
+            repeat match_option_in IHl0.
+            unused_inv_tac.
+      Qed.
+      
+    End unused.
+    
+  End eval_eqs.
 
 End NNRCimpishEval.
 
@@ -433,3 +1016,5 @@ Arguments nnrc_impish_stmt_eval_env_stack {fruntime h s σc σ₁ ψc₁ ψd₁ 
 Arguments nnrc_impish_stmt_eval_env_domain_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
 Arguments nnrc_impish_stmt_eval_mcenv_domain_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
 Arguments nnrc_impish_stmt_eval_mdenv_domain_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
+
+Arguments nnrc_impish_stmt_eval_domain_stack {fruntime h s σc σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
