@@ -120,106 +120,13 @@ Section NNRCimpishtoNNRCimp.
     : nnrc_imp
     := (nnrc_impish_stmt_to_nnrc_imp_stmt (fst s), snd s).
 
+    Definition nnrc_impish_to_nnrc_imp_top (sep:string) (s: nnrc_impish)
+    : nnrc_imp
+      := nnrc_impish_to_nnrc_imp (nnrc_impish_uncross_shadow sep s).
+
   Definition pd_bindings := list (string*option data).
   Definition mc_bindings := list (string*list data).
   Definition md_bindings := list (string*option data).
-
-  
-  (*
-    Require Import Interleaved.
-  Lemma nnrc_imp_stmt_eval_close_enough h σc σ₁ σ₂ s :
-    close_enough_envs σ₁ σ₂ ->
-    lift2P close_enough_envs
-           (nnrc_imp_stmt_eval h σc s σ₁) (nnrc_imp_stmt_eval h σc s σ₂).
-  Proof.
-    revert σ₁ σ₂.
-    nnrc_imp_stmt_cases (induction s) Case
-    ; simpl; intros σ₁ σ₂ ceq.
-    - Case "NNRCimpSeq"%string.
-      generalize (IHs1 _ _ ceq)
-      ; intros ceq1.
-      unfold lift2P in ceq1; repeat match_option_in ceq1; simpl; try contradiction.
-      eauto.
-    - Case "NNRCimpAssign"%string.
-      repeat rewrite (close_enough_envs_lookup_equiv _ _ ceq).
-      repeat match_destr; simpl; trivial.
-      apply close_enough_update_first; trivial.
-    - Case "NNRCimpLet"%string.
-      destruct o.
-      + rewrite (close_enough_envs_lookup_equiv _ _ ceq).
-        destruct (nnrc_imp_expr_eval h σc σ₂ n); simpl; trivial.
-        assert (ceq1cons: close_enough_envs ((v,Some d)::σ₁) ((v,Some d)::σ₂)).
-        { apply close_enough_envs_cons; trivial. }
-        specialize (IHs _ _ ceq1cons).
-        unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
-        destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
-        destruct p0; simpl in domeqq'; invcs domeqq'.
-        destruct p; destruct p0; simpl in *; subst.
-        apply close_enough_envs_cons_invs in IHs; tauto.
-      + assert (ceq1cons: close_enough_envs ((v,None)::σ₁) ((v,None)::σ₂)).
-        { apply close_enough_envs_cons; trivial. }
-        specialize (IHs _ _ ceq1cons).
-        unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
-        destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
-        destruct p0; simpl in domeqq'; invcs domeqq'.
-        destruct p; destruct p0; simpl in *; subst.
-        apply close_enough_envs_cons_invs in IHs; tauto.
-    - Case "NNRCimpFor"%string.
-      rewrite (close_enough_envs_lookup_equiv _ _ ceq).
-      match_option; simpl; trivial.
-      destruct d; simpl; trivial.
-      clear n eqq.
-      revert σ₁ σ₂ ceq.
-      induction l; intros σ₁ σ₂ ceq.
-      + simpl; trivial.
-      + assert (ceq1cons: close_enough_envs ((v,Some a)::σ₁) ((v,Some a)::σ₂)).
-        { apply close_enough_envs_cons; trivial. }
-        specialize (IHs _ _ ceq1cons).
-        unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
-        destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
-        destruct p0; simpl in domeqq'; invcs domeqq'.
-        destruct p; destruct p0; simpl in *; subst.
-        apply close_enough_envs_cons_invs in IHs.
-        destruct IHs as [? IHs]; subst.
-        eauto.
-    - Case "NNRCimpIf"%string.
-      rewrite (close_enough_envs_lookup_equiv _ _ ceq).
-      match_destr; simpl; trivial.
-      destruct d; simpl; trivial.
-      destruct b; simpl; eauto.
-    - rewrite (close_enough_envs_lookup_equiv _ _ ceq).
-      match_destr; simpl; trivial.
-      destruct d; simpl; trivial.
-      + assert (ceq1cons: close_enough_envs ((v,Some d)::σ₁) ((v,Some d)::σ₂)).
-        { apply close_enough_envs_cons; trivial. }
-        specialize (IHs1 _ _ ceq1cons).
-        unfold lift2P in IHs1; repeat match_option_in IHs1; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
-        destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
-        destruct p0; simpl in domeqq'; invcs domeqq'.
-        destruct p; destruct p0; simpl in *; subst.
-        apply close_enough_envs_cons_invs in IHs1.
-        tauto.
-      + assert (ceq1cons: close_enough_envs ((v0,Some d)::σ₁) ((v0,Some d)::σ₂)).
-        { apply close_enough_envs_cons; trivial. }
-        specialize (IHs2 _ _ ceq1cons).
-        unfold lift2P in IHs2; repeat match_option_in IHs2; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
-        destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
-        destruct p0; simpl in domeqq'; invcs domeqq'.
-        destruct p; destruct p0; simpl in *; subst.
-        apply close_enough_envs_cons_invs in IHs2.
-        tauto.
-  Qed.
-   *)
   
   Lemma nnrc_imp_stmt_eval_grouped_equiv {σ₁ σ₂} :
     grouped_equiv σ₁ σ₂ ->
@@ -778,6 +685,18 @@ Section NNRCimpishtoNNRCimp.
       eauto.
   Qed.
 
+    Theorem nnrc_impish_to_nnrc_imp_top_correct (sep:string) (s:nnrc_impish) :
+    forall h σc,
+      nnrc_impish_eval_top h σc s = nnrc_imp_eval_top h σc (nnrc_impish_to_nnrc_imp_top sep s).
+    Proof.
+      intros.
+      unfold nnrc_impish_eval_top, nnrc_imp_eval_top, nnrc_impish_to_nnrc_imp_top.
+      f_equal.
+      rewrite <- nnrc_impish_to_nnrc_imp_correct.
+      - rewrite nnrc_impish_uncross_shadow_eval; trivial.
+      - apply nnrc_impish_uncross_shadow_free.
+    Qed.
+
   Section Core.
 
     Lemma nnrc_impish_expr_to_nnrc_imp_expr_preserves_core {e:nnrc_impish_expr} :
@@ -804,38 +723,36 @@ Section NNRCimpishtoNNRCimp.
       apply nnrc_impish_stmt_to_nnrc_imp_stmt_preserves_core.
     Qed.
 
-    (*
-    Theorem nnrc_impish_to_nnrc_imp_top_preserves_core {s:nnrc_impish} :
+    Theorem nnrc_impish_to_nnrc_imp_top_preserves_core sep {s:nnrc_impish} :
       nnrc_impishIsCore s <->
-      nnrc_impIsCore (nnrc_impish_to_nnrc_imp_top s).
+      nnrc_impIsCore (nnrc_impish_to_nnrc_imp_top sep s).
     Proof.
-      unfold nnrc_to_nnrc_impish_top.
+      unfold nnrc_impish_to_nnrc_imp_top.
       rewrite <- nnrc_impish_to_nnrc_imp_preserves_core.
-      apply stratify_preserves_core.
+      rewrite nnrc_impish_uncross_shadow_preserves_core.
+      tauto.
     Qed.
 
     Program Definition nnrc_impish_core_to_nnrc_imp_core_top
-            (s:nnrc_impish_core) : nnrc_imp_core
-      :=nnrc_impish_to_nnrc_imp_top s.
+            sep (s:nnrc_impish_core) : nnrc_imp_core
+      := nnrc_impish_to_nnrc_imp_top sep s.
     Next Obligation.
       destruct s; simpl.
       apply nnrc_impish_to_nnrc_imp_top_preserves_core; trivial.
     Qed.
 
     Theorem nnrc_impish_core_to_nnrc_imp_core_correct
-            h σc (s:nnrc_impish_core) :
+            h σc sep (s:nnrc_impish_core) :
       nnrc_impish_core_eval_top h σc s
-      = nnrc_imp_core_eval_top h σc (nnrc_impish_core_to_nnrc_imp_core_top s).
+      = nnrc_imp_core_eval_top h σc (nnrc_impish_core_to_nnrc_imp_core_top sep s).
     Proof.
       destruct s as [q pf].
-      generalize (nnrc_impish_to_nnrc_imp_correct h σc q); intros HH.
-      unfold nnrc_eval_top in HH.
-      rewrite <- nnrc_to_nnrc_ext_eq in HH by trivial.
-      unfold nnrc_core_eval_top, lift_nnrc_core; simpl.
-      rewrite HH.
-      reflexivity.
+      unfold nnrc_impish_core_eval_top, nnrc_imp_core_eval_top.
+      unfold nnrc_impish_core_eval, nnrc_imp_core_eval.
+      simpl proj1_sig.
+      apply nnrc_impish_to_nnrc_imp_top_correct.
     Qed.
-*)
+
   End Core.
 
 End NNRCimpishtoNNRCimp.

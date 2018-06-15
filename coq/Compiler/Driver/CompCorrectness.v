@@ -194,7 +194,7 @@ Section CompCorrectness.
   Definition driver_correct_nnrc_impish (dv: nnrc_impish_driver) :=
     match dv with
     | Dv_nnrc_impish_stop => True
-    | Dv_nnrc_impish_to_nnrc_imp dv => False /\ driver_correct_nnrc_imp dv (* XXX TODO: @avi XXX *)
+    | Dv_nnrc_impish_to_nnrc_imp dv => True /\ driver_correct_nnrc_imp dv
     end.
 
   Definition driver_correct_nnrc_impish_core (dv: nnrc_impish_core_driver) :=
@@ -523,7 +523,10 @@ Section CompCorrectness.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nraenv_to_nraenv_core q));
         rewrite Forall_forall in H; auto.
-      - destruct n; simpl in *; intuition; subst; simpl; trivial.
+      - unfold driver_correct_nnrc_impish_core in H.
+        destruct n; simpl in *; intuition; subst; simpl; trivial.
+        red in H3.
+        destruct n; simpl in *; intuition; subst; simpl; trivial.
         destruct n; simpl in *; intuition.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nnrc_core_to_nnrc q));
@@ -531,7 +534,9 @@ Section CompCorrectness.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nnrc_to_nnrc_core q));
         rewrite Forall_forall in H; auto.
-      - destruct n; simpl in *; intuition; subst; simpl; trivial.
+      - 
+        destruct n; simpl in *; intuition; subst; simpl; trivial.
+        destruct n; simpl in *; intuition; subst; simpl; trivial.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
@@ -707,7 +712,7 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *.
       - contradiction.
-      - elim H; contradiction.
+      - destruct n; intuition; subst; simpl in *; tauto.
     Qed.
 
     Lemma correct_driver_succeeds_nnrc_impish_core:
@@ -721,6 +726,7 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *; try contradiction.
       destruct n; simpl in *; intuition; subst; simpl; trivial.
+      destruct n; intuition; subst; simpl in *; tauto.
     Qed.
 
     Lemma correct_driver_succeeds_nra:
@@ -1191,6 +1197,47 @@ Section CompCorrectness.
       trivial_same_query.
     Qed.
 
+    Lemma nnrc_to_nnrc_imp_preserves_eval l (q:nnrc) :
+      query_preserves_eval
+        (Q_nnrc q)
+        (Q_nnrc_imp (nnrc_impish_to_nnrc_imp (nnrc_to_nnrc_impish l q))).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc.
+      unfold eval_nnrc_imp.
+      unfold nnrc_impish_to_nnrc_imp.
+      rewrite <- nnrc_impish_to_nnrc_imp_top_correct.
+      rewrite <- nnrc_to_nnrc_impish_top_correct.
+      reflexivity.
+    Qed.
+
+    Lemma nnrc_core_to_nnrc_imp_preserves_eval l (q:nnrc_core) :
+      query_preserves_eval (Q_nnrc_core q) (Q_nnrc_imp (nnrc_impish_to_nnrc_imp (nnrc_to_nnrc_impish_top l (proj1_sig q)))).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc_core.
+      unfold eval_nnrc_imp.
+      unfold nnrc_impish_to_nnrc_imp.
+      rewrite <- nnrc_impish_to_nnrc_imp_top_correct.
+      rewrite <- nnrc_to_nnrc_impish_top_correct.
+      rewrite nnrc_core_to_nnrc_top_correct.
+      reflexivity.
+    Qed.
+
+    Lemma nnrc_impish_to_nnrc_imp_preserves_eval q :
+      query_preserves_eval (Q_nnrc_impish q) (Q_nnrc_imp (nnrc_impish_to_nnrc_imp q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc_impish.
+      unfold eval_nnrc_imp.
+      unfold nnrc_impish_to_nnrc_imp.
+      rewrite <- nnrc_impish_to_nnrc_imp_top_correct.
+      reflexivity.
+    Qed.
+
     (*
     Lemma nnrc_to_dnnrc_preserves_eval (inputs_loc: vdbindings) (q:nnrc) :
       query_preserves_eval (Q_nnrc q) (Q_dnnrc (nnrc_to_dnnrc inputs_loc q)).
@@ -1352,9 +1399,12 @@ Section CompCorrectness.
         apply nraenv_to_nraenv_core_preserves_eval.
       (* cNNRC to cNNRCimpish arrow *)
       - destruct H.
-        destruct n; simpl in *; intuition; subst
-        ; try destruct n; try apply nnrc_core_to_nnrc_impish_core_preserves_eval
-        ; simpl in *; intuition.
+        destruct n; simpl in *; intuition
+        ; try contradiction; subst; simpl
+        ; try apply nnrc_core_to_nnrc_impish_core_preserves_eval.
+        destruct n; simpl in *; intuition; subst.
+        + apply nnrc_core_to_nnrc_imp_preserves_eval.
+        + destruct n; simpl in *; tauto.
       (* cNNRC to NNRC arrow *)
       - elim H1; intros; clear H1.
         rewrite <- H0; simpl; trivial_same_query.
@@ -1378,8 +1428,12 @@ Section CompCorrectness.
         + simpl in *.
           intuition; subst.
           apply nnrc_to_nnrc_impish_preserves_eval.
-        + simpl in *.
-          elim H0; intros; contradiction. (* Not proved *)
+        + destruct H1; simpl in *; subst
+          ; try apply nnrc_to_nnrc_impish_preserves_eval.
+          destruct n; simpl in *; try tauto.
+          destruct H1; try tauto.
+          subst; simpl.
+          apply nnrc_to_nnrc_imp_preserves_eval.
       (* NNRC to DNNRC arrow *)
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRC to js_ast arrow *)
@@ -1585,7 +1639,9 @@ Section CompCorrectness.
         reflexivity.
       - destruct dv; simpl in *.
         + contradiction.
-        + elim H; contradiction.
+        + destruct n; simpl in *; intuition.
+          subst; simpl.
+          apply nnrc_impish_to_nnrc_imp_preserves_eval.      
     Qed.
 
 
@@ -1602,7 +1658,10 @@ Section CompCorrectness.
         reflexivity.
       - destruct dv; simpl in *; try contradiction.
         destruct n; simpl in *; intuition; subst.
-        trivial_same_query; reflexivity.
+        + trivial_same_query; try reflexivity.
+        + trivial_same_query; try reflexivity.
+        + apply nnrc_impish_to_nnrc_imp_preserves_eval.
+        + destruct n; simpl in *; try tauto.
     Qed.
 
     Lemma correct_driver_preserves_eval_nnrcmr:

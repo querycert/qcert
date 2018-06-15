@@ -230,7 +230,7 @@ Section CompDriver.
       nnrc_to_nnrc_impish_top inputs q.
 
     Definition nnrc_impish_to_nnrc_imp (q: nnrc_impish) : nnrc_imp :=
-      nnrc_impish_to_nnrc_imp q.
+      nnrc_impish_to_nnrc_imp_top "$"%string q.
 
     Definition nnrc_imp_to_js_ast (inputs: list var) (q: nnrc_imp) : js_ast :=
       nnrc_imp_to_js_ast_top inputs q.
