@@ -17,7 +17,7 @@
 (* Cross Shadowing is when a variable in one namespace "shadows" 
    a variable in another namespace.  This is not a problem for nnrs, since 
    the namespaces are all distinct.  However, it poses a problem when compiling to
-   a language like nnrc_imp that has a single namespace.
+   a language like nnrs_imp that has a single namespace.
  *)
 
 Require Import String.

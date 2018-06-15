@@ -21,19 +21,19 @@ Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
 Require Import CommonRuntime.
-Require Import NNRCimp.
-Require Import NNRCimpEval.
+Require Import NNRSimp.
+Require Import NNRSimpEval.
   
-Section NNRCimpNorm.
+Section NNRSimpNorm.
 
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
   
-  (** NNRCimp evaluation preserves data normalization. *)
+  (** NNRSimp evaluation preserves data normalization. *)
 
-  Lemma nnrc_imp_expr_eval_normalized
-        {σc:bindings} {σ:pd_bindings} {e:nnrc_imp_expr} {o} :
-    nnrc_imp_expr_eval h σc σ e = Some o ->
+  Lemma nnrs_imp_expr_eval_normalized
+        {σc:bindings} {σ:pd_bindings} {e:nnrs_imp_expr} {o} :
+    nnrs_imp_expr_eval h σc σ e = Some o ->
     Forall (data_normalized h) (map snd σc) ->
     (forall x, In (Some x) (map snd σ) -> data_normalized h x)  ->
     data_normalized h o.
@@ -72,23 +72,23 @@ Section NNRCimpNorm.
 
   Local Open Scope string.
 
-  Lemma nnrc_imp_stmt_eval_normalized
+  Lemma nnrs_imp_stmt_eval_normalized
         {σc:bindings}
         {σ:pd_bindings}
-        {s:nnrc_imp_stmt}
+        {s:nnrs_imp_stmt}
         {σ':pd_bindings} :
-    nnrc_imp_stmt_eval h σc s σ = Some σ' ->
+    nnrs_imp_stmt_eval h σc s σ = Some σ' ->
     Forall (data_normalized h) (map snd σc) ->
     (forall x, In (Some x) (map snd σ) -> data_normalized h x)  ->
     (forall x, In (Some x) (map snd σ') -> data_normalized h x).
   Proof.
     intros eqq Fσc.
     revert σ σ' eqq.
-    nnrc_imp_stmt_cases (induction s) Case; intros  σ σ' eqq Fσ; simpl in *.
-    - Case "NNRCimpSeq".
+    nnrs_imp_stmt_cases (induction s) Case; intros  σ σ' eqq Fσ; simpl in *.
+    - Case "NNRSimpSeq".
       apply some_olift in eqq.
       destruct eqq as [???]; eauto.
-    - Case "NNRCimpAssign".
+    - Case "NNRSimpAssign".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       match_case_in eqq; [intros ? eqq2 | intros eqq2]
@@ -103,8 +103,8 @@ Section NNRCimpNorm.
       + eapply Fσ.
         apply in_map_iff; eexists; split; eauto; simpl; eauto.
       + invcs H.
-        eapply nnrc_imp_expr_eval_normalized; eauto.
-    -  Case "NNRCimpLet".
+        eapply nnrs_imp_expr_eval_normalized; eauto.
+    -  Case "NNRSimpLet".
        destruct o; simpl in *.
        + apply some_olift in eqq.
          destruct eqq as [? eqq1 eqq2].
@@ -113,7 +113,7 @@ Section NNRCimpNorm.
          match_option_in eqq2.
          destruct p; try discriminate.
          invcs eqq2.
-         apply nnrc_imp_expr_eval_normalized in eqq1; eauto.
+         apply nnrs_imp_expr_eval_normalized in eqq1; eauto.
          intros.
          apply (IHs _ _ eqq); simpl; eauto.
          intuition.
@@ -125,11 +125,11 @@ Section NNRCimpNorm.
          apply (IHs _ _ eqq0); simpl; eauto.
          intuition.
          invcs H1; eauto.
-    - Case "NNRCimpFor".
+    - Case "NNRSimpFor".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       destruct d; try discriminate.
-      apply nnrc_imp_expr_eval_normalized in eqq1; eauto 2.
+      apply nnrs_imp_expr_eval_normalized in eqq1; eauto 2.
       revert σ σ' eqq Fσ eqq1.
       induction l; intros σ σ' eqq Fσ eqq1; simpl.
       + invcs eqq; intuition.
@@ -144,17 +144,17 @@ Section NNRCimpNorm.
         intuition.
         invcs H3.
         eauto.
-    - Case "NNRCimpIf".
+    - Case "NNRSimpIf".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      generalize (nnrc_imp_expr_eval_normalized eqq1); intros Fd.
+      generalize (nnrs_imp_expr_eval_normalized eqq1); intros Fd.
       cut_to Fd; eauto 2.
       destruct d; try discriminate.
       destruct b; try discriminate; eauto.
-    - Case "NNRCimpEither".
+    - Case "NNRSimpEither".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      generalize (nnrc_imp_expr_eval_normalized eqq1); intros Fd.
+      generalize (nnrs_imp_expr_eval_normalized eqq1); intros Fd.
       cut_to Fd; eauto 2.
       destruct d; try discriminate;
         (match_case_in eqq; [intros ? eqq2 | intros eqq2]
@@ -169,12 +169,12 @@ Section NNRCimpNorm.
         invcs H1; intuition.
   Qed.
   
-  Lemma nnrc_imp_eval_normalized  {σc:bindings} {q:nnrc_imp} {d} :
-    nnrc_imp_eval h σc q = Some d ->
+  Lemma nnrs_imp_eval_normalized  {σc:bindings} {q:nnrs_imp} {d} :
+    nnrs_imp_eval h σc q = Some d ->
     Forall (data_normalized h) (map snd σc) ->
     forall x, d = Some x -> data_normalized h x.
   Proof.
-    unfold nnrc_imp_eval; intros ev Fσc.
+    unfold nnrs_imp_eval; intros ev Fσc.
     destruct q.
     match_case_in ev; [intros ? eqq | intros eqq]
     ; rewrite eqq in ev; try discriminate.
@@ -183,27 +183,27 @@ Section NNRCimpNorm.
     invcs ev.
     destruct d; try discriminate.
     intros ? eqq2; invcs eqq2.
-    eapply nnrc_imp_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate; trivial.
+    eapply nnrs_imp_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate; trivial.
   Qed.
 
-    Lemma nnrc_imp_eval_top_normalized  {σc:bindings} {q:nnrc_imp} {d} :
-    nnrc_imp_eval_top h σc q = Some d ->
+    Lemma nnrs_imp_eval_top_normalized  {σc:bindings} {q:nnrs_imp} {d} :
+    nnrs_imp_eval_top h σc q = Some d ->
     Forall (data_normalized h) (map snd σc) ->
     data_normalized h d.
   Proof.
-    unfold nnrc_imp_eval_top; intros ev Fσc.
+    unfold nnrs_imp_eval_top; intros ev Fσc.
     unfold olift, id in ev.
     match_option_in ev.
-    eapply nnrc_imp_eval_normalized; eauto.
+    eapply nnrs_imp_eval_normalized; eauto.
     rewrite Forall_map in *.
     apply dnrec_sort_content; trivial.
   Qed.
   
-End NNRCimpNorm.
+End NNRSimpNorm.
 
-Hint Resolve nnrc_imp_expr_eval_normalized.
-Hint Resolve nnrc_imp_stmt_eval_normalized.
+Hint Resolve nnrs_imp_expr_eval_normalized.
+Hint Resolve nnrs_imp_stmt_eval_normalized.
 
-Arguments nnrc_imp_expr_eval_normalized {fruntime h σc σ e o}.
-Arguments nnrc_imp_stmt_eval_normalized {fruntime h σc σ s σ'}.
+Arguments nnrs_imp_expr_eval_normalized {fruntime h σc σ e o}.
+Arguments nnrs_imp_stmt_eval_normalized {fruntime h σc σ s σ'}.
 

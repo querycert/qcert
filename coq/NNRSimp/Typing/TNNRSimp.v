@@ -23,15 +23,15 @@ Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
 Require Import CommonSystem.
-Require Import NNRCimp.
-Require Import NNRCimpVars.
-Require Import NNRCimpEval.
-Require Import NNRCimpSem.
-Require Import NNRCimpSemEval.
+Require Import NNRSimp.
+Require Import NNRSimpVars.
+Require Import NNRSimpEval.
+Require Import NNRSimpSem.
+Require Import NNRSimpSemEval.
   
-Section TNNRCimp.
+Section TNNRSimp.
 
-  (** Typing rules for NNRCimp *)
+  (** Typing rules for NNRSimp *)
   Context {m:basic_model}.
 
   Definition pd_tbindings := list (string*rtype).
@@ -89,34 +89,34 @@ Section TNNRCimp.
 
     Reserved Notation "[ Γ  ⊢ e ▷ τ ]".
 
-    Inductive nnrc_imp_expr_type : pd_tbindings -> nnrc_imp_expr -> rtype -> Prop :=
-    | type_NNRCimpGetConstant {τ} Γ s :
+    Inductive nnrs_imp_expr_type : pd_tbindings -> nnrs_imp_expr -> rtype -> Prop :=
+    | type_NNRSimpGetConstant {τ} Γ s :
         tdot Γc s = Some τ ->
-        [ Γ ⊢ NNRCimpGetConstant s ▷ τ ]
-    | type_NNRCimpVar {τ} Γ v :
+        [ Γ ⊢ NNRSimpGetConstant s ▷ τ ]
+    | type_NNRSimpVar {τ} Γ v :
         lookup equiv_dec Γ v = (Some τ) ->
-        [ Γ ⊢ NNRCimpVar v ▷ τ ]
-    | type_NNRCimpConst {τ} Γ c :
+        [ Γ ⊢ NNRSimpVar v ▷ τ ]
+    | type_NNRSimpConst {τ} Γ c :
         normalize_data brand_relation_brands c ▹ τ ->
-        [ Γ ⊢ NNRCimpConst c ▷ τ ]
-    | type_NNRCimpBinop  {τ₁ τ₂ τ} Γ b e₁ e₂ :
+        [ Γ ⊢ NNRSimpConst c ▷ τ ]
+    | type_NNRSimpBinop  {τ₁ τ₂ τ} Γ b e₁ e₂ :
         binary_op_type b τ₁ τ₂ τ ->
         [ Γ ⊢ e₁ ▷ τ₁ ] ->
         [ Γ ⊢ e₂ ▷ τ₂ ] ->
-        [ Γ ⊢ NNRCimpBinop b e₁ e₂ ▷ τ ]
-    | type_NNRCimpUnop {τ₁ τ} Γ u e :
+        [ Γ ⊢ NNRSimpBinop b e₁ e₂ ▷ τ ]
+    | type_NNRSimpUnop {τ₁ τ} Γ u e :
         unary_op_type u τ₁ τ ->
         [ Γ ⊢ e ▷ τ₁ ] ->
-        [ Γ ⊢ NNRCimpUnop u e ▷ τ ]
-    | type_NNRCimpGroupBy {τl k pf} Γ g sl e :
+        [ Γ ⊢ NNRSimpUnop u e ▷ τ ]
+    | type_NNRSimpGroupBy {τl k pf} Γ g sl e :
         sublist sl (domain τl) ->
         [ Γ ⊢ e ▷ Coll (Rec k τl pf) ] ->
-        [ Γ ⊢ NNRCimpGroupBy g sl e ▷ GroupBy_type g sl k τl pf ]
+        [ Γ ⊢ NNRSimpGroupBy g sl e ▷ GroupBy_type g sl k τl pf ]
     where
-    "[ Γ ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γ e τ) : nnrc_imp
+    "[ Γ ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γ e τ) : nnrs_imp
     .
 
-    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γ e τ) : nnrc_imp.
+    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γ e τ) : nnrs_imp.
 
     (* Observation: all the contexts are stacklike in their domain,
        and there is no reason to allow strong updates, since there is a phase
@@ -125,19 +125,19 @@ Section TNNRCimp.
        evaluation semantics models them in a more state-like way.
      *)
 
-    Fixpoint nnrc_imp_expr_may_use (e:nnrc_imp_expr) (x:var) : bool
+    Fixpoint nnrs_imp_expr_may_use (e:nnrs_imp_expr) (x:var) : bool
       := match e with
-         | NNRCimpGetConstant v => false
-         | NNRCimpVar v => x ==b v
-         | NNRCimpConst d => false
-         | NNRCimpBinop bop e₁ e₂ =>
-           nnrc_imp_expr_may_use e₁ x || nnrc_imp_expr_may_use e₂ x
-         | NNRCimpUnop uop e => nnrc_imp_expr_may_use e x
-         | NNRCimpGroupBy g sl e => nnrc_imp_expr_may_use e x
+         | NNRSimpGetConstant v => false
+         | NNRSimpVar v => x ==b v
+         | NNRSimpConst d => false
+         | NNRSimpBinop bop e₁ e₂ =>
+           nnrs_imp_expr_may_use e₁ x || nnrs_imp_expr_may_use e₂ x
+         | NNRSimpUnop uop e => nnrs_imp_expr_may_use e x
+         | NNRSimpGroupBy g sl e => nnrs_imp_expr_may_use e x
          end.
 
-    Lemma nnrc_imp_expr_may_use_free_vars e x :
-      nnrc_imp_expr_may_use e x = true <-> In x (nnrc_imp_expr_free_vars e).
+    Lemma nnrs_imp_expr_may_use_free_vars e x :
+      nnrs_imp_expr_may_use e x = true <-> In x (nnrs_imp_expr_free_vars e).
     Proof.
       induction e; simpl; intuition; unfold equiv_decb in *.
       - match_destr_in H; rewrite e; tauto.
@@ -149,16 +149,16 @@ Section TNNRCimp.
         intuition.
     Qed.
 
-    Lemma nnrc_imp_expr_may_use_free_vars_neg e x :
-      nnrc_imp_expr_may_use e x = false <-> ~ In x (nnrc_imp_expr_free_vars e).
+    Lemma nnrs_imp_expr_may_use_free_vars_neg e x :
+      nnrs_imp_expr_may_use e x = false <-> ~ In x (nnrs_imp_expr_free_vars e).
     Proof.
       split; intros HH.
       - intros H.
-        apply nnrc_imp_expr_may_use_free_vars in H.
+        apply nnrs_imp_expr_may_use_free_vars in H.
         congruence.
-      - case_eq (nnrc_imp_expr_may_use e x); trivial.
+      - case_eq (nnrs_imp_expr_may_use e x); trivial.
         intros H.
-        apply nnrc_imp_expr_may_use_free_vars in H.
+        apply nnrs_imp_expr_may_use_free_vars in H.
         congruence.
     Qed.
 
@@ -173,55 +173,55 @@ Section TNNRCimp.
       decide equality.
     Defined.
     
-    Fixpoint nnrc_imp_stmt_var_usage (s:nnrc_imp_stmt) (x:var) : VarUsage
+    Fixpoint nnrs_imp_stmt_var_usage (s:nnrs_imp_stmt) (x:var) : VarUsage
       := match s with
-         | NNRCimpSeq s₁ s₂ =>
-           match nnrc_imp_stmt_var_usage s₁ x with
+         | NNRSimpSeq s₁ s₂ =>
+           match nnrs_imp_stmt_var_usage s₁ x with
            | VarMustBeAssigned => VarMustBeAssigned
            | VarMayBeUsedWithoutAssignment => VarMayBeUsedWithoutAssignment
-           | VarNotUsedAndNotAssigned => nnrc_imp_stmt_var_usage s₂ x 
+           | VarNotUsedAndNotAssigned => nnrs_imp_stmt_var_usage s₂ x 
            end
-         | NNRCimpLet v oe₁ s₂ =>
+         | NNRSimpLet v oe₁ s₂ =>
            if match oe₁ with
-              | Some e₁ => nnrc_imp_expr_may_use e₁ x
+              | Some e₁ => nnrs_imp_expr_may_use e₁ x
               | None => false
               end
            then VarMayBeUsedWithoutAssignment
            else if v ==b x
                 then VarNotUsedAndNotAssigned
-                else nnrc_imp_stmt_var_usage s₂ x
-         | NNRCimpAssign v e =>
-           if nnrc_imp_expr_may_use e x
+                else nnrs_imp_stmt_var_usage s₂ x
+         | NNRSimpAssign v e =>
+           if nnrs_imp_expr_may_use e x
            then VarMayBeUsedWithoutAssignment
            else if v ==b x
                 then VarMustBeAssigned
                 else VarNotUsedAndNotAssigned
-         | NNRCimpFor v e s₀ => 
-           if nnrc_imp_expr_may_use e x
+         | NNRSimpFor v e s₀ => 
+           if nnrs_imp_expr_may_use e x
            then VarMayBeUsedWithoutAssignment
            else if v ==b x
                 then VarNotUsedAndNotAssigned
-                else match nnrc_imp_stmt_var_usage s₀ x with
+                else match nnrs_imp_stmt_var_usage s₀ x with
                      (* If the loops does run, then there may be a problem *)
                      | VarMayBeUsedWithoutAssignment => VarMayBeUsedWithoutAssignment
                      (* Since the loop may not execute, it can't count as a definite assignment *)
                      | VarMustBeAssigned => VarNotUsedAndNotAssigned
                      | VarNotUsedAndNotAssigned => VarNotUsedAndNotAssigned
                      end
-         | NNRCimpIf e s₁ s₂ =>
-           if nnrc_imp_expr_may_use e x
+         | NNRSimpIf e s₁ s₂ =>
+           if nnrs_imp_expr_may_use e x
            then VarMayBeUsedWithoutAssignment
-           else match nnrc_imp_stmt_var_usage s₁ x, nnrc_imp_stmt_var_usage s₂ x with
+           else match nnrs_imp_stmt_var_usage s₁ x, nnrs_imp_stmt_var_usage s₂ x with
                 | VarMayBeUsedWithoutAssignment, _ => VarMayBeUsedWithoutAssignment
                 | _, VarMayBeUsedWithoutAssignment => VarMayBeUsedWithoutAssignment
                 | VarMustBeAssigned, VarMustBeAssigned => VarMustBeAssigned
                 | _, _ => VarNotUsedAndNotAssigned
                 end
 
-         | NNRCimpEither e x₁ s₁ x₂ s₂ =>
-           if nnrc_imp_expr_may_use e x
+         | NNRSimpEither e x₁ s₁ x₂ s₂ =>
+           if nnrs_imp_expr_may_use e x
            then VarMayBeUsedWithoutAssignment
-           else match x₁ == x, nnrc_imp_stmt_var_usage s₁ x, x₂ == x, nnrc_imp_stmt_var_usage s₂ x with
+           else match x₁ == x, nnrs_imp_stmt_var_usage s₁ x, x₂ == x, nnrs_imp_stmt_var_usage s₂ x with
                 | right _, VarMayBeUsedWithoutAssignment, _, _ => VarMayBeUsedWithoutAssignment
                 | _, _, right _, VarMayBeUsedWithoutAssignment => VarMayBeUsedWithoutAssignment
                 | right _, VarMustBeAssigned, right _, VarMustBeAssigned => VarMustBeAssigned
@@ -231,68 +231,68 @@ Section TNNRCimp.
 
     Reserved Notation "[  Γ  ⊢ s ]".
 
-    Inductive nnrc_imp_stmt_type :
-      pd_tbindings -> nnrc_imp_stmt -> Prop :=
-    | type_NNRCimpSeq Γ s₁ s₂ :
+    Inductive nnrs_imp_stmt_type :
+      pd_tbindings -> nnrs_imp_stmt -> Prop :=
+    | type_NNRSimpSeq Γ s₁ s₂ :
         [  Γ ⊢ s₁ ] -> 
         [  Γ   ⊢ s₂ ]  ->
-        [  Γ ⊢ NNRCimpSeq s₁ s₂ ]
-    | type_NNRCimpLetDef Γ τ x e₁ s₂ :
+        [  Γ ⊢ NNRSimpSeq s₁ s₂ ]
+    | type_NNRSimpLetDef Γ τ x e₁ s₂ :
         [  Γ  ⊢ e₁ ▷ τ ] -> 
         [  (x,τ)::Γ  ⊢ s₂ ]  ->
-        [  Γ  ⊢ NNRCimpLet x (Some e₁) s₂ ]
-    | type_NNRCimpLetNone Γ τ x s₂ :
-        nnrc_imp_stmt_var_usage s₂ x <> VarMayBeUsedWithoutAssignment ->
+        [  Γ  ⊢ NNRSimpLet x (Some e₁) s₂ ]
+    | type_NNRSimpLetNone Γ τ x s₂ :
+        nnrs_imp_stmt_var_usage s₂ x <> VarMayBeUsedWithoutAssignment ->
         [  (x,τ)::Γ  ⊢ s₂ ]  ->
-        [  Γ  ⊢ NNRCimpLet x None s₂ ]
-    | type_NNRCimpAssign Γ τ τd x e :
+        [  Γ  ⊢ NNRSimpLet x None s₂ ]
+    | type_NNRSimpAssign Γ τ τd x e :
         [ Γ ⊢ e ▷ τ ] ->
         lookup string_dec Γ x = Some τd ->
         τ ≤ τd -> 
-        [  Γ   ⊢ NNRCimpAssign x e ]
-    | type_NNRCimpFor Γ τ x e₁ s₂ :
+        [  Γ   ⊢ NNRSimpAssign x e ]
+    | type_NNRSimpFor Γ τ x e₁ s₂ :
         [  Γ  ⊢ e₁ ▷ Coll τ ] -> 
         [  (x,τ)::Γ  ⊢ s₂ ]  ->
-        [  Γ ⊢ NNRCimpFor x e₁ s₂ ]
-    | type_NNRCimpIf Γ e s₁ s₂ :
+        [  Γ ⊢ NNRSimpFor x e₁ s₂ ]
+    | type_NNRSimpIf Γ e s₁ s₂ :
         [  Γ  ⊢ e ▷ Bool] -> 
         [  Γ   ⊢ s₁ ] -> 
         [  Γ  ⊢ s₂ ]  ->
-        [  Γ ⊢ NNRCimpIf e s₁ s₂ ]
-    | type_NNRCimpEither Γ τl τr e x₁ s₁ x₂ s₂ :
+        [  Γ ⊢ NNRSimpIf e s₁ s₂ ]
+    | type_NNRSimpEither Γ τl τr e x₁ s₁ x₂ s₂ :
         [  Γ  ⊢ e ▷ Either τl τr] -> 
         [  (x₁,τl)::Γ  ⊢ s₁ ] -> 
         [  (x₂,τr)::Γ  ⊢ s₂ ]  ->
-        [  Γ  ⊢ NNRCimpEither e x₁ s₁ x₂ s₂ ]
+        [  Γ  ⊢ NNRSimpEither e x₁ s₁ x₂ s₂ ]
     where
-    "[ Γ ⊢ s ]" := (nnrc_imp_stmt_type Γ s) : nnrc_imp
+    "[ Γ ⊢ s ]" := (nnrs_imp_stmt_type Γ s) : nnrs_imp
     .
 
-    Notation "[ Γ ⊢ s ]" := (nnrc_imp_stmt_type Γ s) : nnrc_imp.
+    Notation "[ Γ ⊢ s ]" := (nnrs_imp_stmt_type Γ s) : nnrs_imp.
   End typ.
 
-  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γc Γ e τ) : nnrc_imp.
-  Notation "[ Γc ; Γ  ⊢ s ]" := (nnrc_imp_stmt_type Γc Γ s) : nnrc_imp.
+  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp.
+  Notation "[ Γc ; Γ  ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp.
 
-  Local Open Scope nnrc_imp.
+  Local Open Scope nnrs_imp.
   
-  Definition nnrc_imp_type Γc (si:nnrc_imp) τ
+  Definition nnrs_imp_type Γc (si:nnrs_imp) τ
     := let (s, ret) := si in
-       nnrc_imp_stmt_var_usage s ret <> VarMayBeUsedWithoutAssignment 
+       nnrs_imp_stmt_var_usage s ret <> VarMayBeUsedWithoutAssignment 
        /\ [ Γc ; (ret, τ)::nil  ⊢ s ].
 
-  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrc_imp_type Γc si τ) : nnrc_imp.
+  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_imp_type Γc si τ) : nnrs_imp.
 
-  Definition nnrc_imp_returns (si:nnrc_imp)
-    := nnrc_imp_stmt_var_usage (fst si) (snd si) = VarMustBeAssigned.
+  Definition nnrs_imp_returns (si:nnrs_imp)
+    := nnrs_imp_stmt_var_usage (fst si) (snd si) = VarMustBeAssigned.
 
-  Lemma typed_nnrc_imp_expr_yields_typed_data {σc Γc} {σ Γ} {e τ} :
+  Lemma typed_nnrs_imp_expr_yields_typed_data {σc Γc} {σ Γ} {e τ} :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
-    has_some_parts (nnrc_imp_expr_free_vars e) σ ->
+    has_some_parts (nnrs_imp_expr_free_vars e) σ ->
     [ Γc ; Γ  ⊢ e ▷ τ ] ->
     exists d,
-      nnrc_imp_expr_eval brand_relation_brands σc σ e = Some d
+      nnrs_imp_expr_eval brand_relation_brands σc σ e = Some d
       /\ d ▹ τ.
   Proof.
     intros Γctyp Γtyp hasparts etyp.
@@ -323,34 +323,34 @@ Section TNNRCimp.
       apply typed_group_by_nested_eval_table_yields_typed_data; trivial.
   Qed.
 
-  Lemma typed_nnrc_imp_expr_yields_typed_data_gen {σc Γc} {σ Γ} {e τ} {alreadydefined} :
+  Lemma typed_nnrs_imp_expr_yields_typed_data_gen {σc Γc} {σ Γ} {e τ} {alreadydefined} :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
     has_some_parts alreadydefined σ ->
     [ Γc ; Γ  ⊢ e ▷ τ ] ->
-    incl (nnrc_imp_expr_free_vars e) alreadydefined ->
+    incl (nnrs_imp_expr_free_vars e) alreadydefined ->
     exists d,
-      nnrc_imp_expr_eval brand_relation_brands σc σ e = Some d
+      nnrs_imp_expr_eval brand_relation_brands σc σ e = Some d
       /\ d ▹ τ.
   Proof.
     intros ? pdb hp ? Hinc.
     rewrite <- Hinc in hp.
-    eapply typed_nnrc_imp_expr_yields_typed_data; eauto.
+    eapply typed_nnrs_imp_expr_yields_typed_data; eauto.
   Qed.
 
   (* Computationally friendly version of this theorem *)
-  Theorem typed_nnrc_imp_expr_yields_typed_data_compute {σc Γc} {σ Γ} {e τ} :
+  Theorem typed_nnrs_imp_expr_yields_typed_data_compute {σc Γc} {σ Γ} {e τ} :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
-    has_some_parts (nnrc_imp_expr_free_vars e) σ ->
+    has_some_parts (nnrs_imp_expr_free_vars e) σ ->
     [ Γc ; Γ  ⊢ e ▷ τ ] ->
     {d |
-     nnrc_imp_expr_eval brand_relation_brands σc σ e = Some d
+     nnrs_imp_expr_eval brand_relation_brands σc σ e = Some d
      & d ▹ τ}.
   Proof.
     intros Γctyp Γtyp hp etyp.
-    generalize (typed_nnrc_imp_expr_yields_typed_data Γctyp Γtyp hp etyp); intros HH.
-    destruct (nnrc_imp_expr_eval brand_relation_brands σc σ e).
+    generalize (typed_nnrs_imp_expr_yields_typed_data Γctyp Γtyp hp etyp); intros HH.
+    destruct (nnrs_imp_expr_eval brand_relation_brands σc σ e).
     - exists d; destruct HH as [?[??]]; simpl; congruence.
     - cut False; [contradiction | ].
       destruct HH as [?[??]]; simpl; congruence.
@@ -358,9 +358,9 @@ Section TNNRCimp.
 
   (** Main lemma for the type correctness of NNNRC *)
 
-  Lemma typed_nnrc_imp_expr_vars_in_ctxt {Γc Γ} {e:nnrc_imp_expr} {τ} :
+  Lemma typed_nnrs_imp_expr_vars_in_ctxt {Γc Γ} {e:nnrs_imp_expr} {τ} :
     [Γc; Γ ⊢ e ▷ τ] ->
-    forall x, nnrc_imp_expr_may_use e x = true -> In x (domain Γ).
+    forall x, nnrs_imp_expr_may_use e x = true -> In x (domain Γ).
   Proof.
     intros typexpr; dependent induction typexpr; simpl; intros ? eqq; try discriminate.
     - unfold equiv_decb in eqq.
@@ -371,9 +371,9 @@ Section TNNRCimp.
     - intuition.
   Qed.
   
-  Lemma typed_nnrc_imp_stmt_vars_in_ctxt {Γc Γ} {s:nnrc_imp_stmt} :
+  Lemma typed_nnrs_imp_stmt_vars_in_ctxt {Γc Γ} {s:nnrs_imp_stmt} :
     [  Γc ; Γ  ⊢ s ] ->
-    (forall x, nnrc_imp_stmt_var_usage s x <> VarNotUsedAndNotAssigned -> In x (domain Γ)).
+    (forall x, nnrs_imp_stmt_var_usage s x <> VarNotUsedAndNotAssigned -> In x (domain Γ)).
   Proof.
     intros typs.
     dependent induction typs; simpl; intros v neq; unfold equiv_decb, var in *.
@@ -382,7 +382,7 @@ Section TNNRCimp.
       ; match_destr_in neq
       ; tauto.
     - match_case_in neq; intros eqq; rewrite eqq in neq.
-      + eapply typed_nnrc_imp_expr_vars_in_ctxt; eauto.
+      + eapply typed_nnrs_imp_expr_vars_in_ctxt; eauto.
       + destruct (x == v); [congruence | ].
         specialize (IHtyps _ neq).
         unfold equiv, complement in *.
@@ -392,12 +392,12 @@ Section TNNRCimp.
       unfold equiv, complement in *.
       simpl in IHtyps; tauto.
     - match_case_in neq; intros eqq; rewrite eqq in neq.
-      + eapply typed_nnrc_imp_expr_vars_in_ctxt; eauto.
+      + eapply typed_nnrs_imp_expr_vars_in_ctxt; eauto.
       + destruct (x == v); [| congruence].
         red in e0; subst.
         apply lookup_in_domain in H0; trivial.
-    - case_eq (nnrc_imp_expr_may_use e₁ v); intros eqq1; rewrite eqq1 in neq.
-      + eapply typed_nnrc_imp_expr_vars_in_ctxt; eauto.
+    - case_eq (nnrs_imp_expr_may_use e₁ v); intros eqq1; rewrite eqq1 in neq.
+      + eapply typed_nnrs_imp_expr_vars_in_ctxt; eauto.
       + destruct (x == v); [congruence | ].
         match_case_in neq; intros eqq2; rewrite eqq2 in neq.
         * congruence.
@@ -407,8 +407,8 @@ Section TNNRCimp.
           simpl in IHtyps.
           intuition.
         * congruence.
-    - case_eq (nnrc_imp_expr_may_use e v); intros eqq1; rewrite eqq1 in neq.
-      + eapply typed_nnrc_imp_expr_vars_in_ctxt; eauto.
+    - case_eq (nnrs_imp_expr_may_use e v); intros eqq1; rewrite eqq1 in neq.
+      + eapply typed_nnrs_imp_expr_vars_in_ctxt; eauto.
       + { match_case_in neq; intros eqq2; rewrite eqq2 in neq.
           - match_case_in neq; intros eqq3; rewrite eqq3 in neq
             ; eapply IHtyps1; congruence.
@@ -416,8 +416,8 @@ Section TNNRCimp.
           - match_case_in neq; intros eqq3; rewrite eqq3 in neq; try congruence.
             eapply IHtyps2; congruence.
         }
-    - case_eq (nnrc_imp_expr_may_use e v); intros eqq1; rewrite eqq1 in neq.
-      + eapply typed_nnrc_imp_expr_vars_in_ctxt; eauto.
+    - case_eq (nnrs_imp_expr_may_use e v); intros eqq1; rewrite eqq1 in neq.
+      + eapply typed_nnrs_imp_expr_vars_in_ctxt; eauto.
       + { destruct (x₁ == v).
           + destruct (x₂ == v); [congruence | ].
             specialize (IHtyps2 v); simpl in IHtyps2.
@@ -436,8 +436,8 @@ Section TNNRCimp.
         } 
   Qed.
 
-  Lemma nnrc_imp_stmt_env_preserves_some {s σc σ σ' } :
-    nnrc_imp_stmt_eval brand_relation_brands σc s σ =
+  Lemma nnrs_imp_stmt_env_preserves_some {s σc σ σ' } :
+    nnrs_imp_stmt_eval brand_relation_brands σc s σ =
     Some σ' ->
     Forall2 (preserves_Some snd) σ σ'.
   Proof.
@@ -494,21 +494,21 @@ Section TNNRCimp.
         invcs IHs2; trivial.
   Qed.
   
-  Lemma nnrc_imp_stmt_preserves_has_some_parts_skip alreadydefined σc s σ₁ σ₂ σ₁' σ₂' :
-    nnrc_imp_stmt_eval brand_relation_brands σc s (σ₁++σ₂) = Some (σ₁'++σ₂') ->
+  Lemma nnrs_imp_stmt_preserves_has_some_parts_skip alreadydefined σc s σ₁ σ₂ σ₁' σ₂' :
+    nnrs_imp_stmt_eval brand_relation_brands σc s (σ₁++σ₂) = Some (σ₁'++σ₂') ->
     domain σ₁ = domain σ₁' ->
     has_some_parts alreadydefined σ₂ ->
     has_some_parts alreadydefined σ₂'.
   Proof.
     intros evals sd hp.
-    generalize (nnrc_imp_stmt_eval_env_domain_stack evals); intros domeqs.
+    generalize (nnrs_imp_stmt_eval_env_domain_stack evals); intros domeqs.
     assert (sd2:domain σ₂ = domain σ₂').
     {
       repeat rewrite domain_app in domeqs.
       rewrite sd in domeqs.
       apply app_inv_head in domeqs; trivial.
     }
-    apply nnrc_imp_stmt_env_preserves_some in evals.
+    apply nnrs_imp_stmt_env_preserves_some in evals.
     unfold has_some_parts in *.
     rewrite Forall_forall in *.
     intros x inn.
@@ -534,28 +534,28 @@ Section TNNRCimp.
       destruct (pres _ (eq_refl _)); discriminate.
   Qed.
 
-  Lemma nnrc_imp_stmt_preserves_has_some_parts alreadydefined σc s σ σ' :
-    nnrc_imp_stmt_eval brand_relation_brands σc s σ = Some σ' ->
+  Lemma nnrs_imp_stmt_preserves_has_some_parts alreadydefined σc s σ σ' :
+    nnrs_imp_stmt_eval brand_relation_brands σc s σ = Some σ' ->
     has_some_parts alreadydefined σ ->
     has_some_parts alreadydefined σ'.
   Proof.
     intros evals hp.
-    eapply (nnrc_imp_stmt_preserves_has_some_parts_skip _ _ _ nil _ nil); simpl; eauto.
+    eapply (nnrs_imp_stmt_preserves_has_some_parts_skip _ _ _ nil _ nil); simpl; eauto.
   Qed.
 
-  Theorem typed_nnrc_imp_stmt_yields_typed_data {σc σ} {Γc Γ} {alreadydefined} (s:nnrc_imp_stmt) :
+  Theorem typed_nnrs_imp_stmt_yields_typed_data {σc σ} {Γc Γ} {alreadydefined} (s:nnrs_imp_stmt) :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
     has_some_parts alreadydefined σ ->
-    (forall x, nnrc_imp_stmt_var_usage s x = VarMayBeUsedWithoutAssignment ->
+    (forall x, nnrs_imp_stmt_var_usage s x = VarMayBeUsedWithoutAssignment ->
                In x alreadydefined) ->
     [  Γc ; Γ  ⊢ s ] ->
     exists σ',
-      (nnrc_imp_stmt_eval brand_relation_brands σc s σ) = Some σ'
+      (nnrs_imp_stmt_eval brand_relation_brands σc s σ) = Some σ'
       /\ pd_bindings_type σ' Γ
       /\ has_some_parts (alreadydefined
                            ++
-                           (filter (fun x => nnrc_imp_stmt_var_usage s x ==b VarMustBeAssigned))
+                           (filter (fun x => nnrs_imp_stmt_var_usage s x ==b VarMustBeAssigned))
                            (domain Γ))
                         σ'.
   Proof.
@@ -582,18 +582,18 @@ Section TNNRCimp.
         match_destr.
         destruct o; trivial.
         intuition.
-        destruct (nnrc_imp_stmt_var_usage s₁ x); congruence.
+        destruct (nnrs_imp_stmt_var_usage s₁ x); congruence.
       + intros.
         rewrite in_app_iff, filter_In.
         specialize (enoughdefined x).
-        generalize (typed_nnrc_imp_stmt_vars_in_ctxt typs2 x); intros. 
+        generalize (typed_nnrs_imp_stmt_vars_in_ctxt typs2 x); intros. 
         match_destr_in enoughdefined
         ; intuition congruence.
-    - destruct (typed_nnrc_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
+    - destruct (typed_nnrs_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
         as [d [eqq typd]].
       { intros v inn.
         apply enoughdefined.
-        apply nnrc_imp_expr_may_use_free_vars in inn.
+        apply nnrs_imp_expr_may_use_free_vars in inn.
         rewrite inn; trivial.
       } 
       rewrite eqq; simpl.
@@ -626,7 +626,7 @@ Section TNNRCimp.
       destruct x0; simpl in *.
       eexists; split; try reflexivity.
       split; trivial.
-      generalize (nnrc_imp_stmt_preserves_has_some_parts_skip alreadydefined
+      generalize (nnrs_imp_stmt_preserves_has_some_parts_skip alreadydefined
                                                               σc s₂ ((s, Some d)::nil) σ ((s, o) :: nil) l)
       ; simpl; intros pres.
       specialize (pres eqq1 (eq_refl _) hasparts).
@@ -636,7 +636,7 @@ Section TNNRCimp.
       specialize (hasparts' x); simpl in hasparts'.
       apply filter_In in inn.
       destruct inn as [inn eqq2].
-      destruct (nnrc_imp_expr_may_use e₁ x); try discriminate.
+      destruct (nnrs_imp_expr_may_use e₁ x); try discriminate.
       unfold equiv_decb in *.
       destruct (s == x); try discriminate.
       match_destr_in eqq2; try discriminate.
@@ -674,7 +674,7 @@ Section TNNRCimp.
       destruct x0; simpl in *.
       eexists; split; try reflexivity.
       split; trivial.
-      generalize (nnrc_imp_stmt_preserves_has_some_parts_skip alreadydefined
+      generalize (nnrs_imp_stmt_preserves_has_some_parts_skip alreadydefined
                                                               σc s₂ ((s, None)::nil) σ ((s, o) :: nil) l)
       ; simpl; intros pres.
       specialize (pres eqq1 (eq_refl _) hasparts).
@@ -693,11 +693,11 @@ Section TNNRCimp.
       right.
       match_destr; simpl; [right | ]
       ; apply filter_In; rewrite e; eauto.
-    - destruct (typed_nnrc_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
+    - destruct (typed_nnrs_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
         as [d [eqq typd]].
       { intros v inn.
         apply enoughdefined.
-        apply nnrc_imp_expr_may_use_free_vars in inn.
+        apply nnrs_imp_expr_may_use_free_vars in inn.
         rewrite inn; trivial.
       } 
       rewrite eqq; simpl.
@@ -738,11 +738,11 @@ Section TNNRCimp.
               destruct (x == x1); [ congruence | ].
               discriminate.
           } 
-    - destruct (typed_nnrc_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
+    - destruct (typed_nnrs_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
         as [d [eqq typd]].
       { intros v inn.
         apply enoughdefined.
-        apply nnrc_imp_expr_may_use_free_vars in inn.
+        apply nnrs_imp_expr_may_use_free_vars in inn.
         rewrite inn; trivial.
       } 
       rewrite eqq; simpl.
@@ -765,7 +765,7 @@ Section TNNRCimp.
           match_destr_in neq.
           unfold equiv_decb in *.
           destruct (x == y); try discriminate.
-          destruct (nnrc_imp_stmt_var_usage s₂ y); try discriminate.
+          destruct (nnrs_imp_stmt_var_usage s₂ y); try discriminate.
       + invcs H1.
         assert (typσcons:pd_bindings_type ((x, Some a)::σ) ((x, τ) :: Γ)).
         { unfold pd_bindings_type in *; simpl; constructor; trivial; simpl; split; auto.
@@ -796,7 +796,7 @@ Section TNNRCimp.
         unfold var in *; rewrite eqq1.
         invcs typσ'.
         destruct x0; destruct H4; simpl in *; subst.
-        generalize (nnrc_imp_stmt_preserves_has_some_parts_skip alreadydefined
+        generalize (nnrs_imp_stmt_preserves_has_some_parts_skip alreadydefined
                                                                 σc s₂ ((x, Some a)::nil) σ ((x, o) :: nil) l)
         ; simpl; intros pres.
         specialize (pres eqq1 (eq_refl _) hasparts).
@@ -806,11 +806,11 @@ Section TNNRCimp.
         rewrite eqq2.
         eexists; split; try reflexivity.
         split; trivial.
-    - destruct (typed_nnrc_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
+    - destruct (typed_nnrs_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
         as [d [eqq typd]].
       { intros v inn.
         apply enoughdefined.
-        apply nnrc_imp_expr_may_use_free_vars in inn.
+        apply nnrs_imp_expr_may_use_free_vars in inn.
         rewrite inn; trivial.
       } 
       rewrite eqq; simpl.
@@ -839,8 +839,8 @@ Section TNNRCimp.
         right; apply filter_In.
         split; trivial.
         unfold equiv_decb, var in *.
-        destruct (nnrc_imp_stmt_var_usage s₁ x); simpl; trivial
-        ; destruct (nnrc_imp_stmt_var_usage s₂ x); simpl; trivial.
+        destruct (nnrs_imp_stmt_var_usage s₁ x); simpl; trivial
+        ; destruct (nnrs_imp_stmt_var_usage s₂ x); simpl; trivial.
       + destruct (IHtyps2 _ _ typσ hasparts)
           as [σ' [eqq1 [typσ' hasparts']]].
         { intros y inn.
@@ -863,13 +863,13 @@ Section TNNRCimp.
         right; apply filter_In.
         split; trivial.
         unfold equiv_decb, var in *.
-        destruct (nnrc_imp_stmt_var_usage s₁ x); simpl; trivial
-        ; destruct (nnrc_imp_stmt_var_usage s₂ x); simpl; trivial.
-    - destruct (typed_nnrc_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
+        destruct (nnrs_imp_stmt_var_usage s₁ x); simpl; trivial
+        ; destruct (nnrs_imp_stmt_var_usage s₂ x); simpl; trivial.
+    - destruct (typed_nnrs_imp_expr_yields_typed_data_gen typσc typσ hasparts H)
         as [d [eqq typd]].
       { intros v inn.
         apply enoughdefined.
-        apply nnrc_imp_expr_may_use_free_vars in inn.
+        apply nnrs_imp_expr_may_use_free_vars in inn.
         rewrite inn; trivial.
       } 
       rewrite eqq; simpl.
@@ -904,7 +904,7 @@ Section TNNRCimp.
         unfold var in *; rewrite eqq1.
         invcs typσ'.
         destruct x; destruct H3; simpl in *; subst.
-        generalize (nnrc_imp_stmt_preserves_has_some_parts_skip alreadydefined
+        generalize (nnrs_imp_stmt_preserves_has_some_parts_skip alreadydefined
                                                                 σc s₁ ((x₁, Some d0)::nil) σ ((x₁, o) :: nil) l)
         ; simpl; intros pres.
         specialize (pres eqq1 (eq_refl _) hasparts).
@@ -921,8 +921,8 @@ Section TNNRCimp.
         unfold equiv_decb, var in *.
         destruct (x₁ == x)
         ; destruct (x₂ == x); try discriminate
-        ; case_eq (nnrc_imp_stmt_var_usage s₁ x); intros eqq3; try rewrite eqq3 in *; try discriminate
-        ; case_eq (nnrc_imp_stmt_var_usage s₂ x);  intros eqq4; try rewrite eqq4 in *; try discriminate.
+        ; case_eq (nnrs_imp_stmt_var_usage s₁ x); intros eqq3; try rewrite eqq3 in *; try discriminate
+        ; case_eq (nnrs_imp_stmt_var_usage s₂ x);  intros eqq4; try rewrite eqq4 in *; try discriminate.
         destruct (x == x₁); try congruence.
         apply hasparts'.
         right.
@@ -958,7 +958,7 @@ Section TNNRCimp.
         unfold var in *; rewrite eqq1.
         invcs typσ'.
         destruct x; destruct H3; simpl in *; subst.
-        generalize (nnrc_imp_stmt_preserves_has_some_parts_skip alreadydefined
+        generalize (nnrs_imp_stmt_preserves_has_some_parts_skip alreadydefined
                                                                 σc s₂ ((x₂, Some d0)::nil) σ ((x₂, o) :: nil) l)
         ; simpl; intros pres.
         specialize (pres eqq1 (eq_refl _) hasparts).
@@ -975,8 +975,8 @@ Section TNNRCimp.
         unfold equiv_decb, var in *.
         destruct (x₁ == x)
         ; destruct (x₂ == x); try discriminate
-        ; case_eq (nnrc_imp_stmt_var_usage s₁ x); intros eqq3; try rewrite eqq3 in *; try discriminate
-        ; case_eq (nnrc_imp_stmt_var_usage s₂ x);  intros eqq4; try rewrite eqq4 in *; try discriminate.
+        ; case_eq (nnrs_imp_stmt_var_usage s₁ x); intros eqq3; try rewrite eqq3 in *; try discriminate
+        ; case_eq (nnrs_imp_stmt_var_usage s₂ x);  intros eqq4; try rewrite eqq4 in *; try discriminate.
         destruct (x == x₂); try congruence.
         apply hasparts'.
         right.
@@ -985,25 +985,25 @@ Section TNNRCimp.
         ; rewrite eqq4; simpl; eauto.
   Qed.
 
-  Lemma typed_nnrc_imp_yields_typed_data_aux {σc} {Γc} {τ} {si:nnrc_imp}:
+  Lemma typed_nnrs_imp_yields_typed_data_aux {σc} {Γc} {τ} {si:nnrs_imp}:
     bindings_type σc Γc ->
     [ Γc ⊢ si ▷ τ ] ->
     exists o,
-      nnrc_imp_eval brand_relation_brands σc si = Some o
+      nnrs_imp_eval brand_relation_brands σc si = Some o
       /\ (forall d, o = Some d -> d ▹ τ)
-      /\ (nnrc_imp_stmt_var_usage (fst si) (snd si) ==b VarMustBeAssigned = true ->
+      /\ (nnrs_imp_stmt_var_usage (fst si) (snd si) ==b VarMustBeAssigned = true ->
           exists d, o = Some d).
   Proof.
     destruct si as [q ret]; simpl.
     intros typσc [neq typq].
-    destruct (@typed_nnrc_imp_stmt_yields_typed_data
+    destruct (@typed_nnrs_imp_stmt_yields_typed_data
                 σc [(ret, None)]
                 Γc [(ret, τ)] nil q)
       as [σ' [eqq1 [typσ' eqq]]]
     ; simpl; trivial ; try solve[constructor].
     - constructor; trivial.
       simpl; intuition discriminate.
-    - generalize (typed_nnrc_imp_stmt_vars_in_ctxt typq); intros.
+    - generalize (typed_nnrs_imp_stmt_vars_in_ctxt typq); intros.
       simpl in H.
       specialize (H x).
       cut_to H.
@@ -1026,60 +1026,60 @@ Section TNNRCimp.
       eauto.
   Qed.
 
-  Theorem typed_nnrc_imp_yields_typed_data {σc} {Γc} {τ} {si:nnrc_imp}:
+  Theorem typed_nnrs_imp_yields_typed_data {σc} {Γc} {τ} {si:nnrs_imp}:
     bindings_type σc Γc ->
     [ Γc ⊢ si ▷ τ ] ->
     exists o,
-      nnrc_imp_eval brand_relation_brands σc si = Some o
+      nnrs_imp_eval brand_relation_brands σc si = Some o
       /\ forall d, o = Some d -> d ▹ τ.
   Proof.
     intros typσc typq.
-    destruct (typed_nnrc_imp_yields_typed_data_aux typσc typq)
+    destruct (typed_nnrs_imp_yields_typed_data_aux typσc typq)
       as [? [?[??]]].
     eauto.
   Qed.
 
-  Theorem typed_nnrc_imp_yields_typed_data_used {σc} {Γc} {τ} {si:nnrc_imp}:
-    nnrc_imp_returns si ->
+  Theorem typed_nnrs_imp_yields_typed_data_used {σc} {Γc} {τ} {si:nnrs_imp}:
+    nnrs_imp_returns si ->
     bindings_type σc Γc ->
     [ Γc ⊢ si ▷ τ ] ->
     exists d,
-      nnrc_imp_eval brand_relation_brands σc si = Some (Some d)
+      nnrs_imp_eval brand_relation_brands σc si = Some (Some d)
       /\ d ▹ τ.
   Proof.
     intros ma typσc typq.
-    destruct (typed_nnrc_imp_yields_typed_data_aux typσc typq)
+    destruct (typed_nnrs_imp_yields_typed_data_aux typσc typq)
       as [? [?[??]]].
     rewrite ma in H1.
     destruct H1; trivial.
     subst; eauto.
   Qed.
   
-  Theorem typed_nnrc_imp_top_yields_typed_data {σc} {Γc} {τ} {si:nnrc_imp}:
+  Theorem typed_nnrs_imp_top_yields_typed_data {σc} {Γc} {τ} {si:nnrs_imp}:
     bindings_type σc Γc ->
     [ rec_sort Γc ⊢ si ▷ τ ] ->
     forall d, 
-      nnrc_imp_eval_top brand_relation_brands σc si = Some d
+      nnrs_imp_eval_top brand_relation_brands σc si = Some d
       -> d ▹ τ.
   Proof.
     intros bt typ.
-    destruct (typed_nnrc_imp_yields_typed_data (bindings_type_sort _ _ bt) typ)
+    destruct (typed_nnrs_imp_yields_typed_data (bindings_type_sort _ _ bt) typ)
       as [o [eqq dtyp]].
-    unfold nnrc_imp_eval_top.
+    unfold nnrs_imp_eval_top.
     rewrite eqq; unfold id; simpl; tauto.
   Qed.
 
-  Theorem typed_nnrc_imp_top_yields_typed_data_used {σc} {Γc} {τ} {si:nnrc_imp}:
-    nnrc_imp_returns si ->
+  Theorem typed_nnrs_imp_top_yields_typed_data_used {σc} {Γc} {τ} {si:nnrs_imp}:
+    nnrs_imp_returns si ->
     bindings_type σc Γc ->
     [ rec_sort Γc ⊢ si ▷ τ ] ->
     exists d,
-      nnrc_imp_eval_top brand_relation_brands σc si = Some d
+      nnrs_imp_eval_top brand_relation_brands σc si = Some d
       /\ d ▹ τ.
   Proof.
     intros ma bt typ.
-    destruct (typed_nnrc_imp_yields_typed_data_used ma (bindings_type_sort _ _ bt) typ) as [o [eqq dtyp]].
-    unfold nnrc_imp_eval_top.
+    destruct (typed_nnrs_imp_yields_typed_data_used ma (bindings_type_sort _ _ bt) typ) as [o [eqq dtyp]].
+    unfold nnrs_imp_eval_top.
     rewrite eqq; unfold id; simpl.
     eauto.
   Qed.
@@ -1088,7 +1088,7 @@ Section TNNRCimp.
     (* restates type soundness theorems in terms of the semantics.  
        This enables nicer notation :-) *)
 
-    Theorem typed_nnrc_imp_yields_typed_data_sem {σc} {Γc} {τ} {si:nnrc_imp}:
+    Theorem typed_nnrs_imp_yields_typed_data_sem {σc} {Γc} {τ} {si:nnrs_imp}:
       bindings_type σc Γc ->
       [ Γc ⊢ si ▷ τ ] ->
       exists o,
@@ -1096,14 +1096,14 @@ Section TNNRCimp.
         /\ forall d, o = Some d -> d ▹ τ.
     Proof.
       intros typΓc typsi.
-      destruct (typed_nnrc_imp_yields_typed_data typΓc typsi)
+      destruct (typed_nnrs_imp_yields_typed_data typΓc typsi)
         as [o [ev F]].
-      apply nnrc_imp_sem_eval in ev.
+      apply nnrs_imp_sem_eval in ev.
       eauto.
     Qed.
 
-    Theorem typed_nnrc_imp_yields_typed_data_used_sem {σc} {Γc} {τ} {si:nnrc_imp}:
-      nnrc_imp_returns si ->
+    Theorem typed_nnrs_imp_yields_typed_data_used_sem {σc} {Γc} {τ} {si:nnrs_imp}:
+      nnrs_imp_returns si ->
       bindings_type σc Γc ->
       [ Γc ⊢ si ▷ τ ] ->
       exists d,
@@ -1111,19 +1111,19 @@ Section TNNRCimp.
         /\ d ▹ τ.
     Proof.
       intros ma typΓc typsi.
-      destruct (typed_nnrc_imp_yields_typed_data_used ma typΓc typsi)
+      destruct (typed_nnrs_imp_yields_typed_data_used ma typΓc typsi)
         as [o [ev F]].
-      apply nnrc_imp_sem_eval in ev.
+      apply nnrs_imp_sem_eval in ev.
       eauto.
     Qed.
 
   End sem.
   
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrc_imp_expr_type_lookup_equiv_prop {m:basic_model} :
-    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_imp_expr_type.
+  Global Instance nnrs_imp_expr_type_lookup_equiv_prop {m:basic_model} :
+    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrs_imp_expr_type.
   Proof.
-    cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrc_imp_expr_type);
+    cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrs_imp_expr_type);
       unfold Proper, respectful, lookup_equiv, iff, impl; intros; subst;
         [intuition; eauto | ].
     rename y1 into e.
@@ -1135,12 +1135,12 @@ Section TNNRCimp.
     rewrite <- H0; trivial.
   Qed.
 
-  Global Instance nnrc_imp_stmt_type_lookup_equiv_prop :
-    Proper (eq ==> lookup_equiv  ==> eq ==> iff) nnrc_imp_stmt_type.
+  Global Instance nnrs_imp_stmt_type_lookup_equiv_prop :
+    Proper (eq ==> lookup_equiv  ==> eq ==> iff) nnrs_imp_stmt_type.
   Proof.
-    Hint Constructors nnrc_imp_stmt_type.
+    Hint Constructors nnrs_imp_stmt_type.
     
-    cut (Proper (eq ==> lookup_equiv ==> eq ==> impl) nnrc_imp_stmt_type)
+    cut (Proper (eq ==> lookup_equiv ==> eq ==> impl) nnrs_imp_stmt_type)
     ; unfold Proper, respectful, iff, impl; intros; subst;
       [unfold lookup_equiv in *; intuition; eauto | ].
     rename x0 into Γ₁.
@@ -1162,8 +1162,8 @@ Section TNNRCimp.
     ; rewrite <- Γeqq; eauto.
   Qed.
   
-End TNNRCimp.
+End TNNRSimp.
 
-Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrc_imp_expr_type Γc Γ e τ) : nnrc_imp.
-Notation "[ Γc ; Γ ⊢ s ]" := (nnrc_imp_stmt_type Γc Γ s) : nnrc_imp.
-Notation "[ Γc ⊢ si ▷ τ ]" := (nnrc_imp_type Γc si τ) : nnrc_imp.
+Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp.
+Notation "[ Γc ; Γ ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp.
+Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_imp_type Γc si τ) : nnrs_imp.

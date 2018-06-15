@@ -15,4 +15,4 @@
  *)
 
 Require Export CommonTypes.
-Require Export TNNRCimp.
+Require Export TNNRSimp.

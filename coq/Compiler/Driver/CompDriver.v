@@ -36,7 +36,7 @@ Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRSRuntime.
-Require Import NNRCimpRuntime.
+Require Import NNRSimpRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
@@ -70,8 +70,8 @@ Require Import NRAEnvtocNRAEnv.
 Require Import NRAtocNRAEnv.
 Require Import NNRCtocNNRC.
 Require Import NNRCtoNNRS.
-Require Import NNRStoNNRCimp.
-Require Import NNRCimptoJavaScriptAst.
+Require Import NNRStoNNRSimp.
+Require Import NNRSimptoJavaScriptAst.
 Require Import JavaScriptAsttoJavaScript.
 Require Import NNRCtoDNNRC.
 Require Import NNRCtoNNRCMR.
@@ -229,11 +229,11 @@ Section CompDriver.
     Definition nnrc_to_nnrs (inputs: list var) (q: nnrc) : nnrs :=
       nnrc_to_nnrs_top inputs q.
 
-    Definition nnrs_to_nnrc_imp (q: nnrs) : nnrc_imp :=
-      nnrs_to_nnrc_imp_top "$"%string q.
+    Definition nnrs_to_nnrs_imp (q: nnrs) : nnrs_imp :=
+      nnrs_to_nnrs_imp_top "$"%string q.
 
-    Definition nnrc_imp_to_js_ast (inputs: list var) (q: nnrc_imp) : js_ast :=
-      nnrc_imp_to_js_ast_top inputs q.
+    Definition nnrs_imp_to_js_ast (inputs: list var) (q: nnrs_imp) : js_ast :=
+      nnrs_imp_to_js_ast_top inputs q.
 
     Definition js_ast_to_javascript (q: js_ast) : javascript :=
       js_ast_to_js_top q.
@@ -342,14 +342,14 @@ Section CompDriver.
     | Dv_dnnrc_to_dnnrc_typed : tdbindings -> dnnrc_typed_driver -> dnnrc_driver
   .
 
-  Inductive nnrc_imp_driver : Set :=
-    | Dv_nnrc_imp_stop : nnrc_imp_driver
-    | Dv_nnrc_imp_to_js_ast : (* inputs *) list var -> js_ast_driver -> nnrc_imp_driver
+  Inductive nnrs_imp_driver : Set :=
+    | Dv_nnrs_imp_stop : nnrs_imp_driver
+    | Dv_nnrs_imp_to_js_ast : (* inputs *) list var -> js_ast_driver -> nnrs_imp_driver
   .
 
   Inductive nnrs_driver : Set :=
     | Dv_nnrs_stop : nnrs_driver
-    | Dv_nnrs_to_nnrc_imp : nnrc_imp_driver -> nnrs_driver
+    | Dv_nnrs_to_nnrs_imp : nnrs_imp_driver -> nnrs_driver
   .
 
   Inductive nnrs_core_driver : Set :=
@@ -474,7 +474,7 @@ Section CompDriver.
   | Dv_nnrc : nnrc_driver -> driver
   | Dv_nnrs_core : nnrs_core_driver -> driver
   | Dv_nnrs : nnrs_driver -> driver
-  | Dv_nnrc_imp : nnrc_imp_driver -> driver
+  | Dv_nnrs_imp : nnrs_imp_driver -> driver
   | Dv_nnrcmr : nnrcmr_driver -> driver
   | Dv_cldmr : cldmr_driver -> driver
   | Dv_dnnrc : dnnrc_driver -> driver
@@ -504,7 +504,7 @@ Section CompDriver.
     | Case_aux c "Dv_nnrc"%string
     | Case_aux c "Dv_nnrs_core"%string
     | Case_aux c "Dv_nnrs"%string
-    | Case_aux c "Dv_nnrc_imp"%string
+    | Case_aux c "Dv_nnrs_imp"%string
     | Case_aux c "Dv_nnrcmr"%string
     | Case_aux c "Dv_cldmr"%string
     | Case_aux c "Dv_dnnrc"%string
@@ -530,7 +530,7 @@ Section CompDriver.
     | Dv_nnrc _ => L_nnrc
     | Dv_nnrs_core _ => L_nnrs_core
     | Dv_nnrs _ => L_nnrs
-    | Dv_nnrc_imp _ => L_nnrc_imp
+    | Dv_nnrs_imp _ => L_nnrs_imp
     | Dv_nnrcmr _ => L_nnrcmr
     | Dv_camp_rule _ => L_camp_rule
     | Dv_tech_rule _ => L_tech_rule
@@ -592,16 +592,16 @@ Section CompDriver.
     | Dv_cldmr_to_cloudant queryname h dv => 1 + driver_length_cloudant dv
     end.
 
-  Definition driver_length_nnrc_imp (dv: nnrc_imp_driver) :=
+  Definition driver_length_nnrs_imp (dv: nnrs_imp_driver) :=
     match dv with
-    | Dv_nnrc_imp_stop => 1
-    | Dv_nnrc_imp_to_js_ast _ dv => 1 + driver_length_js_ast dv
+    | Dv_nnrs_imp_stop => 1
+    | Dv_nnrs_imp_to_js_ast _ dv => 1 + driver_length_js_ast dv
     end.
 
   Definition driver_length_nnrs (dv: nnrs_driver) :=
     match dv with
     | Dv_nnrs_stop => 1
-    | Dv_nnrs_to_nnrc_imp dv => 1 + driver_length_nnrc_imp dv
+    | Dv_nnrs_to_nnrs_imp dv => 1 + driver_length_nnrs_imp dv
     end.
 
   Definition driver_length_nnrs_core (dv: nnrs_core_driver) :=
@@ -743,7 +743,7 @@ Section CompDriver.
     | Dv_nnrc dv => driver_length_nnrc dv
     | Dv_nnrs_core dv => driver_length_nnrs_core dv
     | Dv_nnrs dv => driver_length_nnrs dv
-    | Dv_nnrc_imp dv => driver_length_nnrc_imp dv
+    | Dv_nnrs_imp dv => driver_length_nnrs_imp dv
     | Dv_nnrcmr dv => driver_length_nnrcmr dv
     | Dv_cldmr dv => driver_length_cldmr dv
     | Dv_dnnrc dv => driver_length_dnnrc dv
@@ -823,24 +823,24 @@ Section CompDriver.
       in
       (Q_cldmr q) :: queries.
 
-    Definition compile_nnrc_imp (dv: nnrc_imp_driver) (q: nnrc_imp) : list query :=
+    Definition compile_nnrs_imp (dv: nnrs_imp_driver) (q: nnrs_imp) : list query :=
       let queries :=
           match dv with
-          | Dv_nnrc_imp_stop => nil
-          | Dv_nnrc_imp_to_js_ast inputs dv =>
-            let q := nnrc_imp_to_js_ast inputs q in
+          | Dv_nnrs_imp_stop => nil
+          | Dv_nnrs_imp_to_js_ast inputs dv =>
+            let q := nnrs_imp_to_js_ast inputs q in
             compile_js_ast dv q
           end
       in
-      (Q_nnrc_imp q) :: queries.
+      (Q_nnrs_imp q) :: queries.
 
     Definition compile_nnrs (dv: nnrs_driver) (q: nnrs) : list query :=
       let queries :=
           match dv with
           | Dv_nnrs_stop => nil
-          | Dv_nnrs_to_nnrc_imp dv =>
-            let q := nnrs_to_nnrc_imp q in
-            compile_nnrc_imp dv q
+          | Dv_nnrs_to_nnrs_imp dv =>
+            let q := nnrs_to_nnrs_imp q in
+            compile_nnrs_imp dv q
           end
       in
       (Q_nnrs q) :: queries.
@@ -1118,7 +1118,7 @@ Section CompDriver.
       | (Dv_nnrc dv, Q_nnrc q) => compile_nnrc dv q
       | (Dv_nnrs_core dv, Q_nnrs_core q) => compile_nnrs_core dv q
       | (Dv_nnrs dv, Q_nnrs q) => compile_nnrs dv q
-      | (Dv_nnrc_imp dv, Q_nnrc_imp q) => compile_nnrc_imp dv q
+      | (Dv_nnrs_imp dv, Q_nnrs_imp q) => compile_nnrs_imp dv q
       | (Dv_nnrcmr dv, Q_nnrcmr q) => compile_nnrcmr dv q
       | (Dv_cldmr dv, Q_cldmr q) => compile_cldmr dv q
       | (Dv_dnnrc dv, Q_dnnrc q) => compile_dnnrc dv q
@@ -1156,7 +1156,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1188,7 +1188,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1220,7 +1220,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1252,7 +1252,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1284,7 +1284,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1316,7 +1316,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1348,7 +1348,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1380,7 +1380,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1412,7 +1412,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1444,7 +1444,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1476,7 +1476,7 @@ Section CompDriver.
       | Dv_lambda_nra _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1499,7 +1499,7 @@ Section CompDriver.
       | Dv_nnrc_core _
       | Dv_nraenv _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_js_ast _
@@ -1542,7 +1542,7 @@ Section CompDriver.
       | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrs_core _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_js_ast _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1572,7 +1572,7 @@ Section CompDriver.
       | Dv_nnrc_core _
       | Dv_nnrc _
       | Dv_nnrs_core _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1589,7 +1589,7 @@ Section CompDriver.
       end
     | L_nnrs =>
       match dv with
-      | Dv_nnrc_imp dv => Dv_nnrs (Dv_nnrs_to_nnrc_imp dv)
+      | Dv_nnrs_imp dv => Dv_nnrs (Dv_nnrs_to_nnrs_imp dv)
       | Dv_camp _
       | Dv_nraenv_core _
       | Dv_nraenv _
@@ -1619,9 +1619,9 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-    | L_nnrc_imp =>
+    | L_nnrs_imp =>
       match dv with
-      | Dv_js_ast dv => Dv_nnrc_imp (Dv_nnrc_imp_to_js_ast (vars_of_constants_config config.(comp_constants)) dv)
+      | Dv_js_ast dv => Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast (vars_of_constants_config config.(comp_constants)) dv)
       | Dv_camp _
       | Dv_nraenv_core _
       | Dv_nraenv _
@@ -1637,7 +1637,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1662,7 +1662,7 @@ Section CompDriver.
       | Dv_nnrc_core _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
@@ -1701,7 +1701,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1735,7 +1735,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_js_ast _
@@ -1769,7 +1769,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1801,7 +1801,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_nnrc_imp _
+      | Dv_nnrs_imp _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -1842,7 +1842,7 @@ Section CompDriver.
     | L_nnrc => Dv_nnrc Dv_nnrc_stop
     | L_nnrs_core => Dv_nnrs_core Dv_nnrs_core_stop
     | L_nnrs => Dv_nnrs Dv_nnrs_stop
-    | L_nnrc_imp => Dv_nnrc_imp Dv_nnrc_imp_stop
+    | L_nnrs_imp => Dv_nnrs_imp Dv_nnrs_imp_stop
     | L_nnrcmr => Dv_nnrcmr Dv_nnrcmr_stop
     | L_cldmr => Dv_cldmr Dv_cldmr_stop
     | L_dnnrc => Dv_dnnrc Dv_dnnrc_stop
@@ -1928,9 +1928,9 @@ Section CompDriver.
           opc = (get_optim_config L_nnrc config.(comp_optim_config))
         | Dv_nnrc_core (Dv_nnrc_core_to_camp avoid _) =>
           avoid = (List.map fst (vdbindings_of_constants_config config.(comp_constants)))
-        | Dv_nnrs (Dv_nnrs_to_nnrc_imp _) =>
+        | Dv_nnrs (Dv_nnrs_to_nnrs_imp _) =>
           True (* inputs = (vars_of_constants_config config.(comp_constants)) *)
-        | Dv_nnrc_imp (Dv_nnrc_imp_to_js_ast inputs _) =>
+        | Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast inputs _) =>
           inputs = (vars_of_constants_config config.(comp_constants))
         | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd qname _) =>
           qname = config.(comp_qname)
@@ -2005,9 +2005,9 @@ Section CompDriver.
     | Dv_nnrs_core (Dv_nnrs_core_to_nnrs dv) => (L_nnrs_core, Some (Dv_nnrs dv))
     | Dv_nnrs_core (Dv_nnrs_core_stop) => (L_nnrs_core, None)
     | Dv_nnrs (Dv_nnrs_stop) => (L_nnrs, None)
-    | Dv_nnrs (Dv_nnrs_to_nnrc_imp dv) => (L_nnrs, Some (Dv_nnrc_imp dv))
-    | Dv_nnrc_imp (Dv_nnrc_imp_stop) => (L_nnrc_imp, None)
-    | Dv_nnrc_imp (Dv_nnrc_imp_to_js_ast inputs dv) => (L_nnrc_imp, Some (Dv_js_ast dv))
+    | Dv_nnrs (Dv_nnrs_to_nnrs_imp dv) => (L_nnrs, Some (Dv_nnrs_imp dv))
+    | Dv_nnrs_imp (Dv_nnrs_imp_stop) => (L_nnrs_imp, None)
+    | Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast inputs dv) => (L_nnrs_imp, Some (Dv_js_ast dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
     | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd name dv) => (L_nnrcmr, Some (Dv_spark_rdd dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
@@ -2172,8 +2172,8 @@ Section CompDriver.
       rewrite (constants_config_of_tdbindings_merges t); reflexivity.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_nnrc_imp:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrc_imp dv))) (Dv_nnrc_imp dv)).
+  Lemma target_language_of_driver_is_postfix_nnrs_imp:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrs_imp dv))) (Dv_nnrs_imp dv)).
   Proof.
     destruct dv; simpl.
     - reflexivity.
@@ -2188,7 +2188,7 @@ Section CompDriver.
                  EmptyString
                  (one_constant_config_of_avoid_list l)
                  EmptyString
-                 nil) (lang:=L_nnrc_imp)
+                 nil) (lang:=L_nnrs_imp)
       ; [eapply target_language_of_driver_is_postfix_js_ast | | ]; simpl; trivial.
       rewrite vars_of_one_constant_config_of_avoid_list; reflexivity.
   Qed.
@@ -2211,7 +2211,7 @@ Section CompDriver.
                  nil
                  EmptyString
                  nil) (lang:=L_nnrs)
-      ; [eapply target_language_of_driver_is_postfix_nnrc_imp | | ]; simpl; trivial.
+      ; [eapply target_language_of_driver_is_postfix_nnrs_imp | | ]; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_nnrs_core:
@@ -2588,7 +2588,7 @@ Section CompDriver.
          target_language_of_driver_is_postfix_nnrc
          target_language_of_driver_is_postfix_nnrs_core
          target_language_of_driver_is_postfix_nnrs
-         target_language_of_driver_is_postfix_nnrc_imp
+         target_language_of_driver_is_postfix_nnrs_imp
          target_language_of_driver_is_postfix_nnrcmr
          target_language_of_driver_is_postfix_camp_rule
          target_language_of_driver_is_postfix_tech_rule
@@ -2668,7 +2668,7 @@ Section CompDriver.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (comp_class_name config0) (comp_java_imports config0) j)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
-        * destruct (H_config (Dv_nnrc_imp (Dv_nnrc_imp_to_js_ast (vars_of_constants_config (comp_constants config0)) j)));
+        * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast (vars_of_constants_config (comp_constants config0)) j)));
             try reflexivity.
         * destruct (H_config (Dv_nnrcmr (Dv_nnrcmr_to_cldmr (comp_brand_rel config0) c)));
             reflexivity.
@@ -2793,7 +2793,7 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_camp_rule, L_nnrc_imp =>
+      | L_camp_rule, L_nnrs_imp =>
         L_camp_rule
           :: L_camp
           :: L_nraenv
@@ -2801,7 +2801,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_camp_rule, L_js_ast =>
         L_camp_rule
@@ -2811,7 +2811,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_camp_rule, L_nnrcmr =>
@@ -2982,7 +2982,7 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_tech_rule, L_nnrc_imp =>
+      | L_tech_rule, L_nnrs_imp =>
         L_tech_rule
           :: L_camp_rule
           :: L_camp
@@ -2991,7 +2991,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_tech_rule, L_js_ast =>
         L_tech_rule
@@ -3002,7 +3002,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_tech_rule, L_nnrcmr =>
@@ -3180,7 +3180,7 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_designer_rule, L_nnrc_imp =>
+      | L_designer_rule, L_nnrs_imp =>
         L_designer_rule
           :: L_camp_rule
           :: L_camp
@@ -3189,7 +3189,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_designer_rule, L_js_ast =>
         L_designer_rule
@@ -3200,7 +3200,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_designer_rule, L_nnrcmr =>
@@ -3351,14 +3351,14 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_camp, L_nnrc_imp =>
+      | L_camp, L_nnrs_imp =>
         L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_camp, L_js_ast =>
         L_camp
@@ -3367,7 +3367,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_camp, L_nnrcmr =>
@@ -3517,14 +3517,14 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_oql, L_nnrc_imp =>
+      | L_oql, L_nnrs_imp =>
         L_oql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_oql, L_js_ast =>
         L_oql
@@ -3533,7 +3533,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_oql, L_nnrcmr =>
@@ -3684,14 +3684,14 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_sql, L_nnrc_imp =>
+      | L_sql, L_nnrs_imp =>
         L_sql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_sql, L_js_ast =>
         L_sql
@@ -3700,7 +3700,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_sql, L_nnrcmr =>
@@ -3851,14 +3851,14 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_sqlpp, L_nnrc_imp =>
+      | L_sqlpp, L_nnrs_imp =>
         L_sqlpp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_sqlpp, L_js_ast =>
         L_sqlpp
@@ -3867,7 +3867,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_sqlpp, L_nnrcmr =>
@@ -4018,14 +4018,14 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_lambda_nra, L_nnrc_imp =>
+      | L_lambda_nra, L_nnrs_imp =>
         L_lambda_nra
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_lambda_nra, L_js_ast =>
         L_lambda_nra
@@ -4034,7 +4034,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_lambda_nra, L_nnrcmr =>
@@ -4179,7 +4179,7 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_nra, L_nnrc_imp =>
+      | L_nra, L_nnrs_imp =>
         L_nra
           :: L_nraenv_core
           :: L_nraenv
@@ -4187,7 +4187,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nra, L_js_ast =>
         L_nra
@@ -4197,7 +4197,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nra, L_nnrcmr =>
@@ -4342,14 +4342,14 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_nraenv_core, L_nnrc_imp =>
+      | L_nraenv_core, L_nnrs_imp =>
         L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nraenv_core, L_js_ast =>
         L_nraenv_core
@@ -4358,7 +4358,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nraenv_core, L_nnrcmr =>
@@ -4496,13 +4496,13 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_nraenv, L_nnrc_imp =>
+      | L_nraenv, L_nnrs_imp =>
         L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nraenv, L_js_ast =>
         L_nraenv
@@ -4510,7 +4510,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nraenv, L_nnrcmr =>
@@ -4630,19 +4630,19 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_nnrc_core, L_nnrc_imp =>
+      | L_nnrc_core, L_nnrs_imp =>
         L_nnrc_core
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nnrc_core, L_js_ast =>
         L_nnrc_core
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nnrc_core, L_nnrcmr =>
@@ -4760,17 +4760,17 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_nnrc, L_nnrc_imp =>
+      | L_nnrc, L_nnrs_imp =>
         L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nnrc, L_js_ast =>
         L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nnrc, L_nnrcmr =>
@@ -4825,18 +4825,18 @@ Section CompDriver.
       | L_nnrs, L_nnrs =>
         L_nnrs
           :: nil
-      | L_nnrs, L_nnrc_imp =>
+      | L_nnrs, L_nnrs_imp =>
         L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nnrs, L_js_ast =>
         L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nnrs, L_javascript =>
         L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4848,34 +4848,34 @@ Section CompDriver.
         L_nnrs_core
           :: L_nnrs
           :: nil
-      | L_nnrs_core, L_nnrc_imp =>
+      | L_nnrs_core, L_nnrs_imp =>
         L_nnrs_core
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nnrs_core, L_js_ast =>
         L_nnrs_core
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nnrs_core, L_javascript =>
         L_nnrs_core
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: L_javascript
           :: nil
       (* From nnrs: *)
-      | L_nnrc_imp, L_nnrc_imp =>
-        L_nnrc_imp
+      | L_nnrs_imp, L_nnrs_imp =>
+        L_nnrs_imp
           :: nil
-      | L_nnrc_imp, L_js_ast =>
-        L_nnrc_imp
+      | L_nnrs_imp, L_js_ast =>
+        L_nnrs_imp
           :: L_js_ast
           :: nil
-      | L_nnrc_imp, L_javascript =>
-        L_nnrc_imp
+      | L_nnrs_imp, L_javascript =>
+        L_nnrs_imp
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4947,13 +4947,13 @@ Section CompDriver.
           :: L_nnrc_core
           :: L_nnrs_core
           :: nil
-      | L_nnrcmr, L_nnrc_imp =>
+      | L_nnrcmr, L_nnrs_imp =>
         L_nnrcmr
           :: L_nnrcmr
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: nil
       | L_nnrcmr, L_js_ast =>
         L_nnrcmr
@@ -4961,7 +4961,7 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrc
           :: L_nnrs
-          :: L_nnrc_imp
+          :: L_nnrs_imp
           :: L_js_ast
           :: nil
       | L_nnrcmr, L_javascript =>
@@ -5171,14 +5171,14 @@ Section CompDriver.
 
     Hint Resolve exists_path_from_source_target_completeness_js_ast : exists_path_hints.
 
-    Lemma exists_path_from_source_target_completeness_nnrc_imp :
+    Lemma exists_path_from_source_target_completeness_nnrs_imp :
       (forall dv,
-          exists_path_from_source_target L_nnrc_imp (target_language_of_driver (Dv_nnrc_imp dv))).
+          exists_path_from_source_target L_nnrs_imp (target_language_of_driver (Dv_nnrs_imp dv))).
     Proof.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_nnrc_imp : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_nnrs_imp : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_nnrs :
       (forall dv,

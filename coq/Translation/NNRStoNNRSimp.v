@@ -27,40 +27,40 @@ Require Import Program.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import NNRSRuntime.
-Require Import NNRCimpRuntime.
+Require Import NNRSimpRuntime.
 Require Import NNRSCrossShadow.
 Require Import Fresh.
 
-Section NNRStoNNRCimp.
+Section NNRStoNNRSimp.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint nnrs_expr_to_nnrc_imp_expr (e: nnrs_expr) : nnrc_imp_expr
+  Fixpoint nnrs_expr_to_nnrs_imp_expr (e: nnrs_expr) : nnrs_imp_expr
     := match e with
        | NNRSGetConstant v =>
-         NNRCimpGetConstant v
+         NNRSimpGetConstant v
        | NNRSVar v =>
-         NNRCimpVar v
+         NNRSimpVar v
        | NNRSConst d =>
-         NNRCimpConst d
+         NNRSimpConst d
        | NNRSBinop bop e₁ e₂ =>
-         NNRCimpBinop bop
-                      (nnrs_expr_to_nnrc_imp_expr e₁)
-                      (nnrs_expr_to_nnrc_imp_expr e₂)
+         NNRSimpBinop bop
+                      (nnrs_expr_to_nnrs_imp_expr e₁)
+                      (nnrs_expr_to_nnrs_imp_expr e₂)
        | NNRSUnop uop e =>
-         NNRCimpUnop uop
-                     (nnrs_expr_to_nnrc_imp_expr e)
+         NNRSimpUnop uop
+                     (nnrs_expr_to_nnrs_imp_expr e)
        | NNRSGroupBy g sl e =>
-         NNRCimpGroupBy g sl
-                        (nnrs_expr_to_nnrc_imp_expr e)
+         NNRSimpGroupBy g sl
+                        (nnrs_expr_to_nnrs_imp_expr e)
        end.
 
-  Lemma nnrs_expr_to_nnrc_imp_expr_correct (e:nnrs_expr) :
+  Lemma nnrs_expr_to_nnrs_imp_expr_correct (e:nnrs_expr) :
     forall h σc σ,
       nnrs_expr_eval h σc σ e =
-      nnrc_imp_expr_eval h σc
+      nnrs_imp_expr_eval h σc
                          σ
-                         (nnrs_expr_to_nnrc_imp_expr e) .
+                         (nnrs_expr_to_nnrs_imp_expr e) .
   Proof.
     induction e; intros h σc σ; simpl; trivial
     ; try rewrite IHe
@@ -69,96 +69,96 @@ Section NNRStoNNRCimp.
     ; trivial.
   Qed.
 
-  Fixpoint nnrs_stmt_to_nnrc_imp_stmt (s: nnrs_stmt)
-    : nnrc_imp_stmt
+  Fixpoint nnrs_stmt_to_nnrs_imp_stmt (s: nnrs_stmt)
+    : nnrs_imp_stmt
     := match s with
        | NNRSSeq s₁ s₂ =>
-         NNRCimpSeq
-           (nnrs_stmt_to_nnrc_imp_stmt s₁)
-           (nnrs_stmt_to_nnrc_imp_stmt s₂)
+         NNRSimpSeq
+           (nnrs_stmt_to_nnrs_imp_stmt s₁)
+           (nnrs_stmt_to_nnrs_imp_stmt s₂)
        | NNRSLet v e s₀ =>
-         NNRCimpLet v
-                    (Some (nnrs_expr_to_nnrc_imp_expr e))
-                    (nnrs_stmt_to_nnrc_imp_stmt s₀)
+         NNRSimpLet v
+                    (Some (nnrs_expr_to_nnrs_imp_expr e))
+                    (nnrs_stmt_to_nnrs_imp_stmt s₀)
        | NNRSLetMut v s₁ s₂ =>
-         NNRCimpLet v
+         NNRSimpLet v
                     None
-                    (NNRCimpSeq
-                       (nnrs_stmt_to_nnrc_imp_stmt s₁)
-                       (nnrs_stmt_to_nnrc_imp_stmt s₂))
+                    (NNRSimpSeq
+                       (nnrs_stmt_to_nnrs_imp_stmt s₁)
+                       (nnrs_stmt_to_nnrs_imp_stmt s₂))
        | NNRSLetMutColl v s₁ s₂ =>
-         NNRCimpLet v
-                    (Some (NNRCimpConst (dcoll nil)))
-                    (NNRCimpSeq
-                       (nnrs_stmt_to_nnrc_imp_stmt s₁)
-                       (nnrs_stmt_to_nnrc_imp_stmt s₂))
+         NNRSimpLet v
+                    (Some (NNRSimpConst (dcoll nil)))
+                    (NNRSimpSeq
+                       (nnrs_stmt_to_nnrs_imp_stmt s₁)
+                       (nnrs_stmt_to_nnrs_imp_stmt s₂))
        | NNRSAssign v e =>
-         NNRCimpAssign v
-                       (nnrs_expr_to_nnrc_imp_expr e)
+         NNRSimpAssign v
+                       (nnrs_expr_to_nnrs_imp_expr e)
        | NNRSPush v e =>
-         NNRCimpAssign v
-                       (NNRCimpBinop OpBagUnion
-                                     (NNRCimpVar v)
-                                     (NNRCimpUnop OpBag (nnrs_expr_to_nnrc_imp_expr e)))
+         NNRSimpAssign v
+                       (NNRSimpBinop OpBagUnion
+                                     (NNRSimpVar v)
+                                     (NNRSimpUnop OpBag (nnrs_expr_to_nnrs_imp_expr e)))
        | NNRSFor v e s₀ =>
-         NNRCimpFor v
-                    (nnrs_expr_to_nnrc_imp_expr e)
-                    (nnrs_stmt_to_nnrc_imp_stmt s₀)
+         NNRSimpFor v
+                    (nnrs_expr_to_nnrs_imp_expr e)
+                    (nnrs_stmt_to_nnrs_imp_stmt s₀)
        | NNRSIf e s₁ s₂ =>
-         NNRCimpIf
-           (nnrs_expr_to_nnrc_imp_expr e)
-           (nnrs_stmt_to_nnrc_imp_stmt s₁)
-           (nnrs_stmt_to_nnrc_imp_stmt s₂)           
+         NNRSimpIf
+           (nnrs_expr_to_nnrs_imp_expr e)
+           (nnrs_stmt_to_nnrs_imp_stmt s₁)
+           (nnrs_stmt_to_nnrs_imp_stmt s₂)           
        | NNRSEither e x₁ s₁ x₂ s₂ =>
-         NNRCimpEither
-           (nnrs_expr_to_nnrc_imp_expr e)
-           x₁ (nnrs_stmt_to_nnrc_imp_stmt s₁)
-           x₂ (nnrs_stmt_to_nnrc_imp_stmt s₂)
+         NNRSimpEither
+           (nnrs_expr_to_nnrs_imp_expr e)
+           x₁ (nnrs_stmt_to_nnrs_imp_stmt s₁)
+           x₂ (nnrs_stmt_to_nnrs_imp_stmt s₂)
        end.
 
-  Definition nnrs_to_nnrc_imp (s: nnrs)
-    : nnrc_imp
-    := (nnrs_stmt_to_nnrc_imp_stmt (fst s), snd s).
+  Definition nnrs_to_nnrs_imp (s: nnrs)
+    : nnrs_imp
+    := (nnrs_stmt_to_nnrs_imp_stmt (fst s), snd s).
 
-    Definition nnrs_to_nnrc_imp_top (sep:string) (s: nnrs)
-    : nnrc_imp
-      := nnrs_to_nnrc_imp (nnrs_uncross_shadow sep s).
+    Definition nnrs_to_nnrs_imp_top (sep:string) (s: nnrs)
+    : nnrs_imp
+      := nnrs_to_nnrs_imp (nnrs_uncross_shadow sep s).
 
   Definition pd_bindings := list (string*option data).
   Definition mc_bindings := list (string*list data).
   Definition md_bindings := list (string*option data).
   
-  Lemma nnrc_imp_stmt_eval_grouped_equiv {σ₁ σ₂} :
+  Lemma nnrs_imp_stmt_eval_grouped_equiv {σ₁ σ₂} :
     grouped_equiv σ₁ σ₂ ->
     forall h σc s,
       lift2P grouped_equiv
-             (nnrc_imp_stmt_eval h σc s σ₁) (nnrc_imp_stmt_eval h σc s σ₂).
+             (nnrs_imp_stmt_eval h σc s σ₁) (nnrs_imp_stmt_eval h σc s σ₂).
   Proof.
     intros ceq h σc s.
     revert σ₁ σ₂ ceq.
-    nnrc_imp_stmt_cases (induction s) Case
+    nnrs_imp_stmt_cases (induction s) Case
     ; simpl; intros σ₁ σ₂ ceq.
-    - Case "NNRCimpSeq"%string.
+    - Case "NNRSimpSeq"%string.
       generalize (IHs1 _ _ ceq)
       ; intros ceq1.
       unfold lift2P in ceq1; repeat match_option_in ceq1; simpl; try contradiction.
       eauto.
-    - Case "NNRCimpAssign"%string.
+    - Case "NNRSimpAssign"%string.
       repeat rewrite (grouped_equiv_lookup_equiv _ _ ceq).
       unfold var, string_eqdec.
       repeat match_destr; simpl; trivial.
       apply grouped_equiv_update_first; trivial.
-    - Case "NNRCimpLet"%string.
+    - Case "NNRSimpLet"%string.
       destruct o.
       + rewrite (grouped_equiv_lookup_equiv _ _ ceq).
-        destruct (nnrc_imp_expr_eval h σc σ₂ n); simpl; trivial.
+        destruct (nnrs_imp_expr_eval h σc σ₂ n); simpl; trivial.
         assert (ceq1cons: grouped_equiv ((v,Some d)::σ₁) ((v,Some d)::σ₂)).
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs _ _ ceq1cons).
         unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs; tauto.
@@ -166,13 +166,13 @@ Section NNRStoNNRCimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs _ _ ceq1cons).
         unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs; tauto.
-    - Case "NNRCimpFor"%string.
+    - Case "NNRSimpFor"%string.
       rewrite (grouped_equiv_lookup_equiv _ _ ceq).
       match_option; simpl; trivial.
       destruct d; simpl; trivial.
@@ -184,15 +184,15 @@ Section NNRStoNNRCimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs _ _ ceq1cons).
         unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs.
         destruct IHs as [? IHs]; subst.
         eauto.
-    - Case "NNRCimpIf"%string.
+    - Case "NNRSimpIf"%string.
       rewrite (grouped_equiv_lookup_equiv _ _ ceq).
       match_destr; simpl; trivial.
       destruct d; simpl; trivial.
@@ -204,9 +204,9 @@ Section NNRStoNNRCimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs1 _ _ ceq1cons).
         unfold lift2P in IHs1; repeat match_option_in IHs1; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs1.
@@ -215,9 +215,9 @@ Section NNRStoNNRCimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs2 _ _ ceq1cons).
         unfold lift2P in IHs2; repeat match_option_in IHs2; simpl; try contradiction.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs2.
@@ -321,15 +321,15 @@ Section NNRStoNNRCimp.
     tauto.
   Qed.
 
-  Lemma nnrs_stmt_to_nnrc_imp_stmt_correct (s:nnrs_stmt) :
+  Lemma nnrs_stmt_to_nnrs_imp_stmt_correct (s:nnrs_stmt) :
     forall h σc σ ψc ψd,
       nnrs_stmt_cross_shadow_free_under s (domain σ) (domain ψc) (domain ψd)->
       all_disjoint ((domain σ)::(domain ψc)::(domain ψd)::nil) ->
       lift2P grouped_equiv
              (lift concat_envs
                    (nnrs_stmt_eval h σc σ ψc ψd s))
-             (nnrc_imp_stmt_eval h σc
-                                 (nnrs_stmt_to_nnrc_imp_stmt s) 
+             (nnrs_imp_stmt_eval h σc
+                                 (nnrs_stmt_to_nnrs_imp_stmt s) 
                                  (concat_envs (σ, ψc, ψd))).
   Proof.
     unfold concat_envs.
@@ -345,13 +345,13 @@ Section NNRStoNNRCimp.
         rewrite eqq.
         preserve_doms.
         rewrite (IHs2 _ _ _ sf2 disj).
-        rewrite (nnrc_imp_stmt_eval_grouped_equiv IHs1).
+        rewrite (nnrs_imp_stmt_eval_grouped_equiv IHs1).
         reflexivity.
       + apply none_lift in eqq.
         rewrite eqq; simpl; trivial.
     - Case "NNRSLet"%string.
       destruct sf as [disj1 [disj2 [nin1 [nin2 sf]]]].
-      rewrite <- (nnrs_expr_to_nnrc_imp_expr_correct n).
+      rewrite <- (nnrs_expr_to_nnrs_imp_expr_correct n).
       rewrite nnrs_expr_eval_free_env, nnrs_expr_eval_free_env_tail
         by (try rewrite domain_map_codomain; tauto).
       match_option; simpl; trivial.
@@ -364,7 +364,7 @@ Section NNRStoNNRCimp.
           ; unfold var in *; rewrite eqq1 in IHs
           ; try contradiction.
           preserve_doms; simpl.
-          generalize (nnrc_imp_stmt_eval_env_domain_stack eqq1).
+          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1).
           destruct p0; simpl; intros deq; invcs deq.
           destruct p; simpl in IHs.
           apply grouped_equiv_cons_invs in IHs.
@@ -397,7 +397,7 @@ Section NNRStoNNRCimp.
         rewrite geq2 in IHs1 by trivial.
         preserve_doms.
         cut_to geq1; trivial.
-        generalize (nnrc_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrc_imp_stmt s1)); intros geq3.
+        generalize (nnrs_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrs_imp_stmt s1)); intros geq3.
         rewrite eqq0 in geq3.
         simpl in geq3.
         match_option_in geq3; try contradiction.
@@ -415,13 +415,13 @@ Section NNRStoNNRCimp.
         * match_option_in IHs2; try contradiction.
           destruct p1 as [[??]?].
           preserve_doms; simpl.
-          generalize (nnrc_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrc_imp_stmt s2)); intros geq4.
+          generalize (nnrs_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrs_imp_stmt s2)); intros geq4.
           rewrite eqq3 in geq4; simpl in geq4.
           match_option_in geq4; try contradiction.
           rewrite geq4 in IHs2.
-          generalize (nnrc_imp_stmt_eval_env_domain_stack eqq1)
+          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
           ; intros deq1.
-          generalize (nnrc_imp_stmt_eval_env_domain_stack eqq4)
+          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq4)
           ; intros deq2.
           rewrite deq2 in deq1.
           simpl in deq1.
@@ -430,7 +430,7 @@ Section NNRStoNNRCimp.
           apply grouped_equiv_cons_invs in IHs2.
           tauto.
         * match_option_in IHs2; try contradiction.
-          generalize (nnrc_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrc_imp_stmt s2)); intros geq4.
+          generalize (nnrs_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrs_imp_stmt s2)); intros geq4.
           rewrite eqq3 in geq4; simpl in *.
           match_option_in geq4; try contradiction.
       + apply none_lift in eqq.
@@ -438,7 +438,7 @@ Section NNRStoNNRCimp.
         generalize (grouped_equiv_mdenv_env (v,None) σ ψc ψd); simpl
         ; intros geq1.
         cut_to geq1; trivial.
-        generalize (nnrc_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrc_imp_stmt s1)); intros geq2.
+        generalize (nnrs_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrs_imp_stmt s1)); intros geq2.
         unfold var in *.
         rewrite eqq0 in geq2; simpl in *.
         match_option_in geq2; try contradiction.
@@ -465,7 +465,7 @@ Section NNRStoNNRCimp.
         rewrite geq2 in IHs1 by trivial.
         preserve_doms.
         cut_to geq1; trivial.
-        generalize (nnrc_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrc_imp_stmt s1)); intros geq3.
+        generalize (nnrs_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrs_imp_stmt s1)); intros geq3.
         rewrite eqq0 in geq3.
         simpl in geq3.
         match_option_in geq3; try contradiction.
@@ -483,13 +483,13 @@ Section NNRStoNNRCimp.
         * match_option_in IHs2; try contradiction.
           destruct p1 as [[??]?].
           preserve_doms; simpl.
-          generalize (nnrc_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrc_imp_stmt s2)); intros geq4.
+          generalize (nnrs_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrs_imp_stmt s2)); intros geq4.
           rewrite eqq3 in geq4; simpl in geq4.
           match_option_in geq4; try contradiction.
           rewrite geq4 in IHs2.
-          generalize (nnrc_imp_stmt_eval_env_domain_stack eqq1)
+          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
           ; intros deq1.
-          generalize (nnrc_imp_stmt_eval_env_domain_stack eqq4)
+          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq4)
           ; intros deq2.
           rewrite deq2 in deq1.
           simpl in deq1.
@@ -498,7 +498,7 @@ Section NNRStoNNRCimp.
           apply grouped_equiv_cons_invs in IHs2.
           tauto.
         * match_option_in IHs2; try contradiction.
-          generalize (nnrc_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrc_imp_stmt s2)); intros geq4.
+          generalize (nnrs_imp_stmt_eval_grouped_equiv IHs1 h σc (nnrs_stmt_to_nnrs_imp_stmt s2)); intros geq4.
           rewrite eqq3 in geq4; simpl in *.
           match_option_in geq4; try contradiction.
       + apply none_lift in eqq.
@@ -506,14 +506,14 @@ Section NNRStoNNRCimp.
         generalize (grouped_equiv_mcenv_env (v,nil) σ ψc ψd); simpl
         ; intros geq1.
         cut_to geq1; trivial.
-        generalize (nnrc_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrc_imp_stmt s1)); intros geq2.
+        generalize (nnrs_imp_stmt_eval_grouped_equiv geq1 h σc (nnrs_stmt_to_nnrs_imp_stmt s1)); intros geq2.
         unfold var in *.
         simpl in *.
         rewrite eqq0 in geq2; simpl in *.
         match_option_in geq2; try contradiction.
     - Case "NNRSAssign"%string.
       destruct sf as [disj1 [disj2 [nin1 nin2]]].
-      rewrite <- nnrs_expr_to_nnrc_imp_expr_correct.
+      rewrite <- nnrs_expr_to_nnrs_imp_expr_correct.
       rewrite nnrs_expr_eval_free_env, nnrs_expr_eval_free_env_tail           by (try rewrite domain_map_codomain; tauto).
       match_option; simpl; trivial.
       repeat rewrite lookup_app.
@@ -525,7 +525,7 @@ Section NNRStoNNRCimp.
       reflexivity.
     - Case "NNRSPush"%string.
       destruct sf as [disj1 [disj2 [nin1 nin2]]].
-      rewrite <- nnrs_expr_to_nnrc_imp_expr_correct.
+      rewrite <- nnrs_expr_to_nnrs_imp_expr_correct.
       rewrite nnrs_expr_eval_free_env, nnrs_expr_eval_free_env_tail           by (try rewrite domain_map_codomain; tauto).
       match_option; simpl; trivial; [ | rewrite olift2_none_r; trivial].
       repeat rewrite lookup_app.
@@ -541,7 +541,7 @@ Section NNRStoNNRCimp.
       apply grouped_equiv_equiv.
     - Case "NNRSFor"%string.
       destruct sf as [disj1 [disj2 [nin1 [nin2 sf]]]].
-      rewrite <- nnrs_expr_to_nnrc_imp_expr_correct.
+      rewrite <- nnrs_expr_to_nnrs_imp_expr_correct.
       rewrite nnrs_expr_eval_free_env, nnrs_expr_eval_free_env_tail           by (try rewrite domain_map_codomain; tauto).
       match_option; simpl; trivial.
       destruct d; simpl; trivial.
@@ -560,7 +560,7 @@ Section NNRStoNNRCimp.
       ; match_option_in IHs; try contradiction.
       destruct p as [[??]?].
       generalize (nnrs_stmt_eval_env_stack eqq); intros; subst.
-      generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0)
+      generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0)
       ; intros deq1.
       simpl in deq1.
       destruct p0; invcs deq1.
@@ -576,17 +576,17 @@ Section NNRStoNNRCimp.
       induction l; simpl; trivial; intros p2 p1 geq1.
       assert (geq2: grouped_equiv ((s0, Some a)::p1) ((s0, Some a) :: p2)).
       { apply grouped_equiv_cons; trivial. }
-      generalize (nnrc_imp_stmt_eval_grouped_equiv
+      generalize (nnrs_imp_stmt_eval_grouped_equiv
                     geq2 h σc
-                    (nnrs_stmt_to_nnrc_imp_stmt s))
+                    (nnrs_stmt_to_nnrs_imp_stmt s))
       ; intros geq3.
       unfold var in *.
       match_option; simpl in *
       ; rewrite eqq in geq3; simpl in geq3
       ; match_option_in geq3; try contradiction.
-      generalize (nnrc_imp_stmt_eval_env_domain_stack eqq)
+      generalize (nnrs_imp_stmt_eval_env_domain_stack eqq)
       ; intros deq1.
-      generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0)
+      generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0)
       ; intros deq2.
       simpl in deq1, deq2.
       destruct p; invcs deq1.
@@ -596,14 +596,14 @@ Section NNRStoNNRCimp.
       apply IHl; tauto.
     - Case "NNRSIf"%string.
       destruct sf as [disj1 [disj2 [sf1 sf2]]].
-      rewrite <- nnrs_expr_to_nnrc_imp_expr_correct.
+      rewrite <- nnrs_expr_to_nnrs_imp_expr_correct.
       rewrite nnrs_expr_eval_free_env, nnrs_expr_eval_free_env_tail           by (try rewrite domain_map_codomain; tauto).
       match_option; simpl; trivial.
       destruct d; simpl; trivial.
       destruct b; simpl; auto.
     - Case "NNRSEither"%string.
       destruct sf as [disj1 [disj2 [nin1 [nin2 [nin3 [nin4 [sf1 sf2]]]]]]].
-      rewrite <- nnrs_expr_to_nnrc_imp_expr_correct.
+      rewrite <- nnrs_expr_to_nnrs_imp_expr_correct.
       rewrite nnrs_expr_eval_free_env, nnrs_expr_eval_free_env_tail           by (try rewrite domain_map_codomain; tauto).
       match_option; simpl; trivial.
       destruct d; simpl; trivial.
@@ -620,7 +620,7 @@ Section NNRStoNNRCimp.
         ; match_option_in IHs1; try contradiction; simpl in *.
         destruct p as [[??]?].
         generalize (nnrs_stmt_eval_env_stack eqq0); intros; subst.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq1)
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
         ; intros deq1.
         simpl in deq1.
         destruct p0; invcs deq1.
@@ -640,7 +640,7 @@ Section NNRStoNNRCimp.
         ; match_option_in IHs2; try contradiction; simpl in *.
         destruct p as [[??]?].
         generalize (nnrs_stmt_eval_env_stack eqq0); intros; subst.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq1)
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
         ; intros deq1.
         simpl in deq1.
         destruct p0; invcs deq1.
@@ -649,15 +649,15 @@ Section NNRStoNNRCimp.
         tauto.
   Qed.
   
-  Theorem nnrs_to_nnrc_imp_correct (s:nnrs) :
+  Theorem nnrs_to_nnrs_imp_correct (s:nnrs) :
     forall h σc,
       nnrs_cross_shadow_free s ->
-      nnrs_eval h σc s = nnrc_imp_eval h σc (nnrs_to_nnrc_imp s).
+      nnrs_eval h σc s = nnrs_imp_eval h σc (nnrs_to_nnrs_imp s).
   Proof.
     unfold nnrs_cross_shadow_free.
     intros h σc sf.
     destruct s as [s ret].
-    generalize (nnrs_stmt_to_nnrc_imp_stmt_correct s h σc nil nil ((ret,None)::nil)); simpl; intros HH.
+    generalize (nnrs_stmt_to_nnrs_imp_stmt_correct s h σc nil nil ((ret,None)::nil)); simpl; intros HH.
     cut_to HH; trivial.
     - unfold var in *; match_option
       ; rewrite eqq in HH; simpl in HH.
@@ -668,7 +668,7 @@ Section NNRStoNNRCimp.
         ; intros deq1.
         generalize (nnrs_stmt_eval_mdenv_domain_stack eqq)
         ; intros deq2.
-        generalize (nnrc_imp_stmt_eval_env_domain_stack eqq0)
+        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0)
         ; intros deq3.
         destruct m0; simpl in *; invcs deq2.
         destruct p0; simpl in *; invcs deq3.
@@ -685,74 +685,74 @@ Section NNRStoNNRCimp.
       eauto.
   Qed.
 
-    Theorem nnrs_to_nnrc_imp_top_correct (sep:string) (s:nnrs) :
+    Theorem nnrs_to_nnrs_imp_top_correct (sep:string) (s:nnrs) :
     forall h σc,
-      nnrs_eval_top h σc s = nnrc_imp_eval_top h σc (nnrs_to_nnrc_imp_top sep s).
+      nnrs_eval_top h σc s = nnrs_imp_eval_top h σc (nnrs_to_nnrs_imp_top sep s).
     Proof.
       intros.
-      unfold nnrs_eval_top, nnrc_imp_eval_top, nnrs_to_nnrc_imp_top.
+      unfold nnrs_eval_top, nnrs_imp_eval_top, nnrs_to_nnrs_imp_top.
       f_equal.
-      rewrite <- nnrs_to_nnrc_imp_correct.
+      rewrite <- nnrs_to_nnrs_imp_correct.
       - rewrite nnrs_uncross_shadow_eval; trivial.
       - apply nnrs_uncross_shadow_free.
     Qed.
 
   Section Core.
 
-    Lemma nnrs_expr_to_nnrc_imp_expr_preserves_core {e:nnrs_expr} :
+    Lemma nnrs_expr_to_nnrs_imp_expr_preserves_core {e:nnrs_expr} :
       nnrs_exprIsCore e <->
-      nnrc_imp_exprIsCore (nnrs_expr_to_nnrc_imp_expr e).
+      nnrs_imp_exprIsCore (nnrs_expr_to_nnrs_imp_expr e).
     Proof.
       induction e; simpl; tauto.
     Qed.
 
-    Lemma nnrs_stmt_to_nnrc_imp_stmt_preserves_core {s:nnrs_stmt} :
+    Lemma nnrs_stmt_to_nnrs_imp_stmt_preserves_core {s:nnrs_stmt} :
       nnrs_stmtIsCore s <->
-      nnrc_imp_stmtIsCore (nnrs_stmt_to_nnrc_imp_stmt s).
+      nnrs_imp_stmtIsCore (nnrs_stmt_to_nnrs_imp_stmt s).
     Proof.
       induction s; simpl;
-        repeat rewrite nnrs_expr_to_nnrc_imp_expr_preserves_core
+        repeat rewrite nnrs_expr_to_nnrs_imp_expr_preserves_core
         ; tauto.
     Qed.
 
-    Theorem nnrs_to_nnrc_imp_preserves_core {s:nnrs} :
+    Theorem nnrs_to_nnrs_imp_preserves_core {s:nnrs} :
       nnrsIsCore s <->
-      nnrc_impIsCore (nnrs_to_nnrc_imp s).
+      nnrs_impIsCore (nnrs_to_nnrs_imp s).
     Proof.
       destruct s; simpl.
-      apply nnrs_stmt_to_nnrc_imp_stmt_preserves_core.
+      apply nnrs_stmt_to_nnrs_imp_stmt_preserves_core.
     Qed.
 
-    Theorem nnrs_to_nnrc_imp_top_preserves_core sep {s:nnrs} :
+    Theorem nnrs_to_nnrs_imp_top_preserves_core sep {s:nnrs} :
       nnrsIsCore s <->
-      nnrc_impIsCore (nnrs_to_nnrc_imp_top sep s).
+      nnrs_impIsCore (nnrs_to_nnrs_imp_top sep s).
     Proof.
-      unfold nnrs_to_nnrc_imp_top.
-      rewrite <- nnrs_to_nnrc_imp_preserves_core.
+      unfold nnrs_to_nnrs_imp_top.
+      rewrite <- nnrs_to_nnrs_imp_preserves_core.
       rewrite nnrs_uncross_shadow_preserves_core.
       tauto.
     Qed.
 
-    Program Definition nnrs_core_to_nnrc_imp_core_top
-            sep (s:nnrs_core) : nnrc_imp_core
-      := nnrs_to_nnrc_imp_top sep s.
+    Program Definition nnrs_core_to_nnrs_imp_core_top
+            sep (s:nnrs_core) : nnrs_imp_core
+      := nnrs_to_nnrs_imp_top sep s.
     Next Obligation.
       destruct s; simpl.
-      apply nnrs_to_nnrc_imp_top_preserves_core; trivial.
+      apply nnrs_to_nnrs_imp_top_preserves_core; trivial.
     Qed.
 
-    Theorem nnrs_core_to_nnrc_imp_core_correct
+    Theorem nnrs_core_to_nnrs_imp_core_correct
             h σc sep (s:nnrs_core) :
       nnrs_core_eval_top h σc s
-      = nnrc_imp_core_eval_top h σc (nnrs_core_to_nnrc_imp_core_top sep s).
+      = nnrs_imp_core_eval_top h σc (nnrs_core_to_nnrs_imp_core_top sep s).
     Proof.
       destruct s as [q pf].
-      unfold nnrs_core_eval_top, nnrc_imp_core_eval_top.
-      unfold nnrs_core_eval, nnrc_imp_core_eval.
+      unfold nnrs_core_eval_top, nnrs_imp_core_eval_top.
+      unfold nnrs_core_eval, nnrs_imp_core_eval.
       simpl proj1_sig.
-      apply nnrs_to_nnrc_imp_top_correct.
+      apply nnrs_to_nnrs_imp_top_correct.
     Qed.
 
   End Core.
 
-End NNRStoNNRCimp.
+End NNRStoNNRSimp.

@@ -317,64 +317,64 @@ let pretty_nnrs greek margin annot inheritance link_runtime q =
 let pretty_nnrs_core greek margin annot inheritance link_runtime q =
   pretty_nnrs greek margin annot inheritance link_runtime q
 
-(** Pretty NNRCimp *)
+(** Pretty NNRSimp *)
 
-let rec pretty_nnrc_imp_expr p sym ff e =
+let rec pretty_nnrs_imp_expr p sym ff e =
   match e with
-  | QcertCompiler.NNRCimpGetConstant v -> fprintf ff "$$%s"  (Util.string_of_char_list v)
-  | QcertCompiler.NNRCimpVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
-  | QcertCompiler.NNRCimpConst d -> fprintf ff "%a" pretty_data d
-  | QcertCompiler.NNRCimpBinop (b,n1,n2) -> (pretty_binary_op p sym pretty_nnrc_imp_expr) ff b n1 n2
-  | QcertCompiler.NNRCimpUnop (u,n1) -> (pretty_unary_op p sym pretty_nnrc_imp_expr) ff u n1
-  | QcertCompiler.NNRCimpGroupBy (g,atts,n1) ->
-      fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrc_imp_expr 0 sym) n1
+  | QcertCompiler.NNRSimpGetConstant v -> fprintf ff "$$%s"  (Util.string_of_char_list v)
+  | QcertCompiler.NNRSimpVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
+  | QcertCompiler.NNRSimpConst d -> fprintf ff "%a" pretty_data d
+  | QcertCompiler.NNRSimpBinop (b,n1,n2) -> (pretty_binary_op p sym pretty_nnrs_imp_expr) ff b n1 n2
+  | QcertCompiler.NNRSimpUnop (u,n1) -> (pretty_unary_op p sym pretty_nnrs_imp_expr) ff u n1
+  | QcertCompiler.NNRSimpGroupBy (g,atts,n1) ->
+      fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrs_imp_expr 0 sym) n1
 
-let rec pretty_nnrc_imp_stmt p sym ff stmt =
+let rec pretty_nnrs_imp_stmt p sym ff stmt =
   match stmt with
-  | QcertCompiler.NNRCimpSeq (s1, s2) ->
+  | QcertCompiler.NNRSimpSeq (s1, s2) ->
       fprintf ff "@[<hv 0>%a;@;<1 0>%a@]"
-        (pretty_nnrc_imp_stmt 0 sym) s1
-        (pretty_nnrc_imp_stmt 0 sym) s2
-  | QcertCompiler.NNRCimpLet (v,None,n2) ->
+        (pretty_nnrs_imp_stmt 0 sym) s1
+        (pretty_nnrs_imp_stmt 0 sym) s2
+  | QcertCompiler.NNRSimpLet (v,None,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s@]@;<1 0>@[<hv 2>in@ %a@]@]"
         (Util.string_of_char_list v)
-        (pretty_nnrc_imp_stmt p sym) n2
-  | QcertCompiler.NNRCimpLet (v,Some n1,n2) ->
+        (pretty_nnrs_imp_stmt p sym) n2
+  | QcertCompiler.NNRSimpLet (v,Some n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
         (Util.string_of_char_list v)
-        (pretty_nnrc_imp_expr p sym) n1
-        (pretty_nnrc_imp_stmt p sym) n2
-  | QcertCompiler.NNRCimpAssign (v, e) ->
+        (pretty_nnrs_imp_expr p sym) n1
+        (pretty_nnrs_imp_stmt p sym) n2
+  | QcertCompiler.NNRSimpAssign (v, e) ->
       fprintf ff "@[<hv 2>$v%s :=@;<1 0>%a@;<0 -2>)@]"
         (Util.string_of_char_list v)
-        (pretty_nnrc_imp_expr 0 sym) e
-  | QcertCompiler.NNRCimpFor (v,n1,n2) ->
+        (pretty_nnrs_imp_expr 0 sym) e
+  | QcertCompiler.NNRSimpFor (v,n1,n2) ->
       fprintf ff "@[<hv 0>for (@[<hv 2>$v%s %a@;<1 0>%a@]) {@;<1 2>%a@ }@]"
         (Util.string_of_char_list v) pretty_sym sym.sin
-        (pretty_nnrc_imp_expr 0 sym) n1
-        (pretty_nnrc_imp_stmt 0 sym) n2
-  | QcertCompiler.NNRCimpIf (n1,n2,n3) ->
+        (pretty_nnrs_imp_expr 0 sym) n1
+        (pretty_nnrs_imp_stmt 0 sym) n2
+  | QcertCompiler.NNRSimpIf (n1,n2,n3) ->
       fprintf ff "@[<hv 0>@[<hv 2>if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
-        (pretty_nnrc_imp_expr p sym) n1
-        (pretty_nnrc_imp_stmt p sym) n2
-        (pretty_nnrc_imp_stmt p sym) n3
-  | QcertCompiler.NNRCimpEither (n0,v1,n1,v2,n2) ->
+        (pretty_nnrs_imp_expr p sym) n1
+        (pretty_nnrs_imp_stmt p sym) n2
+        (pretty_nnrs_imp_stmt p sym) n3
+  | QcertCompiler.NNRSimpEither (n0,v1,n1,v2,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
-        (pretty_nnrc_imp_expr p sym) n0
-         (Util.string_of_char_list v1) (pretty_nnrc_imp_stmt p sym) n1
-        (Util.string_of_char_list v2) (pretty_nnrc_imp_stmt p sym) n2
+        (pretty_nnrs_imp_expr p sym) n0
+         (Util.string_of_char_list v1) (pretty_nnrs_imp_stmt p sym) n1
+        (Util.string_of_char_list v2) (pretty_nnrs_imp_stmt p sym) n2
 
-let pretty_nnrc_imp_aux p sym ff ((s, ret): QcertCompiler.nnrc_imp) =
+let pretty_nnrs_imp_aux p sym ff ((s, ret): QcertCompiler.nnrs_imp) =
   fprintf ff "@[<hv 0>%a;@;<1 0>return $v%s@]@]"
-    (pretty_nnrc_imp_stmt 0 sym) s
+    (pretty_nnrs_imp_stmt 0 sym) s
     (Util.string_of_char_list ret)
 
-let pretty_nnrc_imp greek margin annot inheritance link_runtime q =
+let pretty_nnrs_imp greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
     pp_set_margin ff margin;
-    fprintf ff "@[%a@]@." (pretty_nnrc_imp_aux 0 sym) q;
+    fprintf ff "@[%a@]@." (pretty_nnrs_imp_aux 0 sym) q;
     flush_str_formatter ()
   end
 

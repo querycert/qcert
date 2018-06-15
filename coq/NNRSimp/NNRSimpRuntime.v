@@ -15,10 +15,10 @@
  *)
 
 Require Export CommonRuntime.
-Require Export NNRCimp.
-Require Export NNRCimpSize.
-Require Export NNRCimpVars.
-Require Export NNRCimpEval.
-Require Export NNRCimpSem.
-Require Export NNRCimpSemEval.
-Require Export NNRCimpNorm.
+Require Export NNRSimp.
+Require Export NNRSimpSize.
+Require Export NNRSimpVars.
+Require Export NNRSimpEval.
+Require Export NNRSimpSem.
+Require Export NNRSimpSemEval.
+Require Export NNRSimpNorm.

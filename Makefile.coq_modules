@@ -196,17 +196,17 @@ MODULES = \
 	NNRS/NNRSRuntime \
 	NNRS/NNRSTypes \
 	NNRS/NNRSSystem \
-	NNRCimp/Lang/NNRCimp \
-	NNRCimp/Lang/NNRCimpSize \
-	NNRCimp/Lang/NNRCimpVars \
-	NNRCimp/Lang/NNRCimpNorm \
-	NNRCimp/Lang/NNRCimpSem \
-	NNRCimp/Lang/NNRCimpEval \
-	NNRCimp/Lang/NNRCimpSemEval \
-	NNRCimp/Typing/TNNRCimp \
-	NNRCimp/NNRCimpRuntime \
-	NNRCimp/NNRCimpTypes \
-	NNRCimp/NNRCimpSystem \
+	NNRSimp/Lang/NNRSimp \
+	NNRSimp/Lang/NNRSimpSize \
+	NNRSimp/Lang/NNRSimpVars \
+	NNRSimp/Lang/NNRSimpNorm \
+	NNRSimp/Lang/NNRSimpSem \
+	NNRSimp/Lang/NNRSimpEval \
+	NNRSimp/Lang/NNRSimpSemEval \
+	NNRSimp/Typing/TNNRSimp \
+	NNRSimp/NNRSimpRuntime \
+	NNRSimp/NNRSimpTypes \
+	NNRSimp/NNRSimpSystem \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \
@@ -328,8 +328,8 @@ MODULES = \
 	Translation/CldMRtoCloudant \
 	Translation/NNRCtoNNRS \
 	Translation/TNNRCtoNNRS \
-	Translation/NNRStoNNRCimp \
-	Translation/NNRCimptoJavaScriptAst \
+	Translation/NNRStoNNRSimp \
+	Translation/NNRSimptoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \
 	Translation/NNRCtoJavaScript \
