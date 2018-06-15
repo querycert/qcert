@@ -21,18 +21,18 @@ Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
 Require Import CommonRuntime.
-Require Import NNRCimpish.
-Require Import NNRCimpishEval.
+Require Import NNRS.
+Require Import NNRSEval.
 
-Section NNRCimpishNorm.
+Section NNRSNorm.
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
   
-  (** NNRCimpish evaluation preserves data normalization. *)
+  (** NNRS evaluation preserves data normalization. *)
 
-  Lemma nnrc_impish_expr_eval_normalized
-        {σc:bindings} {σ:pd_bindings} {e:nnrc_impish_expr} {o} :
-    nnrc_impish_expr_eval h σc σ e = Some o ->
+  Lemma nnrs_expr_eval_normalized
+        {σc:bindings} {σ:pd_bindings} {e:nnrs_expr} {o} :
+    nnrs_expr_eval h σc σ e = Some o ->
     Forall (data_normalized h) (map snd σc) ->
     (forall x, In (Some x) (map snd σ) -> data_normalized h x)  ->
     data_normalized h o.
@@ -71,12 +71,12 @@ Section NNRCimpishNorm.
 
   Local Open Scope string.
 
-  Lemma nnrc_impish_stmt_eval_normalized
+  Lemma nnrs_stmt_eval_normalized
         {σc:bindings}
         {σ:pd_bindings} {ψc:mc_bindings} {ψd:md_bindings}
-        {s:nnrc_impish_stmt}
+        {s:nnrs_stmt}
         {σ':pd_bindings} {ψc':mc_bindings} {ψd':md_bindings} :
-    nnrc_impish_stmt_eval h σc σ ψc ψd s = Some (σ', ψc', ψd') ->
+    nnrs_stmt_eval h σc σ ψc ψd s = Some (σ', ψc', ψd') ->
     Forall (data_normalized h) (map snd σc) ->
     (forall x, In (Some x) (map snd σ) -> data_normalized h x)  ->
     Forall (Forall (data_normalized h)) (map snd ψc) ->
@@ -87,12 +87,12 @@ Section NNRCimpishNorm.
   Proof.
     intros eqq Fσc.
     revert σ ψc ψd σ' ψc' ψd' eqq.
-    nnrc_impish_stmt_cases (induction s) Case; intros  σ ψc ψd σ' ψc' ψd' eqq Fσ Fψc' Fψd'; simpl in *.
-    - Case "NNRCimpishSeq".
+    nnrs_stmt_cases (induction s) Case; intros  σ ψc ψd σ' ψc' ψd' eqq Fσ Fψc' Fψd'; simpl in *.
+    - Case "NNRSSeq".
       match_case_in eqq; [intros [[??]?] eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       destruct (IHs1 _ _ _ _ _ _  eqq1) as [?[??]]; eauto.
-    -  Case "NNRCimpishLet".
+    -  Case "NNRSLet".
        match_case_in eqq; [intros ? eqq1 | intros eqq1]
        ; rewrite eqq1 in eqq; try discriminate.
        match_case_in eqq; [intros ? eqq2 | intros eqq2]
@@ -100,7 +100,7 @@ Section NNRCimpishNorm.
        destruct p as [[??]?].
        destruct p; try discriminate.
        invcs eqq.
-       apply nnrc_impish_expr_eval_normalized in eqq1; eauto.
+       apply nnrs_expr_eval_normalized in eqq1; eauto.
        specialize (IHs _ _ _ _ _ _ eqq2).
        cut_to IHs.
        * intuition.
@@ -109,7 +109,7 @@ Section NNRCimpishNorm.
          invcs H0; auto.
        * eauto.
        * eauto.
-    - Case "NNRCimpishLetMut".
+    - Case "NNRSLetMut".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       destruct p as [[??]?].
@@ -128,7 +128,7 @@ Section NNRCimpishNorm.
       + intuition.
       + intuition.
       + intuition; try discriminate.
-    - Case "NNRCimpishLetMutColl".
+    - Case "NNRSLetMutColl".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       destruct p as [[??]?].
@@ -151,7 +151,7 @@ Section NNRCimpishNorm.
       + intuition.
       + intuition.
       + intuition; try discriminate.
-    - Case "NNRCimpishAssign".
+    - Case "NNRSAssign".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       match_case_in eqq; [intros ? eqq2 | intros eqq2]
@@ -166,8 +166,8 @@ Section NNRCimpishNorm.
       + eapply Fψd'.
         apply in_map_iff; eexists; split; eauto; simpl; eauto.
       + invcs H.
-        eapply nnrc_impish_expr_eval_normalized; eauto.
-    - Case "NNRCimpishPush".
+        eapply nnrs_expr_eval_normalized; eauto.
+    - Case "NNRSPush".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       match_case_in eqq; [intros ? eqq2 | intros eqq2]
@@ -181,12 +181,12 @@ Section NNRCimpishNorm.
          rewrite Forall_forall in Fψc'.
          apply (Fψc' _ eqq2).
       + constructor; trivial.
-        eapply nnrc_impish_expr_eval_normalized; eauto.
-    - Case "NNRCimpishFor".
+        eapply nnrs_expr_eval_normalized; eauto.
+    - Case "NNRSFor".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
       destruct d; try discriminate.
-      apply nnrc_impish_expr_eval_normalized in eqq1; eauto 2.
+      apply nnrs_expr_eval_normalized in eqq1; eauto 2.
       revert σ ψc ψd σ' ψc' ψd' eqq Fσ Fψc' Fψd' eqq1.
       induction l; intros σ ψc ψd σ' ψc' ψd' eqq Fσ Fψc' Fψd' eqq1; simpl.
       + invcs eqq; intuition.
@@ -200,17 +200,17 @@ Section NNRCimpishNorm.
           invcs H2; intuition.
         * intuition.
         * intuition.
-    - Case "NNRCimpishIf".
+    - Case "NNRSIf".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      generalize (nnrc_impish_expr_eval_normalized eqq1); intros Fd.
+      generalize (nnrs_expr_eval_normalized eqq1); intros Fd.
       cut_to Fd; eauto 2.
       destruct d; try discriminate.
       destruct b; try discriminate; eauto.
-    - Case "NNRCimpishEither".
+    - Case "NNRSEither".
       match_case_in eqq; [intros ? eqq1 | intros eqq1]
       ; rewrite eqq1 in eqq; try discriminate.
-      generalize (nnrc_impish_expr_eval_normalized eqq1); intros Fd.
+      generalize (nnrs_expr_eval_normalized eqq1); intros Fd.
       cut_to Fd; eauto 2.
       destruct d; try discriminate;
         (match_case_in eqq; [intros ? eqq2 | intros eqq2]
@@ -225,12 +225,12 @@ Section NNRCimpishNorm.
         invcs H1; intuition.
   Qed.
   
-  Lemma nnrc_impish_eval_normalized  {σc:bindings} {q:nnrc_impish} {d} :
-    nnrc_impish_eval h σc q = Some d ->
+  Lemma nnrs_eval_normalized  {σc:bindings} {q:nnrs} {d} :
+    nnrs_eval h σc q = Some d ->
     Forall (data_normalized h) (map snd σc) ->
     forall x, d = Some x -> data_normalized h x.
   Proof.
-    unfold nnrc_impish_eval; intros ev Fσc.
+    unfold nnrs_eval; intros ev Fσc.
     destruct q.
     match_case_in ev; [intros [[??]?] eqq | intros eqq]
     ; rewrite eqq in ev; try discriminate.
@@ -239,27 +239,27 @@ Section NNRCimpishNorm.
     invcs ev.
     destruct d; try discriminate.
     intros ? eqq2; invcs eqq2.
-    apply nnrc_impish_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate.
+    apply nnrs_stmt_eval_normalized in eqq; simpl in *; intuition; try discriminate.
   Qed.
 
-    Lemma nnrc_impish_eval_top_normalized  {σc:bindings} {q:nnrc_impish} {d} :
-    nnrc_impish_eval_top h σc q = Some d ->
+    Lemma nnrs_eval_top_normalized  {σc:bindings} {q:nnrs} {d} :
+    nnrs_eval_top h σc q = Some d ->
     Forall (data_normalized h) (map snd σc) ->
     data_normalized h d.
   Proof.
-    unfold nnrc_impish_eval_top; intros ev Fσc.
+    unfold nnrs_eval_top; intros ev Fσc.
     unfold olift, id in ev.
     match_option_in ev.
-    eapply nnrc_impish_eval_normalized; eauto.
+    eapply nnrs_eval_normalized; eauto.
     rewrite Forall_map in *.
     apply dnrec_sort_content; trivial.
   Qed.
   
-End NNRCimpishNorm.
+End NNRSNorm.
 
-Hint Resolve nnrc_impish_expr_eval_normalized.
-Hint Resolve nnrc_impish_stmt_eval_normalized.
+Hint Resolve nnrs_expr_eval_normalized.
+Hint Resolve nnrs_stmt_eval_normalized.
 
-Arguments nnrc_impish_expr_eval_normalized {fruntime h σc σ e o}.
-Arguments nnrc_impish_stmt_eval_normalized {fruntime h σc σ ψc ψd s σ' ψc' ψd'}.
+Arguments nnrs_expr_eval_normalized {fruntime h σc σ e o}.
+Arguments nnrs_stmt_eval_normalized {fruntime h σc σ ψc ψd s σ' ψc' ψd'}.
 

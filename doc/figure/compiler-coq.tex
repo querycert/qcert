@@ -70,9 +70,9 @@
  \node[lang, coqc, hyperlink node=\coqurl{CldMR.Lang}{CldMR}{cldmr},
        right=3em of nnrcmr]
       (cldmr) {CldMR};
- \node[lang, coqp, hyperlink node=\coqurl{NNRCimpish.Lang}{NNRCimpish}{nnrc_impish},
+ \node[lang, coqp, hyperlink node=\coqurl{NNRS.Lang}{NNRS}{nnrs},
        above=3em of nnrcmr]
-      (nnrcimpish) {NNRCimpish};
+      (NNRS) {NNRS};
  \node[lang, coqc, hyperlink node=\coqurl{JavaScriptAst.Lang}{JavaScriptAst}{ajavascript},
        above=3em of cldmr]
       (ajs) {JavaScript AST};
@@ -160,8 +160,8 @@
    \transref{3}{\coqurl{Translation}{NNRCMRtoNNRC}{nnrc_of_nnrcmr_top}};
  \path[trans, tcoqp, dashed] (nnrc) -- (dnnrc)
    \transref{6}{\coqurl{Translation}{NNRCtoDNNRC}{nnrc_to_dnnrc_top}};
- \path[trans, tcoqp] (nnrc) -- (nnrcimpish)
-   \transref{3}{\coqurl{Translation}{NNRCtoNNRCimpish}{nnrc_to_nnrc_impish_top}};
+ \path[trans, tcoqp] (nnrc) -- (NNRS)
+   \transref{3}{\coqurl{Translation}{NNRCtoNNRS}{nnrc_to_nnrs_top}};
  \path[trans, tcoqc] (ajs) -- (js)
    \transref{30}{\coqurl{Translation}{JavaScriptAsttoJavaScript}{js_ast_to_js_top}};
  \path[trans, tcoqc] (nnrc)
@@ -179,9 +179,9 @@
    (camp.south)
    \transref{30}{\coqurl{Translation}{cNNRCtoCAMP}{nnrc_core_to_camp_top}};
 
- % *NNRCimpish
- \path[trans, tcoqc] (nnrcimpish) -- (ajs)
-   \transref{6}{\coqurl{Translation}{NNRCimpishtoJavaScriptAst}{nnrc_impish_to_js_ast_top}};
+ % *NNRS
+ \path[trans, tcoqc] (NNRS) -- (ajs)
+   \transref{6}{\coqurl{Translation}{NNRStoJavaScriptAst}{nnrs_to_js_ast_top}};
 
  % NNRCMR
  \tikzoptim[ccoqc]{nnrcmr}{\coqurl{NNRCMR.Optim}{NNRCMROptimizer}{run_nnrcmr_optims}}

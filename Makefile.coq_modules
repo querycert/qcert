@@ -183,19 +183,19 @@ MODULES = \
 	NNRC/Optim/TNNRCRewrite \
 	NNRC/Optim/NNRCOptimizer \
 	NNRC/NNRCOptim \
-	NNRCimpish/Lang/NNRCimpish \
-	NNRCimpish/Lang/NNRCimpishSize \
-	NNRCimpish/Lang/NNRCimpishVars \
-	NNRCimpish/Lang/NNRCimpishRename \
-	NNRCimpish/Lang/NNRCimpishNorm \
-	NNRCimpish/Lang/NNRCimpishSem \
-	NNRCimpish/Lang/NNRCimpishEval \
-	NNRCimpish/Lang/NNRCimpishSemEval \
-	NNRCimpish/Lang/NNRCimpishCrossShadow \
-	NNRCimpish/Typing/TNNRCimpish \
-	NNRCimpish/NNRCimpishRuntime \
-	NNRCimpish/NNRCimpishTypes \
-	NNRCimpish/NNRCimpishSystem \
+	NNRS/Lang/NNRS \
+	NNRS/Lang/NNRSSize \
+	NNRS/Lang/NNRSVars \
+	NNRS/Lang/NNRSRename \
+	NNRS/Lang/NNRSNorm \
+	NNRS/Lang/NNRSSem \
+	NNRS/Lang/NNRSEval \
+	NNRS/Lang/NNRSSemEval \
+	NNRS/Lang/NNRSCrossShadow \
+	NNRS/Typing/TNNRS \
+	NNRS/NNRSRuntime \
+	NNRS/NNRSTypes \
+	NNRS/NNRSSystem \
 	NNRCimp/Lang/NNRCimp \
 	NNRCimp/Lang/NNRCimpSize \
 	NNRCimp/Lang/NNRCimpVars \
@@ -326,9 +326,9 @@ MODULES = \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \
 	Translation/CldMRtoCloudant \
-	Translation/NNRCtoNNRCimpish \
-	Translation/TNNRCtoNNRCimpish \
-	Translation/NNRCimpishtoNNRCimp \
+	Translation/NNRCtoNNRS \
+	Translation/TNNRCtoNNRS \
+	Translation/NNRStoNNRCimp \
 	Translation/NNRCimptoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \

@@ -14,5 +14,5 @@
  * limitations under the License.
  *)
 
-Require Export NNRCimpishRuntime.
-Require Export NNRCimpishTypes.
+Require Export CommonTypes.
+Require Export TNNRS.

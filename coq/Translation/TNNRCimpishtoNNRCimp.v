@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TNNRCtoNNRCimpish.
+Section TNNRCtoNNRS.
   Require Import String.
   Require Import List.
   Require Import Bool.
@@ -28,11 +28,11 @@ Section TNNRCtoNNRCimpish.
   Require Import CommonSystem.
   Require Import cNNRCSystem.
   Require Import NNRCSystem.
-  Require Import NNRCimpishSystem.
-  Require Import NNRCtoNNRCimpish.
+  Require Import NNRSSystem.
+  Require Import NNRCtoNNRS.
   Require Import TNNRCStratify.
 
-  Local Open Scope nnrc_impish.
+  Local Open Scope nnrs.
 
   Context {m:basic_model}.
   Context (τconstants:tbindings).
@@ -72,14 +72,14 @@ Section TNNRCtoNNRCimpish.
         apply rproject_domain_in in inn; tauto.
     Qed.
     
-    Lemma tnnrc_expr_to_nnrc_impish_expr_some_correct {e ei} :
-      nnrc_expr_to_nnrc_impish_expr e = Some ei ->
+    Lemma tnnrc_expr_to_nnrs_expr_some_correct {e ei} :
+      nnrc_expr_to_nnrs_expr e = Some ei ->
       forall (Γc Γ:tbindings) (τ:rtype),
         nnrc_type Γc Γ e τ <-> [ Γc ; pd_tbindings_lift Γ  ⊢ ei ▷ τ ].
     Proof.
       unfold nnrc_type.
       Hint Constructors nnrc_core_type.
-      Hint Constructors nnrc_impish_expr_type.
+      Hint Constructors nnrs_expr_type.
       
       revert ei.
       induction e; simpl; intros ei eqq Γc Γ τ; try discriminate.
@@ -142,18 +142,18 @@ Section TNNRCtoNNRCimpish.
       ; congruence.
     Qed.
 
-    Lemma nnrc_stmt_to_nnrc_impish_stmt_aux_must_assign
+    Lemma nnrc_stmt_to_nnrs_stmt_aux_must_assign
           {fvs x s si} :
-      nnrc_stmt_to_nnrc_impish_stmt_aux fvs (Term_assign x) s = Some si ->
-      nnrc_impish_stmt_must_assign si x.
+      nnrc_stmt_to_nnrs_stmt_aux fvs (Term_assign x) s = Some si ->
+      nnrs_stmt_must_assign si x.
     Proof.
       revert x si.
       induction s; simpl; intros x si eqq
       ; repeat match_option_in eqq; invcs eqq; simpl; eauto.
     Qed.
     
-    Lemma tnnrc_stmt_to_nnrc_impish_stmt_aux_some_correct_fw {fvs term s si} :
-      nnrc_stmt_to_nnrc_impish_stmt_aux fvs term s = Some si ->
+    Lemma tnnrc_stmt_to_nnrs_stmt_aux_some_correct_fw {fvs term s si} :
+      nnrc_stmt_to_nnrs_stmt_aux fvs term s = Some si ->
       forall {Γc:tbindings} {Γ:tbindings} {τ:rtype},
         nnrc_type Γc Γ s τ ->
         forall Δc Δd,
@@ -162,7 +162,7 @@ Section TNNRCtoNNRCimpish.
       unfold nnrc_type.
       Hint Resolve terminate_type.
       Hint Constructors nnrc_core_type.
-      Hint Constructors nnrc_impish_expr_type.
+      Hint Constructors nnrs_expr_type.
       intros eqq Γc.
       revert fvs term si eqq.
       induction s; simpl; intros fvs term si eqq Γ τ typ Δc Δd
@@ -172,14 +172,14 @@ Section TNNRCtoNNRCimpish.
         econstructor.
         rewrite lookup_pd_tbindings_lift, H1; simpl; trivial.
       - apply terminate_type.
-        apply (tnnrc_expr_to_nnrc_impish_expr_some_correct (e:=NNRCBinop b s1 s2))
+        apply (tnnrc_expr_to_nnrs_expr_some_correct (e:=NNRCBinop b s1 s2))
         ; simpl; eauto.
       - apply terminate_type.
-        apply (tnnrc_expr_to_nnrc_impish_expr_some_correct (e:=NNRCUnop u s))
+        apply (tnnrc_expr_to_nnrs_expr_some_correct (e:=NNRCUnop u s))
         ; simpl; eauto.
       - invcs typ.
         econstructor.
-        + eapply nnrc_stmt_to_nnrc_impish_stmt_aux_must_assign; eauto.
+        + eapply nnrc_stmt_to_nnrs_stmt_aux_must_assign; eauto.
         + specialize (IHs1 _ _ _ eqq0 _ _ H4
                            (add_term_mc term τ Δc)
                            (add_term_md term τ Δd)); simpl in IHs1; eauto.
@@ -187,35 +187,35 @@ Section TNNRCtoNNRCimpish.
       - invcs typ.
         econstructor.
         + econstructor.
-          * eapply tnnrc_expr_to_nnrc_impish_expr_some_correct; eauto.
+          * eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
           * specialize (IHs2 _ _ _ eqq1 _ _ H5); simpl in IHs2; eauto.
         + apply terminate_type.
           econstructor; simpl.
           match_destr; congruence.
       - invcs typ.
         econstructor; eauto.
-        apply (tnnrc_expr_to_nnrc_impish_expr_some_correct eqq0); trivial.
+        apply (tnnrc_expr_to_nnrs_expr_some_correct eqq0); trivial.
       - invcs typ.
         econstructor; eauto.
-        + apply (tnnrc_expr_to_nnrc_impish_expr_some_correct eqq0); eauto.
+        + apply (tnnrc_expr_to_nnrs_expr_some_correct eqq0); eauto.
         + specialize (IHs2 _ _ _ eqq1 _ _ H7); simpl in IHs2; eauto.
         + specialize (IHs3 _ _ _ eqq2 _ _ H8); simpl in IHs3; eauto.
       - apply terminate_type.
-        eapply (tnnrc_expr_to_nnrc_impish_expr_some_correct (e:= (NNRCGroupBy s l s0))); simpl; eauto.
+        eapply (tnnrc_expr_to_nnrs_expr_some_correct (e:= (NNRCGroupBy s l s0))); simpl; eauto.
     Qed.
 
 
-    Theorem tnnrc_stmt_to_nnrc_impish_some_correct_fw {Γc:tbindings} {globals s si} :
-      nnrc_stmt_to_nnrc_impish globals s = Some si ->
+    Theorem tnnrc_stmt_to_nnrs_some_correct_fw {Γc:tbindings} {globals s si} :
+      nnrc_stmt_to_nnrs globals s = Some si ->
       forall {τ:rtype},
         nnrc_type Γc nil s τ ->
         [ h, Γc ⊢ si ▷ τ ].
     Proof.
-      unfold nnrc_stmt_to_nnrc_impish, nnrc_impish_type; match_option
+      unfold nnrc_stmt_to_nnrs, nnrs_type; match_option
       ; intros eqq1; invcs eqq1.
       intros τ typ.
       unfold nnrc_type in *.
-      apply (tnnrc_stmt_to_nnrc_impish_stmt_aux_some_correct_fw eqq typ).
+      apply (tnnrc_stmt_to_nnrs_stmt_aux_some_correct_fw eqq typ).
     Qed.
 
     Definition get_terminator_type
@@ -241,26 +241,26 @@ Section TNNRCtoNNRCimpish.
     Section counterexample.
       Local Open Scope string.
       
-      Example nnrc_stmt_with_weaker_nnrc_impish_type_example : nnrc 
+      Example nnrc_stmt_with_weaker_nnrs_type_example : nnrc 
         := NNRCBinop (OpNatBinary NatPlus)
                      (NNRCConst (dnat 1))
                      (NNRCConst (dnat 2)).
 
-      Example nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example
-        :=     (NNRCimpishPush "x"
-                            (NNRCimpishBinop (OpNatBinary NatPlus) (NNRCimpishConst (dnat 1))
-                                          (NNRCimpishConst (dnat 2)))).
+      Example nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example
+        :=     (NNRSPush "x"
+                            (NNRSBinop (OpNatBinary NatPlus) (NNRSConst (dnat 1))
+                                          (NNRSConst (dnat 2)))).
 
-      Example nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example_correct
-        : nnrc_stmt_to_nnrc_impish_stmt_aux nil (Term_push "x") nnrc_stmt_with_weaker_nnrc_impish_type_example = Some nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example.
+      Example nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example_correct
+        : nnrc_stmt_to_nnrs_stmt_aux nil (Term_push "x") nnrc_stmt_with_weaker_nnrs_type_example = Some nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example.
       Proof.
         vm_compute; reflexivity.
       Qed.
 
-      Example nnrc_impish_typing_for_nnrc_with_weaker_nnrc_impish_type_example 
-        : [ nil ; pd_tbindings_lift nil , (add_term_mc (Term_push "x") ⊤ nil) , (add_term_md (Term_push "x") ⊤ nil) ⊢ nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example ].
+      Example nnrs_typing_for_nnrc_with_weaker_nnrs_type_example 
+        : [ nil ; pd_tbindings_lift nil , (add_term_mc (Term_push "x") ⊤ nil) , (add_term_md (Term_push "x") ⊤ nil) ⊢ nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example ].
       Proof.
-        unfold nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example.
+        unfold nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example.
         simpl.
         econstructor; simpl.
         - repeat econstructor.
@@ -268,74 +268,74 @@ Section TNNRCtoNNRCimpish.
         - apply STop.
       Qed.
 
-      Example nnrc_typing_for_nnrc_with_weaker_nnrc_impish_type_example 
-        : nnrc_type nil nil nnrc_stmt_with_weaker_nnrc_impish_type_example Nat.
+      Example nnrc_typing_for_nnrc_with_weaker_nnrs_type_example 
+        : nnrc_type nil nil nnrc_stmt_with_weaker_nnrs_type_example Nat.
       Proof.
-        unfold nnrc_type, nnrc_stmt_with_weaker_nnrc_impish_type_example.
+        unfold nnrc_type, nnrc_stmt_with_weaker_nnrs_type_example.
         simpl.
         econstructor; simpl
         ; repeat econstructor.
       Qed.
 
-      Example not_nnrc_typing_for_nnrc_with_weaker_nnrc_impish_type_example 
-        : ~ nnrc_type nil nil nnrc_stmt_with_weaker_nnrc_impish_type_example ⊤.
+      Example not_nnrc_typing_for_nnrc_with_weaker_nnrs_type_example 
+        : ~ nnrc_type nil nil nnrc_stmt_with_weaker_nnrs_type_example ⊤.
       Proof.
-        unfold nnrc_type, nnrc_stmt_with_weaker_nnrc_impish_type_example
+        unfold nnrc_type, nnrc_stmt_with_weaker_nnrs_type_example
         ; simpl; intros typ.
         invcs typ.
         invcs H3.
       Qed.
 
-      Example nnrc_typing_weaker_nnrc_impish_translated_typing :
-        nnrc_stmt_to_nnrc_impish_stmt_aux nil (Term_push "x")
-                                       nnrc_stmt_with_weaker_nnrc_impish_type_example =
-        Some nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example
+      Example nnrc_typing_weaker_nnrs_translated_typing :
+        nnrc_stmt_to_nnrs_stmt_aux nil (Term_push "x")
+                                       nnrc_stmt_with_weaker_nnrs_type_example =
+        Some nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example
         /\ 
         [ nil ; pd_tbindings_lift nil , (add_term_mc (Term_push "x") ⊤ nil) , (add_term_md (Term_push "x") ⊤ nil)
-                                                                                ⊢ nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example ]
-        /\ ~ nnrc_type nil nil nnrc_stmt_with_weaker_nnrc_impish_type_example ⊤.
+                                                                                ⊢ nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example ]
+        /\ ~ nnrc_type nil nil nnrc_stmt_with_weaker_nnrs_type_example ⊤.
       Proof.
         split; [ | split].
-        - apply nnrc_impish_of_nnrc_stmt_with_weaker_nnrc_impish_type_example_correct.
-        - apply nnrc_impish_typing_for_nnrc_with_weaker_nnrc_impish_type_example.
-        - apply not_nnrc_typing_for_nnrc_with_weaker_nnrc_impish_type_example.
+        - apply nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example_correct.
+        - apply nnrs_typing_for_nnrc_with_weaker_nnrs_type_example.
+        - apply not_nnrc_typing_for_nnrc_with_weaker_nnrs_type_example.
       Qed.
 
     (*
-    Example nnrc_with_weaker_nnrc_impish_type_example : nnrc 
+    Example nnrc_with_weaker_nnrs_type_example : nnrc 
       := NNRCFor "x"%string (NNRCConst (dcoll (dnat 3:: dnat 4::dnat 5::nil)))
-                 nnrc_stmt_with_weaker_nnrc_impish_type_example.
+                 nnrc_stmt_with_weaker_nnrs_type_example.
      *)
 
-    (* Backwards is more problematic, since the type system for nnrc_impish allows for 
-       free upcasts in a NNRCimpishPush, whereas NNRC typing does not have
+    (* Backwards is more problematic, since the type system for nnrs allows for 
+       free upcasts in a NNRSPush, whereas NNRC typing does not have
        such a mechanism (and NNRC is not Proper with respect to subtyping, since
        operators (such as (OpNatBinary NatPlus) are not.
        For example, 
-       nnrc_typing_weaker_nnrc_impish_translated_typing witnesses a counter example.      *)
+       nnrc_typing_weaker_nnrs_translated_typing witnesses a counter example.      *)
     End counterexample.
 
   End from_stratified.
 
-  Lemma tnnrc_stmt_to_nnrc_impish_stmt_stratified_some_correct_fw {Γc:tbindings} {globals s τ} :
+  Lemma tnnrc_stmt_to_nnrs_stmt_stratified_some_correct_fw {Γc:tbindings} {globals s τ} :
     nnrc_type Γc nil s τ ->
     forall pf,
-      [ h, Γc ⊢ ` (nnrc_stmt_to_nnrc_impish_stmt_stratified_some globals s pf) ▷ τ ].
+      [ h, Γc ⊢ ` (nnrc_stmt_to_nnrs_stmt_stratified_some globals s pf) ▷ τ ].
   Proof.
     intros typ pf.
-    destruct (nnrc_stmt_to_nnrc_impish_stmt_stratified_some globals s pf); simpl.
-    eapply tnnrc_stmt_to_nnrc_impish_some_correct_fw; eauto.
+    destruct (nnrc_stmt_to_nnrs_stmt_stratified_some globals s pf); simpl.
+    eapply tnnrc_stmt_to_nnrs_some_correct_fw; eauto.
   Qed.
   
-  Theorem tnnrc_to_nnrc_impish_correct_fw {Γc:tbindings} {globals s τ} :
+  Theorem tnnrc_to_nnrs_correct_fw {Γc:tbindings} {globals s τ} :
     nnrc_type Γc nil s τ ->
-    [ h, Γc ⊢ (nnrc_to_nnrc_impish_top globals s) ▷ τ ].
+    [ h, Γc ⊢ (nnrc_to_nnrs_top globals s) ▷ τ ].
   Proof.
     intros typ.
-    unfold nnrc_to_nnrc_impish_top.
-    apply tnnrc_stmt_to_nnrc_impish_stmt_stratified_some_correct_fw.
+    unfold nnrc_to_nnrs_top.
+    apply tnnrc_stmt_to_nnrs_stmt_stratified_some_correct_fw.
     apply -> stratify_preserves_types.
     trivial.
   Qed.
 
-End TNNRCtoNNRCimpish.
+End TNNRCtoNNRS.

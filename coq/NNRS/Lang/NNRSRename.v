@@ -27,215 +27,215 @@ Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
 Require Import CommonRuntime.
-Require Import NNRCimpish.
-Require Import NNRCimpishVars.
-Require Import NNRCimpishEval.
+Require Import NNRS.
+Require Import NNRSVars.
+Require Import NNRSEval.
 
-Section NNRCimpishRename.
+Section NNRSRename.
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
 
   Section renames.
     
-    Fixpoint nnrc_impish_stmt_rename_mc
-             (s:nnrc_impish_stmt) (oldvar newvar:var) : nnrc_impish_stmt
+    Fixpoint nnrs_stmt_rename_mc
+             (s:nnrs_stmt) (oldvar newvar:var) : nnrs_stmt
       := match s with
-         | NNRCimpishSeq s₁ s₂ =>
-           NNRCimpishSeq
-             (nnrc_impish_stmt_rename_mc s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_mc s₂ oldvar newvar)
-         | NNRCimpishLet v e s₀ =>
-           NNRCimpishLet
+         | NNRSSeq s₁ s₂ =>
+           NNRSSeq
+             (nnrs_stmt_rename_mc s₁ oldvar newvar)
+             (nnrs_stmt_rename_mc s₂ oldvar newvar)
+         | NNRSLet v e s₀ =>
+           NNRSLet
              v e
-             (nnrc_impish_stmt_rename_mc s₀ oldvar newvar)         
-         | NNRCimpishLetMut v s₁ s₂ =>
-           NNRCimpishLetMut
+             (nnrs_stmt_rename_mc s₀ oldvar newvar)         
+         | NNRSLetMut v s₁ s₂ =>
+           NNRSLetMut
              v
-             (nnrc_impish_stmt_rename_mc s₁ oldvar newvar)         
-             (nnrc_impish_stmt_rename_mc s₂ oldvar newvar)         
-         | NNRCimpishLetMutColl v s₁ s₂ =>
-           NNRCimpishLetMutColl
+             (nnrs_stmt_rename_mc s₁ oldvar newvar)         
+             (nnrs_stmt_rename_mc s₂ oldvar newvar)         
+         | NNRSLetMutColl v s₁ s₂ =>
+           NNRSLetMutColl
              v
              (if v == oldvar
               then s₁
-              else nnrc_impish_stmt_rename_mc s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_mc s₂ oldvar newvar)
-         | NNRCimpishAssign v e =>
-           NNRCimpishAssign v e
-         | NNRCimpishPush v e =>
-           NNRCimpishPush
+              else nnrs_stmt_rename_mc s₁ oldvar newvar)
+             (nnrs_stmt_rename_mc s₂ oldvar newvar)
+         | NNRSAssign v e =>
+           NNRSAssign v e
+         | NNRSPush v e =>
+           NNRSPush
              (if v == oldvar then newvar else v)
              e
-         | NNRCimpishFor v e s₀ =>
-           NNRCimpishFor
+         | NNRSFor v e s₀ =>
+           NNRSFor
              v e
-             (nnrc_impish_stmt_rename_mc s₀ oldvar newvar)         
-         | NNRCimpishIf e s₁ s₂ =>
-           NNRCimpishIf
+             (nnrs_stmt_rename_mc s₀ oldvar newvar)         
+         | NNRSIf e s₁ s₂ =>
+           NNRSIf
              e
-             (nnrc_impish_stmt_rename_mc s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_mc s₂ oldvar newvar)         
-         | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
-           NNRCimpishEither
+             (nnrs_stmt_rename_mc s₁ oldvar newvar)
+             (nnrs_stmt_rename_mc s₂ oldvar newvar)         
+         | NNRSEither e x₁ s₁ x₂ s₂ =>
+           NNRSEither
              e
-             x₁ (nnrc_impish_stmt_rename_mc s₁ oldvar newvar)
-             x₂ (nnrc_impish_stmt_rename_mc s₂ oldvar newvar)         
+             x₁ (nnrs_stmt_rename_mc s₁ oldvar newvar)
+             x₂ (nnrs_stmt_rename_mc s₂ oldvar newvar)         
          end.
 
-    Fixpoint nnrc_impish_stmt_rename_md
-             (s:nnrc_impish_stmt) (oldvar newvar:var) : nnrc_impish_stmt
+    Fixpoint nnrs_stmt_rename_md
+             (s:nnrs_stmt) (oldvar newvar:var) : nnrs_stmt
       := match s with
-         | NNRCimpishSeq s₁ s₂ =>
-           NNRCimpishSeq
-             (nnrc_impish_stmt_rename_md s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_md s₂ oldvar newvar)
-         | NNRCimpishLet v e s₀ =>
-           NNRCimpishLet
+         | NNRSSeq s₁ s₂ =>
+           NNRSSeq
+             (nnrs_stmt_rename_md s₁ oldvar newvar)
+             (nnrs_stmt_rename_md s₂ oldvar newvar)
+         | NNRSLet v e s₀ =>
+           NNRSLet
              v e
-             (nnrc_impish_stmt_rename_md s₀ oldvar newvar)         
-         | NNRCimpishLetMut v s₁ s₂ =>
-           NNRCimpishLetMut
+             (nnrs_stmt_rename_md s₀ oldvar newvar)         
+         | NNRSLetMut v s₁ s₂ =>
+           NNRSLetMut
              v
              (if v == oldvar
               then s₁
-              else nnrc_impish_stmt_rename_md s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_md s₂ oldvar newvar)
-         | NNRCimpishLetMutColl v s₁ s₂ =>
-           NNRCimpishLetMutColl
+              else nnrs_stmt_rename_md s₁ oldvar newvar)
+             (nnrs_stmt_rename_md s₂ oldvar newvar)
+         | NNRSLetMutColl v s₁ s₂ =>
+           NNRSLetMutColl
              v
-             (nnrc_impish_stmt_rename_md s₁ oldvar newvar)         
-             (nnrc_impish_stmt_rename_md s₂ oldvar newvar)
-         | NNRCimpishAssign v e =>
-           NNRCimpishAssign
+             (nnrs_stmt_rename_md s₁ oldvar newvar)         
+             (nnrs_stmt_rename_md s₂ oldvar newvar)
+         | NNRSAssign v e =>
+           NNRSAssign
              (if v == oldvar then newvar else v)
              e
-         | NNRCimpishPush v e =>
-           NNRCimpishPush v e
+         | NNRSPush v e =>
+           NNRSPush v e
 
-         | NNRCimpishFor v e s₀ =>
-           NNRCimpishFor
+         | NNRSFor v e s₀ =>
+           NNRSFor
              v e
-             (nnrc_impish_stmt_rename_md s₀ oldvar newvar)         
-         | NNRCimpishIf e s₁ s₂ =>
-           NNRCimpishIf
+             (nnrs_stmt_rename_md s₀ oldvar newvar)         
+         | NNRSIf e s₁ s₂ =>
+           NNRSIf
              e
-             (nnrc_impish_stmt_rename_md s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_md s₂ oldvar newvar)         
-         | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
-           NNRCimpishEither
+             (nnrs_stmt_rename_md s₁ oldvar newvar)
+             (nnrs_stmt_rename_md s₂ oldvar newvar)         
+         | NNRSEither e x₁ s₁ x₂ s₂ =>
+           NNRSEither
              e
-             x₁ (nnrc_impish_stmt_rename_md s₁ oldvar newvar)
-             x₂ (nnrc_impish_stmt_rename_md s₂ oldvar newvar)         
+             x₁ (nnrs_stmt_rename_md s₁ oldvar newvar)
+             x₂ (nnrs_stmt_rename_md s₂ oldvar newvar)         
          end.
 
-    Fixpoint nnrc_impish_expr_rename_env
-             (e:nnrc_impish_expr) (oldvar newvar:var) : nnrc_impish_expr
+    Fixpoint nnrs_expr_rename_env
+             (e:nnrs_expr) (oldvar newvar:var) : nnrs_expr
       := match e with
-         |  NNRCimpishGetConstant v =>
-            NNRCimpishGetConstant v
-         | NNRCimpishVar v =>
-           NNRCimpishVar
+         |  NNRSGetConstant v =>
+            NNRSGetConstant v
+         | NNRSVar v =>
+           NNRSVar
              (if v == oldvar then newvar else v)
-         | NNRCimpishConst d =>
-           NNRCimpishConst d
-         | NNRCimpishBinop b e₁ e₂ =>
-           NNRCimpishBinop
+         | NNRSConst d =>
+           NNRSConst d
+         | NNRSBinop b e₁ e₂ =>
+           NNRSBinop
              b
-             (nnrc_impish_expr_rename_env e₁ oldvar newvar)
-             (nnrc_impish_expr_rename_env e₂ oldvar newvar)
-         | NNRCimpishUnop u e₀ =>
-           NNRCimpishUnop
+             (nnrs_expr_rename_env e₁ oldvar newvar)
+             (nnrs_expr_rename_env e₂ oldvar newvar)
+         | NNRSUnop u e₀ =>
+           NNRSUnop
              u
-             (nnrc_impish_expr_rename_env e₀ oldvar newvar)
-         | NNRCimpishGroupBy g ls e₀ =>
-           NNRCimpishGroupBy
+             (nnrs_expr_rename_env e₀ oldvar newvar)
+         | NNRSGroupBy g ls e₀ =>
+           NNRSGroupBy
              g ls
-             (nnrc_impish_expr_rename_env e₀ oldvar newvar)
+             (nnrs_expr_rename_env e₀ oldvar newvar)
          end.
 
-    Fixpoint nnrc_impish_stmt_rename_env
-             (s:nnrc_impish_stmt) (oldvar newvar:var) : nnrc_impish_stmt
+    Fixpoint nnrs_stmt_rename_env
+             (s:nnrs_stmt) (oldvar newvar:var) : nnrs_stmt
       := match s with
-         | NNRCimpishSeq s₁ s₂ =>
-           NNRCimpishSeq
-             (nnrc_impish_stmt_rename_env s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_env s₂ oldvar newvar)
-         | NNRCimpishLet v e s₀ =>
-           NNRCimpishLet
+         | NNRSSeq s₁ s₂ =>
+           NNRSSeq
+             (nnrs_stmt_rename_env s₁ oldvar newvar)
+             (nnrs_stmt_rename_env s₂ oldvar newvar)
+         | NNRSLet v e s₀ =>
+           NNRSLet
              v
-             (nnrc_impish_expr_rename_env e oldvar newvar)
+             (nnrs_expr_rename_env e oldvar newvar)
              (if v == oldvar
               then s₀
-              else nnrc_impish_stmt_rename_env s₀ oldvar newvar)
-         | NNRCimpishLetMut v s₁ s₂ =>
-           NNRCimpishLetMut
+              else nnrs_stmt_rename_env s₀ oldvar newvar)
+         | NNRSLetMut v s₁ s₂ =>
+           NNRSLetMut
              v
-             (nnrc_impish_stmt_rename_env s₁ oldvar newvar)
+             (nnrs_stmt_rename_env s₁ oldvar newvar)
              (if v == oldvar
               then s₂
-              else nnrc_impish_stmt_rename_env s₂ oldvar newvar)
-         | NNRCimpishLetMutColl v s₁ s₂ =>
-           NNRCimpishLetMutColl
+              else nnrs_stmt_rename_env s₂ oldvar newvar)
+         | NNRSLetMutColl v s₁ s₂ =>
+           NNRSLetMutColl
              v
-             (nnrc_impish_stmt_rename_env s₁ oldvar newvar)         
+             (nnrs_stmt_rename_env s₁ oldvar newvar)         
              (if v == oldvar
               then s₂
-              else nnrc_impish_stmt_rename_env s₂ oldvar newvar)
-         | NNRCimpishAssign v e =>
-           NNRCimpishAssign
+              else nnrs_stmt_rename_env s₂ oldvar newvar)
+         | NNRSAssign v e =>
+           NNRSAssign
              v
-             (nnrc_impish_expr_rename_env e oldvar newvar)
-         | NNRCimpishPush v e =>
-           NNRCimpishPush
+             (nnrs_expr_rename_env e oldvar newvar)
+         | NNRSPush v e =>
+           NNRSPush
              v
-             (nnrc_impish_expr_rename_env e oldvar newvar)
-         | NNRCimpishFor v e s₀ =>
-           NNRCimpishFor
+             (nnrs_expr_rename_env e oldvar newvar)
+         | NNRSFor v e s₀ =>
+           NNRSFor
              v
-             (nnrc_impish_expr_rename_env e oldvar newvar)
+             (nnrs_expr_rename_env e oldvar newvar)
              (if v == oldvar
               then s₀
-              else nnrc_impish_stmt_rename_env s₀ oldvar newvar)
-         | NNRCimpishIf e s₁ s₂ =>
-           NNRCimpishIf
-             (nnrc_impish_expr_rename_env e oldvar newvar)
-             (nnrc_impish_stmt_rename_env s₁ oldvar newvar)
-             (nnrc_impish_stmt_rename_env s₂ oldvar newvar)         
-         | NNRCimpishEither e x₁ s₁ x₂ s₂ =>
-           NNRCimpishEither
-             (nnrc_impish_expr_rename_env e oldvar newvar)
+              else nnrs_stmt_rename_env s₀ oldvar newvar)
+         | NNRSIf e s₁ s₂ =>
+           NNRSIf
+             (nnrs_expr_rename_env e oldvar newvar)
+             (nnrs_stmt_rename_env s₁ oldvar newvar)
+             (nnrs_stmt_rename_env s₂ oldvar newvar)         
+         | NNRSEither e x₁ s₁ x₂ s₂ =>
+           NNRSEither
+             (nnrs_expr_rename_env e oldvar newvar)
              x₁
              (if x₁ == oldvar
               then s₁
-              else nnrc_impish_stmt_rename_env s₁ oldvar newvar)
+              else nnrs_stmt_rename_env s₁ oldvar newvar)
              x₂
              (if x₂ == oldvar
               then s₂
-              else nnrc_impish_stmt_rename_env s₂ oldvar newvar)
+              else nnrs_stmt_rename_env s₂ oldvar newvar)
          end.
 
   End renames.
 
   Section rename_vars.
     
-    Lemma nnrc_impish_expr_free_vars_rename_env e v v' :
-      nnrc_impish_expr_free_vars (nnrc_impish_expr_rename_env e v v')
-      = replace_all (nnrc_impish_expr_free_vars e) v v'.
+    Lemma nnrs_expr_free_vars_rename_env e v v' :
+      nnrs_expr_free_vars (nnrs_expr_rename_env e v v')
+      = replace_all (nnrs_expr_free_vars e) v v'.
     Proof.
       unfold replace_all.
       induction e; simpl; trivial.
       rewrite IHe1, IHe2, map_app; trivial.
     Qed.
 
-    Lemma nnrc_impish_stmt_free_env_vars_rename_env s v v' :
-      ~ In v' (nnrc_impish_stmt_bound_env_vars s) ->
-      nnrc_impish_stmt_free_env_vars (nnrc_impish_stmt_rename_env s v v')
-      = replace_all (nnrc_impish_stmt_free_env_vars s) v v'.
+    Lemma nnrs_stmt_free_env_vars_rename_env s v v' :
+      ~ In v' (nnrs_stmt_bound_env_vars s) ->
+      nnrs_stmt_free_env_vars (nnrs_stmt_rename_env s v v')
+      = replace_all (nnrs_stmt_free_env_vars s) v v'.
     Proof.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl
       ; intros
-      ; repeat rewrite nnrc_impish_expr_free_vars_rename_env
+      ; repeat rewrite nnrs_expr_free_vars_rename_env
       ; repeat rewrite IHs
       ; repeat rewrite IHs1
       ; repeat rewrite IHs2
@@ -243,7 +243,7 @@ Section NNRCimpishRename.
       ; repeat rewrite replace_all_app
       ; repeat rewrite in_app_iff in *
       ; intuition.
-      - Case "NNRCimpishLet"%string.
+      - Case "NNRSLet"%string.
         match_destr.
         + rewrite e in *; clear e v0.
           rewrite replace_all_remove_eq.
@@ -251,7 +251,7 @@ Section NNRCimpishRename.
         + rewrite H.
           rewrite remove_replace_all_comm by congruence.
           trivial.
-      - Case "NNRCimpishLetMut"%string.
+      - Case "NNRSLetMut"%string.
         match_destr.
         + rewrite e in *; clear e v0.
           rewrite replace_all_remove_eq.
@@ -259,7 +259,7 @@ Section NNRCimpishRename.
         + rewrite H3.
           rewrite remove_replace_all_comm by congruence.
           trivial.
-      - Case "NNRCimpishLetMutColl"%string.
+      - Case "NNRSLetMutColl"%string.
         match_destr.
         + rewrite e in *; clear e v0.
           rewrite replace_all_remove_eq.
@@ -267,7 +267,7 @@ Section NNRCimpishRename.
         + rewrite H3.
           rewrite remove_replace_all_comm by congruence.
           trivial.
-      - Case "NNRCimpishFor"%string.
+      - Case "NNRSFor"%string.
         match_destr.
         + rewrite e in *; clear e v0.
           rewrite replace_all_remove_eq.
@@ -275,7 +275,7 @@ Section NNRCimpishRename.
         + rewrite H.
           rewrite remove_replace_all_comm by congruence.
           trivial.
-      - Case "NNRCimpishEither"%string.
+      - Case "NNRSEither"%string.
         repeat match_destr; unfold equiv, complement in *; subst
         ; repeat rewrite replace_all_remove_eq; trivial.
         + rewrite H4.
@@ -289,19 +289,19 @@ Section NNRCimpishRename.
           trivial.
     Qed.
 
-    Lemma nnrc_impish_stmt_free_env_vars_rename_env_in s v0 v v' :
-      In v0 (nnrc_impish_stmt_free_env_vars (nnrc_impish_stmt_rename_env s v v')) ->
-      v0 = v' \/ (v0 <> v /\ In v0 (nnrc_impish_stmt_free_env_vars s)).
+    Lemma nnrs_stmt_free_env_vars_rename_env_in s v0 v v' :
+      In v0 (nnrs_stmt_free_env_vars (nnrs_stmt_rename_env s v v')) ->
+      v0 = v' \/ (v0 <> v /\ In v0 (nnrs_stmt_free_env_vars s)).
     Proof.
       destruct (v0 == v')
       ; [left; trivial | ].
       intros inn; right.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl in *
       ; repeat rewrite in_app_iff in *
-      ;  repeat rewrite nnrc_impish_expr_free_vars_rename_env in *.
+      ;  repeat rewrite nnrs_expr_free_vars_rename_env in *.
       - intuition.
-      - Case "NNRCimpishLet"%string.
+      - Case "NNRSLet"%string.
         destruct inn as [inn|inn].
         + apply in_replace_all in inn.
           intuition.
@@ -310,7 +310,7 @@ Section NNRCimpishRename.
           ; intuition
           ; right
           ; apply remove_in_neq; tauto.
-      - Case "NNRCimpishLetMut"%string.
+      - Case "NNRSLetMut"%string.
         destruct inn as [inn|inn].
         + intuition.
         + apply remove_inv in inn.
@@ -318,7 +318,7 @@ Section NNRCimpishRename.
           ; intuition
           ; right
           ; apply remove_in_neq; tauto.
-      - Case "NNRCimpishLetMutColl"%string.
+      - Case "NNRSLetMutColl"%string.
         destruct inn as [inn|inn].
         + intuition.
         + apply remove_inv in inn.
@@ -326,13 +326,13 @@ Section NNRCimpishRename.
           ; intuition
           ; right
           ; apply remove_in_neq; tauto.
-      - Case "NNRCimpishAssign"%string.
+      - Case "NNRSAssign"%string.
         apply in_replace_all in inn.
         intuition.
-      - Case "NNRCimpishPush"%string.
+      - Case "NNRSPush"%string.
         apply in_replace_all in inn.
         intuition.
-      - Case "NNRCimpishFor"%string.
+      - Case "NNRSFor"%string.
         destruct inn as [inn|inn].
         + apply in_replace_all in inn.
           intuition.
@@ -341,13 +341,13 @@ Section NNRCimpishRename.
           ; intuition
           ; right
           ; apply remove_in_neq; tauto.
-      - Case "NNRCimpishIf"%string.
+      - Case "NNRSIf"%string.
         destruct inn as [inn|[inn|inn]].
         + apply in_replace_all in inn.
           intuition.
         + intuition.
         + intuition.
-      - Case "NNRCimpishEither"%string.
+      - Case "NNRSEither"%string.
         destruct inn as [inn|[inn|inn]].
         + apply in_replace_all in inn.
           intuition.
@@ -363,165 +363,165 @@ Section NNRCimpishRename.
           ; apply remove_in_neq; tauto.
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_env_vars_rename_env s v v' :
-      nnrc_impish_stmt_bound_env_vars (nnrc_impish_stmt_rename_env s v v')
-      = nnrc_impish_stmt_bound_env_vars s.
+    Lemma nnrs_stmt_bound_env_vars_rename_env s v v' :
+      nnrs_stmt_bound_env_vars (nnrs_stmt_rename_env s v v')
+      = nnrs_stmt_bound_env_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_free_mcenv_vars_rename_env s v v' :
-      nnrc_impish_stmt_free_mcenv_vars (nnrc_impish_stmt_rename_env s v v')
-      = nnrc_impish_stmt_free_mcenv_vars s.
+    Lemma nnrs_stmt_free_mcenv_vars_rename_env s v v' :
+      nnrs_stmt_free_mcenv_vars (nnrs_stmt_rename_env s v v')
+      = nnrs_stmt_free_mcenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_mcenv_vars_rename_env s v v' :
-      nnrc_impish_stmt_bound_mcenv_vars (nnrc_impish_stmt_rename_env s v v')
-      = nnrc_impish_stmt_bound_mcenv_vars s.
+    Lemma nnrs_stmt_bound_mcenv_vars_rename_env s v v' :
+      nnrs_stmt_bound_mcenv_vars (nnrs_stmt_rename_env s v v')
+      = nnrs_stmt_bound_mcenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_free_mdenv_vars_rename_env s v v' :
-      nnrc_impish_stmt_free_mdenv_vars (nnrc_impish_stmt_rename_env s v v')
-      = nnrc_impish_stmt_free_mdenv_vars s.
+    Lemma nnrs_stmt_free_mdenv_vars_rename_env s v v' :
+      nnrs_stmt_free_mdenv_vars (nnrs_stmt_rename_env s v v')
+      = nnrs_stmt_free_mdenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_mdenv_vars_rename_env s v v' :
-      nnrc_impish_stmt_bound_mdenv_vars (nnrc_impish_stmt_rename_env s v v')
-      = nnrc_impish_stmt_bound_mdenv_vars s.
+    Lemma nnrs_stmt_bound_mdenv_vars_rename_env s v v' :
+      nnrs_stmt_bound_mdenv_vars (nnrs_stmt_rename_env s v v')
+      = nnrs_stmt_bound_mdenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.  
 
-    Lemma nnrc_impish_stmt_free_env_vars_rename_mcenv s v v' :
-      nnrc_impish_stmt_free_env_vars (nnrc_impish_stmt_rename_mc s v v')
-      = nnrc_impish_stmt_free_env_vars s.
+    Lemma nnrs_stmt_free_env_vars_rename_mcenv s v v' :
+      nnrs_stmt_free_env_vars (nnrs_stmt_rename_mc s v v')
+      = nnrs_stmt_free_env_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_env_vars_rename_mcenv s v v' :
-      nnrc_impish_stmt_bound_env_vars (nnrc_impish_stmt_rename_mc s v v')
-      = nnrc_impish_stmt_bound_env_vars s.
+    Lemma nnrs_stmt_bound_env_vars_rename_mcenv s v v' :
+      nnrs_stmt_bound_env_vars (nnrs_stmt_rename_mc s v v')
+      = nnrs_stmt_bound_env_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_free_mcenv_vars_rename_mcenv_in s v0 v v' :
-      In v0 (nnrc_impish_stmt_free_mcenv_vars (nnrc_impish_stmt_rename_mc s v v')) ->
-      v0 = v' \/ (v0 <> v /\ In v0 (nnrc_impish_stmt_free_mcenv_vars s)).
+    Lemma nnrs_stmt_free_mcenv_vars_rename_mcenv_in s v0 v v' :
+      In v0 (nnrs_stmt_free_mcenv_vars (nnrs_stmt_rename_mc s v v')) ->
+      v0 = v' \/ (v0 <> v /\ In v0 (nnrs_stmt_free_mcenv_vars s)).
     Proof.
       destruct (v0 == v')
       ; [left; trivial | ].
       intros inn; right.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl in *
       ; repeat rewrite in_app_iff in *
       ; try solve [intuition].
-      - Case "NNRCimpishLetMutColl"%string.
+      - Case "NNRSLetMutColl"%string.
         destruct inn as [inn|inn].
         + apply remove_inv in inn.
           match_destr_in inn; unfold equiv, complement in *; subst
           ; intuition; left
           ; apply remove_in_neq; tauto.
         + intuition.
-      - Case "NNRCimpishPush"%string.
+      - Case "NNRSPush"%string.
         match_destr_in inn; intuition; congruence.
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_mcenv_vars_rename_mcenv s v v' :
-      nnrc_impish_stmt_bound_mcenv_vars (nnrc_impish_stmt_rename_mc s v v')
-      = nnrc_impish_stmt_bound_mcenv_vars s.
+    Lemma nnrs_stmt_bound_mcenv_vars_rename_mcenv s v v' :
+      nnrs_stmt_bound_mcenv_vars (nnrs_stmt_rename_mc s v v')
+      = nnrs_stmt_bound_mcenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_free_mdenv_vars_rename_mcenv s v v' :
-      nnrc_impish_stmt_free_mdenv_vars (nnrc_impish_stmt_rename_mc s v v')
-      = nnrc_impish_stmt_free_mdenv_vars s.
+    Lemma nnrs_stmt_free_mdenv_vars_rename_mcenv s v v' :
+      nnrs_stmt_free_mdenv_vars (nnrs_stmt_rename_mc s v v')
+      = nnrs_stmt_free_mdenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_mdenv_vars_rename_mcenv s v v' :
-      nnrc_impish_stmt_bound_mdenv_vars (nnrc_impish_stmt_rename_mc s v v')
-      = nnrc_impish_stmt_bound_mdenv_vars s.
+    Lemma nnrs_stmt_bound_mdenv_vars_rename_mcenv s v v' :
+      nnrs_stmt_bound_mdenv_vars (nnrs_stmt_rename_mc s v v')
+      = nnrs_stmt_bound_mdenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_free_env_vars_rename_mdenv s v v' :
-      nnrc_impish_stmt_free_env_vars (nnrc_impish_stmt_rename_md s v v')
-      = nnrc_impish_stmt_free_env_vars s.
+    Lemma nnrs_stmt_free_env_vars_rename_mdenv s v v' :
+      nnrs_stmt_free_env_vars (nnrs_stmt_rename_md s v v')
+      = nnrs_stmt_free_env_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_env_vars_rename_mdenv s v v' :
-      nnrc_impish_stmt_bound_env_vars (nnrc_impish_stmt_rename_md s v v')
-      = nnrc_impish_stmt_bound_env_vars s.
+    Lemma nnrs_stmt_bound_env_vars_rename_mdenv s v v' :
+      nnrs_stmt_bound_env_vars (nnrs_stmt_rename_md s v v')
+      = nnrs_stmt_bound_env_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_free_mcenv_vars_rename_mdenv s v v' :
-      nnrc_impish_stmt_free_mcenv_vars (nnrc_impish_stmt_rename_md s v v')
-      = nnrc_impish_stmt_free_mcenv_vars s.
+    Lemma nnrs_stmt_free_mcenv_vars_rename_mdenv s v v' :
+      nnrs_stmt_free_mcenv_vars (nnrs_stmt_rename_md s v v')
+      = nnrs_stmt_free_mcenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_mcenv_vars_rename_mdenv s v v' :
-      nnrc_impish_stmt_bound_mcenv_vars (nnrc_impish_stmt_rename_md s v v')
-      = nnrc_impish_stmt_bound_mcenv_vars s.
+    Lemma nnrs_stmt_bound_mcenv_vars_rename_mdenv s v v' :
+      nnrs_stmt_bound_mcenv_vars (nnrs_stmt_rename_md s v v')
+      = nnrs_stmt_bound_mcenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_stmt_free_mdenv_vars_rename_mdenv_in s v0 v v' :
-      In v0 (nnrc_impish_stmt_free_mdenv_vars (nnrc_impish_stmt_rename_md s v v')) ->
-      v0 = v' \/ (v0 <> v /\ In v0 (nnrc_impish_stmt_free_mdenv_vars s)).
+    Lemma nnrs_stmt_free_mdenv_vars_rename_mdenv_in s v0 v v' :
+      In v0 (nnrs_stmt_free_mdenv_vars (nnrs_stmt_rename_md s v v')) ->
+      v0 = v' \/ (v0 <> v /\ In v0 (nnrs_stmt_free_mdenv_vars s)).
     Proof.
       destruct (v0 == v')
       ; [left; trivial | ].
       intros inn; right.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl in *
       ; repeat rewrite in_app_iff in *
       ; try solve [intuition].
-      - Case "NNRCimpishLetMut"%string.
+      - Case "NNRSLetMut"%string.
         destruct inn as [inn|inn].
         + apply remove_inv in inn.
           match_destr_in inn; unfold equiv, complement in *; subst
           ; intuition; left
           ; apply remove_in_neq; tauto.
         + intuition.
-      - Case "NNRCimpishAssign"%string.
+      - Case "NNRSAssign"%string.
         match_destr_in inn; intuition; congruence.
     Qed.
 
-    Lemma nnrc_impish_stmt_bound_mdenv_vars_rename_mdenv s v v' :
-      nnrc_impish_stmt_bound_mdenv_vars (nnrc_impish_stmt_rename_md s v v')
-      = nnrc_impish_stmt_bound_mdenv_vars s.
+    Lemma nnrs_stmt_bound_mdenv_vars_rename_mdenv s v v' :
+      nnrs_stmt_bound_mdenv_vars (nnrs_stmt_rename_md s v v')
+      = nnrs_stmt_bound_mdenv_vars s.
     Proof.
       induction s; simpl; intuition; try congruence
       ; repeat (match_destr; try congruence).
@@ -532,34 +532,34 @@ Section NNRCimpishRename.
 
   Section rename_eval.
     
-    Lemma nnrc_impish_expr_eval_rename_env c σ e v v' d:
-      ~ In v' (nnrc_impish_expr_free_vars e) ->
-      nnrc_impish_expr_eval h c ((v', d) :: σ) (nnrc_impish_expr_rename_env e v v')
-      = nnrc_impish_expr_eval h c ((v, d) :: σ) e.
+    Lemma nnrs_expr_eval_rename_env c σ e v v' d:
+      ~ In v' (nnrs_expr_free_vars e) ->
+      nnrs_expr_eval h c ((v', d) :: σ) (nnrs_expr_rename_env e v v')
+      = nnrs_expr_eval h c ((v, d) :: σ) e.
     Proof.
-      nnrc_impish_expr_cases (induction e) Case; simpl; trivial; intros nin
+      nnrs_expr_cases (induction e) Case; simpl; trivial; intros nin
       ; try solve [ rewrite IHe by intuition; trivial
                   |  rewrite IHe1, IHe2 by intuition; trivial
                   ] .
-      - Case "NNRCimpishVar"%string.
+      - Case "NNRSVar"%string.
         intuition.
         destruct (equiv_dec v0 v)
         ; repeat (match_destr; try congruence).
     Qed.
 
-    Lemma nnrc_impish_expr_eval_rename_env_in c l σ e v v' d:
+    Lemma nnrs_expr_eval_rename_env_in c l σ e v v' d:
       ~ In v (domain l) ->
       ~ In v' (domain l) ->
-      ~ In v' (nnrc_impish_expr_free_vars e) ->
-      nnrc_impish_expr_eval h c (l++(v', d) :: σ) (nnrc_impish_expr_rename_env e v v')
-      = nnrc_impish_expr_eval h c (l++(v, d) :: σ) e.
+      ~ In v' (nnrs_expr_free_vars e) ->
+      nnrs_expr_eval h c (l++(v', d) :: σ) (nnrs_expr_rename_env e v v')
+      = nnrs_expr_eval h c (l++(v, d) :: σ) e.
     Proof.
-      nnrc_impish_expr_cases (induction e) Case; simpl; trivial
+      nnrs_expr_cases (induction e) Case; simpl; trivial
       ; repeat rewrite in_app_iff; intros
       ; try solve [ rewrite IHe by intuition; trivial
                   |  rewrite IHe1, IHe2 by intuition; trivial
                   ].
-      - Case "NNRCimpishVar"%string.
+      - Case "NNRSVar"%string.
         intuition.
         repeat rewrite lookup_app.
         destruct (equiv_dec v0 v); unfold equiv, complement in *
@@ -599,10 +599,10 @@ Section NNRCimpishRename.
                     destruct x; try discriminate; simpl in H; invcs H
                   | [H: _ * _ * _ |- _ ] => destruct H as [[??]?]; simpl in *
                   | [H: _ * _ |- _ ] => destruct H as [??]; simpl in *
-                  | [H : nnrc_impish_stmt_eval _ _ ?p1 _ _ _ = Some (?p2,_,_) |- _ ] =>
+                  | [H : nnrs_stmt_eval _ _ ?p1 _ _ _ = Some (?p2,_,_) |- _ ] =>
                     match p1 with
                     | p2 => fail 1
-                    | _ => generalize (nnrc_impish_stmt_eval_domain_stack H)
+                    | _ => generalize (nnrs_stmt_eval_domain_stack H)
                            ; intros [?[??]]
                     end
                   | [H: ~ (_ \/ _) |- _] => apply not_or in H
@@ -649,139 +649,139 @@ Section NNRCimpishRename.
                                    _ => _
                                  end) ] => destruct x; try reflexivity
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (nnrc_impish_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s)
+                        |- lift2P _ (nnrs_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s)
                                   _ ] => specialize (H l σ ψc ψd d)
                                          ; disect_tac H stac
                                                       
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H l σ ψc ψd d)
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ (?x :: ?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with| Some _ => _
+                        |- lift2P _ (match nnrs_stmt_eval _ _ (?x :: ?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with| Some _ => _
                                                                                                             | None => _
                                      end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (nnrc_impish_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s)
+                        |- lift2P _ (nnrs_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s)
                                   _ ] => specialize (H l σ ψc ψd d)
                                          ; disect_tac H stac
                                                       
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H l σ ψc ψd d)
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ ?ψc (?x::?l ++ (_, ?d) :: ?ψd)?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ ?ψc (?x::?l ++ (_, ?d) :: ?ψd)?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (nnrc_impish_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s)
+                        |- lift2P _ (nnrs_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s)
                                   _ ] => specialize (H l σ ψc ψd d)
                                          ; disect_tac H stac
                                                       
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H l σ ψc ψd d)
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d,
-                        _ -> _ -> _ -> _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ (?x::?l ++ (_, ?d) :: ?ψc) ?ψd ?s  with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ (?x::?l ++ (_, ?d) :: ?ψc) ?ψd ?s  with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
                                                  ; disect_tac H stac
 
                   | [H:forall l es ec ed d,
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (nnrc_impish_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s)
+                        |- lift2P _ (nnrs_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s)
                                   _ ] => specialize (H l σ ψc ψd d)
                                          ; disect_tac H stac
 
                   | [H:forall l es ec ed d,
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ (?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H l σ ψc ψd d)
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d,
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ (?x :: ?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ (?x :: ?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d, 
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (nnrc_impish_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s)
+                        |- lift2P _ (nnrs_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s)
                                   _ ] => specialize (H l σ ψc ψd d)
                                          ; disect_tac H stac
 
                   | [H:forall l es ec ed d, 
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ ?ψc (?l ++ (_, ?d) :: ?ψd) ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H l σ ψc ψd d)
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d, 
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ ?ψc (?x::?l ++ (_, ?d) :: ?ψd) ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ ?ψc (?x::?l ++ (_, ?d) :: ?ψd) ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d, 
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (nnrc_impish_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s)
+                        |- lift2P _ (nnrs_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s)
                                   _ ] => specialize (H l σ ψc ψd d)
                                          ; disect_tac H stac
 
                   | [H:forall l es ec ed d, 
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ (?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H l σ ψc ψd d)
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d, 
-                        _ -> lift2P _ (nnrc_impish_stmt_eval _ _ _ _ _ ?s) _
+                        _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                     
-                        |- lift2P _ (match nnrc_impish_stmt_eval _ _ ?σ (?x::?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
+                        |- lift2P _ (match nnrs_stmt_eval _ _ ?σ (?x::?l ++ (_, ?d) :: ?ψc) ?ψd ?s with
                                      | Some _ => _
                                      | None => _
                                      end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
@@ -801,25 +801,25 @@ Section NNRCimpishRename.
             ; try subst; simpl in *; intros
             ; try congruence
     .
-    Ltac unused_inv_tac := repeat progress (try rename_inv_tac1 ltac:( unused_inv_tac ; intuition unused_inv_tac); try rewrite nnrc_impish_expr_eval_unused_env by tauto).
+    Ltac unused_inv_tac := repeat progress (try rename_inv_tac1 ltac:( unused_inv_tac ; intuition unused_inv_tac); try rewrite nnrs_expr_eval_unused_env by tauto).
 
     Ltac rename_inv_extra_tac
       := match goal with
-         | [|- context [nnrc_impish_stmt_eval ?h ?c ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?σ) ?ψc ?ψd ?s ]] =>
+         | [|- context [nnrs_stmt_eval ?h ?c ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?σ) ?ψc ?ψd ?s ]] =>
            let HH := fresh in
-           generalize (nnrc_impish_stmt_eval_unused_env h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
+           generalize (nnrs_stmt_eval_unused_env h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
            ; unfold lift2P in HH
            ; unfold var in *
            ; repeat match_option_in HH
-         | [|- context [nnrc_impish_stmt_eval ?h ?c ?σ ?ψc ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψd) ?s ]] =>
+         | [|- context [nnrs_stmt_eval ?h ?c ?σ ?ψc ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψd) ?s ]] =>
            let HH := fresh in
-           generalize (nnrc_impish_stmt_eval_unused_mdenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
+           generalize (nnrs_stmt_eval_unused_mdenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
            ; unfold lift2P in HH
            ; unfold var in *
            ; repeat match_option_in HH
-         | [|- context [nnrc_impish_stmt_eval ?h ?c ?σ ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψc) ?ψd ?s ]] =>
+         | [|- context [nnrs_stmt_eval ?h ?c ?σ ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψc) ?ψd ?s ]] =>
            let HH := fresh in
-           generalize (nnrc_impish_stmt_eval_unused_mcenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
+           generalize (nnrs_stmt_eval_unused_mcenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
            ; unfold lift2P in HH
            ; unfold var in *
            ; repeat match_option_in HH
@@ -828,14 +828,14 @@ Section NNRCimpishRename.
     Ltac rename_inv_tac := repeat progress (
                                     try rename_inv_tac1 ltac:( intuition congruence ; intuition unused_inv_tac)
                                     ; try rename_inv_extra_tac
-                                    ; repeat rewrite nnrc_impish_expr_eval_rename_env_in by tauto).
+                                    ; repeat rewrite nnrs_expr_eval_rename_env_in by tauto).
 
 
-    Lemma nnrc_impish_stmt_eval_rename_env_in c l σ ψc ψd s (v v':var) d :
+    Lemma nnrs_stmt_eval_rename_env_in c l σ ψc ψd s (v v':var) d :
       ~ In v (domain l) ->
       ~ In v' (domain l) ->
-      ~ In v' (nnrc_impish_stmt_free_env_vars s) ->
-      ~ In v' (nnrc_impish_stmt_bound_env_vars s) ->
+      ~ In v' (nnrs_stmt_free_env_vars s) ->
+      ~ In v' (nnrs_stmt_bound_env_vars s) ->
       lift2P  (fun '(σ₁', ψc₁', ψd₁') '(σ₂', ψc₂', ψd₂') =>
                  (forall l' d σ'',
                      domain l' = domain l ->
@@ -844,25 +844,25 @@ Section NNRCimpishRename.
                  /\ ψc₁' = ψc₂'
                  /\ ψd₁' = ψd₂'
               )
-              (nnrc_impish_stmt_eval h c (l++(v',d)::σ) ψc ψd (nnrc_impish_stmt_rename_env s v v'))
-              (nnrc_impish_stmt_eval h c (l++(v,d)::σ) ψc ψd s).
+              (nnrs_stmt_eval h c (l++(v',d)::σ) ψc ψd (nnrs_stmt_rename_env s v v'))
+              (nnrs_stmt_eval h c (l++(v,d)::σ) ψc ψd s).
     Proof.
       revert l σ ψc ψd d
-      ; nnrc_impish_stmt_cases (induction s) Case
+      ; nnrs_stmt_cases (induction s) Case
       ; simpl; intros l σ ψc ψd d ninl ninl' nine ninb
       ; repeat rewrite in_app_iff in nine
       ; repeat rewrite in_app_iff in ninb
       ; rename_inv_tac
       ; try solve [dest_eqdec; rename_inv_tac].
-      - Case "NNRCimpishFor"%string.
+      - Case "NNRSFor"%string.
         dest_eqdec.
         + revert σ ψc ψd d.
           { induction l0; intros σ ψc ψd d; simpl.
             - rename_inv_tac.
             - unfold lift2P.
-              generalize (nnrc_impish_stmt_eval_unused_env h c ((v,Some a)::l) σ ψc ψd s v' d); simpl; intros eqs1.
+              generalize (nnrs_stmt_eval_unused_env h c ((v,Some a)::l) σ ψc ψd s v' d); simpl; intros eqs1.
               cut_to eqs1; [|tauto].
-              generalize (nnrc_impish_stmt_eval_unused_env h c ((v,Some a)::l) σ ψc ψd s v d); simpl; intros eqs2.
+              generalize (nnrs_stmt_eval_unused_env h c ((v,Some a)::l) σ ψc ψd s v d); simpl; intros eqs2.
               cut_to eqs2; [|tauto].
               unfold lift2P in *.
               unfold var in *.
@@ -895,11 +895,11 @@ Section NNRCimpishRename.
           }
     Qed.
 
-    Lemma nnrc_impish_stmt_eval_rename_mdenv_in c l σ ψc ψd s (v v':var) d :
+    Lemma nnrs_stmt_eval_rename_mdenv_in c l σ ψc ψd s (v v':var) d :
       ~ In v (domain l) ->
       ~ In v' (domain l) ->
-      ~ In v' (nnrc_impish_stmt_free_mdenv_vars s) ->
-      ~ In v' (nnrc_impish_stmt_bound_mdenv_vars s) ->
+      ~ In v' (nnrs_stmt_free_mdenv_vars s) ->
+      ~ In v' (nnrs_stmt_bound_mdenv_vars s) ->
       lift2P  (fun '(σ₁', ψc₁', ψd₁') '(σ₂', ψc₂', ψd₂') =>
                  (forall l' d ψd'',
                      domain l' = domain l ->
@@ -908,22 +908,22 @@ Section NNRCimpishRename.
                  /\ σ₁' = σ₂'
                  /\ ψc₁' = ψc₂'
               )
-              (nnrc_impish_stmt_eval h c σ ψc (l++(v',d)::ψd) (nnrc_impish_stmt_rename_md s v v'))
-              (nnrc_impish_stmt_eval h c σ ψc (l++(v,d)::ψd) s).
+              (nnrs_stmt_eval h c σ ψc (l++(v',d)::ψd) (nnrs_stmt_rename_md s v v'))
+              (nnrs_stmt_eval h c σ ψc (l++(v,d)::ψd) s).
     Proof.
       revert l σ ψc ψd d
-      ; nnrc_impish_stmt_cases (induction s) Case
+      ; nnrs_stmt_cases (induction s) Case
       ; simpl; intros l σ ψc ψd d ninl ninl' nine ninb
       ; repeat rewrite in_app_iff in nine
       ; repeat rewrite in_app_iff in ninb
       ; rename_inv_tac
       ; try solve [dest_eqdec; rename_inv_tac].
-      - Case "NNRCimpishLetMut"%string.
+      - Case "NNRSLetMut"%string.
         dest_eqdec.
         + repeat match goal with
-                   [|- context [nnrc_impish_stmt_eval ?h ?c ?σ ?ψc ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψd) ?s ]] =>
+                   [|- context [nnrs_stmt_eval ?h ?c ?σ ?ψc ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψd) ?s ]] =>
                    let HH := fresh in
-                   generalize (nnrc_impish_stmt_eval_unused_mdenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
+                   generalize (nnrs_stmt_eval_unused_mdenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
                    ; unfold lift2P in HH
                    ; unfold var in *
                    ; repeat match_option_in HH
@@ -932,7 +932,7 @@ Section NNRCimpishRename.
           invcs eqq2.
           rename_inv_tac; unfold domain in *; try congruence.
         + rename_inv_tac.
-      - Case "NNRCimpishAssign"%string.
+      - Case "NNRSAssign"%string.
         repeat rewrite lookup_app; simpl.
         dest_eqdec.
         + rewrite (lookup_nin_none string_dec ninl).
@@ -963,7 +963,7 @@ Section NNRCimpishRename.
             destruct eqq as [eqq1 eqq2].
             invcs eqq2.
             congruence.
-      - Case "NNRCimpishFor"%string.
+      - Case "NNRSFor"%string.
         revert l σ ψc ψd d ninl ninl'.
         induction l0; intros l σ ψc ψd d ninl ninl' ; simpl.
         + rename_inv_tac. 
@@ -981,11 +981,11 @@ Section NNRCimpishRename.
           rename_inv_tac.
     Qed.
     
-    Lemma nnrc_impish_stmt_eval_rename_mcenv_in c l σ ψc ψd s (v v':var) d :
+    Lemma nnrs_stmt_eval_rename_mcenv_in c l σ ψc ψd s (v v':var) d :
       ~ In v (domain l) ->
       ~ In v' (domain l) ->
-      ~ In v' (nnrc_impish_stmt_free_mcenv_vars s) ->
-      ~ In v' (nnrc_impish_stmt_bound_mcenv_vars s) ->
+      ~ In v' (nnrs_stmt_free_mcenv_vars s) ->
+      ~ In v' (nnrs_stmt_bound_mcenv_vars s) ->
       lift2P  (fun '(σ₁', ψc₁', ψd₁') '(σ₂', ψc₂', ψd₂') =>
                  (forall l' d ψc'',
                      domain l' = domain l ->
@@ -994,22 +994,22 @@ Section NNRCimpishRename.
                  /\ σ₁' = σ₂'
                  /\ ψd₁' = ψd₂'
               )
-              (nnrc_impish_stmt_eval h c σ (l++(v',d)::ψc) ψd (nnrc_impish_stmt_rename_mc s v v'))
-              (nnrc_impish_stmt_eval h c σ (l++(v,d)::ψc) ψd s).
+              (nnrs_stmt_eval h c σ (l++(v',d)::ψc) ψd (nnrs_stmt_rename_mc s v v'))
+              (nnrs_stmt_eval h c σ (l++(v,d)::ψc) ψd s).
     Proof.
       revert l σ ψc ψd d
-      ; nnrc_impish_stmt_cases (induction s) Case
+      ; nnrs_stmt_cases (induction s) Case
       ; simpl; intros l σ ψc ψd d ninl ninl' nine ninb
       ; repeat rewrite in_app_iff in nine
       ; repeat rewrite in_app_iff in ninb
       ; rename_inv_tac
       ; try solve [dest_eqdec; rename_inv_tac].
-      - Case "NNRCimpishLetMutColl"%string.
+      - Case "NNRSLetMutColl"%string.
         dest_eqdec.
         + repeat match goal with
-                   [|- context [nnrc_impish_stmt_eval ?h ?c ?σ ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψc) ?ψd ?s ]] =>
+                   [|- context [nnrs_stmt_eval ?h ?c ?σ ((?v1, ?d1) :: ?l ++ (?v2, ?d2) :: ?ψc) ?ψd ?s ]] =>
                    let HH := fresh in
-                   generalize (nnrc_impish_stmt_eval_unused_mcenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
+                   generalize (nnrs_stmt_eval_unused_mcenv h c ((v1,d1)::l) σ ψc ψd s v2 d2); simpl; intros HH; (cut_to HH; [|tauto])
                    ; unfold lift2P in HH
                    ; unfold var in *
                    ; repeat match_option_in HH
@@ -1018,7 +1018,7 @@ Section NNRCimpishRename.
           invcs eqq2.
           rename_inv_tac; unfold domain in *; try congruence.
         + rename_inv_tac.
-      - Case "NNRCimpishPush"%string.
+      - Case "NNRSPush"%string.
         repeat rewrite lookup_app; simpl.
         dest_eqdec.
         + rewrite (lookup_nin_none string_dec ninl).
@@ -1053,7 +1053,7 @@ Section NNRCimpishRename.
             invcs eqq2.
             destruct (string_dec v0 v); try congruence.
             destruct (string_dec v0 v'); try congruence.
-      - Case "NNRCimpishFor"%string.
+      - Case "NNRSFor"%string.
         revert l σ ψc ψd d ninl ninl'.
         induction l0; intros l σ ψc ψd d ninl ninl' ; simpl.
         + rename_inv_tac. 
@@ -1071,18 +1071,18 @@ Section NNRCimpishRename.
           rename_inv_tac.
     Qed.
     
-    Lemma nnrc_impish_stmt_eval_rename_env c σ ψc ψd s v v' d:
-      ~ In v' (nnrc_impish_stmt_free_env_vars s) ->
-      ~ In v' (nnrc_impish_stmt_bound_env_vars s) ->
-      nnrc_impish_stmt_eval h c ((v',d)::σ) ψc ψd 
-                            (nnrc_impish_stmt_rename_env s v v') =
-      match nnrc_impish_stmt_eval h c ((v,d)::σ) ψc ψd s with
+    Lemma nnrs_stmt_eval_rename_env c σ ψc ψd s v v' d:
+      ~ In v' (nnrs_stmt_free_env_vars s) ->
+      ~ In v' (nnrs_stmt_bound_env_vars s) ->
+      nnrs_stmt_eval h c ((v',d)::σ) ψc ψd 
+                            (nnrs_stmt_rename_env s v v') =
+      match nnrs_stmt_eval h c ((v,d)::σ) ψc ψd s with
       | Some ((_,d)::σ',ψc',ψd') => Some ((v',d)::σ',ψc',ψd')
       | _ => None
       end.
     Proof.
       intros.
-      generalize (nnrc_impish_stmt_eval_rename_env_in c nil σ ψc ψd s v v' d); simpl; intros HH.
+      generalize (nnrs_stmt_eval_rename_env_in c nil σ ψc ψd s v v' d); simpl; intros HH.
       cut_to HH; try tauto.
       unfold lift2P in *.
       repeat match_option_in HH
@@ -1091,18 +1091,18 @@ Section NNRCimpishRename.
     Qed.
     
 
-    Lemma nnrc_impish_stmt_eval_rename_mdenv c σ ψc ψd s v v' d:
-      ~ In v' (nnrc_impish_stmt_free_mdenv_vars s) ->
-      ~ In v' (nnrc_impish_stmt_bound_mdenv_vars s) ->
-      nnrc_impish_stmt_eval h c σ ψc ((v',d)::ψd)
-                            (nnrc_impish_stmt_rename_md s v v') =
-      match nnrc_impish_stmt_eval h c σ ψc ((v,d)::ψd) s with
+    Lemma nnrs_stmt_eval_rename_mdenv c σ ψc ψd s v v' d:
+      ~ In v' (nnrs_stmt_free_mdenv_vars s) ->
+      ~ In v' (nnrs_stmt_bound_mdenv_vars s) ->
+      nnrs_stmt_eval h c σ ψc ((v',d)::ψd)
+                            (nnrs_stmt_rename_md s v v') =
+      match nnrs_stmt_eval h c σ ψc ((v,d)::ψd) s with
       | Some (σ',ψc',(_,d)::ψd') => Some (σ',ψc',(v',d)::ψd')
       | _ => None
       end.
     Proof.
       intros.
-      generalize (nnrc_impish_stmt_eval_rename_mdenv_in c nil σ ψc ψd s v v' d); simpl; intros HH.
+      generalize (nnrs_stmt_eval_rename_mdenv_in c nil σ ψc ψd s v v' d); simpl; intros HH.
       cut_to HH; try tauto.
       unfold lift2P in *.
       repeat match_option_in HH
@@ -1113,18 +1113,18 @@ Section NNRCimpishRename.
       invcs H1; trivial.
     Qed.
 
-    Lemma nnrc_impish_stmt_eval_rename_mcenv c σ ψc ψd s v v' d:
-      ~ In v' (nnrc_impish_stmt_free_mcenv_vars s) ->
-      ~ In v' (nnrc_impish_stmt_bound_mcenv_vars s) ->
-      nnrc_impish_stmt_eval h c σ ((v',d)::ψc) ψd
-                            (nnrc_impish_stmt_rename_mc s v v') =
-      match nnrc_impish_stmt_eval h c σ ((v,d)::ψc) ψd s with
+    Lemma nnrs_stmt_eval_rename_mcenv c σ ψc ψd s v v' d:
+      ~ In v' (nnrs_stmt_free_mcenv_vars s) ->
+      ~ In v' (nnrs_stmt_bound_mcenv_vars s) ->
+      nnrs_stmt_eval h c σ ((v',d)::ψc) ψd
+                            (nnrs_stmt_rename_mc s v v') =
+      match nnrs_stmt_eval h c σ ((v,d)::ψc) ψd s with
       | Some (σ',(_,d)::ψc',ψd') => Some (σ',(v',d)::ψc',ψd')
       | _ => None
       end.
     Proof.
       intros.
-      generalize (nnrc_impish_stmt_eval_rename_mcenv_in c nil σ ψc ψd s v v' d); simpl; intros HH.
+      generalize (nnrs_stmt_eval_rename_mcenv_in c nil σ ψc ψd s v v' d); simpl; intros HH.
       cut_to HH; try tauto.
       unfold lift2P in *.
       repeat match_option_in HH
@@ -1139,116 +1139,116 @@ Section NNRCimpishRename.
 
   Section core.
 
-    Lemma nnrc_impish_expr_rename_env_core e v v' :
-      nnrc_impish_exprIsCore (nnrc_impish_expr_rename_env e v v') <->
-      nnrc_impish_exprIsCore e.
+    Lemma nnrs_expr_rename_env_core e v v' :
+      nnrs_exprIsCore (nnrs_expr_rename_env e v v') <->
+      nnrs_exprIsCore e.
     Proof.
       induction e; simpl; intuition.
     Qed.
 
-    Lemma nnrc_impish_stmt_rename_env_core_f s v v' :
-      nnrc_impish_stmtIsCore s ->
-      nnrc_impish_stmtIsCore (nnrc_impish_stmt_rename_env s v v').
+    Lemma nnrs_stmt_rename_env_core_f s v v' :
+      nnrs_stmtIsCore s ->
+      nnrs_stmtIsCore (nnrs_stmt_rename_env s v v').
     Proof.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl; intros isc.
-      - Case "NNRCimpishSeq"%string.
+      - Case "NNRSSeq"%string.
         intuition.
-      - Case "NNRCimpishLet"%string.
+      - Case "NNRSLet"%string.
         destruct isc as [isc1 isc2]; split; trivial.
-        + apply nnrc_impish_expr_rename_env_core; trivial.
+        + apply nnrs_expr_rename_env_core; trivial.
         + match_destr; intuition.
-      - Case "NNRCimpishLetMut"%string.
-        destruct isc as [isc1 isc2]; split; trivial.
-        + intuition.
-        + match_destr; intuition.
-      - Case "NNRCimpishLetMutColl"%string.
+      - Case "NNRSLetMut"%string.
         destruct isc as [isc1 isc2]; split; trivial.
         + intuition.
         + match_destr; intuition.
-      - Case "NNRCimpishAssign"%string.
-        apply nnrc_impish_expr_rename_env_core; trivial.
-      - Case "NNRCimpishPush"%string.
-        apply nnrc_impish_expr_rename_env_core; trivial.
-      - Case "NNRCimpishFor"%string.
+      - Case "NNRSLetMutColl"%string.
         destruct isc as [isc1 isc2]; split; trivial.
-        + apply nnrc_impish_expr_rename_env_core; trivial.
+        + intuition.
         + match_destr; intuition.
-      - Case "NNRCimpishIf"%string.
+      - Case "NNRSAssign"%string.
+        apply nnrs_expr_rename_env_core; trivial.
+      - Case "NNRSPush"%string.
+        apply nnrs_expr_rename_env_core; trivial.
+      - Case "NNRSFor"%string.
+        destruct isc as [isc1 isc2]; split; trivial.
+        + apply nnrs_expr_rename_env_core; trivial.
+        + match_destr; intuition.
+      - Case "NNRSIf"%string.
         destruct isc as [isc1 [isc2 isc3]]; split; trivial.
-        + apply nnrc_impish_expr_rename_env_core; trivial.
+        + apply nnrs_expr_rename_env_core; trivial.
         + split; intuition.
-      - Case "NNRCimpishEither"%string.
+      - Case "NNRSEither"%string.
         destruct isc as [isc1 [isc2 isc3]]; split; trivial.
-        + apply nnrc_impish_expr_rename_env_core; trivial.
+        + apply nnrs_expr_rename_env_core; trivial.
         + split; match_destr; intuition.
     Qed.
 
-    Lemma nnrc_impish_stmt_rename_env_core_b s v v' :
-      nnrc_impish_stmtIsCore (nnrc_impish_stmt_rename_env s v v') ->
-      nnrc_impish_stmtIsCore s.
+    Lemma nnrs_stmt_rename_env_core_b s v v' :
+      nnrs_stmtIsCore (nnrs_stmt_rename_env s v v') ->
+      nnrs_stmtIsCore s.
     Proof.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl; intros isc.
-      - Case "NNRCimpishSeq"%string.
+      - Case "NNRSSeq"%string.
         intuition.
-      - Case "NNRCimpishLet"%string.
+      - Case "NNRSLet"%string.
         destruct isc as [isc1 isc2].
         split.
-        + eapply nnrc_impish_expr_rename_env_core; eauto.
+        + eapply nnrs_expr_rename_env_core; eauto.
         + match_destr_in isc2; intuition.
-      - Case "NNRCimpishLetMut"%string.
+      - Case "NNRSLetMut"%string.
         destruct isc as [isc1 isc2]; split; trivial.
         + intuition.
         + match_destr_in isc2; intuition.
-      - Case "NNRCimpishLetMutColl"%string.
+      - Case "NNRSLetMutColl"%string.
         destruct isc as [isc1 isc2]; split; trivial.
         + intuition.
         + match_destr_in isc2; intuition.
-      - Case "NNRCimpishAssign"%string.
-        eapply nnrc_impish_expr_rename_env_core; eauto.
-      - Case "NNRCimpishPush"%string.
-        eapply nnrc_impish_expr_rename_env_core; eauto.
-      - Case "NNRCimpishFor"%string.
+      - Case "NNRSAssign"%string.
+        eapply nnrs_expr_rename_env_core; eauto.
+      - Case "NNRSPush"%string.
+        eapply nnrs_expr_rename_env_core; eauto.
+      - Case "NNRSFor"%string.
         destruct isc as [isc1 isc2]; split; trivial.
-        + eapply nnrc_impish_expr_rename_env_core; eauto.
+        + eapply nnrs_expr_rename_env_core; eauto.
         + match_destr_in isc2; intuition.
-      - Case "NNRCimpishIf"%string.
+      - Case "NNRSIf"%string.
         destruct isc as [isc1 [isc2 isc3]]; split; trivial.
-        + eapply nnrc_impish_expr_rename_env_core; eauto.
+        + eapply nnrs_expr_rename_env_core; eauto.
         + split; intuition.
-      - Case "NNRCimpishEither"%string.
+      - Case "NNRSEither"%string.
         destruct isc as [isc1 [isc2 isc3]]; split; trivial.
-        + eapply nnrc_impish_expr_rename_env_core; eauto.
+        + eapply nnrs_expr_rename_env_core; eauto.
         + split.
           * match_destr_in isc2; intuition.
           * match_destr_in isc3; intuition.
     Qed.
 
-    Lemma nnrc_impish_stmt_rename_env_core s v v' :
-      nnrc_impish_stmtIsCore (nnrc_impish_stmt_rename_env s v v') <->
-      nnrc_impish_stmtIsCore s.
+    Lemma nnrs_stmt_rename_env_core s v v' :
+      nnrs_stmtIsCore (nnrs_stmt_rename_env s v v') <->
+      nnrs_stmtIsCore s.
     Proof.
       split.
-      - apply nnrc_impish_stmt_rename_env_core_b.
-      - apply nnrc_impish_stmt_rename_env_core_f.
+      - apply nnrs_stmt_rename_env_core_b.
+      - apply nnrs_stmt_rename_env_core_f.
     Qed.
 
-    Lemma nnrc_impish_stmt_rename_mc_core s v v' :
-      nnrc_impish_stmtIsCore (nnrc_impish_stmt_rename_mc s v v') <->
-      nnrc_impish_stmtIsCore s.
+    Lemma nnrs_stmt_rename_mc_core s v v' :
+      nnrs_stmtIsCore (nnrs_stmt_rename_mc s v v') <->
+      nnrs_stmtIsCore s.
     Proof.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl; intuition.
       - match_destr_in H4; intuition.
       - match_destr; intuition.
     Qed.
 
-    Lemma nnrc_impish_stmt_rename_md_core s v v' :
-      nnrc_impish_stmtIsCore (nnrc_impish_stmt_rename_md s v v') <->
-      nnrc_impish_stmtIsCore s.
+    Lemma nnrs_stmt_rename_md_core s v v' :
+      nnrs_stmtIsCore (nnrs_stmt_rename_md s v v') <->
+      nnrs_stmtIsCore s.
     Proof.
-      nnrc_impish_stmt_cases (induction s) Case
+      nnrs_stmt_cases (induction s) Case
       ; simpl; intuition.
       - match_destr_in H4; intuition.
       - match_destr; intuition.
@@ -1256,23 +1256,23 @@ Section NNRCimpishRename.
 
   End core.
 
-End NNRCimpishRename.
+End NNRSRename.
 
 Hint Rewrite
-     @nnrc_impish_stmt_bound_env_vars_rename_env 
-     @nnrc_impish_stmt_free_mcenv_vars_rename_env 
-     @nnrc_impish_stmt_bound_mcenv_vars_rename_env 
-     @nnrc_impish_stmt_free_mdenv_vars_rename_env 
-     @nnrc_impish_stmt_bound_mdenv_vars_rename_env 
+     @nnrs_stmt_bound_env_vars_rename_env 
+     @nnrs_stmt_free_mcenv_vars_rename_env 
+     @nnrs_stmt_bound_mcenv_vars_rename_env 
+     @nnrs_stmt_free_mdenv_vars_rename_env 
+     @nnrs_stmt_bound_mdenv_vars_rename_env 
      
-     @nnrc_impish_stmt_free_env_vars_rename_mcenv 
-     @nnrc_impish_stmt_bound_env_vars_rename_mcenv 
-     @nnrc_impish_stmt_bound_mcenv_vars_rename_mcenv 
-     @nnrc_impish_stmt_free_mdenv_vars_rename_mcenv 
-     @nnrc_impish_stmt_bound_mdenv_vars_rename_mcenv 
+     @nnrs_stmt_free_env_vars_rename_mcenv 
+     @nnrs_stmt_bound_env_vars_rename_mcenv 
+     @nnrs_stmt_bound_mcenv_vars_rename_mcenv 
+     @nnrs_stmt_free_mdenv_vars_rename_mcenv 
+     @nnrs_stmt_bound_mdenv_vars_rename_mcenv 
      
-     @nnrc_impish_stmt_free_env_vars_rename_mdenv 
-     @nnrc_impish_stmt_bound_env_vars_rename_mdenv 
-     @nnrc_impish_stmt_free_mcenv_vars_rename_mdenv 
-     @nnrc_impish_stmt_bound_mcenv_vars_rename_mdenv 
-     @nnrc_impish_stmt_bound_mdenv_vars_rename_mdenv : nnrc_impish_rename.
+     @nnrs_stmt_free_env_vars_rename_mdenv 
+     @nnrs_stmt_bound_env_vars_rename_mdenv 
+     @nnrs_stmt_free_mcenv_vars_rename_mdenv 
+     @nnrs_stmt_bound_mcenv_vars_rename_mdenv 
+     @nnrs_stmt_bound_mdenv_vars_rename_mdenv : nnrs_rename.

@@ -14,13 +14,5 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
-Require Export NNRCimpish.
-Require Export NNRCimpishSize.
-Require Export NNRCimpishVars.
-Require Export NNRCimpishEval.
-Require Export NNRCimpishSem.
-Require Export NNRCimpishSemEval.
-Require Export NNRCimpishNorm.
-Require Export NNRCimpishRename.
-Require Export NNRCimpishCrossShadow.
+Require Export NNRSRuntime.
+Require Export NNRSTypes.

@@ -35,8 +35,8 @@ let output_query pconf q =
   | QcertCompiler.Q_nraenv q -> pretty_query pconf pretty_nraenv q
   | QcertCompiler.Q_nnrc_core q -> pretty_query pconf pretty_nnrc q
   | QcertCompiler.Q_nnrc q -> pretty_query pconf pretty_nnrc q
-  | QcertCompiler.Q_nnrc_impish q -> pretty_query pconf pretty_nnrc_impish q
-  | QcertCompiler.Q_nnrc_impish_core q -> pretty_query pconf pretty_nnrc_impish_core q
+  | QcertCompiler.Q_nnrs q -> pretty_query pconf pretty_nnrs q
+  | QcertCompiler.Q_nnrs_core q -> pretty_query pconf pretty_nnrs_core q
   | QcertCompiler.Q_nnrc_imp q -> pretty_query pconf pretty_nnrc_imp q
   | QcertCompiler.Q_nnrcmr q -> pretty_query pconf pretty_nnrcmr q
   | QcertCompiler.Q_cldmr q -> pretty_query pconf pretty_cldmr q

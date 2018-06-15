@@ -35,7 +35,7 @@ Require Import DesignerRuleRuntime.
 Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
-Require Import NNRCimpishRuntime.
+Require Import NNRSRuntime.
 Require Import NNRCimpRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
@@ -117,13 +117,13 @@ Section CompEval.
     Definition eval_nnrc (q:nnrc) (cenv: bindings) : option data :=
       NNRC.nnrc_eval_top h q cenv.
 
-    (* Language: nnrc_impish_core *)
-    Definition eval_nnrc_impish_core (q:nnrc_impish_core) (cenv: bindings) : option data :=
-      NNRCimpishEval.nnrc_impish_core_eval_top h cenv q.
+    (* Language: nnrs_core *)
+    Definition eval_nnrs_core (q:nnrs_core) (cenv: bindings) : option data :=
+      NNRSEval.nnrs_core_eval_top h cenv q.
 
-    (* Language: nnrc_impish *)
-    Definition eval_nnrc_impish (q:nnrc_impish) (cenv: bindings) : option data :=
-      NNRCimpishEval.nnrc_impish_eval_top h cenv q.
+    (* Language: nnrs *)
+    Definition eval_nnrs (q:nnrs) (cenv: bindings) : option data :=
+      NNRSEval.nnrs_eval_top h cenv q.
 
     (* Language: nnrc_imp *)
     Definition eval_nnrc_imp (q:nnrc_imp) (cenv: bindings) : option data :=
@@ -181,8 +181,8 @@ Section CompEval.
       | Q_nraenv q => lift_output (eval_nraenv q (lift_input ev_in))
       | Q_nnrc_core q => lift_output (eval_nnrc_core q (lift_input ev_in))
       | Q_nnrc q => lift_output (eval_nnrc q (lift_input ev_in))
-      | Q_nnrc_impish_core q => lift_output (eval_nnrc_impish_core q (lift_input ev_in))
-      | Q_nnrc_impish q => lift_output (eval_nnrc_impish q (lift_input ev_in))
+      | Q_nnrs_core q => lift_output (eval_nnrs_core q (lift_input ev_in))
+      | Q_nnrs q => lift_output (eval_nnrs q (lift_input ev_in))
       | Q_nnrc_imp q => lift_output (eval_nnrc_imp q (lift_input ev_in))
       | Q_nnrcmr q => lift_output (eval_nnrcmr q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
       | Q_cldmr q => lift_output (eval_cldmr q (lift_input ev_in))
@@ -212,8 +212,8 @@ Section CompEval.
       | Q_nraenv _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_nnrc_impish_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_nnrc_impish _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nnrs_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nnrs _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc_imp _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
@@ -295,11 +295,11 @@ Section CompEval.
     Definition eval_nnrc_world (q:nnrc) (world:list data) : option data :=
       eval_nnrc q (mkWorld world).
 
-    Definition eval_nnrc_impish_core_world (q:nnrc_impish_core) (world:list data) : option data :=
-      eval_nnrc_impish_core q (mkWorld world).
+    Definition eval_nnrs_core_world (q:nnrs_core) (world:list data) : option data :=
+      eval_nnrs_core q (mkWorld world).
 
-    Definition eval_nnrc_impish_world (q:nnrc_impish) (world:list data) : option data :=
-      eval_nnrc_impish q (mkWorld world).
+    Definition eval_nnrs_world (q:nnrs) (world:list data) : option data :=
+      eval_nnrs q (mkWorld world).
 
     Definition eval_nnrc_imp_world (q:nnrc_imp) (world:list data) : option data :=
       eval_nnrc_imp q (mkWorld world).

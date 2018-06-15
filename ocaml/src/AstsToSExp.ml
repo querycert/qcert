@@ -507,77 +507,77 @@ let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
       raise (Qcert_Error "Not well-formed S-expr inside nnrc")
   end
 
-(* NNRCimpish Section *)
+(* NNRS Section *)
 
-let rec nnrc_impish_expr_to_sexp e : sexp =
+let rec nnrs_expr_to_sexp e : sexp =
   match e with
-  | NNRCimpishGetConstant v -> STerm ("NNRCimpishGetConstant", [SString (string_of_char_list v)])
-  | NNRCimpishVar v -> STerm ("NNRCimpishVar", [SString (string_of_char_list v)])
-  | NNRCimpishConst d -> STerm ("NNRCimpishConst", [data_to_sexp d])
-  | NNRCimpishBinop (b, n1, n2) -> STerm ("NNRCimpishBinop", (binary_op_to_sexp b) :: [nnrc_impish_expr_to_sexp n1;nnrc_impish_expr_to_sexp n2])
-  | NNRCimpishUnop (u, n1) -> STerm ("NNRCimpishUnop", (unary_op_to_sexp u) :: [nnrc_impish_expr_to_sexp n1])
-  | NNRCimpishGroupBy (g,sl,n1) -> STerm ("NNRCimpishGroupBy",
+  | NNRSGetConstant v -> STerm ("NNRSGetConstant", [SString (string_of_char_list v)])
+  | NNRSVar v -> STerm ("NNRSVar", [SString (string_of_char_list v)])
+  | NNRSConst d -> STerm ("NNRSConst", [data_to_sexp d])
+  | NNRSBinop (b, n1, n2) -> STerm ("NNRSBinop", (binary_op_to_sexp b) :: [nnrs_expr_to_sexp n1;nnrs_expr_to_sexp n2])
+  | NNRSUnop (u, n1) -> STerm ("NNRSUnop", (unary_op_to_sexp u) :: [nnrs_expr_to_sexp n1])
+  | NNRSGroupBy (g,sl,n1) -> STerm ("NNRSGroupBy",
                                  (SString (string_of_char_list g))
                                  :: (STerm ("keys",coq_string_list_to_sstring_list sl))
-                                 :: [nnrc_impish_expr_to_sexp n1])
+                                 :: [nnrs_expr_to_sexp n1])
 
-let rec nnrc_impish_stmt_to_sexp s : sexp =
+let rec nnrs_stmt_to_sexp s : sexp =
   match s with
-  | NNRCimpishSeq (s1, s2) ->
-    STerm ("NNRCimpishSeq", [ nnrc_impish_stmt_to_sexp s1; nnrc_impish_stmt_to_sexp s2])
-  | NNRCimpishLet (v, e, s) -> STerm ("NNRCimpishLet", [SString (string_of_char_list v); nnrc_impish_expr_to_sexp e; nnrc_impish_stmt_to_sexp s])
-  | NNRCimpishLetMut (v, s1, s2) -> STerm ("NNRCimpishLetMut", [SString (string_of_char_list v); nnrc_impish_stmt_to_sexp s1; nnrc_impish_stmt_to_sexp s2])
-  | NNRCimpishLetMutColl (v, s1, s2) -> STerm ("NNRCimpishLetMutColl", [SString (string_of_char_list v); nnrc_impish_stmt_to_sexp s1; nnrc_impish_stmt_to_sexp s2])
-  | NNRCimpishAssign (v, e) -> STerm ("NNRCimpishAssign", [SString (string_of_char_list v); nnrc_impish_expr_to_sexp e])
-  | NNRCimpishPush (v, e) -> STerm ("NNRCimpishPush", [SString (string_of_char_list v); nnrc_impish_expr_to_sexp e])
-  | NNRCimpishFor (v, e, s) -> STerm ("NNRCimpishFor", [SString (string_of_char_list v); nnrc_impish_expr_to_sexp e; nnrc_impish_stmt_to_sexp s])
-  | NNRCimpishIf (e, s1, s2) -> STerm ("NNRCimpishIf", [nnrc_impish_expr_to_sexp e; nnrc_impish_stmt_to_sexp s1; nnrc_impish_stmt_to_sexp s2])
-  | NNRCimpishEither (e,v1,s1,v2,s2) -> STerm ("NNRCimpishEither",
+  | NNRSSeq (s1, s2) ->
+    STerm ("NNRSSeq", [ nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
+  | NNRSLet (v, e, s) -> STerm ("NNRSLet", [SString (string_of_char_list v); nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s])
+  | NNRSLetMut (v, s1, s2) -> STerm ("NNRSLetMut", [SString (string_of_char_list v); nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
+  | NNRSLetMutColl (v, s1, s2) -> STerm ("NNRSLetMutColl", [SString (string_of_char_list v); nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
+  | NNRSAssign (v, e) -> STerm ("NNRSAssign", [SString (string_of_char_list v); nnrs_expr_to_sexp e])
+  | NNRSPush (v, e) -> STerm ("NNRSPush", [SString (string_of_char_list v); nnrs_expr_to_sexp e])
+  | NNRSFor (v, e, s) -> STerm ("NNRSFor", [SString (string_of_char_list v); nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s])
+  | NNRSIf (e, s1, s2) -> STerm ("NNRSIf", [nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
+  | NNRSEither (e,v1,s1,v2,s2) -> STerm ("NNRSEither",
                                       (SString (string_of_char_list v1))
                                    :: (SString (string_of_char_list v2))
-                                   :: [nnrc_impish_expr_to_sexp e;nnrc_impish_stmt_to_sexp s1;nnrc_impish_stmt_to_sexp s2])
+                                   :: [nnrs_expr_to_sexp e;nnrs_stmt_to_sexp s1;nnrs_stmt_to_sexp s2])
 
-let nnrc_impish_to_sexp ((n, ret) : QLang.nnrc_impish) : sexp =
-  STerm ("NNRCimpish", [nnrc_impish_stmt_to_sexp n; SString (string_of_char_list ret)])
+let nnrs_to_sexp ((n, ret) : QLang.nnrs) : sexp =
+  STerm ("NNRS", [nnrs_stmt_to_sexp n; SString (string_of_char_list ret)])
 
 
-let rec sexp_to_nnrc_impish_expr (se:sexp) =
+let rec sexp_to_nnrs_expr (se:sexp) =
   match se with
-  | STerm ("NNRCimpishGetConstant", [SString v]) -> NNRCimpishGetConstant (char_list_of_string v)
-  | STerm ("NNRCimpishVar", [SString v]) -> NNRCimpishVar (char_list_of_string v)
-  | STerm ("NNRCimpishConst", [d]) -> NNRCimpishConst (sexp_to_data d)
-  | STerm ("NNRCimpishBinop", b :: [n1;n2]) -> NNRCimpishBinop (sexp_to_binary_op b, sexp_to_nnrc_impish_expr n1, sexp_to_nnrc_impish_expr n2)
-  | STerm ("NNRCimpishUnop", u :: [n1]) -> NNRCimpishUnop (sexp_to_unary_op u, sexp_to_nnrc_impish_expr n1)
-  | STerm ("NNRCimpishGroupBy", (SString v1) :: (STerm ("keys", v2)) :: [n1]) ->
-      NNRCimpishGroupBy (char_list_of_string v1,sstring_list_to_coq_string_list v2,sexp_to_nnrc_impish_expr n1)
+  | STerm ("NNRSGetConstant", [SString v]) -> NNRSGetConstant (char_list_of_string v)
+  | STerm ("NNRSVar", [SString v]) -> NNRSVar (char_list_of_string v)
+  | STerm ("NNRSConst", [d]) -> NNRSConst (sexp_to_data d)
+  | STerm ("NNRSBinop", b :: [n1;n2]) -> NNRSBinop (sexp_to_binary_op b, sexp_to_nnrs_expr n1, sexp_to_nnrs_expr n2)
+  | STerm ("NNRSUnop", u :: [n1]) -> NNRSUnop (sexp_to_unary_op u, sexp_to_nnrs_expr n1)
+  | STerm ("NNRSGroupBy", (SString v1) :: (STerm ("keys", v2)) :: [n1]) ->
+      NNRSGroupBy (char_list_of_string v1,sstring_list_to_coq_string_list v2,sexp_to_nnrs_expr n1)
   | STerm (t, _) ->
-      raise (Qcert_Error ("Not well-formed S-expr inside nnrc_impish_expr with name " ^ t))
+      raise (Qcert_Error ("Not well-formed S-expr inside nnrs_expr with name " ^ t))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside nnrc_expr")
 
-let rec sexp_to_nnrc_impish_stmt (se:sexp) =
+let rec sexp_to_nnrs_stmt (se:sexp) =
   match se with
-  | STerm ("NNRCimpishSeq", [s1; s2]) -> NNRCimpishSeq (sexp_to_nnrc_impish_stmt s1, sexp_to_nnrc_impish_stmt s1)
-  | STerm ("NNRCimpishLet", [SString v; e; s]) -> NNRCimpishLet (char_list_of_string v, (sexp_to_nnrc_impish_expr e), sexp_to_nnrc_impish_stmt s)
-  | STerm ("NNRCimpishLetMut", [SString v; s1; s2]) -> NNRCimpishLetMut (char_list_of_string v, sexp_to_nnrc_impish_stmt s1, sexp_to_nnrc_impish_stmt s2)
-  | STerm ("NNRCimpishLetMutColl", [SString v; s1; s2]) -> NNRCimpishLetMutColl (char_list_of_string v, sexp_to_nnrc_impish_stmt s1, sexp_to_nnrc_impish_stmt s2)
-  | STerm ("NNRCimpishAssign", [SString v; e]) -> NNRCimpishAssign (char_list_of_string v, sexp_to_nnrc_impish_expr e)
-  | STerm ("NNRCimpishPush", [SString v; e]) -> NNRCimpishPush (char_list_of_string v, sexp_to_nnrc_impish_expr e)
-  | STerm ("NNRCimpishFor", [SString v; e; s]) -> NNRCimpishFor (char_list_of_string v, sexp_to_nnrc_impish_expr e, sexp_to_nnrc_impish_stmt s)
-  | STerm ("NNRCimpishIf", [e; s1; s2]) -> NNRCimpishIf (sexp_to_nnrc_impish_expr e, sexp_to_nnrc_impish_stmt s1, sexp_to_nnrc_impish_stmt s2)
-  | STerm ("NNRCimpishEither", (SString v1) :: (SString v2) :: [e;s1;s2]) ->
-      NNRCimpishEither (sexp_to_nnrc_impish_expr e,char_list_of_string v1,sexp_to_nnrc_impish_stmt s1,char_list_of_string v2,sexp_to_nnrc_impish_stmt s2)
+  | STerm ("NNRSSeq", [s1; s2]) -> NNRSSeq (sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s1)
+  | STerm ("NNRSLet", [SString v; e; s]) -> NNRSLet (char_list_of_string v, (sexp_to_nnrs_expr e), sexp_to_nnrs_stmt s)
+  | STerm ("NNRSLetMut", [SString v; s1; s2]) -> NNRSLetMut (char_list_of_string v, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
+  | STerm ("NNRSLetMutColl", [SString v; s1; s2]) -> NNRSLetMutColl (char_list_of_string v, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
+  | STerm ("NNRSAssign", [SString v; e]) -> NNRSAssign (char_list_of_string v, sexp_to_nnrs_expr e)
+  | STerm ("NNRSPush", [SString v; e]) -> NNRSPush (char_list_of_string v, sexp_to_nnrs_expr e)
+  | STerm ("NNRSFor", [SString v; e; s]) -> NNRSFor (char_list_of_string v, sexp_to_nnrs_expr e, sexp_to_nnrs_stmt s)
+  | STerm ("NNRSIf", [e; s1; s2]) -> NNRSIf (sexp_to_nnrs_expr e, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
+  | STerm ("NNRSEither", (SString v1) :: (SString v2) :: [e;s1;s2]) ->
+      NNRSEither (sexp_to_nnrs_expr e,char_list_of_string v1,sexp_to_nnrs_stmt s1,char_list_of_string v2,sexp_to_nnrs_stmt s2)
   | STerm (t, _) ->
-      raise (Qcert_Error ("Not well-formed S-expr inside nnrc_impish_stmt with name " ^ t))
+      raise (Qcert_Error ("Not well-formed S-expr inside nnrs_stmt with name " ^ t))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside nnrc_stmt")
 
-let sexp_to_nnrc_impish (se:sexp) : QLang.nnrc_impish =
+let sexp_to_nnrs (se:sexp) : QLang.nnrs =
   match se with
-  | STerm ("NNRCimpish", [s; SString ret]) ->
-    (sexp_to_nnrc_impish_stmt s, char_list_of_string ret)
+  | STerm ("NNRS", [s; SString ret]) ->
+    (sexp_to_nnrs_stmt s, char_list_of_string ret)
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside nnrc_impish")
+      raise (Qcert_Error "Not well-formed S-expr inside nnrs")
 
 (* NNRCimp Section *)
 
@@ -1939,8 +1939,8 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_nnrc_core -> Q_nnrc_core (sexp_to_nnrc se)
   | L_nnrc -> Q_nnrc (sexp_to_nnrc se)
-  | L_nnrc_impish_core -> Q_nnrc_impish_core (sexp_to_nnrc_impish se)
-  | L_nnrc_impish -> Q_nnrc_impish (sexp_to_nnrc_impish se)
+  | L_nnrs_core -> Q_nnrs_core (sexp_to_nnrs se)
+  | L_nnrs -> Q_nnrs (sexp_to_nnrs se)
   | L_nnrc_imp -> Q_nnrc_imp (sexp_to_nnrc_imp se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
   | L_cldmr -> Q_cldmr (sexp_to_cldmr se)
@@ -1981,8 +1981,8 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_nnrc_core q -> nnrc_to_sexp q
   | Q_nnrc q -> nnrc_to_sexp q
-  | Q_nnrc_impish_core q -> nnrc_impish_to_sexp q
-  | Q_nnrc_impish q -> nnrc_impish_to_sexp q
+  | Q_nnrs_core q -> nnrs_to_sexp q
+  | Q_nnrs q -> nnrs_to_sexp q
   | Q_nnrc_imp q -> nnrc_imp_to_sexp q
   | Q_nnrcmr q -> nnrcmr_to_sexp q
   | Q_cldmr q -> cldmr_to_sexp q

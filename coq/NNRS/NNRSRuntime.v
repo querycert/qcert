@@ -14,5 +14,13 @@
  * limitations under the License.
  *)
 
-Require Export CommonTypes.
-Require Export TNNRCimpish.
+Require Export CommonRuntime.
+Require Export NNRS.
+Require Export NNRSSize.
+Require Export NNRSVars.
+Require Export NNRSEval.
+Require Export NNRSSem.
+Require Export NNRSSemEval.
+Require Export NNRSNorm.
+Require Export NNRSRename.
+Require Export NNRSCrossShadow.

@@ -20,7 +20,7 @@ Require Import CommonSystem.
 Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
-Require Import NNRCimpishRuntime.
+Require Import NNRSRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
 Require Import DNNRCRuntime.

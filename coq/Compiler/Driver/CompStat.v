@@ -31,7 +31,7 @@ Require Import DesignerRuleRuntime.
 Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
-Require Import NNRCimpishRuntime.
+Require Import NNRSRuntime.
 Require Import NNRCimpRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
@@ -136,14 +136,14 @@ Section CompStat.
       (("nnrc_imp_size", dnat (Z_of_nat (nnrc_imp_size q)))
          :: nil).
 
-  Definition stat_nnrc_impish_core (q: nnrc_impish_core) : data :=
+  Definition stat_nnrs_core (q: nnrs_core) : data :=
     drec
-      (("nnrc_impish_core_size", dnat (Z_of_nat (nnrc_impish_core_size q)))
+      (("nnrs_core_size", dnat (Z_of_nat (nnrs_core_size q)))
          :: nil).
 
-  Definition stat_nnrc_impish (q: nnrc_impish) : data :=
+  Definition stat_nnrs (q: nnrs) : data :=
     drec
-      (("nnrc_impish_size", dnat (Z_of_nat (nnrc_impish_size q)))
+      (("nnrs_size", dnat (Z_of_nat (nnrs_size q)))
          :: nil).
 
   Definition stat_nnrc_core (q: nnrc_core) : data :=
@@ -281,14 +281,14 @@ Section CompStat.
       (("nnrc_imp", stat_nnrc_imp q)
          :: nil).
 
-  Definition stat_tree_nnrc_impish_core (q: nnrc_impish_core) : data :=
+  Definition stat_tree_nnrs_core (q: nnrs_core) : data :=
     drec
-      (("nnrc_impish_core", stat_nnrc_impish_core q)
+      (("nnrs_core", stat_nnrs_core q)
          :: nil).
 
-  Definition stat_tree_nnrc_impish (q: nnrc_impish) : data :=
+  Definition stat_tree_nnrs (q: nnrs) : data :=
     drec
-      (("nnrc_impish", stat_nnrc_impish q)
+      (("nnrs", stat_nnrs q)
          :: nil).
 
   Definition stat_tree_nnrc_core (q: nnrc_core) : data :=
@@ -461,8 +461,8 @@ Section CompStat.
         | Q_nraenv q => stat_nraenv q
         | Q_nnrc_core q => stat_nnrc_core q
         | Q_nnrc q => stat_nnrc q
-        | Q_nnrc_impish_core q => stat_nnrc_impish_core q
-        | Q_nnrc_impish q => stat_nnrc_impish q
+        | Q_nnrs_core q => stat_nnrs_core q
+        | Q_nnrs q => stat_nnrs q
         | Q_nnrc_imp q => stat_nnrc_imp q
         | Q_nnrcmr q => stat_nnrcmr q
         | Q_cldmr q => stat_cldmr q
@@ -495,8 +495,8 @@ Section CompStat.
         | Q_nraenv q => stat_tree_nraenv q
         | Q_nnrc_core q => stat_tree_nnrc_core q
         | Q_nnrc q => stat_tree_nnrc q
-        | Q_nnrc_impish_core q => stat_tree_nnrc_impish_core q
-        | Q_nnrc_impish q => stat_tree_nnrc_impish q
+        | Q_nnrs_core q => stat_tree_nnrs_core q
+        | Q_nnrs q => stat_tree_nnrs q
         | Q_nnrc_imp q => stat_tree_nnrc_imp q
         | Q_nnrcmr q => stat_tree_nnrcmr q
         | Q_cldmr q => stat_tree_cldmr q

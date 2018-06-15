@@ -210,7 +210,7 @@ text.f3 {font-family:cmr7;font-size:6.97385px}
 </a>
 <path d='M261.925 -56.8828H308.469V-70.8281H261.925Z' fill='#dea8a7'/>
 <path d='M261.925 -56.8828H308.469V-70.8281H261.925Z' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.799999'/>
-<a target='_top' xlink:href='https://querycert.github.io/html/Qcert.NNRCimpish.Lang.NNRCimpish.html#nnrc_impish' xlink:title='https://querycert.github.io/html/Qcert.NNRCimpish.Lang.NNRCimpish.html#nnrc_impish'>
+<a target='_top' xlink:href='https://querycert.github.io/html/Qcert.NNRS.Lang.NNRS.html#nnrs' xlink:title='https://querycert.github.io/html/Qcert.NNRS.Lang.NNRS.html#nnrs'>
 <text class='f1' transform='matrix(1 0 0 1 250.488 -13.2007)' x='14.7575' y='-48.9113'>N<tspan x='19.988'>N</tspan>
 <tspan x='25.2184'>R</tspan>
 <tspan x='30.013'>C</tspan>
@@ -406,7 +406,7 @@ text.f3 {font-family:cmr7;font-size:6.97385px}
 <path d='M241.398 -11.8516L270.969 8.3047' fill='none' stroke='#cd7c7b' stroke-dasharray='2.98883,2.98883' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
 <path d='M274.379 10.6289C273.5 9.75 272.246 8.06249 271.558 6.625L269.621 9.46875C271.211 9.5781 273.242 10.1289 274.379 10.6289' fill='#cd7c7b'/>
 </a>
-<a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCtoNNRCimpish.html#nnrc_to_nnrc_impish_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCtoNNRCimpish.html#nnrc_to_nnrc_impish_top'>
+<a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCtoNNRS.html#nnrc_to_nnrs_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCtoNNRS.html#nnrc_to_nnrs_top'>
 <path d='M239.606 -26.5937L272.976 -53.8633' fill='none' stroke='#cd7c7b' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
 <path d='M276.179 -56.4844C275.086 -55.8867 273.105 -55.1602 271.527 -54.9102L273.711 -52.2383C274.269 -53.7344 275.379 -55.5274 276.179 -56.4844' fill='#cd7c7b'/>
 </a>
@@ -430,7 +430,7 @@ text.f3 {font-family:cmr7;font-size:6.97385px}
 <path d='M230.585 22.8203C179.972 127.231 129.363 30.6719 129.363 -7.7266' fill='none' stroke='#cd7c7b' stroke-dasharray='2.98883,2.98883' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
 <path d='M129.364 -11.8516C129.133 -10.6289 128.446 -8.64062 127.645 -7.26562H131.082C130.278 -8.64062 129.59 -10.6289 129.364 -11.8516' fill='#cd7c7b'/>
 </a>
-<a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRCimpishtoJavaScriptAst.html#nnrc_impish_to_js_ast_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRCimpishtoJavaScriptAst.html#nnrc_impish_to_js_ast_top'>
+<a target='_top' xlink:href='https://querycert.github.io/html/Qcert.Translation.NNRStoJavaScriptAst.html#nnrs_to_js_ast_top' xlink:title='https://querycert.github.io/html/Qcert.Translation.NNRStoJavaScriptAst.html#nnrs_to_js_ast_top'>
 <path d='M308.868 -63.8555H317.512' fill='none' stroke='#7299c3' stroke-miterlimit='10.0375' stroke-width='0.600002'/>
 <path d='M321.637 -63.8555C320.414 -64.086 318.43 -64.7735 317.055 -65.5743V-62.1367C318.43 -62.9375 320.414 -63.625 321.637 -63.8555' fill='#7299c3'/>
 </a>

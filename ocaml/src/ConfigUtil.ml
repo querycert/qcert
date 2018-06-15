@@ -91,8 +91,8 @@ let suffix_nnrcsexp () = "_nnrc.sexp"
 let suffix_dnnrc () = "_dnnrc.txt"
 let suffix_dnnrc_typed () = "_tdnnrc.txt"
 let suffix_dnnrcsexp () = "_dnnrc.sexp"
-let suffix_nnrc_impish () = "_nnrc_impish.txt"
-let suffix_nnrc_impish_core () = "_nnrc_impish_core.txt"
+let suffix_nnrs () = "_nnrs.txt"
+let suffix_nnrs_core () = "_nnrs_core.txt"
 let suffix_nnrc_imp () = "_nnrc_imp.txt"
 let suffix_nnrcmr () = "_nnrcmr.txt"
 let suffix_nnrcmr_spark_rdd () = "_nnrcmr_spark_rdd.txt"
@@ -129,8 +129,8 @@ let suffix_of_language lang =
   | QcertCompiler.L_nnrc -> suffix_nnrc ()
   | QcertCompiler.L_dnnrc -> suffix_dnnrc ()
   | QcertCompiler.L_dnnrc_typed -> suffix_dnnrc_typed ()
-  | QcertCompiler.L_nnrc_impish -> suffix_nnrc_impish ()
-  | QcertCompiler.L_nnrc_impish_core -> suffix_nnrc_impish_core ()
+  | QcertCompiler.L_nnrs -> suffix_nnrs ()
+  | QcertCompiler.L_nnrs_core -> suffix_nnrs_core ()
   | QcertCompiler.L_nnrc_imp -> suffix_nnrc_imp ()
   | QcertCompiler.L_nnrcmr -> suffix_nnrcmr ()
   | QcertCompiler.L_cldmr -> suffix_nnrcmr_cldmr ()
