@@ -1366,7 +1366,7 @@ Section NNRSCrossShadow.
                                 (NNRSPush "x" (NNRSConst (dnat 6))))
                              (NNRSPush "x" (NNRSConst (dnat 7))))
                           (NNRSAssign "ret" (NNRSConst (dnat 8)))).
-    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr1 nil nil nil).
+(*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr1 nil nil nil). *)
     
     Example expr2 : nnrs_stmt
       := NNRSLet "x"
@@ -1376,7 +1376,7 @@ Section NNRSCrossShadow.
                           (NNRSPush "x" (NNRSConst (dnat 8)))
                           (NNRSAssign "ret" (NNRSConst (dnat 8)))).
 
-    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr2 nil nil nil).
+(*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr2 nil nil nil). *)
 
     Example expr3 : nnrs_stmt
       := (NNRSLetMut
@@ -1384,7 +1384,7 @@ Section NNRSCrossShadow.
             (NNRSPush "x" (NNRSConst (dnat 8)))
             (NNRSAssign "ret" (NNRSConst (dnat 8)))).
 
-    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr3 nil nil nil).
+(*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr3 nil nil nil). *)
     
   End examples.
 
