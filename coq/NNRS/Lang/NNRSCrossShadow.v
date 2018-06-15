@@ -443,6 +443,327 @@ Section NNRSCrossShadow.
       -  apply nnrs_stmt_cross_shadow_free_under_free_mdenv_cons.
     Qed.
 
+        Lemma nnrs_stmt_cross_shadow_free_under_bound_mcenv_env
+          (s:nnrs_stmt) (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      disjoint (nnrs_stmt_bound_mcenv_vars s) σ.
+    Proof.
+      unfold disjoint.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; simpl; intros σ ψc ψd sf x inn.
+      - Case "NNRSSeq"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+      - Case "NNRSLet"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSLetMut"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        eapply IHs2; eauto; simpl; eauto.
+      - Case "NNRSLetMutColl"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto; subst; intuition.
+        eapply IHs2 in H5; eauto; simpl; tauto.
+      - Case "NNRSAssign"%string.
+        contradiction.
+      - Case "NNRSPush"%string.
+        intuition congruence.
+      - Case "NNRSFor"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSIf"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition eauto. 
+      - Case "NNRSEither"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition.
+        + eapply IHs1; eauto; simpl; eauto.
+        + eapply IHs2; eauto; simpl; eauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_mdenv_env
+          (s:nnrs_stmt) (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      disjoint (nnrs_stmt_bound_mdenv_vars s) σ.
+    Proof.
+      unfold disjoint.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; simpl; intros σ ψc ψd sf x inn.
+      - Case "NNRSSeq"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+      - Case "NNRSLet"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSLetMut"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto; subst; try tauto.
+        eapply IHs2 in H5; intuition eauto.
+        simpl; tauto.
+      - Case "NNRSLetMutColl"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        eapply IHs2; eauto; simpl; eauto.
+      - Case "NNRSAssign"%string.
+        intuition congruence.
+      - Case "NNRSPush"%string.
+        contradiction.
+      - Case "NNRSFor"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSIf"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition eauto. 
+      - Case "NNRSEither"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition.
+        + eapply IHs1; eauto; simpl; eauto.
+        + eapply IHs2; eauto; simpl; eauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_env_mcenv
+          (s:nnrs_stmt) (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      disjoint (nnrs_stmt_bound_env_vars s) ψc.
+    Proof.
+      unfold disjoint.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; simpl; intros σ ψc ψd sf x inn.
+      - Case "NNRSSeq"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+      - Case "NNRSLet"%string.
+        destruct inn.
+        + subst; intuition.
+        + intuition.
+          eapply IHs in H6; intuition eauto.
+      - Case "NNRSLetMut"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        subst; intuition.
+      - Case "NNRSLetMutColl"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        + subst; tauto.
+        + eapply IHs1 in H3; intuition eauto.
+          simpl; tauto.
+      - Case "NNRSAssign"%string.
+        intuition eauto.
+      - Case "NNRSPush"%string.
+        intuition eauto.
+      - Case "NNRSFor"%string.
+        intuition eauto; subst; tauto.
+      - Case "NNRSIf"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition eauto. 
+      - Case "NNRSEither"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition.
+        + subst; tauto.
+        + subst; tauto.
+        + eapply IHs1; eauto.
+        + eapply IHs2; eauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_mdenv_mcenv
+          (s:nnrs_stmt) (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      disjoint (nnrs_stmt_bound_mdenv_vars s) ψc.
+    Proof.
+      unfold disjoint.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; simpl; intros σ ψc ψd sf x inn.
+      - Case "NNRSSeq"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+      - Case "NNRSLet"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSLetMut"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        subst; tauto.
+      - Case "NNRSLetMutColl"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        eapply IHs1; eauto; simpl; eauto.
+      - Case "NNRSAssign"%string.
+        intuition congruence.
+      - Case "NNRSPush"%string.
+        contradiction.
+      - Case "NNRSFor"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSIf"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition eauto. 
+      - Case "NNRSEither"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition.
+        + eapply IHs1; eauto; simpl; eauto.
+        + eapply IHs2; eauto; simpl; eauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_env_mdenv
+          (s:nnrs_stmt) (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      disjoint (nnrs_stmt_bound_env_vars s) ψd.
+    Proof.
+      unfold disjoint.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; simpl; intros σ ψc ψd sf x inn.
+      - Case "NNRSSeq"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+      - Case "NNRSLet"%string.
+        intuition eauto.
+        subst; tauto.
+      - Case "NNRSLetMut"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        + subst; tauto.
+        + eapply IHs1; eauto; simpl; tauto.
+      - Case "NNRSLetMutColl"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        subst; tauto.
+      - Case "NNRSAssign"%string.
+        intuition eauto.
+      - Case "NNRSPush"%string.
+        intuition eauto.
+      - Case "NNRSFor"%string.
+        intuition eauto.
+        subst; tauto.
+      - Case "NNRSIf"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition eauto. 
+      - Case "NNRSEither"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition.
+        + subst; tauto.
+        + subst; tauto.
+        + eapply IHs1; eauto; tauto.
+        + eapply IHs2; eauto; tauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv
+          (s:nnrs_stmt) (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      disjoint (nnrs_stmt_bound_mcenv_vars s) ψd.
+    Proof.
+      unfold disjoint.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; simpl; intros σ ψc ψd sf x inn.
+      - Case "NNRSSeq"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+      - Case "NNRSLet"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSLetMut"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        eapply IHs1; eauto; simpl; tauto.
+      - Case "NNRSLetMutColl"%string.
+        rewrite in_app_iff in inn.
+        intuition eauto.
+        subst; tauto.
+      - Case "NNRSAssign"%string.
+        contradiction.
+      - Case "NNRSPush"%string.
+        intuition congruence.
+      - Case "NNRSFor"%string.
+        intuition.
+        eapply IHs; eauto; simpl; eauto.
+      - Case "NNRSIf"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition eauto. 
+      - Case "NNRSEither"%string.
+        repeat rewrite in_app_iff in inn.
+        intuition.
+        + eapply IHs1; eauto; simpl; eauto.
+        + eapply IHs2; eauto; simpl; eauto.
+    Qed.
+    
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_env_cons
+          {s:nnrs_stmt} {σ ψc ψd:list var} {v} :
+      nnrs_stmt_cross_shadow_free_under s (v::σ) ψc ψd ->
+      ~ In v (nnrs_stmt_bound_mcenv_vars s) /\ ~ In v (nnrs_stmt_bound_mdenv_vars s).
+    Proof.
+      intros sf; split; intros inn.
+      - eapply nnrs_stmt_cross_shadow_free_under_bound_mcenv_env; eauto
+        ;  simpl; eauto.
+      - eapply nnrs_stmt_cross_shadow_free_under_bound_mdenv_env; eauto
+        ;  simpl; eauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_mcenv_cons
+          {s:nnrs_stmt} {σ ψc ψd:list var} {v} :
+      nnrs_stmt_cross_shadow_free_under s σ (v::ψc) ψd ->
+      ~ In v (nnrs_stmt_bound_env_vars s) /\ ~ In v (nnrs_stmt_bound_mdenv_vars s).
+    Proof.
+      intros sf; split; intros inn.
+      - eapply nnrs_stmt_cross_shadow_free_under_bound_env_mcenv; eauto
+        ;  simpl; eauto.
+      - eapply nnrs_stmt_cross_shadow_free_under_bound_mdenv_mcenv; eauto
+        ;  simpl; eauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_mdenv_cons
+          {s:nnrs_stmt} {σ ψc ψd:list var} {v} :
+      nnrs_stmt_cross_shadow_free_under s σ ψc (v::ψd) ->
+      ~ In v (nnrs_stmt_bound_env_vars s) /\ ~ In v (nnrs_stmt_bound_mcenv_vars s).
+    Proof.
+      intros sf; split; intros inn.
+      - eapply nnrs_stmt_cross_shadow_free_under_bound_env_mdenv; eauto
+        ;  simpl; eauto.
+      - eapply nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv; eauto
+        ;  simpl; eauto.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_cons
+          (s:nnrs_stmt) (σ ψc ψd:list var) v :
+      (nnrs_stmt_cross_shadow_free_under s (v::σ) ψc ψd ->
+       ~ In v (nnrs_stmt_bound_mcenv_vars s) /\ ~ In v (nnrs_stmt_bound_mdenv_vars s))
+      /\ (nnrs_stmt_cross_shadow_free_under s σ (v::ψc) ψd ->
+          ~ In v (nnrs_stmt_bound_env_vars s) /\ ~ In v (nnrs_stmt_bound_mdenv_vars s))
+      /\ (nnrs_stmt_cross_shadow_free_under s σ ψc (v::ψd) ->
+          ~ In v (nnrs_stmt_bound_env_vars s) /\ ~ In v (nnrs_stmt_bound_mcenv_vars s))
+
+    .
+    Proof.
+      split; [ | split ].
+      -  apply nnrs_stmt_cross_shadow_free_under_bound_env_cons.
+      -  apply nnrs_stmt_cross_shadow_free_under_bound_mcenv_cons.
+      -  apply nnrs_stmt_cross_shadow_free_under_bound_mdenv_cons.
+    Qed.
+
+    Lemma nnrs_stmt_cross_shadow_free_under_vars_cons
+          (s:nnrs_stmt) (σ ψc ψd:list var) v :
+      (nnrs_stmt_cross_shadow_free_under s (v::σ) ψc ψd ->
+       ~ In v (nnrs_stmt_free_mcenv_vars s) /\ ~ In v (nnrs_stmt_free_mdenv_vars s)
+       /\ ~ In v (nnrs_stmt_bound_mcenv_vars s) /\ ~ In v (nnrs_stmt_bound_mdenv_vars s))
+      /\ (nnrs_stmt_cross_shadow_free_under s σ (v::ψc) ψd ->
+          ~ In v (nnrs_stmt_free_env_vars s) /\ ~ In v (nnrs_stmt_free_mdenv_vars s)
+          /\ ~ In v (nnrs_stmt_bound_env_vars s) /\ ~ In v (nnrs_stmt_bound_mdenv_vars s))
+      /\ (nnrs_stmt_cross_shadow_free_under s σ ψc (v::ψd) ->
+          ~ In v (nnrs_stmt_free_env_vars s) /\ ~ In v (nnrs_stmt_free_mcenv_vars s)
+          /\ ~ In v (nnrs_stmt_bound_env_vars s) /\ ~ In v (nnrs_stmt_bound_mcenv_vars s))
+           
+    .
+    Proof.
+      generalize (nnrs_stmt_cross_shadow_free_under_free_cons s σ ψc ψd v).
+      generalize (nnrs_stmt_cross_shadow_free_under_bound_cons s σ ψc ψd v).
+      intuition.
+    Qed.
+    
   End cross_shadow_free_disjointness.
 
   (** The cross shadow predicate is preserved by equivalence an inclusion of the variable lists *)
@@ -646,7 +967,7 @@ Section NNRSCrossShadow.
          end; repeat rewrite in_app_iff in *
         ).
 
-    Theorem  nnrs_stmt_cross_shadow_free_under_alt
+    Theorem  nnrs_stmt_cross_shadow_free_alt_under
              (s:nnrs_stmt) :
       nnrs_stmt_cross_shadow_free_alt s ->
       forall (σ ψc ψd:list var),
@@ -675,6 +996,25 @@ Section NNRSCrossShadow.
             | eapply IHs2; disj_tac; intuition].
     Qed.
 
+    Theorem  nnrs_stmt_cross_shadow_free_under_alt (s:nnrs_stmt) (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      nnrs_stmt_cross_shadow_free_alt s.
+    Proof.
+      revert σ ψc ψd.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl; intros σ ψc ψd sf
+      ; disj_tac
+      ; try solve[
+              repeat match goal with
+               | [H: _ /\ _ |- _ ] => destruct H
+               end
+        ; repeat split; eauto 3
+        ; repeat match goal with
+          | [H: nnrs_stmt_cross_shadow_free_under _ _ _ _ |- _ ] => apply nnrs_stmt_cross_shadow_free_under_vars_cons in H
+          end; try tauto].
+    Qed.
+
+
     Ltac fresh_simpl_rewriter
       := repeat autorewrite with nnrs_rename in *
          ; repeat rewrite in_app_iff in *
@@ -686,6 +1026,7 @@ Section NNRSCrossShadow.
                     try rewrite <- remove_in_neq in H by congruence
                   end
          ; intuition.
+
     
     Lemma nnrs_stmt_cross_shadow_free_alt_rename_env s v v' :
       ~ In v' (nnrs_stmt_free_mcenv_vars s) ->
@@ -1032,7 +1373,7 @@ Section NNRSCrossShadow.
     Proof.
       destruct s as [s ret]
       ; unfold nnrs_cross_shadow_free, nnrs_uncross_shadow; simpl.
-      apply nnrs_stmt_cross_shadow_free_under_alt; simpl
+      apply nnrs_stmt_cross_shadow_free_alt_under; simpl
       ; try apply disjoint_nil_r
       ; try
           (fresh_prover
@@ -1214,6 +1555,155 @@ Section NNRSCrossShadow.
     Qed. 
 
   End correctness.
+
+  Section idempotence.
+
+    Ltac disj_tac :=
+      repeat progress
+        (repeat rewrite in_app_iff in *
+         ; try match goal with
+         | [ H : disjoint (_ ++ _) _ |- _ ] => apply disjoint_app_l in H; destruct H
+         | [ H : disjoint (_ :: _) _ |- _ ] => apply disjoint_cons_inv1 in H; destruct H
+         | [ H : disjoint _ (_ :: _) |- _ ] => apply disjoint_cons_inv2 in H; destruct H
+         | [H1:disjoint (remove _ ?v ?l1) ?l2,
+               H2:In ?v ?l1 -> False |- _ ] => rewrite nin_remove in H1 by apply H2
+         | [H1:disjoint (remove _ ?v ?l1) ?l2,
+               H2:~ In ?v ?l1 |- _ ] => rewrite nin_remove in H1 by apply H2
+         | [H1:disjoint (remove _ ?v ?l1) ?l2,
+               H2:In ?v ?l2 -> False |- _ ] => rewrite disjoint_remove_swap in H1; rewrite nin_remove in H1 by apply H2
+         | [H1:disjoint (remove _ ?v ?l1) ?l2,
+               H2:~ In ?v ?l2 |- _ ] => rewrite disjoint_remove_swap in H1; rewrite nin_remove in H1 by apply H2
+         | [H : In _ (replace_all _ _ _ ) |- _ ] => apply in_replace_all in H; try solve [destruct H as [?|[??]]; subst; eauto]
+         | [H: ~ In _ (remove _ _ _) |- _ ] => try rewrite <- remove_in_neq in H by congruence
+         | [H: In _ (remove _ _ _) -> False |- _ ] => try rewrite <- remove_in_neq in H by congruence
+         | [ |- disjoint (_ :: _) _ ] => apply disjoint_cons1
+         | [ |- disjoint _ (_ :: _) ] => apply disjoint_cons2
+         | [ |- disjoint _ (replace_all _ _ _ )] => try solve [apply disjoint_replace_all; intuition]
+         | [ H: In _ (remove _ _ _) |- _ ] => apply remove_inv in H; destruct H; try congruence
+         end
+        ).
+    
+    Lemma nnrs_stmt_uncross_shadow_under_alt_id sep (s:nnrs_stmt) :
+      nnrs_stmt_cross_shadow_free_alt s ->
+            forall (σ ψc ψd:list var),
+        disjoint (nnrs_stmt_free_mcenv_vars s) σ ->
+        disjoint (nnrs_stmt_bound_mcenv_vars s) σ ->
+        disjoint (nnrs_stmt_free_mdenv_vars s) σ ->
+        disjoint (nnrs_stmt_bound_mdenv_vars s) σ ->
+        disjoint (nnrs_stmt_free_env_vars s) ψc ->
+        disjoint (nnrs_stmt_bound_env_vars s) ψc ->
+        disjoint (nnrs_stmt_free_mdenv_vars s) ψc ->
+        disjoint (nnrs_stmt_bound_mdenv_vars s) ψc ->
+        disjoint (nnrs_stmt_free_env_vars s) ψd ->
+        disjoint (nnrs_stmt_bound_env_vars s) ψd ->
+        disjoint (nnrs_stmt_free_mcenv_vars s) ψd ->
+        disjoint (nnrs_stmt_bound_mcenv_vars s) ψd ->
+      nnrs_stmt_uncross_shadow_under sep s σ ψc ψd = s.
+    Proof.
+      Ltac ucsid_tac := repeat intuition disj_tac.
+      
+      nnrs_stmt_cases (induction s) Case
+      ; simpl; intros sf σ ψc ψd
+      ; intros; disj_tac.
+      - Case "NNRSSeq"%string.
+        rewrite IHs1, IHs2; intuition.
+      - Case "NNRSLet"%string.
+        destruct sf as [sf1 [sf2 [nin1 [nin2 sf]]]].
+        rewrite IHs; ucsid_tac.
+        rewrite fresh_var_from_id; ucsid_tac.
+        rewrite mk_lazy_lift_id; trivial.
+      - Case "NNRSLetMut"%string.
+        destruct sf as [nin1 [nin2 [nin3 [sf1 sf2]]]].
+        rewrite IHs1 by ucsid_tac.
+        rewrite IHs2 by ucsid_tac.
+        rewrite fresh_var_from_id by ucsid_tac.
+        repeat rewrite mk_lazy_lift_id; trivial.
+      - Case "NNRSLetMutColl"%string.
+        destruct sf as [nin1 [nin2 [nin3 [sf1 sf2]]]].
+        rewrite IHs1 by ucsid_tac.
+        rewrite IHs2 by ucsid_tac.
+        rewrite fresh_var_from_id by ucsid_tac.
+        repeat rewrite mk_lazy_lift_id; trivial.
+      - Case "NNRSAssign"%string.
+        trivial.
+      - Case "NNRSPush"%string.
+        trivial.
+      - Case "NNRSFor"%string.
+        destruct sf as [sf1 [sf2 [nin1 [nin2 sf]]]].
+        rewrite IHs by ucsid_tac.
+        rewrite fresh_var_from_id by ucsid_tac.
+        rewrite mk_lazy_lift_id; trivial.
+      - Case "NNRSIf"%string.
+        rewrite IHs1, IHs2; tauto.
+      - Case "NNRSEither"%string.
+        destruct sf as [disj1 [disj2 [nin11 [nin12 [nin21 [nin22 [sf1 sf2]]]]]]].
+        rewrite IHs1, IHs2 by ucsid_tac.
+        repeat rewrite fresh_var_from_id by ucsid_tac.
+        repeat rewrite mk_lazy_lift_id; trivial.
+    Qed.
+
+    Lemma nnrs_stmt_uncross_shadow_under_id sep (s:nnrs_stmt)  (σ ψc ψd:list var) :
+      nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
+      nnrs_stmt_uncross_shadow_under sep s σ ψc ψd = s.
+    Proof.
+      Hint Resolve nnrs_stmt_cross_shadow_free_under_alt
+           nnrs_stmt_cross_shadow_free_under_free_mcenv_env
+           nnrs_stmt_cross_shadow_free_under_bound_mcenv_env
+           nnrs_stmt_cross_shadow_free_under_free_mdenv_env
+           nnrs_stmt_cross_shadow_free_under_bound_mdenv_env
+           nnrs_stmt_cross_shadow_free_under_free_env_mcenv
+           nnrs_stmt_cross_shadow_free_under_bound_env_mcenv
+           nnrs_stmt_cross_shadow_free_under_free_mdenv_mcenv
+           nnrs_stmt_cross_shadow_free_under_bound_mdenv_mcenv
+           nnrs_stmt_cross_shadow_free_under_free_env_mdenv
+           nnrs_stmt_cross_shadow_free_under_bound_env_mdenv
+           nnrs_stmt_cross_shadow_free_under_free_mcenv_mdenv
+           nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv.
+      
+      intros cs.
+      apply nnrs_stmt_uncross_shadow_under_alt_id; eauto.
+    Qed.
+
+    Theorem nnrs_uncross_shadow_id sep (s:nnrs) :
+      nnrs_cross_shadow_free s ->
+      nnrs_uncross_shadow sep s = s.
+    Proof.
+      destruct s.
+      unfold nnrs_cross_shadow_free, nnrs_uncross_shadow
+      ; simpl in *.
+      intros cs.
+      rewrite nnrs_stmt_uncross_shadow_under_id by trivial.
+      rewrite fresh_var_from_id.
+      - rewrite mk_lazy_lift_id; trivial.
+      - repeat rewrite in_app_iff.
+        intuition.
+        + apply nnrs_stmt_cross_shadow_free_under_free_env_mdenv in cs.
+          disj_tac; tauto.
+        + apply nnrs_stmt_cross_shadow_free_under_bound_env_mdenv in cs.
+          disj_tac; tauto.
+        + apply nnrs_stmt_cross_shadow_free_under_free_mcenv_mdenv in cs.
+          disj_tac; tauto.
+        + apply nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv in cs.
+          disj_tac; tauto.
+        + disj_tac.
+        + disj_tac.
+    Qed.
+
+    Lemma nnrs_uncross_shadow_idempotent' sep sep2 (s:nnrs) :
+      nnrs_uncross_shadow sep2 (nnrs_uncross_shadow sep s) = (nnrs_uncross_shadow sep s).
+    Proof.
+      destruct s as [s ret].
+      rewrite nnrs_uncross_shadow_id; trivial.
+      apply nnrs_uncross_shadow_free.
+    Qed.
+
+    Theorem nnrs_uncross_shadow_idempotent sep  (s:nnrs) :
+      nnrs_uncross_shadow sep (nnrs_uncross_shadow sep s) = (nnrs_uncross_shadow sep s).
+    Proof.
+      apply nnrs_uncross_shadow_idempotent'.
+    Qed.
+    
+  End idempotence.
   
   Section core.
     
