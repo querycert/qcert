@@ -263,12 +263,12 @@ let rec pretty_nnrs_stmt p sym ff stmt =
         (pretty_nnrs_expr p sym) n1
         (pretty_nnrs_stmt p sym) n2
   | QcertCompiler.NNRSLetMut (v, s1, s2) ->
-      fprintf ff "@[<hv 0>@[<hv 2>let $v%s from @a @]@;<1 0>@[<hv 2>in@ @[<hv 0>%a;@;<1 0>%a@]@]@]"
+      fprintf ff "@[<hv 0>@[<hv 2>let $v%s from {%a} @]@;<1 0>@[<hv 2>in@ @[<hv 2>%a@]@]@]"
         (Util.string_of_char_list v)
         (pretty_nnrs_stmt p sym) s1
         (pretty_nnrs_stmt p sym) s2
   | QcertCompiler.NNRSLetMutColl (v, s1, s2) ->
-      fprintf ff "@[<hv 0>@[<hv 2>let_coll $v%s from @a {}@]@;<1 0>@[<hv 2>in@ @[<hv 0>%a;@;<1 0>%a@]@]@]"
+      fprintf ff "@[<hv 0>@[<hv 2>let_coll $v%s from {%a} @]@;<1 0>@[<hv 2>in@ @[<hv 2>%a@]@]@]"
         (Util.string_of_char_list v)
         (pretty_nnrs_stmt p sym) s1
         (pretty_nnrs_stmt p sym) s2
