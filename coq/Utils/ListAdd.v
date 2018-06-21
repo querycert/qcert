@@ -1065,6 +1065,15 @@ Section ListAdd.
             contradiction.
     Qed.
 
+    Lemma remove_nin_inv {v1 v2 l} :
+      ~ (In v1 (remove eqdec v2 l)) ->
+      v1 = v2 \/ ~ In v1 l.
+    Proof.
+      destruct (v2 == v1); unfold equiv, complement in *; eauto 3.
+      intros nin.
+      apply not_in_remove_impl_not_in in nin; eauto.
+    Qed.
+
     Lemma incl_remove x (l1 l2:list A) :
       incl (remove eqdec x l1) l2 <-> incl l1 (x::l2).
     Proof.
@@ -2238,3 +2247,4 @@ End ListAdd.
 
 Hint Resolve disjoint_nil_l disjoint_nil_r.
 
+Global Arguments remove_nin_inv {A eqdec v1 v2 l}.

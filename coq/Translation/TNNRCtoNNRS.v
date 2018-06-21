@@ -209,7 +209,7 @@ Section TNNRCtoNNRS.
       nnrc_stmt_to_nnrs globals s = Some si ->
       forall {τ:rtype},
         nnrc_type Γc nil s τ ->
-        [ h, Γc ⊢ si ▷ τ ].
+        [ Γc ⊢ si ▷ τ ].
     Proof.
       unfold nnrc_stmt_to_nnrs, nnrs_type; match_option
       ; intros eqq1; invcs eqq1.
@@ -320,7 +320,7 @@ Section TNNRCtoNNRS.
   Lemma tnnrc_stmt_to_nnrs_stmt_stratified_some_correct_fw {Γc:tbindings} {globals s τ} :
     nnrc_type Γc nil s τ ->
     forall pf,
-      [ h, Γc ⊢ ` (nnrc_stmt_to_nnrs_stmt_stratified_some globals s pf) ▷ τ ].
+      [ Γc ⊢ ` (nnrc_stmt_to_nnrs_stmt_stratified_some globals s pf) ▷ τ ].
   Proof.
     intros typ pf.
     destruct (nnrc_stmt_to_nnrs_stmt_stratified_some globals s pf); simpl.
@@ -329,7 +329,7 @@ Section TNNRCtoNNRS.
   
   Theorem tnnrc_to_nnrs_correct_fw {Γc:tbindings} {globals s τ} :
     nnrc_type Γc nil s τ ->
-    [ h, Γc ⊢ (nnrc_to_nnrs_top globals s) ▷ τ ].
+    [ Γc ⊢ (nnrc_to_nnrs_top globals s) ▷ τ ].
   Proof.
     intros typ.
     unfold nnrc_to_nnrs_top.

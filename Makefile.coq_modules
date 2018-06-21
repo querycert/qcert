@@ -193,6 +193,8 @@ MODULES = \
 	NNRS/Lang/NNRSSemEval \
 	NNRS/Lang/NNRSCrossShadow \
 	NNRS/Typing/TNNRS \
+	NNRS/Typing/TNNRSRename \
+	NNRS/Typing/TNNRSCrossShadow \
 	NNRS/NNRSRuntime \
 	NNRS/NNRSTypes \
 	NNRS/NNRSSystem \

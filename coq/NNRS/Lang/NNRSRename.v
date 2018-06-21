@@ -289,6 +289,56 @@ Section NNRSRename.
           trivial.
     Qed.
 
+    Lemma nnrs_stmt_free_mdenv_vars_rename_md s v v' :
+      ~ In v' (nnrs_stmt_bound_mdenv_vars s) ->
+      nnrs_stmt_free_mdenv_vars (nnrs_stmt_rename_md s v v')
+      = replace_all (nnrs_stmt_free_mdenv_vars s) v v'.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; intros
+      ; repeat rewrite IHs
+      ; repeat rewrite IHs1
+      ; repeat rewrite IHs2
+      ; repeat rewrite IHs3
+      ; repeat rewrite replace_all_app
+      ; repeat rewrite in_app_iff in *
+      ; intuition.
+      - Case "NNRSLetMut"%string.
+        match_destr.
+        + rewrite e in *; clear e v0.
+          rewrite replace_all_remove_eq.
+          trivial.
+        + rewrite H1.
+          rewrite remove_replace_all_comm by congruence.
+          trivial.
+    Qed.
+
+    Lemma nnrs_stmt_free_mcenv_vars_rename_mc s v v' :
+      ~ In v' (nnrs_stmt_bound_mcenv_vars s) ->
+      nnrs_stmt_free_mcenv_vars (nnrs_stmt_rename_mc s v v')
+      = replace_all (nnrs_stmt_free_mcenv_vars s) v v'.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; intros
+      ; repeat rewrite IHs
+      ; repeat rewrite IHs1
+      ; repeat rewrite IHs2
+      ; repeat rewrite IHs3
+      ; repeat rewrite replace_all_app
+      ; repeat rewrite in_app_iff in *
+      ; intuition.
+      - Case "NNRSLetMutColl"%string.
+        match_destr.
+        + rewrite e in *; clear e v0.
+          rewrite replace_all_remove_eq.
+          trivial.
+        + rewrite H1.
+          rewrite remove_replace_all_comm by congruence.
+          trivial.
+    Qed.
+
     Lemma nnrs_stmt_free_env_vars_rename_env_in s v0 v v' :
       In v0 (nnrs_stmt_free_env_vars (nnrs_stmt_rename_env s v v')) ->
       v0 = v' \/ (v0 <> v /\ In v0 (nnrs_stmt_free_env_vars s)).
@@ -489,6 +539,7 @@ Section NNRSRename.
       ; repeat (match_destr; try congruence).
     Qed.
 
+    
     Lemma nnrs_stmt_bound_mcenv_vars_rename_mdenv s v v' :
       nnrs_stmt_bound_mcenv_vars (nnrs_stmt_rename_md s v v')
       = nnrs_stmt_bound_mcenv_vars s.
@@ -530,6 +581,345 @@ Section NNRSRename.
     
   End rename_vars.
 
+  Section rename_id.
+
+    Lemma nnrs_expr_rename_env_id e v :
+      nnrs_expr_rename_env e v v = e.
+    Proof.
+      induction e
+      ; simpl
+      ; try rewrite IHe
+      ; try rewrite IHe1
+      ; try rewrite IHe2
+      ; try rewrite IHe3; try tauto.
+      - match_destr; congruence.
+    Qed.
+    
+    Lemma nnrs_stmt_rename_env_id s v :
+      nnrs_stmt_rename_env s v v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; try rewrite nnrs_expr_rename_env_id
+      ; repeat match_destr; unfold equiv, complement in *
+      ; try subst
+      ; try rewrite IHs
+      ; try rewrite IHs1
+      ; try rewrite IHs2
+      ; try rewrite IHs3
+      ; trivial.
+    Qed.
+
+    Lemma nnrs_stmt_rename_md_id s v :
+      nnrs_stmt_rename_md s v v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat match_destr; unfold equiv, complement in *
+      ; try subst
+      ; try rewrite IHs
+      ; try rewrite IHs1
+      ; try rewrite IHs2
+      ; try rewrite IHs3
+      ; trivial.
+    Qed.
+
+    Lemma nnrs_stmt_rename_mc_id s v :
+      nnrs_stmt_rename_mc s v v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat match_destr; unfold equiv, complement in *
+      ; try subst
+      ; try rewrite IHs
+      ; try rewrite IHs1
+      ; try rewrite IHs2
+      ; try rewrite IHs3
+      ; trivial.
+    Qed.
+    
+  End rename_id.
+  
+  Section rename_nfree.
+
+    Lemma nnrs_expr_rename_env_nin e v v' :
+      ~ In v (nnrs_expr_free_vars e) ->
+      nnrs_expr_rename_env e v v' = e.
+    Proof.
+      induction e
+      ; simpl
+      ; repeat rewrite in_app_iff
+      ; intros
+      ; try rewrite IHe
+      ; try rewrite IHe1
+      ; try rewrite IHe2
+      ; try rewrite IHe3; try tauto.
+      - match_destr; tauto.
+    Qed.
+    
+    Lemma nnrs_stmt_rename_env_nin s v v' :
+      ~ In v' (nnrs_stmt_free_env_vars s) ->
+      nnrs_stmt_rename_env s v' v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat rewrite in_app_iff
+      ; intros inn
+      ; try rewrite nnrs_expr_rename_env_nin by tauto
+      ; try rewrite IHs by tauto
+      ; try rewrite IHs1 by tauto
+      ; try rewrite IHs2 by tauto
+      ; try rewrite IHs3 by tauto
+      ; trivial.
+      - Case "NNRSLet"%string.
+        match_destr.
+        rewrite IHs; intuition.
+        destruct (remove_nin_inv H1); congruence.
+      - Case "NNRSLetMut"%string.
+        match_destr.
+        rewrite IHs2; intuition.
+        destruct (remove_nin_inv H1); congruence.
+      - Case "NNRSLetMutColl"%string.
+        match_destr.
+        rewrite IHs2; intuition.
+        destruct (remove_nin_inv H1); congruence.
+      - Case "NNRSFor"%string.
+        match_destr.
+        rewrite IHs; intuition.
+        destruct (remove_nin_inv H1); congruence.
+      - Case "NNRSEither"%string.
+        repeat match_destr.
+        + rewrite IHs2; intuition.
+          destruct (remove_nin_inv H3); congruence.
+        + rewrite IHs1; intuition.
+          destruct (remove_nin_inv H2); congruence.
+        + rewrite IHs1, IHs2; intuition.
+          * destruct (remove_nin_inv H3); congruence.
+          * destruct (remove_nin_inv H2); congruence.
+    Qed.
+
+    Lemma nnrs_stmt_rename_mc_nin s v v' :
+      ~ In v' (nnrs_stmt_free_mcenv_vars s) ->
+      nnrs_stmt_rename_mc s v' v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat rewrite in_app_iff
+      ; intros inn
+      ; try rewrite IHs by tauto
+      ; try rewrite IHs1 by tauto
+      ; try rewrite IHs2 by tauto
+      ; try rewrite IHs3 by tauto
+      ; trivial.
+      - Case "NNRSLetMutColl"%string.
+        match_destr.
+        rewrite IHs1; intuition.
+        destruct (remove_nin_inv H0); congruence.
+      - Case "NNRSPush"%string.
+        match_destr; unfold equiv, complement in *.
+        subst; tauto.
+    Qed.
+    
+    Lemma nnrs_stmt_rename_md_nin s v v' :
+      ~ In v' (nnrs_stmt_free_mdenv_vars s) ->
+      nnrs_stmt_rename_md s v' v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat rewrite in_app_iff
+      ; intros inn
+      ; try rewrite IHs by tauto
+      ; try rewrite IHs1 by tauto
+      ; try rewrite IHs2 by tauto
+      ; try rewrite IHs3 by tauto
+      ; trivial.
+      - Case "NNRSLetMut"%string.
+        match_destr.
+        rewrite IHs1; intuition.
+        destruct (remove_nin_inv H0); congruence.
+      - Case "NNRSAssign"%string.
+        match_destr; unfold equiv, complement in *.
+        subst; tauto.
+    Qed.
+
+  End rename_nfree.
+  
+  Section rename_involutive.
+
+    Lemma nnrs_expr_rename_env_involutive e v v' :
+      ~ In v' (nnrs_expr_free_vars e) ->
+      nnrs_expr_rename_env (nnrs_expr_rename_env e v v') v' v = e.
+    Proof.
+      induction e; simpl
+      ; repeat rewrite in_app_iff
+      ; intros inn
+      ; try rewrite IHe by tauto
+      ; try rewrite IHe1 by tauto
+      ; try rewrite IHe2 by tauto
+      ; try rewrite IHe3 by tauto
+      ; trivial.
+      - destruct (equiv_dec v0 v); match_destr; try congruence; tauto.
+    Qed.
+
+
+    Lemma nnrs_stmt_rename_env_involutive s v v' :
+      ~ In v' (nnrs_stmt_free_env_vars s) ->
+      ~ In v' (nnrs_stmt_bound_env_vars s) ->
+      nnrs_stmt_rename_env (nnrs_stmt_rename_env s v v') v' v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat rewrite in_app_iff
+      ; intros ninf ninb
+      ; try rewrite nnrs_expr_rename_env_involutive by tauto
+      ; try rewrite IHs by tauto
+      ; try rewrite IHs1 by tauto
+      ; try rewrite IHs2 by tauto
+      ; try rewrite IHs3 by tauto
+      ; trivial.
+      - Case "NNRSLet"%string.
+        destruct (equiv_dec v0 v'); unfold equiv, complement in *.
+        + subst.
+          match_destr.
+          rewrite nnrs_stmt_rename_env_nin; intuition.
+        + match_destr; unfold equiv, complement in *.
+          * subst. 
+            rewrite nnrs_stmt_rename_env_nin; intuition.
+            destruct (remove_nin_inv H3); eauto.
+          * rewrite IHs; intuition.
+            destruct (remove_nin_inv H1); eauto.
+      - Case "NNRSLetMut"%string.
+        destruct (equiv_dec v0 v'); unfold equiv, complement in *.
+        + subst.
+          match_destr.
+          rewrite nnrs_stmt_rename_env_nin; intuition.
+        + match_destr; unfold equiv, complement in *.
+          * subst. 
+            rewrite nnrs_stmt_rename_env_nin; intuition.
+            destruct (remove_nin_inv H3); eauto.
+          * rewrite IHs2; intuition.
+            destruct (remove_nin_inv H1); eauto.
+      - Case "NNRSLetMutColl"%string.
+        destruct (equiv_dec v0 v'); unfold equiv, complement in *.
+        + subst.
+          match_destr.
+          rewrite nnrs_stmt_rename_env_nin; intuition.
+        + match_destr; unfold equiv, complement in *.
+          * subst. 
+            rewrite nnrs_stmt_rename_env_nin; intuition.
+            destruct (remove_nin_inv H3); eauto.
+          * rewrite IHs2; intuition.
+            destruct (remove_nin_inv H1); eauto.
+      - Case "NNRSFor"%string.
+        destruct (equiv_dec v0 v'); unfold equiv, complement in *.
+        + subst.
+          match_destr.
+          rewrite nnrs_stmt_rename_env_nin; intuition.
+        + match_destr; unfold equiv, complement in *.
+          * subst. 
+            rewrite nnrs_stmt_rename_env_nin; intuition.
+            destruct (remove_nin_inv H3); eauto.
+          * rewrite IHs; intuition.
+            destruct (remove_nin_inv H1); eauto.
+      - Case "NNRSEither"%string.
+        destruct (equiv_dec v0 v'); unfold equiv, complement in *.
+        + subst.
+          match_destr
+          ; rewrite nnrs_stmt_rename_env_nin; intuition.
+        + match_destr; unfold equiv, complement in *.
+          * subst.
+            { match_destr.
+              - match_destr
+                ; rewrite nnrs_stmt_rename_env_nin; intuition.
+              - rewrite nnrs_stmt_rename_env_nin; [| intuition].
+                + match_destr; unfold equiv, complement in *.
+                  * subst.
+                    rewrite nnrs_stmt_rename_env_nin; intuition.
+                    destruct (remove_nin_inv H5); eauto. 
+                  * rewrite IHs2; intuition.
+                    destruct (remove_nin_inv H6); eauto. 
+                + destruct (remove_nin_inv H1); eauto. 
+            }                       
+          * { rewrite IHs1; [| intuition..].
+              -  match_destr; unfold equiv, complement in *.
+                 + subst.
+                   match_destr
+                   ; rewrite nnrs_stmt_rename_env_nin; intuition.
+                 + match_destr; unfold equiv, complement in *.
+                   * rewrite nnrs_stmt_rename_env_nin; intuition.
+                     destruct (remove_nin_inv H5); eauto.
+                   * rewrite IHs2; intuition.
+                     destruct (remove_nin_inv H5); eauto.
+              - destruct (remove_nin_inv H4); eauto.
+            }
+    Qed.
+
+    Lemma nnrs_stmt_rename_md_involutive s v v' :
+      ~ In v' (nnrs_stmt_free_mdenv_vars s) ->
+      ~ In v' (nnrs_stmt_bound_mdenv_vars s) ->
+      nnrs_stmt_rename_md (nnrs_stmt_rename_md s v v') v' v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat rewrite in_app_iff
+      ; intros ninf ninb
+      ; try rewrite IHs by tauto
+      ; try rewrite IHs1 by tauto
+      ; try rewrite IHs2 by tauto
+      ; try rewrite IHs3 by tauto
+      ; trivial.
+      - Case "NNRSLetMut"%string.
+        destruct (equiv_dec v0 v'); unfold equiv, complement in *.
+        + subst.
+          match_destr.
+          rewrite nnrs_stmt_rename_md_nin; intuition.
+        + match_destr; unfold equiv, complement in *.
+          * subst. 
+            rewrite nnrs_stmt_rename_md_nin; intuition.
+            destruct (remove_nin_inv H2); eauto.
+          * rewrite IHs1; intuition.
+            destruct (remove_nin_inv H0); eauto.
+      - Case "NNRSAssign"%string.
+        destruct (equiv_dec v0 v); unfold equiv, complement in *.
+        + match_destr; try congruence.
+        + match_destr; try congruence.
+          tauto.
+    Qed.
+
+    Lemma nnrs_stmt_rename_mc_involutive s v v' :
+      ~ In v' (nnrs_stmt_free_mcenv_vars s) ->
+      ~ In v' (nnrs_stmt_bound_mcenv_vars s) ->
+      nnrs_stmt_rename_mc (nnrs_stmt_rename_mc s v v') v' v = s.
+    Proof.
+      nnrs_stmt_cases (induction s) Case
+      ; simpl
+      ; repeat rewrite in_app_iff
+      ; intros ninf ninb
+      ; try rewrite IHs by tauto
+      ; try rewrite IHs1 by tauto
+      ; try rewrite IHs2 by tauto
+      ; try rewrite IHs3 by tauto
+      ; trivial.
+      - Case "NNRSLetMutColl"%string.
+        destruct (equiv_dec v0 v'); unfold equiv, complement in *.
+        + subst.
+          match_destr.
+          rewrite nnrs_stmt_rename_mc_nin; intuition.
+        + match_destr; unfold equiv, complement in *.
+          * subst. 
+            rewrite nnrs_stmt_rename_mc_nin; intuition.
+            destruct (remove_nin_inv H2); eauto.
+          * rewrite IHs1; intuition.
+            destruct (remove_nin_inv H0); eauto.
+      - Case "NNRSPush"%string.
+        destruct (equiv_dec v0 v); unfold equiv, complement in *.
+        + match_destr; try congruence.
+        + match_destr; try congruence.
+          tauto.
+    Qed.
+
+  End rename_involutive.
+  
   Section rename_eval.
     
     Lemma nnrs_expr_eval_rename_env c σ e v v' d:
@@ -667,7 +1057,7 @@ Section NNRSRename.
                         _ -> _ -> _ -> _ -> lift2P _ (nnrs_stmt_eval _ _ _ _ _ ?s) _
                                                    
                         |- lift2P _ (match nnrs_stmt_eval _ _ (?x :: ?l ++ (_, ?d) :: ?σ) ?ψc ?ψd ?s with| Some _ => _
-                                                                                                            | None => _
+                                                                                                     | None => _
                                      end) _ ] => specialize (H (x::l) σ ψc ψd d); simpl in H
                                                  ; disect_tac H stac
                   | [H:forall l es ec ed d,
@@ -1075,7 +1465,7 @@ Section NNRSRename.
       ~ In v' (nnrs_stmt_free_env_vars s) ->
       ~ In v' (nnrs_stmt_bound_env_vars s) ->
       nnrs_stmt_eval h c ((v',d)::σ) ψc ψd 
-                            (nnrs_stmt_rename_env s v v') =
+                     (nnrs_stmt_rename_env s v v') =
       match nnrs_stmt_eval h c ((v,d)::σ) ψc ψd s with
       | Some ((_,d)::σ',ψc',ψd') => Some ((v',d)::σ',ψc',ψd')
       | _ => None
@@ -1095,7 +1485,7 @@ Section NNRSRename.
       ~ In v' (nnrs_stmt_free_mdenv_vars s) ->
       ~ In v' (nnrs_stmt_bound_mdenv_vars s) ->
       nnrs_stmt_eval h c σ ψc ((v',d)::ψd)
-                            (nnrs_stmt_rename_md s v v') =
+                     (nnrs_stmt_rename_md s v v') =
       match nnrs_stmt_eval h c σ ψc ((v,d)::ψd) s with
       | Some (σ',ψc',(_,d)::ψd') => Some (σ',ψc',(v',d)::ψd')
       | _ => None
@@ -1117,7 +1507,7 @@ Section NNRSRename.
       ~ In v' (nnrs_stmt_free_mcenv_vars s) ->
       ~ In v' (nnrs_stmt_bound_mcenv_vars s) ->
       nnrs_stmt_eval h c σ ((v',d)::ψc) ψd
-                            (nnrs_stmt_rename_mc s v v') =
+                     (nnrs_stmt_rename_mc s v v') =
       match nnrs_stmt_eval h c σ ((v,d)::ψc) ψd s with
       | Some (σ',(_,d)::ψc',ψd') => Some (σ',(v',d)::ψc',ψd')
       | _ => None

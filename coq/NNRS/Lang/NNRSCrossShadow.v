@@ -443,7 +443,7 @@ Section NNRSCrossShadow.
       -  apply nnrs_stmt_cross_shadow_free_under_free_mdenv_cons.
     Qed.
 
-        Lemma nnrs_stmt_cross_shadow_free_under_bound_mcenv_env
+    Lemma nnrs_stmt_cross_shadow_free_under_bound_mcenv_env
           (s:nnrs_stmt) (σ ψc ψd:list var) :
       nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
       disjoint (nnrs_stmt_bound_mcenv_vars s) σ.
@@ -1006,12 +1006,12 @@ Section NNRSCrossShadow.
       ; disj_tac
       ; try solve[
               repeat match goal with
-               | [H: _ /\ _ |- _ ] => destruct H
-               end
-        ; repeat split; eauto 3
-        ; repeat match goal with
-          | [H: nnrs_stmt_cross_shadow_free_under _ _ _ _ |- _ ] => apply nnrs_stmt_cross_shadow_free_under_vars_cons in H
-          end; try tauto].
+                     | [H: _ /\ _ |- _ ] => destruct H
+                     end
+              ; repeat split; eauto 3
+              ; repeat match goal with
+                       | [H: nnrs_stmt_cross_shadow_free_under _ _ _ _ |- _ ] => apply nnrs_stmt_cross_shadow_free_under_vars_cons in H
+                       end; try tauto].
     Qed.
 
 
@@ -1191,8 +1191,8 @@ Section NNRSCrossShadow.
                                   ++ nnrs_stmt_bound_mdenv_vars s₂' in
            let v' := fresh_var_from sep v problems in
            NNRSLetMut v'
-                            (mk_lazy_lift nnrs_stmt_rename_md s₁' v v')
-                            (mk_lazy_lift nnrs_stmt_rename_env s₂' v v')
+                      (mk_lazy_lift nnrs_stmt_rename_md s₁' v v')
+                      (mk_lazy_lift nnrs_stmt_rename_env s₂' v v')
          | NNRSLetMutColl v s₁ s₂ =>
            let s₁' := nnrs_stmt_uncross_shadow_under s₁ σ (v::ψc) ψd in
            let s₂' := nnrs_stmt_uncross_shadow_under s₂ (v::σ) ψc ψd in
@@ -1213,8 +1213,8 @@ Section NNRSCrossShadow.
                                    ++ nnrs_stmt_bound_mdenv_vars s₂' in
            let v' := fresh_var_from sep v problems in
            NNRSLetMutColl v' 
-                                (mk_lazy_lift nnrs_stmt_rename_mc s₁' v v')
-                                (mk_lazy_lift nnrs_stmt_rename_env s₂' v v')
+                          (mk_lazy_lift nnrs_stmt_rename_mc s₁' v v')
+                          (mk_lazy_lift nnrs_stmt_rename_env s₂' v v')
          | NNRSAssign v e =>
            NNRSAssign v e
          | NNRSPush v e =>
@@ -1252,10 +1252,10 @@ Section NNRSCrossShadow.
                                    ++ (nnrs_stmt_bound_mdenv_vars s₂') in
            let x₂' := fresh_var_from sep x₂ problems₂ in
            NNRSEither e
-                            x₁'
-                            (mk_lazy_lift nnrs_stmt_rename_env s₁' x₁ x₁')
-                            x₂'
-                            (mk_lazy_lift nnrs_stmt_rename_env s₂' x₂ x₂')
+                      x₁'
+                      (mk_lazy_lift nnrs_stmt_rename_env s₁' x₁ x₁')
+                      x₂'
+                      (mk_lazy_lift nnrs_stmt_rename_env s₂' x₂ x₂')
          end.
 
     Definition nnrs_uncross_shadow
@@ -1264,15 +1264,132 @@ Section NNRSCrossShadow.
       :=
         let s' := nnrs_stmt_uncross_shadow_under (fst s) nil nil (snd s::nil) in
         let problems := nnrs_stmt_free_env_vars s'
-                                                       ++ nnrs_stmt_bound_env_vars s'
-                                                       ++ nnrs_stmt_free_mcenv_vars s'
-                                                       ++ nnrs_stmt_bound_mcenv_vars s' 
-                                                       ++ remove equiv_dec (snd s) (nnrs_stmt_free_mdenv_vars s')
-                                                       ++ remove equiv_dec (snd s) (nnrs_stmt_bound_mdenv_vars s') in
+                                                ++ nnrs_stmt_bound_env_vars s'
+                                                ++ nnrs_stmt_free_mcenv_vars s'
+                                                ++ nnrs_stmt_bound_mcenv_vars s' 
+                                                ++ remove equiv_dec (snd s) (nnrs_stmt_free_mdenv_vars s')
+                                                ++ remove equiv_dec (snd s) (nnrs_stmt_bound_mdenv_vars s') in
         let v' := fresh_var_from sep (snd s) problems in
         (mk_lazy_lift nnrs_stmt_rename_md s' (snd s) v', v').
 
   End uncross.
+
+  (* nnrs_stmt_uncross_shadow_under does not affect free variables *)
+  Section uncross_free.
+
+    Ltac unlazy_tac := 
+      try (apply mk_lazy_lift_prop;
+         let H := fresh "eqq" in
+         intros H; subst; try rewrite <- H; eauto).
+
+
+    Ltac addremove_inclin_tac
+      := let HH:= fresh "inn" in
+         let HH2 := fresh "inn" in
+         intros HH
+         ; match type of HH with
+             In ?fv ?l =>
+             match fv with
+             | (fresh_var_from _ ?v _) => assert (HH2:In fv (remove equiv_dec v l))
+                 by (apply remove_in_neq; auto)
+             end
+           end; revert HH2
+         ; apply fresh_var_from_incl_nin
+         ; intros ? ?; repeat rewrite in_app_iff; tauto.
+
+    Ltac freeuncross_t IH renH
+      := unlazy_tac
+         ; [rewrite IH; trivial
+           | rewrite renH
+             ; [rewrite IH
+                ; apply remove_replace_all_nin
+                ; addremove_inclin_tac
+               | addremove_inclin_tac
+           ]].
+
+      Ltac fresh_prover
+    :=
+      repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_env_vars_rename_env)          
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_free_mcenv_vars_rename_env)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_mcenv_vars_rename_env)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_free_mdenv_vars_rename_env)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_mdenv_vars_rename_env)
+               
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_free_env_vars_rename_mcenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_env_vars_rename_mcenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_mcenv_vars_rename_mcenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_free_mdenv_vars_rename_mcenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_mdenv_vars_rename_mcenv)
+
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_free_env_vars_rename_mdenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_env_vars_rename_mdenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_free_mcenv_vars_rename_mdenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_mcenv_vars_rename_mdenv)
+      ; repeat rewrite (mk_lazy_lift_under nnrs_stmt_bound_mdenv_vars_rename_mdenv)
+
+      ; try solve [apply fresh_var_from_incl_nin
+                   ; unfold incl; intros; repeat rewrite in_app_iff; intuition].
+
+    Lemma nnrs_stmt_free_env_vars_uncross_under sep s σ ψc ψd :
+      nnrs_stmt_free_env_vars (nnrs_stmt_uncross_shadow_under sep s σ ψc ψd) 
+      = nnrs_stmt_free_env_vars s.
+    Proof.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; intros σ ψc ψd
+      ; simpl
+      ; fresh_prover; eauto
+      ; try rewrite IHs
+      ; try rewrite IHs1
+      ; try rewrite IHs2
+      ; try rewrite IHs3; trivial
+      ; try solve
+            [f_equal; freeuncross_t IHs nnrs_stmt_free_env_vars_rename_env
+            | f_equal; freeuncross_t IHs2 nnrs_stmt_free_env_vars_rename_env].
+      - Case "NNRSEither"%string.
+        f_equal.
+        f_equal.
+        + freeuncross_t IHs1 nnrs_stmt_free_env_vars_rename_env.
+        + freeuncross_t IHs2 nnrs_stmt_free_env_vars_rename_env.
+    Qed.
+
+    Lemma nnrs_stmt_free_mdenv_vars_uncross_under sep s σ ψc ψd :
+      nnrs_stmt_free_mdenv_vars (nnrs_stmt_uncross_shadow_under sep s σ ψc ψd) 
+      = nnrs_stmt_free_mdenv_vars s.
+    Proof.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; intros σ ψc ψd
+      ; simpl
+      ; fresh_prover; eauto
+      ; try rewrite IHs
+      ; try rewrite IHs1
+      ; try rewrite IHs2
+      ; try rewrite IHs3; trivial.
+      - Case "NNRSLetMut"%string.
+        f_equal.
+        freeuncross_t IHs1 nnrs_stmt_free_mdenv_vars_rename_md.
+    Qed.
+
+    Lemma nnrs_stmt_free_mcenv_vars_uncross_under sep s σ ψc ψd :
+      nnrs_stmt_free_mcenv_vars (nnrs_stmt_uncross_shadow_under sep s σ ψc ψd) 
+      = nnrs_stmt_free_mcenv_vars s.
+    Proof.
+      revert σ ψc ψd
+      ; nnrs_stmt_cases (induction s) Case
+      ; intros σ ψc ψd
+      ; simpl
+      ; fresh_prover; eauto
+      ; try rewrite IHs
+      ; try rewrite IHs1
+      ; try rewrite IHs2
+      ; try rewrite IHs3; trivial.
+      - Case "NNRSLetMutColl"%string.
+        f_equal.
+        freeuncross_t IHs1 nnrs_stmt_free_mcenv_vars_rename_mc.
+    Qed.
+
+  End uncross_free.
 
   Section correctness.
 
@@ -1560,32 +1677,32 @@ Section NNRSCrossShadow.
 
     Ltac disj_tac :=
       repeat progress
-        (repeat rewrite in_app_iff in *
-         ; try match goal with
-         | [ H : disjoint (_ ++ _) _ |- _ ] => apply disjoint_app_l in H; destruct H
-         | [ H : disjoint (_ :: _) _ |- _ ] => apply disjoint_cons_inv1 in H; destruct H
-         | [ H : disjoint _ (_ :: _) |- _ ] => apply disjoint_cons_inv2 in H; destruct H
-         | [H1:disjoint (remove _ ?v ?l1) ?l2,
-               H2:In ?v ?l1 -> False |- _ ] => rewrite nin_remove in H1 by apply H2
-         | [H1:disjoint (remove _ ?v ?l1) ?l2,
-               H2:~ In ?v ?l1 |- _ ] => rewrite nin_remove in H1 by apply H2
-         | [H1:disjoint (remove _ ?v ?l1) ?l2,
-               H2:In ?v ?l2 -> False |- _ ] => rewrite disjoint_remove_swap in H1; rewrite nin_remove in H1 by apply H2
-         | [H1:disjoint (remove _ ?v ?l1) ?l2,
-               H2:~ In ?v ?l2 |- _ ] => rewrite disjoint_remove_swap in H1; rewrite nin_remove in H1 by apply H2
-         | [H : In _ (replace_all _ _ _ ) |- _ ] => apply in_replace_all in H; try solve [destruct H as [?|[??]]; subst; eauto]
-         | [H: ~ In _ (remove _ _ _) |- _ ] => try rewrite <- remove_in_neq in H by congruence
-         | [H: In _ (remove _ _ _) -> False |- _ ] => try rewrite <- remove_in_neq in H by congruence
-         | [ |- disjoint (_ :: _) _ ] => apply disjoint_cons1
-         | [ |- disjoint _ (_ :: _) ] => apply disjoint_cons2
-         | [ |- disjoint _ (replace_all _ _ _ )] => try solve [apply disjoint_replace_all; intuition]
-         | [ H: In _ (remove _ _ _) |- _ ] => apply remove_inv in H; destruct H; try congruence
-         end
-        ).
+             (repeat rewrite in_app_iff in *
+              ; try match goal with
+                    | [ H : disjoint (_ ++ _) _ |- _ ] => apply disjoint_app_l in H; destruct H
+                    | [ H : disjoint (_ :: _) _ |- _ ] => apply disjoint_cons_inv1 in H; destruct H
+                    | [ H : disjoint _ (_ :: _) |- _ ] => apply disjoint_cons_inv2 in H; destruct H
+                    | [H1:disjoint (remove _ ?v ?l1) ?l2,
+                          H2:In ?v ?l1 -> False |- _ ] => rewrite nin_remove in H1 by apply H2
+                    | [H1:disjoint (remove _ ?v ?l1) ?l2,
+                          H2:~ In ?v ?l1 |- _ ] => rewrite nin_remove in H1 by apply H2
+                    | [H1:disjoint (remove _ ?v ?l1) ?l2,
+                          H2:In ?v ?l2 -> False |- _ ] => rewrite disjoint_remove_swap in H1; rewrite nin_remove in H1 by apply H2
+                    | [H1:disjoint (remove _ ?v ?l1) ?l2,
+                          H2:~ In ?v ?l2 |- _ ] => rewrite disjoint_remove_swap in H1; rewrite nin_remove in H1 by apply H2
+                    | [H : In _ (replace_all _ _ _ ) |- _ ] => apply in_replace_all in H; try solve [destruct H as [?|[??]]; subst; eauto]
+                    | [H: ~ In _ (remove _ _ _) |- _ ] => try rewrite <- remove_in_neq in H by congruence
+                    | [H: In _ (remove _ _ _) -> False |- _ ] => try rewrite <- remove_in_neq in H by congruence
+                    | [ |- disjoint (_ :: _) _ ] => apply disjoint_cons1
+                    | [ |- disjoint _ (_ :: _) ] => apply disjoint_cons2
+                    | [ |- disjoint _ (replace_all _ _ _ )] => try solve [apply disjoint_replace_all; intuition]
+                    | [ H: In _ (remove _ _ _) |- _ ] => apply remove_inv in H; destruct H; try congruence
+                    end
+             ).
     
     Lemma nnrs_stmt_uncross_shadow_under_alt_id sep (s:nnrs_stmt) :
       nnrs_stmt_cross_shadow_free_alt s ->
-            forall (σ ψc ψd:list var),
+      forall (σ ψc ψd:list var),
         disjoint (nnrs_stmt_free_mcenv_vars s) σ ->
         disjoint (nnrs_stmt_bound_mcenv_vars s) σ ->
         disjoint (nnrs_stmt_free_mdenv_vars s) σ ->
@@ -1598,7 +1715,7 @@ Section NNRSCrossShadow.
         disjoint (nnrs_stmt_bound_env_vars s) ψd ->
         disjoint (nnrs_stmt_free_mcenv_vars s) ψd ->
         disjoint (nnrs_stmt_bound_mcenv_vars s) ψd ->
-      nnrs_stmt_uncross_shadow_under sep s σ ψc ψd = s.
+        nnrs_stmt_uncross_shadow_under sep s σ ψc ψd = s.
     Proof.
       Ltac ucsid_tac := repeat intuition disj_tac.
       
@@ -1842,31 +1959,31 @@ Section NNRSCrossShadow.
 
     Example expr1 : nnrs_stmt
       := NNRSLet "x"
-                       (NNRSConst (dnat 3))
+                 (NNRSConst (dnat 3))
+                 (NNRSLetMutColl
+                    "x"
+                    (NNRSLetMutColl
+                       "y"
                        (NNRSLetMutColl
                           "x"
-                          (NNRSLetMutColl
-                             "y"
-                             (NNRSLetMutColl
-                                "x"
-                                (NNRSLetMut
-                                   "x"
-                                   (NNRSAssign "x" (NNRSConst (dnat 5)))
-                                   (NNRSPush "x" (NNRSConst (dnat 4))))
-                                (NNRSPush "x" (NNRSConst (dnat 6))))
-                             (NNRSPush "x" (NNRSConst (dnat 7))))
-                          (NNRSAssign "ret" (NNRSConst (dnat 8)))).
-(*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr1 nil nil nil). *)
+                          (NNRSLetMut
+                             "x"
+                             (NNRSAssign "x" (NNRSConst (dnat 5)))
+                             (NNRSPush "x" (NNRSConst (dnat 4))))
+                          (NNRSPush "x" (NNRSConst (dnat 6))))
+                       (NNRSPush "x" (NNRSConst (dnat 7))))
+                    (NNRSAssign "ret" (NNRSConst (dnat 8)))).
+    (*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr1 nil nil nil). *)
     
     Example expr2 : nnrs_stmt
       := NNRSLet "x"
-                       (NNRSConst (dnat 3))
-                       (NNRSLetMutColl
-                          "x"
-                          (NNRSPush "x" (NNRSConst (dnat 8)))
-                          (NNRSAssign "ret" (NNRSConst (dnat 8)))).
+                 (NNRSConst (dnat 3))
+                 (NNRSLetMutColl
+                    "x"
+                    (NNRSPush "x" (NNRSConst (dnat 8)))
+                    (NNRSAssign "ret" (NNRSConst (dnat 8)))).
 
-(*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr2 nil nil nil). *)
+    (*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr2 nil nil nil). *)
 
     Example expr3 : nnrs_stmt
       := (NNRSLetMut
@@ -1874,7 +1991,7 @@ Section NNRSCrossShadow.
             (NNRSPush "x" (NNRSConst (dnat 8)))
             (NNRSAssign "ret" (NNRSConst (dnat 8)))).
 
-(*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr3 nil nil nil). *)
+    (*    Eval vm_compute in (nnrs_stmt_uncross_shadow_under "$" expr3 nil nil nil). *)
     
   End examples.
 

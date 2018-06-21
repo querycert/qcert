@@ -26,6 +26,7 @@ Require Import NNRS.
 Require Import NNRSEval.
 Require Import NNRSSem.
 Require Import NNRSSemEval.
+Require Import NNRSVars.
 
 Section TNNRS.
   (** Typing rules for NNRS *)
@@ -752,29 +753,29 @@ Section TNNRS.
     forall d, 
       nnrs_eval_top brand_relation_brands σc si = Some d
       -> d ▹ τ.
-    Proof.
-      intros bt typ.
-      destruct (typed_nnrs_yields_typed_data (bindings_type_sort _ _ bt) typ)
-               as [o [eqq dtyp]].
-      unfold nnrs_eval_top.
-      rewrite eqq; unfold id; simpl; tauto.
-    Qed.
+  Proof.
+    intros bt typ.
+    destruct (typed_nnrs_yields_typed_data (bindings_type_sort _ _ bt) typ)
+      as [o [eqq dtyp]].
+    unfold nnrs_eval_top.
+    rewrite eqq; unfold id; simpl; tauto.
+  Qed.
 
-    Theorem typed_nnrs_top_yields_typed_data_used {σc} {Γc} {τ} {si:nnrs}:
+  Theorem typed_nnrs_top_yields_typed_data_used {σc} {Γc} {τ} {si:nnrs}:
     nnrs_stmt_must_assign (fst si) (snd si) ->
     bindings_type σc Γc ->
     [ rec_sort Γc ⊢ si ▷ τ ] ->
     exists d,
       nnrs_eval_top brand_relation_brands σc si = Some d
       /\ d ▹ τ.
-    Proof.
-      intros ma bt typ.
-      destruct (typed_nnrs_yields_typed_data_used ma (bindings_type_sort _ _ bt) typ) as [o [eqq dtyp]].
-      unfold nnrs_eval_top.
-      rewrite eqq; unfold id; simpl.
-      eauto.
-    Qed.
-      
+  Proof.
+    intros ma bt typ.
+    destruct (typed_nnrs_yields_typed_data_used ma (bindings_type_sort _ _ bt) typ) as [o [eqq dtyp]].
+    unfold nnrs_eval_top.
+    rewrite eqq; unfold id; simpl.
+    eauto.
+  Qed.
+  
   Section sem.
     (* restates type soundness theorems in terms of the semantics.  
        This enables nicer notation :-) *)
@@ -861,9 +862,342 @@ Section TNNRS.
       + rewrite <- Γeqq; eauto.
       + rewrite <- Δceqq; eauto.
   Qed.
-  
+
+  Section unused.
+    Local Open Scope nnrs.
+
+    Hint Constructors nnrs_expr_type.
+    Hint Constructors nnrs_stmt_type.
+
+    Section remove.
+      
+      Lemma nnrs_expr_type_unused_remove_env Γc l Γ e v τ τo:
+        (In v (domain l) \/
+         ~ In v (nnrs_expr_free_vars e)) ->
+        [  Γc ; l++(v,τ)::Γ ⊢ e ▷ τo ] ->
+        [  Γc ; l++Γ ⊢  e ▷ τo  ].
+      Proof.
+        revert l Γ τo.
+        nnrs_expr_cases (induction e) Case
+        ; simpl; intros ll Γ τo inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn
+        ; eauto 3.
+        - Case "NNRSVar"%string.
+          econstructor.
+          repeat rewrite lookup_app in *
+          ; simpl in *.
+          match_option
+          ; rewrite eqq in H1; try congruence.
+          apply lookup_none_nin in eqq.
+          match_destr_in H1; unfold equiv, complement in *.
+          subst; intuition.
+        - Case "NNRSBinop"%string.
+          econstructor; intuition eauto.
+      Qed.
+
+      Lemma nnrs_stmt_type_unused_remove_env Γc l Γ Δc Δd s v τ:
+        (In v (domain l) \/
+         ~ In v (nnrs_stmt_free_env_vars s)) ->
+        [  Γc ; l++(v,τ)::Γ , Δc , Δd  ⊢ s ] ->
+        [  Γc ; l++Γ , Δc , Δd  ⊢ s ].
+      Proof.
+        Hint Resolve nnrs_expr_type_unused_remove_env.
+        revert l Γ Δc Δd τ.
+        nnrs_stmt_cases (induction s) Case
+        ; simpl; intros l Γ Δc Δd τ inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn.
+        - Case "NNRSSeq"%string.
+          econstructor; intuition eauto.
+        - Case "NNRSLet"%string.
+          econstructor.
+          + eapply nnrs_expr_type_unused_remove_env; eauto.
+            tauto.
+          + specialize (IHs ((v0, Some τ0) :: l)); simpl in IHs.
+            eapply IHs; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.
+        - Case "NNRSLetMut"%string.
+          econstructor; trivial.
+          + intuition eauto.
+          + specialize (IHs2 ((v0, Some τ0) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.           
+        - Case "NNRSLetMut"%string.
+          eapply type_NNRSLetMutNotUsed.
+          + intuition eauto.
+          + specialize (IHs2 ((v0, None) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.           
+        - Case "NNRSLetMutColl"%string.
+          econstructor.
+          + intuition eauto.
+          + specialize (IHs2 ((v0, Some (Coll τ0)) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.
+        - Case "NNRSAssign"%string.        
+          eauto.
+        - Case "NNRSPush"%string.
+          eauto.
+        - Case "NNRSFor"%string.
+          econstructor.
+          + eapply nnrs_expr_type_unused_remove_env;[|eauto]; tauto.
+          + specialize (IHs ((v0, Some τ0) :: l)); simpl in IHs.
+            eapply IHs; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.
+        - Case "NNRSIf"%string.
+          econstructor; intuition eauto.
+        - Case "NNRSEither"%string.
+          econstructor.
+          + eapply nnrs_expr_type_unused_remove_env;[|eauto]; tauto.
+          + specialize (IHs1 ((v0, Some τl) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition.
+            destruct (remove_nin_inv H); eauto.
+          + specialize (IHs2 ((v1, Some τr) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition.
+            destruct (remove_nin_inv H2); eauto.
+      Qed.
+
+      Lemma nnrs_stmt_type_unused_remove_mdenv Γc l Γ Δc Δd s v τ:
+        (In v (domain l) \/
+         ~ In v (nnrs_stmt_free_mdenv_vars s)) ->
+        [  Γc ; Γ , Δc , l++(v,τ)::Δd  ⊢ s ] ->
+        [  Γc ; Γ , Δc , l++Δd  ⊢ s ].
+      Proof.
+        revert l Γ Δc Δd τ.
+        nnrs_stmt_cases (induction s) Case
+        ; simpl; intros l Γ Δc Δd τ inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn
+        ; try solve [econstructor; intuition eauto].
+        - Case "NNRSLetMut"%string.
+          econstructor; trivial.
+          + specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition.
+            destruct (remove_nin_inv H0); eauto.
+          + intuition eauto.
+        - Case "NNRSLetMut"%string.
+          eapply type_NNRSLetMutNotUsed.
+          + specialize (IHs1 ((v0, ⊤) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition; destruct (remove_nin_inv H0); eauto.
+          + intuition eauto.
+        - Case "NNRSAssign"%string.
+          econstructor; eauto.
+          repeat rewrite lookup_app in *
+          ; simpl in *.
+          match_option
+          ; rewrite eqq in H5; try congruence.
+          apply lookup_none_nin in eqq.
+          match_destr_in H5; unfold equiv, complement in *.
+          subst; intuition.
+      Qed.
+
+      Lemma nnrs_stmt_type_unused_remove_mcenv Γc l Γ Δc Δd s v τ:
+        (In v (domain l) \/
+         ~ In v (nnrs_stmt_free_mcenv_vars s)) ->
+        [  Γc ; Γ , l++(v,τ)::Δc , Δd  ⊢ s ] ->
+        [  Γc ; Γ , l++Δc , Δd  ⊢ s ].
+      Proof.
+        revert l Γ Δc Δd τ.
+        nnrs_stmt_cases (induction s) Case
+        ; simpl; intros l Γ Δc Δd τ inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn
+        ; try solve [econstructor; intuition eauto].
+        - Case "NNRSLetMutColl"%string.
+          econstructor.
+          + specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition.
+            destruct (remove_nin_inv H0); eauto.
+          + intuition eauto.
+        - Case "NNRSPush"%string.
+          econstructor; eauto.
+          repeat rewrite lookup_app in *
+          ; simpl in *.
+          match_option
+          ; rewrite eqq in H5; try congruence.
+          apply lookup_none_nin in eqq.
+          match_destr_in H5; unfold equiv, complement in *.
+          subst; intuition.
+      Qed.
+
+    End remove.
+    
+    Section add.
+      
+      Lemma nnrs_expr_type_unused_add_env Γc l Γ e v τ τo:
+        (In v (domain l) \/
+         ~ In v (nnrs_expr_free_vars e)) ->
+        [  Γc ; l++Γ ⊢  e ▷ τo  ] ->
+        [  Γc ; l++(v,τ)::Γ ⊢ e ▷ τo ].
+      Proof.
+        revert l Γ τo.
+        nnrs_expr_cases (induction e) Case
+        ; simpl; intros ll Γ τo inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn
+        ; eauto 3.
+        - Case "NNRSVar"%string.
+          econstructor.
+          repeat rewrite lookup_app in *
+          ; simpl in *.
+          match_option
+          ; rewrite eqq in H1; try congruence.
+          apply lookup_none_nin in eqq.
+          match_destr; unfold equiv, complement in *.
+          subst; intuition.
+        - Case "NNRSBinop"%string.
+          econstructor; intuition eauto.
+      Qed.
+
+      Lemma nnrs_stmt_type_unused_add_env Γc l Γ Δc Δd s v τ:
+        (In v (domain l) \/
+         ~ In v (nnrs_stmt_free_env_vars s)) ->
+        [  Γc ; l++Γ , Δc , Δd  ⊢ s ] ->
+        [  Γc ; l++(v,τ)::Γ , Δc , Δd  ⊢ s ].
+      Proof.
+        Hint Resolve nnrs_expr_type_unused_add_env.
+        revert l Γ Δc Δd τ.
+        nnrs_stmt_cases (induction s) Case
+        ; simpl; intros l Γ Δc Δd τ inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn.
+        - Case "NNRSSeq"%string.
+          econstructor; intuition eauto.
+        - Case "NNRSLet"%string.
+          econstructor.
+          + eapply nnrs_expr_type_unused_add_env; eauto.
+            tauto.
+          + specialize (IHs ((v0, Some τ0) :: l)); simpl in IHs.
+            eapply IHs; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.
+        - Case "NNRSLetMut"%string.
+          econstructor; trivial.
+          + intuition eauto.
+          + specialize (IHs2 ((v0, Some τ0) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.           
+        - Case "NNRSLetMut"%string.
+          eapply type_NNRSLetMutNotUsed.
+          + intuition eauto.
+          + specialize (IHs2 ((v0, None) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.           
+        - Case "NNRSLetMutColl"%string.
+          econstructor.
+          + intuition eauto.
+          + specialize (IHs2 ((v0, Some (Coll τ0)) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.
+        - Case "NNRSAssign"%string.        
+          eauto.
+        - Case "NNRSPush"%string.
+          eauto.
+        - Case "NNRSFor"%string.
+          econstructor.
+          + eapply nnrs_expr_type_unused_add_env;[|eauto]; tauto.
+          + specialize (IHs ((v0, Some τ0) :: l)); simpl in IHs.
+            eapply IHs; eauto.
+            intuition; destruct (remove_nin_inv H1); eauto.
+        - Case "NNRSIf"%string.
+          econstructor; intuition eauto.
+        - Case "NNRSEither"%string.
+          econstructor.
+          + eapply nnrs_expr_type_unused_add_env;[|eauto]; tauto.
+          + specialize (IHs1 ((v0, Some τl) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition.
+            destruct (remove_nin_inv H); eauto.
+          + specialize (IHs2 ((v1, Some τr) :: l)); simpl in IHs2.
+            eapply IHs2; eauto.
+            intuition.
+            destruct (remove_nin_inv H2); eauto.
+      Qed.
+
+      Lemma nnrs_stmt_type_unused_add_mdenv Γc l Γ Δc Δd s v τ:
+        (In v (domain l) \/
+         ~ In v (nnrs_stmt_free_mdenv_vars s)) ->
+        [  Γc ; Γ , Δc , l++Δd  ⊢ s ] ->
+        [  Γc ; Γ , Δc , l++(v,τ)::Δd  ⊢ s ].
+      Proof.
+        revert l Γ Δc Δd τ.
+        nnrs_stmt_cases (induction s) Case
+        ; simpl; intros l Γ Δc Δd τ inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn
+        ; try solve [econstructor; intuition eauto].
+        - Case "NNRSLetMut"%string.
+          econstructor; trivial.
+          + specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition.
+            destruct (remove_nin_inv H0); eauto.
+          + intuition eauto.
+        - Case "NNRSLetMut"%string.
+          eapply type_NNRSLetMutNotUsed.
+          + specialize (IHs1 ((v0, ⊤) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition; destruct (remove_nin_inv H0); eauto.
+          + intuition eauto.
+        - Case "NNRSAssign"%string.
+          econstructor; eauto.
+          repeat rewrite lookup_app in *
+          ; simpl in *.
+          match_option
+          ; rewrite eqq in H5; try congruence.
+          apply lookup_none_nin in eqq.
+          match_destr; unfold equiv, complement in *.
+          subst; intuition.
+      Qed.
+
+      Lemma nnrs_stmt_type_unused_add_mcenv Γc l Γ Δc Δd s v τ:
+        (In v (domain l) \/
+         ~ In v (nnrs_stmt_free_mcenv_vars s)) ->
+        [  Γc ; Γ , l++Δc , Δd  ⊢ s ] ->
+        [  Γc ; Γ , l++(v,τ)::Δc , Δd  ⊢ s ].
+      Proof.
+        revert l Γ Δc Δd τ.
+        nnrs_stmt_cases (induction s) Case
+        ; simpl; intros l Γ Δc Δd τ inn typ
+        ; invcs typ
+        ; repeat rewrite in_app_iff in inn
+        ; try solve [econstructor; intuition eauto].
+        - Case "NNRSLetMutColl"%string.
+          econstructor.
+          + specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
+            eapply IHs1; eauto.
+            intuition.
+            destruct (remove_nin_inv H0); eauto.
+          + intuition eauto.
+        - Case "NNRSPush"%string.
+          econstructor; eauto.
+          repeat rewrite lookup_app in *
+          ; simpl in *.
+          match_option
+          ; rewrite eqq in H5; try congruence.
+          apply lookup_none_nin in eqq.
+          match_destr; unfold equiv, complement in *.
+          subst; intuition.
+      Qed.
+
+    End add.
+  End unused.
+
+  Lemma nnrs_stmt_must_assign_is_free s x : nnrs_stmt_must_assign s x -> In x (nnrs_stmt_free_mdenv_vars s).
+  Proof.
+    induction s; simpl; intuition.
+    rewrite in_app_iff.
+    rewrite <- remove_in_neq by congruence.
+    tauto.
+  Qed.
+
 End TNNRS.
 
 Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_expr_type Γc Γ e τ) : nnrs.
 Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γc Γ Δc  Δd s) : nnrs.
-Notation "[ h, Γc ⊢ si ▷ τ ]" := (nnrs_type Γc si τ) : nnrs.
+Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_type Γc si τ) : nnrs.

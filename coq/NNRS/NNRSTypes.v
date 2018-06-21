@@ -16,3 +16,5 @@
 
 Require Export CommonTypes.
 Require Export TNNRS.
+Require Export TNNRSRename.
+Require Export TNNRSCrossShadow.
