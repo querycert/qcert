@@ -168,15 +168,13 @@ Section TNNRS.
         [  Γ , (x,τ)::Δc , Δd  ⊢ s₁ ]  ->
         [  (x,Some (Coll τ))::Γ, Δc , Δd  ⊢ s₂ ]  ->
         [  Γ , Δc , Δd  ⊢ NNRSLetMutColl x s₁ s₂ ]
-    | type_NNRSAssign Γ Δc Δd τ τd x e :
+    | type_NNRSAssign Γ Δc Δd τ x e :
         [ Γ ⊢ e ▷ τ ] ->
-        lookup string_dec Δd x = Some τd ->
-        τ ≤ τd -> 
+        lookup string_dec Δd x = Some τ ->
         [  Γ , Δc , Δd  ⊢ NNRSAssign x e ]
-    | type_NNRSPush Γ Δc Δd τ τd x e :
+    | type_NNRSPush Γ Δc Δd τ x e :
         [ Γ ⊢ e ▷ τ ] ->
-        lookup string_dec Δc x = Some τd ->
-        τ ≤ τd -> 
+        lookup string_dec Δc x = Some τ ->
         [  Γ , Δc , Δd  ⊢ NNRSPush x e ]
     | type_NNRSFor Γ Δc Δd τ x e₁ s₂ :
         [  Γ  ⊢ e₁ ▷ Coll τ ] -> 
@@ -625,7 +623,6 @@ Section TNNRS.
       do 3 eexists; split; try reflexivity.
       intuition.
       eapply md_bindings_type_update_first_same; eauto.
-      rewrite <- H1; trivial.
     - destruct ( typed_nnrs_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
@@ -636,7 +633,6 @@ Section TNNRS.
       eapply mc_bindings_type_update_first_same; eauto.
       apply Forall_app; trivial.
       constructor; trivial.
-      rewrite <- H1; trivial.
     - destruct ( typed_nnrs_expr_yields_typed_data typσc typσ H)
         as [d [eqq typd]].
       rewrite eqq.
@@ -1195,6 +1191,145 @@ Section TNNRS.
     rewrite <- remove_in_neq by congruence.
     tauto.
   Qed.
+
+  Lemma nnrs_expr_unused_tenv_free_env {Γc Γ e τ}:
+    [Γc; Γ ⊢ e ▷ τ] ->
+    forall x,
+      lookup equiv_dec Γ x = Some None ->
+      ~ In x (nnrs_expr_free_vars e).
+  Proof.
+    revert τ.
+    induction e; simpl
+    ; intros τ typ x eqq
+    ; invcs typ
+    ; simpl in *
+    ; repeat rewrite in_app_iff
+    ; try solve[intuition eauto].
+    - destruct (v == x); unfold equiv, complement in *
+      ; subst; intuition congruence.
+  Qed.
+
+  Lemma nnrs_expr_type_env_in_none_some {l1 Γc Γ v e τ} :
+    [Γc; l1++(v, None) :: Γ ⊢ e ▷ τ] ->
+    ~ In v (domain l1) ->
+    forall τ',
+      [Γc; l1++(v, Some τ') :: Γ ⊢ e ▷ τ].
+  Proof.
+    Hint Constructors nnrs_expr_type.
+    revert τ.
+    induction e; intros τ typ nin τ'
+    ; invcs typ; eauto.
+    econstructor.
+    repeat rewrite lookup_app in *.
+    match_destr; simpl in *.
+    match_destr.
+  Qed.
+
+  (* Move to tnnrs *)
+  Lemma nnrs_stmt_type_env_in_none_some {l1 Γc Γ Δc Δd v s} :
+    [Γc; l1++(v, None) :: Γ, Δc, Δd ⊢ s] ->
+    ~ In v (domain l1) ->
+    forall τ,
+      [Γc; l1++(v, Some τ) :: Γ, Δc, Δd ⊢ s].
+  Proof.
+    Hint Constructors nnrs_stmt_type.
+    revert l1 Γ Δc Δd.
+    nnrs_stmt_cases (induction s) Case
+    ; simpl; intros l1 Γ Δc Δd typ nin τ
+    ; invcs typ.
+    - Case "NNRSSeq"%string.
+      eauto.
+    - Case "NNRSLet"%string.
+      econstructor.
+      + apply nnrs_expr_type_env_in_none_some; eauto.
+      + destruct (v == v0); unfold equiv, complement in *.
+        * subst.
+          apply (nnrs_stmt_type_unused_remove_env Γc ((v0, Some τ0) :: l1)) in H6
+          ; simpl; try tauto.
+          apply (nnrs_stmt_type_unused_add_env Γc ((v0, Some τ0) :: l1))
+          ; simpl; try tauto.
+        * apply (IHs ((v0, Some τ0) :: l1))
+          ; simpl; intuition.
+    - Case "NNRSLetMut"%string.
+      econstructor; eauto.
+      + destruct (v == v0); unfold equiv, complement in *.
+        * subst.
+          apply (nnrs_stmt_type_unused_remove_env Γc ((v0, Some τ0) :: l1)) in H7
+          ; simpl; try tauto.
+          apply (nnrs_stmt_type_unused_add_env Γc ((v0, Some τ0) :: l1))
+          ; simpl; try tauto.
+        * apply (IHs2 ((v0, Some τ0) :: l1))
+          ; simpl; intuition.
+    - Case "NNRSLetMut"%string.
+      eapply type_NNRSLetMutNotUsed; eauto.
+      + destruct (v == v0); unfold equiv, complement in *.
+        * subst.
+          apply (nnrs_stmt_type_unused_remove_env Γc ((v0, None) :: l1)) in H6
+          ; simpl; try tauto.
+          apply (nnrs_stmt_type_unused_add_env Γc ((v0, None) :: l1))
+          ; simpl; try tauto.
+        * apply (IHs2 ((v0, None) :: l1))
+          ; simpl; intuition.
+    - Case "NNRSLetMutColl"%string.
+      econstructor; eauto.
+      + destruct (v == v0); unfold equiv, complement in *.
+        * subst.
+          apply (nnrs_stmt_type_unused_remove_env Γc ((v0, Some (Coll τ0)) :: l1)) in H6
+          ; simpl; try tauto.
+          apply (nnrs_stmt_type_unused_add_env Γc ((v0, Some (Coll τ0)) :: l1))
+          ; simpl; try tauto.
+        * apply (IHs2 ((v0, Some (Coll τ0)) :: l1))
+          ; simpl; intuition.
+    - Case "NNRSAssign"%string.
+      econstructor; eauto.
+      apply nnrs_expr_type_env_in_none_some; eauto.
+    - Case "NNRSPush"%string.
+      econstructor; eauto.
+      apply nnrs_expr_type_env_in_none_some; eauto.
+    - Case "NNRSFor"%string.
+      econstructor.
+      + apply nnrs_expr_type_env_in_none_some; eauto.
+      + destruct (v == v0); unfold equiv, complement in *.
+        * subst.
+          apply (nnrs_stmt_type_unused_remove_env Γc ((v0, Some τ0) :: l1)) in H6
+          ; simpl; try tauto.
+          apply (nnrs_stmt_type_unused_add_env Γc ((v0, Some τ0) :: l1))
+          ; simpl; try tauto.
+        * apply (IHs ((v0, Some τ0) :: l1))
+          ; simpl; intuition.
+    - Case "NNRSIf"%string.
+      econstructor; eauto.
+      apply nnrs_expr_type_env_in_none_some; eauto.
+    - Case "NNRSEither"%string.
+      econstructor.
+      + apply nnrs_expr_type_env_in_none_some; eauto.
+      + destruct (v == v0); unfold equiv, complement in *.
+        * subst.
+          apply (nnrs_stmt_type_unused_remove_env Γc ((v0, Some τl) :: l1)) in H8
+          ; simpl; try tauto.
+          apply (nnrs_stmt_type_unused_add_env Γc ((v0, Some τl) :: l1))
+          ; simpl; try tauto.
+        * apply (IHs1 ((v0, Some τl) :: l1))
+          ; simpl; intuition.
+      + destruct (v == v1); unfold equiv, complement in *.
+        * subst.
+          apply (nnrs_stmt_type_unused_remove_env Γc ((v1, Some τr) :: l1)) in H9
+          ; simpl; try tauto.
+          apply (nnrs_stmt_type_unused_add_env Γc ((v1, Some τr) :: l1))
+          ; simpl; try tauto.
+        * apply (IHs2 ((v1, Some τr) :: l1))
+          ; simpl; intuition.
+  Qed.
+
+  Lemma nnrs_stmt_type_env_cons_none_some {Γc Γ Δc Δd v s} :
+    [Γc; (v, None) :: Γ, Δc, Δd ⊢ s] ->
+    forall τ,
+      [Γc; (v, Some τ) :: Γ, Δc, Δd ⊢ s].
+  Proof.
+    intros typ.
+    apply (nnrs_stmt_type_env_in_none_some (l1:=nil)); simpl; tauto.
+  Qed.
+  
 
 End TNNRS.
 

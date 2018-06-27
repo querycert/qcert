@@ -227,93 +227,136 @@ Section TNNRCtoNNRS.
       | Term_push v => lookup equiv_dec mc v
       end.
 
-    Lemma terminate_type_inv  {Γc:tbindings} {Γ:pd_tbindings} {e τ} { term Δc Δd }:
+    Lemma terminate_type_inv  {Γc:tbindings} {Γ:pd_tbindings} {e} { term Δc Δd }:
       [ Γc ; Γ , Δc , Δd ⊢ terminate term e ] ->
-      get_terminator_type term Δc Δd = Some τ ->
-      exists τ', [ Γc ; Γ  ⊢ e ▷ τ' ] /\ τ' ≤ τ.
+      forall τ,
+        get_terminator_type term Δc Δd = Some τ ->
+        [ Γc ; Γ  ⊢ e ▷ τ].
     Proof.
-      destruct term; simpl; intros typ eqq; invcs typ; simpl in *
+      destruct term; simpl; intros typ τ eqq; invcs typ; simpl in *
       ; unfold equiv_dec, string_eqdec in *
       ; rewrite H5 in eqq; invcs eqq
       ; eauto.
     Qed.
 
-    Section counterexample.
-      Local Open Scope string.
-      
-      Example nnrc_stmt_with_weaker_nnrs_type_example : nnrc 
-        := NNRCBinop (OpNatBinary NatPlus)
-                     (NNRCConst (dnat 1))
-                     (NNRCConst (dnat 2)).
+    Lemma get_terminator_type_add_term 
+          (term:terminator)
+          τ
+          (Δc:mc_tbindings)
+          (Δd:md_tbindings) :
+      get_terminator_type term (add_term_mc term τ Δc) (add_term_md term τ Δd)
+      = Some τ.
+    Proof.
+      destruct term; simpl; match_destr; try congruence.
+    Qed.        
 
-      Example nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example
-        :=     (NNRSPush "x"
-                            (NNRSBinop (OpNatBinary NatPlus) (NNRSConst (dnat 1))
-                                          (NNRSConst (dnat 2)))).
+    Lemma terminate_type_add_term_inv {Γc:tbindings} {Γ:pd_tbindings} {e} { term} {τ} {Δc Δd } :
+      [Γc; Γ, add_term_mc term τ Δc, add_term_md term τ Δd
+                                                 ⊢ terminate term e] ->
+      [ Γc ; Γ  ⊢ e ▷ τ].
+    Proof.
+      intros typ.
+      generalize (terminate_type_inv typ); simpl.
+      rewrite get_terminator_type_add_term.
+      intuition.
+    Qed.
 
-      Example nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example_correct
-        : nnrc_stmt_to_nnrs_stmt_aux nil (Term_push "x") nnrc_stmt_with_weaker_nnrs_type_example = Some nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example.
-      Proof.
-        vm_compute; reflexivity.
-      Qed.
-
-      Example nnrs_typing_for_nnrc_with_weaker_nnrs_type_example 
-        : [ nil ; pd_tbindings_lift nil , (add_term_mc (Term_push "x") ⊤ nil) , (add_term_md (Term_push "x") ⊤ nil) ⊢ nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example ].
-      Proof.
-        unfold nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example.
-        simpl.
-        econstructor; simpl.
-        - repeat econstructor.
-        - reflexivity.
-        - apply STop.
-      Qed.
-
-      Example nnrc_typing_for_nnrc_with_weaker_nnrs_type_example 
-        : nnrc_type nil nil nnrc_stmt_with_weaker_nnrs_type_example Nat.
-      Proof.
-        unfold nnrc_type, nnrc_stmt_with_weaker_nnrs_type_example.
-        simpl.
-        econstructor; simpl
-        ; repeat econstructor.
-      Qed.
-
-      Example not_nnrc_typing_for_nnrc_with_weaker_nnrs_type_example 
-        : ~ nnrc_type nil nil nnrc_stmt_with_weaker_nnrs_type_example ⊤.
-      Proof.
-        unfold nnrc_type, nnrc_stmt_with_weaker_nnrs_type_example
-        ; simpl; intros typ.
+    Lemma tnnrc_stmt_to_nnrs_stmt_aux_some_correct_bk {fvs term s si} :
+      nnrc_stmt_to_nnrs_stmt_aux fvs term s = Some si ->
+      forall (Γc:tbindings) (Γ:tbindings) (τ:rtype) Δc Δd,
+        [ Γc ; pd_tbindings_lift Γ , (add_term_mc term τ Δc) , (add_term_md term τ Δd) ⊢ si ] ->
+        nnrc_type Γc Γ s τ.
+    Proof.
+      unfold nnrc_type.
+      Hint Resolve terminate_type.
+      Hint Constructors nnrc_core_type.
+      Hint Constructors nnrs_expr_type.
+      intros eqq Γc.
+      revert fvs term si eqq.
+      nnrc_cases (induction s) Case
+      ; simpl; intros fvs term si eqq Γ τ Δc Δd typ
+      ; repeat match_option_in eqq; invcs eqq
+      ; try apply terminate_type_add_term_inv in typ
+      ; try solve [invcs typ; eauto 3].
+      - Case "NNRCVar"%string.
         invcs typ.
-        invcs H3.
-      Qed.
+        rewrite lookup_pd_tbindings_lift in H1; simpl in H1.
+        apply some_lift in H1.
+        destruct H1 as [? ? eqq].
+        invcs eqq.
+        eauto.
+      - Case "NNRCBinop"%string.
+        apply some_lift2 in eqq0.
+        destruct eqq0 as [? [? eqq1 [eqq2 ?]]]; subst.
+        invcs typ.
+        econstructor; eauto 2.
+        + eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
+        + eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
+      - Case "NNRCUnop"%string.
+        apply some_lift in eqq0.
+        destruct eqq0 as [? eqq ?]; subst.
+        invcs typ.
+        econstructor; eauto 2.
+        eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
+      - Case "NNRCLet"%string.
+        invcs typ.
+        + econstructor; eauto.
+        + econstructor; eauto.
+          eapply IHs2; eauto.
+          simpl.
+          apply  nnrs_stmt_type_env_cons_none_some; eauto.
+      - Case "NNRCFor"%string.
+        invcs typ.
+        apply terminate_type_add_term_inv in H6.
+        invcs H6.
+        simpl in H1.
+        match_destr_in H1; try congruence.
+        invcs H1.
+        invcs H4.
+        econstructor.
+        + eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
+        + eauto.
+      - Case "NNRCIf"%string.
+        invcs typ.
+        econstructor; eauto.
+        eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
+      - Case "NNRCEither"%string.
+        invcs typ.
+        econstructor.
+        + eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
+        + eauto.
+        + eauto.
+      - Case "NNRCGroupBy"%string.
+        apply some_lift in eqq0.
+        destruct eqq0 as [? eqq ?]; subst.
+        invcs typ.
+        generalize type_NNRCGroupBy; unfold nnrc_type; simpl; intros HH.
+        apply HH; trivial.
+        eapply tnnrc_expr_to_nnrs_expr_some_correct; eauto.
+    Qed.
 
-      Example nnrc_typing_weaker_nnrs_translated_typing :
-        nnrc_stmt_to_nnrs_stmt_aux nil (Term_push "x")
-                                       nnrc_stmt_with_weaker_nnrs_type_example =
-        Some nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example
-        /\ 
-        [ nil ; pd_tbindings_lift nil , (add_term_mc (Term_push "x") ⊤ nil) , (add_term_md (Term_push "x") ⊤ nil)
-                                                                                ⊢ nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example ]
-        /\ ~ nnrc_type nil nil nnrc_stmt_with_weaker_nnrs_type_example ⊤.
-      Proof.
-        split; [ | split].
-        - apply nnrs_of_nnrc_stmt_with_weaker_nnrs_type_example_correct.
-        - apply nnrs_typing_for_nnrc_with_weaker_nnrs_type_example.
-        - apply not_nnrc_typing_for_nnrc_with_weaker_nnrs_type_example.
-      Qed.
+    Theorem tnnrc_stmt_to_nnrs_some_correct_bk {Γc:tbindings} {globals s si} :
+      nnrc_stmt_to_nnrs globals s = Some si ->
+      forall {τ:rtype},
+        [ Γc ⊢ si ▷ τ ] ->
+        nnrc_type Γc nil s τ.
+    Proof.
+      unfold nnrc_stmt_to_nnrs, nnrs_type; match_option
+      ; intros eqq1; invcs eqq1.
+      intros τ typ.
+      eapply (tnnrc_stmt_to_nnrs_stmt_aux_some_correct_bk eqq).
+      simpl; eauto.
+    Qed.
 
-    (*
-    Example nnrc_with_weaker_nnrs_type_example : nnrc 
-      := NNRCFor "x"%string (NNRCConst (dcoll (dnat 3:: dnat 4::dnat 5::nil)))
-                 nnrc_stmt_with_weaker_nnrs_type_example.
-     *)
-
-    (* Backwards is more problematic, since the type system for nnrs allows for 
-       free upcasts in a NNRSPush, whereas NNRC typing does not have
-       such a mechanism (and NNRC is not Proper with respect to subtyping, since
-       operators (such as (OpNatBinary NatPlus) are not.
-       For example, 
-       nnrc_typing_weaker_nnrs_translated_typing witnesses a counter example.      *)
-    End counterexample.
+    Theorem tnnrc_stmt_to_nnrs_some_correct {Γc:tbindings} {globals s si} :
+      nnrc_stmt_to_nnrs globals s = Some si ->
+      forall {τ:rtype},
+        nnrc_type Γc nil s τ <-> [ Γc ⊢ si ▷ τ ].
+    Proof.
+      intros; split; intros.
+      - eapply tnnrc_stmt_to_nnrs_some_correct_fw; eauto.
+      - eapply tnnrc_stmt_to_nnrs_some_correct_bk; eauto.
+    Qed.
 
   End from_stratified.
 
@@ -336,6 +379,33 @@ Section TNNRCtoNNRS.
     apply tnnrc_stmt_to_nnrs_stmt_stratified_some_correct_fw.
     apply -> stratify_preserves_types.
     trivial.
+  Qed.
+
+  Lemma tnnrc_stmt_to_nnrs_stmt_stratified_some_correct_bk {Γc:tbindings} {globals s τ} {pf} :
+    [ Γc ⊢ ` (nnrc_stmt_to_nnrs_stmt_stratified_some globals s pf) ▷ τ ] ->
+    nnrc_type Γc nil s τ.
+  Proof.
+    intros typ.
+    destruct (nnrc_stmt_to_nnrs_stmt_stratified_some globals s pf); simpl.
+    eapply tnnrc_stmt_to_nnrs_some_correct_bk; eauto.
+  Qed.
+  
+  Theorem tnnrc_to_nnrs_correct_bk {Γc:tbindings} {globals s τ} :
+    [ Γc ⊢ (nnrc_to_nnrs_top globals s) ▷ τ ] ->
+    nnrc_type Γc nil s τ.
+  Proof.
+    unfold nnrc_to_nnrs_top.
+    intros typ.
+    apply stratify_preserves_types.
+    eapply tnnrc_stmt_to_nnrs_stmt_stratified_some_correct_bk; eauto.
+  Qed.
+
+  Theorem tnnrc_to_nnrs_correct {Γc:tbindings} {globals s τ} :
+    nnrc_type Γc nil s τ <-> [ Γc ⊢ (nnrc_to_nnrs_top globals s) ▷ τ ].
+  Proof.
+    split; intros.
+    - eapply tnnrc_to_nnrs_correct_fw; eauto.
+    - eapply tnnrc_to_nnrs_correct_bk; eauto.
   Qed.
 
 End TNNRCtoNNRS.
