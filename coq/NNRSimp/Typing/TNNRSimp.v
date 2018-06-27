@@ -28,7 +28,7 @@ Require Import NNRSimpVars.
 Require Import NNRSimpEval.
 Require Import NNRSimpSem.
 Require Import NNRSimpSemEval.
-  
+
 Section TNNRSimp.
 
   (** Typing rules for NNRSimp *)
@@ -1161,7 +1161,149 @@ Section TNNRSimp.
     econstructor; eauto
     ; rewrite <- Γeqq; eauto.
   Qed.
+
+  Lemma nnrs_imp_expr_type_lookup_on_equiv {Γc Γ₁ e τ} :
+    [ Γc ; Γ₁  ⊢ e ▷ τ ] ->
+    forall Γ₂,
+      lookup_equiv_on (nnrs_imp_expr_free_vars e) Γ₁ Γ₂ ->
+      [ Γc ; Γ₂  ⊢ e ▷ τ ].
+  Proof.
+    revert Γ₁ τ.
+    induction e; intros Γ₁ τ typ Γ₂ leo
+    ; invcs typ; simpl in *; subst; econstructor; eauto 3.
+    - rewrite <- leo; simpl; tauto.
+    - eapply IHe1; eauto.
+      unfold lookup_equiv_on in *; intuition.
+    - eapply IHe2; eauto.
+      unfold lookup_equiv_on in *; intuition.
+  Qed.
   
+  Lemma nnrs_imp_stmt_type_lookup_equiv_on {Γc Γ₁ s} :
+    [ Γc ; Γ₁  ⊢ s ] ->
+    forall Γ₂,
+      lookup_equiv_on (nnrs_imp_stmt_free_vars s) Γ₁ Γ₂ ->
+      [ Γc ; Γ₂  ⊢ s ].
+  Proof.
+    revert Γ₁.
+    nnrs_imp_stmt_cases (induction s) Case
+    ; simpl
+    ; intros Γ₁ typ Γ₂ leo
+    ; invcs typ.
+    - Case "NNRSimpSeq"%string.
+      apply lookup_equiv_on_dom_app in leo.
+      econstructor; intuition eauto.
+    - Case "NNRSimpAssign"%string.
+      econstructor; eauto.
+      + eapply nnrs_imp_expr_type_lookup_on_equiv; eauto.
+        eapply lookup_equiv_on_dom_incl; eauto.
+        unfold incl; simpl; tauto.
+      + rewrite <- leo; simpl; tauto.
+    - Case "NNRSimpLet"%string.
+      apply lookup_equiv_on_dom_app in leo.
+      econstructor; intuition eauto.
+      + eapply nnrs_imp_expr_type_lookup_on_equiv; eauto.
+      + eapply IHs; eauto.
+        unfold lookup_equiv_on in *; simpl; intros.
+        match_destr.
+        apply H0.
+        apply remove_in_neq; tauto.
+    - Case "NNRSimpLet"%string.
+      simpl in leo.
+      econstructor; intuition eauto.
+      eapply IHs; eauto.
+      unfold lookup_equiv_on in *; simpl; intros.
+      match_destr.
+      apply leo.
+      apply remove_in_neq; tauto.
+    - Case "NNRSimpFor"%string.
+      apply lookup_equiv_on_dom_app in leo.
+      econstructor; intuition eauto.
+      + eapply nnrs_imp_expr_type_lookup_on_equiv; eauto.
+      + eapply IHs; eauto.
+        unfold lookup_equiv_on in *; simpl; intros.
+        match_destr.
+        apply H0.
+        apply remove_in_neq; tauto.
+    - Case "NNRSimpIf"%string.
+      apply lookup_equiv_on_dom_app in leo.
+      destruct leo as [leo1 leo2].
+      apply lookup_equiv_on_dom_app in leo2.
+      destruct leo2 as [leo2 leo3].
+      econstructor; eauto.
+      eapply nnrs_imp_expr_type_lookup_on_equiv; eauto.
+    - Case "NNRSimpEither"%string.
+      apply lookup_equiv_on_dom_app in leo.
+      destruct leo as [leo1 leo2].
+      apply lookup_equiv_on_dom_app in leo2.
+      destruct leo2 as [leo2 leo3].
+      econstructor.
+      + eapply nnrs_imp_expr_type_lookup_on_equiv; eauto.
+      + eapply IHs1; eauto.
+        unfold lookup_equiv_on in *; simpl; intros.
+        match_destr.
+        apply leo2.
+        apply remove_in_neq; tauto.
+      + eapply IHs2; eauto.
+        unfold lookup_equiv_on in *; simpl; intros.
+        match_destr.
+        apply leo3.
+        apply remove_in_neq; tauto.
+  Qed.
+
+  Lemma nnrs_imp_expr_type_unused_add Γc l Γ e v τ τo:
+    (In v (domain l) \/
+     ~ In v (nnrs_imp_expr_free_vars e)) ->
+    [  Γc ; l++(v,τ)::Γ ⊢  e ▷ τo  ] ->
+    [  Γc ; l++Γ ⊢ e ▷ τo ].
+  Proof.
+    Hint Constructors nnrs_imp_expr_type.
+    revert l Γ τo.
+    nnrs_imp_expr_cases (induction e) Case
+    ; simpl; intros ll Γ τo inn typ
+    ; invcs typ
+    ; repeat rewrite in_app_iff in inn
+    ; eauto 3.
+    - Case "NNRSimpVar"%string.
+      econstructor.
+      repeat rewrite lookup_app in *
+      ; simpl in *.
+      match_option
+      ; rewrite eqq in H1; try congruence.
+      apply lookup_none_nin in eqq.
+      match_destr_in H1; unfold equiv, complement in *.
+      subst; intuition.
+    - Case "NNRSimpBinop"%string.
+      econstructor; intuition eauto.
+  Qed.
+  
+  Lemma nnrs_imp_expr_type_unused_irrelevant Γc l Γ e v τ₁ τo:
+    (In v (domain l) \/
+     ~ In v (nnrs_imp_expr_free_vars e)) ->
+    [  Γc ; l++(v,τ₁)::Γ ⊢  e ▷ τo  ] ->
+    forall τ₂,
+      [  Γc ; l++(v,τ₂)::Γ ⊢ e ▷ τo ].
+  Proof.
+    Hint Constructors nnrs_imp_expr_type.
+
+    revert l Γ τo.
+    nnrs_imp_expr_cases (induction e) Case
+    ; simpl; intros ll Γ τo inn typ
+    ; invcs typ
+    ; repeat rewrite in_app_iff in inn
+    ; eauto 3.
+    - Case "NNRSimpVar"%string.
+      econstructor.
+      repeat rewrite lookup_app in *
+      ; simpl in *.
+      match_option
+      ; rewrite eqq in H1; try congruence.
+      apply lookup_none_nin in eqq.
+      match_destr; unfold equiv, complement in *.
+      subst; intuition.
+    - Case "NNRSimpBinop"%string.
+      econstructor; intuition eauto.
+  Qed.
+
 End TNNRSimp.
 
 Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp.
