@@ -310,13 +310,13 @@ Section TNNRSRename.
       match_destr; unfold equiv, complement in *.
       + subst.
         eapply type_NNRSLetMutNotUsed; eauto.
-        * apply (nnrs_stmt_type_unused_remove_mdenv Γc ((v, ⊤) :: l)) in H4
+        * apply (nnrs_stmt_type_unused_remove_mdenv Γc ((v, τ0) :: l)) in H4
           ; simpl; [| tauto].
-          apply (nnrs_stmt_type_unused_add_mdenv Γc ((v, ⊤) :: l)); trivial; simpl.
+          apply (nnrs_stmt_type_unused_add_mdenv Γc ((v, τ0) :: l)); trivial; simpl.
           intuition.
           destruct (remove_nin_inv H); eauto.
       + eapply type_NNRSLetMutNotUsed; eauto.
-        * specialize (IHs1 ((v0, ⊤) :: l)); simpl in IHs1.
+        * specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
           eapply IHs1; intuition.
           destruct (remove_nin_inv H); eauto.
     - Case "NNRSAssign"%string.
@@ -593,14 +593,14 @@ Section TNNRSRename.
       match_destr_in H4; unfold equiv, complement in *.
       + subst.
         eapply type_NNRSLetMutNotUsed; eauto.
-        * apply (nnrs_stmt_type_unused_add_mdenv Γc ((v, ⊤) :: l))
+        * apply (nnrs_stmt_type_unused_add_mdenv Γc ((v, τ0) :: l))
           ; simpl; try tauto.
-          apply (nnrs_stmt_type_unused_remove_mdenv Γc ((v, ⊤) :: l)) in H4
+          apply (nnrs_stmt_type_unused_remove_mdenv Γc ((v, τ0) :: l)) in H4
           ; simpl; try tauto.
           intuition.
           destruct (remove_nin_inv H); eauto.
       + eapply type_NNRSLetMutNotUsed; eauto.
-        * specialize (IHs1 ((v0, ⊤) :: l)); simpl in IHs1.
+        * specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
           eapply IHs1; intuition.
           destruct (remove_nin_inv H); eauto.
     - Case "NNRSAssign"%string.

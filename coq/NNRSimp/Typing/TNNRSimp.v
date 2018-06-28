@@ -245,10 +245,9 @@ Section TNNRSimp.
         nnrs_imp_stmt_var_usage s₂ x <> VarMayBeUsedWithoutAssignment ->
         [  (x,τ)::Γ  ⊢ s₂ ]  ->
         [  Γ  ⊢ NNRSimpLet x None s₂ ]
-    | type_NNRSimpAssign Γ τ τd x e :
+    | type_NNRSimpAssign Γ τ x e :
         [ Γ ⊢ e ▷ τ ] ->
-        lookup string_dec Γ x = Some τd ->
-        τ ≤ τd -> 
+        lookup string_dec Γ x = Some τ ->
         [  Γ   ⊢ NNRSimpAssign x e ]
     | type_NNRSimpFor Γ τ x e₁ s₂ :
         [  Γ  ⊢ e₁ ▷ Coll τ ] -> 
@@ -712,13 +711,12 @@ Section TNNRSimp.
         revert typσ.
         clear; intros typσ.
         induction typσ; simpl; [constructor | ]; intros.
-        destruct H; destruct y; destruct x0; simpl in *; subst.
+        destruct H; destruct y; destruct x1; simpl in *; subst.
         destruct (string_dec x s).
         * invcs H0.
           constructor; trivial; simpl.
           split; trivial.
-          intros ? eqq3; invcs eqq3.
-          rewrite <- H1; trivial.
+          intros ? eqq3; invcs eqq3; trivial.
         * constructor; simpl; eauto.
           apply IHtypσ; eauto.
       + unfold has_some_parts in *; rewrite Forall_forall in *; intros ? inn.

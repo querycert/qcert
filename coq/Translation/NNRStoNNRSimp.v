@@ -88,7 +88,8 @@ Section NNRStoNNRSimp.
                        (nnrs_stmt_to_nnrs_imp_stmt s₂))
        | NNRSLetMutColl v s₁ s₂ =>
          NNRSimpLet v
-                    (Some (NNRSimpConst (dcoll nil)))
+                    (* OpDistinct is used to force the collection to be a bag type *)
+                    (Some (NNRSimpUnop OpDistinct (NNRSimpConst (dcoll nil))))
                     (NNRSimpSeq
                        (nnrs_stmt_to_nnrs_imp_stmt s₁)
                        (nnrs_stmt_to_nnrs_imp_stmt s₂))

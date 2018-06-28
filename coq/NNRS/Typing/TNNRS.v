@@ -160,8 +160,8 @@ Section TNNRS.
         [  Γ , Δc , (x,τ)::Δd  ⊢ s₁ ]  ->
         [  (x,Some τ)::Γ, Δc , Δd  ⊢ s₂ ]  ->
         [  Γ , Δc , Δd  ⊢ NNRSLetMut x s₁ s₂ ]
-    | type_NNRSLetMutNotUsed Γ Δc Δd x s₁ s₂ :
-        [  Γ , Δc , (x,⊤)::Δd  ⊢ s₁ ]  ->
+    | type_NNRSLetMutNotUsed Γ Δc Δd x τ s₁ s₂ :
+        [  Γ , Δc , (x,τ)::Δd  ⊢ s₁ ]  ->
         [  (x,None)::Γ, Δc , Δd  ⊢ s₂ ]  ->
         [  Γ , Δc , Δd  ⊢ NNRSLetMut x s₁ s₂ ]
     | type_NNRSLetMutColl Γ Δc Δd τ x s₁ s₂ :
@@ -580,7 +580,7 @@ Section TNNRS.
       destruct σ''; invcs typσ''.
       do 3 eexists; split; try reflexivity.
       eauto.
-    - assert (typψdcons:md_bindings_type ((x,None)::ψd) ((x, ⊤) :: Δd)).
+    - assert (typψdcons:md_bindings_type ((x,None)::ψd) ((x, τ) :: Δd)).
       { unfold md_bindings_type in *; simpl; constructor; trivial; simpl; split; trivial.
         intros; discriminate.
       } 
@@ -977,7 +977,7 @@ Section TNNRS.
           + intuition eauto.
         - Case "NNRSLetMut"%string.
           eapply type_NNRSLetMutNotUsed.
-          + specialize (IHs1 ((v0, ⊤) :: l)); simpl in IHs1.
+          + specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
             eapply IHs1; eauto.
             intuition; destruct (remove_nin_inv H0); eauto.
           + intuition eauto.
@@ -1136,7 +1136,7 @@ Section TNNRS.
           + intuition eauto.
         - Case "NNRSLetMut"%string.
           eapply type_NNRSLetMutNotUsed.
-          + specialize (IHs1 ((v0, ⊤) :: l)); simpl in IHs1.
+          + specialize (IHs1 ((v0, τ0) :: l)); simpl in IHs1.
             eapply IHs1; eauto.
             intuition; destruct (remove_nin_inv H0); eauto.
           + intuition eauto.

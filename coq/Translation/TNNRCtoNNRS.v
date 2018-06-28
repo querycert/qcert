@@ -400,7 +400,7 @@ Section TNNRCtoNNRS.
     eapply tnnrc_stmt_to_nnrs_stmt_stratified_some_correct_bk; eauto.
   Qed.
 
-  Theorem tnnrc_to_nnrs_correct {Γc:tbindings} {globals s τ} :
+  Theorem tnnrc_to_nnrs_correct (Γc:tbindings) globals s τ :
     nnrc_type Γc nil s τ <-> [ Γc ⊢ (nnrc_to_nnrs_top globals s) ▷ τ ].
   Proof.
     split; intros.
