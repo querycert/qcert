@@ -37,7 +37,8 @@ Section NNRSimpSize.
        end.
 
     Fixpoint nnrs_imp_stmt_size (n:nnrs_imp_stmt) : nat
-    := match n with
+      := match n with
+       | NNRSimpSkip => 1
        | NNRSimpSeq s₁ s₂ => S (nnrs_imp_stmt_size s₁ + nnrs_imp_stmt_size s₂)
        | NNRSimpAssign _ e => S (nnrs_imp_expr_size e)
        | NNRSimpLet v None s => S (nnrs_imp_stmt_size s)

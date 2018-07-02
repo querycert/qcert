@@ -49,6 +49,7 @@ Section NNRSimp.
     .
 
     Inductive nnrs_imp_stmt :=
+    | NNRSimpSkip : nnrs_imp_stmt
     | NNRSimpSeq : nnrs_imp_stmt -> nnrs_imp_stmt -> nnrs_imp_stmt                    (**r sequence ([s₁; s₂]]) *)
     | NNRSimpAssign : var -> nnrs_imp_expr -> nnrs_imp_stmt                           (**r variable assignent ([$v := e]) *)
     | NNRSimpLet : var -> option nnrs_imp_expr -> nnrs_imp_stmt -> nnrs_imp_stmt (**r variable declaration ([var $v := e₁?; s₂]) *)
@@ -114,6 +115,7 @@ Section NNRSimp.
     
     Fixpoint nnrs_imp_stmtIsCore (s:nnrs_imp_stmt) : Prop :=
       match s with
+      | NNRSimpSkip => True
       | NNRSimpSeq s1 s2 =>
         nnrs_imp_stmtIsCore s1 /\ nnrs_imp_stmtIsCore s2
       | NNRSimpLet _ (Some e) s1 =>
@@ -193,6 +195,7 @@ Section NNRSimp.
         {nnrs_imp_stmtIsCore s} + {~ nnrs_imp_stmtIsCore s}.
       Proof.
         induction s; simpl.
+        - left; trivial.
         - destruct IHs1.
           + destruct IHs2; [left|right]; intuition.
           + right; intuition.
@@ -257,7 +260,8 @@ Tactic Notation "nnrs_imp_expr_cases" tactic(first) ident(c) :=
 
 Tactic Notation "nnrs_imp_stmt_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "NNRSimpSeq"%string
+  [ Case_aux c "NNRSimpSkip"%string
+  | Case_aux c "NNRSimpSeq"%string
   | Case_aux c "NNRSimpAssign"%string
   | Case_aux c "NNRSimpLet"%string
   | Case_aux c "NNRSimpFor"%string

@@ -249,6 +249,8 @@ Section TNNRStoNNRSimp.
     ; try rewrite IHs
     ; try rewrite IHs1
     ; try rewrite IHs2.
+    - Case "NNRSimpSkip"%string.
+      congruence.
     - Case "NNRSimpSeq"%string.
       match_case; intuition congruence.
     - Case "NNRSimpAssign"%string.
@@ -738,6 +740,7 @@ Section TNNRStoNNRSimp.
       ; try (match_case; intros eqq; intuition)
       ; unfold equiv_decb in *
       ; try (destruct (v0 == v); try intuition congruence).
+      - congruence.
       - rewrite in_app_iff.
         right.
          apply remove_in_neq; intuition.

@@ -85,6 +85,7 @@ Section NNRSimpEval.
              (σc:bindings) (s:nnrs_imp_stmt) 
              (σ:pd_bindings) : option (pd_bindings)
       := match s with
+         | NNRSimpSkip => Some σ
          | NNRSimpSeq s₁ s₂ =>
            olift (nnrs_imp_stmt_eval σc s₂)
                  (nnrs_imp_stmt_eval σc s₁ σ)
@@ -193,6 +194,8 @@ Section NNRSimpEval.
     Proof.
       revert σ₁ σ₂.
       nnrs_imp_stmt_cases (induction s) Case; intros σ₁ σ₂ sem; simpl in sem; repeat destr sem.
+      - Case "NNRSimpSkip".
+        invcs sem; trivial.
       - Case "NNRSimpSeq".
         apply some_olift in sem.
         destruct sem as [σ' ? ?].

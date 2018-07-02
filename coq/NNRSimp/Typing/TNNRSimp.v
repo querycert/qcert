@@ -146,6 +146,8 @@ Section TNNRSimp.
 
     Inductive nnrs_imp_stmt_type :
       pd_tbindings -> nnrs_imp_stmt -> Prop :=
+    | type_NNRSimpSkip Γ  :
+        [  Γ ⊢ NNRSimpSkip ]
     | type_NNRSimpSeq Γ s₁ s₂ :
         [  Γ ⊢ s₁ ] -> 
         [  Γ   ⊢ s₂ ]  ->
@@ -186,6 +188,7 @@ Section TNNRSimp.
   Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp.
   Notation "[ Γc ; Γ  ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp.
 
+  Hint Immediate type_NNRSimpSkip.
   Local Open Scope nnrs_imp.
   
   Definition nnrs_imp_type Γc (si:nnrs_imp) τ
@@ -347,6 +350,7 @@ Section TNNRSimp.
   Proof.
     intros typs.
     dependent induction typs; simpl; intros v neq; unfold equiv_decb, var in *.
+    - congruence.
     - specialize (IHtyps1 v)
       ; specialize (IHtyps2 v)
       ; match_destr_in neq
@@ -413,6 +417,7 @@ Section TNNRSimp.
   Proof.
     revert σ σ'.
     induction s; simpl; intros σ σ' eqq1; simpl.
+    - invcs eqq1; reflexivity.
     - apply some_olift in eqq1.
       destruct eqq1 as [? eqq1 eqq2].
       specialize (IHs1 _ _ eqq1).
@@ -532,6 +537,9 @@ Section TNNRSimp.
     intros typσc typσ hasparts enoughdefined typs.
     revert alreadydefined σ typσ hasparts enoughdefined.
     dependent induction typs; simpl; intros alreadydefined σ typσ hasparts enoughdefined.
+    - rewrite false_filter_nil.
+      + rewrite app_nil_r; eauto.
+      + intuition.
     - specialize (IHtyps1 _ _ typσ hasparts).
       cut_to IHtyps1; [ | intros ? eqq1; apply enoughdefined; rewrite eqq1; trivial].
       destruct IHtyps1 as [σ' [eqq1 [typσ' hasparts']]].
@@ -967,6 +975,7 @@ Section TNNRSimp.
     intros typσc typσ typs.
     revert σ typσ.
     dependent induction typs; simpl; intros σ typσ σ' eqq.
+    - invcs eqq; eauto.
     - apply some_olift in eqq.
       destruct eqq as [? eqq1 eqq2].
       specialize (IHtyps1 _ typσ _ eqq1).
@@ -1251,6 +1260,7 @@ Section TNNRSimp.
     rename H2 into typ.
     revert Γ₁ Γ₂ Γeqq typ.
     induction s; simpl; intros Γ₁ Γ₂ Γeqq typ
+    ; trivial
     ; invcs typ
     ; try solve [
             econstructor; trivial
@@ -1258,7 +1268,6 @@ Section TNNRSimp.
             ; first [eapply IHs | eapply IHs1 | eapply IHs2]
             ; eauto; unfold lookup_equiv; simpl; intros; match_destr
           ].
-
     econstructor; eauto
     ; rewrite <- Γeqq; eauto.
   Qed.
@@ -1290,6 +1299,8 @@ Section TNNRSimp.
     ; simpl
     ; intros Γ₁ typ Γ₂ leo
     ; invcs typ.
+    - Case "NNRSimpSkip"%string.
+      trivial.
     - Case "NNRSimpSeq"%string.
       apply lookup_equiv_on_dom_app in leo.
       econstructor; intuition eauto.

@@ -85,6 +85,8 @@ Section NNRSimpNorm.
     intros eqq Fσc.
     revert σ σ' eqq.
     nnrs_imp_stmt_cases (induction s) Case; intros  σ σ' eqq Fσ; simpl in *.
+    - Case "NNRSimpSkip".
+      invcs eqq; trivial.
     - Case "NNRSimpSeq".
       apply some_olift in eqq.
       destruct eqq as [???]; eauto.

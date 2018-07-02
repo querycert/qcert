@@ -46,6 +46,7 @@ Section NNRSimpVars.
 
     Fixpoint nnrs_imp_stmt_free_vars (s:nnrs_imp_stmt) : list var
       := match s with
+         | NNRSimpSkip => nil
          | NNRSimpSeq s₁ s₂ =>
            nnrs_imp_stmt_free_vars s₁ ++ nnrs_imp_stmt_free_vars s₂
          | NNRSimpAssign v e =>

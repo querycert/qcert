@@ -139,6 +139,8 @@ Section NNRStoNNRSimp.
     revert σ₁ σ₂ ceq.
     nnrs_imp_stmt_cases (induction s) Case
     ; simpl; intros σ₁ σ₂ ceq.
+    - Case "NNRSimpSkip"%string.
+      trivial.
     - Case "NNRSimpSeq"%string.
       generalize (IHs1 _ _ ceq)
       ; intros ceq1.

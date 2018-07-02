@@ -85,6 +85,9 @@ Section NNRSimpSem.
     Reserved Notation "[ s , σ₁ ⇓[ v <- dl ] σ₂ ]".
     
     Inductive nnrs_imp_stmt_sem : nnrs_imp_stmt -> pd_bindings -> pd_bindings -> Prop :=
+    | sem_NNRSimpSkip σ  :
+        [ NNRSimpSkip, σ ⇓ σ ]
+
     | sem_NNRSimpSeq s₁ s₂ σ₁ σ₂ σ₃  :
         [ s₁, σ₁ ⇓ σ₂ ] ->
         [ s₂, σ₂ ⇓ σ₃  ] ->
@@ -184,6 +187,8 @@ Section NNRSimpSem.
     Proof.
       revert σ₁ σ₂.
       nnrs_imp_stmt_cases (induction s) Case; intros σ₁ σ₂ sem; invcs sem.
+      - Case "NNRSimpSkip".
+        trivial.
       - Case "NNRSimpSeq".
         transitivity (domain σ₂0); eauto.
       - Case "NNRSimpAssign".

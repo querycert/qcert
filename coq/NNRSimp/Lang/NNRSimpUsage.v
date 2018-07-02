@@ -83,6 +83,7 @@ Section NNRSimpUsage.
 
   Fixpoint nnrs_imp_stmt_var_usage (s:nnrs_imp_stmt) (x:var) : VarUsage
     := match s with
+       | NNRSimpSkip => VarNotUsedAndNotAssigned
        | NNRSimpSeq s₁ s₂ =>
          match nnrs_imp_stmt_var_usage s₁ x with
          | VarMustBeAssigned => VarMustBeAssigned

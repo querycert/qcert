@@ -158,6 +158,8 @@ Section NNRSimpSemEval.
         Hint Resolve nnrs_imp_stmt_sem_env_cons_same.
 
         nnrs_imp_stmt_cases (induction s) Case; simpl; intros σ₁ σ₂ sem; repeat destr sem.
+        - Case "NNRSimpSkip".
+          invcs sem; eauto.
         - Case "NNRSimpSeq".
           apply some_olift in sem.
           destruct sem as [???].

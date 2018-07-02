@@ -486,6 +486,7 @@ Section NNRSimptoJavaScriptAst.
 
   Fixpoint nnrs_imp_stmt_to_js_ast (avoid: list string) (stmt: nnrs_imp_stmt): stat :=
     match stmt with
+    | NNRSimpSkip => stat_block []
     | NNRSimpSeq s1 s2 =>
       stat_block
         [ nnrs_imp_stmt_to_js_ast avoid s1;
