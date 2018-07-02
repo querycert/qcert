@@ -18,8 +18,9 @@ Require Export CommonRuntime.
 Require Export NNRSimp.
 Require Export NNRSimpSize.
 Require Export NNRSimpVars.
+Require Export NNRSimpUsage.
 Require Export NNRSimpEval.
 Require Export NNRSimpSem.
 Require Export NNRSimpSemEval.
 Require Export NNRSimpNorm.
-Require Import NNRSimpEq.
+Require Export NNRSimpEq.
