@@ -361,6 +361,15 @@ Section ListAdd.
     
   End Forall.
 
+  Lemma Forall_liftP_in {A} {f:A->Prop} {l} :
+    Forall (liftP f) l ->
+    forall x, In (Some x) l -> f x.
+  Proof.
+    rewrite Forall_forall; intros HH x inn.
+    specialize (HH _ inn).
+    simpl in HH; trivial.
+  Qed.
+  
   (** * Properties of [filter] *)
   
   Section Filter.

@@ -84,6 +84,22 @@ Section TNNRSimp.
                   (fst xy1) = (fst xy2)
                   /\ forall d, snd xy1 = Some d -> d ▹ snd xy2) b t.
 
+  Lemma pd_bindings_type_in_normalized {Γ σ} :
+    pd_bindings_type σ Γ ->
+    forall d,
+      In (Some d) (map snd σ) ->
+      data_normalized brand_relation_brands d.
+  Proof.
+    unfold pd_bindings_type.
+    intros typ d inn.
+    rewrite in_map_iff in inn.
+    destruct inn as [[??][? inn]]; simpl in *; subst.
+    apply (Forall2_In_l typ) in inn.
+    destruct inn as [[??][?[? dt]]]; simpl in *; subst.
+    specialize (dt _ (eq_refl _)).
+    eauto.
+  Qed.
+  
   Section typ.
     Context (Γc:tbindings).
 
@@ -355,7 +371,65 @@ Section TNNRSimp.
       destruct HH as [?[??]]; simpl; congruence.
   Defined.
 
-  (** Main lemma for the type correctness of NNNRC *)
+  
+  (* This variant does not ensure progress, but does guarantee type preservation
+      and has less hypothesis *)
+  Lemma nnrs_imp_expr_eval_preserves_types {σc Γc} {σ Γ} {e τ} :
+    bindings_type σc Γc ->
+    pd_bindings_type σ Γ ->
+    [ Γc ; Γ  ⊢ e ▷ τ ] ->
+    forall d,
+    nnrs_imp_expr_eval brand_relation_brands σc σ e = Some d ->
+    d ▹ τ.
+  Proof.
+    intros Γctyp Γtyp etyp d eqq.
+    dependent induction etyp; simpl in *.
+    - unfold tdot in *.
+      red in Γctyp.
+      assert (Γctyp':Forall2
+            (fun (x : string * rtype) (y : string * data) => fst x = fst y /\ (fun x y => data_type y x) (snd x) (snd y))
+            Γc σc).
+      {
+        apply Forall2_flip in Γctyp.
+        simpl in Γctyp.
+        revert Γctyp.
+        apply Forall2_incl; intuition.
+      }
+      destruct (Forall2_lookupr_some Γctyp' eqq)
+        as [? [eqq1 eqq2]].
+      unfold edot in H.
+      rewrite eqq1 in H; invcs H.
+      trivial.
+    - unfold id in eqq.
+      apply some_olift in eqq.
+      simpl in eqq.
+      destruct eqq as [? eqq ?]; subst.
+      destruct (Forall2_lookup_some Γtyp H
+                                    (P:=(fun xy1 xy2 => forall d : data, xy1 = Some d -> d ▹ xy2)))
+        as [?[ eqq1 ?]].
+      rewrite eqq1 in eqq; invcs eqq.
+      auto.
+    - invcs eqq; trivial.
+    - apply some_olift2 in eqq.
+      destruct eqq as [d1 [d2 d1eq [d2eq beq]]].
+      specialize (IHetyp1 Γtyp _ d1eq).
+      specialize (IHetyp2 Γtyp _ d2eq).
+      destruct (typed_binary_op_yields_typed_data _ _ _ IHetyp1 IHetyp2 H)
+        as [? [eqq1 ?]].
+      rewrite eqq1 in beq; invcs beq; trivial.
+    - apply some_olift in eqq.
+      destruct eqq as [d1 d1eq oeq].
+      specialize (IHetyp Γtyp _ d1eq).
+      destruct (typed_unary_op_yields_typed_data _ _ IHetyp H)
+        as [? [eqq1 ?]].
+      rewrite eqq1 in oeq; invcs oeq; trivial.
+    - match_option_in eqq.
+      specialize (IHetyp Γtyp _ eqq0).
+      dtype_inverter.
+      destruct (typed_group_by_nested_eval_table_yields_typed_data IHetyp g sl H)
+        as [? [eqq1 ?]].
+      rewrite eqq1 in eqq; invcs eqq; trivial.
+  Qed.
 
   Lemma typed_nnrs_imp_expr_vars_in_ctxt {Γc Γ} {e:nnrs_imp_expr} {τ} :
     [Γc; Γ ⊢ e ▷ τ] ->
@@ -983,6 +1057,97 @@ Section TNNRSimp.
         ; rewrite eqq4; simpl; eauto.
   Qed.
 
+    (* This variant does not ensure progress, but does guarantee type preservation
+      and has less hypothesis *)
+    Theorem nnrs_imp_stmt_eval_preserves_types {σc σ} {Γc Γ} (s:nnrs_imp_stmt) :
+    bindings_type σc Γc ->
+    pd_bindings_type σ Γ ->
+    [  Γc ; Γ  ⊢ s ] ->
+    forall σ',
+      nnrs_imp_stmt_eval brand_relation_brands σc s σ = Some σ' ->
+      pd_bindings_type σ' Γ.
+  Proof.
+    intros typσc typσ typs.
+    revert σ typσ.
+    dependent induction typs; simpl; intros σ typσ σ' eqq.
+    - apply some_olift in eqq.
+      destruct eqq as [? eqq1 eqq2].
+      specialize (IHtyps1 _ typσ _ eqq1).
+      specialize (IHtyps2 _ IHtyps1 _ (symmetry eqq2)).
+      trivial.
+    - apply some_olift in eqq.
+      destruct eqq as [? eqq1 eqq2].
+      apply some_lift in eqq1.
+      destruct eqq1 as [? eqq1 ?]; subst.
+      match_option_in eqq2.
+      destruct p; try discriminate.
+      invcs eqq2.
+      apply IHtyps in eqq.
+      + invcs eqq; trivial.
+      + constructor; trivial; simpl.
+        split; trivial.
+        intros ? eqq2; invcs eqq2.
+        eapply nnrs_imp_expr_eval_preserves_types; eauto.
+    - match_option_in eqq.
+       destruct p; try discriminate.
+       invcs eqq.
+       apply IHtyps in eqq0.
+      + invcs eqq0; trivial.
+      + constructor; trivial; simpl.
+        intuition; discriminate.
+    - match_option_in eqq.
+      match_option_in eqq.
+      invcs eqq.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq0; eauto.
+      clear H.
+      unfold pd_bindings_type in *.
+      induction typσ; simpl.
+      + constructor.
+      + destruct x0.
+        destruct y.
+        simpl in *.
+        destruct H as [??]; simpl in *; subst.
+        match_destr; constructor; simpl; eauto.
+        invcs eqq1.
+        split; trivial.
+        intros ? eqq1; invcs eqq1.
+        invcs H0; trivial.
+    - match_option_in eqq.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq0; eauto.
+      destruct d; try discriminate.
+      invcs eqq0; rtype_equalizer; subst.
+      revert σ typσ σ' eqq H2.
+      induction l; simpl; intros σ typσ σ' eqq eqq1.
+      + invcs eqq; trivial.
+      + match_option_in eqq.
+        invcs eqq1.
+        destruct p; try discriminate.
+        apply IHtyps in eqq0.
+        * apply IHl in eqq; trivial.
+          invcs eqq0; trivial.
+        * constructor; simpl; eauto.
+          split; trivial; intros ? eqq1; invcs eqq1; trivial.
+    - match_option_in eqq.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq0; eauto.
+      invcs eqq0.
+      destruct b; eauto.
+    - match_option_in eqq.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq0; eauto.
+      invcs eqq0; rtype_equalizer; subst
+      ; match_option_in eqq
+      ; destruct p; try discriminate
+      ; invcs eqq.
+      + eapply IHtyps1 in eqq0.
+        * invcs eqq0; trivial.
+        * econstructor; simpl; eauto.
+          split; trivial; intros ? eqq1; invcs eqq1; trivial.
+      + eapply IHtyps2 in eqq0.
+        * invcs eqq0; trivial.
+        * econstructor; simpl; eauto.
+          split; trivial; intros ? eqq1; invcs eqq1; trivial.
+  Qed.
+
+
   Lemma typed_nnrs_imp_yields_typed_data_aux {σc} {Γc} {τ} {si:nnrs_imp}:
     bindings_type σc Γc ->
     [ Γc ⊢ si ▷ τ ] ->
@@ -1052,6 +1217,32 @@ Section TNNRSimp.
     destruct H1; trivial.
     subst; eauto.
   Qed.
+
+  (* This variant does not ensure progress, but does guarantee type preservation
+      and has less hypothesis *)
+    Theorem nnrs_imp_eval_preserves_types {σc} {Γc τ} (si:nnrs_imp) :
+      bindings_type σc Γc ->
+      [ Γc ⊢ si ▷ τ ] ->
+      forall d,
+        nnrs_imp_eval brand_relation_brands σc si = Some (Some d) ->
+        d ▹ τ.
+    Proof.
+      intros bt typ d eqq.
+      destruct si as [s ret].
+      destruct typ as [ne typ].
+      assert (pd:pd_bindings_type [(ret, None)]
+                                  [(ret, τ)]).
+      { constructor; simpl; eauto.
+        intuition; discriminate.
+      } 
+      unfold nnrs_imp_eval in eqq.
+      match_option_in eqq.
+      repeat (destruct p; try discriminate).
+      invcs eqq.
+      generalize (nnrs_imp_stmt_eval_preserves_types s bt pd typ _ eqq0); intros pd2.
+      invcs pd2; simpl in *.
+      intuition eauto.
+    Qed.
   
   Theorem typed_nnrs_imp_top_yields_typed_data {σc} {Γc} {τ} {si:nnrs_imp}:
     bindings_type σc Γc ->
@@ -1081,7 +1272,22 @@ Section TNNRSimp.
     rewrite eqq; unfold id; simpl.
     eauto.
   Qed.
-  
+
+  Theorem nnrs_imp_top_eval_preserves_types {σc} {Γc τ} (si:nnrs_imp) :
+    bindings_type σc Γc ->
+    [ rec_sort Γc ⊢ si ▷ τ ] ->
+    forall d,
+      nnrs_imp_eval_top brand_relation_brands σc si = Some d ->
+      d ▹ τ.
+  Proof.
+    unfold nnrs_imp_eval_top, id.
+    intros bt typ d eqq.
+    apply some_olift in eqq.
+    destruct eqq as [? eqq1 ?]; subst.
+    eapply nnrs_imp_eval_preserves_types in eqq1; eauto.
+    apply bindings_type_sort; trivial.
+  Qed.
+
   Section sem.
     (* restates type soundness theorems in terms of the semantics.  
        This enables nicer notation :-) *)

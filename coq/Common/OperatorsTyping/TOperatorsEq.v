@@ -71,13 +71,28 @@ Section TOperatorsEq.
         rewrite (H0 x0); [reflexivity|assumption].
   Qed.
 
-  Definition tunary_op_rewrites_to {τ₁ τ₂} (u1 u2:unary_op) :=
+  Definition tunary_op_rewrites_to (u1 u2:unary_op) :=
+    forall τ₁ τ₂,
     unary_op_type u1 τ₁ τ₂ ->
-    unary_op_type u2 τ₁ τ₂ ->
+    unary_op_type u2 τ₁ τ₂ /\
     (forall (x:data),
         data_type x τ₁ ->
         (unary_op_eval brand_relation_brands u1) x
         = (unary_op_eval brand_relation_brands u2) x).
+
+  Global Instance tunary_op_rewrites_to_pre : PreOrder tunary_op_rewrites_to.
+  Proof.
+    unfold tunary_op_rewrites_to.
+    constructor; red.
+    - intuition.
+    - intros x y z Hx Hy; intros ? ? typx.
+      specialize (Hx _ _ typx).
+      destruct Hx as [typy Hx].
+      specialize (Hy _ _ typy).
+      destruct Hy as [typz Hy].
+      split; trivial; intros.
+      rewrite Hx, Hy; trivial.
+  Qed.
   
   Definition typed_binary_op τ₁ τ₂ τout := {b:binary_op|binary_op_type b τ₁ τ₂ τout}.
 
@@ -100,7 +115,8 @@ Section TOperatorsEq.
           rewrite (H0 x1 x2); try assumption; reflexivity.
   Qed.
 
-  Definition tbinary_op_rewrites_to {τ₁ τ₂ τ₃} (b1 b2:binary_op) :=
+  Definition tbinary_op_rewrites_to (b1 b2:binary_op) :=
+    forall τ₁ τ₂ τ₃,
     binary_op_type b1 τ₁ τ₂ τ₃ ->
     binary_op_type b2 τ₁ τ₂ τ₃ /\
     (forall (x1 x2:data),
@@ -109,5 +125,19 @@ Section TOperatorsEq.
         (binary_op_eval brand_relation_brands b1) x1 x2
         = (binary_op_eval brand_relation_brands b2) x1 x2).
 
+  Global Instance tbinary_op_rewrites_to_pre : PreOrder tbinary_op_rewrites_to.
+  Proof.
+    unfold tbinary_op_rewrites_to.
+    constructor; red.
+    - intuition.
+    - intros x y z Hx Hy; intros ? ? ? typx.
+      specialize (Hx _ _ _ typx).
+      destruct Hx as [typy Hx].
+      specialize (Hy _ _ _ typy).
+      destruct Hy as [typz Hy].
+      split; trivial; intros.
+      rewrite Hx, Hy; trivial.
+  Qed.
+  
 End TOperatorsEq.
 

@@ -22,3 +22,4 @@ Require Export NNRSimpEval.
 Require Export NNRSimpSem.
 Require Export NNRSimpSemEval.
 Require Export NNRSimpNorm.
+Require Import NNRSimpEq.

@@ -173,12 +173,28 @@ Section Lift.
     destruct x; simpl; auto.
   Qed.
 
+  Lemma olift2_ext {A B C : Type}
+        (f g : A -> B -> option C) (x : option A) (y: option B) :
+    (forall (a : A) (b:B), x = Some a -> y = Some b -> f a b = g a b) ->
+    olift2 f x y = olift2 g x y.
+  Proof.
+    unfold olift2; intros.
+    destruct x; destruct y; simpl; auto.
+  Qed.
+
+
   Definition rif {A} (e:A -> option bool) (a:A) : option (list A) :=
     match (e a) with
     | None => None
     | Some b =>
       if b then Some (a::nil) else Some nil
     end.
+
+  Definition liftP {A:Type} (P:A->Prop) (xo:option A) : Prop
+    := match xo with
+       | Some x => P x
+       | None => True
+       end.
 
   Definition lift2P {A B:Type} (P:A->B->Prop) (xo:option A) (yo:option B) : Prop
     := match xo, yo with

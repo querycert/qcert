@@ -205,7 +205,9 @@ MODULES = \
 	NNRSimp/Lang/NNRSimpSem \
 	NNRSimp/Lang/NNRSimpEval \
 	NNRSimp/Lang/NNRSimpSemEval \
+	NNRSimp/Lang/NNRSimpEq \
 	NNRSimp/Typing/TNNRSimp \
+	NNRSimp/Typing/TNNRSimpEq \
 	NNRSimp/NNRSimpRuntime \
 	NNRSimp/NNRSimpTypes \
 	NNRSimp/NNRSimpSystem \
