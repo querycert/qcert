@@ -595,6 +595,8 @@ let rec nnrs_imp_expr_to_sexp e : sexp =
 
 let rec nnrs_imp_stmt_to_sexp s : sexp =
   match s with
+  | NNRSimpSkip  ->
+    STerm ("NNRSimpSkip", [])
   | NNRSimpSeq (s1, s2) ->
     STerm ("NNRSimpSeq", [ nnrs_imp_stmt_to_sexp s1; nnrs_imp_stmt_to_sexp s2])
   | NNRSimpLet (v, None, s) -> STerm ("NNRSimpLet", [SString (string_of_char_list v); nnrs_imp_stmt_to_sexp s])
@@ -627,6 +629,7 @@ let rec sexp_to_nnrs_imp_expr (se:sexp) =
 
 let rec sexp_to_nnrs_imp_stmt (se:sexp) =
   match se with
+  | STerm ("NNRSimpSkip", []) -> NNRSimpSkip
   | STerm ("NNRSimpSeq", [s1; s2]) -> NNRSimpSeq (sexp_to_nnrs_imp_stmt s1, sexp_to_nnrs_imp_stmt s1)
   | STerm ("NNRSimpLet", [SString v; s]) -> NNRSimpLet (char_list_of_string v, None, sexp_to_nnrs_imp_stmt s)
   | STerm ("NNRSimpLet", [SString v; e; s]) -> NNRSimpLet (char_list_of_string v, Some (sexp_to_nnrs_imp_expr e), sexp_to_nnrs_imp_stmt s)

@@ -331,6 +331,8 @@ let rec pretty_nnrs_imp_expr p sym ff e =
 
 let rec pretty_nnrs_imp_stmt p sym ff stmt =
   match stmt with
+  | QcertCompiler.NNRSimpSkip ->
+      fprintf ff "@[<hv 0>()@;<1 0>@]"
   | QcertCompiler.NNRSimpSeq (s1, s2) ->
       fprintf ff "@[<hv 0>%a;@;<1 0>%a@]"
         (pretty_nnrs_imp_stmt 0 sym) s1
