@@ -41,7 +41,7 @@ Module QLambdaNRA(runtime:CompilerRuntime).
     := LambdaNRA.LNRAVar.
   Definition laconst : Data.qdata -> expr
     := LambdaNRA.LNRAConst.
-  Definition ltable  : String.string -> expr
+  Definition latable  : String.string -> expr
     := LambdaNRA.LNRATable.
   Definition labinop : Ops.Binary.op -> expr -> expr -> expr
     := LambdaNRA.LNRABinop.
