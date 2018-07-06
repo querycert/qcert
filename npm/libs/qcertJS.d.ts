@@ -11,8 +11,9 @@ export type SourceLanguageGroups = {
 
 export type OptimStepDescription = {name: string, description:string, lemma:string};
 
-export type OptimPhase = {name: string; optims: string[]; iter: number};
+export type OptimPhase = {name: string; optims: {[key: string]: string[]}; iter: number};
 export type OptimConfig = {language: string; phases: OptimPhase[]};
+
 export type CompilerConfig = {
     source:Language, /* Source language */
     target:Language, /* Target language */
@@ -42,7 +43,7 @@ export type Result = {
 /**  Returns the set of languages known by the compiler, grouped into phases */
 export declare function languages(): SourceLanguageGroups;
 
-export declare function optimList():{optims:{language:{name:Language, modulebase:string}, optims:OptimStepDescription[]}[]};
+export declare function optimList():{optims:{language:{name:Language, modulebase:string}, optims:{[key: string]: OptimStepDescription[]}}[]};
 
 /**
  * Derives a default path between the arguments

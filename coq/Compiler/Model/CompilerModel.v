@@ -36,6 +36,7 @@ Require Import cNRAEnv.
 Require Import NRAEnv.
 Require Import DNNRC.
 Require Import tDNNRC.
+Require Import NNRSimp.
 
 Set Typeclasses Axioms Are Instances.
 
@@ -54,6 +55,9 @@ Module Type CompilerModel.
   Axiom compiler_model_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
+  Axiom compiler_model_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
+  Axiom compiler_model_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
+  Axiom compiler_model_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
   Axiom compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
   Axiom compiler_model_foreign_data_typing : foreign_data_typing.
 End CompilerModel.
@@ -89,6 +93,12 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     :=  model.compiler_model_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
     :=  model.compiler_model_nnrc_optimizer_logger.
+  Definition compiler_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr
+    :=  model.compiler_model_nnrs_imp_expr_optimizer_logger.
+  Definition compiler_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt
+    :=  model.compiler_model_nnrs_imp_stmt_optimizer_logger.
+  Definition compiler_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp
+    :=  model.compiler_model_nnrs_imp_optimizer_logger.
   Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string  (dnnrc_typed)
     :=  model.compiler_model_dnnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing

@@ -31,6 +31,27 @@ val nrc_log_endPass : nrc_logger_token_type -> 'a -> nrc_logger_token_type
 
 val nrc_set_trace : (Obj.t->sexp) -> string -> unit
 
+val nnrs_imp_expr_log_startPass : string -> 'a -> nnrs_imp_expr_logger_token_type
+val nnrs_imp_expr_log_step : nnrs_imp_expr_logger_token_type -> string -> 'a -> 'a -> nnrs_imp_expr_logger_token_type
+val nnrs_imp_expr_log_endPass : nnrs_imp_expr_logger_token_type -> 'a -> nnrs_imp_expr_logger_token_type
+
+val nnrs_imp_expr_set_trace : (Obj.t->sexp) -> string -> unit
+
+val nnrs_imp_stmt_log_startPass : string -> 'a -> nnrs_imp_stmt_logger_token_type
+val nnrs_imp_stmt_log_step : nnrs_imp_stmt_logger_token_type -> string -> 'a -> 'a -> nnrs_imp_stmt_logger_token_type
+val nnrs_imp_stmt_log_endPass : nnrs_imp_stmt_logger_token_type -> 'a -> nnrs_imp_stmt_logger_token_type
+
+val nnrs_imp_stmt_set_trace : (Obj.t->sexp) -> string -> unit
+
+val nnrs_imp_log_startPass : string -> 'a -> nnrs_imp_logger_token_type
+val nnrs_imp_log_step : nnrs_imp_logger_token_type -> string -> 'a -> 'a -> nnrs_imp_logger_token_type
+val nnrs_imp_log_endPass : nnrs_imp_logger_token_type -> 'a -> nnrs_imp_logger_token_type
+
+val nnrs_imp_set_trace : (Obj.t->sexp) -> string -> unit
+
+val nnrs_imp_all_set_trace : (Obj.t->sexp) -> (Obj.t->sexp) -> (Obj.t->sexp) -> string -> unit
+
+  
 val dnrc_log_startPass : string -> 'a -> dnrc_logger_token_type
 val dnrc_log_step : dnrc_logger_token_type -> string -> 'a -> 'a -> dnrc_logger_token_type
 val dnrc_log_endPass : dnrc_logger_token_type -> 'a -> dnrc_logger_token_type

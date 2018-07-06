@@ -70,8 +70,7 @@ let set_stat_all gconf () = gconf.gconf_stat_all <- true
 let set_stat_tree gconf () = gconf.gconf_stat_tree <- true
 let set_optim_config_file gconf file = gconf.gconf_optim_config_file <- Some file
 let set_emit_optim_config gconf () = gconf.gconf_emit_optim_config <- true
-let set_optims gconf optims = gconf.gconf_optim_config <- (optim_conf_from_ocaml_conf optims)
-let set_optim gconf optim = gconf.gconf_optim_config <- gconf.gconf_optim_config@[optim_phases_config_from_ocaml_conf optim]
+let set_optims gconf optims = gconf.gconf_optim_config <- optims
 
 let set_link_js_runtime gconf () = PrettyCommon.set_link_js_runtime gconf.gconf_pretty_config ()
 let set_prefix gconf prefix = gconf.gconf_prefix <- prefix

@@ -232,20 +232,7 @@ let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
   { res_file = fout; res_lang = language_name; res_content = string stats; }
 
 (* Optim config *)
-let data_of_optim_phase optim_phase =
-  let phase_name = fst (fst optim_phase) in
-  let phase_optims = List.map QData.dstring (snd (fst optim_phase)) in
-  let phase_iter = snd optim_phase in
-  QData.drec [(Util.char_list_of_string "name", QData.dstring phase_name);
-	      (Util.char_list_of_string "optims", QData.dcoll phase_optims);
-	      (Util.char_list_of_string "iter", QData.dnat phase_iter);]
-  
-let data_of_optim_language optim_lang =
-  let language_name = QcertCompiler.name_of_language (fst optim_lang) in
-  let optim_phases = List.map data_of_optim_phase (snd optim_lang) in
-  QData.drec [(Util.char_list_of_string "language", QData.dstring language_name);
-	      (Util.char_list_of_string "phases", QData.dcoll optim_phases);]
-let data_of_optim_config (optim_config:QcertCompiler.optim_config) =
+let json_of_optim_config (optim_config:QcertCompiler.optim_config) =
   let optim_config =
     if optim_config = []
     then
@@ -253,13 +240,12 @@ let data_of_optim_config (optim_config:QcertCompiler.optim_config) =
     else
       optim_config
   in
-  let optim_languages = List.map data_of_optim_language optim_config in
-  QData.dcoll optim_languages
+  QDriver.optim_config_to_json optim_config
 let emit_optim_config optim_config dir file_name =
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_optim.json" in
-  let optims_data = data_of_optim_config optim_config in
-  let optims = Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") optims_data) in
+  let optims_data = json_of_optim_config optim_config in
+  let optims = Util.string_of_char_list (QData.json_to_string optims_data) in
   { res_file = fout; res_lang = "json"; res_content = optims; }
     
 (* Main *)

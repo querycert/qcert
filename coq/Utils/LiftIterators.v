@@ -402,5 +402,55 @@ Section LiftIterators.
     Qed.
   End lift_flatten.
 
+  Section lift_err.
+
+    Definition lift_err {A E B} (f:A->B) (a:E+A) : E+B
+      := match a with
+         | inl e => inl e
+         | inr a' => inr (f a')
+         end.
+    
+    Fixpoint lift_err_map {A E B} (f:A->E+B) (l:list A) : E + list B
+      := match l with
+         | nil => inr nil
+         | x::t =>
+           match f x with
+           | inl e => inl e
+           | inr x' =>
+             lift_err (fun t' => x' :: t') (lift_err_map f t)
+           end
+         end.
+    
+    Lemma lift_err_map_map {A B E C} (f:B->E+C) (g:A->B) (l:list A) :
+      lift_err_map f (map g l) = lift_err_map (fun x => f (g x)) l.
+    Proof.
+      induction l; simpl; trivial.
+      rewrite IHl; trivial.
+    Qed.
+
+    Lemma lift_err_map_inr {A E} (l:list A) :
+      lift_err_map (@inr E A) l = inr l.
+    Proof.
+      induction l; simpl; trivial.
+      rewrite IHl; trivial.
+    Qed.
+
+    Lemma lift_err_map_ext  {A E B} (f g:A->E+B) (l:list A) :
+      (forall x, In x l -> f x = g x) ->
+      lift_err_map f l = lift_err_map g l.
+    Proof.
+      intros eqq.
+      induction l; simpl; trivial.
+      rewrite eqq, IHl; simpl in *; eauto.
+    Qed.
+
+    Lemma lift_err_map_eta  {A E B} (f:A->E+B) (l:list A) :
+      lift_err_map (fun x => f x) l = lift_err_map f l.
+    Proof.
+      apply lift_err_map_ext; trivial.
+    Qed.
+
+  End lift_err.
+
 End LiftIterators.
 

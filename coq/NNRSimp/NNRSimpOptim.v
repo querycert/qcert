@@ -14,25 +14,6 @@
  * limitations under the License.
  *)
 
-(* This module contains the implementation for the optimization logger *)
+Require Export NNRSimpOptimizerEngine.
+Require Export NNRSimpOptimizer.
 
-open SExp
-open AstsToSExp
-
-let logger_nra_to_sexp exp
-  = nraenv_to_sexp (Obj.magic exp)
-  
-let logger_nrc_to_sexp exp
-  = nnrc_to_sexp (Obj.magic exp)
-
-let logger_nnrs_imp_expr_to_sexp exp
-  = nnrs_imp_expr_to_sexp (Obj.magic exp)
-
-let logger_nnrs_imp_stmt_to_sexp exp
-  = nnrs_imp_stmt_to_sexp (Obj.magic exp)
-
-let logger_nnrs_imp_to_sexp exp
-  = nnrs_imp_to_sexp (Obj.magic exp)
-
-let logger_dnrc_to_sexp exp
-  = SString "DNRC->SEXP not yet implemented"

@@ -232,40 +232,8 @@ let build_input format h input =
 let build_output h output =
   QData.json_to_qdata h output
 
-let build_phase_config j =
-  begin match j with
-  | QcertCompiler.Jobject r ->
-      let phase_name = get_field_string "name" r in
-      let phase_iter = int_of_float (get_field_int "iter" r) in
-      let phase_optims = get_field_string_array "optims" r in
-      { optim_phase_name = phase_name;
-	optim_phase_iter = phase_iter;
-	optim_phase_optims = phase_optims; }
-  | _ ->
-      raise (Qcert_Error "Ill-formed language optim config")
-  end
-let build_phases_config j =
-  begin match j with
-  | QcertCompiler.Jarray l ->
-      List.map build_phase_config l
-  | _ ->
-      raise (Qcert_Error "Illed formed phase optim configuration")
-  end
-
-let build_language_config j =
-  begin match j with
-  | QcertCompiler.Jobject r ->
-      let language_name = get_field_string "language" r in
-      let phases = build_phases_config (get_field "phases" r) in
-      { optim_language_name = language_name;
-	optim_phases = phases; }
-  | _ ->
-      raise (Qcert_Error "Ill-formed language optim config")
-  end
 let build_optim_config j =
-  begin match j with
-  | QcertCompiler.Jarray l ->
-      List.map build_language_config l
-  | _ ->
-      raise (Qcert_Error "Illed formed optim configuration")
-  end
+  match QDriver.json_to_optim_config j with
+  | QcertCompiler.Inl e -> raise (Qcert_Error (Util.string_of_char_list e))
+  | QcertCompiler.Inr oc -> oc
+  

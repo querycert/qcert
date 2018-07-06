@@ -43,7 +43,7 @@ let map_array_gen gconf f o =
 (* Optim. configuration support   *)
 (**********************************)
 
-let optim_config_from_json s : optim_config =
+let optim_config_from_json s : QDriver.optim_config =
   let optim_json = ParseString.parse_json_from_string s in
   DataUtil.build_optim_config optim_json
 
@@ -192,52 +192,24 @@ let json_of_source_to_target_path j =
     val path = Js.def (wrap_all wrap path)
   end
 
-let json_of_optim x =
-  Js.string (Util.string_of_char_list x)
+let rec unsafe_json_to_js (j:QData.json) =
+  match j with
+  | QcertCompiler.Jnil -> Js.Unsafe.inject (Js.null)
+  | QcertCompiler.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
+  | QcertCompiler.Jbool b -> Js.Unsafe.inject (Js.bool b)
+  | QcertCompiler.Jstring str -> Js.Unsafe.inject (Js.string (Util.string_of_char_list str))
+  | QcertCompiler.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
+  | QcertCompiler.Jobject l ->
+     Js.Unsafe.inject (Js.Unsafe.obj (Array.of_list (List.map (fun (str,y) -> ((Util.string_of_char_list str, unsafe_json_to_js y))) l)))
+  
 
-let js_of_optim_step_list {QcertCompiler.optim_step_name; QcertCompiler.optim_step_description; QcertCompiler.optim_step_lemma} =
+let json_of_optim_list() = unsafe_json_to_js QDriver.optim_config_list_to_json
+
+let json_of_optim_default() =
   object%js
-    val name = Js.string (Util.string_of_char_list optim_step_name)
-    val description = Js.string (Util.string_of_char_list optim_step_description)
-    val lemma = Js.string (Util.string_of_char_list optim_step_lemma)
+    val optims = unsafe_json_to_js QDriver.optim_config_default_to_json
   end
-
-let json_of_optim_list () =
-  let ocl = QDriver.optim_config_list in
-  let wrap (QcertCompiler.ExistT (x, (optim_module_name, y))) =
-    object%js
-      val language =
-	object%js
-	  val name = Js.string (name_of_language x)
-	  val modulebase = Js.string (Util.string_of_char_list optim_module_name)
-	end
-      val optims = Js.def (wrap_all js_of_optim_step_list y)
-    end
-  in
-  object%js
-    val optims = Js.def (wrap_all wrap ocl)
-  end
-
-let js_of_optim_phase x =
-  let ((name,optim_list), iter) = x in
-  object%js
-    val name = Js.string (Util.string_of_char_list name)
-    val optims = Js.def (wrap_all json_of_optim optim_list)
-    val iter = Js.number_of_float (float_of_int iter)
-  end
-
-let json_of_optim_default () =
-  let ocd = QDriver.optim_config_default in
-  let wrap (x,y) =
-    object%js
-      val language = Js.string (name_of_language x)
-      val phases = Js.def (wrap_all js_of_optim_phase y)
-    end
-  in
-  object%js
-    val optims = Js.def (wrap_all wrap ocd)
-  end
-
+  
 let qcert_compile input =
   begin try
     let gconf =

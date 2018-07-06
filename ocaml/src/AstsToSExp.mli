@@ -49,6 +49,8 @@ val sexp_to_nnrs : sexp -> QLang.nnrs
 val nnrs_to_sexp : QLang.nnrs -> sexp
 
 val sexp_to_nnrs_imp : sexp -> QLang.nnrs_imp
+val nnrs_imp_expr_to_sexp : QLang.nnrs_imp_expr -> sexp
+val nnrs_imp_stmt_to_sexp : QLang.nnrs_imp_stmt -> sexp
 val nnrs_imp_to_sexp : QLang.nnrs_imp -> sexp
 
 val sexp_to_nnrcmr : sexp -> QLang.nnrcmr

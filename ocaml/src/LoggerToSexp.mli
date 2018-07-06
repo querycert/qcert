@@ -20,4 +20,7 @@ open SExp
    
 val logger_nra_to_sexp : Obj.t -> sexp
 val logger_nrc_to_sexp : Obj.t -> sexp
+val logger_nnrs_imp_expr_to_sexp : Obj.t -> sexp
+val logger_nnrs_imp_stmt_to_sexp : Obj.t -> sexp
+val logger_nnrs_imp_to_sexp : Obj.t -> sexp
 val logger_dnrc_to_sexp : Obj.t -> sexp

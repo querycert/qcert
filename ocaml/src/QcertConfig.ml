@@ -52,7 +52,7 @@ type global_config = {
     mutable gconf_stat_tree : bool;
     mutable gconf_optim_config_file : string option;
     mutable gconf_emit_optim_config : bool;
-    mutable gconf_optim_config : QcertCompiler.optim_config;
+    mutable gconf_optim_config : QDriver.optim_config;
     mutable gconf_prefix : string;
   }
 
@@ -82,33 +82,14 @@ let parse_io_kind gconf =
   end
     
 (* Optimization support *)
-let optim_phase_from_ocaml_conf (gp: optim_phase)
-    : (char list * char list list) * int =
-  let phase_name = Util.char_list_of_string gp.optim_phase_name in
-  let phase_iter = gp.optim_phase_iter in
-  let phase_list = List.map Util.char_list_of_string gp.optim_phase_optims in
-  ((phase_name, phase_list),phase_iter)
-    
-let optim_phases_config_from_ocaml_conf (gpc: optim_language)
-    : QcertCompiler.language * QcertCompiler.optim_phases_config =
-  let language_name =
-    QcertCompiler.language_of_name_case_sensitive
-      (Util.char_list_of_string gpc.optim_language_name)
-  in
-  let optim_phases = List.map optim_phase_from_ocaml_conf gpc.optim_phases in
-  (language_name,optim_phases)
-
-let optim_conf_from_ocaml_conf (gc:optim_config) : QcertCompiler.optim_config =
-  List.map optim_phases_config_from_ocaml_conf gc
 
 let complete_configuration gconf =
   let _optim_config =
     begin match gconf.gconf_optim_config_file with
     | Some f ->
 	let optim_json = ParseFile.parse_json_from_file f in
-	let caml_optim_conf = build_optim_config optim_json in
-	let coq_optim_conf = optim_conf_from_ocaml_conf caml_optim_conf in
-	gconf.gconf_optim_config <- coq_optim_conf
+	let optim_conf = build_optim_config optim_json in
+	gconf.gconf_optim_config <- optim_conf
     | None -> ()
     end
   in

@@ -35,6 +35,7 @@ Require Import cNRAEnv.
 Require Import NRAEnv.
 Require Import DNNRC.
 Require Import tDNNRC.
+Require Import NNRSimp.
 
 Set Typeclasses Axioms Are Instances.
 
@@ -54,6 +55,9 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_nnrc_optimizer_logger : optimizer_logger string nnrc.
+  Axiom compiler_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
+  Axiom compiler_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
+  Axiom compiler_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
   Axiom compiler_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
   Axiom compiler_foreign_data_typing : foreign_data_typing.
 End CompilerRuntime.

@@ -35,6 +35,7 @@ Require Import String.
 Require Import cNRAEnv.
 Require Import NRAEnv.
 Require Import cNNRC.
+Require Import NNRSimp.
 Require Import DNNRCBase.
 Require Import tDNNRC.
 Require Import Dataframe.
@@ -368,6 +369,12 @@ Existing Instance silent_optimizer_logger.
       := silent_optimizer_logger string nraenv.
     Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
       := silent_optimizer_logger string nnrc.
+    Definition compiler_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr
+      := silent_optimizer_logger string nnrs_imp_expr.
+    Definition compiler_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt
+      := silent_optimizer_logger string nnrs_imp_stmt.
+    Definition compiler_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp
+      := silent_optimizer_logger string nnrs_imp.
     Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc_base _ (type_annotation unit) dataframe)
       := silent_optimizer_logger string (@dnnrc_base _ (type_annotation unit) dataframe).
     Definition compiler_foreign_data_typing : foreign_data_typing
@@ -411,6 +418,12 @@ Existing Instance silent_optimizer_logger.
       := silent_optimizer_logger string nraenv.
     Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
       := silent_optimizer_logger string nnrc.
+    Definition compiler_model_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr
+      := silent_optimizer_logger string nnrs_imp_expr.
+    Definition compiler_model_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt
+      := silent_optimizer_logger string nnrs_imp_stmt.
+    Definition compiler_model_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp
+      := silent_optimizer_logger string nnrs_imp.
     Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc_base _ (type_annotation unit) dataframe)
       := silent_optimizer_logger string (@dnnrc_base _ (type_annotation unit) dataframe).
     Definition compiler_model_foreign_data_typing : foreign_data_typing

@@ -87,9 +87,11 @@ Require Import tDNNRCtoSparkDF.
 (* Optimizers *)
 Require Import NRAEnvOptim.
 Require Import NNRCOptim.
+Require Import NNRSimpOptim.
 Require Import NNRCMROptim.
 Require Import tDNNRCOptim.
 Require Import OptimizerLogger.
+
 
 (* Foreign Datatypes Support *)
 Require Import ForeignToReduceOps.
@@ -123,6 +125,9 @@ Section CompCorrectness.
   Context {ftyping: foreign_typing}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
   Context {nnrc_logger:optimizer_logger string nnrc}.
+  Context {nnrs_imp_expr_logger:optimizer_logger string nnrs_imp_expr}.
+  Context {nnrs_imp_stmt_logger:optimizer_logger string nnrs_imp_stmt}.
+  Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
   Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
   Context {ftojs:foreign_to_javascript}.
   Context {ftoajs:foreign_to_ajavascript}.
@@ -185,9 +190,10 @@ Section CompCorrectness.
     | Dv_dnnrc_to_dnnrc_typed _ dv => False /\ driver_correct_dnnrc_typed dv
     end.
 
-  Definition driver_correct_nnrs_imp (dv: nnrs_imp_driver) :=
+  Fixpoint driver_correct_nnrs_imp (dv: nnrs_imp_driver) :=
     match dv with
     | Dv_nnrs_imp_stop => True
+    | Dv_nnrs_imp_optim _ dv => False /\ driver_correct_nnrs_imp dv
     | Dv_nnrs_imp_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 
@@ -465,6 +471,49 @@ Section CompCorrectness.
     | (_, _) => False
     end.
 
+    Lemma correct_driver_succeeds_nnrs_imp:
+      forall dv, driver_correct (Dv_nnrs_imp dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      unfold compile in H0.
+      revert q H0.
+      induction dv; simpl in *; intuition; subst; eauto.
+    Qed.
+
+    Lemma correct_driver_succeeds_nnrs:
+      forall dv, driver_correct (Dv_nnrs dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_nnrs dv) (Q_nnrs q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *.
+      - contradiction.
+      - destruct H as [_ H].
+        generalize (correct_driver_succeeds_nnrs_imp n H (nnrs_to_nnrs_imp q)).
+        rewrite Forall_forall; eauto.
+    Qed.
+
+    Lemma correct_driver_succeeds_nnrs_core:
+      forall dv, driver_correct (Dv_nnrs_core dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_nnrs_core dv) (Q_nnrs_core q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; try contradiction.
+      destruct n; simpl in *; intuition; subst; simpl; trivial.
+      generalize (correct_driver_succeeds_nnrs_imp n H3  (nnrs_to_nnrs_imp (nnrs_core_to_nnrs q))).
+        rewrite Forall_forall; eauto.
+    Qed.
+
     Lemma correct_driver_succeeds_cnd:
       (forall dv, driver_correct (Dv_camp dv)
                   -> (forall q, Forall query_not_error
@@ -523,11 +572,13 @@ Section CompCorrectness.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nraenv_to_nraenv_core q));
         rewrite Forall_forall in H; auto.
-      - unfold driver_correct_nnrs_core in H.
+      - destruct H as [_ H].
+        unfold driver_correct_nnrs_core in H.
+        destruct H1; intros; subst; simpl; trivial.
         destruct n; simpl in *; intuition; subst; simpl; trivial.
-        red in H3.
         destruct n; simpl in *; intuition; subst; simpl; trivial.
-        destruct n; simpl in *; intuition.
+        generalize (correct_driver_succeeds_nnrs_imp n H3  (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l (proj1_sig q)))).
+        rewrite Forall_forall; eauto.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nnrc_core_to_nnrc q));
         rewrite Forall_forall in H; auto.
@@ -537,6 +588,9 @@ Section CompCorrectness.
       - 
         destruct n; simpl in *; intuition; subst; simpl; trivial.
         destruct n; simpl in *; intuition; subst; simpl; trivial.
+(*        generalize (correct_driver_succeeds_nnrs_imp n H4 (nnrs_imp_optim o (nnrs_to_nnrs_imp (nnrc_to_nnrs l q)))).
+        rewrite Forall_forall; eauto.
+*)
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
@@ -687,47 +741,6 @@ Section CompCorrectness.
       rewrite Forall_forall in H1; auto.
     Qed.
 
-    Lemma correct_driver_succeeds_nnrs_imp:
-      forall dv, driver_correct (Dv_nnrs_imp dv) ->
-                 (forall q, Forall query_not_error
-                                   (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *.
-      - contradiction.
-      - elim H; contradiction.
-    Qed.
-
-    Lemma correct_driver_succeeds_nnrs:
-      forall dv, driver_correct (Dv_nnrs dv) ->
-                 (forall q, Forall query_not_error
-                                   (compile (Dv_nnrs dv) (Q_nnrs q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *.
-      - contradiction.
-      - destruct n; intuition; subst; simpl in *; tauto.
-    Qed.
-
-    Lemma correct_driver_succeeds_nnrs_core:
-      forall dv, driver_correct (Dv_nnrs_core dv) ->
-                 (forall q, Forall query_not_error
-                                   (compile (Dv_nnrs_core dv) (Q_nnrs_core q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *; try contradiction.
-      destruct n; simpl in *; intuition; subst; simpl; trivial.
-      destruct n; intuition; subst; simpl in *; tauto.
-    Qed.
 
     Lemma correct_driver_succeeds_nra:
       forall dv, driver_correct (Dv_nra dv) ->
@@ -1279,6 +1292,36 @@ Section CompCorrectness.
       trivial_same_query.
     Qed.
 
+    Lemma correct_driver_preserves_eval_nnrs_imp:
+      forall dv, driver_correct (Dv_nnrs_imp dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nnrs_imp q))
+                                   (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      revert q x H0.
+      induction dv; simpl in *; intuition; subst; simpl
+      ; try solve[trivial_same_query; reflexivity].
+    Qed.
+
+    Lemma correct_driver_preserves_eval_nnrs:
+      forall dv, driver_correct (Dv_nnrs dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nnrs q))
+                                   (compile (Dv_nnrs dv) (Q_nnrs q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl| ].
+      - trivial_same_query.
+        reflexivity.
+      - destruct dv; simpl in *.
+        + contradiction.
+        + destruct n; simpl in *; intuition.
+          subst; simpl.
+          apply nnrs_to_nnrs_imp_preserves_eval.      
+    Qed.
+
     Lemma correct_driver_preserves_eval_cnd:
       (forall dv, driver_correct (Dv_camp dv)
                   -> (forall q, Forall (query_preserves_eval (Q_camp q))
@@ -1398,13 +1441,14 @@ Section CompCorrectness.
         clear H2 H.
         apply nraenv_to_nraenv_core_preserves_eval.
       (* cNNRC to cNNRS arrow *)
-      - destruct H.
+      - destruct H as [_ H].
         destruct n; simpl in *; intuition
         ; try contradiction; subst; simpl
         ; try apply nnrc_core_to_nnrs_core_preserves_eval.
         destruct n; simpl in *; intuition; subst.
-        + apply nnrc_core_to_nnrs_imp_preserves_eval.
-        + destruct n; simpl in *; tauto.
+        induction n; simpl in *; intuition; subst
+        ; try apply (nnrc_core_to_nnrs_imp_preserves_eval)
+        ; eauto 2.
       (* cNNRC to NNRC arrow *)
       - elim H1; intros; clear H1.
         rewrite <- H0; simpl; trivial_same_query.
@@ -1610,39 +1654,7 @@ Section CompCorrectness.
       auto.
     Qed.
 
-    Lemma correct_driver_preserves_eval_nnrs_imp:
-      forall dv, driver_correct (Dv_nnrs_imp dv) ->
-                 (forall q, Forall (query_preserves_eval (Q_nnrs_imp q))
-                                   (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl| ].
-      - trivial_same_query.
-        reflexivity.
-      - destruct dv; simpl in *.
-        + contradiction.
-        + elim H; contradiction.
-    Qed.
 
-    Lemma correct_driver_preserves_eval_nnrs:
-      forall dv, driver_correct (Dv_nnrs dv) ->
-                 (forall q, Forall (query_preserves_eval (Q_nnrs q))
-                                   (compile (Dv_nnrs dv) (Q_nnrs q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl| ].
-      - trivial_same_query.
-        reflexivity.
-      - destruct dv; simpl in *.
-        + contradiction.
-        + destruct n; simpl in *; intuition.
-          subst; simpl.
-          apply nnrs_to_nnrs_imp_preserves_eval.      
-    Qed.
 
 
     Lemma correct_driver_preserves_eval_nnrs_core:
@@ -1660,8 +1672,8 @@ Section CompCorrectness.
         destruct n; simpl in *; intuition; subst.
         + trivial_same_query; try reflexivity.
         + trivial_same_query; try reflexivity.
-        + apply nnrs_to_nnrs_imp_preserves_eval.
-        + destruct n; simpl in *; try tauto.
+        + destruct n; simpl in *; intuition; subst.
+          apply nnrs_to_nnrs_imp_preserves_eval.
     Qed.
 
     Lemma correct_driver_preserves_eval_nnrcmr:

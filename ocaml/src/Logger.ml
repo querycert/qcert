@@ -152,6 +152,186 @@ let nrc_log_endPass tok output =
   else
     tok
 
+(* nnrs_imp logger *)  
+let nnrs_imp_expr_trace = ref LOG_NONE
+let nnrs_imp_expr_set_trace conv s = nnrs_imp_expr_trace := (logger_verbosity_of_string conv s)
+
+let nnrs_imp_expr_log_startPass name input =
+  if !nnrs_imp_expr_trace != LOG_NONE
+  then
+    (begin
+	match !nnrs_imp_expr_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_string "starting nnrs_imp_expr optimization pass: "; print_endline name
+	| LOG_VERBOSE_SEXP conv -> print_string ("(phase \"nnrs_imp_expr\" \""^name^"\"")
+	| _ -> ()
+    end;
+     name)
+  else
+    name
+  
+let nnrs_imp_expr_log_step tok name input output =
+  if !nnrs_imp_expr_trace != LOG_NONE
+  then
+    begin
+     if (input == output)
+      then () (* (print_string "skipping optimization: "; print_endline name) *)
+      else
+	begin
+	  match !nnrs_imp_expr_trace with
+	  | LOG_NAMES ->
+	     (print_string "running nnrs_imp_expr optimization: "; print_endline name) ;
+	  | LOG_PHASES_AND_NAMES ->
+	     (print_string "  running nnrs_imp_expr optimization: "; print_endline name) ;
+	  | LOG_VERBOSE_SEXP conv ->
+	     begin
+	       let sexp_input = conv (Obj.magic input) in
+	       let sexp_output = conv (Obj.magic output) in
+	       let sexp_opt = STerm ("opt", [SString name; sexp_input; sexp_output]) in
+	       print_endline ""; print_string ("  " ^ (sexp_to_string sexp_opt))
+	     end
+	  | _ -> ()
+	end;
+     tok
+    end
+  else
+    tok
+
+let nnrs_imp_expr_log_endPass tok output =
+  if !nnrs_imp_expr_trace != LOG_NONE
+  then
+    (begin
+	match !nnrs_imp_expr_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_endline "ending nnrs_imp_expr optimization pass: "
+	| LOG_VERBOSE_SEXP conv -> print_endline ")"
+	| _ -> ()
+    end;
+     tok)
+  else
+    tok
+
+let nnrs_imp_stmt_trace = ref LOG_NONE
+let nnrs_imp_stmt_set_trace conv s = nnrs_imp_stmt_trace := (logger_verbosity_of_string conv s)
+
+let nnrs_imp_stmt_log_startPass name input =
+  if !nnrs_imp_stmt_trace != LOG_NONE
+  then
+    (begin
+	match !nnrs_imp_stmt_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_string "starting nnrs_imp_stmt optimization pass: "; print_endline name
+	| LOG_VERBOSE_SEXP conv -> print_string ("(phase \"nnrs_imp_stmt\" \""^name^"\"")
+	| _ -> ()
+    end;
+     name)
+  else
+    name
+  
+let nnrs_imp_stmt_log_step tok name input output =
+  if !nnrs_imp_stmt_trace != LOG_NONE
+  then
+    begin
+     if (input == output)
+      then () (* (print_string "skipping optimization: "; print_endline name) *)
+      else
+	begin
+	  match !nnrs_imp_stmt_trace with
+	  | LOG_NAMES ->
+	     (print_string "running nnrs_imp_stmt optimization: "; print_endline name) ;
+	  | LOG_PHASES_AND_NAMES ->
+	     (print_string "  running nnrs_imp_stmt optimization: "; print_endline name) ;
+	  | LOG_VERBOSE_SEXP conv ->
+	     begin
+	       let sexp_input = conv (Obj.magic input) in
+	       let sexp_output = conv (Obj.magic output) in
+	       let sexp_opt = STerm ("opt", [SString name; sexp_input; sexp_output]) in
+	       print_endline ""; print_string ("  " ^ (sexp_to_string sexp_opt))
+	     end
+	  | _ -> ()
+	end;
+     tok
+    end
+  else
+    tok
+
+let nnrs_imp_stmt_log_endPass tok output =
+  if !nnrs_imp_stmt_trace != LOG_NONE
+  then
+    (begin
+	match !nnrs_imp_stmt_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_endline "ending nnrs_imp_stmt optimization pass: "
+	| LOG_VERBOSE_SEXP conv -> print_endline ")"
+	| _ -> ()
+    end;
+     tok)
+  else
+    tok
+
+let nnrs_imp_trace = ref LOG_NONE
+let nnrs_imp_set_trace conv s = nnrs_imp_trace := (logger_verbosity_of_string conv s)
+
+let nnrs_imp_log_startPass name input =
+  if !nnrs_imp_trace != LOG_NONE
+  then
+    (begin
+	match !nnrs_imp_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_string "starting nnrs_imp optimization pass: "; print_endline name
+	| LOG_VERBOSE_SEXP conv -> print_string ("(phase \"nnrs_imp\" \""^name^"\"")
+	| _ -> ()
+    end;
+     name)
+  else
+    name
+  
+let nnrs_imp_log_step tok name input output =
+  if !nnrs_imp_trace != LOG_NONE
+  then
+    begin
+     if (input == output)
+      then () (* (print_string "skipping optimization: "; print_endline name) *)
+      else
+	begin
+	  match !nnrs_imp_trace with
+	  | LOG_NAMES ->
+	     (print_string "running nnrs_imp optimization: "; print_endline name) ;
+	  | LOG_PHASES_AND_NAMES ->
+	     (print_string "  running nnrs_imp optimization: "; print_endline name) ;
+	  | LOG_VERBOSE_SEXP conv ->
+	     begin
+	       let sexp_input = conv (Obj.magic input) in
+	       let sexp_output = conv (Obj.magic output) in
+	       let sexp_opt = STerm ("opt", [SString name; sexp_input; sexp_output]) in
+	       print_endline ""; print_string ("  " ^ (sexp_to_string sexp_opt))
+	     end
+	  | _ -> ()
+	end;
+     tok
+    end
+  else
+    tok
+
+let nnrs_imp_log_endPass tok output =
+  if !nnrs_imp_trace != LOG_NONE
+  then
+    (begin
+	match !nnrs_imp_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_endline "ending nnrs_imp optimization pass: "
+	| LOG_VERBOSE_SEXP conv -> print_endline ")"
+	| _ -> ()
+    end;
+     tok)
+  else
+    tok
+
+let nnrs_imp_all_set_trace conv_e conv_s conv_t s =
+  nnrs_imp_expr_set_trace conv_e s;
+  nnrs_imp_stmt_set_trace conv_s s;
+  nnrs_imp_set_trace conv_t s
+
 (* dnrc logger *)
   
 let dnrc_trace = ref LOG_NONE

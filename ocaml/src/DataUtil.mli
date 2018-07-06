@@ -57,7 +57,6 @@ type optim_phase =
 type optim_language =
     { mutable optim_language_name : string;
       mutable optim_phases : optim_phase list; }
-type optim_config = optim_language list
 
 val get_io_components : io_json option -> io_input option * io_output option * io_schema option
 
@@ -68,4 +67,4 @@ val build_brandTypes : io_brandTypes -> content_brandTypes
 val build_typeDefs : io_typeDefs -> content_typeDefs
 val build_globals : io_globals -> content_globals
 
-val build_optim_config : QData.json -> optim_config
+val build_optim_config : QData.json -> QDriver.optim_config

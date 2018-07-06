@@ -253,8 +253,14 @@ interface PuzzleSides {
     }
 
     function getClearConfig() {
+		function clearOptimsInOptimsList(optims:{[key: string]: string[];}) {
+			for(const k in Object.keys(optims)) {
+				optims[k] = [optPlaceholder];
+			}
+        }
+
         function clearOptimsInPhaseList(array:Qcert.OptimPhase[]) {
-            array.forEach((elem) => elem.optims = [ optPlaceholder ])
+            array.forEach((elem) =>clearOptimsInOptimsList(elem.optims));
         }
         function clearOptimsInTopList(array:Qcert.OptimConfig[]) {
             array.forEach((elem) => clearOptimsInPhaseList(elem.phases));
@@ -2399,7 +2405,7 @@ class OptimPhaseTab extends CanvasDynamicTab {
 
 		phase:Qcert.OptimPhase, 
 		options:{color:string, top?:number}):OptimPhaseTab {
-		return new OptimPhaseTab(canvas, parentDiv, modulebase, optims, phase, options);
+		return new OptimPhaseTab(canvas, parentDiv, modulebase, optims, phase, "top", options);
 	}
 
 	constructor(canvas:fabric.Canvas,
@@ -2408,6 +2414,7 @@ class OptimPhaseTab extends CanvasDynamicTab {
 		optims:Qcert.OptimStepDescription[],
 
 		phase:Qcert.OptimPhase,
+		optimsType:string,
 		options:{color:string, top?:number}) {
 		
 		super(canvas);
@@ -2420,15 +2427,16 @@ class OptimPhaseTab extends CanvasDynamicTab {
 		this.parentDiv = div;
 		const newdiv = document.createElement('div');
 		this.optimDiv = newdiv;
+		this.optimsType = optimsType;
 
 
 		const divTitle = document.createElement('h3');
 		divTitle.style.cssFloat = 'center';
 		const titlenodetext = (num:number) => "Currently selected optimizations (" + num + ")";
-        let displayedCount = phase.optims.length;
+        let displayedCount = phase.optims[optimsType].length;
         if (displayedCount == 0)
-            phase.optims = [ optPlaceholder ];
-        else if (displayedCount == 1 && phase.optims[0] == optPlaceholder)
+            phase.optims[optimsType] = [ optPlaceholder ];
+        else if (displayedCount == 1 && phase.optims[optimsType][0] == optPlaceholder)
             displayedCount = 0;
 		const titlenode = document.createTextNode(titlenodetext(displayedCount));
 		divTitle.appendChild(titlenode);
@@ -2440,8 +2448,8 @@ class OptimPhaseTab extends CanvasDynamicTab {
 		const listnode = document.createElement('ul');
 		listnode.classList.add('optim-list');
 
-		for(let i =0 ; i < phase.optims.length; i++) {
-			listnode.appendChild(makePhaseOptimElement(modulebase, optims, phase.optims[i]));
+		for(let i =0 ; i < phase.optims[optimsType].length; i++) {
+			listnode.appendChild(makePhaseOptimElement(modulebase, optims, phase.optims[optimsType][i]));
 		}
 
 		function updateListAndTitleContent() {
@@ -2491,11 +2499,13 @@ class OptimPhaseTab extends CanvasDynamicTab {
         console.log(optims);
         if (optims.length == 1 && optims[0] == optPlaceholder)
             optims = [];
-		return {
+		const ret = {
 			name:this.name,
-			optims:optims,
+			optims:{},
 			iter: this.iter
-		}
+		};
+		ret.optims[this.optimsType] = optims;
+		return ret;
 	}
 
 	getLabel():string {
@@ -2513,6 +2523,8 @@ class OptimPhaseTab extends CanvasDynamicTab {
 
 	parentDiv:HTMLElement;
 	optimDiv:HTMLElement;
+
+	optimsType:string;
 	show() {
 		this.parentDiv.appendChild(this.optimDiv);		
 
@@ -2712,7 +2724,7 @@ function OptimizationsTabMakeFromConfig(canvas:fabric.Canvas, defaults:Qcert.Opt
 		const cfg = findFirstWithField(defaults, 'language', opt.language.name);
 		const cfg_phases = cfg === undefined ? [] : cfg.phases;
 
-		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language.name, opt.language.modulebase, opt.optims, cfg_phases));
+		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language.name, opt.language.modulebase, opt.optims["top"], cfg_phases));
 	}
 	globalOptimTabs = optimTabs;
 	return TabManager.make(canvas, {label:"Optim Config", rectOptions:{fill:'#FEBF01'}}, optimTabs, 0);

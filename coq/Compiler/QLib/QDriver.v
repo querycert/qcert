@@ -33,14 +33,27 @@ Require Import CompConfig.
 Require Import CompDriver.
 Require Import CompilerRuntime.
 Require Import TypingRuntime.
+Require Import JSON.
 
 Module QDriver(runtime:CompilerRuntime).
 
   Local Open Scope list_scope.
 
   Section QD.
-    Definition optim_config_default : optim_config := optim_config_default.
+    Definition optim_config := optim_config.
+    Definition optim_config_default : optim_config
+      := optim_config_default.
+    Definition optim_config_to_json : optim_config -> json
+      := optim_config_to_json.
+    Definition json_to_optim_config : json -> string + optim_config
+      := json_to_optim_config.
 
+    Definition optim_config_list_to_json : json
+      := optim_config_list_to_json.
+    
+    Definition optim_config_default_to_json : json
+      := optim_config_default_to_json.
+    
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
 

@@ -75,12 +75,22 @@ let args_list gconf =
       ("-log-optims", Arg.String
 			(fun s -> Logger.nra_set_trace logger_nra_to_sexp s;
 				  Logger.nrc_set_trace logger_nrc_to_sexp s;
-				  Logger.dnrc_set_trace logger_dnrc_to_sexp s),
+				  Logger.dnrc_set_trace logger_dnrc_to_sexp s;
+                                  Logger.nnrs_imp_all_set_trace logger_nnrs_imp_expr_to_sexp logger_nnrs_imp_stmt_to_sexp logger_nnrs_imp_to_sexp s
+                        ),
        " Enable optimization logging");
       ("-log-optims-nra", Arg.String (Logger.nra_set_trace logger_nra_to_sexp),
        " Enable optimization logging for nra");
       ("-log-optims-nrc", Arg.String (Logger.nrc_set_trace logger_nrc_to_sexp),
        " Enable optimization logging for nrc");
+      ("-log-optims-nnrs-imp", Arg.String (Logger.nnrs_imp_all_set_trace logger_nnrs_imp_expr_to_sexp logger_nnrs_imp_stmt_to_sexp logger_nnrs_imp_to_sexp),
+       " Enable optimization logging for nnrs-imp");
+      ("-log-optims-nnrs-imp-expr", Arg.String (Logger.nnrs_imp_expr_set_trace logger_nnrs_imp_expr_to_sexp),
+       " Enable optimization logging for nnrs-imp-expr");
+      ("-log-optims-nnrs-imp-stmt", Arg.String (Logger.nnrs_imp_stmt_set_trace logger_nnrs_imp_stmt_to_sexp),
+       " Enable optimization logging for nnrs-imp-stmt");
+      ("-log-optims-nnrs-imp-top", Arg.String (Logger.nnrs_imp_set_trace logger_nnrs_imp_to_sexp),
+       " Enable optimization logging for nnrs-imp top level");
       ("-log-optims-dnrc", Arg.String (Logger.dnrc_set_trace logger_dnrc_to_sexp),
        " Enable optimization logging for dnrc");
       ("-ascii", Arg.Unit (PrettyCommon.set_ascii gconf.gconf_pretty_config),

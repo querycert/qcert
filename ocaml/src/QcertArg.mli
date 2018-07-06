@@ -14,6 +14,9 @@
  * limitations under the License.
  *)
 
+open QcertCompiler.EnhancedCompiler
+
+
 val set_qname : QcertConfig.global_config -> string -> unit
 val set_source : QcertConfig.global_config -> string -> unit
 val set_target : QcertConfig.global_config -> string -> unit
@@ -44,8 +47,7 @@ val set_stat_tree : QcertConfig.global_config -> unit -> unit
 
 val set_optim_config_file : QcertConfig.global_config -> string -> unit
 val set_emit_optim_config : QcertConfig.global_config -> unit -> unit
-val set_optim : QcertConfig.global_config -> DataUtil.optim_language -> unit
-val set_optims : QcertConfig.global_config -> DataUtil.optim_config -> unit
+val set_optims : QcertConfig.global_config -> QDriver.optim_config -> unit
 
 val set_link_js_runtime : QcertConfig.global_config -> unit -> unit
 val set_prefix : QcertConfig.global_config -> string -> unit

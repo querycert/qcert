@@ -210,7 +210,7 @@ Section CompLang.
         :: (L_nnrc_core,CoreEnd,"cNNRC", "Core Named Nested Relational Calculus")
         :: (L_nnrc,CoreEnd,"NNRC", "Named Nested Relational Calculus")
         :: (L_nnrs_core,BackEnd,"cNNRS", "Core Named Nested Relational Calculus imperative")
-        :: (L_nnrs,BackEnd,"NNRS", "Named Nested Relational Calculus imperative")
+        :: (L_nnrs,CoreEnd,"NNRS", "Named Nested Relational Calculus imperative")
         :: (L_nnrs_imp,BackEnd,"NNRSimp", "Named Nested Relational Calculus imperative")
         :: (L_nnrcmr,DistrEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
         :: (L_cldmr,DistrEnd,"CldMR", "Named Nested Relational Calculus with Cloudant Map/Reduce")
@@ -304,6 +304,8 @@ Section CompLang.
     Definition nnrc := nnrc.
     Definition nnrs_core := nnrs_core.
     Definition nnrs := nnrs.
+    Definition nnrs_imp_expr := nnrs_imp_expr.
+    Definition nnrs_imp_stmt := nnrs_imp_stmt.
     Definition nnrs_imp := nnrs_imp.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
