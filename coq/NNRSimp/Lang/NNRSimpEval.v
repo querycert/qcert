@@ -189,7 +189,7 @@ Section NNRSimpEval.
              [intros eqq | intros ? eqq]; try rewrite eqq in H; try discriminate)
         ]; subst.
 
-    Lemma nnrs_imp_stmt_eval_env_domain_stack {s σc σ₁ σ₂} :
+    Lemma nnrs_imp_stmt_eval_domain_stack {s σc σ₁ σ₂} :
       nnrs_imp_stmt_eval σc s σ₁ = Some σ₂ -> domain σ₁ = domain σ₂.
     Proof.
       revert σ₁ σ₂.
@@ -272,6 +272,411 @@ Section NNRSimpEval.
 
   End props.
 
+    Section eval_eqs.
+
+    Local Close Scope string.
+
+    Lemma nnrs_imp_expr_eval_free σc (l1 l2 l3:pd_bindings) e :
+      disjoint (nnrs_imp_expr_free_vars e) (domain l2) ->
+      nnrs_imp_expr_eval σc (l1 ++ l2 ++ l3) e
+      =
+      nnrs_imp_expr_eval σc (l1 ++ l3) e.
+    Proof.
+      induction e; simpl; eauto; intros.
+      - repeat rewrite lookup_app.
+        repeat match_option.
+        specialize (H v); simpl in H.
+        apply lookup_in_domain in eqq0.
+        intuition.
+      - apply disjoint_app_l in H.
+        rewrite IHe1, IHe2; tauto.
+      - rewrite IHe; tauto.
+      - rewrite IHe; tauto.
+    Qed.
+
+    Lemma nnrs_imp_expr_eval_free_tail σc (l1 l2:pd_bindings) e :
+      disjoint (nnrs_imp_expr_free_vars e) (domain l2) ->
+      nnrs_imp_expr_eval σc (l1 ++ l2) e
+      =
+      nnrs_imp_expr_eval σc l1 e.
+    Proof.
+      intros.
+      generalize (nnrs_imp_expr_eval_free σc l1 l2 nil).
+      repeat rewrite app_nil_r; auto.
+    Qed.
+    
+    Lemma nnrs_imp_expr_eval_unused c l σ e v d :
+      (In v (domain l) 
+       \/ ~ In v (nnrs_imp_expr_free_vars e)) ->
+      nnrs_imp_expr_eval c (l ++ (v, d) :: σ) e
+      = nnrs_imp_expr_eval c (l ++ σ) e.
+    Proof.
+      intros inn.
+      apply nnrs_imp_expr_eval_same.
+      unfold lookup_equiv_on; simpl; intros.
+      repeat rewrite lookup_app.
+      match_case; intros.
+      simpl.
+      match_destr; unfold equiv in *.
+      subst.
+      apply lookup_none_nin in H0.
+      tauto.
+    Qed.
+
+    Section swap.
+      
+      Lemma nnrs_imp_expr_eval_swap c l σ e v₁ v₂ d₁ d₂:
+        v₁ <> v₂ ->
+        nnrs_imp_expr_eval c (l++(v₁,d₁)::(v₂,d₂)::σ) e =
+        nnrs_imp_expr_eval c (l++(v₂,d₂)::(v₁,d₁)::σ) e.
+      Proof.
+        intros neq.
+        apply nnrs_imp_expr_eval_same.
+        unfold lookup_equiv_on; simpl; intros.
+        repeat rewrite lookup_app.
+        match_destr.
+        simpl.
+        repeat match_destr.
+        congruence.
+      Qed.
+
+      Lemma nnrs_imp_stmt_eval_swap c l σ s v₁ v₂ d₁ d₂:
+        v₁ <> v₂ ->
+        lift2P
+          (fun σ₁' σ₂' =>
+             (forall l' d₁' d₂' σ'',
+                 domain l' = domain l ->
+                 σ₁' = l' ++ (v₁,d₁')::(v₂,d₂')::σ'' ->
+                 σ₂' = l' ++ (v₂,d₂')::(v₁,d₁')::σ'')
+          )
+          (nnrs_imp_stmt_eval c s (l++(v₁,d₁)::(v₂,d₂)::σ))
+          (nnrs_imp_stmt_eval c s (l++(v₂,d₂)::(v₁,d₁)::σ)).
+      Proof.
+
+        Ltac swap_t
+          := repeat (repeat match goal with
+             | [H : ~ (_ \/ _ ) |- _ ] => apply not_or in H
+                | [H : (_ \/ _ ) -> False |- _ ] => apply not_or in H
+               | [H: _ /\ _ |- _ ] => destruct H
+               | [ H : _ * _ |- _ ] => destruct H
+               | [H: _::_ = _::_ |- _ ] => invcs H
+               | [ H: domain (_ ++ _) = domain _ |- _ ] =>
+                 rewrite domain_app in H
+                   ; unfold domain in H
+                   ; symmetry in H; apply map_app_break in H
+                   ; destruct H as [? [?[?[??]]]]; subst; simpl in *
+                 | [ H: map (_ ++ _) = map _ |- _ ] =>
+                   rewrite map_app in H
+                   ; symmetry in H; apply map_app_break in H
+                   ; destruct H as [? [?[?[??]]]]; subst; simpl in *
+                 | [ H: _ :: _ = map _ ?x |- _ ] =>
+                   destruct x; try discriminate; simpl in H; invcs H
+                 | [ H: _ :: _ = domain ?x |- _ ] =>
+                   destruct x; try discriminate; simpl in H; invcs H
+                 | [H : ~ In _ (remove _ _ _) |- _ ] =>
+                   apply not_in_remove_impl_not_in in H; [| congruence]
+                 | [H : ?x ++ _ = ?y ++ _ |- _ ] =>
+                 let HH := fresh in
+                 assert (HH:domain y = domain x) by (unfold domain in *; intuition congruence)
+                 ; apply app_inv_head_domain in H;[clear HH|apply HH]
+                                                    
+
+               | [ H: forall a b c d, _ -> ?x1 ++ ?dd1 :: ?dd2 :: ?x2 = _ ++ _ :: _ -> _ |- _] =>
+                 specialize (H x1 (snd dd1) (snd dd2) x2); simpl in H
+                 ; match dd1 with
+                   | (_,_) => idtac
+                   | _ => destruct dd1
+                   end
+                 ; simpl in *
+                 ; cut_to H; [ | eauto 3 | reflexivity]
+               | [ H: forall a b c d, _ -> ?dd0::?x1 ++ ?dd1 :: ?dd2 :: ?x2 = _ ++ _ :: _ -> _ |- _] =>
+                 specialize (H (dd0::x1) (snd dd1) (snd dd2) x2); simpl in H
+                 ; match dd1 with
+                   | (_,_) => idtac
+                   | _ => destruct dd1
+                   end
+                 ; simpl in *
+                 ; cut_to H; [ | eauto 3 | reflexivity]
+               | [H : nnrs_imp_stmt_eval _ _ ?p1 = ?p2 |- _ ] =>
+                 match p1 with
+                 | p2 => fail 1
+                 | _ =>  apply nnrs_imp_stmt_eval_domain_stack in H
+                 end
+        end; intros; simpl in *; trivial; try solve [unfold domain in *; congruence]
+                    ).
+
+        Ltac un2p H :=
+          unfold lift2P in H; unfold var in *; simpl in H
+          ; repeat match_option_in H; try contradiction
+          ; swap_t.
+
+        intros neq.
+        revert l σ d₁ d₂.
+        nnrs_imp_stmt_cases (induction s) Case
+        ; simpl; intros l σ d₁ d₂.
+        - Case "NNRSimpSkip"%string.
+          swap_t.
+        - Case "NNRSimpSeq"%string.
+          specialize (IHs1 l σ d₁ d₂); un2p IHs1.
+          specialize (IHs2 x1 x2 o1 o2); un2p IHs2.
+        - Case "NNRSimpAssign"%string.
+          rewrite nnrs_imp_expr_eval_swap by trivial.
+          match_destr; try reflexivity.
+          repeat rewrite lookup_app.
+          case_eq (lookup string_dec l v); [intros ? inn | intros nin].
+          + apply lookup_in_domain in inn.
+            repeat rewrite update_app_in by trivial.
+            simpl; intros.
+            apply app_inv_head_domain in H0.
+            * destruct H0 as [eqq1 eqq2].
+              invcs eqq2; trivial.
+            * rewrite domain_update_first; trivial.
+          + apply lookup_none_nin in nin.
+             repeat rewrite update_app_nin by trivial.
+             simpl.
+            destruct (string_dec v v₁)
+            ; destruct (string_dec v v₂)
+            ; simpl
+            ; intros
+            ; subst
+            ; try congruence
+            ; swap_t.
+
+            match_destr; simpl; trivial.
+            swap_t.
+        - Case "NNRSimpLet"%string.
+          destruct o.
+          + rewrite nnrs_imp_expr_eval_swap by trivial.
+            destruct (nnrs_imp_expr_eval c (l ++ (v₂, d₂) :: (v₁, d₁) :: σ) n)
+            ; simpl; try reflexivity.
+            specialize (IHs ((v, Some d)::l) σ d₁ d₂); un2p IHs.
+          + specialize (IHs ((v, None)::l) σ d₁ d₂); un2p IHs.
+        - Case "NNRSimpFor"%string.
+          rewrite nnrs_imp_expr_eval_swap by trivial.
+          destruct (nnrs_imp_expr_eval c (l ++ (v₂, d₂) :: (v₁, d₁) :: σ) n)
+          ; simpl; try reflexivity.
+          destruct d; simpl; try reflexivity.
+          revert l σ d₁ d₂.
+          induction l0; intros  l σ d₁ d₂; swap_t.
+          specialize (IHs ((v, Some a)::l) σ d₁ d₂); un2p IHs.
+          specialize (IHl0 x1 x2 o3 o4); un2p IHl0.
+          apply IHl0; swap_t.
+        - Case "NNRSimpIf"%string.
+          rewrite nnrs_imp_expr_eval_swap by trivial.
+          destruct (nnrs_imp_expr_eval c (l ++ (v₂, d₂) :: (v₁, d₁) :: σ) n)
+          ; simpl; try reflexivity.
+          destruct d; simpl; try reflexivity.
+          destruct b.
+          + specialize (IHs1 l σ d₁ d₂); un2p IHs1.
+          + specialize (IHs2 l σ d₁ d₂); un2p IHs2.
+        - Case "NNRSimpEither"%string.
+          rewrite nnrs_imp_expr_eval_swap by trivial.
+          destruct (nnrs_imp_expr_eval c (l ++ (v₂, d₂) :: (v₁, d₁) :: σ) n)
+          ; simpl; try reflexivity.
+          destruct d; simpl; try reflexivity.
+          + specialize (IHs1 ((v, Some d)::l) σ d₁ d₂); un2p IHs1.
+          + specialize (IHs2 ((v0, Some d)::l) σ d₁ d₂); un2p IHs2.
+      Qed.
+            
+    End swap.
+
+    Section unused.
+
+      
+      Ltac disect_tac H stac
+        := 
+          unfold var in *
+          ; cut_to H; unfold domain in *; [ | solve[stac]..]
+          ; unfold lift2P in H
+          ; (repeat match_option_in H; try contradiction).
+
+        Ltac unused_eval_t stac
+          := repeat progress (
+                      intros
+                      ; repeat rewrite in_app_iff in *
+            ; repeat
+                match goal with
+                | [H : ~ (_ \/ _ ) |- _ ] => apply not_or in H
+                | [H : (_ \/ _ ) -> False |- _ ] => apply not_or in H
+               | [H: _ /\ _ |- _ ] => destruct H
+               | [ H : _ * _ |- _ ] => destruct H
+               | [H: _::_ = _::_ |- _ ] => invcs H
+               | [ H: domain (_ ++ _) = domain _ |- _ ] =>
+                 rewrite domain_app in H
+                   ; unfold domain in H
+                   ; symmetry in H; apply map_app_break in H
+                   ; destruct H as [? [?[?[??]]]]; subst; simpl in *
+                 | [ H: map (_ ++ _) = map _ |- _ ] =>
+                   rewrite map_app in H
+                   ; symmetry in H; apply map_app_break in H
+                   ; destruct H as [? [?[?[??]]]]; subst; simpl in *
+                 | [ H: _ :: _ = map _ ?x |- _ ] =>
+                   destruct x; try discriminate; simpl in H; invcs H
+                 | [ H: _ :: _ = domain ?x |- _ ] =>
+                   destruct x; try discriminate; simpl in H; invcs H
+                 | [H : ~ In _ (remove _ _ _) |- _ ] =>
+                   apply not_in_remove_impl_not_in in H; [| congruence]
+                 | [H : ?x ++ _ = ?y ++ _ |- _ ] =>
+                 let HH := fresh in
+                 assert (HH:domain y = domain x) by (unfold domain in *; intuition congruence)
+                 ; apply app_inv_head_domain in H;[clear HH|apply HH]
+                                                    
+
+               | [ H: forall a b c, _ -> ?x1 ++ ?dd :: ?x2 = _ ++ _ :: _ -> _ |- _] =>
+                 specialize (H x1 (snd dd) x2); simpl in H
+                 ; match dd with
+                   | (_,_) => idtac
+                   | _ => destruct dd
+                   end
+                 ; simpl in *
+                 ; cut_to H; [ | eauto 3 | reflexivity]
+               | [ H: forall a b c, _ -> ?dd0::?x1 ++ ?dd :: ?x2 = _ ++ _ :: _ -> _ |- _] =>
+                 specialize (H (dd0::x1) (snd dd) x2); simpl in H
+                 ; match dd with
+                   | (_,_) => idtac
+                   | _ => destruct dd
+                   end
+                 ; simpl in *
+                 ; cut_to H; [ | eauto 3 | reflexivity]
+
+                               
+               | [H : nnrs_imp_stmt_eval _ _ ?p1 = ?p2 |- _ ] =>
+                 match p1 with
+                 | p2 => fail 1
+                 | _ =>  apply nnrs_imp_stmt_eval_domain_stack in H
+                 end                   
+               | [H:forall l σ d,
+                     _ -> _ -> _ -> _ -> lift2P _ (nnrs_imp_stmt_eval _ ?s _) _
+                                           
+                     |- lift2P _ (olift _ (nnrs_imp_stmt_eval _ ?s (?l ++ (_, ?d) :: ?σ) ))
+                               _ ] =>
+                 specialize (H l σ d)
+                 ; disect_tac H stac
+               | [H:forall l σ d,
+                     _ -> _ -> _ -> _ -> lift2P _ (nnrs_imp_stmt_eval _ ?s _) _
+                                           
+                     |- lift2P _ (nnrs_imp_stmt_eval _ ?s (?l ++ (_, ?d) :: ?σ) )
+                               _ ] =>
+                 specialize (H l σ d)
+                 ; disect_tac H stac
+               | [H:forall l σ d,
+                     _ -> _ -> _ -> _ -> lift2P _ (nnrs_imp_stmt_eval _ ?s _) _
+                                                
+                     |- lift2P _ (match nnrs_imp_stmt_eval _ ?s (?x::?l ++ (_, ?d) :: ?σ)
+                                  with | Some _ => _ | None => _ end)
+                               _ ] =>
+                 specialize (H (x::l) σ d); simpl in H
+              ; disect_tac H stac
+               end; simpl in *; trivial; try tauto; try solve [try unfold domain in *; try congruence]).
+
+        Ltac unused_eval_tt := unused_eval_t ltac:(try tauto; try congruence).
+
+        Lemma nnrs_imp_stmt_eval_unused c l σ s v d:
+        (In v (domain l) \/
+         ~ In v (nnrs_imp_stmt_free_vars s)) ->
+        lift2P
+          (fun σ₁' σ₂' =>
+             (forall l' d' σ'',
+                 domain l' = domain l ->
+                 σ₁' = l' ++ (v,d')::σ'' ->
+                 σ₂' = l' ++ σ''
+                 /\ d = d')
+          )
+          (nnrs_imp_stmt_eval c s (l++(v,d)::σ))
+          (nnrs_imp_stmt_eval c s (l++σ)).
+        Proof.
+          Ltac un2p H :=
+          unfold lift2P in H; unfold var in *; simpl in H
+          ; repeat match_option_in H; try contradiction
+          ; unused_eval_tt.
+
+          Ltac cut2p H
+            := cut_to H;
+               [un2p H
+                | try unfold domain in *; simpl in *; intuition
+                ; repeat match goal with
+                         | [H: In _ (remove _ _ _) -> False |- _ ] =>
+                           apply remove_nin_inv in H
+                         end
+                ; intuition].
+          
+        revert l σ d.
+        nnrs_imp_stmt_cases (induction s) Case
+        ; simpl; intros l σ d inn
+        ; repeat rewrite in_app_iff in inn
+        ; unused_eval_tt.
+        - Case "NNRSimpSeq"%string.
+          specialize (IHs1 l σ d); cut2p IHs1.
+          subst.
+          specialize (IHs2 x1 x2 o); cut2p IHs2.
+          unfold domain in *; rewrite <- H0; tauto.
+        - Case "NNRSimpAssign"%string.
+          rewrite nnrs_imp_expr_eval_unused by tauto.
+          match_destr; try reflexivity.
+          repeat rewrite lookup_app.
+          case_eq (lookup string_dec l v0); [intros ? inn2 | intros nin].
+          + apply lookup_in_domain in inn2.
+            repeat rewrite update_app_in by trivial.
+            simpl; intros.
+            apply app_inv_head_domain in H0.
+            * destruct H0 as [eqq1 eqq2].
+              invcs eqq2; tauto.
+            * rewrite domain_update_first; trivial.
+          + apply lookup_none_nin in nin.
+             repeat rewrite update_app_nin by trivial.
+             simpl.
+            destruct (string_dec v0 v)
+            ; simpl
+            ; intros
+            ; subst
+            ; try tauto.
+            match_destr; simpl; trivial.
+            unused_eval_tt.
+        - Case "NNRSimpLet"%string.
+          destruct o.
+          + rewrite nnrs_imp_expr_eval_unused by tauto.
+            destruct (nnrs_imp_expr_eval c (l ++ σ) n)
+            ; simpl; try reflexivity.
+                        intuition
+            ; repeat match goal with
+            | [H: In _ (remove _ _ _) -> False |- _ ] =>
+              apply remove_nin_inv in H
+                     end
+            ; specialize (IHs ((v0, Some d0)::l) σ d); cut2p IHs.
+          + specialize (IHs ((v0, None)::l) σ d); cut2p IHs.
+        - Case "NNRSimpFor"%string.
+          rewrite nnrs_imp_expr_eval_unused by tauto.
+          destruct (nnrs_imp_expr_eval c (l ++ σ) n)
+          ; simpl; try reflexivity.
+          destruct d0; simpl; try reflexivity.
+          revert l σ d inn.
+          induction l0; intros  l σ d inn; unused_eval_tt.
+          specialize (IHs ((v0, Some a)::l) σ d); cut2p IHs.
+          subst.
+          specialize (IHl0 x1 x2 o1); cut2p IHl0.
+          + subst; unused_eval_tt.
+          + intuition congruence.
+        - Case "NNRSimpIf"%string.
+          rewrite nnrs_imp_expr_eval_unused by tauto.
+          destruct (nnrs_imp_expr_eval c (l ++ σ) n)
+          ; simpl; try reflexivity.
+          destruct d0; simpl; try reflexivity.
+          destruct b.
+          + specialize (IHs1 l σ d); un2p IHs1.
+          + specialize (IHs2 l σ d); un2p IHs2.
+        - Case "NNRSimpEither"%string.
+          rewrite nnrs_imp_expr_eval_unused by tauto.
+          destruct (nnrs_imp_expr_eval c (l ++ σ) n)
+          ; simpl; try reflexivity.
+          destruct d0; simpl; try reflexivity.
+          + specialize (IHs1 ((v0, Some d0)::l) σ d); cut2p IHs1.
+          + specialize (IHs2 ((v1, Some d0)::l) σ d); cut2p IHs2.
+      Qed.
+      
+    End unused.
+    
+  End eval_eqs.
+
 End NNRSimpEval.
 
-Arguments nnrs_imp_stmt_eval_env_domain_stack {fruntime h s σc σ₁ σ₂}.
+Arguments nnrs_imp_stmt_eval_domain_stack {fruntime h s σc σ₁ σ₂}.

@@ -159,9 +159,9 @@ Section NNRStoNNRSimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs _ _ ceq1cons).
         unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs; tauto.
@@ -169,9 +169,9 @@ Section NNRStoNNRSimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs _ _ ceq1cons).
         unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs; tauto.
@@ -187,9 +187,9 @@ Section NNRStoNNRSimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs _ _ ceq1cons).
         unfold lift2P in IHs; repeat match_option_in IHs; simpl; try contradiction.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs.
@@ -207,9 +207,9 @@ Section NNRStoNNRSimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs1 _ _ ceq1cons).
         unfold lift2P in IHs1; repeat match_option_in IHs1; simpl; try contradiction.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs1.
@@ -218,9 +218,9 @@ Section NNRStoNNRSimp.
         { apply grouped_equiv_cons; trivial. }
         specialize (IHs2 _ _ ceq1cons).
         unfold lift2P in IHs2; repeat match_option_in IHs2; simpl; try contradiction.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq); simpl; intros domeqq.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq); simpl; intros domeqq.
         destruct p; simpl in domeqq; invcs domeqq.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0); simpl; intros domeqq'.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq0); simpl; intros domeqq'.
         destruct p0; simpl in domeqq'; invcs domeqq'.
         destruct p; destruct p0; simpl in *; subst.
         apply grouped_equiv_cons_invs in IHs2.
@@ -367,7 +367,7 @@ Section NNRStoNNRSimp.
           ; unfold var in *; rewrite eqq1 in IHs
           ; try contradiction.
           preserve_doms; simpl.
-          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1).
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq1).
           destruct p0; simpl; intros deq; invcs deq.
           destruct p; simpl in IHs.
           apply grouped_equiv_cons_invs in IHs.
@@ -422,9 +422,9 @@ Section NNRStoNNRSimp.
           rewrite eqq3 in geq4; simpl in geq4.
           match_option_in geq4; try contradiction.
           rewrite geq4 in IHs2.
-          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq1)
           ; intros deq1.
-          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq4)
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq4)
           ; intros deq2.
           rewrite deq2 in deq1.
           simpl in deq1.
@@ -490,9 +490,9 @@ Section NNRStoNNRSimp.
           rewrite eqq3 in geq4; simpl in geq4.
           match_option_in geq4; try contradiction.
           rewrite geq4 in IHs2.
-          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq1)
           ; intros deq1.
-          generalize (nnrs_imp_stmt_eval_env_domain_stack eqq4)
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq4)
           ; intros deq2.
           rewrite deq2 in deq1.
           simpl in deq1.
@@ -563,7 +563,7 @@ Section NNRStoNNRSimp.
       ; match_option_in IHs; try contradiction.
       destruct p as [[??]?].
       generalize (nnrs_stmt_eval_env_stack eqq); intros; subst.
-      generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0)
+      generalize (nnrs_imp_stmt_eval_domain_stack eqq0)
       ; intros deq1.
       simpl in deq1.
       destruct p0; invcs deq1.
@@ -587,9 +587,9 @@ Section NNRStoNNRSimp.
       match_option; simpl in *
       ; rewrite eqq in geq3; simpl in geq3
       ; match_option_in geq3; try contradiction.
-      generalize (nnrs_imp_stmt_eval_env_domain_stack eqq)
+      generalize (nnrs_imp_stmt_eval_domain_stack eqq)
       ; intros deq1.
-      generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0)
+      generalize (nnrs_imp_stmt_eval_domain_stack eqq0)
       ; intros deq2.
       simpl in deq1, deq2.
       destruct p; invcs deq1.
@@ -623,7 +623,7 @@ Section NNRStoNNRSimp.
         ; match_option_in IHs1; try contradiction; simpl in *.
         destruct p as [[??]?].
         generalize (nnrs_stmt_eval_env_stack eqq0); intros; subst.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq1)
         ; intros deq1.
         simpl in deq1.
         destruct p0; invcs deq1.
@@ -643,7 +643,7 @@ Section NNRStoNNRSimp.
         ; match_option_in IHs2; try contradiction; simpl in *.
         destruct p as [[??]?].
         generalize (nnrs_stmt_eval_env_stack eqq0); intros; subst.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq1)
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq1)
         ; intros deq1.
         simpl in deq1.
         destruct p0; invcs deq1.
@@ -671,7 +671,7 @@ Section NNRStoNNRSimp.
         ; intros deq1.
         generalize (nnrs_stmt_eval_mdenv_domain_stack eqq)
         ; intros deq2.
-        generalize (nnrs_imp_stmt_eval_env_domain_stack eqq0)
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq0)
         ; intros deq3.
         destruct m0; simpl in *; invcs deq2.
         destruct p0; simpl in *; invcs deq3.

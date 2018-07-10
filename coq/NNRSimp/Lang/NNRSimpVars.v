@@ -62,6 +62,23 @@ Section NNRSimpVars.
            nnrs_imp_expr_free_vars e ++ nnrs_imp_stmt_free_vars s₁ ++ nnrs_imp_stmt_free_vars s₂
          | NNRSimpEither e x₁ s₁ x₂ s₂ =>
            nnrs_imp_expr_free_vars e ++ remove string_eqdec x₁ (nnrs_imp_stmt_free_vars s₁) ++ remove string_eqdec x₂ (nnrs_imp_stmt_free_vars s₂)
+         end.
+
+    Fixpoint nnrs_imp_stmt_bound_vars (s:nnrs_imp_stmt) : list var
+      := match s with
+         | NNRSimpSkip => nil
+         | NNRSimpSeq s₁ s₂ =>
+           nnrs_imp_stmt_bound_vars s₁ ++ nnrs_imp_stmt_bound_vars s₂
+         | NNRSimpAssign v e =>
+           nil
+         | NNRSimpLet v eo s₀ =>
+           v::(nnrs_imp_stmt_bound_vars s₀)
+         | NNRSimpFor v e s₀ =>
+           v::(nnrs_imp_stmt_bound_vars s₀)
+         | NNRSimpIf e s₁ s₂ =>
+           nnrs_imp_stmt_bound_vars s₁ ++ nnrs_imp_stmt_bound_vars s₂
+         | NNRSimpEither e x₁ s₁ x₂ s₂ =>
+           x₁::(nnrs_imp_stmt_bound_vars s₁) ++ x₂::(nnrs_imp_stmt_bound_vars s₂)
        end.
 
 End NNRSimpVars.

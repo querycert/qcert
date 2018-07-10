@@ -561,7 +561,7 @@ Section TNNRStoNNRSimp.
             | [H: [ _ ; _ ⊢ ?e ▷ _ ]%nnrs_scope |-
                [ _ ; _ ⊢ nnrs_expr_to_nnrs_imp_expr ?e ▷ _ ] %nnrs_imp_scope ] =>
               apply tnnrs_expr_to_nnrs_expr_correct_f in H
-              ; apply (nnrs_imp_expr_type_lookup_on_equiv H)
+              ; apply (nnrs_imp_expr_type_lookup_equiv_on H)
               ; rewrite nnrs_expr_to_nnrs_imp_expr_free_vars
               ; unfold lookup_equiv_on; intros ? inn
               ; unfold concat_tenvs; repeat rewrite lookup_app
@@ -956,7 +956,7 @@ Section TNNRStoNNRSimp.
            [ _ ; _ ⊢ ?e ▷ _ ]%nnrs_scope ] => 
         apply tnnrs_expr_to_nnrs_expr_correct_b
         ; [ eauto; try (intros; apply notnone; rewrite in_app_iff; tauto)
-          | apply (nnrs_imp_expr_type_lookup_on_equiv H)
+          | apply (nnrs_imp_expr_type_lookup_equiv_on H)
             ; rewrite nnrs_expr_to_nnrs_imp_expr_free_vars
             ; unfold lookup_equiv_on; intros ? inn
             ; unfold concat_tenvs; repeat rewrite lookup_app

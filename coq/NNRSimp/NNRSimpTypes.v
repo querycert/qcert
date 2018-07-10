@@ -17,3 +17,4 @@
 Require Export CommonTypes.
 Require Export TNNRSimp.
 Require Export TNNRSimpEq.
+Require Export TNNRSimpRename.

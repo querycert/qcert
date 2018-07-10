@@ -201,6 +201,7 @@ MODULES = \
 	NNRSimp/Lang/NNRSimp \
 	NNRSimp/Lang/NNRSimpSize \
 	NNRSimp/Lang/NNRSimpVars \
+	NNRSimp/Lang/NNRSimpRename \
 	NNRSimp/Lang/NNRSimpUsage \
 	NNRSimp/Lang/NNRSimpNorm \
 	NNRSimp/Lang/NNRSimpSem \
@@ -209,6 +210,7 @@ MODULES = \
 	NNRSimp/Lang/NNRSimpEq \
 	NNRSimp/Typing/TNNRSimp \
 	NNRSimp/Typing/TNNRSimpEq \
+	NNRSimp/Typing/TNNRSimpRename \
 	NNRSimp/Optim/NNRSimpRewrite \
 	NNRSimp/Optim/TNNRSimpRewrite \
 	NNRSimp/Optim/NNRSimpOptimizer \

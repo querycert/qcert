@@ -24,3 +24,4 @@ Require Export NNRSimpSem.
 Require Export NNRSimpSemEval.
 Require Export NNRSimpNorm.
 Require Export NNRSimpEq.
+Require Export NNRSimpRename.
