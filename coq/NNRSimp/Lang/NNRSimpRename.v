@@ -175,7 +175,7 @@ Section NNRSimpRename.
   End vars.
 
   Section var_usage.
-
+    
     Lemma nnrs_imp_expr_rename_may_use_neq e v v' v0 :
       v0 <> v ->
       v0 <> v' ->
@@ -233,6 +233,102 @@ Section NNRSimpRename.
         ; repeat rewrite IHs1 by tauto
         ; repeat rewrite IHs2 by tauto
         ; trivial.
+    Qed.
+    
+    Lemma nnrs_imp_expr_rename_may_use_eq_to e v v'  :
+      ~ In v' (nnrs_imp_expr_free_vars e) ->
+      nnrs_imp_expr_may_use (nnrs_imp_expr_rename e v v') v' =
+      nnrs_imp_expr_may_use e v.
+    Proof.
+      intros.
+      induction e; simpl in *
+      ; repeat rewrite in_app_iff in *
+      ; intros
+      ; repeat rewrite IHe by tauto
+      ; repeat rewrite IHe1 by tauto
+      ; repeat rewrite IHe2 by tauto
+      ; trivial.
+      - unfold equiv_decb.
+        intuition.
+        destruct (v0 == v)
+        ; repeat match_destr; try congruence.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_var_usage_eq_to s v v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s) ->
+      nnrs_imp_stmt_var_usage (nnrs_imp_stmt_rename s v v') v' =
+      nnrs_imp_stmt_var_usage s v.
+    Proof.
+      nnrs_imp_stmt_cases (induction s) Case; simpl; intros
+      ; repeat rewrite in_app_iff in *
+      ; repeat rewrite nnrs_imp_expr_rename_may_use_eq_to by tauto
+      ; repeat rewrite IHs by tauto
+      ; repeat rewrite IHs1 by tauto
+      ; repeat rewrite IHs2 by tauto
+      ; trivial.
+      - Case "NNRSimpAssign"%string.
+        match_destr.
+        unfold equiv_decb.
+        intuition.
+        destruct (equiv_dec v0 v)
+        ; destruct (equiv_dec v0 v')
+        ; destruct (equiv_dec v' v')
+        ; try congruence.
+      - Case "NNRSimpLet"%string.
+        destruct o.
+        + intuition.
+          repeat rewrite nnrs_imp_expr_rename_may_use_eq_to by tauto.
+          unfold equiv_decb.
+          apply remove_nin_inv in H2.
+          match_destr.
+          destruct (v0 == v); try congruence
+          ; destruct (v0 == v'); try congruence
+          ;  unfold equiv, complement in *
+          ; subst
+          ; intuition.
+          apply nnrs_imp_stmt_free_unassigned in H0; trivial.
+        + intuition.
+          unfold equiv_decb.
+          apply remove_nin_inv in H2.
+          destruct (v0 == v); try congruence
+          ; destruct (v0 == v'); try congruence
+          ;  unfold equiv, complement in *
+          ; subst
+          ; intuition.
+          apply nnrs_imp_stmt_free_unassigned in H0; trivial.
+      - Case "NNRSimpFor"%string.
+        match_destr.
+        intuition.
+        apply remove_nin_inv in H2.
+        unfold equiv_decb.
+        destruct (equiv_dec v0 v'); try congruence.
+        intuition.
+        apply nnrs_imp_stmt_free_unassigned in H0; trivial.
+        destruct (equiv_dec v0 v).
+        + rewrite H0; trivial.
+        + rewrite H4; trivial.
+      - Case "NNRSimpEither"%string.
+        match_destr.
+        intuition.
+        apply remove_nin_inv in H0.
+        apply remove_nin_inv in H4.
+        simpl in *.
+        intuition.
+        destruct (v0 == v'); try congruence.
+        destruct (v1 == v'); try congruence.
+        destruct (equiv_dec v0 v)
+        ; destruct (equiv_dec v1 v)
+        ; unfold equiv, complement in *
+        ; subst.
+        + apply nnrs_imp_stmt_free_unassigned in H3; trivial.
+          apply nnrs_imp_stmt_free_unassigned in H0; trivial.
+          rewrite H3, H0; trivial.
+        + apply nnrs_imp_stmt_free_unassigned in H3; trivial.
+          rewrite H3, H5; trivial.
+        + apply nnrs_imp_stmt_free_unassigned in H0; trivial.
+          rewrite H6, H0; trivial.
+        + rewrite H5, H6; trivial.
     Qed.
 
   End var_usage.

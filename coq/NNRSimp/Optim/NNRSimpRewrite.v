@@ -23,6 +23,7 @@ Require Import Arith.
 Require Import Equivalence.
 Require Import Morphisms.
 Require Import Setoid.
+Require Import Decidable.
 Require Import EquivDec.
 Require Import Program.
 Require Import Utils.

@@ -36,6 +36,8 @@ Section NNRSimpOptimizer.
   Local Open Scope string.
 
   Section optims.
+    (* The separator used when creating new variables from old variables *)
+    Definition nnrs_imp_optimizer_sep := "$".
 
     (* It would be nice to generalize this, but normalization gets in the way *)
     Definition op_const_fun  {fruntime:foreign_runtime} (e:nnrs_imp_expr) :=
@@ -84,6 +86,63 @@ Section NNRSimpOptimizer.
     Definition for_nil_step_correct {model:basic_model}
       := mkOptimizerStepModel for_nil_step for_nil_fun_correctness.
 
+    Definition let_let_assign_coalesce_fun sep {fruntime:foreign_runtime}(s:nnrs_imp_stmt) :=
+      match s with
+      | NNRSimpLet x₁ None
+                   (NNRSimpSeq
+                      (NNRSimpLet x₂ oe
+                                  (NNRSimpSeq s₁
+                                              (NNRSimpAssign x₁' (NNRSimpVar x₂'))))
+                      s₂) =>
+        if x₁ == x₁'
+        then if x₂ == x₂'
+             then if x₁ == x₂
+                  then s
+                  else
+                    if in_dec string_dec x₁ (nnrs_imp_stmt_free_vars s₁)
+                    then s
+                    else if in_dec string_dec x₁ (nnrs_imp_stmt_bound_vars s₁)
+                         then
+                           let x₃ := (fresh_var_from sep x₁
+                                                     (nnrs_imp_stmt_free_vars s₁ ++ nnrs_imp_stmt_bound_vars s₁ ++ nnrs_imp_stmt_free_vars s₂ ++ nnrs_imp_stmt_bound_vars s₂)) in
+                                                                              
+                           NNRSimpLet x₃
+                                      oe
+                                      (NNRSimpSeq (nnrs_imp_stmt_rename s₁ x₂ x₃)
+                                                  (nnrs_imp_stmt_rename s₂ x₁ x₃))
+
+                         else
+                           NNRSimpLet x₁ oe
+                                      (NNRSimpSeq (nnrs_imp_stmt_rename s₁ x₂ x₁)
+                                                  s₂)
+             else s
+        else s
+      | _ => s
+      end.
+
+    Lemma let_let_assign_coalesce_fun_correctness sep {model:basic_model} (s:nnrs_imp_stmt) :
+      s ⇒ˢ (let_let_assign_coalesce_fun sep s).
+    Proof.
+      tprove_correctness s; unfold complement in *.
+      - apply let_let_coalesce_trew; trivial
+        ; try (right; split); try solve [apply fresh_var_from_incl_nin
+                                         ; unfold incl; intros ?; repeat rewrite in_app_iff; intuition].
+      - apply let_let_coalesce_trew1; trivial.
+    Qed.
+
+    Definition let_let_assign_coalesce_step {fruntime:foreign_runtime}
+      := mkOptimizerStep
+           "let/let/assign" (* name *)
+           "Remove loop comprehensions over empty bags" (* description *)
+           "let_let_assign_coalesce_fun" (* lemma name *)
+           (let_let_assign_coalesce_fun nnrs_imp_optimizer_sep) (* lemma *).
+
+    Definition let_let_assign_coalesce_step_correct {model:basic_model}
+      := mkOptimizerStepModel
+           let_let_assign_coalesce_step
+           (let_let_assign_coalesce_fun_correctness nnrs_imp_optimizer_sep).
+    
+    
   End optims.
 
   Section optim_lists.
@@ -102,11 +161,13 @@ Section NNRSimpOptimizer.
     Definition nnrs_imp_stmt_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrs_imp_stmt)
       := [
           for_nil_step
+          ; let_let_assign_coalesce_step
         ].
 
     Definition nnrs_imp_stmt_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrs_imp_stmt_rewrites_to)
       := [
           for_nil_step_correct
+          ; let_let_assign_coalesce_step_correct
         ].
 
     Definition nnrs_imp_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrs_imp)
@@ -225,6 +286,7 @@ Section NNRSimpOptimizer.
     Definition default_nnrs_imp_stmt_optim_list {fruntime:foreign_runtime} : list string
       := [
           optim_step_name for_nil_step
+          ; optim_step_name let_let_assign_coalesce_step
         ].
 
     Definition default_nnrs_imp_optim_list {fruntime:foreign_runtime} : list string
