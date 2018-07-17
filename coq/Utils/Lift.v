@@ -163,6 +163,15 @@ Section Lift.
     destruct x; simpl; reflexivity.
   Qed.
 
+  Lemma olift_commute {A B C} (f: A->B->option C) d₁ d₂ :
+    olift (fun d₁ =>
+             olift (fun d₂ => f d₁ d₂) d₂) d₁
+    =
+    olift (fun d₂ =>
+             olift (fun d₁ => f d₁ d₂) d₁) d₂.
+  Proof.
+    destruct d₁; destruct d₂; simpl; trivial.
+  Qed.
 
   Lemma olift2_none_r {A B C} (f:A -> B -> option C) (x1:option A) :
     olift2 f x1 None = None.
@@ -196,10 +205,29 @@ Section Lift.
     reflexivity.
   Qed.
 
+  Lemma lift_lift {A B C} (f:B->C) (g:A->B) (x:option A) : lift f (lift g x) = lift (fun x => f (g x)) x.
+  Proof.
+    destruct x; simpl; trivial.
+  Qed.
+
   Lemma olift_lift {A B C} (f:B->option C) (g:A->B) (x:option A) : olift f (lift g x) = olift (fun x => f (g x)) x.
   Proof.
     destruct x; simpl; trivial.
   Qed.
+
+  Lemma lift_olift {A B C} (f:B->C) (g:A->option B) x:
+    lift f (olift g x) = olift (fun x => lift f (g x)) x.
+  Proof.
+    destruct x; simpl; trivial.
+  Qed.
+
+  Lemma olift_eta {A B : Type} (f : A -> option B) (x : option A) :
+    olift f x = olift (fun x => f x) x.
+  Proof.
+    destruct x; simpl; trivial.
+  Qed.
+
+
 
   Definition rif {A} (e:A -> option bool) (a:A) : option (list A) :=
     match (e a) with

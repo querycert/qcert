@@ -1708,6 +1708,14 @@ Section MergeBindings.
     then Some (rec_concat_sort l₁ l₂)
     else None.
 
+  Lemma merge_bindings_nil_l {A} `{EqDec A eq} l : merge_bindings nil l = Some (rec_sort l).
+  Proof.
+    unfold merge_bindings.
+    simpl.
+    unfold rec_concat_sort; simpl.
+    trivial.
+  Qed.
+
   Lemma merge_bindings_nil_r {A} `{EqDec A eq} l : merge_bindings l nil = Some (rec_sort l).
   Proof.
     unfold merge_bindings.

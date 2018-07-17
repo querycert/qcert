@@ -215,6 +215,70 @@ Section NNRCOptimizer.
   Definition tunshadow_preserves_step_correct {model:basic_model}
     := mkOptimizerStepModel tunshadow_preserves_step tunshadow_preserves_fun_correctness.
 
+  
+  Definition tconcat_nil_fun  {fruntime:foreign_runtime}(e:nnrc) :=
+    match e with
+    | NNRCBinop OpRecConcat (NNRCConst (drec nil)) ee => ee
+    | NNRCBinop OpRecConcat ee (NNRCConst (drec nil)) => ee
+    | _ => e
+    end.
+  
+  Lemma tconcat_nil_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tconcat_nil_fun e).
+  Proof.
+    destruct e; simpl; try reflexivity.
+    destruct b; simpl; try reflexivity.
+    destruct (e1 == (‵[||])).
+    - rewrite e.
+      apply tconcat_of_nil_l_arrow.
+    - destruct (e2 == (‵[||])).
+      + repeat rewrite e.
+        rewrite tconcat_of_nil_r_arrow.
+        repeat (match_destr; try reflexivity).
+      + repeat (match_destr; try reflexivity; try congruence).
+  Qed.
+
+  Definition tconcat_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "concat/nil" (* name *)
+         "Remove record concatenation with an empty bag" (* description *)
+         "tconcat_nil_fun" (* lemma name *)
+         tconcat_nil_fun (* lemma *).
+
+  Definition tconcat_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tconcat_nil_step tconcat_nil_fun_correctness.
+
+  Definition tmerge_nil_fun  {fruntime:foreign_runtime}(e:nnrc) :=
+    match e with
+    | NNRCBinop OpRecMerge (NNRCConst (drec nil)) ee => NNRCUnop OpBag ee
+    | NNRCBinop OpRecMerge ee (NNRCConst (drec nil)) => NNRCUnop OpBag ee
+    | _ => e
+    end.
+  
+  Lemma tmerge_nil_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tmerge_nil_fun e).
+  Proof.
+    destruct e; simpl; try reflexivity.
+    destruct b; simpl; try reflexivity.
+    destruct (e1 == (‵[||])).
+    - rewrite e.
+      apply tmerge_of_nil_l_arrow.
+    - destruct (e2 == (‵[||])).
+      + repeat rewrite e.
+        rewrite tmerge_of_nil_r_arrow.
+        repeat (match_destr; try reflexivity).
+      + repeat (match_destr; try reflexivity; try congruence).
+  Qed.
+
+  Definition tmerge_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "merge/nil" (* name *)
+         "Remove record merge with an empty bag" (* description *)
+         "tmerge_nil_fun" (* lemma name *)
+         tmerge_nil_fun (* lemma *).
+
+  Definition tmerge_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmerge_nil_step tmerge_nil_fun_correctness.
 
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tfor_nil_fun  {fruntime:foreign_runtime}(e:nnrc) :=
@@ -354,18 +418,15 @@ Section NNRCOptimizer.
       | (NNRCFor v2 
                 (NNRCUnop OpFlatten
                          (NNRCFor v1 e1
-                                 (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1')) (NNRCConst (dcoll nil)))))
+                                 (NNRCIf e2 (NNRCUnop OpBag ee) (NNRCConst (dcoll nil)))))
                 e3) =>
-        if (v1 == v1')
-        then
           if (v1 == v2)
           then
             (NNRCUnop OpFlatten
                      (NNRCFor v1 e1
                              (NNRCIf e2
-                                    (NNRCUnop OpBag e3)
+                                    (NNRCUnop OpBag (NNRCLet v1 ee e3))
                                     (NNRCConst (dcoll nil)))))
-          else e
         else e
       | _ => e
     end.
@@ -970,7 +1031,9 @@ Section NNRCOptimizer.
   (* list of all optimizations *)
     Definition tnnrc_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrc)
       := [
-          tfor_nil_step
+          tconcat_nil_step
+          ; tmerge_nil_step
+          ; tfor_nil_step
           ; tfor_singleton_to_let_step
           ; tflatten_singleton_step
           ; tflatten_nil_step
@@ -998,7 +1061,9 @@ Section NNRCOptimizer.
 
     Definition tnnrc_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrc_rewrites_to)
       := [
-          tfor_nil_step_correct
+          tconcat_nil_step_correct
+          ; tmerge_nil_step_correct
+          ; tfor_nil_step_correct
           ; tfor_singleton_to_let_step_correct
           ; tflatten_singleton_step_correct
           ; tflatten_nil_step_correct
@@ -1082,6 +1147,8 @@ Section NNRCOptimizer.
         ; optim_step_name tfor_over_for_step
         ; optim_step_name tfor_over_if_nil_step
         ; optim_step_name tfor_nil_step
+        ; optim_step_name tmerge_nil_step
+        ; optim_step_name tconcat_nil_step
         ; optim_step_name tmap_sigma_fusion_samevar_step
         ; optim_step_name tproject_nil_step
         ; optim_step_name tproject_over_const_step

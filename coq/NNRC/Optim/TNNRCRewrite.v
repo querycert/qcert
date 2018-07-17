@@ -144,6 +144,169 @@ Section TNNRCRewrite.
      solve[eauto].
   Qed.
 
+  (* [] ⊕ e ≡ e *)
+  Lemma tconcat_of_nil_l_arrow (e:nnrc) :
+    tnnrc_rewrites_to (NNRCBinop OpRecConcat (NNRCConst (drec nil)) e) e.
+  Proof.
+    red; simpl.
+    unfold nnrc_eval, nnrc_type.
+    intros ??? typ.
+    invcs typ.
+    invcs H5; simpl in *.
+    invcs H3.
+    apply dtrec_closed_inv in H1.
+    invcs H1.
+    split.
+    - revert pf3.
+      rewrite rec_concat_sort_nil_l.
+      rewrite (sort_sorted_is_id _ pf2); intros.
+      erewrite Rec_pr_irrel; eauto.
+    - intros.
+      match_option.
+      destruct (typed_nnrc_core_yields_typed_data cenv env τenv _ H H0 H6)
+        as [xout [xeval xtype]]; rewrite xeval in *; simpl.
+      invcs eqq.
+      dtype_inverter.
+      rewrite sort_sorted_is_id; trivial.
+      apply data_type_normalized in xtype.
+      invcs xtype; trivial.
+  Qed.
+
+  (* e ⊕ [] ≡ e *)
+  Lemma tconcat_of_nil_r_arrow (e:nnrc) :
+    tnnrc_rewrites_to (NNRCBinop OpRecConcat e (NNRCConst (drec nil))) e.
+  Proof.
+    red; simpl.
+    unfold nnrc_eval, nnrc_type.
+    intros ??? typ.
+    invcs typ.
+    invcs H6; simpl in *.
+    invcs H3.
+    apply dtrec_closed_inv in H1.
+    invcs H1.
+    split.
+    - revert pf3.
+      rewrite rec_concat_sort_nil_r.
+      rewrite (sort_sorted_is_id _ pf1); intros.
+      erewrite Rec_pr_irrel; eauto.
+    - intros.
+      unfold olift2.
+      match_option.
+      destruct (typed_nnrc_core_yields_typed_data cenv env τenv _ H H0 H5)
+        as [xout [xeval xtype]]; rewrite xeval in *; simpl.
+      invcs eqq.
+      dtype_inverter.
+      rewrite app_nil_r.
+      rewrite sort_sorted_is_id; trivial.
+      apply data_type_normalized in xtype.
+      invcs xtype; trivial.
+  Qed.
+  
+    (* [] ⊗ e ≡ e *)
+  Lemma tmerge_of_nil_l_arrow (e:nnrc) :
+    tnnrc_rewrites_to (NNRCBinop OpRecMerge (NNRCConst (drec nil)) e) (NNRCUnop OpBag e).
+  Proof.
+    red; simpl.
+    unfold nnrc_eval, nnrc_type.
+    intros ??? typ.
+    invcs typ.
+    invcs H5; simpl in *.
+    invcs H3.
+    - apply dtrec_closed_inv in H1.
+      invcs H1.
+      rewrite merge_bindings_nil_l in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        match_option.
+        destruct (typed_nnrc_core_yields_typed_data cenv env τenv _ H H0 H6)
+          as [xout [xeval xtype]]; rewrite xeval in *; simpl.
+        invcs eqq.
+        dtype_inverter.
+        apply data_type_normalized in xtype.
+        invcs xtype; trivial.
+        unfold rec_concat_sort; simpl.
+        rewrite sort_sorted_is_id; trivial.
+    - invcs H1.
+      invcs H7.
+      rtype_equalizer; subst.
+      apply sublist_nil_r in H4; subst.
+      unfold rec_concat_sort; simpl.
+      rewrite merge_bindings_nil_l in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        match_option.
+        destruct (typed_nnrc_core_yields_typed_data cenv env τenv _ H H0 H6)
+          as [xout [xeval xtype]]; rewrite xeval in *; simpl.
+        invcs eqq.
+        dtype_inverter.
+        apply data_type_normalized in xtype.
+        invcs xtype; trivial.
+        unfold rec_concat_sort; simpl.
+        rewrite sort_sorted_is_id; trivial.
+  Qed.
+
+  (* e ⊗ [] ≡ e *)
+  Lemma tmerge_of_nil_r_arrow (e:nnrc) :
+    tnnrc_rewrites_to (NNRCBinop OpRecMerge e (NNRCConst (drec nil))) (NNRCUnop OpBag e).
+  Proof.
+    red; simpl.
+    unfold nnrc_eval, nnrc_type.
+    intros ??? typ.
+    invcs typ.
+    invcs H6; simpl in *.
+    invcs H3.
+    - apply dtrec_closed_inv in H1.
+      invcs H1.
+      rewrite merge_bindings_nil_r in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        unfold olift2.
+        match_option.
+        destruct (typed_nnrc_core_yields_typed_data cenv env τenv _ H H0 H5)
+          as [xout [xeval xtype]]; rewrite xeval in *; simpl.
+        invcs eqq.
+        dtype_inverter.
+        rewrite merge_bindings_nil_r.
+        apply data_type_normalized in xtype.
+        invcs xtype; trivial.
+        unfold rec_concat_sort; simpl.
+        rewrite sort_sorted_is_id; trivial.
+    - invcs H1.
+      invcs H7.
+      rtype_equalizer; subst.
+      apply sublist_nil_r in H4; subst.
+      rewrite merge_bindings_nil_r in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        unfold olift2.
+        match_option.
+        destruct (typed_nnrc_core_yields_typed_data cenv env τenv _ H H0 H5)
+          as [xout [xeval xtype]]; rewrite xeval in *; simpl.
+        invcs eqq.
+        dtype_inverter.
+        rewrite merge_bindings_nil_r.
+        apply data_type_normalized in xtype.
+        invcs xtype; trivial.
+        unfold rec_concat_sort; simpl.
+        rewrite sort_sorted_is_id; trivial.
+  Qed.
+
   (* { e | x ∈ {} } ≡ {} *)
 
   Lemma tfor_nil_arrow x e :
@@ -209,35 +372,33 @@ Section TNNRCRewrite.
   Qed.
 
   (*  $t₁ ∉ free(e₃) ->
-      { e₃ | $t₂ ∈ ♯flatten({ e₂ ? {$t₁} : {} | $t₁ ∈ e₁ }) }
-        ≡ ♯flatten({ e₂ ? { LET $t₂ := $t₁ IN e₃ } : {} | $t₁ ∈ e₁ }) *)
+      { e₃ | $t₂ ∈ ♯flatten({ e₂ ? {ee} : {} | $t₁ ∈ e₁ }) }
+        ≡ ♯flatten({ e₂ ? { LET $t₂ := ee IN e₃ } : {} | $t₁ ∈ e₁ }) *)
 
-  Lemma tmap_sigma_fusion_arrow (v1 v2:var) (e1 e2 e3:nnrc) :
+  Lemma tmap_sigma_fusion_arrow (v1 v2:var) ee (e1 e2 e3:nnrc) :
     ~ In v1 (nnrc_free_vars e3) ->
     tnnrc_rewrites_to
       (NNRCFor v2 
               (NNRCUnop OpFlatten
                        (NNRCFor v1 e1
-                               (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1)) (NNRCConst (dcoll nil)))))
+                               (NNRCIf e2 (NNRCUnop OpBag ee) (NNRCConst (dcoll nil)))))
               e3)
       (NNRCUnop OpFlatten
                (NNRCFor v1 e1
                        (NNRCIf e2
-                              (NNRCUnop OpBag (NNRCLet v2 (NNRCVar v1) e3))
+                              (NNRCUnop OpBag (NNRCLet v2 ee e3))
                               (NNRCConst (dcoll nil))))).
   Proof.
     intros.
     unfold nnrc_eval in *.
     unfold nnrc_type in *.
     apply nnrc_rewrites_typed_with_untyped.
-    - rewrite (map_sigma_fusion e1 e2 e3 v1 v2 H); reflexivity.
+    - rewrite (map_sigma_fusion e1 e2 e3 ee v1 v2 H); reflexivity.
     - intros.
       nnrc_inverter.
+      fold nnrc_to_nnrc_base in *.
       repeat (econstructor; eauto 2).
-      + simpl. 
-        match_destr.
-        congruence.
-      + generalize (@nnrc_type_remove_free_env _ τcenv ((v2, τ₁)::nil) v1 τ₁ τenv e3 τ₂ H); intros nt.
+      + generalize (@nnrc_type_remove_free_env _ τcenv ((v2, τ₁)::nil) v1 τ₁1 τenv e3 τ₂ H); intros nt.
         simpl in nt.
         rewrite nt.
         trivial.
@@ -246,27 +407,37 @@ Section TNNRCRewrite.
   (* { e₃ | $t₂ ∈ ♯flatten({ e₂ ? {$t₁} : {} | $t₁ ∈ e₁ }) }
        ≡ ♯flatten({ e₂ ? { LET $t₂ := $t₁ IN e₃ } : {} | $t₁ ∈ e₁ }) *)
 
-  Lemma tmap_sigma_fusion_samevar_arrow (v1:var) (e1 e2 e3:nnrc) :
+  Lemma tmap_sigma_fusion_samevar_arrow (v1:var) e (e1 e2 e3:nnrc) :
     tnnrc_rewrites_to
       (NNRCFor v1 
               (NNRCUnop OpFlatten
                        (NNRCFor v1 e1
-                               (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1)) (NNRCConst (dcoll nil)))))
+                               (NNRCIf e2 (NNRCUnop OpBag e) (NNRCConst (dcoll nil)))))
               e3)
       (NNRCUnop OpFlatten
                (NNRCFor v1 e1
                        (NNRCIf e2
-                              (NNRCUnop OpBag e3)
+                              (NNRCUnop OpBag (NNRCLet v1 e e3))
                               (NNRCConst (dcoll nil))))).
   Proof.
     intros.
     unfold nnrc_eval in *.
     unfold nnrc_type in *.
     apply nnrc_rewrites_typed_with_untyped.
-    - rewrite (map_sigma_fusion_samevar e1 e2 e3 v1); reflexivity.
+    - rewrite (map_sigma_fusion_samevar e1 e2 e3 e v1); reflexivity.
     - intros.
       nnrc_inverter.
-      repeat (econstructor; eauto 2).
+      fold nnrc_to_nnrc_base in *.
+      econstructor; [econstructor; eauto | ].
+      econstructor; eauto.
+      econstructor; eauto.
+      + econstructor; [econstructor; eauto | ].
+        econstructor; eauto.
+        eapply nnrc_type_lookup_equiv_prop; eauto.
+        red; simpl; intros.
+        destruct (string_eqdec x v1); simpl; trivial.
+      + econstructor; simpl.
+        repeat econstructor.
   Qed.
 
   (* bound(e2) ∩ free(e1) = ∅ ->
