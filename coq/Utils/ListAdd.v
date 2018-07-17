@@ -128,6 +128,12 @@ Section ListAdd.
       induction l1; simpl; trivial.
       rewrite app_ass. congruence.
     Qed.
+
+    Lemma flat_map_singleton a : flat_map (fun d : A => d::nil) a = a.
+    Proof.
+      induction a; simpl; trivial.
+      rewrite IHa; trivial.
+    Qed.
     
     Lemma map_nil f l :
       map f l = (@nil A) <-> l = (@nil A).

@@ -583,7 +583,35 @@ Section NNRCOptimizer.
   Definition tfor_over_if_nil_step_correct {model:basic_model}
     := mkOptimizerStepModel tfor_over_if_nil_step tfor_over_if_nil_fun_correctness.
 
-  
+  (* for (map) fusion *)
+    Definition tfor_over_for_fun  {fruntime:foreign_runtime}(e:nnrc)
+      := match e with
+         | NNRCFor x (NNRCFor y source body1) body2 =>
+           if (in_dec string_dec y (nnrc_free_vars body2))
+           then e
+           else NNRCFor y source
+                        (NNRCLet x body1 body2)
+       | _ => e
+       end.
+
+  Lemma tfor_over_for_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tfor_over_for_fun e).
+  Proof.
+    tprove_correctness e.
+    apply tfor_over_for_arrow; simpl; trivial.
+  Qed.
+
+    Definition tfor_over_for_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "for/for" (* name *)
+         "Fuse nested loop comprehensions" (* description *)
+         "tfor_over_for_fun" (* lemma name *)
+         tfor_over_for_fun (* lemma *).
+
+  Definition tfor_over_for_step_correct {model:basic_model}
+    := mkOptimizerStepModel tfor_over_for_step tfor_over_for_fun_correctness.
+
+(* END *)  
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tfor_over_either_nil_fun  {fruntime:foreign_runtime} (e:nnrc)
     := match e with
@@ -953,6 +981,7 @@ Section NNRCOptimizer.
           ; tdot_of_concat_rec_step
           ; tinline_let_step
           ; tfor_over_if_nil_step
+          ; tfor_over_for_step
           ; tfor_over_either_nil_step
           ; tunop_over_either_const_step
           ; tunop_over_if_const_step
@@ -980,6 +1009,7 @@ Section NNRCOptimizer.
           ; tdot_of_concat_rec_step_correct
           ; tinline_let_step_correct
           ; tfor_over_if_nil_step_correct
+          ; tfor_over_for_step_correct
           ; tfor_over_either_nil_step_correct
           ; tunop_over_either_const_step_correct
           ; tunop_over_if_const_step_correct
@@ -1049,6 +1079,7 @@ Section NNRCOptimizer.
         ; optim_step_name tunop_over_either_const_step
         ; optim_step_name tunop_over_if_const_step
         ; optim_step_name tfor_over_either_nil_step
+        ; optim_step_name tfor_over_for_step
         ; optim_step_name tfor_over_if_nil_step
         ; optim_step_name tfor_nil_step
         ; optim_step_name tmap_sigma_fusion_samevar_step

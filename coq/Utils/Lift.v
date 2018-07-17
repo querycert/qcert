@@ -140,6 +140,14 @@ Section Lift.
     destruct x; reflexivity.
   Qed.
 
+  Lemma lift_ext {A B:Type} (f g : A -> B) (x : option A) :
+    (forall a, f a = g a) ->
+    lift f x = lift g x.
+  Proof.
+    destruct x; simpl; intros HH; trivial.
+    rewrite HH; trivial.
+  Qed.
+
   Lemma match_lift_id {A} (x:option A) :
     match x with
     | None => None
@@ -182,6 +190,16 @@ Section Lift.
     destruct x; destruct y; simpl; auto.
   Qed.
 
+
+  Lemma olift_is_lift {A B} (f:A->B) x : olift (fun x => Some (f x)) x = lift f x.
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma olift_lift {A B C} (f:B->option C) (g:A->B) (x:option A) : olift f (lift g x) = olift (fun x => f (g x)) x.
+  Proof.
+    destruct x; simpl; trivial.
+  Qed.
 
   Definition rif {A} (e:A -> option bool) (a:A) : option (list A) :=
     match (e a) with
@@ -290,7 +308,7 @@ Section Lift.
     unfold mk_lazy_lift; intros.
     destruct (equiv_dec v v'); eauto.
   Qed.
-
+  
 End Lift.
 
 Hint Rewrite @olift_some : alg.

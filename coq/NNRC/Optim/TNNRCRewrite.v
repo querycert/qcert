@@ -329,6 +329,25 @@ Section TNNRCRewrite.
       { e₀ | $t ∈ (Either e₁ $tl el $tr er) } 
         ≡ Either e₁ $tl { e₀ | $t ∈ el } $tr { e₀ | $t ∈ er} *)
 
+  Lemma tfor_over_for_arrow x y source body1 body2 :
+    ~ In y (nnrc_free_vars body2) ->
+     tnnrc_rewrites_to (NNRCFor x (NNRCFor y source body1) body2)
+            (NNRCFor y source
+                     (NNRCLet x body1 body2)).
+  Proof.
+    intros nin.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply for_over_for; trivial.
+    - intros ? ? ? typ.
+      invcs typ.
+      invcs H4.
+      rtype_equalizer; subst.
+      red; simpl.
+      repeat (econstructor; eauto 2).
+      apply (nnrc_core_type_remove_free_env ((x, τ₁) :: nil)); simpl; trivial.
+      rewrite <- nnrc_to_nnrc_base_free_vars_same; trivial.
+  Qed.
+  
   Lemma tfor_over_either_disjoint_arrow x e1 xl el xr er ebody:
     disjoint (xl::xr::nil) (nnrc_free_vars ebody) ->
     tnnrc_rewrites_to (NNRCFor x (NNRCEither e1 xl el xr er) ebody)

@@ -300,6 +300,59 @@ Section NNRCRewrite.
     destruct d; simpl; trivial.
     destruct b; simpl; trivial.
   Qed.
+
+  Lemma for_over_for x y source body1 body2 :
+    ~ In y (nnrc_free_vars body2) ->
+    nnrc_eq (NNRCFor x (NNRCFor y source body1) body2)
+            (NNRCFor y source
+                     (NNRCLet x body1 body2)).
+  Proof.
+    red; simpl; intros nin; intros.
+    rewrite nnrc_to_nnrc_base_free_vars_same in nin.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base source)); simpl; trivial.
+    destruct d; simpl; trivial.
+    (* simplify a bit *)
+    transitivity (
+    match
+      (lift_map
+         (fun d1 : data => nnrc_core_eval h cenv ((y, d1) :: env) (nnrc_to_nnrc_base body1)) l)
+  with
+  | Some c1 =>
+      lift dcoll
+        (lift_map
+           (fun d1 : data => nnrc_core_eval h cenv ((x, d1) :: env) (nnrc_to_nnrc_base body2))
+           c1)
+  | _ => None
+    end).
+    {
+      destruct (lift_map
+                  (fun d1 : data => nnrc_core_eval h cenv ((y, d1) :: env) (nnrc_to_nnrc_base body1)) l); simpl; trivial.
+    }
+    (* another tweak *)
+    transitivity (lift dcoll
+                       (olift (fun c1 => (lift_map
+           (fun d1 : data => nnrc_core_eval h cenv ((x, d1) :: env) (nnrc_to_nnrc_base body2))
+           c1)) (lift_map
+                   (fun d1 : data => nnrc_core_eval h cenv ((y, d1) :: env) (nnrc_to_nnrc_base body1)) l))).
+    {
+      destruct (lift_map
+                  (fun d1 : data => nnrc_core_eval h cenv ((y, d1) :: env) (nnrc_to_nnrc_base body1)) l); simpl; trivial.
+    }
+    f_equal.
+    induction l; simpl; simpl; trivial.
+    destruct (nnrc_core_eval h cenv ((y, a) :: env) (nnrc_to_nnrc_base body1))
+    ; simpl; trivial.
+    rewrite olift_lift; simpl.
+    generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x, d)::nil) y a)
+    ; simpl; intros HH.
+    rewrite HH by tauto; clear HH.
+    destruct (nnrc_core_eval h cenv ((x, d) :: env) (nnrc_to_nnrc_base body2))
+    ; simpl
+    ; [rewrite <- IHl | ]
+    ; destruct (lift_map
+                  (fun d1 : data => nnrc_core_eval h cenv ((y, d1) :: env) (nnrc_to_nnrc_base body1)) l); simpl; trivial.
+  Qed.
     
   Lemma for_over_either_disjoint x e1 xl el xr er ebody:
     disjoint (xl::xr::nil) (nnrc_free_vars ebody) ->

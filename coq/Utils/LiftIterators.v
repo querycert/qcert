@@ -81,6 +81,16 @@ Section LiftIterators.
       unfold lift.
       rewrite IHl; reflexivity.
     Qed.
+
+    Lemma lift_map_lift {A B C} (f:B->C) (g:A->option B) l :
+    lift_map (fun x => lift f (g x)) l =
+    lift (map f) (lift_map g l).
+  Proof.
+    induction l; simpl; trivial.
+    rewrite IHl.
+    destruct (g a); simpl; trivial.
+    destruct (lift_map g l); simpl; trivial.
+  Qed.
     
     Lemma lift_map_map_merge {A} {B} {C} (f1:A -> B) (f2:B -> option C) (l: list A):
       (lift_map (fun d => f2 (f1 d)) l) =
