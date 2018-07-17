@@ -466,6 +466,42 @@ Section NNRCRewrite.
     - generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x,x0)::nil) xr d env (nnrc_to_nnrc_base ebody)); simpl; intros re1; rewrite re1; trivial.
   Qed.
 
+  Lemma nnrclet_rename e₁ e₂ x x' :
+    ~ In x' (nnrc_free_vars e₂) ->
+    ~ In x' (nnrc_bound_vars e₂) ->
+    nnrc_eq (NNRCLet x e₁ e₂)
+            (NNRCLet x' e₁ (nnrc_subst e₂ x (NNRCVar x'))).
+  Proof.
+    red; simpl; intros nfree nbound; intros.
+    generalize (@nnrc_eval_cons_subst _ h cenv e₂ env x);
+      unfold nnrc_eval; simpl; intros.
+    match_destr.
+    rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
+    specialize (H1 d x' nfree nbound).
+    rewrite <- nnrc_to_nnrc_base_subst_comm in H1. simpl in H1.
+    rewrite H1.
+    trivial.
+  Qed.
+
+   Lemma nnrcfor_rename e₁ e₂ x x' :
+    ~ In x' (nnrc_free_vars e₂) ->
+    ~ In x' (nnrc_bound_vars e₂) ->
+    nnrc_eq (NNRCFor x e₁ e₂)
+            (NNRCFor x' e₁ (nnrc_subst e₂ x (NNRCVar x'))).
+  Proof.
+    red; simpl; intros nfree nbound; intros.
+    generalize (@nnrc_eval_cons_subst _ h cenv e₂ env x);
+      unfold nnrc_eval; simpl; intros.
+    do 2 match_destr.
+    f_equal.
+    apply lift_map_ext; intros dd inn.
+    rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
+    specialize (H1 dd x' nfree nbound).
+    rewrite <- nnrc_to_nnrc_base_subst_comm in H1. simpl in H1.
+    rewrite H1.
+    trivial.
+  Qed.
+
   Lemma nnrceither_rename_l e1 xl el xr er xl' :
     ~ In xl' (nnrc_free_vars el) ->
     ~ In xl' (nnrc_bound_vars el) ->

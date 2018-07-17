@@ -546,6 +546,42 @@ Section TNNRCRewrite.
         unfold nnrc_type in *; simpl in *; rewrite re1; trivial.
   Qed.
 
+  Lemma tnnrclet_rename_arrow e₁ e₂ x x' :
+    ~ In x' (nnrc_free_vars e₂) ->
+    ~ In x' (nnrc_bound_vars e₂) ->
+    tnnrc_rewrites_to (NNRCLet x e₁ e₂)
+            (NNRCLet x' e₁ (nnrc_subst e₂ x (NNRCVar x'))).
+  Proof.
+    intros nfree nbound.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nnrclet_rename; trivial.
+    - intros.
+      nnrc_inverter.
+      econstructor; eauto 2.
+      generalize (@nnrc_type_cons_subst _ τcenv); intros Hsubst;
+      unfold nnrc_eval in *;
+      unfold nnrc_type in *; simpl in *; 
+      apply Hsubst; trivial.
+  Qed.
+
+   Lemma tnnrcfor_rename_arrow e₁ e₂ x x' :
+    ~ In x' (nnrc_free_vars e₂) ->
+    ~ In x' (nnrc_bound_vars e₂) ->
+    tnnrc_rewrites_to (NNRCFor x e₁ e₂)
+            (NNRCFor x' e₁ (nnrc_subst e₂ x (NNRCVar x'))).
+  Proof.
+    intros nfree nbound.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nnrcfor_rename; trivial.
+    - intros.
+      nnrc_inverter.
+      econstructor; eauto 2.
+      generalize (@nnrc_type_cons_subst _ τcenv); intros Hsubst;
+      unfold nnrc_eval in *;
+      unfold nnrc_type in *; simpl in *; 
+      apply Hsubst; trivial.
+  Qed.
+  
   Lemma tnnrceither_rename_l_arrow e1 xl el xr er xl' :
     ~ In xl' (nnrc_free_vars el) ->
     ~ In xl' (nnrc_bound_vars el) ->

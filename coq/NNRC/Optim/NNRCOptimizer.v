@@ -649,7 +649,10 @@ Section NNRCOptimizer.
       := match e with
          | NNRCFor x (NNRCFor y source body1) body2 =>
            if (in_dec string_dec y (nnrc_free_vars body2))
-           then e
+           then let fr := really_fresh_in 
+                     nnrc_unshadow_sep y (nnrc_free_vars body1 ++ nnrc_bound_vars body1) body2
+                in NNRCFor fr source
+                     (NNRCLet x (nnrc_subst body1 y (NNRCVar fr)) body2)
            else NNRCFor y source
                         (NNRCLet x body1 body2)
        | _ => e
@@ -659,7 +662,13 @@ Section NNRCOptimizer.
     tnnrc_rewrites_to e (tfor_over_for_fun e).
   Proof.
     tprove_correctness e.
-    apply tfor_over_for_arrow; simpl; trivial.
+    - rewrite <- tfor_over_for_arrow; simpl; trivial.
+      + apply tproper_NNRCFor; try reflexivity.
+        generalize (really_fresh_from_avoid nnrc_unshadow_sep v0 (nnrc_free_vars e1_2 ++ nnrc_bound_vars e1_2) e2)
+        ; rewrite in_app_iff; intros inn.
+         apply tnnrcfor_rename_arrow; tauto.
+      + apply really_fresh_from_free.
+    - apply tfor_over_for_arrow; simpl; trivial.
   Qed.
 
     Definition tfor_over_for_step {fruntime:foreign_runtime}
