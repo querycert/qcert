@@ -2013,6 +2013,30 @@ Section ListAdd.
       destruct H2 as [? [eqq inn]].
       match_destr_in eqq; unfold equiv, complement in *; subst; eauto.
     Qed.
+
+    Lemma disjoint_dec {A} (dec:forall x y:A, {x=y} + {x<>y}) (l₁ l₂:list A) :
+      {disjoint l₁ l₂} + {~ disjoint l₁ l₂}.
+    Proof.
+      unfold disjoint.
+      assert (F:{Forall (fun x => ~ In x l₁) l₂} + {~ Forall (fun x => ~ In x l₁) l₂}).
+      {
+        apply Forall_dec_defined.
+        intros.
+        destruct (in_dec dec x l₁); [right | left]; eauto.
+      }
+      destruct F.
+      - left; rewrite Forall_forall in *.
+        intros; eapply f; eauto.
+      - right; rewrite Forall_forall in *.
+        intros f; eapply n; eauto.
+    Defined.
+
+    Lemma disjoint_eqdec {A} `{dec:EqDec A eq} (l₁ l₂:list A) :
+      {disjoint l₁ l₂} + {~ disjoint l₁ l₂}.
+    Proof.
+      apply disjoint_dec; trivial.
+    Defined.
+
     
   End Disjoint.
 

@@ -902,4 +902,38 @@ Section NNRSimpRename.
     
   End core.
 
+  Section lazy.
+    (* The lazy variants have the same semantics, but are more efficient
+       if we expect it likely that from == to.
+       This is the case when we are enabling an optimization to "lazily" rename
+       to avoid a possible conflict and there is not actual conflict.
+     *)
+    Definition nnrs_imp_expr_rename_lazy (e:nnrs_imp_expr) (from to:var)
+      := if from == to
+         then e
+         else nnrs_imp_expr_rename e from to.
+        
+    Definition nnrs_imp_stmt_rename_lazy (s:nnrs_imp_stmt) (from to:var)
+      := if from == to
+         then s
+         else nnrs_imp_stmt_rename s from to.
+
+    Lemma nnrs_imp_expr_rename_lazy_eq (e:nnrs_imp_expr) (from to:var) :
+      nnrs_imp_expr_rename_lazy e from to = nnrs_imp_expr_rename e from to.
+    Proof.
+      unfold nnrs_imp_expr_rename_lazy.
+      match_destr; unfold equiv in *; subst.
+      rewrite nnrs_imp_expr_rename_id; trivial.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_lazy_eq (s:nnrs_imp_stmt) (from to:var) :
+      nnrs_imp_stmt_rename_lazy s from to = nnrs_imp_stmt_rename s from to.
+    Proof.
+      unfold nnrs_imp_stmt_rename_lazy.
+      match_destr; unfold equiv in *; subst.
+      rewrite nnrs_imp_stmt_rename_id; trivial.
+    Qed.
+
+  End lazy.
+  
 End NNRSimpRename.

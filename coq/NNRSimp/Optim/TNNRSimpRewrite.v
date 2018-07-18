@@ -57,6 +57,71 @@ Section TNNRSimpRewrite.
     - eauto.
   Qed.
 
+  (* renaming *)
+  Lemma rename_let_trew x x' e s:
+    ~ In x' (nnrs_imp_stmt_free_vars s) ->
+    ~ In x' (nnrs_imp_stmt_bound_vars s) ->
+    (NNRSimpLet x e s) ⇒ˢ
+            (NNRSimpLet x' e (nnrs_imp_stmt_rename s x x')).
+  Proof.
+    intros.
+    apply nnrs_imp_stmt_eq_rewrites_to.
+    - apply rename_let_eq; trivial.
+    - intros.
+      invcs H1.
+      + econstructor; eauto.
+        apply nnrs_imp_stmt_type_rename; eauto.
+      + econstructor.
+        * rewrite nnrs_imp_stmt_rename_var_usage_eq_to; trivial.
+        * apply nnrs_imp_stmt_type_rename; eauto.
+  Qed.
+
+  Lemma rename_for_trew x x' e s:
+    ~ In x' (nnrs_imp_stmt_free_vars s) ->
+    ~ In x' (nnrs_imp_stmt_bound_vars s) ->
+    (NNRSimpFor x e s) ⇒ˢ
+            (NNRSimpFor x' e (nnrs_imp_stmt_rename s x x')).
+  Proof.
+    intros.
+    apply nnrs_imp_stmt_eq_rewrites_to.
+    - apply rename_for_eq; trivial.
+    - intros.
+      invcs H1.
+      econstructor; eauto.
+      apply nnrs_imp_stmt_type_rename; eauto.
+  Qed.
+
+  Lemma rename_either_l_trew e s₁ x₁ x₁' x₂ s₂:
+    ~ In x₁' (nnrs_imp_stmt_free_vars s₁) ->
+    ~ In x₁' (nnrs_imp_stmt_bound_vars s₁) ->
+    (NNRSimpEither e x₁ s₁ x₂ s₂) ⇒ˢ
+            (NNRSimpEither e x₁' (nnrs_imp_stmt_rename s₁ x₁ x₁') x₂ s₂).
+  Proof.
+    intros.
+    apply nnrs_imp_stmt_eq_rewrites_to.
+    - apply rename_either_l_eq; trivial.
+    - intros.
+      invcs H1.
+      econstructor; eauto.
+      apply nnrs_imp_stmt_type_rename; eauto.
+  Qed.
+
+
+  Lemma rename_either_r_trew e s₁ x₁ x₂ x₂'  s₂:
+    ~ In x₂' (nnrs_imp_stmt_free_vars s₂) ->
+    ~ In x₂' (nnrs_imp_stmt_bound_vars s₂) ->
+    (NNRSimpEither e x₁ s₁ x₂ s₂) ⇒ˢ
+            (NNRSimpEither e x₁ s₁ x₂' (nnrs_imp_stmt_rename s₂ x₂ x₂')).
+  Proof.
+    intros.
+    apply nnrs_imp_stmt_eq_rewrites_to.
+    - apply rename_either_r_eq; trivial.
+    - intros.
+      invcs H1.
+      econstructor; eauto.
+      apply nnrs_imp_stmt_type_rename; eauto.
+  Qed.
+
   Ltac disect_tac H stac
     := 
       unfold var in *
@@ -340,5 +405,111 @@ Section TNNRSimpRewrite.
     rewrite nnrs_imp_stmt_rename_id in HH.
     apply HH; try tauto.
   Qed.
+
+  Lemma for_for_fuse_trew x₁ tmp₁ source expr tmp₂ expr₂ tmp₃ body rest :
+    x₁ <> tmp₁ ->
+    x₁ <> tmp₂ ->
+    tmp₂ <> tmp₁ ->
+    ~ In x₁ (nnrs_imp_expr_free_vars expr) ->
+    ~ In x₁ (nnrs_imp_expr_free_vars source) ->
+    ~ In tmp₂ (nnrs_imp_expr_free_vars source) ->
+    ~ In tmp₂ (nnrs_imp_expr_free_vars expr) ->
+    ~ In tmp₁ (nnrs_imp_stmt_free_vars body) ->
+    ~ In x₁ (nnrs_imp_stmt_free_vars body) ->
+    ~ In x₁ (nnrs_imp_stmt_free_vars rest) ->
+    liftP (fun e => ~ In x₁ (nnrs_imp_expr_free_vars e)) expr₂ ->
+    disjoint (nnrs_imp_stmt_maybewritten_vars body) (nnrs_imp_expr_free_vars expr) ->
+    NNRSimpLet x₁ (Some (NNRSimpConst (dcoll nil)))
+                   (NNRSimpSeq
+                      (NNRSimpFor tmp₁ source
+                                  (NNRSimpAssign x₁
+                                              (NNRSimpBinop
+                                                 OpBagUnion
+                                                 (NNRSimpVar x₁)
+                                                 (NNRSimpUnop OpBag expr))))
+                      (NNRSimpLet tmp₂ expr₂
+                                  (NNRSimpSeq
+                                     (NNRSimpFor tmp₃ (NNRSimpVar x₁)
+                                                 body
+                                     )
+                                     rest)))
+                   ⇒ˢ
+                   (NNRSimpLet tmp₂ expr₂
+                               (NNRSimpSeq
+                                  (NNRSimpFor tmp₁ source
+                                              (NNRSimpLet tmp₃ (Some expr) body))
+                                  rest)).
+      Proof.
+        intros.
+        apply nnrs_imp_stmt_eq_rewrites_to.
+        - apply for_for_fuse_eq; trivial.
+        - intros ? ? typ.
+          invcs typ.
+          invcs H16.
+          invcs H15.
+          invcs H19.
+          invcs H15.
+          invcs H23.
+          invcs H22.
+          invcs H15.
+          invcs H20.
+          rtype_equalizer; subst.
+          simpl in *.
+          unfold equiv_dec, string_eqdec in *.
+          destruct (string_dec x₁ tmp₁); try congruence.
+          destruct (string_dec x₁ x₁); try congruence.
+          invcs H18.
+          invcs H13.
+          invcs H17.
+          + invcs H19.
+            invcs H17.
+            invcs H19.
+            simpl in *.
+            unfold equiv_dec, string_eqdec in *.
+            destruct (string_dec x₁ tmp₂); try congruence.
+            destruct (string_dec x₁ x₁); try congruence.
+            invcs H13; rtype_equalizer; subst.
+            { econstructor.
+              - apply (nnrs_imp_expr_type_unused_remove Γc nil Γ) in H15; eauto.
+              - econstructor.
+                + econstructor.
+                  * apply (nnrs_imp_expr_type_unused_remove Γc nil Γ) in H16; eauto.
+                    apply (nnrs_imp_expr_type_unused_add Γc nil Γ); eauto.
+                  * { econstructor.
+                      - apply (nnrs_imp_expr_type_unused_remove Γc ((tmp₁, τ0)::nil) Γ) in H21; eauto.
+                        apply (nnrs_imp_expr_type_unused_add Γc ((tmp₁, τ0)::nil) Γ); eauto.
+                      - apply (nnrs_imp_stmt_type_unused_remove Γc ((tmp₃, τ1) :: (tmp₂, τ) ::nil) Γ) in H22; eauto.
+                        apply (nnrs_imp_stmt_type_unused_add Γc ((tmp₃, τ1)::nil) ((tmp₂, τ)::Γ)); eauto.
+                    }
+                + apply (nnrs_imp_stmt_type_unused_remove Γc ((tmp₂, τ)::nil) Γ) in H18; eauto.
+            }
+          + invcs H19.
+            invcs H17.
+            invcs H19.
+            simpl in *.
+            unfold equiv_decb, equiv_dec, string_eqdec in *.
+            destruct (string_dec x₁ tmp₂); try congruence.
+            destruct (string_dec x₁ x₁); try congruence.
+            destruct (string_dec tmp₂ x₁); try congruence.
+            invcs H13; rtype_equalizer; subst.
+            { econstructor.
+              - simpl.
+                unfold equiv_decb, equiv_dec, string_eqdec in *.
+                destruct (string_dec tmp₁ tmp₂); try congruence.
+                rewrite <- nnrs_imp_expr_may_use_free_vars_neg in H4, H5.
+                rewrite H4, H5.
+                destruct (string_dec tmp₃ tmp₂); simpl; trivial.
+              - eapply (nnrs_imp_stmt_type_unused_remove Γc ((tmp₂, τ)::nil) Γ) in H18; eauto.
+                econstructor; eauto.
+                econstructor.
+                + apply (nnrs_imp_expr_type_unused_remove Γc nil Γ) in H16; eauto.
+                   apply (nnrs_imp_expr_type_unused_add Γc nil Γ); eauto.
+                + econstructor.
+                  * apply (nnrs_imp_expr_type_unused_remove Γc ((tmp₁, τ0)::nil) Γ) in H21; eauto.
+                    apply (nnrs_imp_expr_type_unused_add Γc ((tmp₁, τ0)::nil) Γ); eauto.
+                  * apply (nnrs_imp_stmt_type_unused_remove Γc ((tmp₃, τ1) :: (tmp₂, τ) ::nil) Γ) in H22; eauto.
+                    apply (nnrs_imp_stmt_type_unused_add Γc ((tmp₃, τ1)::nil) ((tmp₂, τ)::Γ)); eauto.
+            }
+      Qed.
 
 End TNNRSimpRewrite.

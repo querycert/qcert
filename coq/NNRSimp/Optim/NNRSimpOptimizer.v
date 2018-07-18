@@ -105,7 +105,7 @@ Section NNRSimpOptimizer.
                          then
                            let x₃ := (fresh_var_from sep x₁
                                                      (nnrs_imp_stmt_free_vars s₁ ++ nnrs_imp_stmt_bound_vars s₁ ++ nnrs_imp_stmt_free_vars s₂ ++ nnrs_imp_stmt_bound_vars s₂)) in
-                                                                              
+                           
                            NNRSimpLet x₃
                                       oe
                                       (NNRSimpSeq (nnrs_imp_stmt_rename s₁ x₂ x₃)
@@ -133,7 +133,7 @@ Section NNRSimpOptimizer.
     Definition let_let_assign_coalesce_step {fruntime:foreign_runtime}
       := mkOptimizerStep
            "let/let/assign" (* name *)
-           "Remove loop comprehensions over empty bags" (* description *)
+           "Coalesce redundant let statements" (* description *)
            "let_let_assign_coalesce_fun" (* lemma name *)
            (let_let_assign_coalesce_fun nnrs_imp_optimizer_sep) (* lemma *).
 
@@ -141,8 +141,68 @@ Section NNRSimpOptimizer.
       := mkOptimizerStepModel
            let_let_assign_coalesce_step
            (let_let_assign_coalesce_fun_correctness nnrs_imp_optimizer_sep).
-    
-    
+
+    (* we could rename to avoid many of these conflicts *)
+    Definition for_for_fuse_fun {fruntime:foreign_runtime}(s:nnrs_imp_stmt) :=
+      match s with
+      | NNRSimpLet x₁ (Some (NNRSimpConst (dcoll nil)))
+                   (NNRSimpSeq
+                      (NNRSimpFor tmp₁ source
+                                  (NNRSimpAssign x₁'
+                                                 (NNRSimpBinop
+                                                    OpBagUnion
+                                                    (NNRSimpVar x₁'')
+                                                    (NNRSimpUnop OpBag expr))))
+                      (NNRSimpLet tmp₂ expr₂
+                                  (NNRSimpSeq
+                                     (NNRSimpFor tmp₃ (NNRSimpVar x₁''')
+                                                 body
+                                     )
+                                     rest))) =>
+        if string_dec x₁ x₁'
+        then if string_dec x₁ x₁''
+             then if string_dec x₁ x₁'''
+                  then if in_dec string_dec x₁ (nnrs_imp_expr_free_vars expr ++ nnrs_imp_expr_free_vars source ++ nnrs_imp_stmt_free_vars body ++ nnrs_imp_stmt_free_vars rest ++ match expr₂ with | None => nil | Some e => nnrs_imp_expr_free_vars e end) then s
+                                 else if disjoint_dec string_dec (nnrs_imp_stmt_maybewritten_vars body) (nnrs_imp_expr_free_vars expr)
+                                      then if string_dec x₁ tmp₁ then s
+                                           else if string_dec x₁ tmp₂ then s
+                                                                             (* fixable *)
+                                                else if string_dec tmp₁ tmp₂ then s
+                                                else if in_dec string_dec tmp₂ (nnrs_imp_expr_free_vars source ++ nnrs_imp_expr_free_vars expr) then s
+                                                     else if in_dec string_dec tmp₁ (nnrs_imp_stmt_free_vars body) then s
+                                                     else (NNRSimpLet tmp₂ expr₂
+                                                                      (NNRSimpSeq
+                                                                         (NNRSimpFor tmp₁ source
+                                                                                     (NNRSimpLet tmp₃ (Some expr) body))
+                                                                         rest))
+                                      else s
+                  else s
+             else s
+        else s
+      | _ => s
+      end.
+
+    Lemma for_for_fuse_fun_correctness {model:basic_model} (s:nnrs_imp_stmt) :
+      s ⇒ˢ (for_for_fuse_fun s).
+    Proof.
+      tprove_correctness s; unfold complement in *.
+      repeat rewrite in_app_iff in *.
+      - apply for_for_fuse_trew; eauto; try tauto.
+        destruct o; simpl; try tauto.
+    Qed.
+
+    Definition for_for_fuse_step {fruntime:foreign_runtime}
+      := mkOptimizerStep
+           "map/map/fuse" (* name *)
+           "Fuse for loops  " (* description *)
+           "for_for_fuse_fun" (* lemma name *)
+           for_for_fuse_fun (* lemma *).
+
+    Definition for_for_fuse_step_correct {model:basic_model}
+      := mkOptimizerStepModel
+           for_for_fuse_step
+           for_for_fuse_fun_correctness.
+
   End optims.
 
   Section optim_lists.
@@ -162,12 +222,14 @@ Section NNRSimpOptimizer.
       := [
           for_nil_step
           ; let_let_assign_coalesce_step
+          ; for_for_fuse_step 
         ].
 
     Definition nnrs_imp_stmt_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrs_imp_stmt_rewrites_to)
       := [
           for_nil_step_correct
           ; let_let_assign_coalesce_step_correct
+          ; for_for_fuse_step_correct 
         ].
 
     Definition nnrs_imp_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrs_imp)
@@ -287,6 +349,7 @@ Section NNRSimpOptimizer.
       := [
           optim_step_name for_nil_step
           ; optim_step_name let_let_assign_coalesce_step
+          ; optim_step_name for_for_fuse_step 
         ].
 
     Definition default_nnrs_imp_optim_list {fruntime:foreign_runtime} : list string
