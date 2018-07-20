@@ -347,7 +347,7 @@ let rec pretty_nnrs_imp_stmt p sym ff stmt =
         (pretty_nnrs_imp_expr p sym) n1
         (pretty_nnrs_imp_stmt p sym) n2
   | QcertCompiler.NNRSimpAssign (v, e) ->
-      fprintf ff "@[<hv 2>$v%s :=@;<1 0>%a@;<0 -2>)@]"
+      fprintf ff "@[<hv 2>$v%s :=@;<1 0>%a@;<0 -2>@]"
         (Util.string_of_char_list v)
         (pretty_nnrs_imp_expr 0 sym) e
   | QcertCompiler.NNRSimpFor (v,n1,n2) ->
