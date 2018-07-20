@@ -202,7 +202,7 @@ Section TNNRCRewrite.
       invcs xtype; trivial.
   Qed.
   
-    (* [] ⊗ e ≡ e *)
+    (* [] ⊗ e ≡ {e} *)
   Lemma tmerge_of_nil_l_arrow (e:nnrc) :
     tnnrc_rewrites_to (NNRCBinop OpRecMerge (NNRCConst (drec nil)) e) (NNRCUnop OpBag e).
   Proof.
@@ -253,7 +253,7 @@ Section TNNRCRewrite.
         rewrite sort_sorted_is_id; trivial.
   Qed.
 
-  (* e ⊗ [] ≡ e *)
+  (* e ⊗ [] ≡ {e} *)
   Lemma tmerge_of_nil_r_arrow (e:nnrc) :
     tnnrc_rewrites_to (NNRCBinop OpRecMerge e (NNRCConst (drec nil))) (NNRCUnop OpBag e).
   Proof.
