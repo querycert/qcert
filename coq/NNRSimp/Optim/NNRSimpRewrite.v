@@ -294,7 +294,7 @@ Section NNRSimpRewrite.
            cut (x=y); [intros eqqq; rewrite eqqq; trivial | ]
          end.
 
-      red; intros neq1 neq2 neq3 nin1 nin2 nin3 nin4 nin5 nin6 nin7 nin8 disj1; intros; simpl.
+    red; intros neq1 neq2 neq3 nin1 nin2 nin3 nin4 nin5 nin6 nin7 nin8 disj1; intros; simpl.
       generalize (nnrs_imp_expr_eval_unused h σc nil σ source)
       ; simpl; intros HH.
       repeat rewrite HH by tauto.
@@ -306,7 +306,8 @@ Section NNRSimpRewrite.
       destruct (x₁ == tmp₂); try congruence; clear c.
       case_eq (nnrs_imp_expr_eval h σc σ source)
       ; simpl; [intros ? eqq | intros eqq].
-      2: { idtac.
+      2: {
+           idtac.
            destruct expr₂; simpl; trivial.
            destruct (nnrs_imp_expr_eval h σc σ n); simpl; trivial.
            rewrite HH by tauto.
@@ -1175,36 +1176,35 @@ Section NNRSimpRewrite.
              (lift_map (fun x : data => nnrs_imp_expr_eval h σc ((tmp₁, Some x) :: σ) expr) l)
      | _ => None
      end).
-                      {
-                        clear.
-                        destruct (nnrs_imp_stmt_eval h σc body ((tmp₃, Some d) :: (tmp₂, o) :: σ))
-                        ; destruct ((lift_map (fun x : data => nnrs_imp_expr_eval h σc ((tmp₁, Some x) :: σ) expr) l)); simpl; trivial.
-                        match_destr.
-                      }
-                      match_option.
-                      generalize (nnrs_imp_stmt_eval_domain_stack eqq)
-                      ; simpl ; intros eqq1.
-                      destruct p; simpl in *; try discriminate.
-                      destruct p.
-                      invcs eqq1.
-                      destruct p0; simpl in *; try discriminate.
-                      destruct p.
-                      invcs H1.
-                      rewrite <- IHl.
-                      f_equal.
-                      apply lift_map_ext; intros.
-                      apply nnrs_imp_expr_eval_same.
-                      red; simpl; intros dd inn.
-                      destruct (string_eqdec dd tmp₁); simpl; trivial.
-                      apply (nnrs_imp_stmt_eval_lookup_preserves_unwritten
-                                    ((s, Some d) :: (s0, o)::nil)
-                                    ((s, o0) :: (s0, o1)::nil) _ _ eqq (eq_refl _))
-                      ; simpl.
-                      right.
-                      intros inn2.
-                      apply (disj1 dd); trivial.
-                      
+     {
+       clear.
+       destruct (nnrs_imp_stmt_eval h σc body ((tmp₃, Some d) :: (tmp₂, o) :: σ))
+       ; destruct ((lift_map (fun x : data => nnrs_imp_expr_eval h σc ((tmp₁, Some x) :: σ) expr) l)); simpl; trivial.
+       match_destr.
+     }
+     match_option.
+     generalize (nnrs_imp_stmt_eval_domain_stack eqq)
+     ; simpl ; intros eqq1.
+     destruct p; simpl in *; try discriminate.
+     destruct p.
+     invcs eqq1.
+     destruct p0; simpl in *; try discriminate.
+     destruct p.
+     invcs H1.
+     rewrite <- IHl.
+     f_equal.
+     apply lift_map_ext; intros.
+     apply nnrs_imp_expr_eval_same.
+     red; simpl; intros dd inn.
+     destruct (string_eqdec dd tmp₁); simpl; trivial.
+     apply (nnrs_imp_stmt_eval_lookup_preserves_unwritten
+              ((s, Some d) :: (s0, o)::nil)
+              ((s, o0) :: (s0, o1)::nil) _ _ eqq (eq_refl _))
+     ; simpl.
+     right.
+     intros inn2.
+     apply (disj1 dd); trivial.
     Qed.
-      
+
 End NNRSimpRewrite.
 

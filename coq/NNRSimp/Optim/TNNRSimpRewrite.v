@@ -57,6 +57,206 @@ Section TNNRSimpRewrite.
     - eauto.
   Qed.
 
+  (* {} ∪ e = e *)
+  Lemma bagunion_nil_l_trew e :
+    (NNRSimpBinop OpBagUnion ‵{||} e) ⇒ᵉ e.
+  Proof.
+    red; simpl; intros ??? typ.
+    invcs typ.
+    invcs H3.
+    split.
+    - trivial.
+    - intros.
+      match_option.
+      unfold rondcoll2.
+      simpl.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+      dtype_inverter; trivial.
+  Qed.
+
+  (* e ∪ {} = e *)
+  Lemma bagunion_nil_r_trew e :
+    (NNRSimpBinop OpBagUnion e ‵{||}) ⇒ᵉ e.
+  Proof.
+    red; simpl; intros ??? typ.
+    invcs typ.
+    invcs H3.
+    split.
+    - trivial.
+    - intros.
+      unfold olift2.
+      match_option.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+      dtype_inverter.
+      unfold rondcoll2, ondcoll2.
+      simpl.
+      rewrite bunion_nil_r; trivial.
+  Qed.
+
+  (* [] ⊕ e ≡ e *)
+  Lemma concat_nil_l_trew (e:nnrs_imp_expr) :
+    ‵[||] ⊕ e ⇒ᵉ e.
+  Proof.
+    red; simpl.
+    intros ??? typ.
+    invcs typ.
+    invcs H5; simpl in *.
+    invcs H3.
+    apply dtrec_closed_inv in H1.
+    invcs H1.
+    split.
+    - revert pf3.
+      rewrite rec_concat_sort_nil_l.
+      rewrite (sort_sorted_is_id _ pf2); intros.
+      erewrite Rec_pr_irrel; eauto.
+    - intros.
+      match_option.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+      dtype_inverter.
+      rewrite sort_sorted_is_id; trivial.
+      apply data_type_normalized in eqq.
+      invcs eqq; trivial.
+  Qed.
+
+  (* e ⊕ [] ≡ e *)
+  Lemma concat_nil_r_trew (e:nnrs_imp_expr) :
+    e ⊕ ‵[||]  ⇒ᵉ e.
+  Proof.
+    red; simpl.
+    intros ??? typ.
+    invcs typ.
+    invcs H6; simpl in *.
+    invcs H3.
+    apply dtrec_closed_inv in H1.
+    invcs H1.
+    split.
+    - revert pf3.
+      rewrite rec_concat_sort_nil_r.
+      rewrite (sort_sorted_is_id _ pf1); intros.
+      erewrite Rec_pr_irrel; eauto.
+    - intros.
+      unfold olift2.
+      match_option.
+      eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+      dtype_inverter.
+      rewrite app_nil_r.
+      rewrite sort_sorted_is_id; trivial.
+      apply data_type_normalized in eqq.
+      invcs eqq; trivial.
+  Qed.
+  
+    (* [] ⊗ e ≡ {e} *)
+  Lemma merge_nil_l_trew (e:nnrs_imp_expr) :
+        ‵[||] ⊗ e  ⇒ᵉ   ‵{| e|}.
+  Proof.
+    red; simpl.
+    intros ??? typ.
+    invcs typ.
+    invcs H5; simpl in *.
+    invcs H3.
+    - apply dtrec_closed_inv in H1.
+      invcs H1.
+      rewrite merge_bindings_nil_l in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        match_option.
+        eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+        dtype_inverter.
+        unfold rec_concat_sort; simpl.
+        rewrite sort_sorted_is_id; trivial.
+        apply data_type_normalized in eqq.
+        invcs eqq; trivial.
+    - invcs H1.
+      invcs H7.
+      rtype_equalizer; subst.
+      apply sublist_nil_r in H4; subst.
+      unfold rec_concat_sort; simpl.
+      rewrite merge_bindings_nil_l in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        match_option.
+        eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+        dtype_inverter.
+        rewrite sort_sorted_is_id; trivial.
+        apply data_type_normalized in eqq.
+        invcs eqq; trivial.
+  Qed.
+
+  (* e ⊗ [] ≡ {e} *)
+  Lemma merge_nil_r_trew (e:nnrs_imp_expr) :
+        e ⊗ ‵[||]   ⇒ᵉ   ‵{| e|}.
+  Proof.
+    red; simpl.
+    intros ??? typ.
+    invcs typ.
+    invcs H6; simpl in *.
+    invcs H3.
+    - apply dtrec_closed_inv in H1.
+      invcs H1.
+      rewrite merge_bindings_nil_r in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        unfold olift2.
+        match_option.
+        eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+        dtype_inverter.
+        rewrite merge_bindings_nil_r.
+        rewrite sort_sorted_is_id; trivial.
+        apply data_type_normalized in eqq.
+        invcs eqq; trivial.
+    - invcs H1.
+      invcs H7.
+      rtype_equalizer; subst.
+      apply sublist_nil_r in H4; subst.
+      rewrite merge_bindings_nil_r in H.
+      rewrite sort_sorted_is_id in H by trivial.
+      invcs H.
+      split.
+      + econstructor; eauto.
+        erewrite Rec_pr_irrel; econstructor.
+      + intros.
+        unfold olift2.
+        match_option.
+        eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+        dtype_inverter.
+        rewrite merge_bindings_nil_r.
+        rewrite sort_sorted_is_id; trivial.
+        apply data_type_normalized in eqq.
+        invcs eqq; trivial.
+  Qed.
+
+  Lemma flatten_nil_trew : ♯flatten( ‵{||}) ⇒ᵉ ‵{||}.
+  Proof.
+    red; simpl; intros ??? typ.
+    invcs typ.
+    invcs H2.
+    split.
+    - econstructor; simpl; repeat econstructor.
+    - intros; reflexivity.
+  Qed.
+      
+  Lemma flatten_nil_nil_trew : ♯flatten( ‵ (dcoll [dcoll []])) ⇒ᵉ ‵{||}.
+  Proof.
+    red; simpl; intros ??? typ.
+    invcs typ.
+    invcs H2.
+    split.
+    - econstructor; simpl; repeat econstructor.
+    - intros; reflexivity.
+  Qed.
+
   (* renaming *)
   Lemma rename_let_trew x x' e s:
     ~ In x' (nnrs_imp_stmt_free_vars s) ->
@@ -105,7 +305,6 @@ Section TNNRSimpRewrite.
       econstructor; eauto.
       apply nnrs_imp_stmt_type_rename; eauto.
   Qed.
-
 
   Lemma rename_either_r_trew e s₁ x₁ x₂ x₂'  s₂:
     ~ In x₂' (nnrs_imp_stmt_free_vars s₂) ->

@@ -29,6 +29,7 @@ Require Import Utils.
 Require Import CommonSystem.
 Require Import NNRSimpSystem.
 Require Import NNRSimpOptimizerEngine.
+Require Import NNRSimpRewrite.
 Require Import TNNRSimpRewrite.
 
 Section NNRSimpOptimizer.
@@ -42,15 +43,44 @@ Section NNRSimpOptimizer.
     (* It would be nice to generalize this, but normalization gets in the way *)
     Definition op_const_fun  {fruntime:foreign_runtime} (e:nnrs_imp_expr) :=
       match e with
-      | NNRSimpUnop OpDistinct ‵{||} => NNRSimpConst (dcoll nil)
+      | NNRSimpUnop OpDistinct (NNRSimpConst (dcoll nil)) => NNRSimpConst (dcoll nil)
+      | NNRSimpUnop OpFlatten (NNRSimpConst (dcoll nil)) => NNRSimpConst (dcoll nil)
+      | NNRSimpUnop OpFlatten (NNRSimpConst (dcoll ((dcoll nil)::nil))) =>
+                               NNRSimpConst (dcoll nil)
+      | ‵[||] ⊕ e => e
+      | e ⊕ ‵[||]  => e
+      | ‵[||] ⊗ e => ‵{| e|}
+      | e ⊗ ‵[||] => ‵{| e|}
       | _ => e
       end.
 
     Lemma op_const_fun_correctness {model:basic_model} (e:nnrs_imp_expr) :
       e ⇒ᵉ (op_const_fun e).
     Proof.
-      tprove_correctness e.
-      - apply distinct_nil_trew.
+      destruct e; simpl; try reflexivity.
+      - destruct b; try reflexivity.
+        + { destruct (e1 == (‵[||])).
+            -  rewrite e.
+               apply concat_nil_l_trew.
+            -  destruct (e2 == (‵[||])).
+               + repeat rewrite e.
+                 rewrite concat_nil_r_trew.
+                 repeat (match_destr; try reflexivity).
+               + repeat (match_destr; try reflexivity; try congruence).
+          }
+        + { destruct (e1 == (‵[||])).
+            -  rewrite e.
+               apply merge_nil_l_trew.
+            -  destruct (e2 == (‵[||])).
+               + repeat rewrite e.
+                 rewrite merge_nil_r_trew.
+                 repeat (match_destr; try reflexivity).
+               + repeat (match_destr; try reflexivity; try congruence).
+          }
+      - tprove_correctness e. 
+        + apply flatten_nil_trew.
+        + apply flatten_nil_nil_trew.
+        + apply distinct_nil_trew.
     Qed.
 
     Definition op_const_step {fruntime:foreign_runtime}
