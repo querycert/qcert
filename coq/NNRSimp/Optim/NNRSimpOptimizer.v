@@ -31,6 +31,7 @@ Require Import NNRSimpSystem.
 Require Import NNRSimpOptimizerEngine.
 Require Import NNRSimpRewrite.
 Require Import TNNRSimpRewrite.
+Require Import NNRSimpUnflatten.
 
 Section NNRSimpOptimizer.
   Local Open Scope nnrs_imp.
@@ -116,6 +117,43 @@ Section NNRSimpOptimizer.
     Definition for_nil_step_correct {model:basic_model}
       := mkOptimizerStepModel for_nil_step for_nil_fun_correctness.
 
+    Definition unflatten_fun  {fruntime:foreign_runtime}(s:nnrs_imp_stmt) :=
+      match s with
+      | NNRSimpLet x None s₁ =>
+        match nnrs_imp_stmt_unflatten_safe s₁ x with
+        | Some s' => NNRSimpLet x None s'
+        | None => s
+        end
+      | NNRSimpLet x (Some e) s₁ =>
+        match nnrs_imp_expr_unflatten_init e, nnrs_imp_stmt_unflatten_safe s₁ x with
+        | Some e', Some s' => NNRSimpLet x (Some e') s'
+        | _, _ => s
+        end
+      | _ => s
+      end.
+
+    Lemma unflatten_fun_correctness {model:basic_model} (s:nnrs_imp_stmt) :
+      s ⇒ˢ (unflatten_fun s).
+    Proof.
+      destruct s; simpl; try reflexivity.
+      destruct o.
+      - repeat (match_option; try reflexivity).
+        apply unflatten_let_some_trew; trivial.
+      - repeat (match_option; try reflexivity).
+        apply unflatten_let_none_trew; trivial.
+    Qed.
+
+    Definition unflatten_step {fruntime:foreign_runtime}
+      := mkOptimizerStep
+           "unflatten" (* name *)
+           "Remove unneeded flatten  / singleton application to a variable" (* description *)
+           "unflatten_fun" (* lemma name *)
+           unflatten_fun (* lemma *).
+
+    Definition unflatten_step_correct {model:basic_model}
+      := mkOptimizerStepModel unflatten_step unflatten_fun_correctness.
+
+    
     Definition let_let_assign_coalesce_fun sep {fruntime:foreign_runtime}(s:nnrs_imp_stmt) :=
       match s with
       | NNRSimpLet x₁ None
@@ -251,6 +289,7 @@ Section NNRSimpOptimizer.
     Definition nnrs_imp_stmt_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrs_imp_stmt)
       := [
           for_nil_step
+          ; unflatten_step
           ; let_let_assign_coalesce_step
           ; for_for_fuse_step 
         ].
@@ -258,6 +297,7 @@ Section NNRSimpOptimizer.
     Definition nnrs_imp_stmt_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrs_imp_stmt_rewrites_to)
       := [
           for_nil_step_correct
+          ; unflatten_step_correct
           ; let_let_assign_coalesce_step_correct
           ; for_for_fuse_step_correct 
         ].
@@ -378,6 +418,7 @@ Section NNRSimpOptimizer.
     Definition default_nnrs_imp_stmt_optim_list {fruntime:foreign_runtime} : list string
       := [
           optim_step_name for_nil_step
+          ; optim_step_name unflatten_step
           ; optim_step_name let_let_assign_coalesce_step
           ; optim_step_name for_for_fuse_step 
         ].

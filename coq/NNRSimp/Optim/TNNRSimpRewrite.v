@@ -30,6 +30,8 @@ Require Import Utils.
 Require Import CommonSystem.
 Require Import NNRSimpSystem.
 Require Import NNRSimpRewrite.
+Require Import NNRSimpUnflatten.
+Require Import TNNRSimpUnflatten.
 
 Section TNNRSimpRewrite.
   Local Open Scope nnrs_imp.
@@ -257,6 +259,118 @@ Section TNNRSimpRewrite.
     - intros; reflexivity.
   Qed.
 
+  (* unflattening *)
+  Lemma unflatten_let_none_trew x (s s':nnrs_imp_stmt):
+    nnrs_imp_stmt_unflatten_safe s x = Some s' ->
+    NNRSimpLet x None s ⇒ˢ NNRSimpLet x None s'.
+  Proof.
+    red; intros eqq1 Γc Γ typ.
+    invcs typ.
+    rewrite (nnrs_imp_stmt_unflatten_safe_var_usage eqq1) in H2.
+    split.
+    - destruct (nnrs_imp_stmt_unflatten_safe_type _ _ _ eqq1 H3 τ)
+               as [τ' [typ' ?]]; simpl.
+      + match_destr; try congruence.
+      + subst.
+        simpl in typ'.
+        match_destr_in typ'; try congruence.
+        econstructor; eauto.
+    - intros σc σc_bt σ σ_bt.
+      simpl.
+      generalize (nnrs_imp_stmt_unflatten_safe_eval _ _ _ _ ((x, None)::σ) None eqq1 _ σc_bt ((x,τ)::Γ)); intros HH.
+      cut_to HH; [ | constructor; simpl; intuition discriminate ].
+      specialize (HH τ); simpl in HH.
+      match_destr_in HH; try congruence.
+      cut_to HH; trivial.
+      specialize (HH None I).
+      unfold lift2P, var in *.
+      repeat match_option_in HH
+      ; try contradiction.
+      + destruct HH as [dd' [? eqq4]].
+        subst.
+        destruct dd'; try contradiction.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq)
+        ; destruct p; try discriminate
+        ; destruct p
+        ; simpl
+        ; intros domeq.
+        invcs domeq.
+        destruct (equiv_dec s0 s0); try congruence.
+      + destruct HH as [dd' [? eqq4]].
+        subst.
+        destruct dd'; try contradiction.
+        generalize (nnrs_imp_stmt_eval_domain_stack eqq)
+        ; destruct p; try discriminate
+        ; destruct p
+        ; simpl
+        ; intros domeq.
+        invcs domeq.
+        destruct (equiv_dec s0 s0); try congruence.
+  Qed.        
+  
+  Lemma unflatten_let_some_trew x (e e':nnrs_imp_expr) (s s':nnrs_imp_stmt):
+    nnrs_imp_expr_unflatten_init e = Some e' ->
+    nnrs_imp_stmt_unflatten_safe s x = Some s' ->
+    NNRSimpLet x (Some e) s ⇒ˢ NNRSimpLet x (Some e') s'.
+  Proof.
+    red; intros eqq_init eqq1 Γc Γ typ.
+    invcs typ.
+    split.
+    - destruct (nnrs_imp_stmt_unflatten_safe_type _ _ _ eqq1 H4 τ)
+               as [τ' [typ' ?]]; simpl.
+      + match_destr; try congruence.
+      + subst.
+        simpl in typ'.
+        match_destr_in typ'; try congruence.
+        econstructor; eauto.
+        eapply nnrs_imp_expr_unflatten_init_type; eauto.
+    - intros σc σc_bt σ σ_bt.
+      simpl.
+      generalize (nnrs_imp_expr_unflatten_init_eval _ _ brand_relation_brands σc σ eqq_init)
+      ; intros eveq.
+      unfold lift2P, var in *.
+      repeat match_option_in eveq; simpl; try contradiction.
+      generalize (nnrs_imp_stmt_unflatten_safe_eval _ _ _ _ ((x, Some d)::σ) (Some d) eqq1 _ σc_bt ((x,τ)::Γ)); intros HH.
+      generalize (nnrs_imp_expr_eval_preserves_types σc_bt σ_bt H2 _ eqq)
+      ; intros dt.
+      cut_to HH.
+      + specialize (HH τ); simpl in HH.
+        match_destr_in HH; try congruence.
+        cut_to HH; trivial.
+        specialize (HH (Some d0) eveq).
+        unfold lift2P, var in *.
+        repeat match_option_in HH
+        ; try contradiction.
+        * destruct HH as [dd' [? eqq6]].
+          subst.
+          destruct dd'; try contradiction.
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq2)
+          ; destruct p; try discriminate
+          ; destruct p
+          ; simpl
+          ; intros domeq.
+          invcs domeq.
+          destruct (equiv_dec s0 s0); try congruence.
+        * destruct HH as [dd' [? eqq6]].
+          subst.
+          destruct dd'; try contradiction.
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq2)
+          ; destruct p; try discriminate
+          ; destruct p
+          ; simpl
+          ; intros domeq.
+          invcs domeq.
+        destruct (equiv_dec s0 s0); try congruence.
+      + constructor; simpl; trivial.
+        split; trivial.
+        intros ? eqq3; invcs eqq3; trivial.
+  Qed.
+
+  (* TODO: we can do unflattening for either/for as well!
+     The only thing that needs to change is the initialization check.
+     In both cases, we can at least handle constants.
+   *)
+  
   (* renaming *)
   Lemma rename_let_trew x x' e s:
     ~ In x' (nnrs_imp_stmt_free_vars s) ->

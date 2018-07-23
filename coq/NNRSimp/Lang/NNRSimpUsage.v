@@ -139,6 +139,21 @@ Section NNRSimpUsage.
         apply nnrs_imp_expr_may_use_free_vars in H.
         congruence.
     Qed.
+
+    Lemma nnrs_imp_expr_may_use_free_vars_eq {e₁ e₂} :
+      nnrs_imp_expr_free_vars e₁ = nnrs_imp_expr_free_vars e₂ ->
+      forall x, nnrs_imp_expr_may_use e₁ x = nnrs_imp_expr_may_use e₂ x.
+    Proof.
+      intros eqq x.
+      case_eq (nnrs_imp_expr_may_use e₁ x); intros eqq2.
+      - apply nnrs_imp_expr_may_use_free_vars in eqq2.
+        rewrite eqq in eqq2.
+        apply nnrs_imp_expr_may_use_free_vars in eqq2; eauto.
+      - apply nnrs_imp_expr_may_use_free_vars_neg in eqq2.
+        rewrite eqq in eqq2.
+        apply nnrs_imp_expr_may_use_free_vars_neg in eqq2; eauto.
+    Qed.
+    
     
     Lemma nnrs_imp_stmt_free_used s x :
       nnrs_imp_stmt_var_usage s x <> VarNotUsedAndNotAssigned ->

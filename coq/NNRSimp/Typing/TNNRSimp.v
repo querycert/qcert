@@ -1497,7 +1497,59 @@ Section TNNRSimp.
       destruct (string_eqdec x v); unfold equiv, complement in *
       ; subst; intuition.
   Qed.
+  
+  Section update.
+    Lemma nnrs_imp_expr_type_update_first_irrelevant Γc l Γ τo e v :
+      (In v (domain l) \/
+       ~ In v (nnrs_imp_expr_free_vars e)) ->
+      [  Γc ; l++ Γ ⊢  e ▷ τo ] ->
+      forall τ,
+        [  Γc ; l++ update_first equiv_dec Γ v τ ⊢ e ▷ τo ].
+    Proof.
+      intros inn typ τ.
+      case_eq (lookup equiv_dec Γ v).
+      - intros ? inn2.
+        destruct (in_update_break_first _ inn2 τ)
+            as [?[? [? [eqq2 nin]]]]
+          ; subst.
+        rewrite eqq2.
+        rewrite <- app_ass in typ |- *.
+        assert ( In v (domain (l ++ x)) \/ ~ In v (nnrs_imp_expr_free_vars e)).
+        {
+          rewrite domain_app, in_app_iff; tauto.
+        } 
+        apply nnrs_imp_expr_type_unused_remove in typ; trivial.
+        apply nnrs_imp_expr_type_unused_add; trivial.
+      - intros nin.
+        rewrite nin_update; trivial.
+    Qed.
+    
+    Lemma nnrs_imp_stmt_type_update_first_irrelevant Γc l Γ s v :
+      (In v (domain l) \/
+       ~ In v (nnrs_imp_stmt_free_vars s)) ->
+      [  Γc ; l++ Γ ⊢  s  ] ->
+      forall τ,
+        [  Γc ; l++ update_first equiv_dec Γ v τ ⊢ s  ].
+    Proof.
+      intros inn typ τ.
+      case_eq (lookup equiv_dec Γ v).
+      - intros ? inn2.
+        destruct (in_update_break_first _ inn2 τ)
+            as [?[? [? [eqq2 nin]]]]
+          ; subst.
+        rewrite eqq2.
+        rewrite <- app_ass in typ |- *.
+        assert ( In v (domain (l ++ x)) \/ ~ In v (nnrs_imp_stmt_free_vars s)).
+        {
+          rewrite domain_app, in_app_iff; tauto.
+        } 
+        apply nnrs_imp_stmt_type_unused_remove in typ; trivial.
+        apply nnrs_imp_stmt_type_unused_add; trivial.
+      - intros nin.
+        rewrite nin_update; trivial.
+    Qed.
 
+  End update.
   End unused.
 
 End TNNRSimp.
