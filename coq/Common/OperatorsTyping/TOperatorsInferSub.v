@@ -129,7 +129,7 @@ Section TOperatorsInferSub.
         end
       | OpFloatCompare _ =>
         match subtype_dec τ₁ Float, subtype_dec τ₂ Float with
-        | left _, left _ => Some (Float, Float, Bool)
+        | left _, left _ => Some (Bool, Float, Float)
         | _, _ => None
         end
       | OpForeignBinary fb =>
