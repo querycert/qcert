@@ -24,15 +24,17 @@ compilation pipeline has been mechanically checked for correctness.
 
 To build Q\*cert from the source, you will need:
 
-- OCaml 4.06.1 or later (http://ocaml.org/) along with the following libraries:
+- OCaml 4.06.1 (http://ocaml.org/) along with the following libraries:
   - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - camlp5, a pre-processor (https://camlp5.github.io)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
   - js\_of\_ocaml, a compiler from OCaml to JavaScript
-- Coq 8.8.0 (https://coq.inria.fr/) along with the following libraries:
+- Coq 8.8.1 (https://coq.inria.fr/) along with the following libraries:
   - flocq, a library for floating point numbers
   - jsast, a minimal AST for JavaScript
+
+**Note: Q\*cert will not work with OCaml 4.07.0 due to a regression in the OCaml type checker**
 
 An easy way to get set up on most platforms is to use the OCaml
 package manager (https://opam.ocaml.org). Once opam is installed, you
@@ -41,7 +43,7 @@ can just add the corresponding libraries:
 ```
 $ opam repo add coq-released https://coq.inria.fr/opam/released
 $ opam install ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
-$ opam install coq.8.8.0 coq-flocq coq-jsast
+$ opam install coq.8.8.1 coq-flocq coq-jsast
 ```
 
 ### Java (Recommended)

@@ -26,7 +26,7 @@ jobs:
     - run: export TERM=dumb && opam repo add coq-released https://coq.inria.fr/opam/released || true
     - run: export TERM=dumb && opam update || true
     - run:
-        command: export TERM=dumb && opam install -y ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx coq.8.8.0
+        command: export TERM=dumb && opam install -y ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx coq.8.8.1
         no_output_timeout: 1200s
     - run: export TERM=dumb && opam install -y coq-flocq coq-jsast
     - save_cache:
