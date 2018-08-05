@@ -263,6 +263,260 @@ Section NNRSimpUsage.
     
   End vars.
 
+  (* Definition of sub-usage -- like subtyping, but for usage info *)
+  Section sub.
+
+    Definition var_usage_sub (vu1 vu2:VarUsage)
+      := match vu1, vu2 with
+         | VarMayBeUsedWithoutAssignment, _ => True
+         | VarMustBeAssigned, VarMustBeAssigned => True
+         | VarMustBeAssigned, _ => False
+         | _, VarNotUsedAndNotAssigned => True
+         | _, _ => False
+         end.
+
+    Definition var_usage_sub_dec (vu1 vu2:VarUsage) :
+      {var_usage_sub vu1 vu2} + {~var_usage_sub vu1 vu2}.
+    Proof.
+      destruct vu1; destruct vu2; simpl; eauto.
+    Defined.
+
+    Global Instance var_usage_sub_pre : PreOrder var_usage_sub.
+    Proof.
+      constructor; red.
+      - destruct x; simpl; trivial.
+      - destruct x; destruct y; destruct z; simpl; trivial.
+    Qed.
+
+    Definition stmt_var_usage_sub (s1 s2:nnrs_imp_stmt) : Prop
+      := forall x, var_usage_sub
+                     (nnrs_imp_stmt_var_usage s1 x)
+                     (nnrs_imp_stmt_var_usage s2 x).
+
+    Definition stmt_var_usage_sub_restricted (s1 s2:nnrs_imp_stmt) : Prop
+      := forall x, In x (nnrs_imp_stmt_free_vars s1 ++ nnrs_imp_stmt_free_vars s2) ->
+                   var_usage_sub
+                     (nnrs_imp_stmt_var_usage s1 x)
+                     (nnrs_imp_stmt_var_usage s2 x).
+
+    Lemma stmt_var_usage_sub_is_restricted (s1 s2:nnrs_imp_stmt) :
+      stmt_var_usage_sub_restricted s1 s2 <->  stmt_var_usage_sub s1 s2.
+    Proof.
+      unfold stmt_var_usage_sub_restricted, stmt_var_usage_sub.
+      split; intros H; [ | eauto].
+      intros x.
+      specialize (H x).
+      destruct (in_dec string_dec x (nnrs_imp_stmt_free_vars s1 ++ nnrs_imp_stmt_free_vars s2)); [ tauto | ].
+      rewrite in_app_iff in n.
+      apply Decidable.not_or in n.
+      destruct n as [nin1 nin2].
+      apply nnrs_imp_stmt_free_unassigned in nin1.
+      apply nnrs_imp_stmt_free_unassigned in nin2.
+      rewrite nin1, nin2.
+      simpl; trivial.
+    Qed.
+
+    Definition stmt_var_usage_sub_restricted_Forall (s1 s2:nnrs_imp_stmt) : Prop
+      := Forall (fun x =>
+                   var_usage_sub
+                     (nnrs_imp_stmt_var_usage s1 x)
+                     (nnrs_imp_stmt_var_usage s2 x))
+                (nnrs_imp_stmt_free_vars s1 ++ nnrs_imp_stmt_free_vars s2).
+
+    Definition stmt_var_usage_sub_restricted_Forall_dec (s1 s2:nnrs_imp_stmt)
+      :  {stmt_var_usage_sub_restricted_Forall s1 s2} + {~ stmt_var_usage_sub_restricted_Forall s1 s2}.
+    Proof.
+      apply Forall_dec_defined.
+      intros.
+      apply var_usage_sub_dec.
+    Defined.
+    
+    Definition stmt_var_usage_sub_dec (s1 s2:nnrs_imp_stmt)
+      :  {stmt_var_usage_sub s1 s2} + {~ stmt_var_usage_sub s1 s2}.
+    Proof.
+      destruct (stmt_var_usage_sub_restricted_Forall_dec s1 s2)
+      ; [left|right]
+      ; unfold stmt_var_usage_sub_restricted_Forall in *
+      ; rewrite Forall_forall in *
+      ; rewrite <- stmt_var_usage_sub_is_restricted
+      ; trivial.
+    Defined.
+
+    Global Instance stmt_var_usage_sub_pre : PreOrder stmt_var_usage_sub.
+    Proof.
+      constructor; red.
+      - red; intros.
+        reflexivity.
+      - red; intros.
+        etransitivity; eauto.
+    Qed.
+
+    Lemma stmt_var_usage_sub_to_maybe_used {x y} :
+      stmt_var_usage_sub x y ->
+      forall v,
+        nnrs_imp_stmt_var_usage y v = VarMayBeUsedWithoutAssignment ->
+        nnrs_imp_stmt_var_usage x v = VarMayBeUsedWithoutAssignment.
+    Proof.
+      unfold stmt_var_usage_sub, var_usage_sub; intros sub v.
+      specialize (sub v).
+      repeat match_destr_in sub; try contradiction.
+    Qed.
+
+    Lemma stmt_var_usage_sub_to_not_used {x y} :
+      stmt_var_usage_sub x y ->
+      forall v,
+        nnrs_imp_stmt_var_usage x v = VarNotUsedAndNotAssigned ->
+        nnrs_imp_stmt_var_usage y v = VarNotUsedAndNotAssigned.
+    Proof.
+      unfold stmt_var_usage_sub, var_usage_sub; intros sub v.
+      specialize (sub v).
+      repeat match_destr_in sub; try contradiction.
+    Qed.
+
+    Global Instance stmt_var_usage_sub_seq_proper :
+      Proper (stmt_var_usage_sub ==> stmt_var_usage_sub ==> stmt_var_usage_sub) NNRSimpSeq.
+    Proof.
+      unfold Proper, respectful, stmt_var_usage_sub, var_usage_sub; intros s1 s1' s1eq s2 s2' s2eq x
+      ; simpl.
+      specialize (s1eq x).
+      specialize (s2eq x).
+      repeat match_destr_in s1eq; try contradiction.
+    Qed.
+
+    Lemma stmt_var_usage_sub_assign_proper {e e'}:
+      incl (nnrs_imp_expr_free_vars e') (nnrs_imp_expr_free_vars e) ->
+      forall x,
+        stmt_var_usage_sub (NNRSimpAssign x e) (NNRSimpAssign x e').
+    Proof.
+      intros inclfv x v.
+      specialize (inclfv v).
+      simpl.
+      case_eq (nnrs_imp_expr_may_use e v)
+      ; case_eq (nnrs_imp_expr_may_use e' v)
+      ; simpl; trivial
+      ; try reflexivity
+      ; intros eqq1 eqq2.
+      - apply nnrs_imp_expr_may_use_free_vars in eqq1.
+        specialize (inclfv eqq1).
+        apply nnrs_imp_expr_may_use_free_vars in inclfv.
+        congruence.
+    Qed.
+
+    Lemma stmt_var_usage_sub_let_proper {s s'}:
+      stmt_var_usage_sub s s' ->
+      forall x e,
+        stmt_var_usage_sub (NNRSimpLet x e s) (NNRSimpLet x e s').
+    Proof.
+      intros sub x e v.
+      specialize (sub v).
+      simpl.
+      repeat (match_destr; simpl; trivial).
+    Qed.
+
+    Lemma stmt_var_usage_sub_let_none_proper {s s'}:
+      stmt_var_usage_sub s s' ->
+      forall x,
+        stmt_var_usage_sub (NNRSimpLet x None s) (NNRSimpLet x None s').
+    Proof.
+      intros sub x v.
+      specialize (sub v).
+      simpl.
+      match_destr; simpl; trivial.
+    Qed.
+
+    Lemma stmt_var_usage_sub_let_some_proper {e e' s s'}:
+      incl (nnrs_imp_expr_free_vars e') (nnrs_imp_expr_free_vars e) ->
+      stmt_var_usage_sub s s' ->
+      forall x,
+        stmt_var_usage_sub (NNRSimpLet x (Some e) s) (NNRSimpLet x (Some e') s').
+    Proof.
+      intros inclfv sub x v.
+      specialize (inclfv v).
+      specialize (sub v).
+      simpl.
+      case_eq (nnrs_imp_expr_may_use e v)
+      ; case_eq (nnrs_imp_expr_may_use e' v)
+      ; simpl; trivial
+      ; try reflexivity
+      ; intros eqq1 eqq2.
+      - apply nnrs_imp_expr_may_use_free_vars in eqq1.
+        specialize (inclfv eqq1).
+        apply nnrs_imp_expr_may_use_free_vars in inclfv.
+        congruence.
+      - repeat match_destr; try reflexivity.          
+    Qed.
+
+    Lemma stmt_var_usage_sub_for_proper {e e' s s'}:
+      incl (nnrs_imp_expr_free_vars e') (nnrs_imp_expr_free_vars e) ->
+      stmt_var_usage_sub s s' ->
+      forall x,
+        stmt_var_usage_sub (NNRSimpFor x e s) (NNRSimpFor x e' s').
+    Proof.
+      intros inclfv sub x v.
+      specialize (inclfv v).
+      specialize (sub v).
+      simpl.
+      case_eq (nnrs_imp_expr_may_use e v)
+      ; case_eq (nnrs_imp_expr_may_use e' v)
+      ; simpl; trivial
+      ; try reflexivity
+      ; intros eqq1 eqq2.
+      - apply nnrs_imp_expr_may_use_free_vars in eqq1.
+        specialize (inclfv eqq1).
+        apply nnrs_imp_expr_may_use_free_vars in inclfv.
+        congruence.
+      - repeat match_destr; try reflexivity.          
+    Qed.
+
+    Lemma stmt_var_usage_sub_if_proper {e e' s1 s1' s2 s2'}:
+      incl (nnrs_imp_expr_free_vars e') (nnrs_imp_expr_free_vars e) ->
+      stmt_var_usage_sub s1 s1' ->
+      stmt_var_usage_sub s2 s2' ->
+      stmt_var_usage_sub (NNRSimpIf e s1 s2) (NNRSimpIf e' s1' s2').
+    Proof.
+      intros inclfv sub1 sub2 v.
+      specialize (inclfv v).
+      specialize (sub1 v).
+      specialize (sub2 v).
+      simpl.
+      case_eq (nnrs_imp_expr_may_use e v)
+      ; case_eq (nnrs_imp_expr_may_use e' v)
+      ; simpl; trivial
+      ; try reflexivity
+      ; intros eqq1 eqq2.
+      - apply nnrs_imp_expr_may_use_free_vars in eqq1.
+        specialize (inclfv eqq1).
+        apply nnrs_imp_expr_may_use_free_vars in inclfv.
+        congruence.
+      - repeat match_destr; try reflexivity.          
+    Qed.
+
+    Lemma stmt_var_usage_sub_either_proper {e e' s1 s1' s2 s2'}:
+      incl (nnrs_imp_expr_free_vars e') (nnrs_imp_expr_free_vars e) ->
+      stmt_var_usage_sub s1 s1' ->
+      stmt_var_usage_sub s2 s2' ->
+      forall x1 x2,
+        stmt_var_usage_sub (NNRSimpEither e x1 s1 x2 s2) (NNRSimpEither e' x1 s1' x2 s2').
+    Proof.
+      intros inclfv sub1 sub2 x1 x2 v.
+      specialize (inclfv v).
+      specialize (sub1 v).
+      specialize (sub2 v).
+      simpl.
+      case_eq (nnrs_imp_expr_may_use e v)
+      ; case_eq (nnrs_imp_expr_may_use e' v)
+      ; simpl; trivial
+      ; try reflexivity
+      ; intros eqq1 eqq2.
+      - apply nnrs_imp_expr_may_use_free_vars in eqq1.
+        specialize (inclfv eqq1).
+        apply nnrs_imp_expr_may_use_free_vars in inclfv.
+        congruence.
+      - repeat match_destr; try reflexivity.          
+    Qed.
+
+  End sub.
+
   Section eval.
     
     Lemma nnrs_imp_stmt_eval_must_assign_assigns {h σc s σ σ'}:
@@ -372,5 +626,7 @@ Section NNRSimpUsage.
     Qed.
 
   End eval.
+
+  
   
 End NNRSimpUsage.

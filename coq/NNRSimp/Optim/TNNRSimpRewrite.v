@@ -56,6 +56,8 @@ Section TNNRSimpRewrite.
   Proof.
     apply nnrs_imp_stmt_eq_rewrites_to.
     - apply for_nil_eq.
+    - red; simpl; intros.
+      repeat (match_destr; simpl; trivial).
     - eauto.
   Qed.
 
@@ -275,37 +277,40 @@ Section TNNRSimpRewrite.
         simpl in typ'.
         match_destr_in typ'; try congruence.
         econstructor; eauto.
-    - intros σc σc_bt σ σ_bt.
-      simpl.
-      generalize (nnrs_imp_stmt_unflatten_safe_eval _ _ _ _ ((x, None)::σ) None eqq1 _ σc_bt ((x,τ)::Γ)); intros HH.
-      cut_to HH; [ | constructor; simpl; intuition discriminate ].
-      specialize (HH τ); simpl in HH.
-      match_destr_in HH; try congruence.
-      cut_to HH; trivial.
-      specialize (HH None I).
-      unfold lift2P, var in *.
-      repeat match_option_in HH
-      ; try contradiction.
-      + destruct HH as [dd' [? eqq4]].
-        subst.
-        destruct dd'; try contradiction.
-        generalize (nnrs_imp_stmt_eval_domain_stack eqq)
-        ; destruct p; try discriminate
-        ; destruct p
-        ; simpl
-        ; intros domeq.
-        invcs domeq.
-        destruct (equiv_dec s0 s0); try congruence.
-      + destruct HH as [dd' [? eqq4]].
-        subst.
-        destruct dd'; try contradiction.
-        generalize (nnrs_imp_stmt_eval_domain_stack eqq)
-        ; destruct p; try discriminate
-        ; destruct p
-        ; simpl
-        ; intros domeq.
-        invcs domeq.
-        destruct (equiv_dec s0 s0); try congruence.
+    - split.
+      + intros σc σc_bt σ σ_bt.
+        simpl.
+        generalize (nnrs_imp_stmt_unflatten_safe_eval _ _ _ _ ((x, None)::σ) None eqq1 _ σc_bt ((x,τ)::Γ)); intros HH.
+        cut_to HH; [ | constructor; simpl; intuition discriminate ].
+        specialize (HH τ); simpl in HH.
+        match_destr_in HH; try congruence.
+        cut_to HH; trivial.
+        specialize (HH None I).
+        unfold lift2P, var in *.
+        repeat match_option_in HH
+        ; try contradiction.
+        * destruct HH as [dd' [? eqq4]].
+          subst.
+          destruct dd'; try contradiction.
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq)
+          ; destruct p; try discriminate
+          ; destruct p
+          ; simpl
+          ; intros domeq.
+          invcs domeq.
+          destruct (equiv_dec s0 s0); try congruence.
+        * destruct HH as [dd' [? eqq4]].
+          subst.
+          destruct dd'; try contradiction.
+          generalize (nnrs_imp_stmt_eval_domain_stack eqq)
+          ; destruct p; try discriminate
+          ; destruct p
+          ; simpl
+          ; intros domeq.
+          invcs domeq.
+          destruct (equiv_dec s0 s0); try congruence.
+      + apply stmt_var_usage_sub_let_none_proper.
+         eapply nnrs_imp_stmt_unflatten_safe_var_usage_sub; eauto.
   Qed.        
   
   Lemma unflatten_let_some_trew x (e e':nnrs_imp_expr) (s s':nnrs_imp_stmt):
@@ -324,7 +329,8 @@ Section TNNRSimpRewrite.
         match_destr_in typ'; try congruence.
         econstructor; eauto.
         eapply nnrs_imp_expr_unflatten_init_type; eauto.
-    - intros σc σc_bt σ σ_bt.
+    - { split.
+        - intros σc σc_bt σ σ_bt.
       simpl.
       generalize (nnrs_imp_expr_unflatten_init_eval _ _ brand_relation_brands σc σ eqq_init)
       ; intros eveq.
@@ -364,6 +370,11 @@ Section TNNRSimpRewrite.
       + constructor; simpl; trivial.
         split; trivial.
         intros ? eqq3; invcs eqq3; trivial.
+        - apply stmt_var_usage_sub_let_some_proper.
+          + rewrite (nnrs_imp_expr_unflatten_init_free_vars _ _ eqq_init).
+            reflexivity.
+          + eapply nnrs_imp_stmt_unflatten_safe_var_usage_sub; eauto.
+      } 
   Qed.
 
   (* TODO: we can do unflattening for either/for as well!
@@ -381,6 +392,7 @@ Section TNNRSimpRewrite.
     intros.
     apply nnrs_imp_stmt_eq_rewrites_to.
     - apply rename_let_eq; trivial.
+    - apply nnrs_imp_stmt_rename_let_var_usage_sub; trivial.
     - intros.
       invcs H1.
       + econstructor; eauto.
@@ -399,6 +411,7 @@ Section TNNRSimpRewrite.
     intros.
     apply nnrs_imp_stmt_eq_rewrites_to.
     - apply rename_for_eq; trivial.
+    - apply nnrs_imp_stmt_rename_for_var_usage_sub; trivial.
     - intros.
       invcs H1.
       econstructor; eauto.
@@ -414,6 +427,7 @@ Section TNNRSimpRewrite.
     intros.
     apply nnrs_imp_stmt_eq_rewrites_to.
     - apply rename_either_l_eq; trivial.
+    - apply nnrs_imp_stmt_rename_either_l_var_usage_sub; trivial.
     - intros.
       invcs H1.
       econstructor; eauto.
@@ -429,6 +443,7 @@ Section TNNRSimpRewrite.
     intros.
     apply nnrs_imp_stmt_eq_rewrites_to.
     - apply rename_either_r_eq; trivial.
+    - apply nnrs_imp_stmt_rename_either_r_var_usage_sub; trivial.
     - intros.
       invcs H1.
       econstructor; eauto.
@@ -573,7 +588,8 @@ Section TNNRSimpRewrite.
                 eapply (nnrs_imp_stmt_type_unused_remove Γc ((x₂, τ1)::nil)) in H7
                 ; simpl; eauto; tauto.
           }
-      + { intros.
+      + split.
+        * { intros.
           generalize (nnrs_imp_expr_eval_unused brand_relation_brands σc nil); simpl
           ; intros HH; rewrite HH; clear HH; try tauto.
           case_eq ( (nnrs_imp_expr_eval brand_relation_brands σc σ e₁)); simpl; trivial.
@@ -603,7 +619,7 @@ Section TNNRSimpRewrite.
           generalize (nnrs_imp_stmt_eval_preserves_some eqq1)
           ; simpl; intros HH.
           invcs HH.
-          cut_to H15; try congruence.
+          cut_to H17; try congruence.
           destruct o; simpl; try congruence.
           destruct H3.
           + subst.
@@ -615,7 +631,59 @@ Section TNNRSimpRewrite.
             repeat match_option_in HH
             ; (repeat match_destr_in HH; try contradiction).
             intuition congruence.
-        }
+          }
+        * intros v; simpl.
+          unfold equiv_decb.
+          { unfold var in *.
+            destruct (x₁ == v); unfold equiv, complement in *.
+            - subst.
+              simpl.
+              apply nnrs_imp_expr_may_use_free_vars_neg in nin1.
+              rewrite nin1.
+              destruct (x₃ == v); trivial.
+              rewrite nnrs_imp_stmt_rename_var_usage_neq by eauto.
+              apply nnrs_imp_stmt_free_unassigned in H0.
+              rewrite H0.
+              intuition.
+              replace (nnrs_imp_stmt_var_usage (nnrs_imp_stmt_rename s₂ v x₃) v)
+                with VarNotUsedAndNotAssigned; trivial.
+              symmetry.
+              apply nnrs_imp_stmt_free_unassigned.
+              rewrite nnrs_imp_stmt_rename_free_vars by eauto.
+              intros inn.
+              apply in_replace_all in inn.
+              destruct inn; intuition congruence.
+            - destruct (nnrs_imp_expr_may_use e₁ v); simpl; trivial.
+              destruct (x₂ == v); unfold equiv, complement in *.
+              + subst.
+                destruct (x₃ == v); unfold equiv, complement in *.
+                * subst.
+                  destruct H3 as [?|[nin3 nin4]]; [congruence | ].
+                  apply nnrs_imp_stmt_free_unassigned in nin3.
+                  rewrite nin3; simpl; trivial.
+                * { replace (nnrs_imp_stmt_var_usage (nnrs_imp_stmt_rename s₁ v x₃) v)
+                      with VarNotUsedAndNotAssigned; trivial.
+                    - rewrite nnrs_imp_stmt_rename_var_usage_neq by eauto.
+                      reflexivity.
+                    - symmetry.
+                      apply nnrs_imp_stmt_free_unassigned.
+                      rewrite nnrs_imp_stmt_rename_free_vars by eauto.
+                      intros inn.
+                      apply in_replace_all in inn.
+                      destruct inn; intuition congruence.
+                  }
+              + destruct (v == x₂); [congruence | ].
+                destruct (x₃ == v); unfold equiv, complement in *.
+                * subst.
+                  destruct H3 as [?|[nin3 nin4]]; [congruence | ].
+                  apply nnrs_imp_stmt_free_unassigned in nin3.
+                  apply nnrs_imp_stmt_free_unassigned in H1.
+                  rewrite H1, nin3; simpl; trivial.
+                * { repeat rewrite nnrs_imp_stmt_rename_var_usage_neq by eauto.
+                    destruct ( nnrs_imp_stmt_var_usage s₁ v); simpl; trivial.
+                    reflexivity.
+                  }
+          } 
     - { simpl in H9.
         unfold equiv_decb in *.
         destruct (x₂ == x₂); try congruence.
@@ -654,9 +722,10 @@ Section TNNRSimpRewrite.
                   rewrite nnrs_imp_stmt_rename_id; trivial.
                 + apply nnrs_imp_stmt_type_rename_f; eauto; try tauto.
             }        
-        - intros.
-          generalize (nnrs_imp_stmt_eval_unused brand_relation_brands σc ((x₂, None) :: nil) σ s₁ x₁ None); simpl; intros HH1.
-          cut_to HH1; [ | tauto].
+        - { split.
+            - intros.
+              generalize (nnrs_imp_stmt_eval_unused brand_relation_brands σc ((x₂, None) :: nil) σ s₁ x₁ None); simpl; intros HH1.
+              cut_to HH1; [ | tauto].
           generalize (nnrs_imp_stmt_eval_rename brand_relation_brands σc σ s₁ x₂ x₃ None)
           ; simpl; intros HH2.
           cut_to HH2; [| tauto..].
@@ -694,6 +763,56 @@ Section TNNRSimpRewrite.
             repeat match_option_in HH
             ; (repeat match_destr_in HH; try contradiction).
             intuition congruence.
+       - intros v; simpl.
+         unfold equiv_decb.
+         { unfold var in *.
+           destruct (x₁ == v); unfold equiv, complement in *.
+           - subst.
+             simpl.
+             destruct (x₃ == v); trivial.
+             rewrite nnrs_imp_stmt_rename_var_usage_neq by eauto.
+             apply nnrs_imp_stmt_free_unassigned in H0.
+              rewrite H0.
+              intuition.
+              replace (nnrs_imp_stmt_var_usage (nnrs_imp_stmt_rename s₂ v x₃) v)
+                with VarNotUsedAndNotAssigned; trivial.
+              symmetry.
+              apply nnrs_imp_stmt_free_unassigned.
+              rewrite nnrs_imp_stmt_rename_free_vars by eauto.
+              intros inn.
+              apply in_replace_all in inn.
+              destruct inn; intuition congruence.
+           - destruct (x₂ == v); unfold equiv, complement in *.
+              + subst.
+                destruct (x₃ == v); unfold equiv, complement in *.
+                * subst.
+                  destruct H3 as [?|[nin3 nin4]]; [congruence | ].
+                  apply nnrs_imp_stmt_free_unassigned in nin3.
+                  rewrite nin3; simpl; trivial.
+                * { replace (nnrs_imp_stmt_var_usage (nnrs_imp_stmt_rename s₁ v x₃) v)
+                      with VarNotUsedAndNotAssigned; trivial.
+                    - rewrite nnrs_imp_stmt_rename_var_usage_neq by eauto.
+                      reflexivity.
+                    - symmetry.
+                      apply nnrs_imp_stmt_free_unassigned.
+                      rewrite nnrs_imp_stmt_rename_free_vars by eauto.
+                      intros inn.
+                      apply in_replace_all in inn.
+                      destruct inn; intuition congruence.
+                  }
+              + destruct (v == x₂); [congruence | ].
+                destruct (x₃ == v); unfold equiv, complement in *.
+                * subst.
+                  destruct H3 as [?|[nin3 nin4]]; [congruence | ].
+                  apply nnrs_imp_stmt_free_unassigned in nin3.
+                  apply nnrs_imp_stmt_free_unassigned in H1.
+                  rewrite H1, nin3; simpl; trivial.
+                * { repeat rewrite nnrs_imp_stmt_rename_var_usage_neq by eauto.
+                    destruct ( nnrs_imp_stmt_var_usage s₁ v); simpl; trivial.
+                    reflexivity.
+                  }
+             } 
+          }
       } 
   Qed.
   
@@ -756,6 +875,36 @@ Section TNNRSimpRewrite.
         intros.
         apply nnrs_imp_stmt_eq_rewrites_to.
         - apply for_for_fuse_eq; trivial.
+        - intros v; simpl.
+          unfold equiv_decb.
+          destruct (x₁ == v); simpl; unfold equiv, complement in *.
+          + subst.
+            destruct (tmp₂ == v); [congruence | ].
+            destruct (tmp₁ == v); [congruence | ].
+            apply nnrs_imp_expr_may_use_free_vars_neg in H2.
+            apply nnrs_imp_expr_may_use_free_vars_neg in H3.
+            apply nnrs_imp_stmt_free_unassigned in H7.
+            apply nnrs_imp_stmt_free_unassigned in H8.
+            rewrite H2, H3, H7, H8.
+            destruct expr₂.
+            * simpl in *.
+              apply nnrs_imp_expr_may_use_free_vars_neg in H9.
+              rewrite H9.
+              destruct (tmp₃ == v); trivial.
+            * destruct (tmp₃ == v); trivial.
+          + destruct (nnrs_imp_expr_may_use source v); simpl; trivial.
+             destruct (v == x₁); [congruence | ]; simpl.
+             destruct (tmp₁ == v); unfold equiv, complement in *.
+            * subst.
+              match_destr; simpl; trivial.
+              apply nnrs_imp_stmt_free_unassigned in H6.
+              rewrite H6.
+              destruct (tmp₂ == v); simpl; trivial.
+              destruct (tmp₃ == v); reflexivity.
+            * destruct (nnrs_imp_expr_may_use expr v); simpl; trivial.
+              match_destr; simpl; trivial.
+              destruct (tmp₂ == v); simpl; trivial.
+              destruct (tmp₃ == v); simpl; try reflexivity.
         - intros ? ? typ.
           invcs typ.
           invcs H16.

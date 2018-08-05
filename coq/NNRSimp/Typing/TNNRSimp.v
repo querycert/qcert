@@ -66,16 +66,30 @@ Section TNNRSimp.
                         | Some (Some _) => True
                         end) someparts.
 
-  Global Instance has_some_parts_incl_proper {A B dec}: Proper ((@incl A) --> lookup_equiv ==> impl) (@has_some_parts A B dec).
+  
+  Lemma has_some_parts_app {A B} {dec:EqDec A eq} l1 l2 (σ:list (A*option B)) :
+    has_some_parts (l1 ++ l2) σ <->
+    has_some_parts l1 σ /\ has_some_parts l2 σ.
+  Proof.
+    unfold has_some_parts.
+    split.
+    - apply Forall_app_inv.
+    - intros [??]; apply Forall_app; trivial.
+  Qed.
+  
+  Global Instance has_some_parts_incl_proper {A B dec}: Proper ((@incl A) --> lookup_incl --> impl) (@has_some_parts A B dec).
   Proof.
     intros x y inclxy l1 l2 eql.
-    unfold has_some_parts.
+    unfold has_some_parts, equiv_dec.
     repeat rewrite Forall_forall.
     intros H ? inn.
     unfold flip in *.
-    rewrite <- eql.
-    apply H.
-    apply inclxy; trivial.
+    specialize (inclxy _ inn).
+    specialize (H _ inclxy).
+    match_option.
+    apply eql in eqq.
+    rewrite eqq in H.
+    match_destr.
   Qed.
 
   Definition pd_bindings_type 
@@ -99,6 +113,21 @@ Section TNNRSimp.
     destruct inn as [[??][?[? dt]]]; simpl in *; subst.
     specialize (dt _ (eq_refl _)).
     eauto.
+  Qed.
+
+  Lemma pd_bindings_type_cut_down_to {σ Γ} :
+    pd_bindings_type σ Γ ->
+    forall l,
+      pd_bindings_type (cut_down_to σ l) (cut_down_to Γ l).
+  Proof.
+    induction 1; simpl; intros.
+    - constructor.
+    - destruct H as [eqq1 ?].
+      rewrite eqq1.
+      match_destr.
+      constructor.
+      + tauto.
+      + apply IHForall2.
   Qed.
   
   Section typ.
@@ -279,16 +308,16 @@ Section TNNRSimp.
     pd_bindings_type σ Γ ->
     [ Γc ; Γ  ⊢ e ▷ τ ] ->
     forall d,
-    nnrs_imp_expr_eval brand_relation_brands σc σ e = Some d ->
-    d ▹ τ.
+      nnrs_imp_expr_eval brand_relation_brands σc σ e = Some d ->
+      d ▹ τ.
   Proof.
     intros Γctyp Γtyp etyp d eqq.
     dependent induction etyp; simpl in *.
     - unfold tdot in *.
       red in Γctyp.
       assert (Γctyp':Forall2
-            (fun (x : string * rtype) (y : string * data) => fst x = fst y /\ (fun x y => data_type y x) (snd x) (snd y))
-            Γc σc).
+                       (fun (x : string * rtype) (y : string * data) => fst x = fst y /\ (fun x y => data_type y x) (snd x) (snd y))
+                       Γc σc).
       {
         apply Forall2_flip in Γctyp.
         simpl in Γctyp.
@@ -516,6 +545,55 @@ Section TNNRSimp.
   Proof.
     intros evals hp.
     eapply (nnrs_imp_stmt_preserves_has_some_parts_skip _ _ _ nil _ nil); simpl; eauto.
+  Qed.
+
+  Lemma has_some_parts_cons_some {A B} {dec:EqDec A eq} alreadydefined (σ:list (A*option B)) v x :
+    has_some_parts alreadydefined σ ->
+    has_some_parts (v :: alreadydefined) ((v, Some x) :: σ).
+  Proof.
+    intros.
+    constructor.
+    - simpl.
+      destruct (v == v); [ | congruence].
+      trivial.
+    - revert H.
+      apply Forall_impl; simpl; intros a inn.
+      destruct (a == v); trivial.
+  Qed.
+  
+  Lemma has_some_parts_cons_none {A B} {dec:EqDec A eq} alreadydefined (σ:list (A*option B)) v :
+    has_some_parts alreadydefined σ ->
+    has_some_parts (remove equiv_dec v alreadydefined) ((v, None) :: σ).
+  Proof.
+    unfold has_some_parts.
+    repeat rewrite Forall_forall.
+    intros F x inn.
+    apply remove_inv in inn.
+    destruct inn as [inn neq].
+    simpl.
+    destruct (x == v); try congruence.
+    apply F; trivial.
+  Qed.
+  
+
+  Lemma nnrs_imp_stmt_assigns_has_some_parts {σc s σ σ'} :
+    nnrs_imp_stmt_eval brand_relation_brands σc s σ = Some σ' ->
+    forall ll,
+      has_some_parts (filter (fun x => nnrs_imp_stmt_var_usage s x ==b VarMustBeAssigned)
+                             ll) σ' .
+  Proof.
+    intros eqq1 ll.
+    unfold has_some_parts.
+    rewrite Forall_forall.
+    intros x inn.
+    apply filter_In in inn.
+    destruct inn as [_ eqq2].
+    unfold equiv_decb, equiv_dec in eqq2.
+    match_destr_in eqq2.
+    destruct (nnrs_imp_stmt_eval_must_assign_assigns eqq1 _ e)
+      as [? inn].
+    unfold var in *.
+    rewrite inn; trivial.
   Qed.
 
   Theorem typed_nnrs_imp_stmt_yields_typed_data {σc σ} {Γc Γ} {alreadydefined} (s:nnrs_imp_stmt) :
@@ -962,9 +1040,9 @@ Section TNNRSimp.
         ; rewrite eqq4; simpl; eauto.
   Qed.
 
-    (* This variant does not ensure progress, but does guarantee type preservation
+  (* This variant does not ensure progress, but does guarantee type preservation
       and has less hypothesis *)
-    Theorem nnrs_imp_stmt_eval_preserves_types {σc σ} {Γc Γ} (s:nnrs_imp_stmt) :
+  Theorem nnrs_imp_stmt_eval_preserves_types {σc σ} {Γc Γ} (s:nnrs_imp_stmt) :
     bindings_type σc Γc ->
     pd_bindings_type σ Γ ->
     [  Γc ; Γ  ⊢ s ] ->
@@ -995,9 +1073,9 @@ Section TNNRSimp.
         intros ? eqq2; invcs eqq2.
         eapply nnrs_imp_expr_eval_preserves_types; eauto.
     - match_option_in eqq.
-       destruct p; try discriminate.
-       invcs eqq.
-       apply IHtyps in eqq0.
+      destruct p; try discriminate.
+      invcs eqq.
+      apply IHtyps in eqq0.
       + invcs eqq0; trivial.
       + constructor; trivial; simpl.
         intuition; discriminate.
@@ -1126,29 +1204,29 @@ Section TNNRSimp.
 
   (* This variant does not ensure progress, but does guarantee type preservation
       and has less hypothesis *)
-    Theorem nnrs_imp_eval_preserves_types {σc} {Γc τ} (si:nnrs_imp) :
-      bindings_type σc Γc ->
-      [ Γc ⊢ si ▷ τ ] ->
-      forall d,
-        nnrs_imp_eval brand_relation_brands σc si = Some (Some d) ->
-        d ▹ τ.
-    Proof.
-      intros bt typ d eqq.
-      destruct si as [s ret].
-      destruct typ as [ne typ].
-      assert (pd:pd_bindings_type [(ret, None)]
-                                  [(ret, τ)]).
-      { constructor; simpl; eauto.
-        intuition; discriminate.
-      } 
-      unfold nnrs_imp_eval in eqq.
-      match_option_in eqq.
-      repeat (destruct p; try discriminate).
-      invcs eqq.
-      generalize (nnrs_imp_stmt_eval_preserves_types s bt pd typ _ eqq0); intros pd2.
-      invcs pd2; simpl in *.
-      intuition eauto.
-    Qed.
+  Theorem nnrs_imp_eval_preserves_types {σc} {Γc τ} (si:nnrs_imp) :
+    bindings_type σc Γc ->
+    [ Γc ⊢ si ▷ τ ] ->
+    forall d,
+      nnrs_imp_eval brand_relation_brands σc si = Some (Some d) ->
+      d ▹ τ.
+  Proof.
+    intros bt typ d eqq.
+    destruct si as [s ret].
+    destruct typ as [ne typ].
+    assert (pd:pd_bindings_type [(ret, None)]
+                                [(ret, τ)]).
+    { constructor; simpl; eauto.
+      intuition; discriminate.
+    } 
+    unfold nnrs_imp_eval in eqq.
+    match_option_in eqq.
+    repeat (destruct p; try discriminate).
+    invcs eqq.
+    generalize (nnrs_imp_stmt_eval_preserves_types s bt pd typ _ eqq0); intros pd2.
+    invcs pd2; simpl in *.
+    intuition eauto.
+  Qed.
   
   Theorem typed_nnrs_imp_top_yields_typed_data {σc} {Γc} {τ} {si:nnrs_imp}:
     bindings_type σc Γc ->
@@ -1362,6 +1440,90 @@ Section TNNRSimp.
         apply remove_in_neq; tauto.
   Qed.
 
+  Lemma nnrs_imp_expr_type_has_free_vars {Γc Γ e τ} :
+    [Γc; Γ ⊢ e ▷ τ] ->
+    incl (nnrs_imp_expr_free_vars e) (domain Γ).
+  Proof.
+    intros typ x inn.
+    revert τ typ inn.
+    induction e; simpl; intros τ typ inn
+    ; try contradiction
+    ; invcs typ
+    ; repeat rewrite in_app_iff in *
+    ; intuition eauto.
+    - apply lookup_in_domain in H1.
+      subst; trivial.
+  Qed.
+
+  Lemma nnrs_imp_stmt_type_has_free_vars {Γc Γ s} :
+    [Γc; Γ ⊢ s] ->
+    incl (nnrs_imp_stmt_free_vars s) (domain Γ).
+  Proof.
+    intros typ x inn.
+    revert Γ typ inn.
+    induction s; simpl; intros Γ typ inn
+    ; try contradiction
+    ; invcs typ
+    ; repeat rewrite in_app_iff in *
+    ; intuition eauto
+    ; try solve [eapply nnrs_imp_expr_type_has_free_vars; eauto]
+    ; simpl in *
+    ; try contradiction
+    ; try solve [apply remove_inv in H
+                 ; intuition eauto
+                 ; specialize (IHs _ H4)
+                 ; simpl in IHs
+                 ; intuition].
+    - apply lookup_in_domain in H3.
+      subst; trivial.
+    - apply remove_inv in H0.
+      intuition eauto.
+      specialize (IHs1 _ H6).
+      simpl in IHs1.
+      intuition.
+    - apply remove_inv in H0.
+      intuition eauto.
+      specialize (IHs2 _ H7).
+      simpl in IHs2.
+      intuition.
+  Qed.
+
+  Lemma nnrs_imp_expr_type_impl_free_vars_incl (Γc : tbindings) e₁ e₂ τ:
+    (forall (Γ : pd_tbindings),
+        [Γc; Γ ⊢ e₁ ▷ τ] ->
+        [Γc; Γ ⊢ e₂ ▷ τ]) ->
+    forall Γ,
+      [Γc; Γ ⊢ e₁ ▷ τ] ->
+      incl (nnrs_imp_expr_free_vars e₂) (nnrs_imp_expr_free_vars e₁).
+  Proof.
+    intros.
+    specialize (H (cut_down_to Γ (nnrs_imp_expr_free_vars e₁))).
+    cut_to H.
+    - rewrite (nnrs_imp_expr_type_has_free_vars H).
+      apply cut_down_to_incl_to.
+    - eapply nnrs_imp_expr_type_lookup_equiv_on; eauto.
+      symmetry.
+      apply cut_down_to_lookup_equiv_on.
+  Qed. 
+  
+  Lemma nnrs_imp_stmt_type_impl_free_vars_incl Γc s₁ s₂:
+    (forall (Γ : pd_tbindings),
+        [Γc; Γ ⊢ s₁] ->
+        [Γc; Γ ⊢ s₂]) ->
+    forall Γ,
+      [Γc; Γ ⊢ s₁] ->
+      incl (nnrs_imp_stmt_free_vars s₂) (nnrs_imp_stmt_free_vars s₁).
+  Proof.
+    intros.
+    specialize (H (cut_down_to Γ (nnrs_imp_stmt_free_vars s₁))).
+    cut_to H.
+    - rewrite (nnrs_imp_stmt_type_has_free_vars H).
+      apply cut_down_to_incl_to.
+    - eapply nnrs_imp_stmt_type_lookup_equiv_on; eauto.
+      symmetry.
+      apply cut_down_to_lookup_equiv_on.
+  Qed.
+
   Section swap.
 
     Lemma nnrs_imp_expr_type_swap Γc l Γ  e v₁ v₂ τ₁ τ₂ τo:
@@ -1399,10 +1561,10 @@ Section TNNRSimp.
   Section unused.
 
     Lemma nnrs_imp_expr_type_unused_remove Γc l Γ e v τ τo:
-    (In v (domain l) \/
-     ~ In v (nnrs_imp_expr_free_vars e)) ->
-    [  Γc ; l++(v,τ)::Γ ⊢  e ▷ τo  ] ->
-    [  Γc ; l++Γ ⊢ e ▷ τo ].
+      (In v (domain l) \/
+       ~ In v (nnrs_imp_expr_free_vars e)) ->
+      [  Γc ; l++(v,τ)::Γ ⊢  e ▷ τo  ] ->
+      [  Γc ; l++Γ ⊢ e ▷ τo ].
     Proof.
       intros.
       eapply nnrs_imp_expr_type_lookup_equiv_on; eauto.
@@ -1415,10 +1577,10 @@ Section TNNRSimp.
     Qed.
 
     Lemma nnrs_imp_stmt_type_unused_remove Γc l Γ s v τ:
-    (In v (domain l) \/
-     ~ In v (nnrs_imp_stmt_free_vars s)) ->
-    [  Γc ; l++(v,τ)::Γ  ⊢ s  ] ->
-    [  Γc ; l++Γ ⊢  s ].
+      (In v (domain l) \/
+       ~ In v (nnrs_imp_stmt_free_vars s)) ->
+      [  Γc ; l++(v,τ)::Γ  ⊢ s  ] ->
+      [  Γc ; l++Γ ⊢  s ].
     Proof.
       intros.
       eapply nnrs_imp_stmt_type_lookup_equiv_on; eauto.
@@ -1431,11 +1593,11 @@ Section TNNRSimp.
     Qed.
 
     Lemma nnrs_imp_expr_type_unused_add Γc l Γ e v τo:
-    (In v (domain l) \/
-     ~ In v (nnrs_imp_expr_free_vars e)) ->
-    [  Γc ; l++Γ ⊢ e ▷ τo ] ->
-    forall τ,
-    [  Γc ; l++(v,τ)::Γ ⊢  e ▷ τo  ].
+      (In v (domain l) \/
+       ~ In v (nnrs_imp_expr_free_vars e)) ->
+      [  Γc ; l++Γ ⊢ e ▷ τo ] ->
+      forall τ,
+        [  Γc ; l++(v,τ)::Γ ⊢  e ▷ τo  ].
     Proof.
       intros.
       eapply nnrs_imp_expr_type_lookup_equiv_on; eauto.
@@ -1448,11 +1610,11 @@ Section TNNRSimp.
     Qed.
 
     Lemma nnrs_imp_stmt_type_unused_add Γc l Γ s v:
-    (In v (domain l) \/
-     ~ In v (nnrs_imp_stmt_free_vars s)) ->
-    [  Γc ; l++Γ ⊢  s ] ->
-    forall τ,
-    [  Γc ; l++(v,τ)::Γ  ⊢ s  ].
+      (In v (domain l) \/
+       ~ In v (nnrs_imp_stmt_free_vars s)) ->
+      [  Γc ; l++Γ ⊢  s ] ->
+      forall τ,
+        [  Γc ; l++(v,τ)::Γ  ⊢ s  ].
     Proof.
       intros.
       eapply nnrs_imp_stmt_type_lookup_equiv_on; eauto.
@@ -1465,91 +1627,91 @@ Section TNNRSimp.
     Qed.
 
     Lemma nnrs_imp_expr_type_unused_irrelevant Γc l Γ e v τ₁ τo:
-    (In v (domain l) \/
-     ~ In v (nnrs_imp_expr_free_vars e)) ->
-    [  Γc ; l++(v,τ₁)::Γ ⊢  e ▷ τo  ] ->
-    forall τ₂,
-      [  Γc ; l++(v,τ₂)::Γ ⊢ e ▷ τo ].
-  Proof.
-    intros.
-    eapply nnrs_imp_expr_type_lookup_equiv_on; eauto.
-    red; simpl; intros.
-      repeat rewrite lookup_app.
-      match_option; simpl.
-      apply lookup_none_nin in eqq.
-      destruct (string_eqdec x v); unfold equiv, complement in *
-      ; subst; intuition.
-  Qed.
-
-  Lemma nnrs_imp_stmt_type_unused_irrelevant Γc l Γ s v τ₁ :
-    (In v (domain l) \/
-     ~ In v (nnrs_imp_stmt_free_vars s)) ->
-    [  Γc ; l++(v,τ₁)::Γ ⊢  s  ] ->
-    forall τ₂,
-      [  Γc ; l++(v,τ₂)::Γ ⊢ s  ].
-  Proof.
-    intros.
-    eapply nnrs_imp_stmt_type_lookup_equiv_on; eauto.
-    red; simpl; intros.
-      repeat rewrite lookup_app.
-      match_option; simpl.
-      apply lookup_none_nin in eqq.
-      destruct (string_eqdec x v); unfold equiv, complement in *
-      ; subst; intuition.
-  Qed.
-  
-  Section update.
-    Lemma nnrs_imp_expr_type_update_first_irrelevant Γc l Γ τo e v :
       (In v (domain l) \/
        ~ In v (nnrs_imp_expr_free_vars e)) ->
-      [  Γc ; l++ Γ ⊢  e ▷ τo ] ->
-      forall τ,
-        [  Γc ; l++ update_first equiv_dec Γ v τ ⊢ e ▷ τo ].
+      [  Γc ; l++(v,τ₁)::Γ ⊢  e ▷ τo  ] ->
+      forall τ₂,
+        [  Γc ; l++(v,τ₂)::Γ ⊢ e ▷ τo ].
     Proof.
-      intros inn typ τ.
-      case_eq (lookup equiv_dec Γ v).
-      - intros ? inn2.
-        destruct (in_update_break_first _ inn2 τ)
-            as [?[? [? [eqq2 nin]]]]
-          ; subst.
-        rewrite eqq2.
-        rewrite <- app_ass in typ |- *.
-        assert ( In v (domain (l ++ x)) \/ ~ In v (nnrs_imp_expr_free_vars e)).
-        {
-          rewrite domain_app, in_app_iff; tauto.
-        } 
-        apply nnrs_imp_expr_type_unused_remove in typ; trivial.
-        apply nnrs_imp_expr_type_unused_add; trivial.
-      - intros nin.
-        rewrite nin_update; trivial.
-    Qed.
-    
-    Lemma nnrs_imp_stmt_type_update_first_irrelevant Γc l Γ s v :
-      (In v (domain l) \/
-       ~ In v (nnrs_imp_stmt_free_vars s)) ->
-      [  Γc ; l++ Γ ⊢  s  ] ->
-      forall τ,
-        [  Γc ; l++ update_first equiv_dec Γ v τ ⊢ s  ].
-    Proof.
-      intros inn typ τ.
-      case_eq (lookup equiv_dec Γ v).
-      - intros ? inn2.
-        destruct (in_update_break_first _ inn2 τ)
-            as [?[? [? [eqq2 nin]]]]
-          ; subst.
-        rewrite eqq2.
-        rewrite <- app_ass in typ |- *.
-        assert ( In v (domain (l ++ x)) \/ ~ In v (nnrs_imp_stmt_free_vars s)).
-        {
-          rewrite domain_app, in_app_iff; tauto.
-        } 
-        apply nnrs_imp_stmt_type_unused_remove in typ; trivial.
-        apply nnrs_imp_stmt_type_unused_add; trivial.
-      - intros nin.
-        rewrite nin_update; trivial.
+      intros.
+      eapply nnrs_imp_expr_type_lookup_equiv_on; eauto.
+      red; simpl; intros.
+      repeat rewrite lookup_app.
+      match_option; simpl.
+      apply lookup_none_nin in eqq.
+      destruct (string_eqdec x v); unfold equiv, complement in *
+      ; subst; intuition.
     Qed.
 
-  End update.
+    Lemma nnrs_imp_stmt_type_unused_irrelevant Γc l Γ s v τ₁ :
+      (In v (domain l) \/
+       ~ In v (nnrs_imp_stmt_free_vars s)) ->
+      [  Γc ; l++(v,τ₁)::Γ ⊢  s  ] ->
+      forall τ₂,
+        [  Γc ; l++(v,τ₂)::Γ ⊢ s  ].
+    Proof.
+      intros.
+      eapply nnrs_imp_stmt_type_lookup_equiv_on; eauto.
+      red; simpl; intros.
+      repeat rewrite lookup_app.
+      match_option; simpl.
+      apply lookup_none_nin in eqq.
+      destruct (string_eqdec x v); unfold equiv, complement in *
+      ; subst; intuition.
+    Qed.
+    
+    Section update.
+      Lemma nnrs_imp_expr_type_update_first_irrelevant Γc l Γ τo e v :
+        (In v (domain l) \/
+         ~ In v (nnrs_imp_expr_free_vars e)) ->
+        [  Γc ; l++ Γ ⊢  e ▷ τo ] ->
+        forall τ,
+          [  Γc ; l++ update_first equiv_dec Γ v τ ⊢ e ▷ τo ].
+      Proof.
+        intros inn typ τ.
+        case_eq (lookup equiv_dec Γ v).
+        - intros ? inn2.
+          destruct (in_update_break_first _ inn2 τ)
+            as [?[? [? [eqq2 nin]]]]
+          ; subst.
+          rewrite eqq2.
+          rewrite <- app_ass in typ |- *.
+          assert ( In v (domain (l ++ x)) \/ ~ In v (nnrs_imp_expr_free_vars e)).
+          {
+            rewrite domain_app, in_app_iff; tauto.
+          } 
+          apply nnrs_imp_expr_type_unused_remove in typ; trivial.
+          apply nnrs_imp_expr_type_unused_add; trivial.
+        - intros nin.
+          rewrite nin_update; trivial.
+      Qed.
+      
+      Lemma nnrs_imp_stmt_type_update_first_irrelevant Γc l Γ s v :
+        (In v (domain l) \/
+         ~ In v (nnrs_imp_stmt_free_vars s)) ->
+        [  Γc ; l++ Γ ⊢  s  ] ->
+        forall τ,
+          [  Γc ; l++ update_first equiv_dec Γ v τ ⊢ s  ].
+      Proof.
+        intros inn typ τ.
+        case_eq (lookup equiv_dec Γ v).
+        - intros ? inn2.
+          destruct (in_update_break_first _ inn2 τ)
+            as [?[? [? [eqq2 nin]]]]
+          ; subst.
+          rewrite eqq2.
+          rewrite <- app_ass in typ |- *.
+          assert ( In v (domain (l ++ x)) \/ ~ In v (nnrs_imp_stmt_free_vars s)).
+          {
+            rewrite domain_app, in_app_iff; tauto.
+          } 
+          apply nnrs_imp_stmt_type_unused_remove in typ; trivial.
+          apply nnrs_imp_stmt_type_unused_add; trivial.
+        - intros nin.
+          rewrite nin_update; trivial.
+      Qed.
+
+    End update.
   End unused.
 
 End TNNRSimp.

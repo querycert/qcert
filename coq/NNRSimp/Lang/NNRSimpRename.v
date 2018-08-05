@@ -331,6 +331,238 @@ Section NNRSimpRename.
         + rewrite H5, H6; trivial.
     Qed.
 
+    Lemma nnrs_imp_stmt_rename_let_var_usage_sub s v v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s) ->
+      forall e,
+        stmt_var_usage_sub
+          (NNRSimpLet v e s)
+          (NNRSimpLet v' e (nnrs_imp_stmt_rename s v v')).
+    Proof.
+      intros inn1 inn2 e x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; trivial.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_let_var_usage_sub_b s v v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s) ->
+      forall e,
+        stmt_var_usage_sub
+          (NNRSimpLet v' e (nnrs_imp_stmt_rename s v v'))
+          (NNRSimpLet v e s).
+    Proof.
+      intros inn1 inn2 e x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_for_var_usage_sub s v v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s) ->
+      forall e,
+        stmt_var_usage_sub
+          (NNRSimpFor v e s)
+          (NNRSimpFor v' e (nnrs_imp_stmt_rename s v v')).
+    Proof.
+      intros inn1 inn2 e x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; trivial.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_for_var_usage_sub_b s v v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s) ->
+      forall e,
+        stmt_var_usage_sub
+          (NNRSimpFor v' e (nnrs_imp_stmt_rename s v v'))
+          (NNRSimpFor v e s).
+    Proof.
+      intros inn1 inn2 e x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_either_l_var_usage_sub s1 v1 v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s1) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s1) ->
+      forall e v2 s2,
+        stmt_var_usage_sub
+          (NNRSimpEither e v1 s1 v2 s2)
+          (NNRSimpEither e v' (nnrs_imp_stmt_rename s1 v1 v') v2 s2).
+    Proof.
+      intros inn1 inn2 e v2 s2 x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v1 == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *
+      ; try reflexivity.
+      - subst.
+        rewrite (nnrs_imp_stmt_free_unassigned (nnrs_imp_stmt_rename s1 x v')); simpl; try reflexivity.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+        reflexivity.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_either_l_var_usage_sub_b s1 v1 v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s1) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s1) ->
+      forall e v2 s2,
+        stmt_var_usage_sub
+          (NNRSimpEither e v' (nnrs_imp_stmt_rename s1 v1 v') v2 s2)
+          (NNRSimpEither e v1 s1 v2 s2).
+    Proof.
+      intros inn1 inn2 e v2 s2 x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v1 == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *
+      ; try reflexivity.
+      - subst.
+        rewrite (nnrs_imp_stmt_free_unassigned (nnrs_imp_stmt_rename s1 x v')); simpl; try reflexivity.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite (nnrs_imp_stmt_free_unassigned s1); simpl; trivial.
+        reflexivity.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_either_r_var_usage_sub s2 v2 v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s2) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s2) ->
+      forall e v1 s1,
+        stmt_var_usage_sub
+          (NNRSimpEither e v1 s1 v2 s2)
+          (NNRSimpEither e v1 s1 v' (nnrs_imp_stmt_rename s2 v2 v')).
+    Proof.
+      intros inn1 inn2 e v1 s1 x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v2 == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *
+      ; try reflexivity.
+      - subst.
+        rewrite (nnrs_imp_stmt_free_unassigned (nnrs_imp_stmt_rename s2 x v')); simpl; try reflexivity.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite nnrs_imp_stmt_free_unassigned; simpl; trivial.
+        reflexivity.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_stmt_rename_either_r_var_usage_sub_b s2 v2 v'  :
+      ~ In v' (nnrs_imp_stmt_free_vars s2) ->
+      ~ In v' (nnrs_imp_stmt_bound_vars s2) ->
+      forall e v1 s1,
+        stmt_var_usage_sub
+          (NNRSimpEither e v1 s1 v' (nnrs_imp_stmt_rename s2 v2 v'))
+          (NNRSimpEither e v1 s1 v2 s2).
+    Proof.
+      intros inn1 inn2 e v1 s1 x.
+      simpl.
+      match_destr; simpl; trivial.
+      unfold equiv_decb.
+      destruct (v2 == x)
+      ; destruct (v' == x)
+      ; simpl; trivial
+      ; unfold equiv, complement in *
+      ; try reflexivity.
+      - subst.
+        rewrite (nnrs_imp_stmt_free_unassigned (nnrs_imp_stmt_rename s2 x v')); simpl; try reflexivity.
+        rewrite nnrs_imp_stmt_rename_free_vars; trivial.
+        intros inn.
+        apply in_replace_all in inn.
+        intuition.
+      - subst.
+        rewrite (nnrs_imp_stmt_free_unassigned s2); simpl; trivial.
+        reflexivity.
+      - rewrite nnrs_imp_stmt_rename_var_usage_neq; eauto.
+        reflexivity.
+    Qed.
+    
   End var_usage.
 
   Section id.
@@ -912,7 +1144,7 @@ Section NNRSimpRename.
       := if from == to
          then e
          else nnrs_imp_expr_rename e from to.
-        
+    
     Definition nnrs_imp_stmt_rename_lazy (s:nnrs_imp_stmt) (from to:var)
       := if from == to
          then s

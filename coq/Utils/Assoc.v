@@ -754,6 +754,15 @@ Section Assoc.
     eapply in_dom; eauto.
   Qed.
 
+  Lemma cut_down_to_incl
+        {A B} {dec:EqDec A eq}
+        (l:list (A*B)) (l2:list A) :
+    incl (cut_down_to l l2) l.
+  Proof.
+    unfold incl; intros ? inn.
+    apply cut_down_to_in in inn; tauto.
+  Qed.
+  
   (* note: right-rec so that new fields hide old fields *)
   Fixpoint assoc_lookupr {A B:Type} {P Q:A->A->Prop} (eqd:forall a a':A, {P a a'} + {Q a a'}) (l:list (A*B)) (a:A) : option B
     := match l with
@@ -1333,6 +1342,27 @@ Section Assoc.
         apply in_dom in H1.
         intuition.
       - auto.
+    Qed.
+
+    Lemma cut_down_to_lookup_incl
+          (l:list (A*B)) (l2:list A) :
+      lookup_incl (cut_down_to l l2) l.
+    Proof.
+      unfold cut_down_to, lookup_incl.
+      induction l; simpl; trivial; intros x y inn.
+      destruct a; simpl in *.
+      match_case_in inn
+      ; intros eqq1; rewrite eqq1 in inn.
+      - simpl in inn.
+        match_destr.
+        eauto.
+      - rewrite (IHl _ _ inn).
+        match_destr; unfold Equivalence.equiv, complement in *.
+        subst.
+        apply lookup_in in inn.
+        apply filter_In in inn.
+        simpl in inn.
+        intuition congruence.
     Qed.
 
     Lemma lookup_remove_duplicate l v x l' x' l'' :

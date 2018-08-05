@@ -25,6 +25,7 @@ Require Import Utils.
 Require Import CommonSystem.
 Require Import NNRSimp.
 Require Import NNRSimpNorm.
+Require Import NNRSimpVars.
 Require Import NNRSimpUsage.
 Require Import NNRSimpEval.
 Require Import NNRSimpEq.
@@ -43,8 +44,10 @@ Section TNNRSimpEq.
              bindings_type σc Γc ->
              forall (σ:pd_bindings),
                pd_bindings_type σ Γ ->
+               has_some_parts (nnrs_imp_expr_free_vars e₁) σ ->
                nnrs_imp_expr_eval brand_relation_brands  σc σ e₁
                = nnrs_imp_expr_eval brand_relation_brands  σc σ e₂).
+
 
   Definition tnnrs_imp_stmt_rewrites_to (s₁ s₂:nnrs_imp_stmt) : Prop :=
     forall (Γc:tbindings) (Γ : pd_tbindings) ,
@@ -54,8 +57,13 @@ Section TNNRSimpEq.
              bindings_type σc Γc ->
              forall (σ:pd_bindings),
                pd_bindings_type σ Γ ->
-               nnrs_imp_stmt_eval brand_relation_brands  σc s₁ σ
-               = nnrs_imp_stmt_eval brand_relation_brands  σc s₂ σ).
+               forall alreadydefined,
+                 has_some_parts alreadydefined σ ->
+                 (forall x, nnrs_imp_stmt_var_usage s₁ x = VarMayBeUsedWithoutAssignment ->
+                            In x alreadydefined) ->
+                 nnrs_imp_stmt_eval brand_relation_brands  σc s₁ σ
+                 = nnrs_imp_stmt_eval brand_relation_brands  σc s₂ σ)
+      /\ (stmt_var_usage_sub s₁ s₂).
 
   Definition tnnrs_imp_rewrites_to (si₁ si₂:nnrs_imp) : Prop :=
     forall (Γc:tbindings) (τ:rtype) ,
@@ -77,12 +85,16 @@ Section TNNRSimpEq.
     constructor; red.
     - intuition.
     - intros x y z Hx Hy; intros ? ? ? typx.
-      specialize (Hx _ _ _ typx).
-      destruct Hx as [typy Hx].
-      specialize (Hy _ _ _ typy).
+      destruct (Hx Γc Γ τ typx) as [typy Hx'].
+      specialize (Hy Γc Γ τ typy).
       destruct Hy as [typz Hy].
-      split; trivial; intros.
-      rewrite Hx, Hy; trivial.
+      split; trivial.
+      intros.
+      rewrite (Hx' _ H _ H0 H1).
+      apply (Hy _ H _ H0).
+      rewrite nnrs_imp_expr_type_impl_free_vars_incl; eauto.
+      intros ? typ.
+      destruct (Hx _ _ _ typ); trivial.
   Qed.
 
   Global Instance tnnrs_imp_stmt_rewrites_to_pre : PreOrder tnnrs_imp_stmt_rewrites_to.
@@ -91,12 +103,17 @@ Section TNNRSimpEq.
     constructor; red.
     - intuition.
     - intros x y z Hx Hy; intros ? ? typx.
-      specialize (Hx _ _ typx).
-      destruct Hx as [typy Hx].
+      destruct (Hx _ _ typx) as [typy [Hx' subxy]].
       specialize (Hy _ _ typy).
-      destruct Hy as [typz Hy].
-      split; trivial; intros.
-      rewrite Hx, Hy; trivial.
+      destruct Hy as [typz [Hy subyz]].
+      split; trivial.
+      split; [ | etransitivity; eauto].
+      intros.
+      erewrite Hx'; eauto.
+      erewrite Hy; eauto.
+      intros.
+      apply H2.
+      eapply stmt_var_usage_sub_to_maybe_used; eauto.
   Qed.
   
   Global Instance tnnrs_imp_rewrites_to_pre : PreOrder tnnrs_imp_rewrites_to.
@@ -121,7 +138,7 @@ Section TNNRSimpEq.
         [ Γc ; Γ  ⊢ e₂ ▷ τ ]) ->
     e₁ ⇒ᵉ e₂.
   Proof.
-    red; intros eqq; intros; split; eauto; intros ??? typ2.
+    red; intros eqq; intros; split; eauto; intros ??? typ2 ?.
     apply eqq.
     - apply Forall_map.
       eapply bindings_type_Forall_normalized; eauto.
@@ -131,17 +148,20 @@ Section TNNRSimpEq.
   
   Lemma nnrs_imp_stmt_eq_rewrites_to (s₁ s₂:nnrs_imp_stmt) :
     s₁ ≡ˢ s₂ ->
+    stmt_var_usage_sub s₁ s₂ ->
     (forall {Γc:tbindings} {Γ:tbindings},
         [ Γc ; Γ ⊢ s₁ ] ->
         [ Γc ; Γ ⊢ s₂ ]) ->
     s₁ ⇒ˢ s₂.
   Proof.
-    red; intros eqq; intros; split; eauto; intros ??? typ2.
+    red; intros eqq; intros; split; eauto.
+    split; trivial.
+    intros.
     apply eqq.
     - apply Forall_map.
       eapply bindings_type_Forall_normalized; eauto.
-    - intros ? inn.
-      eapply pd_bindings_type_in_normalized in typ2; eauto.
+    -  intros ? inn.
+       eapply pd_bindings_type_in_normalized; eauto.
   Qed.
   
   Lemma nnrs_imp_eq_rewrites_to (si₁ si₂:nnrs_imp) :
@@ -156,7 +176,19 @@ Section TNNRSimpEq.
     apply Forall_map.
     eapply bindings_type_Forall_normalized; eauto.
   Qed.
-  
+
+  Lemma tnnrs_imp_expr_rewrites_to_free_vars_incl {Γc Γ e τ} :
+      [Γc; Γ ⊢ e ▷ τ] ->
+      forall {e'},
+        e ⇒ᵉ e' ->
+        incl (nnrs_imp_expr_free_vars e') (nnrs_imp_expr_free_vars e).
+    Proof.
+      intros.
+      eapply nnrs_imp_expr_type_impl_free_vars_incl; eauto.
+      intros.
+      apply H0; trivial.
+    Qed.
+    
   Section proper.
 
     Global Instance NNRSimpGetConstant_tproper v :
@@ -190,13 +222,14 @@ Section TNNRSimpEq.
       destruct (eqop _ _ _ H3) as [typop Hop].
       split; [econstructor; eauto | ].
       simpl; intros.
-      rewrite He1, He2 by trivial.
+      apply has_some_parts_app in H1.
+      rewrite He1, He2 by tauto.
       apply olift2_ext; intros.
       apply Hop.
       - eapply nnrs_imp_expr_eval_preserves_types; eauto.
-        rewrite He1; trivial.
-      -  eapply nnrs_imp_expr_eval_preserves_types; eauto.
-         rewrite He2; trivial.
+        rewrite He1; tauto.
+      - eapply nnrs_imp_expr_eval_preserves_types; eauto.
+        rewrite He2; tauto.
     Qed.
 
     Global Instance NNRSimpUnop_tproper :
@@ -236,16 +269,46 @@ Section TNNRSimpEq.
       unfold Proper, respectful, tnnrs_imp_stmt_rewrites_to; simpl.
       intros s1 s1' Hs1 s2 s2' Hs2 Γc Γ typ.
       invcs typ.
-      specialize (Hs1 _ _ H2).
-      destruct Hs1 as [typ1 Hs1].
+      destruct (Hs1 _ _ H2)
+        as [typ1 [Hs1' subs1]].
       specialize (Hs2 _ _ H3).
-      destruct Hs2 as [typ2 Hs2].
+      destruct Hs2 as [typ2 [Hs2 subs2]].
       split; [econstructor; eauto | ].
-      intros.
-      rewrite Hs1 by trivial.
-      apply olift_ext; intros.
-      apply Hs2; trivial.
-      eapply nnrs_imp_stmt_eval_preserves_types in H1; eauto.
+      split.
+      - intros σc σc_bt σ σ_bt alreadydefined hasp inn.
+        erewrite Hs1'; eauto.
+        + apply olift_ext; intros σ' eqq1.
+          generalize (nnrs_imp_stmt_eval_preserves_types _ σc_bt σ_bt typ1 _ eqq1)
+          ; intros σ'_bt.
+          eapply (Hs2 _ σc_bt _ σ'_bt
+                      (alreadydefined ++
+                      filter (fun x =>
+                                nnrs_imp_stmt_var_usage s1' x ==b VarMustBeAssigned)
+                      (nnrs_imp_stmt_free_vars s1))).
+          * rewrite has_some_parts_app.
+            { split.
+              - eapply nnrs_imp_stmt_preserves_has_some_parts; eauto.
+              - eapply nnrs_imp_stmt_assigns_has_some_parts; eauto.
+            }             
+          * intros ? eqq2.
+            specialize (inn x).
+            rewrite in_app_iff, filter_In.
+            rewrite eqq2 in inn.
+            match_case_in inn
+            ; intros eqq3; rewrite eqq3 in inn
+            ; try tauto.
+            right.
+            specialize (subs1 x).
+            rewrite eqq3 in subs1.
+            simpl in subs1.
+            match_case_in subs1
+            ; intros eqq4; rewrite eqq4 in subs1
+            ; try contradiction.
+            split; [ | reflexivity ].
+            apply nnrs_imp_stmt_free_used.
+            congruence.
+        + intros ? eqq1; apply inn; rewrite eqq1; trivial.
+      - rewrite subs1, subs2; reflexivity.
     Qed.
 
     Global Instance NNRSimpAssign_tproper v :
@@ -254,11 +317,20 @@ Section TNNRSimpEq.
       unfold Proper, respectful, tnnrs_imp_stmt_rewrites_to; simpl.
       intros e1 e1' He1 Γc Γ typ.
       invcs typ.
+      generalize (tnnrs_imp_expr_rewrites_to_free_vars_incl H2 He1)
+      ; intros inclfv.
       apply He1 in H2.
       destruct H2 as [typ1 He1'].
       split; [econstructor; eauto | ].
-      intros.
-      rewrite He1'; trivial.
+      split.
+      - intros; rewrite He1'; trivial.
+        eapply has_some_parts_incl_proper; try eapply H1; try reflexivity.
+        intros x inn.
+        specialize (H2 x).
+        apply nnrs_imp_expr_may_use_free_vars in inn.
+        rewrite inn in H2.
+        auto.
+      - apply stmt_var_usage_sub_assign_proper; trivial.
     Qed.
 
     Lemma NNRSimpLet_some_tproper v : 
@@ -270,20 +342,37 @@ Section TNNRSimpEq.
     Proof.
       intros e1 e1' He1 s2 s2' Hs2 Γc Γ typ.
       invcs typ.
+      generalize (tnnrs_imp_expr_rewrites_to_free_vars_incl H2 He1)
+      ; intros inclfv.
       apply He1 in H2.
       destruct H2 as [typ1 He1'].
       specialize (Hs2 _ _ H4).
       destruct Hs2 as [typ2 Hs2].
+      edestruct Hs2; eauto.
       split; [econstructor; eauto | ].
-      simpl; intros.
-      rewrite He1' by trivial.
-      apply olift_ext; intros.
-      rewrite Hs2; trivial.
-      apply some_lift in H1.
-      destruct H1 as [? eqq1 ?]; subst.
-      eapply nnrs_imp_expr_eval_preserves_types in eqq1; eauto.
-      econstructor; simpl; eauto.
-      split; trivial; intros ? eqq2; invcs eqq2; trivial.
+      split.
+      - simpl; intros.
+        rewrite He1'; eauto.
+        + apply olift_ext; intros.
+          apply some_lift in H6.
+          destruct H6 as [? eqq1 ?]; subst.
+          rewrite H with (alreadydefined:=v::alreadydefined); eauto.
+          * simpl.
+            econstructor; eauto.
+            simpl; split; trivial; intros ? eqq2; subst.
+            invcs eqq2.
+            eapply nnrs_imp_expr_eval_preserves_types; eauto.
+          * apply has_some_parts_cons_some; trivial.
+          * simpl; intros a eqq3.
+            specialize (H5 a).
+            match_destr_in H5; [eauto | ].
+            unfold equiv_decb in *.
+            destruct (v == a); eauto.
+        + eapply has_some_parts_incl_proper; try eapply H3; try reflexivity.
+          intros a inn; apply H5.
+          apply nnrs_imp_expr_may_use_free_vars in inn.
+          rewrite inn; trivial.
+      - apply stmt_var_usage_sub_let_some_proper; trivial. 
     Qed.
 
     Lemma NNRSimpLet_none_tproper v : 
@@ -298,10 +387,21 @@ Section TNNRSimpEq.
       specialize (Hs2 _ _ H3).
       destruct Hs2 as [typ2 Hs2].
       split; [econstructor; eauto | ].
-      simpl; intros.
-      rewrite Hs2; trivial.
-      econstructor; simpl; eauto.
-      split; trivial; intros ? eqq2; invcs eqq2; trivial.
+      edestruct Hs2; eauto.
+      split.
+      - simpl; intros.
+        rewrite H with (alreadydefined:=remove equiv_dec v alreadydefined); eauto.
+        + constructor; simpl; trivial.
+          split; trivial.
+          intros ? eqq2; invcs eqq2.
+        + apply has_some_parts_cons_none; trivial.
+        + simpl; intros a eqq3.
+          specialize (H6 a).
+          unfold equiv_decb in *.
+          destruct (v == a).
+          * congruence.
+          * apply remove_in_neq; eauto.
+      - apply stmt_var_usage_sub_let_none_proper; trivial. 
     Qed.
     
     Global Instance NNRSimpFor_tproper v :
@@ -310,32 +410,55 @@ Section TNNRSimpEq.
       unfold Proper, respectful, tnnrs_imp_stmt_rewrites_to; simpl.
       intros e1 e1' He1 s2 s2' Hs2 Γc Γ typ.
       invcs typ.
+      generalize (tnnrs_imp_expr_rewrites_to_free_vars_incl H2 He1)
+      ; intros inclfv.
       apply He1 in H2.
       destruct H2 as [typ1 He1'].
       specialize (Hs2 _ _ H4).
-      destruct Hs2 as [typ2 Hs2].
+      destruct Hs2 as [typ2 [Hs2 sub2]].
       split; [econstructor; eauto | ].
-      simpl; intros.
-      rewrite He1' by trivial.
-      apply olift_ext; intros.
-      destruct a; trivial.
-      eapply nnrs_imp_expr_eval_preserves_types in H1; eauto.
-      invcs H1; rtype_equalizer; subst.
-      clear e1 e1' typ1 He1 He1'.
-      revert σ H0.
-      induction l; simpl; trivial.
-      intros σ bt.
-      invcs H5.
-      rewrite Hs2; eauto.
-      - match_option.
-        destruct p; trivial.
-        eapply IHl; eauto.
-        eapply nnrs_imp_stmt_eval_preserves_types in eqq; eauto.
-        + invcs eqq; trivial.
-        + econstructor; simpl; eauto.
-          split; trivial; intros ? eqq2; invcs eqq2; trivial.
-      - econstructor; simpl; eauto.
-        split; trivial; intros ? eqq2; invcs eqq2; trivial.
+      split.
+      - simpl; intros.
+        erewrite He1'; eauto.
+        + apply olift_ext; intros.
+          destruct a; trivial.
+          eapply nnrs_imp_expr_eval_preserves_types in H3; eauto.
+          invcs H3; rtype_equalizer; subst.
+          revert σ H0 H1.
+          induction l; simpl; trivial.
+          intros σ bt hsp.
+          invcs H7.
+          rewrite Hs2 with (alreadydefined:=v::alreadydefined); eauto.
+          * match_option.
+            destruct p; trivial.
+            { eapply IHl; eauto.
+              - eapply nnrs_imp_stmt_eval_preserves_types in eqq; eauto.
+                + invcs eqq; trivial.
+                + econstructor; simpl; eauto.
+                  split; trivial; intros ? eqq2; invcs eqq2; trivial.
+              - apply (nnrs_imp_stmt_preserves_has_some_parts_skip alreadydefined _ _
+                                                                   ((v, Some a)::nil) _ (p::nil) _ eqq)
+                ; trivial.
+                destruct p; simpl.
+                f_equal.
+                apply nnrs_imp_stmt_eval_domain_stack in eqq; simpl in eqq.
+                congruence.
+            } 
+          * econstructor; simpl; eauto.
+            split; trivial; intros ? eqq2; invcs eqq2; trivial.
+          * apply has_some_parts_cons_some; trivial.
+          * intros aa eqq1.
+            simpl.
+            specialize (H2 aa).
+            unfold equiv_decb in *.
+            rewrite eqq1 in H2.
+            destruct (v == aa); [eauto | ].
+            match_destr_in H2; eauto.
+        + eapply has_some_parts_incl_proper; try eapply H1; try reflexivity.
+          intros a inn; apply H2.
+          apply nnrs_imp_expr_may_use_free_vars in inn.
+          rewrite inn; trivial.
+      - apply stmt_var_usage_sub_for_proper; trivial. 
     Qed.
     
     Global Instance NNRSimpIf_tproper :
@@ -344,18 +467,32 @@ Section TNNRSimpEq.
       unfold Proper, respectful, tnnrs_imp_stmt_rewrites_to; simpl.
       intros e1 e1' He1 s1 s1' Hs1 s2 s2' Hs2 Γc Γ typ.
       invcs typ.
+      generalize (tnnrs_imp_expr_rewrites_to_free_vars_incl H3 He1)
+      ; intros inclfv.
       apply He1 in H3.
       destruct H3 as [type He1'].
       specialize (Hs1 _ _ H4).
-      destruct Hs1 as [typ1 Hs1].
+      destruct Hs1 as [typ1 [Hs1 sub1]].
       specialize (Hs2 _ _ H5).
-      destruct Hs2 as [typ2 Hs2].
+      destruct Hs2 as [typ2 [Hs2 sub2]].
       split; [econstructor; eauto | ].
-      intros.
-      rewrite He1' by trivial.
-      match_option.
-      destruct d; trivial.
-      destruct b; eauto.
+      split.
+      - intros.
+        rewrite He1'; eauto.
+        + match_option.
+          destruct d; trivial.
+          destruct b; trivial.
+          * eapply Hs1; eauto.
+            intros ? eqq1; apply H2; rewrite eqq1.
+            match_destr.
+          * eapply Hs2; eauto.
+            intros ? eqq1; apply H2; rewrite eqq1.
+            repeat match_destr.
+        + eapply has_some_parts_incl_proper; try eapply H1; try reflexivity.
+          intros a inn; apply H2.
+          apply nnrs_imp_expr_may_use_free_vars in inn.
+          rewrite inn; trivial.
+      - apply stmt_var_usage_sub_if_proper; trivial. 
     Qed.
 
     Global Instance NNRSimpEither_tproper :
@@ -365,25 +502,53 @@ Section TNNRSimpEq.
       intros e1 e1' He1 ? ? ? s1 s1' Hs1 ? ? ? s2 s2' Hs2 Γc Γ typ.
       subst.
       invcs typ.
+      generalize (tnnrs_imp_expr_rewrites_to_free_vars_incl H3 He1)
+      ; intros inclfv.
       apply He1 in H3.
       destruct H3 as [type He1'].
       specialize (Hs1 _ _ H6).
-      destruct Hs1 as [typ1 Hs1].
+      destruct Hs1 as [typ1 [Hs1 sub1]].
       specialize (Hs2 _ _ H7).
-      destruct Hs2 as [typ2 Hs2].
+      destruct Hs2 as [typ2 [Hs2 sub2]].
       split; [econstructor; eauto | ].
-      intros.
-      rewrite He1' by trivial.
-      match_option.
-      eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
-      invcs eqq; rtype_equalizer; subst.
-      - rewrite Hs1; trivial.
-        econstructor; simpl; eauto.
-        split; trivial; intros ? eqq2; invcs eqq2; trivial.
-      - rewrite Hs2; trivial.
-        econstructor; simpl; eauto.
-        split; trivial; intros ? eqq2; invcs eqq2; trivial.
-    Qed.      
+      split.
+      - intros.
+        rewrite He1'; eauto.
+        + match_option.
+          eapply nnrs_imp_expr_eval_preserves_types in eqq; eauto.
+          invcs eqq; rtype_equalizer; subst.
+          * { rewrite Hs1 with (alreadydefined:=y::alreadydefined); eauto.
+              - constructor; trivial.
+                simpl; split; trivial.
+                intros ? eqq1; invcs eqq1; trivial.
+              - apply has_some_parts_cons_some; trivial.
+              - intros aa eqq1.
+                simpl.
+                specialize (H2 aa).
+                unfold equiv_decb in *.
+                rewrite eqq1 in H2.
+                destruct (y == aa); [eauto | ].
+                match_destr_in H2; eauto.
+            }
+          * { rewrite Hs2 with (alreadydefined:=y0::alreadydefined); eauto.
+              - constructor; trivial.
+                simpl; split; trivial.
+                intros ? eqq1; invcs eqq1; trivial.
+              - apply has_some_parts_cons_some; trivial.
+              - intros aa eqq1.
+                simpl.
+                specialize (H2 aa).
+                unfold equiv_decb in *.
+                rewrite eqq1 in H2.
+                destruct (y0 == aa); [eauto | ].
+                repeat (match_destr_in H2; eauto).
+            } 
+        + eapply has_some_parts_incl_proper; try eapply H1; try reflexivity.
+          intros a inn; apply H2.
+          apply nnrs_imp_expr_may_use_free_vars in inn.
+          rewrite inn; trivial.
+      - apply stmt_var_usage_sub_either_proper; trivial. 
+    Qed.
 
     Lemma NNRSImp_tproper {s₁ s₂} : tnnrs_imp_stmt_rewrites_to s₁ s₂ ->
                                     forall v,
@@ -392,14 +557,19 @@ Section TNNRSimpEq.
                                    tnnrs_imp_rewrites_to (s₁, v) (s₂, v).
     Proof.
       unfold tnnrs_imp_rewrites_to; intros eqq v neimpl Γc τ [ne typ].
+      generalize (typed_nnrs_imp_stmt_vars_in_ctxt typ)
+      ; simpl; intros inn.
       eapply eqq in typ.
-      destruct typ as [typ IHs].
+      destruct typ as [typ [IHs sub1]].
       split.
       - split; eauto.
       - intros; simpl.
-        rewrite IHs; trivial.
-        econstructor; simpl; eauto.
-        intuition; discriminate.
+        rewrite IHs with (alreadydefined:=nil); simpl; eauto.
+        + repeat econstructor; simpl.
+          intros ? eqq1; invcs eqq1.
+        + econstructor.
+        + intros ? eqq1.
+          destruct (inn x); congruence.
     Qed.
     
   End proper.

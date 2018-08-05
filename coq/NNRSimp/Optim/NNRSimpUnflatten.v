@@ -662,6 +662,16 @@ Section NNRSimpUnflatten.
             * rewrite (IHs2 _ eqq2); trivial.
       Qed.
 
+      Lemma nnrs_imp_stmt_unflatten_var_usage_sub {s x s'} :
+        nnrs_imp_stmt_unflatten s x = Some s' ->
+        stmt_var_usage_sub s s'.
+      Proof.
+        intros eqq1 v.
+        eapply nnrs_imp_stmt_unflatten_var_usage in eqq1.
+        rewrite eqq1.
+        reflexivity.
+      Qed.
+
     End usage.
     
   End unflatten.
