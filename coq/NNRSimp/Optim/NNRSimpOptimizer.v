@@ -117,6 +117,32 @@ Section NNRSimpOptimizer.
     Definition for_nil_step_correct {model:basic_model}
       := mkOptimizerStepModel for_nil_step for_nil_fun_correctness.
 
+      Definition assign_self_fun  {fruntime:foreign_runtime}(s:nnrs_imp_stmt) :=
+      match s with
+      | NNRSimpAssign x₁ (NNRSimpVar x₂) =>
+        if x₁ == x₂
+        then NNRSimpSkip
+        else s
+      | _ => s
+      end.
+
+    Lemma assign_self_fun_correctness {model:basic_model} (s:nnrs_imp_stmt) :
+      s ⇒ˢ (assign_self_fun s).
+    Proof.
+      tprove_correctness s.
+      apply assign_self_trew.
+    Qed.
+
+    Definition assign_self_step {fruntime:foreign_runtime}
+      := mkOptimizerStep
+           "assign/identity" (* name *)
+           "Remove identity assignments" (* description *)
+           "assign_self_fun" (* lemma name *)
+           assign_self_fun (* lemma *).
+
+    Definition assign_self_step_correct {model:basic_model}
+      := mkOptimizerStepModel assign_self_step assign_self_fun_correctness.
+
     Definition unflatten_fun  {fruntime:foreign_runtime}(s:nnrs_imp_stmt) :=
       match s with
       | NNRSimpLet x None s₁ =>
@@ -289,6 +315,7 @@ Section NNRSimpOptimizer.
     Definition nnrs_imp_stmt_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrs_imp_stmt)
       := [
           for_nil_step
+          ; assign_self_step
           ; unflatten_step
           ; let_let_assign_coalesce_step
           ; for_for_fuse_step 
@@ -297,6 +324,7 @@ Section NNRSimpOptimizer.
     Definition nnrs_imp_stmt_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrs_imp_stmt_rewrites_to)
       := [
           for_nil_step_correct
+          ; assign_self_step_correct
           ; unflatten_step_correct
           ; let_let_assign_coalesce_step_correct
           ; for_for_fuse_step_correct 
@@ -418,6 +446,7 @@ Section NNRSimpOptimizer.
     Definition default_nnrs_imp_stmt_optim_list {fruntime:foreign_runtime} : list string
       := [
           optim_step_name for_nil_step
+          ; optim_step_name assign_self_step
           ; optim_step_name unflatten_step
           ; optim_step_name let_let_assign_coalesce_step
           ; optim_step_name for_for_fuse_step 

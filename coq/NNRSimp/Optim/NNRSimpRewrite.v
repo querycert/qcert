@@ -46,7 +46,7 @@ Section NNRSimpRewrite.
   Proof.
     red; simpl; trivial.
   Qed.
-
+    
   (* renaming *)
   Lemma rename_let_eq x x' e s:
     ~ In x' (nnrs_imp_stmt_free_vars s) ->

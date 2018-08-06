@@ -261,6 +261,48 @@ Section TNNRSimpRewrite.
     - intros; reflexivity.
   Qed.
 
+  Lemma update_first_same {A B} dec (l:list (A*B)) v x:
+    lookup dec l v = Some x ->
+    update_first dec l v x = l.
+  Proof.
+    induction l; simpl; trivial; intros inn.
+    repeat match_destr.
+    - invcs inn; trivial.
+    - rewrite IHl; trivial.
+  Qed.
+
+  Lemma assign_self_trew v : NNRSimpAssign v (NNRSimpVar v) ⇒ˢ NNRSimpSkip.
+  Proof.
+    red; intros Γc Γ typ.
+    invcs typ.
+    split; [| split]; simpl.
+    - econstructor; simpl; repeat econstructor.
+    - intros σc σc_bt σ σ_bt alreadydefined hsp alreadyin.
+      specialize (alreadyin v).
+      unfold equiv_decb in *.
+      destruct (v == v); [ | congruence].
+      red in hsp.
+      rewrite Forall_forall in hsp.
+      specialize (hsp _ (alreadyin (eq_refl _))).
+      unfold equiv_dec, string_eqdec in *.
+      match_option_in hsp; simpl.
+      + destruct o; simpl; try contradiction.
+        rewrite update_first_same; trivial.
+      + red in σ_bt.
+        apply lookup_none_nin in eqq.
+        apply lookup_in_domain in H3.
+        cut (domain Γ = domain σ); [congruence | ].
+        revert σ_bt; clear.
+        induction 1; trivial.
+        destruct H; simpl.
+        congruence.
+    - intros x; simpl.
+      unfold equiv_decb.
+      destruct (x == v); simpl; trivial.
+      destruct (v == x); simpl; trivial.
+      congruence.
+  Qed.
+
   (* unflattening *)
   Lemma unflatten_let_none_trew x (s s':nnrs_imp_stmt):
     nnrs_imp_stmt_unflatten_safe s x = Some s' ->
