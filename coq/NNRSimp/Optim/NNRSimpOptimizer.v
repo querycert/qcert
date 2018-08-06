@@ -52,6 +52,8 @@ Section NNRSimpOptimizer.
       | e ⊕ ‵[||]  => e
       | ‵[||] ⊗ e => ‵{| e|}
       | e ⊗ ‵[||] => ‵{| e|}
+      |  NNRSimpBinop OpBagUnion ‵{||} e => e
+      |  NNRSimpBinop OpBagUnion e ‵{||} => e
       | _ => e
       end.
 
@@ -75,6 +77,15 @@ Section NNRSimpOptimizer.
             -  destruct (e2 == (‵[||])).
                + repeat rewrite e.
                  rewrite merge_nil_r_trew.
+                 repeat (match_destr; try reflexivity).
+               + repeat (match_destr; try reflexivity; try congruence).
+          }
+        + { destruct (e1 == (‵{||})).
+            - repeat rewrite e.
+              apply bagunion_nil_l_trew.
+            -  destruct (e2 == (‵{||})).
+               + repeat rewrite e.
+                 rewrite bagunion_nil_r_trew.
                  repeat (match_destr; try reflexivity).
                + repeat (match_destr; try reflexivity; try congruence).
           }
