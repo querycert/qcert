@@ -92,7 +92,7 @@ Extract Inlined Constant float_ge => "(fun x y -> x >= y)".
 Require Import ZArith.
 Extract Inlined Constant float_of_int => "(fun x -> float_of_int x)".
 
-Extract Inlined Constant float_truncate=> "(fun x -> truncate x)".
+Extract Inlined Constant float_truncate => "(fun x -> truncate x)".
 
 Extract Inlined Constant from_string => "(fun x -> float_of_string (Util.string_of_char_list x))".
 Extract Inlined Constant to_string => "(fun x -> Util.char_list_of_string (Util.qcert_string_of_float x))".

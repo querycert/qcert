@@ -40,9 +40,9 @@ Section Schema.
         then
           qsuccess (mkBrand_relation br _ _)
         else
-          qfailure (CompilationError "Brand relation is not transitive")
+          qfailure (CompilationError "Brand relation is not assymetric")
       else
-        qfailure (CompilationError "Brand relation is not assymetric").
+        qfailure (CompilationError "Brand relation is not transitive").
     Next Obligation.
       unfold holds, is_true; match_destr.
       congruence.
