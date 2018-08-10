@@ -2798,6 +2798,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_camp_rule, L_java =>
@@ -2986,6 +2990,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_tech_rule, L_java =>
@@ -3186,6 +3194,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_designer_rule, L_java =>
@@ -3365,6 +3377,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_camp, L_java =>
@@ -3533,6 +3549,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_oql, L_java =>
@@ -3702,6 +3722,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_sql, L_java =>
@@ -3871,6 +3895,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_sqlpp, L_java =>
@@ -4040,6 +4068,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_lambda_nra, L_java =>
@@ -4200,6 +4232,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_nra, L_java =>
@@ -4368,6 +4404,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_nraenv_core, L_java =>
@@ -4527,6 +4567,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_nraenv, L_java =>
@@ -4666,6 +4710,10 @@ Section CompDriver.
         L_nnrc_core
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_nnrc_core, L_java =>
@@ -4801,6 +4849,10 @@ Section CompDriver.
       | L_nnrc, L_javascript =>
         L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_nnrc, L_java =>
@@ -5041,6 +5093,10 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrc
           :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_js_ast
           :: L_javascript
           :: nil
       | L_nnrcmr, L_java =>
