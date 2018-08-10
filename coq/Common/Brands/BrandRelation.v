@@ -27,6 +27,7 @@ Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
 
+Definition brand := string.
 Definition brands := list brand.
 
 Definition any : brands := nil.

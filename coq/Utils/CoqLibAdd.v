@@ -977,8 +977,6 @@ Ltac cut_to H :=
 
 Ltac invcs H := inversion H; clear H; try subst.
 
-Definition brand := string.
-
 (* If there is a default way to convert a type to a string.
     This is particularly useful for debugging *)
 Class ToString (A:Type)
