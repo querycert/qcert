@@ -16,8 +16,9 @@
 
 (** Imp with the Q*cert data model *)
 
-Require Import Imp.
+Require Import String.
 
+Require Import Imp.
 Require Import Data.
 Require Import Operators.
 Require Import CommonRuntime.
@@ -25,11 +26,20 @@ Require Import CommonRuntime.
 Section Syntax.
 
   Context {fruntime:foreign_runtime}.
+
+  Inductive runtime_op :=
+  | RuntimeGroupby : string -> list string -> runtime_op
+  | RuntimeEither : runtime_op
+  | RuntimeToLeft : runtime_op
+  | RuntimeToRight : runtime_op
+  .
+
   Inductive op :=
   | Unary : unary_op -> op
-  | Binary : binary_op -> op.
+  | Binary : binary_op -> op
+  .
 
-  Definition imp_qcert_expr := imp_expr data op.
-  Definition imp_qcert_stmt := imp_expr data op.
+  Definition imp_qcert_expr := @imp_expr data op runtime_op.
+  Definition imp_qcert_stmt := @imp_expr data op runtime_op.
 
 End Syntax.

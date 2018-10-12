@@ -34,15 +34,16 @@ Section Imp.
 
   Section Syntax.
 
-    Context {fruntime:foreign_runtime}.
-    Context (Data: Type).
-    Context (Op: Type).
+    Context {Data: Type}.
+    Context {Op: Type}.
+    Context {Runtime: Type}.
 
     Inductive imp_expr :=
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
     | ImpExprConst : Data -> imp_expr                            (**r constant data ([d]) *)
     | ImpExprOp : Op -> list imp_expr -> imp_expr                (**r operator ([e₁ ⊠ e₂]) *)
     | ImpExprCall : string -> list imp_expr -> imp_expr          (**r function call *)
+    | ImpExprRuntimeCall : Runtime -> list imp_expr -> imp_expr   (**r runtime function call *)
     .
 
     Inductive imp_stmt :=
