@@ -221,6 +221,9 @@ MODULES = \
 	NNRSimp/NNRSimpRuntime \
 	NNRSimp/NNRSimpTypes \
 	NNRSimp/NNRSimpSystem \
+	Imp/Lang/Imp \
+	Imp/Lang/ImpQcert \
+	Imp/Lang/ImpJson \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \

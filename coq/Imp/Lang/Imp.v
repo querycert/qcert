@@ -107,6 +107,7 @@ Section Imp.
 
 End Imp.
 
+
 Tactic Notation "imp_expr_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "ImpExprVar"%string
