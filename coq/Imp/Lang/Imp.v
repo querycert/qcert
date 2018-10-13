@@ -38,6 +38,8 @@ Section Imp.
     Context {Op: Type}.
     Context {Runtime: Type}.
 
+    Definition var := string.
+
     Inductive imp_expr :=
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
     | ImpExprConst : Data -> imp_expr                            (**r constant data ([d]) *)

@@ -24,15 +24,20 @@ Require Import CommonRuntime.
 Section Syntax.
 
   Context {fruntime:foreign_runtime}.
-  Inductive op := (* XXX TODO XXX *)
+
+  Definition imp_json_data := data.
+
+  Inductive imp_json_op := (* XXX TODO XXX *)
   | OpPlus
   .
 
-  Inductive runtime_op := (* XXX TODO XXX *)
+  Inductive imp_json_runtime_op := (* XXX TODO XXX *)
   | RuntimePlus
   .
 
-  Definition imp_json_expr := @imp_expr data op.
-  Definition imp_json_stmt := @imp_expr data op.
+  Definition imp_json_expr := @imp_expr imp_json_data imp_json_op.
+  Definition imp_json_stmt := @imp_expr imp_json_data imp_json_op.
+  Definition imp_json_function := @imp_function imp_json_data imp_json_op imp_json_runtime_op.
+  Definition imp_json := @imp imp_json_data imp_json_op imp_json_runtime_op.
 
 End Syntax.

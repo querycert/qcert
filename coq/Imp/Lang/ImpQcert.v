@@ -27,19 +27,23 @@ Section Syntax.
 
   Context {fruntime:foreign_runtime}.
 
-  Inductive runtime_op :=
-  | RuntimeGroupby : string -> list string -> runtime_op
-  | RuntimeEither : runtime_op
-  | RuntimeToLeft : runtime_op
-  | RuntimeToRight : runtime_op
+  Definition imp_qcert_data := data.
+
+  Inductive imp_qcert_op :=
+  | Unary : unary_op -> imp_qcert_op
+  | Binary : binary_op -> imp_qcert_op
   .
 
-  Inductive op :=
-  | Unary : unary_op -> op
-  | Binary : binary_op -> op
+  Inductive imp_qcert_runtime_op :=
+  | RuntimeGroupby : string -> list string -> imp_qcert_runtime_op
+  | RuntimeEither : imp_qcert_runtime_op
+  | RuntimeToLeft : imp_qcert_runtime_op
+  | RuntimeToRight : imp_qcert_runtime_op
+  | RuntimeDeref : imp_qcert_runtime_op
   .
 
-  Definition imp_qcert_expr := @imp_expr data op runtime_op.
-  Definition imp_qcert_stmt := @imp_expr data op runtime_op.
-
+  Definition imp_qcert_expr := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+  Definition imp_qcert_stmt := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+  Definition imp_qcert_function := @imp_function imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+  Definition imp_qcert := @imp imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
 End Syntax.
