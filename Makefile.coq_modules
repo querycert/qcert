@@ -347,6 +347,7 @@ MODULES = \
 	Translation/TNNRCtoNNRS \
 	Translation/NNRStoNNRSimp \
 	Translation/TNNRStoNNRSimp \
+	Translation/NNRSimptoImpQcert \
 	Translation/NNRSimptoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \

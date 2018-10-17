@@ -93,7 +93,7 @@ Section NNRSimptoImpQcert.
       (*       (stat_block *)
       (*          [ stat_var_decl [ (x, Some (array_get src i)) ]; *)
       (*              nnrs_imp_stmt_to_imp_qcert avoid s ]) ] *)
-      ImpStmtFor x (nnrs_imp_expr_to_imp_qcert avoid e) (nnrs_imp_stmt_to_imp_qcert avoid s)
+      ImpStmtFor x (nnrs_imp_expr_to_imp_qcert e) (nnrs_imp_stmt_to_imp_qcert avoid s)
     | NNRSimpIf e s1 s2 =>
       ImpStmtIf
         (nnrs_imp_expr_to_imp_qcert e)
@@ -105,10 +105,10 @@ Section NNRSimptoImpQcert.
       ImpStmtIf
         (ImpExprRuntimeCall RuntimeEither [e'])
         (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
-           [ (x1, Some (ImpExprRuntimeCall RuntimeToLeft e')) ])
-           [ nnrs_imp_stmt_to_imp_qcert avoid s1 ]
+           [ (x1, Some (ImpExprRuntimeCall RuntimeToLeft [e'])) ]
+           [ nnrs_imp_stmt_to_imp_qcert avoid s1 ])
         (ImpStmtBlock (* var x2 = toRight(e); s2 *)
-           [ (x2, Some (ImpExprRuntimeCall RuntimeToRight e')) ]
+           [ (x2, Some (ImpExprRuntimeCall RuntimeToRight [e'])) ]
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     | NNRSimpEither e x1 s1 x2 s2 =>
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
@@ -116,13 +116,14 @@ Section NNRSimptoImpQcert.
       ImpStmtIf
         (ImpExprRuntimeCall RuntimeEither [e'])
         (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
-           [ (x1, Some (ImpExprRuntimeCall RuntimeToLeft e')) ])
-           [ nnrs_imp_stmt_to_imp_qcert avoid s1 ]
+           [ (x1, Some (ImpExprRuntimeCall RuntimeToLeft [e'])) ]
+           [ nnrs_imp_stmt_to_imp_qcert avoid s1 ])
         (ImpStmtBlock (* var x2 = toRight(e); s2 *)
-           [ (x2, Some (ImpExprRuntimeCall RuntimeToRight e')) ]
+           [ (x2, Some (ImpExprRuntimeCall RuntimeToRight [e'])) ]
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     end.
 
+  (* XXX
   Definition nnrs_imp_to_imp_qcert_top globals (q: nnrs_imp): imp_function :=
     let constants := "constants"%string in
     let (stmt, ret) := q in
@@ -136,5 +137,6 @@ Section NNRSimptoImpQcert.
             ImpStmtReturn (Some (ImpExprVar ret)) ]
     in
     ImpFun [ constants ] body.
+   *)
 
 End NNRSimptoImpQcert.

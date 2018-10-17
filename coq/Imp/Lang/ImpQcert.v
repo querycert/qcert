@@ -43,7 +43,7 @@ Section Syntax.
   .
 
   Definition imp_qcert_expr := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
-  Definition imp_qcert_stmt := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+  Definition imp_qcert_stmt := @imp_stmt imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
   Definition imp_qcert_function := @imp_function imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
   Definition imp_qcert := @imp imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
 End Syntax.
