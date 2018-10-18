@@ -27,7 +27,7 @@ Section JSON.
   Unset Elimination Schemes.
 
   Inductive json : Set :=
-  | jnil : json
+  | jnull : json
   | jnumber : number -> json
   | jbool : bool -> json
   | jstring : string -> json
@@ -39,7 +39,7 @@ Section JSON.
 
   (** Induction principles used as backbone for inductive proofs on json *)
   Definition json_rect (P : json -> Type)
-             (fnil : P jnil)
+             (fnull : P jnull)
              (fnumber : forall n : number, P (jnumber n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
@@ -48,7 +48,7 @@ Section JSON.
     :=
       fix F (j : json) : P j :=
     match j as j0 return (P j0) with
-      | jnil => fnil
+      | jnull => fnull
       | jnumber x => fnumber x
       | jbool x => fbool x
       | jstring x => fstring x
@@ -65,7 +65,7 @@ Section JSON.
     end.
 
   Definition json_ind (P : json -> Prop)
-             (fnil : P jnil)
+             (fnull : P jnull)
              (fnumber : forall n : number, P (jnumber n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
@@ -74,7 +74,7 @@ Section JSON.
     :=
       fix F (j : json) : P j :=
     match j as j0 return (P j0) with
-      | jnil => fnil
+      | jnull => fnull
       | jnumber x => fnumber x
       | jbool x => fbool x
       | jstring x => fstring x
@@ -93,7 +93,7 @@ Section JSON.
   Definition json_rec (P:json->Set) := json_rect P.
   
   Lemma jsonInd2 (P : json -> Prop)
-        (f : P jnil)
+        (f : P jnull)
         (f0 : forall n : number, P (jnumber n))
         (fb : forall b : bool, P (jbool b))
         (f1 : forall s : string, P (jstring s))
@@ -128,7 +128,7 @@ Section JSON.
 
     Fixpoint jsonToJS (quotel:string) (j : json) : string
       := match j with
-         | jnil => "null" (* to be discussed *)
+         | jnull => "null" (* to be discussed *)
          | jnumber n => to_string n
          | jbool b => if b then "true" else "false"
          | jstring s => stringToJS quotel s

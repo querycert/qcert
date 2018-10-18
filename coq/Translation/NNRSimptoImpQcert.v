@@ -27,7 +27,6 @@ Require Import CommonRuntime.
 Require Import NNRSimpRuntime.
 Require Import Imp.
 Require Import ImpQcert.
-Require Import Fresh.
 
 Section NNRSimptoImpQcert.
   Import ListNotations.

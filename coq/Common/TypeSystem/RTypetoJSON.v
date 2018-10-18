@@ -45,7 +45,7 @@ Section RTypeToJSON.
   Section toRType.
     Fixpoint json_to_rtype₀ (j:json) : rtype₀ :=
       match j with
-      | jnil => Unit₀
+      | jnull => Unit₀
       | jnumber _ => Unit₀
       | jbool _ => Unit₀
       | jarray _ => Unit₀
@@ -72,7 +72,7 @@ Section RTypeToJSON.
 
     Fixpoint json_to_rtype₀_with_fail (j:json) : option rtype₀ :=
       match j with
-      | jnil => Some Unit₀
+      | jnull => Some Unit₀
       | jnumber _ => None
       | jbool _ => None
       | jarray _ => None

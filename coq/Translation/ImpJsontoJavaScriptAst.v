@@ -19,7 +19,6 @@ Require Import List.
 Require Import Bool.
 Require Import Arith.
 Require Import Utils.
-Require Import JSONOperators.
 Require Import Imp.
 Require Import ImpJson.
 Require Import JavaScriptAstRuntime.

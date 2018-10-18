@@ -19,7 +19,6 @@ Require Import List.
 Require Import Bool.
 Require Import Arith.
 Require Import Utils.
-Require Import JSONOperators.
 Require Import CommonRuntime.
 Require Import Imp.
 Require Import ImpQcert.
@@ -33,7 +32,7 @@ Section ImpJsontoJavaScriptAst.
 
   (** Translation *)
 
-  Definition mk_imp_json_expr_error : imp_json_expr := ImpExprConst jnil.
+  Definition mk_imp_json_expr_error : imp_json_expr := ImpExprConst jnull.
   Definition mk_imp_json_op op el : imp_json_expr := ImpExprOp op el.
   Definition mk_imp_json_runtime_call op el : imp_json_expr := ImpExprRuntimeCall op el.
   Definition imp_qcert_unary_op_to_imp_json (op:unary_op) el : imp_json_expr :=

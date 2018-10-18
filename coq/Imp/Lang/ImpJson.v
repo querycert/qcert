@@ -17,10 +17,8 @@
 (** Imp with the Json data model *)
 
 Require Import String.
+Require Import Utils.
 Require Import Imp.
-
-Require Import JSON.
-Require Import JSONOperators.
 
 Section Syntax.
 

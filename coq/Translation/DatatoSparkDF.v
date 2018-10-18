@@ -47,7 +47,7 @@ Section DatatoSparkDF.
   Fixpoint typed_data_to_json (d: data) (r: rtype₀): option json :=
     match d, r with
     | _, Top₀ => Some (jstring (data_to_blob d))
-    | dunit, Unit₀ => Some jnil
+    | dunit, Unit₀ => Some jnull
     | dnat i, Nat₀ => Some (jnumber (float_of_int i))
     | dfloat i, Float₀ => Some (jnumber i)
     | dbool b, Bool₀ => Some (jbool b)
@@ -94,10 +94,10 @@ Section DatatoSparkDF.
       | None => None
       end
     | dleft l, Either₀ lt rt =>
-      lift (fun l => jobject (("$left"%string, l)::("$right"%string, jnil)::nil))
+      lift (fun l => jobject (("$left"%string, l)::("$right"%string, jnull)::nil))
            (typed_data_to_json l lt)
     | dright r, Either₀ lt rt =>
-      lift (fun r => jobject (("$left"%string, jnil)::("$right"%string, r)::nil))
+      lift (fun r => jobject (("$left"%string, jnull)::("$right"%string, r)::nil))
            (typed_data_to_json r rt)
     | dbrand bs v, Brand₀ bts =>
       (* Recursive brands are an issue. Solution: blob out the data in a brand. *)

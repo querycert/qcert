@@ -194,7 +194,7 @@ let json_of_source_to_target_path j =
 
 let rec unsafe_json_to_js (j:QData.json) =
   match j with
-  | QcertCompiler.Jnil -> Js.Unsafe.inject (Js.null)
+  | QcertCompiler.Jnull -> Js.Unsafe.inject (Js.null)
   | QcertCompiler.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
   | QcertCompiler.Jbool b -> Js.Unsafe.inject (Js.bool b)
   | QcertCompiler.Jstring str -> Js.Unsafe.inject (Js.string (Util.string_of_char_list str))

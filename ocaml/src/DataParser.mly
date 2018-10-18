@@ -35,7 +35,7 @@ main:
 
 json:
 | NULL
-    { QData.jnil }
+    { QData.jnull }
 | i = INT
     { QData.jnumber (float_of_int i) }
 | f = FLOAT

@@ -17,11 +17,9 @@
 (** Imp with the Q*cert data model *)
 
 Require Import String.
-
-Require Import Imp.
-Require Import Data.
-Require Import Operators.
+Require Import Utils.
 Require Import CommonRuntime.
+Require Import Imp.
 
 Section Syntax.
 

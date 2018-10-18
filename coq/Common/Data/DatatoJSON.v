@@ -48,7 +48,7 @@ Section DatatoJSON.
       | Some fd => dforeign fd
       | None => 
         match j with
-        | jnil => dunit
+        | jnull => dunit
         | jnumber n => dfloat n
         | jbool b => dbool b
         | jstring s => dstring s
@@ -97,7 +97,7 @@ Section DatatoJSON.
       | Some fd => dforeign fd
       | None => 
         match j with
-        | jnil => dright dunit
+        | jnull => dright dunit
         | jnumber n => dfloat n
         | jbool b => dbool b
         | jstring s => dstring s
@@ -139,7 +139,7 @@ Section DatatoJSON.
     
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with
-      | dunit => jnil
+      | dunit => jnull
       | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
       | dfloat n => jnumber n
       | dbool b => jbool b
@@ -157,7 +157,7 @@ Section DatatoJSON.
 
     Fixpoint data_to_js (quotel:string) (d:data) : json :=
       match d with
-      | dunit => jnil
+      | dunit => jnull
       | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
       | dfloat n => jnumber n
       | dbool b => jbool b

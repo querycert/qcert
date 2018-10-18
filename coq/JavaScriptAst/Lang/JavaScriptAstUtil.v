@@ -70,7 +70,7 @@ Section JavaScriptAstUtil.
 
   Fixpoint json_to_js_ast (json: json) : expr :=
     match json with
-    | jnil => expr_literal literal_null
+    | jnull => expr_literal literal_null
     | jnumber n =>
       expr_literal (literal_number n)
     | jbool b =>

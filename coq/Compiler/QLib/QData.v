@@ -31,8 +31,8 @@ Module QData(runtime:CompilerRuntime).
   Definition t : Set 
     := qdata.
   
-  Definition jnil : json
-    := JSON.jnil.
+  Definition jnull : json
+    := JSON.jnull.
   Definition jnumber z : json 
     := JSON.jnumber z.
   Definition jbool b : json 
