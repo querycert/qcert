@@ -254,38 +254,12 @@ Section NNRSimptoJavaScriptAst.
   Definition mk_right (e: expr) : expr :=
     expr_object [(propname_identifier "right", propbody_val e) ].
 
-  Fixpoint json_to_js_ast (json: json) : expr :=
-    match json with
-    | jnil => expr_literal literal_null
-    | jnumber n =>
-      expr_literal (literal_number n)
-    | jbool b =>
-      expr_literal (literal_bool b)
-    | jstring s =>
-      expr_literal (literal_string s)
-    | jarray a =>
-      let a :=
-          List.map
-            (fun v => Some (json_to_js_ast v))
-            a
-      in
-      expr_array a
-    | jobject o =>
-      expr_object
-        (List.map
-           (fun (prop: (string * JSON.json)) =>
-              let (x, v) := prop in
-              (propname_identifier x, propbody_val (json_to_js_ast v)))
-           o)
-    end.
-
   Definition data_to_js_ast (d: data) : expr :=
     let json :=
         (* XXX TODO: is it the good choice vs data_enhanced_to_json XXX *)
         data_to_json d
     in
-    json_to_js_ast json.
-
+    json_to_js_ast json. (* XXX JSON -> JSAst was moved to JavaScriptAstUtil *)
 
   (** Translation *)
 

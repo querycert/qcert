@@ -15,6 +15,7 @@
  *)
 
 Require Import List.
+Require Import Utils.
 Require Import CommonRuntime.
 Require Import JsAst.JsSyntax.
 Require Import JavaScriptAst.
@@ -30,6 +31,12 @@ Section JavaScriptAstUtil.
 
   Definition array_get e1 e2 :=
     expr_access e1 e2.
+
+  Definition object_hasOwnProperty e1 e2 :=
+    expr_call (expr_member e1 "hasOwnProperty") [ e2 ].
+
+  Definition object_toString e1 :=
+    expr_call (expr_member e1 "toString") [ ].
 
   (** Runtime  functions *)
 
@@ -56,8 +63,35 @@ Section JavaScriptAstUtil.
          (fun sc => Some (sortCriteria_to_js_ast sc))
          scl).
 
-  Definition call_runtime (f: string) (args: list expr) : expr:= (* TODO: review *)
+  Definition call_js_function (f: string) (args: list expr) : expr:= (* TODO: review *)
     expr_call (expr_identifier f) args.
+
+  Definition call_runtime := call_js_function.
+
+  Fixpoint json_to_js_ast (json: json) : expr :=
+    match json with
+    | jnil => expr_literal literal_null
+    | jnumber n =>
+      expr_literal (literal_number n)
+    | jbool b =>
+      expr_literal (literal_bool b)
+    | jstring s =>
+      expr_literal (literal_string s)
+    | jarray a =>
+      let a :=
+          List.map
+            (fun v => Some (json_to_js_ast v))
+            a
+      in
+      expr_array a
+    | jobject o =>
+      expr_object
+        (List.map
+           (fun (prop: (string * JSON.json)) =>
+              let (x, v) := prop in
+              (propname_identifier x, propbody_val (json_to_js_ast v)))
+           o)
+    end.
 
 End JavaScriptAstUtil.
 

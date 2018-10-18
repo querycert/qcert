@@ -39,6 +39,7 @@ MODULES = \
 	Utils/Closure \
 	Utils/Result \
 	Utils/JSON \
+	Utils/JSONOperators \
 	Utils/OptimizerStep \
 	Utils/OptimizerLogger \
 	Utils/Utils \
@@ -49,7 +50,7 @@ MODULES = \
 	Common/TypeSystem/RTypeNorm \
 	Common/TypeSystem/RTypetoJSON \
 	Common/TypeSystem/DType \
-        Common/TypeSystem/DTypetoJSON \
+  Common/TypeSystem/DTypetoJSON \
 	Common/TypeSystem/TBrandContext \
 	Common/TypeSystem/RSubtype \
 	Common/TypeSystem/RSubtypeProp \
@@ -348,6 +349,8 @@ MODULES = \
 	Translation/NNRStoNNRSimp \
 	Translation/TNNRStoNNRSimp \
 	Translation/NNRSimptoImpQcert \
+	Translation/ImpQcerttoImpJson \
+  Translation/ImpJsontoJavaScriptAst \
 	Translation/NNRSimptoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \

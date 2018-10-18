@@ -16,27 +16,34 @@
 
 (** Imp with the Json data model *)
 
+Require Import String.
 Require Import Imp.
 
 Require Import JSON.
-Require Import CommonRuntime.
+Require Import JSONOperators.
 
 Section Syntax.
 
-  Context {fruntime:foreign_runtime}.
+  Definition imp_json_data := json.
 
-  Definition imp_json_data := data.
-
-  Inductive imp_json_op := (* XXX TODO XXX *)
-  | OpPlus
+  (* XXX This should contain at least:
+         - all JS operators/expressions used in translation from NNRSimp to JsAst
+         - all JS operators/expressions used to manipulate values in data but not in json (brands, nat, left, right, foreign)
+     imp_json_op constructors names are based on JsAst names
+     imp_json_runtime_op constructors namess are based on Qcert operators names ??
+  *)
+  Definition imp_json_op := json_op. (* See ./Utils/JSONOperators.v *)
+  Inductive imp_json_runtime_op := (* XXX TODO -- Look at NNRSimptoJavaScriptAst XXX *)
+  | JSONRuntimeEqual : imp_json_runtime_op
+  | JSONRuntimeRecConcat : imp_json_runtime_op
+  | JSONRuntimeRecMerge : imp_json_runtime_op
+  | JSONRuntimeDistinct : imp_json_runtime_op
+  | JSONRuntimeGroupBy : imp_json_runtime_op
+  | JSONRuntimeDeref : imp_json_runtime_op
   .
 
-  Inductive imp_json_runtime_op := (* XXX TODO XXX *)
-  | RuntimePlus
-  .
-
-  Definition imp_json_expr := @imp_expr imp_json_data imp_json_op.
-  Definition imp_json_stmt := @imp_expr imp_json_data imp_json_op.
+  Definition imp_json_expr := @imp_expr imp_json_data imp_json_op imp_json_runtime_op.
+  Definition imp_json_stmt := @imp_stmt imp_json_data imp_json_op imp_json_runtime_op.
   Definition imp_json_function := @imp_function imp_json_data imp_json_op imp_json_runtime_op.
   Definition imp_json := @imp imp_json_data imp_json_op imp_json_runtime_op.
 

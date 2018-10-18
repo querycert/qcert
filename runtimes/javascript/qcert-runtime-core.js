@@ -15,6 +15,11 @@
  */
 
 /* "standard library" (implementation of unary and binary operators) */
+/* XXX TODO
+   -- never use 'in' always use 'hasObjectProperty()' instead
+   -- never use '==' or '!=' always use '===' or '!==' instead
+   -- never use 'i++' always use 'i = i+1'
+*/
 function unwrap(doc) {
     // Unwrap for Enhanced TxStore format
     if ("state" in doc && !("$class" in doc)) {

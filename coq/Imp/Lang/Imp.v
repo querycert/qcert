@@ -45,7 +45,8 @@ Section Imp.
     | ImpExprConst : Data -> imp_expr                            (**r constant data ([d]) *)
     | ImpExprOp : Op -> list imp_expr -> imp_expr                (**r operator ([e₁ ⊠ e₂]) *)
     | ImpExprCall : string -> list imp_expr -> imp_expr          (**r function call *)
-    | ImpExprRuntimeCall : Runtime -> list imp_expr -> imp_expr   (**r runtime function call *)
+    | ImpExprRuntimeCall : Runtime -> list imp_expr -> imp_expr  (**r runtime function call *)
+  (*| ImpExprIf : imp_expr -> imp_expr -> imp_expr -> imp_expr *)(* XXX Useful? Used in Qcert JS runtime *)
     .
 
     Inductive imp_stmt :=
@@ -55,6 +56,7 @@ Section Imp.
     | ImpStmtForRange : var -> imp_expr -> imp_expr -> imp_stmt -> imp_stmt    (**r for loop ([for ($v = e₁ to e₂) { s₂ }]) *)
     | ImpStmtIf : imp_expr -> imp_stmt -> imp_stmt -> imp_stmt                 (**r conditional ([if e₁ { s₂ } else { s₃ }]) *)
     | ImpStmtReturn : option imp_expr -> imp_stmt                              (**r return ([return e]) *)
+  (*| ImpStmtBreak : imp_stnt *)(* XXX Possible? Useful? -- Used in Qcert JS runtime *)
     .
 
     Inductive imp_function :=

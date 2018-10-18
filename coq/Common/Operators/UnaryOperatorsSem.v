@@ -56,7 +56,7 @@ Section UnaryOperatorsSem.
 
   Context (h:brand_relation_t).
   Context {fuop:foreign_unary_op}.
-
+  
   Definition unary_op_eval (uop:unary_op) (d:data) : option data :=
     match uop with
     | OpIdentity => Some d
