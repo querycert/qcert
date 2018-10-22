@@ -46,13 +46,13 @@ Section NNRSimptoImpQcert.
     | NNRSimpBinop op e1 e2 =>
       let e1' := nnrs_imp_expr_to_imp_qcert e1 in
       let e2' := nnrs_imp_expr_to_imp_qcert e2 in
-      ImpExprOp (Binary op) [e1'; e2']
+      ImpExprOp (QcertOpBinary op) [e1'; e2']
     | NNRSimpUnop op e =>
       let e' := nnrs_imp_expr_to_imp_qcert e in
-      ImpExprOp (Unary op) [e']
+      ImpExprOp (QcertOpUnary op) [e']
     | NNRSimpGroupBy g fields e =>
       let e' := nnrs_imp_expr_to_imp_qcert e in
-      ImpExprRuntimeCall (RuntimeGroupby g fields) [ e' ]
+      ImpExprRuntimeCall (QcertRuntimeGroupby g fields) [ e' ]
     end.
 
   Fixpoint nnrs_imp_stmt_to_imp_qcert (avoid: list string) (stmt: nnrs_imp_stmt): imp_qcert_stmt :=
@@ -102,23 +102,23 @@ Section NNRSimptoImpQcert.
       let avoid := x1 :: x2 :: avoid in
       let e' := ImpExprVar x  in
       ImpStmtIf
-        (ImpExprRuntimeCall RuntimeEither [e'])
+        (ImpExprRuntimeCall QcertRuntimeEither [e'])
         (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
-           [ (x1, Some (ImpExprRuntimeCall RuntimeToLeft [e'])) ]
+           [ (x1, Some (ImpExprRuntimeCall QcertRuntimeToLeft [e'])) ]
            [ nnrs_imp_stmt_to_imp_qcert avoid s1 ])
         (ImpStmtBlock (* var x2 = toRight(e); s2 *)
-           [ (x2, Some (ImpExprRuntimeCall RuntimeToRight [e'])) ]
+           [ (x2, Some (ImpExprRuntimeCall QcertRuntimeToRight [e'])) ]
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     | NNRSimpEither e x1 s1 x2 s2 =>
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
       let e' := nnrs_imp_expr_to_imp_qcert e in
       ImpStmtIf
-        (ImpExprRuntimeCall RuntimeEither [e'])
+        (ImpExprRuntimeCall QcertRuntimeEither [e'])
         (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
-           [ (x1, Some (ImpExprRuntimeCall RuntimeToLeft [e'])) ]
+           [ (x1, Some (ImpExprRuntimeCall QcertRuntimeToLeft [e'])) ]
            [ nnrs_imp_stmt_to_imp_qcert avoid s1 ])
         (ImpStmtBlock (* var x2 = toRight(e); s2 *)
-           [ (x2, Some (ImpExprRuntimeCall RuntimeToRight [e'])) ]
+           [ (x2, Some (ImpExprRuntimeCall QcertRuntimeToRight [e'])) ]
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     end.
 
@@ -128,7 +128,7 @@ Section NNRSimptoImpQcert.
     let body :=
         ImpStmtBlock
           ((List.map
-              (fun x => (x, Some (ImpExprRuntimeCall (RuntimeDeref) [ ImpExprVar x ])))
+              (fun x => (x, Some (ImpExprRuntimeCall (QcertRuntimeDeref) [ ImpExprVar x ])))
               globals)
              ++ [ (ret, None) ])
           [ nnrs_imp_stmt_to_imp_qcert globals stmt;

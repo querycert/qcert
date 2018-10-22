@@ -32,20 +32,156 @@ Section ImpJsontoJavaScriptAst.
 
   (** Translation *)
 
-  Definition mk_imp_json_expr_error : imp_json_expr := ImpExprConst jnull.
+
+  Definition mk_imp_json_expr_error msg : imp_json_expr :=
+    ImpExprConst (jstring msg).
   Definition mk_imp_json_op op el : imp_json_expr := ImpExprOp op el.
   Definition mk_imp_json_runtime_call op el : imp_json_expr := ImpExprRuntimeCall op el.
+
+  Definition mk_string s : imp_json_expr := ImpExprConst (jstring s).
+  Definition mk_bag el : imp_json_expr := mk_imp_json_op JSONOpArray el.
+  Definition mk_left e : imp_json_expr :=
+    mk_imp_json_op (JSONOpObject ["left"%string]) [ e ].
+  Definition mk_right e : imp_json_expr :=
+    mk_imp_json_op (JSONOpObject ["right"%string]) [ e ].
+
+
+  Definition sortCriteria_to_json_expr (sc: string * SortDesc) : imp_json_expr :=
+    let (lbl, c) := sc in
+    let o :=
+        match c with
+        | Ascending => jobject [ ("asc"%string, jstring lbl) ]
+        | Descending => jobject [ ("desc"%string, jstring lbl) ]
+        end
+    in
+    ImpExprConst o.
+
+  Definition brands_to_json_expr sl : imp_json_expr :=
+    let j := jarray ((List.map (fun s => jstring s)) sl) in
+    ImpExprConst j.
+
   Definition imp_qcert_unary_op_to_imp_json (op:unary_op) el : imp_json_expr :=
     match op with
     | OpIdentity =>
       match el with
       | [e] => e
-      | _ => mk_imp_json_expr_error
+      | _ => mk_imp_json_expr_error "OpIdentity: wrong number of arguments"
       end
     | OpNeg => mk_imp_json_op JSONOpNeg el
     | OpRec s => mk_imp_json_op (JSONOpObject [s]) el
     | OpDot s => mk_imp_json_op (JSONOpAccess s) el
-    | _ => mk_imp_json_expr_error (* XXX TODO  *)
+    | OpRecRemove f =>
+      match el with
+      | [e] => mk_imp_json_runtime_call JSONRuntimeRemove [e; mk_string f ]
+      | _ => mk_imp_json_expr_error "OpRecRemove: wrong number of arguments"
+      end
+    | OpRecProject fl =>
+      match el with
+      | [e] =>
+        mk_imp_json_runtime_call
+          JSONRuntimeProject ((List.map mk_string fl) ++ [ e ])
+      | _ => mk_imp_json_expr_error "OpRecProject: wrong number of arguments"
+      end
+    | OpBag => mk_bag el
+    | OpSingleton => mk_imp_json_runtime_call JSONRuntimeSingleton el
+    | OpFlatten => mk_imp_json_runtime_call JSONRuntimeFlatten el
+    | OpDistinct => mk_imp_json_runtime_call JSONRuntimeDistinct el
+    | OpOrderBy scl =>
+      match el with
+      | [e] =>
+        mk_imp_json_runtime_call
+          JSONRuntimeSort (e :: (List.map sortCriteria_to_json_expr scl))
+      | _ => mk_imp_json_expr_error "OpOrderBy: wrong number of arguments"
+      end
+    | OpCount => mk_imp_json_runtime_call JSONRuntimeCount el
+    | OpToString => mk_imp_json_op JSONOpToString el
+    | OpSubstring start len =>
+      match el with
+      | [e] =>
+        let start :=
+            (* XXX TODO XXX *)
+            ImpExprConst jnull
+            (* ImpExprConst (jnumber start) *)
+        in
+        let args :=
+            match len with
+            | None => [ e; start ]
+            | Some length =>
+              let len :=
+                  ImpExprConst jnull
+                  (* ImpExprConst (jnumber start) *)
+              in
+              [ e; start; len ]
+            end
+        in
+        mk_imp_json_runtime_call JSONRuntimeSubstring args
+      | _ => mk_imp_json_expr_error "OpSubstring: wrong number of arguments"
+      end
+    | OpLike pat oescape =>
+      mk_imp_json_expr_error "XXX TODO: ImpQcerttoImpJson: OpLike XXX"
+    | OpLeft =>
+      match el with
+      | [e] => mk_left e
+      | _ => mk_imp_json_expr_error "OpLeft: wrong number of arguments"
+      end
+    | OpRight =>
+      match el with
+      | [e] => mk_right e
+      | _ => mk_imp_json_expr_error "OpRight: wrong number of arguments"
+      end
+    | OpBrand b =>
+      match el with
+      | [e] =>
+        mk_imp_json_runtime_call JSONRuntimeBrand [ brands_to_json_expr b; e ]
+      | _ => mk_imp_json_expr_error "OpBrand: wrong number of arguments"
+      end
+    | OpUnbrand => mk_imp_json_runtime_call JSONRuntimeUnbrand el
+    | OpCast b =>
+      match el with
+      | [e] =>
+        mk_imp_json_runtime_call JSONRuntimeCast [ brands_to_json_expr b; e ]
+      | _ => mk_imp_json_expr_error "OpCast: wrong number of arguments"
+      end
+    | OpNatUnary u =>
+      match el with
+      | [e] =>
+        let op :=
+            match u with
+            | NatAbs => JSONRuntimeNatAbs
+            | NatLog2 => JSONRuntimeNatLog2
+            | NatSqrt => JSONRuntimeNatSqrt
+            end
+        in
+        mk_imp_json_runtime_call op [ e ]
+      | _ => mk_imp_json_expr_error "OpNatUnary: wrong number of arguments"
+      end
+    | OpNatSum => mk_imp_json_runtime_call JSONRuntimeNatSum el
+    | OpNatMin => mk_imp_json_runtime_call JSONRuntimeNatMin el
+    | OpNatMax => mk_imp_json_runtime_call JSONRuntimeNatMax el
+    | OpNatMean => mk_imp_json_runtime_call JSONRuntimeNatArithMean el
+    | OpFloatOfNat => mk_imp_json_runtime_call JSONRuntimeFloatOfNat el
+    | OpFloatUnary u =>
+      match el with
+      | [e] =>
+        match u with
+        | FloatNeg => mk_imp_json_op JSONOpNeg [ e ]
+        | _ =>
+          mk_imp_json_expr_error "XXX TODO: OpFloatUnary: math operators XXX"
+        (* | FloatSqrt => math_sqrt e' *)
+        (* | FloatExp => math_exp e' *)
+        (* | FloatLog => math_log e' *)
+        (* | FloatLog10 => math_log10 e' *)
+        (* | FloatCeil => math_ceil e' *)
+        (* | FloatFloor => math_floor e' *)
+        (* | FloatAbs => math_abs e' *)
+        end
+      | _ => mk_imp_json_expr_error "OpFloatUnary: wrong number of arguments"
+      end
+    | OpFloatTruncate =>
+      mk_imp_json_expr_error "XXX TODO: OpFloatTruncate: math operators XXX"
+    | OpFloatSum => mk_imp_json_runtime_call JSONRuntimeSum el
+    | OpFloatMean => mk_imp_json_runtime_call JSONRuntimeArithMean el
+    | _ => mk_imp_json_expr_error "XXX TODO: ImpQcerttoImpJson.imp_qcert_unary_op_to_imp_json: not yet implemented XXX" (* XXX TODO XXX *)
     end.
 
   Definition imp_qcert_binary_op_to_imp_json (op:binary_op) el : imp_json_expr :=
@@ -55,36 +191,38 @@ Section ImpJsontoJavaScriptAst.
     | OpRecMerge => mk_imp_json_runtime_call JSONRuntimeRecMerge el
     | OpAnd => mk_imp_json_op JSONOpAnd el
     | OpOr => mk_imp_json_op JSONOpOr el
-    | _ => mk_imp_json_expr_error (* XXX TODO  *)
+    | _ => mk_imp_json_expr_error "XXX TODO: ImpQcerttoImpJson.imp_qcert_binary_op_to_imp_json: not yet implemented XXX" (* XXX TODO  *)
     end.
 
   Definition imp_qcert_op_to_imp_json (op:imp_qcert_op) el : imp_json_expr :=
     match op with
-    | Unary op => imp_qcert_unary_op_to_imp_json op el
-    | Binary op => imp_qcert_binary_op_to_imp_json op el
+    | QcertOpUnary op => imp_qcert_unary_op_to_imp_json op el
+    | QcertOpBinary op => imp_qcert_binary_op_to_imp_json op el
     end.
 
   Definition mk_either_expr (el:list imp_json_expr) : imp_json_expr :=
-    mk_imp_json_expr_error. (* XXX TODO  *)
+    mk_imp_json_runtime_call JSONRuntimeEither el.
+
   Definition mk_to_left_expr (el:list imp_json_expr) : imp_json_expr :=
-    mk_imp_json_expr_error. (* XXX TODO  *)
+    mk_imp_json_runtime_call JSONRuntimeToLeft el.
+
   Definition mk_to_right_expr (el:list imp_json_expr) : imp_json_expr :=
-    mk_imp_json_expr_error. (* XXX TODO  *)
+    mk_imp_json_runtime_call JSONRuntimeToRight el.
 
   Definition imp_qcert_runtime_call_to_imp_json
              (op:imp_qcert_runtime_op)
              (el:list imp_json_expr) : imp_json_expr :=
     match op with
-    | RuntimeGroupby s ls =>
+    | QcertRuntimeGroupby s ls =>
       mk_imp_json_runtime_call
         JSONRuntimeGroupBy
         ((ImpExprConst (jstring s))
            :: (ImpExprConst (jarray (map jstring ls)))
            :: el)
-    | RuntimeEither => mk_either_expr el
-    | RuntimeToLeft => mk_to_left_expr el
-    | RuntimeToRight => mk_to_right_expr el
-    | RuntimeDeref =>
+    | QcertRuntimeEither => mk_either_expr el
+    | QcertRuntimeToLeft => mk_to_left_expr el
+    | QcertRuntimeToRight => mk_to_right_expr el
+    | QcertRuntimeDeref =>
       mk_imp_json_runtime_call JSONRuntimeDeref el (* XXX ???? TODO *)
     end.
 

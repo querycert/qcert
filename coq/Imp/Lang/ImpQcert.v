@@ -28,16 +28,16 @@ Section Syntax.
   Definition imp_qcert_data := data.
 
   Inductive imp_qcert_op :=
-  | Unary : unary_op -> imp_qcert_op
-  | Binary : binary_op -> imp_qcert_op
+  | QcertOpUnary : unary_op -> imp_qcert_op
+  | QcertOpBinary : binary_op -> imp_qcert_op
   .
 
   Inductive imp_qcert_runtime_op :=
-  | RuntimeGroupby : string -> list string -> imp_qcert_runtime_op
-  | RuntimeEither : imp_qcert_runtime_op
-  | RuntimeToLeft : imp_qcert_runtime_op
-  | RuntimeToRight : imp_qcert_runtime_op
-  | RuntimeDeref : imp_qcert_runtime_op
+  | QcertRuntimeGroupby : string -> list string -> imp_qcert_runtime_op
+  | QcertRuntimeEither : imp_qcert_runtime_op
+  | QcertRuntimeToLeft : imp_qcert_runtime_op
+  | QcertRuntimeToRight : imp_qcert_runtime_op
+  | QcertRuntimeDeref : imp_qcert_runtime_op
   .
 
   Definition imp_qcert_expr := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
