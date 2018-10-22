@@ -122,20 +122,18 @@ Section NNRSimptoImpQcert.
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     end.
 
-  (* XXX
   Definition nnrs_imp_to_imp_qcert_top globals (q: nnrs_imp): imp_function :=
     let constants := "constants"%string in
     let (stmt, ret) := q in
     let body :=
         ImpStmtBlock
           ((List.map
-              (fun x => (x, Some (runtime_deref (ImpExprVar constants) x)))
-              globals) ::
-                       stat_var_decl [ (ret, None) ])
+              (fun x => (x, Some (ImpExprRuntimeCall (RuntimeDeref) [ ImpExprVar x ])))
+              globals)
+             ++ [ (ret, None) ])
           [ nnrs_imp_stmt_to_imp_qcert globals stmt;
             ImpStmtReturn (Some (ImpExprVar ret)) ]
     in
     ImpFun [ constants ] body.
-   *)
 
 End NNRSimptoImpQcert.
