@@ -14,6 +14,8 @@
  * limitations under the License.
  *)
 
+open Js_of_ocaml
+
 open Util
 open DataUtil
 open QcertUtil
