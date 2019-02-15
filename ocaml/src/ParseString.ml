@@ -74,7 +74,7 @@ let parse_tech_rule_from_string s : QLang.tech_rule =
 let parse_designer_rule_from_string s : QLang.designer_rule =
   QCAMPRule.rule_match
     (parse_camp_sexp_from_string
-       (JavaService.main "serialRule2CAMP" (B64.encode s)))
+       (JavaService.main "serialRule2CAMP" (Base64.encode_string s)))
 
 let parse_query_from_string l s : string * QLang.query =
   begin match l with

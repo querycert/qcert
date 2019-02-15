@@ -115,8 +115,8 @@ MODULES = \
 	NRA/Lang/NRAExtEq \
 	NRA/Typing/TNRA \
 	NRA/Typing/TNRAInfer \
-        NRA/Typing/TNRAEq \
-        NRA/Typing/TNRAExt \
+	NRA/Typing/TNRAEq \
+	NRA/Typing/TNRAExt \
 	NRA/Typing/TNRAUtil \
 	NRA/Context/NRAContext \
 	NRA/NRARuntime \
@@ -134,16 +134,16 @@ MODULES = \
 	cNRAEnv/Typing/TcNRAEnv \
 	cNRAEnv/Typing/TcNRAEnvInfer \
 	cNRAEnv/Typing/TcNRAEnvIgnore \
-        cNRAEnv/Typing/TcNRAEnvEq \
-        cNRAEnv/Context/cNRAEnvContext \
+	cNRAEnv/Typing/TcNRAEnvEq \
+	cNRAEnv/Context/cNRAEnvContext \
 	cNRAEnv/Context/cNRAEnvContextLift \
 	cNRAEnv/cNRAEnvRuntime \
 	cNRAEnv/cNRAEnvTypes \
 	cNRAEnv/cNRAEnvSystem \
 	NRAEnv/Lang/NRAEnv \
-        NRAEnv/Lang/NRAEnvSize \
-        NRAEnv/Lang/NRAEnvEq \
-        NRAEnv/Lang/NRAEnvIgnore \
+	NRAEnv/Lang/NRAEnvSize \
+	NRAEnv/Lang/NRAEnvEq \
+	NRAEnv/Lang/NRAEnvIgnore \
 	NRAEnv/Typing/TNRAEnv \
 	NRAEnv/Typing/TNRAEnvEq \
 	NRAEnv/NRAEnvRuntime \
