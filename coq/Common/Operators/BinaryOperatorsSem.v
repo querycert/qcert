@@ -87,7 +87,7 @@ Section BinaryOperatorsSem.
     | OpLt => unbdnat (fun x y => if Z_lt_dec x y then true else false) d1 d2
     | OpLe => unbdnat (fun x y => if Z_le_dec x y then true else false) d1 d2
     | OpBagUnion => rondcoll2 bunion d1 d2
-    | OpBagDiff => rondcoll2 (@bminus data data_eq_dec) d1 d2
+    | OpBagDiff => rondcoll2 (@bminus data data_eq_dec) d2 d1
     | OpBagMin => rondcoll2 (@bmin data data_eq_dec) d1 d2
     | OpBagMax => rondcoll2 (@bmax data data_eq_dec) d1 d2
     | OpContains =>

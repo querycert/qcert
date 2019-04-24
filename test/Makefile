@@ -261,7 +261,7 @@ camp-world-tests-java:
                           world$(N);)
 
 ## SQL
-SQLORGNUM=1 2 3 4 5 6 7 8
+SQLORGNUM=1 2 3 4 5 6 7 8 9 10
 SQLTARGETS=nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 sql-tests:
