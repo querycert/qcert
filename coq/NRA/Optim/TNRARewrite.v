@@ -341,10 +341,10 @@ Section TNRARewrite.
     Forall (fun d : data => data_type d τ) (bminus l1 l2) ->
     (forall d : data, data_type d τ -> exists b' : bool, f d = Some b') ->
     lift dcoll (lift_filter f (bminus l1 l2)) =
-    match lift dcoll (lift_filter f l1) with
-      | Some d1 =>
-        match lift dcoll (lift_filter f l2) with
-          | Some d2 => rondcoll2 bminus d1 d2
+    match lift dcoll (lift_filter f l2) with
+      | Some d2 =>
+        match lift dcoll (lift_filter f l1) with
+          | Some d1 => rondcoll2 bminus d1 d2
           | None => None
         end
       | None => None
@@ -361,14 +361,19 @@ Section TNRARewrite.
         case_eq b; intros; rewrite H in *; clear H.
         (* true *)
         * rewrite IHl1; simpl; try assumption.
-          destruct (lift_filter f l1); try reflexivity; simpl.
+          case_eq (lift_filter f l1); intros; try reflexivity; simpl.
           unfold lift; simpl.
+          rewrite (lift_filter_remove_one l2 f a H0 H5 H2); simpl.
+          destruct (lift_filter f l2); try reflexivity.
           rewrite (lift_filter_remove_one l2 f a H0 H5 H2); simpl.
           destruct (lift_filter f l2); try reflexivity.
           apply remove_still_well_typed; assumption.
         (* false *)
         * rewrite IHl1; simpl; try assumption.
           destruct (lift_filter f l1); try reflexivity; simpl.
+          rewrite (lift_filter_remove_one_false); simpl.
+          destruct (lift_filter f l2); try reflexivity.
+          assumption.
           rewrite (lift_filter_remove_one_false); simpl.
           destruct (lift_filter f l2); try reflexivity.
           assumption.
@@ -398,7 +403,7 @@ Section TNRARewrite.
     rtype_equalizer.
     subst.
     simpl.
-    assert (Forall (fun d : data => data_type d τ) (bminus dl dl0))
+    assert (Forall (fun d : data => data_type d τ) (bminus dl0 dl))
       by (apply bminus_Forall; assumption).
     assert (exists f, (forall d : data,
                          data_type d τ ->

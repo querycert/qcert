@@ -130,7 +130,7 @@ Section NRAEnvOptimizer.
     Fixpoint nodupA_checker {fruntime:foreign_runtime} (p:nraenv) : bool
     := match p with
        | NRAEnvUnop OpDistinct _ => true
-       | NRAEnvBinop OpBagDiff p₁ p₂ => nodupA_checker p₂
+       | NRAEnvBinop OpBagDiff p₁ p₂ => nodupA_checker p₁
        | _ => false
        end.
 
@@ -156,9 +156,9 @@ Section NRAEnvOptimizer.
         match_destr_in e.
         invcs e.
         apply bminus_NoDup.
-        specialize (IHp2 nd).
-        specialize (IHp2 h c dn_c env dn_env x dn_x _ H1).
-        simpl in IHp2.
+        specialize (IHp1 nd).
+        specialize (IHp1 h c dn_c env dn_env x dn_x _ H0).
+        simpl in IHp1.
         trivial.
       - destruct u; try discriminate.
         intros _ .

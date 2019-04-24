@@ -652,7 +652,7 @@ Section TBinaryOperators.
     - Case "type_OpBagDiff"%string.
       dependent induction H; dependent induction H0; simpl.
       autorewrite with alg.
-      exists (dcoll (bminus dl dl0)).
+      exists (dcoll (bminus dl0 dl)).
       split; [reflexivity|apply dtcoll].
       assert (r = τ) by (apply rtype_fequal; assumption).
       assert (r0 = τ) by (apply rtype_fequal; assumption).
