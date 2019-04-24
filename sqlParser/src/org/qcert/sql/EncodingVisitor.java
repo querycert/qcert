@@ -386,12 +386,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitExcept(Except node, StringBuilder builder) {
-		builder.append("(except ");
-		if (node.isDistinct())
-			builder.append("(distinct) ");
-		process(node.getLeft(), builder);
-		process(node.getRight(), builder);
-		return builder.append(") ");
+		return processSetOperation(node, builder, Except.class, "except");
 	}
 
 	/* (non-Javadoc)
@@ -554,7 +549,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitIntersect(Intersect node, StringBuilder builder) {
-		return processSetOperation(node, builder, Intersect.class, "intersect");
+		return processSetOperation(node, builder, Union.class, "intersect");
 	}
 
 	/* (non-Javadoc)
