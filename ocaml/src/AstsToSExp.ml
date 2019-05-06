@@ -650,6 +650,67 @@ let sexp_to_nnrs_imp (se:sexp) : QLang.nnrs_imp =
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside nnrs_imp")
 
+(* Imp Section *)
+
+let imp_expr_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp e : sexp =
+  let rec imp_expr_to_sexp e : sexp =
+    match e with
+    | ImpExprVar v -> STerm ("ImpExprVar", [SString (string_of_char_list v)])
+    | ImpExprConst d -> STerm ("ImpExprConst", [data_to_sexp d])
+    | ImpExprOp (op, args) -> STerm ("ImpExprOp", (op_to_sexp op) :: List.map imp_expr_to_sexp args)
+    | ImpExprCall (f, args) -> STerm ("ImpExprCall", (SString (string_of_char_list f)) :: List.map imp_expr_to_sexp args)
+    | ImpExprRuntimeCall (op, args) -> STerm ("ImpExprRuntimeCall", (runtime_op_to_sexp op) :: List.map imp_expr_to_sexp args)
+  in
+  imp_expr_to_sexp e
+
+let imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s : sexp =
+  let imp_expr_to_sexp e = imp_expr_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp e in
+  let rec imp_stmt_to_sexp s : sexp =
+    match s with
+    | ImpStmtAssign (v, e) -> STerm ("ImpStmtAssign", [SString (string_of_char_list v); imp_expr_to_sexp e])
+    | ImpStmtFor (v, e, s) -> STerm ("ImpStmtFor", [SString (string_of_char_list v); imp_expr_to_sexp e; imp_stmt_to_sexp s])
+    | ImpStmtForRange (v, e1, e2, s) -> STerm ("ImpStmtForRange", [SString (string_of_char_list v); imp_expr_to_sexp e1; imp_expr_to_sexp e2; imp_stmt_to_sexp s])
+    | ImpStmtIf (e, s1, s2) -> STerm ("ImpStmtIf", [imp_expr_to_sexp e; imp_stmt_to_sexp s1; imp_stmt_to_sexp s2])
+    | ImpStmtReturn None -> STerm ("ImpStmtReturn", [])
+    | ImpStmtReturn (Some e) -> STerm ("ImpStmtReturn", [imp_expr_to_sexp e])
+  in
+  imp_stmt_to_sexp s
+
+let imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp (ImpFun(vars, s)) : sexp =
+  STerm ("ImpFun", [STerm ("ImpFunArgs", List.map (fun x -> SString (string_of_char_list x)) vars);
+                    imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s])
+
+let rec imp_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp q : sexp =
+  match q with
+  | ImpDef (f, def, next) ->
+    STerm ("ImpDef", [SString (string_of_char_list f);
+                      imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp def;
+                      imp_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp next ])
+  | ImpMain s -> STerm ("ImpMain", [imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s])
+
+
+let sexp_to_imp sexp_to_data sexp_to_op sexp_to_runtime_op (se:sexp) =
+  assert false (* XXX TODO XXX *)
+
+
+(* ImpQcert Section *)
+
+let sexp_to_imp_qcert_data d =
+  assert false (* XXX TODO XXX *)
+
+let sexp_to_imp_qcert_op op =
+  assert false (* XXX TODO XXX *)
+
+let sexp_to_imp_qcert_runtime_op op =
+  assert false (* XXX TODO XXX *)
+
+let rec imp_qcert_to_sexp q : sexp =
+  imp_to_sexp sexp_to_imp_qcert_data sexp_to_imp_qcert_op sexp_to_imp_qcert_runtime_op q
+
+let sexp_to_imp_qcert (se:sexp) =
+  sexp_to_imp sexp_to_imp_qcert_data sexp_to_imp_qcert_op sexp_to_imp_qcert_runtime_op se
+
+
 (* NNRCMR section *)
 
 let var_to_sexp (v:var) : sexp =
@@ -1945,6 +2006,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_nnrs_core -> Q_nnrs_core (sexp_to_nnrs se)
   | L_nnrs -> Q_nnrs (sexp_to_nnrs se)
   | L_nnrs_imp -> Q_nnrs_imp (sexp_to_nnrs_imp se)
+  | L_imp_qcert -> Q_nnrs_imp (sexp_to_imp_qcert se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
   | L_cldmr -> Q_cldmr (sexp_to_cldmr se)
   | L_dnnrc ->
@@ -1987,6 +2049,7 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_nnrs_core q -> nnrs_to_sexp q
   | Q_nnrs q -> nnrs_to_sexp q
   | Q_nnrs_imp q -> nnrs_imp_to_sexp q
+  | Q_imp_qcert q -> imp_qcert_to_sexp q
   | Q_nnrcmr q -> nnrcmr_to_sexp q
   | Q_cldmr q -> cldmr_to_sexp q
   | Q_dnnrc _ ->

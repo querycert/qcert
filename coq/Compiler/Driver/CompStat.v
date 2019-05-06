@@ -33,6 +33,7 @@ Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
+Require Import ImpRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
@@ -129,6 +130,11 @@ Section CompStat.
   Definition stat_nnrcmr (q: nnrcmr) : data :=
     drec
       (("nnrcmr_length", dnat (Z_of_nat (List.length q.(mr_chain))))
+         :: nil).
+
+  Definition stat_imp_qcert (q: imp_qcert) : data :=
+    drec
+      (("imp_qcert_size", dnat (Z_of_nat (imp_qcert_size q)))
          :: nil).
 
   Definition stat_nnrs_imp (q: nnrs_imp) : data :=
@@ -274,6 +280,11 @@ Section CompStat.
       (("nnrcmr_no_optim", stat_nnrcmr q)
          :: ("nnrcmr_optim", stat_nnrcmr q')
          :: ("nnrcmr_optim_time", dstring t)
+         :: nil).
+
+  Definition stat_tree_imp_qcert (q: imp_qcert) : data :=
+    drec
+      (("imp_qcert", stat_imp_qcert q)
          :: nil).
 
   Definition stat_tree_nnrs_imp (q: nnrs_imp) : data :=
@@ -464,6 +475,7 @@ Section CompStat.
         | Q_nnrs_core q => stat_nnrs_core q
         | Q_nnrs q => stat_nnrs q
         | Q_nnrs_imp q => stat_nnrs_imp q
+        | Q_imp_qcert q => stat_imp_qcert q
         | Q_nnrcmr q => stat_nnrcmr q
         | Q_cldmr q => stat_cldmr q
         | Q_dnnrc q => stat_dnnrc q
@@ -498,6 +510,7 @@ Section CompStat.
         | Q_nnrs_core q => stat_tree_nnrs_core q
         | Q_nnrs q => stat_tree_nnrs q
         | Q_nnrs_imp q => stat_tree_nnrs_imp q
+        | Q_imp_qcert q => stat_tree_imp_qcert q
         | Q_nnrcmr q => stat_tree_nnrcmr q
         | Q_cldmr q => stat_tree_cldmr q
         | Q_dnnrc q => stat_tree_dnnrc q

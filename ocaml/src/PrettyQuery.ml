@@ -380,6 +380,126 @@ let pretty_nnrs_imp greek margin annot inheritance link_runtime q =
     flush_str_formatter ()
   end
 
+(** Pretty Imp *)
+
+let pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e =
+  let rec pretty_imp_expr p sym ff e =
+    match e with
+    | QcertCompiler.ImpExprVar v -> fprintf ff "%s"  (Util.string_of_char_list v)
+    | QcertCompiler.ImpExprConst d -> fprintf ff "%a" pretty_data d
+    | QcertCompiler.ImpExprOp (op,args) -> (pretty_op p sym pretty_imp_expr) ff (op, args)
+    | QcertCompiler.ImpExprCall (f,args) ->
+      fprintf ff "@[<hv 0>%s@[<hv 2>(%a)@]"
+        (Util.string_of_char_list f)
+        (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (pretty_imp_expr p sym)) args
+    | QcertCompiler.ImpExprRuntimeCall (op,args) -> (pretty_runtime p sym pretty_imp_expr) ff (op, args)
+  in
+  pretty_imp_expr p sym ff e
+
+
+let pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym ff stmt =
+  let pretty_imp_expr p sym ff e = pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e in
+  let pretty_decl p sym ff (v, e_opt) =
+    match e_opt with
+    | None ->
+      fprintf ff "@[<hv 0>@[<hv 2>let %s@]@]"
+        (Util.string_of_char_list v)
+    | Some e ->
+      fprintf ff "@[<hv 0>@[<hv 2>let %s :=@ %a@]@]"
+        (Util.string_of_char_list v)
+        (pretty_imp_expr p sym) e
+  in
+  let rec pretty_imp_stmt p sym ff stmt =
+    match stmt with
+    | QcertCompiler.ImpStmtBlock (decls, stmts) ->
+      fprintf ff "@[<hv 0>{@;<1 2>%a@;<1 2>%a@ }@]"
+        (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (pretty_decl p sym)) decls
+        (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (pretty_imp_stmt p sym)) stmts
+    | QcertCompiler.ImpStmtAssign (v, e) ->
+      fprintf ff "@[<hv 2>$v%s =@;<1 0>%a;@;<0 -2>@]"
+        (Util.string_of_char_list v)
+        (pretty_imp_expr 0 sym) e
+    | QcertCompiler.ImpStmtFor (v,e,s) ->
+      fprintf ff "@[<hv 0>for (@[<hv 2>%s %a@;<1 0>%a@]) {@;<1 2>%a@ }@]"
+        (Util.string_of_char_list v) pretty_sym sym.sin
+        (pretty_imp_expr 0 sym) e
+        (pretty_imp_stmt 0 sym) s
+    | QcertCompiler.ImpStmtForRange (v,e1,e2,s) ->
+      fprintf ff "@[<hv 0>for (@[<hv 2>%s =@;<1 0>%a to@;<1 0>%a@]) {@;<1 2>%a@ }@]"
+        (Util.string_of_char_list v)
+        (pretty_imp_expr 0 sym) e1
+        (pretty_imp_expr 0 sym) e2
+        (pretty_imp_stmt 0 sym) s
+    | QcertCompiler.ImpStmtIf (e,s1,s2) ->
+      fprintf ff "@[<hv 0>@[<hv 2>if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
+        (pretty_imp_expr p sym) e
+        (pretty_imp_stmt p sym) s1
+        (pretty_imp_stmt p sym) s2
+    | QcertCompiler.ImpStmtReturn (Some e) ->
+      fprintf ff "@[<hv 2>return@;<1 0>%a;@;<0 -2>@]"
+        (pretty_imp_expr 0 sym) e
+    | QcertCompiler.ImpStmtReturn (None) ->
+      fprintf ff "@[<hv 2>return;@;<0 -2>@]"
+  in
+  pretty_imp_stmt p sym ff stmt
+
+let pretty_imp_function pretty_data pretty_op pretty_runtime p sym ff f =
+  let QcertCompiler.ImpFun (args, body) = f in
+  fprintf ff "@[<hv 0>function (@[<hv 2>%a@]) {@;<1 2>%a@ }@]"
+    (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (fun ff v -> fprintf ff "%s" (Util.string_of_char_list v))) args
+    (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) body
+
+let pretty_imp_aux pretty_data pretty_op pretty_runtime p sym ff q =
+  let rec pretty_imp_aux p sym ff q =
+    match q with
+    | QcertCompiler.ImpDef (f, def, next) ->
+      fprintf ff "@[<hv 0>@[<hv 2>let %s :=@ %a@]@;<0 0>%a@]"
+        (Util.string_of_char_list f)
+        (pretty_imp_function pretty_data pretty_op pretty_runtime p sym) def
+        (pretty_imp_aux p sym) next
+    | QcertCompiler.ImpMain stmt ->
+      fprintf ff "%a" (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) stmt
+  in
+  pretty_imp_aux p sym ff q
+
+let pretty_imp pretty_data pretty_op pretty_runtime greek margin annot inheritance link_runtime q =
+  let ff = str_formatter in
+  let sym = if greek then greeksym else textsym in
+  begin
+    pp_set_margin ff margin;
+    fprintf ff "@[%a@]@." (pretty_imp_aux pretty_data pretty_op pretty_runtime 0 sym) q;
+    flush_str_formatter ()
+  end
+
+(** Pretty ImpQcert *)
+
+let pretty_imp_qcert_data = pretty_data
+
+let pretty_imp_qcert_op p sym pretty_imp_expr ff (op, args) =
+  match op, args with
+  | QcertCompiler.QcertOpUnary u, [ e ] ->
+    (pretty_unary_op p sym pretty_imp_expr) ff u e
+  | QcertCompiler.QcertOpBinary b, [e1;e2] ->
+    (pretty_binary_op p sym pretty_imp_expr) ff b e1 e2
+  | _ -> assert false
+
+
+let pretty_imp_qcert_runtime p sym pretty_imp_expr ff (op, args) =
+  match op, args with
+  | QcertCompiler.QcertRuntimeGroupby(g,atts), [e] ->
+    fprintf ff "@[<hv 2>groupBy@[<hv 2>(%a,@ %a,@ %a)@]@]"
+      (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_imp_expr 0 sym) e
+  | QcertCompiler.QcertRuntimeEither, [e] ->
+    fprintf ff "@[<hv 2>either@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+  | QcertCompiler.QcertRuntimeToLeft, [e] ->
+    fprintf ff "@[<hv 2>toLeft@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+  | QcertCompiler.QcertRuntimeToRight, [e] ->
+    fprintf ff "@[<hv 2>toRight@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+  | QcertCompiler.QcertRuntimeDeref, [e] ->
+    fprintf ff "@[<hv 2>deref@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+  | _ -> assert false
+
+let pretty_imp_qcert = pretty_imp pretty_imp_qcert_data pretty_imp_qcert_op pretty_imp_qcert_runtime
 
 (** Pretty NNRCMR *)
 

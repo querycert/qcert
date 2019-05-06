@@ -53,6 +53,10 @@ val nnrs_imp_expr_to_sexp : QLang.nnrs_imp_expr -> sexp
 val nnrs_imp_stmt_to_sexp : QLang.nnrs_imp_stmt -> sexp
 val nnrs_imp_to_sexp : QLang.nnrs_imp -> sexp
 
+
+val sexp_to_imp_qcert : sexp -> QLang.imp_qcert
+val imp_qcert_to_sexp : QLang.imp_qcert -> sexp
+
 val sexp_to_nnrcmr : sexp -> QLang.nnrcmr
 val nnrcmr_to_sexp : QLang.nnrcmr -> sexp
 

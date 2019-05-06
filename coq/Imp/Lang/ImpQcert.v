@@ -45,3 +45,11 @@ Section Syntax.
   Definition imp_qcert_function := @imp_function imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
   Definition imp_qcert := @imp imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
 End Syntax.
+
+Section Env.
+  Context {fruntime:foreign_runtime}.
+
+  (* bindings that may or may not be initialized (defined) *)
+  Definition pd_bindings := list (string*option data).
+
+End Env.

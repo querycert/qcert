@@ -40,6 +40,7 @@ val pretty_nnrc : QcertCompiler.nnrc pretty_fun
 val pretty_nnrs : QcertCompiler.nnrs pretty_fun
 val pretty_nnrs_core : QcertCompiler.nnrs_core pretty_fun
 val pretty_nnrs_imp : QcertCompiler.nnrs_imp pretty_fun
+val pretty_imp_qcert : QcertCompiler.imp_qcert pretty_fun
 val pretty_nnrcmr : QcertCompiler.nnrcmr pretty_fun
 val pretty_cldmr : QcertCompiler.cldmr pretty_fun
 val pretty_dnnrc : QcertCompiler.dnnrc pretty_fun

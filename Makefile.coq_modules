@@ -50,7 +50,7 @@ MODULES = \
 	Common/TypeSystem/RTypeNorm \
 	Common/TypeSystem/RTypetoJSON \
 	Common/TypeSystem/DType \
-  Common/TypeSystem/DTypetoJSON \
+	Common/TypeSystem/DTypetoJSON \
 	Common/TypeSystem/TBrandContext \
 	Common/TypeSystem/RSubtype \
 	Common/TypeSystem/RSubtypeProp \
@@ -223,8 +223,12 @@ MODULES = \
 	NNRSimp/NNRSimpTypes \
 	NNRSimp/NNRSimpSystem \
 	Imp/Lang/Imp \
+	Imp/Lang/ImpSize \
 	Imp/Lang/ImpQcert \
+	Imp/Lang/ImpQcertSize \
+	Imp/Lang/ImpQcertEval \
 	Imp/Lang/ImpJson \
+	Imp/ImpRuntime \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \

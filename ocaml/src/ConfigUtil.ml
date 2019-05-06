@@ -94,6 +94,7 @@ let suffix_dnnrcsexp () = "_dnnrc.sexp"
 let suffix_nnrs () = "_nnrs.txt"
 let suffix_nnrs_core () = "_nnrs_core.txt"
 let suffix_nnrs_imp () = "_nnrs_imp.txt"
+let suffix_imp_qcert () = "_imp_qcert.txt"
 let suffix_nnrcmr () = "_nnrcmr.txt"
 let suffix_nnrcmr_spark_rdd () = "_nnrcmr_spark_rdd.txt"
 let suffix_nnrcmr_spark_rddsexp () = "_nnrcmr_spark_rdd.sexp"
@@ -132,6 +133,7 @@ let suffix_of_language lang =
   | QcertCompiler.L_nnrs -> suffix_nnrs ()
   | QcertCompiler.L_nnrs_core -> suffix_nnrs_core ()
   | QcertCompiler.L_nnrs_imp -> suffix_nnrs_imp ()
+  | QcertCompiler.L_imp_qcert -> suffix_imp_qcert ()
   | QcertCompiler.L_nnrcmr -> suffix_nnrcmr ()
   | QcertCompiler.L_cldmr -> suffix_nnrcmr_cldmr ()
   | QcertCompiler.L_js_ast -> suffix_js_ast ()

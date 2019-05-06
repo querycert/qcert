@@ -72,6 +72,7 @@ let parse_nraenv_sexp f : QLang.nraenv_core = AstsToSExp.sexp_to_nraenv (parse_s
 let parse_nnrc_sexp f : QLang.nnrc = AstsToSExp.sexp_to_nnrc (parse_sexp f)
 let parse_nnrs_sexp f : QLang.nnrs = AstsToSExp.sexp_to_nnrs (parse_sexp f)
 let parse_nnrs_imp_sexp f : QLang.nnrs_imp = AstsToSExp.sexp_to_nnrs_imp (parse_sexp f)
+let parse_imp_qcert_sexp f : QLang.imp_qcert = AstsToSExp.sexp_to_imp_qcert (parse_sexp f)
 let parse_nnrcmr_sexp f : QLang.nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
 let parse_cldmr_sexp f : QLang.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 
@@ -97,6 +98,7 @@ let parse_query l f : (string * QLang.query) =
   | QcertCompiler.L_nnrs_core -> ("NNRSCore", QcertCompiler.Q_nnrs_core (parse_nnrs_sexp f)) (* XXX TODO: check is core XXX *)
   | QcertCompiler.L_nnrs -> ("NNRS", QcertCompiler.Q_nnrs (parse_nnrs_sexp f))
   | QcertCompiler.L_nnrs_imp -> ("NNRSimp", QcertCompiler.Q_nnrs_imp (parse_nnrs_imp_sexp f))
+  | QcertCompiler.L_imp_qcert -> ("ImpQcert", QcertCompiler.Q_imp_qcert (parse_imp_qcert_sexp f))
   | QcertCompiler.L_nnrcmr -> ("NNRCMR", QcertCompiler.Q_nnrcmr (parse_nnrcmr_sexp f))
   | QcertCompiler.L_cldmr -> ("CldMR", QcertCompiler.Q_cldmr (parse_cldmr_sexp f))
   | QcertCompiler.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")

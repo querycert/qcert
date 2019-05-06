@@ -122,7 +122,7 @@ Section NNRSimptoImpQcert.
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     end.
 
-  Definition nnrs_imp_to_imp_qcert_top globals (q: nnrs_imp): imp_function :=
+  Definition nnrs_imp_to_imp_qcert_function globals (q: nnrs_imp): imp_function :=
     let constants := "constants"%string in
     let (stmt, ret) := q in
     let body :=
@@ -135,5 +135,8 @@ Section NNRSimptoImpQcert.
             ImpStmtReturn (Some (ImpExprVar ret)) ]
     in
     ImpFun [ constants ] body.
+
+  Definition nnrs_imp_to_imp_qcert_top globals (q: nnrs_imp): imp :=
+    ImpDef "main" (nnrs_imp_to_imp_qcert_function globals q) (ImpMain (ImpStmtBlock nil nil)).
 
 End NNRSimptoImpQcert.

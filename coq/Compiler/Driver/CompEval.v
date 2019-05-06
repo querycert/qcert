@@ -37,6 +37,7 @@ Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
+Require Import ImpRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
@@ -129,6 +130,10 @@ Section CompEval.
     Definition eval_nnrs_imp (q:nnrs_imp) (cenv: bindings) : option data :=
       NNRSimpEval.nnrs_imp_eval_top h cenv q.
 
+    (* Language: imp_qcert *)
+    Definition eval_imp_qcert (q:imp_qcert) (cenv: bindings) : option data :=
+      ImpQcertEval.imp_qcert_eval_top h cenv q.
+
     (* Language: nnrcmr *)
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=
       NNRCMR.nnrcmr_eval_top h init_vinit q dcenv.
@@ -184,6 +189,7 @@ Section CompEval.
       | Q_nnrs_core q => lift_output (eval_nnrs_core q (lift_input ev_in))
       | Q_nnrs q => lift_output (eval_nnrs q (lift_input ev_in))
       | Q_nnrs_imp q => lift_output (eval_nnrs_imp q (lift_input ev_in))
+      | Q_imp_qcert q => lift_output (eval_imp_qcert q (lift_input ev_in))
       | Q_nnrcmr q => lift_output (eval_nnrcmr q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
       | Q_cldmr q => lift_output (eval_cldmr q (lift_input ev_in))
       | Q_dnnrc q => lift_output (eval_dnnrc q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
@@ -215,6 +221,7 @@ Section CompEval.
       | Q_nnrs_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrs _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrs_imp _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_imp_qcert _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_dnnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))

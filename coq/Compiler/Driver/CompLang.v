@@ -36,6 +36,7 @@ Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
+Require Import ImpRuntime.
 Require Import NNRCMRRuntime.
 Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
@@ -71,6 +72,7 @@ Section CompLang.
     | L_nnrs_core : language
     | L_nnrs : language
     | L_nnrs_imp : language
+    | L_imp_qcert : language
     | L_nnrcmr : language
     | L_cldmr : language
     | L_dnnrc : language
@@ -118,6 +120,7 @@ Section CompLang.
       | "nnrs_core"%string => L_nnrs_core
       | "nnrs"%string => L_nnrs
       | "nnrs_imp"%string => L_nnrs_imp
+      | "imp_qcert"%string => L_imp_qcert
       | "nnrcmr"%string => L_nnrcmr
       | "cldmr"%string => L_cldmr
       | "dnnrc"%string => L_dnnrc
@@ -150,6 +153,7 @@ Section CompLang.
       | L_nnrs_core => "nnrs_core"%string
       | L_nnrs => "nnrs"%string
       | L_nnrs_imp => "nnrs_imp"%string
+      | L_imp_qcert => "imp_qcert"%string
       | L_nnrcmr => "nnrcmr"%string
       | L_cldmr => "cldmr"%string
       | L_dnnrc => "dnnrc"%string
@@ -212,6 +216,7 @@ Section CompLang.
         :: (L_nnrs_core,BackEnd,"cNNRS", "Core Named Nested Relational Calculus imperative")
         :: (L_nnrs,CoreEnd,"NNRS", "Named Nested Relational Calculus imperative")
         :: (L_nnrs_imp,BackEnd,"NNRSimp", "Named Nested Relational Calculus imperative")
+        :: (L_imp_qcert,BackEnd,"ImpQcert", "Imperative langauge with Q*cert data model")
         :: (L_nnrcmr,DistrEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
         :: (L_cldmr,DistrEnd,"CldMR", "Named Nested Relational Calculus with Cloudant Map/Reduce")
         :: (L_dnnrc,DistrEnd,"DNNRC", "Distributed Named Nested Relational Calculus")
@@ -307,6 +312,9 @@ Section CompLang.
     Definition nnrs_imp_expr := nnrs_imp_expr.
     Definition nnrs_imp_stmt := nnrs_imp_stmt.
     Definition nnrs_imp := nnrs_imp.
+    Definition imp_qcert_expr := imp_qcert_expr.
+    Definition imp_qcert_stmt := imp_qcert_stmt.
+    Definition imp_qcert := imp_qcert.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
     Definition dnnrc := dnnrc.
@@ -335,6 +343,7 @@ Section CompLang.
     | Q_nnrs_core : nnrs_core -> query
     | Q_nnrs : nnrs -> query
     | Q_nnrs_imp : nnrs_imp -> query
+    | Q_imp_qcert : imp_qcert -> query
     | Q_nnrcmr : nnrcmr -> query
     | Q_cldmr : cldmr -> query
     | Q_dnnrc : dnnrc -> query
@@ -365,6 +374,7 @@ Section CompLang.
       | Case_aux c "Q_nnrs_core"%string
       | Case_aux c "Q_nnrs"%string
       | Case_aux c "Q_nnrs_imp"%string
+      | Case_aux c "Q_imp_qcert"%string
       | Case_aux c "Q_nnrcmr"%string
       | Case_aux c "Q_cldmr"%string
       | Case_aux c "Q_dnnrc"%string
@@ -395,6 +405,7 @@ Section CompLang.
       | Q_nnrs_core _ => L_nnrs_core
       | Q_nnrs _ => L_nnrs
       | Q_nnrs_imp _ => L_nnrs_imp
+      | Q_imp_qcert _ => L_imp_qcert
       | Q_nnrcmr _ => L_nnrcmr
       | Q_cldmr _ => L_cldmr
       | Q_dnnrc _ => L_dnnrc
@@ -431,6 +442,7 @@ Section CompLang.
       | L_nnrs_core => nnrs_core
       | L_nnrs => nnrs
       | L_nnrs_imp => nnrs_imp
+      | L_imp_qcert => imp_qcert
       | L_nnrcmr => nnrcmr
       | L_cldmr => cldmr
       | L_dnnrc => dnnrc
@@ -465,6 +477,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_nnrs_core"%string
   | Case_aux c "L_nnrs"%string
   | Case_aux c "L_nnrs_imp"%string
+  | Case_aux c "L_imp_qcert"%string
   | Case_aux c "L_nnrcmr"%string
   | Case_aux c "L_cldmr"%string
   | Case_aux c "L_dnnrc"%string
