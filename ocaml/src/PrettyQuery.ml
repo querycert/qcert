@@ -449,18 +449,13 @@ let pretty_imp_function pretty_data pretty_op pretty_runtime p sym ff f =
     (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (fun ff v -> fprintf ff "%s" (Util.string_of_char_list v))) args
     (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) body
 
-let pretty_imp_aux pretty_data pretty_op pretty_runtime p sym ff q =
-  let rec pretty_imp_aux p sym ff q =
-    match q with
-    | QcertCompiler.ImpDef (f, def, next) ->
-      fprintf ff "@[<hv 0>@[<hv 2>let %s :=@ %a@]@;<0 0>%a@]"
-        (Util.string_of_char_list f)
-        (pretty_imp_function pretty_data pretty_op pretty_runtime p sym) def
-        (pretty_imp_aux p sym) next
-    | QcertCompiler.ImpMain stmt ->
-      fprintf ff "%a" (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) stmt
-  in
-  pretty_imp_aux p sym ff q
+let pretty_imp_aux pretty_data pretty_op pretty_runtime p sym ff ((* ImpLib *) l) =
+  List.iter
+    (fun (f, def) ->
+       fprintf ff "@[<hv 0>@[<hv 2>let %s :=@ %a@]@;<0 0>@]"
+         (Util.string_of_char_list f)
+         (pretty_imp_function pretty_data pretty_op pretty_runtime p sym) def)
+    l
 
 let pretty_imp pretty_data pretty_op pretty_runtime greek margin annot inheritance link_runtime q =
   let ff = str_formatter in

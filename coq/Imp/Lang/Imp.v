@@ -63,11 +63,8 @@ Section Imp.
     .
 
     (** [imp] is composed of a list of function declarations *)
-    (*     and a main statement *)
     Inductive imp :=
-    | ImpDef : string -> imp_function -> imp -> imp
-    | ImpMain : imp_stmt -> imp
-    .
+    | ImpLib : list (string * imp_function) -> imp.
 
   End Syntax.
 
@@ -134,8 +131,7 @@ Tactic Notation "imp_function_cases" tactic(first) ident(c) :=
 
 Tactic Notation "imp_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "ImpDef"%string
-  | Case_aux c "ImpMain"%string].
+  [ Case_aux c "ImpLib"%string].
 
 
 Delimit Scope imp with imp_scope.

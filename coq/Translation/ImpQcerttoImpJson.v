@@ -266,12 +266,12 @@ Section ImpJsontoJavaScriptAst.
 
   Fixpoint imp_qcert_to_imp_json (i:imp_qcert) : imp_json :=
     match i with
-    | ImpDef s f i1 =>
-      ImpDef s
-             (imp_qcert_function_to_imp_json f)
-             (imp_qcert_to_imp_json i1)
-    | ImpMain s =>
-      ImpMain (imp_qcert_stmt_to_imp_json s)
+    | ImpLib l =>
+      ImpLib
+        (List.map
+           (fun (decl: string * imp_qcert_function) =>
+              let (name, def) := decl in (name, imp_qcert_function_to_imp_json def))
+           l)
     end.
-  
+
 End ImpJsontoJavaScriptAst.

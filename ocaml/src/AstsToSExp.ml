@@ -680,14 +680,14 @@ let imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp (ImpFun(vars
   STerm ("ImpFun", [STerm ("ImpFunArgs", List.map (fun x -> SString (string_of_char_list x)) vars);
                     imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s])
 
-let rec imp_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp q : sexp =
-  match q with
-  | ImpDef (f, def, next) ->
-    STerm ("ImpDef", [SString (string_of_char_list f);
-                      imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp def;
-                      imp_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp next ])
-  | ImpMain s -> STerm ("ImpMain", [imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s])
-
+let rec imp_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp ((* ImpLib *) l) : sexp =
+  STerm
+    ("ImpLib",
+     List.map
+       (fun (f, def) ->
+          STerm ("ImpDef", [SString (string_of_char_list f);
+                            imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp def ]))
+       l)
 
 let sexp_to_imp sexp_to_data sexp_to_op sexp_to_runtime_op (se:sexp) =
   assert false (* XXX TODO XXX *)

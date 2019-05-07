@@ -137,6 +137,6 @@ Section NNRSimptoImpQcert.
     ImpFun [ constants ] body.
 
   Definition nnrs_imp_to_imp_qcert_top qname globals (q: nnrs_imp): imp :=
-    ImpDef qname (nnrs_imp_to_imp_qcert_function globals q) (ImpMain (ImpStmtBlock nil nil)).
+    ImpLib [ (qname, nnrs_imp_to_imp_qcert_function globals q) ].
 
 End NNRSimptoImpQcert.

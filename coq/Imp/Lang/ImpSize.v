@@ -74,9 +74,11 @@ Section ImpSize.
 
     Fixpoint imp_size (q: imp) : nat :=
       match q with
-      | ImpDef f def next =>
-        imp_function_size def + imp_size next
-      | ImpMain s => imp_stmt_size s
+      | ImpLib l =>
+        List.fold_left
+          (fun acc (decl: string * imp_function) =>
+             let (fname, fdef) := decl in acc + imp_function_size fdef)
+          l 0
       end.
 
     Lemma imp_expr_size_nzero (e:imp_expr) : imp_expr_size e <> 0.
@@ -95,10 +97,10 @@ Section ImpSize.
       apply imp_stmt_size_nzero.
     Qed.
 
-    Corollary imp_size_nzero (q:imp) : imp_size q <> 0.
-    Proof.
-      induction q; simpl; try destruct o; try omega.
-      apply imp_stmt_size_nzero.
-    Qed.
+    (* Corollary imp_size_nzero (q:imp) : imp_size q <> 0. *)
+    (* Proof. *)
+    (*   induction q; simpl; try destruct o; try omega. *)
+    (*   apply imp_stmt_size_nzero. *)
+    (* Qed. *)
 
 End ImpSize.
