@@ -402,10 +402,10 @@ let pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym ff stmt =
   let pretty_decl p sym ff (v, e_opt) =
     match e_opt with
     | None ->
-      fprintf ff "@[<hv 0>@[<hv 2>let %s@]@]"
+      fprintf ff "@[<hv 0>@[<hv 2>let %s;@]@]"
         (Util.string_of_char_list v)
     | Some e ->
-      fprintf ff "@[<hv 0>@[<hv 2>let %s :=@ %a@]@]"
+      fprintf ff "@[<hv 0>@[<hv 2>let %s :=@ %a;@]@]"
         (Util.string_of_char_list v)
         (pretty_imp_expr p sym) e
   in
@@ -416,7 +416,7 @@ let pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym ff stmt =
         (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (pretty_decl p sym)) decls
         (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (pretty_imp_stmt p sym)) stmts
     | QcertCompiler.ImpStmtAssign (v, e) ->
-      fprintf ff "@[<hv 2>$v%s =@;<1 0>%a;@;<0 -2>@]"
+      fprintf ff "@[<hv 2>%s =@;<1 0>%a;@;<0 -2>@]"
         (Util.string_of_char_list v)
         (pretty_imp_expr 0 sym) e
     | QcertCompiler.ImpStmtFor (v,e,s) ->
