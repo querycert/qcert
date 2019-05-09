@@ -326,7 +326,7 @@ Section CompLang.
     Definition cldmr := cldmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
-    Definition js_ast := funcdecl.
+    Definition js_ast := list funcdecl.
     Definition javascript := javascript.
     Definition java := java.
     Definition spark_rdd := spark_rdd.

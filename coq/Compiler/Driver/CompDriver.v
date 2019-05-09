@@ -15,6 +15,7 @@
  *)
 
 Require Import String.
+Require Import List.
 Require Import Morphisms.
 
 (* Common libraries *)
@@ -75,6 +76,7 @@ Require Import NNRStoNNRSimp.
 Require Import NNRSimptoJavaScriptAst.
 Require Import NNRSimptoImpQcert.
 Require Import ImpQcerttoImpJson.
+Require Import ImpJsontoJavaScriptAst.
 Require Import JavaScriptAsttoJavaScript.
 Require Import NNRCtoDNNRC.
 Require Import NNRCtoNNRCMR.
@@ -166,6 +168,8 @@ Section CompDriver.
   End translations_util.
 
   Section translations.
+    Import ListNotations.
+
     (** Source languages translations *)
     Definition oql_to_nraenv (q:oql) : nraenv :=
       OQLtoNRAEnv.oql_to_nraenv_top q.
@@ -241,7 +245,7 @@ Section CompDriver.
       nnrs_to_nnrs_imp_top "$"%string q.
 
     Definition nnrs_imp_to_js_ast (inputs: list var) (q: nnrs_imp) : js_ast :=
-      nnrs_imp_to_js_ast_top inputs q.
+      [ (nnrs_imp_to_js_ast_top inputs q) ].
 
     Definition nnrs_imp_to_imp_qcert (qname: string) (inputs: list var) (q: nnrs_imp) : imp_qcert :=
       nnrs_imp_to_imp_qcert_top qname inputs q.
@@ -249,8 +253,11 @@ Section CompDriver.
     Definition imp_qcert_to_imp_json (q: imp_qcert) : imp_json :=
       imp_qcert_to_imp_json q.
 
+    Definition imp_json_to_js_ast (q: imp_json) : js_ast :=
+      imp_json_to_js_ast q.
+
     Definition js_ast_to_javascript (q: js_ast) : javascript :=
-      js_ast_to_js_top q.
+      List.fold_left (fun acc q => String.append acc (js_ast_to_js_top q)) q  ""%string.
 
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)
@@ -366,7 +373,7 @@ Section CompDriver.
 
   Inductive imp_json_driver : Set :=
     | Dv_imp_json_stop : imp_json_driver
-    (* | Dv_imp_json_to_js_ast : imp_json_driver *)
+    | Dv_imp_json_to_js_ast : js_ast_driver -> imp_json_driver
   .
 
   Inductive imp_qcert_driver : Set :=
@@ -635,6 +642,7 @@ Section CompDriver.
   Fixpoint driver_length_imp_json (dv: imp_json_driver) :=
     match dv with
     | Dv_imp_json_stop => 1
+    | Dv_imp_json_to_js_ast dv => 1 + driver_length_js_ast dv
     end.
 
   Fixpoint driver_length_imp_qcert (dv: imp_qcert_driver) :=
@@ -829,7 +837,7 @@ Section CompDriver.
           match dv with
           | Dv_js_ast_stop => nil
           | Dv_js_ast_to_javascript dv =>
-            let q := js_ast_to_js_top q in
+            let q := js_ast_to_javascript q in
             compile_javascript dv q
           end
       in
@@ -882,6 +890,9 @@ Section CompDriver.
       let queries :=
           match dv with
           | Dv_imp_json_stop => nil
+          | Dv_imp_json_to_js_ast dv =>
+            let q := imp_json_to_js_ast q in
+            compile_js_ast dv q
           end
       in
       (Q_imp_json q) :: queries.
@@ -1805,6 +1816,8 @@ Section CompDriver.
       match dv with
       | Dv_imp_json _ =>
           Dv_error ("XXX TODO: imp_qcert optimizer XXX")
+      | Dv_js_ast dv =>
+        Dv_imp_json (Dv_imp_json_to_js_ast dv)
       | Dv_camp _
       | Dv_nraenv_core _
       | Dv_nraenv _
@@ -1822,7 +1835,6 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_js_ast _
       | Dv_nnrcmr _
       | Dv_cldmr _
       | Dv_dnnrc _
@@ -2215,6 +2227,7 @@ Section CompDriver.
     | Dv_imp_qcert (Dv_imp_qcert_stop) => (L_imp_qcert, None)
     | Dv_imp_qcert (Dv_imp_qcert_to_imp_json dv) => (L_imp_qcert, Some (Dv_imp_json dv))
     | Dv_imp_json (Dv_imp_json_stop) => (L_imp_json, None)
+    | Dv_imp_json (Dv_imp_json_to_js_ast dv) => (L_imp_json, Some (Dv_js_ast dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
     | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd name dv) => (L_nnrcmr, Some (Dv_spark_rdd dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
@@ -2384,6 +2397,19 @@ Section CompDriver.
   Proof.
     induction dv; simpl.
     - reflexivity.
+    - rewrite target_language_of_driver_equation
+      ; simpl.
+      eapply is_postfix_plus_one with
+               (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 EmptyString
+                 nil
+                 EmptyString
+                 nil
+                 EmptyString
+                 nil) (lang:=L_imp_json)
+      ; [eapply target_language_of_driver_is_postfix_js_ast | | ]; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_imp_qcert:
@@ -5580,9 +5606,29 @@ Section CompDriver.
         L_imp_qcert
           :: L_imp_json
           :: nil
+      | L_imp_qcert, L_js_ast =>
+        L_imp_qcert
+          :: L_imp_json
+          :: L_js_ast
+          :: nil
+      | L_imp_qcert, L_javascript =>
+        L_imp_qcert
+          :: L_imp_json
+          :: L_js_ast
+          :: L_javascript
+          :: nil
       (* From imp_json: *)
       | L_imp_json, L_imp_json =>
         L_imp_json
+          :: nil
+      | L_imp_json, L_js_ast =>
+        L_imp_json
+          :: L_js_ast
+          :: nil
+      | L_imp_json, L_javascript =>
+        L_imp_json
+          :: L_js_ast
+          :: L_javascript
           :: nil
       (* From nnrcmr: *)
       | L_nnrcmr, L_nnrcmr =>

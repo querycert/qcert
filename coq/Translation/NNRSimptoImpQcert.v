@@ -74,24 +74,6 @@ Section NNRSimptoImpQcert.
     (* | NNRSimpPush x e => *)
     (*   stat_expr (array_push (expr_identifier x) (nnrs_imp_expr_to_imp_qcert e)) *)
     | NNRSimpFor x e s =>
-      (* (* for (var src = e, i = 0; i < src.length; i++) { var x = src[i]; s } *) *)
-      (* let avoid := x :: avoid in *)
-      (* let e := nnrs_imp_expr_to_imp_qcert e in *)
-      (* let src_id := fresh_var "src" avoid in *)
-      (* let avoid := src_id :: avoid in *)
-      (* let i_id := fresh_var "i" avoid in *)
-      (* let avoid := i_id :: avoid in *)
-      (* let src := expr_identifier src_id in *)
-      (* let i := expr_identifier i_id in *)
-      (* ImpStmtBlock *)
-      (*   [ stat_for_var *)
-      (*       nil *)
-      (*       [ (src_id, Some e); (i_id, Some (expr_literal (literal_number zero))) ] *)
-      (*       (Some (expr_binary_op i binary_op_lt (expr_member src "length"))) *)
-      (*       (Some (expr_unary_op unary_op_post_incr i)) *)
-      (*       (stat_block *)
-      (*          [ stat_var_decl [ (x, Some (array_get src i)) ]; *)
-      (*              nnrs_imp_stmt_to_imp_qcert avoid s ]) ] *)
       ImpStmtFor x (nnrs_imp_expr_to_imp_qcert e) (nnrs_imp_stmt_to_imp_qcert avoid s)
     | NNRSimpIf e s1 s2 =>
       ImpStmtIf
@@ -136,7 +118,7 @@ Section NNRSimptoImpQcert.
     in
     ImpFun [ constants ] body.
 
-  Definition nnrs_imp_to_imp_qcert_top qname globals (q: nnrs_imp): imp :=
-    ImpLib [ (qname, nnrs_imp_to_imp_qcert_function globals q) ].
+  Definition nnrs_imp_to_imp_qcert_top (qname: string) globals (q: nnrs_imp): imp :=
+    ImpLib [ ((* qname *)"query"%string, nnrs_imp_to_imp_qcert_function globals q) ].
 
 End NNRSimptoImpQcert.

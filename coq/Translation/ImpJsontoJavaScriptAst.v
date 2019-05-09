@@ -121,7 +121,7 @@ Section ImpJsontoJavaScriptAst.
       stat_for_var
         nil
         [ (x, Some (imp_json_expr_to_js_ast e1)) ]
-        (Some (expr_binary_op (expr_identifier x) binary_op_le (imp_json_expr_to_js_ast e1)))
+        (Some (expr_binary_op (expr_identifier x) binary_op_lt (imp_json_expr_to_js_ast e2)))
         (Some (expr_unary_op unary_op_post_incr (expr_identifier x)))
         (imp_json_stmt_to_js_ast s)
     | ImpStmtIf e s1 s2 =>
@@ -133,7 +133,7 @@ Section ImpJsontoJavaScriptAst.
       stat_return (lift imp_json_expr_to_js_ast eopt)
     end.
 
-  Definition imp_function_to_js_ast (f: imp_function) : list string * funcbody :=
+  Definition imp_json_function_to_js_ast (f: imp_function) : list string * funcbody :=
     match f with
     | ImpFun lv s =>
       let prog :=
@@ -142,13 +142,13 @@ Section ImpJsontoJavaScriptAst.
       (lv, funcbody_intro prog (prog_to_string prog))
     end.
 
-  Definition imp_to_js_ast (q: imp) : list funcdecl :=
+  Definition imp_json_to_js_ast (q: imp) : list funcdecl :=
     match q with
     | ImpLib l =>
       List.map
         (fun (decl: string * imp_function) =>
            let (x, f) := decl in
-           let (args, body) := imp_function_to_js_ast f in
+           let (args, body) := imp_json_function_to_js_ast f in
            funcdecl_intro x args body)
         l
     end.
