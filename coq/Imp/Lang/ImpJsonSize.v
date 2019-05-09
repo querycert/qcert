@@ -21,23 +21,23 @@ Require Import Decidable.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import Imp.
-Require Import ImpQcert.
+Require Import ImpJson.
 Require Import ImpSize.
 
-Section ImpQcertSize.
+Section ImpJsonSize.
 
   Context {fruntime:foreign_runtime}.
 
-  Definition imp_qcert_expr_size (e:imp_qcert_expr) : nat :=
+  Definition imp_json_expr_size (e:imp_json_expr) : nat :=
     imp_expr_size e.
 
-  Definition imp_qcert_stmt_size (stmt:imp_qcert_stmt) : nat :=
+  Definition imp_json_stmt_size (stmt:imp_json_stmt) : nat :=
     imp_stmt_size stmt.
 
-  Definition imp_qcert_function_size (q:imp_qcert_function) : nat :=
+  Definition imp_json_function_size (q:imp_json_function) : nat :=
     imp_function_size q.
 
-  Fixpoint imp_qcert_size (q: imp_qcert) : nat :=
+  Fixpoint imp_json_size (q: imp_json) : nat :=
     imp_size q.
 
-End ImpQcertSize.
+End ImpJsonSize.

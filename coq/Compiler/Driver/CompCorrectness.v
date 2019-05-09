@@ -74,6 +74,7 @@ Require Import NNRCtoDNNRC.
 Require Import NNRCtoNNRCMR.
 Require Import NNRStoNNRSimp.
 Require Import NNRSimptoImpQcert.
+Require Import ImpQcerttoImpJson.
 Require Import NNRSimptoJavaScriptAst.
 Require Import NNRCtoJavaScript.
 Require Import NNRCtoJava.
@@ -132,6 +133,7 @@ Section CompCorrectness.
   Context {nnrs_imp_stmt_logger:optimizer_logger string nnrs_imp_stmt}.
   Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
   Context {imp_qcert_logger:optimizer_logger string imp_qcert}.
+  Context {imp_json_logger:optimizer_logger string imp_json}.
   Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
   Context {ftojs:foreign_to_javascript}.
   Context {ftoajs:foreign_to_ajavascript}.
@@ -194,9 +196,15 @@ Section CompCorrectness.
     | Dv_dnnrc_to_dnnrc_typed _ dv => False /\ driver_correct_dnnrc_typed dv
     end.
 
+  Fixpoint driver_correct_imp_json (dv: imp_json_driver) :=
+    match dv with
+    | Dv_imp_json_stop => True
+    end.
+
   Fixpoint driver_correct_imp_qcert (dv: imp_qcert_driver) :=
     match dv with
     | Dv_imp_qcert_stop => True
+    | Dv_imp_qcert_to_imp_json dv => False /\ driver_correct_imp_json dv
     end.
 
   Fixpoint driver_correct_nnrs_imp (dv: nnrs_imp_driver) :=
@@ -341,6 +349,7 @@ Section CompCorrectness.
     | Dv_nnrs dv => driver_correct_nnrs dv
     | Dv_nnrs_imp dv => driver_correct_nnrs_imp dv
     | Dv_imp_qcert dv => driver_correct_imp_qcert dv
+    | Dv_imp_json dv => driver_correct_imp_json dv
     | Dv_nnrcmr dv => driver_correct_nnrcmr dv
     | Dv_cldmr dv => driver_correct_cldmr dv
     | Dv_dnnrc dv => driver_correct_dnnrc dv
@@ -374,7 +383,7 @@ Section CompCorrectness.
     Ltac prove_same_outputs :=
       unfold eval_camp_rule, eval_camp,
       eval_nra, eval_nraenv, eval_nraenv_core,
-      eval_nnrc, eval_nnrc_core, eval_nnrs, eval_nnrs_imp, eval_imp_qcert, eval_nnrcmr,
+      eval_nnrc, eval_nnrc_core, eval_nnrs, eval_nnrs_imp, eval_imp_qcert, eval_imp_json, eval_nnrcmr,
       eval_cldmr, eval_dnnrc, eval_dnnrc_typed;
       try match goal with
       | [ |- equal_outputs (lift_output (camp_rule_eval_top ?h ?c (lift_input ?i)))
@@ -470,6 +479,7 @@ Section CompCorrectness.
     | (Dv_nnrs _, Q_nnrs _) => True
     | (Dv_nnrs_imp _, Q_nnrs_imp _) => True
     | (Dv_imp_qcert _, Q_imp_qcert _) => True
+    | (Dv_imp_json _, Q_imp_json _) => True
     | (Dv_nnrcmr _, Q_nnrcmr _) => True
     | (Dv_cldmr _, Q_cldmr _) => True
     | (Dv_dnnrc _, Q_dnnrc _) => True
@@ -482,6 +492,18 @@ Section CompCorrectness.
     | (Dv_cloudant _, Q_cloudant _) => True
     | (_, _) => False
     end.
+
+    Lemma correct_driver_succeeds_imp_json:
+      forall dv, driver_correct (Dv_imp_json dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_imp_json dv) (Q_imp_json q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      unfold compile in H0.
+      revert q H0.
+      induction dv; simpl in *; intuition; subst; eauto.
+    Qed.
 
     Lemma correct_driver_succeeds_imp_qcert:
       forall dv, driver_correct (Dv_imp_qcert dv) ->
@@ -1001,6 +1023,7 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_nnrs; auto.
       - apply correct_driver_succeeds_nnrs_imp; auto.
       - apply correct_driver_succeeds_imp_qcert; auto.
+      - apply correct_driver_succeeds_imp_json; auto.
       - apply correct_driver_succeeds_nnrcmr; auto.
       - apply correct_driver_succeeds_cldmr; auto.
       - apply correct_driver_succeeds_dnnrc; auto.
@@ -1321,6 +1344,18 @@ Section CompCorrectness.
       forall dv, driver_correct (Dv_nnrs_imp dv) ->
                  (forall q, Forall (query_preserves_eval (Q_nnrs_imp q))
                                    (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      revert q x H0.
+      induction dv; simpl in *; intuition; subst; simpl
+      ; try solve[trivial_same_query; reflexivity].
+    Qed.
+
+    Lemma correct_driver_preserves_eval_imp_json:
+      forall dv, driver_correct (Dv_imp_json dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_imp_json q))
+                                   (compile (Dv_imp_json dv) (Q_imp_json q))).
     Proof.
       intros.
       rewrite Forall_forall; intros.
@@ -1988,6 +2023,7 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_nnrs; auto.
       - apply correct_driver_preserves_eval_nnrs_imp; auto.
       - apply correct_driver_preserves_eval_imp_qcert; auto.
+      - apply correct_driver_preserves_eval_imp_json; auto.
       - apply correct_driver_preserves_eval_nnrcmr; auto.
       - apply correct_driver_preserves_eval_cldmr; auto.
       - apply correct_driver_preserves_eval_dnnrc; auto.

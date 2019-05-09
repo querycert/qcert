@@ -69,3 +69,42 @@ Section Syntax.
   Definition imp_json := @imp imp_json_data imp_json_op imp_json_runtime_op.
 
 End Syntax.
+
+Section Util.
+
+  Local Open Scope string.
+
+  Definition string_of_json_runtime_op (op: imp_json_runtime_op) :=
+    match op with
+    | JSONRuntimeEqual => "equal"
+    | JSONRuntimeRecConcat => "concat"
+    | JSONRuntimeRecMerge => "mergeConcat"
+    | JSONRuntimeDistinct => "distinct"
+    | JSONRuntimeGroupBy => "groupBy" (* XXX TODO: to check XXX *)
+    | JSONRuntimeDeref => "deref"
+    | JSONRuntimeEither => "either"
+    | JSONRuntimeToLeft=> "toLeft"
+    | JSONRuntimeToRight=> "toRight"
+    | JSONRuntimeRemove=> "remove"
+    | JSONRuntimeProject=> "project"
+    | JSONRuntimeSingleton => "singleton"
+    | JSONRuntimeFlatten => "flatten"
+    | JSONRuntimeSort => "sort"
+    | JSONRuntimeCount => "count"
+    | JSONRuntimeSubstring => "substring"
+    | JSONRuntimeBrand => "brand"
+    | JSONRuntimeUnbrand => "unbrand"
+    | JSONRuntimeCast => "cast"
+    | JSONRuntimeNatAbs => "natAbs"
+    | JSONRuntimeNatLog2 => "natLog2"
+    | JSONRuntimeNatSqrt => "natSqrt"
+    | JSONRuntimeNatSum => "natSum"
+    | JSONRuntimeNatMin => "natMin"
+    | JSONRuntimeNatMax => "natMax"
+    | JSONRuntimeNatArithMean => "natArithMean"
+    | JSONRuntimeFloatOfNat => "floatOfNat"
+    | JSONRuntimeSum => "sum"
+    | JSONRuntimeArithMean => "arithMean"
+    end.
+
+End Util.

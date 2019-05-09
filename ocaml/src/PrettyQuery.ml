@@ -446,7 +446,7 @@ let pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym ff stmt =
 let pretty_imp_function pretty_data pretty_op pretty_runtime p sym ff f =
   let QcertCompiler.ImpFun (args, body) = f in
   fprintf ff "@[<hv 0>function (@[<hv 2>%a@]) {@;<1 2>%a@ }@]"
-    (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (fun ff v -> fprintf ff "%s" (Util.string_of_char_list v))) args
+    (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (fun ff v -> fprintf ff "%s" (Util.string_of_char_list v))) args
     (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) body
 
 let pretty_imp_aux pretty_data pretty_op pretty_runtime p sym ff ((* ImpLib *) l) =
@@ -495,6 +495,88 @@ let pretty_imp_qcert_runtime p sym pretty_imp_expr ff (op, args) =
   | _ -> assert false
 
 let pretty_imp_qcert = pretty_imp pretty_imp_qcert_data pretty_imp_qcert_op pretty_imp_qcert_runtime
+
+(** Pretty ImpQcert *)
+
+let pretty_imp_json_data ff d =
+  fprintf ff "%s"
+    (Util.string_of_char_list (QcertCompiler.EnhancedCompiler.QData.json_to_string d))
+
+let pretty_imp_json_op p sym pretty_imp_expr ff (op, args) =
+  match op, args with
+  | QcertCompiler.JSONOpNot, [ e ] ->
+    fprintf ff "@[<hv 2>!@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+  | JSONOpNeg, [ e ] ->
+    fprintf ff "@[<hv 2>-@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+  | JSONOpAnd, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ &&@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpOr, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ ||@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpLt, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ <@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpLe, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ <=@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpGt, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ >@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpGe, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ >=@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpAddString, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ +@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpAddNumber, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ +@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpSub, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ -@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpMult, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ *@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpDiv, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ /@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpStrictEqual, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ ===@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpStrictDisequal, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ !==@ @[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpArray, args ->
+    fprintf ff "@[<hv 2>[@[<hv 2>%a@]@]@]"
+      (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (pretty_imp_expr 0 sym))
+      args
+  | JSONOpArrayLength, [ e ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a).length@]@]" (pretty_imp_expr 0 sym) e
+  | JSONOpArrayPush, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@].push@[<hv 2>(%a)@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpToString, [ e ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a).toString()@]@]" (pretty_imp_expr 0 sym) e
+  | JSONOpObject fields, args ->
+    let field_arg_list = List.map2 (fun x y -> (Util.string_of_char_list x, y)) fields args in
+    fprintf ff "@[<hv 2>[@[<hv 2>%a@]@]@]"
+      (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>")
+         (fun ff (f,e) -> fprintf ff "@[<hv 2>'%s': %a@]" f (pretty_imp_expr 0 sym) e))
+      field_arg_list
+  | JSONOpAccess field, [ e ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)['%s']@]@]" (pretty_imp_expr 0 sym) e (Util.string_of_char_list field)
+  | JSONOpHasOwnProperty field, [ e ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a).hasOwnProperty('%s')@]@]" (pretty_imp_expr 0 sym) e (Util.string_of_char_list field)
+  | _ -> assert false
+
+let pretty_imp_json_runtime p sym pretty_imp_expr ff (op, args) =
+  fprintf ff "@[<hv 2>%s(@[<hv 2>%a@]@)@]"
+    (Util.string_of_char_list (QcertCompiler.string_of_json_runtime_op op))
+    (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (pretty_imp_expr 0 sym)) args
+
+let pretty_imp_json = pretty_imp pretty_imp_json_data pretty_imp_json_op pretty_imp_json_runtime
+
 
 (** Pretty NNRCMR *)
 

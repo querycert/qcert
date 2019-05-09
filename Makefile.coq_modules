@@ -228,6 +228,8 @@ MODULES = \
 	Imp/Lang/ImpQcertSize \
 	Imp/Lang/ImpQcertEval \
 	Imp/Lang/ImpJson \
+	Imp/Lang/ImpJsonSize \
+	Imp/Lang/ImpJsonEval \
 	Imp/ImpRuntime \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
@@ -354,7 +356,7 @@ MODULES = \
 	Translation/TNNRStoNNRSimp \
 	Translation/NNRSimptoImpQcert \
 	Translation/ImpQcerttoImpJson \
-  Translation/ImpJsontoJavaScriptAst \
+	Translation/ImpJsontoJavaScriptAst \
 	Translation/NNRSimptoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \

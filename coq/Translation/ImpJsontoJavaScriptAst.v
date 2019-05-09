@@ -28,6 +28,8 @@ Section ImpJsontoJavaScriptAst.
 
   (** Translation *)
 
+  Definition scope l := stat_block l. (* XXX TODO XXX *)
+
   Definition mk_expr_error := expr_literal literal_null.
   Definition mk_unary_expr (f:expr -> expr) (el:list expr) : expr :=
     match el with
@@ -59,6 +61,9 @@ Section ImpJsontoJavaScriptAst.
     | None => mk_expr_error
     end.
   
+  Definition mk_runtime_call (op: imp_json_runtime_op) (el: list expr) :=
+    call_runtime (string_of_json_runtime_op op) el.
+
   Definition imp_json_op_to_js_ast (op:imp_json_op) el : expr :=
     match op with
     | JSONOpNot => mk_unary_op unary_op_not el
@@ -85,18 +90,27 @@ Section ImpJsontoJavaScriptAst.
     | JSONOpToString => mk_unary_expr object_toString el
     end.
 
-  Fixpoint imp_json_to_js_ast (exp: imp_json_expr) : expr :=
+  Fixpoint imp_json_expr_to_js_ast (exp: imp_json_expr) : expr :=
     match exp with
     | ImpExprVar v => expr_identifier v
     | ImpExprConst j => json_to_js_ast j
-    | ImpExprOp op el => imp_json_op_to_js_ast op (map imp_json_to_js_ast el)
-    | ImpExprCall f el => call_js_function f (map imp_json_to_js_ast el)
-    | ImpExprRuntimeCall rop el => mk_expr_error (* XXX TBD *)
+    | ImpExprOp op el => imp_json_op_to_js_ast op (map imp_json_expr_to_js_ast el)
+    | ImpExprCall f el => call_js_function f (map imp_json_expr_to_js_ast el)
+    | ImpExprRuntimeCall rop el => mk_runtime_call rop (map imp_json_expr_to_js_ast el)
+    end.
+
+  Definition decl_to_js_ast (d : var * option imp_expr) :=
+    match d with
+    | (x, None) => (x, None)
+    | (x, Some e) => (x, Some (imp_json_expr_to_js_ast e))
     end.
 
   (* XXX this should be kinda like what happens in NNRSimptoJavaScriptAst *)
-  Fixpoint imp_stmt_to_imp_qcert (stmt: imp_json_stmt): stat :=
+  Fixpoint imp_stmt_to_js_ast (stmt: imp_json_stmt): stat :=
     match stmt with
+    | ImpStmtBlock decls stmts =>
+      scope
+        (stat_var_decl (List.map decl_to_js_ast decls) :: (List.map imp_stmt_to_js_ast stmts))
     | _ => stat_block []
     end.
 

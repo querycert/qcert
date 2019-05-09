@@ -20,9 +20,11 @@ Require Export ImpQcert.
 Require Export ImpJson.
 Require Export ImpSize.
 Require Export ImpQcertSize.
+Require Export ImpJsonSize.
 (* Require Export ImpVars. *)
 (* Require Export ImpUsage. *)
 Require Export ImpQcertEval.
+Require Export ImpJsonEval.
 (* Require Export ImpSem. *)
 (* Require Export ImpSemEval. *)
 (* Require Export ImpNorm. *)

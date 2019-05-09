@@ -132,6 +132,11 @@ Section CompStat.
       (("nnrcmr_length", dnat (Z_of_nat (List.length q.(mr_chain))))
          :: nil).
 
+  Definition stat_imp_json (q: imp_json) : data :=
+    drec
+      (("imp_json_size", dnat (Z_of_nat (imp_json_size q)))
+         :: nil).
+
   Definition stat_imp_qcert (q: imp_qcert) : data :=
     drec
       (("imp_qcert_size", dnat (Z_of_nat (imp_qcert_size q)))
@@ -280,6 +285,11 @@ Section CompStat.
       (("nnrcmr_no_optim", stat_nnrcmr q)
          :: ("nnrcmr_optim", stat_nnrcmr q')
          :: ("nnrcmr_optim_time", dstring t)
+         :: nil).
+
+  Definition stat_tree_imp_json (q: imp_json) : data :=
+    drec
+      (("imp_json", stat_imp_json q)
          :: nil).
 
   Definition stat_tree_imp_qcert (q: imp_qcert) : data :=
@@ -476,6 +486,7 @@ Section CompStat.
         | Q_nnrs q => stat_nnrs q
         | Q_nnrs_imp q => stat_nnrs_imp q
         | Q_imp_qcert q => stat_imp_qcert q
+        | Q_imp_json q => stat_imp_json q
         | Q_nnrcmr q => stat_nnrcmr q
         | Q_cldmr q => stat_cldmr q
         | Q_dnnrc q => stat_dnnrc q
@@ -511,6 +522,7 @@ Section CompStat.
         | Q_nnrs q => stat_tree_nnrs q
         | Q_nnrs_imp q => stat_tree_nnrs_imp q
         | Q_imp_qcert q => stat_tree_imp_qcert q
+        | Q_imp_json q => stat_tree_imp_json q
         | Q_nnrcmr q => stat_tree_nnrcmr q
         | Q_cldmr q => stat_tree_cldmr q
         | Q_dnnrc q => stat_tree_dnnrc q

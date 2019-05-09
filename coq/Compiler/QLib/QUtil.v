@@ -18,6 +18,7 @@ Require Import CommonRuntime.
 Require Import CompilerRuntime.
 Require Import NNRCMRRuntime.
 Require Import tDNNRCRuntime.
+Require Import ImpRuntime.
 Require Import CompEnv.
 Require Import Version.
 
@@ -52,6 +53,8 @@ Module QUtil(runtime:CompilerRuntime).
     Definition qsuccess {fdata:foreign_data} (A:Set) : A -> qresult A := QResult.qsuccess.
     Definition qfailure {fdata:foreign_data} (A:Set) : qerror -> qresult A := QResult.qfailure.
   End results.
-  
+
+  Definition string_of_json_runtime_op := ImpJson.string_of_json_runtime_op.
+
 End QUtil.
 

@@ -45,7 +45,7 @@ Section JSONOperators.
   | JSONOpMult : json_op                         (* binary_op_mult *)            (* v1 * v2 *)
   | JSONOpDiv : json_op                          (* binary_op_div *)             (* v1 / v2 *)
   | JSONOpStrictEqual : json_op                  (* binary_op_strict_equal *)    (* v1 === v2 *)
-  | JSONOpStrictDisequal : json_op               (* binary_op_strict_disequal *) (* v1 === v2 *)
+  | JSONOpStrictDisequal : json_op               (* binary_op_strict_disequal *) (* v1 !== v2 *)
 (*| JSONOpIn : json_op *)                        (* binary_op_in *)              (* v1 in v2 *) (* XXX either 'in' or hasOwnProperty, not both *)
   (* Array Stuff *)
   | JSONOpArray : json_op                        (* expr_array *)                (* [ v1, ...vn ] XXX Nary? *)
@@ -55,7 +55,7 @@ Section JSONOperators.
   | JSONOpObject : list string -> json_op        (* expr_object *)               (* { a1:v1, ...an:vn } XXX Nary? *)
   | JSONOpAccess : string -> json_op             (* expr_access *)               (* v['a'] or v.a *)
   | JSONOpHasOwnProperty : string -> json_op     (* expr_call ?? XXX *)          (* v.hasOwnProperty('a') *)
-  | JSONOpToString : json_op                     (* expr_call ?? XXX *)          (* v.hasOwnProperty('a') *)
+  | JSONOpToString : json_op                     (* expr_call ?? XXX *)          (* v.toString() *)
   .
 
   Definition json_op_eval (op:json_op) (j:list json) : option json :=
