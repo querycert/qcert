@@ -51,6 +51,7 @@ Section JSONOperators.
   | JSONOpArray : json_op                        (* expr_array *)                (* [ v1, ...vn ] XXX Nary? *)
   | JSONOpArrayLength : json_op                  (* expr_access? *)              (* v.length *)
   | JSONOpArrayPush : json_op                    (* expr_access? *)              (* v.push(v2) or var v' = v.slice(); v'.push(v2) XXX Does not actually claim to be mutable from a semantic stand-point *)
+  | JSONOpArrayAccess : json_op                  (* array_get *)                 (* v[i] *)
   (* Object Stuff *)
   | JSONOpObject : list string -> json_op        (* expr_object *)               (* { a1:v1, ...an:vn } XXX Nary? *)
   | JSONOpAccess : string -> json_op             (* expr_access *)               (* v['a'] or v.a *)
@@ -136,6 +137,12 @@ Section JSONOperators.
     | JSONOpArrayPush =>
       match j with
       | [jarray ja; je] => Some (jarray (ja ++ [je]))
+      | _ => None
+      end
+    | JSONOpArrayAccess =>
+      match j with
+      | [jarray ja; jnumber n] =>
+        None (* XXX TODO XXX *)
       | _ => None
       end
     | JSONOpObject atts =>

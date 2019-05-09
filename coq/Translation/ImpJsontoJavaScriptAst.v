@@ -29,6 +29,7 @@ Section ImpJsontoJavaScriptAst.
   (** Translation *)
 
   Definition scope l := stat_block l. (* XXX TODO XXX *)
+  Definition prog_to_string (x: prog) : string := "". (* XXX TODO: prog_to_string XXX *)
 
   Definition mk_expr_error := expr_literal literal_null.
   Definition mk_unary_expr (f:expr -> expr) (el:list expr) : expr :=
@@ -82,8 +83,9 @@ Section ImpJsontoJavaScriptAst.
     | JSONOpStrictEqual => mk_binary_op binary_op_strict_equal el
     | JSONOpStrictDisequal => mk_binary_op binary_op_strict_disequal el
     | JSONOpArray => expr_array (List.map Some el)
-    | JSONOpArrayLength => mk_expr_error (** XXX TBD *)
+    | JSONOpArrayLength => mk_unary_expr (fun e => expr_member e  "length") el
     | JSONOpArrayPush => mk_binary_expr array_push el
+    | JSONOpArrayAccess => mk_binary_expr array_get el
     | JSONOpObject atts => mk_object atts el
     | JSONOpAccess att => mk_binary_expr expr_access (el++[expr_literal (literal_string att)])
     | JSONOpHasOwnProperty att => mk_binary_expr object_hasOwnProperty (el++[expr_literal (literal_string att)])
@@ -105,13 +107,50 @@ Section ImpJsontoJavaScriptAst.
     | (x, Some e) => (x, Some (imp_json_expr_to_js_ast e))
     end.
 
-  (* XXX this should be kinda like what happens in NNRSimptoJavaScriptAst *)
-  Fixpoint imp_stmt_to_js_ast (stmt: imp_json_stmt): stat :=
+  Fixpoint imp_json_stmt_to_js_ast (stmt: imp_json_stmt): stat :=
     match stmt with
     | ImpStmtBlock decls stmts =>
       scope
-        (stat_var_decl (List.map decl_to_js_ast decls) :: (List.map imp_stmt_to_js_ast stmts))
-    | _ => stat_block []
+        (stat_var_decl (List.map decl_to_js_ast decls) :: (List.map imp_json_stmt_to_js_ast stmts))
+    | ImpStmtAssign x e =>
+      stat_expr (expr_assign (expr_identifier x) None (imp_json_expr_to_js_ast e))
+    | ImpStmtFor x e s =>
+      stat_for_in_var nil x None (imp_json_expr_to_js_ast e)
+                      (imp_json_stmt_to_js_ast s)
+    | ImpStmtForRange x e1 e2 s =>
+      stat_for_var
+        nil
+        [ (x, Some (imp_json_expr_to_js_ast e1)) ]
+        (Some (expr_binary_op (expr_identifier x) binary_op_le (imp_json_expr_to_js_ast e1)))
+        (Some (expr_unary_op unary_op_post_incr (expr_identifier x)))
+        (imp_json_stmt_to_js_ast s)
+    | ImpStmtIf e s1 s2 =>
+      stat_if
+        (imp_json_expr_to_js_ast e)
+        (imp_json_stmt_to_js_ast s1)
+        (Some (imp_json_stmt_to_js_ast s2))
+    | ImpStmtReturn eopt =>
+      stat_return (lift imp_json_expr_to_js_ast eopt)
+    end.
+
+  Definition imp_function_to_js_ast (f: imp_function) : list string * funcbody :=
+    match f with
+    | ImpFun lv s =>
+      let prog :=
+          prog_intro strictness_true [ element_stat (imp_json_stmt_to_js_ast s)]
+      in
+      (lv, funcbody_intro prog (prog_to_string prog))
+    end.
+
+  Definition imp_to_js_ast (q: imp) : list funcdecl :=
+    match q with
+    | ImpLib l =>
+      List.map
+        (fun (decl: string * imp_function) =>
+           let (x, f) := decl in
+           let (args, body) := imp_function_to_js_ast f in
+           funcdecl_intro x args body)
+        l
     end.
 
 End ImpJsontoJavaScriptAst.

@@ -556,6 +556,9 @@ let pretty_imp_json_op p sym pretty_imp_expr ff (op, args) =
   | JSONOpArrayPush, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@].push@[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | JSONOpArrayAccess, [ e1; e2 ] ->
+    fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@[<hv 2>[%a]@]@]"
+      (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
   | JSONOpToString, [ e ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a).toString()@]@]" (pretty_imp_expr 0 sym) e
   | JSONOpObject fields, args ->

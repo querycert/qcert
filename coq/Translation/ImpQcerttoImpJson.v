@@ -23,6 +23,8 @@ Require Import CommonRuntime.
 Require Import Imp.
 Require Import ImpQcert.
 Require Import ImpJson.
+Require Import JsAst.JsNumber.
+Require Import Fresh.
 
 Section ImpJsontoJavaScriptAst.
   Import ListNotations.
@@ -235,33 +237,47 @@ Section ImpJsontoJavaScriptAst.
     | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     end.
 
-  Fixpoint imp_qcert_stmt_to_imp_json (stmt: imp_qcert_stmt): imp_json_stmt :=
+  Fixpoint imp_qcert_stmt_to_imp_json (avoid: list string) (stmt: imp_qcert_stmt): imp_json_stmt :=
     match stmt with
     | ImpStmtBlock lv ls =>
       ImpStmtBlock
         (map (fun xy => (fst xy,
                          lift imp_qcert_expr_to_imp_json (snd xy))) lv)
-        (map imp_qcert_stmt_to_imp_json ls)
+        (map (imp_qcert_stmt_to_imp_json ((List.map fst lv) ++ avoid)) ls)
     | ImpStmtAssign v e =>
       ImpStmtAssign v (imp_qcert_expr_to_imp_json e)
     | ImpStmtFor v e s =>
-      ImpStmtFor v (imp_qcert_expr_to_imp_json e) (imp_qcert_stmt_to_imp_json s)
+      let avoid := v :: avoid in
+      let e := imp_qcert_expr_to_imp_json e in
+      let src_id := fresh_var "src" avoid in
+      let avoid := src_id :: avoid in
+      let i_id := fresh_var "i" avoid in
+      let avoid := i_id :: avoid in
+      let src := ImpExprVar src_id in
+      let i := ImpExprVar i_id in
+      ImpStmtBlock
+        [ (src_id, Some e) ]
+        [ ImpStmtForRange
+            i_id (ImpExprConst (jnumber zero)) (ImpExprOp JSONOpArrayLength [ src ])
+            (ImpStmtBlock
+               [ (v, Some (ImpExprOp JSONOpArrayAccess [ src; i ])) ]
+               [ imp_qcert_stmt_to_imp_json avoid s ]) ]
     | ImpStmtForRange v e1 e2 s =>
       ImpStmtForRange v
                       (imp_qcert_expr_to_imp_json e1)
                       (imp_qcert_expr_to_imp_json e2)
-                      (imp_qcert_stmt_to_imp_json s)
+                      (imp_qcert_stmt_to_imp_json (v :: avoid) s)
     | ImpStmtIf e s1 s2 =>
       ImpStmtIf (imp_qcert_expr_to_imp_json e)
-                (imp_qcert_stmt_to_imp_json s1)
-                (imp_qcert_stmt_to_imp_json s2)
+                (imp_qcert_stmt_to_imp_json avoid s1)
+                (imp_qcert_stmt_to_imp_json avoid s2)
     | ImpStmtReturn e =>
       ImpStmtReturn (lift imp_qcert_expr_to_imp_json e)
     end.
 
   Definition imp_qcert_function_to_imp_json (f:imp_qcert_function) : imp_json_function :=
     match f with
-    | ImpFun lv s => ImpFun lv (imp_qcert_stmt_to_imp_json s)
+    | ImpFun lv s => ImpFun lv (imp_qcert_stmt_to_imp_json lv s)
     end.
 
   Fixpoint imp_qcert_to_imp_json (i:imp_qcert) : imp_json :=
