@@ -67,9 +67,9 @@ Section ImpJsontoJavaScriptAst.
     | [e] =>
       match op with
       | OpIdentity => e
-      | OpNeg => mk_imp_json_op JSONOpNeg el
+      | OpNeg => mk_imp_json_op JSONOpNot el
       | OpRec s => mk_imp_json_op (JSONOpObject [s]) el
-      | OpDot s => mk_imp_json_op (JSONOpAccess s) el
+      | OpDot s => mk_imp_json_runtime_call JSONRuntimeDeref [e; ImpExprConst (jstring s)]
       | OpRecRemove f => mk_imp_json_runtime_call JSONRuntimeRemove [e; mk_string f ]
       | OpRecProject fl =>
         mk_imp_json_runtime_call
