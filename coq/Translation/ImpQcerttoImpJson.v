@@ -84,19 +84,12 @@ Section ImpJsontoJavaScriptAst.
       | OpCount => mk_imp_json_runtime_call JSONRuntimeCount el
       | OpToString => mk_imp_json_op JSONOpToString el
       | OpSubstring start len =>
-        let start :=
-            (* XXX TODO XXX *)
-            ImpExprConst jnull
-            (* ImpExprConst (jnumber start) *)
-        in
+        let start := ImpExprConst (jnumber (float_of_int start)) in
         let args :=
             match len with
             | None => [ e; start ]
-            | Some length =>
-              let len :=
-                  ImpExprConst jnull
-                  (* ImpExprConst (jnumber start) *)
-              in
+            | Some len =>
+              let len := ImpExprConst (jnumber (float_of_int len)) in
               [ e; start; len ]
             end
         in
