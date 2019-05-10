@@ -302,7 +302,7 @@ Section NNRSimptoJavaScriptAst.
       | NatPlus =>
         runtime_nat_plus e1' e2'
       | NatMinus =>
-        runtime_nat_plus e1' e2'
+        runtime_nat_minus e1' e2'
       | NatMult =>
         runtime_nat_mult e1' e2'
       | NatDiv =>

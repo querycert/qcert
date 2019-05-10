@@ -33,6 +33,7 @@ Section Syntax.
   Definition imp_json_op := json_op. (* See ./Utils/JSONOperators.v *)
   Inductive imp_json_runtime_op := (* XXX TODO -- Look at NNRSimptoJavaScriptAst XXX *)
   | JSONRuntimeEqual : imp_json_runtime_op
+  | JSONRuntimeCompare : imp_json_runtime_op
   | JSONRuntimeRecConcat : imp_json_runtime_op
   | JSONRuntimeRecMerge : imp_json_runtime_op
   | JSONRuntimeDistinct : imp_json_runtime_op
@@ -51,6 +52,11 @@ Section Syntax.
   | JSONRuntimeBrand : imp_json_runtime_op
   | JSONRuntimeUnbrand : imp_json_runtime_op
   | JSONRuntimeCast : imp_json_runtime_op
+  | JSONRuntimeNatPlus : imp_json_runtime_op
+  | JSONRuntimeNatMinus : imp_json_runtime_op
+  | JSONRuntimeNatMult : imp_json_runtime_op
+  | JSONRuntimeNatDiv : imp_json_runtime_op
+  | JSONRuntimeNatRem : imp_json_runtime_op
   | JSONRuntimeNatAbs : imp_json_runtime_op
   | JSONRuntimeNatLog2 : imp_json_runtime_op
   | JSONRuntimeNatSqrt : imp_json_runtime_op
@@ -61,6 +67,11 @@ Section Syntax.
   | JSONRuntimeFloatOfNat : imp_json_runtime_op
   | JSONRuntimeSum : imp_json_runtime_op
   | JSONRuntimeArithMean : imp_json_runtime_op
+  | JSONRuntimeBunion : imp_json_runtime_op
+  | JSONRuntimeBminus : imp_json_runtime_op
+  | JSONRuntimeBmin : imp_json_runtime_op
+  | JSONRuntimeBmax : imp_json_runtime_op
+  | JSONRuntimeContains : imp_json_runtime_op
   .
 
   Definition imp_json_expr := @imp_expr imp_json_data imp_json_op imp_json_runtime_op.
@@ -77,6 +88,7 @@ Section Util.
   Definition string_of_json_runtime_op (op: imp_json_runtime_op) :=
     match op with
     | JSONRuntimeEqual => "equal"
+    | JSONRuntimeCompare => "compare"
     | JSONRuntimeRecConcat => "concat"
     | JSONRuntimeRecMerge => "mergeConcat"
     | JSONRuntimeDistinct => "distinct"
@@ -95,6 +107,11 @@ Section Util.
     | JSONRuntimeBrand => "brand"
     | JSONRuntimeUnbrand => "unbrand"
     | JSONRuntimeCast => "cast"
+    | JSONRuntimeNatPlus => "natPlus"
+    | JSONRuntimeNatMinus => "natMinus"
+    | JSONRuntimeNatMult => "natMin"
+    | JSONRuntimeNatDiv => "natDiv"
+    | JSONRuntimeNatRem => "natRem"
     | JSONRuntimeNatAbs => "natAbs"
     | JSONRuntimeNatLog2 => "natLog2"
     | JSONRuntimeNatSqrt => "natSqrt"
@@ -105,6 +122,11 @@ Section Util.
     | JSONRuntimeFloatOfNat => "floatOfNat"
     | JSONRuntimeSum => "sum"
     | JSONRuntimeArithMean => "arithMean"
+    | JSONRuntimeBunion => "bunion"
+    | JSONRuntimeBminus => "bminus"
+    | JSONRuntimeBmin => "bmin"
+    | JSONRuntimeBmax => "bmax"
+    | JSONRuntimeContains => "contains"
     end.
 
 End Util.

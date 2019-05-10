@@ -57,6 +57,20 @@ Section JSONOperators.
   | JSONOpAccess : string -> json_op             (* expr_access *)               (* v['a'] or v.a *)
   | JSONOpHasOwnProperty : string -> json_op     (* expr_call ?? XXX *)          (* v.hasOwnProperty('a') *)
   | JSONOpToString : json_op                     (* expr_call ?? XXX *)          (* v.toString() *)
+  (* Math stuff *)
+  | JSONOpMathMin : json_op                      (* expr_call *)                 (* Math.min(e1, e2) *)
+  | JSONOpMathMax : json_op                      (* expr_call *)                 (* Math.max(e1, e2) *)
+  | JSONOpMathMinApply : json_op                 (* expr_call *)                 (* Math.min.apply(Math, e) *)
+  | JSONOpMathMaxApply : json_op                 (* expr_call *)                 (* Math.max.apply(Math, e) *)
+  | JSONOpMathPow : json_op                      (* expr_call *)                 (* Math.pow(e1, e2) *)
+  | JSONOpMathExp : json_op                      (* expr_call *)                 (* Math.exp(e) *)
+  | JSONOpMathAbs : json_op                      (* expr_call *)                 (* Math.abs(e) *)
+  | JSONOpMathLog : json_op                      (* expr_call *)                 (* Math.log2(e) *)
+  | JSONOpMathLog10 : json_op                    (* expr_call *)                 (* Math.log10(e) *)
+  | JSONOpMathSqrt : json_op                     (* expr_call *)                 (* Math.sqrt(e) *)
+  | JSONOpMathCeil : json_op                     (* expr_call *)                 (* Math.ceil(e) *)
+  | JSONOpMathFloor : json_op                    (* expr_call *)                 (* Math.floor(e) *)
+  | JSONOpMathTrunc : json_op                    (* expr_call *)                 (* Math.trunc(e) *)
   .
 
   Definition json_op_eval (op:json_op) (j:list json) : option json :=
@@ -141,8 +155,7 @@ Section JSONOperators.
       end
     | JSONOpArrayAccess =>
       match j with
-      | [jarray ja; jnumber n] =>
-        None (* XXX TODO XXX *)
+      | [jarray ja; jnumber n] => None (* XXX TODO XXX *)
       | _ => None
       end
     | JSONOpObject atts =>
@@ -161,8 +174,20 @@ Section JSONOperators.
         else Some (jbool false)
       | _ => None
       end
-    | JSONOpToString =>
-      None (* XXX TODO *)
+    | JSONOpToString => None (* XXX TODO XXX *)
+    | JSONOpMathMin => None (* XXX TODO XXX *)
+    | JSONOpMathMax => None (* XXX TODO XXX *)
+    | JSONOpMathMinApply => None (* XXX TODO XXX *)
+    | JSONOpMathMaxApply => None (* XXX TODO XXX *)
+    | JSONOpMathExp => None (* XXX TODO XXX *)
+    | JSONOpMathPow => None (* XXX TODO XXX *)
+    | JSONOpMathAbs => None (* XXX TODO XXX *)
+    | JSONOpMathLog => None (* XXX TODO XXX *)
+    | JSONOpMathLog10 => None (* XXX TODO XXX *)
+    | JSONOpMathSqrt => None (* XXX TODO XXX *)
+    | JSONOpMathCeil => None (* XXX TODO XXX *)
+    | JSONOpMathFloor => None (* XXX TODO XXX *)
+    | JSONOpMathTrunc => None (* XXX TODO XXX *)
     end.
 
 End JSONOperators.

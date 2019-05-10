@@ -90,6 +90,25 @@ Section ImpJsontoJavaScriptAst.
     | JSONOpAccess att => mk_binary_expr expr_access (el++[expr_literal (literal_string att)])
     | JSONOpHasOwnProperty att => mk_binary_expr object_hasOwnProperty (el++[expr_literal (literal_string att)])
     | JSONOpToString => mk_unary_expr object_toString el
+    | JSONOpMathMin => expr_call (expr_member (expr_identifier "Math") "min") el
+    | JSONOpMathMax => expr_call (expr_member (expr_identifier "Math") "max") el
+    | JSONOpMathMinApply =>
+      expr_call
+        (expr_member (expr_member (expr_identifier "Math") "min") "apply")
+        (expr_identifier "Math" :: el)
+    | JSONOpMathMaxApply =>
+      expr_call
+        (expr_member (expr_member (expr_identifier "Math") "max") "apply")
+        (expr_identifier "Math" :: el)
+    | JSONOpMathPow => expr_call (expr_member (expr_identifier "Math") "pow") el
+    | JSONOpMathExp => expr_call (expr_member (expr_identifier "Math") "exp") el
+    | JSONOpMathAbs => expr_call (expr_member (expr_identifier "Math") "abs") el
+    | JSONOpMathLog => expr_call (expr_member (expr_identifier "Math") "log2") el
+    | JSONOpMathLog10 => expr_call (expr_member (expr_identifier "Math") "log10") el
+    | JSONOpMathSqrt => expr_call (expr_member (expr_identifier "Math") "sqrt") el
+    | JSONOpMathCeil => expr_call (expr_member (expr_identifier "Math") "ceil") el
+    | JSONOpMathFloor => expr_call (expr_member (expr_identifier "Math") "floor") el
+    | JSONOpMathTrunc => expr_call (expr_member (expr_identifier "Math") "trunc") el
     end.
 
   Fixpoint imp_json_expr_to_js_ast (exp: imp_json_expr) : expr :=

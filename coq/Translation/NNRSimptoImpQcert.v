@@ -104,13 +104,14 @@ Section NNRSimptoImpQcert.
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     end.
 
+  (* XXX Danger: string hypotheys on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_function globals (q: nnrs_imp): imp_function :=
     let constants := "constants"%string in
     let (stmt, ret) := q in
     let body :=
         ImpStmtBlock
           ((List.map
-              (fun x => (x, Some (ImpExprRuntimeCall (QcertRuntimeDeref) [ ImpExprVar x ])))
+              (fun x => (x, Some (ImpExprRuntimeCall (QcertRuntimeDeref) [ ImpExprVar constants; ImpExprConst (dstring x) ])))
               globals)
              ++ [ (ret, None) ])
           [ nnrs_imp_stmt_to_imp_qcert globals stmt;
@@ -118,6 +119,7 @@ Section NNRSimptoImpQcert.
     in
     ImpFun [ constants ] body.
 
+  (* XXX Danger: string hypotheys on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_top (qname: string) globals (q: nnrs_imp): imp :=
     ImpLib [ ((* qname *)"query"%string, nnrs_imp_to_imp_qcert_function globals q) ].
 
