@@ -500,6 +500,9 @@ function natArithMean(b) {
 function count(v) {
     return { "nat" : v.length };
 }
+function stringLength(v) {
+    return { "nat" : v.length };
+}
 function floatOfNat(v) {
     return v.nat;
 }

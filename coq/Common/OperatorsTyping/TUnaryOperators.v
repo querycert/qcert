@@ -75,6 +75,8 @@ Section TUnaryOperators.
         unary_op_type OpCount (Coll τ) Nat
     | type_OpToString τ:
         unary_op_type OpToString τ String
+    | type_OpLength:
+        unary_op_type OpLength String Nat
     | type_OpSubstring start olen:
         unary_op_type (OpSubstring start olen) String String
     | type_OpLike pat oescape:
@@ -134,6 +136,7 @@ Section TUnaryOperators.
     | Case_aux c "type_OpOrderBy"%string
     | Case_aux c "type_OpCount"%string
     | Case_aux c "type_OpToString"%string
+    | Case_aux c "type_OpLength"%string
     | Case_aux c "type_OpSubstring"%string
     | Case_aux c "type_OpLike"%string
     | Case_aux c "type_OpLeft"%string
@@ -386,6 +389,9 @@ Section TUnaryOperators.
       split; [reflexivity|apply dtnat].
     - Case "type_OpToString"%string.
       eauto.
+    - Case "type_OpLength"%string.
+      dtype_inverter.
+      eauto.
     - Case "type_OpSubstring"%string.
       dtype_inverter.
       eauto.
@@ -587,6 +593,7 @@ Tactic Notation "unary_op_type_cases" tactic(first) ident(c) :=
   | Case_aux c "type_OpOrderBy"%string
   | Case_aux c "type_OpCount"%string
   | Case_aux c "type_OpToString"%string
+  | Case_aux c "type_OpLength"%string
   | Case_aux c "type_OpSubstring"%string
   | Case_aux c "type_OpLike"%string
   | Case_aux c "type_OpLeft"%string

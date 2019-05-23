@@ -211,6 +211,7 @@ Section tDNNRCtoSparkDF.
     | OpDistinct => postfix "distinct"
     | OpCount => postfix "length"
     | OpToString => prefix "toQcertString"
+    | OpLength => "(" ++ x ++ ").length()"
     | OpSubstring start olen =>
       "(" ++ x ++ ").substring(" ++ toString start ++
           match olen with

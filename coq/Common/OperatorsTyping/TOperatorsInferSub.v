@@ -196,6 +196,10 @@ Section TOperatorsInferSub.
         lift (fun τ => (Nat, τ₁')) (tuncoll τ₁')
       | OpToString =>
         Some (String, τ₁)
+      | OpLength =>
+        if (subtype_dec τ₁ String)
+        then Some (Nat, String)
+        else None
       | OpSubstring _ _ =>
         if (subtype_dec τ₁ String)
         then Some (String, String)

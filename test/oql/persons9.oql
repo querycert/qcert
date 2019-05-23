@@ -1,0 +1,2 @@
+/* OQL Length of "Hello World!" */
+length("Hello World!")

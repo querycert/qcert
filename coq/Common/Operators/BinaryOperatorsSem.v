@@ -28,7 +28,7 @@ Require Import ForeignOperators.
 Require Import OperatorsUtils.
 Require Import Iterators.
 Require Export BinaryOperators.
-  
+
 Section BinaryOperatorsSem.
   (* Algebra Unary/Binary Ops *)
   Definition nat_arith_binary_op_eval (op:nat_arith_binary_op) (z1 z2:Z) : Z :=
