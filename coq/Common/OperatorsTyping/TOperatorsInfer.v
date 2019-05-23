@@ -297,6 +297,11 @@ Section TOperatorsInfer.
         | _ => None
         end
       | OpToString => Some String
+      | OpLength =>
+        match `τ₁ with
+        | String₀ => Some Nat
+        | _ => None
+        end
       | OpSubstring _ _ =>
         match `τ₁ with
         | String₀ => Some String

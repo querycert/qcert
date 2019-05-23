@@ -81,6 +81,8 @@ Module QOperators(runtime:CompilerRuntime).
       := UnaryOperators.OpCount.
     Definition optostring : op 
       := UnaryOperators.OpToString.
+    Definition oplength : op 
+      := UnaryOperators.OpLength.
     Definition opsubstring : Z -> option Z -> op 
       := UnaryOperators.OpSubstring.
     Definition oplike : String.string -> option Ascii.ascii -> op 

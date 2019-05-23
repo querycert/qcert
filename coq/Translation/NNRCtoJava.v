@@ -330,6 +330,7 @@ Section NNRCtoJava.
                      | OpOrderBy sl => mk_java_unary_op1 "sort" (mk_java_string_collection (List.map fst sl)) e1 (* XXX TO FIX XXX *)
                      | OpCount => mk_java_unary_op0 "count" e1
                      | OpToString =>  mk_java_unary_op0 "tostring" e1
+                     | OpLength =>  mk_java_unary_op0 "stringlength" e1
                      | OpSubstring start olen =>
                        match olen with
                        | Some len => mk_java_unary_opn "substring" (map toString [start; len]) e1

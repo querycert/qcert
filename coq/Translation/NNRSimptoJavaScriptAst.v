@@ -48,6 +48,9 @@ Section NNRSimptoJavaScriptAst.
   Definition toString e :=
     expr_call (expr_identifier "toString") [ e ].
 
+  Definition stringLength e :=
+    expr_call (expr_identifier "stringLength") [ e ].
+
   Definition substring e start len_opt :=
     let start := expr_literal (literal_number (start)) in
     let args :=
@@ -382,6 +385,8 @@ Section NNRSimptoJavaScriptAst.
       runtime_nat_mean e'
     | OpToString =>
       toString e'
+    | OpLength =>
+      stringLength e'
     | OpSubstring start olen =>
       let start_num := float_of_int start in
       match olen with

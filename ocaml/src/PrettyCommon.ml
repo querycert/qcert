@@ -514,6 +514,7 @@ let pretty_unary_op p sym callb ff u a =
   | QcertCompiler.OpOrderBy atts ->
       fprintf ff "@[<hv 0>%s%a(%a)@]" "sort" (pretty_squared_names sym) (List.map fst atts) (callb 0 sym) a
   | QcertCompiler.OpToString -> pretty_unary_exp sym callb "toString" ff a
+  | QcertCompiler.OpLength -> pretty_unary_exp sym callb "length" ff a
   | QcertCompiler.OpSubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
   | QcertCompiler.OpSubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
   | QcertCompiler.OpLike (n1,None) -> pretty_unary_exp sym callb ("like["^(Util.string_of_char_list n1)^"]") ff a

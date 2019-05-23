@@ -65,7 +65,7 @@ public class UnaryOperators {
 		return dst;
 	}
 	public static JsonElement count(JsonElement e) {
-	        return rec("nat",new JsonPrimitive(e.getAsJsonArray().size()));
+    return rec("nat",new JsonPrimitive(e.getAsJsonArray().size()));
 	}
 	
 	public static JsonElement flatten(JsonElement e) {
@@ -209,6 +209,11 @@ public class UnaryOperators {
 		return new JsonPrimitive(sb.toString());
 	}
 	
+	public static JsonElement stringlength(JsonElement e) {
+		String str = e.getAsJsonPrimitive().getAsString();
+		return rec("nat",new JsonPrimitive(str.length()));
+	}
+
 	public static JsonElement substring(int start, int end, JsonElement e) {
 		String str = e.getAsJsonPrimitive().getAsString();
 		return new JsonPrimitive(str.substring(start, end));

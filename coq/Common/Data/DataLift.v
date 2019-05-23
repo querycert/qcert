@@ -54,6 +54,20 @@ Section DataLift.
   Definition unbdata (f:data -> data -> bool) (d1 d2:data) : option data :=
     Some (dbool (f d1 d2)).
 
+  Definition unndstring (f:string -> Z) (d1:data) : option data :=
+    match d1 with
+    | dstring s1 => (Some (dnat (f s1)))
+    | _ => None
+    end.
+
+  Lemma unndstring_is_nat f d1 d2:
+    unndstring f d1 = Some d2 -> exists z:Z, d2 = dnat z.
+  Proof.
+    intros.
+    destruct d1; simpl in *; try congruence.
+    exists (f s); inversion H; reflexivity.
+  Qed.
+
   Definition unsdstring (f:string -> string -> string) (d1 d2:data) : option data :=
     match d1 with
     | dstring s1 =>

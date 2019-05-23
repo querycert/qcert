@@ -27,51 +27,53 @@
   let resolve_call fname el =
     begin match fname,el with
     | "not", [e] ->
-	QOQL.ounop QOps.Unary.opneg e
+	      QOQL.ounop QOps.Unary.opneg e
     | "flatten", [e] ->
-	QOQL.ounop QOps.Unary.opflatten e
+	      QOQL.ounop QOps.Unary.opflatten e
     | "sum", [e] ->
-	QOQL.ounop QOps.Unary.opnatsum e
+	      QOQL.ounop QOps.Unary.opnatsum e
     | "fsum", [e] ->
-	QOQL.ounop QOps.Unary.opfloatsum e
+	      QOQL.ounop QOps.Unary.opfloatsum e
     | "avg", [e] ->
-	QOQL.ounop QOps.Unary.opnatmean e
+	      QOQL.ounop QOps.Unary.opnatmean e
     | "favg", [e] ->
-	QOQL.ounop QOps.Unary.opfloatmean e
+	      QOQL.ounop QOps.Unary.opfloatmean e
     | "count", [e] ->
-	QOQL.ounop QOps.Unary.opcount e
+	      QOQL.ounop QOps.Unary.opcount e
+    | "length", [e] ->
+	      QOQL.ounop QOps.Unary.oplength e
     | "max", [e] ->
-	QOQL.ounop QOps.Unary.opnatmax e
+	      QOQL.ounop QOps.Unary.opnatmax e
     | "min", [e] ->
-	QOQL.ounop QOps.Unary.opnatmin e
+	      QOQL.ounop QOps.Unary.opnatmin e
     | "substring", [e1;e2] ->
-	let start =
-	  begin try static_int e2 with
-	  | Not_found ->
-	      raise (Qcert_Error
-		       ("Second parameter of substring should be an integer constant"))
-	  end
-	in
-	QOQL.ounop (QOps.Unary.opsubstring start None) e1
+	      let start =
+	        begin try static_int e2 with
+	        | Not_found ->
+	            raise (Qcert_Error
+		                   ("Second parameter of substring should be an integer constant"))
+	        end
+	      in
+	      QOQL.ounop (QOps.Unary.opsubstring start None) e1
     | "substring", [e1;e2;e3] ->
-	let start =
-	  begin try static_int e2 with
-	  | Not_found ->
-	      raise (Qcert_Error
-		       ("Second parameter of substring should be an integer constant"))
-	  end
-	in
-	let len =
-	  begin try static_int e3 with
-	  | Not_found ->
-	      raise (Qcert_Error
-		       ("Third parameter of substring should be an integer constant"))
-	  end
-	in
-	QOQL.ounop (QOps.Unary.opsubstring start (Some len)) e1
+	      let start =
+	        begin try static_int e2 with
+	        | Not_found ->
+	            raise (Qcert_Error
+		                   ("Second parameter of substring should be an integer constant"))
+	        end
+	      in
+	      let len =
+	        begin try static_int e3 with
+	        | Not_found ->
+	            raise (Qcert_Error
+		                   ("Third parameter of substring should be an integer constant"))
+	        end
+	      in
+	      QOQL.ounop (QOps.Unary.opsubstring start (Some len)) e1
     | _, _ ->
-	raise (Qcert_Error
-		 ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))
+	      raise (Qcert_Error
+		             ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))
     end
 
 %}

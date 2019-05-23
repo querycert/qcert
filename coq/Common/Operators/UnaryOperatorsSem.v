@@ -94,6 +94,8 @@ Section UnaryOperatorsSem.
       lift dnat (ondcoll (fun z => Z_of_nat (bcount z)) d)
     | OpToString =>
       Some (dstring (dataToString d))
+    | OpLength =>
+      unndstring (fun s => Z_of_nat (String.length s)) d
     | OpSubstring start olen =>
       match d with
       | dstring s =>
