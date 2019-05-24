@@ -48,6 +48,7 @@ Section Syntax.
   | JSONRuntimeFlatten : imp_json_runtime_op
   | JSONRuntimeSort : imp_json_runtime_op
   | JSONRuntimeCount : imp_json_runtime_op
+  | JSONRuntimeLength : imp_json_runtime_op
   | JSONRuntimeSubstring : imp_json_runtime_op
   | JSONRuntimeBrand : imp_json_runtime_op
   | JSONRuntimeUnbrand : imp_json_runtime_op
@@ -103,6 +104,7 @@ Section Util.
     | JSONRuntimeFlatten => "flatten"
     | JSONRuntimeSort => "sort"
     | JSONRuntimeCount => "count"
+    | JSONRuntimeLength => "stringLength"
     | JSONRuntimeSubstring => "substring"
     | JSONRuntimeBrand => "brand"
     | JSONRuntimeUnbrand => "unbrand"
