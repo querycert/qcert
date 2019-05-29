@@ -1,0 +1,6 @@
+/* Simple select-from-where */
+nth(
+  select p
+  from p in Customers
+  where p->age = 32,2
+)

@@ -163,6 +163,7 @@ let binary_op_to_sexp (b:binary_op) : sexp =
   | OpBagDiff -> STerm ("OpBagDiff",[])
   | OpBagMin -> STerm ("OpBagMin",[])
   | OpBagMax -> STerm ("OpBagMax",[])
+  | OpBagNth -> STerm ("OpBagNth",[])
   | OpContains -> STerm ("OpContains",[])
   | OpStringConcat -> STerm ("OpStringConcat",[])
   | OpForeignBinary fbop -> SString (PrettyCommon.string_of_foreign_binary_op (Obj.magic fbop))
@@ -188,6 +189,7 @@ let sexp_to_binary_op (se:sexp) : binary_op =
   | STerm ("OpBagDiff",[]) -> OpBagDiff
   | STerm ("OpBagMin",[]) -> OpBagMin
   | STerm ("OpBagMax",[]) -> OpBagMax
+  | STerm ("OpBagNth",[]) -> OpBagNth
   | STerm ("OpContains",[]) -> OpContains
   | STerm ("OpStringConcat",[]) -> OpStringConcat
   | SString fbop -> OpForeignBinary (Obj.magic (PrettyCommon.foreign_binary_op_of_string fbop))
@@ -251,6 +253,7 @@ let unary_op_to_sexp (u:unary_op) : sexp =
   | OpDistinct -> STerm ("OpDistinct",[])
   | OpOrderBy sl -> STerm ("OpOrderBy", coq_string_list_to_sstring_list_with_order sl)
   | OpToString -> STerm ("OpToString",[])
+  | OpGenerateText -> STerm ("OpGenerateText",[])
   | OpLength -> STerm ("OpLength",[])
   | OpSubstring (n,None) -> STerm ("OpSubstring",[SInt n])
   | OpSubstring (n1,(Some n2)) -> STerm ("OpSubstring",[SInt n1;SInt n2])
@@ -299,6 +302,7 @@ let sexp_to_unary_op (se:sexp) : unary_op =
   | STerm ("OpDistinct",[]) -> OpDistinct
   | STerm ("OpOrderBy",sl) -> OpOrderBy (sstring_list_with_order_to_coq_string_list sl)
   | STerm ("OpToString",[]) -> OpToString
+  | STerm ("OpGenerateText",[]) -> OpGenerateText
   | STerm ("OpLength",[]) -> OpLength
   | STerm ("OpSubstring",[SInt n1]) -> OpSubstring (n1,None)
   | STerm ("OpSubstring",[SInt n1;SInt n2]) -> OpSubstring (n1,Some n2)

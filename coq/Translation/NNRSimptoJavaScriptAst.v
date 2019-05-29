@@ -48,6 +48,9 @@ Section NNRSimptoJavaScriptAst.
   Definition toString e :=
     expr_call (expr_identifier "toString") [ e ].
 
+  Definition generateText e :=
+    expr_call (expr_identifier "generateText") [ e ].
+
   Definition stringLength e :=
     expr_call (expr_identifier "stringLength") [ e ].
 
@@ -134,6 +137,9 @@ Section NNRSimptoJavaScriptAst.
 
   Definition runtime_bmax e1 e2 :=
     call_runtime "bmax" [ e1; e2 ].
+
+  Definition runtime_bnth e1 e2 :=
+    call_runtime "bnth" [ e1; e2 ].
 
   Definition runtime_contains e1 e2 :=
     call_runtime "contains" [ e1; e2 ].
@@ -296,6 +302,8 @@ Section NNRSimptoJavaScriptAst.
       runtime_bmin e1' e2'
     | OpBagMax =>
       runtime_bmax e1' e2'
+    | OpBagNth =>
+      runtime_bnth e1' e2'
     | OpContains =>
       runtime_contains e1' e2'
     | OpStringConcat =>
@@ -385,6 +393,8 @@ Section NNRSimptoJavaScriptAst.
       runtime_nat_mean e'
     | OpToString =>
       toString e'
+    | OpGenerateText =>
+      generateText e'
     | OpLength =>
       stringLength e'
     | OpSubstring start olen =>

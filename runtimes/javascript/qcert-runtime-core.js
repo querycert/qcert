@@ -200,6 +200,9 @@ function arithMean(b) {
 function toString(v) {
     return toStringQ(v, "");
 }
+function generateText(v) {
+    return toStringQ(v, "");
+}
 function toStringQ(v, quote) {
     if (v === null)
 	return "null";
@@ -296,6 +299,17 @@ function bmax(b1, b2) {
     }
     while (i2 < length2) { result.push(v2[i2]); i2++; }
     return result;
+}
+function bnth(b1, n) {
+    var index = n;
+    if(n.hasOwnProperty('nat')){
+	    index = n.nat;
+    }
+    if (b1[index]) {
+        return left(b1[index]);
+    } else {
+        return right(null);
+    }
 }
 function sub_brand(b1,b2) {
     var bsub=null;

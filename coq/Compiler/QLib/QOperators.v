@@ -185,6 +185,8 @@ Module QOperators(runtime:CompilerRuntime).
       := BinaryOperators.OpBagMin.
     Definition opbagmax : op 
       := BinaryOperators.OpBagMax.
+    Definition opbagnth : op 
+      := BinaryOperators.OpBagNth.
     Definition opcontains : op 
       := BinaryOperators.OpContains.
     Definition opstringconcat : op 

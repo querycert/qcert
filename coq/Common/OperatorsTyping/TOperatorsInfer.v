@@ -139,6 +139,12 @@ Section TOperatorsInfer.
           if (`τ₁₀ == `τ₂₀) then Some τ₁ else None
         | _ => None
         end
+      | OpBagNth =>
+        match (tuncoll τ₁, `τ₂) with
+        | (Some τ₁₀, Nat₀) =>
+          Some (Option τ₁₀)
+        | _ => None
+        end
       | OpContains =>
         match tuncoll τ₂ with
         | Some τ₂₀ =>
@@ -296,7 +302,7 @@ Section TOperatorsInfer.
         | Coll₀ _ => Some Nat
         | _ => None
         end
-      | OpToString => Some String
+      | OpToString | OpGenerateText => Some String
       | OpLength =>
         match `τ₁ with
         | String₀ => Some Nat

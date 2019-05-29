@@ -276,6 +276,7 @@ Section NNRCtoJavaScript.
                      | OpOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
                      | OpCount => "count(" ++ e1 ++ ")"
                      | OpToString => "toString(" ++ e1 ++ ")"
+                     | OpGenerateText => "generateText(" ++ e1 ++ ")"
                      | OpLength => "stringLength(" ++ e1 ++ ")"
                      | OpSubstring start olen =>
                        match olen with
@@ -324,6 +325,7 @@ Section NNRCtoJavaScript.
                      | OpBagDiff => "bminus(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpBagMin => "bmin(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpBagMax => "bmax(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpBagNth => "bnth(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpStringConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
                      | OpNatBinary b => nat_barithToJs b e1 e2

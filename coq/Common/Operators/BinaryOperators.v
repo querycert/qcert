@@ -64,6 +64,7 @@ Section BinaryOperators.
   | OpBagDiff : binary_op                                 (**r bag difference *)
   | OpBagMin : binary_op                                  (**r bag min *)
   | OpBagMax : binary_op                                  (**r bag max *)
+  | OpBagNth : binary_op                                  (**r random element in a bag *)
   | OpContains : binary_op                                (**r is an element in a collection *)
   | OpStringConcat : binary_op                            (**r string concatenation *)
   | OpNatBinary : nat_arith_binary_op -> binary_op        (**r arithmetic operators on integers *)
@@ -157,6 +158,7 @@ Section BinaryOperators.
             | OpBagDiff => "OpBagDiff"
             | OpBagMin => "OpBagMin"
             | OpBagMax => "OpBagMax"
+            | OpBagNth => "OpBagNth"
             | OpContains  => "OpContains"
             | OpStringConcat  => "OpStringConcat"
             | OpNatBinary aop => "(OpNatBinary " ++ (toString aop) ++ ")"
@@ -181,6 +183,7 @@ Tactic Notation "binary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpBagDiff"%string
   | Case_aux c "OpBagMin"%string
   | Case_aux c "OpBagMax"%string
+  | Case_aux c "OpBagNth"%string
   | Case_aux c "OpContains"%string
   | Case_aux c "OpStringConcat"%string
   | Case_aux c "OpNatBinary"%string

@@ -210,6 +210,7 @@ Section tDNNRCtoSparkDF.
     | OpFlatten => postfix "flatten.sorted(QcertOrdering)"
     | OpDistinct => postfix "distinct"
     | OpCount => postfix "length"
+    | OpGenerateText
     | OpToString => prefix "toQcertString"
     | OpLength => "(" ++ x ++ ").length()"
     | OpSubstring start olen =>
@@ -284,6 +285,7 @@ Section tDNNRCtoSparkDF.
     | OpBagDiff => r ++ ".diff(" ++ l ++ ")" (* bag minus has operands "the wrong way" around *)
     | OpBagMax => l ++ ".++(" ++ r ++ ".diff(" ++ l ++ "))" (* l1 ⊎ (l2 ⊖ l1) *)
     | OpBagMin => l ++ ".diff(" ++ l ++ ".diff(" ++ r ++ "))" (* l1 ⊖ (l1 ⊖ l2) Can't make recursive calls, but AMinus is weird anyways... *)
+    | OpBagNth => prefix "bagNth"
     | OpContains => prefix "AContains" (* left argument is the element, right element is the collection *)
     | OpStringConcat => infix "+" (* string concat *)
     | OpNatBinary NatDiv => infix "/"

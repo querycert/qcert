@@ -83,6 +83,7 @@ Section ImpJsontoJavaScriptAst.
           JSONRuntimeSort (e :: (List.map sortCriteria_to_json_expr scl))
       | OpCount => mk_imp_json_runtime_call JSONRuntimeCount el
       | OpToString => mk_imp_json_op JSONOpToString el
+      | OpGenerateText => mk_imp_json_runtime_call JSONRuntimeGenerateText el
       | OpLength => mk_imp_json_runtime_call JSONRuntimeLength el
       | OpSubstring start len =>
         let start := ImpExprConst (jnumber (float_of_int start)) in
@@ -161,6 +162,7 @@ Section ImpJsontoJavaScriptAst.
       | OpBagDiff => mk_imp_json_runtime_call JSONRuntimeBminus [e1; e2]
       | OpBagMin => mk_imp_json_runtime_call JSONRuntimeBmin [e1; e2]
       | OpBagMax => mk_imp_json_runtime_call JSONRuntimeBmax [e1; e2]
+      | OpBagNth => mk_imp_json_runtime_call JSONRuntimeBnth [e1; e2]
       | OpContains => mk_imp_json_runtime_call JSONRuntimeContains [e1; e2]
       | OpStringConcat => mk_imp_json_op JSONOpAddString el
       | OpNatBinary opa =>

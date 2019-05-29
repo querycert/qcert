@@ -72,7 +72,10 @@ Section Syntax.
   | JSONRuntimeBminus : imp_json_runtime_op
   | JSONRuntimeBmin : imp_json_runtime_op
   | JSONRuntimeBmax : imp_json_runtime_op
+  | JSONRuntimeBnth : imp_json_runtime_op
   | JSONRuntimeContains : imp_json_runtime_op
+  | JSONRuntimeToString : imp_json_runtime_op
+  | JSONRuntimeGenerateText : imp_json_runtime_op
   .
 
   Definition imp_json_expr := @imp_expr imp_json_data imp_json_op imp_json_runtime_op.
@@ -128,7 +131,10 @@ Section Util.
     | JSONRuntimeBminus => "bminus"
     | JSONRuntimeBmin => "bmin"
     | JSONRuntimeBmax => "bmax"
+    | JSONRuntimeBnth => "bnth"
     | JSONRuntimeContains => "contains"
+    | JSONRuntimeToString => "toString"
+    | JSONRuntimeGenerateText => "generateText"
     end.
 
 End Util.
