@@ -78,6 +78,8 @@ Section TBinaryOperators.
         binary_op_type OpBagMin (Coll τ) (Coll τ) (Coll τ)
     | type_OpBagMax {τ} :
         binary_op_type OpBagMax (Coll τ) (Coll τ) (Coll τ)
+    | type_OpBagNth {τ} :
+        binary_op_type OpBagNth (Coll τ) Nat (Option τ)
     | type_OpContains {τ} :
         binary_op_type OpContains τ (Coll τ) Bool
     | type_OpStringConcat :
@@ -108,6 +110,7 @@ Section TBinaryOperators.
     | Case_aux c "type_OpBagDiff"%string
     | Case_aux c "type_OpBagMin"%string
     | Case_aux c "type_OpBagMax"%string
+    | Case_aux c "type_OpBagNth"%string
     | Case_aux c "type_OpContains"%string
     | Case_aux c "type_OpStringConcat"%string
     | Case_aux c "type_OpNatBinary"%string
@@ -676,6 +679,23 @@ Section TBinaryOperators.
       assert (r0 = τ) by (apply rtype_fequal; assumption).
       rewrite H1 in *; rewrite H2 in *.
       apply forall_typed_bmax; assumption.
+    - Case "type_OpBagNth"%string.
+      dependent induction H; dependent induction H0; simpl.
+      rtype_equalizer; subst.
+      destruct n; simpl in *.
+      + destruct dl.
+        * exists dnone; split; eauto; repeat constructor.
+        * inversion H; subst.
+          exists (dsome d); split; [auto|];
+            constructor; auto.
+      + case_eq (nth_error dl (Pos.to_nat p)); intros.
+        * apply nth_error_In in H0.
+          rewrite Forall_forall in H.
+          specialize (H d H0).
+          exists (dsome d); split; [auto|];
+            constructor; auto.
+        * exists (dnone); split; [auto|repeat constructor].
+      + exists (dnone); split; [auto|repeat constructor].
     - Case "type_OpContains"%string.
       inversion H0.
       rtype_equalizer; subst.
@@ -742,6 +762,7 @@ End TBinaryOperators.
     | Case_aux c "type_OpBagDiff"%string
     | Case_aux c "type_OpBagMin"%string
     | Case_aux c "type_OpBagMax"%string
+    | Case_aux c "type_OpBagNth"%string
     | Case_aux c "type_OpContains"%string
     | Case_aux c "type_OpStringConcat"%string
     | Case_aux c "type_OpNatBinary"%string

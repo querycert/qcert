@@ -330,6 +330,7 @@ Section NNRCtoJava.
                      | OpOrderBy sl => mk_java_unary_op1 "sort" (mk_java_string_collection (List.map fst sl)) e1 (* XXX TO FIX XXX *)
                      | OpCount => mk_java_unary_op0 "count" e1
                      | OpToString =>  mk_java_unary_op0 "tostring" e1
+                     | OpGenerateText =>  mk_java_unary_op0 "generatetext" e1
                      | OpLength =>  mk_java_unary_op0 "stringlength" e1
                      | OpSubstring start olen =>
                        match olen with
@@ -375,6 +376,7 @@ Section NNRCtoJava.
                      | OpBagDiff =>  mk_java_binary_op0 "bag_minus" e1 e2
                      | OpBagMin =>  mk_java_binary_op0 "bag_min" e1 e2
                      | OpBagMax =>  mk_java_binary_op0 "bag_max" e1 e2
+                     | OpBagNth =>  mk_java_binary_op0 "bag_nth" e1 e2
                      | OpContains =>  mk_java_binary_op0 "contains" e1 e2
                      | OpStringConcat => mk_java_binary_op0 "stringConcat" e1 e2
                      | OpNatBinary b => mk_java_binary_op0 (nat_barithToJavaMethod b) e1 e2

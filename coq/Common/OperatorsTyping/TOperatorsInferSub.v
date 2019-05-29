@@ -97,6 +97,13 @@ Section TOperatorsInferSub.
         | left _, left _ => Some (Bool, Nat, Nat)
         | _, _ => None
         end
+      | OpBagNth =>
+        match subtype_dec τ₂ Nat with
+        | left _ =>
+          let τ₁' := τ₁ ⊔ (Coll ⊥) in
+          lift (fun τ => (τ, τ₁', Nat)) (tsingleton τ₁')
+        | _ => None
+        end
       | OpBagUnion | OpBagDiff | OpBagMin | OpBagMax =>
         let τcommon := τ₁ ⊔ τ₂ in
         if (tuncoll τcommon)
@@ -194,7 +201,8 @@ Section TOperatorsInferSub.
       | OpCount =>
         let τ₁' := τ₁ ⊔ (Coll ⊥) in
         lift (fun τ => (Nat, τ₁')) (tuncoll τ₁')
-      | OpToString =>
+      | OpToString
+      | OpGenerateText =>
         Some (String, τ₁)
       | OpLength =>
         if (subtype_dec τ₁ String)

@@ -65,7 +65,7 @@ endif
 	clean
 
 ## OQL
-OQLPERSONSNUM=1 2 3 4 5 6 7 8 9
+OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12
 OQLWORLDNUM=1 2
 OQLEMPLOYEESNUM=1 2
 OQLTARGETS=oql nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed

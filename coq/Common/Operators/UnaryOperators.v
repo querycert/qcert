@@ -61,6 +61,7 @@ Section UnaryOperators.
   | OpOrderBy : SortCriterias -> unary_op             (**r sorts a collection of records *)
   | OpCount : unary_op                                (**r bag count *)
   | OpToString : unary_op                             (**r convert any data to a string *)
+  | OpGenerateText : unary_op                         (**r unspecified conversion from any data to a string *)
   | OpLength : unary_op                               (**r the length of a string *)
   | OpSubstring : Z -> option Z -> unary_op           (**r returns the substring starting with the nth character, for m characters (or the rest of the string) *)
   | OpLike (pattern:string)
@@ -181,6 +182,7 @@ Section UnaryOperators.
                 ++ ")"
             | OpCount => "OpCount"
             | OpToString => "OpToString"
+            | OpGenerateText => "OpGenerateText"
             | OpLength => "OpLength"
             | OpSubstring start len =>
               "(OpSubstring " ++ (toString start)
@@ -234,6 +236,7 @@ Tactic Notation "unary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpOrderBy"%string
   | Case_aux c "OpCount"%string
   | Case_aux c "OpToString"%string
+  | Case_aux c "OpGenerateText"%string
   | Case_aux c "OpLength"%string
   | Case_aux c "OpSubstring"%string
   | Case_aux c "OpLike"%string

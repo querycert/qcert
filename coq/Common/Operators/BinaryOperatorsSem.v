@@ -90,6 +90,18 @@ Section BinaryOperatorsSem.
     | OpBagDiff => rondcoll2 (@bminus data data_eq_dec) d2 d1
     | OpBagMin => rondcoll2 (@bmin data data_eq_dec) d1 d2
     | OpBagMax => rondcoll2 (@bmax data data_eq_dec) d1 d2
+    | OpBagNth =>
+      match d1, d2 with
+      | (dcoll c), (dnat n) =>
+        let natish := ZToSignedNat n in
+        if (fst natish) then
+          match List.nth_error c (snd natish) with
+          | None => Some dnone
+          | Some d => Some (dsome d)
+          end
+        else Some dnone
+      | _, _ => None
+      end
     | OpContains =>
       ondcoll (fun l =>
                  if in_dec data_eq_dec d1 l
@@ -142,6 +154,24 @@ Section BinaryOperatorsSem.
       destruct (Compat.compatible l l0); inversion H; eauto 2.
       constructor. constructor; trivial.
       apply data_normalized_rec_concat_sort; trivial.
+    - do 2 match_destr_in H.
+      destruct z; simpl in *; try discriminate.
+      + destruct l; simpl in *.
+        inversion H; subst; repeat constructor.
+        inversion H; subst. inversion H0; simpl in *.
+        rewrite Forall_forall in H3; simpl in H3.
+        specialize (H3 d).
+        constructor.
+        apply H3; auto.
+      + case_eq (nth_error l (Pos.to_nat p)); intros; rewrite H2 in H.
+        * inversion H; clear H; subst.
+          inversion H0; subst.
+          apply nth_error_In in H2.
+          rewrite Forall_forall in H3.
+          specialize (H3 d H2).
+          constructor; eauto.
+        * inversion H; subst; repeat constructor.
+      + inversion H; subst; repeat constructor.
     - destruct d2; simpl in *; try discriminate.
       match_destr_in H; inversion H; eauto.
     - eapply foreign_binary_op_normalized; eauto.

@@ -257,7 +257,7 @@ public class UnaryOperators {
 		}
 	}
 	
-	private static final JsonElement dnone = mk_right_none();
+	public static final JsonElement dnone = mk_right_none();
 	
 	private static JsonElement mk_right_none() {
 		return right(JsonNull.INSTANCE);

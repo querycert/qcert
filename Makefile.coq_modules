@@ -171,11 +171,11 @@ MODULES = \
 	NNRC/Lang/NNRCShadow \
 	NNRC/Lang/NNRCEq \
 	NNRC/Lang/NNRCSize \
-	NNRC/Stratify/NNRCStratify \
-	NNRC/Stratify/TNNRCStratify \
+	NNRC/Lang/NNRCStratify \
 	NNRC/Typing/TNNRC \
 	NNRC/Typing/TNNRCEq \
 	NNRC/Typing/TNNRCShadow \
+	NNRC/Typing/TNNRCStratify \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \
 	NNRC/NNRCSystem \

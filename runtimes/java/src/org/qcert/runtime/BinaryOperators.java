@@ -184,6 +184,16 @@ public class BinaryOperators {
 		return union(e1, bag_minus(e2, e1));
 	}
 	
+  public static JsonElement bag_nth(JsonElement e1, JsonElement e2) {
+    final JsonArray ec = asColl(e1);
+    final Long index = RuntimeUtils.asLong(e2);
+    try {
+        return UnaryOperators.left(ec.get(Math.toIntExact(index)));
+    } catch(IndexOutOfBoundsException e) {
+				return UnaryOperators.dnone;
+    }
+	}
+	
 	public static JsonElement contains(JsonElement e1, JsonElement e2) {
 		// Note: we can't use the built in contains operation since
 		// we need equality to be determined by our comparator

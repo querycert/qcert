@@ -514,6 +514,7 @@ let pretty_unary_op p sym callb ff u a =
   | QcertCompiler.OpOrderBy atts ->
       fprintf ff "@[<hv 0>%s%a(%a)@]" "sort" (pretty_squared_names sym) (List.map fst atts) (callb 0 sym) a
   | QcertCompiler.OpToString -> pretty_unary_exp sym callb "toString" ff a
+  | QcertCompiler.OpGenerateText -> pretty_unary_exp sym callb "generateText" ff a
   | QcertCompiler.OpLength -> pretty_unary_exp sym callb "length" ff a
   | QcertCompiler.OpSubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
   | QcertCompiler.OpSubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
@@ -740,6 +741,7 @@ let string_of_binary_op b =
   | QcertCompiler.OpBagDiff -> "aminus"
   | QcertCompiler.OpBagMin -> "amin"
   | QcertCompiler.OpBagMax -> "amax"
+  | QcertCompiler.OpBagNth -> "anth"
   | QcertCompiler.OpContains -> "acontains"
   | QcertCompiler.OpStringConcat -> "asconcat"
   | QcertCompiler.OpForeignBinary fb -> string_of_foreign_binary_op (Obj.magic fb)
@@ -761,6 +763,7 @@ let pretty_binary_op p sym callb ff b a1 a2 =
   | QcertCompiler.OpBagDiff -> pretty_infix_exp p 18 sym callb ("\\",1) ff a1 a2
   | QcertCompiler.OpBagMin -> pretty_infix_exp p 20 sym callb ("{min}",5) ff a1 a2
   | QcertCompiler.OpBagMax -> pretty_infix_exp p 20 sym callb ("{max}",5) ff a1 a2
+  | QcertCompiler.OpBagNth -> pretty_infix_exp p 20 sym callb ("{nth}",5) ff a1 a2
   | QcertCompiler.OpContains -> pretty_infix_exp p 16 sym callb sym.sin ff a1 a2
   | QcertCompiler.OpStringConcat -> pretty_infix_exp p 18 sym callb ("^",1) ff a1 a2
   | QcertCompiler.OpForeignBinary fb -> pretty_foreign_binary_op p sym callb ff (Obj.magic fb) a1 a2

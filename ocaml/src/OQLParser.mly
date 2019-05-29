@@ -46,6 +46,8 @@
 	      QOQL.ounop QOps.Unary.opnatmax e
     | "min", [e] ->
 	      QOQL.ounop QOps.Unary.opnatmin e
+    | "nth", [e1;e2] ->
+	      QOQL.obinop QOps.Binary.opbagnth e1 e2
     | "substring", [e1;e2] ->
 	      let start =
 	        begin try static_int e2 with

@@ -92,7 +92,8 @@ Section UnaryOperatorsSem.
       data_sort sc d (* XXX Some very limited/hackish sorting XXX *)
     | OpCount =>
       lift dnat (ondcoll (fun z => Z_of_nat (bcount z)) d)
-    | OpToString =>
+    | OpToString
+    | OpGenerateText =>
       Some (dstring (dataToString d))
     | OpLength =>
       unndstring (fun s => Z_of_nat (String.length s)) d
