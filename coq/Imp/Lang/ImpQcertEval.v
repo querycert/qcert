@@ -46,12 +46,11 @@ Section ImpQcertEval.
   (* Local Open Scope imp_qcert. *)
   Local Open Scope string.
 
-  (** ** Evaluation Semantics *)
-  Section Evaluation.
-
+  Section EvalInstantiation.
+    (* Instantiate Imp for Qcert data *)
     Definition imp_qcert_data_normalize (d:imp_qcert_data) : imp_qcert_data :=
       normalize_data h d.
-    
+
     Definition imp_qcert_data_to_bool (d:imp_qcert_data) : option bool :=
       match d with
       | dbool b => Some b
@@ -114,6 +113,11 @@ Section ImpQcertEval.
         | _ => None
         end
       end.
+
+  End EvalInstantiation.    
+  
+  (** ** Evaluation Semantics *)
+  Section Evaluation.
 
     (** Evaluation takes a ImpQcert expression and an environment. It
           returns an optional value. When [None] is returned, it

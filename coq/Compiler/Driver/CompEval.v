@@ -71,6 +71,7 @@ Section CompEval.
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
   Context {fcloudant:foreign_cloudant}. (* Necessary for CldMR evaluation *)
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)
+  Context {ftjson:foreign_to_JSON}.     (* Necessary for ImpJson evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
 
   Context (h:list(string*string)).
@@ -135,8 +136,10 @@ Section CompEval.
       ImpQcertEval.imp_qcert_eval_top h cenv q.
 
     (* Language: imp_json *)
+    (* XXX Is this really what we want to wrap/unwrap in data? *)
     Definition eval_imp_json (q:imp_json) (cenv: bindings) : option data :=
-      ImpJsonEval.imp_json_eval_top q.
+      let jenv := List.map (fun xy => (fst xy, data_to_js (snd xy))) cenv in
+      lift (json_to_data h) (ImpJsonEval.imp_json_eval_top jenv q).
 
     (* Language: nnrcmr *)
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=

@@ -18,7 +18,9 @@ Require Import List.
 Require Import Ascii.
 Require Import String.
 Require Import ZArith.
+Require Import Bool.
 Require Import JsAst.JsNumber.
+Require Import Float.
 Require Import CoqLibAdd.
 Require Import StringAdd.
 Require Import Digits.
@@ -109,6 +111,31 @@ Section JSON.
       apply f3.
       intros. apply (H (x,y)). trivial.
   Qed.
+
+  (** Equality is decidable for json *)
+  Lemma json_eq_dec : forall x y:json, {x=y}+{x<>y}.
+  Proof.
+    induction x; destruct y; try solve[right; inversion 1].
+    - left; trivial.
+    - destruct (float_eq_dec n n0).
+      + left; f_equal; trivial.
+      + right;intro;apply c;inversion H; reflexivity.
+    - destruct (bool_dec b b0).
+      + left; f_equal; trivial.
+      + right;intro;apply n;inversion H; trivial. 
+    - destruct (string_dec s s0).
+      + left; f_equal; trivial.
+      + right;intro;apply n;inversion H; trivial.
+    - destruct (list_Forallt_eq_dec c l H). subst. auto.
+      right; inversion 1. auto.
+    - destruct (list_Forallt_eq_dec r l); subst; auto.
+      + apply (forallt_impl H).
+        apply forallt_weaken; clear; intros.
+        destruct x; destruct y; simpl in *.
+        apply pair_eq_dec; auto.
+        apply string_dec.
+      + right; inversion 1; auto.
+  Defined.
 
   Section toString.
 

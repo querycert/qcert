@@ -48,6 +48,19 @@ Section ImpEval.
   Definition rbindings := list (string * Data).
   Definition pd_rbindings := list (string * option Data).
 
+  Section Util.
+    Definition apply_unary (f: Data -> option Data) (dl: list Data) : option Data :=
+      match dl with
+      | d :: nil => f d
+      | _ => None
+      end.
+    Definition apply_binary (f: Data -> Data -> option Data) (dl: list Data) : option Data :=
+      match dl with
+      | d1 :: d2 :: nil => f d1 d2
+      | _ => None
+      end.
+  End Util.
+  
   (** ** Evaluation Semantics *)
   Section Evaluation.
     
@@ -117,7 +130,18 @@ Section ImpEval.
               imp_stmt_eval σc s σ'
             end
         in
-        fold_left proc_one_stmt sl σdeclared
+        let σblock := fold_left proc_one_stmt sl σdeclared in
+        let proc_one_var v c :=
+            match c with
+            | None => None
+            | Some (_::σ') =>
+              Some σ'
+            | Some nil =>
+              None
+            end
+        in
+        let σerased := fold_right proc_one_var σblock vl in
+        σerased
       | ImpStmtAssign v e =>
         match imp_expr_eval σc σ e, lookup string_dec σ v with
         | Some d, Some _ => Some (update_first string_dec σ v (Some d))
