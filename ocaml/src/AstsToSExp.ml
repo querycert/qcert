@@ -661,6 +661,7 @@ let sexp_to_nnrs_imp (se:sexp) : QLang.nnrs_imp =
 let imp_expr_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp e : sexp =
   let rec imp_expr_to_sexp e : sexp =
     match e with
+    | ImpExprGetConstant v -> STerm ("ImpExprGetConstant", [SString (string_of_char_list v)])
     | ImpExprVar v -> STerm ("ImpExprVar", [SString (string_of_char_list v)])
     | ImpExprConst d -> STerm ("ImpExprConst", [data_to_sexp d])
     | ImpExprOp (op, args) -> STerm ("ImpExprOp", (op_to_sexp op) :: List.map imp_expr_to_sexp args)

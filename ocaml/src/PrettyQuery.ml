@@ -385,6 +385,7 @@ let pretty_nnrs_imp greek margin annot inheritance link_runtime q =
 let pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e =
   let rec pretty_imp_expr p sym ff e =
     match e with
+    | QcertCompiler.ImpExprGetConstant v -> fprintf ff "%s"  (Util.string_of_char_list v)
     | QcertCompiler.ImpExprVar v -> fprintf ff "%s"  (Util.string_of_char_list v)
     | QcertCompiler.ImpExprConst d -> fprintf ff "%a" pretty_data d
     | QcertCompiler.ImpExprOp (op,args) -> (pretty_op p sym pretty_imp_expr) ff (op, args)
