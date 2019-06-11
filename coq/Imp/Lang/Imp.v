@@ -19,6 +19,7 @@
 Require Import String.
 Require Import List.
 Require Import Arith.
+Require Import ZArith.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Arith.
@@ -40,10 +41,10 @@ Section Imp.
     Definition var := string.
 
     Inductive imp_expr :=
+    | ImpExprGetConstant : var -> imp_expr                       (**r global variable lookup ([$v])*)
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
     | ImpExprConst : Data -> imp_expr                            (**r constant data ([d]) *)
     | ImpExprOp : Op -> list imp_expr -> imp_expr                (**r operator ([e₁ ⊠ e₂]) *)
-    | ImpExprCall : string -> list imp_expr -> imp_expr          (**r function call *)
     | ImpExprRuntimeCall : Runtime -> list imp_expr -> imp_expr  (**r runtime function call *)
   (*| ImpExprIf : imp_expr -> imp_expr -> imp_expr -> imp_expr *)(* XXX Useful? Used in Qcert JS runtime *)
     .
@@ -54,12 +55,12 @@ Section Imp.
     | ImpStmtFor : var -> imp_expr -> imp_stmt -> imp_stmt                     (**r for loop ([for ($v in e₁) { s₂ }]) *)
     | ImpStmtForRange : var -> imp_expr -> imp_expr -> imp_stmt -> imp_stmt    (**r for loop ([for ($v = e₁ to e₂) { s₂ }]) *)
     | ImpStmtIf : imp_expr -> imp_stmt -> imp_stmt -> imp_stmt                 (**r conditional ([if e₁ { s₂ } else { s₃ }]) *)
-    | ImpStmtReturn : option imp_expr -> imp_stmt                              (**r return ([return e]) *)
   (*| ImpStmtBreak : imp_stnt *)(* XXX Possible? Useful? -- Used in Qcert JS runtime *)
     .
 
+    (* input variables + statements + returned variable *)
     Inductive imp_function :=
-    | ImpFun : list var -> imp_stmt -> imp_function
+    | ImpFun : list var -> imp_stmt -> var -> imp_function
     .
 
     (** [imp] is composed of a list of function declarations *)
@@ -111,10 +112,10 @@ End Imp.
 
 Tactic Notation "imp_expr_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "ImpExprVar"%string
+  [ Case_aux c "ImpExprGet"%string
+  | Case_aux c "ImpExprVar"%string
   | Case_aux c "ImpExprConst"%string
-  | Case_aux c "ImpExprOp"%string
-  | Case_aux c "ImpExprCall"%string].
+  | Case_aux c "ImpExprOp"%string].
 
 Tactic Notation "imp_stmt_cases" tactic(first) ident(c) :=
   first;
@@ -122,8 +123,7 @@ Tactic Notation "imp_stmt_cases" tactic(first) ident(c) :=
   | Case_aux c "ImpStmtAssign"%string
   | Case_aux c "ImpStmtFor"%string
   | Case_aux c "ImpStmtForRange"%string
-  | Case_aux c "ImpStmtIf"%string
-  | Case_aux c "ImpStmtReturn"%string].
+  | Case_aux c "ImpStmtIf"%string].
 
 Tactic Notation "imp_function_cases" tactic(first) ident(c) :=
   first;

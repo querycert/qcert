@@ -664,7 +664,6 @@ let imp_expr_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp e : sexp =
     | ImpExprVar v -> STerm ("ImpExprVar", [SString (string_of_char_list v)])
     | ImpExprConst d -> STerm ("ImpExprConst", [data_to_sexp d])
     | ImpExprOp (op, args) -> STerm ("ImpExprOp", (op_to_sexp op) :: List.map imp_expr_to_sexp args)
-    | ImpExprCall (f, args) -> STerm ("ImpExprCall", (SString (string_of_char_list f)) :: List.map imp_expr_to_sexp args)
     | ImpExprRuntimeCall (op, args) -> STerm ("ImpExprRuntimeCall", (runtime_op_to_sexp op) :: List.map imp_expr_to_sexp args)
   in
   imp_expr_to_sexp e
@@ -677,14 +676,13 @@ let imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s : sexp =
     | ImpStmtFor (v, e, s) -> STerm ("ImpStmtFor", [SString (string_of_char_list v); imp_expr_to_sexp e; imp_stmt_to_sexp s])
     | ImpStmtForRange (v, e1, e2, s) -> STerm ("ImpStmtForRange", [SString (string_of_char_list v); imp_expr_to_sexp e1; imp_expr_to_sexp e2; imp_stmt_to_sexp s])
     | ImpStmtIf (e, s1, s2) -> STerm ("ImpStmtIf", [imp_expr_to_sexp e; imp_stmt_to_sexp s1; imp_stmt_to_sexp s2])
-    | ImpStmtReturn None -> STerm ("ImpStmtReturn", [])
-    | ImpStmtReturn (Some e) -> STerm ("ImpStmtReturn", [imp_expr_to_sexp e])
   in
   imp_stmt_to_sexp s
 
-let imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp (ImpFun(vars, s)) : sexp =
+let imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp (ImpFun(vars, s, ret)) : sexp =
   STerm ("ImpFun", [STerm ("ImpFunArgs", List.map (fun x -> SString (string_of_char_list x)) vars);
-                    imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s])
+                    imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s;
+                    STerm ("ImpFunReturn", [SString (string_of_char_list ret)])])
 
 let rec imp_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp ((* ImpLib *) l) : sexp =
   STerm

@@ -38,7 +38,7 @@ Section NNRSimptoImpQcert.
   Fixpoint nnrs_imp_expr_to_imp_qcert (exp: nnrs_imp_expr): imp_qcert_expr :=
     match exp with
     | NNRSimpGetConstant x =>
-      ImpExprVar x
+      ImpExprGetConstant x
     | NNRSimpVar x =>
       ImpExprVar x
     | NNRSimpConst d =>
@@ -114,10 +114,9 @@ Section NNRSimptoImpQcert.
               (fun x => (x, Some (ImpExprRuntimeCall (QcertRuntimeDeref) [ ImpExprVar constants; ImpExprConst (dstring x) ])))
               globals)
              ++ [ (ret, None) ])
-          [ nnrs_imp_stmt_to_imp_qcert globals stmt;
-            ImpStmtReturn (Some (ImpExprVar ret)) ]
+          [ nnrs_imp_stmt_to_imp_qcert globals stmt ]
     in
-    ImpFun [ constants ] body.
+    ImpFun [ constants ] body ret.
 
   (* XXX Danger: string hypotheys on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_top (qname: string) globals (q: nnrs_imp): imp :=

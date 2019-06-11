@@ -233,10 +233,10 @@ Section ImpJsontoJavaScriptAst.
 
   Fixpoint imp_qcert_expr_to_imp_json (exp: imp_qcert_expr) : imp_json_expr :=
     match exp with
+    | ImpExprGetConstant v => ImpExprGetConstant v
     | ImpExprVar v => ImpExprVar v
     | ImpExprConst d => ImpExprConst (data_to_json d)
     | ImpExprOp op el => imp_qcert_op_to_imp_json op (map imp_qcert_expr_to_imp_json el)
-    | ImpExprCall f el => ImpExprCall f (map imp_qcert_expr_to_imp_json el)
     | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     end.
 
@@ -274,13 +274,11 @@ Section ImpJsontoJavaScriptAst.
       ImpStmtIf (imp_qcert_expr_to_imp_json e)
                 (imp_qcert_stmt_to_imp_json avoid s1)
                 (imp_qcert_stmt_to_imp_json avoid s2)
-    | ImpStmtReturn e =>
-      ImpStmtReturn (lift imp_qcert_expr_to_imp_json e)
     end.
 
   Definition imp_qcert_function_to_imp_json (f:imp_qcert_function) : imp_json_function :=
     match f with
-    | ImpFun lv s => ImpFun lv (imp_qcert_stmt_to_imp_json lv s)
+    | ImpFun lv s ret => ImpFun lv (imp_qcert_stmt_to_imp_json lv s) ret
     end.
 
   Fixpoint imp_qcert_to_imp_json (i:imp_qcert) : imp_json :=

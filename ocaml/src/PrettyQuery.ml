@@ -388,10 +388,6 @@ let pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e =
     | QcertCompiler.ImpExprVar v -> fprintf ff "%s"  (Util.string_of_char_list v)
     | QcertCompiler.ImpExprConst d -> fprintf ff "%a" pretty_data d
     | QcertCompiler.ImpExprOp (op,args) -> (pretty_op p sym pretty_imp_expr) ff (op, args)
-    | QcertCompiler.ImpExprCall (f,args) ->
-      fprintf ff "@[<hv 0>%s@[<hv 2>(%a)@]"
-        (Util.string_of_char_list f)
-        (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (pretty_imp_expr p sym)) args
     | QcertCompiler.ImpExprRuntimeCall (op,args) -> (pretty_runtime p sym pretty_imp_expr) ff (op, args)
   in
   pretty_imp_expr p sym ff e
@@ -435,19 +431,21 @@ let pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym ff stmt =
         (pretty_imp_expr p sym) e
         (pretty_imp_stmt p sym) s1
         (pretty_imp_stmt p sym) s2
-    | QcertCompiler.ImpStmtReturn (Some e) ->
-      fprintf ff "@[<hv 2>return@;<1 0>%a;@;<0 -2>@]"
-        (pretty_imp_expr 0 sym) e
-    | QcertCompiler.ImpStmtReturn (None) ->
-      fprintf ff "@[<hv 2>return;@;<0 -2>@]"
   in
   pretty_imp_stmt p sym ff stmt
 
+
+let pretty_imp_return pretty_data pretty_op pretty_runtime p sym ff ret =
+  let pretty_imp_expr p sym ff e = pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e in
+  fprintf ff "@[<hv 2>return@;<1 0>%a;@;<0 -2>@]"
+    (pretty_imp_expr 0 sym) (QcertCompiler.ImpExprVar ret)
+
 let pretty_imp_function pretty_data pretty_op pretty_runtime p sym ff f =
-  let QcertCompiler.ImpFun (args, body) = f in
-  fprintf ff "@[<hv 0>function (@[<hv 2>%a@]) {@;<1 2>%a@ }@]"
+  let QcertCompiler.ImpFun (args, body, ret) = f in
+  fprintf ff "@[<hv 0>function (@[<hv 2>%a@]) {@;<1 2>%a@;<1 2>%a@ }@]"
     (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (fun ff v -> fprintf ff "%s" (Util.string_of_char_list v))) args
     (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) body
+    (pretty_imp_return pretty_data pretty_op pretty_runtime p sym) ret
 
 let pretty_imp_aux pretty_data pretty_op pretty_runtime p sym ff ((* ImpLib *) l) =
   List.iter

@@ -80,7 +80,6 @@ Section NNRSimpEval.
            end
          end.
 
-
     Fixpoint nnrs_imp_stmt_eval
              (σc:bindings) (s:nnrs_imp_stmt) 
              (σ:pd_bindings) : option (pd_bindings)

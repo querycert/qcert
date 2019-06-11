@@ -25,6 +25,7 @@ Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Arith.
+Require Import ZArith.
 Require Import Max.
 Require Import Bool.
 Require Import Peano_dec.
@@ -33,6 +34,7 @@ Require Import Decidable.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import Imp.
+Require Import ImpEval.
 Require Import ImpQcert.
 
 Section ImpQcertEval.
@@ -47,6 +49,69 @@ Section ImpQcertEval.
   (** ** Evaluation Semantics *)
   Section Evaluation.
 
+    Definition imp_qcert_data_to_bool (d:imp_qcert_data) : option bool :=
+      match d with
+      | dbool b => Some b
+      | _ => None
+      end.
+
+    Definition imp_qcert_data_to_Z (d:imp_qcert_data) : option Z :=
+      match d with
+      | dnat n => Some n
+      | _ => None
+      end.
+
+
+    Definition imp_qcert_runtime_eval (rt:imp_qcert_runtime_op) (dl:list imp_qcert_data) : option imp_qcert_data :=
+      match rt with
+      | QcertRuntimeGroupby g kl =>
+        match dl with
+        | (dcoll dl) :: nil =>
+          match group_by_nested_eval_table g kl dl with
+          | Some dl' => Some (dcoll dl')
+          | None => None
+          end
+        | _ => None
+        end
+      | QcertRuntimeEither =>
+        match dl with
+        | (dleft d) :: nil => Some (dbool true)
+        | (dright d) :: nil => Some (dbool false)
+        | _ => None
+        end
+      | QcertRuntimeToLeft =>
+        match dl with
+        | (dleft d) :: nil => Some d
+        | _ => None
+        end
+      | QcertRuntimeToRight =>
+        match dl with
+        | (dright d) :: nil => Some d
+        | _ => None
+        end
+      | QcertRuntimeDeref => (* XXX Not so sure this should be so high-level *)
+        match dl with
+        | d :: nil => Some d
+        | _ => None
+        end
+      end.
+
+    Definition imp_qcert_op_eval (op:imp_qcert_op) (dl:list imp_qcert_data) : option imp_qcert_data :=
+      match op with
+      | QcertOpUnary uop =>
+        match dl with
+        | d :: nil =>
+          unary_op_eval h uop d
+        | _ => None
+        end
+      | QcertOpBinary bop =>
+        match dl with
+        | d1 :: d2 :: nil =>
+          binary_op_eval h bop d1 d2
+        | _ => None
+        end
+      end.
+
     (** Evaluation takes a ImpQcert expression and an environment. It
           returns an optional value. When [None] is returned, it
           denotes an error. An error is always propagated. *)
@@ -54,14 +119,24 @@ Section ImpQcertEval.
     Fixpoint imp_qcert_expr_eval
              (σc:bindings) (σ:pd_bindings) (e:imp_qcert_expr)
     : option data
-      := None. (* XXX TODO XXX *)
-
+      := @imp_expr_eval
+           imp_qcert_data
+           imp_qcert_op
+           imp_qcert_runtime_op
+           imp_qcert_runtime_eval
+           imp_qcert_op_eval
+           σc σ e.
 
     Fixpoint imp_qcert_stmt_eval
-             (σc:bindings) (s:imp_qcert_stmt)
-             (σ:pd_bindings) : option (pd_bindings)
-      := None. (* XXX TODO XXX *)
-
+             (σc:bindings) (σ:pd_bindings) (s:imp_qcert_stmt) : option (pd_bindings)
+      := @imp_stmt_eval
+           imp_qcert_data
+           imp_qcert_op
+           imp_qcert_runtime_op
+           imp_qcert_data_to_bool
+           imp_qcert_runtime_eval
+           imp_qcert_op_eval
+           σc σ s.
 
     Definition imp_qcert_eval (σc:bindings) (q:imp_qcert) : option (option data)
       := let ignore := h in None. (* XXX TODO XXX *)
