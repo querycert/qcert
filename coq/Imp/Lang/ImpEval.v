@@ -35,6 +35,7 @@ Section ImpEval.
   Context {Op: Type}.
   Context {Runtime: Type}.
 
+  Context {DataNormalize: Data -> Data}.
   Context {DataToBool: Data -> option bool}.
   Context {DataToZ: Data -> option Z}.
 
@@ -51,14 +52,15 @@ Section ImpEval.
   Section Evaluation.
     
     Fixpoint imp_expr_eval
-             (σc:rbindings) (σ:pd_rbindings) (e:imp_expr) : option Data
+             (σc:rbindings) (σ:pd_rbindings) (e:imp_expr) {struct e} : option Data
       :=
         match e with
         | ImpExprGetConstant v =>
           edot σc v
         | ImpExprVar v =>
-          olift (fun x => x) (edot σ v)
-        | ImpExprConst d => Some d
+          olift id (lookup equiv_dec σ v)
+        | ImpExprConst d =>
+          Some (DataNormalize d)
         | ImpExprOp op el =>
           let fix lift_map (l : list imp_expr) {struct l} : option (list Data) :=
               match l with
@@ -88,7 +90,7 @@ Section ImpEval.
         end.
 
     Fixpoint imp_stmt_eval
-             (σc:rbindings) (σ:pd_rbindings) (s:imp_stmt) : option pd_rbindings :=
+             (σc:rbindings) (s:imp_stmt) (σ:pd_rbindings) : option pd_rbindings :=
       match s with
       | ImpStmtBlock vl sl =>
         let proc_one_decl c vd :=
@@ -112,14 +114,14 @@ Section ImpEval.
             match c with
             | None => None
             | Some σ' =>
-              imp_stmt_eval σc σ' s
+              imp_stmt_eval σc s σ'
             end
         in
         fold_left proc_one_stmt sl σdeclared
       | ImpStmtAssign v e =>
-        match imp_expr_eval σc σ e with
-        | None => None
-        | Some d => Some ((v, Some d)::σ)
+        match imp_expr_eval σc σ e, lookup string_dec σ v with
+        | Some d, Some _ => Some (update_first string_dec σ v (Some d))
+        | _, _ => None
         end
       | ImpStmtFor v e s => None (* XXX TBD *)
       | ImpStmtForRange v e1 e2 s => None (* XXX TBD *)
@@ -130,8 +132,8 @@ Section ImpEval.
           match DataToBool d with
           | None => None
           | Some b =>
-            if b then imp_stmt_eval σc σ s1
-            else imp_stmt_eval σc σ s2
+            if b then imp_stmt_eval σc s1 σ
+            else imp_stmt_eval σc s2 σ
           end
         end
       end.
