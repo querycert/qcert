@@ -97,7 +97,7 @@ oql-world-tests:
                             -eval-validate -output oql/world$(N).out;))
 oql-world-tests-js:
 	@$(foreach N,$(OQLWORLDNUM), \
-	       $(QCERTCOMP) -source oql -target js oql/world$(N).oql \
+	       $(QCERTCOMP) -source oql -path imp_json  -target js oql/world$(N).oql \
                             -eval-validate -schema oql/world.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -125,7 +125,7 @@ oql-persons-tests:
                             -eval-validate -output oql/persons$(N).out;))
 oql-persons-tests-js:
 	@$(foreach N,$(OQLPERSONSNUM), \
-	       $(QCERTCOMP) -source oql -target js oql/persons$(N).oql \
+	       $(QCERTCOMP) -source oql -path imp_json  -target js oql/persons$(N).oql \
                             -eval-validate -schema oql/persons.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -153,7 +153,7 @@ oql-employees-tests:
                             -eval-validate -output oql/employees$(N).out;))
 oql-employees-tests-js:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
-	       $(QCERTCOMP) -source oql -target js oql/employees$(N).oql \
+	       $(QCERTCOMP) -source oql -path imp_json  -target js oql/employees$(N).oql \
                             -eval-validate -schema oql/employees.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -197,7 +197,7 @@ lambda_nra-persons-tests:
                             -eval-validate -output lambda_nra/persons$(N).out;))
 lambda_nra-persons-tests-js:
 	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
-	       $(QCERTCOMP) -source lambda_nra -target js lambda_nra/persons$(N).lnra \
+	       $(QCERTCOMP) -source lambda_nra -path imp_json  -target js lambda_nra/persons$(N).lnra \
                             -eval-validate -schema lambda_nra/persons.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -241,7 +241,7 @@ camp-world-tests:
                             -eval-validate -output camp/world$(N).out;))
 camp-world-tests-js:
 	@$(foreach N,$(CAMPWORLDNUM), \
-	       $(QCERTCOMP) -source camp -target js camp/world$(N).camp \
+	       $(QCERTCOMP) -source camp -path imp_json  -target js camp/world$(N).camp \
                             -eval-validate -schema camp/world.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -285,7 +285,7 @@ sql-org-tests:
                             -eval-validate -output sql/org$(N).out;))
 sql-org-tests-js:
 	@$(foreach N,$(SQLORGNUM), \
-	       $(QCERTCOMP) -source sql -target js sql/org$(N).sql \
+	       $(QCERTCOMP) -source sql -path imp_json  -target js sql/org$(N).sql \
                             -eval-validate -schema sql/org.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -330,7 +330,7 @@ tech_rule-test-tests:
                             -eval-validate -output tech_rule/test$(N).out;))
 tech_rule-test-tests-js:
 	@$(foreach N,$(TECHRULETESTNUM), \
-	       $(QCERTCOMP) -source tech_rule -target js tech_rule/test$(N).arl \
+	       $(QCERTCOMP) -source tech_rule -path imp_json  -target js tech_rule/test$(N).arl \
                             -eval-validate -schema tech_rule/test.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -371,7 +371,7 @@ designer_rule-test-tests:
                             -eval-validate -output designer_rule/test$(N).out;))
 designer_rule-test-tests-js:
 	@$(foreach N,$(DESIGNERRULETESTNUM), \
-	       $(QCERTCOMP) -source designer_rule -target js designer_rule/test$(N).agg \
+	       $(QCERTCOMP) -source designer_rule -path imp_json  -target js designer_rule/test$(N).agg \
                             -eval-validate -schema designer_rule/test.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \

@@ -224,6 +224,7 @@ MODULES = \
 	NNRSimp/NNRSimpSystem \
 	Imp/Lang/Imp \
 	Imp/Lang/ImpSize \
+	Imp/Lang/ImpEval \
 	Imp/Lang/ImpQcert \
 	Imp/Lang/ImpQcertSize \
 	Imp/Lang/ImpQcertEval \

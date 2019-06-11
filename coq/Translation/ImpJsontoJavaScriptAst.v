@@ -61,7 +61,7 @@ Section ImpJsontoJavaScriptAst.
            l)
     | None => mk_expr_error
     end.
-  
+
   Definition mk_runtime_call (op: imp_json_runtime_op) (el: list expr) :=
     call_runtime (string_of_json_runtime_op op) el.
 
@@ -113,10 +113,10 @@ Section ImpJsontoJavaScriptAst.
 
   Fixpoint imp_json_expr_to_js_ast (exp: imp_json_expr) : expr :=
     match exp with
+    | ImpExprGetConstant v => expr_identifier v
     | ImpExprVar v => expr_identifier v
     | ImpExprConst j => json_to_js_ast j
     | ImpExprOp op el => imp_json_op_to_js_ast op (map imp_json_expr_to_js_ast el)
-    | ImpExprCall f el => call_js_function f (map imp_json_expr_to_js_ast el)
     | ImpExprRuntimeCall rop el => mk_runtime_call rop (map imp_json_expr_to_js_ast el)
     end.
 
@@ -148,15 +148,15 @@ Section ImpJsontoJavaScriptAst.
         (imp_json_expr_to_js_ast e)
         (imp_json_stmt_to_js_ast s1)
         (Some (imp_json_stmt_to_js_ast s2))
-    | ImpStmtReturn eopt =>
-      stat_return (lift imp_json_expr_to_js_ast eopt)
     end.
 
   Definition imp_json_function_to_js_ast (f: imp_function) : list string * funcbody :=
     match f with
-    | ImpFun lv s =>
+    | ImpFun lv s ret =>
+      let body := imp_json_stmt_to_js_ast s in
+      let ret := scope (body :: stat_return (Some (expr_identifier ret)) :: nil) in
       let prog :=
-          prog_intro strictness_true [ element_stat (imp_json_stmt_to_js_ast s)]
+          prog_intro strictness_true [ element_stat ret ]
       in
       (lv, funcbody_intro prog (prog_to_string prog))
     end.

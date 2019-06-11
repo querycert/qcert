@@ -36,10 +36,10 @@ Section ImpSize.
 
   Fixpoint imp_expr_size (e:imp_expr) : nat
     := match e with
+       | ImpExprGetConstant v => 1
        | ImpExprVar v => 1
        | ImpExprConst v => 1
        | ImpExprOp op l => S (List.fold_left (fun acc e => acc + imp_expr_size e ) l 0)
-       | ImpExprCall f args => S (List.fold_left (fun acc e => acc + imp_expr_size e) args 0)
        | ImpExprRuntimeCall f args => S (List.fold_left (fun acc e => acc + imp_expr_size e) args 0)
        end.
 
@@ -63,13 +63,11 @@ Section ImpSize.
            1 + imp_expr_size e1  + imp_expr_size e2  + imp_stmt_size s
          | ImpStmtIf e s1 s2 =>
            1 + imp_expr_size e + imp_stmt_size s1 + imp_stmt_size s2
-         | ImpStmtReturn None => 1
-         | ImpStmtReturn (Some e) => 1 + imp_expr_size e
          end.
 
     Definition imp_function_size (q:imp_function) : nat :=
       match q with
-      | ImpFun args s => imp_stmt_size s
+      | ImpFun args s ret => imp_stmt_size s
       end.
 
     Fixpoint imp_size (q: imp) : nat :=
