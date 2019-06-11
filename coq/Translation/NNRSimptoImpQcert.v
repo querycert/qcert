@@ -27,6 +27,7 @@ Require Import CommonRuntime.
 Require Import NNRSimpRuntime.
 Require Import Imp.
 Require Import ImpQcert.
+Require Import ImpQcertEval.
 
 Section NNRSimptoImpQcert.
   Import ListNotations.
@@ -55,6 +56,29 @@ Section NNRSimptoImpQcert.
       ImpExprRuntimeCall (QcertRuntimeGroupby g fields) [ e' ]
     end.
 
+  Lemma nnrs_imp_expr_to_imp_qcert_correct h (σc:bindings) (σ:pd_bindings) (exp:nnrs_imp_expr) :
+    nnrs_imp_expr_eval h σc σ exp = imp_qcert_expr_eval h σc σ (nnrs_imp_expr_to_imp_qcert exp).
+  Proof.
+    nnrs_imp_expr_cases (induction exp) Case; simpl.
+    - Case "NNRSimpGetConstant"%string.
+      reflexivity.
+    - Case "NNRSimpVar"%string.
+      unfold edot.
+      reflexivity.
+    - Case "NNRSimpConst"%string.
+      reflexivity.
+    - Case "NNRSimpBinop"%string.
+      rewrite <- IHexp1.
+      rewrite <- IHexp2.
+      match_destr. match_destr.
+    - Case "NNRSimpUnop"%string.
+      rewrite <- IHexp.
+      match_destr.
+    - Case "NNRSimpGroupBy"%string.
+      rewrite <- IHexp.
+      match_destr.
+  Qed.
+  
   Fixpoint nnrs_imp_stmt_to_imp_qcert (avoid: list string) (stmt: nnrs_imp_stmt): imp_qcert_stmt :=
     match stmt with
     | NNRSimpSkip =>
@@ -104,6 +128,30 @@ Section NNRSimptoImpQcert.
            [ nnrs_imp_stmt_to_imp_qcert avoid s2 ])
     end.
 
+  Lemma nnrs_imp_stmt_to_imp_qcert_correct h (σc:bindings) (σ:pd_bindings) (avoid:list string) (stmt:nnrs_imp_stmt) :
+    nnrs_imp_stmt_eval h σc stmt σ = imp_qcert_stmt_eval h σc (nnrs_imp_stmt_to_imp_qcert avoid stmt) σ.
+  Proof.
+    revert σ.
+    nnrs_imp_stmt_cases (induction stmt) Case; intros; simpl in *.
+    - Case "NNRSimpSkip"%string.
+      reflexivity.
+    - Case "NNRSimpSeq"%string.
+      simpl; rewrite <- IHstmt1.
+      match_destr; simpl; auto.
+    - Case "NNRSimpAssign"%string.
+      rewrite nnrs_imp_expr_to_imp_qcert_correct.
+      unfold imp_qcert_expr_eval.
+      match_destr.
+    - Case "NNRSimpLet"%string.
+      destruct o; simpl.
+      + unfold imp_qcert_expr_eval.
+        rewrite nnrs_imp_expr_to_imp_qcert_correct.
+        admit.
+      + rewrite IHstmt.
+        admit.
+      
+  Admitted.
+    
   (* XXX Danger: string hypotheys on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_function globals (q: nnrs_imp): imp_function :=
     let constants := "constants"%string in
@@ -118,7 +166,7 @@ Section NNRSimptoImpQcert.
     in
     ImpFun [ constants ] body ret.
 
-  (* XXX Danger: string hypotheys on the encoding of the queries XXX *)
+  (* XXX Danger: string hypothesis on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_top (qname: string) globals (q: nnrs_imp): imp :=
     ImpLib [ ((* qname *)"query"%string, nnrs_imp_to_imp_qcert_function globals q) ].
 

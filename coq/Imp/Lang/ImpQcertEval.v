@@ -49,6 +49,9 @@ Section ImpQcertEval.
   (** ** Evaluation Semantics *)
   Section Evaluation.
 
+    Definition imp_qcert_data_normalize (d:imp_qcert_data) : imp_qcert_data :=
+      normalize_data h d.
+    
     Definition imp_qcert_data_to_bool (d:imp_qcert_data) : option bool :=
       match d with
       | dbool b => Some b
@@ -116,27 +119,29 @@ Section ImpQcertEval.
           returns an optional value. When [None] is returned, it
           denotes an error. An error is always propagated. *)
 
-    Fixpoint imp_qcert_expr_eval
+    Definition imp_qcert_expr_eval
              (σc:bindings) (σ:pd_bindings) (e:imp_qcert_expr)
     : option data
       := @imp_expr_eval
            imp_qcert_data
            imp_qcert_op
            imp_qcert_runtime_op
+           imp_qcert_data_normalize
            imp_qcert_runtime_eval
            imp_qcert_op_eval
            σc σ e.
 
-    Fixpoint imp_qcert_stmt_eval
-             (σc:bindings) (σ:pd_bindings) (s:imp_qcert_stmt) : option (pd_bindings)
+    Definition imp_qcert_stmt_eval
+             (σc:bindings) (s:imp_qcert_stmt) (σ:pd_bindings) : option (pd_bindings)
       := @imp_stmt_eval
            imp_qcert_data
            imp_qcert_op
            imp_qcert_runtime_op
+           imp_qcert_data_normalize
            imp_qcert_data_to_bool
            imp_qcert_runtime_eval
            imp_qcert_op_eval
-           σc σ s.
+           σc s σ.
 
     Definition imp_qcert_eval (σc:bindings) (q:imp_qcert) : option (option data)
       := let ignore := h in None. (* XXX TODO XXX *)
