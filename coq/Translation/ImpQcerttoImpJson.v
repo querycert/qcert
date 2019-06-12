@@ -22,7 +22,9 @@ Require Import Utils.
 Require Import CommonRuntime.
 Require Import Imp.
 Require Import ImpQcert.
+Require Import ImpQcertEval.
 Require Import ImpJson.
+Require Import ImpJsonEval.
 Require Import JsAst.JsNumber.
 Require Import Fresh.
 
@@ -239,6 +241,110 @@ Section ImpJsontoJavaScriptAst.
     | ImpExprOp op el => imp_qcert_op_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     end.
+
+  Section Correctness.
+    Context (h:list(string*string)).
+
+    Definition lift_bindings (env:bindings) : jbindings :=
+      List.map (fun xy => (fst xy, data_to_json (snd xy))) env.
+    Definition lift_pd_bindings (env:pd_bindings) : pd_jbindings :=
+      List.map (fun xy => (fst xy, lift data_to_json (snd xy))) env.
+    Definition lift_result (res:option json) : option data :=
+      lift (json_to_data h) res.
+
+    Lemma imp_qcert_unary_op_to_imp_json_expr_correct
+           (σc:bindings) (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
+      Forall
+        (fun exp : imp_expr =>
+           imp_qcert_expr_eval h σc σ exp =
+           lift_result
+             (imp_json_expr_eval
+                (lift_bindings σc)
+                (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json exp))) el -> 
+      imp_qcert_expr_eval h σc σ (ImpExprOp (QcertOpUnary u) el) =
+      lift_result
+        (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ)
+                            (imp_qcert_unary_op_to_imp_json u (map imp_qcert_expr_to_imp_json el))).
+    Proof.
+      intros.
+      unary_op_cases (destruct u) Case.
+      - Case "OpIdentity"%string.
+        Opaque lift_result lift_bindings lift_pd_bindings.
+        simpl.
+    Admitted.
+
+    Lemma imp_qcert_binary_op_to_imp_json_expr_correct
+           (σc:bindings) (σ:pd_bindings) (b:binary_op) (el:list imp_expr) :
+      Forall
+        (fun exp : imp_expr =>
+           imp_qcert_expr_eval h σc σ exp =
+           lift_result
+             (imp_json_expr_eval
+                (lift_bindings σc)
+                (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json exp))) el -> 
+      imp_qcert_expr_eval h σc σ (ImpExprOp (QcertOpBinary b) el) =
+      lift_result
+        (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ)
+                            (imp_qcert_binary_op_to_imp_json b (map imp_qcert_expr_to_imp_json el))).
+    Proof.
+    Admitted.
+
+    Lemma imp_qcert_runtime_call_to_imp_json_expr_correct
+           (σc:bindings) (σ:pd_bindings) (rt:imp_qcert_runtime_op) (el:list imp_expr) :
+      Forall
+        (fun exp : imp_expr =>
+           imp_qcert_expr_eval h σc σ exp =
+           lift_result
+             (imp_json_expr_eval
+                (lift_bindings σc)
+                (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json exp))) el -> 
+      imp_qcert_expr_eval h σc σ (ImpExprRuntimeCall rt el) =
+      lift_result
+        (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ)
+                            (imp_qcert_runtime_call_to_imp_json rt (map imp_qcert_expr_to_imp_json el))).
+    Proof.
+    Admitted.
+
+    Lemma imp_qcert_op_to_imp_json_correct
+          (σc:bindings) (σ:pd_bindings) (op:imp_qcert_op) (el:list imp_expr) :
+      Forall
+        (fun exp : imp_expr =>
+           imp_qcert_expr_eval h σc σ exp =
+           lift_result
+             (imp_json_expr_eval
+                (lift_bindings σc)
+                (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json exp))) el -> 
+      imp_qcert_expr_eval h σc σ (ImpExprOp op el) =
+      lift_result
+        (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ)
+                            (imp_qcert_op_to_imp_json op (map imp_qcert_expr_to_imp_json el))).
+    Proof.
+      intros.
+      destruct op.
+      + apply imp_qcert_unary_op_to_imp_json_expr_correct; assumption.
+      + apply imp_qcert_binary_op_to_imp_json_expr_correct; assumption.
+    Qed.
+     
+    Lemma imp_qcert_expr_to_imp_json_expr_correct (σc:bindings) (σ:pd_bindings) (exp:imp_qcert_expr) :
+      imp_qcert_expr_eval h σc σ exp =
+      lift_result
+        (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ)
+                            (imp_qcert_expr_to_imp_json exp)).
+    Proof.
+      imp_expr_cases (induction exp) Case.
+      - Case "ImpExprGetConstant"%string.
+        admit. (* XXX Needs lift/unlift roundtrip property over edot *)
+      - Case "ImpExprVar"%string.
+        admit. (* XXX Needs lift/unlift roundtrip property over lookup *)
+      - Case "ImpExprConst"%string.
+        admit. (* XXX Needs json_normalize with lift/unlift roundtrip property *)
+      - Case "ImpExprOp"%string.
+        apply imp_qcert_op_to_imp_json_correct; assumption.
+      - Case "ImpExprRuntimeCall"%string.
+        apply imp_qcert_runtime_call_to_imp_json_expr_correct; assumption.
+    Admitted.
+
+  End Correctness.
 
   Fixpoint imp_qcert_stmt_to_imp_json (avoid: list string) (stmt: imp_qcert_stmt): imp_json_stmt :=
     match stmt with

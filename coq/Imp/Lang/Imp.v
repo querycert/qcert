@@ -40,6 +40,8 @@ Section Imp.
 
     Definition var := string.
 
+    Unset Elimination Schemes.
+  
     Inductive imp_expr :=
     | ImpExprGetConstant : var -> imp_expr                       (**r global variable lookup ([$v])*)
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
@@ -48,6 +50,8 @@ Section Imp.
     | ImpExprRuntimeCall : Runtime -> list imp_expr -> imp_expr  (**r runtime function call *)
   (*| ImpExprIf : imp_expr -> imp_expr -> imp_expr -> imp_expr *)(* XXX Useful? Used in Qcert JS runtime *)
     .
+
+    Set Elimination Schemes.
 
     Inductive imp_stmt :=
     | ImpStmtBlock : list (var * option imp_expr) -> list imp_stmt -> imp_stmt (**r block ([[{let x=e₁; let x=e₂; s₁; s₂}]]) *)
@@ -67,6 +71,67 @@ Section Imp.
     Inductive imp :=
     | ImpLib : list (string * imp_function) -> imp.
 
+    Section RectInd.
+      (** Induction principles used as backbone for inductive proofs on imp *)
+      Definition imp_expr_rect (P : imp_expr -> Type)
+                 (fgetconstant : forall v : string, P (ImpExprGetConstant v))
+                 (fvar : forall v : string, P (ImpExprVar v))
+                 (fconst : forall d : Data, P (ImpExprConst d))
+                 (fop : forall op : Op, forall el : list imp_expr,
+                       Forallt P el -> P (ImpExprOp op el))
+                 (fruntime : forall rt : Runtime, forall el : list imp_expr,
+                       Forallt P el -> P (ImpExprRuntimeCall rt el))
+        :=
+          fix F (e : imp_expr) : P e :=
+            match e as e0 return (P e0) with
+            | ImpExprGetConstant v => fgetconstant v
+            | ImpExprVar v => fvar v
+            | ImpExprConst d => fconst d
+            | ImpExprOp op el =>
+              fop op el ((fix F2 (c : list imp_expr) : Forallt P c :=
+                            match c as c0 with
+                            | nil => Forallt_nil _
+                            | cons d c0 => @Forallt_cons _ P d c0 (F d) (F2 c0)
+                            end) el)
+            | ImpExprRuntimeCall rt el =>
+              fruntime rt el ((fix F3 (c : list imp_expr) : Forallt P c :=
+                                 match c as c0 with
+                                 | nil => Forallt_nil _
+                                 | cons d c0 => @Forallt_cons _ P d c0 (F d) (F3 c0)
+                                 end) el)
+            end.
+
+      Definition imp_expr_ind (P : imp_expr -> Prop)
+                 (fgetconstant : forall v : string, P (ImpExprGetConstant v))
+                 (fvar : forall v : string, P (ImpExprVar v))
+                 (fconst : forall d : Data, P (ImpExprConst d))
+                 (fop : forall op : Op, forall el : list imp_expr,
+                       Forall P el -> P (ImpExprOp op el))
+                 (fruntime : forall rt : Runtime, forall el : list imp_expr,
+                       Forall P el -> P (ImpExprRuntimeCall rt el))
+        :=
+          fix F (e : imp_expr) : P e :=
+            match e as e0 return (P e0) with
+            | ImpExprGetConstant v => fgetconstant v
+            | ImpExprVar v => fvar v
+            | ImpExprConst d => fconst d
+            | ImpExprOp op el =>
+              fop op el ((fix F2 (c : list imp_expr) : Forall P c :=
+                            match c as c0 with
+                            | nil => Forall_nil _
+                            | cons d c0 => @Forall_cons _ P d c0 (F d) (F2 c0)
+                            end) el)
+            | ImpExprRuntimeCall rt el =>
+              fruntime rt el ((fix F3 (c : list imp_expr) : Forall P c :=
+                                 match c as c0 with
+                                 | nil => Forall_nil _
+                                 | cons d c0 => @Forall_cons _ P d c0 (F d) (F3 c0)
+                                 end) el)
+            end.
+
+      Definition imp_expr_rec (P:imp_expr->Set) := imp_expr_rect P.
+  
+    End RectInd.
   End Syntax.
 
   (* Section dec. *)
@@ -112,10 +177,11 @@ End Imp.
 
 Tactic Notation "imp_expr_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "ImpExprGet"%string
+  [ Case_aux c "ImpExprGetConstant"%string
   | Case_aux c "ImpExprVar"%string
   | Case_aux c "ImpExprConst"%string
-  | Case_aux c "ImpExprOp"%string].
+  | Case_aux c "ImpExprOp"%string
+  | Case_aux c "ImpExprRuntimeCall"%string].
 
 Tactic Notation "imp_stmt_cases" tactic(first) ident(c) :=
   first;

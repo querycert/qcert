@@ -138,7 +138,7 @@ Section CompEval.
     (* Language: imp_json *)
     (* XXX Is this really what we want to wrap/unwrap in data? *)
     Definition eval_imp_json (q:imp_json) (cenv: bindings) : option data :=
-      let jenv := List.map (fun xy => (fst xy, data_to_js (snd xy))) cenv in
+      let jenv := List.map (fun xy => (fst xy, data_to_json (snd xy))) cenv in
       lift (json_to_data h) (ImpJsonEval.imp_json_eval_top jenv q).
 
     (* Language: nnrcmr *)
