@@ -63,7 +63,6 @@ Section ImpEval.
   
   (** ** Evaluation Semantics *)
   Section Evaluation.
-    
     Fixpoint imp_expr_eval
              (σc:rbindings) (σ:pd_rbindings) (e:imp_expr) {struct e} : option Data
       :=
@@ -71,35 +70,13 @@ Section ImpEval.
         | ImpExprGetConstant v =>
           edot σc v
         | ImpExprVar v =>
-          olift id (lookup equiv_dec σ v)
+          olift (fun x => x) (lookup equiv_dec σ v)
         | ImpExprConst d =>
           Some (DataNormalize d)
         | ImpExprOp op el =>
-          let fix lift_map (l : list imp_expr) {struct l} : option (list Data) :=
-              match l with
-              | nil => Some nil
-              | x :: t =>
-                match imp_expr_eval σc σ x with
-                | Some x' => lift (fun t' : list Data => x' :: t') (lift_map t)
-                | None => None
-                end
-              end
-          in
-          let x := lift_map el in
-          olift (OpEval op) x
+          olift (OpEval op) (lift_map (fun x => x) (map (imp_expr_eval σc σ) el))
         | ImpExprRuntimeCall rt el =>
-          let fix lift_map (l : list imp_expr) {struct l} : option (list Data) :=
-              match l with
-              | nil => Some nil
-              | x :: t =>
-                match imp_expr_eval σc σ x with
-                | Some x' => lift (fun t' : list Data => x' :: t') (lift_map t)
-                | None => None
-                end
-              end
-          in
-          let x := lift_map el in
-          olift (RuntimeEval rt) x
+          olift (RuntimeEval rt) (lift_map (fun x => x) (map (imp_expr_eval σc σ) el))
         end.
 
     Fixpoint imp_stmt_eval
