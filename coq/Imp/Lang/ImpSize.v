@@ -36,6 +36,7 @@ Section ImpSize.
 
   Fixpoint imp_expr_size (e:imp_expr) : nat
     := match e with
+       | ImpExprError v => 1
        | ImpExprGetConstant v => 1
        | ImpExprVar v => 1
        | ImpExprConst v => 1

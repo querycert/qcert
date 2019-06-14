@@ -43,6 +43,7 @@ Section Imp.
     Unset Elimination Schemes.
   
     Inductive imp_expr :=
+    | ImpExprError : string -> imp_expr                          (**r raises an error *)
     | ImpExprGetConstant : var -> imp_expr                       (**r global variable lookup ([$v])*)
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
     | ImpExprConst : Data -> imp_expr                            (**r constant data ([d]) *)
@@ -74,6 +75,7 @@ Section Imp.
     Section RectInd.
       (** Induction principles used as backbone for inductive proofs on imp *)
       Definition imp_expr_rect (P : imp_expr -> Type)
+                 (ferror : forall v : string, P (ImpExprError v))
                  (fgetconstant : forall v : string, P (ImpExprGetConstant v))
                  (fvar : forall v : string, P (ImpExprVar v))
                  (fconst : forall d : Data, P (ImpExprConst d))
@@ -84,6 +86,7 @@ Section Imp.
         :=
           fix F (e : imp_expr) : P e :=
             match e as e0 return (P e0) with
+            | ImpExprError msg => ferror msg
             | ImpExprGetConstant v => fgetconstant v
             | ImpExprVar v => fvar v
             | ImpExprConst d => fconst d
@@ -102,6 +105,7 @@ Section Imp.
             end.
 
       Definition imp_expr_ind (P : imp_expr -> Prop)
+                 (ferror : forall v : string, P (ImpExprError v))
                  (fgetconstant : forall v : string, P (ImpExprGetConstant v))
                  (fvar : forall v : string, P (ImpExprVar v))
                  (fconst : forall d : Data, P (ImpExprConst d))
@@ -112,6 +116,7 @@ Section Imp.
         :=
           fix F (e : imp_expr) : P e :=
             match e as e0 return (P e0) with
+            | ImpExprError msg => ferror msg
             | ImpExprGetConstant v => fgetconstant v
             | ImpExprVar v => fvar v
             | ImpExprConst d => fconst d
@@ -177,7 +182,8 @@ End Imp.
 
 Tactic Notation "imp_expr_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "ImpExprGetConstant"%string
+  [ Case_aux c "ImpExprError"%string
+  | Case_aux c "ImpExprGetConstant"%string
   | Case_aux c "ImpExprVar"%string
   | Case_aux c "ImpExprConst"%string
   | Case_aux c "ImpExprOp"%string

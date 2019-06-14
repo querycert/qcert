@@ -67,6 +67,8 @@ Section ImpEval.
              (σc:rbindings) (σ:pd_rbindings) (e:imp_expr) {struct e} : option Data
       :=
         match e with
+        | ImpExprError msg =>
+          None
         | ImpExprGetConstant v =>
           edot σc v
         | ImpExprVar v =>
