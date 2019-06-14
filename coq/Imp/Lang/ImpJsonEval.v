@@ -194,7 +194,7 @@ Section ImpJsonEval.
 
     Definition jbindings := list (string * imp_json_data).
     Definition pd_jbindings := list (string * option imp_json_data).
-    
+
     Definition imp_json_expr_eval
              (σc:jbindings) (σ:pd_jbindings) (e:imp_json_expr)
     : option imp_json_data

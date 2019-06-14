@@ -31,14 +31,15 @@ Require Import Fresh.
 Section ImpJsontoJavaScriptAst.
   Import ListNotations.
 
-  Context {fruntime:foreign_runtime}.
-  Context {ftojson:foreign_to_JSON}.
-
   (** Translation *)
 
+  Context {fruntime:foreign_runtime}.
+  Context {ftjson:foreign_to_JSON}.
 
+(*Definition mk_imp_json_expr_error msg : imp_json_expr :=
+    ImpExprConst (jstring msg). *)
   Definition mk_imp_json_expr_error msg : imp_json_expr :=
-    ImpExprConst (jstring msg).
+    ImpExprError msg. (* XXX Error should eval to None if we want to prove stuffs! *)
   Definition mk_imp_json_op op el : imp_json_expr := ImpExprOp op el.
   Definition mk_imp_json_runtime_call op el : imp_json_expr := ImpExprRuntimeCall op el.
 
@@ -235,9 +236,10 @@ Section ImpJsontoJavaScriptAst.
 
   Fixpoint imp_qcert_expr_to_imp_json (exp: imp_qcert_expr) : imp_json_expr :=
     match exp with
+    | ImpExprError msg => ImpExprError msg
     | ImpExprGetConstant v => ImpExprGetConstant v
     | ImpExprVar v => ImpExprVar v
-    | ImpExprConst d => ImpExprConst (data_to_json d)
+    | ImpExprConst d => ImpExprConst (@data_to_json _ _ d)
     | ImpExprOp op el => imp_qcert_op_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     end.
@@ -251,6 +253,29 @@ Section ImpJsontoJavaScriptAst.
       List.map (fun xy => (fst xy, lift data_to_json (snd xy))) env.
     Definition lift_result (res:option json) : option data :=
       lift (json_to_data h) res.
+
+    Lemma lift_map_lift_result {A} (g:A -> option json) l :
+      lift_map (fun x => lift_result (g x)) l = lift (map (json_to_data h)) (lift_map g l).
+    Proof.
+      unfold lift_result.
+      apply lift_map_lift.
+    Qed.
+
+    Lemma test 
+          (σc:bindings) (σ:pd_bindings) (el:list imp_expr) :
+      Forall
+        (fun exp : imp_expr =>
+           imp_qcert_expr_eval h σc σ exp =
+           lift_result
+             (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json exp))) el -> 
+      map (fun x : imp_qcert_expr => imp_qcert_expr_eval h σc σ x) el =
+      map (fun x : imp_qcert_expr => lift_result
+             (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json x))) el.
+    Proof.
+      intros.
+      apply map_eq.
+      assumption.
+    Qed.
 
     Lemma imp_qcert_unary_op_to_imp_json_expr_correct
            (σc:bindings) (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
@@ -267,10 +292,20 @@ Section ImpJsontoJavaScriptAst.
                             (imp_qcert_unary_op_to_imp_json u (map imp_qcert_expr_to_imp_json el))).
     Proof.
       intros.
-      unary_op_cases (destruct u) Case.
+      unary_op_cases (destruct u) Case; simpl.
       - Case "OpIdentity"%string.
-        Opaque lift_result lift_bindings lift_pd_bindings.
-        simpl.
+        simpl; unfold lift_result, lift, olift.
+        rewrite test; [|assumption]; clear H.
+        destruct el; simpl; [reflexivity|]; destruct el; simpl.
+        + simpl; unfold lift_result, lift, olift.
+          destruct (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+            try reflexivity.
+        + unfold olift, lift_result, lift; simpl.
+          destruct (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i)); try reflexivity.
+          destruct (imp_json_expr_eval (lift_bindings σc) (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i0)); try reflexivity.
+          rewrite lift_map_map_fusion.
+          admit.
+      - admit.
     Admitted.
 
     Lemma imp_qcert_binary_op_to_imp_json_expr_correct
@@ -332,6 +367,8 @@ Section ImpJsontoJavaScriptAst.
                             (imp_qcert_expr_to_imp_json exp)).
     Proof.
       imp_expr_cases (induction exp) Case.
+      - Case "ImpExprError"%string.
+        reflexivity.
       - Case "ImpExprGetConstant"%string.
         admit. (* XXX Needs lift/unlift roundtrip property over edot *)
       - Case "ImpExprVar"%string.
@@ -398,3 +435,4 @@ Section ImpJsontoJavaScriptAst.
     end.
 
 End ImpJsontoJavaScriptAst.
+

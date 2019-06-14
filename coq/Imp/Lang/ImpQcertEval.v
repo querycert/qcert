@@ -45,6 +45,7 @@ Section ImpQcertEval.
 
   (* Local Open Scope imp_qcert. *)
   Local Open Scope string.
+  Import ListNotations.
 
   Section EvalInstantiation.
     (* Instantiate Imp for Qcert data *)
@@ -102,13 +103,13 @@ Section ImpQcertEval.
       match op with
       | QcertOpUnary uop =>
         match dl with
-        | d :: nil =>
+        | [d] =>
           unary_op_eval h uop d
         | _ => None
         end
       | QcertOpBinary bop =>
         match dl with
-        | d1 :: d2 :: nil =>
+        | [d1;d2] =>
           binary_op_eval h bop d1 d2
         | _ => None
         end
