@@ -79,6 +79,8 @@ Module QOQL(runtime:CompilerRuntime).
     := OQLSugar.OArrow.
   Definition ostruct : list (String.string * expr) -> expr 
     := OQLSugar.OStruct.
+  Definition onew : String.string -> list (String.string * expr) -> expr 
+    := OQLSugar.ONew.
 
   Definition tableify : expr -> expr
     := OQLSugar.tableify.

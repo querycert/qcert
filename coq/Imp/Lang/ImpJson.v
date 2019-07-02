@@ -74,6 +74,7 @@ Section Syntax.
   | JSONRuntimeBmax : imp_json_runtime_op
   | JSONRuntimeBnth : imp_json_runtime_op
   | JSONRuntimeContains : imp_json_runtime_op
+  | JSONRuntimeStringJoin : imp_json_runtime_op
   | JSONRuntimeToString : imp_json_runtime_op
   | JSONRuntimeGenerateText : imp_json_runtime_op
   .
@@ -133,6 +134,7 @@ Section Util.
     | JSONRuntimeBmax => "bmax"
     | JSONRuntimeBnth => "bnth"
     | JSONRuntimeContains => "contains"
+    | JSONRuntimeStringJoin => "stringJoin"
     | JSONRuntimeToString => "toString"
     | JSONRuntimeGenerateText => "generateText"
     end.

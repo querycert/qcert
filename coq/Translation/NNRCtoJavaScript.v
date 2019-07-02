@@ -328,6 +328,7 @@ Section NNRCtoJavaScript.
                      | OpBagNth => "bnth(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpStringConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
+                     | OpStringJoin => "stringJoin(" ++ e1 ++ ", " ++ e2 ++ ")"
                      | OpNatBinary b => nat_barithToJs b e1 e2
                      | OpFloatBinary b => mumber_barithToJs b e1 e2
                      | OpFloatCompare b => mumber_bcompareToJs b e1 e2

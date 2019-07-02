@@ -1,0 +1,2 @@
+/* toString */
+toString(new Customer( cid: 1, age: 32, name: "John" ))

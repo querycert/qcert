@@ -37,7 +37,6 @@ Section NNRSimptoJavaScriptAst.
 
   Context {fruntime:foreign_runtime}.
   Context {ftoajavascript:foreign_to_ajavascript}.
-  Context {ftojson:foreign_to_JSON}.
 
   Definition prog_to_string (x: prog) : string := "". (* XXX TODO: prog_to_string XXX *)
 
@@ -143,6 +142,9 @@ Section NNRSimptoJavaScriptAst.
 
   Definition runtime_contains e1 e2 :=
     call_runtime "contains" [ e1; e2 ].
+
+  Definition runtime_string_join e1 e2 :=
+    call_runtime "stringJoin" [ e1; e2 ].
 
   Definition runtime_deref e s :=
     call_runtime "deref" [ e; expr_literal (literal_string s) ].
@@ -308,6 +310,8 @@ Section NNRSimptoJavaScriptAst.
       runtime_contains e1' e2'
     | OpStringConcat =>
       expr_binary_op e1' binary_op_add e2'
+    | OpStringJoin =>
+      runtime_string_join e1' e2'
     | OpNatBinary opa =>
       match opa with
       | NatPlus =>

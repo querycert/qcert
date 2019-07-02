@@ -104,6 +104,12 @@ Section DataLift.
   Definition rondcoll2 (f:(list data -> list data -> list data)) (d1 d2:data) : option data :=
     lift dcoll (ondcoll2 f d1 d2).
 
+  Definition ondstring {A} (f : string -> A) (d : data) :=
+    match d with
+    | dstring n => Some (f n)
+    | _ => None
+    end.
+
   Definition ondnat {A} (f : Z -> A) (d : data) :=
     match d with
     | dnat n => Some (f n)

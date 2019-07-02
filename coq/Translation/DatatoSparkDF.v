@@ -32,7 +32,6 @@ Section DatatoSparkDF.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
-  Context {ftjson:foreign_to_JSON}.
 
   Definition data_to_blob (d: data): string :=
     dataToJS quotel_double d.
@@ -161,7 +160,6 @@ Section DatatoSparkDF.
    *)
   
   (* Added call for integration within the compiler interface *)
-  Context {ftojson:foreign_to_JSON}.
   Definition data_to_sjson (d:data) (r:rtype) : option string :=
     (* Some (typed_data_to_json_string d r) *)
     lift (jsonToJS """") (typed_data_to_json d (proj1_sig r)).

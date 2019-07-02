@@ -186,7 +186,7 @@ Section TDNNRCBase.
       elim H2; clear H2; intros.
       rewrite H2; clear H2.
       inversion H3; clear H3; intros; subst.
-      elim (@typed_unary_op_yields_typed_data _ _ _ _ _ _ τ₁ τout _ u H5 H); intros.
+      elim (@typed_unary_op_yields_typed_data _ _ _ _ _ _ _ τ₁ τout _ u H5 H); intros.
       elim H2; clear H2; intros.
       exists (Dlocal x); simpl.
       split.

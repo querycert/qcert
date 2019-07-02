@@ -526,3 +526,6 @@ function substring(v, start, len) {
 function substringNoLength(v, start) {
     return v.substring(start);
 }
+function stringJoin(sep, v) {
+    return v.join(sep);
+}

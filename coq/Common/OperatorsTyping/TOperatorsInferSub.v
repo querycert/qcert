@@ -124,6 +124,14 @@ Section TOperatorsInferSub.
         | left _, left _ => Some (String, String, String)
         | _, _ => None
         end
+      | OpStringJoin =>
+        match subtype_dec τ₁ String with
+        | left _ =>
+          if subtype_dec τ₂ (Coll String)
+          then Some (String, String, Coll String)
+          else None
+        | _ => None
+        end
       | OpNatBinary _ =>
         match subtype_dec τ₁ Nat, subtype_dec τ₂ Nat with
         | left _, left _ => Some (Nat, Nat, Nat)

@@ -168,6 +168,7 @@ Section ImpJsontoJavaScriptAst.
       | OpBagNth => mk_imp_json_runtime_call JSONRuntimeBnth [e1; e2]
       | OpContains => mk_imp_json_runtime_call JSONRuntimeContains [e1; e2]
       | OpStringConcat => mk_imp_json_op JSONOpAddString el
+      | OpStringJoin => mk_imp_json_runtime_call JSONRuntimeStringJoin [e1; e2]
       | OpNatBinary opa =>
         match opa with
         | NatPlus => mk_imp_json_runtime_call JSONRuntimeNatPlus [e1; e2]
