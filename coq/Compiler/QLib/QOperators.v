@@ -191,6 +191,8 @@ Module QOperators(runtime:CompilerRuntime).
       := BinaryOperators.OpContains.
     Definition opstringconcat : op 
       := BinaryOperators.OpStringConcat.
+    Definition opstringjoin : op 
+      := BinaryOperators.OpStringJoin.
 
     (* Note that foreign operators should be encapuslated and 
        exported as part of the model *)

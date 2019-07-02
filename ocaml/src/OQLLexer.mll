@@ -37,6 +37,7 @@
 	  "or", OR;
 	  "and", AND;
 	  (* Constructors *)
+	  "new", NEW;
 	  "struct", STRUCT;
 	  "bag", BAG;
 	  (* Data *)

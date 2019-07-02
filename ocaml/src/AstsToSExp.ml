@@ -166,6 +166,7 @@ let binary_op_to_sexp (b:binary_op) : sexp =
   | OpBagNth -> STerm ("OpBagNth",[])
   | OpContains -> STerm ("OpContains",[])
   | OpStringConcat -> STerm ("OpStringConcat",[])
+  | OpStringJoin -> STerm ("OpStringJoin",[])
   | OpForeignBinary fbop -> SString (PrettyCommon.string_of_foreign_binary_op (Obj.magic fbop))
   end
 
@@ -192,6 +193,7 @@ let sexp_to_binary_op (se:sexp) : binary_op =
   | STerm ("OpBagNth",[]) -> OpBagNth
   | STerm ("OpContains",[]) -> OpContains
   | STerm ("OpStringConcat",[]) -> OpStringConcat
+  | STerm ("OpStringJoin",[]) -> OpStringJoin
   | SString fbop -> OpForeignBinary (Obj.magic (PrettyCommon.foreign_binary_op_of_string fbop))
   (* WARNING: Those are not printed, only parsed *)
   | STerm ("OpTimeAs",[]) -> Enhanced.Ops.Binary.coq_OpTimeAs

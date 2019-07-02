@@ -91,12 +91,22 @@ Defined.
     destruct op. 
   Defined.
 
+  Program Instance trivial_foreign_to_JSON : foreign_to_JSON
+    := mk_foreign_to_JSON trivial_foreign_data _ _.
+  Next Obligation.
+    exact None.
+  Defined.
+  Next Obligation.
+     destruct fd. 
+  Defined.
+
   Instance trivial_foreign_runtime :
     foreign_runtime
   := mk_foreign_runtime
        trivial_foreign_data
        trivial_foreign_unary_op
-       trivial_foreign_binary_op.
+       trivial_foreign_binary_op
+       trivial_foreign_to_JSON.
 
   Program Instance trivial_foreign_type : foreign_type
     := mk_foreign_type Empty_set _ _ _ _ _ _ _.
@@ -268,15 +278,6 @@ Defined.
     exact "TRIVIAL MODEL DOES NOT SUPPORT FOREIGN TYPES"%string.
   Defined.
   
-  Program Instance trivial_foreign_to_JSON : foreign_to_JSON
-    := mk_foreign_to_JSON trivial_foreign_data _ _.
-  Next Obligation.
-    exact None.
-  Defined.
-  Next Obligation.
-     destruct fd. 
-  Defined.
-
   Program Instance trivial_foreign_type_to_JSON : foreign_type_to_JSON
     := mk_foreign_type_to_JSON trivial_foreign_type _ _.
   Next Obligation.

@@ -744,6 +744,7 @@ let string_of_binary_op b =
   | QcertCompiler.OpBagNth -> "anth"
   | QcertCompiler.OpContains -> "acontains"
   | QcertCompiler.OpStringConcat -> "asconcat"
+  | QcertCompiler.OpStringJoin -> "asjoin"
   | QcertCompiler.OpForeignBinary fb -> string_of_foreign_binary_op (Obj.magic fb)
   end
 
@@ -766,6 +767,7 @@ let pretty_binary_op p sym callb ff b a1 a2 =
   | QcertCompiler.OpBagNth -> pretty_infix_exp p 20 sym callb ("{nth}",5) ff a1 a2
   | QcertCompiler.OpContains -> pretty_infix_exp p 16 sym callb sym.sin ff a1 a2
   | QcertCompiler.OpStringConcat -> pretty_infix_exp p 18 sym callb ("^",1) ff a1 a2
+  | QcertCompiler.OpStringJoin -> pretty_infix_exp p 16 sym callb ("{join}",5) ff a1 a2
   | QcertCompiler.OpForeignBinary fb -> pretty_foreign_binary_op p sym callb ff (Obj.magic fb) a1 a2
   end
 

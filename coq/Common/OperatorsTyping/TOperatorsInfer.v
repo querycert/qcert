@@ -98,10 +98,10 @@ Section TOperatorsInfer.
               | [H: ` _ = String₀ |- _ ] => apply String_canon in H
               | [H: ` _ = Coll₀ ?A |- _] =>
                 match A with
+                |  String₀  => apply Coll_String_inside in H
                 |  ` _  => apply Coll_canon in H
                 | _ => destruct (Coll_inside _ _ H); subst; apply Coll_canon in H
                 end
-                  
               | [H: ?a = ?a |- _ ] => clear H
               | [H: ?a = ?b |- _ ] => rewrite H in *
               | [H:binary_op_type _ _ _ _ |- _ ] => inversion H; clear H
@@ -154,6 +154,11 @@ Section TOperatorsInfer.
       | OpStringConcat =>
         match (`τ₁, `τ₂) with
         | (String₀, String₀) => Some String
+        | (_, _) => None
+        end
+      | OpStringJoin =>
+        match (`τ₁, `τ₂) with
+        | (String₀, Coll₀ String₀) => Some String
         | (_, _) => None
         end
       | OpNatBinary _ =>

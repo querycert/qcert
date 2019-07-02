@@ -36,6 +36,9 @@ Section OQLSugar.
       fold_right proc_one init_rec rest
     end.
 
+  Definition ONew (class:string) (el:list (string * oql_expr)) :=
+    OUnop (OpBrand (class::nil)) (OStruct el).
+  
   Definition ODot (s:string) (e:oql_expr) := OUnop (OpDot s) e.
   Definition OArrow (s:string) (e:oql_expr) := OUnop (OpDot s) (OUnop OpUnbrand e).
   

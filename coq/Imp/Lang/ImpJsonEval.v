@@ -184,6 +184,7 @@ Section ImpJsonEval.
       | JSONRuntimeContains => None
       | JSONRuntimeToString => None
       | JSONRuntimeGenerateText => None
+      | JSONRuntimeStringJoin => None
       end.
 
     Definition imp_json_op_eval (op:imp_json_op) (dl:list imp_json_data) : option imp_json_data :=

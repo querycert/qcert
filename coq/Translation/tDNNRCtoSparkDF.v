@@ -288,6 +288,7 @@ Section tDNNRCtoSparkDF.
     | OpBagNth => prefix "bagNth"
     | OpContains => prefix "AContains" (* left argument is the element, right element is the collection *)
     | OpStringConcat => infix "+" (* string concat *)
+    | OpStringJoin => prefix "AStringJoin" (* left argument is the element, right element is the collection *)
     | OpNatBinary NatDiv => infix "/"
     | OpNatBinary NatMax => infix "max"
     | OpNatBinary NatMin => infix "min"

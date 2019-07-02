@@ -837,6 +837,13 @@ Section other.
     simpl. inversion H; reflexivity.
   Defined.
 
+  Lemma Coll_String_inside (τ₁:rtype) :
+    (proj1_sig τ₁) = Coll₀ String₀ ->
+    τ₁ = Coll String.
+  Proof.
+    intros; apply rtype_fequal; auto.
+  Defined.
+
   Lemma map_rtype_nil x0:
     map (fun x2 : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
            (fst x2, proj1_sig (snd x2))) x0 = nil <-> x0 = nil.
@@ -882,6 +889,13 @@ Section other.
 
   Lemma  Coll_canon x pf:
     (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) (Coll₀ x) pf) = Coll (exist _ x pf).
+  Proof.
+    apply rtype_fequal.
+    simpl; trivial.
+  Qed.
+
+  Lemma  Coll_String_canon pf:
+    (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) (Coll₀ String₀) pf) = Coll String.
   Proof.
     apply rtype_fequal.
     simpl; trivial.

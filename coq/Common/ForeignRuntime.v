@@ -23,5 +23,6 @@ Class foreign_runtime : Type
          foreign_runtime_data :> foreign_data
          ; foreign_runtime_unary_op :> foreign_unary_op
          ; foreign_runtime_binary_op :> foreign_binary_op
+         ; foreign_runtime_tojson :> foreign_to_JSON
        }.
 

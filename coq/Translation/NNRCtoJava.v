@@ -379,6 +379,7 @@ Section NNRCtoJava.
                      | OpBagNth =>  mk_java_binary_op0 "bag_nth" e1 e2
                      | OpContains =>  mk_java_binary_op0 "contains" e1 e2
                      | OpStringConcat => mk_java_binary_op0 "stringConcat" e1 e2
+                     | OpStringJoin => mk_java_binary_op0 "stringJoin" e1 e2
                      | OpNatBinary b => mk_java_binary_op0 (nat_barithToJavaMethod b) e1 e2
                      | OpFloatBinary b => mk_java_binary_op0 (float_barithToJavaMethod b) e1 e2
                      | OpFloatCompare b => mk_java_binary_op0 (float_bcompareToJavaMethod b) e1 e2

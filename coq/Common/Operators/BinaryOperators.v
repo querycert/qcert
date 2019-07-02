@@ -67,6 +67,7 @@ Section BinaryOperators.
   | OpBagNth : binary_op                                  (**r random element in a bag *)
   | OpContains : binary_op                                (**r is an element in a collection *)
   | OpStringConcat : binary_op                            (**r string concatenation *)
+  | OpStringJoin : binary_op                              (**r string join *)
   | OpNatBinary : nat_arith_binary_op -> binary_op        (**r arithmetic operators on integers *)
   | OpFloatBinary : float_arith_binary_op -> binary_op    (**r arithmetic operators on floats *)
   | OpFloatCompare : float_compare_binary_op -> binary_op (**r comparison operators on floats *)
@@ -161,6 +162,7 @@ Section BinaryOperators.
             | OpBagNth => "OpBagNth"
             | OpContains  => "OpContains"
             | OpStringConcat  => "OpStringConcat"
+            | OpStringJoin  => "OpStringJoin"
             | OpNatBinary aop => "(OpNatBinary " ++ (toString aop) ++ ")"
             | OpFloatBinary aop => "(OpFloatBinary " ++ (toString aop) ++ ")"
             | OpFloatCompare aop => "(OpFloatCompare " ++ (toString aop) ++ ")"
@@ -186,6 +188,7 @@ Tactic Notation "binary_op_cases" tactic(first) ident(c) :=
   | Case_aux c "OpBagNth"%string
   | Case_aux c "OpContains"%string
   | Case_aux c "OpStringConcat"%string
+  | Case_aux c "OpStringJoin"%string
   | Case_aux c "OpNatBinary"%string
   | Case_aux c "OpFloatBinary"%string
   | Case_aux c "OpFloatCompare"%string

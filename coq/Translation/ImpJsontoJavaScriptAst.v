@@ -111,7 +111,6 @@ Section ImpJsontoJavaScriptAst.
     | JSONOpMathTrunc => expr_call (expr_member (expr_identifier "Math") "trunc") el
     end.
 
-  Locate imp_json_runtime_op.
   Fixpoint imp_json_expr_to_js_ast (exp: imp_json_expr) : expr :=
     match exp with
     | ImpExprError v => mk_expr_error

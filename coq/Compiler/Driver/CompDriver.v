@@ -306,7 +306,7 @@ Section CompDriver.
 
     Definition dnnrc_typed_to_spark_df
                (tenv:tdbindings) (name:string) (q:dnnrc_typed) : spark_df :=
-      @dnnrc_typed_to_spark_df_top _ _ bm _ _ unit tenv name q.
+      @dnnrc_typed_to_spark_df_top _ _ bm _ unit tenv name q.
 
   End translations.
 

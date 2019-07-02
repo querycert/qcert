@@ -1,0 +1,2 @@
+/* toString */
+stringJoin(", ", select x->name from x as Customer in WORLD)

@@ -107,6 +107,12 @@ Section BinaryOperatorsSem.
                  if in_dec data_eq_dec d1 l
                  then dbool true else dbool false) d2
     | OpStringConcat => unsdstring append d1 d2
+    | OpStringJoin =>
+      match d1, d2 with
+      | (dstring sep), (dcoll c) =>
+        lifted_join sep c
+      | _, _ => None
+      end
     | OpNatBinary op =>
         match d1, d2 with
         | dnat n1, dnat n2 => Some (dnat (nat_arith_binary_op_eval op n1 n2))
@@ -174,6 +180,10 @@ Section BinaryOperatorsSem.
       + inversion H; subst; repeat constructor.
     - destruct d2; simpl in *; try discriminate.
       match_destr_in H; inversion H; eauto.
+    - destruct d1; destruct d2; simpl in *; try discriminate.
+      unfold lifted_join in H.
+      apply some_lift in H; destruct H; subst.
+      eauto.
     - eapply foreign_binary_op_normalized; eauto.
   Qed.
   

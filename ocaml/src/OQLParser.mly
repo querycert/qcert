@@ -46,8 +46,12 @@
 	      QOQL.ounop QOps.Unary.opnatmax e
     | "min", [e] ->
 	      QOQL.ounop QOps.Unary.opnatmin e
+    | "toString", [e] ->
+	      QOQL.ounop QOps.Unary.optostring e
     | "nth", [e1;e2] ->
 	      QOQL.obinop QOps.Binary.opbagnth e1 e2
+    | "stringJoin", [e1;e2] ->
+	      QOQL.obinop QOps.Binary.opstringjoin e1 e2
     | "substring", [e1;e2] ->
 	      let start =
 	        begin try static_int e2 with
@@ -89,7 +93,7 @@
 %token AS IN
 
 %token OR AND
-%token STRUCT BAG
+%token NEW STRUCT BAG
 
 %token NIL TRUE FALSE
 
@@ -170,6 +174,8 @@ expr:
     { QOQL.oarrow (Util.char_list_of_string a) e }
 | STRUCT LPAREN r = reclist RPAREN
     { QOQL.ostruct r }
+| NEW a = IDENT LPAREN r = reclist RPAREN  (* XXX Spec does not use `new` *)
+    { QOQL.onew (Util.char_list_of_string a) r }
 | BAG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opbag e }
 (* Binary operators *)

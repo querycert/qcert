@@ -421,12 +421,29 @@ Next Obligation.
       ; repeat constructor.
 Qed.
 
+Program Instance enhanced_foreign_to_JSON : foreign_to_JSON
+  := mk_foreign_to_JSON enhanced_foreign_data _ _.
+Next Obligation.
+  (* TODO: For now, we assume that JSON supports floating point *)
+  exact None.
+Defined.
+Next Obligation.
+  destruct fd.
+  - exact (jstring (jenhancedstring s)).
+  - exact (jstring (toString t)).
+  - exact (jstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
+  - exact (jstring (@toString _ time_point_foreign_data.(@foreign_data_tostring ) t)).
+  - exact (jstring (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) s)).
+  - exact (jstring (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) s)).
+Defined.
+
 Instance enhanced_foreign_runtime :
   foreign_runtime
   := mk_foreign_runtime
        enhanced_foreign_data
        enhanced_foreign_unary_op
-       enhanced_foreign_binary_op.
+       enhanced_foreign_binary_op
+       enhanced_foreign_to_JSON.
 
 (* TODO: fix me *)
 Definition enhanced_to_java_data
@@ -562,22 +579,6 @@ Instance enhanced_foreign_to_scala {ftype: foreign_type}:
 *)
 
 
-
-Program Instance enhanced_foreign_to_JSON : foreign_to_JSON
-  := mk_foreign_to_JSON enhanced_foreign_data _ _.
-Next Obligation.
-  (* TODO: For now, we assume that JSON supports floating point *)
-  exact None.
-Defined.
-Next Obligation.
-  destruct fd.
-  - exact (jstring (jenhancedstring s)).
-  - exact (jstring (toString t)).
-  - exact (jstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
-  - exact (jstring (@toString _ time_point_foreign_data.(@foreign_data_tostring ) t)).
-  - exact (jstring (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) s)).
-  - exact (jstring (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) s)).
-Defined.
 
   Inductive enhanced_numeric_type :=
   | enhanced_numeric_int

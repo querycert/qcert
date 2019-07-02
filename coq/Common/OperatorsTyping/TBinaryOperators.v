@@ -84,6 +84,8 @@ Section TBinaryOperators.
         binary_op_type OpContains τ (Coll τ) Bool
     | type_OpStringConcat :
         binary_op_type OpStringConcat String String String
+    | type_OpStringJoin :
+        binary_op_type OpStringJoin String (Coll String) String
     | type_OpNatBinary (b:nat_arith_binary_op) :
         binary_op_type (OpNatBinary b) Nat Nat Nat
     | type_OpFloatBinary (b:float_arith_binary_op) :
@@ -113,6 +115,7 @@ Section TBinaryOperators.
     | Case_aux c "type_OpBagNth"%string
     | Case_aux c "type_OpContains"%string
     | Case_aux c "type_OpStringConcat"%string
+    | Case_aux c "type_OpStringJoin"%string
     | Case_aux c "type_OpNatBinary"%string
     | Case_aux c "type_OpFloatBinary"%string
     | Case_aux c "type_OpFloatCompare"%string
@@ -712,6 +715,30 @@ Section TBinaryOperators.
     - Case "type_OpStringConcat"%string.
       dependent induction H; dependent induction H0; simpl.
       eauto.
+    - Case "type_OpStringJoin"%string.
+      dependent induction H; dependent induction H0; simpl.
+      rtype_equalizer; subst.
+      assert (r = String)
+        by (apply rtype_fequal; assumption); subst; clear x.
+      unfold lifted_join; simpl.
+      induction dl; simpl in *.
+      + rewrite Forall_forall in H; simpl in *.
+        exists (dstring ""); eauto.
+      + inversion H; subst.
+        specialize (IHdl H3).
+        elim IHdl; clear IHdl; intros.
+        elim H0; clear H0; intros.
+        unfold lift in *.
+        unfold lifted_stringbag in *.
+        destruct (data_type_String_inv H2); subst.
+        simpl.
+        destruct (lift_map (ondstring (fun x2 : string => x2)) dl); try congruence.
+        simpl.
+        exists (dstring match l with
+                  | [] => x0
+                  | _ :: _ => x0 ++ s ++ String.concat s l
+                        end).
+        auto.
     - Case "type_OpNatBinary"%string.
       dependent induction H; dependent induction H0; simpl.
       eauto.
@@ -765,6 +792,7 @@ End TBinaryOperators.
     | Case_aux c "type_OpBagNth"%string
     | Case_aux c "type_OpContains"%string
     | Case_aux c "type_OpStringConcat"%string
+    | Case_aux c "type_OpStringJoin"%string
     | Case_aux c "type_OpNatBinary"%string
     | Case_aux c "type_OpFloatBinary"%string
     | Case_aux c "type_OpFloatCompare"%string

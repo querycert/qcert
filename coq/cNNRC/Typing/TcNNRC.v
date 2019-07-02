@@ -115,7 +115,7 @@ Section TcNNRC.
       elim IHnnrc_core_type; intros; clear IHnnrc_core_type.
       elim H2; clear H2; intros.
       rewrite H2; clear H2.
-      simpl; apply (@typed_unary_op_yields_typed_data _ _ _ _ _ _ τ₁ τ); assumption.
+      simpl; apply (@typed_unary_op_yields_typed_data _ _ _ _ _ _ _ τ₁ τ); assumption.
     - destruct (IHnnrc_core_type1 _ H) as [?[re1 ?]].
       destruct (IHnnrc_core_type2 ((v,x)::env)) as [?[re2 ?]].
       + apply Forall2_cons; intuition.

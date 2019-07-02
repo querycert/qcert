@@ -67,6 +67,7 @@ endif
 ## OQL
 OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12
 OQLWORLDNUM=1 2
+OQLSTRINGNUM=1 2
 OQLEMPLOYEESNUM=1 2
 OQLTARGETS=oql nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
@@ -74,19 +75,50 @@ oql-tests:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] OQL tests"
 	@echo "[Q*cert] "
+	@$(MAKE) oql-string-tests
 	@$(MAKE) oql-world-tests
 	@$(MAKE) oql-persons-tests
 	@$(MAKE) oql-employees-tests
 ifneq ($(JAVA),)
+	@$(MAKE) oql-string-tests-js
 	@$(MAKE) oql-world-tests-js
 	@$(MAKE) oql-persons-tests-js
 	@$(MAKE) oql-employees-tests-js
 endif
 ifneq ($(JAVA),)
+	@$(MAKE) oql-string-tests-java
 	@$(MAKE) oql-world-tests-java
 	@$(MAKE) oql-persons-tests-java
 	@$(MAKE) oql-employees-tests-java
 endif
+
+oql-string-tests:
+	$(foreach N,$(OQLSTRINGNUM), \
+            $(foreach T,$(OQLTARGETS), \
+	       $(QCERTCOMP) -source oql -target $(T) oql/string$(N).oql \
+                            -eval -input oql/string.input \
+                            -schema oql/string.schema \
+                            -eval-validate -output oql/string$(N).out;))
+oql-string-tests-js:
+	@$(foreach N,$(OQLSTRINGNUM), \
+	       $(QCERTCOMP) -source oql -target js oql/string$(N).oql \
+                            -eval-validate -schema oql/string.schema; \
+	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -input oql/string.input \
+                          -schema oql/string.schema \
+                          -output oql/string$(N).out \
+                          oql/string$(N).js;)
+oql-string-tests-java:
+	@$(foreach N,$(OQLSTRINGNUM), \
+	       $(QCERTCOMP) -source oql -target java oql/string$(N).oql \
+                            -eval-validate -schema oql/string.schema; \
+	       $(JAVAC) -cp $(CPATH) oql/string$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):oql testing.runners.RunJava \
+                          -input oql/string.input \
+                          -schema oql/string.schema \
+                          -output oql/string$(N).out \
+                          string$(N);)
 
 oql-world-tests:
 	$(foreach N,$(OQLWORLDNUM), \

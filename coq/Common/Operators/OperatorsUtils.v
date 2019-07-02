@@ -110,6 +110,8 @@ Section OperatorsUtils.
          | _ => lift (fun x => Z.quot x (Z_of_nat (List.length ns))) (dsum ns)
        end.
 
+  Definition lifted_stringbag (l : list data) : option (list string) :=
+    lift_map (ondstring (fun x => x)) l.
   Definition lifted_zbag (l : list data) : option (list Z) :=
     lift_map (ondnat (fun x => x)) l.
   Definition lifted_min (l : list data) : option data :=
@@ -128,6 +130,9 @@ Section OperatorsUtils.
     lift dfloat (lift float_list_min (lifted_fbag l)).
   Definition lifted_fmax (l : list data) : option data :=
     lift dfloat (lift float_list_max (lifted_fbag l)).
+
+  Definition lifted_join (sep : string) (l : list data) : option data :=
+    lift dstring (lift (concat sep) (lifted_stringbag l)).
 
 End OperatorsUtils.
 

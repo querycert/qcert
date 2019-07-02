@@ -214,6 +214,19 @@ public class BinaryOperators {
 		return new JsonPrimitive(e1.getAsString() + e2.getAsString());
 	}
 
+  private static String[] join_helper(JsonArray ec) {
+    String acc[] = new String[ec.size()];
+		int i = 0;
+		for (JsonElement elem : ec) {
+			acc[i] = elem.getAsString();
+      i++;
+		}
+		return acc;
+	}
+	public static JsonElement stringJoin(JsonElement e1, JsonElement e2) {
+      return new JsonPrimitive(String.join(e1.getAsString(), join_helper(e2.getAsJsonArray())));
+	}
+
 	public static JsonElement float_plus(JsonElement e1, JsonElement e2) {
 		return toDouble(asDouble(e1)+asDouble(e2));
 	}
