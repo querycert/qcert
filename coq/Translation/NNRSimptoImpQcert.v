@@ -103,16 +103,16 @@ Section NNRSimptoImpQcert.
         (nnrs_imp_expr_to_imp_qcert e)
         (nnrs_imp_stmt_to_imp_qcert s1)
         (nnrs_imp_stmt_to_imp_qcert s2)
-    | NNRSimpEither (NNRSimpVar x) x1 s1 x2 s2 =>
-      let e' := ImpExprVar x  in
-      ImpStmtIf
-        (ImpExprRuntimeCall QcertRuntimeEither [e'])
-        (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
-           [ (x1, Some (ImpExprRuntimeCall QcertRuntimeToLeft [e'])) ]
-           [ nnrs_imp_stmt_to_imp_qcert s1 ])
-        (ImpStmtBlock (* var x2 = toRight(e); s2 *)
-           [ (x2, Some (ImpExprRuntimeCall QcertRuntimeToRight [e'])) ]
-           [ nnrs_imp_stmt_to_imp_qcert s2 ])
+    (* | NNRSimpEither (NNRSimpVar x) x1 s1 x2 s2 => *)
+    (*   let e' := ImpExprVar x  in *)
+    (*   ImpStmtIf *)
+    (*     (ImpExprRuntimeCall QcertRuntimeEither [e']) *)
+    (*     (ImpStmtBlock (* var x1 = toLeft(e); s1 *) *)
+    (*        [ (x1, Some (ImpExprRuntimeCall QcertRuntimeToLeft [e'])) ] *)
+    (*        [ nnrs_imp_stmt_to_imp_qcert s1 ]) *)
+    (*     (ImpStmtBlock (* var x2 = toRight(e); s2 *) *)
+    (*        [ (x2, Some (ImpExprRuntimeCall QcertRuntimeToRight [e'])) ] *)
+    (*        [ nnrs_imp_stmt_to_imp_qcert s2 ]) *)
     | NNRSimpEither e x1 s1 x2 s2 =>
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
       let e' := nnrs_imp_expr_to_imp_qcert e in
@@ -151,7 +151,19 @@ Section NNRSimptoImpQcert.
       + rewrite IHstmt.
         reflexivity.
     - Case "NNRSimpFor"%string.
-      admit.
+      rewrite nnrs_imp_expr_to_imp_qcert_correct.
+      unfold imp_qcert_expr_eval.
+      match_destr.
+      destruct i; simpl; try reflexivity.
+      revert σ.
+      induction l; try reflexivity.
+      intro.
+      rewrite IHstmt.
+      unfold Var.var in *.
+      unfold var in *.
+      unfold imp_qcert_data in *.
+      match_destr.
+      match_destr.
     - Case "NNRSimpIf"%string.
       rewrite nnrs_imp_expr_to_imp_qcert_correct.
       unfold imp_qcert_expr_eval.
@@ -159,8 +171,20 @@ Section NNRSimptoImpQcert.
       destruct i; simpl; try reflexivity.
       destruct b; simpl; auto.
     - Case "NNRSimpEither"%string.
-      admit. (** XXX Quite messy due to the two different translations *)
-  Admitted.
+      rewrite nnrs_imp_expr_to_imp_qcert_correct.
+      unfold imp_qcert_expr_eval.
+      match_destr.
+      simpl.
+      match_destr; simpl.
+      * rewrite IHstmt1.
+        unfold Var.var in *.
+        unfold imp_qcert_data in *.
+        match_destr; simpl.
+      * rewrite IHstmt2.
+        unfold Var.var in *.
+        unfold imp_qcert_data in *.
+        match_destr; simpl.
+  Qed.
 
   (* XXX Danger: string hypotheys on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_function globals (q: nnrs_imp): imp_function :=
