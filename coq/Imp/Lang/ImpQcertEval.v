@@ -64,6 +64,11 @@ Section ImpQcertEval.
       | _ => None
       end.
 
+    Definition imp_qcert_data_to_list (d:imp_qcert_data) : option (list imp_qcert_data) :=
+      match d with
+      | dcoll c => Some (c)
+      | _ => None
+      end.
 
     Definition imp_qcert_runtime_eval (rt:imp_qcert_runtime_op) (dl:list imp_qcert_data) : option imp_qcert_data :=
       match rt with
@@ -144,6 +149,7 @@ Section ImpQcertEval.
            imp_qcert_runtime_op
            imp_qcert_data_normalize
            imp_qcert_data_to_bool
+           imp_qcert_data_to_list
            imp_qcert_runtime_eval
            imp_qcert_op_eval
            σc s σ.

@@ -58,9 +58,15 @@ Section ImpJsonEval.
       | _ => None
       end.
 
+    Definition imp_json_data_to_list (d:imp_json_data) : option (list imp_json_data) :=
+      match d with
+      | jarray c => Some (c)
+      | _ => None
+      end.
+
     Definition of_string_list (sl:list json) : option (list string)
       := lift_map (fun x => match x with jstring s => Some s | _ => None end) sl.
-    
+
     Definition imp_json_runtime_eval (rt:imp_json_runtime_op) (dl:list imp_json_data) : option imp_json_data :=
       match rt with
       | JSONRuntimeEqual =>
@@ -215,6 +221,7 @@ Section ImpJsonEval.
            imp_json_runtime_op
            imp_json_data_normalize
            imp_json_data_to_bool
+           imp_json_data_to_list
            imp_json_runtime_eval
            imp_json_op_eval
            σc s σ.

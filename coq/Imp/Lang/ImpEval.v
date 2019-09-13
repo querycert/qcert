@@ -38,6 +38,7 @@ Section ImpEval.
   Context {DataNormalize: Data -> Data}.
   Context {DataToBool: Data -> option bool}.
   Context {DataToZ: Data -> option Z}.
+  Context {DataToList: Data -> option (list Data)}.
 
   Context {RuntimeEval: Runtime -> list Data -> option Data}.
   Context {OpEval: Op -> list Data -> option Data}.
@@ -126,7 +127,25 @@ Section ImpEval.
         | Some d, Some _ => Some (update_first string_dec σ v (Some d))
         | _, _ => None
         end
-      | ImpStmtFor v e s => None (* XXX TBD *)
+      | ImpStmtFor v e s =>
+        match imp_expr_eval σc σ e with
+        | Some d =>
+          match DataToList d with
+          | Some c1 =>
+            let fix for_fun (dl:list Data) σ₁ :=
+                match dl with
+                | nil => Some σ₁
+                | dXXX::dl' =>
+                  match imp_stmt_eval σc s ((v,Some dXXX)::σ₁) with
+                  | Some (_::σ₂) => for_fun dl' σ₂
+                  | _ => None
+                  end
+                end in
+            for_fun c1 σ
+          | None =>  None
+          end
+        | _ => None
+        end
       | ImpStmtForRange v e1 e2 s => None (* XXX TBD *)
       | ImpStmtIf e1 s1 s2 =>
         match imp_expr_eval σc σ e1 with
