@@ -86,7 +86,7 @@ Section Dataframe.
       | CLessThan c1 c2 =>
         None (* TODO *)
       | CToString c1 =>
-        lift (compose dstring dataToString) (fc c1)
+        lift (compose dstring foreign_unary_op_data_tostring) (fc c1)
       | CSConcat c1 c2 =>
         match fc c1, fc c2 with
         | Some (dstring l), Some (dstring r) => Some (dstring (l ++ r))

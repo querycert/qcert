@@ -28,7 +28,6 @@ Require Import Iterators.
 
 Section OperatorsUtils.
   Import ListNotations.
-
   Context {fdata:foreign_data}.
 
   Definition boolToString (b:bool) : string
@@ -58,45 +57,6 @@ Section OperatorsUtils.
   Instance ToString_brands : ToString brands
     := { toString := fun b => (concat " & " b)}.
 
-  Fixpoint dataToString (d:data) : string
-    := match d with
-           | dunit => "UNIT"%string
-           | dnat n => toString n
-           | dfloat n => toString n
-           | dbool b => toString b
-           | dstring s => stringToString s
-           | dcoll l => bracketString 
-                          "["%string
-                          (concat ", "
-                                       (string_sort (map dataToString l)))
-                          "]"%string
-           | drec lsd => bracketString
-             "{"%string
-                (concat "," 
-                             (map (fun xy => let '(x,y):=xy in 
-                                             (append (stringToString x) (append "->"%string
-                                             (dataToString y)))
-                                  ) lsd))
-                "}"%string
-           | dleft d => bracketString
-                          "Left("%string
-                          (dataToString d)
-                          ")"%string
-           | dright d => bracketString
-                          "Right("%string
-                          (dataToString d)
-                          ")"%string
-           | dbrand b d => (bracketString
-                              "<"
-                              (append (@toString _ ToString_brands b)
-                                      (append ":" (dataToString d)))
-                              ">")
-           | dforeign fd => toString fd
-       end.
-
-  Global Instance ToString_data : ToString data
-    := { toString := dataToString}.
-  
   Fixpoint dsum (ns:list data) : option Z
     := match ns with
          | nil => Some 0%Z

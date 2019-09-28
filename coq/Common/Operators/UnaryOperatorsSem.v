@@ -37,7 +37,7 @@ Require Export UnaryOperators.
 Section UnaryOperatorsSem.
   Context {fdata:foreign_data}.
   Context {ftojson:foreign_to_JSON}.
-  
+
   Definition nat_arith_unary_op_eval (op:nat_arith_unary_op) (z:Z) :=
     match op with
     | NatAbs => Z.abs z
@@ -60,6 +60,45 @@ Section UnaryOperatorsSem.
   Context (h:brand_relation_t).
   Context {fuop:foreign_unary_op}.
   
+  Global Instance ToString_data : ToString data
+    := { toString := foreign_unary_op_data_tostring }.
+
+  Fixpoint defaultDataToString (d:data) : string
+    := match d with
+       | dunit => "unit"%string
+       | dnat n => toString n
+       | dfloat n => toString n
+       | dbool b => toString b
+       | dstring s => stringToString s
+       | dcoll l => bracketString 
+                      "["%string
+                      (String.concat ", "%string
+                              (string_sort (map defaultDataToString l)))
+                      "]"%string
+       | drec lsd => bracketString
+                       "{"%string
+                       (String.concat ", "%string 
+                               (map (fun xy => let '(x,y):=xy in 
+                                               (append (stringToString x) (append "->"%string
+                                                                                  (defaultDataToString y)))
+                                    ) lsd))
+                       "}"%string
+       | dleft d => bracketString
+                      "Left("%string
+                      (defaultDataToString d)
+                      ")"%string
+       | dright d => bracketString
+                       "Right("%string
+                       (defaultDataToString d)
+                       ")"%string
+       | dbrand b d => (bracketString
+                          "<"
+                          (append (@toString _ ToString_brands b)
+                                  (append ":" (defaultDataToString d)))
+                          ">")
+       | dforeign fd => toString fd
+       end.
+
   Definition unary_op_eval (uop:unary_op) (d:data) : option data :=
     match uop with
     | OpIdentity => Some d
@@ -95,9 +134,10 @@ Section UnaryOperatorsSem.
       data_sort sc d (* XXX Some very limited/hackish sorting XXX *)
     | OpCount =>
       lift dnat (ondcoll (fun z => Z_of_nat (bcount z)) d)
-    | OpToString
-    | OpGenerateText =>
-      Some (dstring (dataToString d))
+    | OpToString =>
+      Some (dstring (foreign_unary_op_data_tostring d))
+    | OpToText =>
+      Some (dstring (foreign_unary_op_data_totext d))
     | OpLength =>
       unndstring (fun s => Z_of_nat (String.length s)) d
     | OpSubstring start olen =>

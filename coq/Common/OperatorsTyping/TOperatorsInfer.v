@@ -307,7 +307,7 @@ Section TOperatorsInfer.
         | Coll₀ _ => Some Nat
         | _ => None
         end
-      | OpToString | OpGenerateText => Some String
+      | OpToString | OpToText => Some String
       | OpLength =>
         match `τ₁ with
         | String₀ => Some Nat

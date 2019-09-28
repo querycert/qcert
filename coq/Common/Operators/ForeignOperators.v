@@ -15,6 +15,7 @@
  *)
 
 Require Import EquivDec.
+Require Import String.
 Require Import Utils.
 Require Import BrandRelation.
 Require Import ForeignData.
@@ -38,6 +39,8 @@ Section ForeignOperators.
                foreign_unary_op_interp br op d = Some o ->
                data_normalized br d ->
                data_normalized br o
+           ; foreign_unary_op_data_tostring : data -> string
+           ; foreign_unary_op_data_totext : data -> string
          }.
 
   Class foreign_binary_op {fdata:foreign_data}
@@ -60,4 +63,3 @@ Section ForeignOperators.
          }.
 
 End ForeignOperators.
-

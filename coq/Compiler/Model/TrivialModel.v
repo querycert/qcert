@@ -14,6 +14,10 @@
  * limitations under the License.
  *)
 
+Require Import List.
+Require Import EquivDec.
+
+Require Import Utils.
 Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
@@ -55,10 +59,9 @@ Next Obligation.
   constructor; intros [].
 Defined.
 
-Program Instance trivial_foreign_unary_op
-        {fdata:foreign_data}:
+Program Instance trivial_foreign_unary_op:
   foreign_unary_op
-  := mk_foreign_unary_op fdata Empty_set _ _ _ _.
+  := mk_foreign_unary_op trivial_foreign_data Empty_set _ _ _ _ defaultDataToString defaultDataToString.
 Next Obligation.
   intros []. 
 Defined.
@@ -73,23 +76,22 @@ Next Obligation.
   destruct op. 
 Defined.
 
-  Program Instance trivial_foreign_binary_op
-            {fdata:foreign_data}:
-      foreign_binary_op
-    := mk_foreign_binary_op fdata Empty_set _ _ _ _.
-  Next Obligation.
-     intros []. 
-  Defined.
-  Next Obligation.
-    constructor.
-    intros []. 
-  Defined.
-    Next Obligation.
-    destruct op. 
-  Defined.
-  Next Obligation.
-    destruct op. 
-  Defined.
+Program Instance trivial_foreign_binary_op:
+  foreign_binary_op
+  := mk_foreign_binary_op trivial_foreign_data Empty_set _ _ _ _.
+Next Obligation.
+  intros []. 
+Defined.
+Next Obligation.
+  constructor.
+  intros []. 
+Defined.
+Next Obligation.
+  destruct op. 
+Defined.
+Next Obligation.
+  destruct op. 
+Defined.
 
   Program Instance trivial_foreign_to_JSON : foreign_to_JSON
     := mk_foreign_to_JSON trivial_foreign_data _ _.

@@ -84,4 +84,3 @@ Section OperatorsEq.
   Qed.
 
 End OperatorsEq.
-

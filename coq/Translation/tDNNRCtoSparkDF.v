@@ -210,7 +210,7 @@ Section tDNNRCtoSparkDF.
     | OpFlatten => postfix "flatten.sorted(QcertOrdering)"
     | OpDistinct => postfix "distinct"
     | OpCount => postfix "length"
-    | OpGenerateText
+    | OpToText
     | OpToString => prefix "toQcertString"
     | OpLength => "(" ++ x ++ ").length()"
     | OpSubstring start olen =>

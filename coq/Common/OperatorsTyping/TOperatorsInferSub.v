@@ -210,7 +210,7 @@ Section TOperatorsInferSub.
         let τ₁' := τ₁ ⊔ (Coll ⊥) in
         lift (fun τ => (Nat, τ₁')) (tuncoll τ₁')
       | OpToString
-      | OpGenerateText =>
+      | OpToText =>
         Some (String, τ₁)
       | OpLength =>
         if (subtype_dec τ₁ String)

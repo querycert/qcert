@@ -276,7 +276,7 @@ Section NNRCtoJavaScript.
                      | OpOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
                      | OpCount => "count(" ++ e1 ++ ")"
                      | OpToString => "toString(" ++ e1 ++ ")"
-                     | OpGenerateText => "generateText(" ++ e1 ++ ")"
+                     | OpToText => "toText(" ++ e1 ++ ")"
                      | OpLength => "stringLength(" ++ e1 ++ ")"
                      | OpSubstring start olen =>
                        match olen with
