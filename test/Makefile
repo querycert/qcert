@@ -98,7 +98,7 @@ oql-string-tests:
 	       $(QCERTCOMP) -source oql -target $(T) oql/string$(N).oql \
                             -eval -input oql/string.input \
                             -schema oql/string.schema \
-                            -eval-validate -output oql/string$(N).out;))
+                            -eval-validate -output oql/string$(N).out || exit 1;))
 oql-string-tests-js:
 	@$(foreach N,$(OQLSTRINGNUM), \
 	       $(QCERTCOMP) -source oql -target js oql/string$(N).oql \
@@ -108,7 +108,7 @@ oql-string-tests-js:
                           -input oql/string.input \
                           -schema oql/string.schema \
                           -output oql/string$(N).out \
-                          oql/string$(N).js;)
+                          oql/string$(N).js || exit 1 ;)
 oql-string-tests-java:
 	@$(foreach N,$(OQLSTRINGNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/string$(N).oql \
@@ -118,7 +118,7 @@ oql-string-tests-java:
                           -input oql/string.input \
                           -schema oql/string.schema \
                           -output oql/string$(N).out \
-                          string$(N);)
+                          string$(N) || exit 1;)
 
 oql-world-tests:
 	$(foreach N,$(OQLWORLDNUM), \
@@ -126,7 +126,7 @@ oql-world-tests:
 	       $(QCERTCOMP) -source oql -target $(T) oql/world$(N).oql \
                             -eval -input oql/world.input \
                             -schema oql/world.schema \
-                            -eval-validate -output oql/world$(N).out;))
+                            -eval-validate -output oql/world$(N).out || exit 1;))
 oql-world-tests-js:
 	@$(foreach N,$(OQLWORLDNUM), \
 	       $(QCERTCOMP) -source oql -path imp_json  -target js oql/world$(N).oql \
@@ -136,7 +136,7 @@ oql-world-tests-js:
                           -input oql/world.input \
                           -schema oql/world.schema \
                           -output oql/world$(N).out \
-                          oql/world$(N).js;)
+                          oql/world$(N).js || exit 1;)
 oql-world-tests-java:
 	@$(foreach N,$(OQLWORLDNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/world$(N).oql \
@@ -146,7 +146,7 @@ oql-world-tests-java:
                           -input oql/world.input \
                           -schema oql/world.schema \
                           -output oql/world$(N).out \
-                          world$(N);)
+                          world$(N) || exit 1;)
 
 oql-persons-tests:
 	@$(foreach N,$(OQLPERSONSNUM), \
@@ -154,7 +154,7 @@ oql-persons-tests:
 	       $(QCERTCOMP) -source oql -target $(T) oql/persons$(N).oql \
                             -eval -input oql/persons.input \
                             -schema oql/persons.schema \
-                            -eval-validate -output oql/persons$(N).out;))
+                            -eval-validate -output oql/persons$(N).out || exit 1;))
 oql-persons-tests-js:
 	@$(foreach N,$(OQLPERSONSNUM), \
 	       $(QCERTCOMP) -source oql -path imp_json  -target js oql/persons$(N).oql \
@@ -164,7 +164,7 @@ oql-persons-tests-js:
                           -input oql/persons.input \
                           -schema oql/persons.schema \
                           -output oql/persons$(N).out \
-                          oql/persons$(N).js;)
+                          oql/persons$(N).js || exit 1;)
 oql-persons-tests-java:
 	@$(foreach N,$(OQLPERSONSNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/persons$(N).oql \
@@ -174,7 +174,7 @@ oql-persons-tests-java:
                           -input oql/persons.input \
                           -schema oql/persons.schema \
                           -output oql/persons$(N).out \
-                          persons$(N);)
+                          persons$(N) || exit 1;)
 
 oql-employees-tests:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
@@ -182,7 +182,7 @@ oql-employees-tests:
 	       $(QCERTCOMP) -source oql -target $(T) oql/employees$(N).oql \
                             -eval -input oql/employees.input \
                             -schema oql/employees.schema \
-                            -eval-validate -output oql/employees$(N).out;))
+                            -eval-validate -output oql/employees$(N).out || exit 1;))
 oql-employees-tests-js:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
 	       $(QCERTCOMP) -source oql -path imp_json  -target js oql/employees$(N).oql \
@@ -192,7 +192,7 @@ oql-employees-tests-js:
                           -input oql/employees.input \
                           -schema oql/employees.schema \
                           -output oql/employees$(N).out \
-                          oql/employees$(N).js;)
+                          oql/employees$(N).js || exit 1;)
 oql-employees-tests-java:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/employees$(N).oql \
@@ -202,7 +202,7 @@ oql-employees-tests-java:
                           -input oql/employees.input \
                           -schema oql/employees.schema \
                           -output oql/employees$(N).out \
-                          employees$(N);)
+                          employees$(N) || exit 1;)
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7

@@ -106,6 +106,7 @@ public class RunJava {
 			System.out.println(result);
 			System.out.println("Expected:");
 			System.out.println(output);
+      System.exit(1);
 		    }
 		}
 	    }

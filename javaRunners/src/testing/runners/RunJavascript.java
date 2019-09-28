@@ -114,6 +114,7 @@ public class RunJavascript {
 			System.out.println(resultAsSting);
 			System.out.println("Expected:");
 			System.out.println(output);
+      System.exit(1);
 		    }
 		}
 	    }
