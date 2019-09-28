@@ -266,7 +266,9 @@ Require Import String.
 
 Program Instance enhanced_foreign_unary_op : foreign_unary_op
   := { foreign_unary_op_type := enhanced_unary_op
-       ; foreign_unary_op_interp := enhanced_unary_op_interp }.
+       ; foreign_unary_op_interp := enhanced_unary_op_interp
+       ; foreign_unary_op_data_tostring := defaultDataToString
+       ; foreign_unary_op_data_totext := defaultDataToString }.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
@@ -295,7 +297,7 @@ Next Obligation.
     + destruct f; invcs H; repeat constructor.
     + invcs H; repeat constructor.
     + invcs H; repeat constructor.
-Qed.
+Defined.
 
 Inductive enhanced_binary_op
   :=

@@ -183,7 +183,7 @@ Section ImpJsonEval.
       | JSONRuntimeBnth => None
       | JSONRuntimeContains => None
       | JSONRuntimeToString => None
-      | JSONRuntimeGenerateText => None
+      | JSONRuntimeToText => None
       | JSONRuntimeStringJoin => None
       end.
 

@@ -2566,50 +2566,6 @@ Section TNRAEnvRewrite.
    * Misc *
    ********)
   
-  (* ♯toString(s) ⇒ s *)
-  
-  Lemma ttostring_dstring_arrow s:
-    (cNRAEnvUnop OpToString (cNRAEnvConst (dstring s))) ⇒ (cNRAEnvConst (dstring s)).
-  Proof.
-    apply (rewrites_typed_with_untyped _ _ (tostring_dstring s)).
-    intros; nraenv_core_inferer.
-    inversion H2; subst.
-    econstructor. apply normalize_preserves_type.
-    econstructor.
-  Qed.
-
-  (* ♯toString(♯toString(q)) ⇒ ♯toString(q) *)
-  
-  Lemma ttostring_tostring_arrow q:
-    (cNRAEnvUnop OpToString (cNRAEnvUnop OpToString q)) ⇒ (cNRAEnvUnop OpToString q).
-  Proof.
-    apply (rewrites_typed_with_untyped _ _ (tostring_tostring q)).
-    intros.
-    inversion H. clear H; subst.
-    inversion H2; clear H2; subst.
-    inversion H6; clear H6; subst.
-    econstructor; eauto.
-  Qed.
-
-  (* ♯toString(♯sConcat q₁ q₂) ⇒ ♯toString(♯sConcat q₁ q₂) *)
-  
-  Lemma ttostring_sconcat_arrow q₁ q₂:
-    (cNRAEnvUnop OpToString (cNRAEnvBinop OpStringConcat q₁ q₂)) ⇒ (cNRAEnvBinop OpStringConcat q₁ q₂).
-  Proof.
-    unfold tnraenv_core_rewrites_to; intros; simpl.
-    nraenv_core_inferer.
-    econstructor; eauto.
-    - inversion H3; clear H3; subst.
-      inversion H2; clear H2; subst.
-      econstructor; eauto.
-    - intros.
-      input_well_typed; simpl.
-      case_eq (unsdstring append dout dout0); intros; try reflexivity; simpl.
-      generalize (unsdstring_is_string append dout dout0 d H); intros.
-      elim H0; clear H0; intros.
-      rewrite H0; reflexivity.
-  Qed.
-
    (****************
    * ARecProject *
    ****************)
@@ -3292,15 +3248,10 @@ Hint Rewrite @tapp_over_select_arrow : tnraenv_core_optim.
        product_singletons : { [ s1 : p1 ] } × { [ s2 : p2 ] } ⇒ { [ s1 : p1; s2 : p2 ] }
        double_flatten_map_coll : ♯flatten(χ⟨ χ⟨ { ID } ⟩( ♯flatten( p1 ) ) ⟩( p2 ))
                                  ⇒ χ⟨ { ID } ⟩(♯flatten(χ⟨ ♯flatten( p1 ) ⟩( p2 )))
-       #toString(s) ⇒ s
-       #toString(#toString(q)) ⇒ #toString(q)
 *)
 
 Hint Rewrite @tproduct_singletons_arrow : tnraenv_core_optim.
 Hint Rewrite @tdouble_flatten_map_coll_arrow : tnraenv_core_optim.
-Hint Rewrite @ttostring_dstring_arrow : tnraenv_core_optim.
-Hint Rewrite @ttostring_tostring_arrow : tnraenv_core_optim.
-Hint Rewrite @ttostring_sconcat_arrow : tnraenv_core_optim.
 
 (*
        -- Those handle operators on the environment

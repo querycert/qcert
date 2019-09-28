@@ -1547,36 +1547,6 @@ Section NRAEnvOptimizer.
   Definition tappenv_over_env_merge_l_step_correct {model:basic_model}
     := mkOptimizerStepModel tappenv_over_env_merge_l_step tappenv_over_env_merge_l_fun_correctness.
 
-  Definition ttostring_on_string_fun {fruntime:foreign_runtime} (p: nraenv) :=
-    match p with
-      | NRAEnvUnop OpToString (NRAEnvConst (dstring s)) =>
-        NRAEnvConst (dstring s)
-      | NRAEnvUnop OpToString (NRAEnvUnop OpToString p) =>
-        NRAEnvUnop OpToString p
-      | NRAEnvUnop OpToString (NRAEnvBinop OpStringConcat p1 p2) =>
-        (NRAEnvBinop OpStringConcat p1 p2)
-      | _ => p
-    end.
-
-  Lemma ttostring_on_string_fun_correctness {model:basic_model} (p: nraenv) :
-    p ⇒ₓ ttostring_on_string_fun p.
-  Proof.
-    tprove_correctness p.
-    - apply ttostring_dstring_arrow.
-    - apply ttostring_sconcat_arrow.
-    - apply ttostring_tostring_arrow.
-  Qed.
-
-  Definition ttostring_on_string_step {fruntime:foreign_runtime}
-    := mkOptimizerStep
-         "to-string/string" (* name *)
-         "Remove ToString operations where the argument is statically known to already be a string" (* description *)
-         "ttostring_on_string_fun" (* lemma name *)
-         ttostring_on_string_fun (* lemma *).
-
-  Definition ttostring_on_string_step_correct {model:basic_model}
-    := mkOptimizerStepModel ttostring_on_string_step ttostring_on_string_fun_correctness.
-
   Definition tmap_full_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop OpBag NRAEnvID)) => p
@@ -2870,7 +2840,6 @@ Section NRAEnvOptimizer.
         ; tflatten_over_double_map_step
         ; tflatten_over_double_map_with_either_step
         ; tappenv_over_env_merge_l_step
-        ; ttostring_on_string_step
         ; tmap_full_over_select_step
         ; tcompose_selects_in_mapenv_step
         ; tmapenv_to_env_step
@@ -2966,7 +2935,6 @@ Section NRAEnvOptimizer.
         ; tflatten_over_double_map_step_correct
         ; tflatten_over_double_map_with_either_step_correct
         ; tappenv_over_env_merge_l_step_correct
-        ; ttostring_on_string_step_correct
         ; tmap_full_over_select_step_correct
         ; tcompose_selects_in_mapenv_step_correct
         ; tmapenv_to_env_step_correct
@@ -3079,7 +3047,6 @@ Section NRAEnvOptimizer.
       ; optim_step_name tappenv_over_unop_step
       ; optim_step_name tcompose_selects_in_mapenv_step
       ; optim_step_name tmap_full_over_select_step
-      ; optim_step_name ttostring_on_string_step
       ; optim_step_name tmerge_empty_record_r_step
       ; optim_step_name tselect_and_step
       ; optim_step_name select_union_distr_step
@@ -3181,7 +3148,6 @@ Section NRAEnvOptimizer.
       ; optim_step_name tappenv_over_unop_step
       ; optim_step_name tcompose_selects_in_mapenv_step
       ; optim_step_name tmap_full_over_select_step
-      ; optim_step_name ttostring_on_string_step
       ; optim_step_name tmerge_empty_record_r_step
       ; optim_step_name tselect_and_step
       ; optim_step_name select_union_distr_step

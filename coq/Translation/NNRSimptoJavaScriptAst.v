@@ -47,8 +47,8 @@ Section NNRSimptoJavaScriptAst.
   Definition toString e :=
     expr_call (expr_identifier "toString") [ e ].
 
-  Definition generateText e :=
-    expr_call (expr_identifier "generateText") [ e ].
+  Definition toText e :=
+    expr_call (expr_identifier "toText") [ e ].
 
   Definition stringLength e :=
     expr_call (expr_identifier "stringLength") [ e ].
@@ -397,8 +397,8 @@ Section NNRSimptoJavaScriptAst.
       runtime_nat_mean e'
     | OpToString =>
       toString e'
-    | OpGenerateText =>
-      generateText e'
+    | OpToText =>
+      toText e'
     | OpLength =>
       stringLength e'
     | OpSubstring start olen =>

@@ -76,7 +76,7 @@ Section Syntax.
   | JSONRuntimeContains : imp_json_runtime_op
   | JSONRuntimeStringJoin : imp_json_runtime_op
   | JSONRuntimeToString : imp_json_runtime_op
-  | JSONRuntimeGenerateText : imp_json_runtime_op
+  | JSONRuntimeToText : imp_json_runtime_op
   .
 
   Definition imp_json_expr := @imp_expr imp_json_data imp_json_op imp_json_runtime_op.
@@ -136,7 +136,7 @@ Section Util.
     | JSONRuntimeContains => "contains"
     | JSONRuntimeStringJoin => "stringJoin"
     | JSONRuntimeToString => "toString"
-    | JSONRuntimeGenerateText => "generateText"
+    | JSONRuntimeToText => "toText"
     end.
 
 End Util.

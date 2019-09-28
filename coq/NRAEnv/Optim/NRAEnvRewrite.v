@@ -1298,23 +1298,6 @@ Section ROptimEnv.
     destruct o; reflexivity.
   Qed.
 
-  (* #toString(s) ≡ s *)
-  
-  Lemma tostring_dstring s:
-    (cNRAEnvUnop OpToString (cNRAEnvConst (dstring s))) ≡ₑ (cNRAEnvConst (dstring s)).
-  Proof.
-    unfold nraenv_core_eq; intros ? ? _ ? _ ? _; reflexivity.
-  Qed.
-
-  (* #toString(#toString(p)) ≡ #toString(p) *)
-  
-  Lemma tostring_tostring p:
-    (cNRAEnvUnop OpToString (cNRAEnvUnop OpToString p)) ≡ₑ (cNRAEnvUnop OpToString p).
-  Proof.
-    unfold nraenv_core_eq; intros ? ? _ ? _ ? _; simpl.
-    destruct (h ⊢ₑ p @ₑ x ⊣ c;env); reflexivity.
-  Qed.
-
   (* This one should be generalized based on types
       (ENV ◯ (ENV.a)).a ≡ₑ ENV.a
    *)
@@ -1896,8 +1879,6 @@ Hint Rewrite @app_over_appenv_over_mapenv : nraenv_core_optim.
 
 Hint Rewrite @product_singletons : nraenv_core_optim.
 Hint Rewrite @double_flatten_map_coll : nraenv_core_optim.
-Hint Rewrite @tostring_dstring : nraenv_core_optim.
-Hint Rewrite @tostring_tostring : nraenv_core_optim.
 
 (*
        -- Those handle operators on the environment

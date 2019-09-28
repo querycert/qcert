@@ -114,10 +114,10 @@ Section CompilerUntypedTest.
   Example Example1_expected := map dconst
                                    ["MainEntitys with doubleAttribute 50: 2"].
 
-  Definition camp5 : camp := Eval compute in Example1'.
+  Definition camp5 : camp := Eval vm_compute in Example1'.
   Definition algopt5 : nraenv_core := camp_to_nraenv_core Example1'.
   
-  Definition rcamp5 : camp_rule := Eval compute in Example1.
+  Definition rcamp5 : camp_rule := Eval vm_compute in Example1.
   Definition ralgopt5 : nraenv := camp_rule_to_nraenv_optim Example1.
   Definition rnnrc5 : nnrc := camp_rule_to_nnrc_optim Example1.
   

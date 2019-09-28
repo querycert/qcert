@@ -86,7 +86,7 @@ Section ImpJsontoJavaScriptAst.
           JSONRuntimeSort (e :: (List.map sortCriteria_to_json_expr scl))
       | OpCount => mk_imp_json_runtime_call JSONRuntimeCount el
       | OpToString => mk_imp_json_op JSONOpToString el
-      | OpGenerateText => mk_imp_json_runtime_call JSONRuntimeGenerateText el
+      | OpToText => mk_imp_json_runtime_call JSONRuntimeToText el
       | OpLength => mk_imp_json_runtime_call JSONRuntimeLength el
       | OpSubstring start len =>
         let start := ImpExprConst (jnumber (float_of_int start)) in
