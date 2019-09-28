@@ -30,6 +30,7 @@ type result = {
     res_stat_all : string list;
     res_stat_tree : result_file;
     res_optim_config : result_file;
+    res_validates : bool;
   }
 and result_file = {
     res_file : string;
@@ -203,16 +204,16 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
     end
   in
   let queryname = Filename.chop_extension file_name in
-  let _ =
+  let res_validates =
     if validate
     then CheckUtil.validate_result queryname language_name expected_output (Some ev_data)
-    else ()
+    else true
   in
   let s = Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") ev_data) in
   let fpref = queryname in
   let fpost = language_name in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".json" in
-  { res_file = fout; res_lang = language_name; res_content = s; }
+  ({ res_file = fout; res_lang = language_name; res_content = s; }, res_validates)
 
 (* Stats *)
 
@@ -345,20 +346,40 @@ let main gconf (file_name, query_s) =
     else
       []
   in
-  let res_eval =
+  let (res_eval, res_validates) =
     (* eval compiled query *)
     if gconf.gconf_eval then
-      eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug input expected_output schema gconf.gconf_dir file_name q_target
+      eval_string
+        gconf.gconf_eval_validate
+        gconf.gconf_eval_debug
+        input
+        expected_output
+        schema
+        gconf.gconf_dir
+        file_name
+        q_target
     else
-      no_result_file
+      (no_result_file, true)
   in
+  let res_validates_all = ref res_validates in
   let res_eval_all =
     (* eval-all intermediate queries *)
     if gconf.gconf_eval_all then
       let _, l =
         List.fold_left
           (fun (fname, acc) q ->
-            let res = eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug input expected_output schema gconf.gconf_dir fname q in
+            let (res,res_validates) =
+              eval_string
+                gconf.gconf_eval_validate
+                gconf.gconf_eval_debug
+                input
+                expected_output
+                schema
+                gconf.gconf_dir
+                fname
+                q
+            in
+            res_validates_all := !res_validates_all && res_validates;
             let suff =
               ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q)
             in
@@ -403,5 +424,6 @@ let main gconf (file_name, query_s) =
     res_stat = res_stat;
     res_stat_all = res_stat_all;
     res_stat_tree = res_stat_tree;
-    res_optim_config = res_optim_config; }
+    res_optim_config = res_optim_config;
+    res_validates = !res_validates_all }
 

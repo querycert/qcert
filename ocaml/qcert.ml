@@ -212,8 +212,10 @@ let () =
         res.QcertCore.res_stat_all;
     output_res res.QcertCore.res_stat_tree
   in
+  let res_validates = ref true in
   List.iter
     (fun res ->
+      res_validates := !res_validates && res.QcertCore.res_validates;
       output_res res.QcertCore.res_emit;
       List.iter output_res res.QcertCore.res_emit_all;
       output_res res.QcertCore.res_eval;
@@ -222,4 +224,8 @@ let () =
       List.iter output_res res.QcertCore.res_emit_sexp_all;
       output_stats res;
       output_res res.QcertCore.res_optim_config;)
-    results
+    results;
+  if !res_validates
+  then exit 0
+  else exit 1
+
