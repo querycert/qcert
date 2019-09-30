@@ -17,7 +17,11 @@
 package org.qcert.runtime;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -153,7 +157,7 @@ public class UnaryOperators {
 			elemstrings[i] = sbelem.toString();
 		}
 		Arrays.sort(elemstrings);
-		
+
 		sb.append("[");
 		boolean isFirst = true;
 		for(String elem : elemstrings) {
@@ -169,23 +173,40 @@ public class UnaryOperators {
 	}
 
 	private static <V> void tostring(StringBuilder sb, JsonObject o){
-	    if (o.has("nat")) {
-		sb.append(o.get("nat").getAsLong());
-	    } else {
-		sb.append("{");
-		
-		boolean isFirst = true;
-		for(Entry<String, JsonElement>entry : o.entrySet()) {
-			if(isFirst) {
-				isFirst = false;
-			} else {
-				sb.append(",");
-			}
-			sb.append(entry.getKey());
-			sb.append(":");
-			tostring(sb,entry.getValue());
-		}
-		sb.append("}");
+	    if (o.has("nat")) { // integer
+          sb.append(o.get("nat").getAsLong());
+	    } else if (o.has("type")) { // branded value
+          sb.append("<");
+          sb.append(o.get("type").getAsString());
+          sb.append(":");
+          tostring(sb,o.get("data"));
+          sb.append(">");
+      } else { // record
+          sb.append("{");
+          // Sort based on keys first
+          Set<Entry<String,JsonElement>> entryset = o.entrySet();
+          List<Entry<String,JsonElement>> entrylist = new ArrayList<Entry<String,JsonElement>>(entryset);
+          Comparator<Entry<String,JsonElement>> compareByKey = new Comparator<Entry<String,JsonElement>>() {
+                  @Override
+                  public int compare(Entry<String,JsonElement> e1, Entry<String,JsonElement> e2) {
+                      return e1.getKey().compareTo( e2.getKey() );
+                  }
+              };
+
+          Collections.sort(entrylist, compareByKey);
+
+          boolean isFirst = true;
+          for(Entry<String, JsonElement>entry : entrylist) {
+              if(isFirst) {
+                  isFirst = false;
+              } else {
+                  sb.append(", ");
+              }
+              sb.append(entry.getKey());
+              sb.append("->");
+              tostring(sb,entry.getValue());
+          }
+          sb.append("}");
 	    }
 	}
 
@@ -197,7 +218,8 @@ public class UnaryOperators {
 		} else if(e.isJsonArray()) {
 			tostring(sb, e.getAsJsonArray());
 		} else if(e.isJsonObject()) {
-			tostring(sb, e.getAsJsonObject());
+      final JsonObject er = e.getAsJsonObject();
+			tostring(sb, er);
 		} else {
 			sb.append(e.toString());
 		}

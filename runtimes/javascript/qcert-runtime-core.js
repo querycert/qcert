@@ -229,13 +229,29 @@ function toStringQ(v, quote) {
     if(v.hasOwnProperty('nat')){
 	return "" + v.nat;
     }
-    var result2 = "{";
-    var first = true;
-    for (var key in v) {
-	if (first) first = false; else result2 += ", ";
-	result2 += toStringQ(key, quote) + ": " + toStringQ(v[key], quote);
+    var result2 = "";
+    if (v.type) { // branded value
+        result2 += "<";
+        result2 += v.type;
+        result2 += ":";
+        result2 += toStringQ(v.data, quote);
+        result2 += ">";
+    } else { // record
+        // First need to sort
+        var sortable = [];
+        for (var key in v) {
+            sortable.push({ key: key, val: v[key] });
+        }
+        sortable.sort(function(a, b) { return a.key.localeCompare(b.key); });
+        var result2 = "{";
+        var first = true;
+        for (var i=0, n=sortable.length; i<n; i++) {
+	          if (first) first = false; else result2 += ", ";
+	          result2 += toStringQ(sortable[i].key, quote) + "->" + toStringQ(sortable[i].val, quote);
+        }
+        result2 += "}";
     }
-    return result2 + "}";
+    return result2 + "";
 }
 function bunion(b1, b2) {
     var result = [ ];
