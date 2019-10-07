@@ -212,6 +212,9 @@ MODULES = \
 	NNRSimp/Typing/TNNRSimp \
 	NNRSimp/Typing/TNNRSimpEq \
 	NNRSimp/Typing/TNNRSimpRename \
+	NNRSimp/NNRSimpRuntime \
+	NNRSimp/NNRSimpTypes \
+	NNRSimp/NNRSimpSystem \
 	NNRSimp/Optim/NNRSimpUnflatten \
 	NNRSimp/Optim/NNRSimpRewrite \
 	NNRSimp/Optim/TNNRSimpUnflatten \
@@ -219,9 +222,6 @@ MODULES = \
 	NNRSimp/Optim/NNRSimpOptimizer \
 	NNRSimp/Optim/NNRSimpOptimizerEngine \
 	NNRSimp/NNRSimpOptim \
-	NNRSimp/NNRSimpRuntime \
-	NNRSimp/NNRSimpTypes \
-	NNRSimp/NNRSimpSystem \
 	Imp/Lang/Imp \
 	Imp/Lang/ImpSize \
 	Imp/Lang/ImpEval \

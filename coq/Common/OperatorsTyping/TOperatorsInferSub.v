@@ -69,7 +69,7 @@ Section TOperatorsInferSub.
         | false, true =>
            lift (fun _ => (τ₁, τ₁, ⊥)) (tunrec τ₁)
         | false, false =>
-          lift (fun τ => (τ, τ₁, τ₂)) (trecConcat τ₁ τ₂)
+          lift (fun τ => (τ, τ₁, τ₂)) (trecConcatRight τ₁ τ₂)
         end
       | OpRecMerge =>
         match τ₁ ==b ⊥, τ₂ ==b ⊥ with

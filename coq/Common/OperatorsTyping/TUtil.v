@@ -197,6 +197,46 @@ Section TUtil.
     - exact None.
   Defined.
 
+  Definition trecConcatRight (τ₁ τ₂: rtype) : option rtype.
+  Proof.
+    destruct τ₁; destruct x.
+    - exact None.
+    - exact None.
+    - exact None.
+    - exact None.
+    - exact None.
+    - exact None.
+    - exact None.
+    - exact None.
+    - destruct τ₂; destruct x.
+      + exact None.
+      + exact None.
+      + exact None.
+      + exact None.
+      + exact None.
+      + exact None.
+      + exact None.
+      + exact None.
+      + generalize (from_Rec₀ srl e); intros.
+        generalize (from_Rec₀ srl0 e0); intros.
+        destruct H; destruct H0.
+        destruct k; destruct k0; simpl.
+        * exact None. (* Both open record *)
+        * generalize (rec_concat_sort x x0); intros. (* Left open record *)
+          exact (RecMaybe Open H).
+        * exact None. (* Right open record *)
+        * generalize (rec_concat_sort x x0); intros.
+          exact (RecMaybe Closed H).
+      + exact None.
+      + exact None.
+      + exact None.
+      + exact None.
+    - exact None.
+    - exact None.
+    - exact None.
+    - exact None.
+  Defined.
+
   Definition tmergeConcat (τ₁ τ₂: rtype) : option rtype.
   Proof.
     destruct τ₁; destruct x.
