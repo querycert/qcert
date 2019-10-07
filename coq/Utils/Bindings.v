@@ -1686,14 +1686,36 @@ Section Edot.
     apply assoc_lookupr_nodup_perm.
   Qed.
   
-  Lemma edot_fresh_concat {A} x (d:A) b :
-    ~ In x (domain b) ->
+  Lemma edot_fresh_concat_right_single {A} x (d:A) b :
     edot (rec_concat_sort b ((x,d)::nil)) x = Some d.
   Proof.
     intros.
-    apply (@assoc_lookupr_insertion_sort_fresh string ODT_string); trivial.
+    unfold rec_concat_sort.
+    unfold edot.
+    rewrite assoc_lookupr_drec_sort.
+    simpl.
+    induction b; simpl.
+    match_destr; try congruence.
+    destruct a; simpl.
+    rewrite IHb.
+    reflexivity.
   Qed.
 
+  Lemma edot_concat_right {A} x (d:A) b c :
+    edot c x = Some d ->
+    edot (rec_concat_sort b c) x = Some d.
+  Proof.
+    intros.
+    unfold rec_concat_sort.
+    unfold edot in *.
+    rewrite assoc_lookupr_drec_sort.
+    simpl.
+    induction b; simpl; auto.
+    destruct a; simpl.
+    rewrite IHb.
+    reflexivity.
+  Qed.
+    
 End Edot.
 
 Hint Unfold rec_sort rec_concat_sort.

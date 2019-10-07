@@ -1452,7 +1452,7 @@ Section cNNRCtoCAMP.
       case_eq (camp_eval h cenv p bind a); simpl; intros; trivial.
       - case_eq (gather_successes (map (camp_eval h cenv p bind) l)); simpl; trivial; intros.
         rewrite merge_bindings_single_nin by trivial.
-        rewrite edot_fresh_concat by trivial.
+        rewrite edot_fresh_concat_right_single by trivial.
         simpl.
         destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (bcount l))))
                               (dnat (Z.of_nat (bcount res)))).
@@ -1468,32 +1468,32 @@ Section cNNRCtoCAMP.
           inversion e.
           rewrite merge_bindings_nil_r.
           rewrite sort_sorted_is_id; trivial.
-          rewrite edot_fresh_concat; trivial.
+          rewrite edot_fresh_concat_right_single; trivial.
       - case_eq (gather_successes (map (camp_eval h cenv p bind) l)); simpl; trivial; intros.
         rewrite merge_bindings_single_nin by trivial.
-        rewrite edot_fresh_concat by trivial.
+        rewrite edot_fresh_concat_right_single by trivial.
         simpl.
         destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (bcount l))))
                               (dnat (Z.pos (Pos.of_succ_nat (bcount res0))))).
         trivial; simpl.
         + rewrite merge_bindings_nil_r.
           rewrite sort_sorted_is_id; trivial.
-          rewrite edot_fresh_concat; trivial. simpl.
+          rewrite edot_fresh_concat_right_single; trivial. simpl.
           rewrite merge_bindings_single_nin by trivial.
-          rewrite edot_fresh_concat; trivial.
+          rewrite edot_fresh_concat_right_single; trivial.
           simpl.
           inversion e.
           destruct (data_eq_dec (dnat (Z.of_nat (bcount l)))
                                 (dnat (Z.of_nat (bcount res0)))); simpl; trivial.
           * rewrite merge_bindings_nil_r.
             rewrite sort_sorted_is_id; trivial.
-            rewrite edot_fresh_concat; trivial.
+            rewrite edot_fresh_concat_right_single; trivial.
           * inversion e.
             assert (bcount l = bcount res0)
               by apply (pos_succ_nat_inv (bcount l) (bcount res0) H6).
             rewrite H4 in *. congruence.
         + rewrite merge_bindings_single_nin by trivial.
-          rewrite edot_fresh_concat; trivial.
+          rewrite edot_fresh_concat_right_single; trivial.
           simpl.
           destruct (data_eq_dec (dnat (Z.of_nat (bcount l)))
                                 (dnat (Z.of_nat (bcount res0))));
@@ -1521,11 +1521,11 @@ Section cNNRCtoCAMP.
         intuition. unfold fresh_let_var, let_var in H0.
         eapply H0; trivial; reflexivity.
         rewrite merge_bindings_single_nin by trivial.
-        rewrite edot_fresh_concat by trivial.
+        rewrite edot_fresh_concat_right_single by trivial.
         simpl. 
         rewrite merge_bindings_nil_r.
         rewrite drec_sort_drec_sort_concat.
-        rewrite edot_fresh_concat by trivial.
+        rewrite edot_fresh_concat_right_single by trivial.
         trivial.
       - rewrite camp_eval_mapall_let_cons by trivial.
         rewrite IHl by trivial.
@@ -1687,7 +1687,7 @@ Section cNNRCtoCAMP.
         destruct (camp_eval h cenv (nnrcToCamp_ns n1) b d); trivial.
         simpl.
         rewrite merge_bindings_single_nin by trivial.
-        rewrite edot_fresh_concat by trivial.
+        rewrite edot_fresh_concat_right_single by trivial.
         destruct res; trivial.
         destruct b0; simpl.
         + repeat rewrite merge_bindings_nil_r.
