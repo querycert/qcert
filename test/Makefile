@@ -67,7 +67,7 @@ endif
 ## OQL
 OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12
 OQLWORLDNUM=1 2
-OQLSTRINGNUM=1 2
+OQLSTRINGNUM=1 2 3
 OQLEMPLOYEESNUM=1 2
 OQLTARGETS=oql nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
@@ -205,7 +205,7 @@ oql-employees-tests-java:
                           employees$(N) || exit 1;)
 
 ## λ-NRA
-LAMBDANRAPERSONSNUM=1 2 3 4 5 6 7
+LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7
 LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 lambda_nra-tests:
@@ -226,7 +226,7 @@ lambda_nra-persons-tests:
 	       $(QCERTCOMP) -source lambda_nra -target $(T) lambda_nra/persons$(N).lnra \
                             -eval -input lambda_nra/persons.input \
                             -schema lambda_nra/persons.schema \
-                            -eval-validate -output lambda_nra/persons$(N).out;))
+                            -eval-validate -output lambda_nra/persons$(N).out || exit 1;))
 lambda_nra-persons-tests-js:
 	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
 	       $(QCERTCOMP) -source lambda_nra -path imp_json  -target js lambda_nra/persons$(N).lnra \
@@ -236,7 +236,7 @@ lambda_nra-persons-tests-js:
                           -input lambda_nra/persons.input \
                           -schema lambda_nra/persons.schema \
                           -output lambda_nra/persons$(N).out \
-                          lambda_nra/persons$(N).js;)
+                          lambda_nra/persons$(N).js || exit 1;)
 lambda_nra-persons-tests-java:
 	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
 	       $(QCERTCOMP) -source lambda_nra -target java lambda_nra/persons$(N).lnra \
@@ -246,7 +246,7 @@ lambda_nra-persons-tests-java:
                           -input lambda_nra/persons.input \
                           -schema lambda_nra/persons.schema \
                           -output lambda_nra/persons$(N).out \
-                          persons$(N);)
+                          persons$(N) || exit 1;)
 
 ## CAMP
 CAMPWORLDNUM=1
@@ -270,7 +270,7 @@ camp-world-tests:
 	       $(QCERTCOMP) -source camp -target $(T) camp/world$(N).camp \
                             -eval -input camp/world.input \
                             -schema camp/world.schema \
-                            -eval-validate -output camp/world$(N).out;))
+                            -eval-validate -output camp/world$(N).out || exit 1;))
 camp-world-tests-js:
 	@$(foreach N,$(CAMPWORLDNUM), \
 	       $(QCERTCOMP) -source camp -path imp_json  -target js camp/world$(N).camp \
@@ -280,7 +280,7 @@ camp-world-tests-js:
                           -input camp/world.input \
                           -schema camp/world.schema \
                           -output camp/world$(N).out \
-                          camp/world$(N).js;)
+                          camp/world$(N).js || exit 1;)
 camp-world-tests-java:
 	@$(foreach N,$(CAMPWORLDNUM), \
 	       $(QCERTCOMP) -source camp -target java camp/world$(N).camp \
@@ -290,10 +290,10 @@ camp-world-tests-java:
                           -input camp/world.input \
                           -schema camp/world.schema \
                           -output camp/world$(N).out \
-                          world$(N);)
+                          world$(N) || exit 1;)
 
 ## SQL
-SQLORGNUM=1 2 3 4 5 6 7 8 9 10
+SQLORGNUM=1 2 3 4 5 6 7 8 9 10 11
 SQLTARGETS=nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc # dnnrc_typed
 
 sql-tests:
@@ -314,7 +314,7 @@ sql-org-tests:
 	       $(QCERTCOMP) -source sql -target $(T) sql/org$(N).sql \
                             -eval -input sql/org.input \
                             -schema sql/org.schema \
-                            -eval-validate -output sql/org$(N).out;))
+                            -eval-validate -output sql/org$(N).out || exit 1;))
 sql-org-tests-js:
 	@$(foreach N,$(SQLORGNUM), \
 	       $(QCERTCOMP) -source sql -path imp_json  -target js sql/org$(N).sql \
@@ -324,7 +324,7 @@ sql-org-tests-js:
                           -input sql/org.input \
                           -schema sql/org.schema \
                           -output sql/org$(N).out \
-                          sql/org$(N).js;)
+                          sql/org$(N).js || exit 1;)
 sql-org-tests-java:
 	@$(foreach N,$(SQLORGNUM), \
 	       $(QCERTCOMP) -source sql -target java sql/org$(N).sql \
@@ -334,7 +334,7 @@ sql-org-tests-java:
                           -input sql/org.input \
                           -schema sql/org.schema \
                           -output sql/org$(N).out \
-                          org$(N);)
+                          org$(N) || exit 1;)
 
 
 ## TECHRULE
@@ -359,7 +359,7 @@ tech_rule-test-tests:
 	       $(QCERTCOMP) -source tech_rule -target $(T) tech_rule/test$(N).arl \
                             -eval -input tech_rule/test.input \
                             -schema tech_rule/test.schema \
-                            -eval-validate -output tech_rule/test$(N).out;))
+                            -eval-validate -output tech_rule/test$(N).out || exit 1;))
 tech_rule-test-tests-js:
 	@$(foreach N,$(TECHRULETESTNUM), \
 	       $(QCERTCOMP) -source tech_rule -path imp_json  -target js tech_rule/test$(N).arl \
@@ -369,7 +369,7 @@ tech_rule-test-tests-js:
                           -input tech_rule/test.input \
                           -schema tech_rule/test.schema \
                           -output tech_rule/test$(N).out \
-                          tech_rule/test$(N).js;)
+                          tech_rule/test$(N).js || exit 1;)
 tech_rule-test-tests-java:
 	@$(foreach N,$(TECHRULETESTNUM), \
 	       $(QCERTCOMP) -source tech_rule -target java tech_rule/test$(N).arl \
@@ -379,7 +379,7 @@ tech_rule-test-tests-java:
                           -input tech_rule/test.input \
                           -schema tech_rule/test.schema \
                           -output tech_rule/test$(N).out \
-                          test$(N);)
+                          test$(N) || exit 1;)
 
 ## DESIGNERRULE
 DESIGNERRULETESTNUM=
@@ -400,7 +400,7 @@ designer_rule-test-tests:
 	       $(QCERTCOMP) -source designer_rule -target $(T) designer_rule/test$(N).agg \
                             -eval -input designer_rule/test.input \
                             -schema designer_rule/test.schema \
-                            -eval-validate -output designer_rule/test$(N).out;))
+                            -eval-validate -output designer_rule/test$(N).out || exit 1;))
 designer_rule-test-tests-js:
 	@$(foreach N,$(DESIGNERRULETESTNUM), \
 	       $(QCERTCOMP) -source designer_rule -path imp_json  -target js designer_rule/test$(N).agg \
@@ -410,7 +410,7 @@ designer_rule-test-tests-js:
                           -input designer_rule/test.input \
                           -schema designer_rule/test.schema \
                           -output designer_rule/test$(N).out \
-                          designer_rule/test$(N).js;)
+                          designer_rule/test$(N).js || exit 1;)
 
 clean:
 	@rm -f */*.txt
