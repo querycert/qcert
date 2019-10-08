@@ -18,8 +18,14 @@ package org.qcert.runtime;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -90,12 +96,31 @@ public class BinaryOperators {
 	public static JsonElement concat(JsonElement e1, JsonElement e2) {
 		final JsonObject rec1 = asRec(e1);
 		final JsonObject rec2 = asRec(e2);
-		final JsonObject dst = new JsonObject();
-		for(final Entry<String, JsonElement> entry : rec1.entrySet()) {
-			dst.add(entry.getKey(), entry.getValue());
-		}
+
+    // Sort based on keys first and do not add fields in rec1 which are in rec
+    Set<Entry<String,JsonElement>> entryset = new HashSet<Entry<String,JsonElement>>();
 		for(final Entry<String, JsonElement> entry : rec2.entrySet()) {
-			dst.add(entry.getKey(), entry.getValue());
+      entryset.add(entry);
+		}
+		for(final Entry<String, JsonElement> entry : rec1.entrySet()) {
+      if (!rec2.has(entry.getKey())) {
+        entryset.add(entry);
+      }
+		}
+
+    List<Entry<String,JsonElement>> entrylist = new ArrayList<Entry<String,JsonElement>>(entryset);
+    Comparator<Entry<String,JsonElement>> compareByKey = new Comparator<Entry<String,JsonElement>>() {
+            @Override
+            public int compare(Entry<String,JsonElement> e1, Entry<String,JsonElement> e2) {
+                return e1.getKey().compareTo( e2.getKey() );
+            }
+        };
+
+    Collections.sort(entrylist, compareByKey);
+    
+		final JsonObject dst = new JsonObject();
+		for(final Entry<String, JsonElement> entry : entrylist) {
+        dst.add(entry.getKey(), entry.getValue());
 		}
 		return dst;
 	}

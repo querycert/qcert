@@ -1,0 +1,2 @@
+select struct(name:x->name)
+from x as Customer in WORLD

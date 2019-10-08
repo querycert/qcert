@@ -12,10 +12,12 @@
  * limitations under the License.
  *)
 
+Require Import String.
+Require Import List.
 Require Import Qcert.Compiler.Driver.CompLang.
 Require Import Qcert.Compiler.EnhancedCompiler.
-Require Import String.
 Require Import Qcert.Common.DataModel.Data.
+Require Import Qcert.Common.Operators.BinaryOperators.
 Require Import Qcert.NRAEnv.Lang.NRAEnv.
 
 Section HelloWorld.
@@ -28,12 +30,30 @@ Section HelloWorld.
   Definition compile : query -> query :=
     @EnhancedCompiler.QDriver.compile_from_source_target bm _ config source target.
 
-  Section example.
+  Section example1.
     Definition a1 :=
       NRAEnvConst (dstring "Hello World!").
 
-    (* Eval vm_compute in compile (Q_nraenv a1). *)
-  End example.
+    Section compile.
+      (* Eval vm_compute in compile (Q_nraenv a1). *)
+    End compile.
+    Section eval.
+      (* Eval vm_compute in (nraenv_eval_top nil a1 nil). *)
+    End eval.
+  End example1.
+
+  Section example2.
+    Definition a2 :=
+      NRAEnvBinop OpRecConcat
+                  (NRAEnvConst (drec (("a"%string, dstring "Hello World!")::nil)))
+                  (NRAEnvConst (drec (("a"%string, dnat 1)::nil))).
+
+    Section compile.
+      (* Eval vm_compute in compile (Q_nraenv a2). *)
+    End compile.
+    Section eval.
+      (* Eval vm_compute in (nraenv_eval_top nil a2 nil). *)
+    End eval.
+  End example2.
 
 End HelloWorld.
-
