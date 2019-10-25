@@ -212,7 +212,7 @@ Section CompCorrectness.
     match dv with
     | Dv_nnrs_imp_stop => True
     | Dv_nnrs_imp_optim _ dv => False /\ driver_correct_nnrs_imp dv
-    | Dv_nnrs_imp_to_imp_qcert _ _ dv => False /\ driver_correct_imp_qcert dv
+    | Dv_nnrs_imp_to_imp_qcert _ dv => False /\ driver_correct_imp_qcert dv
     | Dv_nnrs_imp_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 

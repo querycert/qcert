@@ -36,6 +36,7 @@ Require Import NNRSimp.
 Require Import NNRSimpVars.
 
 Section NNRSimpEval.
+  Import ListNotations.
 
   Context {fruntime:foreign_runtime}.
 
@@ -526,7 +527,7 @@ Section NNRSimpEval.
           apply remove_nin_inv in inn2.
           intuition congruence.
     Qed.
-    
+
     Lemma nnrs_imp_expr_eval_same σc pd₁ pd₂ s :
       lookup_equiv_on (nnrs_imp_expr_free_vars s) pd₁ pd₂ ->
       nnrs_imp_expr_eval σc pd₁ s = nnrs_imp_expr_eval σc pd₂ s.
