@@ -37,39 +37,36 @@ Section NNRSimptoImpQcert.
   (** Translation *)
 
 
-  (* XXX Danger: string hypothesis on the encoding of the queries XXX *)
-  (* We make the hypothesis that the constants environment is provided as a record named constants *)
-  Definition constants := "constants"%string.
-
-  Fixpoint nnrs_imp_expr_to_imp_qcert (exp: nnrs_imp_expr): imp_qcert_expr :=
+  Fixpoint nnrs_imp_expr_to_imp_qcert (constants: string) (exp: nnrs_imp_expr): imp_qcert_expr :=
     match exp with
     | NNRSimpGetConstant x =>
-      (* XXX Danger: string hypothesis on the encoding of the queries XXX *)
       ImpExprOp (QcertOpUnary (OpDot x)) [ ImpExprVar constants ]
     | NNRSimpVar x =>
       ImpExprVar x
     | NNRSimpConst d =>
       ImpExprConst d
     | NNRSimpBinop op e1 e2 =>
-      let e1' := nnrs_imp_expr_to_imp_qcert e1 in
-      let e2' := nnrs_imp_expr_to_imp_qcert e2 in
+      let e1' := nnrs_imp_expr_to_imp_qcert constants e1 in
+      let e2' := nnrs_imp_expr_to_imp_qcert constants e2 in
       ImpExprOp (QcertOpBinary op) [e1'; e2']
     | NNRSimpUnop op e =>
-      let e' := nnrs_imp_expr_to_imp_qcert e in
+      let e' := nnrs_imp_expr_to_imp_qcert constants e in
       ImpExprOp (QcertOpUnary op) [e']
     | NNRSimpGroupBy g fields e =>
-      let e' := nnrs_imp_expr_to_imp_qcert e in
+      let e' := nnrs_imp_expr_to_imp_qcert constants e in
       ImpExprRuntimeCall (QcertRuntimeGroupby g fields) [ e' ]
     end.
 
   Lemma nnrs_imp_expr_to_imp_qcert_correct h (σc:bindings) (σ:pd_bindings) (exp:nnrs_imp_expr) :
+    forall constants: string,
     let σ0 : pd_bindings :=
         σ ++ [(constants,  Some (drec σc))]
     in
     ~ In constants (nnrs_imp_expr_free_vars exp) ->
     lookup equiv_dec σ constants = None ->
-    nnrs_imp_expr_eval h σc σ exp = imp_qcert_expr_eval h σ0 (nnrs_imp_expr_to_imp_qcert exp).
+    nnrs_imp_expr_eval h σc σ exp = imp_qcert_expr_eval h σ0 (nnrs_imp_expr_to_imp_qcert constants exp).
   Proof.
+    intros constants.
     nnrs_imp_expr_cases (induction exp) Case; simpl.
     - Case "NNRSimpGetConstant"%string.
       intros Hfv Hσ.
@@ -125,30 +122,30 @@ Section NNRSimptoImpQcert.
       match_destr.
   Qed.
 
-  Fixpoint nnrs_imp_stmt_to_imp_qcert (stmt: nnrs_imp_stmt): imp_qcert_stmt :=
+  Fixpoint nnrs_imp_stmt_to_imp_qcert (constants: string) (stmt: nnrs_imp_stmt): imp_qcert_stmt :=
     match stmt with
     | NNRSimpSkip =>
       @ImpStmtBlock imp_qcert_data imp_qcert_op imp_qcert_runtime_op  [] []
     | NNRSimpSeq s1 s2 =>
       ImpStmtBlock
         []
-        [ nnrs_imp_stmt_to_imp_qcert s1;
-          nnrs_imp_stmt_to_imp_qcert s2 ]
+        [ nnrs_imp_stmt_to_imp_qcert constants s1;
+          nnrs_imp_stmt_to_imp_qcert constants s2 ]
     | NNRSimpLet x e s =>
       ImpStmtBlock
-        [ (x, lift nnrs_imp_expr_to_imp_qcert e) ]
-        [ nnrs_imp_stmt_to_imp_qcert s ]
+        [ (x, lift (nnrs_imp_expr_to_imp_qcert constants) e) ]
+        [ nnrs_imp_stmt_to_imp_qcert constants s ]
     | NNRSimpAssign x e =>
-      ImpStmtAssign x (nnrs_imp_expr_to_imp_qcert e)
+      ImpStmtAssign x (nnrs_imp_expr_to_imp_qcert constants e)
     (* | NNRSimpPush x e => *)
     (*   stat_expr (array_push (expr_identifier x) (nnrs_imp_expr_to_imp_qcert e)) *)
     | NNRSimpFor x e s =>
-      ImpStmtFor x (nnrs_imp_expr_to_imp_qcert e) (nnrs_imp_stmt_to_imp_qcert s)
+      ImpStmtFor x (nnrs_imp_expr_to_imp_qcert constants e) (nnrs_imp_stmt_to_imp_qcert constants s)
     | NNRSimpIf e s1 s2 =>
       ImpStmtIf
-        (nnrs_imp_expr_to_imp_qcert e)
-        (nnrs_imp_stmt_to_imp_qcert s1)
-        (nnrs_imp_stmt_to_imp_qcert s2)
+        (nnrs_imp_expr_to_imp_qcert constants e)
+        (nnrs_imp_stmt_to_imp_qcert constants s1)
+        (nnrs_imp_stmt_to_imp_qcert constants s2)
     (* | NNRSimpEither (NNRSimpVar x) x1 s1 x2 s2 => *)
     (*   let e' := ImpExprVar x  in *)
     (*   ImpStmtIf *)
@@ -161,18 +158,19 @@ Section NNRSimptoImpQcert.
     (*        [ nnrs_imp_stmt_to_imp_qcert s2 ]) *)
     | NNRSimpEither e x1 s1 x2 s2 =>
       (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
-      let e' := nnrs_imp_expr_to_imp_qcert e in
+      let e' := nnrs_imp_expr_to_imp_qcert constants e in
       ImpStmtIf
         (ImpExprRuntimeCall QcertRuntimeEither [e'])
         (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
            [ (x1, Some (ImpExprRuntimeCall QcertRuntimeToLeft [e'])) ]
-           [ nnrs_imp_stmt_to_imp_qcert s1 ])
+           [ nnrs_imp_stmt_to_imp_qcert constants s1 ])
         (ImpStmtBlock (* var x2 = toRight(e); s2 *)
            [ (x2, Some (ImpExprRuntimeCall QcertRuntimeToRight [e'])) ]
-           [ nnrs_imp_stmt_to_imp_qcert s2 ])
+           [ nnrs_imp_stmt_to_imp_qcert constants s2 ])
     end.
 
   Lemma nnrs_imp_stmt_to_imp_qcert_correct h (σc:bindings) (σ:pd_bindings) (stmt:nnrs_imp_stmt) :
+    forall constants: string,
     let σ0 : pd_bindings :=
         σ ++ [(constants,  Some (drec σc))]
     in
@@ -181,8 +179,9 @@ Section NNRSimptoImpQcert.
     lookup equiv_dec σ constants = None ->
     olift (fun σr => Some (σr ++ [(constants,  Some (drec σc))]))
           (nnrs_imp_stmt_eval h σc stmt σ) =
-    imp_qcert_stmt_eval h (nnrs_imp_stmt_to_imp_qcert stmt) σ0.
+    imp_qcert_stmt_eval h (nnrs_imp_stmt_to_imp_qcert constants stmt) σ0.
   Proof.
+    intros constants.
     simpl.
     revert σ.
     nnrs_imp_stmt_cases (induction stmt) Case; intros σ Hfv Hbv Hσ; simpl in *.
@@ -211,8 +210,8 @@ Section NNRSimptoImpQcert.
       unfold olift.
       apply notand in Hfv.
       destruct Hfv as [ Hv Hfv ].
-      rewrite nnrs_imp_expr_to_imp_qcert_correct; trivial.
-      case_eq (imp_qcert_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_qcert n)).
+      rewrite (nnrs_imp_expr_to_imp_qcert_correct h _ _ _ constants); trivial.
+      case_eq (imp_qcert_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_qcert constants n)).
       + unfold imp_qcert_expr_eval.
         intros d Hn; rewrite Hn.
         rewrite (lookup_remove_nin); trivial.
@@ -232,9 +231,9 @@ Section NNRSimptoImpQcert.
       + rewrite app_or_in_iff in Hfv.
         apply notand in Hfv.
         destruct Hfv as [ Hfvn Hfvs ].
-        rewrite nnrs_imp_expr_to_imp_qcert_correct; trivial.
+        rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); trivial.
         unfold lift.
-        case_eq (imp_qcert_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_qcert n)).
+        case_eq (imp_qcert_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_qcert constants n)).
         * intros d Hn.
           unfold imp_qcert_expr_eval in *.
           rewrite Hn.
@@ -294,7 +293,7 @@ Section NNRSimptoImpQcert.
       rewrite app_or_in_iff in Hfv.
       apply notand in Hfv.
       destruct Hfv as [ Hfvn Hfvs ].
-      rewrite nnrs_imp_expr_to_imp_qcert_correct; trivial.
+      rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); trivial.
       unfold imp_qcert_expr_eval.
       match_destr.
       destruct i; simpl; try reflexivity.
@@ -349,7 +348,7 @@ Section NNRSimptoImpQcert.
       destruct Hfv as [ Hfvn Hfvs ].
       apply notand in Hfvs.
       destruct Hfvs as [ Hfvs1 Hfvs2 ].
-      rewrite nnrs_imp_expr_to_imp_qcert_correct; auto.
+      rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); auto.
       unfold imp_qcert_expr_eval.
       match_destr; simpl.
       destruct i; simpl; try reflexivity.
@@ -366,7 +365,7 @@ Section NNRSimptoImpQcert.
       destruct Hfv as [ Hfvn Hfvs ].
       apply notand in Hfvs.
       destruct Hfvs as [ Hfvs1 Hfvs2 ].
-      rewrite nnrs_imp_expr_to_imp_qcert_correct; auto.
+      rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); auto.
       unfold imp_qcert_expr_eval.
       match_destr.
       simpl.
@@ -425,11 +424,62 @@ Section NNRSimptoImpQcert.
            congruence.
   Qed.
 
-  (* XXX Danger: string hypotheys on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_function (q: nnrs_imp): imp_function :=
     let (stmt, ret) := q in
-    let body := nnrs_imp_stmt_to_imp_qcert stmt in
+    let constants :=
+        let fv := nnrs_imp_stmt_free_vars stmt in
+        let bv := nnrs_imp_stmt_bound_vars stmt in
+        fresh_var "constants"%string (ret :: fv ++ bv)
+    in
+    let body := nnrs_imp_stmt_to_imp_qcert constants stmt in
     ImpFun constants body ret.
+
+  Lemma nnrs_imp_to_imp_qcert_function_correct h (σc:bindings) (q:nnrs_imp) :
+    (* nnrs_imp_eval h σc q = *)
+    (* lift (fun x => Some x) (imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec σc)). *)
+    match nnrs_imp_eval h σc q with
+    | None => imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec σc) = None
+    | Some o => imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec σc) = o
+    end.
+  Proof.
+    elim q; intros stmt ret.
+    simpl.
+    specialize (fresh_var_fresh "constants" (ret :: nnrs_imp_stmt_free_vars stmt ++ nnrs_imp_stmt_bound_vars stmt)).
+    rewrite not_in_cons.
+    rewrite nin_app_or.
+    set (constants := (fresh_var "constants" (ret :: nnrs_imp_stmt_free_vars stmt ++ nnrs_imp_stmt_bound_vars stmt))).
+    intros Hfresh.
+    destruct Hfresh as [Hret Hfresh].
+    destruct Hfresh as [Hfv Hbv].
+    specialize (nnrs_imp_stmt_to_imp_qcert_correct h σc [(ret, None)] stmt constants).
+    simpl.
+    unfold imp_qcert_stmt_eval.
+    unfold Var.var.
+    unfold var.
+    unfold imp_qcert_data.
+    intros Hstmt.
+    rewrite <- Hstmt; clear Hstmt; trivial;
+      [ | case (equiv_dec constants ret); congruence ];
+      unfold Var.var;
+      unfold var;
+      unfold imp_qcert_data.
+    unfold olift.
+    unfold lift.
+    case_eq (nnrs_imp_stmt_eval h σc stmt [(ret, None)]);
+      unfold Var.var;
+      unfold var;
+      unfold imp_qcert_data;
+      [ | intros Hstmt; rewrite  Hstmt; reflexivity].
+    intros σ Hstmt.
+    rewrite  Hstmt.
+    specialize (nnrs_imp_stmt_eval_domain_stack Hstmt).
+    case_eq σ; simpl; try congruence.
+    intros p σ' Hσ Hdom.
+    destruct p.
+    simpl in Hdom.
+    inversion Hdom.
+    case (equiv_dec s s); try congruence.
+  Qed.
 
   (* XXX Danger: string hypothesis on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_top (qname: string) (q: nnrs_imp): imp :=

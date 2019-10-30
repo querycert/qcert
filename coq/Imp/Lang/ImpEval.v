@@ -31,6 +31,8 @@ Require Import CommonRuntime.
 Require Import Imp.
 
 Section ImpEval.
+  Import ListNotations.
+
   Context {Data: Type}.
   Context {Op: Type}.
   Context {Runtime: Type}.
@@ -158,13 +160,13 @@ Section ImpEval.
         end
       end.
 
-    Definition imp_function_eval f (v: Data)  : option Data :=
+    Definition imp_function_eval f (v: Data) : option Data :=
       match f with
       | ImpFun x s ret =>
-        let σ := (x, Some v) :: nil in
+        let σ := [ (ret, None); (x, Some v) ] in
         match imp_stmt_eval s σ with
         | Some σ' =>
-          olift (fun x => x) (lookup equiv_dec σ ret)
+          olift (fun x => x) (lookup equiv_dec σ' ret)
         | None => None
         end
       end.
