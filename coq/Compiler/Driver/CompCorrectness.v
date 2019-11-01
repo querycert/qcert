@@ -212,7 +212,7 @@ Section CompCorrectness.
     match dv with
     | Dv_nnrs_imp_stop => True
     | Dv_nnrs_imp_optim _ dv => False /\ driver_correct_nnrs_imp dv
-    | Dv_nnrs_imp_to_imp_qcert _ dv => False /\ driver_correct_imp_qcert dv
+    | Dv_nnrs_imp_to_imp_qcert _ dv => driver_correct_imp_qcert dv
     | Dv_nnrs_imp_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 
@@ -523,11 +523,28 @@ Section CompCorrectness.
                  (forall q, Forall query_not_error
                                    (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
     Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      unfold compile in H0.
-      revert q H0.
-      induction dv; simpl in *; intuition; subst; eauto.
+      induction dv;
+        intros;
+        rewrite Forall_forall; intros;
+        unfold compile in H0.
+      - simpl in H0; destruct H0; try contradiction.
+        rewrite <- H0; simpl; trivial.
+      - simpl in H0; destruct H0; try contradiction.
+        rewrite <- H0; simpl; trivial.
+        revert q H0.
+        induction dv; simpl in *; intuition; subst; eauto.
+      - simpl in H0; destruct H0.
+        rewrite <- H0; simpl; trivial.
+        destruct H0.
+        + rewrite <- H0; simpl; trivial.
+        + destruct j; simpl in *; try contradiction.
+          destruct j; simpl in *; try contradiction.
+          destruct H0; simpl in *; try contradiction.
+          rewrite <- H0; simpl; trivial.
+      - simpl in H0; destruct H0; try contradiction.
+        rewrite <- H0; simpl; trivial.
+        revert q H0.
+        induction i; simpl in *; intuition; subst; eauto.
     Qed.
 
     Lemma correct_driver_succeeds_nnrs:
@@ -632,12 +649,10 @@ Section CompCorrectness.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nnrc_to_nnrc_core q));
         rewrite Forall_forall in H; auto.
-      - 
+      - elim H1; intros; try (rewrite <- H0; simpl; trivial).
         destruct n; simpl in *; intuition; subst; simpl; trivial.
-        destruct n; simpl in *; intuition; subst; simpl; trivial.
-(*        generalize (correct_driver_succeeds_nnrs_imp n H4 (nnrs_imp_optim o (nnrs_to_nnrs_imp (nnrc_to_nnrs l q)))).
-        rewrite Forall_forall; eauto.
-*)
+       generalize (correct_driver_succeeds_nnrs_imp n H4 (nnrs_to_nnrs_imp (nnrc_to_nnrs l q))).
+       rewrite Forall_forall; eauto.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
@@ -1077,6 +1092,19 @@ Section CompCorrectness.
         + contradiction.
     Qed.
 
+    Lemma query_preserves_eval_trans q1 q2 q3:
+      query_preserves_eval q1 q2 -> query_preserves_eval q2 q3 -> query_preserves_eval q1 q3.
+    Proof.
+      intros H12 H23.
+      unfold query_preserves_eval in *.
+      intros i.
+      specialize (H12 i).
+      specialize (H23 i).
+      rewrite H12.
+      rewrite H23.
+      reflexivity.
+    Qed.
+
     Lemma camp_rule_to_camp_preserves_eval (q:camp_rule) :
       query_preserves_eval (Q_camp_rule q) (Q_camp (camp_rule_to_camp q)).
     Proof.
@@ -1288,6 +1316,23 @@ Section CompCorrectness.
       reflexivity.
     Qed.
 
+    Lemma nnrc_core_to_imp_qcert_preserves_eval l qname (q:nnrc_core) :
+      query_preserves_eval (Q_nnrc_core q)
+       (Q_imp_qcert (nnrs_imp_to_imp_qcert qname (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l (proj1_sig q))))).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc_core.
+      unfold eval_imp_qcert.
+      unfold nnrs_to_nnrs_imp.
+      unfold nnrs_imp_to_imp_qcert.
+      rewrite <- nnrs_imp_to_imp_qcert_top_correct.
+      rewrite <- nnrs_to_nnrs_imp_top_correct.
+      rewrite <- nnrc_to_nnrs_top_correct.
+      rewrite nnrc_core_to_nnrc_top_correct.
+      reflexivity.
+    Qed.
+
     Lemma nnrs_to_nnrs_imp_preserves_eval q :
       query_preserves_eval (Q_nnrs q) (Q_nnrs_imp (nnrs_to_nnrs_imp q)).
     Proof.
@@ -1297,6 +1342,20 @@ Section CompCorrectness.
       unfold eval_nnrs_imp.
       unfold nnrs_to_nnrs_imp.
       rewrite <- nnrs_to_nnrs_imp_top_correct.
+      reflexivity.
+    Qed.
+
+    Lemma nnrs_imp_to_imp_qcert_preserves_eval qname q :
+      query_preserves_eval (Q_nnrs_imp q) (Q_imp_qcert (nnrs_imp_to_imp_qcert qname q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrs_imp.
+      unfold eval_imp_qcert.
+      unfold nnrs_imp_to_imp_qcert.
+      rewrite <- nnrs_imp_to_imp_qcert_top_correct.
+      unfold nnrs_imp_eval_top.
+      unfold id, olift.
       reflexivity.
     Qed.
 
@@ -1341,18 +1400,6 @@ Section CompCorrectness.
       trivial_same_query.
     Qed.
 
-    Lemma correct_driver_preserves_eval_nnrs_imp:
-      forall dv, driver_correct (Dv_nnrs_imp dv) ->
-                 (forall q, Forall (query_preserves_eval (Q_nnrs_imp q))
-                                   (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      revert q x H0.
-      induction dv; simpl in *; intuition; subst; simpl
-      ; try solve[trivial_same_query; reflexivity].
-    Qed.
-
     Lemma correct_driver_preserves_eval_imp_json:
       forall dv, driver_correct (Dv_imp_json dv) ->
                  (forall q, Forall (query_preserves_eval (Q_imp_json q))
@@ -1377,6 +1424,26 @@ Section CompCorrectness.
       ; try solve[trivial_same_query; reflexivity].
     Qed.
 
+    Lemma correct_driver_preserves_eval_nnrs_imp:
+      forall dv, driver_correct (Dv_nnrs_imp dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nnrs_imp q))
+                                   (compile (Dv_nnrs_imp dv) (Q_nnrs_imp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      induction dv.
+      + destruct H0; try contradiction.
+        rewrite <- H0.
+        reflexivity.
+      + destruct H; contradiction.
+      + destruct H; contradiction.
+      + destruct H0; [ rewrite <- H0; reflexivity | ].
+        simpl in H0. intuition.
+        * rewrite <- H1.
+          apply nnrs_imp_to_imp_qcert_preserves_eval.
+        * destruct i; simpl in *; try contradiction; intuition.
+    Qed.
+
     Lemma correct_driver_preserves_eval_nnrs:
       forall dv, driver_correct (Dv_nnrs dv) ->
                  (forall q, Forall (query_preserves_eval (Q_nnrs q))
@@ -1388,11 +1455,15 @@ Section CompCorrectness.
       elim H0; clear H0; intros; [rewrite <- H0; simpl| ].
       - trivial_same_query.
         reflexivity.
-      - destruct dv; simpl in *.
-        + contradiction.
-        + destruct n; simpl in *; intuition.
-          subst; simpl.
-          apply nnrs_to_nnrs_imp_preserves_eval.      
+      - destruct dv; simpl in *; try contradiction.
+        apply (query_preserves_eval_trans (Q_nnrs q) (Q_nnrs_imp (nnrs_to_nnrs_imp q))  x).
+        * apply nnrs_to_nnrs_imp_preserves_eval.
+        * destruct H; clear H.
+          specialize (correct_driver_preserves_eval_nnrs_imp n H1 (nnrs_to_nnrs_imp q)).
+          rewrite Forall_forall.
+          intros Hnnrs_imp.
+          specialize (Hnnrs_imp x H0).
+          trivial.
     Qed.
 
     Lemma correct_driver_preserves_eval_cnd:
@@ -1513,15 +1584,19 @@ Section CompCorrectness.
         rewrite <- H.
         clear H2 H.
         apply nraenv_to_nraenv_core_preserves_eval.
-      (* cNNRC to cNNRS arrow *)
+      (* cNNRC to NNRSimp arrow *)
       - destruct H as [_ H].
         destruct n; simpl in *; intuition
         ; try contradiction; subst; simpl
         ; try apply nnrc_core_to_nnrs_core_preserves_eval.
         destruct n; simpl in *; intuition; subst.
-        induction n; simpl in *; intuition; subst
-        ; try apply (nnrc_core_to_nnrs_imp_preserves_eval)
-        ; eauto 2.
+        apply (query_preserves_eval_trans (Q_nnrc_core q) (Q_nnrs_imp (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l (proj1_sig q)))) x).
+        * apply (nnrc_core_to_nnrs_imp_preserves_eval).
+        * specialize (correct_driver_preserves_eval_nnrs_imp n H3 (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l (proj1_sig q)))).
+          intros Hn.
+          rewrite Forall_forall in Hn.
+          specialize (Hn x H1).
+          trivial.
       (* cNNRC to NNRC arrow *)
       - elim H1; intros; clear H1.
         rewrite <- H0; simpl; trivial_same_query.
@@ -1547,10 +1622,15 @@ Section CompCorrectness.
           apply nnrc_to_nnrs_preserves_eval.
         + destruct H1; simpl in *; subst
           ; try apply nnrc_to_nnrs_preserves_eval.
-          destruct n; simpl in *; try tauto.
-          destruct H1; try tauto.
-          subst; simpl.
-          apply nnrc_to_nnrs_imp_preserves_eval.
+          apply (query_preserves_eval_trans (Q_nnrc q) (Q_nnrs_imp (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l q))) x).
+        * apply (nnrc_to_nnrs_imp_preserves_eval).
+        * destruct H0.
+          specialize (correct_driver_preserves_eval_nnrs_imp n H2 (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l q))).
+          intros Hn.
+          rewrite Forall_forall in Hn.
+          specialize (Hn x H1).
+          trivial.
+
       (* NNRC to DNNRC arrow *)
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRC to js_ast arrow *)
@@ -1563,7 +1643,6 @@ Section CompCorrectness.
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRCMR to DNNRC arrow *)
       - elim H; intros; contradiction. (* Not proved *)
-      (* NNRCMR to CldMR arrow *)
     Qed.
 
     Lemma correct_driver_preserves_eval_camp_rule:
@@ -1745,8 +1824,13 @@ Section CompCorrectness.
         destruct n; simpl in *; intuition; subst.
         + trivial_same_query; try reflexivity.
         + trivial_same_query; try reflexivity.
-        + destruct n; simpl in *; intuition; subst.
-          apply nnrs_to_nnrs_imp_preserves_eval.
+        + apply (query_preserves_eval_trans (Q_nnrs_core q) (Q_nnrs_imp (nnrs_to_nnrs_imp (nnrs_core_to_nnrs q))) x).
+          * apply nnrs_to_nnrs_imp_preserves_eval.
+          * specialize (correct_driver_preserves_eval_nnrs_imp n H3 (nnrs_to_nnrs_imp (nnrs_core_to_nnrs q))).
+            intros Hn.
+            rewrite Forall_forall in Hn.
+            specialize (Hn x H2).
+            trivial.
     Qed.
 
     Lemma correct_driver_preserves_eval_nnrcmr:

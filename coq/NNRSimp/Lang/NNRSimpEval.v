@@ -963,9 +963,9 @@ Section NNRSimpEval.
           + specialize (IHs1 ((v0, Some d0)::l) σ d); cut2p IHs1.
           + specialize (IHs2 ((v1, Some d0)::l) σ d); cut2p IHs2.
       Qed.
-      
+
     End unused.
-    
+
   End eval_eqs.
 
 End NNRSimpEval.

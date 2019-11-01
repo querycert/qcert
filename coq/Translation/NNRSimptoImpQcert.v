@@ -435,13 +435,10 @@ Section NNRSimptoImpQcert.
     ImpFun constants body ret.
 
   Lemma nnrs_imp_to_imp_qcert_function_correct h (σc:bindings) (q:nnrs_imp) :
-    (* nnrs_imp_eval h σc q = *)
-    (* lift (fun x => Some x) (imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec σc)). *)
-    match nnrs_imp_eval h σc q with
-    | None => imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec σc) = None
-    | Some o => imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec σc) = o
-    end.
+    olift id (nnrs_imp_eval h (rec_sort σc) q) =
+    imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec (rec_sort σc)).
   Proof.
+    unfold olift, id.
     elim q; intros stmt ret.
     simpl.
     specialize (fresh_var_fresh "constants" (ret :: nnrs_imp_stmt_free_vars stmt ++ nnrs_imp_stmt_bound_vars stmt)).
@@ -451,7 +448,7 @@ Section NNRSimptoImpQcert.
     intros Hfresh.
     destruct Hfresh as [Hret Hfresh].
     destruct Hfresh as [Hfv Hbv].
-    specialize (nnrs_imp_stmt_to_imp_qcert_correct h σc [(ret, None)] stmt constants).
+    specialize (nnrs_imp_stmt_to_imp_qcert_correct h (rec_sort σc) [(ret, None)] stmt constants).
     simpl.
     unfold imp_qcert_stmt_eval.
     unfold Var.var.
@@ -465,7 +462,7 @@ Section NNRSimptoImpQcert.
       unfold imp_qcert_data.
     unfold olift.
     unfold lift.
-    case_eq (nnrs_imp_stmt_eval h σc stmt [(ret, None)]);
+    case_eq (nnrs_imp_stmt_eval h (rec_sort σc) stmt [(ret, None)]);
       unfold Var.var;
       unfold var;
       unfold imp_qcert_data;
@@ -484,5 +481,22 @@ Section NNRSimptoImpQcert.
   (* XXX Danger: string hypothesis on the encoding of the queries XXX *)
   Definition nnrs_imp_to_imp_qcert_top (qname: string) (q: nnrs_imp): imp :=
     ImpLib [ ((* qname *)"query"%string, nnrs_imp_to_imp_qcert_function q) ].
+
+  Theorem nnrs_imp_to_imp_qcert_top_correct h (σc:bindings) (qname: string) (q:nnrs_imp) :
+    nnrs_imp_eval_top h σc q =
+    imp_qcert_eval_top h σc (nnrs_imp_to_imp_qcert_top qname q).
+  Proof.
+    unfold nnrs_imp_eval_top.
+    unfold nnrs_imp_eval.
+    unfold imp_qcert_eval_top.
+    unfold imp_qcert_eval.
+    unfold nnrs_imp_to_imp_qcert_top.
+    rewrite <- nnrs_imp_to_imp_qcert_function_correct.
+    destruct q.
+    unfold nnrs_imp_eval.
+    unfold olift.
+    unfold id.
+    reflexivity.
+  Qed.
 
 End NNRSimptoImpQcert.
