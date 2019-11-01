@@ -89,7 +89,7 @@ Section ImpJsontoJavaScriptAst.
     | JSONOpObject atts => mk_object atts el
     | JSONOpAccess att => mk_binary_expr expr_access (el++[expr_literal (literal_string att)])
     | JSONOpHasOwnProperty att => mk_binary_expr object_hasOwnProperty (el++[expr_literal (literal_string att)])
-    | JSONOpToString => mk_unary_expr object_toString el
+    | JSONOpToString => expr_call (expr_identifier "toString") el
     | JSONOpMathMin => expr_call (expr_member (expr_identifier "Math") "min") el
     | JSONOpMathMax => expr_call (expr_member (expr_identifier "Math") "max") el
     | JSONOpMathMinApply =>
@@ -114,7 +114,6 @@ Section ImpJsontoJavaScriptAst.
   Fixpoint imp_json_expr_to_js_ast (exp: imp_json_expr) : expr :=
     match exp with
     | ImpExprError v => mk_expr_error
-    | ImpExprGetConstant v => expr_identifier v
     | ImpExprVar v => expr_identifier v
     | ImpExprConst j => json_to_js_ast j
     | ImpExprOp op el => imp_json_op_to_js_ast op (map imp_json_expr_to_js_ast el)
@@ -153,13 +152,13 @@ Section ImpJsontoJavaScriptAst.
 
   Definition imp_json_function_to_js_ast (f: imp_function) : list string * funcbody :=
     match f with
-    | ImpFun lv s ret =>
+    | ImpFun v s ret =>
       let body := imp_json_stmt_to_js_ast s in
       let ret := scope (body :: stat_return (Some (expr_identifier ret)) :: nil) in
       let prog :=
           prog_intro strictness_true [ element_stat ret ]
       in
-      (lv, funcbody_intro prog (prog_to_string prog))
+      ([v], funcbody_intro prog (prog_to_string prog))
     end.
 
   Definition imp_json_to_js_ast (q: imp) : list funcdecl :=

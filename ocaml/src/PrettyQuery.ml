@@ -385,7 +385,6 @@ let pretty_nnrs_imp greek margin annot inheritance link_runtime q =
 let pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e =
   let rec pretty_imp_expr p sym ff e =
     match e with
-    | QcertCompiler.ImpExprGetConstant v -> fprintf ff "%s"  (Util.string_of_char_list v)
     | QcertCompiler.ImpExprVar v -> fprintf ff "%s"  (Util.string_of_char_list v)
     | QcertCompiler.ImpExprConst d -> fprintf ff "%a" pretty_data d
     | QcertCompiler.ImpExprOp (op,args) -> (pretty_op p sym pretty_imp_expr) ff (op, args)
@@ -442,9 +441,9 @@ let pretty_imp_return pretty_data pretty_op pretty_runtime p sym ff ret =
     (pretty_imp_expr 0 sym) (QcertCompiler.ImpExprVar ret)
 
 let pretty_imp_function pretty_data pretty_op pretty_runtime p sym ff f =
-  let QcertCompiler.ImpFun (args, body, ret) = f in
+  let QcertCompiler.ImpFun (arg, body, ret) = f in
   fprintf ff "@[<hv 0>function (@[<hv 2>%a@]) {@;<1 2>%a@;<1 2>%a@ }@]"
-    (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (fun ff v -> fprintf ff "%s" (Util.string_of_char_list v))) args
+    (fun ff v -> fprintf ff "%s" (Util.string_of_char_list v)) arg
     (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) body
     (pretty_imp_return pretty_data pretty_op pretty_runtime p sym) ret
 

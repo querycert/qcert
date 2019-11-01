@@ -31,6 +31,8 @@ Require Import CommonRuntime.
 Require Import Imp.
 
 Section ImpEval.
+  Import ListNotations.
+
   Context {Data: Type}.
   Context {Op: Type}.
   Context {Runtime: Type}.
@@ -65,25 +67,23 @@ Section ImpEval.
   (** ** Evaluation Semantics *)
   Section Evaluation.
     Fixpoint imp_expr_eval
-             (σc:rbindings) (σ:pd_rbindings) (e:imp_expr) {struct e} : option Data
+             (σ:pd_rbindings) (e:imp_expr) {struct e} : option Data
       :=
         match e with
         | ImpExprError msg =>
           None
-        | ImpExprGetConstant v =>
-          edot σc v
         | ImpExprVar v =>
           olift (fun x => x) (lookup equiv_dec σ v)
         | ImpExprConst d =>
           Some (DataNormalize d)
         | ImpExprOp op el =>
-          olift (OpEval op) (lift_map (fun x => x) (map (imp_expr_eval σc σ) el))
+          olift (OpEval op) (lift_map (fun x => x) (map (imp_expr_eval σ) el))
         | ImpExprRuntimeCall rt el =>
-          olift (RuntimeEval rt) (lift_map (fun x => x) (map (imp_expr_eval σc σ) el))
+          olift (RuntimeEval rt) (lift_map (fun x => x) (map (imp_expr_eval σ) el))
         end.
 
     Fixpoint imp_stmt_eval
-             (σc:rbindings) (s:imp_stmt) (σ:pd_rbindings) : option pd_rbindings :=
+             (s:imp_stmt) (σ:pd_rbindings) : option pd_rbindings :=
       match s with
       | ImpStmtBlock vl sl =>
         let proc_one_decl c vd :=
@@ -94,7 +94,7 @@ Section ImpEval.
               | (v, None) =>
                 Some ((v, None) :: σ')
               | (v, Some e) =>
-                match imp_expr_eval σc σ' e with
+                match imp_expr_eval σ' e with
                 | None => None
                 | Some d =>
                   Some ((v, Some d) :: σ')
@@ -107,7 +107,7 @@ Section ImpEval.
             match c with
             | None => None
             | Some σ' =>
-              imp_stmt_eval σc s σ'
+              imp_stmt_eval s σ'
             end
         in
         let σblock := fold_left proc_one_stmt sl σdeclared in
@@ -123,20 +123,20 @@ Section ImpEval.
         let σerased := fold_right proc_one_var σblock vl in
         σerased
       | ImpStmtAssign v e =>
-        match imp_expr_eval σc σ e, lookup string_dec σ v with
+        match imp_expr_eval σ e, lookup string_dec σ v with
         | Some d, Some _ => Some (update_first string_dec σ v (Some d))
         | _, _ => None
         end
       | ImpStmtFor v e s =>
-        match imp_expr_eval σc σ e with
+        match imp_expr_eval σ e with
         | Some d =>
           match DataToList d with
           | Some c1 =>
             let fix for_fun (dl:list Data) σ₁ :=
                 match dl with
                 | nil => Some σ₁
-                | dXXX::dl' =>
-                  match imp_stmt_eval σc s ((v,Some dXXX)::σ₁) with
+                | d::dl' =>
+                  match imp_stmt_eval s ((v,Some d)::σ₁) with
                   | Some (_::σ₂) => for_fun dl' σ₂
                   | _ => None
                   end
@@ -148,15 +148,26 @@ Section ImpEval.
         end
       | ImpStmtForRange v e1 e2 s => None (* XXX TBD *)
       | ImpStmtIf e1 s1 s2 =>
-        match imp_expr_eval σc σ e1 with
+        match imp_expr_eval σ e1 with
         | None => None
         | Some d =>
           match DataToBool d with
           | None => None
           | Some b =>
-            if b then imp_stmt_eval σc s1 σ
-            else imp_stmt_eval σc s2 σ
+            if b then imp_stmt_eval s1 σ
+            else imp_stmt_eval s2 σ
           end
+        end
+      end.
+
+    Definition imp_function_eval f (v: Data) : option Data :=
+      match f with
+      | ImpFun x s ret =>
+        let σ := [ (ret, None); (x, Some v) ] in
+        match imp_stmt_eval s σ with
+        | Some σ' =>
+          olift (fun x => x) (lookup equiv_dec σ' ret)
+        | None => None
         end
       end.
 

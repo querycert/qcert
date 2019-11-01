@@ -37,7 +37,6 @@ Section ImpSize.
   Fixpoint imp_expr_size (e:imp_expr) : nat
     := match e with
        | ImpExprError v => 1
-       | ImpExprGetConstant v => 1
        | ImpExprVar v => 1
        | ImpExprConst v => 1
        | ImpExprOp op l => S (List.fold_left (fun acc e => acc + imp_expr_size e ) l 0)

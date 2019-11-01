@@ -130,7 +130,7 @@ Section ImpQcertEval.
           denotes an error. An error is always propagated. *)
 
     Definition imp_qcert_expr_eval
-             (σc:bindings) (σ:pd_bindings) (e:imp_qcert_expr)
+             (σ:pd_bindings) (e:imp_qcert_expr)
     : option data
       := @imp_expr_eval
            imp_qcert_data
@@ -139,10 +139,10 @@ Section ImpQcertEval.
            imp_qcert_data_normalize
            imp_qcert_runtime_eval
            imp_qcert_op_eval
-           σc σ e.
+           σ e.
 
     Definition imp_qcert_stmt_eval
-             (σc:bindings) (s:imp_qcert_stmt) (σ:pd_bindings) : option (pd_bindings)
+             (s:imp_qcert_stmt) (σ:pd_bindings) : option (pd_bindings)
       := @imp_stmt_eval
            imp_qcert_data
            imp_qcert_op
@@ -152,16 +152,32 @@ Section ImpQcertEval.
            imp_qcert_data_to_list
            imp_qcert_runtime_eval
            imp_qcert_op_eval
-           σc s σ.
+           s σ.
 
-    Definition imp_qcert_eval (σc:bindings) (q:imp_qcert) : option (option data)
-      := let ignore := h in None. (* XXX TODO XXX *)
+    Definition imp_qcert_function_eval
+             (f:imp_qcert_function) args : option imp_qcert_data
+      := @imp_function_eval
+           imp_qcert_data
+           imp_qcert_op
+           imp_qcert_runtime_op
+           imp_qcert_data_normalize
+           imp_qcert_data_to_bool
+           imp_qcert_data_to_list
+           imp_qcert_runtime_eval
+           imp_qcert_op_eval
+           f args.
+
+    Definition imp_qcert_eval (q:imp_qcert) (d: data) : option (option data)
+      := match q with
+           | ImpLib [ (_, f) ] => Some (imp_qcert_function_eval f d)
+           | _ => None
+         end.
 
     Definition imp_qcert_eval_top σc (q:imp_qcert) :=
-      olift id (imp_qcert_eval (rec_sort σc) q).
+      olift id (imp_qcert_eval q (drec (rec_sort σc))).
 
   End Evaluation.
 
 End ImpQcertEval.
 
-(* Arguments imp_stmt_eval_domain_stack {fruntime h s σc σ₁ σ₂}. *)
+(* Arguments imp_stmt_eval_domain_stack {fruntime h s σ₁ σ₂}. *)

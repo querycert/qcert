@@ -44,7 +44,6 @@ Section Imp.
   
     Inductive imp_expr :=
     | ImpExprError : string -> imp_expr                          (**r raises an error *)
-    | ImpExprGetConstant : var -> imp_expr                       (**r global variable lookup ([$v])*)
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
     | ImpExprConst : Data -> imp_expr                            (**r constant data ([d]) *)
     | ImpExprOp : Op -> list imp_expr -> imp_expr                (**r operator ([e₁ ⊠ e₂]) *)
@@ -63,9 +62,9 @@ Section Imp.
   (*| ImpStmtBreak : imp_stnt *)(* XXX Possible? Useful? -- Used in Qcert JS runtime *)
     .
 
-    (* input variables + statements + returned variable *)
+    (* input variable + statements + returned variable *)
     Inductive imp_function :=
-    | ImpFun : list var -> imp_stmt -> var -> imp_function
+    | ImpFun : var -> imp_stmt -> var -> imp_function
     .
 
     (** [imp] is composed of a list of function declarations *)
@@ -76,7 +75,6 @@ Section Imp.
       (** Induction principles used as backbone for inductive proofs on imp *)
       Definition imp_expr_rect (P : imp_expr -> Type)
                  (ferror : forall v : string, P (ImpExprError v))
-                 (fgetconstant : forall v : string, P (ImpExprGetConstant v))
                  (fvar : forall v : string, P (ImpExprVar v))
                  (fconst : forall d : Data, P (ImpExprConst d))
                  (fop : forall op : Op, forall el : list imp_expr,
@@ -87,7 +85,6 @@ Section Imp.
           fix F (e : imp_expr) : P e :=
             match e as e0 return (P e0) with
             | ImpExprError msg => ferror msg
-            | ImpExprGetConstant v => fgetconstant v
             | ImpExprVar v => fvar v
             | ImpExprConst d => fconst d
             | ImpExprOp op el =>
@@ -106,7 +103,6 @@ Section Imp.
 
       Definition imp_expr_ind (P : imp_expr -> Prop)
                  (ferror : forall v : string, P (ImpExprError v))
-                 (fgetconstant : forall v : string, P (ImpExprGetConstant v))
                  (fvar : forall v : string, P (ImpExprVar v))
                  (fconst : forall d : Data, P (ImpExprConst d))
                  (fop : forall op : Op, forall el : list imp_expr,
@@ -117,7 +113,6 @@ Section Imp.
           fix F (e : imp_expr) : P e :=
             match e as e0 return (P e0) with
             | ImpExprError msg => ferror msg
-            | ImpExprGetConstant v => fgetconstant v
             | ImpExprVar v => fvar v
             | ImpExprConst d => fconst d
             | ImpExprOp op el =>
@@ -183,7 +178,6 @@ End Imp.
 Tactic Notation "imp_expr_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "ImpExprError"%string
-  | Case_aux c "ImpExprGetConstant"%string
   | Case_aux c "ImpExprVar"%string
   | Case_aux c "ImpExprConst"%string
   | Case_aux c "ImpExprOp"%string

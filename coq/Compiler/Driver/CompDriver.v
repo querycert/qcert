@@ -247,8 +247,8 @@ Section CompDriver.
     Definition nnrs_imp_to_js_ast (inputs: list var) (q: nnrs_imp) : js_ast :=
       [ (nnrs_imp_to_js_ast_top inputs q) ].
 
-    Definition nnrs_imp_to_imp_qcert (qname: string) (inputs: list var) (q: nnrs_imp) : imp_qcert :=
-      nnrs_imp_to_imp_qcert_top qname inputs q.
+    Definition nnrs_imp_to_imp_qcert (qname: string) (q: nnrs_imp) : imp_qcert :=
+      nnrs_imp_to_imp_qcert_top qname q.
 
     Definition imp_qcert_to_imp_json (q: imp_qcert) : imp_json :=
       imp_qcert_to_imp_json q.
@@ -385,7 +385,7 @@ Section CompDriver.
     | Dv_nnrs_imp_stop : nnrs_imp_driver
     | Dv_nnrs_imp_optim : optim_phases3_config -> nnrs_imp_driver -> nnrs_imp_driver
     | Dv_nnrs_imp_to_js_ast : (* inputs *) list var -> js_ast_driver -> nnrs_imp_driver
-    | Dv_nnrs_imp_to_imp_qcert : (* query name*) string -> (* inputs *) list var -> imp_qcert_driver -> nnrs_imp_driver
+    | Dv_nnrs_imp_to_imp_qcert : (* query name*) string -> imp_qcert_driver -> nnrs_imp_driver
   .
 
   Inductive nnrs_driver : Set :=
@@ -656,7 +656,7 @@ Section CompDriver.
     | Dv_nnrs_imp_stop => 1
     | Dv_nnrs_imp_optim _ dv => 1 + driver_length_nnrs_imp dv
     | Dv_nnrs_imp_to_js_ast _ dv => 1 + driver_length_js_ast dv
-    | Dv_nnrs_imp_to_imp_qcert _ _ dv => 1 + driver_length_imp_qcert dv
+    | Dv_nnrs_imp_to_imp_qcert _ dv => 1 + driver_length_imp_qcert dv
     end.
 
   Definition driver_length_nnrs (dv: nnrs_driver) :=
@@ -918,8 +918,8 @@ Section CompDriver.
           | Dv_nnrs_imp_to_js_ast inputs dv =>
             let q := nnrs_imp_to_js_ast inputs q in
             compile_js_ast dv q
-          | Dv_nnrs_imp_to_imp_qcert qname inputs dv =>
-            let q := nnrs_imp_to_imp_qcert qname inputs q in
+          | Dv_nnrs_imp_to_imp_qcert qname dv =>
+            let q := nnrs_imp_to_imp_qcert qname q in
             compile_imp_qcert dv q
           end
       in
@@ -1745,7 +1745,7 @@ Section CompDriver.
     | L_nnrs_imp =>
       match dv with
       | Dv_js_ast dv => Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast (vars_of_constants_config config.(comp_constants)) dv)
-      | Dv_imp_qcert dv => Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert config.(comp_qname_lowercase) (vars_of_constants_config config.(comp_constants)) dv)
+      | Dv_imp_qcert dv => Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert config.(comp_qname_lowercase) dv)
       | Dv_nnrs_imp dv => Dv_nnrs_imp (Dv_nnrs_imp_optim (get_optim_config L_nnrs_imp config.(comp_optim_config)) dv)
       | Dv_camp _
       | Dv_nraenv_core _
@@ -2143,9 +2143,8 @@ Section CompDriver.
           opc = (get_optim_config L_nnrs_imp config.(comp_optim_config))
         | Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast inputs _) =>
           inputs = (vars_of_constants_config config.(comp_constants))
-        | Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert qname inputs _) =>
-          qname = config.(comp_qname_lowercase) /\
-          inputs = (vars_of_constants_config config.(comp_constants))
+        | Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert qname _) =>
+          qname = config.(comp_qname_lowercase)
         | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd qname _) =>
           qname = config.(comp_qname)
         | Dv_nnrcmr (Dv_nnrcmr_to_cldmr brand_rel _) =>
@@ -2223,7 +2222,7 @@ Section CompDriver.
     | Dv_nnrs_imp (Dv_nnrs_imp_stop) => (L_nnrs_imp, None)
     | Dv_nnrs_imp (Dv_nnrs_imp_optim _ dv) => (L_nnrs_imp, Some (Dv_nnrs_imp dv))
     | Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast inputs dv) => (L_nnrs_imp, Some (Dv_js_ast dv))
-    | Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert _ inputs dv) => (L_nnrs_imp, Some (Dv_imp_qcert dv))
+    | Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert _ dv) => (L_nnrs_imp, Some (Dv_imp_qcert dv))
     | Dv_imp_qcert (Dv_imp_qcert_stop) => (L_imp_qcert, None)
     | Dv_imp_qcert (Dv_imp_qcert_to_imp_json dv) => (L_imp_qcert, Some (Dv_imp_json dv))
     | Dv_imp_json (Dv_imp_json_stop) => (L_imp_json, None)
@@ -2473,11 +2472,10 @@ Section CompDriver.
                  EmptyString
                  nil
                  EmptyString
-                 (one_constant_config_of_avoid_list l)
+                 nil
                  EmptyString
                  nil) (lang:=L_nnrs_imp)
       ; [eapply target_language_of_driver_is_postfix_imp_qcert | | ]; simpl; trivial.
-      rewrite vars_of_one_constant_config_of_avoid_list; reflexivity.
   Qed.
 
 
@@ -2959,9 +2957,8 @@ Section CompDriver.
           rewrite H0; rewrite H3; reflexivity.
         * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_optim (get_optim_config L_nnrs_imp (comp_optim_config config0)) n)))
           ; try reflexivity.
-        * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert config0.(comp_qname_lowercase) (vars_of_constants_config (comp_constants config0)) i)));
+        * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert config0.(comp_qname_lowercase) i)));
             try reflexivity.
-          rewrite H0; rewrite H3; reflexivity.
         * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast (vars_of_constants_config (comp_constants config0)) j)));
             try reflexivity.
         * destruct (H_config (Dv_nnrcmr (Dv_nnrcmr_to_cldmr (comp_brand_rel config0) c)));

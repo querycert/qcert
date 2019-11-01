@@ -203,7 +203,7 @@ Section ImpJsonEval.
     Definition pd_jbindings := list (string * option imp_json_data).
 
     Definition imp_json_expr_eval
-             (σc:jbindings) (σ:pd_jbindings) (e:imp_json_expr)
+             (σ:pd_jbindings) (e:imp_json_expr)
     : option imp_json_data
       := @imp_expr_eval
            imp_json_data
@@ -212,10 +212,10 @@ Section ImpJsonEval.
            imp_json_data_normalize
            imp_json_runtime_eval
            imp_json_op_eval
-           σc σ e.
+           σ e.
 
     Definition imp_json_stmt_eval
-             (σc:jbindings) (s:imp_json_stmt) (σ:pd_jbindings) : option (pd_jbindings)
+             (s:imp_json_stmt) (σ:pd_jbindings) : option (pd_jbindings)
       := @imp_stmt_eval
            imp_json_data
            imp_json_op
@@ -225,7 +225,20 @@ Section ImpJsonEval.
            imp_json_data_to_list
            imp_json_runtime_eval
            imp_json_op_eval
-           σc s σ.
+           s σ.
+
+    Definition imp_json_function_eval
+             (f:imp_json_function) args : option imp_json_data
+      := @imp_function_eval
+           imp_json_data
+           imp_json_op
+           imp_json_runtime_op
+           imp_json_data_normalize
+           imp_json_data_to_bool
+           imp_json_data_to_list
+           imp_json_runtime_eval
+           imp_json_op_eval
+           f args.
 
     Definition imp_json_eval (σc:jbindings) (q:imp_json) : option (option imp_json_data)
       := None. (* XXX TODO XXX *)
