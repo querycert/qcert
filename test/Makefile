@@ -101,7 +101,7 @@ oql-string-tests:
                             -eval-validate -output oql/string$(N).out || exit 1;))
 oql-string-tests-js:
 	@$(foreach N,$(OQLSTRINGNUM), \
-	       $(QCERTCOMP) -source oql -path imp_qcert -target js oql/string$(N).oql \
+	       $(QCERTCOMP) -source oql -path imp_json -target js oql/string$(N).oql \
                             -eval-validate -schema oql/string.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
@@ -129,7 +129,7 @@ oql-world-tests:
                             -eval-validate -output oql/world$(N).out || exit 1;))
 oql-world-tests-js:
 	@$(foreach N,$(OQLWORLDNUM), \
-	       $(QCERTCOMP) -source oql -path imp_json  -target js oql/world$(N).oql \
+	       $(QCERTCOMP) -source oql -path imp_json -target js oql/world$(N).oql \
                             -eval-validate -schema oql/world.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
                           -runtime ../runtimes/javascript/qcert-runtime.js \
