@@ -244,6 +244,59 @@ Section ImpJsontoJavaScriptAst.
     | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     end.
 
+  Fixpoint imp_qcert_stmt_to_imp_json (avoid: list string) (stmt: imp_qcert_stmt): imp_json_stmt :=
+    match stmt with
+    | ImpStmtBlock lv ls =>
+      ImpStmtBlock
+        (map (fun xy => (fst xy,
+                         lift imp_qcert_expr_to_imp_json (snd xy))) lv)
+        (map (imp_qcert_stmt_to_imp_json ((List.map fst lv) ++ avoid)) ls)
+    | ImpStmtAssign v e =>
+      ImpStmtAssign v (imp_qcert_expr_to_imp_json e)
+    | ImpStmtFor v e s =>
+      let avoid := v :: avoid in
+      let e := imp_qcert_expr_to_imp_json e in
+      let src_id := fresh_var "src" avoid in
+      let avoid := src_id :: avoid in
+      let i_id := fresh_var "i" avoid in
+      let avoid := i_id :: avoid in
+      let src := ImpExprVar src_id in
+      let i := ImpExprVar i_id in
+      ImpStmtBlock
+        [ (src_id, Some e) ]
+        [ ImpStmtForRange
+            i_id (ImpExprConst (jnumber zero)) (ImpExprOp JSONOpArrayLength [ src ])
+            (ImpStmtBlock
+               [ (v, Some (ImpExprOp JSONOpArrayAccess [ src; i ])) ]
+               [ imp_qcert_stmt_to_imp_json avoid s ]) ]
+    | ImpStmtForRange v e1 e2 s =>
+      ImpStmtForRange v
+                      (imp_qcert_expr_to_imp_json e1)
+                      (imp_qcert_expr_to_imp_json e2)
+                      (imp_qcert_stmt_to_imp_json (v :: avoid) s)
+    | ImpStmtIf e s1 s2 =>
+      ImpStmtIf (imp_qcert_expr_to_imp_json e)
+                (imp_qcert_stmt_to_imp_json avoid s1)
+                (imp_qcert_stmt_to_imp_json avoid s2)
+    end.
+
+
+  Definition imp_qcert_function_to_imp_json (f:imp_qcert_function) : imp_json_function :=
+    match f with
+    | ImpFun v s ret => ImpFun v (imp_qcert_stmt_to_imp_json [v] s) ret
+    end.
+
+  Fixpoint imp_qcert_to_imp_json (i:imp_qcert) : imp_json :=
+    match i with
+    | ImpLib l =>
+      ImpLib
+        (List.map
+           (fun (decl: string * imp_qcert_function) =>
+              let (name, def) := decl in (name, imp_qcert_function_to_imp_json def))
+           l)
+    end.
+
+
   Section Correctness.
     Context (h:list(string*string)).
 
@@ -253,6 +306,9 @@ Section ImpJsontoJavaScriptAst.
       List.map (fun xy => (fst xy, lift data_to_json (snd xy))) env.
     Definition lift_result (res:option json) : option data :=
       lift (json_to_data h) res.
+    Definition lift_result_env (res:option pd_jbindings) : option pd_bindings :=
+      lift (fun env => List.map (fun xy => (fst xy, lift (json_to_data h) (snd xy))) env) res.
+
 
     Lemma lift_map_lift_result {A} (g:A -> option json) l :
       lift_map (fun x => lift_result (g x)) l = lift (map (json_to_data h)) (lift_map g l).
@@ -276,6 +332,32 @@ Section ImpJsontoJavaScriptAst.
       apply map_eq.
       assumption.
     Qed.
+
+    Lemma json_to_data_to_json_idempotent d:
+      json_to_data h (data_to_json d) = d.
+    Proof.
+      (* induction d; simpl. *)
+      (* -  unfold json_to_data, json_to_data_pre. *)
+      (*    unfold foreign_to_JSON_to_data. *)
+      (*    destruct ftjson. *)
+      (*    match_destr. *)
+      (*    admit. *)
+      (* - unfold json_to_data, json_to_data_pre. *)
+      (*   unfold foreign_to_JSON_to_data. *)
+      (*   destruct ftjson. *)
+      (*   destruct (string_dec "nat" "nat"); try congruence. *)
+      admit.
+    Admitted.
+    (* Qed. *)
+
+    Lemma data_to_bool_json_to_bool_correct j:
+      imp_qcert_data_to_bool (json_to_data h j) = imp_json_data_to_bool j.
+    Proof.
+      unfold json_to_data.
+      admit.
+      (* destruct j; simpl. *)
+      Admitted.
+
 
     Lemma imp_qcert_unary_op_to_imp_json_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
@@ -366,6 +448,7 @@ Section ImpJsontoJavaScriptAst.
       - Case "ImpExprError"%string.
         reflexivity.
       - Case "ImpExprVar"%string.
+        simpl.
         admit. (* XXX Needs lift/unlift roundtrip property over lookup *)
       - Case "ImpExprConst"%string.
         admit. (* XXX Needs json_normalize with lift/unlift roundtrip property *)
@@ -375,58 +458,82 @@ Section ImpJsontoJavaScriptAst.
         apply imp_qcert_runtime_call_to_imp_json_expr_correct; assumption.
     Admitted.
 
+
+
+    Lemma imp_qcert_stmt_to_imp_json_stmt_correct (σ:pd_bindings) (stmt:imp_qcert_stmt) :
+      forall avoid: list string,
+         (* (fres_var stmt) avoid -> *)
+        imp_qcert_stmt_eval h stmt σ =
+        lift_result_env (imp_json_stmt_eval (imp_qcert_stmt_to_imp_json avoid stmt) (lift_pd_bindings σ)).
+    Proof.
+      imp_stmt_cases (induction stmt) Case.
+      - Case "ImpStmtBlock"%string.
+        admit.
+      - Case "ImpStmtAssign"%string.
+        intros avoid.
+        simpl.
+        specialize (imp_qcert_expr_to_imp_json_expr_correct σ i).
+        unfold imp_qcert_expr_eval in *.
+        intros Hi.
+        rewrite Hi.
+        unfold lift_result.
+        unfold lift.
+        unfold imp_json_expr_eval.
+        destruct (ImpEval.imp_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity.
+        unfold lift_pd_bindings.
+        rewrite lookup_map_codomain_unfolded.
+        unfold lift.
+        unfold imp_qcert_data, foreign_runtime_data.
+        match_destr.
+        unfold lift_result_env, lift.
+        assert (forall (x: pd_bindings) y,  x = y -> Some x = Some y) as Hsome; try congruence.
+        apply Hsome.
+        clear Hi.
+        induction σ; try reflexivity.
+        simpl.
+        rewrite IHσ; clear IHσ.
+        destruct a; simpl.
+        assert (forall (x1 x2: string * option data) l1 l2,
+                   x1 = x2 -> l1 = l2 -> x1 :: l1 = x2 :: l2) as Hl; try congruence.
+        match_destr; simpl.
+        + apply Hl; try reflexivity.
+          induction σ; try reflexivity.
+          destruct a; simpl.
+          rewrite <- IHσ.
+          apply Hl; try reflexivity.
+          destruct o1; try reflexivity.
+          rewrite json_to_data_to_json_idempotent.
+          reflexivity.
+        + apply Hl; try reflexivity.
+          destruct o0; try reflexivity.
+          rewrite json_to_data_to_json_idempotent.
+          reflexivity.
+      - Case "ImpStmtFor"%string.
+        admit.
+      - Case "ImpStmtForRange"%string.
+        intros avoid.
+        admit. (* XXX TODO: eval XXX *)
+      - Case "ImpStmtIf"%string.
+        intros avoid.
+        simpl.
+        specialize (imp_qcert_expr_to_imp_json_expr_correct σ i).
+        unfold imp_qcert_expr_eval in *.
+        intros Hi.
+        rewrite Hi.
+        unfold lift_result.
+        unfold lift.
+        unfold imp_json_expr_eval.
+        destruct (ImpEval.imp_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity.
+        rewrite data_to_bool_json_to_bool_correct.
+        match_destr.
+        match_destr.
+    (* Qed. *)
+    Admitted.
+
   End Correctness.
 
-  Fixpoint imp_qcert_stmt_to_imp_json (avoid: list string) (stmt: imp_qcert_stmt): imp_json_stmt :=
-    match stmt with
-    | ImpStmtBlock lv ls =>
-      ImpStmtBlock
-        (map (fun xy => (fst xy,
-                         lift imp_qcert_expr_to_imp_json (snd xy))) lv)
-        (map (imp_qcert_stmt_to_imp_json ((List.map fst lv) ++ avoid)) ls)
-    | ImpStmtAssign v e =>
-      ImpStmtAssign v (imp_qcert_expr_to_imp_json e)
-    | ImpStmtFor v e s =>
-      let avoid := v :: avoid in
-      let e := imp_qcert_expr_to_imp_json e in
-      let src_id := fresh_var "src" avoid in
-      let avoid := src_id :: avoid in
-      let i_id := fresh_var "i" avoid in
-      let avoid := i_id :: avoid in
-      let src := ImpExprVar src_id in
-      let i := ImpExprVar i_id in
-      ImpStmtBlock
-        [ (src_id, Some e) ]
-        [ ImpStmtForRange
-            i_id (ImpExprConst (jnumber zero)) (ImpExprOp JSONOpArrayLength [ src ])
-            (ImpStmtBlock
-               [ (v, Some (ImpExprOp JSONOpArrayAccess [ src; i ])) ]
-               [ imp_qcert_stmt_to_imp_json avoid s ]) ]
-    | ImpStmtForRange v e1 e2 s =>
-      ImpStmtForRange v
-                      (imp_qcert_expr_to_imp_json e1)
-                      (imp_qcert_expr_to_imp_json e2)
-                      (imp_qcert_stmt_to_imp_json (v :: avoid) s)
-    | ImpStmtIf e s1 s2 =>
-      ImpStmtIf (imp_qcert_expr_to_imp_json e)
-                (imp_qcert_stmt_to_imp_json avoid s1)
-                (imp_qcert_stmt_to_imp_json avoid s2)
-    end.
-
-  Definition imp_qcert_function_to_imp_json (f:imp_qcert_function) : imp_json_function :=
-    match f with
-    | ImpFun v s ret => ImpFun v (imp_qcert_stmt_to_imp_json [v] s) ret
-    end.
-
-  Fixpoint imp_qcert_to_imp_json (i:imp_qcert) : imp_json :=
-    match i with
-    | ImpLib l =>
-      ImpLib
-        (List.map
-           (fun (decl: string * imp_qcert_function) =>
-              let (name, def) := decl in (name, imp_qcert_function_to_imp_json def))
-           l)
-    end.
 
 End ImpJsontoJavaScriptAst.
 

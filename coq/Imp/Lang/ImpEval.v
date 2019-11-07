@@ -21,6 +21,7 @@ Require Import EquivDec.
 Require Import Morphisms.
 Require Import Arith.
 Require Import ZArith.
+Require Import ZArith.BinIntDef.
 Require Import Max.
 Require Import Bool.
 Require Import Peano_dec.
@@ -81,6 +82,8 @@ Section ImpEval.
         | ImpExprRuntimeCall rt el =>
           olift (RuntimeEval rt) (lift_map (fun x => x) (map (imp_expr_eval σ) el))
         end.
+
+    Local Open Scope Z_scope.
 
     Fixpoint imp_stmt_eval
              (s:imp_stmt) (σ:pd_rbindings) : option pd_rbindings :=
@@ -146,7 +149,11 @@ Section ImpEval.
           end
         | _ => None
         end
-      | ImpStmtForRange v e1 e2 s => None (* XXX TBD *)
+      | ImpStmtForRange v e1 e2 s =>
+        match (imp_expr_eval σ e1, imp_expr_eval σ e2) with
+        | (Some n1, Some n2) => (* imp_for_range v n1 n2 s σ *) None (* XXX TODO XXX *)
+        | _ => None
+        end
       | ImpStmtIf e1 s1 s2 =>
         match imp_expr_eval σ e1 with
         | None => None
@@ -158,7 +165,17 @@ Section ImpEval.
             else imp_stmt_eval s2 σ
           end
         end
-      end.
+      end
+    .
+    (* with imp_for_range v n1 n2 (s:imp_stmt) (σ:pd_rbindings) : option pd_rbindings := *)
+    (*   match (DataToZ n1, DataToZ n2) with *)
+    (*   | (Some v1, Some v2) => *)
+    (*     if v1 <? v2 then (* XXX TODO XXX *) *)
+    (*       let res := imp_stmt_eval s ((v, Some n1) :: σ) in *)
+    (*       imp_for_range  *)
+    (*     else Some σ *)
+    (*   | _ => None *)
+    (*   end. *)
 
     Definition imp_function_eval f (v: Data) : option Data :=
       match f with

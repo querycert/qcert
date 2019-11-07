@@ -660,6 +660,15 @@ Section Assoc.
     apply map_ext; trivial.
   Qed.
 
+  Lemma lookup_map_codomain_unfolded {A B C:Type} dec (f:B->C) (l:list (A*B)) v :
+    lookup dec (map (fun b => (fst b, f (snd b))) l) v = lift f (lookup dec l v).
+  Proof.
+    generalize (lookup_map_codomain dec f l).
+    intros.
+    unfold map_codomain in H.
+    auto.
+  Qed.
+
   Lemma domain_map_codomain {A B C} (f:B->C) (l:list (A*B)) :
     domain (map_codomain f l) = domain l.
   Proof.
