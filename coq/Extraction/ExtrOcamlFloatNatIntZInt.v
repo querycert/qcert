@@ -29,12 +29,13 @@ Extract Inductive Fappli_IEEE.binary_float => float [
   "(fun s -> if s then (-0.) else (0.))"
   "(fun s -> if s then neg_infinity else infinity)"
   "nan"
-  "(fun (s, m, e) -> if s then -. (ldexp (float_of_int m) e) else (ldexp (float_of_int m) e)"
+  "(fun (s, m, e) -> if s then -. (ldexp (float_of_int m) e) else (ldexp (float_of_int m) e))"
 ].
 Extract Inlined Constant nan => "nan".
 Extract Inlined Constant zero => "0.".
 Extract Inlined Constant neg_zero => "(-0.)".
 Extract Inlined Constant one => "1.".
+Extract Inlined Constant neg_one => "(-1.)".
 Extract Inlined Constant infinity => "infinity".
 Extract Inlined Constant neg_infinity => "neg_infinity".
 Extract Inlined Constant max_value => "max_float".
