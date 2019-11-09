@@ -155,22 +155,20 @@ Section DatatoJSON.
 
     Fixpoint data_enhanced_to_json (d:data) : json := data_enhanced_to_js "" d.
 
-    Fixpoint data_to_js (d:data) : json :=
+    Fixpoint data_to_json (d:data) : json :=
       match d with
       | dunit => jnull
       | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
       | dfloat n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
-      | dcoll c => jarray (map data_to_js c)
-      | drec r => jobject (map (fun x => (fst x, data_to_js (snd x))) r)
-      | dleft d' => jobject (("left"%string, data_to_js d')::nil)
-      | dright d' => jobject (("right"%string, data_to_js d')::nil)
-      | dbrand b d' => jobject (("type"%string, jarray (map jstring b))::("data"%string, (data_to_js d'))::nil)
+      | dcoll c => jarray (map data_to_json c)
+      | drec r => jobject (map (fun x => (fst x, data_to_json (snd x))) r)
+      | dleft d' => jobject (("left"%string, data_to_json d')::nil)
+      | dright d' => jobject (("right"%string, data_to_json d')::nil)
+      | dbrand b d' => jobject (("type"%string, jarray (map jstring b))::("data"%string, (data_to_json d'))::nil)
       | dforeign fd => foreign_to_JSON_from_data fd
       end.
-
-    Fixpoint data_to_json (d:data) : json := data_to_js d.
   End toJSON.
 
   Section RoundTripping.

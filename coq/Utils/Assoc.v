@@ -677,15 +677,6 @@ Section Assoc.
     rewrite map_eta_fst_domain; trivial.
   Qed.
 
-  Lemma lookup_map_codomain_unfolded {A B C:Type} dec (f:B->C) (l:list (A*B)) v :
-    lookup dec (map (fun b => (fst b, f (snd b))) l) v = lift f (lookup dec l v).
-  Proof.
-    generalize (lookup_map_codomain dec f l).
-    intros.
-    unfold map_codomain in H.
-    auto.
-  Qed.
-
   Lemma cut_down_to_incl_to
         {A B} {dec:EqDec A eq}
         (l:list (A*B)) l2 :

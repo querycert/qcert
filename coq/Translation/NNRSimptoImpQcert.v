@@ -491,12 +491,10 @@ Section NNRSimptoImpQcert.
     unfold imp_qcert_eval_top.
     unfold imp_qcert_eval.
     unfold nnrs_imp_to_imp_qcert_top.
-    rewrite <- nnrs_imp_to_imp_qcert_function_correct.
-    destruct q.
-    unfold nnrs_imp_eval.
-    unfold olift.
-    unfold id.
-    reflexivity.
+    generalize (nnrs_imp_to_imp_qcert_function_correct h σc q); intros.
+    simpl in *.
+    unfold nnrs_imp_eval in *.
+    auto.
   Qed.
 
 End NNRSimptoImpQcert.

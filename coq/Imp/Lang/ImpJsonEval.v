@@ -52,12 +52,6 @@ Section ImpJsonEval.
       | _ => None
       end.
 
-    Definition imp_json_data_to_Z (d:imp_json_data) : option Z :=
-      match d with
-      | jnumber n => Some (float_truncate n)
-      | _ => None
-      end.
-
     Definition imp_json_data_to_list (d:imp_json_data) : option (list imp_json_data) :=
       match d with
       | jarray c => Some (c)
@@ -66,6 +60,12 @@ Section ImpJsonEval.
 
     Definition of_string_list (sl:list json) : option (list string)
       := lift_map (fun x => match x with jstring s => Some s | _ => None end) sl.
+
+    Definition imp_json_data_to_Z (d:imp_json_data) : option Z :=
+      match d with
+      | jnumber n => Some (float_truncate n)
+      | _ => None
+      end.
 
     Definition imp_json_runtime_eval (rt:imp_json_runtime_op) (dl:list imp_json_data) : option imp_json_data :=
       match rt with
@@ -240,14 +240,34 @@ Section ImpJsonEval.
            imp_json_op_eval
            f args.
 
-    Definition imp_json_eval (σc:jbindings) (q:imp_json) : option (option imp_json_data)
-      := None. (* XXX TODO XXX *)
+    Import ListNotations.
+    Definition imp_json_eval (q:imp_json) (d:imp_json_data) : option (option imp_json_data)
+      := @imp_eval
+           imp_json_data
+           imp_json_op
+           imp_json_runtime_op
+           imp_json_data_normalize
+           imp_json_data_to_bool
+           imp_json_data_to_list
+           imp_json_runtime_eval
+           imp_json_op_eval
+           q d.
 
-    Definition imp_json_eval_top σc (q:imp_json) :=
-      olift id (imp_json_eval (rec_sort σc) q).
+    Definition imp_json_eval_top σc (q:imp_json) : option imp_json_data :=
+      olift id (imp_json_eval q (jobject (rec_sort σc))).
 
   End Evaluation.
 
+  Section Top.
+    Context {fruntime:foreign_runtime}.
+    Context {ftjson:foreign_to_JSON}.
+
+    Context (h:list(string*string)).
+
+    Definition imp_json_eval_top_alt (cenv: bindings) (q:imp_json) : option data :=
+      let jenv := List.map (fun xy => (fst xy, data_to_json (snd xy))) cenv in
+      lift (json_to_data h) (imp_json_eval_top jenv q).
+  End Top.
 End ImpJsonEval.
 
 (* Arguments imp_stmt_eval_domain_stack {fruntime h s σc σ₁ σ₂}. *)
