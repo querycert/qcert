@@ -358,7 +358,6 @@ Section ImpJsontoJavaScriptAst.
       (* destruct j; simpl. *)
       Admitted.
 
-
     Lemma imp_qcert_unary_op_to_imp_json_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -458,8 +457,6 @@ Section ImpJsontoJavaScriptAst.
         apply imp_qcert_runtime_call_to_imp_json_expr_correct; assumption.
     Admitted.
 
-
-
     Lemma imp_qcert_stmt_to_imp_json_stmt_correct (σ:pd_bindings) (stmt:imp_qcert_stmt) :
       forall avoid: list string,
          (* (fres_var stmt) avoid -> *)
@@ -532,8 +529,112 @@ Section ImpJsontoJavaScriptAst.
     (* Qed. *)
     Admitted.
 
+    Lemma imp_qcert_function_to_imp_json_function_correct (d:data) (f:imp_qcert_function) :
+      imp_qcert_function_eval h f d =
+      lift (json_to_data h) (imp_json_function_eval (imp_qcert_function_to_imp_json f) (data_to_json d)).
+    Proof.
+      destruct f; simpl.
+      generalize (imp_qcert_stmt_to_imp_json_stmt_correct [(v0, None); (v, Some d)] i (v::nil)); intros.
+      unfold imp_qcert_stmt_eval in H.
+      unfold imp_json_stmt_eval in H.
+      assert (
+        (@ImpEval.imp_stmt_eval (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op
+           (@imp_qcert_data_normalize fruntime h) (@imp_qcert_data_to_bool fruntime)
+           (@imp_qcert_data_to_list fruntime) (@imp_qcert_runtime_eval fruntime) (@imp_qcert_op_eval fruntime h)
+           i
+           (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
+              (@pair var (option (@data (@foreign_runtime_data fruntime))) v0
+                 (@None (@data (@foreign_runtime_data fruntime))))
+              (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
+                 (@pair var (option (@data (@foreign_runtime_data fruntime))) v
+                    (@Some (@data (@foreign_runtime_data fruntime)) d))
+                 (@nil (prod var (option (@data (@foreign_runtime_data fruntime))))))))
+        = @ImpEval.imp_stmt_eval (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op
+        (@imp_qcert_data_normalize fruntime h) (@imp_qcert_data_to_bool fruntime)
+        (@imp_qcert_data_to_list fruntime) (@imp_qcert_runtime_eval fruntime) (@imp_qcert_op_eval fruntime h) i
+        (@cons (prod var (option (@imp_qcert_data fruntime)))
+           (@pair var (option (@imp_qcert_data fruntime)) v0 (@None (@imp_qcert_data fruntime)))
+           (@cons (prod var (option (@imp_qcert_data fruntime)))
+              (@pair var (option (@imp_qcert_data fruntime)) v (@Some (@imp_qcert_data fruntime) d))
+              (@nil (prod var (option (@imp_qcert_data fruntime))))))) by reflexivity.
+      rewrite <- H0.
+      rewrite H.
+      clear H0 H.
+      unfold lift_result_env.
+      unfold lift.
+      assert (
+          @ImpEval.imp_stmt_eval imp_json_data imp_json_op imp_json_runtime_op imp_json_data_normalize
+           imp_json_data_to_bool imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval
+           (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
+           (lift_pd_bindings
+              (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
+                 (@pair var (option (@data (@foreign_runtime_data fruntime))) v0
+                    (@None (@data (@foreign_runtime_data fruntime))))
+                 (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
+                    (@pair var (option (@data (@foreign_runtime_data fruntime))) v
+                       (@Some (@data (@foreign_runtime_data fruntime)) d))
+                    (@nil (prod var (option (@data (@foreign_runtime_data fruntime))))))))
+           = @ImpEval.imp_stmt_eval imp_json_data imp_json_op imp_json_runtime_op imp_json_data_normalize
+          imp_json_data_to_bool imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval
+          (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
+          (@cons (prod var (option imp_json_data)) (@pair var (option imp_json_data) v0 (@None imp_json_data))
+             (@cons (prod var (option imp_json_data))
+                (@pair var (option imp_json_data) v
+                   (@Some imp_json_data (@data_to_json (@foreign_runtime_data fruntime) ftjson d)))
+                (@nil (prod var (option imp_json_data)))))) by reflexivity.
+      rewrite H.
+      case_eq (@ImpEval.imp_stmt_eval _ _ _ imp_json_data_normalize imp_json_data_to_bool imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval (imp_qcert_stmt_to_imp_json [v] i) (lift_pd_bindings [(v0, None); (v, Some d)])); intros.
+      - rewrite H in *.
+        rewrite H0.
+        simpl.
+        unfold olift.
+        generalize (@lookup_map_codomain_unfolded string (option json) (option data) string_dec (fun x => match x with
+                   | Some a' => Some (json_to_data h a')
+                   | None => None
+                   end)); intros.
+        rewrite H1; clear H1.
+        unfold lift.
+        assert (lookup string_dec p v0 = lookup EquivDec.equiv_dec p v0) by reflexivity.
+        rewrite <- H1; clear H1.
+        assert (@lookup string (option json) string_dec p v0 = @lookup string (option imp_json_data) string_dec p v0) by reflexivity.
+        case_eq (lookup string_dec p v0); intros;
+        rewrite H1 in *;
+        rewrite H2; simpl; try reflexivity.
+      - rewrite H in *.
+        rewrite H0; reflexivity.
+    Qed.
+
+    Theorem imp_qcert_to_imp_json_correct (σc:bindings) (q:imp_qcert) :
+      imp_qcert_eval_top h σc q =
+      imp_json_eval_top_alt h σc (imp_qcert_to_imp_json q).
+    Proof.
+      unfold imp_qcert_eval_top.
+      unfold imp_json_eval_top_alt.
+      unfold imp_json_eval_top.
+      unfold imp_json_eval.
+      destruct q; simpl.
+      destruct l; try reflexivity; simpl.
+      destruct p; simpl.
+      destruct l; try reflexivity; simpl.
+      generalize (imp_qcert_function_to_imp_json_function_correct (drec (rec_sort σc)) i); intros.
+      unfold imp_qcert_eval_top.
+      unfold imp_json_eval_top_alt.
+      unfold imp_json_eval_top.
+      unfold imp_json_eval.
+      unfold id; simpl.
+      simpl in H.
+      unfold imp_qcert_function_eval in H.
+      unfold imp_json_function_eval in H.
+      rewrite H; clear H.
+      f_equal.
+      f_equal.
+      f_equal.
+      rewrite map_rec_sort.
+      - auto.
+      - intros.
+        split; auto.
+    Qed.
+
   End Correctness.
 
-
 End ImpJsontoJavaScriptAst.
-

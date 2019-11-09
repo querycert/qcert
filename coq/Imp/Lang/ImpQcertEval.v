@@ -168,10 +168,16 @@ Section ImpQcertEval.
            f args.
 
     Definition imp_qcert_eval (q:imp_qcert) (d: data) : option (option data)
-      := match q with
-           | ImpLib [ (_, f) ] => Some (imp_qcert_function_eval f d)
-           | _ => None
-         end.
+      := @imp_eval
+           imp_qcert_data
+           imp_qcert_op
+           imp_qcert_runtime_op
+           imp_qcert_data_normalize
+           imp_qcert_data_to_bool
+           imp_qcert_data_to_list
+           imp_qcert_runtime_eval
+           imp_qcert_op_eval
+           q d.
 
     Definition imp_qcert_eval_top σc (q:imp_qcert) :=
       olift id (imp_qcert_eval q (drec (rec_sort σc))).

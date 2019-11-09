@@ -159,7 +159,7 @@ Section NNRCtoJavaScript.
 
     (* Java equivalent: JavaScriptBackend.dataToJS *)
     Definition dataToJS (quotel:string) (d : data) : string :=
-      jsonToJS quotel (data_to_js d).
+      jsonToJS quotel (data_to_json d).
 
     Definition dataEnhancedToJS (quotel:string) (d : data) : string :=
       jsonToJS quotel (data_enhanced_to_js quotel d).

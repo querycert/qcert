@@ -64,15 +64,15 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
     begin match gconf.gconf_io with
     | None -> "{}"
     | Some (IO_file f) ->
-	begin match f with
-	| Some s -> string_of_file s
-	| None -> "{}"
-	end 
+  begin match f with
+  | Some s -> string_of_file s
+  | None -> "{}"
+  end 
     | Some (IO_components (fin,fout,fschema)) ->
-	begin match fschema with
-	| Some s -> s
-	| None -> "{}"
-	end
+  begin match fschema with
+  | Some s -> s
+  | None -> "{}"
+  end
     end
   in
   let slang = gconf.gconf_source in
@@ -194,13 +194,13 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
   let ev_data =
     begin match ev_output with
     | QcertCompiler.Ev_out_unsupported msg ->
-	QData.drec [(Util.char_list_of_string "error", QData.dstring msg)]
+        QData.drec [(Util.char_list_of_string "error", QData.dstring msg)]
     | QcertCompiler.Ev_out_failed ->
-	QData.drec [(Util.char_list_of_string "error", QData.dstring (Util.char_list_of_string "Eval failed"))]
+        QData.drec [(Util.char_list_of_string "error", QData.dstring (Util.char_list_of_string "Eval failed"))]
     | QcertCompiler.Ev_out_returned d ->
-	d
+        d
     | QcertCompiler.Ev_out_returned_debug s ->
-	QData.drec [(Util.char_list_of_string "debug", QData.dstring s)]
+        QData.drec [(Util.char_list_of_string "debug", QData.dstring s)]
     end
   in
   let queryname = Filename.chop_extension file_name in

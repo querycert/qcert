@@ -177,7 +177,7 @@ Section ImpEval.
     (*   | _ => None *)
     (*   end. *)
 
-    Definition imp_function_eval f (v: Data) : option Data :=
+    Definition imp_function_eval f (v:Data) : option Data :=
       match f with
       | ImpFun x s ret =>
         let σ := [ (ret, None); (x, Some v) ] in
@@ -187,6 +187,13 @@ Section ImpEval.
         | None => None
         end
       end.
+
+    Definition imp_eval (q:imp) (d:Data) : option (option Data)
+      := match q with
+         | ImpLib [ (_, f) ] => Some (imp_function_eval f d)
+         (* XXX What happens when more than one functions ? XXX *)                            
+         | _ => None
+         end.
 
   End Evaluation.
 End ImpEval.
