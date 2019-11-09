@@ -71,7 +71,21 @@ Section ImpJsonEval.
       match rt with
       | JSONRuntimeEqual =>
         apply_binary (fun d1 d2 => if json_eq_dec d1 d2 then Some (jbool true) else Some (jbool false)) dl
-      | JSONRuntimeCompare => None (* XXX pfff... *)
+      | JSONRuntimeCompare =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | (jobject (("nat", jnumber n1)::nil)), (jobject (("nat",jnumber n2)::nil)) =>
+               if float_lt n1 n2
+               then
+                 Some (jobject (("nat", jnumber float_one)::nil))
+               else if float_gt n1 n2
+                    then
+                      Some (jobject (("nat", jnumber float_neg_one)::nil))
+                    else
+                      Some (jobject (("nat", jnumber float_zero)::nil))
+             | _, _ => None
+             end) dl
       | JSONRuntimeRecConcat =>
         apply_binary
           (fun d1 d2 =>
