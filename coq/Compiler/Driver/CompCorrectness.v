@@ -2074,7 +2074,9 @@ Section CompCorrectness.
 compiler driver as a whole. *)
 
 (** Assuming the driver [dv] is correct (i.e., only follows
-verified compilation paths), then:
+verified compilation paths),
+And assuming the driver [dv] matches the input query,
+then:
 - For every query [q] that matches
 the expected input of driver [dv]
 - for every produced compilation
@@ -2123,4 +2125,53 @@ input data returns the same output data. *)
 
   End eval_preserved.
 
+  Section Verified.
+
+    Lemma driver_nraenv_to_imp_qcert_verified_correct conf :
+      driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)).
+    Proof.
+      simpl.
+      auto.
+    Qed.
+
+    Lemma driver_nraenv_to_imp_qcert_verified_matches_query conf q :
+      driver_matches_query
+        (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)) 
+        (Q_nraenv q).
+    Proof.
+      unfold driver_of_path.
+      simpl.
+      unfold driver_matches_query.
+      auto.
+    Qed.
+
+    Context {h:list(string*string)}.
+
+    Lemma compile_nraenv_to_imp_qcert_verified_correct conf q q' :
+      compile_nraenv_to_imp_qcert_verified conf (Q_nraenv q) = q' ->
+      exists q'',
+        (q' = Q_imp_qcert q'' /\ (@query_preserves_eval h (Q_nraenv q) (Q_imp_qcert q''))).
+    Proof.
+      elim (compile_nraenv_to_imp_qcert_verified_yields_result conf q); intros.
+      unfold compile_nraenv_to_imp_qcert_verified in *.
+      generalize (@compile_with_correct_driver_preserves_eval h
+                    (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil))
+                    (Q_nraenv q)
+                    (driver_nraenv_to_imp_qcert_verified_correct conf)
+                    (driver_nraenv_to_imp_qcert_verified_matches_query conf q)).
+      intro Heval.
+      rewrite H in H0.
+      rewrite <- H0.
+      exists x.
+      split.
+      - reflexivity.
+      - rewrite Forall_forall in Heval.
+        apply Heval; clear Heval.
+        simpl.
+        right; right; right; right; left; simpl.
+        simpl in H.
+        auto.
+    Qed.
+
+  End Verified.
 End CompCorrectness.

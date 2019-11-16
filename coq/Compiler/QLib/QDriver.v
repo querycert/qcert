@@ -92,6 +92,10 @@ Module QDriver(runtime:CompilerRuntime).
       driver_config -> language -> language -> query -> query
       := compile_from_source_target.
 
+    Definition compile_nraenv_to_imp_qcert_verified :
+      driver_config -> query -> query
+      := compile_nraenv_to_imp_qcert_verified.
+
     (* Used in CompTest: *)
     Definition camp_rule_to_nraenv_optim : camp_rule -> nraenv := camp_rule_to_nraenv_optim.
     Definition camp_rule_to_nnrc_optim : camp_rule -> nnrc := camp_rule_to_nnrc_optim.

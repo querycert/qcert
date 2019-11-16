@@ -6238,7 +6238,6 @@ Section CompDriver.
   Definition camp_rule_to_cldmr (h:list (string*string)) (inputs_loc:vdbindings) (q:camp_rule) : cldmr :=
     nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (camp_rule_to_nraenv_to_nnrc_optim q))).
 
-
   (* *)
 
   Definition get_source_from_path path :=
@@ -6327,6 +6326,28 @@ Section CompDriver.
   Qed.
 
   End CompPaths.
+
+  Section Verified.
+    Definition compile_nraenv_to_imp_qcert_verified (conf:driver_config) (q:query) : query :=
+      let dv := driver_of_path conf (L_nraenv::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::nil) in
+      match List.rev (compile dv q) with
+      | nil => Q_error "No compilation result!"
+      | target :: _ => target
+      end.
+
+    Lemma compile_nraenv_to_imp_qcert_verified_yields_result conf q :
+      exists q', compile_nraenv_to_imp_qcert_verified conf (Q_nraenv q) = Q_imp_qcert q'.
+    Proof.
+      unfold compile_nraenv_to_imp_qcert_verified.
+      simpl.
+      exists (nnrs_imp_to_imp_qcert
+                (comp_qname_lowercase conf)
+                (nnrs_to_nnrs_imp
+                   (nnrc_to_nnrs (vars_of_constants_config (comp_constants conf)) (nraenv_to_nnrc q)))).
+      reflexivity.
+    Qed.
+
+  End Verified.
 
 End CompDriver.
 
