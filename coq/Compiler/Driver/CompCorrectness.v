@@ -2173,5 +2173,44 @@ input data returns the same output data. *)
         auto.
     Qed.
 
+    Lemma stuff d:
+      (lift_input (map (fun xy : string * data => (fst xy, Dlocal (snd xy))) d)) = d.
+    Proof.
+      induction d; simpl; [reflexivity| ].
+      destruct a; simpl.
+      f_equal.
+      assumption.
+    Qed.
+    
+    Lemma nraenv_to_imp_qcert_correct conf (qnra:nraenv) (x:imp_qcert):
+      CompDriver.compile_nraenv_to_imp_qcert_verified conf (Q_nraenv qnra) = Q_imp_qcert x ->
+      forall d : bindings, nraenv_eval_top h qnra d =
+                           imp_qcert_eval_top h d x.
+    Proof.
+      intros.
+      generalize (compile_nraenv_to_imp_qcert_verified_correct conf qnra (Q_imp_qcert x) H); intros; clear H.
+      elim H0; clear H0; intros.
+      elim H; clear H; intros.
+      unfold query_preserves_eval in H0.
+      specialize (H0 (map (fun xy => (fst xy, Dlocal (snd xy))) d)).
+      unfold equal_outputs in H0.
+      simpl in H0.
+      inversion H; clear H; subst.
+      case_eq (eval_nraenv h qnra (lift_input (map (fun xy : string * data => (fst xy, Dlocal (snd xy))) d))); intros;
+        case_eq (eval_imp_qcert h x0 (lift_input (map (fun xy : string * data => (fst xy, Dlocal (snd xy))) d))); intros;
+      rewrite H in H0; simpl in H0;
+      rewrite H1 in H0; simpl in H0;
+        try contradiction;
+          rewrite stuff in H; rewrite stuff in H1.
+      - unfold eval_nraenv in H; rewrite H.
+        unfold eval_imp_qcert in H1; rewrite H1.
+        case_eq (data_eq_dec d0 d1); intros.
+        subst; auto.
+        rewrite H2 in H0; contradiction.
+      - unfold eval_nraenv in H; rewrite H.
+        unfold eval_imp_qcert in H1; rewrite H1.
+        auto.
+    Qed.
+
   End Verified.
 End CompCorrectness.
