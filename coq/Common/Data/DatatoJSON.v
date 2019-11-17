@@ -16,6 +16,7 @@
 
 Require Import List.
 Require Import String.
+Require Import Ascii.
 Require Import ZArith.
 Require Import Utils.
 Require Import JSON.
@@ -38,53 +39,73 @@ Section DatatoJSON.
     | _ => None
     end.
 
+  Definition json_key_encode (s:string) : string
+    := match s with
+       | String "$"%char s => String "$"%char (String "$"%char s)
+       | _ => s
+       end.
+                            
+  Definition json_key_decode (s:string) : string
+    := match s with
+       | EmptyString => EmptyString
+       | String "$"%char (String "$"%char s) =>  String "$"%char s
+       | _ => s
+       end.
+
+  Lemma json_key_encode_decode (s:string) : json_key_decode (json_key_encode s) = s.
+    do 2 (destruct s; simpl; trivial)
+    ; repeat match_destr.
+  Qed.
+
   Section toData.
     Context {ftojson:foreign_to_JSON}.
 
     (* JSON to CAMP data model (META Variant) *)
 
     Fixpoint json_to_data_pre (j:json) : data :=
-      match foreign_to_JSON_to_data j with
-      | Some fd => dforeign fd
-      | None => 
-        match j with
-        | jnull => dunit
-        | jnumber n => dfloat n
-        | jbool b => dbool b
-        | jstring s => dstring s
-        | jarray c => dcoll (map json_to_data_pre c)
-        | jobject nil => drec nil
-        | jobject ((s1,j')::nil) =>
-          if (string_dec s1 "nat") then
-            match j' with
-            | jnumber n =>
-              dnat (float_truncate n)
-            | _ =>
-              drec ((s1, json_to_data_pre j')::nil)
+      
+      match j with
+      | jnull => dunit
+      | jnumber n => dfloat n
+      | jbool b => dbool b
+      | jstring s => dstring s
+      | jarray c => dcoll (map json_to_data_pre c)
+      | jobject nil => drec nil
+      | jobject ((s1,j')::nil) =>
+        if (string_dec s1 "$nat") then
+          match j' with
+          | jnumber n =>
+            dnat (float_truncate n)
+          | _ =>
+            drec ((json_key_decode s1, json_to_data_pre j')::nil)
+          end
+        else if (string_dec s1 "$left") then dleft (json_to_data_pre j')
+             else if (string_dec s1 "$right") then dright (json_to_data_pre j')
+                  else if (string_dec s1 "$foreign") then
+                         match foreign_to_JSON_to_data j' with
+                         | Some fd => dforeign fd
+                         | None => drec ((json_key_decode s1, json_to_data_pre j')::nil)
+                         end
+                       else drec ((json_key_decode s1, json_to_data_pre j')::nil)
+      | jobject ((s1,jarray j1)::(s2,j2)::nil) =>
+        if (string_dec s1 "$type") then
+          if (string_dec s2 "$data") then
+            match (json_brands j1) with
+            | Some br => dbrand br (json_to_data_pre j2)
+            | None => drec ((json_key_decode s1, dcoll (map json_to_data_pre j1))::(json_key_decode s2, json_to_data_pre j2)::nil)
             end
-          else if (string_dec s1 "left") then dleft (json_to_data_pre j')
-               else if (string_dec s1 "right") then dright (json_to_data_pre j')
-                    else drec ((s1, json_to_data_pre j')::nil)
-        | jobject ((s1,jarray j1)::(s2,j2)::nil) =>
-          if (string_dec s1 "type") then
-            if (string_dec s2 "data") then
-              match (json_brands j1) with
-              | Some br => dbrand br (json_to_data_pre j2)
-              | None => drec ((s1, dcoll (map json_to_data_pre j1))::(s2, json_to_data_pre j2)::nil)
-              end
-            else drec ((s1, dcoll (map json_to_data_pre j1))::(s2, json_to_data_pre j2)::nil)
-          else drec ((s1, dcoll (map json_to_data_pre j1))::(s2, json_to_data_pre j2)::nil)
-        | jobject ((s1,j1)::(s2,jarray j2)::nil) =>
-          if (string_dec s1 "data") then
-            if (string_dec s2 "type") then
-              match (json_brands j2) with
-              | Some br => dbrand br (json_to_data_pre j1)
-              | None => drec ((s1, json_to_data_pre j1)::(s2, dcoll (map json_to_data_pre j2))::nil)
-              end
-            else drec ((s1, json_to_data_pre j1)::(s2, dcoll (map json_to_data_pre j2))::nil)
-          else drec ((s1, json_to_data_pre j1)::(s2, dcoll (map json_to_data_pre j2))::nil)
-        | jobject r => (drec (map (fun x => (fst x, json_to_data_pre (snd x))) r))
-        end
+          else drec ((json_key_decode s1, dcoll (map json_to_data_pre j1))::(json_key_decode s2, json_to_data_pre j2)::nil)
+        else drec ((json_key_decode s1, dcoll (map json_to_data_pre j1))::(json_key_decode s2, json_to_data_pre j2)::nil)
+      | jobject ((s1,j1)::(s2,jarray j2)::nil) =>
+        if (string_dec s1 "$data") then
+          if (string_dec s2 "$type") then
+            match (json_brands j2) with
+            | Some br => dbrand br (json_to_data_pre j1)
+            | None => drec ((json_key_decode s1, json_to_data_pre j1)::(json_key_decode s2, dcoll (map json_to_data_pre j2))::nil)
+            end
+          else drec ((json_key_decode s1, json_to_data_pre j1)::(json_key_decode s2, dcoll (map json_to_data_pre j2))::nil)
+        else drec ((json_key_decode s1, json_to_data_pre j1)::(json_key_decode s2, dcoll (map json_to_data_pre j2))::nil)
+      | jobject r => (drec (map (fun x => (json_key_decode (fst x), json_to_data_pre (snd x))) r))
       end.
 
     Definition json_to_data h (j:json) :=
@@ -138,7 +159,7 @@ Section DatatoJSON.
     Context {ftojson:foreign_to_JSON}.
 
     Definition Z_to_json (n: Z) : json :=
-      jobject (("nat"%string, jnumber (float_of_int n))::nil).
+      jobject (("$nat"%string, jnumber (float_of_int n))::nil).
 
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with
@@ -166,13 +187,14 @@ Section DatatoJSON.
       | dbool b => jbool b
       | dstring s => jstring s
       | dcoll c => jarray (map data_to_json c)
-      | drec r => jobject (map (fun x => (fst x, data_to_json (snd x))) r)
-      | dleft d' => jobject (("left"%string, data_to_json d')::nil)
-      | dright d' => jobject (("right"%string, data_to_json d')::nil)
-      | dbrand b d' => jobject (("type"%string, jarray (map jstring b))::("data"%string, (data_to_json d'))::nil)
-      | dforeign fd => foreign_to_JSON_from_data fd
+      | drec r => jobject (map (fun x => (json_key_encode (fst x), data_to_json (snd x))) r)
+      | dleft d' => jobject (("$left"%string, data_to_json d')::nil)
+      | dright d' => jobject (("$right"%string, data_to_json d')::nil)
+      | dbrand b d' => jobject (("$type"%string, jarray (map jstring b))::("$data"%string, (data_to_json d'))::nil)
+      | dforeign fd => jobject (("$foreign"%string, foreign_to_JSON_from_data fd)::nil)
       end.
-  End toJSON.
+
+    End toJSON.
 
   Section RoundTripping.
     Inductive json_data : data -> Prop :=
@@ -249,6 +271,7 @@ Section DatatoJSON.
       destruct (assoc_lookupr string_dec l s); congruence.
     Qed.
 
+    
     Lemma pure_drec_cons_inv a r:
       pure_data (drec (a::r)) -> (pure_data (drec r) /\ pure_data (snd a)).
     Proof.
@@ -264,7 +287,191 @@ Section DatatoJSON.
         assumption.
       - assumption.
     Qed.
+
   End RoundTripping.
 
 End DatatoJSON.
 
+
+(* TODO: figure out what to do and move this somewhere else *)
+Axiom float_truncate_float_of_int : forall (z:Z), float_truncate (float_of_int z) = z.
+
+Section ModelRoundTrip.
+
+  Context {fdata:foreign_data}.
+  Context {ftojson:foreign_to_JSON}.
+  Lemma json_brands_map_jstring b : json_brands (map jstring b) = Some b.
+  Proof.
+    induction b; simpl; trivial.
+    now rewrite IHb.
+  Qed.
+
+
+  Lemma json_key_encode_not_data s : (json_key_encode s) <> "$data"%string.
+  Proof.
+    destruct s; simpl; try discriminate.
+    repeat match_destr.
+  Qed.
+
+  Lemma json_key_encode_not_type s : (json_key_encode s) <> "$type"%string.
+  Proof.
+    destruct s; simpl; try discriminate.
+    repeat match_destr.
+  Qed.
+
+  Lemma json_key_encode_not_foreign s : (json_key_encode s) <> "$foreign"%string.
+  Proof.
+    destruct s; simpl; try discriminate.
+    repeat match_destr.
+  Qed.
+
+  Lemma json_key_encode_not_nat s : (json_key_encode s) <> "$nat"%string.
+  Proof.
+    destruct s; simpl; try discriminate.
+    repeat match_destr.
+  Qed.
+
+  Lemma json_key_encode_not_left s : (json_key_encode s) <> "$left"%string.
+  Proof.
+    destruct s; simpl; try discriminate.
+    repeat match_destr.
+  Qed.
+
+  Lemma json_key_encode_not_right s : (json_key_encode s) <> "$right"%string.
+  Proof.
+    destruct s; simpl; try discriminate.
+    repeat match_destr.
+  Qed.
+
+  Lemma string_dec_from_neq {a b} (pf:a <> b) : exists pf2, string_dec a b = right pf2.
+  Proof.
+    destruct (string_dec a b); try congruence.
+    eauto.
+  Qed.
+
+  Ltac rewrite_string_dec_from_neq H
+    :=  let d := fresh "d" in
+        let neq := fresh "neq" in
+        destruct (string_dec_from_neq H) as [d neq]
+        ; repeat rewrite neq in *
+        ; clear d neq.
+
+
+  Lemma json_to_data_to_json_idempotent h d:
+    json_to_data h (data_to_json d) = normalize_data h d.
+  Proof.
+    unfold json_to_data.
+    induction d; simpl; trivial.
+    - rewrite float_truncate_float_of_int; trivial.
+    - f_equal.
+      repeat rewrite map_map.
+      now apply map_eq.
+    -
+      destruct r; simpl; trivial.
+      destruct p; simpl.
+      rewrite_string_dec_from_neq (json_key_encode_not_nat s).
+      rewrite_string_dec_from_neq (json_key_encode_not_data s).
+      rewrite_string_dec_from_neq (json_key_encode_not_type s).
+      rewrite_string_dec_from_neq (json_key_encode_not_left s).
+      rewrite_string_dec_from_neq (json_key_encode_not_right s).
+      rewrite_string_dec_from_neq (json_key_encode_not_foreign s).
+
+      assert (eq_simpl: match data_to_json d with
+                        | jarray j1 =>
+                          match map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r with
+                          | nil =>
+                            drec ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d)) :: nil)
+                          | (s2, jnull as j2) :: nil | (s2, jnumber _ as j2) :: nil | (s2, jbool _ as j2) :: nil |
+                          (s2, jstring _ as j2) :: nil | (s2, jarray _ as j2) :: nil |
+                          (s2, jobject _ as j2) :: nil =>
+                          drec
+                            ((json_key_decode (json_key_encode s), dcoll (map json_to_data_pre j1))
+                               :: (json_key_decode s2, json_to_data_pre j2) :: nil)
+                          | (s2, jnull as j2) :: _ :: _ | (s2, jnumber _ as j2) :: _ :: _ |
+                          (s2, jbool _ as j2) :: _ :: _ | (s2, jstring _ as j2) :: _ :: _ |
+                          (s2, jarray _ as j2) :: _ :: _ | (s2, jobject _ as j2) :: _ :: _ =>
+                                                           drec
+                                                             ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d))
+                                                                :: map (fun x : string * json => (json_key_decode (fst x), json_to_data_pre (snd x)))
+                                                                (map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r))
+                          end
+                        | _ =>
+                          match map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r with
+                          | nil =>
+                            drec ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d)) :: nil)
+                          | (s2, jarray j2) :: nil =>
+                            drec
+                              ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d))
+                                 :: (json_key_decode s2, dcoll (map json_to_data_pre j2)) :: nil)
+                          | (s2, jarray j2) :: _ :: _ =>
+                            drec
+                              ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d))
+                                 :: map (fun x : string * json => (json_key_decode (fst x), json_to_data_pre (snd x)))
+                                 (map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r))
+                          | (s2, jnull) :: _ | (s2, jnumber _) :: _ | (s2, jbool _) :: _ | 
+                          (s2, jstring _) :: _ | (s2, jobject _) :: _ =>
+                                                 drec
+                                                   ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d))
+                                                      :: map (fun x : string * json => (json_key_decode (fst x), json_to_data_pre (snd x)))
+                                                      (map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r))
+                          end
+                        end = drec ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d))::(map (fun x : string * json => (json_key_decode (fst x), json_to_data_pre (snd x))) (map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r)))).
+      {
+        destruct (data_to_json d); simpl
+        ; destruct (map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r      ); simpl; trivial
+        ; destruct p
+        ; destruct j; simpl; trivial
+        ; destruct l; simpl; trivial
+        ; destruct l0; simpl; trivial.
+      }
+      rewrite eq_simpl; clear eq_simpl.
+      rewrite json_key_encode_decode.
+      invcs H.
+      simpl in *.
+      rewrite H2.
+      f_equal.
+      f_equal.
+      repeat rewrite map_map; simpl.
+      f_equal.
+      apply map_eq.
+      revert H3.
+      apply Forall_impl; intros.
+      rewrite json_key_encode_decode.
+      rewrite H; trivial.
+    - cut (
+          match data_to_json d with
+          | jnull | _ => normalize_data h (dleft (json_to_data_pre (data_to_json d)))
+          end = dleft (normalize_data h d)).
+      + now destruct (data_to_json d).
+      + simpl.
+        rewrite IHd.
+        now destruct (data_to_json d).
+    - cut (
+          match data_to_json d with
+          | jnull | _ => normalize_data h (dright (json_to_data_pre (data_to_json d)))
+          end = dright (normalize_data h d)).
+      + now destruct (data_to_json d).
+      + simpl.
+        rewrite IHd.
+        now destruct (data_to_json d).
+    - cut (
+          match data_to_json d with
+          | jnull | _ =>
+                    match json_brands (map jstring b) with
+                    | Some br => (normalize_data h (dbrand br (json_to_data_pre (data_to_json d))))
+                    | None =>
+                      (normalize_data h (drec
+                                           (("type"%string, dcoll (map json_to_data_pre (map jstring b)))
+                                              :: ("data"%string, json_to_data_pre (data_to_json d)) :: nil)))
+                    end
+          end = dbrand (BrandRelation.canon_brands h b) (normalize_data h d)).
+      + now (destruct (data_to_json d); destruct (json_brands (map jstring b))).
+      + simpl.
+        rewrite IHd.
+        rewrite json_brands_map_jstring.
+        now destruct (data_to_json d).
+    - rewrite foreign_to_JSON_to_data_to_json.
+      now destruct (foreign_to_JSON_from_data fd).
+  Qed.
+
+End ModelRoundTrip.

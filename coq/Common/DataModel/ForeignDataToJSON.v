@@ -32,6 +32,8 @@ Class foreign_to_JSON {fdata:foreign_data}: Type
            (j:json) : option foreign_data_type
          ; foreign_to_JSON_from_data
              (fd:foreign_data_type) : json
+         ; foreign_to_JSON_to_data_to_json (fd:foreign_data_type) :
+             foreign_to_JSON_to_data (foreign_to_JSON_from_data fd) = Some fd
        }.
 
 End ForeignDatatoJSON.
