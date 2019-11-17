@@ -424,9 +424,9 @@ Next Obligation.
 Qed.
 
 Program Instance enhanced_foreign_to_JSON : foreign_to_JSON
-  := mk_foreign_to_JSON enhanced_foreign_data _ _.
+  := mk_foreign_to_JSON enhanced_foreign_data _ _ _.
 Next Obligation.
-  (* TODO: For now, we assume that JSON supports floating point *)
+  (* Todo: For now, we assume that JSON supports floating point *)
   exact None.
 Defined.
 Next Obligation.
@@ -438,6 +438,10 @@ Next Obligation.
   - exact (jstring (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) s)).
   - exact (jstring (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) s)).
 Defined.
+Next Obligation.
+  unfold  enhanced_foreign_to_JSON_obligation_1.
+  destruct fd; simpl.
+Admitted.
 
 Instance enhanced_foreign_runtime :
   foreign_runtime
