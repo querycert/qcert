@@ -380,6 +380,73 @@ Section ImpJsontoJavaScriptAst.
       specialize (HH2 b); congruence.
     Qed.
 
+    Lemma normalize_data_forall_ndnat d :  (forall n, d <> dnat n) -> (forall n, normalize_data h d <> dnat n).
+    Proof.
+      destruct d; simpl; intuition discriminate.
+    Qed.
+
+    Lemma data_to_bool_json_to_nat_correct j:
+      imp_qcert_data_to_Z (json_to_data h j) = imp_json_data_to_Z j.
+    Proof.
+      unfold json_to_data.
+      unfold imp_qcert_data_to_Z.
+      unfold imp_json_data_to_Z.
+      destruct j; trivial.
+      assert (simpl_eq1:
+                match normalize_data h (json_to_data_pre (jobject l)) with
+                | dnat n => Some n
+                | _ => None
+                end =
+                match json_to_data_pre (jobject l) with
+                | dnat n => Some n
+                | _ => None
+                end)
+             
+        by now destruct (json_to_data_pre (jobject l)).
+      rewrite simpl_eq1; clear simpl_eq1.
+
+      destruct l; trivial.
+      destruct p.
+      assert (simpl_eq: match s with
+  | "$nat"%string =>
+      match j with
+      | jnumber n => match l with
+                     | [] => Some (float_truncate n)
+                     | _ :: _ => None
+                     end
+      | _ => None
+      end
+  | _ => None
+                end =
+                      (match l with
+                      | [] => if string_dec s  ("$nat"%string)
+                                  then match j with
+                                  | jnumber n => Some (float_truncate n)
+                                  | _ => None
+                                       end
+                              else None
+                      | _ :: _ => None
+                       end))
+        by (repeat match_destr).
+      rewrite simpl_eq; clear simpl_eq.      
+      destruct l.
+      - simpl.
+        string_dec_to_equiv.
+        destruct j; simpl
+        ; repeat dest_eqdec; trivial
+        ; destruct (foreign_to_JSON_to_data _); trivial.
+      - simpl.
+        destruct p.
+        string_dec_to_equiv.
+        destruct j; simpl
+        ; repeat dest_eqdec; trivial
+        ; destruct j0; simpl; trivial
+        ; destruct l; simpl; trivial
+        ; try destruct (json_brands l0); trivial.
+        
+        now destruct (json_brands l1).
+    Qed.
+
     Lemma imp_qcert_unary_op_to_imp_json_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
