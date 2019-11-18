@@ -63,7 +63,7 @@ Section ImpJsonEval.
 
     Definition imp_json_data_to_Z (d:imp_json_data) : option Z :=
       match d with
-      | jnumber n => Some (float_truncate n)
+      | jobject (("$nat"%string, jnumber n)::nil) => Some (float_truncate n)
       | _ => None
       end.
 
