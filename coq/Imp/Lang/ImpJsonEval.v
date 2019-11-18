@@ -277,7 +277,8 @@ Section ImpJsonEval.
            q d.
 
     Definition imp_json_eval_top σc (q:imp_json) : option imp_json_data :=
-      olift id (imp_json_eval q (jobject (rec_sort σc))).
+      let σc' := List.map (fun xy => (json_key_encode (fst xy), snd xy)) (rec_sort σc) in
+      olift id (imp_json_eval q (jobject σc')).
 
   End Evaluation.
 

@@ -633,6 +633,15 @@ Section ImpJsontoJavaScriptAst.
         reflexivity.
     Qed.
 
+    Lemma push_rec_sort_in_map env :
+      (rec_sort (map (fun xy : string * data => (fst xy, data_to_json (snd xy))) env))
+      = (map (fun xy : string * data => (fst xy, data_to_json (snd xy))) (rec_sort env)).
+    Proof.
+      rewrite map_rec_sort.
+      - reflexivity.
+      - intros; split; intros; auto.
+    Qed.
+
     Theorem imp_qcert_to_imp_json_correct (σc:bindings) (q:imp_qcert) :
       imp_qcert_eval_top h σc q =
       imp_json_eval_top_alt h σc (imp_qcert_to_imp_json q).
@@ -658,10 +667,9 @@ Section ImpJsontoJavaScriptAst.
       f_equal.
       f_equal.
       f_equal.
-      rewrite map_rec_sort.
-      - auto.
-      - intros.
-        split; auto.
+      rewrite push_rec_sort_in_map.
+      rewrite map_map.
+      reflexivity.
     Qed.
 
   End Correctness.
