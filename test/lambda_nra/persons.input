@@ -1,11 +1,11 @@
 { "Persons" :
-  [{"pid": 1, "name": "John Doe", "age":{"nat":32}, "company":101, "salary":1000},
-   {"pid": 2, "name": "Jane Doe", "age":{"nat":32}, "company":103, "salary":1500},
-   {"pid": 3, "name": "Jim Does", "age":{"nat":34}, "company":101, "salary":800},
-   {"pid": 4, "name": "Jill Does","age":{"nat":32}, "company":102, "salary":1000},
-   {"pid": 5, "name": "Joan Doe", "age":{"nat":34}, "company":101, "salary":900},
-   {"pid": 6, "name": "James Do", "age":{"nat":35}, "company":103, "salary":1200}],
+  [{"pid": {"$nat":1}, "name": "John Doe", "age":{"$nat":32}, "company":{"$nat":101}, "salary":1000.0},
+   {"pid": {"$nat":2}, "name": "Jane Doe", "age":{"$nat":32}, "company":{"$nat":103}, "salary":1500.0},
+   {"pid": {"$nat":3}, "name": "Jim Does", "age":{"$nat":34}, "company":{"$nat":101}, "salary":800.0},
+   {"pid": {"$nat":4}, "name": "Jill Does","age":{"$nat":32}, "company":{"$nat":102}, "salary":1000.0},
+   {"pid": {"$nat":5}, "name": "Joan Doe", "age":{"$nat":34}, "company":{"$nat":101}, "salary":900.0},
+   {"pid": {"$nat":6}, "name": "James Do", "age":{"$nat":35}, "company":{"$nat":103}, "salary":1200.0}],
   "Companies" :
-  [{"cid": 101, "cname": "HBO", "departments":["HR","Research"]},
-   {"cid": 102, "cname": "CNN", "departments":["M&A","Corporate"]},
-   {"cid": 103, "cname": "ATT", "departments":["Mobile","Cable"]}] }
+  [{"cid": {"$nat":101}, "cname": "HBO", "departments":["HR","Research"]},
+   {"cid": {"$nat":102}, "cname": "CNN", "departments":["M&A","Corporate"]},
+   {"cid": {"$nat":103}, "cname": "ATT", "departments":["Mobile","Cable"]}] }

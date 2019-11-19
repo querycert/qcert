@@ -1,12 +1,12 @@
 { "Employees" :
-  [{"eid": 1, "name": "John Doe", "age":32, "company":101, "salary":1000},
-   {"eid": 2, "name": "Jane Doe", "age":32, "company":103, "salary":1500},
-   {"eid": 3, "name": "Jim Does", "age":34, "company":101, "salary":800},
-   {"eid": 4, "name": "Jill Does","age":32, "company":102, "salary":1000},
-   {"eid": 5, "name": "Joan Doe", "age":34, "company":101, "salary":900},
-   {"eid": 6, "name": "James Do", "age":35, "company":103, "salary":1200}],
+  [{"eid": { "$nat" : 1 }, "name": "John Doe", "age": { "$nat" : 32 }, "company": { "$nat" : 101 }, "salary": { "$nat" : 1000 }},
+   {"eid": { "$nat" : 2 }, "name": "Jane Doe", "age": { "$nat" : 32 }, "company": { "$nat" : 103 }, "salary": { "$nat" : 1500 }},
+   {"eid": { "$nat" : 3 }, "name": "Jim Does", "age": { "$nat" : 34 }, "company": { "$nat" : 101 }, "salary": { "$nat" : 800 }},
+   {"eid": { "$nat" : 4 }, "name": "Jill Does","age": { "$nat" : 32 }, "company": { "$nat" : 102 }, "salary": { "$nat" : 100 }},
+   {"eid": { "$nat" : 5 }, "name": "Joan Doe", "age": { "$nat" : 34 }, "company": { "$nat" : 101 }, "salary": { "$nat" : 900 }},
+   {"eid": { "$nat" : 6 }, "name": "James Do", "age": { "$nat" : 35 }, "company": { "$nat" : 103 }, "salary": { "$nat" : 1200 }}],
   "Companies" :
-  [{"cid": 101, "cname": "HBO", "departments":["HR","Research"]},
-   {"cid": 102, "cname": "CNN", "departments":["M&A","Corporate"]},
-   {"cid": 103, "cname": "ATT", "departments":["Mobile","Cable"]},
-   {"cid": 104, "cname": "CBS", "departments":["News","Comedy"]}]}
+  [{"cid": { "$nat" : 101 }, "cname": "HBO", "departments":["HR","Research"]},
+   {"cid": { "$nat" : 102 }, "cname": "CNN", "departments":["M&A","Corporate"]},
+   {"cid": { "$nat" : 103 }, "cname": "ATT", "departments":["Mobile","Cable"]},
+   {"cid": { "$nat" : 104 }, "cname": "CBS", "departments":["News","Comedy"]}]}

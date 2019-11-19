@@ -1,10 +1,10 @@
 {
   "WORLD": [
     {
-      "type": [
+      "$type": [
         "tests.entities.Purchase"
       ],
-      "data": {
+      "$data": {
         "name": "Tomatoe",
         "pid": 1,
         "quantity": 3,
@@ -12,10 +12,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Purchase"
       ],
-      "data": {
+      "$data": {
         "name": "Potatoe",
         "pid": 2,
         "quantity": 1,
@@ -23,10 +23,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Purchase"
       ],
-      "data": {
+      "$data": {
         "name": "Stiletto",
         "pid": 3,
         "quantity": 64,
@@ -34,10 +34,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Purchase"
       ],
-      "data": {
+      "$data": {
         "name": "Libretto",
         "pid": 4,
         "quantity": 62,
@@ -45,10 +45,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Purchase"
       ],
-      "data": {
+      "$data": {
         "name": "Dough",
         "pid": 5,
         "quantity": 4,
@@ -56,10 +56,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Purchase"
       ],
-      "data": {
+      "$data": {
         "name": "Croissant",
         "pid": 6,
         "quantity": 2,
@@ -67,10 +67,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Marketer"
       ],
-      "data": {
+      "$data": {
         "name": "Jill Does",
         "id": "126",
         "clients": [
@@ -80,10 +80,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.ProductRep"
       ],
-      "data": {
+      "$data": {
         "name": "Joan Doe",
         "id": "127",
         "clients": [
@@ -98,10 +98,10 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.ProductRep"
       ],
-      "data": {
+      "$data": {
         "name": "James Do",
         "id": "128",
         "clients": [
@@ -116,200 +116,200 @@
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Product"
       ],
-      "data": {
+      "$data": {
         "name": "Tomatoe",
         "client": "123",
         "id": "1"
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Product"
       ],
-      "data": {
+      "$data": {
         "name": "Potatoe",
         "client": "124",
         "id": "2"
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Product"
       ],
-      "data": {
+      "$data": {
         "name": "Stiletto",
         "client": "125",
         "id": "3"
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Product"
       ],
-      "data": {
+      "$data": {
         "name": "Libretto",
         "client": "100",
         "id": "4"
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Product"
       ],
-      "data": {
+      "$data": {
         "name": "Dough",
         "client": "101",
         "id": "5"
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Product"
       ],
-      "data": {
+      "$data": {
         "name": "Croissant",
         "client": "102",
         "id": "6"
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Customer"
       ],
-      "data": {
+      "$data": {
         "name": "John Doe",
         "age": 32,
         "cid": 123
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Customer"
       ],
-      "data": {
+      "$data": {
         "name": "Jane Doe",
         "age": 32,
         "cid": 124
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Customer"
       ],
-      "data": {
+      "$data": {
         "name": "Jim Does",
         "age": 34,
         "cid": 125
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Customer"
       ],
-      "data": {
+      "$data": {
         "name": "Jill Does",
         "age": 32,
         "cid": 126
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Customer"
       ],
-      "data": {
+      "$data": {
         "name": "Joan Doe",
         "age": 34,
         "cid": 127
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.Customer"
       ],
-      "data": {
+      "$data": {
         "name": "James Do",
         "age": 35,
         "cid": 128
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.MainEntity"
       ],
-      "data": {
+      "$data": {
         "doubleAttribute": 4.0,
         "stringId": "201",
         "id": 201
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.entities.MainEntity"
       ],
-      "data": {
+      "$data": {
         "doubleAttribute": 100.0,
         "stringId": "202",
         "id": 202
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Client"
       ],
-      "data": {
+      "$data": {
         "name": "Librettos are Us",
         "id": "100",
         "capitalization": 1000000
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Client"
       ],
-      "data": {
+      "$data": {
         "name": "We Got Dough",
         "id": "101",
         "capitalization": 10000000
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Client"
       ],
-      "data": {
+      "$data": {
         "name": "Croissant City",
         "id": "102",
         "capitalization": 34000
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Client"
       ],
-      "data": {
+      "$data": {
         "name": "Tomatoe Paradise",
         "id": "123",
         "capitalization": 3200
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Client"
       ],
-      "data": {
+      "$data": {
         "name": "Have Potatoes, Will Travel",
         "id": "124",
         "capitalization": 16000
       }
     },
     {
-      "type": [
+      "$type": [
         "tests.branding.Client"
       ],
-      "data": {
+      "$data": {
         "name": "Stillettos are Us",
         "id": "125",
         "capitalization": 34000

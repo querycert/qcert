@@ -1,18 +1,18 @@
 { "employees" :
-  [{"eid": 1, "name": "John Doe", "age":{"nat":32}, "company":101},
-   {"eid": 2, "name": "Jane Doe", "age":{"nat":32}, "company":104},
-   {"eid": 3, "name": "Jim Does", "age":{"nat":34}, "company":101},
-   {"eid": 4, "name": "Jill Does","age":{"nat":32}, "company":102},
-   {"eid": 5, "name": "Joan Doe", "age":{"nat":34}, "company":103},
-   {"eid": 6, "name": "James Do", "age":{"nat":35}, "company":104}],
+  [{"eid": {"$nat":1}, "name": "John Doe", "age":{"$nat":32}, "company":{"$nat":101}},
+   {"eid": {"$nat":2}, "name": "Jane Doe", "age":{"$nat":32}, "company":{"$nat":104}},
+   {"eid": {"$nat":3}, "name": "Jim Does", "age":{"$nat":34}, "company":{"$nat":101}},
+   {"eid": {"$nat":4}, "name": "Jill Does","age":{"$nat":32}, "company":{"$nat":102}},
+   {"eid": {"$nat":5}, "name": "Joan Doe", "age":{"$nat":34}, "company":{"$nat":103}},
+   {"eid": {"$nat":6}, "name": "James Do", "age":{"$nat":35}, "company":{"$nat":104}}],
   "students" :
-  [{"sid": 1, "name": "Thandy Coe", "age":{"nat":26}, "univ":103},
-   {"sid": 2, "name": "Tedd Coes", "age":{"nat":42}, "univ":105},
-   {"sid": 3, "name": "Theo Co", "age":{"nat":22}, "univ":103},
-   {"sid": 4, "name": "Tim Coe","age":{"nat":32}, "univ":103}],
+  [{"sid": {"$nat":1}, "name": "Thandy Coe", "age":{"$nat":26}, "univ":{"$nat":103}},
+   {"sid": {"$nat":2}, "name": "Tedd Coes", "age":{"$nat":42}, "univ":{"$nat":105}},
+   {"sid": {"$nat":3}, "name": "Theo Co", "age":{"$nat":22}, "univ":{"$nat":103}},
+   {"sid": {"$nat":4}, "name": "Tim Coe","age":{"$nat":32}, "univ":{"$nat":103}}],
   "organizations" :
-  [{"oid": 101, "name": "Blue Widget", "departments" : [ "Sales", "Manufacturing" ] },
-   {"oid": 102, "name": "Pimble", "departments" : [] },
-   {"oid": 103, "name": "BUNY", "departments" : [ "Computer Science", "HR" ] },
-   {"oid": 104, "name": "Unter", "departments" : ["IP","M&A","Sales"] },
-   {"oid": 105, "name": "UBass", "departments" : ["Comparative Literature","Engineering","Legal"] } ] }
+  [{"oid": {"$nat":101}, "name": "Blue Widget", "departments" : [ "Sales", "Manufacturing" ] },
+   {"oid": {"$nat":102}, "name": "Pimble", "departments" : [] },
+   {"oid": {"$nat":103}, "name": "BUNY", "departments" : [ "Computer Science", "HR" ] },
+   {"oid": {"$nat":104}, "name": "Unter", "departments" : ["IP","M&A","Sales"] },
+   {"oid": {"$nat":105}, "name": "UBass", "departments" : ["Comparative Literature","Engineering","Legal"] } ] }

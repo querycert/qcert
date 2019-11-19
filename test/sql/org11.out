@@ -1,2 +1,2 @@
-[{"age" : { "nat" : 26 },
+[{"age" : { "$nat" : 26 },
   "name" : "Thandy Coe"}]

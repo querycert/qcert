@@ -1,1 +1,1 @@
-{"left": {"type": ["Customer"], "data": {"age": { "nat" : 32 }, "cid": 126, "name": "Jill Does"}}}
+{"$left": {"$type": ["Customer"], "$data": {"age": { "$nat" : 32 }, "cid": { "$nat" : 126 }, "name": "Jill Does"}}}

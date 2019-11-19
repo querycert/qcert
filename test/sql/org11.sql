@@ -1,5 +1,5 @@
 select age, name
 from students, employees
-where eid = 1.0
-  and sid = 1.0
+where eid = 1
+  and sid = 1
 ;

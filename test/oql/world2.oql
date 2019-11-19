@@ -1,4 +1,4 @@
 /* SFW with selection */
 select p->name
 from p as entities.Customer in WORLD
-where p->age =32.0
+where p->age =32
