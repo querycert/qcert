@@ -146,7 +146,7 @@ Section NNRCtoJava.
 
      Definition mk_java_json_nat quotel n : java_json
        := mk_java_json_object quotel
-                              [("nat", (mk_java_json_primitive (Z_to_string10 n)))].
+                              [("$nat", (mk_java_json_primitive (Z_to_string10 n)))].
      
      Definition mk_java_json_number n : java_json
        := mk_java_json_primitive (float_to_string n).
@@ -170,15 +170,15 @@ Section NNRCtoJava.
                                 let '(k,v) := kv in
                                 (k, (mk_java_json_data quotel v))) ls)
          | dleft d => mk_java_json_object quotel
-                                         [("left", (mk_java_json_data quotel d))]
+                                         [("$left", (mk_java_json_data quotel d))]
 
          | dright d => mk_java_json_object quotel
-                                         [("right", (mk_java_json_data quotel d))]
+                                         [("$right", (mk_java_json_data quotel d))]
 
          | dbrand b d =>
            mk_java_json_object quotel
-                              [("data", mk_java_json_data quotel d)
-                               ; ("type", mk_java_json_brands quotel b)]
+                              [("$data", mk_java_json_data quotel d)
+                               ; ("$type", mk_java_json_brands quotel b)]
          | dforeign fd => foreign_to_java_data quotel fd
          end.
 

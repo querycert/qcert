@@ -69,7 +69,7 @@ public class UnaryOperators {
 		return dst;
 	}
 	public static JsonElement count(JsonElement e) {
-    return rec("nat",new JsonPrimitive(e.getAsJsonArray().size()));
+    return rec("$nat",new JsonPrimitive(e.getAsJsonArray().size()));
 	}
 	
 	public static JsonElement flatten(JsonElement e) {
@@ -173,13 +173,13 @@ public class UnaryOperators {
 	}
 
 	private static <V> void tostring(StringBuilder sb, JsonObject o){
-	    if (o.has("nat")) { // integer
-          sb.append(o.get("nat").getAsLong());
-	    } else if (o.has("type")) { // branded value
+	    if (o.has("$nat")) { // integer
+          sb.append(o.get("$nat").getAsLong());
+	    } else if (o.has("$type")) { // branded value
           sb.append("<");
-          sb.append(o.get("type").getAsString());
+          sb.append(o.get("$type").getAsString());
           sb.append(":");
-          tostring(sb,o.get("data"));
+          tostring(sb,o.get("$data"));
           sb.append(">");
       } else { // record
           sb.append("{");
@@ -233,7 +233,7 @@ public class UnaryOperators {
 	
 	public static JsonElement stringlength(JsonElement e) {
 		String str = e.getAsJsonPrimitive().getAsString();
-		return rec("nat",new JsonPrimitive(str.length()));
+		return rec("$nat",new JsonPrimitive(str.length()));
 	}
 
 	public static JsonElement substring(int start, int end, JsonElement e) {
@@ -247,30 +247,30 @@ public class UnaryOperators {
 	}
 
 	public static JsonElement left(JsonElement e) {
-		return rec("left", e);
+		return rec("$left", e);
 	}
 	public static JsonElement right(JsonElement e) {
-		return rec("right", e);
+		return rec("$right", e);
 	}
 	
 	public static JsonElement brand(Collection<String> brands, JsonElement e) {
 		final JsonObject dst = new JsonObject();
-		dst.add("data", e);
+		dst.add("$data", e);
 		
 		JsonArray brands_dst = new JsonArray();
 		for(final String br : brands) {
 			brands_dst.add(br);
 		}
-		dst.add("type", brands_dst);
+		dst.add("$type", brands_dst);
 		return dst;
 	}
 	public static JsonElement unbrand(JsonElement e) {
-		return e.getAsJsonObject().get("data");
+		return e.getAsJsonObject().get("$data");
 	}
 	
 	public static JsonElement cast(Inheritance inheritance, Collection<String> brands, JsonElement e) {
 		final JsonObject er = e.getAsJsonObject();
-		final JsonArray typs = er.get("type").getAsJsonArray();
+		final JsonArray typs = er.get("$type").getAsJsonArray();
 		Set<String> actualBrands = collToBrands(typs);
 		if(inheritance.isAssignableFrom(brands, actualBrands)) {
 			return left(e);
@@ -343,8 +343,8 @@ public class UnaryOperators {
 	}
 	public static JsonElement float_of_int(JsonElement e) {
 	        if(e.isJsonObject()) {
-		    if (((JsonObject) e).has("nat")) {
-			return new JsonPrimitive(((JsonObject) e).get("nat").getAsLong());
+		    if (((JsonObject) e).has("$nat")) {
+			return new JsonPrimitive(((JsonObject) e).get("$nat").getAsLong());
 		    } else return new JsonPrimitive(e.getAsLong());
 		} else return new JsonPrimitive(e.getAsLong());
 	}

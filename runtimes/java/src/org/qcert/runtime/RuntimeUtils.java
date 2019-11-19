@@ -78,9 +78,9 @@ public class RuntimeUtils {
 
 	public static boolean either(JsonElement obj) {
  		final JsonObject rec = obj.getAsJsonObject();
- 		if(rec.has("left")) {
+ 		if(rec.has("$left")) {
  			return true;
- 		} else if(rec.has("right")) {
+ 		} else if(rec.has("$right")) {
  			return false;
  		} else {
  			throw new RuntimeException("RuntimeUtils.either: Expected an either, but got an " + obj);
@@ -88,11 +88,11 @@ public class RuntimeUtils {
 	}
 
 	public static JsonElement toLeft(JsonElement obj) {
-		return asRec(obj).get("left");
+		return asRec(obj).get("$left");
 	}
 
 	public static JsonElement toRight(JsonElement obj) {
-		return asRec(obj).get("right");
+		return asRec(obj).get("$right");
 	}
 
 	public static JsonElement[] collAsArray(JsonArray coll) {
@@ -106,8 +106,8 @@ public class RuntimeUtils {
 
 	public static long asLong(JsonElement e) {
 	    if(e.isJsonObject()) {
-		if (((JsonObject) e).has("nat"))
-		    return ((JsonObject) e).get("nat").getAsLong();
+		if (((JsonObject) e).has("$nat"))
+		    return ((JsonObject) e).get("$nat").getAsLong();
 		else
 		    return e.getAsLong();
 	    } else
