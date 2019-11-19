@@ -511,14 +511,18 @@ Section ImpJsontoJavaScriptAst.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
-        destruct l; try reflexivity; simpl.
-        destruct l; try reflexivity; simpl.
-        + f_equal.
+        + destruct l; try reflexivity; simpl.
+          destruct l; try reflexivity; simpl.
+          f_equal.
           unfold json_to_data; simpl.
-          admit.
+          destruct j; reflexivity.
         + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
           generalize (json_to_data_object_not_coll h l l0); intros.
           congruence.
+      - Case "OpFlatten"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        
     Admitted.
 
     Lemma imp_qcert_binary_op_to_imp_json_expr_correct

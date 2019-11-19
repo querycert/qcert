@@ -63,7 +63,6 @@ Section DatatoJSON.
     (* JSON to CAMP data model (META Variant) *)
 
     Fixpoint json_to_data_pre (j:json) : data :=
-      
       match j with
       | jnull => dunit
       | jnumber n => dfloat n

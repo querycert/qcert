@@ -70,6 +70,12 @@ Section ImpJsonEval.
     Definition imp_json_Z_to_data (n: Z) : imp_json_data :=
       Z_to_json n.
 
+    Definition jflatten (d:list json) : option (list json) :=
+      lift_flat_map (fun x =>
+                   match x with
+                   | jarray y => Some y
+                   | _ => None end) d.
+    
     Definition imp_json_runtime_eval (rt:imp_json_runtime_op) (dl:list imp_json_data) : option imp_json_data :=
       match rt with
       | JSONRuntimeEqual =>
@@ -171,7 +177,14 @@ Section ImpJsonEval.
              | jarray _ => Some (jobject (("$right",jnull)::nil))
              | _ => None
              end) dl
-      | JSONRuntimeFlatten => None
+      | JSONRuntimeFlatten =>
+        apply_unary
+          (fun d =>
+             match d with
+             | jarray l =>
+               lift jarray (jflatten l)
+             | _ => None
+             end) dl
       | JSONRuntimeSort => None
       | JSONRuntimeCount => None
       | JSONRuntimeLength => None
