@@ -474,4 +474,44 @@ Section ModelRoundTrip.
       now destruct (foreign_to_JSON_from_data fd).
   Qed.
 
+  Section RuntimeLemmas.
+    (* XXX Some assumptions for the correctness of operators translation -- do they hold?? *)
+    Lemma json_to_data_object_not_boolean h l b:
+      ~(json_to_data h (jobject l) = dbool b).
+    Proof.
+    Admitted.
+
+    Lemma json_to_data_object_not_coll h l j:
+      ~(json_to_data h (jobject l) = dcoll j).
+    Proof.
+    Admitted.
+
+    Lemma rec_json_key_encode_roundtrip h s i0:
+      drec ((s, json_to_data h i0)::nil) = json_to_data h (jobject ((json_key_encode s, i0)::nil)).
+    Proof.
+    Admitted.
+
+    Lemma assoc_lookupr_json_key_encode_roundtrip h l s:
+      match json_to_data h (jobject l) with
+      | drec r => assoc_lookupr ODT_eqdec r s
+      | _ => None
+      end =
+      match assoc_lookupr ODT_eqdec l (json_key_encode s) with
+      | Some a' => Some (json_to_data h a')
+      | None => None
+      end.
+    Proof.
+      admit.
+    Admitted.
+
+    Lemma rremove_json_key_encode_roundtrip h l s:
+      match json_to_data h (jobject l) with
+      | drec r => Some (drec (rremove r s))
+      | _ => None
+      end = Some (json_to_data h (jobject (rremove l (json_key_encode s)))).
+    Proof.
+      admit.
+    Admitted.
+
+  End RuntimeLemmas.
 End ModelRoundTrip.

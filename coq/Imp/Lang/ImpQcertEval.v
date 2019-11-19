@@ -115,6 +115,7 @@ Section ImpQcertEval.
           unary_op_eval h uop d
         | _ => None
         end
+
       | QcertOpBinary bop =>
         match dl with
         | [d1;d2] =>

@@ -44,7 +44,7 @@ Section ImpJsonEval.
   Section EvalInstantiation.
     (* Instantiate Imp for Qcert data *)
     Definition imp_json_data_normalize (d:imp_json_data) : imp_json_data :=
-      d. (* XXX What to do? *)
+      normalize_json d.
 
     Definition imp_json_data_to_bool (d:imp_json_data) : option bool :=
       match d with
@@ -129,22 +129,22 @@ Section ImpJsonEval.
         apply_unary
           (fun d =>
              match d with
-             | jobject (("left", _)::nil) => Some (jbool true)
-             | jobject (("right",_)::nil) => Some (jbool false)
+             | jobject (("$left", _)::nil) => Some (jbool true)
+             | jobject (("$right",_)::nil) => Some (jbool false)
              | _ => None
              end) dl
       | JSONRuntimeToLeft =>
         apply_unary
           (fun d =>
              match d with
-             | jobject (("left", d)::nil) => Some d
+             | jobject (("$left", d)::nil) => Some d
              | _ => None
              end) dl
       | JSONRuntimeToRight =>
         apply_unary
           (fun d =>
              match d with
-             | jobject (("right", d)::nil) => Some d
+             | jobject (("$right", d)::nil) => Some d
              | _ => None
              end) dl
       | JSONRuntimeRemove =>
@@ -167,7 +167,8 @@ Section ImpJsonEval.
         apply_unary
           (fun d =>
              match d with
-             | jarray (d::nil) => Some d
+             | jarray (d::nil) => Some (jobject (("$left",d)::nil))
+             | jarray _ => Some (jobject (("$right",jnull)::nil))
              | _ => None
              end) dl
       | JSONRuntimeFlatten => None
