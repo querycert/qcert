@@ -39,6 +39,7 @@ MODULES = \
 	Utils/Closure \
 	Utils/Result \
 	Utils/JSON \
+	Utils/JSONNorm \
 	Utils/JSONOperators \
 	Utils/OptimizerStep \
 	Utils/OptimizerLogger \

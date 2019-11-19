@@ -1624,7 +1624,7 @@ Section ROptimEnv.
   Qed.
 
   Lemma rproject_over_const sl l :
-    π[sl](cNRAEnvConst (drec l)) ≡ₑ cNRAEnvConst (drec (RecOperators.rproject l sl)).
+    π[sl](cNRAEnvConst (drec l)) ≡ₑ cNRAEnvConst (drec (Bindings.rproject l sl)).
   Proof.
     red; simpl; intros.
     rewrite rproject_rec_sort_commute.

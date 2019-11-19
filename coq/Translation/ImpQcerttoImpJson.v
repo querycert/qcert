@@ -46,10 +46,9 @@ Section ImpJsontoJavaScriptAst.
   Definition mk_string s : imp_json_expr := ImpExprConst (jstring s).
   Definition mk_bag el : imp_json_expr := mk_imp_json_op JSONOpArray el.
   Definition mk_left e : imp_json_expr :=
-    mk_imp_json_op (JSONOpObject ["left"%string]) [ e ].
+    mk_imp_json_op (JSONOpObject ["$left"%string]) [ e ].
   Definition mk_right e : imp_json_expr :=
-    mk_imp_json_op (JSONOpObject ["right"%string]) [ e ].
-
+    mk_imp_json_op (JSONOpObject ["$right"%string]) [ e ].
 
   Definition sortCriteria_to_json_expr (sc: string * SortDesc) : imp_json_expr :=
     let (lbl, c) := sc in
@@ -70,13 +69,13 @@ Section ImpJsontoJavaScriptAst.
     | [e] =>
       match op with
       | OpIdentity => e
-      | OpNeg => mk_imp_json_op JSONOpNot el
-      | OpRec s => mk_imp_json_op (JSONOpObject [s]) el
-      | OpDot s => mk_imp_json_runtime_call JSONRuntimeDeref [e; ImpExprConst (jstring s)]
-      | OpRecRemove f => mk_imp_json_runtime_call JSONRuntimeRemove [e; mk_string f ]
+      | OpNeg => mk_imp_json_op JSONOpNot [e]
+      | OpRec s => mk_imp_json_op (JSONOpObject [json_key_encode s]) [e]
+      | OpDot s => mk_imp_json_runtime_call JSONRuntimeDeref [e; ImpExprConst (jstring (json_key_encode s))]
+      | OpRecRemove s => mk_imp_json_runtime_call JSONRuntimeRemove [e; mk_string (json_key_encode s)]
       | OpRecProject fl =>
         mk_imp_json_runtime_call
-          JSONRuntimeProject ((List.map mk_string fl) ++ [ e ])
+          JSONRuntimeProject ((List.map mk_string fl) ++ [e])
       | OpBag => mk_bag el
       | OpSingleton => mk_imp_json_runtime_call JSONRuntimeSingleton el
       | OpFlatten => mk_imp_json_runtime_call JSONRuntimeFlatten el
@@ -141,7 +140,7 @@ Section ImpJsontoJavaScriptAst.
       | OpForeignUnary fu =>
         mk_imp_json_expr_error "XXX TODO: ImpQcerttoImpJson.imp_qcert_unary_op_to_imp_json OpForeignUnary"
       end
-    | _ => mk_imp_json_expr_error "OpIdentity: wrong number of arguments"
+    | _ => mk_imp_json_expr_error "wrong number of arguments"
     end.
 
   Definition imp_qcert_binary_op_to_imp_json (op:binary_op) el : imp_json_expr :=
@@ -310,14 +309,7 @@ Section ImpJsontoJavaScriptAst.
       lift (fun env => List.map (fun xy => (fst xy, lift (json_to_data h) (snd xy))) env) res.
 
 
-    Lemma lift_map_lift_result {A} (g:A -> option json) l :
-      lift_map (fun x => lift_result (g x)) l = lift (map (json_to_data h)) (lift_map g l).
-    Proof.
-      unfold lift_result.
-      apply lift_map_lift.
-    Qed.
-
-    Lemma test 
+    Lemma map_qcert_json_eval 
           (σ:pd_bindings) (el:list imp_expr) :
       Forall
         (fun exp : imp_expr =>
@@ -334,21 +326,10 @@ Section ImpJsontoJavaScriptAst.
     Qed.
 
     Lemma json_to_data_to_json_id d:
-      json_to_data h (data_to_json d) = d.
+      json_to_data h (data_to_json d) = normalize_data h d.
     Proof.
-      (* induction d; simpl. *)
-      (* -  unfold json_to_data, json_to_data_pre. *)
-      (*    unfold foreign_to_JSON_to_data. *)
-      (*    destruct ftjson. *)
-      (*    match_destr. *)
-      (*    admit. *)
-      (* - unfold json_to_data, json_to_data_pre. *)
-      (*   unfold foreign_to_JSON_to_data. *)
-      (*   destruct ftjson. *)
-      (*   destruct (string_dec "nat" "nat"); try congruence. *)
-      admit.
-    Admitted.
-    (* Qed. *)
+      apply json_to_data_to_json_idempotent.
+    Qed.
 
     Lemma normalize_data_dbool d b : normalize_data h d = dbool b <-> d = dbool b.
     Proof.
@@ -447,6 +428,21 @@ Section ImpJsontoJavaScriptAst.
         now destruct (json_brands l1).
     Qed.
 
+    Lemma Forall_singleton σ i:
+      Forall
+        (fun exp : imp_expr =>
+           imp_qcert_expr_eval h σ exp =
+           lift_result (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json exp))) [i]
+      -> imp_qcert_expr_eval h σ i
+         = lift_result (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i)).
+    Proof.
+      intros.
+      rewrite Forall_forall in H.
+      specialize (H i).
+      apply H.
+      left; reflexivity.
+    Qed.
+
     Lemma imp_qcert_unary_op_to_imp_json_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -461,20 +457,68 @@ Section ImpJsontoJavaScriptAst.
                             (imp_qcert_unary_op_to_imp_json u (map imp_qcert_expr_to_imp_json el))).
     Proof.
       intros.
-      unary_op_cases (destruct u) Case; simpl.
+      (* elim no params *)
+      destruct el; simpl; [reflexivity|].
+      (* elim two or more params *)
+      destruct el; simpl;
+        [|destruct (imp_qcert_expr_eval h σ i); [|reflexivity]; simpl;
+          destruct (imp_qcert_expr_eval h σ i0); [|reflexivity]; simpl;
+          unfold lift, olift;
+          case_eq
+            (lift_map (fun x : option imp_qcert_data => x)
+                      (map (fun x : imp_qcert_expr => imp_qcert_expr_eval h σ x) el)); intros;
+          unfold imp_qcert_data, ImpEval.imp_expr, imp_qcert_expr, imp_qcert_data, foreign_runtime_data in *;
+          rewrite H0; reflexivity].
+      (* just one param *)
+      apply Forall_singleton in H.
+      rewrite H; clear H.
+      unfold imp_qcert_op_eval, imp_json_op_eval.
+      unary_op_cases (destruct u) Case; unfold lift_result, lift, olift; simpl.
       - Case "OpIdentity"%string.
-        simpl; unfold lift_result, lift, olift.
-        rewrite test; [|assumption]; clear H.
-        destruct el; simpl; [reflexivity|]; destruct el; simpl.
-        + simpl; unfold lift_result, lift, olift.
-          destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
-            try reflexivity.
-        + unfold olift, lift_result, lift; simpl.
-          destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i)); try reflexivity.
-          destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i0)); try reflexivity.
-          rewrite lift_map_map_fusion.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+      - Case "OpNeg"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        unfold unudbool.
+        case_eq (json_to_data h (jobject l)); intros; try reflexivity.
+        generalize (json_to_data_object_not_boolean h l b); intros.
+        congruence.
+      - Case "OpRec"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        f_equal.
+        apply rec_json_key_encode_roundtrip.
+      - Case "OpDot"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        unfold edot.
+        apply assoc_lookupr_json_key_encode_roundtrip.
+      - Case "OpRecRemove"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        apply rremove_json_key_encode_roundtrip.
+      - Case "OpRecProject"%string.
+        simpl.
+        admit. (** XXX This one looks more complicated *)
+      - Case "OpBag"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+      - Case "OpSingleton"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        destruct l; try reflexivity; simpl.
+        destruct l; try reflexivity; simpl.
+        + f_equal.
+          unfold json_to_data; simpl.
           admit.
-      - admit.
+        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
+          generalize (json_to_data_object_not_coll h l l0); intros.
+          congruence.
     Admitted.
 
     Lemma imp_qcert_binary_op_to_imp_json_expr_correct
@@ -525,7 +569,7 @@ Section ImpJsontoJavaScriptAst.
       + apply imp_qcert_unary_op_to_imp_json_expr_correct; assumption.
       + apply imp_qcert_binary_op_to_imp_json_expr_correct; assumption.
     Qed.
-     
+
     Lemma imp_qcert_expr_to_imp_json_expr_correct (σ:pd_bindings) (exp:imp_qcert_expr) :
       imp_qcert_expr_eval h σ exp =
       lift_result
@@ -545,9 +589,10 @@ Section ImpJsontoJavaScriptAst.
         match_destr.
         destruct o; try reflexivity.
         rewrite json_to_data_to_json_id.
-        reflexivity.
+        admit.
       - Case "ImpExprConst"%string.
         simpl.
+        f_equal.
         admit. (* XXX Needs json_normalize with lift/unlift roundtrip property *)
       - Case "ImpExprOp"%string.
         apply imp_qcert_op_to_imp_json_correct; assumption.
@@ -599,11 +644,11 @@ Section ImpJsontoJavaScriptAst.
           apply Hl; try reflexivity.
           destruct o1; try reflexivity.
           rewrite json_to_data_to_json_id.
-          reflexivity.
+          admit. (** XX Needs a proof of normalization *)
         + apply Hl; try reflexivity.
           destruct o0; try reflexivity.
           rewrite json_to_data_to_json_id.
-          reflexivity.
+          admit. (** XX Needs a proof of normalization *)
       - Case "ImpStmtFor"%string.
         admit.
       - Case "ImpStmtForRange"%string.

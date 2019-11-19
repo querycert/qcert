@@ -24,6 +24,7 @@ Require Import Float.
 Require Import CoqLibAdd.
 Require Import StringAdd.
 Require Import Digits.
+Require Import EquivDec.
 
 Section JSON.
   Unset Elimination Schemes.
@@ -136,6 +137,10 @@ Section JSON.
         apply string_dec.
       + right; inversion 1; auto.
   Defined.
+
+  (* begin hide *)
+  Global Instance json_eqdec : EqDec json eq := json_eq_dec.
+  (* begin hide *)
 
   Section toString.
 
