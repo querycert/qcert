@@ -1,1 +1,1 @@
-[{"age": {"nat":32}, "name": "John Doe"}, {"age": {"nat":32}, "name": "Jane Doe"}, {"age": {"nat":32}, "name": "Jill Does"}, {"age": {"nat":32}, "name": "Tim Coe"}]
+[{"age": {"$nat":32}, "name": "John Doe"}, {"age": {"$nat":32}, "name": "Jane Doe"}, {"age": {"$nat":32}, "name": "Jill Does"}, {"age": {"$nat":32}, "name": "Tim Coe"}]

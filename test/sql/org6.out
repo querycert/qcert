@@ -1,1 +1,1 @@
-[{"age": {"nat":32}, "company": 101, "eid": 1, "name": "John Doe"}, {"age": {"nat":32}, "company": 104, "eid": 2, "name": "Jane Doe"}, {"age": {"nat":32}, "company": 102, "eid": 4, "name": "Jill Does"}]
+[{"age": {"$nat":32}, "company": {"$nat":101}, "eid": {"$nat":1}, "name": "John Doe"}, {"age": {"$nat":32}, "company": {"$nat":104}, "eid": {"$nat":2}, "name": "Jane Doe"}, {"age": {"$nat":32}, "company": {"$nat":102}, "eid": {"$nat":4}, "name": "Jill Does"}]

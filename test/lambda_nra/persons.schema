@@ -8,7 +8,7 @@
 			     "name" : "String",
 			     "age" : "Nat",
 			     "company" : "Nat",
-			     "salary" : "Nat" } } },
+			     "salary" : "Float" } } },
     "Companies" :
     { "dist" : "distr",
       "type" : { "$coll" : { "cid" : "Nat" ,
