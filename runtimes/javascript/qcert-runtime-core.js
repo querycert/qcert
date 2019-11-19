@@ -226,15 +226,15 @@ function toStringQ(v, quote) {
 	}
 	return result + "]";
     }
-    if(v.hasOwnProperty('nat')){
-	return "" + v.nat;
+    if(v.hasOwnProperty('$nat')){
+	return "" + v.$nat;
     }
     var result2 = "";
-    if (v.type) { // branded value
+    if (v.$type) { // branded value
         result2 += "<";
-        result2 += v.type;
+        result2 += v.$type;
         result2 += ":";
-        result2 += toStringQ(v.data, quote);
+        result2 += toStringQ(v.$data, quote);
         result2 += ">";
     } else { // record
         // First need to sort
@@ -318,8 +318,8 @@ function bmax(b1, b2) {
 }
 function bnth(b1, n) {
     var index = n;
-    if(n.hasOwnProperty('nat')){
-	    index = n.nat;
+    if(n.hasOwnProperty('$nat')){
+	    index = n.$nat;
     }
     if (b1[index]) {
         return left(b1[index]);
@@ -338,10 +338,10 @@ function sub_brand(b1,b2) {
     return false;
 }
 function left(v) {
-    return { left : v };
+    return { "$left" : v };
 }
 function right(v) {
-    return { right : v };
+    return { "$right" : v };
 }
 function mustBeArray(obj) {
     if (Array.isArray(obj))
@@ -353,7 +353,7 @@ function cast(brands,v) {
     mustBeArray(brands);
     if ("$class" in v)
 	return enhanced_cast(brands,v);
-    var type = v.type;
+    var type = v.$type;
     mustBeArray(type);
     if (brands.length == 1 && brands[0] == "Any") { /* cast to top of inheritance is built-in */
     	return left(v);
@@ -394,24 +394,24 @@ function unbrand(v) {
 	if ("$class" in v) {
 	    return remove(v,"$class");
 	} else {
-	    return ("data" in v) ? v.data : v;
+	    return ("$data" in v) ? v.$data : v;
 	}
     throw "TypeError: unbrand called on non-object";
 }
 function brand(b,v) {
-    return { type : b, data : v };
+    return { "$type" : b, "$data" : v };
 }
 function either(v) {
     if (v == null)
 	return false;
     if (typeof v === "object")
-	return !("right" in v);
+	return !("$right" in v);
     return true;
 }
 function toLeft(v) {
     if (typeof v === "object") {
-	if ("left" in v)
-	    return v.left;
+	if ("$left" in v)
+	    return v.$left;
 	if ("$value" in v)
 	    return v.$value;
 	if (looksLikeRelationship(v))
@@ -422,8 +422,8 @@ function toLeft(v) {
 function toRight(v) {
     if (v === null)
 	return null;
-    if (typeof v === "object" && "right" in v)
-	return v.right;
+    if (typeof v === "object" && "$right" in v)
+	return v.$right;
     return undefined;
 }
 function deref(receiver, member) {
@@ -434,7 +434,7 @@ function deref(receiver, member) {
 	}
 	if (typeof ans === "object" && looksLikeRelationship(ans))
 	    ans = left(ans["key"]);
-	if (("$class" in receiver) && typeof ans === "object" && !("left" in ans) && !Array.isArray(ans))
+	if (("$class" in receiver) && typeof ans === "object" && !("$left" in ans) && !Array.isArray(ans))
 	    ans = left(ans);
 	return ans;
     }
@@ -442,14 +442,14 @@ function deref(receiver, member) {
 }
 function looksLikeRelationship(v) {
     // As the name suggests, this is only heuristic.  We call it a relationship if it has two or three members.
-    // A "key" and "type" member must be among those.   A third member, if present, must be $class and must denote
+    // A "key" and "$type" member must be among those.   A third member, if present, must be $class and must denote
     // the relationship class.
     var hasKey = false;
     var hasType = false;
     for (var member in v)
 	if (member == "key")
 	    hasKey = true;
-    else if (member == "type")
+    else if (member == "$type")
 	hasType = true;
     else if (member == "$class" && v["$class"] == "com.ibm.ia.model.Relationship")
 	continue;
@@ -469,72 +469,72 @@ function escapeRegExp(string){
 // Nat operations
 
 function natPlus(v1, v2) {
-    return { "nat" : v1.nat + v2.nat };
+    return { "$nat" : v1.$nat + v2.$nat };
 }
 function natMinus(v1, v2) {
-    return { "nat" : v1.nat - v2.nat };
+    return { "$nat" : v1.$nat - v2.$nat };
 }
 function natMult(v1, v2) {
-    return { "nat" : v1.nat * v2.nat };
+    return { "$nat" : v1.$nat * v2.$nat };
 }
 function natDiv(v1, v2) {
-    return { "nat" : Math.floor(v1.nat / v2.nat) };
+    return { "$nat" : Math.floor(v1.$nat / v2.$nat) };
 }
 function natDiv(v1, v2) {
-    return { "nat" : Math.floor(v1.nat / v2.nat) };
+    return { "$nat" : Math.floor(v1.$nat / v2.$nat) };
 }
 function natRem(v1, v2) {
-    return { "nat" : Math.floor(v1.nat % v2.nat) };
+    return { "$nat" : Math.floor(v1.$nat % v2.$nat) };
 }
 function natMin(v1, v2) {
-    return { "nat" : Math.min(v1.nat,v2.nat) };
+    return { "$nat" : Math.min(v1.$nat,v2.$nat) };
 }
 function natMax(v1, v2) {
-    return { "nat" : Math.max(v1.nat,v2.nat) };
+    return { "$nat" : Math.max(v1.$nat,v2.$nat) };
 }
 function natAbs(v) {
-    return { "nat" : Math.abs(v.nat) };
+    return { "$nat" : Math.abs(v.$nat) };
 }
 function natLog2(v) {
-    return { "nat" : Math.floor(Math.log2(v.nat)) }; // Default Z.log2 is log_inf, biggest integer lower than log2
+    return { "$nat" : Math.floor(Math.log2(v.$nat)) }; // Default Z.log2 is log_inf, biggest integer lower than log2
 }
 function natSqrt(v) {
-    return { "nat" : Math.floor(Math.sqrt(v.nat)) }; // See Z.sqrt biggest integer lower than sqrt
+    return { "$nat" : Math.floor(Math.sqrt(v.$nat)) }; // See Z.sqrt biggest integer lower than sqrt
 }
 function natSum(b) {
     var result = 0;
     for (var i=0; i<b.length; i++)
-	result += b[i].nat;
-    return { "nat" : result };
+	result += b[i].$nat;
+    return { "$nat" : result };
 }
 function natMinApply(b) {
     var numbers = [ ];
     for (var i=0; i<b.length; i++)
-	numbers.push(b[i].nat);
-    return { "nat" : Math.min.apply(Math,numbers) };
+	numbers.push(b[i].$nat);
+    return { "$nat" : Math.min.apply(Math,numbers) };
 }
 function natMaxApply(b) {
     var numbers = [ ];
     for (var i=0; i<b.length; i++)
-	numbers.push(b[i].nat);
-    return { "nat" : Math.max.apply(Math,numbers) };
+	numbers.push(b[i].$nat);
+    return { "$nat" : Math.max.apply(Math,numbers) };
 }
 function natArithMean(b) {
     var len = b.length;
     if(len == 0) {
-	return { "nat" : 0 };
+	return { "$nat" : 0 };
     } else {
-	return { "nat" : Math.floor(natSum(b)/len) };
+	return { "$nat" : Math.floor(natSum(b)/len) };
     }
 }
 function count(v) {
-    return { "nat" : v.length };
+    return { "$nat" : v.length };
 }
 function stringLength(v) {
-    return { "nat" : v.length };
+    return { "$nat" : v.length };
 }
 function floatOfNat(v) {
-    return v.nat;
+    return v.$nat;
 }
 function substring(v, start, len) {
     return v.substring(start,len);
