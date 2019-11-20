@@ -34,10 +34,11 @@ Require Import Eqdep_dec.
 Require Import Utils.
 Require Import CommonSystem.
 Require Import cNNRCSystem.
-Require Import NNRCSystem.
-Require Import NNRCStratify.
+Require Import NNRCRuntime.
+Require Import cNNRCTypes. (* Always include core support *)
+Require Import TNNRC.
 
-Section TStratify.
+Section TNNRCStratify.
   Context {m:basic_model}.
   
   Fixpoint type_substs Γc (Γ:tbindings) (sdefs:list (var*nnrc)) (τdefs:tbindings) : Prop
@@ -700,7 +701,7 @@ Section TStratify.
     - eapply stratify_preserves_types_bk; eauto.
   Qed.
   
-End TStratify.
+End TNNRCStratify.
 
 (* 
  *** Local Variables: ***
