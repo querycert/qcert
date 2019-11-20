@@ -586,7 +586,15 @@ Section Bag.
 
   (* counting *)
 
-  Definition bcount (l:list A) := length l.
+  Definition bcount {A} (l:list A) := length l.
+
+  Lemma bcount_map_id {B} (f:A -> B) (l:list A) :
+    @bcount A l = @bcount B (map f l).
+  Proof.
+    induction l; [reflexivity|].
+    simpl.
+    auto.
+  Qed.
 
   (* Formally defined with 'max' over arity in the [GL95] paper *)
   Fixpoint bdistinct (l:list A) :=

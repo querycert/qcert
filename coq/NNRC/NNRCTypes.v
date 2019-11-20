@@ -19,4 +19,4 @@ Require Export cNNRCTypes. (* Always include core support *)
 Require Export TNNRC.
 Require Export TNNRCEq.
 Require Export TNNRCShadow.
-
+Require Export TNNRCStratify.

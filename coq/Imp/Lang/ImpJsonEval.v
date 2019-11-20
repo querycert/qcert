@@ -186,7 +186,13 @@ Section ImpJsonEval.
              | _ => None
              end) dl
       | JSONRuntimeSort => None
-      | JSONRuntimeCount => None
+      | JSONRuntimeCount =>
+        apply_unary
+          (fun d =>
+             match d with
+             | jarray l => Some (jobject (("$nat", (jnumber (float_of_int (Z_of_nat (bcount l)))))::nil))
+             | _ => None
+             end) dl
       | JSONRuntimeLength => None
       | JSONRuntimeSubstring => None
       | JSONRuntimeBrand => None

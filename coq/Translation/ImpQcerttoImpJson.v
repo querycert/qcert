@@ -443,6 +443,22 @@ Section ImpJsontoJavaScriptAst.
       left; reflexivity.
     Qed.
 
+    Lemma oflatten_jflatten_roundtrip l :
+      match oflatten (map (normalize_data h) (map json_to_data_pre l)) with
+      | Some a' => Some (dcoll a')
+      | None => None
+      end =
+      match match jflatten l with
+            | Some a' => Some (jarray a')
+            | None => None
+            end with
+      | Some a' => Some (json_to_data h a')
+      | None => None
+      end.
+    Proof.
+      admit.
+    Admitted.
+
     Lemma imp_qcert_unary_op_to_imp_json_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -502,7 +518,6 @@ Section ImpJsontoJavaScriptAst.
         destruct i0; try reflexivity; simpl.
         apply rremove_json_key_encode_roundtrip.
       - Case "OpRecProject"%string.
-        simpl.
         admit. (** XXX This one looks more complicated *)
       - Case "OpBag"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
@@ -522,6 +537,38 @@ Section ImpJsontoJavaScriptAst.
       - Case "OpFlatten"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        + unfold lift. simpl.
+          apply oflatten_jflatten_roundtrip.
+        + simpl.
+          case_eq (json_to_data h (jobject l)); intros; try reflexivity.
+          generalize (json_to_data_object_not_coll h l l0); intros.
+          congruence.
+      - Case "OpDistinct"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        + admit.
+        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
+          generalize (json_to_data_object_not_coll h l l0); intros.
+          congruence.
+      - Case "OpOrderBy"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpCount"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        + rewrite map_map.
+          simpl.
+          unfold json_to_data; simpl.
+          rewrite float_truncate_float_of_int.
+          f_equal; f_equal; f_equal.
+          unfold bcount.
+          apply map_length.
+        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
+          generalize (json_to_data_object_not_coll h l l0); intros.
+          congruence.
+      - admit.
         
     Admitted.
 
