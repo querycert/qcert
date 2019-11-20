@@ -335,18 +335,6 @@ Section ImpJsontoJavaScriptAst.
     Proof.
       destruct d; simpl; intuition discriminate.
     Qed.
-
-    Lemma json_to_data_pre_jobj_nbool l b : (json_to_data_pre (jobject l)) <> dbool b.
-    Proof.
-      destruct l; simpl; try congruence.
-      destruct p.
-      repeat match_destr.
-    Qed.
-
-    Lemma normalize_data_forall_ndbool d :  (forall b, d <> dbool b) -> (forall b, normalize_data h d <> dbool b).
-    Proof.
-      destruct d; simpl; intuition discriminate.
-    Qed.
     
     Lemma data_to_bool_json_to_bool_correct j:
       imp_qcert_data_to_bool (json_to_data h j) = imp_json_data_to_bool j.
@@ -356,7 +344,7 @@ Section ImpJsontoJavaScriptAst.
       unfold imp_json_data_to_bool.
       destruct j; trivial.
       generalize (json_to_data_pre_jobj_nbool l); intros HH1.
-      generalize (normalize_data_forall_ndbool _ HH1); intros HH2.
+      generalize (normalize_data_forall_ndbool h _ HH1); intros HH2.
       match_destr.
       specialize (HH2 b); congruence.
     Qed.

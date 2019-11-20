@@ -474,21 +474,62 @@ Section ModelRoundTrip.
   Qed.
 
   Section RuntimeLemmas.
-    (* XXX Some assumptions for the correctness of operators translation -- do they hold?? *)
+    Lemma json_to_data_pre_jobj_nbool l b : (json_to_data_pre (jobject l)) <> dbool b.
+    Proof.
+      destruct l; simpl; try congruence.
+      destruct p.
+      repeat match_destr.
+    Qed.
+
+    Lemma json_to_data_pre_jobj_ncoll l c : (json_to_data_pre (jobject l)) <> dcoll c.
+    Proof.
+      destruct l; simpl; try congruence.
+      destruct p.
+      repeat match_destr.
+    Qed.
+
+    Lemma normalize_data_forall_ndbool h d :  (forall b, d <> dbool b) -> (forall b, normalize_data h d <> dbool b).
+    Proof.
+      destruct d; simpl; intuition discriminate.
+    Qed.
+
+    Lemma normalize_data_forall_ndcoll h d :  (forall c, d <> dcoll c) -> (forall c, normalize_data h d <> dcoll c).
+    Proof.
+      destruct d; simpl; intuition try discriminate.
+      apply (H _ (eq_refl _)).
+    Qed.
+
     Lemma json_to_data_object_not_boolean h l b:
       ~(json_to_data h (jobject l) = dbool b).
     Proof.
-    Admitted.
+      unfold json_to_data.
+      apply normalize_data_forall_ndbool.
+      apply json_to_data_pre_jobj_nbool.
+    Qed.
 
     Lemma json_to_data_object_not_coll h l j:
       ~(json_to_data h (jobject l) = dcoll j).
     Proof.
-    Admitted.
+      unfold json_to_data.
+      apply normalize_data_forall_ndcoll.
+      apply json_to_data_pre_jobj_ncoll.
+    Qed.
 
     Lemma rec_json_key_encode_roundtrip h s i0:
       drec ((s, json_to_data h i0)::nil) = json_to_data h (jobject ((json_key_encode s, i0)::nil)).
     Proof.
-    Admitted.
+      unfold json_to_data; simpl.
+      rewrite_string_dec_from_neq (json_key_encode_not_nat s).
+      rewrite_string_dec_from_neq (json_key_encode_not_data s).
+      rewrite_string_dec_from_neq (json_key_encode_not_type s).
+      rewrite_string_dec_from_neq (json_key_encode_not_left s).
+      rewrite_string_dec_from_neq (json_key_encode_not_right s).
+      rewrite_string_dec_from_neq (json_key_encode_not_foreign s).
+      rewrite json_key_encode_decode.
+      now destruct i0.
+    Qed.
+
+    (* XXX Some assumptions for the correctness of operators translation -- they do not hold as-is *)
 
     Lemma assoc_lookupr_json_key_encode_roundtrip h l s:
       match json_to_data h (jobject l) with
@@ -509,6 +550,7 @@ Section ModelRoundTrip.
       | _ => None
       end = Some (json_to_data h (jobject (rremove l (json_key_encode s)))).
     Proof.
+      
       admit.
     Admitted.
 
