@@ -44,7 +44,8 @@ Section ImpJsonEval.
   Section EvalInstantiation.
     (* Instantiate Imp for Qcert data *)
     Definition imp_json_data_normalize (d:imp_json_data) : imp_json_data :=
-      normalize_json d.
+      d.
+      (* normalize_json d. XXX Unclear *)
 
     Definition imp_json_data_to_bool (d:imp_json_data) : option bool :=
       match d with
@@ -193,10 +194,39 @@ Section ImpJsonEval.
              | jarray l => Some (jobject (("$nat", (jnumber (float_of_int (Z_of_nat (bcount l)))))::nil))
              | _ => None
              end) dl
-      | JSONRuntimeLength => None
+      | JSONRuntimeLength =>
+        apply_unary
+          (fun d =>
+             match d with
+             | jstring s => Some (jobject (("$nat", (jnumber (float_of_int (Z_of_nat (String.length s)))))::nil))
+             | _ => None
+             end) dl
       | JSONRuntimeSubstring => None
-      | JSONRuntimeBrand => None
-      | JSONRuntimeUnbrand => None
+      | JSONRuntimeBrand =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1 with
+             | jarray bls =>
+               let ob := of_string_list bls in
+               lift (fun b =>
+                       jobject
+                         (("$type"%string, jarray (map jstring b))
+                            ::("$data"%string, d2)
+                            ::nil)) ob
+             | _ => None
+             end
+          ) dl
+      | JSONRuntimeUnbrand =>
+        apply_unary
+          (fun d =>
+             match d with
+             | jobject ((s1,jarray j1)::(s2,j2)::nil) =>
+               if (string_dec s1 "$type") then
+                 if (string_dec s2 "$data") then Some j2
+                 else None
+               else None
+             | _ => None
+             end) dl
       | JSONRuntimeCast => None
       | JSONRuntimeNatPlus => None
       | JSONRuntimeNatMinus => None

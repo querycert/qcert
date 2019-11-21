@@ -75,13 +75,13 @@ Section ToString.
                eol ++ (indent (i+1)) ++
                match body with
                | propbody_val e =>
-                 string_of_propname name ++ ": " ++ "(" ++ string_of_expr e (i+1) ++ ")"
+                 quotel ++ string_of_propname name ++ quotel ++ ": " ++ "(" ++ string_of_expr e (i+1) ++ ")"
                | propbody_get funcbody =>
-                 "get " ++ string_of_propname name ++ "() {" ++
+                 "get " ++ quotel ++ string_of_propname name ++ quotel ++ "() {" ++
                         string_of_funcbody funcbody (i+1) ++
                  "}"
                | propbody_set args funcbody =>
-                 "set " ++ string_of_propname name ++ "("++ comma_list args ++") {" ++
+                 "set " ++ quotel ++ string_of_propname name ++ quotel ++ "("++ comma_list args ++") {" ++
                         string_of_funcbody funcbody (i+1) ++
                  "}"
                end)

@@ -1654,6 +1654,14 @@ Section Bindings.
     ; rewrite drec_sort_equiv_domain; trivial.
   Qed.
 
+  Lemma domains_with_map {A B} (r:list (string*A)) (f:A->B):
+    domain (map (fun x : string * A => (fst x, f (snd x))) r) = domain r.
+  Proof.
+    induction r. reflexivity.
+    simpl.
+    rewrite IHr; reflexivity.
+  Qed.
+
 End Bindings.
 
 Section Map.
@@ -1667,6 +1675,32 @@ Section Map.
     apply map_insertion_sort.
     trivial.
   Qed.
+
+  Lemma no_assoc_with_map {A B} (r:list (string*A)) (f:A->B) (s:string):
+    assoc_lookupr string_dec r s = None ->
+    assoc_lookupr string_dec (map (fun x => (fst x, f (snd x))) r) s = None.
+  Proof.
+    intros.
+    induction r.
+    reflexivity.
+    destruct a; simpl in *.
+    case_eq (assoc_lookupr string_dec r s); intros.
+    rewrite H0 in H; congruence.
+    rewrite H0 in H.
+    rewrite (IHr H0).
+    destruct (string_dec s s0); congruence.
+  Qed.
+
+  Lemma assoc_lookupr_skip {A} (a:string*A) (l:list (string*A)) (s:string):
+    assoc_lookupr string_dec (a::l) s = None ->
+    assoc_lookupr string_dec l s = None.
+  Proof.
+    intros.
+    simpl in H.
+    destruct a; simpl in *.
+    destruct (assoc_lookupr string_dec l s); congruence.
+  Qed.
+
 End Map.
 
 Section BindingsString.

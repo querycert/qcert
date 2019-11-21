@@ -423,6 +423,8 @@ Next Obligation.
       ; repeat constructor.
 Qed.
 
+Locate mk_foreign_to_JSON.
+Locate enhanced_foreign_data.
 Program Instance enhanced_foreign_to_JSON : foreign_to_JSON
   := mk_foreign_to_JSON enhanced_foreign_data _ _ _.
 Next Obligation.
@@ -439,6 +441,7 @@ Next Obligation.
   - exact (jstring (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) s)).
 Defined.
 Next Obligation.
+  Locate enhanced_foreign_to_JSON_obligation_1.
   unfold  enhanced_foreign_to_JSON_obligation_1.
   destruct fd; simpl.
 Admitted.
@@ -2379,4 +2382,3 @@ Module CompEnhanced.
     End Ops.
   End Enhanced.
 End CompEnhanced.  
-
