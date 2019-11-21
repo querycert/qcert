@@ -59,7 +59,7 @@ Section UnaryOperatorsSem.
 
   Context (h:brand_relation_t).
   Context {fuop:foreign_unary_op}.
-  
+
   Global Instance ToString_data : ToString data
     := { toString := foreign_unary_op_data_tostring }.
 

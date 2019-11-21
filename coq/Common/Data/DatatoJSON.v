@@ -25,9 +25,8 @@ Require Import ForeignDataToJSON.
 Require Import Data.
 Require Import DataNorm.
 
-Section DatatoJSON.
 
-  Context {fdata:foreign_data}.
+Section Encode.
   Fixpoint json_brands (d:list json) : option (list string) :=
     match d with
     | nil => Some nil
@@ -57,8 +56,13 @@ Section DatatoJSON.
     ; repeat match_destr.
   Qed.
 
+End Encode.
+
+Section DatatoJSON.
+  Context {fdata:foreign_data}.
+  Context {ftojson:foreign_to_JSON}.
+
   Section toData.
-    Context {ftojson:foreign_to_JSON}.
 
     (* JSON to CAMP data model (META Variant) *)
 
@@ -151,11 +155,10 @@ Section DatatoJSON.
 
     Definition json_enhanced_to_data h (j:json) :=
       normalize_data h (json_enhanced_to_data_pre j).
-    
+
   End toData.
 
   Section toJSON.
-    Context {ftojson:foreign_to_JSON}.
 
     Definition Z_to_json (n: Z) : json :=
       jobject (("$nat"%string, jnumber (float_of_int n))::nil).
@@ -193,118 +196,22 @@ Section DatatoJSON.
       | dforeign fd => jobject (("$foreign"%string, foreign_to_JSON_from_data fd)::nil)
       end.
 
-    End toJSON.
-
-  Section RoundTripping.
-    Inductive json_data : data -> Prop :=
-    | json_null : json_data dunit
-    | json_nat n : json_data (dnat n)
-    | json_bool b : json_data (dbool b)
-    | json_string s : json_data (dstring s)
-    | json_array dl : Forall (fun d => json_data d) dl -> json_data (dcoll dl)
-    | json_rec r :
-        is_list_sorted ODT_lt_dec (domain r) = true ->
-        Forall (fun ab => json_data (snd ab)) r ->
-        json_data (drec r)
-    .
-  
-    Inductive pure_data : data -> Prop :=
-    | pure_null : pure_data dunit
-    | pure_nat n : pure_data (dnat n)
-    | pure_bool b : pure_data (dbool b)
-    | pure_string s : pure_data (dstring s)
-    | pure_array dl : Forall (fun d => pure_data d) dl -> pure_data (dcoll dl)
-    | pure_rec r :
-        assoc_lookupr string_dec r "$left"%string = None ->
-        assoc_lookupr string_dec r "$right"%string = None ->
-        assoc_lookupr string_dec r "$class"%string = None ->
-        is_list_sorted ODT_lt_dec (domain r) = true ->
-        Forall (fun ab => pure_data (snd ab)) r ->
-        pure_data (drec r)
-    | pure_left d :
-        pure_data d -> pure_data (dleft d)
-    | pure_right d :
-        pure_data d -> pure_data (dright d)
-    | pure_brand b r :
-        pure_data (drec r) -> pure_data (dbrand b (drec r))
-    .
-
-    Lemma pure_dcoll_inv c:
-      Forall (fun d : data => pure_data d) c <-> pure_data (dcoll c).
-    Proof.
-      split; intros.
-      econstructor; assumption.
-      inversion H; assumption.
-    Qed.
-
-    Lemma no_assoc_with_map (r:list (string*data)) (f:data->data) s:
-      assoc_lookupr string_dec r s = None ->
-      assoc_lookupr string_dec (map (fun x => (fst x, f (snd x))) r) s = None.
-    Proof.
-      intros.
-      induction r.
-      reflexivity.
-      destruct a; simpl in *.
-      case_eq (assoc_lookupr string_dec r s); intros.
-      rewrite H0 in H; congruence.
-      rewrite H0 in H.
-      rewrite (IHr H0).
-      destruct (string_dec s s0); congruence.
-    Qed.
-    
-    Lemma domains_with_map (r:list (string*data)) (f:data->data):
-      domain (map (fun x : string * data => (fst x, f (snd x))) r) = domain r.
-    Proof.
-      induction r. reflexivity.
-      simpl.
-      rewrite IHr; reflexivity.
-    Qed.
-
-    Lemma assoc_lookupr_skip {A} (a:string*A) (l:list (string*A)) (s:string):
-      assoc_lookupr string_dec (a::l) s = None ->
-      assoc_lookupr string_dec l s = None.
-    Proof.
-      intros.
-      simpl in H.
-      destruct a; simpl in *.
-      destruct (assoc_lookupr string_dec l s); congruence.
-    Qed.
-
-    
-    Lemma pure_drec_cons_inv a r:
-      pure_data (drec (a::r)) -> (pure_data (drec r) /\ pure_data (snd a)).
-    Proof.
-      intros.
-      inversion H; clear H; subst.
-      inversion H5; clear H5; subst.
-      split.
-      - constructor.
-        apply (assoc_lookupr_skip a r _ H1).
-        apply (assoc_lookupr_skip a r _ H2).
-        apply (assoc_lookupr_skip a r _ H3).
-        apply (rec_sorted_skip_first r a H4).
-        assumption.
-      - assumption.
-    Qed.
-
-  End RoundTripping.
+  End toJSON.
 
 End DatatoJSON.
-
 
 (* TODO: figure out what to do and move this somewhere else *)
 Axiom float_truncate_float_of_int : forall (z:Z), float_truncate (float_of_int z) = z.
 
 Section ModelRoundTrip.
-
   Context {fdata:foreign_data}.
   Context {ftojson:foreign_to_JSON}.
+
   Lemma json_brands_map_jstring b : json_brands (map jstring b) = Some b.
   Proof.
     induction b; simpl; trivial.
     now rewrite IHb.
   Qed.
-
 
   Lemma json_key_encode_not_data s : (json_key_encode s) <> "$data"%string.
   Proof.
@@ -354,7 +261,6 @@ Section ModelRoundTrip.
         destruct (string_dec_from_neq H) as [d neq]
         ; repeat rewrite neq in *
         ; clear d neq.
-
 
   Lemma json_to_data_to_json_idempotent h d:
     json_to_data h (data_to_json d) = normalize_data h d.
@@ -481,6 +387,13 @@ Section ModelRoundTrip.
       repeat match_destr.
     Qed.
 
+    Lemma json_to_data_pre_jobj_nstring l s : (json_to_data_pre (jobject l)) <> dstring s.
+    Proof.
+      destruct l; simpl; try congruence.
+      destruct p.
+      repeat match_destr.
+    Qed.
+
     Lemma json_to_data_pre_jobj_ncoll l c : (json_to_data_pre (jobject l)) <> dcoll c.
     Proof.
       destruct l; simpl; try congruence.
@@ -489,6 +402,11 @@ Section ModelRoundTrip.
     Qed.
 
     Lemma normalize_data_forall_ndbool h d :  (forall b, d <> dbool b) -> (forall b, normalize_data h d <> dbool b).
+    Proof.
+      destruct d; simpl; intuition discriminate.
+    Qed.
+
+    Lemma normalize_data_forall_ndstring h d :  (forall s, d <> dstring s) -> (forall s, normalize_data h d <> dstring s).
     Proof.
       destruct d; simpl; intuition discriminate.
     Qed.
@@ -505,6 +423,14 @@ Section ModelRoundTrip.
       unfold json_to_data.
       apply normalize_data_forall_ndbool.
       apply json_to_data_pre_jobj_nbool.
+    Qed.
+
+    Lemma json_to_data_object_not_string h l b:
+      ~(json_to_data h (jobject l) = dstring b).
+    Proof.
+      unfold json_to_data.
+      apply normalize_data_forall_ndstring.
+      apply json_to_data_pre_jobj_nstring.
     Qed.
 
     Lemma json_to_data_object_not_coll h l j:

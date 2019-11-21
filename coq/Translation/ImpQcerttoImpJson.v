@@ -87,7 +87,7 @@ Section ImpJsontoJavaScriptAst.
       | OpToString => mk_imp_json_op JSONOpToString el
       | OpToText => mk_imp_json_runtime_call JSONRuntimeToText el
       | OpLength => mk_imp_json_runtime_call JSONRuntimeLength el
-      | OpSubstring start len =>
+      | OpSubstring start len => (* XXX Should be split into two different functions *)
         let start := ImpExprConst (jnumber (float_of_int start)) in
         let args :=
             match len with
@@ -297,7 +297,7 @@ Section ImpJsontoJavaScriptAst.
 
 
   Section Correctness.
-    Context (h:list(string*string)).
+    Context (h:brand_relation_t). (* We need a brand relation for the Q*cert side *)
 
     Definition lift_bindings (env:bindings) : jbindings :=
       List.map (fun xy => (fst xy, data_to_json (snd xy))) env.
@@ -323,12 +323,6 @@ Section ImpJsontoJavaScriptAst.
       intros.
       apply map_eq.
       assumption.
-    Qed.
-
-    Lemma json_to_data_to_json_id d:
-      json_to_data h (data_to_json d) = normalize_data h d.
-    Proof.
-      apply json_to_data_to_json_idempotent.
     Qed.
 
     Lemma normalize_data_dbool d b : normalize_data h d = dbool b <-> d = dbool b.
@@ -447,6 +441,22 @@ Section ImpJsontoJavaScriptAst.
       admit.
     Admitted.
 
+    Lemma of_string_list_over_strings_idempotent sl :
+      of_string_list (map (fun s : string => jstring s) sl) = Some sl.
+    Proof.
+      induction sl; try reflexivity; simpl.
+      unfold of_string_list in *; simpl.
+      rewrite IHsl; reflexivity.
+    Qed.
+
+    Lemma json_brands_of_brands_idempotent b:
+      json_brands (map jstring b) = Some b.
+    Proof.
+      induction b; try reflexivity; simpl.
+      rewrite IHb.
+      reflexivity.
+    Qed.
+
     Lemma imp_qcert_unary_op_to_imp_json_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -556,8 +566,60 @@ Section ImpJsontoJavaScriptAst.
         + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
           generalize (json_to_data_object_not_coll h l l0); intros.
           congruence.
-      - admit.
-        
+      - Case "OpToString"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpToText"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpLength"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        + unfold json_to_data; simpl.
+          rewrite float_truncate_float_of_int.
+          reflexivity.
+        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
+          generalize (json_to_data_object_not_string h l s); intros.
+          congruence.
+      - Case "OpSubstring"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpLike"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpLeft"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        unfold json_to_data; simpl.
+        destruct i0; reflexivity.
+      - Case "OpRight"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        unfold json_to_data; simpl.
+        destruct i0; reflexivity.
+      - Case "OpBrand"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        rewrite of_string_list_over_strings_idempotent; simpl.
+        unfold json_to_data; simpl.
+        rewrite json_brands_of_brands_idempotent; simpl.
+        destruct i0; try reflexivity; simpl.
+      - Case "OpUnbrand"%string.
+        destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
+          try reflexivity; simpl.
+        destruct i0; try reflexivity; simpl.
+        admit. (* XXX Shouldn't be too hard with proper lemma(s) tying json_to_data and dbrand *)
+      - Case "OpCast"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpNatUnary"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpNatSum"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpNatMin"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpNatMax"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpNatMean"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpFloatOfNat"%string.
+        admit. (* XXX Not implemented *)
     Admitted.
 
     Lemma imp_qcert_binary_op_to_imp_json_expr_correct
@@ -627,12 +689,16 @@ Section ImpJsontoJavaScriptAst.
         unfold imp_qcert_data.
         match_destr.
         destruct o; try reflexivity.
-        rewrite json_to_data_to_json_id.
+        rewrite json_to_data_to_json_idempotent.
         admit.
       - Case "ImpExprConst"%string.
         simpl.
         f_equal.
-        admit. (* XXX Needs json_normalize with lift/unlift roundtrip property *)
+        unfold imp_qcert_data_normalize.
+        unfold imp_json_data_normalize.
+        rewrite <- json_to_data_to_json_idempotent.
+        unfold normalize_json.
+        reflexivity.
       - Case "ImpExprOp"%string.
         apply imp_qcert_op_to_imp_json_correct; assumption.
       - Case "ImpExprRuntimeCall"%string.
@@ -682,11 +748,11 @@ Section ImpJsontoJavaScriptAst.
           rewrite <- IHσ.
           apply Hl; try reflexivity.
           destruct o1; try reflexivity.
-          rewrite json_to_data_to_json_id.
+          rewrite json_to_data_to_json_idempotent.
           admit. (** XX Needs a proof of normalization *)
         + apply Hl; try reflexivity.
           destruct o0; try reflexivity.
-          rewrite json_to_data_to_json_id.
+          rewrite json_to_data_to_json_idempotent.
           admit. (** XX Needs a proof of normalization *)
       - Case "ImpStmtFor"%string.
         admit.

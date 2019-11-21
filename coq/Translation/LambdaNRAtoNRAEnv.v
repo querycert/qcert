@@ -123,8 +123,6 @@ Section LambdaNRAtoNRAEnv.
   Hint Rewrite @lambda_nra_to_nraenv_filter_eq : lambda_nra_to_nraenv.
   Hint Rewrite @lambda_nra_to_nraenv_lambda_eq : lambda_nra_to_nraenv.
 
-
-
   Context (h:brand_relation_t).
 
   Section Translation.
