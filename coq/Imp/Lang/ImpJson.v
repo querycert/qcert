@@ -115,7 +115,7 @@ Section Util.
     | JSONRuntimeCast => "cast"
     | JSONRuntimeNatPlus => "natPlus"
     | JSONRuntimeNatMinus => "natMinus"
-    | JSONRuntimeNatMult => "natMin"
+    | JSONRuntimeNatMult => "natMult"
     | JSONRuntimeNatDiv => "natDiv"
     | JSONRuntimeNatRem => "natRem"
     | JSONRuntimeNatAbs => "natAbs"

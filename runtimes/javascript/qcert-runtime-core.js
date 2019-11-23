@@ -83,6 +83,12 @@ function fastdistinct(b) {
 }
 function compare(v1, v2) {
     var t1 = typeof v1, t2 = typeof v2;
+    if (t1 == "object" && v1 !== null) {
+        if (v1.hasOwnProperty('$nat')) { t1 = "number"; v1 = v1.$nat; }
+    };
+    if (t2 == "object" && v2 !== null) {
+        if (v2.hasOwnProperty('$nat')) { t2 = "number"; v2 = v2.$nat; }
+    };
     if (t1 != t2)
         return t1 < t2 ? -1 : +1;
     var a1 = {}.toString.apply(v1), a2 = {}.toString.apply(v2);

@@ -6329,7 +6329,7 @@ Section CompDriver.
 
   Section Verified.
     Definition compile_nraenv_to_imp_qcert_verified (conf:driver_config) (q:query) : query :=
-      let dv := driver_of_path conf (L_nraenv::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::nil) in
+      let dv := driver_of_path conf (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::nil) in
       match List.rev (compile dv q) with
       | nil => Q_error "No compilation result!"
       | target :: _ => target
@@ -6340,10 +6340,12 @@ Section CompDriver.
     Proof.
       unfold compile_nraenv_to_imp_qcert_verified.
       simpl.
-      exists (nnrs_imp_to_imp_qcert
-                (comp_qname_lowercase conf)
-                (nnrs_to_nnrs_imp
-                   (nnrc_to_nnrs (vars_of_constants_config (comp_constants conf)) (nraenv_to_nnrc q)))).
+      exists (nnrs_imp_to_imp_qcert (comp_qname_lowercase conf)
+         (nnrs_to_nnrs_imp
+            (nnrc_to_nnrs (vars_of_constants_config (comp_constants conf))
+               (NNRCLet init_venv (NNRCConst (drec nil))
+                  (NNRCLet init_vid (NNRCConst dunit)
+                     (nnrc_to_nnrc_base (NRAEnvtoNNRC.nraenv_to_nnrc q init_vid init_venv))))))).
       reflexivity.
     Qed.
 

@@ -2128,15 +2128,14 @@ input data returns the same output data. *)
   Section Verified.
 
     Lemma driver_nraenv_to_imp_qcert_verified_correct conf :
-      driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)).
+      driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)).
     Proof.
-      simpl.
-      auto.
+      simpl; split; auto.
     Qed.
 
     Lemma driver_nraenv_to_imp_qcert_verified_matches_query conf q :
       driver_matches_query
-        (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)) 
+        (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)) 
         (Q_nraenv q).
     Proof.
       unfold driver_of_path.
@@ -2155,7 +2154,7 @@ input data returns the same output data. *)
       elim (compile_nraenv_to_imp_qcert_verified_yields_result conf q); intros.
       unfold compile_nraenv_to_imp_qcert_verified in *.
       generalize (@compile_with_correct_driver_preserves_eval h
-                    (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil))
+                    (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil))
                     (Q_nraenv q)
                     (driver_nraenv_to_imp_qcert_verified_correct conf)
                     (driver_nraenv_to_imp_qcert_verified_matches_query conf q)).
@@ -2168,7 +2167,7 @@ input data returns the same output data. *)
       - rewrite Forall_forall in Heval.
         apply Heval; clear Heval.
         simpl.
-        right; right; right; right; left; simpl.
+        right; right; right; right; right; right; left; simpl.
         simpl in H.
         auto.
     Qed.
