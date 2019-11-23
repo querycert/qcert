@@ -96,14 +96,11 @@ let suffix_nnrs_imp () = "_nnrs_imp.txt"
 let suffix_imp_qcert () = "_imp_qcert.txt"
 let suffix_imp_json () = "_imp_json.txt"
 let suffix_nnrcmr () = "_nnrcmr.txt"
-let suffix_nnrcmr_spark_rdd () = "_nnrcmr_spark_rdd.txt"
-let suffix_nnrcmr_spark_rddsexp () = "_nnrcmr_spark_rdd.sexp"
 let suffix_nnrcmr_spark_df () = "_nnrcmr_spark_df.txt"
 let suffix_nnrcmr_spark_dfsexp () = "_nnrcmr_spark_df.sexp"
 let suffix_java () = ".java"
 let suffix_js_ast () = ".js_ast"
 let suffix_javascript () = ".js"
-let suffix_spark_rdd () = "_spark_rdd.scala"
 let suffix_spark_df () = "_spark_df.scala"
 let suffix_stats () = "_stats.json"
 let suffix_error () = ".error"
@@ -136,7 +133,6 @@ let suffix_of_language lang =
   | QcertCompiler.L_js_ast -> suffix_js_ast ()
   | QcertCompiler.L_javascript -> suffix_javascript ()
   | QcertCompiler.L_java -> suffix_java ()
-  | QcertCompiler.L_spark_rdd -> suffix_spark_rdd ()
   | QcertCompiler.L_spark_df -> suffix_spark_df ()
   | QcertCompiler.L_error _ -> suffix_error ()
 

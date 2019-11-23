@@ -46,7 +46,6 @@ let output_query pconf q =
   | QcertCompiler.Q_js_ast q -> pretty_query pconf pretty_js_ast q
   | QcertCompiler.Q_javascript q -> pretty_query pconf pretty_javascript q
   | QcertCompiler.Q_java q -> pretty_query pconf pretty_java q
-  | QcertCompiler.Q_spark_rdd q -> pretty_query pconf pretty_spark_rdd q
   | QcertCompiler.Q_spark_df q -> pretty_query pconf pretty_spark_df q
   | QcertCompiler.Q_error q -> pretty_query pconf pretty_error q
   end

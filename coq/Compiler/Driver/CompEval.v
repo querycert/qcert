@@ -46,7 +46,6 @@ Require Import CAMPRuntime.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
-Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
 
 (* Foreign Support *)
@@ -194,7 +193,6 @@ Section CompEval.
       | Q_js_ast _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q))) (* XXX TODO XXX *)
       | Q_javascript _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_spark_rdd _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       end.
@@ -225,7 +223,6 @@ Section CompEval.
       | Q_js_ast _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_javascript _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_spark_rdd _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       end.

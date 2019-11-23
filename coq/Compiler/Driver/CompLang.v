@@ -45,7 +45,6 @@ Require Import CAMPRuntime.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
-Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
 
 Require Import NNRCMRtoDNNRC.
@@ -78,7 +77,6 @@ Section CompLang.
     | L_js_ast : language
     | L_javascript : language
     | L_java : language
-    | L_spark_rdd : language
     | L_spark_df : language
     | L_error : string -> language.
 
@@ -125,7 +123,6 @@ Section CompLang.
       | "js_ast"%string => L_js_ast
       | "js"%string | "rhino"%string | "javascript"%string => L_javascript
       | "java"%string => L_java
-      | "spark_rdd"%string => L_spark_rdd
       | "spark_df"%string | "spark_dataset"%string => L_spark_df
       | "error"%string => L_error ""
       | _ => L_error ("'"++name++"' is not a language name")
@@ -157,7 +154,6 @@ Section CompLang.
       | L_js_ast => "js_ast"%string
       | L_javascript => "js"%string
       | L_java => "java"%string
-      | L_spark_rdd => "spark_rdd"%string
       | L_spark_df => "spark_df"%string
       | L_error _ => "error"%string
       end.
@@ -219,7 +215,6 @@ Section CompLang.
         :: (L_js_ast,BackEnd,"JsAst", "JavaScript AST")
         :: (L_javascript,BackEnd,"JavaScript", "JavaScript")
         :: (L_java,BackEnd,"Java", "Java")
-        :: (L_spark_rdd,BackEnd,"SparkRDD", "Spark (RDDs API)")
         :: (L_spark_df,BackEnd,"SparkDF", "Spark (DataFrames API)")
         :: nil.
 
@@ -318,7 +313,6 @@ Section CompLang.
     Definition js_ast := list funcdecl.
     Definition javascript := javascript.
     Definition java := java.
-    Definition spark_rdd := spark_rdd.
     Definition spark_df := spark_df.
 
     Inductive query : Set :=
@@ -346,7 +340,6 @@ Section CompLang.
     | Q_js_ast : js_ast -> query
     | Q_javascript : javascript -> query
     | Q_java : java -> query
-    | Q_spark_rdd : spark_rdd -> query
     | Q_spark_df : spark_df -> query
     | Q_error : string -> query.
 
@@ -376,7 +369,6 @@ Section CompLang.
       | Case_aux c "Q_js_ast"%string
       | Case_aux c "Q_javascript"%string
       | Case_aux c "Q_java"%string
-      | Case_aux c "Q_spark_rdd"%string
       | Case_aux c "Q_spark_df"%string
       | Case_aux c "Q_error"%string].
 
@@ -406,7 +398,6 @@ Section CompLang.
       | Q_js_ast _ => L_js_ast
       | Q_javascript _ => L_javascript
       | Q_java _ => L_java
-      | Q_spark_rdd _ => L_spark_rdd
       | Q_spark_df _ => L_spark_df
       | Q_error err =>
         L_error ("No language corresponding to error query '"++err++"'")
@@ -442,7 +433,6 @@ Section CompLang.
       | L_js_ast => js_ast
       | L_javascript => javascript
       | L_java => java
-      | L_spark_rdd => spark_rdd
       | L_spark_df => spark_df
       | L_error _ => string
       end.
@@ -476,7 +466,6 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_js_ast"%string
   | Case_aux c "L_javascript"%string
   | Case_aux c "L_java"%string
-  | Case_aux c "L_spark_rdd"%string
   | Case_aux c "L_spark_df"%string
   | Case_aux c "L_error"%string].
 

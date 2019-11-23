@@ -838,11 +838,6 @@ let pretty_javascript greek margin annot inheritance link_runtime q =
 let pretty_java greek margin annot inheritance link_runtime q =
   Util.string_of_char_list q
 
-(** Pretty SparkRDD *)
-
-let pretty_spark_rdd greek margin annot inheritance link_runtime q =
-  Util.string_of_char_list q
-
 (** Pretty SparkDF *)
 
 let pretty_spark_df greek margin annot inheritance link_runtime q =

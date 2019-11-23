@@ -46,7 +46,6 @@ Require Import CAMPRuntime.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
-Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
 
 (* Translations *)
@@ -79,7 +78,6 @@ Require Import NNRCtoJava.
 Require Import cNNRCtoCAMP.
 Require Import cNNRCtoNNRC.
 Require Import NNRCMRtoNNRC.
-Require Import NNRCMRtoSparkRDD.
 Require Import NNRCMRtoDNNRC.
 Require Import DNNRCtotDNNRC.
 Require Import tDNNRCtoSparkDF.
@@ -152,11 +150,6 @@ Section CompCorrectness.
   Definition driver_correct_java (dv: java_driver) :=
     match dv with
     | Dv_java_stop => True
-    end.
-
-  Definition driver_correct_spark_rdd (dv: spark_rdd_driver) :=
-    match dv with
-    | Dv_spark_rdd_stop => True
     end.
 
   Definition driver_correct_spark_df (dv: spark_df_driver) :=
@@ -264,7 +257,6 @@ Section CompCorrectness.
     match dv with
     | Dv_nnrcmr_stop => True
     | Dv_nnrcmr_optim dv => False /\ driver_correct_nnrcmr dv
-    | Dv_nnrcmr_to_spark_rdd rulename dv => False /\ driver_correct_spark_rdd dv
     | Dv_nnrcmr_to_nnrc dv => False /\ driver_correct_nnrc dv
     | Dv_nnrcmr_to_dnnrc dv => False /\ driver_correct_dnnrc dv
     end.
@@ -337,7 +329,6 @@ Section CompCorrectness.
     | Dv_js_ast dv => driver_correct_js_ast dv
     | Dv_javascript dv => driver_correct_javascript dv
     | Dv_java dv => driver_correct_java dv
-    | Dv_spark_rdd dv => driver_correct_spark_rdd dv
     | Dv_spark_df dv => driver_correct_spark_df dv
     | Dv_error s => True (* XXX ??? XXX *)
     end.
@@ -461,7 +452,6 @@ Section CompCorrectness.
     | (Dv_js_ast _, Q_js_ast _) => True
     | (Dv_javascript _, Q_javascript _) => True
     | (Dv_java _, Q_java _) => True
-    | (Dv_spark_rdd _, Q_spark_rdd _) => True
     | (Dv_spark_df _, Q_spark_df _) => True
     | (_, _) => False
     end.
@@ -629,7 +619,6 @@ Section CompCorrectness.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction. (* Failure case for dnnrc to dnnrc_typed -- False on correctness branch *)
-      - elim H; intros; contradiction.
     Qed.
 
     Lemma correct_driver_succeeds_camp_rule:
@@ -904,18 +893,6 @@ Section CompCorrectness.
       destruct dv; simpl in *; contradiction.
     Qed.
 
-    Lemma correct_driver_succeeds_spark_rdd:
-      forall dv, driver_correct (Dv_spark_rdd dv) ->
-                 (forall q, Forall query_not_error
-                                   (compile (Dv_spark_rdd dv) (Q_spark_rdd q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *; contradiction.
-    Qed.
-
     Lemma correct_driver_succeeds_spark_df:
       forall dv, driver_correct (Dv_spark_df dv) ->
                  (forall q, Forall query_not_error
@@ -991,7 +968,6 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_js_ast; auto.
       - apply correct_driver_succeeds_javascript; auto.
       - apply correct_driver_succeeds_java; auto.
-      - apply correct_driver_succeeds_spark_rdd; auto.
       - apply correct_driver_succeeds_spark_df; auto.
     Qed.
 
@@ -1582,8 +1558,6 @@ Section CompCorrectness.
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRC to Java arrow *)
       - elim H; intros; contradiction. (* Not proved *)
-      (* NNRCMR to SparkRDD arrow *)
-      - elim H; intros; contradiction. (* Not proved *)
     Qed.
 
     Lemma correct_driver_preserves_eval_camp_rule:
@@ -1790,7 +1764,6 @@ Section CompCorrectness.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
-      - elim H; intros; contradiction.
     Qed.
 
     Lemma correct_driver_preserves_eval_dnnrc:
@@ -1953,20 +1926,6 @@ Section CompCorrectness.
       - contradiction.
     Qed.
 
-    Lemma correct_driver_preserves_eval_spark_rdd:
-      forall dv, driver_correct (Dv_spark_rdd dv) ->
-                 (forall q, Forall (query_preserves_eval (Q_spark_rdd q))
-                                   (compile (Dv_spark_rdd dv) (Q_spark_rdd q))).
-    Proof.
-      intros.
-      simpl in H.
-      rewrite Forall_forall; intros.
-      destruct dv; simpl in *.
-      elim H0; intros.
-      - rewrite <- H1; simpl; trivial_same_query.
-      - contradiction.
-    Qed.
-
     Lemma correct_driver_preserves_eval_spark_df:
       forall dv, driver_correct (Dv_spark_df dv) ->
                  (forall q, Forall (query_preserves_eval (Q_spark_df q))
@@ -2028,7 +1987,6 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_js_ast; auto.
       - apply correct_driver_preserves_eval_javascript; auto.
       - apply correct_driver_preserves_eval_java; auto.
-      - apply correct_driver_preserves_eval_spark_rdd; auto.
       - apply correct_driver_preserves_eval_spark_df; auto.
     Qed.
 

@@ -21,4 +21,5 @@ Require Export NNRCSugar.
 Require Export NNRCShadow.
 Require Export NNRCEq.
 Require Export NNRCSize.
+Require Export NNRCSanitizer.
 Require Export NNRCStratify.
