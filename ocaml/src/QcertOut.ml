@@ -41,7 +41,6 @@ let output_query pconf q =
   | QcertCompiler.Q_imp_qcert q -> pretty_query pconf pretty_imp_qcert q
   | QcertCompiler.Q_imp_json q -> pretty_query pconf pretty_imp_json q
   | QcertCompiler.Q_nnrcmr q -> pretty_query pconf pretty_nnrcmr q
-  | QcertCompiler.Q_cldmr q -> pretty_query pconf pretty_cldmr q
   | QcertCompiler.Q_dnnrc q -> pretty_query pconf pretty_dnnrc q
   | QcertCompiler.Q_dnnrc_typed q -> pretty_query pconf pretty_dnnrc_typed q
   | QcertCompiler.Q_js_ast q -> pretty_query pconf pretty_js_ast q
@@ -49,7 +48,6 @@ let output_query pconf q =
   | QcertCompiler.Q_java q -> pretty_query pconf pretty_java q
   | QcertCompiler.Q_spark_rdd q -> pretty_query pconf pretty_spark_rdd q
   | QcertCompiler.Q_spark_df q -> pretty_query pconf pretty_spark_df q
-  | QcertCompiler.Q_cloudant q -> pretty_query pconf pretty_cloudant q
   | QcertCompiler.Q_error q -> pretty_query pconf pretty_error q
   end
 

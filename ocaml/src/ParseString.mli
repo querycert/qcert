@@ -43,7 +43,6 @@ val parse_nraenv_sexp_from_string : string -> QLang.nraenv_core
 val parse_nnrc_sexp_from_string : string -> QLang.nnrc
 val parse_nnrs_sexp_from_string : string -> QLang.nnrs
 val parse_nnrcmr_sexp_from_string : string -> QLang.nnrcmr
-val parse_cldmr_sexp_from_string : string -> QLang.cldmr
 
 (*******************
  * Languages Parse *

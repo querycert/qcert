@@ -48,14 +48,12 @@ Module QLang(runtime:CompilerRuntime).
     Definition imp_qcert := imp_qcert.
     Definition imp_json := imp_json.
     Definition nnrcmr := nnrcmr.
-    Definition cldmr := cldmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
     Definition javascript := javascript.
     Definition java := java.
     Definition spark_rdd := spark_rdd.
     Definition spark_df := spark_df.
-    Definition cloudant := cloudant.
 
     Definition language : Set := language.
 

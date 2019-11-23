@@ -66,7 +66,6 @@ let parse_nraenv_sexp_from_file s : QLang.nraenv_core = parse_file parse_nraenv_
 let parse_nnrc_sexp_from_file s : QLang.nnrc = parse_file parse_nnrc_sexp s
 let parse_nnrs_sexp_from_file s : QLang.nnrs = parse_file parse_nnrs_sexp s
 let parse_nnrcmr_sexp_from_file s : QLang.nnrcmr = parse_file parse_nnrcmr_sexp s
-let parse_cldmr_sexp_from_file s : QLang.cldmr = parse_file parse_cldmr_sexp s
 
 (*******************
  * Languages Parse *

@@ -61,7 +61,6 @@ let parse_nraenv_sexp_from_string s : QLang.nraenv_core = parse_string parse_nra
 let parse_nnrc_sexp_from_string s : QLang.nnrc = parse_string parse_nnrc_sexp s
 let parse_nnrs_sexp_from_string s : QLang.nnrs = parse_string parse_nnrs_sexp s
 let parse_nnrcmr_sexp_from_string s : QLang.nnrcmr = parse_string parse_nnrcmr_sexp s
-let parse_cldmr_sexp_from_string s : QLang.cldmr = parse_string parse_cldmr_sexp s
 
 (*******************
  * Languages Parse *

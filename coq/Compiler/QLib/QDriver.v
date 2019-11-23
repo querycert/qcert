@@ -22,7 +22,6 @@ Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRSRuntime.
 Require Import NNRCMRRuntime.
-Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
 Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
@@ -108,11 +107,6 @@ Module QDriver(runtime:CompilerRuntime).
     Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_optim : vdbindings -> nraenv -> nnrcmr
       := nraenv_optim_to_nnrc_optim_to_nnrcmr_optim.
 
-    (* Used in CloudantUtil *)
-    Definition cldmr_to_cloudant : string -> list (string*string) -> cldmr -> cloudant := cldmr_to_cloudant.
-    Definition nnrcmr_to_cldmr : list (string*string) -> nnrcmr -> cldmr := nnrcmr_to_cldmr.
-    Definition nnrcmr_prepared_to_cldmr : list (string*string) -> nnrcmr -> cldmr := nnrcmr_prepared_to_cldmr.
-
     (* Used in PrettyIL *)
     Definition nraenv_core_to_nraenv : nraenv_core -> nraenv := nraenv_core_to_nraenv.
     
@@ -123,7 +117,6 @@ Module QDriver(runtime:CompilerRuntime).
     Definition camp_rule_to_nraenv_to_nnrc_optim_to_javascript :
       camp_rule -> string := camp_rule_to_nraenv_to_nnrc_optim_to_javascript.
     Definition camp_rule_to_nnrcmr : vdbindings -> camp_rule -> nnrcmr := camp_rule_to_nnrcmr.
-    Definition camp_rule_to_cldmr : list (string*string) -> vdbindings -> camp_rule -> cldmr := camp_rule_to_cldmr.
 
   End QD.
 End QDriver.

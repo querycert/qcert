@@ -64,8 +64,5 @@ val imp_json_to_sexp : QLang.imp_json -> sexp
 val sexp_to_nnrcmr : sexp -> QLang.nnrcmr
 val nnrcmr_to_sexp : QLang.nnrcmr -> sexp
 
-val sexp_to_cldmr : sexp -> QLang.cldmr
-val cldmr_to_sexp : QLang.cldmr -> sexp
-
 val sexp_to_query : QLang.language -> sexp -> QLang.query
 val query_to_sexp : QLang.query -> sexp

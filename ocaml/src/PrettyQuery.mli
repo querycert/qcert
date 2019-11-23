@@ -43,7 +43,6 @@ val pretty_nnrs_imp : QcertCompiler.nnrs_imp pretty_fun
 val pretty_imp_qcert : QcertCompiler.imp_qcert pretty_fun
 val pretty_imp_json : QcertCompiler.imp_json pretty_fun
 val pretty_nnrcmr : QcertCompiler.nnrcmr pretty_fun
-val pretty_cldmr : QcertCompiler.cldmr pretty_fun
 val pretty_dnnrc : QcertCompiler.dnnrc pretty_fun
 val pretty_dnnrc_typed : QcertCompiler.dnnrc_typed pretty_fun
 val pretty_js_ast : QcertCompiler.js_ast pretty_fun
@@ -51,7 +50,6 @@ val pretty_javascript : QcertCompiler.javascript pretty_fun
 val pretty_java : QcertCompiler.java pretty_fun
 val pretty_spark_rdd : QcertCompiler.spark_rdd pretty_fun
 val pretty_spark_df : QcertCompiler.spark_df pretty_fun
-val pretty_cloudant : QcertCompiler.cloudant pretty_fun
 val pretty_error : (char list) pretty_fun
 
 val pretty_query : pretty_config -> 'a pretty_fun -> 'a -> string

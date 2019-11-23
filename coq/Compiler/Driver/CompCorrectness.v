@@ -39,7 +39,6 @@ Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
 Require Import ImpRuntime.
 Require Import NNRCMRRuntime.
-Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
 Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
@@ -49,7 +48,6 @@ Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
-Require Import CloudantRuntime.
 
 (* Translations *)
 Require Import OQLtoNRAEnv.
@@ -82,9 +80,7 @@ Require Import cNNRCtoCAMP.
 Require Import cNNRCtoNNRC.
 Require Import NNRCMRtoNNRC.
 Require Import NNRCMRtoSparkRDD.
-Require Import NNRCMRtoCldMR.
 Require Import NNRCMRtoDNNRC.
-Require Import CldMRtoCloudant.
 Require Import DNNRCtotDNNRC.
 Require Import tDNNRCtoSparkDF.
 
@@ -100,8 +96,6 @@ Require Import OptimizerLogger.
 (* Foreign Datatypes Support *)
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
-Require Import ForeignCloudant.
-Require Import ForeignToCloudant.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToJavaScriptAst.
@@ -122,8 +116,6 @@ Section CompCorrectness.
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
-  Context {fcloudant:foreign_cloudant}.
-  Context {ftocloudant:foreign_to_cloudant}.
   Context {ftoredop:foreign_to_reduce_op}.
   Context {bm:brand_model}.
   Context {ftyping: foreign_typing}.
@@ -170,17 +162,6 @@ Section CompCorrectness.
   Definition driver_correct_spark_df (dv: spark_df_driver) :=
     match dv with
     | Dv_spark_df_stop => True
-    end.
-
-  Definition driver_correct_cloudant (dv: cloudant_driver) :=
-    match dv with
-    | Dv_cloudant_stop => True
-    end.
-
-  Definition driver_correct_cldmr (dv: cldmr_driver) :=
-    match dv with
-    | Dv_cldmr_stop => True
-    | Dv_cldmr_to_cloudant rulename h dv => False /\ driver_correct_cloudant dv
     end.
 
   Fixpoint driver_correct_dnnrc_typed {ftyping: foreign_typing} (dv: dnnrc_typed_driver) :=
@@ -285,7 +266,6 @@ Section CompCorrectness.
     | Dv_nnrcmr_optim dv => False /\ driver_correct_nnrcmr dv
     | Dv_nnrcmr_to_spark_rdd rulename dv => False /\ driver_correct_spark_rdd dv
     | Dv_nnrcmr_to_nnrc dv => False /\ driver_correct_nnrc dv
-    | Dv_nnrcmr_to_cldmr h dv => False /\ driver_correct_cldmr dv
     | Dv_nnrcmr_to_dnnrc dv => False /\ driver_correct_dnnrc dv
     end.
 
@@ -352,7 +332,6 @@ Section CompCorrectness.
     | Dv_imp_qcert dv => driver_correct_imp_qcert dv
     | Dv_imp_json dv => driver_correct_imp_json dv
     | Dv_nnrcmr dv => driver_correct_nnrcmr dv
-    | Dv_cldmr dv => driver_correct_cldmr dv
     | Dv_dnnrc dv => driver_correct_dnnrc dv
     | Dv_dnnrc_typed dv => driver_correct_dnnrc_typed dv
     | Dv_js_ast dv => driver_correct_js_ast dv
@@ -360,7 +339,6 @@ Section CompCorrectness.
     | Dv_java dv => driver_correct_java dv
     | Dv_spark_rdd dv => driver_correct_spark_rdd dv
     | Dv_spark_df dv => driver_correct_spark_df dv
-    | Dv_cloudant dv => driver_correct_cloudant dv
     | Dv_error s => True (* XXX ??? XXX *)
     end.
 
@@ -385,7 +363,7 @@ Section CompCorrectness.
       unfold eval_camp_rule, eval_camp,
       eval_nra, eval_nraenv, eval_nraenv_core,
       eval_nnrc, eval_nnrc_core, eval_nnrs, eval_nnrs_imp, eval_imp_qcert, eval_imp_json, eval_nnrcmr,
-      eval_cldmr, eval_dnnrc, eval_dnnrc_typed;
+      eval_dnnrc, eval_dnnrc_typed;
       try match goal with
       | [ |- equal_outputs (lift_output (camp_rule_eval_top ?h ?c (lift_input ?i)))
                            (lift_output (camp_rule_eval_top ?h ?c (lift_input ?i))) ] =>
@@ -435,10 +413,6 @@ Section CompCorrectness.
                            (lift_output (nnrcmr_eval_top ?h ?init ?c ?i)) ] =>
         destruct  (lift_output (nnrcmr_eval_top h init c i)); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
-      | [ |- equal_outputs (lift_output (cldmr_eval_top ?h ?init ?c (lift_input ?i)))
-                           (lift_output (cldmr_eval_top ?h ?init ?c (lift_input ?i))) ] =>
-        destruct  (lift_output (cldmr_eval_top h init c (lift_input i))); simpl; try reflexivity;
-        unfold equal_outputs; simpl; match_destr; auto
       | [ |- equal_outputs (lift_output (dnnrc_eval_top ?h ?c ?i))
                            (lift_output (dnnrc_eval_top ?h ?c ?i)) ] =>
         destruct  (lift_output (dnnrc_eval_top h c i)); simpl; try reflexivity;
@@ -482,7 +456,6 @@ Section CompCorrectness.
     | (Dv_imp_qcert _, Q_imp_qcert _) => True
     | (Dv_imp_json _, Q_imp_json _) => True
     | (Dv_nnrcmr _, Q_nnrcmr _) => True
-    | (Dv_cldmr _, Q_cldmr _) => True
     | (Dv_dnnrc _, Q_dnnrc _) => True
     | (Dv_dnnrc_typed _, Q_dnnrc_typed _) => True
     | (Dv_js_ast _, Q_js_ast _) => True
@@ -490,7 +463,6 @@ Section CompCorrectness.
     | (Dv_java _, Q_java _) => True
     | (Dv_spark_rdd _, Q_spark_rdd _) => True
     | (Dv_spark_df _, Q_spark_df _) => True
-    | (Dv_cloudant _, Q_cloudant _) => True
     | (_, _) => False
     end.
 
@@ -657,7 +629,6 @@ Section CompCorrectness.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction. (* Failure case for dnnrc to dnnrc_typed -- False on correctness branch *)
-      - elim H; intros; contradiction.
       - elim H; intros; contradiction.
     Qed.
 
@@ -895,20 +866,6 @@ Section CompCorrectness.
       auto.
     Qed.
 
-    Lemma correct_driver_succeeds_cldmr:
-      forall dv, driver_correct (Dv_cldmr dv) ->
-                 (forall q, Forall query_not_error
-                                   (compile (Dv_cldmr dv) (Q_cldmr q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; [simpl in *; contradiction| ].
-      simpl in H.
-      elim H; intros; contradiction.
-    Qed.
-
     Lemma correct_driver_succeeds_javascript:
       forall dv, driver_correct (Dv_javascript dv) ->
                  (forall q, Forall query_not_error
@@ -963,18 +920,6 @@ Section CompCorrectness.
       forall dv, driver_correct (Dv_spark_df dv) ->
                  (forall q, Forall query_not_error
                                    (compile (Dv_spark_df dv) (Q_spark_df q))).
-    Proof.
-      intros.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *; contradiction.
-    Qed.
-
-    Lemma correct_driver_succeeds_cloudant:
-      forall dv, driver_correct (Dv_cloudant dv) ->
-                 (forall q, Forall query_not_error
-                                   (compile (Dv_cloudant dv) (Q_cloudant q))).
     Proof.
       intros.
       rewrite Forall_forall; intros.
@@ -1041,7 +986,6 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_imp_qcert; auto.
       - apply correct_driver_succeeds_imp_json; auto.
       - apply correct_driver_succeeds_nnrcmr; auto.
-      - apply correct_driver_succeeds_cldmr; auto.
       - apply correct_driver_succeeds_dnnrc; auto.
       - apply correct_driver_succeeds_dnnrc_typed; auto.
       - apply correct_driver_succeeds_js_ast; auto.
@@ -1049,7 +993,6 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_java; auto.
       - apply correct_driver_succeeds_spark_rdd; auto.
       - apply correct_driver_succeeds_spark_df; auto.
-      - apply correct_driver_succeeds_cloudant; auto.
     Qed.
 
     Definition query_preserves_eval (q1 q2:query) : Prop :=
@@ -1641,8 +1584,6 @@ Section CompCorrectness.
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRCMR to SparkRDD arrow *)
       - elim H; intros; contradiction. (* Not proved *)
-      (* NNRCMR to DNNRC arrow *)
-      - elim H; intros; contradiction. (* Not proved *)
     Qed.
 
     Lemma correct_driver_preserves_eval_camp_rule:
@@ -1850,22 +1791,6 @@ Section CompCorrectness.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
-      - elim H; intros; contradiction.
-    Qed.
-
-    Lemma correct_driver_preserves_eval_cldmr:
-      forall dv, driver_correct (Dv_cldmr dv) ->
-                 (forall q, Forall (query_preserves_eval (Q_cldmr q))
-                                   (compile (Dv_cldmr dv) (Q_cldmr q))).
-    Proof.
-      intros.
-      simpl in H.
-      rewrite Forall_forall; intros.
-      simpl in H0.
-      elim H0; intros; clear H0.
-      rewrite <- H1; simpl; trivial_same_query.
-      destruct dv; simpl in H1; [contradiction| ].
-      elim H; intros; contradiction.
     Qed.
 
     Lemma correct_driver_preserves_eval_dnnrc:
@@ -2056,20 +1981,6 @@ Section CompCorrectness.
       - contradiction.
     Qed.
 
-    Lemma correct_driver_preserves_eval_cloudant:
-      forall dv, driver_correct (Dv_cloudant dv) ->
-                 (forall q, Forall (query_preserves_eval (Q_cloudant q))
-                                   (compile (Dv_cloudant dv) (Q_cloudant q))).
-    Proof.
-      intros.
-      simpl in H.
-      rewrite Forall_forall; intros.
-      destruct dv; simpl in *.
-      elim H0; intros.
-      - rewrite <- H1; simpl; trivial_same_query.
-      - contradiction.
-    Qed.
-
     (** This is an initial version of correctness theorem for the
 compiler driver as a whole. *)
 
@@ -2112,7 +2023,6 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_imp_qcert; auto.
       - apply correct_driver_preserves_eval_imp_json; auto.
       - apply correct_driver_preserves_eval_nnrcmr; auto.
-      - apply correct_driver_preserves_eval_cldmr; auto.
       - apply correct_driver_preserves_eval_dnnrc; auto.
       - apply correct_driver_preserves_eval_dnnrc_typed; auto.
       - apply correct_driver_preserves_eval_js_ast; auto.
@@ -2120,7 +2030,6 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_java; auto.
       - apply correct_driver_preserves_eval_spark_rdd; auto.
       - apply correct_driver_preserves_eval_spark_df; auto.
-      - apply correct_driver_preserves_eval_cloudant; auto.
     Qed.
 
   End eval_preserved.

@@ -26,9 +26,7 @@ EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
 # Keep this list accurate as dependencies evolve or versions change
-DEPENDENCIES=lib/cloudant-client-1.2.3-sources.jar \
-	     lib/cloudant-client-1.2.3.jar \
-	     lib/commons-codec-1.9-sources.jar \
+DEPENDENCIES=lib/commons-codec-1.9-sources.jar \
 	     lib/commons-codec-1.9.jar \
 	     lib/commons-collections-3.2.2-sources.jar \
 	     lib/commons-collections-3.2.2.jar \

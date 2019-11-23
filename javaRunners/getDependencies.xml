@@ -2,8 +2,6 @@
 
 <property name="repo" value="http://central.maven.org/maven2/"/>
 	
-<property name="cloudantclient" value="com/cloudant/cloudant-client/1.2.3/cloudant-client-1.2.3.jar"/>
-<property name="cloudantclient-src" value="com/cloudant/cloudant-client/1.2.3/cloudant-client-1.2.3-sources.jar"/>
 <property name="commonscodec" value="commons-codec/commons-codec/1.9/commons-codec-1.9.jar"/>
 <property name="commonscodec-src" value="commons-codec/commons-codec/1.9/commons-codec-1.9-sources.jar"/>
 <property name="commonscollections" value="commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar"/>
@@ -22,8 +20,6 @@
 <target name="get">
 	<delete dir="lib"/>
 	<mkdir dir="lib"/>
-	<get src="${repo}${cloudantclient}" dest="lib"/>
-	<get src="${repo}${cloudantclient-src}" dest="lib"/>
 	<get src="${repo}${commonscodec}" dest="lib"/>
 	<get src="${repo}${commonscodec-src}" dest="lib"/>
 	<get src="${repo}${commonscollections}" dest="lib"/>

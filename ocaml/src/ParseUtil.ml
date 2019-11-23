@@ -75,7 +75,6 @@ let parse_nnrs_imp_sexp f : QLang.nnrs_imp = AstsToSExp.sexp_to_nnrs_imp (parse_
 let parse_imp_qcert_sexp f : QLang.imp_qcert = AstsToSExp.sexp_to_imp_qcert (parse_sexp f)
 let parse_imp_json_sexp f : QLang.imp_json = AstsToSExp.sexp_to_imp_json (parse_sexp f)
 let parse_nnrcmr_sexp f : QLang.nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
-let parse_cldmr_sexp f : QLang.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 
 (*******************
  * Languages Parse *
@@ -102,7 +101,6 @@ let parse_query l f : (string * QLang.query) =
   | QcertCompiler.L_imp_qcert -> ("ImpQcert", QcertCompiler.Q_imp_qcert (parse_imp_qcert_sexp f))
   | QcertCompiler.L_imp_json -> ("ImpJson", QcertCompiler.Q_imp_json (parse_imp_json_sexp f))
   | QcertCompiler.L_nnrcmr -> ("NNRCMR", QcertCompiler.Q_nnrcmr (parse_nnrcmr_sexp f))
-  | QcertCompiler.L_cldmr -> ("CldMR", QcertCompiler.Q_cldmr (parse_cldmr_sexp f))
   | QcertCompiler.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")
   | QcertCompiler.L_dnnrc_typed -> raise (Qcert_Error "No parser for typed DNNRC available")
   | QcertCompiler.L_js_ast -> raise (Qcert_Error "No parser for Javascript AST available")
@@ -110,7 +108,6 @@ let parse_query l f : (string * QLang.query) =
   | QcertCompiler.L_java -> raise (Qcert_Error "No parser for Java available")
   | QcertCompiler.L_spark_rdd -> raise (Qcert_Error "No parser for Spark (RDD) available")
   | QcertCompiler.L_spark_df -> raise (Qcert_Error "No parser for Spark (Dataframe) available")
-  | QcertCompiler.L_cloudant -> raise (Qcert_Error "No parser for Cloudant available")
   | QcertCompiler.L_error err ->
       let err = string_of_char_list err in
       raise (Qcert_Error ("No parser for Error language available: "^err))

@@ -53,8 +53,6 @@ val suffix_nnrcmr_spark_rddsexp : unit -> string
 val suffix_nnrcmr_spark_rdd : unit -> string
 val suffix_nnrcmr_spark_dfsexp : unit -> string
 val suffix_nnrcmr_spark_df : unit -> string
-val suffix_nnrcmr_cldmr : unit -> string
-val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string
 
 val suffix_of_language : QLang.language -> string

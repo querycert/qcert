@@ -69,7 +69,7 @@ OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12
 OQLWORLDNUM=1 2
 OQLSTRINGNUM=1 2 3
 OQLEMPLOYEESNUM=1 2
-OQLTARGETS=oql nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
+OQLTARGETS=oql nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
 
 oql-tests:
 	@echo "[Q*cert] "
@@ -206,7 +206,7 @@ oql-employees-tests-java:
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7
-LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
+LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
 
 lambda_nra-tests:
 	@echo "[Q*cert] "
@@ -250,7 +250,7 @@ lambda_nra-persons-tests-java:
 
 ## CAMP
 CAMPWORLDNUM=1
-CAMPTARGETS=camp nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
+CAMPTARGETS=camp nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
 
 camp-tests:
 	@echo "[Q*cert] "
@@ -294,7 +294,7 @@ camp-world-tests-java:
 
 ## SQL
 SQLORGNUM=1 2 3 4 5 6 7 8 9 10 11
-SQLTARGETS=nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
+SQLTARGETS=nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
 
 sql-tests:
 	@echo "[Q*cert] "
@@ -339,7 +339,7 @@ sql-org-tests-java:
 
 ## TECHRULE
 TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22 #20
-TECHRULETARGETS=camp_rule camp nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
+TECHRULETARGETS=camp_rule camp nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
 
 tech_rule-tests:
 	@echo "[Q*cert] "
@@ -383,7 +383,7 @@ tech_rule-test-tests-java:
 
 ## DESIGNERRULE
 DESIGNERRULETESTNUM=
-DESIGNERRULETARGETS=camp_rule camp nraenv nnrc nnrs nnrs_imp nnrcmr cldmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
+DESIGNERRULETARGETS=camp_rule camp nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
 
 designer_rule-tests:
 	@echo "[Q*cert] "

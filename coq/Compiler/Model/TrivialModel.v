@@ -28,12 +28,9 @@ Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
-Require Import ForeignCloudant.
-Require Import ForeignToCloudant.
 Require Import CompilerRuntime.
 Require Import CompilerModel.
 Require NNRCMR.
-Require CldMR.
 Require Import OptimizerLogger.
 Require Import String.
 Require Import cNRAEnv.
@@ -323,25 +320,6 @@ Defined.
   Program Instance trivial_foreign_to_spark : foreign_to_spark
   := mk_foreign_to_spark trivial_foreign_runtime trivial_foreign_reduce_op _ _.
 
-  Program Instance trivial_foreign_to_cloudant : foreign_to_cloudant
-    := mk_foreign_to_cloudant trivial_foreign_runtime trivial_foreign_reduce_op _ _ _ _.
-  Next Obligation.
-    destruct rop.
-  Defined.
-  Next Obligation.
-    exact True.
-  Defined.
-  Next Obligation.
-    compute; trivial.
-  Qed.
-
-Instance trivial_foreign_cloudant : foreign_cloudant
-  := mk_foreign_cloudant
-       trivial_foreign_runtime
-       OpNatSum
-       OpNatMin
-       OpNatMax.
-
 Existing Instance silent_optimizer_logger.
 
   Module TrivialRuntime <: CompilerRuntime.
@@ -367,10 +345,6 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_reduce_op.
     Definition compiler_foreign_to_spark : foreign_to_spark
       := trivial_foreign_to_spark.
-    Definition compiler_foreign_cloudant : foreign_cloudant
-      := trivial_foreign_cloudant.
-    Definition compiler_foreign_to_cloudant : foreign_to_cloudant
-      := trivial_foreign_to_cloudant.
     Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
       := silent_optimizer_logger string nraenv.
     Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
@@ -416,10 +390,6 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_reduce_op.
     Definition compiler_model_foreign_to_spark : foreign_to_spark
       := trivial_foreign_to_spark.
-    Definition compiler_model_foreign_cloudant : foreign_cloudant
-      := trivial_foreign_cloudant.
-    Definition compiler_model_foreign_to_cloudant : foreign_to_cloudant
-      := trivial_foreign_to_cloudant.
     Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
       := silent_optimizer_logger string nraenv.
     Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc

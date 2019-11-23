@@ -35,7 +35,6 @@ Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
 Require Import ImpRuntime.
 Require Import NNRCMRRuntime.
-Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
 Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
@@ -45,7 +44,6 @@ Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
-Require Import CloudantRuntime.
 
 Require Import CompilerRuntime.
 Require Import CommonSystem.
@@ -55,7 +53,6 @@ Require Import NNRCtoJavaScript.
 Require Import OptimizerLogger.
 Require Import CompLang.
 Require Import CompDriver.
-Require Import ForeignCloudant.
 
 Definition time {A: Type} {B: Type} (compile: A -> B) (q: A) := ("no timing info"%string, compile q).
 Extract Inlined Constant time => "(fun f x -> Util.time f x)".
@@ -80,11 +77,6 @@ Section CompStat.
   Definition stat_error (q: string) : data :=
     drec
       (("error_stat", dstring "no stat available")
-         :: nil).
-
-  Definition stat_cloudant (q: cloudant) : data :=
-    drec
-      (("cloudant_stat", dstring "no stat available")
          :: nil).
 
   Definition stat_spark_df (q: spark_df) : data :=
@@ -120,11 +112,6 @@ Section CompStat.
   Definition stat_dnnrc (q: dnnrc) : data :=
     drec
       (("dnnrc_stat", dstring "no stat available")
-         :: nil).
-
-  Definition stat_cldmr (q: cldmr) : data :=
-    drec
-      (("cldmr_stat", dstring "no stat available")
          :: nil).
 
   Definition stat_nnrcmr (q: nnrcmr) : data :=
@@ -234,11 +221,6 @@ Section CompStat.
       (("error", stat_error q)
          :: nil).
 
-  Definition stat_tree_cloudant (q: cloudant) : data :=
-    drec
-      (("cloudant", stat_cloudant q)
-         :: nil).
-
   Definition stat_tree_spark_df (q: spark_df) : data :=
     drec
       (("spark_df", stat_spark_df q)
@@ -272,11 +254,6 @@ Section CompStat.
   Definition stat_tree_dnnrc (q: dnnrc) : data :=
     drec
       (("dnnrc", stat_dnnrc q)
-         :: nil).
-
-  Definition stat_tree_cldmr (q: cldmr) : data :=
-    drec
-      (("cldmr", stat_cldmr q)
          :: nil).
 
   Definition stat_tree_nnrcmr (q: nnrcmr) : data :=
@@ -488,7 +465,6 @@ Section CompStat.
         | Q_imp_qcert q => stat_imp_qcert q
         | Q_imp_json q => stat_imp_json q
         | Q_nnrcmr q => stat_nnrcmr q
-        | Q_cldmr q => stat_cldmr q
         | Q_dnnrc q => stat_dnnrc q
         | Q_dnnrc_typed q => stat_dnnrc_typed q
         | Q_js_ast q => stat_js_ast q
@@ -496,7 +472,6 @@ Section CompStat.
         | Q_java q => stat_java q
         | Q_spark_rdd q => stat_spark_rdd q
         | Q_spark_df q => stat_spark_df q
-        | Q_cloudant q => stat_cloudant q
         | Q_error q => stat_error q
         end
     in
@@ -524,7 +499,6 @@ Section CompStat.
         | Q_imp_qcert q => stat_tree_imp_qcert q
         | Q_imp_json q => stat_tree_imp_json q
         | Q_nnrcmr q => stat_tree_nnrcmr q
-        | Q_cldmr q => stat_tree_cldmr q
         | Q_dnnrc q => stat_tree_dnnrc q
         | Q_dnnrc_typed q => stat_tree_dnnrc_typed q
         | Q_js_ast q => stat_tree_js_ast q
@@ -532,7 +506,6 @@ Section CompStat.
         | Q_java q => stat_tree_java q
         | Q_spark_rdd q => stat_tree_spark_rdd q
         | Q_spark_df q => stat_tree_spark_df q
-        | Q_cloudant q => stat_tree_cloudant q
         | Q_error q => stat_tree_error q
         end
     in
