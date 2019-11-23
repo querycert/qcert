@@ -44,6 +44,7 @@ Section ImpJsontoJavaScriptAst.
   Definition mk_imp_json_runtime_call op el : imp_json_expr := ImpExprRuntimeCall op el.
 
   Definition mk_string s : imp_json_expr := ImpExprConst (jstring s).
+  Definition mk_string_array sl : imp_json_expr := ImpExprConst (jarray (map jstring sl)).
   Definition mk_bag el : imp_json_expr := mk_imp_json_op JSONOpArray el.
   Definition mk_left e : imp_json_expr :=
     mk_imp_json_op (JSONOpObject ["$left"%string]) [ e ].
@@ -75,7 +76,7 @@ Section ImpJsontoJavaScriptAst.
       | OpRecRemove s => mk_imp_json_runtime_call JSONRuntimeRemove [e; mk_string (json_key_encode s)]
       | OpRecProject fl =>
         mk_imp_json_runtime_call
-          JSONRuntimeProject ([e] ++ (List.map mk_string fl))
+          JSONRuntimeProject ([e] ++ [mk_string_array fl])
       | OpBag => mk_bag el
       | OpSingleton => mk_imp_json_runtime_call JSONRuntimeSingleton el
       | OpFlatten => mk_imp_json_runtime_call JSONRuntimeFlatten el

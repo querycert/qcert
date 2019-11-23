@@ -200,7 +200,7 @@ Section ToString.
         List.map
           (fun (x_e_opt: string * option expr) =>
              let (x, e_opt) := x_e_opt in
-             "var " ++ x ++
+             "let " ++ x ++
              match e_opt with
              | Some e =>
                " = " ++ string_of_expr e (i+1)
@@ -246,7 +246,7 @@ Section ToString.
     in
     (* lbl ++ *) (* TODO: print labels *)
     "for (" ++
-        "var " ++ comma_list decls ++ "; " ++
+        "let " ++ comma_list decls ++ "; " ++
         match e2_opt with
         | Some e2 => string_of_expr e2 (i+1)
         | None => ""
@@ -261,7 +261,7 @@ Section ToString.
   | stat_for_in_var lbl x e1_opt e2 s =>
     (*  Note: for (var x [= e1] in e2) stat *)
     (* lbl ++ *) (* TODO: print labels *)
-    "for (var " ++ x ++
+    "for (let " ++ x ++
         match e1_opt with
         | Some e => " = " ++ string_of_expr e (i+1)
         | None => ""
