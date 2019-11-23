@@ -125,13 +125,14 @@ let languages =
     QcertCompiler.L_nnrc_core;
     QcertCompiler.L_nnrs;
     QcertCompiler.L_nnrs_core;
+    QcertCompiler.L_imp_qcert;
+    QcertCompiler.L_imp_json;
     QcertCompiler.L_nnrcmr;
     QcertCompiler.L_dnnrc;
     QcertCompiler.L_dnnrc_typed;
     QcertCompiler.L_js_ast;
     QcertCompiler.L_javascript;
     QcertCompiler.L_java;
-    QcertCompiler.L_spark_rdd;
     QcertCompiler.L_spark_df; ]
 
 

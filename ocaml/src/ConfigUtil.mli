@@ -49,8 +49,6 @@ val suffix_nnrcsexp : unit -> string
 val suffix_dnnrc : unit -> string
 val suffix_dnnrcsexp : unit -> string
 val suffix_nnrcmr : unit -> string
-val suffix_nnrcmr_spark_rddsexp : unit -> string
-val suffix_nnrcmr_spark_rdd : unit -> string
 val suffix_nnrcmr_spark_dfsexp : unit -> string
 val suffix_nnrcmr_spark_df : unit -> string
 val suffix_stats : unit -> string

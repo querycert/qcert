@@ -106,7 +106,6 @@ let parse_query l f : (string * QLang.query) =
   | QcertCompiler.L_js_ast -> raise (Qcert_Error "No parser for Javascript AST available")
   | QcertCompiler.L_javascript -> raise (Qcert_Error "No parser for Javascript available")
   | QcertCompiler.L_java -> raise (Qcert_Error "No parser for Java available")
-  | QcertCompiler.L_spark_rdd -> raise (Qcert_Error "No parser for Spark (RDD) available")
   | QcertCompiler.L_spark_df -> raise (Qcert_Error "No parser for Spark (Dataframe) available")
   | QcertCompiler.L_error err ->
       let err = string_of_char_list err in

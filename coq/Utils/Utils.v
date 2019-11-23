@@ -36,6 +36,7 @@ Require Export Var.
 Require Export Closure.
 Require Export Result.
 Require Export JSON.
+Require Export JSONUtil.
 Require Export JSONNorm.
 Require Export JSONOperators.
 Require Export OptimizerStep.

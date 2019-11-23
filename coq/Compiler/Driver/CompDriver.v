@@ -47,7 +47,6 @@ Require Import CAMPRuntime.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
-Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
 
 (* Translations *)
@@ -83,7 +82,6 @@ Require Import NNRCtoJava.
 Require Import cNNRCtoCAMP.
 Require Import cNNRCtoNNRC.
 Require Import NNRCMRtoNNRC.
-Require Import NNRCMRtoSparkRDD.
 Require Import NNRCMRtoDNNRC.
 Require Import DNNRCtotDNNRC.
 Require Import tDNNRCtoSparkDF.
@@ -245,9 +243,6 @@ Section CompDriver.
 
     Definition nnrcmr_to_dnnrc (q: nnrcmr) : option dnnrc := dnnrc_base_of_nnrcmr_top tt q.
 
-    Definition nnrcmr_to_spark_rdd (queryname: string) (q: nnrcmr) : spark_rdd :=
-      nnrcmr_to_spark_rdd_top init_vinit queryname q. (* XXX init_vinit should be a parameter? *)
-
     (** DNNRC translations *)
 
     Definition dnnrc_to_dnnrc_typed (q: dnnrc) (tdenv: tdbindings)
@@ -296,9 +291,6 @@ Section CompDriver.
 
   Inductive java_driver : Set :=
     | Dv_java_stop : java_driver.
-
-  Inductive spark_rdd_driver : Set :=
-    | Dv_spark_rdd_stop : spark_rdd_driver.
 
   Inductive spark_df_driver : Set :=
     | Dv_spark_df_stop : spark_df_driver.
@@ -384,7 +376,6 @@ Section CompDriver.
   with nnrcmr_driver : Set :=
     | Dv_nnrcmr_stop : nnrcmr_driver
     | Dv_nnrcmr_optim : nnrcmr_driver -> nnrcmr_driver
-    | Dv_nnrcmr_to_spark_rdd : (* queryname *) string -> spark_rdd_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_nnrc : nnrc_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_dnnrc : dnnrc_driver -> nnrcmr_driver.
 
@@ -466,7 +457,6 @@ Section CompDriver.
   | Dv_js_ast : js_ast_driver -> driver
   | Dv_javascript : javascript_driver -> driver
   | Dv_java : java_driver -> driver
-  | Dv_spark_rdd : spark_rdd_driver -> driver
   | Dv_spark_df : spark_df_driver -> driver
   | Dv_error : string -> driver.
 
@@ -496,7 +486,6 @@ Section CompDriver.
     | Case_aux c "Dv_js_ast"%string
     | Case_aux c "Dv_javascript"%string
     | Case_aux c "Dv_java"%string
-    | Case_aux c "Dv_spark_rdd"%string
     | Case_aux c "Dv_spark_df"%string
     | Case_aux c "Dv_error"%string ].
 
@@ -530,7 +519,6 @@ Section CompDriver.
     | Dv_js_ast _ => L_js_ast
     | Dv_javascript _ => L_javascript
     | Dv_java _ => L_java
-    | Dv_spark_rdd _ => L_spark_rdd
     | Dv_spark_df _ => L_spark_df
     | Dv_error err => L_error ("language of "++err)
     end.
@@ -552,11 +540,6 @@ Section CompDriver.
   Definition driver_length_java (dv: java_driver) :=
     match dv with
     | Dv_java_stop => 1
-    end.
-
-  Definition driver_length_spark_rdd (dv: spark_rdd_driver) :=
-    match dv with
-    | Dv_spark_rdd_stop => 1
     end.
 
   Definition driver_length_spark_df (dv: spark_df_driver) :=
@@ -664,7 +647,6 @@ Section CompDriver.
     match dv with
     | Dv_nnrcmr_stop => 1
     | Dv_nnrcmr_optim dv => 1 + driver_length_nnrcmr dv
-    | Dv_nnrcmr_to_spark_rdd queryname dv => 1 + driver_length_spark_rdd dv
     | Dv_nnrcmr_to_nnrc dv => 1 + driver_length_nnrc dv
     | Dv_nnrcmr_to_dnnrc dv => 1 + driver_length_dnnrc dv
     end.
@@ -737,7 +719,6 @@ Section CompDriver.
     | Dv_js_ast dv => driver_length_js_ast dv
     | Dv_javascript dv => driver_length_javascript dv
     | Dv_java dv => driver_length_java dv
-    | Dv_spark_rdd dv => driver_length_spark_rdd dv
     | Dv_spark_df dv => driver_length_spark_df dv
     | Dv_error s => 1
     end.
@@ -772,14 +753,6 @@ Section CompDriver.
           end
       in
       (Q_java q) :: queries.
-
-    Definition compile_spark_rdd (dv: spark_rdd_driver) (q: spark_rdd) : list query :=
-      let queries :=
-          match dv with
-          | Dv_spark_rdd_stop => nil
-          end
-      in
-      (Q_spark_rdd q) :: queries.
 
     Definition compile_spark_df (dv: spark_df_driver) (q: spark_df) : list query :=
       let queries :=
@@ -996,9 +969,6 @@ Section CompDriver.
           | Dv_nnrcmr_optim dv =>
             let q := nnrcmr_optim q in
             compile_nnrcmr dv q
-          | Dv_nnrcmr_to_spark_rdd queryname dv =>
-            let q := nnrcmr_to_spark_rdd queryname q in
-            compile_spark_rdd dv q
           | Dv_nnrcmr_to_nnrc dv =>
             let q_opt := nnrcmr_to_nnrc q in
             match q_opt with
@@ -1118,7 +1088,6 @@ Section CompDriver.
       | (Dv_js_ast dv, Q_js_ast q) => compile_js_ast dv q
       | (Dv_javascript dv, Q_javascript q) => compile_javascript dv q
       | (Dv_java dv, Q_java q) => compile_java dv q
-      | (Dv_spark_rdd dv, Q_spark_rdd q) => compile_spark_rdd dv q
       | (Dv_spark_df dv, Q_spark_df q) => compile_spark_df dv q
       | (Dv_error s, _) => (Q_error ("[Driver Error]" ++ s)) :: nil
       | (_, _) => (Q_error "incompatible query and driver") :: nil
@@ -1156,7 +1125,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1188,7 +1156,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1220,7 +1187,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1252,7 +1218,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1284,7 +1249,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1316,7 +1280,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1348,7 +1311,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1380,7 +1342,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1412,7 +1373,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1444,7 +1404,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1476,7 +1435,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1508,7 +1466,6 @@ Section CompDriver.
       | Dv_nra _
       | Dv_nraenv_core _
       | Dv_dnnrc_typed _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1540,7 +1497,6 @@ Section CompDriver.
       | Dv_nra _
       | Dv_nraenv_core _
       | Dv_dnnrc_typed _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1572,7 +1528,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
         Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1604,7 +1559,6 @@ Section CompDriver.
       | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1636,7 +1590,6 @@ Section CompDriver.
       | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1670,7 +1623,6 @@ Section CompDriver.
       | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1704,7 +1656,6 @@ Section CompDriver.
       | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1712,7 +1663,6 @@ Section CompDriver.
       end
     | L_nnrcmr =>
       match dv with
-      | Dv_spark_rdd dv => Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd config.(comp_qname) dv)
       | Dv_nnrc dv => Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv)
       | Dv_dnnrc dv => Dv_nnrcmr (Dv_nnrcmr_to_dnnrc dv)
       | Dv_nnrcmr dv => Dv_nnrcmr (Dv_nnrcmr_optim dv)
@@ -1769,7 +1719,6 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_rdd _
       | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1803,8 +1752,7 @@ Section CompDriver.
       | Dv_dnnrc _
       | Dv_js_ast _
       | Dv_javascript _
-      | Dv_java _
-      | Dv_spark_rdd _ =>
+      | Dv_java _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1836,15 +1784,13 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_spark_df _
       | Dv_dnnrc_typed _
-      | Dv_java _
-      | Dv_spark_rdd _ =>
+      | Dv_java _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
     | L_javascript
     | L_java
-    | L_spark_rdd
     | L_spark_df =>
       Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
     | L_error err =>
@@ -1877,7 +1823,6 @@ Section CompDriver.
     | L_js_ast => Dv_js_ast Dv_js_ast_stop
     | L_javascript => Dv_javascript Dv_javascript_stop
     | L_java => Dv_java Dv_java_stop
-    | L_spark_rdd => Dv_spark_rdd Dv_spark_rdd_stop
     | L_spark_df => Dv_spark_df Dv_spark_df_stop
     | L_error err => Dv_error ("No driver for error: "++err)
     end.
@@ -1962,8 +1907,6 @@ Section CompDriver.
           inputs = (vars_of_constants_config config.(comp_constants))
         | Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert qname _) =>
           qname = config.(comp_qname_lowercase)
-        | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd qname _) =>
-          qname = config.(comp_qname)
         | Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed tdbindings _) =>
           tdbindings = tdbindings_of_constants_config config.(comp_constants)
         | Dv_dnnrc_typed (Dv_dnnrc_typed_to_spark_df tdbindings qname _) =>
@@ -2041,7 +1984,6 @@ Section CompDriver.
     | Dv_imp_json (Dv_imp_json_stop) => (L_imp_json, None)
     | Dv_imp_json (Dv_imp_json_to_js_ast dv) => (L_imp_json, Some (Dv_js_ast dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
-    | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd name dv) => (L_nnrcmr, Some (Dv_spark_rdd dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_dnnrc dv) => (L_nnrcmr, Some (Dv_dnnrc dv))
     | Dv_nnrcmr (Dv_nnrcmr_optim dv) => (L_nnrcmr, Some (Dv_nnrcmr dv))
@@ -2054,7 +1996,6 @@ Section CompDriver.
     | Dv_js_ast (Dv_js_ast_to_javascript dv) => (L_js_ast, Some (Dv_javascript dv))
     | Dv_javascript (Dv_javascript_stop) => (L_javascript, None)
     | Dv_java (Dv_java_stop) => (L_java, None)
-    | Dv_spark_rdd (Dv_spark_rdd_stop) => (L_spark_rdd, None)
     | Dv_spark_df (Dv_spark_df_stop) => (L_spark_df, None)
     | Dv_error err => (L_error err, None)
     end.
@@ -2107,13 +2048,6 @@ Section CompDriver.
 
   Lemma target_language_of_driver_is_postfix_java:
     (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_java dv))) (Dv_java dv)).
-  Proof.
-    destruct dv.
-    reflexivity.
-  Qed.
-
-  Lemma target_language_of_driver_is_postfix_spark_rdd:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_spark_rdd dv))) (Dv_spark_rdd dv)).
   Proof.
     destruct dv.
     reflexivity.
@@ -2478,17 +2412,6 @@ Section CompDriver.
       [eapply target_language_of_driver_is_postfix_java | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
-                 s
-                 EmptyString
-                 EmptyString
-                 nil
-                 EmptyString
-                 nil
-                 EmptyString
-                 nil) (lang:=L_nnrcmr);
-        [eapply target_language_of_driver_is_postfix_spark_rdd | | ]; simpl; trivial.
-    - eapply is_postfix_plus_one with
-      (config:=mkDvConfig
                  EmptyString
                  EmptyString
                  EmptyString
@@ -2629,7 +2552,6 @@ Section CompDriver.
          target_language_of_driver_is_postfix_js_ast
          target_language_of_driver_is_postfix_javascript
          target_language_of_driver_is_postfix_java
-         target_language_of_driver_is_postfix_spark_rdd
          target_language_of_driver_is_postfix_spark_df
          target_language_of_driver_is_postfix_dnnrc_typed
          target_language_of_driver_is_postfix_dnnrc
@@ -2729,8 +2651,6 @@ Section CompDriver.
             try reflexivity.
         * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_to_js_ast (vars_of_constants_config (comp_constants config0)) j)));
             try reflexivity.
-        * destruct (H_config (Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd (comp_qname config0) s)));
-            reflexivity.
         * destruct (H_config (Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed (tdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.
         * destruct (H_config (Dv_dnnrc_typed
@@ -2908,17 +2828,6 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrcmr
           :: L_nnrcmr
-          :: nil
-      | L_camp_rule, L_spark_rdd =>
-        L_camp_rule
-          :: L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
           :: nil
       | L_camp_rule, L_dnnrc =>
         L_camp_rule
@@ -3110,18 +3019,6 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrcmr
           :: L_nnrcmr
-          :: nil
-      | L_tech_rule, L_spark_rdd =>
-        L_tech_rule
-          :: L_camp_rule
-          :: L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
           :: nil
       | L_tech_rule, L_dnnrc =>
         L_tech_rule
@@ -3317,18 +3214,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_designer_rule, L_spark_rdd =>
-        L_designer_rule
-          :: L_camp_rule
-          :: L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
-          :: nil
       | L_designer_rule, L_dnnrc =>
         L_designer_rule
           :: L_camp_rule
@@ -3485,16 +3370,6 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrcmr
           :: L_nnrcmr
-          :: nil
-      | L_camp, L_spark_rdd =>
-        L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
           :: nil
       | L_camp, L_dnnrc =>
         L_camp
@@ -3659,16 +3534,6 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrcmr
           :: L_nnrcmr
-          :: nil
-      | L_oql, L_spark_rdd =>
-        L_oql
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
           :: nil
       | L_oql, L_dnnrc =>
         L_oql
@@ -3835,16 +3700,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_sql, L_spark_rdd =>
-        L_sql
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
-          :: nil
       | L_sql, L_dnnrc =>
         L_sql
           :: L_nraenv
@@ -4009,16 +3864,6 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrcmr
           :: L_nnrcmr
-          :: nil
-      | L_sqlpp, L_spark_rdd =>
-        L_sqlpp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
           :: nil
       | L_sqlpp, L_dnnrc =>
         L_sqlpp
@@ -4185,16 +4030,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_lambda_nra, L_spark_rdd =>
-        L_lambda_nra
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
-          :: nil
       | L_lambda_nra, L_dnnrc =>
         L_lambda_nra
           :: L_nraenv
@@ -4359,17 +4194,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_nra, L_spark_rdd =>
-        L_nra
-          :: L_nraenv_core
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
-          :: nil
       | L_nra, L_dnnrc =>
         L_nra
           :: L_nraenv_core
@@ -4525,16 +4349,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_nraenv_core, L_spark_rdd =>
-        L_nraenv_core
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
-          :: nil
       | L_nraenv_core, L_dnnrc =>
         L_nraenv_core
           :: L_nraenv
@@ -4682,15 +4496,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_nraenv, L_spark_rdd =>
-        L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
-          :: nil
       | L_nraenv, L_dnnrc =>
         L_nraenv
           :: L_nraenv
@@ -4819,14 +4624,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_nnrc_core, L_spark_rdd =>
-        L_nnrc_core
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
-          :: nil
       | L_nnrc_core, L_dnnrc =>
         L_nnrc_core
           :: L_nnrc
@@ -4951,13 +4748,6 @@ Section CompDriver.
           :: L_nnrc
           :: L_nnrcmr
           :: L_nnrcmr
-          :: nil
-      | L_nnrc, L_spark_rdd =>
-        L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
           :: nil
       | L_nnrc, L_dnnrc =>
         L_nnrc
@@ -5121,11 +4911,6 @@ Section CompDriver.
       | L_nnrcmr, L_nnrcmr =>
         L_nnrcmr
           :: L_nnrcmr
-          :: nil
-      | L_nnrcmr, L_spark_rdd =>
-        L_nnrcmr
-          :: L_nnrcmr
-          :: L_spark_rdd
           :: nil
       | L_nnrcmr, L_dnnrc =>
         L_nnrcmr
@@ -5310,9 +5095,6 @@ Section CompDriver.
       (* From spark_df *)
       | L_spark_df, L_spark_df =>
         L_spark_df :: nil
-      (* From spark_rdd *)
-      | L_spark_rdd, L_spark_rdd =>
-        L_spark_rdd :: nil
       | _, _ =>
         let err :=
             "No default path defined from "++(name_of_language source)++" to "++(name_of_language target)
@@ -5485,15 +5267,6 @@ Section CompDriver.
     Qed.
 
     Hint Resolve exists_path_from_source_target_completeness_dnnrc : exists_path_hints.
-
-    Lemma exists_path_from_source_target_completeness_spark_rdd :
-      (forall dv,
-          exists_path_from_source_target L_spark_rdd (target_language_of_driver (Dv_spark_rdd dv))).
-    Proof.
-      destruct dv; prove_exists_path_complete.
-    Qed.
-
-    Hint Resolve exists_path_from_source_target_completeness_spark_rdd : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_cnd :
         (forall dv,
@@ -5732,7 +5505,6 @@ Section CompDriver.
     | L_js_ast :: L_js_ast :: path => L_js_ast :: path
     | L_javascript :: L_javascript :: path => L_javascript :: path
     | L_java :: L_java :: path => L_java :: path
-    | L_spark_rdd :: L_spark_rdd :: path => L_spark_rdd :: path
     | L_spark_df :: L_spark_df :: path => L_spark_df :: path
     | _ => path
     end.

@@ -15,10 +15,24 @@
  *)
 
 Require Import String.
+Require Import List.
+Require Import Ascii.
+Require Import Utils.
+Require Import cNNRCShadow.
+Require Import NNRC.
+Require Import NNRCShadow.
+Require Import CommonRuntime.
 
-Section SparkRDD.
-  (** Spark (RDD API) programs are in serialized form *)
-  Definition spark_rdd := string.
-  
-End SparkRDD.
+Local Open Scope string_scope.
 
+Section NNRCSanitizer.
+  (* Java equivalent: JavaScriptBackend.unshadow_js *)
+  Context {fruntime:foreign_runtime}.
+
+  Definition unshadow_js {fruntime:foreign_runtime} (avoid:list var) (e:nnrc) : nnrc
+    := unshadow jsSafeSeparator jsIdentifierSanitize (avoid++jsAvoidList) e.
+
+  Definition jsSanitizeNNRC {fruntime:foreign_runtime} (e:nnrc) : nnrc
+    := unshadow_js nil e.
+
+End NNRCSanitizer.

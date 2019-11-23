@@ -39,6 +39,7 @@ MODULES = \
 	Utils/Closure \
 	Utils/Result \
 	Utils/JSON \
+	Utils/JSONUtil \
 	Utils/JSONNorm \
 	Utils/JSONOperators \
 	Utils/OptimizerStep \
@@ -172,6 +173,7 @@ MODULES = \
 	NNRC/Lang/NNRCShadow \
 	NNRC/Lang/NNRCEq \
 	NNRC/Lang/NNRCSize \
+	NNRC/Lang/NNRCSanitizer \
 	NNRC/Lang/NNRCStratify \
 	NNRC/Typing/TNNRC \
 	NNRC/Typing/TNNRCEq \
@@ -306,8 +308,6 @@ MODULES = \
 	JavaScript/JavaScriptRuntime \
 	Java/Lang/Java \
 	Java/JavaRuntime \
-	SparkRDD/Lang/SparkRDD \
-	SparkRDD/SparkRDDRuntime \
 	SparkDF/Lang/SparkDF \
 	SparkDF/SparkDFRuntime \
 	Translation/ForeignToReduceOps \
@@ -352,7 +352,6 @@ MODULES = \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \
 	Translation/NNRCtoJavaScript \
-	Translation/NNRCMRtoSparkRDD \
 	Translation/DatatoSparkDF \
 	Translation/tDNNRCtoSparkDF \
 	Translation/TNRAtocNNRC \

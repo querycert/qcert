@@ -17,6 +17,7 @@
 Require Extraction.
 Require Import String.
 Require Import ZArith.
+Require Import Utils.
 
 (** Query languages *)
 Require Import SQLRuntime.
@@ -42,7 +43,6 @@ Require Import CAMPRuntime.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
-Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
 
 Require Import CompilerRuntime.
@@ -82,11 +82,6 @@ Section CompStat.
   Definition stat_spark_df (q: spark_df) : data :=
     drec
       (("spark_df_stat", dstring "no stat available")
-         :: nil).
-
-  Definition stat_spark_rdd (q: spark_rdd) : data :=
-    drec
-      (("spark_rdd_stat", dstring "no stat available")
          :: nil).
 
   Definition stat_java (q: java) : data :=
@@ -224,11 +219,6 @@ Section CompStat.
   Definition stat_tree_spark_df (q: spark_df) : data :=
     drec
       (("spark_df", stat_spark_df q)
-         :: nil).
-
-  Definition stat_tree_spark_rdd (q: spark_rdd) : data :=
-    drec
-      (("spark_rdd", stat_spark_rdd q)
          :: nil).
 
   Definition stat_tree_java (q: java) : data :=
@@ -470,7 +460,6 @@ Section CompStat.
         | Q_js_ast q => stat_js_ast q
         | Q_javascript q => stat_javascript q
         | Q_java q => stat_java q
-        | Q_spark_rdd q => stat_spark_rdd q
         | Q_spark_df q => stat_spark_df q
         | Q_error q => stat_error q
         end
@@ -504,7 +493,6 @@ Section CompStat.
         | Q_js_ast q => stat_tree_js_ast q
         | Q_javascript q => stat_tree_javascript q
         | Q_java q => stat_tree_java q
-        | Q_spark_rdd q => stat_tree_spark_rdd q
         | Q_spark_df q => stat_tree_spark_df q
         | Q_error q => stat_tree_error q
         end
