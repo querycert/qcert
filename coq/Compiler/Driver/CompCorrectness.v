@@ -73,7 +73,6 @@ Require Import NNRStoNNRSimp.
 Require Import NNRSimptoImpQcert.
 Require Import ImpQcerttoImpJson.
 Require Import NNRSimptoJavaScriptAst.
-Require Import NNRCtoJavaScript.
 Require Import NNRCtoJava.
 Require Import cNNRCtoCAMP.
 Require Import cNNRCtoNNRC.
@@ -249,7 +248,6 @@ Section CompCorrectness.
     | Dv_nnrc_to_nnrs inputs dv => True /\ driver_correct_nnrs dv
     | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => False /\ driver_correct_nnrcmr dv
     | Dv_nnrc_to_dnnrc inputs_loc dv => False /\ driver_correct_dnnrc dv
-    | Dv_nnrc_to_javascript dv => False /\ driver_correct_javascript dv
     | Dv_nnrc_to_java class_name imports dv => False /\ driver_correct_java dv
     end
 
@@ -615,7 +613,6 @@ Section CompCorrectness.
         destruct n; simpl in *; intuition; subst; simpl; trivial.
        generalize (correct_driver_succeeds_nnrs_imp n H4 (nnrs_to_nnrs_imp (nnrc_to_nnrs l q))).
        rewrite Forall_forall; eauto.
-      - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction. (* Failure case for dnnrc to dnnrc_typed -- False on correctness branch *)
@@ -1553,8 +1550,6 @@ Section CompCorrectness.
       (* NNRC to DNNRC arrow *)
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRC to js_ast arrow *)
-      - elim H; intros; contradiction. (* Not proved *)
-      (* NNRC to JavaScript arrow *)
       - elim H; intros; contradiction. (* Not proved *)
       (* NNRC to Java arrow *)
       - elim H; intros; contradiction. (* Not proved *)

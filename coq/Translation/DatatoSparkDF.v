@@ -22,24 +22,23 @@ Require Import Types.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import ForeignDataTyping.
-Require Import NNRCtoJavaScript.
+Require Import ForeignToJavaScript.
 
 Section DatatoSparkDF.
 
   Context {f:foreign_runtime}.
   Context {h:brand_relation_t}.
-  Context {fttojs: ForeignToJavaScript.foreign_to_javascript}.
+  Context {fttojs: foreign_to_javascript}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
   Definition data_to_blob (d: data): string :=
-    dataToJS quotel_double d.
+    jsonToJS quotel_double (data_to_json d).
 
   Lemma dataToJS_correctly_escapes_quote_inside_string:
-    dataToJS """" (dstring "abc""cde") = """abc\""cde"""%string.
+    data_to_blob (dstring "abc""cde") = """abc\""cde"""%string.
   Proof.
-    vm_compute.
     reflexivity.
   Qed.
   

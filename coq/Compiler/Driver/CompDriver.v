@@ -77,7 +77,6 @@ Require Import ImpJsontoJavaScriptAst.
 Require Import JavaScriptAsttoJavaScript.
 Require Import NNRCtoDNNRC.
 Require Import NNRCtoNNRCMR.
-Require Import NNRCtoJavaScript.
 Require Import NNRCtoJava.
 Require Import cNNRCtoCAMP.
 Require Import cNNRCtoNNRC.
@@ -232,9 +231,6 @@ Section CompDriver.
     Definition nnrc_to_dnnrc (inputs_loc: vdbindings) (q: nnrc) : dnnrc :=
       nnrc_to_dnnrc_top inputs_loc q.
 
-    Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
-      lift_nnrc_core nnrc_to_js_top (nnrc_to_nnrc_core q).
-
     Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Expands GroupBy For now XXX *)
       lift_nnrc_core (nnrc_to_java_top class_name imports) (nnrc_to_nnrc_core q).
 
@@ -364,7 +360,6 @@ Section CompDriver.
     | Dv_nnrc_to_nnrs : (* inputs *) list var -> nnrs_driver -> nnrc_driver
     | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
     | Dv_nnrc_to_dnnrc : (* inputs_loc *) vdbindings -> dnnrc_driver -> nnrc_driver
-    | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver
 
   with nnrc_core_driver : Set :=
@@ -639,7 +634,6 @@ Section CompDriver.
     | Dv_nnrc_to_nnrs inputs dv => 1 + driver_length_nnrs dv
     | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => 1 + driver_length_nnrcmr dv
     | Dv_nnrc_to_dnnrc inputs_loc dv => 1 + driver_length_dnnrc dv
-    | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
     | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
     end
 
@@ -952,9 +946,6 @@ Section CompDriver.
           | Dv_nnrc_to_dnnrc inputs_loc dv =>
             let q := nnrc_to_dnnrc inputs_loc q in
             compile_dnnrc dv q
-          | Dv_nnrc_to_javascript dv =>
-            let q := nnrc_to_javascript q in
-            compile_javascript dv q
           | Dv_nnrc_to_java class_name imports dv =>
             let q := nnrc_to_java class_name imports q in
             compile_java dv q
@@ -1476,10 +1467,10 @@ Section CompDriver.
       | Dv_nnrs dv => Dv_nnrc (Dv_nnrc_to_nnrs (vars_of_constants_config config.(comp_constants)) dv)
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (vdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_dnnrc dv => Dv_nnrc (Dv_nnrc_to_dnnrc (vdbindings_of_constants_config config.(comp_constants)) dv)
-      | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc config.(comp_optim_config)) dv)
       | Dv_nnrc_core dv => Dv_nnrc (Dv_nnrc_to_nnrc_core dv)
+      | Dv_javascript _
       | Dv_camp _
       | Dv_nraenv _
       | Dv_camp_rule _
@@ -1968,7 +1959,6 @@ Section CompDriver.
     | Dv_nnrc (Dv_nnrc_to_nnrs inputs dv) => (L_nnrc, Some (Dv_nnrs dv))
     | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
     | Dv_nnrc (Dv_nnrc_to_dnnrc inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc dv))
-    | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
     | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))
     | Dv_nnrc (Dv_nnrc_optim opc dv) => (L_nnrc, Some (Dv_nnrc dv))
     | Dv_nnrs_core (Dv_nnrs_core_to_nnrs dv) => (L_nnrs_core, Some (Dv_nnrs dv))
@@ -2396,9 +2386,6 @@ Section CompDriver.
         [eapply target_language_of_driver_is_postfix_dnnrc | | ]; simpl; trivial.
       subst.
       rewrite vdbindings_of_constants_config_commutes; reflexivity.
-    - eapply is_postfix_plus_one with
-      (config:=trivial_driver_config) (lang:=L_nnrc);
-        [eapply target_language_of_driver_is_postfix_javascript | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
@@ -5454,8 +5441,6 @@ Section CompDriver.
   Definition camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc
              (inputs_loc:vdbindings) (q:camp_rule) : dnnrc :=
     nnrc_to_dnnrc inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q)))))).
-  Definition camp_rule_to_nraenv_to_nnrc_optim_to_javascript (q:camp_rule) : string :=
-    nnrc_to_javascript (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q)))))).
   Definition camp_rule_to_nnrcmr (inputs_loc:vdbindings) (q:camp_rule) : nnrcmr :=
     nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (camp_rule_to_nraenv_to_nnrc_optim q)).
 

@@ -114,8 +114,6 @@ Module QDriver(runtime:CompilerRuntime).
     Definition camp_rule_to_nraenv_to_nnrc_optim : camp_rule -> nnrc := camp_rule_to_nraenv_to_nnrc_optim.
     Definition camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc :
       vdbindings -> camp_rule -> dnnrc := camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc.
-    Definition camp_rule_to_nraenv_to_nnrc_optim_to_javascript :
-      camp_rule -> string := camp_rule_to_nraenv_to_nnrc_optim_to_javascript.
     Definition camp_rule_to_nnrcmr : vdbindings -> camp_rule -> nnrcmr := camp_rule_to_nnrcmr.
 
   End QD.
