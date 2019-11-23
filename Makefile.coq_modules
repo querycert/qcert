@@ -277,12 +277,6 @@ MODULES = \
 	TechRule/TechRuleRuntime \
 	DesignerRule/Lang/DesignerRule \
 	DesignerRule/DesignerRuleRuntime \
-	CldMR/Lang/CldMRUtil \
-	CldMR/Lang/ForeignCloudant \
-	CldMR/Lang/CldMR \
-	CldMR/Lang/CldMRSanitize \
-	CldMR/CldMRRuntime \
-	CldMR/CldMRSystem \
 	LambdaNRA/Lang/LambdaNRA \
 	LambdaNRA/Lang/LambdaNRASugar \
 	LambdaNRA/Lang/LambdaNRAEq \
@@ -316,10 +310,7 @@ MODULES = \
 	SparkRDD/SparkRDDRuntime \
 	SparkDF/Lang/SparkDF \
 	SparkDF/SparkDFRuntime \
-	Cloudant/Lang/Cloudant \
-	Cloudant/CloudantRuntime \
 	Translation/ForeignToReduceOps \
-	Translation/ForeignToCloudant \
 	Translation/NRAtocNNRC \
 	Translation/cNRAEnvtocNNRC \
 	Translation/cNRAEnvtoNRA \
@@ -334,7 +325,6 @@ MODULES = \
 	Translation/NNRCtoDNNRC \
 	Translation/NNRCMRtoNNRC \
 	Translation/NNRCMRtoDNNRC \
-	Translation/NNRCMRtoCldMR \
 	Translation/DNNRCtotDNNRC \
 	Translation/TechRuletoCAMPRule \
 	Translation/DesignerRuletoCAMPRule \
@@ -351,7 +341,6 @@ MODULES = \
 	Translation/ForeignToJava \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \
-	Translation/CldMRtoCloudant \
 	Translation/NNRCtoNNRS \
 	Translation/TNNRCtoNNRS \
 	Translation/NNRStoNNRSimp \

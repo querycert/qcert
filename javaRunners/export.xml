@@ -8,8 +8,6 @@
         <fileset dir="bin"/>
       </jar>
       <copy todir="${dest}/lib">
-	<fileset file="lib/cloudant-client-1.2.3.jar"/>
-	<fileset file="lib/cloudant-client-1.2.3-sources.jar"/>
 	<fileset file="lib/commons-codec-1.9.jar"/>
 	<fileset file="lib/commons-codec-1.9-sources.jar"/>
 	<fileset file="lib/commons-collections-3.2.2.jar"/>

@@ -692,85 +692,6 @@ let pretty_nnrcmr greek margin annot inheritance link_runtime mr_chain =
     flush_str_formatter ()
   end
 
-(** Pretty CldMR *)
-
-let pretty_cldmr_map_aux sym ff cldmr_map =
-  begin match cldmr_map.QcertCompiler.map_fun0 with
-    | QcertCompiler.CldMapId f -> fprintf ff "map(@[%a@]) " (pretty_fun sym) f
-    | QcertCompiler.CldMapFlatten f -> fprintf ff "flatMap(@[%a@]) " (pretty_fun sym) f
-  end;
-  begin match cldmr_map.QcertCompiler.map_emit with
-    | QcertCompiler.CldEmitDist -> fprintf ff "emit distributed;"
-    | QcertCompiler.CldEmitCollect i -> fprintf ff "emit collect (%i);" i
-  end
-
-let pretty_cldmr_reduce_aux sym ff cldmr_reduce =
-  begin match cldmr_reduce.QcertCompiler.reduce_fun0 with
-    | QcertCompiler.CldRedId -> ()
-    | QcertCompiler.CldRedAggregate (f1,f2) ->
-	begin
-	  fprintf ff "reduceAggregate(@[%a@]);" (pretty_fun2 sym) f1;
-	  fprintf ff "@\n";
-	  fprintf ff "rereduce(@[%a@]);" (pretty_fun sym) f2
-	end
-    | QcertCompiler.CldRedOp op ->
-     let op_s = pretty_reduce_op_to_string (Obj.magic op)
-     in
-     fprintf ff "reduce(%s);" op_s
-  end;
-  begin match cldmr_reduce.QcertCompiler.reduce_output with
-    | None -> fprintf ff "output = NONE;"
-    | Some x -> fprintf ff "output = $v%s : distributed" (Util.string_of_char_list x)
-  end
-
-let pretty_cldmr_job_aux sym ff cldmr =
-  fprintf ff "@[<hv 0>input = $v%s : distributed;@\n"
-    (Util.string_of_char_list cldmr.QcertCompiler.cldmr_step_input);
-  pretty_cldmr_map_aux sym ff cldmr.QcertCompiler.cldmr_step_map;
-  fprintf ff "@\n";
-  begin match cldmr.QcertCompiler.cldmr_step_reduce with
-  | None -> ()
-  | Some red -> pretty_cldmr_reduce_aux sym ff red
-  end;
-  fprintf ff "@\n";
-  begin match cldmr.QcertCompiler.cldmr_step_reduce_default with
-  | None -> ()
-  | Some f -> fprintf ff "default(@[%a@]);" (pretty_default_fun sym) f
-  end
-
-let pretty_cldmr_chain sym ff cldmr_chain =
-  List.iter (fun cldmr ->
-    fprintf ff "----------------@\n";
-    fprintf ff "@[%a@]@\n" (pretty_cldmr_job_aux sym) cldmr;
-    fprintf ff "----------------@\n")
-    cldmr_chain
-
-let pretty_cldmr_last sym ff cldmr_last =
-  let ((params, n), args) = cldmr_last in
-  let pretty_param ff x =
-    fprintf ff "%s" (Util.string_of_char_list x)
-  in
-  let pretty_arg ff x =
-    fprintf ff "(%s: Distributed)" (Util.string_of_char_list x)
-  in
-  fprintf ff "@[<hov 2>(fun (%a) =>@ %a)@ (%a)@]"
-    (pretty_list pretty_param ",") params
-    (pretty_nnrc_aux 0 sym) n
-    (pretty_list pretty_arg ",") args
-
-let pretty_cldmr_aux sym ff mrl =
-  pretty_cldmr_chain sym ff mrl.QcertCompiler.cldmr_chain;
-  fprintf ff "@[%a@]" (pretty_cldmr_last sym) mrl.QcertCompiler.cldmr_last
-
-let pretty_cldmr greek margin annot inheritance link_runtime q =
-  let ff = str_formatter in
-  let sym = if greek then greeksym else textsym in
-  begin
-    pp_set_margin ff margin;
-    fprintf ff "@[%a@]@." (pretty_cldmr_aux sym) q;
-    flush_str_formatter ()
-  end
-
 (** Pretty DNNRC *)
 
 let rec pretty_dnnrc_aux ann plug p sym ff n =
@@ -926,16 +847,6 @@ let pretty_spark_rdd greek margin annot inheritance link_runtime q =
 
 let pretty_spark_df greek margin annot inheritance link_runtime q =
   Util.string_of_char_list q
-
-(** Pretty Cloudant *)
-
-let pretty_cloudant greek margin annot inheritance link_runtime q =
-  CloudantUtil.string_of_cloudant (CloudantUtil.link_js_runtime_top link_runtime inheritance q)
-
-(** Pretty CloudantWhisk *)
-
-let pretty_cloudant_whisk greek margin annot inheritance link_runtime q =
-  "(* There is no pretty printer for CloudantWhisk at the moment. *)\n"  (* XXX TODO XXX *)
 
 (** Pretty Error *)
 

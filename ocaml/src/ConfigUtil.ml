@@ -15,7 +15,6 @@
  *)
 
 open Util
-open CloudantUtil
 open DataUtil
 open QcertArg
 
@@ -101,14 +100,11 @@ let suffix_nnrcmr_spark_rdd () = "_nnrcmr_spark_rdd.txt"
 let suffix_nnrcmr_spark_rddsexp () = "_nnrcmr_spark_rdd.sexp"
 let suffix_nnrcmr_spark_df () = "_nnrcmr_spark_df.txt"
 let suffix_nnrcmr_spark_dfsexp () = "_nnrcmr_spark_df.sexp"
-let suffix_nnrcmr_cldmr () = "_nnrcmr_cldmr.txt"
-let suffix_nnrcmr_cldmrsexp () = "_nnrcmr_cldmr.sexp"
 let suffix_java () = ".java"
 let suffix_js_ast () = ".js_ast"
 let suffix_javascript () = ".js"
 let suffix_spark_rdd () = "_spark_rdd.scala"
 let suffix_spark_df () = "_spark_df.scala"
-let suffix_cld_design () = "_cloudant_design.json"
 let suffix_stats () = "_stats.json"
 let suffix_error () = ".error"
 
@@ -137,13 +133,11 @@ let suffix_of_language lang =
   | QcertCompiler.L_imp_qcert -> suffix_imp_qcert ()
   | QcertCompiler.L_imp_json -> suffix_imp_json ()
   | QcertCompiler.L_nnrcmr -> suffix_nnrcmr ()
-  | QcertCompiler.L_cldmr -> suffix_nnrcmr_cldmr ()
   | QcertCompiler.L_js_ast -> suffix_js_ast ()
   | QcertCompiler.L_javascript -> suffix_javascript ()
   | QcertCompiler.L_java -> suffix_java ()
   | QcertCompiler.L_spark_rdd -> suffix_spark_rdd ()
   | QcertCompiler.L_spark_df -> suffix_spark_df ()
-  | QcertCompiler.L_cloudant -> suffix_cld_design ()
   | QcertCompiler.L_error _ -> suffix_error ()
 
 (* let suffix_target conf = *)

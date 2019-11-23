@@ -99,8 +99,6 @@ let args_list gconf =
        " Print type annotations on ILs");
       ("-margin", Arg.Int (PrettyCommon.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
-      ("-cloudant-prefix", Arg.String (QcertArg.set_prefix gconf),
-       "<pref> Database prefix (only for Cloudant target)");
       ("-link-js-runtime", Arg.Unit (QcertArg.set_link_js_runtime gconf),
        " Link the JavaScript runtime (only for JavaScript and Cloudant targets)");
       ("-java-imports", Arg.String (QcertArg.set_java_imports gconf),
@@ -128,15 +126,13 @@ let languages =
     QcertCompiler.L_nnrs;
     QcertCompiler.L_nnrs_core;
     QcertCompiler.L_nnrcmr;
-    QcertCompiler.L_cldmr;
     QcertCompiler.L_dnnrc;
     QcertCompiler.L_dnnrc_typed;
     QcertCompiler.L_js_ast;
     QcertCompiler.L_javascript;
     QcertCompiler.L_java;
     QcertCompiler.L_spark_rdd;
-    QcertCompiler.L_spark_df;
-    QcertCompiler.L_cloudant; ]
+    QcertCompiler.L_spark_df; ]
 
 
 let languages_string =

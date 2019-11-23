@@ -981,181 +981,6 @@ let sexp_to_nnrcmr (se:sexp) : QLang.nnrcmr =
       raise (Qcert_Error "Not well-formed S-expr inside nrcmr")
   end
 
-(* CldMR section *)
-
-let cld_map_fun_to_sexp (mf:cld_map_fun) =
-  begin match mf with
-  | CldMapId f -> STerm ("CldMapId", (unary_fun_to_sexp f)::[])
-  | CldMapFlatten f -> STerm ("CldMapFlatten", (unary_fun_to_sexp f)::[])
-  end
-
-let sexp_to_cld_map_fun (se:sexp) : cld_map_fun =
-  begin match se with
-  | STerm ("CldMapId", sef::[]) -> CldMapId (sexp_to_unary_fun sef)
-  | STerm ("CldMapFlatten", sef::[]) -> CldMapFlatten (sexp_to_unary_fun sef)
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_map_fun")
-  end
-
-let cld_map_emit_to_sexp (me:cld_map_emit) =
-  begin match me with
-  | CldEmitDist -> STerm ("CldEmitDist", [])
-  | CldEmitCollect i -> STerm ("CldEmitCollect", (SInt i)::[])
-  end
-
-let sexp_to_cld_map_emit (se:sexp) : cld_map_emit =
-  begin match se with
-  | STerm ("CldEmitDist", []) -> CldEmitDist
-  | STerm ("CldEmitCollect", (SInt i)::[]) -> CldEmitCollect i
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_map_emit")
-  end
-
-let cld_numeric_type_to_sexp nt =
-  begin match nt with
-  | Cld_int -> SString "Cld_int"
-  | Cld_float -> SString "Cld_float"
-  end
-
-let sexp_to_cld_numeric_type se =
-  begin match se with
-  | SString "Cld_int" -> Cld_int
-  | SString "Cld_float" -> Cld_float
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_numeric_type")
-  end
-
-let cld_reduce_op_to_sexp se =
-  begin match se with
-  | CldRedOpCount -> STerm ("CldRedOpCount",[])
-  | CldRedOpSum nt -> STerm ("CldRedOpSum", (cld_numeric_type_to_sexp nt)::[])
-  | CldRedOpStats nt -> STerm ("CldRedOpStats", (cld_numeric_type_to_sexp nt)::[])
-  end
-
-let sexp_to_cld_reduce_op se =
-  begin match se with
-  | STerm ("CldRedOpCount",[]) -> CldRedOpCount
-  | STerm ("CldRedOpSum", nt::[]) -> CldRedOpSum (sexp_to_cld_numeric_type nt)
-  | STerm ("CldRedOpStats", nt::[]) -> CldRedOpStats (sexp_to_cld_numeric_type nt)
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_reduce_op")
-  end
-
-let cld_reduce_fun_to_sexp (rf:cld_reduce_fun) =
-  begin match rf with
-  | CldRedId -> STerm ("CldRedId", [])
-  | CldRedAggregate (fred,frered) -> STerm ("CldRedAggregate", (binary_fun_to_sexp fred)::(unary_fun_to_sexp frered)::[])
-  | CldRedOp ro -> STerm ("CldRedOp", (cld_reduce_op_to_sexp (Obj.magic ro))::[])
-  end
-
-let sexp_to_cld_reduce_fun (se:sexp) : cld_reduce_fun =
-  begin match se with
-  | STerm ("CldRedId", []) -> CldRedId
-  | STerm ("CldRedAggregate", fred::frered::[]) -> CldRedAggregate (sexp_to_binary_fun fred, sexp_to_unary_fun frered)
-  | STerm ("CldRedOp", ro::[]) -> CldRedOp (Obj.magic (sexp_to_cld_reduce_op ro))
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_reduce_fun")
-  end
-
-let cld_red_opt_to_sexp red =
-  begin match red with
-  | None -> []
-  | Some ff ->
-      (cld_reduce_fun_to_sexp ff.reduce_fun0) :: (STerm ("reduce_output", opt_var_to_sexp ff.reduce_output)) :: []
-  end
-
-let sexp_to_cld_red_opt sel =
-  begin match sel with
-  | [] -> None
-  | reduce :: (STerm ("reduce_output", reduce_out)) :: [] ->
-      Some { reduce_fun0 = sexp_to_cld_reduce_fun reduce;
-	     reduce_output = sexp_to_var_opt reduce_out }
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_reduce")
-  end
-
-let cld_reduce_default_to_sexp def =
-  begin match def with
-  | None -> []
-  | Some n -> (nnrc_to_sexp n) :: []
-  end
-
-let sexp_to_cld_reduce_default se =
-  begin match se with
-  | [] -> None
-  | n :: [] -> Some (sexp_to_nnrc n)
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_reduce_default")
-  end
-
-let cldmr_step_to_sexp (mr:cldmr_step) : sexp =
-  STerm ("cld_mr",
-	 (STerm ("cld_mr_input", (SString (string_of_char_list mr.cldmr_step_input))::[]))
-	 :: (STerm ("cld_mr_map", (cld_map_fun_to_sexp mr.cldmr_step_map.map_fun0)
-		    :: (cld_map_emit_to_sexp mr.cldmr_step_map.map_emit) :: []))
-	 :: (STerm ("cld_mr_reduce", cld_red_opt_to_sexp mr.cldmr_step_reduce))
-	 :: (STerm ("cld_mr_reduce_default", cld_reduce_default_to_sexp mr.cldmr_step_reduce_default))
-	 :: [])
-
-let sexp_to_cldmr_step (se:sexp) : cldmr_step =
-  begin match se with
-  | STerm ("cld_mr",
-	   (STerm ("cld_mr_input", (SString input)::[]))
-	   :: (STerm ("cld_mr_map", mapf::mape::[]))
-	   :: (STerm ("cld_mr_reduce", reduce_opt))
-	   :: (STerm ("cld_mr_reduce_default", default))
-	   :: [])
-    ->
-      { cldmr_step_input = char_list_of_string input;
-	cldmr_step_map = { map_fun0 = sexp_to_cld_map_fun mapf;
-		       map_emit = sexp_to_cld_map_emit mape };
-	cldmr_step_reduce = sexp_to_cld_red_opt reduce_opt;
-        cldmr_step_reduce_default = sexp_to_cld_reduce_default default }
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_mr")
-  end
-
-let cldmr_chain_to_sexp (mrl:cldmr_step list) : sexp list =
-  List.map cldmr_step_to_sexp mrl
-
-let sexp_to_cldmr_chain (sel:sexp list) : cldmr_step list =
-  List.map sexp_to_cldmr_step sel
-
-
-let cldmr_last_to_sexp (last: (var list * QLang.nnrc) * var list) : sexp list =
-  begin match last with
-  | (f, vars)
-    ->
-      (fun_to_sexp f) :: (var_list_to_sexp vars)
-  end
-
-let sexp_to_cldmr_last (sel:sexp list) : (var list * QLang.nnrc) * var list =
-  begin match sel with
-  | f :: vars ->
-      (sexp_to_fun f, sexp_to_var_list vars)
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cldmr_last")
-  end
-
-let cldmr_to_sexp (c:QLang.cldmr) : sexp =
-  STerm ("cldmr",
-	  (STerm ("cld_mr_chain", cldmr_chain_to_sexp c.cldmr_chain))
-	  :: (STerm ("cld_mr_last", cldmr_last_to_sexp c.cldmr_last))
-	  :: [])
-
-let sexp_to_cldmr (se:sexp) : QLang.cldmr =
-  begin match se with
-  | STerm ("cld_mrl",
-	   (STerm ("cld_mr_chain", chain))
-	   :: (STerm ("cld_mr_last", last))
-	   :: [])
-    ->
-      { cldmr_chain = sexp_to_cldmr_chain chain;
-	cldmr_last = sexp_to_cldmr_last last }
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cldmr")
-  end
-
 (* SQL Section *)
 
 let rec sexp_to_sql_query (se : sexp) =
@@ -2032,7 +1857,6 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_imp_qcert -> Q_nnrs_imp (sexp_to_imp_qcert se)
   | L_imp_json -> Q_nnrs_imp (sexp_to_imp_json se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
-  | L_cldmr -> Q_cldmr (sexp_to_cldmr se)
   | L_dnnrc ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_dnnrc_typed ->
@@ -2041,8 +1865,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_javascript
   | L_java
   | L_spark_rdd
-  | L_spark_df
-  | L_cloudant ->
+  | L_spark_df ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_error err ->
       raise (Qcert_Error ("sexp_to_query: "^(Util.string_of_char_list err)))
@@ -2076,7 +1899,6 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_imp_qcert q -> imp_qcert_to_sexp q
   | Q_imp_json q -> imp_json_to_sexp q
   | Q_nnrcmr q -> nnrcmr_to_sexp q
-  | Q_cldmr q -> cldmr_to_sexp q
   | Q_dnnrc _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_dnnrc_typed _ ->
@@ -2090,8 +1912,6 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_spark_rdd _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_spark_df _ ->
-      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Q_cloudant _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_error err ->
       SString ("query_to_sexp: "^(Util.string_of_char_list err))

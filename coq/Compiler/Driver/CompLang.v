@@ -38,7 +38,6 @@ Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
 Require Import ImpRuntime.
 Require Import NNRCMRRuntime.
-Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
 Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
@@ -48,7 +47,6 @@ Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
-Require Import CloudantRuntime.
 
 Require Import NNRCMRtoDNNRC.
 Require Import DNNRCTypes.
@@ -75,7 +73,6 @@ Section CompLang.
     | L_imp_qcert : language
     | L_imp_json : language
     | L_nnrcmr : language
-    | L_cldmr : language
     | L_dnnrc : language
     | L_dnnrc_typed : language
     | L_js_ast : language
@@ -83,7 +80,6 @@ Section CompLang.
     | L_java : language
     | L_spark_rdd : language
     | L_spark_df : language
-    | L_cloudant : language
     | L_error : string -> language.
 
     Lemma language_eq_dec : EqDec language eq.
@@ -124,7 +120,6 @@ Section CompLang.
       | "imp_qcert"%string => L_imp_qcert
       | "imp_json"%string => L_imp_json
       | "nnrcmr"%string => L_nnrcmr
-      | "cldmr"%string => L_cldmr
       | "dnnrc"%string => L_dnnrc
       | "dnnrc_typed"%string => L_dnnrc_typed
       | "js_ast"%string => L_js_ast
@@ -132,7 +127,6 @@ Section CompLang.
       | "java"%string => L_java
       | "spark_rdd"%string => L_spark_rdd
       | "spark_df"%string | "spark_dataset"%string => L_spark_df
-      | "cloudant"%string => L_cloudant
       | "error"%string => L_error ""
       | _ => L_error ("'"++name++"' is not a language name")
       end.
@@ -158,7 +152,6 @@ Section CompLang.
       | L_imp_qcert => "imp_qcert"%string
       | L_imp_json => "imp_json"%string
       | L_nnrcmr => "nnrcmr"%string
-      | L_cldmr => "cldmr"%string
       | L_dnnrc => "dnnrc"%string
       | L_dnnrc_typed => "dnnrc_typed"%string
       | L_js_ast => "js_ast"%string
@@ -166,7 +159,6 @@ Section CompLang.
       | L_java => "java"%string
       | L_spark_rdd => "spark_rdd"%string
       | L_spark_df => "spark_df"%string
-      | L_cloudant => "cloudant"%string
       | L_error _ => "error"%string
       end.
 
@@ -222,7 +214,6 @@ Section CompLang.
         :: (L_imp_qcert,BackEnd,"ImpQcert", "Imperative langauge with Q*cert data model")
         :: (L_imp_json,BackEnd,"ImpJson", "Imperative langauge with json data model")
         :: (L_nnrcmr,DistrEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
-        :: (L_cldmr,DistrEnd,"CldMR", "Named Nested Relational Calculus with Cloudant Map/Reduce")
         :: (L_dnnrc,DistrEnd,"DNNRC", "Distributed Named Nested Relational Calculus")
         :: (L_dnnrc_typed,DistrEnd,"tDNNRC", "Typed Distributed Named Nested Relational Calculus")
         :: (L_js_ast,BackEnd,"JsAst", "JavaScript AST")
@@ -230,7 +221,6 @@ Section CompLang.
         :: (L_java,BackEnd,"Java", "Java")
         :: (L_spark_rdd,BackEnd,"SparkRDD", "Spark (RDDs API)")
         :: (L_spark_df,BackEnd,"SparkDF", "Spark (DataFrames API)")
-        :: (L_cloudant,BackEnd,"Cloudant", "Cloudant Map/Reduce Views")
         :: nil.
 
     Definition add_id_to_language_description (ld:language * language_kind * string * string) :=
@@ -323,7 +313,6 @@ Section CompLang.
     Definition imp_json_stmt := imp_json_stmt.
     Definition imp_json := imp_json.
     Definition nnrcmr := nnrcmr.
-    Definition cldmr := cldmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
     Definition js_ast := list funcdecl.
@@ -331,7 +320,6 @@ Section CompLang.
     Definition java := java.
     Definition spark_rdd := spark_rdd.
     Definition spark_df := spark_df.
-    Definition cloudant := cloudant.
 
     Inductive query : Set :=
     | Q_camp_rule : camp_rule -> query
@@ -353,7 +341,6 @@ Section CompLang.
     | Q_imp_qcert : imp_qcert -> query
     | Q_imp_json : imp_json -> query
     | Q_nnrcmr : nnrcmr -> query
-    | Q_cldmr : cldmr -> query
     | Q_dnnrc : dnnrc -> query
     | Q_dnnrc_typed : dnnrc_typed -> query
     | Q_js_ast : js_ast -> query
@@ -361,7 +348,6 @@ Section CompLang.
     | Q_java : java -> query
     | Q_spark_rdd : spark_rdd -> query
     | Q_spark_df : spark_df -> query
-    | Q_cloudant : cloudant -> query
     | Q_error : string -> query.
 
     Tactic Notation "query_cases" tactic(first) ident(c) :=
@@ -385,7 +371,6 @@ Section CompLang.
       | Case_aux c "Q_imp_qcert"%string
       | Case_aux c "Q_imp_json"%string
       | Case_aux c "Q_nnrcmr"%string
-      | Case_aux c "Q_cldmr"%string
       | Case_aux c "Q_dnnrc"%string
       | Case_aux c "Q_dnnrc_typed"%string
       | Case_aux c "Q_js_ast"%string
@@ -393,7 +378,6 @@ Section CompLang.
       | Case_aux c "Q_java"%string
       | Case_aux c "Q_spark_rdd"%string
       | Case_aux c "Q_spark_df"%string
-      | Case_aux c "Q_cloudant"%string
       | Case_aux c "Q_error"%string].
 
     Definition language_of_query q :=
@@ -417,7 +401,6 @@ Section CompLang.
       | Q_imp_qcert _ => L_imp_qcert
       | Q_imp_json _ => L_imp_json
       | Q_nnrcmr _ => L_nnrcmr
-      | Q_cldmr _ => L_cldmr
       | Q_dnnrc _ => L_dnnrc
       | Q_dnnrc_typed _ => L_dnnrc_typed
       | Q_js_ast _ => L_js_ast
@@ -425,7 +408,6 @@ Section CompLang.
       | Q_java _ => L_java
       | Q_spark_rdd _ => L_spark_rdd
       | Q_spark_df _ => L_spark_df
-      | Q_cloudant _ => L_cloudant
       | Q_error err =>
         L_error ("No language corresponding to error query '"++err++"'")
       end.
@@ -455,7 +437,6 @@ Section CompLang.
       | L_imp_qcert => imp_qcert
       | L_imp_json => imp_json
       | L_nnrcmr => nnrcmr
-      | L_cldmr => cldmr
       | L_dnnrc => dnnrc
       | L_dnnrc_typed => dnnrc_typed
       | L_js_ast => js_ast
@@ -463,7 +444,6 @@ Section CompLang.
       | L_java => java
       | L_spark_rdd => spark_rdd
       | L_spark_df => spark_df
-      | L_cloudant => cloudant
       | L_error _ => string
       end.
   End Query.
@@ -491,7 +471,6 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_imp_qcert"%string
   | Case_aux c "L_imp_json"%string
   | Case_aux c "L_nnrcmr"%string
-  | Case_aux c "L_cldmr"%string
   | Case_aux c "L_dnnrc"%string
   | Case_aux c "L_dnnrc_typed"%string
   | Case_aux c "L_js_ast"%string
@@ -499,6 +478,5 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_java"%string
   | Case_aux c "L_spark_rdd"%string
   | Case_aux c "L_spark_df"%string
-  | Case_aux c "L_cloudant"%string
   | Case_aux c "L_error"%string].
 

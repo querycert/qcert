@@ -42,7 +42,6 @@ val parse_nraenv_sexp : Lexing.lexbuf -> QLang.nraenv_core
 val parse_nnrc_sexp : Lexing.lexbuf -> QLang.nnrc
 val parse_nnrs_sexp : Lexing.lexbuf -> QLang.nnrs
 val parse_nnrcmr_sexp : Lexing.lexbuf -> QLang.nnrcmr
-val parse_cldmr_sexp : Lexing.lexbuf -> QLang.cldmr
 
 (*******************
  * Languages Parse *

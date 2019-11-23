@@ -27,15 +27,12 @@ Require Import ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
-Require Import ForeignCloudant.
-Require Import ForeignToCloudant.
 Require Import CompilerRuntime.
 Require Import CompilerModel.
 Require Import StringModelPart. 
 Require Import DateTimeModelPart.
 Require Import SqlDateModelPart.
 Require NNRCMR.
-Require CldMR.
 Require Import OptimizerLogger.
 Require Import String.
 Require Import cNRAEnv.
@@ -600,13 +597,6 @@ Instance enhanced_foreign_to_scala {ftype: foreign_type}:
     decide equality.
   Defined.
 
-  Definition enhanced_to_cld_numeric_type
-             (typ:enhanced_numeric_type) : CldMR.cld_numeric_type
-    := match typ with
-       | enhanced_numeric_int => CldMR.Cld_int
-       | enhanced_numeric_float => CldMR.Cld_float
-       end.
-
 Inductive enhanced_reduce_op
   := RedOpCount : enhanced_reduce_op
    | RedOpSum (typ:enhanced_numeric_type) : enhanced_reduce_op
@@ -977,125 +967,6 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
        enhanced_foreign_reduce_op
        enhanced_to_spark_reduce_op
        to_spark_nnrcmr.
-
-Instance enhanced_foreign_cloudant : foreign_cloudant
-  := mk_foreign_cloudant
-       enhanced_foreign_runtime
-       (OpFloatSum)
-       (OpFloatBagMin)
-       (OpFloatBagMax).
-
-Definition enhanced_to_cloudant_reduce_op
-           (rop:enhanced_reduce_op) : CldMR.cld_reduce_op
-  := match rop with
-     | RedOpCount => CldMR.CldRedOpCount
-     | RedOpSum typ => CldMR.CldRedOpSum (enhanced_to_cld_numeric_type typ)
-     | RedOpStats typ => CldMR.CldRedOpStats (enhanced_to_cld_numeric_type typ)
-     | RedOpMin _ => CldMR.CldRedOpStats CldMR.Cld_int (* assert false *)
-     | RedOpMax _ => CldMR.CldRedOpStats CldMR.Cld_int (* assert false *)
-     | RedOpArithMean _ => CldMR.CldRedOpStats CldMR.Cld_int (* assert false *)
-     end.
-
-  (* Java equivalent: MROptimizer.foreign_to_cloudant_prepare_nnrcmr *)
-  Definition to_cloudant_nnrcmr (l: nnrcmr) :=
-    let avoid := get_nnrcmr_vars l in
-    let l := apply_rewrite (min_max_to_stats avoid) l in
-    let l := apply_rewrite (arithmean_to_stats avoid) l in
-    l.
-
-  Definition to_cloudant_nnrcmr_prepared (src:nnrcmr)
-    := min_max_free_nnrcmr src /\ arithmean_free_nnrcmr src.
-
-  Program Instance enhanced_foreign_to_cloudant : foreign_to_cloudant
-    :=
-      { foreign_to_cloudant_reduce_op := enhanced_to_cloudant_reduce_op
-        ; foreign_to_cloudant_prepare_nnrcmr := to_cloudant_nnrcmr
-        ; foreign_to_cloudant_nnrcmr_prepared := to_cloudant_nnrcmr_prepared
-      }.
-  Next Obligation.
-    unfold to_cloudant_nnrcmr.
-    unfold to_cloudant_nnrcmr_prepared.
-    unfold min_max_free_nnrcmr, min_max_free_mr_chain, min_max_free_mr, min_max_free_reduce.
-    split.
-    - unfold apply_rewrite, min_max_to_stats.
-      unfold mr_chain_apply_rewrite.
-      apply Forall_forall; intros ? inn.
-      simpl in *.
-      apply in_flat_map in inn.
-      destruct inn as [? [inn1 inn2]].
-      destruct x; simpl.
-      destruct mr_reduce; simpl in *;
-        unfold min_max_free_mr;
-        simpl;
-      trivial.
-      destruct r; simpl in *; trivial.
-      destruct x0; simpl in *.
-      destruct mr_reduce; simpl in *;
-        try solve [invcs inn2; invcs H].
-      destruct r; simpl in * .
-      destruct f0; simpl in *.
-      + intuition.
-        invcs H; trivial.
-      + intuition.
-        invcs H; trivial.
-      + apply in_flat_map in inn1.
-        destruct inn1 as [? [inn1 inn3]].
-        destruct x.
-        simpl in inn3.
-        destruct mr_reduce
-        ; try solve [simpl in inn3; intuition
-                     ; invcs H].
-        destruct r; destruct f0
-        ; simpl in inn3; intuition
-        ; invcs H0
-        ; try solve [invcs H | invcs H1].
-      + apply in_flat_map in inn1.
-        destruct inn1 as [? [inn1 inn3]].
-        destruct x.
-        simpl in inn3.
-        destruct mr_reduce
-        ; try solve [simpl in inn3; intuition
-                     ; invcs H].
-        destruct r; destruct f0
-        ; simpl in inn3; intuition
-        ; invcs H0
-        ; try solve [invcs H | invcs H1].
-      + intuition.
-        invcs H; trivial.
-        intuition.
-        invcs H0; trivial.
-      + intuition.
-        invcs H; trivial.
-    - unfold apply_rewrite, mr_chain_apply_rewrite, arithmean_free_nnrcmr, arithmean_free_mr_chain.
-      simpl in *.
-      apply Forall_forall; intros ? inn.
-      apply in_flat_map in inn.
-      destruct inn as [? [inn1 inn2]].
-      destruct x; simpl.
-      destruct mr_reduce; simpl in *;
-        unfold arithmean_free_mr;
-        simpl;
-      trivial.
-      destruct r; simpl in *; trivial.
-      destruct x0; simpl in *.
-      destruct mr_reduce; simpl in *;
-        try solve [invcs inn2; invcs H].
-      destruct r; simpl in * .
-      destruct f0; simpl in *.
-      + intuition.
-        invcs H; trivial.
-      + intuition.
-        invcs H; trivial.
-      + intuition.
-        invcs H; trivial.
-      + intuition.
-        invcs H; trivial.
-      + intuition.
-        invcs H; trivial.
-        invcs H0; trivial.
-      + intuition.
-        invcs H; trivial.
-  Qed.
 
   (* nra optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_nraenv_token_type : Set.
@@ -1496,10 +1367,6 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_reduce_op.
   Definition compiler_foreign_to_spark : foreign_to_spark
     := enhanced_foreign_to_spark.
-  Definition compiler_foreign_cloudant : foreign_cloudant
-    := enhanced_foreign_cloudant.
-  Definition compiler_foreign_to_cloudant : foreign_to_cloudant
-    := enhanced_foreign_to_cloudant.
   Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
     := foreign_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
@@ -2191,10 +2058,6 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_reduce_op.
   Definition compiler_model_foreign_to_spark : foreign_to_spark
     := enhanced_foreign_to_spark.
-  Definition compiler_model_foreign_cloudant : foreign_cloudant
-    := enhanced_foreign_cloudant.
-  Definition compiler_model_foreign_to_cloudant : foreign_to_cloudant
-    := enhanced_foreign_to_cloudant.
   Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
     := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc

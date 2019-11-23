@@ -26,8 +26,6 @@ Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
-Require Import ForeignCloudant.
-Require Import ForeignToCloudant.
 Require Import OptimizerLogger.
 Require Import ForeignType.
 Require Import ForeignDataTyping.
@@ -51,8 +49,6 @@ Module Type CompilerModel.
   Axiom compiler_model_foreign_reduce_op : foreign_reduce_op.
   Axiom compiler_model_foreign_to_reduce_op : foreign_to_reduce_op.
   Axiom compiler_model_foreign_to_spark : foreign_to_spark.
-  Axiom compiler_model_foreign_cloudant : foreign_cloudant.
-  Axiom compiler_model_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
   Axiom compiler_model_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
@@ -85,10 +81,6 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := model.compiler_model_foreign_to_reduce_op.
   Definition compiler_foreign_to_spark : foreign_to_spark
     := model.compiler_model_foreign_to_spark.
-  Definition compiler_foreign_cloudant : foreign_cloudant
-    := model.compiler_model_foreign_cloudant.
-  Definition compiler_foreign_to_cloudant : foreign_to_cloudant
-    := model.compiler_model_foreign_to_cloudant.
   Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
     :=  model.compiler_model_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc

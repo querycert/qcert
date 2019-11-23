@@ -39,7 +39,6 @@ Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
 Require Import ImpRuntime.
 Require Import NNRCMRRuntime.
-Require Import CldMRRuntime.
 Require Import DNNRCRuntime.
 Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
@@ -49,13 +48,10 @@ Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkRDDRuntime.
 Require Import SparkDFRuntime.
-Require Import CloudantRuntime.
 
 (* Foreign Support *)
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
-Require Import ForeignCloudant.
-Require Import ForeignToCloudant.
 
 (* Compiler Driver *)
 Require Import CompLang.
@@ -69,7 +65,6 @@ Section CompEval.
 
   Context {fruntime:foreign_runtime}.   (* Necessary for everything, including data *)
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
-  Context {fcloudant:foreign_cloudant}. (* Necessary for CldMR evaluation *)
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)
   Context {ftjson:foreign_to_JSON}.     (* Necessary for ImpJson evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
@@ -144,10 +139,6 @@ Section CompEval.
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=
       NNRCMR.nnrcmr_eval_top h init_vinit q dcenv.
 
-    (* Language: cldmr *)
-    Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data :=
-      CldMR.cldmr_eval_top h init_vinit q cenv.
-
     (* Language: dnnrc *)
     Definition eval_dnnrc (q:dnnrc) (cenv: dbindings) : option data :=
       DNNRC.dnnrc_eval_top h q cenv.
@@ -198,7 +189,6 @@ Section CompEval.
       | Q_imp_qcert q => lift_output (eval_imp_qcert q (lift_input ev_in))
       | Q_imp_json q => lift_output (eval_imp_json q (lift_input ev_in))
       | Q_nnrcmr q => lift_output (eval_nnrcmr q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
-      | Q_cldmr q => lift_output (eval_cldmr q (lift_input ev_in))
       | Q_dnnrc q => lift_output (eval_dnnrc q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
       | Q_dnnrc_typed q => lift_output (eval_dnnrc_typed q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
       | Q_js_ast _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q))) (* XXX TODO XXX *)
@@ -206,7 +196,6 @@ Section CompEval.
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_rdd _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_cloudant _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       end.
 
@@ -231,7 +220,6 @@ Section CompEval.
       | Q_imp_qcert _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_imp_json _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_dnnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_dnnrc_typed _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_js_ast _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
@@ -239,7 +227,6 @@ Section CompEval.
       | Q_java _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_rdd _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_cloudant _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       end.
 
@@ -321,9 +308,6 @@ Section CompEval.
 
     Definition eval_nnrcmr_world (q:nnrcmr) (world:list data) : option data :=
       eval_nnrcmr q (mkDistWorld world). (* XXX Creates a distributed WORLD collection XXX *)
-
-    Definition eval_cldmr_world (q:cldmr) (world:list data) : option data :=
-      eval_cldmr q (mkWorld world).
 
     Definition eval_dnnrc_world (q:dnnrc) (world:list data) : option data :=
       eval_dnnrc q (mkDistWorld world).

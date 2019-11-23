@@ -51,7 +51,6 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_nnrs : nnrs -> constant_env -> option data := @eval_nnrs _ h.
 
   Definition eval_nnrcmr : nnrcmr -> dconstant_env -> option data := @eval_nnrcmr _ _ h.
-  Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.
   Definition eval_dnnrc {bm:brand_model} : dnnrc -> dconstant_env -> option data := @eval_dnnrc _ _ h.
 
   (* Eval driver *)
@@ -59,7 +58,7 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_input : Set := eval_input.
   Definition eval_output : Set := eval_output.
 
-  Definition eval_query {bm:brand_model} : query -> eval_input -> eval_output := @eval_query _ _ _ _ _ bm h.
+  Definition eval_query {bm:brand_model} : query -> eval_input -> eval_output := @eval_query _ _ _ _ bm h.
 
   Definition eval_query_debug {bm:brand_model} : query -> eval_input -> eval_output := @eval_query_debug _ _ _ _ h.
 
@@ -80,7 +79,6 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_nnrc_world : nnrc -> world_env -> option data := @eval_nnrc_world _ h.
 
   Definition eval_nnrcmr_world : nnrcmr -> world_env -> option data := @eval_nnrcmr_world _ _ h.
-  Definition eval_cldmr_world : cldmr -> world_env -> option data := @eval_cldmr_world _ _ h.
   Definition eval_dnnrc_world {bm:brand_model} : dnnrc -> world_env -> option data := @eval_dnnrc_world _ _ h.
   End QE.
 
