@@ -75,7 +75,7 @@ Section ImpJsontoJavaScriptAst.
       | OpRecRemove s => mk_imp_json_runtime_call JSONRuntimeRemove [e; mk_string (json_key_encode s)]
       | OpRecProject fl =>
         mk_imp_json_runtime_call
-          JSONRuntimeProject ((List.map mk_string fl) ++ [e])
+          JSONRuntimeProject ([e] ++ (List.map mk_string fl))
       | OpBag => mk_bag el
       | OpSingleton => mk_imp_json_runtime_call JSONRuntimeSingleton el
       | OpFlatten => mk_imp_json_runtime_call JSONRuntimeFlatten el
