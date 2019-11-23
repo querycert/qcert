@@ -79,7 +79,7 @@ oql-tests:
 	@$(MAKE) oql-world-tests
 	@$(MAKE) oql-persons-tests
 	@$(MAKE) oql-employees-tests
-ifneq ($(JAVA),)
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) oql-string-tests-js
 	@$(MAKE) oql-world-tests-js
 	@$(MAKE) oql-persons-tests-js
@@ -213,7 +213,7 @@ lambda_nra-tests:
 	@echo "[Q*cert] λ-NRA tests"
 	@echo "[Q*cert] "
 	@$(MAKE) lambda_nra-persons-tests
-ifneq ($(JAVA),)
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) lambda_nra-persons-tests-js
 endif
 ifneq ($(JAVA),)
@@ -257,7 +257,7 @@ camp-tests:
 	@echo "[Q*cert] CAMP tests"
 	@echo "[Q*cert] "
 	@$(MAKE) camp-world-tests
-ifneq ($(JAVA),)
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) camp-world-tests-js
 endif
 ifneq ($(JAVA),)
@@ -301,7 +301,7 @@ sql-tests:
 	@echo "[Q*cert] SQL tests"
 	@echo "[Q*cert] "
 	@$(MAKE) sql-org-tests
-ifneq ($(JAVA),)
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) sql-org-tests-js
 endif
 ifneq ($(JAVA),)
@@ -346,7 +346,7 @@ tech_rule-tests:
 	@echo "[Q*cert] ODM Tech Rules tests"
 	@echo "[Q*cert] "
 	@$(MAKE) tech_rule-test-tests
-ifneq ($(JAVA),)
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) tech_rule-test-tests-js
 endif
 ifneq ($(JAVA),)
@@ -390,7 +390,7 @@ designer_rule-tests:
 	@echo "[Q*cert] ODM Designer Rules tests"
 	@echo "[Q*cert] "
 	@$(MAKE) designer_rule-test-tests
-ifneq ($(JAVA),)
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) designer_rule-test-tests-js
 endif
 

@@ -62,9 +62,9 @@ $(DEPENDENCIES):
 	ant -f getDependencies.xml
 
 clean:
-	@rm -rf bin/*
+	rm -rf bin/*
 
 cleanall: clean
-	@rm -f $(DEPENDENCIES)
-	@rm -f lib/*.jar
+	rm -f $(DEPENDENCIES)
+	rm -f lib/*.jar
 
