@@ -49,7 +49,6 @@ Require Import CompilerRuntime.
 Require Import CommonSystem.
 
 Require Import ForeignToJavaScript.
-Require Import NNRCtoJavaScript.
 Require Import OptimizerLogger.
 Require Import CompLang.
 Require Import CompDriver.
@@ -464,7 +463,7 @@ Section CompStat.
         | Q_error q => stat_error q
         end
     in
-    dataToJS quotel_double stat.
+    jsonToJS quotel_double (data_to_json stat).
 
   Definition json_stat_tree_of_query (qname:string) (q:query) : string :=
     let stat :=
@@ -497,11 +496,10 @@ Section CompStat.
         | Q_error q => stat_tree_error q
         end
     in
-    dataToJS quotel_double
-             (drec
-                (("name", dstring qname)
-                   :: ("stats", stat)
-                   :: nil)).
+    jsonToJS quotel_double
+             (data_to_json (drec
+                              (("name", dstring qname)
+                                 :: ("stats", stat)
+                                 :: nil))).
 
 End CompStat.
-

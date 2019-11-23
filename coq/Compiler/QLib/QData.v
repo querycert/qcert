@@ -19,7 +19,6 @@ Require String.
 Require Data.
 Require JSON.
 Require DatatoJSON.
-Require NNRCtoJavaScript.
 Require Import String.
 
 Module QData(runtime:CompilerRuntime).
@@ -76,16 +75,16 @@ Module QData(runtime:CompilerRuntime).
   
   (** data -> JSON *string* conversion *)
   Definition qdataToJS s : qdata -> String.string 
-    := NNRCtoJavaScript.dataToJS s.
+    := (fun d => JSON.jsonToJS s (DatatoJSON.data_to_json d)).
 
   Definition jsonToJS s : JSON.json -> String.string 
     := JSON.jsonToJS s.
 
   Definition data_to_string : qdata -> String.string
-    := qdataToJS """"%string.
+    := qdataToJS JSONUtil.quotel_double.
   
   Definition json_to_string : JSON.json -> String.string
-    := jsonToJS """"%string.
+    := jsonToJS JSONUtil.quotel_double.
 
   Section dist.
     Import DData.
