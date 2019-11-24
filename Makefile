@@ -178,7 +178,6 @@ qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 
 clean-demo:
 	- @rm -f doc/demo/demo.js doc/demo/demo.js.map
-	- @rm -f doc/demo/qcertWhiskDispatch.js doc/demo/qcertWhiskDispatch.js.map
 
 cleanall-demo: clean-demo
 	- @rm -rf doc/demo/node_modules

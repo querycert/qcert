@@ -28,7 +28,6 @@ deploy:
 	$(CP) qcertsite.css $(QUERYCERTDOTIO)
 	$(CP) index.html $(QUERYCERTDOTIO)
 	$(CP) demo.html $(QUERYCERTDOTIO)
-	$(CP) demo-openwhisk.html $(QUERYCERTDOTIO)
 	$(CP) doc.html $(QUERYCERTDOTIO)
 	mkdir -p $(QUERYCERTDOTIO)/figure
 	$(CP) figure/figure.svg figure/figure.png figure/figure.pdf $(QUERYCERTDOTIO)/figure
