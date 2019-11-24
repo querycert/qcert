@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_javaservice_artifacts" name="Export artifacts from javaService project">
-	<!-- This script creates three sets of artifacts.  (1) Jar files in the local QCert binary directory.
-	(2) A 'javaService.zip' to be deployed as a long-running server in some convenient location (to support demo.html).
-	(3) A 'qcertJavaWhiskAction.jar' to be deployed as a whisk action (an alternative to the previous). -->
+	<!-- This script creates two sets of artifacts.  (1) Jar files in the local QCert binary directory.
+	(2) A 'javaService.zip' to be deployed as a long-running server in some convenient location (to support demo.html). -->
 	
 	<!-- The target directory for the JavaService artifacts that support local execution -->
 	<property name="dest" value="../bin"/>
@@ -45,13 +44,5 @@
 		<zip destfile="javaService.zip">
 			<fileset dir="${dest}" includes="**/*.jar"/>
 		</zip>
-		
-		<!-- Build the whisk action jar.  This requires merging dependent jars for those dependencies that will be needed for whisk.
-		This is not _all_ of the dependencies, since some of them are only to support the long-running server deployment.
-		For the moment, we also omit the JRules dependencies since the whisk action is destined to always be public. -->
-		<delete file="qcertJavaWhiskAction.jar"/>
-		<jar destfile="qcertJavaWhiskAction.jar">
-			<zipgroupfileset dir ="${dest}" includesfile="whiskJars"/>
-		</jar>
-    </target>
+	</target>
 </project>
