@@ -25,7 +25,7 @@ endif
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
-CPATH=$(subst $(BLANK),$(PATH_SEP),../runtimes/java/bin ../bin/javaRunners.jar ../bin/lib/*)
+CPATH=$(subst $(BLANK),$(PATH_SEP),../backends/java/bin ../bin/javaRunners.jar ../bin/lib/*)
 JAVAC=javac
 JAVARUN=java
 
@@ -104,7 +104,7 @@ oql-string-tests-js:
 	       $(QCERTCOMP) -source oql -target js oql/string$(N).oql \
                             -eval-validate -schema oql/string.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input oql/string.input \
                           -schema oql/string.schema \
                           -output oql/string$(N).out \
@@ -132,7 +132,7 @@ oql-world-tests-js:
 	       $(QCERTCOMP) -source oql -target js oql/world$(N).oql \
                             -eval-validate -schema oql/world.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input oql/world.input \
                           -schema oql/world.schema \
                           -output oql/world$(N).out \
@@ -160,7 +160,7 @@ oql-persons-tests-js:
 	       $(QCERTCOMP) -source oql  -target js oql/persons$(N).oql \
                             -eval-validate -schema oql/persons.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input oql/persons.input \
                           -schema oql/persons.schema \
                           -output oql/persons$(N).out \
@@ -188,7 +188,7 @@ oql-employees-tests-js:
 	       $(QCERTCOMP) -source oql  -target js oql/employees$(N).oql \
                             -eval-validate -schema oql/employees.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input oql/employees.input \
                           -schema oql/employees.schema \
                           -output oql/employees$(N).out \
@@ -232,7 +232,7 @@ lambda_nra-persons-tests-js:
 	       $(QCERTCOMP) -source lambda_nra  -target js lambda_nra/persons$(N).lnra \
                             -eval-validate -schema lambda_nra/persons.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input lambda_nra/persons.input \
                           -schema lambda_nra/persons.schema \
                           -output lambda_nra/persons$(N).out \
@@ -276,7 +276,7 @@ camp-world-tests-js:
 	       $(QCERTCOMP) -source camp  -target js camp/world$(N).camp \
                             -eval-validate -schema camp/world.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input camp/world.input \
                           -schema camp/world.schema \
                           -output camp/world$(N).out \
@@ -320,7 +320,7 @@ sql-org-tests-js:
 	       $(QCERTCOMP) -source sql  -target js sql/org$(N).sql \
                             -eval-validate -schema sql/org.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input sql/org.input \
                           -schema sql/org.schema \
                           -output sql/org$(N).out \
@@ -365,7 +365,7 @@ tech_rule-test-tests-js:
 	       $(QCERTCOMP) -source tech_rule  -target js tech_rule/test$(N).arl \
                             -eval-validate -schema tech_rule/test.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input tech_rule/test.input \
                           -schema tech_rule/test.schema \
                           -output tech_rule/test$(N).out \
@@ -406,7 +406,7 @@ designer_rule-test-tests-js:
 	       $(QCERTCOMP) -source designer_rule -target js designer_rule/test$(N).agg \
                             -eval-validate -schema designer_rule/test.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
+                          -runtime ../backends/javascript/qcert-runtime.js \
                           -input designer_rule/test.input \
                           -schema designer_rule/test.schema \
                           -output designer_rule/test$(N).out \

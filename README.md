@@ -56,6 +56,12 @@ Building those Java components also requires a recent version of ant
 Both the `javac` and the `ant` executables must be available from the
 command line.
 
+### Node.js (Recommended)
+
+Execution and testing for the JavaScript backend, as well demo material, requires Node.js. We suggest Node.js version 10.
+
+Node.js can be installed from https://nodejs.org/en/
+
 ### Scala (Optional)
 
 The Spark targets require a Scala compiler and the Scala Build Tool
@@ -64,13 +70,6 @@ The Spark targets require a Scala compiler and the Scala Build Tool
 Scala can be obtained from: https://www.scala-lang.org.
 
 sbt can be obtained from: http://www.scala-sbt.org.
-
-### TypeScript (Optional)
-
-The Q\*cert distribution includes a Web demo for the compiler which
-is written in TypeScript.
-
-TypeScript can be obtained from: https://www.typescriptlang.org.
 
 ### Portability
 

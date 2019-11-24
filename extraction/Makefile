@@ -45,16 +45,16 @@ native: ../bin/$(MAIN) ../bin/$(MAIN2)
 js: ../bin/$(MAIN3).js
 
 ## Extraction
-VO_FILES = $(MODULES:%=../coq/%.vo)
+VO_FILES = $(MODULES:%=../mechanization/%.vo)
 
-../runtimes/javascript/qcert_runtime.ml ../runtimes/javascript/imp_runtime.ml:
-	$(MAKE) -C ../runtimes/javascript
+../backends/javascript/qcert_runtime.ml ../backends/javascript/imp_runtime.ml:
+	$(MAKE) -C ../backends/javascript
 
-src/QcertJsRuntime.ml: ../runtimes/javascript/qcert_runtime.ml
-	cp ../runtimes/javascript/qcert_runtime.ml src/QcertJsRuntime.ml
+src/QcertJsRuntime.ml: ../backends/javascript/qcert_runtime.ml
+	cp ../backends/javascript/qcert_runtime.ml src/QcertJsRuntime.ml
 
-src/ImpJsRuntime.ml: ../runtimes/javascript/imp_runtime.ml
-	cp ../runtimes/javascript/imp_runtime.ml src/ImpJsRuntime.ml
+src/ImpJsRuntime.ml: ../backends/javascript/imp_runtime.ml
+	cp ../backends/javascript/imp_runtime.ml src/ImpJsRuntime.ml
 
 extracted: extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 
@@ -63,7 +63,7 @@ extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 	mkdir -p extracted
 	echo "(* This file is generated *)" > extracted/StaticConfig.ml
 	echo "let qcert_home = \"$(QCERT_HOME)\"" >> extracted/StaticConfig.ml
-	(cd extracted; coqc -R ../../coq Qcert ../QcertExtraction.v)
+	(cd extracted; coqc -R ../../mechanization Qcert ../QcertExtraction.v)
 
 ## Native
 ../bin/$(MAIN): src/QcertJsRuntime.ml src/ImpJsRuntime.ml extracted $(MAIN).$(TARGET)

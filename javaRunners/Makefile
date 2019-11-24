@@ -40,7 +40,7 @@ DEPENDENCIES=lib/commons-codec-1.9-sources.jar \
 	     lib/httpcore-4.4.5.jar \
 	     lib/junit-4.9-sources.jar \
 	     lib/junit-4.9.jar
-CPATH=$(subst $(BLANK),$(PATH_SEP),../runtimes/java/bin $(DEPENDENCIES))
+CPATH=$(subst $(BLANK),$(PATH_SEP),../backends/java/bin $(DEPENDENCIES))
 
 JAVAC=javac
 
