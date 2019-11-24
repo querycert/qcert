@@ -23,12 +23,12 @@ include Makefile.coq_modules
 CP=cp
 TSC?=tsc
 
-FILES = $(addprefix coq/,$(MODULES:%=%.v))
+FILES = $(addprefix mechanization/,$(MODULES:%=%.v))
 
 ## Compiler
 all: 
 	@$(MAKE) qcert
-	@$(MAKE) MAKEFLAGS= qcert-runtimes
+	@$(MAKE) MAKEFLAGS= qcert-backends
 	@$(MAKE) MAKEFLAGS= qcert-runners
 	@$(MAKE) npm
 
@@ -53,13 +53,13 @@ qcert-ocaml:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Extracting compiler to OCaml"
 	@echo "[Q*cert] "
-	@$(MAKE) -C ocaml native
+	@$(MAKE) -C extraction native
 
 qcert-javascript:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Extracting compiler to JavaScript"
 	@echo "[Q*cert] "
-	@$(MAKE) -C ocaml js
+	@$(MAKE) -C extraction js
 
 qcert-java:
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
@@ -99,10 +99,10 @@ clean-coq:
 cleanall-coq: clean-coq
 
 clean-ocaml:
-	- @$(MAKE) -C ocaml clean
+	- @$(MAKE) -C extraction clean
 
 cleanall-ocaml:
-	- @$(MAKE) -C ocaml cleanall
+	- @$(MAKE) -C extraction cleanall
 
 clean-java:
 	- @$(MAKE) -C javaService clean
@@ -121,56 +121,56 @@ cleanall-java:
 	- @rm -f bin/javaService.jar
 
 
-## Runtime
-qcert-runtimes:
-	@$(MAKE) javascript-runtime
+## Backends
+qcert-backends:
+	@$(MAKE) javascript-backend
 ifneq ($(JAVA),)
-	@$(MAKE) java-runtime
+	@$(MAKE) java-backend
 endif
 ifneq ($(SPARK),)
-	@$(MAKE) spark2-runtime
+	@$(MAKE) spark2-backend
 endif
 
-javascript-runtime:
+javascript-backend:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building JavaScript runtime"
+	@echo "[Q*cert] Building JavaScript backend"
 	@echo "[Q*cert] "
-	@$(MAKE) -C runtimes/javascript
+	@$(MAKE) -C backends/javascript
 
-java-runtime:
+java-backend:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building Java runtime"
+	@echo "[Q*cert] Building Java backend"
 	@echo "[Q*cert] "
-	@$(MAKE) -C runtimes/java
+	@$(MAKE) -C backends/java
 
-spark2-runtime:
+spark2-backend:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building Spark2 runtime"
+	@echo "[Q*cert] Building Spark2 backend"
 	@echo "[Q*cert] "
-	@$(MAKE) -C runtimes/spark2
+	@$(MAKE) -C backends/spark2
 
-clean-runtimes:
-	- @$(MAKE) -C runtimes/javascript clean
-	- @$(MAKE) -C runtimes/java clean
-	- @$(MAKE) -C runtimes/spark2 clean
+clean-backends:
+	- @$(MAKE) -C backends/javascript clean
+	- @$(MAKE) -C backends/java clean
+	- @$(MAKE) -C backends/spark2 clean
 
-cleanall-runtimes:
-	- @$(MAKE) -C runtimes/javascript cleanall
-	- @$(MAKE) -C runtimes/java cleanall
-	- @$(MAKE) -C runtimes/spark2 cleanall
+cleanall-backends:
+	- @$(MAKE) -C backends/javascript cleanall
+	- @$(MAKE) -C backends/java cleanall
+	- @$(MAKE) -C backends/spark2 cleanall
 
 
 ## Demo
 bin/qcertJS.js:
 	@$(MAKE) qcert-javascript
 
-runtimes/javascript/qcert-runtime.js:
-	@$(MAKE) javascript-runtime
+backends/javascript/qcert-runtime.js:
+	@$(MAKE) javascript-backend
 
 demo:
 	@$(MAKE) qcert-demo
 
-qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
+qcert-demo: bin/qcertJS.js backends/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling Web Demo in TypeScript"
 	@echo "[Q*cert] "
@@ -222,7 +222,7 @@ install-coq:
 
 ## Documentation
 documentation:
-	@$(MAKE) -C coq documentation
+	@$(MAKE) -C mechanization documentation
 
 
 ## Cleanup
@@ -230,7 +230,7 @@ clean: Makefile.coq remove_all_derived
 	- @$(MAKE) clean-coq
 	- @$(MAKE) clean-ocaml
 	- @$(MAKE) clean-java
-	- @$(MAKE) clean-runtimes
+	- @$(MAKE) clean-backends
 	- @$(MAKE) clean-demo
 	- @$(MAKE) clean-runners
 	- @$(MAKE) clean-tests
@@ -241,7 +241,7 @@ cleanall: Makefile.coq remove_all_derived
 	- @$(MAKE) cleanall-coq
 	- @$(MAKE) cleanall-ocaml
 	- @$(MAKE) cleanall-java
-	- @$(MAKE) cleanall-runtimes
+	- @$(MAKE) cleanall-backends
 	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-runners
 	- @$(MAKE) cleanall-tests
