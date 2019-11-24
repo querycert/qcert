@@ -72,7 +72,6 @@ Require Import NNRCtoNNRCMR.
 Require Import NNRStoNNRSimp.
 Require Import NNRSimptoImpQcert.
 Require Import ImpQcerttoImpJson.
-Require Import NNRSimptoJavaScriptAst.
 Require Import NNRCtoJava.
 Require Import cNNRCtoCAMP.
 Require Import cNNRCtoNNRC.
@@ -186,7 +185,6 @@ Section CompCorrectness.
     | Dv_nnrs_imp_stop => True
     | Dv_nnrs_imp_optim _ dv => False /\ driver_correct_nnrs_imp dv
     | Dv_nnrs_imp_to_imp_qcert _ dv => driver_correct_imp_qcert dv
-    | Dv_nnrs_imp_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 
   Definition driver_correct_nnrs (dv: nnrs_driver) :=
@@ -493,14 +491,6 @@ Section CompCorrectness.
         rewrite <- H0; simpl; trivial.
         revert q H0.
         induction dv; simpl in *; intuition; subst; eauto.
-      - simpl in H0; destruct H0.
-        rewrite <- H0; simpl; trivial.
-        destruct H0.
-        + rewrite <- H0; simpl; trivial.
-        + destruct j; simpl in *; try contradiction.
-          destruct j; simpl in *; try contradiction.
-          destruct H0; simpl in *; try contradiction.
-          rewrite <- H0; simpl; trivial.
       - simpl in H0; destruct H0; try contradiction.
         rewrite <- H0; simpl; trivial.
         revert q H0.
@@ -1351,7 +1341,6 @@ Section CompCorrectness.
       + destruct H0; try contradiction.
         rewrite <- H0.
         reflexivity.
-      + destruct H; contradiction.
       + destruct H; contradiction.
       + destruct H0; [ rewrite <- H0; reflexivity | ].
         simpl in H0. intuition.

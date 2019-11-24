@@ -348,7 +348,6 @@ MODULES = \
 	Translation/NNRSimptoImpQcert \
 	Translation/ImpQcerttoImpJson \
 	Translation/ImpJsontoJavaScriptAst \
-	Translation/NNRSimptoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \
 	Translation/DatatoSparkDF \
