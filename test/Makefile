@@ -25,7 +25,7 @@ endif
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
-CPATH=$(subst $(BLANK),$(PATH_SEP),../backends/java/bin ../bin/javaRunners.jar ../bin/lib/*)
+CPATH=$(subst $(BLANK),$(PATH_SEP),../backends/java/bin ../bin/javaRunner.jar ../bin/lib/*)
 JAVAC=javac
 JAVARUN=java
 

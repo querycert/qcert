@@ -3,8 +3,8 @@
   <property name="dest" value="../../bin"/>
 
   <target name="create_runners_jar">
-    <delete file="${dest}/javaRunners.jar"/>
-      <jar destfile="${dest}/javaRunners.jar">
+    <delete file="${dest}/javaRunner.jar"/>
+      <jar destfile="${dest}/javaRunner.jar">
         <fileset dir="bin"/>
       </jar>
       <copy todir="${dest}/lib">

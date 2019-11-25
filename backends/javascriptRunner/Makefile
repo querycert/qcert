@@ -18,9 +18,9 @@
 ### WARNING: This file is meant to be invoked by the qcert/Makefile documentation target, not run directly
 ###
 
-DEP_FILES=../bin/qcertJS.js \
-	../backends/javascript/qcert-runtime.js \
-	../backends/javascript/quoted-qcert-runtime.js \
+DEP_FILES=../../bin/qcertJS.js \
+	../javascript/qcert-runtime.js \
+	../javascript/quoted-qcert-runtime.js \
 
 all: package
 
