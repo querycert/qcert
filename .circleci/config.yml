@@ -42,7 +42,7 @@ common_steps: &common_steps
     - run:
         name: "Install Coq deps"
         command: |
-          opam install -y -v coq.8.8.2 coq-flocq coq-jsast
+          opam install -y -v coq.8.8.2 coq-flocq coq-jsast.1.0.9
         no_output_timeout: 30m
     - save_cache:
         <<: *common_cache_key
