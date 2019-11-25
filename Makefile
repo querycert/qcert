@@ -30,7 +30,6 @@ all:
 	@$(MAKE) qcert
 	@$(MAKE) MAKEFLAGS= qcert-frontends
 	@$(MAKE) MAKEFLAGS= qcert-backends
-	@$(MAKE) npm
 
 # Regenerate the npm directory
 npm:
@@ -138,30 +137,31 @@ java-backend:
 	@echo "[Q*cert] Building Java backend"
 	@echo "[Q*cert] "
 	@$(MAKE) -C backends/java
-	@$(MAKE) -C backends/javaRunners all install
+	@$(MAKE) -C backends/javaRunner all install
+	@$(MAKE) -C backends/javascriptRunner all
 
 spark2-backend:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building Spark2 backend"
 	@echo "[Q*cert] "
 	@$(MAKE) -C backends/spark2
-	@$(MAKE) -C backends/javaRunners all install
+	@$(MAKE) -C backends/javaRunner all install
 
 clean-backends:
 	- @$(MAKE) -C backends/javascript clean
 	- @$(MAKE) -C backends/java clean
 	- @$(MAKE) -C backends/spark2 clean
-	- @$(MAKE) -C backends/javaRunners clean
+	- @$(MAKE) -C backends/javaRunner clean
 	- @rm -rf bin/lib
-	- @rm -f bin/javaRunners.jar
+	- @rm -f bin/javaRunner.jar
 
 cleanall-backends:
 	- @$(MAKE) -C backends/javascript cleanall
 	- @$(MAKE) -C backends/java cleanall
 	- @$(MAKE) -C backends/spark2 cleanall
-	- @$(MAKE) -C backends/javaRunners cleanall
+	- @$(MAKE) -C backends/javaRunner cleanall
 	- @rm -rf bin/lib
-	- @rm -f bin/javaRunners.jar
+	- @rm -f bin/javaRunner.jar
 
 ## Demo
 bin/qcertJS.js:
