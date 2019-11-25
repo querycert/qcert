@@ -28,8 +28,8 @@ FILES = $(addprefix mechanization/,$(MODULES:%=%.v))
 ## Compiler
 all: 
 	@$(MAKE) qcert
+	@$(MAKE) MAKEFLAGS= qcert-frontends
 	@$(MAKE) MAKEFLAGS= qcert-backends
-	@$(MAKE) MAKEFLAGS= qcert-runners
 	@$(MAKE) npm
 
 # Regenerate the npm directory
@@ -41,7 +41,6 @@ qcert: Makefile.coq
 	@$(MAKE) qcert-coq
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
 	@$(MAKE) MAKEFLAGS= qcert-javascript
-	@$(MAKE) MAKEFLAGS= qcert-java
 
 qcert-coq: Makefile.coq
 	@echo "[Q*cert] "
@@ -61,36 +60,33 @@ qcert-javascript:
 	@echo "[Q*cert] "
 	@$(MAKE) -C extraction js
 
-qcert-java:
-ifneq ($(SQL)$(SQLPP)$(JRULES),)
+qcert-frontends:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling Java service"
+	@echo "[Q*cert] FRONTEND"
 	@echo "[Q*cert] "
-	@$(MAKE) -C javaService
-endif
 ifneq ($(SQL),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling SQL parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C sqlParser
+	@$(MAKE) -C frontends/sqlParser
 endif
 ifneq ($(SQLPP),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling SQL++ parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C sqlppParser
+	@$(MAKE) -C frontends/sqlppParser
 endif
 ifneq ($(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling ODM rules parsers"
 	@echo "[Q*cert] "
-	@$(MAKE) -C jrulesParser
+	@$(MAKE) -C frontends/jrulesParser
 endif
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Installing Java service"
+	@echo "[Q*cert] Installing frontend service"
 	@echo "[Q*cert] "
-	@$(MAKE) -C javaService install
+	@$(MAKE) -C frontends/javaService all install
 endif
 
 clean-coq:
@@ -104,19 +100,19 @@ clean-ocaml:
 cleanall-ocaml:
 	- @$(MAKE) -C extraction cleanall
 
-clean-java:
-	- @$(MAKE) -C javaService clean
-	- @$(MAKE) -C sqlParser clean
-	- @$(MAKE) -C sqlppParser clean
-	- @$(MAKE) -C jrulesParser clean
+clean-frontends:
+	- @$(MAKE) -C frontends/javaService clean
+	- @$(MAKE) -C frontends/sqlParser clean
+	- @$(MAKE) -C frontends/sqlppParser clean
+	- @$(MAKE) -C frontends/jrulesParser clean
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
-cleanall-java:
-	- @$(MAKE) -C javaService cleanall
-	- @$(MAKE) -C sqlParser cleanall
-	- @$(MAKE) -C sqlppParser cleanall
-	- @$(MAKE) -C jrulesParser cleanall
+cleanall-frontends:
+	- @$(MAKE) -C frontends/javaService cleanall
+	- @$(MAKE) -C frontends/sqlParser cleanall
+	- @$(MAKE) -C frontends/sqlppParser cleanall
+	- @$(MAKE) -C frontends/jrulesParser cleanall
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
@@ -142,23 +138,30 @@ java-backend:
 	@echo "[Q*cert] Building Java backend"
 	@echo "[Q*cert] "
 	@$(MAKE) -C backends/java
+	@$(MAKE) -C backends/javaRunners all install
 
 spark2-backend:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building Spark2 backend"
 	@echo "[Q*cert] "
 	@$(MAKE) -C backends/spark2
+	@$(MAKE) -C backends/javaRunners all install
 
 clean-backends:
 	- @$(MAKE) -C backends/javascript clean
 	- @$(MAKE) -C backends/java clean
 	- @$(MAKE) -C backends/spark2 clean
+	- @$(MAKE) -C backends/javaRunners clean
+	- @rm -rf bin/lib
+	- @rm -f bin/javaRunners.jar
 
 cleanall-backends:
 	- @$(MAKE) -C backends/javascript cleanall
 	- @$(MAKE) -C backends/java cleanall
 	- @$(MAKE) -C backends/spark2 cleanall
-
+	- @$(MAKE) -C backends/javaRunners cleanall
+	- @rm -rf bin/lib
+	- @rm -f bin/javaRunners.jar
 
 ## Demo
 bin/qcertJS.js:
@@ -181,29 +184,6 @@ clean-demo:
 
 cleanall-demo: clean-demo
 	- @rm -rf doc/demo/node_modules
-
-## Runners
-qcert-runners:
-ifneq ($(JAVA),)
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Building the query runners"
-	@echo "[Q*cert] "
-	@$(MAKE) -C javaRunners all install
-else
-	@echo "[Q*cert] "
-	@echo "[Q*cert] JAVA is not enabled: Not building the query runners"
-	@echo "[Q*cert] "
-endif
-
-clean-runners:
-	- @$(MAKE) -C javaRunners clean
-	- @rm -rf bin/lib
-	- @rm -f bin/javaRunners.jar
-
-cleanall-runners:
-	- @$(MAKE) -C javaRunners cleanall
-	- @rm -rf bin/lib
-	- @rm -f bin/javaRunners.jar
 
 ## Test
 
@@ -229,10 +209,9 @@ documentation:
 clean: Makefile.coq remove_all_derived
 	- @$(MAKE) clean-coq
 	- @$(MAKE) clean-ocaml
-	- @$(MAKE) clean-java
 	- @$(MAKE) clean-backends
+	- @$(MAKE) cleanall-frontends
 	- @$(MAKE) clean-demo
-	- @$(MAKE) clean-runners
 	- @$(MAKE) clean-tests
 	- @rm -f Makefile.coq
 	- @rm -f *~
@@ -240,10 +219,18 @@ clean: Makefile.coq remove_all_derived
 cleanall: Makefile.coq remove_all_derived
 	- @$(MAKE) cleanall-coq
 	- @$(MAKE) cleanall-ocaml
-	- @$(MAKE) cleanall-java
 	- @$(MAKE) cleanall-backends
+	- @$(MAKE) cleanall-frontends
 	- @$(MAKE) cleanall-demo
-	- @$(MAKE) cleanall-runners
+	- @$(MAKE) cleanall-tests
+	- @rm -f Makefile.coq
+	- @rm -f *~
+
+cleannotall: Makefile.coq
+	- @$(MAKE) cleanall-ocaml
+	- @$(MAKE) cleanall-backends
+	- @$(MAKE) cleanall-frontends
+	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-tests
 	- @rm -f Makefile.coq
 	- @rm -f *~
