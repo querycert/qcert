@@ -200,6 +200,21 @@ Section ToString.
         List.map
           (fun (x_e_opt: string * option expr) =>
              let (x, e_opt) := x_e_opt in
+             "var " ++ x ++
+             match e_opt with
+             | Some e =>
+               " = " ++ string_of_expr e (i+1)
+             | None => ""
+             end
+          )
+          l
+    in
+    concat (";"++eol) decls
+    | stat_let_decl l =>
+      let decls :=
+        List.map
+          (fun (x_e_opt: string * option expr) =>
+             let (x, e_opt) := x_e_opt in
              "let " ++ x ++
              match e_opt with
              | Some e =>
@@ -246,6 +261,33 @@ Section ToString.
     in
     (* lbl ++ *) (* TODO: print labels *)
     "for (" ++
+        "var " ++ comma_list decls ++ "; " ++
+        match e2_opt with
+        | Some e2 => string_of_expr e2 (i+1)
+        | None => ""
+        end ++ "; " ++
+        match e3_opt with
+        | Some e3 => string_of_expr e3 (i+1)
+        | None => ""
+        end ++ ") {" ++ eol ++
+        string_of_stat s (i+1) ++ eol ++
+    indent i ++ "}" ++ eol
+  (* | stat_for_in : label_set -> expr -> expr -> stat -> stat (* Note: for (e1 in e2) stat *) *)
+  | stat_for_let lbl vars e2_opt e3_opt s =>
+    (* Note: for (var ...; e2; e3) stat *)
+    let decls :=
+        List.map
+          (fun (decl: (string * option expr)) =>
+             let (x, e1_opt) := decl in
+             x ++
+             match e1_opt with
+             | None => ""
+             | Some e1 => " = " ++ string_of_expr e1 (i+1)
+             end)
+          vars
+    in
+    (* lbl ++ *) (* TODO: print labels *)
+    "for (" ++
         "let " ++ comma_list decls ++ "; " ++
         match e2_opt with
         | Some e2 => string_of_expr e2 (i+1)
@@ -259,6 +301,17 @@ Section ToString.
     indent i ++ "}" ++ eol
   (* | stat_for_in : label_set -> expr -> expr -> stat -> stat (* Note: for (e1 in e2) stat *) *)
   | stat_for_in_var lbl x e1_opt e2 s =>
+    (*  Note: for (var x [= e1] in e2) stat *)
+    (* lbl ++ *) (* TODO: print labels *)
+    "for (var " ++ x ++
+        match e1_opt with
+        | Some e => " = " ++ string_of_expr e (i+1)
+        | None => ""
+        end ++
+        " in " ++ string_of_expr e2 (i+1)  ++ ") {" ++ eol ++
+        string_of_stat s (i+1) ++ eol ++
+    indent i ++ "}" ++ eol
+  | stat_for_in_let lbl x e1_opt e2 s =>
     (*  Note: for (var x [= e1] in e2) stat *)
     (* lbl ++ *) (* TODO: print labels *)
     "for (let " ++ x ++
