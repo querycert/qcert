@@ -23,7 +23,7 @@ QUOTE=quote
 
 TARGET=native
 
-all: qcert-runtime.js quoted-qcert-runtime.js imp-runtime.js quoted-imp-runtime.js
+all: qcert-runtime.js quoted-qcert-runtime.js
 
 $(QUOTE).$(TARGET):
 	$(OCAMLBUILD) $(QUOTE).$(TARGET)
@@ -42,23 +42,8 @@ qcert_runtime.ml: qcert-runtime.js
 quoted-qcert-runtime.js: qcert-runtime.js qcert_runtime.ml $(QUOTE).$(TARGET)
 	_build/quote.native > quoted-qcert-runtime.js
 
-imp-runtime.js: imp-runtime-core.js imp-runtime-dates.js
-	(for i in imp-runtime-core.js imp-runtime-dates.js; do \
-         cat $$i; \
-         done) > imp-runtime.js
-
-imp_runtime.ml: imp-runtime.js
-	(echo "let runtime = {runtime|"; \
-         cat imp-runtime.js; \
-         echo '|runtime}' \
-         ) > imp_runtime.ml
-
-quoted-imp-runtime.js: imp-runtime.js imp_runtime.ml $(QUOTE).$(TARGET)
-	_build/quote.native > quoted-imp-runtime.js
-
 clean:
 	-rm -f qcert-runtime.js quoted-qcert-runtime.js qcert_runtime.ml
-	-rm -f imp-runtime.js quoted-imp-runtime.js imp_runtime.ml
 	-rm -f *~
 
 cleanall: clean

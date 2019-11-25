@@ -9,14 +9,9 @@ Web Site: http://querycert.github.io
 
 ## About
 
-This is the source code for Q\*cert, a framework for the development
-and verification of query compilers. It supports a rich data model and
-includes an extensive compilation pipeline 'out of the box'.
+This is the source code for Q\*cert, a framework for the development and verification of data-centric languages. It supports a rich data model and includes an extensive compilation pipeline 'out of the box'.
 
-Q\*cert is built using the Coq proof assistant
-(https://coq.inria.fr). A significant subset of the provided
-compilation pipeline has been mechanically checked for correctness.
-
+Q\*cert is built using the Coq proof assistant (https://coq.inria.fr). A significant subset of the provided compilation pipeline has been mechanically checked for correctness.
 
 ## Prerequisites
 
@@ -34,9 +29,7 @@ To build Q\*cert from the source, you will need:
   - flocq, a library for floating point numbers
   - jsast, a minimal AST for JavaScript
 
-An easy way to get set up on most platforms is to use the OCaml
-package manager (https://opam.ocaml.org). Once opam is installed, you
-can just add the corresponding libraries:
+An easy way to get set up on most platforms is to use the OCaml package manager (https://opam.ocaml.org). Once opam is installed, you can just add the corresponding libraries:
 
 ```
 $ opam repo add coq-released https://coq.inria.fr/opam/released

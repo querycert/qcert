@@ -831,7 +831,12 @@ let pretty_js_ast greek margin annot inheritance link_runtime q =
 (** Pretty JavaScript *)
 
 let pretty_javascript greek margin annot inheritance link_runtime q =
-  Util.string_of_char_list q
+  let runtime = 
+    if (link_runtime)
+    then QcertJsRuntime.runtime
+    else ""
+  in
+  runtime ^ Util.string_of_char_list q
 
 (** Pretty Java *)
 
