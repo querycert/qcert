@@ -42,6 +42,7 @@ Section ImpEval.
   Context {DataToBool: Data -> option bool}.
   Context {DataToZ: Data -> option Z}.
   Context {DataToList: Data -> option (list Data)}.
+  Context {ZToData: Z -> Data}.
 
   Context {RuntimeEval: Runtime -> list Data -> option Data}.
   Context {OpEval: Op -> list Data -> option Data}.
@@ -64,7 +65,7 @@ Section ImpEval.
       | _ => None
       end.
   End Util.
-  
+
   (** ** Evaluation Semantics *)
   Section Evaluation.
     Fixpoint imp_expr_eval
@@ -85,8 +86,12 @@ Section ImpEval.
 
     Local Open Scope Z_scope.
 
+    Definition nb_iter (n1: Z) (n2: Z) :=
+      if n1 <=? n2 then S (Z.to_nat (n2 - n1))
+      else 0%nat.
+
     Fixpoint imp_stmt_eval
-             (s:imp_stmt) (σ:pd_rbindings) : option pd_rbindings :=
+             (s:imp_stmt) (σ:pd_rbindings) { struct s } : option pd_rbindings :=
       match s with
       | ImpStmtBlock vl sl =>
         let proc_one_decl c vd :=
@@ -150,8 +155,19 @@ Section ImpEval.
         | _ => None
         end
       | ImpStmtForRange v e1 e2 s =>
-        match (imp_expr_eval σ e1, imp_expr_eval σ e2) with
-        | (Some n1, Some n2) => (* imp_for_range v n1 n2 s σ *) None (* XXX TODO XXX *)
+        match (olift DataToZ (imp_expr_eval σ e1), olift DataToZ (imp_expr_eval σ e2)) with
+        | (Some n1, Some n2) =>
+          let fix for_range n n1 σ₁ :=
+             match n with
+             | O => Some σ₁
+             | S n' =>
+               match imp_stmt_eval s ((v, Some (ZToData n1)) :: σ₁) with
+               | Some (_::σ₂) => for_range n' (n1 + 1) σ₂
+               | _ => None
+               end
+             end
+          in
+          for_range (nb_iter n1 n2) n1 σ
         | _ => None
         end
       | ImpStmtIf e1 s1 s2 =>
@@ -165,17 +181,7 @@ Section ImpEval.
             else imp_stmt_eval s2 σ
           end
         end
-      end
-    .
-    (* with imp_for_range v n1 n2 (s:imp_stmt) (σ:pd_rbindings) : option pd_rbindings := *)
-    (*   match (DataToZ n1, DataToZ n2) with *)
-    (*   | (Some v1, Some v2) => *)
-    (*     if v1 <? v2 then (* XXX TODO XXX *) *)
-    (*       let res := imp_stmt_eval s ((v, Some n1) :: σ) in *)
-    (*       imp_for_range  *)
-    (*     else Some σ *)
-    (*   | _ => None *)
-    (*   end. *)
+      end.
 
     Definition imp_function_eval f (v:Data) : option Data :=
       match f with
@@ -191,7 +197,7 @@ Section ImpEval.
     Definition imp_eval (q:imp) (d:Data) : option (option Data)
       := match q with
          | ImpLib [ (_, f) ] => Some (imp_function_eval f d)
-         (* XXX What happens when more than one functions ? XXX *)                            
+         (* XXX What happens when more than one functions ? XXX *)
          | _ => None
          end.
 

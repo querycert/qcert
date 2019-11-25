@@ -67,6 +67,9 @@ Section ImpJsonEval.
       | _ => None
       end.
 
+    Definition imp_json_Z_to_data (n: Z) : imp_json_data :=
+      Z_to_json n.
+
     Definition imp_json_runtime_eval (rt:imp_json_runtime_op) (dl:list imp_json_data) : option imp_json_data :=
       match rt with
       | JSONRuntimeEqual =>
@@ -236,7 +239,9 @@ Section ImpJsonEval.
            imp_json_runtime_op
            imp_json_data_normalize
            imp_json_data_to_bool
+           imp_json_data_to_Z
            imp_json_data_to_list
+           imp_json_Z_to_data
            imp_json_runtime_eval
            imp_json_op_eval
            s σ.
@@ -249,7 +254,9 @@ Section ImpJsonEval.
            imp_json_runtime_op
            imp_json_data_normalize
            imp_json_data_to_bool
+           imp_json_data_to_Z
            imp_json_data_to_list
+           imp_json_Z_to_data
            imp_json_runtime_eval
            imp_json_op_eval
            f args.
@@ -262,7 +269,9 @@ Section ImpJsonEval.
            imp_json_runtime_op
            imp_json_data_normalize
            imp_json_data_to_bool
+           imp_json_data_to_Z
            imp_json_data_to_list
+           imp_json_Z_to_data
            imp_json_runtime_eval
            imp_json_op_eval
            q d.

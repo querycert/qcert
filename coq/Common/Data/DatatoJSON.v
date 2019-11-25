@@ -136,11 +136,14 @@ Section DatatoJSON.
 
   Section toJSON.
     Context {ftojson:foreign_to_JSON}.
-    
+
+    Definition Z_to_json (n: Z) : json :=
+      jobject (("nat"%string, jnumber (float_of_int n))::nil).
+
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with
       | dunit => jnull
-      | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
+      | dnat n => Z_to_json n
       | dfloat n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s
@@ -158,7 +161,7 @@ Section DatatoJSON.
     Fixpoint data_to_json (d:data) : json :=
       match d with
       | dunit => jnull
-      | dnat n => jobject (("nat"%string, jnumber (float_of_int n))::nil)
+      | dnat n => Z_to_json n
       | dfloat n => jnumber n
       | dbool b => jbool b
       | dstring s => jstring s

@@ -550,13 +550,13 @@ Section ImpJsontoJavaScriptAst.
       rewrite H; clear H.
       unfold lift_result_env.
       unfold lift.
-      case_eq (@ImpEval.imp_stmt_eval _ _ _ imp_json_data_normalize imp_json_data_to_bool imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval (imp_qcert_stmt_to_imp_json [v] i) (lift_pd_bindings [(v0, None); (v, Some d)])); intros.
+      case_eq (@ImpEval.imp_stmt_eval _ _ _ imp_json_data_normalize imp_json_data_to_bool imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval (imp_qcert_stmt_to_imp_json [v] i) (lift_pd_bindings [(v0, None); (v, Some d)])); intros.
       - unfold olift.
         unfold imp_json_data in *.
         unfold imp_qcert_data in *.
         unfold imp_json_op in *.
         assert ((@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
-           imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval
+           imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
            (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
            (lift_pd_bindings
               (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
@@ -567,7 +567,7 @@ Section ImpJsontoJavaScriptAst.
                        (@Some (@data (@foreign_runtime_data fruntime)) d))
                     (@nil (prod var (option (@data (@foreign_runtime_data fruntime)))))))))
                 = (@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
-          imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval
+          imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
           (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
           (@cons (prod var (option json)) (@pair var (option json) v0 (@None json))
              (@cons (prod var (option json))
@@ -589,7 +589,7 @@ Section ImpJsontoJavaScriptAst.
         unfold imp_qcert_data in *.
         unfold imp_json_op in *.
         assert ((@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
-           imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval
+           imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
            (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
            (lift_pd_bindings
               (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
@@ -600,7 +600,7 @@ Section ImpJsontoJavaScriptAst.
                        (@Some (@data (@foreign_runtime_data fruntime)) d))
                     (@nil (prod var (option (@data (@foreign_runtime_data fruntime)))))))))
                 = (@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
-          imp_json_data_to_list imp_json_runtime_eval imp_json_op_eval
+          imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
           (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
           (@cons (prod var (option json)) (@pair var (option json) v0 (@None json))
              (@cons (prod var (option json))
