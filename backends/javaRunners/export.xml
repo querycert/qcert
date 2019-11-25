@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_runners_jar" name="Export artifacts from query runners project to bin">
-  <property name="dest" value="../bin"/>
+  <property name="dest" value="../../bin"/>
 
   <target name="create_runners_jar">
     <delete file="${dest}/javaRunners.jar"/>
