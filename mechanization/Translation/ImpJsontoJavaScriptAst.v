@@ -130,14 +130,14 @@ Section ImpJsontoJavaScriptAst.
     match stmt with
     | ImpStmtBlock decls stmts =>
       scope
-        (stat_var_decl (List.map decl_to_js_ast decls) :: (List.map imp_json_stmt_to_js_ast stmts))
+        (stat_let_decl (List.map decl_to_js_ast decls) :: (List.map imp_json_stmt_to_js_ast stmts))
     | ImpStmtAssign x e =>
       stat_expr (expr_assign (expr_identifier x) None (imp_json_expr_to_js_ast e))
     | ImpStmtFor x e s =>
-      stat_for_in_var nil x None (imp_json_expr_to_js_ast e)
+      stat_for_in_let nil x None (imp_json_expr_to_js_ast e)
                       (imp_json_stmt_to_js_ast s)
     | ImpStmtForRange x e1 e2 s =>
-      stat_for_var
+      stat_for_let
         nil
         [ (x, Some (imp_json_expr_to_js_ast e1)) ]
         (Some (expr_binary_op (expr_identifier x) binary_op_lt (imp_json_expr_to_js_ast e2)))
