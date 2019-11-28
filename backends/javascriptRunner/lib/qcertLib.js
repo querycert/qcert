@@ -1,6 +1,4 @@
 /*
- * Copyright 2017 IBM Corporation
- *
  * Licensed under the Apache License; Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,4 +12,11 @@
  * limitations under the License.
  */
 
-export * from '../libs/qcertJS';
+const Fs = require('fs');
+const { Qcert } = require('../extracted/qcertJS.js');
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(Qcert);
