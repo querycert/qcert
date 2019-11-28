@@ -71,7 +71,7 @@ function execute(compiledQuery,input) {
 
 /* compile query then execute */
 function compileExecute(source,schema,input,sourceQuery) {
-    const compiledQuery = compile('oql',schema,sourceQuery);
+    const compiledQuery = compile(source,schema,sourceQuery);
     return execute(compiledQuery,input);
 }
 

@@ -7,6 +7,7 @@ bin/qcertJS.js
 bin/*.jar
 bin/services/*.jar
 bin/lib/*.jar
+log/
 /.project
 .coqdeps.d
 *~
