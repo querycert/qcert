@@ -28,7 +28,7 @@ package: copy-libs
 	npm install && npm pack
 
 copy-libs: $(DEP_FILES)
-	@mkdir -p libs
-	cp $^ libs/
+	@mkdir -p extracted
+	cp $^ extracted/
 
 .PHONY: copy-libs package

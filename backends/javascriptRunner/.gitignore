@@ -1,5 +1,5 @@
 node_modules/
-libs/*.js
 dist/
+log/
 qcert-*.tgz
 package-lock.json
