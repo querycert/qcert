@@ -22,10 +22,13 @@ DEP_FILES=../../bin/qcertJS.js \
 	../../runtimes/javascript/qcert-runtime.js \
 	../../runtimes/javascript/quoted-qcert-runtime.js \
 
-all: package
+all: install
 
-package: copy-libs
-	npm install && npm pack
+install: copy-libs
+	npm install
+
+package:
+	npm pack
 
 copy-libs: $(DEP_FILES)
 	@mkdir -p extracted
