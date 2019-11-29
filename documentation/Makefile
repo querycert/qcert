@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-QUERYCERTDOTIO?=../../querycert.github.io
+QUERYCERTDOTIO=../../querycert.github.io
 
 
 #
