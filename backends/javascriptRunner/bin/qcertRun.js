@@ -42,15 +42,24 @@ require('yargs')
             describe: 'the data',
             type: 'string'
         });
+        yargs.option('output', {
+            describe: 'the expected result',
+            type: 'string'
+        });
+        yargs.option('eval-validate', {
+            describe: 'check result correctness',
+            type: 'boolean',
+            default: false
+        });
     }, (argv) => {
         let files = argv._;
 
         // Compile and Execute
         try {
-            const result = Commands.execute(argv.source, { file: argv.schema }, argv.query, { file: argv.input });
+            const result = Commands.execute(argv.source, { file: argv.schema }, argv.query, { file: argv.input }, argv.output ? { file: argv.output } : null, argv['eval-validate']);
             Logger.info(result);
         } catch(err) {
-            Logger.error(err.message + '\n' + JSON.stringify(err));
+            Logger.error(err.message);
         };
     })
     .option('verbose', {

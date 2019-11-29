@@ -41,20 +41,23 @@ let print_error_opt_data d =
       Format.eprintf "%a@." PrettyCommon.pretty_data d
   end
 
-let validate_result queryname targetname expected_res actual_res =
+let validate_result quiet queryname targetname expected_res actual_res =
   let ok = QUtil.validate_data actual_res (Some expected_res) in
   if ok then
     begin
-      Format.printf "[%s %s] OK@." queryname targetname;
+      if not quiet then Format.printf "[%s %s] OK@." queryname targetname;
       true
     end
   else
     begin
-      Format.eprintf "[%s %s] ERROR@." queryname targetname;
-      Format.eprintf "Expected:@.";
-      print_error_opt_data (Some expected_res);
-      Format.eprintf "Actual:@.";
-      print_error_opt_data actual_res;
+      if not quiet then
+        begin
+          Format.eprintf "[%s %s] ERROR@." queryname targetname;
+          Format.eprintf "Expected:@.";
+          print_error_opt_data (Some expected_res);
+          Format.eprintf "Actual:@.";
+          print_error_opt_data actual_res;
+        end;
       false
     end
 	

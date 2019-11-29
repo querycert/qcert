@@ -22,57 +22,95 @@ const QcertRuntimeString = Fs.readFileSync(Path.join(__dirname,'../extracted/qce
 
 /* Generic Node module require from string */
 function requireFromString(src, filename) {
-  var Module = module.constructor;
-  var m = new Module();
-  m._compile(src, filename);
-  return m.exports;
+    var Module = module.constructor;
+    var m = new Module();
+    m._compile(src, filename);
+    return m.exports;
 }
 
-/* Call Q*cert compiler */
-function compile(source,schema,sourceQuery) {
-    const config = {
-		    'source' : source,
-		    'target' : 'js',
-		    'exactpath' : false,
-		    'emitall' : false,
-		    'eval' : false,
-		    'schema' : JSON.stringify(schema),
-		    'input' : '{}', // Do not pass input, only compiling
-		    'ascii' : true,
-		    'javaimports' : '',
-		    'query' : sourceQuery,
-	      'optims' : '[]',
-    };
-    const compileResult = QcertLib.compile(config);
-    if (compileResult.emit && compileResult.emit.value) {
-        return compileResult.emit.value;
-    } else {
-        throw new Error(compileResult.result);
+class QcertRunner {
+    /* Call Q*cert compiler */
+    static compile(source,schema,sourceQuery,output) {
+        const config = {
+		        'source' : source,
+		        'target' : 'js',
+		        'exactpath' : false,
+		        'emitall' : false,
+		        'eval' : false,
+		        'schema' : JSON.stringify(schema),
+		        'input' : '{}', // Do not pass input, only compiling
+            'output' : JSON.stringify(output),
+		        'ascii' : true,
+		        'javaimports' : '',
+	          'optims' : '[]',
+        };
+        const gconf = QcertLib.buildConfig(config);
+        const queryInput = {
+            'gconf' : gconf,
+		        'query' : sourceQuery,
+        };
+        const compileResult = QcertLib.compile(queryInput);
+        if (compileResult.emit && compileResult.emit.value) {
+            return { 'gconf' : gconf, 'result': compileResult.emit.value };
+        } else {
+            throw new Error(compileResult.result);
+        }
+    }
+
+    /* Link compile query and load it as Node module */
+    static loadQuery(compiledQuery) {
+        try {
+            const linkedQuery = QcertRuntimeString + compiledQuery + 'module.exports = { query };\n';
+            const { query } = requireFromString(linkedQuery, 'query.js');
+            return query;
+        } catch(err) {
+            Logger.error('Compiled query is not valid JavaScript');
+            throw err;
+        }
+    }
+
+    /* execute compiled query */
+    static execute(compiledQuery,input) {
+        const query = QcertRunner.loadQuery(compiledQuery);
+        return query(input);
+    }
+
+    /* validate result */
+    static validate(gconf,queryName,source,output,result) {
+        const config = {
+		        'gconf' : gconf,
+		        'source' : source,
+		        'queryName' : queryName,
+		        'actual' : JSON.stringify(result),
+        };
+        const valid = QcertLib.validateOutput(config);
+        if (valid.error) {
+            throw new Error(valid.error);
+        } else {
+            if (valid.result) {
+                return `[${queryName} js] OK`;
+            } else {
+                const expected = JSON.stringify(output);
+                const actual = JSON.stringify(result);
+                throw new Error (`[${queryName} js] ERROR\nExpected: ${expected}\nActual: ${actual}`);
+            }
+        }
+    }
+
+    /* compile query then execute */
+    static compileExecute(source,schema,input,queryFile,sourceQuery,output,validate) {
+        const compiledQuery = QcertRunner.compile(source,schema,sourceQuery,output);
+        if (validate) {
+            if (output) {
+                let result = QcertRunner.execute(compiledQuery.result,input);
+                return QcertRunner.validate(compiledQuery.gconf,queryFile,source,output,result)
+            } else {
+                throw new Error('Cannot validate result without expected result (--output option)');
+            }
+        } else {
+            return QcertRunner.execute(compiledQuery.result,input);
+        }
     }
 }
 
-/* Link compile query and load it as Node module */
-function loadQuery(compiledQuery) {
-    try {
-        const linkedQuery = QcertRuntimeString + compiledQuery + 'module.exports = { query };\n';
-        const { query } = requireFromString(linkedQuery, 'query.js');
-        return query;
-    } catch(err) {
-        Logger.error('Compiled query is not valid JavaScript');
-        throw err;
-    }
-}
-
-/* execute compiled query */
-function execute(compiledQuery,input) {
-    const query = loadQuery(compiledQuery);
-    return query(input);
-}
-
-/* compile query then execute */
-function compileExecute(source,schema,input,sourceQuery) {
-    const compiledQuery = compile(source,schema,sourceQuery);
-    return execute(compiledQuery,input);
-}
-
-module.exports = { compile, execute, compileExecute };
+module.exports = QcertRunner;

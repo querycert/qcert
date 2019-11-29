@@ -100,6 +100,7 @@ let global_config_of_json j =
   apply QcertArg.set_dir j##.dirtarget;
   (* I/O *)
   apply QcertArg.set_schema_content j##.schema;
+  apply QcertArg.set_output_content j##.output;
   apply QcertArg.set_input_content j##.input;
   (* Cloudant options *)
   Js.Optdef.iter j##.jsruntime (fun b -> if b then QcertArg.set_link_js_runtime gconf ());
@@ -165,6 +166,12 @@ let json_of_error msg =
     val eval = Js.string msg
   end
 
+let json_of_validate_error msg =
+  object%js
+    val result = Js.bool false
+    val error = Js.def (Js.string msg)
+  end
+
 let json_of_exported_languages exported_languages =
   let wrap x =
     let ((((_,id),_),lab),desc) = x in
@@ -212,15 +219,37 @@ let json_of_optim_default() =
     val optims = unsafe_json_to_js QDriver.optim_config_default_to_json
   end
   
+let build_config input =
+  begin try
+	  global_config_of_json input
+  with exn ->
+    raise (Qcert_Error ("[Couldn't load configuration: "^(Printexc.to_string exn)^"]"))
+  end
+
+let validate_output input =
+  begin try
+    let gconf = input##.gconf in
+    let actual = Js.to_string input##.actual in
+    let actual_output =
+      try QcertConfig.data_of_string gconf actual with
+      | err ->
+          raise (Qcert_Error ("Cannot convert data " ^ actual))
+    in
+    let expected_output = gconf.gconf_output in
+    let queryname = Js.to_string input##.queryName in
+    let language_name = Js.to_string input##.source in
+    (object%js
+      val result = Js.bool (CheckUtil.validate_result true queryname language_name expected_output (Some actual_output))
+      val error = Js.undefined
+     end)
+  with
+  | Qcert_Error msg -> json_of_validate_error msg
+  | exn -> json_of_validate_error ("[Main error: "^(Printexc.to_string exn)^"]")
+  end
+
 let qcert_compile input =
   begin try
-    let gconf =
-      begin try
-	global_config_of_json input
-      with exn ->
-        raise (Qcert_Error ("[Couldn't load configuration: "^(Printexc.to_string exn)^"]"))
-      end
-    in
+    let gconf = input##.gconf in
     let q_s =
       begin try
        Js.to_string input##.query
@@ -242,22 +271,12 @@ let qcert_compile input =
   end
 
 let _ =
-(*  Js.Unsafe.global##.qcertLanguages :=
-    Js.wrap_callback language_specs;
-  Js.Unsafe.global##.qcertLanguagesPath :=
-    Js.wrap_callback json_of_source_to_target_path;
-  Js.Unsafe.global##.qcertOptimList :=
-    Js.wrap_callback json_of_optim_list;
-  Js.Unsafe.global##.qcertOptimDefaults :=
-    Js.wrap_callback json_of_optim_default;
-  Js.Unsafe.global##.qcertCompile :=
-    Js.wrap_callback qcert_compile;
-  Js.Unsafe.global##.main :=
-    Js.wrap_callback qcert_compile;*)
   Js.export "Qcert" (object%js
     val languages = Js.wrap_callback language_specs;
     val languagesPath = Js.wrap_callback json_of_source_to_target_path
     val optimList = Js.wrap_callback json_of_optim_list
     val optimDefaults = Js.wrap_callback json_of_optim_default
+    val buildConfig = Js.wrap_callback build_config
+    val validateOutput = Js.wrap_callback validate_output
     val compile = Js.wrap_callback qcert_compile
    end)
