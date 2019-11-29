@@ -1,11 +1,11 @@
-# Q\*cert
+<h1 align="center">Q*cert</h1>
 
-[![CircleCI](https://circleci.com/gh/querycert/qcert.svg?style=svg)](https://circleci.com/gh/querycert/qcert)
-
-Git: http://github.com/querycert/qcert
-
-Web Site: http://querycert.github.io
-
+<p align="center">
+  <a href="https://circleci.com/gh/querycert/qcert"><img src="https://circleci.com/gh/querycert/qcert.svg?style=shield" alt="Build Status"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/accordproject/ergo?color=bright-green" alt="License"></a>
+  <a href="https://www.npmjs.com/package/qcert"><img src="https://img.shields.io/npm/dm/qcert" alt="downloads"></a>
+  <a href="https://badge.fury.io/js/qcert"><img src="https://badge.fury.io/js/qcert.svg" alt="npm version"></a>
+</p>
 
 ## About
 
@@ -231,18 +231,11 @@ javaService as follows:
 $ cd bin; java -jar javaService.jar -server 9879
 ```
 
-
 ## Documentation
 
-Code documentation and background information, notably references for
-all supported languages, can be found on the Q\*cert Web site:
-https://querycert.github.io
+Code documentation and background information, notably references for all supported languages, can be found on the Q\*cert Web site: https://querycert.github.io
 
-If you want to re-generated the documentation from the source itself,
-you will need to install
-[coq2html](https://github.com/xavierleroy/coq2html). Detailed
-instructions are provided in [doc/README.md](doc/README.md)
-
+If you want to re-generated the documentation from the source itself, you will need to install [coq2html](https://github.com/xavierleroy/coq2html). Detailed instructions are provided in [doc/README.md](doc/README.md)
 
 ## Using Q\*cert
 
@@ -497,7 +490,7 @@ $ run.sh
 ## License
 
 Q\*cert is distributed under the terms of the Apache 2.0 License, see
-[LICENSE.txt](LICENSE.txt)
+[LICENSE](LICENSE)
 
 ## Contributions
 
