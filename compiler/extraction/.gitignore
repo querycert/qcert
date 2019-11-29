@@ -1,7 +1,7 @@
+src/QcertJsRuntime.ml
 /_build/
 /_build_js/
 /extracted/
-/src/QcertJsRuntime.ml 
 /out/
 /*.aux
 /.paths
