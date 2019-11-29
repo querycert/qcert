@@ -18,14 +18,14 @@
 ### WARNING: This file is meant to be invoked by the qcert/Makefile documentation target, not run directly
 ###
 
-include ../Makefile.coq_modules
+include ../../Makefile.coq_modules
 
 COQ_FILES = $(MODULES:%=%.v)
 GLOB_FILES = $(MODULES:%=%.glob)
 
 documentation: $(GLOB_FILES) $(COQ_FILES)
-	mkdir -p ../doc/html
-	rm -f ../doc/html/*.html
-	coq2html -d ../doc/html -base Qcert $^
+	mkdir -p ../../documentation/html
+	rm -f ../../documentation/html/*.html
+	coq2html -d ../../documentation/html -base Qcert $^
 
 .PHONY: documentation

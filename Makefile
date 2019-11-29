@@ -198,13 +198,13 @@ qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling Web Demo in TypeScript"
 	@echo "[Q*cert] "
-	cd doc/demo && npm install && npm run compile
+	cd documentation/demo && npm install && npm run compile
 
 clean-demo:
-	- @rm -f doc/demo/demo.js doc/demo/demo.js.map
+	- @rm -f documentation/demo/demo.js documentation/demo/demo.js.map
 
 cleanall-demo: clean-demo
-	- @rm -rf doc/demo/node_modules
+	- @rm -rf documentation/demo/node_modules
 
 ## Test
 
@@ -222,9 +222,8 @@ install-coq:
 	@$(MAKE) -f Makefile.coq install
 
 ## Documentation
-documentation:
+docs:
 	@$(MAKE) -C compiler/src documentation
-
 
 ## Cleanup
 clean: Makefile.coq remove_all_derived

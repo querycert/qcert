@@ -220,7 +220,7 @@ Once compiled, the Web demo can be started by opening the following
 HTML page:
 
 ```
-doc/demo/demo.html
+documentation/demo/demo.html
 ```
 
 If you want support for any of the optional source languages (SQL,
