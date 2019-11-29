@@ -103,7 +103,7 @@ oql-string-tests:
                             -eval-validate -output oql/string$(N).out || exit 1;))
 oql-string-tests-js:
 	@$(foreach N,$(OQLSTRINGNUM), \
-	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/string.input \
                           --schema oql/string.schema \
@@ -130,7 +130,7 @@ oql-world-tests:
                             -eval-validate -output oql/world$(N).out || exit 1;))
 oql-world-tests-js:
 	@$(foreach N,$(OQLWORLDNUM), \
-	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/world.input \
                           --schema oql/world.schema \
@@ -157,7 +157,7 @@ oql-persons-tests:
                             -eval-validate -output oql/persons$(N).out || exit 1;))
 oql-persons-tests-js:
 	@$(foreach N,$(OQLPERSONSNUM), \
-	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/persons.input \
                           --schema oql/persons.schema \
@@ -185,7 +185,7 @@ oql-employees-tests:
                             -eval-validate -output oql/employees$(N).out || exit 1;))
 oql-employees-tests-js:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
-	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/employees.input \
                           --schema oql/employees.schema \
@@ -228,7 +228,7 @@ lambda_nra-persons-tests:
                             -eval-validate -output lambda_nra/persons$(N).out || exit 1;))
 lambda_nra-persons-tests-js:
 	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
-	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source lambda_nra \
                           --input lambda_nra/persons.input \
                           --schema lambda_nra/persons.schema \
@@ -271,7 +271,7 @@ camp-world-tests:
                             -eval-validate -output camp/world$(N).out || exit 1;))
 camp-world-tests-js:
 	@$(foreach N,$(CAMPWORLDNUM), \
-	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source camp \
                           --input camp/world.input \
                           --schema camp/world.schema \
@@ -298,7 +298,7 @@ sql-tests:
 	@echo "[Q*cert] SQL tests"
 	@echo "[Q*cert] "
 	@$(MAKE) sql-org-tests
-ifneq ($(JAVASCRIPT_NOT),)
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) sql-org-tests-js
 endif
 ifneq ($(JAVA),)
@@ -316,12 +316,12 @@ sql-org-tests-js:
 	@$(foreach N,$(SQLORGNUM), \
 	       $(QCERTCOMP) -source sql  -target js sql/org$(N).sql \
                             -eval-validate -schema sql/org.schema; \
-	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../backends/javascript/qcert-runtime.js \
-                          -input sql/org.input \
-                          -schema sql/org.schema \
-                          -output sql/org$(N).out \
-                          sql/org$(N).js || exit 1;)
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --input sql/org.input \
+                          --schema sql/org.schema \
+                          --output sql/org$(N).out \
+                          --eval-validate \
+                          --query sql/org$(N).js || exit 1 ;)
 sql-org-tests-java:
 	@$(foreach N,$(SQLORGNUM), \
 	       $(QCERTCOMP) -source sql -target java sql/org$(N).sql \

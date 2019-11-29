@@ -39,7 +39,7 @@ function getJson(input) {
  */
 class Commands {
     /**
-     * Compile and execute query
+     * Compile and run query
      *
      * @param {string} source - source language
      * @param {string} schemaFile - schema file
@@ -49,12 +49,30 @@ class Commands {
      * @param {boolean} validate - validate the result
      * @returns {object} Promise to the result of execution
      */
-    static execute(source,schemaFile,queryFile,inputFile,outputFile,validate) {
+    static compile(source,schemaFile,queryFile,inputFile,outputFile,validate) {
         const input = getJson(inputFile);
         const sourceQuery = Fs.readFileSync(queryFile,'utf8');
         const schema = getJson(schemaFile);
         const output = outputFile ? getJson(outputFile) : null;
         return QcertRunner.compileExecute(source,schema,input,queryFile,sourceQuery,output,validate);
+    }
+
+    /**
+     * Run query
+     *
+     * @param {string} schemaFile - schema file
+     * @param {string} queryFile - compiled query file
+     * @param {string} inputFile - input data file
+     * @param {string} outputFile - expected result file
+     * @param {boolean} validate - validate the result
+     * @returns {object} Promise to the result of execution
+     */
+    static execute(schemaFile,queryFile,inputFile,outputFile,validate) {
+        const input = getJson(inputFile);
+        const sourceQuery = Fs.readFileSync(queryFile,'utf8');
+        const schema = getJson(schemaFile);
+        const output = outputFile ? getJson(outputFile) : null;
+        return QcertRunner.execute(schema,input,queryFile,sourceQuery,output,validate);
     }
 
 }
