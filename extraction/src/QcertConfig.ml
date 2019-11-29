@@ -143,3 +143,11 @@ let driver_conf_of_global_conf gconf qname cname =
     comp_constants = constants_config;
     comp_java_imports = char_list_of_string gconf.gconf_java_imports;
     comp_optim_config = gconf.gconf_optim_config; }
+
+(* Util *)
+let data_of_string gconf s =
+  let j = ParseString.parse_json_from_string s in
+  let h = inheritance_of_conf gconf in
+  build_output h j
+
+

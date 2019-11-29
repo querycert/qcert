@@ -14,5 +14,6 @@ tech_rule/*_rule.camp
 camp/*.json
 camp/*_camp.camp
 lambda_nra/*.json
+/log/
 /lib/*
 /bin/

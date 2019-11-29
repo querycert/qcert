@@ -56,3 +56,6 @@ type global_config = {
 val complete_configuration : global_config -> global_config
 
 val driver_conf_of_global_conf : global_config -> string -> string -> QDriver.driver_config
+
+val data_of_string : global_config -> string -> QData.qdata
+

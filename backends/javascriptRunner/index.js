@@ -22,4 +22,4 @@
 
 module.exports.Logger = require('./lib/logger');
 module.exports.QcertLib = require('./lib/qcertLib');
-module.exports.QcertRunner = require('./lib/qcertRunner');
+module.exports.QcertRunner = require('./lib/qcertRunner').QcertRunner;

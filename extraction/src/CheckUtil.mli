@@ -28,7 +28,7 @@ val check_nraenv_result : eval_config -> QData.qdata list -> string -> QData.qda
 val print_rule_result : string -> QData.qdata option -> unit
 val print_oql_result : string -> QData.qdata option -> unit
 
-val validate_result : string -> string -> QData.qdata -> QData.qdata option -> bool
+val validate_result : bool -> string -> string -> QData.qdata -> QData.qdata option -> bool
     
 val check_rule_result : eval_config -> QData.qdata list -> string -> QData.qdata option -> string -> unit
 val check_oql_result : QData.qdata list -> string -> QData.qdata option -> string -> unit

@@ -26,8 +26,10 @@ EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
 CPATH=$(subst $(BLANK),$(PATH_SEP),../backends/java/bin ../bin/javaRunner.jar ../bin/lib/*)
+NPMPATH=../backends/javascriptRunner/bin
 JAVAC=javac
 JAVARUN=java
+NODERUN=node
 
 #
 QCERTCOMP=../bin/qcert
@@ -101,14 +103,13 @@ oql-string-tests:
                             -eval-validate -output oql/string$(N).out || exit 1;))
 oql-string-tests-js:
 	@$(foreach N,$(OQLSTRINGNUM), \
-	       $(QCERTCOMP) -source oql -target js oql/string$(N).oql \
-                            -eval-validate -schema oql/string.schema; \
-	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../backends/javascript/qcert-runtime.js \
-                          -input oql/string.input \
-                          -schema oql/string.schema \
-                          -output oql/string$(N).out \
-                          oql/string$(N).js || exit 1 ;)
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --source oql \
+                          --input oql/string.input \
+                          --schema oql/string.schema \
+                          --output oql/string$(N).out \
+                          --eval-validate \
+                          --query oql/string$(N).oql || exit 1 ;)
 oql-string-tests-java:
 	@$(foreach N,$(OQLSTRINGNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/string$(N).oql \
@@ -129,14 +130,13 @@ oql-world-tests:
                             -eval-validate -output oql/world$(N).out || exit 1;))
 oql-world-tests-js:
 	@$(foreach N,$(OQLWORLDNUM), \
-	       $(QCERTCOMP) -source oql -target js oql/world$(N).oql \
-                            -eval-validate -schema oql/world.schema; \
-	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../backends/javascript/qcert-runtime.js \
-                          -input oql/world.input \
-                          -schema oql/world.schema \
-                          -output oql/world$(N).out \
-                          oql/world$(N).js || exit 1;)
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --source oql \
+                          --input oql/world.input \
+                          --schema oql/world.schema \
+                          --output oql/world$(N).out \
+                          --eval-validate \
+                          --query oql/world$(N).oql || exit 1 ;)
 oql-world-tests-java:
 	@$(foreach N,$(OQLWORLDNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/world$(N).oql \
@@ -185,14 +185,13 @@ oql-employees-tests:
                             -eval-validate -output oql/employees$(N).out || exit 1;))
 oql-employees-tests-js:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
-	       $(QCERTCOMP) -source oql  -target js oql/employees$(N).oql \
-                            -eval-validate -schema oql/employees.schema; \
-	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../backends/javascript/qcert-runtime.js \
-                          -input oql/employees.input \
-                          -schema oql/employees.schema \
-                          -output oql/employees$(N).out \
-                          oql/employees$(N).js || exit 1;)
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --source oql \
+                          --input oql/employees.input \
+                          --schema oql/employees.schema \
+                          --output oql/employees$(N).out \
+                          --eval-validate \
+                          --query oql/employees$(N).oql || exit 1 ;)
 oql-employees-tests-java:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/employees$(N).oql \

@@ -42,16 +42,19 @@ class Commands {
      * Compile and execute query
      *
      * @param {string} source - source language
-     * @param {string} schemaFile - source schema file
-     * @param {string} queryFile - source query file
-     * @param {string} inputFile - source data file
+     * @param {string} schemaFile - schema file
+     * @param {string} queryFile - query file
+     * @param {string} inputFile - input data file
+     * @param {string} outputFile - expected result file
+     * @param {boolean} validate - validate the result
      * @returns {object} Promise to the result of execution
      */
-    static execute(source,schemaFile,queryFile,inputFile) {
+    static execute(source,schemaFile,queryFile,inputFile,outputFile,validate) {
         const input = getJson(inputFile);
         const sourceQuery = Fs.readFileSync(queryFile,'utf8');
         const schema = getJson(schemaFile);
-        return QcertRunner.compileExecute(source,schema,input,sourceQuery);
+        const output = outputFile ? getJson(outputFile) : null;
+        return QcertRunner.compileExecute(source,schema,input,queryFile,sourceQuery,output,validate);
     }
 
 }

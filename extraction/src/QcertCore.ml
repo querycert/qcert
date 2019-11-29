@@ -206,7 +206,7 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
   let queryname = Filename.chop_extension file_name in
   let res_validates =
     if validate
-    then CheckUtil.validate_result queryname language_name expected_output (Some ev_data)
+    then CheckUtil.validate_result false queryname language_name expected_output (Some ev_data)
     else true
   in
   let s = Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") ev_data) in
