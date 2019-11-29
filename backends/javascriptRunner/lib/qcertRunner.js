@@ -58,9 +58,12 @@ class QcertRunner {
     }
 
     /* Link compile query and load it as Node module */
-    static loadQuery(compiledQuery) {
+    static loadQuery(schema,compiledQuery) {
         try {
-            const linkedQuery = QcertRuntimeString + compiledQuery + 'module.exports = { query };\n';
+            const inheritance = schema && schema.inheritance ? schema.inheritance : [];
+            const inheritanceString = `const inheritance = ${JSON.stringify(inheritance)};`;
+            const linkedQuery =
+                  inheritanceString + QcertRuntimeString + compiledQuery + 'module.exports = { query };\n';
             const { query } = requireFromString(linkedQuery, 'query.js');
             return query;
         } catch(err) {
@@ -70,8 +73,8 @@ class QcertRunner {
     }
 
     /* execute compiled query */
-    static execute(compiledQuery,input) {
-        const query = QcertRunner.loadQuery(compiledQuery);
+    static execute(schema,compiledQuery,input) {
+        const query = QcertRunner.loadQuery(schema,compiledQuery);
         return query(input);
     }
 
@@ -102,13 +105,13 @@ class QcertRunner {
         const compiledQuery = QcertRunner.compile(source,schema,sourceQuery,output);
         if (validate) {
             if (output) {
-                let result = QcertRunner.execute(compiledQuery.result,input);
+                let result = QcertRunner.execute(schema,compiledQuery.result,input);
                 return QcertRunner.validate(compiledQuery.gconf,queryFile,source,output,result)
             } else {
                 throw new Error('Cannot validate result without expected result (--output option)');
             }
         } else {
-            return QcertRunner.execute(compiledQuery.result,input);
+            return QcertRunner.execute(schema,compiledQuery.result,input);
         }
     }
 }
