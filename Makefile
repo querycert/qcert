@@ -21,14 +21,13 @@ include Makefile.coq_modules
 
 #
 CP=cp
-TSC?=tsc
 
-FILES = $(addprefix mechanization/,$(MODULES:%=%.v))
+FILES = $(addprefix compiler/src/,$(MODULES:%=%.v))
 
 ## Compiler
 all: 
 	@$(MAKE) qcert
-	@$(MAKE) MAKEFLAGS= qcert-frontends
+	@$(MAKE) MAKEFLAGS= qcert-parser
 	@$(MAKE) MAKEFLAGS= qcert-backends
 
 # Regenerate the npm directory
@@ -51,41 +50,41 @@ qcert-ocaml:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Extracting compiler to OCaml"
 	@echo "[Q*cert] "
-	@$(MAKE) -C extraction native
+	@$(MAKE) -C compiler/extraction native
 
 qcert-javascript:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Extracting compiler to JavaScript"
 	@echo "[Q*cert] "
-	@$(MAKE) -C extraction js
+	@$(MAKE) -C compiler/extraction js
 
-qcert-frontends:
+qcert-parser:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] FRONTEND"
+	@echo "[Q*cert] PARSERS"
 	@echo "[Q*cert] "
 ifneq ($(SQL),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling SQL parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C frontends/sqlParser
+	@$(MAKE) -C parsers/sqlParser
 endif
 ifneq ($(SQLPP),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling SQL++ parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C frontends/sqlppParser
+	@$(MAKE) -C parsers/sqlppParser
 endif
 ifneq ($(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling ODM rules parsers"
 	@echo "[Q*cert] "
-	@$(MAKE) -C frontends/jrulesParser
+	@$(MAKE) -C parsers/jrulesParser
 endif
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Installing frontend service"
 	@echo "[Q*cert] "
-	@$(MAKE) -C frontends/javaService all install
+	@$(MAKE) -C parsers/javaService all install
 endif
 
 clean-coq:
@@ -94,24 +93,24 @@ clean-coq:
 cleanall-coq: clean-coq
 
 clean-ocaml:
-	- @$(MAKE) -C extraction clean
+	- @$(MAKE) -C compiler/extraction clean
 
 cleanall-ocaml:
-	- @$(MAKE) -C extraction cleanall
+	- @$(MAKE) -C compiler/extraction cleanall
 
-clean-frontends:
-	- @$(MAKE) -C frontends/javaService clean
-	- @$(MAKE) -C frontends/sqlParser clean
-	- @$(MAKE) -C frontends/sqlppParser clean
-	- @$(MAKE) -C frontends/jrulesParser clean
+clean-parsers:
+	- @$(MAKE) -C parsers/javaService clean
+	- @$(MAKE) -C parsers/sqlParser clean
+	- @$(MAKE) -C parsers/sqlppParser clean
+	- @$(MAKE) -C parsers/jrulesParser clean
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
-cleanall-frontends:
-	- @$(MAKE) -C frontends/javaService cleanall
-	- @$(MAKE) -C frontends/sqlParser cleanall
-	- @$(MAKE) -C frontends/sqlppParser cleanall
-	- @$(MAKE) -C frontends/jrulesParser cleanall
+cleanall-parsers:
+	- @$(MAKE) -C parsers/javaService cleanall
+	- @$(MAKE) -C parsers/sqlParser cleanall
+	- @$(MAKE) -C parsers/sqlppParser cleanall
+	- @$(MAKE) -C parsers/jrulesParser cleanall
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
@@ -202,7 +201,7 @@ install-coq:
 
 ## Documentation
 documentation:
-	@$(MAKE) -C mechanization documentation
+	@$(MAKE) -C compiler/src documentation
 
 
 ## Cleanup
@@ -210,7 +209,7 @@ clean: Makefile.coq remove_all_derived
 	- @$(MAKE) clean-coq
 	- @$(MAKE) clean-ocaml
 	- @$(MAKE) clean-backends
-	- @$(MAKE) cleanall-frontends
+	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) clean-demo
 	- @$(MAKE) clean-tests
 	- @rm -f Makefile.coq
@@ -220,7 +219,7 @@ cleanall: Makefile.coq remove_all_derived
 	- @$(MAKE) cleanall-coq
 	- @$(MAKE) cleanall-ocaml
 	- @$(MAKE) cleanall-backends
-	- @$(MAKE) cleanall-frontends
+	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-tests
 	- @rm -f Makefile.coq
@@ -229,7 +228,7 @@ cleanall: Makefile.coq remove_all_derived
 cleannotall: Makefile.coq
 	- @$(MAKE) cleanall-ocaml
 	- @$(MAKE) cleanall-backends
-	- @$(MAKE) cleanall-frontends
+	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-tests
 	- @rm -f Makefile.coq
