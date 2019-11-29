@@ -23,7 +23,7 @@ JAVAC=javac
 
 # Remaining entries can be left as is
 
-QCERTCOMP=../bin/qcert
+QCERTCOMP=../../../bin/qcert
 RAWCPATH=bin ../javaService/bin ../javaService/lib/gson-2.7.jar ../javaService/lib/commons-csv-1.1.jar $(wildcard lib/*.jar)
 
 JAVA_SRCS=$(shell find src/ -name '*.java')
