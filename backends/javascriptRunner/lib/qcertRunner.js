@@ -29,8 +29,8 @@ function requireFromString(src, filename) {
 }
 
 class QcertRunner {
-    /* Call Q*cert compiler */
-    static compile(source,schema,sourceQuery,output) {
+    /* Build compilation configuration */
+    static configure(source,schema,sourceQuery,output) {
         const config = {
 		        'source' : source,
 		        'target' : 'js',
@@ -44,7 +44,12 @@ class QcertRunner {
 		        'javaimports' : '',
 	          'optims' : '[]',
         };
-        const gconf = QcertLib.buildConfig(config);
+        return QcertLib.buildConfig(config);
+    }
+
+    /* Call Q*cert compiler */
+    static compile(source,schema,sourceQuery,output) {
+        const gconf = QcertRunner.configure(source,schema,sourceQuery,output);
         const queryInput = {
             'gconf' : gconf,
 		        'query' : sourceQuery,
@@ -73,7 +78,7 @@ class QcertRunner {
     }
 
     /* execute compiled query */
-    static execute(schema,compiledQuery,input) {
+    static executeCompiled(schema,compiledQuery,input) {
         const query = QcertRunner.loadQuery(schema,compiledQuery);
         return query(input);
     }
@@ -105,13 +110,28 @@ class QcertRunner {
         const compiledQuery = QcertRunner.compile(source,schema,sourceQuery,output);
         if (validate) {
             if (output) {
-                let result = QcertRunner.execute(schema,compiledQuery.result,input);
+                let result = QcertRunner.executeCompiled(schema,compiledQuery.result,input);
                 return QcertRunner.validate(compiledQuery.gconf,queryFile,source,output,result)
             } else {
                 throw new Error('Cannot validate result without expected result (--output option)');
             }
         } else {
-            return QcertRunner.execute(schema,compiledQuery.result,input);
+            return QcertRunner.executeCompiled(schema,compiledQuery.result,input);
+        }
+    }
+
+    /* run compiled query */
+    static execute(schema,input,queryFile,compiledQuery,output,validate) {
+        const gconf = QcertRunner.configure('oql',schema,compiledQuery,output);
+        if (validate) {
+            if (output) {
+                let result = QcertRunner.executeCompiled(schema,compiledQuery,input);
+                return QcertRunner.validate(gconf,queryFile,'js',output,result)
+            } else {
+                throw new Error('Cannot validate result without expected result (--output option)');
+            }
+        } else {
+            return QcertRunner.executeCompiled(schema,compiledQuery,input);
         }
     }
 }

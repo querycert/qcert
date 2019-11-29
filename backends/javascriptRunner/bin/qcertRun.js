@@ -23,7 +23,7 @@ require('yargs')
     .demandCommand(1, '# Please specify a command')
     .recommendCommands()
     .strict()
-    .command('execute', 'Compile and execute a query', (yargs) => {
+    .command('compile', 'Compile and run a query', (yargs) => {
         yargs.demandOption(['source', 'query','schema','input'], 'Please provide at least the source language, query, schema and input');
         yargs.usage('Usage: $0 execute --source [lang] --query [file] --schema [file] --input [file]');
         yargs.option('source', {
@@ -56,7 +56,42 @@ require('yargs')
 
         // Compile and Execute
         try {
-            const result = Commands.execute(argv.source, { file: argv.schema }, argv.query, { file: argv.input }, argv.output ? { file: argv.output } : null, argv['eval-validate']);
+            const result = Commands.compile(argv.source, { file: argv.schema }, argv.query, { file: argv.input }, argv.output ? { file: argv.output } : null, argv['eval-validate']);
+            Logger.info(result);
+        } catch(err) {
+            Logger.error(err.message);
+        };
+    })
+    .command('execute', 'Run a query', (yargs) => {
+        yargs.demandOption(['query','schema','input'], 'Please provide at least the source language, compiled query, schema and input');
+        yargs.usage('Usage: $0 execute [lang] --query [file] --schema [file] --input [file]');
+        yargs.option('query', {
+            describe: 'the query',
+            type: 'string'
+        });
+        yargs.option('schema', {
+            describe: 'the schema',
+            type: 'string'
+        });
+        yargs.option('input', {
+            describe: 'the data',
+            type: 'string'
+        });
+        yargs.option('output', {
+            describe: 'the expected result',
+            type: 'string'
+        });
+        yargs.option('eval-validate', {
+            describe: 'check result correctness',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        let files = argv._;
+
+        // Compile and Execute
+        try {
+            const result = Commands.execute({ file: argv.schema }, argv.query, { file: argv.input }, argv.output ? { file: argv.output } : null, argv['eval-validate']);
             Logger.info(result);
         } catch(err) {
             Logger.error(err.message);
