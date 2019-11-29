@@ -29,7 +29,7 @@ all:
 	@$(MAKE) qcert
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
 	@$(MAKE) MAKEFLAGS= qcert-javascript
-	@$(MAKE) MAKEFLAGS= qcert-parser
+	@$(MAKE) MAKEFLAGS= qcert-parsers
 	@$(MAKE) MAKEFLAGS= qcert-runtimes
 	@$(MAKE) MAKEFLAGS= qcert-clis
 
@@ -74,7 +74,7 @@ cleanall-ocaml:
 
 ## Java Parsers
 
-qcert-parser:
+qcert-parsers:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compling Java parsers"
 	@echo "[Q*cert] "
@@ -82,40 +82,40 @@ ifneq ($(SQL),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] SQL parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/sqlParser
+	@$(MAKE) -C compiler/parsers/sqlParser
 endif
 ifneq ($(SQLPP),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] SQL++ parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/sqlppParser
+	@$(MAKE) -C compiler/parsers/sqlppParser
 endif
 ifneq ($(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] ODM rules parsers"
 	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/jrulesParser
+	@$(MAKE) -C compiler/parsers/jrulesParser
 endif
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Installing parser service"
 	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/javaService all install
+	@$(MAKE) -C compiler/parsers/javaService all install
 endif
 
 clean-parsers:
-	- @$(MAKE) -C parsers/javaService clean
-	- @$(MAKE) -C parsers/sqlParser clean
-	- @$(MAKE) -C parsers/sqlppParser clean
-	- @$(MAKE) -C parsers/jrulesParser clean
+	- @$(MAKE) -C compiler/parsers/javaService clean
+	- @$(MAKE) -C compiler/parsers/sqlParser clean
+	- @$(MAKE) -C compiler/parsers/sqlppParser clean
+	- @$(MAKE) -C compiler/parsers/jrulesParser clean
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
 cleanall-parsers:
-	- @$(MAKE) -C parsers/javaService cleanall
-	- @$(MAKE) -C parsers/sqlParser cleanall
-	- @$(MAKE) -C parsers/sqlppParser cleanall
-	- @$(MAKE) -C parsers/jrulesParser cleanall
+	- @$(MAKE) -C compiler/parsers/javaService cleanall
+	- @$(MAKE) -C compiler/parsers/sqlParser cleanall
+	- @$(MAKE) -C compiler/parsers/sqlppParser cleanall
+	- @$(MAKE) -C compiler/parsers/jrulesParser cleanall
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
@@ -165,6 +165,7 @@ cleanall-runtimes:
 	- @$(MAKE) -C runtimes/java cleanall
 	- @$(MAKE) -C runtimes/spark2 cleanall
 	- @rm -rf bin/lib
+	- @rm -f bin/javaRunner.jar
 
 
 ## CLIs
@@ -256,26 +257,19 @@ clean: Makefile.coq remove_all_derived
 	- @rm -f Makefile.coq
 	- @rm -f *~
 
-cleanall: Makefile.coq remove_all_derived
-	- @$(MAKE) cleanall-coq
+cleanmost: Makefile.coq
 	- @$(MAKE) cleanall-ocaml
-	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-runtimes
 	- @$(MAKE) cleanall-clis
+	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-test
 	- @rm -f Makefile.coq
 	- @rm -f *~
 
-cleannotall: Makefile.coq
-	- @$(MAKE) cleanall-ocaml
-	- @$(MAKE) cleanall-runtimes
-	- @$(MAKE) cleanall-clis
-	- @$(MAKE) cleanall-parsers
-	- @$(MAKE) cleanall-demo
-	- @$(MAKE) cleanall-test
-	- @rm -f Makefile.coq
-	- @rm -f *~
+cleanall: Makefile.coq remove_all_derived
+	- @$(MAKE) cleanall-coq
+	- @$(MAKE) cleanmost
 
 ## Misc
 

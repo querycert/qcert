@@ -83,13 +83,13 @@ tests/%_j.sexp:	tests/%.sqlpp
 	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $<
 
 tests/%.js:	tests/%.sqlpp
-	-../bin/qcert -source $(LANG) $<
+	-../../../bin/qcert -source $(LANG) $<
 
 tests/%.js:	tests/%.sql
-	-../bin/qcert -source $(LANG) $<
+	-../../../bin/qcert -source $(LANG) $<
 
 tests/%_sqlpp.sexp:	tests/%.sqlpp tests/%_j.sexp
-	-../bin/qcert -source sqlpp -target sqlpp -emit-sexp $<
+	-../../../bin/qcert -source sqlpp -target sqlpp -emit-sexp $<
 	-java -cp bin$(PATH_SEP)$(CPATH) org.qcert.util.SExpParser tests/$*_j.sexp $@
 
 $(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)

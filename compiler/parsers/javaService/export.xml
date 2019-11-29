@@ -4,7 +4,7 @@
 	(2) A 'javaService.zip' to be deployed as a long-running server in some convenient location (to support demo.html). -->
 	
 	<!-- The target directory for the JavaService artifacts that support local execution -->
-	<property name="dest" value="../../bin"/>
+	<property name="dest" value="../../../bin"/>
 	
 	<target name="create_javaservice_artifacts">
 
