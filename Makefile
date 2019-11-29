@@ -28,7 +28,8 @@ FILES = $(addprefix compiler/src/,$(MODULES:%=%.v))
 all: 
 	@$(MAKE) qcert
 	@$(MAKE) MAKEFLAGS= qcert-parser
-	@$(MAKE) MAKEFLAGS= qcert-backends
+	@$(MAKE) MAKEFLAGS= qcert-runtimes
+	@$(MAKE) MAKEFLAGS= qcert-clis
 
 # Regenerate the npm directory
 npm:
@@ -115,64 +116,85 @@ cleanall-parsers:
 	- @rm -f bin/javaService.jar
 
 
-## Backends
-qcert-backends:
-	@$(MAKE) javascript-backend
+## Runtimes
+qcert-runtimes:
+	@$(MAKE) javascript-runtime
 ifneq ($(JAVA),)
-	@$(MAKE) java-backend
+	@$(MAKE) java-runtime
 endif
 ifneq ($(SPARK),)
-	@$(MAKE) spark2-backend
+	@$(MAKE) spark2-runtime
 endif
 
-javascript-backend:
+javascript-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building JavaScript backend"
+	@echo "[Q*cert] Building JavaScript runtime"
 	@echo "[Q*cert] "
-	@$(MAKE) -C backends/javascript
+	@$(MAKE) -C runtimes/javascript
 
-java-backend:
+java-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building Java backend"
+	@echo "[Q*cert] Building Java runtime"
 	@echo "[Q*cert] "
-	@$(MAKE) -C backends/java
-	@$(MAKE) -C backends/javaRunner all install
-	@$(MAKE) -C backends/javascriptRunner all
+	@$(MAKE) -C runtimes/java
 
-spark2-backend:
+spark2-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building Spark2 backend"
+	@echo "[Q*cert] Building Spark2 runtime"
 	@echo "[Q*cert] "
-	@$(MAKE) -C backends/spark2
-	@$(MAKE) -C backends/javaRunner all install
+	@$(MAKE) -C runtimes/spark2
 
-clean-backends:
-	- @$(MAKE) -C backends/javascript clean
-	- @$(MAKE) -C backends/java clean
-	- @$(MAKE) -C backends/spark2 clean
-	- @$(MAKE) -C backends/javaRunner clean
+clean-runtimes:
+	- @$(MAKE) -C runtimes/javascript clean
+	- @$(MAKE) -C runtimes/java clean
+	- @$(MAKE) -C runtimes/spark2 clean
 	- @rm -rf bin/lib
 	- @rm -f bin/javaRunner.jar
 
-cleanall-backends:
-	- @$(MAKE) -C backends/javascript cleanall
-	- @$(MAKE) -C backends/java cleanall
-	- @$(MAKE) -C backends/spark2 cleanall
-	- @$(MAKE) -C backends/javaRunner cleanall
+cleanall-runtimes:
+	- @$(MAKE) -C runtimes/javascript cleanall
+	- @$(MAKE) -C runtimes/java cleanall
+	- @$(MAKE) -C runtimes/spark2 cleanall
 	- @rm -rf bin/lib
+
+## CLIS
+qcert-clis:
+	@$(MAKE) javascript-cli
+ifneq ($(JAVA),)
+	@$(MAKE) java-cli
+endif
+
+javascript-cli:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Building JavaScript CLI"
+	@echo "[Q*cert] "
+	@$(MAKE) -C clis/nodejs all
+
+java-cli:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Building Java CLI"
+	@echo "[Q*cert] "
+	@$(MAKE) -C clis/java all install
+
+clean-clis:
+	- @$(MAKE) -C clis/java clean
+	- @rm -f bin/javaRunner.jar
+
+cleanall-clis:
+	- @$(MAKE) -C clis/java cleanall
 	- @rm -f bin/javaRunner.jar
 
 ## Demo
 bin/qcertJS.js:
 	@$(MAKE) qcert-javascript
 
-backends/javascript/qcert-runtime.js:
-	@$(MAKE) javascript-backend
+runtimes/javascript/qcert-runtime.js:
+	@$(MAKE) javascript-runtime
 
 demo:
 	@$(MAKE) qcert-demo
 
-qcert-demo: bin/qcertJS.js backends/javascript/qcert-runtime.js
+qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling Web Demo in TypeScript"
 	@echo "[Q*cert] "
@@ -208,7 +230,8 @@ documentation:
 clean: Makefile.coq remove_all_derived
 	- @$(MAKE) clean-coq
 	- @$(MAKE) clean-ocaml
-	- @$(MAKE) clean-backends
+	- @$(MAKE) clean-runtimes
+	- @$(MAKE) clean-clis
 	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) clean-demo
 	- @$(MAKE) clean-tests
@@ -218,7 +241,8 @@ clean: Makefile.coq remove_all_derived
 cleanall: Makefile.coq remove_all_derived
 	- @$(MAKE) cleanall-coq
 	- @$(MAKE) cleanall-ocaml
-	- @$(MAKE) cleanall-backends
+	- @$(MAKE) cleanall-runtimes
+	- @$(MAKE) cleanall-clis
 	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-tests
@@ -227,7 +251,8 @@ cleanall: Makefile.coq remove_all_derived
 
 cleannotall: Makefile.coq
 	- @$(MAKE) cleanall-ocaml
-	- @$(MAKE) cleanall-backends
+	- @$(MAKE) cleanall-runtimes
+	- @$(MAKE) cleanall-clis
 	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-tests

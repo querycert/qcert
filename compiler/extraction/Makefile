@@ -47,11 +47,11 @@ js: ../../bin/$(MAIN3).js
 ## Extraction
 VO_FILES = $(MODULES:%=../src/%.vo)
 
-../../backends/javascript/qcert_runtime.ml:
-	$(MAKE) -C ../../backends/javascript
+../../runtimes/javascript/qcert_runtime.ml:
+	$(MAKE) -C ../../runtimes/javascript
 
-src/QcertJsRuntime.ml: ../../backends/javascript/qcert_runtime.ml
-	cp ../../backends/javascript/qcert_runtime.ml src/QcertJsRuntime.ml
+src/QcertJsRuntime.ml: ../../runtimes/javascript/qcert_runtime.ml
+	cp ../../runtimes/javascript/qcert_runtime.ml src/QcertJsRuntime.ml
 
 extracted: extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 

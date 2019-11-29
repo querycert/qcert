@@ -25,8 +25,8 @@ endif
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
-CPATH=$(subst $(BLANK),$(PATH_SEP),../backends/java/bin ../bin/javaRunner.jar ../bin/lib/*)
-NPMPATH=../backends/javascriptRunner/bin
+CPATH=$(subst $(BLANK),$(PATH_SEP),../runtimes/java/bin ../bin/javaRunner.jar ../bin/lib/*)
+NPMPATH=../clis/nodejs/bin
 JAVAC=javac
 JAVARUN=java
 NODERUN=node
@@ -362,7 +362,7 @@ tech_rule-test-tests-js:
 	       $(QCERTCOMP) -source tech_rule  -target js tech_rule/test$(N).arl \
                             -eval-validate -schema tech_rule/test.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../backends/javascript/qcert-runtime.js \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
                           -input tech_rule/test.input \
                           -schema tech_rule/test.schema \
                           -output tech_rule/test$(N).out \
@@ -403,7 +403,7 @@ designer_rule-test-tests-js:
 	       $(QCERTCOMP) -source designer_rule -target js designer_rule/test$(N).agg \
                             -eval-validate -schema designer_rule/test.schema; \
 	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../backends/javascript/qcert-runtime.js \
+                          -runtime ../runtimes/javascript/qcert-runtime.js \
                           -input designer_rule/test.input \
                           -schema designer_rule/test.schema \
                           -output designer_rule/test$(N).out \
