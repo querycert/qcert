@@ -83,14 +83,6 @@ $(MAIN2).$(TARGET): src/QcertJsRuntime.ml extracted
 _build_js/$(MAIN3).byte: src/QcertJsRuntime.ml extracted $(MAIN3).ml
 	$(OCAMLBUILD) $(MENHIRFLAG) -build-dir _build_js -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is extracted -Is src $(MAIN3).byte
 
-## Whisk
-wsk-update: js
-	wsk action update qcert _build_js/$(MAIN3).js
-
-wsk-invoke:
-	wsk action invoke -br qcert -p source lambda_nra -p target nraenv \
-		-p query 'Persons.filter{ p => p.age = 32 }'
-
 ## Clean
 
 clean:

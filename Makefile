@@ -24,28 +24,34 @@ CP=cp
 
 FILES = $(addprefix compiler/src/,$(MODULES:%=%.v))
 
-## Compiler
+## Full run
 all: 
 	@$(MAKE) qcert
+	@$(MAKE) MAKEFLAGS= qcert-ocaml
+	@$(MAKE) MAKEFLAGS= qcert-javascript
 	@$(MAKE) MAKEFLAGS= qcert-parser
 	@$(MAKE) MAKEFLAGS= qcert-runtimes
 	@$(MAKE) MAKEFLAGS= qcert-clis
 
-# Regenerate the npm directory
-npm:
-	@echo "Updating npm package"
-	@$(MAKE) -C npm package
+
+## Compiler Core
 
 qcert: Makefile.coq
 	@$(MAKE) qcert-coq
-	@$(MAKE) MAKEFLAGS= qcert-ocaml
-	@$(MAKE) MAKEFLAGS= qcert-javascript
 
 qcert-coq: Makefile.coq
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling Coq source"
 	@echo "[Q*cert] "
 	@$(MAKE) -f Makefile.coq
+
+clean-coq:
+	- @$(MAKE) -f Makefile.coq clean
+
+cleanall-coq: clean-coq
+
+
+## Extraction
 
 qcert-ocaml:
 	@echo "[Q*cert] "
@@ -59,45 +65,43 @@ qcert-javascript:
 	@echo "[Q*cert] "
 	@$(MAKE) -C compiler/extraction js
 
-qcert-parser:
-	@echo "[Q*cert] "
-	@echo "[Q*cert] PARSERS"
-	@echo "[Q*cert] "
-ifneq ($(SQL),)
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling SQL parser"
-	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/sqlParser
-endif
-ifneq ($(SQLPP),)
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling SQL++ parser"
-	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/sqlppParser
-endif
-ifneq ($(JRULES),)
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling ODM rules parsers"
-	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/jrulesParser
-endif
-ifneq ($(SQL)$(SQLPP)$(JRULES),)
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Installing frontend service"
-	@echo "[Q*cert] "
-	@$(MAKE) -C parsers/javaService all install
-endif
-
-clean-coq:
-	- @$(MAKE) -f Makefile.coq clean
-
-cleanall-coq: clean-coq
-
 clean-ocaml:
 	- @$(MAKE) -C compiler/extraction clean
 
 cleanall-ocaml:
 	- @$(MAKE) -C compiler/extraction cleanall
+
+
+## Java Parsers
+
+qcert-parser:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compling Java parsers"
+	@echo "[Q*cert] "
+ifneq ($(SQL),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] SQL parser"
+	@echo "[Q*cert] "
+	@$(MAKE) -C parsers/sqlParser
+endif
+ifneq ($(SQLPP),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] SQL++ parser"
+	@echo "[Q*cert] "
+	@$(MAKE) -C parsers/sqlppParser
+endif
+ifneq ($(JRULES),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] ODM rules parsers"
+	@echo "[Q*cert] "
+	@$(MAKE) -C parsers/jrulesParser
+endif
+ifneq ($(SQL)$(SQLPP)$(JRULES),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Installing parser service"
+	@echo "[Q*cert] "
+	@$(MAKE) -C parsers/javaService all install
+endif
 
 clean-parsers:
 	- @$(MAKE) -C parsers/javaService clean
@@ -118,7 +122,12 @@ cleanall-parsers:
 
 ## Runtimes
 qcert-runtimes:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Building runtimes"
+	@echo "[Q*cert] "
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) javascript-runtime
+endif
 ifneq ($(JAVA),)
 	@$(MAKE) java-runtime
 endif
@@ -128,19 +137,19 @@ endif
 
 javascript-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building JavaScript runtime"
+	@echo "[Q*cert] JavaScript runtime"
 	@echo "[Q*cert] "
 	@$(MAKE) -C runtimes/javascript
 
 java-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building Java runtime"
+	@echo "[Q*cert] Java runtime"
 	@echo "[Q*cert] "
 	@$(MAKE) -C runtimes/java
 
 spark2-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building Spark2 runtime"
+	@echo "[Q*cert] Spark2 runtime"
 	@echo "[Q*cert] "
 	@$(MAKE) -C runtimes/spark2
 
@@ -157,22 +166,28 @@ cleanall-runtimes:
 	- @$(MAKE) -C runtimes/spark2 cleanall
 	- @rm -rf bin/lib
 
-## CLIS
+
+## CLIs
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Building CLIs"
+	@echo "[Q*cert] "
 qcert-clis:
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) javascript-cli
+endif
 ifneq ($(JAVA),)
 	@$(MAKE) java-cli
 endif
 
 javascript-cli:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building JavaScript CLI"
+	@echo "[Q*cert] Node.js CLI"
 	@echo "[Q*cert] "
 	@$(MAKE) -C clis/nodejs all
 
 java-cli:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building Java CLI"
+	@echo "[Q*cert] Java CLI"
 	@echo "[Q*cert] "
 	@$(MAKE) -C clis/java all install
 
@@ -184,15 +199,16 @@ cleanall-clis:
 	- @$(MAKE) -C clis/java cleanall
 	- @rm -f bin/javaRunner.jar
 
+
 ## Demo
+demo:
+	@$(MAKE) qcert-demo
+
 bin/qcertJS.js:
 	@$(MAKE) qcert-javascript
 
 runtimes/javascript/qcert-runtime.js:
 	@$(MAKE) javascript-runtime
-
-demo:
-	@$(MAKE) qcert-demo
 
 qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
@@ -206,20 +222,23 @@ clean-demo:
 cleanall-demo: clean-demo
 	- @rm -rf documentation/demo/node_modules
 
-## Test
 
-tests:
-	@$(MAKE) -C test
+## Tests
 
-clean-tests:
-	@$(MAKE) -C test clean
+test:
+	@$(MAKE) -C tests
 
-cleanall-tests: clean-tests
+clean-test:
+	@$(MAKE) -C tests clean
+
+cleanall-test: clean-test
+
 
 ## Install
 
 install-coq:
 	@$(MAKE) -f Makefile.coq install
+
 
 ## Documentation
 docs:
@@ -229,22 +248,22 @@ docs:
 clean: Makefile.coq remove_all_derived
 	- @$(MAKE) clean-coq
 	- @$(MAKE) clean-ocaml
+	- @$(MAKE) clean-parsers
 	- @$(MAKE) clean-runtimes
 	- @$(MAKE) clean-clis
-	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) clean-demo
-	- @$(MAKE) clean-tests
+	- @$(MAKE) clean-test
 	- @rm -f Makefile.coq
 	- @rm -f *~
 
 cleanall: Makefile.coq remove_all_derived
 	- @$(MAKE) cleanall-coq
 	- @$(MAKE) cleanall-ocaml
+	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-runtimes
 	- @$(MAKE) cleanall-clis
-	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-demo
-	- @$(MAKE) cleanall-tests
+	- @$(MAKE) cleanall-test
 	- @rm -f Makefile.coq
 	- @rm -f *~
 
@@ -254,9 +273,11 @@ cleannotall: Makefile.coq
 	- @$(MAKE) cleanall-clis
 	- @$(MAKE) cleanall-parsers
 	- @$(MAKE) cleanall-demo
-	- @$(MAKE) cleanall-tests
+	- @$(MAKE) cleanall-test
 	- @rm -f Makefile.coq
 	- @rm -f *~
+
+## Misc
 
 clean_detritus:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 ./scripts/remove_detritus_derived_file.sh
@@ -264,7 +285,6 @@ clean_detritus:
 remove_all_derived:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
 
-##
 Makefile.coq: Makefile Makefile.coq_modules $(FILES)
 	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
 

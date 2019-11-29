@@ -410,6 +410,7 @@ designer_rule-test-tests-js:
                           designer_rule/test$(N).js || exit 1;)
 
 clean:
+	@rm -f log
 	@rm -f */*.txt
 	@rm -f oql/*.json
 	@rm -f oql/*.js
