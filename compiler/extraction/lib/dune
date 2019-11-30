@@ -1,0 +1,13 @@
+(ocamllex
+  (modules DataLexer LambdaNRALexer OQLLexer RuleLexer SExpLexer)
+)
+
+(menhir
+  (modules DataParser LambdaNRAParser OQLParser RuleParser SExpParser)
+  (flags ("-la" "2"))
+)
+
+(library
+ (name qcertLib)
+ (libraries qcertExtracted base64)
+)

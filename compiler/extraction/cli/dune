@@ -1,0 +1,3 @@
+(executables
+ (names qcert qdata)
+ (libraries unix qcertExtracted qcertLib))
