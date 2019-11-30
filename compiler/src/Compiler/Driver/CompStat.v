@@ -54,7 +54,7 @@ Require Import CompLang.
 Require Import CompDriver.
 
 Definition time {A: Type} {B: Type} (compile: A -> B) (q: A) := ("no timing info"%string, compile q).
-Extract Inlined Constant time => "(fun f x -> Util.time f x)".
+Extract Inlined Constant time => "(fun f x -> QcertUtils.Util.time f x)".
 
 Section CompStat.
   Local Open Scope list_scope.

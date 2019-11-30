@@ -205,7 +205,7 @@ Definition denhancedsqldateinterval td := dforeign (enhancedsqldateinterval td).
 Require Import JSON.
 
 Axiom JENHANCED_string : STRING -> string.
-Extract Constant JENHANCED_string => "(fun s -> Util.string_of_enhanced_string s)".
+Extract Constant JENHANCED_string => "(fun s -> QcertUtils.Util.string_of_enhanced_string s)".
 
 Definition jenhancedstring s := JENHANCED_string s.
 
@@ -970,13 +970,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
 
   (* nra optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_nraenv_token_type : Set.
-  Extract Constant OPTIMIZER_LOGGER_nraenv_token_type => "Util.nra_logger_token_type".
+  Extract Constant OPTIMIZER_LOGGER_nraenv_token_type => "QcertUtils.Util.nra_logger_token_type".
 
   Axiom OPTIMIZER_LOGGER_nraenv_startPass :
     String.string -> nraenv -> OPTIMIZER_LOGGER_nraenv_token_type.
 
   Extract Constant OPTIMIZER_LOGGER_nraenv_startPass =>
-  "(fun name input -> Logger.nra_log_startPass (Util.string_of_char_list name) input)".
+  "(fun name input -> QcertUtils.Logger.nra_log_startPass (QcertUtils.Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_nraenv_step :
     OPTIMIZER_LOGGER_nraenv_token_type -> String.string ->
@@ -984,13 +984,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
     OPTIMIZER_LOGGER_nraenv_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_step =>
-  "(fun token name input output -> Logger.nra_log_step token (Util.string_of_char_list name) input output)".
+  "(fun token name input output -> QcertUtils.Logger.nra_log_step token (QcertUtils.Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_nraenv_endPass :
     OPTIMIZER_LOGGER_nraenv_token_type -> nraenv -> OPTIMIZER_LOGGER_nraenv_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_endPass =>
-  "(fun token output -> Logger.nra_log_endPass token output)".
+  "(fun token output -> QcertUtils.Logger.nra_log_endPass token output)".
 
   Instance foreign_nraenv_optimizer_logger :
     optimizer_logger string nraenv
@@ -1004,13 +1004,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
 
   (* nrc optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_nnrc_token_type : Set.
-  Extract Constant OPTIMIZER_LOGGER_nnrc_token_type => "Util.nrc_logger_token_type".
+  Extract Constant OPTIMIZER_LOGGER_nnrc_token_type => "QcertUtils.Util.nrc_logger_token_type".
 
   Axiom OPTIMIZER_LOGGER_nnrc_startPass :
     String.string -> nnrc -> OPTIMIZER_LOGGER_nnrc_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_startPass =>
-  "(fun name input -> Logger.nrc_log_startPass (Util.string_of_char_list name) input)".
+  "(fun name input -> QcertUtils.Logger.nrc_log_startPass (QcertUtils.Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_nnrc_step :
     OPTIMIZER_LOGGER_nnrc_token_type -> String.string ->
@@ -1018,13 +1018,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
     OPTIMIZER_LOGGER_nnrc_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_step =>
-  "(fun token name input output -> Logger.nrc_log_step token (Util.string_of_char_list name) input output)".
+  "(fun token name input output -> QcertUtils.Logger.nrc_log_step token (QcertUtils.Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_nnrc_endPass :
     OPTIMIZER_LOGGER_nnrc_token_type -> nnrc -> OPTIMIZER_LOGGER_nnrc_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_endPass =>
-  "(fun token output -> Logger.nrc_log_endPass token output)".
+  "(fun token output -> QcertUtils.Logger.nrc_log_endPass token output)".
 
     Instance foreign_nnrc_optimizer_logger :
     optimizer_logger string nnrc
@@ -1038,13 +1038,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
 
     (* nnrs_imp optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_token_type : Set.
-  Extract Constant OPTIMIZER_LOGGER_nnrs_imp_expr_token_type => "Util.nnrs_imp_expr_logger_token_type".
+  Extract Constant OPTIMIZER_LOGGER_nnrs_imp_expr_token_type => "QcertUtils.Util.nnrs_imp_expr_logger_token_type".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_startPass :
     String.string -> nnrs_imp_expr -> OPTIMIZER_LOGGER_nnrs_imp_expr_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_startPass =>
-  "(fun name input -> Logger.nnrs_imp_expr_log_startPass (Util.string_of_char_list name) input)".
+  "(fun name input -> QcertUtils.Logger.nnrs_imp_expr_log_startPass (QcertUtils.Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_step :
     OPTIMIZER_LOGGER_nnrs_imp_expr_token_type -> String.string ->
@@ -1052,13 +1052,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
     OPTIMIZER_LOGGER_nnrs_imp_expr_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_step =>
-  "(fun token name input output -> Logger.nnrs_imp_expr_log_step token (Util.string_of_char_list name) input output)".
+  "(fun token name input output -> QcertUtils.Logger.nnrs_imp_expr_log_step token (QcertUtils.Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_endPass :
     OPTIMIZER_LOGGER_nnrs_imp_expr_token_type -> nnrs_imp_expr -> OPTIMIZER_LOGGER_nnrs_imp_expr_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_endPass =>
-  "(fun token output -> Logger.nnrs_imp_expr_log_endPass token output)".
+  "(fun token output -> QcertUtils.Logger.nnrs_imp_expr_log_endPass token output)".
 
     Instance foreign_nnrs_imp_expr_optimizer_logger :
     optimizer_logger string nnrs_imp_expr
@@ -1071,13 +1071,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
       } .
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type : Set.
-  Extract Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type => "Util.nnrs_imp_stmt_logger_token_type".
+  Extract Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type => "QcertUtils.Util.nnrs_imp_stmt_logger_token_type".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_startPass :
     String.string -> nnrs_imp_stmt -> OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_startPass =>
-  "(fun name input -> Logger.nnrs_imp_stmt_log_startPass (Util.string_of_char_list name) input)".
+  "(fun name input -> QcertUtils.Logger.nnrs_imp_stmt_log_startPass (QcertUtils.Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_step :
     OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type -> String.string ->
@@ -1085,13 +1085,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
     OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_step =>
-  "(fun token name input output -> Logger.nnrs_imp_stmt_log_step token (Util.string_of_char_list name) input output)".
+  "(fun token name input output -> QcertUtils.Logger.nnrs_imp_stmt_log_step token (QcertUtils.Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass :
     OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type -> nnrs_imp_stmt -> OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass =>
-  "(fun token output -> Logger.nnrs_imp_stmt_log_endPass token output)".
+  "(fun token output -> QcertUtils.Logger.nnrs_imp_stmt_log_endPass token output)".
 
     Instance foreign_nnrs_imp_stmt_optimizer_logger :
     optimizer_logger string nnrs_imp_stmt
@@ -1104,13 +1104,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
       } .
 
       Axiom OPTIMIZER_LOGGER_nnrs_imp_token_type : Set.
-  Extract Constant OPTIMIZER_LOGGER_nnrs_imp_token_type => "Util.nnrs_imp_logger_token_type".
+  Extract Constant OPTIMIZER_LOGGER_nnrs_imp_token_type => "QcertUtils.Util.nnrs_imp_logger_token_type".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_startPass :
     String.string -> nnrs_imp -> OPTIMIZER_LOGGER_nnrs_imp_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_startPass =>
-  "(fun name input -> Logger.nnrs_imp_log_startPass (Util.string_of_char_list name) input)".
+  "(fun name input -> QcertUtils.Logger.nnrs_imp_log_startPass (QcertUtils.Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_step :
     OPTIMIZER_LOGGER_nnrs_imp_token_type -> String.string ->
@@ -1118,13 +1118,13 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
     OPTIMIZER_LOGGER_nnrs_imp_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_step =>
-  "(fun token name input output -> Logger.nnrs_imp_log_step token (Util.string_of_char_list name) input output)".
+  "(fun token name input output -> QcertUtils.Logger.nnrs_imp_log_step token (QcertUtils.Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_nnrs_imp_endPass :
     OPTIMIZER_LOGGER_nnrs_imp_token_type -> nnrs_imp -> OPTIMIZER_LOGGER_nnrs_imp_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_endPass =>
-  "(fun token output -> Logger.nnrs_imp_log_endPass token output)".
+  "(fun token output -> QcertUtils.Logger.nnrs_imp_log_endPass token output)".
 
     Instance foreign_nnrs_imp_optimizer_logger :
     optimizer_logger string nnrs_imp
@@ -1311,13 +1311,13 @@ Definition dnnrc_for_log {br:brand_relation}
 
   (* dnnrc optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_dnnrc_token_type : Set.
-  Extract Constant OPTIMIZER_LOGGER_dnnrc_token_type => "Util.dnrc_logger_token_type".
+  Extract Constant OPTIMIZER_LOGGER_dnnrc_token_type => "QcertUtils.Util.dnrc_logger_token_type".
 
   Axiom OPTIMIZER_LOGGER_dnnrc_startPass :
     forall {br:brand_relation}, String.string -> dnnrc_for_log -> OPTIMIZER_LOGGER_dnnrc_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_startPass =>
-  "(fun br name input -> Logger.dnrc_log_startPass (Util.string_of_char_list name) input)".
+  "(fun br name input -> QcertUtils.Logger.dnrc_log_startPass (QcertUtils.Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_dnnrc_step :
     forall  {br:brand_relation}, 
@@ -1326,13 +1326,13 @@ Definition dnnrc_for_log {br:brand_relation}
     OPTIMIZER_LOGGER_dnnrc_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_step =>
-  "(fun br token name input output -> Logger.dnrc_log_step token (Util.string_of_char_list name) input output)".
+  "(fun br token name input output -> QcertUtils.Logger.dnrc_log_step token (QcertUtils.Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_dnnrc_endPass :
     forall {br:brand_relation}, OPTIMIZER_LOGGER_dnnrc_token_type -> dnnrc_for_log -> OPTIMIZER_LOGGER_dnnrc_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_endPass =>
-  "(fun br token output -> Logger.dnrc_log_endPass token output)".
+  "(fun br token output -> QcertUtils.Logger.dnrc_log_endPass token output)".
 
   Instance foreign_dnnrc_optimizer_logger  {br:brand_relation} :
     optimizer_logger string dnnrc_for_log
