@@ -32,7 +32,7 @@ An easy way to get set up on most platforms is to use the OCaml package manager 
 
 ```
 $ opam repo add coq-released https://coq.inria.fr/opam/released
-$ opam install ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
+$ opam install dune menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
 $ opam install coq.8.8.2 coq-flocq coq-jsast
 ```
 
