@@ -1,7 +1,5 @@
-src/QcertJsRuntime.ml
-src/StaticConfig.ml
-extracted/QcertCompiler.ml
-extracted/QcertCompiler.mli
+QcertCompiler.ml
+QcertCompiler.mli
 /out/
 /*.aux
 /.paths

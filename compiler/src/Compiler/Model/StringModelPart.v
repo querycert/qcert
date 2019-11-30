@@ -20,7 +20,7 @@ Require String.
 (** Defines the foreign support for a native string type.
      Posits axioms for the basic data/operators, and 
      defines how they are extracted to ocaml (using helper functions
-     defined in qcert/ocaml/...../Util.ml)
+     defined in qcert/compiler/utils/Util.ml)
      *)
 
 Axiom STRING : Set.
@@ -33,5 +33,5 @@ Axiom STRING_tostring : STRING -> String.string.
 
 Extract Constant STRING => "string".
 Extract Inlined Constant STRING_eq => "(fun x y -> x = y)".
-Extract Inlined Constant STRING_tostring => "(fun x -> Util.char_list_of_string x)".
+Extract Inlined Constant STRING_tostring => "(fun x -> QcertUtils.Util.char_list_of_string x)".
 

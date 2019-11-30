@@ -49,7 +49,7 @@ Conjecture SQL_DATE_INTERVAL_eq_correct :
   forall f1 f2, (SQL_DATE_INTERVAL_eq f1 f2 = true <-> f1 = f2).
 
 Axiom SQL_DATE_INTERVAL_tostring : SQL_DATE_INTERVAL -> String.string.
-Extract Inlined Constant SQL_DATE_INTERVAL_tostring => "(fun x -> Util.char_list_of_string x)".
+Extract Inlined Constant SQL_DATE_INTERVAL_tostring => "(fun x -> QcertUtils.Util.char_list_of_string x)".
 
 Program Instance sql_date_interval_foreign_data : foreign_data
   := {foreign_data_type := SQL_DATE_INTERVAL}.
@@ -89,7 +89,7 @@ Conjecture SQL_DATE_eq_correct :
   forall f1 f2, (SQL_DATE_eq f1 f2 = true <-> f1 = f2).
 
 Axiom SQL_DATE_tostring : SQL_DATE -> String.string.
-Extract Inlined Constant SQL_DATE_tostring => "(fun x -> Util.char_list_of_string x)".
+Extract Inlined Constant SQL_DATE_tostring => "(fun x -> QcertUtils.Util.char_list_of_string x)".
 
 Program Instance sql_date_foreign_data : foreign_data
   := {foreign_data_type := SQL_DATE}.
@@ -118,10 +118,10 @@ Next Obligation.
 Defined.
 
 Axiom SQL_DATE_from_string : String.string -> SQL_DATE.
-Extract Inlined Constant SQL_DATE_from_string => "(fun x -> Util.string_of_char_list x)".
+Extract Inlined Constant SQL_DATE_from_string => "(fun x -> QcertUtils.Util.string_of_char_list x)".
 
 Axiom SQL_DATE_INTERVAL_from_string : String.string -> SQL_DATE_INTERVAL.
-Extract Inlined Constant SQL_DATE_INTERVAL_from_string => "(fun x -> Util.string_of_char_list x)".
+Extract Inlined Constant SQL_DATE_INTERVAL_from_string => "(fun x -> QcertUtils.Util.string_of_char_list x)".
 
 Inductive sql_date_component
   :=
