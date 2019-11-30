@@ -20,9 +20,8 @@ Q\*cert is built using the Coq proof assistant (https://coq.inria.fr). A signifi
 To build Q\*cert from the source, you will need:
 
 - OCaml 4.07.1 (http://ocaml.org/) along with the following libraries:
-  - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
+  - dune, a build system (https://dune.build)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
-  - camlp5, a pre-processor (https://camlp5.github.io)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
   - js\_of\_ocaml, a compiler from OCaml to JavaScript
 - Coq 8.8.2 (https://coq.inria.fr/) along with the following libraries:

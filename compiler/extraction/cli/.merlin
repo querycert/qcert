@@ -1,0 +1,14 @@
+EXCLUDE_QUERY_DIR
+B /Users/jeromesimeon/.opam/4.07.1/lib/base64
+B /Users/jeromesimeon/.opam/4.07.1/lib/bytes
+B /Users/jeromesimeon/.opam/4.07.1/lib/ocaml
+B ../../../_build/default/compiler/extraction/cli/.qcert.eobjs/byte
+B ../../../_build/default/compiler/extraction/extracted/.qcertExtracted.objs/byte
+B ../../../_build/default/compiler/extraction/lib/.qcertLib.objs/byte
+S /Users/jeromesimeon/.opam/4.07.1/lib/base64
+S /Users/jeromesimeon/.opam/4.07.1/lib/bytes
+S /Users/jeromesimeon/.opam/4.07.1/lib/ocaml
+S .
+S ../extracted
+S ../lib
+FLG -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27 -w -39
