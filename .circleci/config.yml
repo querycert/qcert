@@ -38,7 +38,7 @@ common_steps: &common_steps
     - run:
         name: "Install OCaml deps"
         command: |
-          opam install -y --jobs=2 ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx re
+          opam install -y --jobs=2 dune menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx re
     - run:
         name: "Install Coq deps"
         command: |
