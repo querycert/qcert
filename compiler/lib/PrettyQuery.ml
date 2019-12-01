@@ -810,7 +810,7 @@ let pretty_js_ast greek margin annot inheritance link_runtime q =
 let pretty_javascript greek margin annot inheritance link_runtime q =
   let runtime = 
     if (link_runtime)
-    then QcertJsRuntime.runtime
+    then QcertUtils.QcertJsRuntime.runtime
     else ""
   in
   runtime ^ string_of_char_list q
