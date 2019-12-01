@@ -36,6 +36,9 @@ Section JSONUtil.
          | S j => "  " ++ (indent j)
          end.
 
+    Definition bracketString (open s close:string)
+      := append open (append s close).
+
   End Whitespace.
 
   Section Identifiers.

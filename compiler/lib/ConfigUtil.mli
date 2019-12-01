@@ -15,9 +15,6 @@
  *)
 
 open QcertExtracted
-
-open DataUtil
-
 open QcertCompiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
@@ -72,9 +69,7 @@ val default_eval_config : unit -> eval_config
 val set_eval_io : eval_config -> QData.json -> unit
 val set_eval_schema : eval_config -> string -> unit
 val set_input : eval_config -> string -> unit
-val set_format : eval_config -> string -> unit
 
-val get_format : eval_config -> serialization_format
 val get_eval_only : eval_config -> bool ref
 val get_debug : eval_config -> bool ref
 val get_eval_io : eval_config -> QData.json option
@@ -89,11 +84,9 @@ type data_config
 val default_data_config : unit -> data_config
 
 val set_json : data_config -> QData.json -> unit
-val set_data_format : data_config -> string -> unit
 val set_data_schema : data_config -> QData.json -> unit
 val set_data_dir : data_config -> string -> unit
 
-val get_data_format : data_config -> serialization_format
 val get_data_schema : data_config -> QData.json option
 val get_data_dir : data_config -> string option
 

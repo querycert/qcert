@@ -21,6 +21,7 @@ Require Import ZArith.
 Require Import Bool.
 Require Import JsAst.JsNumber.
 Require Import Float.
+Require Import ToString.
 Require Import CoqLibAdd.
 Require Import StringAdd.
 Require Import Digits.
@@ -31,7 +32,8 @@ Section JSON.
 
   Inductive json : Set :=
   | jnull : json
-  | jnumber : number -> json
+  | jnumber : float -> json
+  | jbigint : Z -> json
   | jbool : bool -> json
   | jstring : string -> json
   | jarray : list json -> json
@@ -44,6 +46,7 @@ Section JSON.
   Definition json_rect (P : json -> Type)
              (fnull : P jnull)
              (fnumber : forall n : number, P (jnumber n))
+             (fbigint : forall n : Z, P (jbigint n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forallt P c -> P (jarray c))
@@ -53,6 +56,7 @@ Section JSON.
     match j as j0 return (P j0) with
       | jnull => fnull
       | jnumber x => fnumber x
+      | jbigint x => fbigint x
       | jbool x => fbool x
       | jstring x => fstring x
       | jarray x => farray x ((fix F2 (c : list json) : Forallt P c :=
@@ -70,6 +74,7 @@ Section JSON.
   Definition json_ind (P : json -> Prop)
              (fnull : P jnull)
              (fnumber : forall n : number, P (jnumber n))
+             (fbigint : forall n : Z, P (jbigint n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forall P c -> P (jarray c))
@@ -79,6 +84,7 @@ Section JSON.
     match j as j0 return (P j0) with
       | jnull => fnull
       | jnumber x => fnumber x
+      | jbigint x => fbigint x
       | jbool x => fbool x
       | jstring x => fstring x
       | jarray x => farray x ((fix F2 (c : list json) : Forall P c :=
@@ -94,14 +100,15 @@ Section JSON.
     end.
 
   Definition json_rec (P:json->Set) := json_rect P.
-  
+
   Lemma jsonInd2 (P : json -> Prop)
         (f : P jnull)
         (f0 : forall n : number, P (jnumber n))
-        (fb : forall b : bool, P (jbool b))
-        (f1 : forall s : string, P (jstring s))
-        (f2 : forall c : list json, (forall x, In x c -> P x) -> P (jarray c))
-        (f3 : forall r : list (string * json), (forall x y, In (x,y) r -> P y) -> P (jobject r)):
+        (f1 : forall n : Z, P (jbigint n))
+        (f2 : forall b : bool, P (jbool b))
+        (f3 : forall s : string, P (jstring s))
+        (f4 : forall c : list json, (forall x, In x c -> P x) -> P (jarray c))
+        (f5 : forall r : list (string * json), (forall x y, In (x,y) r -> P y) -> P (jobject r)):
     forall d, P d.
   Proof.
     intros.
@@ -109,7 +116,7 @@ Section JSON.
     - intros. rewrite Forall_forall in H.
       auto.
     - intros. rewrite Forall_forall in H.
-      apply f3.
+      apply f5.
       intros. apply (H (x,y)). trivial.
   Qed.
 
@@ -118,9 +125,12 @@ Section JSON.
   Proof.
     induction x; destruct y; try solve[right; inversion 1].
     - left; trivial.
-    - destruct (float_eq_dec n n0).
+    - destruct (float_eq_dec n f).
       + left; f_equal; trivial.
       + right;intro;apply c;inversion H; reflexivity.
+    - destruct (Z.eq_dec n z).
+      + left; f_equal; trivial.
+      + right;intro;apply n0;inversion H; trivial.
     - destruct (bool_dec b b0).
       + left; f_equal; trivial.
       + right;intro;apply n;inversion H; trivial. 
@@ -146,34 +156,64 @@ Section JSON.
 
     Local Open Scope string.
 
-    Definition js_quote_char (a:ascii)
-      := match a with
-         | """"%char => "\"""
-         | _ => String a EmptyString
-         end.
-
-    Definition js_quote_string (s:string)
-      := flat_map_string js_quote_char s.
-
-    Definition stringToJS (quotel:string) (s:string)
-      := "" ++ quotel ++ "" ++ js_quote_string s ++ "" ++ quotel ++ "".
-
-    Fixpoint jsonToJS (quotel:string) (j : json) : string
+    Fixpoint jsonStringify (quotel:string) (j : json) : string
       := match j with
-         | jnull => "null" (* to be discussed *)
-         | jnumber n => to_string n
-         | jbool b => if b then "true" else "false"
-         | jstring s => stringToJS quotel s
+         | jnull => "null"
+         | jnumber n => toString n
+         | jbigint n => toString n
+         | jbool b => toString b
+         | jstring s => stringToStringQuote quotel s
          | jarray ls =>
-           let ss := map (jsonToJS quotel) ls in
+           let ss := map (jsonStringify quotel) ls in
            "[" ++ (concat ", " ss) ++ "]"
          | jobject ls =>
-           let ss := (map (fun kv => let '(k,v) := kv in
-                                     "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (jsonToJS quotel v)) ls) in
-           "{" ++ (concat ", " ss) ++ "}"
+           let ss := (map (fun kv =>
+                             let '(k,v) := kv in
+                             "" ++ quotel ++ "" ++ k ++ ""
+                                ++ quotel ++ ": " ++ (jsonStringify quotel v)) ls)
+           in "{" ++ (concat ", " ss) ++ "}"
          end.
 
   End toString.
-  
-End JSON.
 
+  Section preProcess.
+    Fixpoint json_to_qjson (j:json) : json :=
+      match j with
+      | jnull => jnull
+      | jnumber n => jnumber n
+      | jbigint n => jbigint n
+      | jbool b => jbool b
+      | jstring s => jstring s
+      | jarray c => jarray (map json_to_qjson c)
+      | jobject nil => jobject nil
+      | jobject ((s1,j')::nil) =>
+        if (string_dec s1 "$nat") then
+          match j' with
+          | jnumber n => jobject ((s1, jbigint (float_truncate n))::nil)
+          | _ => jobject ((s1, json_to_qjson j')::nil)
+          end
+        else jobject ((s1, json_to_qjson j')::nil)
+      | jobject r => jobject (map (fun x => (fst x, json_to_qjson (snd x))) r)
+      end.
+
+    Fixpoint qjson_to_json (j:json) : json :=
+      match j with
+      | jnull => jnull
+      | jnumber n => jnumber n
+      | jbigint n => jbigint n
+      | jbool b => jbool b
+      | jstring s => jstring s
+      | jarray c => jarray (map qjson_to_json c)
+      | jobject nil => jobject nil
+      | jobject ((s1,j')::nil) =>
+        if (string_dec s1 "$nat") then
+          match j' with
+          | jbigint n => jobject ((s1, jnumber (float_of_int n))::nil)
+          | _ => jobject ((s1, qjson_to_json j')::nil)
+          end
+        else jobject ((s1, qjson_to_json j')::nil)
+      | jobject r => jobject (map (fun x => (fst x, qjson_to_json (snd x))) r)
+      end.
+
+  End preProcess.
+End JSON.

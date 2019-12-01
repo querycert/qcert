@@ -349,6 +349,7 @@ Section ImpJsontoJavaScriptAst.
       destruct d; simpl; intuition discriminate.
     Qed.
 
+    (** XXX Not true anymore... how was it ever? 
     Lemma data_to_bool_json_to_nat_correct j:
       imp_qcert_data_to_Z (json_to_data h j) = imp_json_data_to_Z j.
     Proof.
@@ -356,6 +357,7 @@ Section ImpJsontoJavaScriptAst.
       unfold imp_qcert_data_to_Z.
       unfold imp_json_data_to_Z.
       destruct j; trivial.
+      simpl.
       assert (simpl_eq1:
                 match normalize_data h (json_to_data_pre (jobject l)) with
                 | dnat n => Some n
@@ -410,6 +412,7 @@ Section ImpJsontoJavaScriptAst.
         
         now destruct (json_brands l1).
     Qed.
+     *)
 
     Lemma Forall_singleton σ i:
       Forall
@@ -560,7 +563,6 @@ Section ImpJsontoJavaScriptAst.
         + rewrite map_map.
           simpl.
           unfold json_to_data; simpl.
-          rewrite float_truncate_float_of_int.
           f_equal; f_equal; f_equal.
           unfold bcount.
           apply map_length.
@@ -575,12 +577,9 @@ Section ImpJsontoJavaScriptAst.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
-        + unfold json_to_data; simpl.
-          rewrite float_truncate_float_of_int.
-          reflexivity.
-        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
-          generalize (json_to_data_object_not_string h l s); intros.
-          congruence.
+        case_eq (json_to_data h (jobject l)); intros; try reflexivity.
+        generalize (json_to_data_object_not_string h l s); intros.
+        congruence.
       - Case "OpSubstring"%string.
         admit. (* XXX Not implemented *)
       - Case "OpLike"%string.

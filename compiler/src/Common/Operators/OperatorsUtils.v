@@ -27,32 +27,9 @@ Require Import DataLift.
 Require Import Iterators.
 
 Section OperatorsUtils.
-  Import ListNotations.
   Context {fdata:foreign_data}.
 
-  Definition boolToString (b:bool) : string
-    := if b then "TRUE"%string else "FALSE"%string.
-
-  Definition bracketString (open s close:string)
-    := append open (append s close).
-
-  Definition stringToString (s:string) : string
-(*    := bracketString "'"%string s "'"%string. *)
-    := s.
-
   Definition string_sort := insertion_sort StringOrder.le_dec.
-
-  Global Instance ToString_Z : ToString Z
-    := { toString := Z_to_string10}.
-
-  Global Instance ToString_nat : ToString nat
-    := { toString := nat_to_string10}.
-
-  Global Instance ToString_float : ToString float
-    := { toString := float_to_string}.
-
-  Global Instance ToString_bool : ToString bool
-    := { toString := boolToString}.
 
   Instance ToString_brands : ToString brands
     := { toString := fun b => (concat " & " b)}.

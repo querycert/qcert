@@ -70,6 +70,7 @@ Section DatatoJSON.
       match j with
       | jnull => dunit
       | jnumber n => dfloat n
+      | jbigint n => dnat n
       | jbool b => dbool b
       | jstring s => dstring s
       | jarray c => dcoll (map json_to_data_pre c)
@@ -77,8 +78,8 @@ Section DatatoJSON.
       | jobject ((s1,j')::nil) =>
         if (string_dec s1 "$nat") then
           match j' with
-          | jnumber n =>
-            dnat (float_truncate n)
+          | jbigint n =>
+            dnat n
           | _ =>
             drec ((json_key_decode s1, json_to_data_pre j')::nil)
           end
@@ -114,8 +115,8 @@ Section DatatoJSON.
     Definition json_to_data h (j:json) :=
       normalize_data h (json_to_data_pre j).
 
+    (* XXX not used anywhere -- but could help with figuring out foreign *)
     (* JSON to CAMP data model (Enhanced Variant) *)
-
     Fixpoint json_enhanced_to_data_pre (j:json) :=
       match foreign_to_JSON_to_data j with
       | Some fd => dforeign fd
@@ -123,6 +124,7 @@ Section DatatoJSON.
         match j with
         | jnull => dright dunit
         | jnumber n => dfloat n
+        | jbigint n => dnat n
         | jbool b => dbool b
         | jstring s => dstring s
         | jarray c => dcoll (map json_enhanced_to_data_pre c)
@@ -161,8 +163,10 @@ Section DatatoJSON.
   Section toJSON.
 
     Definition Z_to_json (n: Z) : json :=
-      jobject (("$nat"%string, jnumber (float_of_int n))::nil).
+      jobject (("$nat"%string, jbigint n)::nil).
 
+    (* XXX not used anywhere -- but could help with figuring out foreign *)
+    (* DATA to JSON (Enhanced Variant) *)
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with
       | dunit => jnull
@@ -199,9 +203,6 @@ Section DatatoJSON.
   End toJSON.
 
 End DatatoJSON.
-
-(* TODO: figure out what to do and move this somewhere else *)
-Axiom float_truncate_float_of_int : forall (z:Z), float_truncate (float_of_int z) = z.
 
 Section ModelRoundTrip.
   Context {fdata:foreign_data}.
@@ -267,12 +268,10 @@ Section ModelRoundTrip.
   Proof.
     unfold json_to_data.
     induction d; simpl; trivial.
-    - rewrite float_truncate_float_of_int; trivial.
     - f_equal.
       repeat rewrite map_map.
       now apply map_eq.
-    -
-      destruct r; simpl; trivial.
+    - destruct r; simpl; trivial.
       destruct p; simpl.
       rewrite_string_dec_from_neq (json_key_encode_not_nat s).
       rewrite_string_dec_from_neq (json_key_encode_not_data s).
@@ -286,13 +285,13 @@ Section ModelRoundTrip.
                           match map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r with
                           | nil =>
                             drec ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d)) :: nil)
-                          | (s2, jnull as j2) :: nil | (s2, jnumber _ as j2) :: nil | (s2, jbool _ as j2) :: nil |
+                          | (s2, jnull as j2) :: nil | (s2, jnumber _ as j2) :: nil | (s2, jbigint _ as j2) :: nil | (s2, jbool _ as j2) :: nil |
                           (s2, jstring _ as j2) :: nil | (s2, jarray _ as j2) :: nil |
                           (s2, jobject _ as j2) :: nil =>
                           drec
                             ((json_key_decode (json_key_encode s), dcoll (map json_to_data_pre j1))
                                :: (json_key_decode s2, json_to_data_pre j2) :: nil)
-                          | (s2, jnull as j2) :: _ :: _ | (s2, jnumber _ as j2) :: _ :: _ |
+                          | (s2, jnull as j2) :: _ :: _ | (s2, jnumber _ as j2) :: _ :: _ | (s2, jbigint _ as j2) :: _ :: _ |
                           (s2, jbool _ as j2) :: _ :: _ | (s2, jstring _ as j2) :: _ :: _ |
                           (s2, jarray _ as j2) :: _ :: _ | (s2, jobject _ as j2) :: _ :: _ =>
                                                            drec
@@ -313,7 +312,7 @@ Section ModelRoundTrip.
                               ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d))
                                  :: map (fun x : string * json => (json_key_decode (fst x), json_to_data_pre (snd x)))
                                  (map (fun x : string * data => (json_key_encode (fst x), data_to_json (snd x))) r))
-                          | (s2, jnull) :: _ | (s2, jnumber _) :: _ | (s2, jbool _) :: _ | 
+                          | (s2, jnull) :: _ | (s2, jnumber _) :: _ | (s2, jbigint _) :: _ | (s2, jbool _) :: _ | 
                           (s2, jstring _) :: _ | (s2, jobject _) :: _ =>
                                                  drec
                                                    ((json_key_decode (json_key_encode s), json_to_data_pre (data_to_json d))

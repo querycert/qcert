@@ -20,11 +20,6 @@ open QcertCompiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
-type serialization_format =
-  | META
-  | ENHANCED
-
-
 type io_json = QData.json
 
 type io_input = QData.json
@@ -58,7 +53,6 @@ type optim_language =
     { mutable optim_language_name : string;
       mutable optim_phases : optim_phase list; }
 
-
 let get_field_opt name r =
   begin try
     Some (List.assoc (char_list_of_string name) r)
@@ -76,21 +70,21 @@ let get_field_defaults name r d =
 let get_io_components (od:QData.json option) : QData.json option * QData.json option * QData.json option =
   begin match od with
   | Some d ->
-      begin
-	try
-	  match d with
-	  | QcertCompiler.Jobject r ->
-	      let input = get_field_opt "input" r in
-	      let output = get_field_opt "output" r in
-	      let schema = get_field_opt "schema" r in
-	      (input,
-	       output,
-	       schema)
-	  | _ ->
-	      raise Not_found
-	with
-	| _ ->
-	    raise (Qcert_Error "Ill-formed IO")
+      begin	try
+	      begin match d with
+	      | QcertCompiler.Jobject r ->
+	          let input = get_field_opt "input" r in
+	          let output = get_field_opt "output" r in
+	          let schema = get_field_opt "schema" r in
+	          (input,
+	           output,
+	           schema)
+	      | _ ->
+	          raise Not_found
+        end
+	    with
+	    | _ ->
+	        raise (Qcert_Error "Ill-formed IO")
       end
   | None ->
       raise (Qcert_Error "No IO file provided")
@@ -174,21 +168,17 @@ let build_schema (j:QData.json) =
       raise (Qcert_Error "Ill-formed model")
   end
 
-let build_input format h input =
+let build_input h input =
   begin match input with
-  | QcertCompiler.Jobject j ->
-      begin match format with
-      | META -> List.map (fun (x,y) -> (x, QData.json_to_qdata h y)) j
-      | ENHANCED -> List.map (fun (x,y) -> (x, QData.json_enhanced_to_qdata h y)) j
-      end
+  | QcertCompiler.Jobject j -> List.map (fun (x,y) -> (x, QData.json_to_qdata h (QData.json_to_qjson y))) j
   | _ -> raise (Qcert_Error "Illed formed working memory: input")
   end
 
 let build_output h output =
-  QData.json_to_qdata h output
+  QData.json_to_qdata h (QData.json_to_qjson output)
 
 let build_optim_config j =
-  match QDriver.json_to_optim_config j with
+  begin match QDriver.json_to_optim_config j with
   | QcertCompiler.Inl e -> raise (Qcert_Error (string_of_char_list e))
   | QcertCompiler.Inr oc -> oc
-  
+  end

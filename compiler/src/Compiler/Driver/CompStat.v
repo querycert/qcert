@@ -463,7 +463,7 @@ Section CompStat.
         | Q_error q => stat_error q
         end
     in
-    jsonToJS quotel_double (data_to_json stat).
+    jsonStringify quotel_double (data_to_json stat).
 
   Definition json_stat_tree_of_query (qname:string) (q:query) : string :=
     let stat :=
@@ -496,7 +496,7 @@ Section CompStat.
         | Q_error q => stat_tree_error q
         end
     in
-    jsonToJS quotel_double
+    jsonStringify quotel_double
              (data_to_json (drec
                               (("name", dstring qname)
                                  :: ("stats", stat)

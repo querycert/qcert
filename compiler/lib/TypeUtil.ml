@@ -37,12 +37,12 @@ let lookup_brand_type (brand_type:string) type_defs =
 
 let rtype_content_to_rtype (br: (char list * char list) list) (j:rtype_content) =
   match QType.json_to_rtype_with_fail br j with
-  | None -> raise (Failure ("type parsing failed for JSON:" ^ (string_of_char_list (QData.jsonToJS ['"'] j))))
+  | None -> raise (Failure ("type parsing failed for JSON:" ^ (string_of_char_list (QData.jsonStringify ['"'] j))))
   | Some t -> t
 
 let rtype_content_to_vrtype (br: (char list * char list) list) (j:vrtype_content) =
   begin match QType.json_to_vrtype_with_fail br j with
-  | None -> raise (Failure ("global type parsing failed for JSON:" ^ (string_of_char_list (QData.jsonToJS ['"'] j))))
+  | None -> raise (Failure ("global type parsing failed for JSON:" ^ (string_of_char_list (QData.jsonStringify ['"'] j))))
   | Some t -> t
   end
 
