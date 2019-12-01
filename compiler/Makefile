@@ -44,8 +44,8 @@ VO_FILES = $(MODULES:%=./src/%.vo)
 ../runtimes/javascript/qcert_runtime.ml:
 	$(MAKE) -C ../runtimes/javascript
 
-lib/QcertJsRuntime.ml: ../runtimes/javascript/qcert_runtime.ml
-	cp ../runtimes/javascript/qcert_runtime.ml lib/QcertJsRuntime.ml
+utils/QcertJsRuntime.ml: ../runtimes/javascript/qcert_runtime.ml
+	cp ../runtimes/javascript/qcert_runtime.ml utils/QcertJsRuntime.ml
 
 lib/StaticConfig.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli: $(VO_FILES)
 	echo "(* This file is generated *)" > lib/StaticConfig.ml
@@ -53,16 +53,16 @@ lib/StaticConfig.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli: $(
 	(cd extraction; coqc -R ../src Qcert ./QcertExtraction.v)
 
 ## Native
-../bin/$(MAIN): lib/QcertJsRuntime.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli
+../bin/$(MAIN): utils/QcertJsRuntime.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli
 	cd $(QCERT_HOME)/clis/ocaml ; dune build $(MAIN).$(NATIVE)
 	cp $(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN).$(NATIVE) ../bin/$(MAIN)
 
-../bin/$(MAIN2): lib/QcertJsRuntime.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli
+../bin/$(MAIN2): utils/QcertJsRuntime.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli
 	cd $(QCERT_HOME)/clis/ocaml ; dune build $(MAIN2).$(NATIVE)
 	cp $(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN2).$(NATIVE) ../bin/$(MAIN2)
 
 ## JavaScript
-../bin/$(MAIN3).js: lib/QcertJsRuntime.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli
+../bin/$(MAIN3).js: utils/QcertJsRuntime.ml extraction/QcertCompiler.ml extraction/QcertCompiler.mli
 	cd $(QCERT_HOME)/compiler/libjs ; dune build $(MAIN3).$(BYTECODE)
 	js_of_ocaml $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN3).$(BYTECODE)
 	cp $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN3).$(JS) ../bin/$(MAIN3).$(JS)
@@ -77,9 +77,10 @@ clean:
 	rm -f ../bin/$(MAIN3).js
 
 cleanall: clean
+	rm -rf utils/QcertJsRuntime.ml
 	rm -f extraction/QcertExtraction.glob extraction/QcertExtraction.vo extraction/.QcertExtraction.aux
 	rm -rf extraction/QcertCompiler.ml extraction/QcertCompiler.mli
-	rm -rf lib/StaticConfig.ml lib/QcertJsRuntime.ml
+	rm -rf lib/StaticConfig.ml
 	rm -rf *~
 
 .NOTPARALLEL: 
