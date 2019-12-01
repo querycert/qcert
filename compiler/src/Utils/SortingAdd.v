@@ -578,5 +578,6 @@ Section SortingAdd.
             - destruct (dec a1 a); invcs eqq; try tauto.
           } 
   Qed.
+
 End SortingAdd.
 

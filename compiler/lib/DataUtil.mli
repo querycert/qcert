@@ -17,10 +17,6 @@
 open QcertExtracted
 open QcertCompiler.EnhancedCompiler
 
-type serialization_format =
-  | META
-  | ENHANCED
-
 (* Data utils for the Camp evaluator and compiler *)
 
 (* Extract JSON components *)
@@ -60,7 +56,7 @@ type optim_language =
 
 val get_io_components : io_json option -> io_input option * io_output option * io_schema option
 
-val build_input : serialization_format -> content_inheritance -> io_input -> content_input
+val build_input : content_inheritance -> io_input -> content_input
 val build_output : content_inheritance -> io_output -> content_output
 val build_schema : io_schema -> content_schema
 val build_brandTypes : io_brandTypes -> content_brandTypes

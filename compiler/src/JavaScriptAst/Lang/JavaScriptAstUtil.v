@@ -71,12 +71,10 @@ Section JavaScriptAstUtil.
   Fixpoint json_to_js_ast (json: json) : expr :=
     match json with
     | jnull => expr_literal literal_null
-    | jnumber n =>
-      expr_literal (literal_number n)
-    | jbool b =>
-      expr_literal (literal_bool b)
-    | jstring s =>
-      expr_literal (literal_string s)
+    | jnumber n => expr_literal (literal_number n)
+    | jbigint n => expr_literal (literal_number (float_of_int n)) (* XXX Could be replaced by JavaScript BigInt some fix to JsAst XXX *)
+    | jbool b => expr_literal (literal_bool b)
+    | jstring s => expr_literal (literal_string s)
     | jarray a =>
       let a :=
           List.map

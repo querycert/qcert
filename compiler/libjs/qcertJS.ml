@@ -206,6 +206,7 @@ let rec unsafe_json_to_js (j:QData.json) =
   match j with
   | QcertCompiler.Jnull -> Js.Unsafe.inject (Js.null)
   | QcertCompiler.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
+  | QcertCompiler.Jbigint n -> Js.Unsafe.inject (Js.number_of_float (float_of_int n)) (* XXX Coerce bigint to number *)
   | QcertCompiler.Jbool b -> Js.Unsafe.inject (Js.bool b)
   | QcertCompiler.Jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
   | QcertCompiler.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)

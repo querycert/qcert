@@ -104,7 +104,7 @@ let complete_configuration gconf =
   let h = inheritance_of_conf gconf in
   let _input =
     begin match io_input with
-    | Some io -> gconf.gconf_input <- (build_input META h io)
+    | Some io -> gconf.gconf_input <- (build_input h io)
     | None -> ()
     end
   in

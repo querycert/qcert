@@ -65,26 +65,26 @@ Module QData(runtime:CompilerRuntime).
     := Data.dbrand b.
   (* foreign data is supported via the model *)
   
-  (** JSON -> data conversion (META variant) *)
-  Definition json_to_qdata br : JSON.json -> qdata 
+  (** JSON -> data conversion *)
+  Definition json_to_qdata br : JSON.json -> qdata
     := DatatoJSON.json_to_data br.
-  
-  (** JSON -> data conversion (Enhanced variant) *)
-  Definition json_enhanced_to_qdata br : JSON.json -> qdata 
-    := DatatoJSON.json_enhanced_to_data br.
-  
-  (** data -> JSON *string* conversion *)
-  Definition qdataToJS s : qdata -> String.string 
-    := (fun d => JSON.jsonToJS s (DatatoJSON.data_to_json d)).
 
-  Definition jsonToJS s : JSON.json -> String.string 
-    := JSON.jsonToJS s.
+  (** JSON -> JSON for Qcert conversion *)
+  Definition json_to_qjson : JSON.json -> JSON.json
+    := JSON.json_to_qjson.
+
+  (** data -> JSON *string* conversion *)
+  Definition qdataStringify s : qdata -> String.string
+    := (fun d => JSON.jsonStringify s (DatatoJSON.data_to_json d)).
+
+  Definition jsonStringify s : JSON.json -> String.string 
+    := JSON.jsonStringify s.
 
   Definition data_to_string : qdata -> String.string
-    := qdataToJS JSONUtil.quotel_double.
+    := qdataStringify JSONUtil.quotel_double.
   
   Definition json_to_string : JSON.json -> String.string
-    := jsonToJS JSONUtil.quotel_double.
+    := jsonStringify JSONUtil.quotel_double.
 
   Section dist.
     Import DData.

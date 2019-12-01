@@ -38,6 +38,7 @@ MODULES = \
 	Utils/Var \
 	Utils/Closure \
 	Utils/Result \
+	Utils/ToString \
 	Utils/JSON \
 	Utils/JSONUtil \
 	Utils/JSONNorm \

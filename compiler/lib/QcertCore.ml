@@ -167,9 +167,9 @@ let get_dist (dd:QData.qddata) =
 let get_value (dd:QData.qddata) =
   begin match dd with
   | QcertCompiler.Ddistr d ->
-      string_of_char_list (QData.qdataToJS (char_list_of_string "\"") (QData.dcoll d))
+      string_of_char_list (QData.qdataStringify (char_list_of_string "\"") (QData.dcoll d))
   | QcertCompiler.Dlocal d ->
-      string_of_char_list (QData.qdataToJS (char_list_of_string "\"") d)
+      string_of_char_list (QData.qdataStringify (char_list_of_string "\"") d)
   end
     
 let print_input_var (v:char list * QData.qddata) =
@@ -210,7 +210,7 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
     then CheckUtil.validate_result false queryname language_name expected_output (Some ev_data)
     else true
   in
-  let s = string_of_char_list (QData.qdataToJS (char_list_of_string "\"") ev_data) in
+  let s = string_of_char_list (QData.qdataStringify (char_list_of_string "\"") ev_data) in
   let fpref = queryname in
   let fpost = language_name in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".json" in

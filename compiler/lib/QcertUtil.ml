@@ -24,7 +24,7 @@ let qcert_error_of_qerror e =
   begin match e with
  | QcertCompiler.CompilationError cl -> "[CompilationError] " ^ (string_of_char_list cl)
  | QcertCompiler.TypeError cl -> "[TypeError] " ^ (string_of_char_list cl)
- | QcertCompiler.UserError d -> "[UserError] " ^ (string_of_char_list (QData.qdataToJS [] d))
+ | QcertCompiler.UserError d -> "[UserError] " ^ (string_of_char_list (QData.qdataStringify [] d))
   end
 
 let lift_qerror f x =

@@ -15,9 +15,6 @@
  *)
 
 open QcertExtracted
-
-open DataUtil
-
 open QcertCompiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
@@ -146,7 +143,6 @@ type eval_config =
       eval_only : bool ref;
       mutable eval_io : QData.json option;
       mutable eval_schema : string option;
-      mutable format : serialization_format;
       mutable eval_inputs : string list;
       eval_lang_config : lang_config }
 
@@ -155,7 +151,6 @@ let default_eval_config () =
     eval_only = ref false;
     eval_io = None;
     eval_schema = None;
-    format = META;
     eval_inputs = [];
     eval_lang_config = default_eval_lang_config () }
 
@@ -163,13 +158,6 @@ let set_eval_io conf io = conf.eval_io <- Some io
 let set_eval_schema conf schema = conf.eval_schema <- Some schema
 let set_input conf f = conf.eval_inputs <- f :: conf.eval_inputs
 
-let set_format conf s =
-  match String.lowercase_ascii s with
-  | "meta" -> conf.format <- META
-  | "enhanced" -> conf.format <- ENHANCED
-  | _ -> ()
-
-let get_format conf = conf.format
 let get_eval_lang_config conf = conf.eval_lang_config
 let get_eval_only conf = conf.eval_only
 let get_debug conf = conf.debug
@@ -181,14 +169,12 @@ let get_eval_inputs conf = conf.eval_inputs
 
 type data_config =
     { mutable in_jsons : QData.json list;
-      mutable data_format : serialization_format;
       mutable data_args : string list;
       mutable data_dir : string option;
       mutable data_schema : QData.json option }
 
 let default_data_config () =
   { in_jsons = [];
-    data_format = META;
     data_args = [];
     data_dir = None;
     data_schema = None }
@@ -196,17 +182,9 @@ let default_data_config () =
 let set_json conf json =
   conf.in_jsons <- json :: conf.in_jsons
 
-let set_data_format conf s =
-  match String.lowercase_ascii s with
-  | "meta" -> conf.data_format <- META
-  | "enhanced" -> conf.data_format <- ENHANCED
-  | _ -> ()
-
 let set_data_dir conf d = conf.data_dir <- Some d
 let set_data_schema conf s = conf.data_schema <- Some s
 
-let get_data_format conf =
-  conf.data_format
 let get_data_schema conf =
   conf.data_schema
 let get_data_dir conf =

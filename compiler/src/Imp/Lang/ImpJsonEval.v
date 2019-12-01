@@ -64,7 +64,7 @@ Section ImpJsonEval.
 
     Definition imp_json_data_to_Z (d:imp_json_data) : option Z :=
       match d with
-      | jobject (("$nat"%string, jnumber n)::nil) => Some (float_truncate n)
+      | jobject (("$nat"%string, jbigint n)::nil) => Some n
       | _ => None
       end.
 
@@ -191,14 +191,14 @@ Section ImpJsonEval.
         apply_unary
           (fun d =>
              match d with
-             | jarray l => Some (jobject (("$nat", (jnumber (float_of_int (Z_of_nat (bcount l)))))::nil))
+             | jarray l => Some (jobject (("$nat", (jbigint (Z_of_nat (bcount l))))::nil))
              | _ => None
              end) dl
       | JSONRuntimeLength =>
         apply_unary
           (fun d =>
              match d with
-             | jstring s => Some (jobject (("$nat", (jnumber (float_of_int (Z_of_nat (String.length s)))))::nil))
+             | jstring s => Some (jobject (("$nat", (jbigint (Z_of_nat (String.length s))))::nil))
              | _ => None
              end) dl
       | JSONRuntimeSubstring => None

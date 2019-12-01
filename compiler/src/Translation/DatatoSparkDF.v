@@ -34,7 +34,7 @@ Section DatatoSparkDF.
   Context {m:brand_model}.
 
   Definition data_to_blob (d: data): string :=
-    jsonToJS quotel_double (data_to_json d).
+    jsonStringify quotel_double (data_to_json d).
 
   Lemma dataToJS_correctly_escapes_quote_inside_string:
     data_to_blob (dstring "abc""cde") = """abc\""cde"""%string.
@@ -107,7 +107,7 @@ Section DatatoSparkDF.
 
   Definition typed_data_to_json_string (d: data) (r: rtype): string :=
     match typed_data_to_json d (proj1_sig r) with
-    | Some json => jsonToJS """" json
+    | Some json => jsonStringify """" json
     (* Uhmm... this only works if we also have a proof that this d has this type r...
      * d ◁ r is the notation, if I remember correctly *)
     | None => "typed_data_to_json_string failed. This cannot happen. Get rid of this case by proving that typed_data_to_json always succeeds for well-typed data."
@@ -161,7 +161,7 @@ Section DatatoSparkDF.
   (* Added call for integration within the compiler interface *)
   Definition data_to_sjson (d:data) (r:rtype) : option string :=
     (* Some (typed_data_to_json_string d r) *)
-    lift (jsonToJS """") (typed_data_to_json d (proj1_sig r)).
+    lift (jsonStringify """") (typed_data_to_json d (proj1_sig r)).
 
 End DatatoSparkDF.
 
