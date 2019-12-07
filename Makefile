@@ -29,7 +29,9 @@ all:
 	@$(MAKE) qcert
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
 	@$(MAKE) MAKEFLAGS= qcert-javascript
+ifneq ($(JAVA),)
 	@$(MAKE) MAKEFLAGS= qcert-parsersJava
+endif
 	@$(MAKE) MAKEFLAGS= qcert-runtimes
 	@$(MAKE) MAKEFLAGS= qcert-clis
 
