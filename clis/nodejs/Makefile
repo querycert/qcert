@@ -35,3 +35,16 @@ copy-libs: $(DEP_FILES)
 	cp $^ extracted/
 
 .PHONY: copy-libs package
+
+clean:
+	- @rm extracted/*.js
+	- @rm -rf log
+	- @rm -rf node_modules
+	- @rm -f qcert-*.tgz
+
+cleanall:
+	- @rm extracted/*.js
+	- @rm -rf log
+	- @rm -rf node_modules
+	- @rm -f qcert-*.tgz
+

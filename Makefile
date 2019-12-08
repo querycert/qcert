@@ -195,10 +195,12 @@ java-cli:
 	@$(MAKE) -C clis/java all install
 
 clean-clis:
+	- @$(MAKE) -C clis/nodejs clean
 	- @$(MAKE) -C clis/java clean
 	- @rm -f bin/javaRunner.jar
 
 cleanall-clis:
+	- @$(MAKE) -C clis/nodejs cleanall
 	- @$(MAKE) -C clis/java cleanall
 	- @rm -f bin/javaRunner.jar
 
