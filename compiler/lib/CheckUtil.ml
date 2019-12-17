@@ -16,12 +16,8 @@
 
 (* Result checking *)
 
-open QcertExtracted
-
 open Format
-
 open ConfigUtil
-
 open QcertCompiler.EnhancedCompiler
 
 (* Check result *)

@@ -16,8 +16,7 @@
 
 %{
 
-  open QcertExtracted
-  open QcertUtils.Util
+  open Util
   open QcertCompiler.EnhancedCompiler
 
   type lambda_or_expression =
@@ -72,7 +71,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <QcertExtracted.QcertCompiler.EnhancedCompiler.QLambdaNRA.expr> main
+%start <QcertCompiler.EnhancedCompiler.QLambdaNRA.expr> main
 
 %%
 

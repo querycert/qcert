@@ -15,7 +15,7 @@
  *)
 
 {
-  open QcertUtils.LexUtil
+  open LexUtil
   open LambdaNRAParser
 
   let keyword_table =

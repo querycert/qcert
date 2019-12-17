@@ -16,7 +16,6 @@
 
 (* This module contains parsing utilities *)
 
-open QcertExtracted
 open QcertCompiler.EnhancedCompiler
 
 (*********************)
@@ -35,7 +34,7 @@ val parse_oql_from_string : string -> QLang.oql
 (* S-Expr Parse *)
 (****************)
 
-val parse_sexp_from_string : string -> QcertUtils.SExp.sexp
+val parse_sexp_from_string : string -> SExp.sexp
 val parse_io_sexp_from_string : string -> QData.qdata
 val parse_camp_sexp_from_string : string -> QLang.camp
 val parse_nraenv_sexp_from_string : string -> QLang.nraenv_core

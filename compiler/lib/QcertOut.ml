@@ -16,7 +16,6 @@
 
 (** This module contains compiler output code *)
 
-open QcertExtracted
 open PrettyQuery
 
 (** Output languages *)

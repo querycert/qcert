@@ -16,7 +16,6 @@
 
 (** This module contains common code for pretty-printers *)
 
-open QcertExtracted
 open QcertCompiler.EnhancedCompiler
 
 (* Character sets *)

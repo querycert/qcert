@@ -1,4 +1,0 @@
-(library
- (name qcertLib)
- (libraries qcertUtils qcertParsers qcertExtracted base64)
-)

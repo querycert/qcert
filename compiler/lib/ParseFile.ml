@@ -16,9 +16,8 @@
 
 (* This module contains parsing utilities *)
 
-open QcertExtracted
-open QcertUtils.Util
-open QcertUtils.LexUtil
+open Util
+open LexUtil
 open ParseUtil
 
 open QcertCompiler.EnhancedCompiler
@@ -60,7 +59,7 @@ let parse_oql_from_file f : QLang.oql = parse_file parse_oql f
 (* S-Expr Parse *)
 (****************)
 
-let parse_sexp_from_file s : QcertUtils.SExp.sexp = parse_file parse_sexp s
+let parse_sexp_from_file s : SExp.sexp = parse_file parse_sexp s
 let parse_io_sexp_from_file s : QData.qdata = parse_file parse_io_sexp s
 let parse_camp_sexp_from_file s : QLang.camp = parse_file parse_camp_sexp s
 let parse_nraenv_sexp_from_file s : QLang.nraenv_core = parse_file parse_nraenv_sexp s

@@ -16,12 +16,10 @@
 
 (* This is main for the Camp Data processor *)
 
-open QcertExtracted
-open QcertLib
+open Qcert_lib
 
-open QcertUtils.Util
+open Util
 open QcertConfig
-
 open QcertCompiler.EnhancedCompiler
 
 let verbose = ref false

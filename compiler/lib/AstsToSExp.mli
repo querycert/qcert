@@ -16,8 +16,7 @@
 
 (* This module contains parsing utilities *)
 
-open QcertExtracted
-open QcertUtils.SExp
+open SExp
 open QcertCompiler.EnhancedCompiler
 
 (******************

@@ -14,7 +14,6 @@
  * limitations under the License.
  *)
 
-open QcertExtracted
 open DataUtil
 
 open QcertCompiler.EnhancedCompiler

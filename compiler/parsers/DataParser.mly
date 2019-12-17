@@ -15,8 +15,7 @@
  *)
 
 %{
-  open QcertUtils.Util
-  open QcertExtracted
+  open Util
   open QcertCompiler.EnhancedCompiler
 %}
 %token NULL TRUE FALSE
@@ -28,7 +27,7 @@
 %token LBRACKET RBRACKET
 %token EOF
   
-%start <QcertExtracted.QcertCompiler.EnhancedCompiler.QData.json> main
+%start <QcertCompiler.EnhancedCompiler.QData.json> main
 %%
 
 main:

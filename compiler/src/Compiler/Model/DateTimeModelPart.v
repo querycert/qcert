@@ -94,7 +94,7 @@ Conjecture TIME_DURATION_eq_correct :
   forall f1 f2, (TIME_DURATION_eq f1 f2 = true <-> f1 = f2).
 
 Axiom TIME_DURATION_tostring : TIME_DURATION -> String.string.
-Extract Inlined Constant TIME_DURATION_tostring => "(fun x -> QcertUtils.Util.char_list_of_string x)".
+Extract Inlined Constant TIME_DURATION_tostring => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance time_duration_foreign_data : foreign_data
   := {foreign_data_type := TIME_DURATION}.
@@ -134,7 +134,7 @@ Conjecture TIME_POINT_eq_correct :
   forall f1 f2, (TIME_POINT_eq f1 f2 = true <-> f1 = f2).
 
 Axiom TIME_POINT_tostring : TIME_POINT -> String.string.
-Extract Inlined Constant TIME_POINT_tostring => "(fun x -> QcertUtils.Util.char_list_of_string x)".
+Extract Inlined Constant TIME_POINT_tostring => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance time_point_foreign_data : foreign_data
   := {foreign_data_type := TIME_POINT}.
@@ -163,10 +163,10 @@ Next Obligation.
 Defined.
 
 Axiom TIME_POINT_from_string : String.string -> TIME_POINT.
-Extract Inlined Constant TIME_POINT_from_string => "(fun x -> QcertUtils.Util.string_of_char_list x)".
+Extract Inlined Constant TIME_POINT_from_string => "(fun x -> Util.string_of_char_list x)".
 
 Axiom TIME_DURATION_from_string : String.string -> TIME_DURATION.
-Extract Inlined Constant TIME_DURATION_from_string => "(fun x -> QcertUtils.Util.string_of_char_list x)".
+Extract Inlined Constant TIME_DURATION_from_string => "(fun x -> Util.string_of_char_list x)".
 
 Axiom TIME_POINT_to_scale : TIME_POINT -> time_scale.
 Extract Inlined Constant TIME_POINT_to_scale => "(fun x -> Ts_second)".

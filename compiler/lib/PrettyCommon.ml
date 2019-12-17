@@ -17,8 +17,7 @@
 (* This module contains pretty-printers for intermediate languages *)
 
 open Format
-open QcertUtils.Util
-open QcertExtracted
+open Util
 open QcertCompiler.EnhancedCompiler
 
 (** Character sets *)

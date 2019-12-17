@@ -16,7 +16,7 @@
 
 (* This module contains the implementation for the optimization logger *)
 
-open QcertUtils.SExp
+open SExp
 
 open AstsToSExp
 
