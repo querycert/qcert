@@ -18,8 +18,7 @@
 
 open Format
 
-open QcertUtils.Util
-open QcertExtracted
+open Util
 open PrettyCommon
 
 open QcertCompiler.EnhancedCompiler
@@ -810,7 +809,7 @@ let pretty_js_ast greek margin annot inheritance link_runtime q =
 let pretty_javascript greek margin annot inheritance link_runtime q =
   let runtime = 
     if (link_runtime)
-    then QcertUtils.QcertJsRuntime.runtime
+    then QcertJsRuntime.runtime
     else ""
   in
   runtime ^ string_of_char_list q

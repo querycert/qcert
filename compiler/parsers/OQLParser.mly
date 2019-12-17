@@ -15,8 +15,7 @@
  *)
 
 %{
-  open QcertExtracted
-  open QcertUtils.Util
+  open Util
   open QcertCompiler.EnhancedCompiler
 
   let static_int e =
@@ -116,7 +115,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <QcertExtracted.QcertCompiler.EnhancedCompiler.QOQL.program> main
+%start <QcertCompiler.EnhancedCompiler.QOQL.program> main
 
 %%
 

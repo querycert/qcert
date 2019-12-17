@@ -15,7 +15,7 @@
  *)
 
 %{
-   open QcertUtils.SExp
+   open SExp
 %}
 
 %token EOF
@@ -27,7 +27,7 @@
 %token <string> STRING
 %token <string> IDENT
 
-%start <QcertUtils.SExp.sexp> main
+%start <SExp.sexp> main
 
 %%
 

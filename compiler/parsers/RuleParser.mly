@@ -15,9 +15,10 @@
  *)
 
 %{
-  open QcertUtils.Util
-  open QcertExtracted
-  open QcertCompiler.EnhancedCompiler
+  module Qcert_lib = struct end (* Hack for dune bug, see https://github.com/ocaml/dune/issues/2450 *)
+  open Util
+  open QcertCompiler
+  open EnhancedCompiler
 %}
 
 %token <int> INT
@@ -100,9 +101,9 @@
 %nonassoc UWITHVAR
 %nonassoc PASSERT
 
-%start <(string * QcertExtracted.QcertCompiler.EnhancedCompiler.QLang.camp_rule)> rulemain
-%start <(string * QcertExtracted.QcertCompiler.EnhancedCompiler.QLang.camp)> campmain
-%type <QcertExtracted.QcertCompiler.EnhancedCompiler.QLang.camp_rule -> QcertExtracted.QcertCompiler.EnhancedCompiler.QLang.camp_rule> rule_rule
+%start <(string * QcertCompiler.EnhancedCompiler.QLang.camp_rule)> rulemain
+%start <(string * QcertCompiler.EnhancedCompiler.QLang.camp)> campmain
+%type <QcertCompiler.EnhancedCompiler.QLang.camp_rule -> QcertCompiler.EnhancedCompiler.QLang.camp_rule> rule_rule
 
 %%
 

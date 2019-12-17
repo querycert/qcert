@@ -14,11 +14,10 @@
  * limitations under the License.
  *)
 
-open QcertExtracted
-open QcertLib
+open Qcert_lib
 
-open QcertUtils.Util
-open QcertUtils.Logger
+open Util
+open Logger
 open QcertConfig
 open QcertCompiler.EnhancedCompiler
 open LoggerToSexp

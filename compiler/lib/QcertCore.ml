@@ -14,8 +14,7 @@
  * limitations under the License.
  *)
 
-open QcertUtils.Util
-open QcertExtracted
+open Util
 open QcertConfig
 
 open QcertCompiler.EnhancedCompiler
@@ -117,7 +116,7 @@ let emit_string (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) prett
 
 let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let sexp = AstsToSExp.query_to_sexp q in
-  let s = QcertUtils.SExp.sexp_to_string sexp in
+  let s = SExp.sexp_to_string sexp in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
   let lang = QLang.language_of_query brand_model q in

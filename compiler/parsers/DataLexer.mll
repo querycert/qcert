@@ -15,7 +15,7 @@
  *)
 
 {
-  open QcertUtils.LexUtil
+  open LexUtil
   open DataParser
 }
 

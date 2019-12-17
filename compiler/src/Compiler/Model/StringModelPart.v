@@ -33,5 +33,5 @@ Axiom STRING_tostring : STRING -> String.string.
 
 Extract Constant STRING => "string".
 Extract Inlined Constant STRING_eq => "(fun x y -> x = y)".
-Extract Inlined Constant STRING_tostring => "(fun x -> QcertUtils.Util.char_list_of_string x)".
+Extract Inlined Constant STRING_tostring => "(fun x -> Util.char_list_of_string x)".
 

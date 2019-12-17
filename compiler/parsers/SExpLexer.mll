@@ -15,7 +15,7 @@
  *)
 
 {
-  open QcertUtils.LexUtil
+  open LexUtil
   open SExpParser
     
   let keyword_table =

@@ -14,11 +14,10 @@
  * limitations under the License.
  *)
 
-open QcertExtracted
-open QcertLib
+open Qcert_lib
 open Js_of_ocaml
 
-open QcertUtils.Util
+open Util
 open QcertUtil
 open QcertConfig
 open QcertCompiler.EnhancedCompiler

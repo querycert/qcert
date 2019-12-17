@@ -15,7 +15,7 @@
  *)
 
 {
-  open QcertUtils.LexUtil
+  open LexUtil
   open OQLParser
 
   let keyword_table =

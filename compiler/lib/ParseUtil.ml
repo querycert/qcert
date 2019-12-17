@@ -16,10 +16,8 @@
 
 (* This module contains parsing utilities *)
 
-open QcertUtils.Util
-open QcertUtils.LexUtil
-open QcertExtracted
-open QcertParsers
+open Util
+open LexUtil
 
 open QcertCompiler.EnhancedCompiler
 
@@ -66,7 +64,7 @@ let parse_lambda_nra f : QLang.lambda_nra = QLambdaNRA.latableify (parse LambdaN
 (* S-Expr Parse *)
 (****************)
 
-let parse_sexp f : QcertUtils.SExp.sexp = parse SExpParser.main (SExpLexer.token (string_buff ())) f
+let parse_sexp f : SExp.sexp = parse SExpParser.main (SExpLexer.token (string_buff ())) f
 let parse_io_sexp f : QData.qdata = AstsToSExp.sexp_to_data (parse_sexp f)
 let parse_camp_sexp f : QLang.camp = AstsToSExp.sexp_to_camp (parse_sexp f)
 let parse_sql_sexp f : QLang.sql = AstsToSExp.sexp_to_sql (parse_sexp f)

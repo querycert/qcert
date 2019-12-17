@@ -16,7 +16,6 @@
 
 (* This module contains parsing utilities *)
 
-open QcertExtracted
 open QcertCompiler.EnhancedCompiler
 
 (******************
@@ -35,7 +34,7 @@ val parse_oql : Lexing.lexbuf -> QLang.oql
  * S-Expr Parse *
  ****************)
 
-val parse_sexp : Lexing.lexbuf -> QcertUtils.SExp.sexp
+val parse_sexp : Lexing.lexbuf -> SExp.sexp
 val parse_io_sexp : Lexing.lexbuf -> QData.qdata
 
 val parse_sql_sexp : Lexing.lexbuf -> QLang.sql
