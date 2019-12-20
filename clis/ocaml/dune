@@ -1,3 +1,5 @@
 (executables
  (names qcert qdata)
- (libraries unix qcert_lib))
+ (public_names qcert qdata)
+ (package qcert)
+ (libraries unix coq-qcert qcert-lib))

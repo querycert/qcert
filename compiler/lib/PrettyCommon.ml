@@ -17,6 +17,8 @@
 (* This module contains pretty-printers for intermediate languages *)
 
 open Format
+
+open Qcert_coq
 open Util
 open QcertCompiler.EnhancedCompiler
 

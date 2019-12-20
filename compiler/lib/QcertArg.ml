@@ -14,7 +14,9 @@
  * limitations under the License.
  *)
 
+open Qcert_coq
 open Util
+
 open QcertUtil
 open QcertConfig
 

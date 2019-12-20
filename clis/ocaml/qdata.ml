@@ -16,6 +16,7 @@
 
 (* This is main for the Camp Data processor *)
 
+open Qcert_coq
 open Qcert_lib
 
 open Util

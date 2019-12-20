@@ -15,6 +15,7 @@
  *)
 
 %{
+  open Qcert_coq
   open Util
   open QcertCompiler.EnhancedCompiler
 
@@ -115,7 +116,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <QcertCompiler.EnhancedCompiler.QOQL.program> main
+%start <Qcert_coq.QcertCompiler.EnhancedCompiler.QOQL.program> main
 
 %%
 

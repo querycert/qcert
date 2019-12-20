@@ -16,6 +16,7 @@
 
 (** This module contains pretty-printers for all languages *)
 
+open Qcert_coq
 open QcertCompiler.EnhancedCompiler
 
 open PrettyCommon

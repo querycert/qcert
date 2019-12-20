@@ -14,8 +14,8 @@
  * limitations under the License.
  *)
 
+open Qcert_coq
 open Util
-
 open QcertCompiler.EnhancedCompiler
 
 let qcert_error_of_qerror e =

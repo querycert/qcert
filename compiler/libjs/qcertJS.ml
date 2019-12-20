@@ -14,13 +14,15 @@
  * limitations under the License.
  *)
 
-open Qcert_lib
 open Js_of_ocaml
 
+open Qcert_coq
 open Util
+open QcertCompiler.EnhancedCompiler
+
+open Qcert_lib
 open QcertUtil
 open QcertConfig
-open QcertCompiler.EnhancedCompiler
 
 
 (**********************************)

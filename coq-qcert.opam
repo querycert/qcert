@@ -1,5 +1,5 @@
 opam-version: "2.0"
-name: "qcert-lib"
+name: "coq-qcert"
 version: "2.0.0~alpha.1"
 synopsis: "Verified compiler for data-centric languages"
 description: """
@@ -18,9 +18,9 @@ depends: [
   "ocaml" {>= "4.07.1"}
   "ocamlfind"
   "dune"
-  "menhir"
-  "base64"
-  "coq-qcert"
+  "coq" {>= "8.8.2" & < "8.9~"}
+  "coq-flocq" {>= "2.6.1" & < "3.0~"}
+  "coq-jsast" {>= "1.0.8"}
 ]
 build: [
   ["make" "-j" jobs name]

@@ -19,10 +19,9 @@
 ###
 
 DEP_FILES=../../bin/qcertJS.js \
-	../../runtimes/javascript/qcert-runtime.js \
-	../../runtimes/javascript/quoted-qcert-runtime.js \
+	../../runtimes/javascript/qcert-runtime.js
 
-all: install
+all: copy-libs
 
 install: copy-libs
 	npm install
@@ -37,14 +36,11 @@ copy-libs: $(DEP_FILES)
 .PHONY: copy-libs package
 
 clean:
-	- @rm extracted/*.js
 	- @rm -rf log
 	- @rm -rf node_modules
 	- @rm -f qcert-*.tgz
 
-cleanall:
-	- @rm extracted/*.js
-	- @rm -rf log
-	- @rm -rf node_modules
-	- @rm -f qcert-*.tgz
+cleanall: clean
+	- @rm -f ../../bin/qcertJS.js
+	- @rm -f extracted/*.js
 
