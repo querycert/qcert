@@ -15,7 +15,8 @@
  *)
 
 %{
-   open SExp
+  open Qcert_coq
+  open SExp
 %}
 
 %token EOF
@@ -27,7 +28,7 @@
 %token <string> STRING
 %token <string> IDENT
 
-%start <SExp.sexp> main
+%start <Qcert_coq.SExp.sexp> main
 
 %%
 

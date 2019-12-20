@@ -25,82 +25,180 @@ CP=cp
 FILES = $(addprefix compiler/src/,$(MODULES:%=%.v))
 
 ## Full run
-all: 
-	@$(MAKE) qcert
+all:
+	@$(MAKE) build
+	@$(MAKE) install
+
+build: 
+	@$(MAKE) qcert-compiler
+	@$(MAKE) MAKEFLAGS= qcert-runtimes
+	@$(MAKE) MAKEFLAGS= qcert-clis
+
+clean: Makefile.coq remove_all_derived
+	- @$(MAKE) clean-qcert-compiler
+	- @$(MAKE) clean-runtimes
+	- @$(MAKE) clean-clis
+	- @$(MAKE) clean-demo
+	- @$(MAKE) clean-test
+	- @rm -f Makefile.coq
+	- @rm -f *~
+
+cleanmost: Makefile.coq
+	- @$(MAKE) cleanmost-qcert-compiler
+	- @$(MAKE) cleanall-runtimes
+	- @$(MAKE) cleanall-clis
+	- @$(MAKE) cleanall-demo
+	- @$(MAKE) cleanall-test
+	- @rm -f Makefile.coq
+	- @rm -f *~
+
+cleanall: Makefile.coq remove_all_derived
+	- @$(MAKE) cleanall-qcert-compiler
+	- @$(MAKE) cleanmost
+
+
+## Install
+
+install: 
+	@$(MAKE) install-ocaml
+ifneq ($(JAVASCRIPT),)
+	@$(MAKE) install-javascript
+endif
+
+install-ocaml:
+	@$(MAKE) -C clis/ocaml install
+
+install-javascript:
+	@$(MAKE) -C clis/nodejs install
+
+
+## Coq build
+
+qcert-compiler:
+	@$(MAKE) prebuild
+	@$(MAKE) qcert-coq
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
+ifneq ($(JAVASCRIPT),)
 	@$(MAKE) MAKEFLAGS= qcert-javascript
+endif
 ifneq ($(JAVA),)
 	@$(MAKE) MAKEFLAGS= qcert-parsersJava
 endif
-	@$(MAKE) MAKEFLAGS= qcert-runtimes
-	@$(MAKE) MAKEFLAGS= qcert-clis
+
+clean-qcert-compiler:
+	- @$(MAKE) clean-prebuild
+	- @$(MAKE) clean-qcert-coq
+	- @$(MAKE) clean-qcert-ocaml
+	- @$(MAKE) clean-parsersJava
+
+cleanall-qcert-compiler:
+	- @$(MAKE) cleanall-prebuild
+	- @$(MAKE) cleanall-qcert-coq
+	- @$(MAKE) cleanall-qcert-ocaml
+	- @$(MAKE) cleanall-parsersJava
+
+cleanmost-qcert-compiler:
+	- @$(MAKE) cleanall-prebuild
+	- @$(MAKE) cleanall-qcert-ocaml
+	- @$(MAKE) cleanall-parsersJava
+
+
+## Opam
+
+coq-qcert:
+	@$(MAKE) qcert-coq
+	@$(MAKE) qcert-ocaml-extract
+
+qcert-lib:
+	@$(MAKE) prebuild
+
+
+## Pre-build
+
+prebuild:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Preparing Build"
+	@echo "[Q*cert] "
+	@$(MAKE) -C compiler
+
+clean-prebuild:
+	@$(MAKE) -C compiler clean
+
+cleanall-prebuild:
+	@$(MAKE) -C compiler cleanall
 
 
 ## Compiler Core
 
-qcert: Makefile.coq
-	@$(MAKE) qcert-coq
-
 qcert-coq: Makefile.coq
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling Coq source"
+	@echo "[Q*cert] Building Compiler from Coq"
 	@echo "[Q*cert] "
 	@$(MAKE) -f Makefile.coq
 
-clean-coq:
+clean-qcert-coq:
 	- @$(MAKE) -f Makefile.coq clean
 
-cleanall-coq: clean-coq
+cleanall-qcert-coq: clean-qcert-coq
 
+### OCaml Extraction
 
-## Extraction
+qcert-ocaml-extract:
+	@$(MAKE) -C compiler/extraction
 
 qcert-ocaml:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Extracting compiler to OCaml"
+	@echo "[Q*cert] Extracting Compiler to OCaml"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler native
+	@$(MAKE) qcert-ocaml-extract
+	dune build -p coq-qcert
+	dune build -p qcert-lib
+
+clean-qcert-ocaml:
+	- @$(MAKE) -C compiler/extraction clean
+	- dune clean
+
+cleanall-qcert-ocaml:
+	- @$(MAKE) -C compiler/extraction cleanall
+	- dune clean
+	- rm -f *.install
+
+### JavaScript Extraction
 
 qcert-javascript:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Extracting compiler to JavaScript"
+	@echo "[Q*cert] Extracting Compiler to JavaScript"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler js
-
-clean-ocaml:
-	- @$(MAKE) -C compiler clean
-
-cleanall-ocaml:
-	- @$(MAKE) -C compiler cleanall
+	@$(MAKE) -C compiler/libjs
 
 
 ## Java Parsers
 
 qcert-parsersJava:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compling Java parsers"
+	@echo "[Q*cert] Building Java Parsers"
 	@echo "[Q*cert] "
 ifneq ($(SQL),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] SQL parser"
+	@echo "[Q*cert] SQL Parser"
 	@echo "[Q*cert] "
 	@$(MAKE) -C compiler/parsersJava/sqlParser
 endif
 ifneq ($(SQLPP),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] SQL++ parser"
+	@echo "[Q*cert] SQL++ Parser"
 	@echo "[Q*cert] "
 	@$(MAKE) -C compiler/parsersJava/sqlppParser
 endif
 ifneq ($(JRULES),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] ODM rules parsers"
+	@echo "[Q*cert] ODM Rules Parsers"
 	@echo "[Q*cert] "
 	@$(MAKE) -C compiler/parsersJava/jrulesParser
 endif
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Installing parser service"
+	@echo "[Q*cert] Installing Parser Service"
 	@echo "[Q*cert] "
 	@$(MAKE) -C compiler/parsersJava/javaService all install
 endif
@@ -171,16 +269,23 @@ cleanall-runtimes:
 
 
 ## CLIs
+qcert-clis:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building CLIs"
 	@echo "[Q*cert] "
-qcert-clis:
+	@$(MAKE) ocaml-cli
 ifneq ($(JAVASCRIPT),)
 	@$(MAKE) javascript-cli
 endif
 ifneq ($(JAVA),)
 	@$(MAKE) java-cli
 endif
+
+ocaml-cli:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] OCaml CLI"
+	@echo "[Q*cert] "
+	@$(MAKE) -C clis/ocaml all
 
 javascript-cli:
 	@echo "[Q*cert] "
@@ -195,11 +300,13 @@ java-cli:
 	@$(MAKE) -C clis/java all install
 
 clean-clis:
+	- @$(MAKE) -C clis/ocaml clean
 	- @$(MAKE) -C clis/nodejs clean
 	- @$(MAKE) -C clis/java clean
 	- @rm -f bin/javaRunner.jar
 
 cleanall-clis:
+	- @$(MAKE) -C clis/ocaml cleanall
 	- @$(MAKE) -C clis/nodejs cleanall
 	- @$(MAKE) -C clis/java cleanall
 	- @rm -f bin/javaRunner.jar
@@ -239,41 +346,9 @@ clean-test:
 cleanall-test: clean-test
 
 
-## Install
-
-install-coq:
-	@$(MAKE) -f Makefile.coq install
-
-
 ## Documentation
 docs:
 	@$(MAKE) -C compiler/src documentation
-
-## Cleanup
-clean: Makefile.coq remove_all_derived
-	- @$(MAKE) clean-coq
-	- @$(MAKE) clean-ocaml
-	- @$(MAKE) clean-parsersJava
-	- @$(MAKE) clean-runtimes
-	- @$(MAKE) clean-clis
-	- @$(MAKE) clean-demo
-	- @$(MAKE) clean-test
-	- @rm -f Makefile.coq
-	- @rm -f *~
-
-cleanmost: Makefile.coq
-	- @$(MAKE) cleanall-ocaml
-	- @$(MAKE) cleanall-runtimes
-	- @$(MAKE) cleanall-clis
-	- @$(MAKE) cleanall-parsersJava
-	- @$(MAKE) cleanall-demo
-	- @$(MAKE) cleanall-test
-	- @rm -f Makefile.coq
-	- @rm -f *~
-
-cleanall: Makefile.coq remove_all_derived
-	- @$(MAKE) cleanall-coq
-	- @$(MAKE) cleanmost
 
 ## Misc
 

@@ -20,7 +20,7 @@
 	 Also, parsing JRules, converting SQL schemas to JSON, and data loading using Apache commons-csv.
 *)
 
-open Util
+open Qcert_coq.Util
 
 let get_qcert_home () =
   try Sys.getenv "QCERT_HOME"

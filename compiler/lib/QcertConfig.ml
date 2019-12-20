@@ -14,10 +14,11 @@
  * limitations under the License.
  *)
 
+open Qcert_coq
 open Util
-open DataUtil
-
 open QcertCompiler.EnhancedCompiler
+
+open DataUtil
 
 type io_kind =
   | IO_file of string option

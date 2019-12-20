@@ -4,9 +4,11 @@ B /Users/jeromesimeon/.opam/4.07.1/lib/bytes
 B /Users/jeromesimeon/.opam/4.07.1/lib/ocaml
 B ../../_build/default/clis/ocaml/.qcert.eobjs/byte
 B ../../_build/default/compiler/.qcert_lib.objs/byte
+B ../../_build/default/compiler/extraction/.qcert_coq.objs/byte
 S /Users/jeromesimeon/.opam/4.07.1/lib/base64
 S /Users/jeromesimeon/.opam/4.07.1/lib/bytes
 S /Users/jeromesimeon/.opam/4.07.1/lib/ocaml
 S .
 S ../../compiler
-FLG -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27 -w -39
+S ../../compiler/extraction
+FLG -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -27 -w -39 -warn-error -A

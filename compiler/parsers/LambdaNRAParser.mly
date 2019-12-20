@@ -15,7 +15,7 @@
  *)
 
 %{
-
+  open Qcert_coq
   open Util
   open QcertCompiler.EnhancedCompiler
 
@@ -71,7 +71,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <QcertCompiler.EnhancedCompiler.QLambdaNRA.expr> main
+%start <Qcert_coq.QcertCompiler.EnhancedCompiler.QLambdaNRA.expr> main
 
 %%
 

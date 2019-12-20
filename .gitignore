@@ -8,6 +8,7 @@ bin/*.jar
 bin/services/*.jar
 bin/lib/*.jar
 _build/
+*.install
 log/
 /.project
 .coqdeps.d

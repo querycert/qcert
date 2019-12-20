@@ -14,8 +14,8 @@
  * limitations under the License.
  *)
 
+open Qcert_coq
 open QcertCompiler.EnhancedCompiler
-
 
 val set_qname : QcertConfig.global_config -> string -> unit
 val set_source : QcertConfig.global_config -> string -> unit

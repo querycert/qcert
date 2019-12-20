@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+open Qcert_coq
 open QcertCompiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)

@@ -15,37 +15,34 @@
 #
 
 # User-level configuration
-include ../Makefile.config
+include ../../Makefile.config
 # Contains the list of all the Coq modules
-include ../Makefile.coq_modules
+include ../../Makefile.coq_modules
 
 ## Configuraton
-QCERT_HOME=$(CURDIR)/..
+QCERT_HOME=$(CURDIR)/../..
+
+## Mains
+MAIN=qcertJS
+
+BYTECODE=bc
+JS=js
 
 ## Toplevel
-all: prepare
+all: ../../bin/$(MAIN).js
 
-prepare: lib/StaticConfig.ml lib/QcertJsRuntime.ml
-
-## Extraction
-../runtimes/javascript/qcert_runtime.ml:
-	$(MAKE) -C ../runtimes/javascript
-
-lib/QcertJsRuntime.ml: ../runtimes/javascript/qcert_runtime.ml
-	cp ../runtimes/javascript/qcert_runtime.ml lib/QcertJsRuntime.ml
-
-lib/StaticConfig.ml:
-	echo "(* This file is generated *)" > lib/StaticConfig.ml
-	echo "let qcert_home = \"$(QCERT_HOME)\"" >> lib/StaticConfig.ml
+## JavaScript
+../../bin/$(MAIN).js:
+	dune build $(MAIN).$(BYTECODE)
+	js_of_ocaml $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(BYTECODE)
+	cp $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(JS) ../../bin/$(MAIN).$(JS)
 
 ## Clean
 
 clean:
+	rm -f ../../bin/$(MAIN).js
 
 cleanall: clean
-	$(MAKE) -C ../runtimes/javascript cleanall
-	rm -rf lib/QcertJsRuntime.ml
-	rm -rf lib/StaticConfig.ml
 	rm -rf *~
 
 .NOTPARALLEL: 

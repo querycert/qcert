@@ -18,10 +18,11 @@
 
 open Format
 
+open Qcert_coq
 open Util
-open PrettyCommon
-
 open QcertCompiler.EnhancedCompiler
+
+open PrettyCommon
 
 (** Pretty query wrapper *)
 

@@ -15,6 +15,7 @@
  *)
 
 {
+  open Qcert_coq
   open LexUtil
   open RuleParser
 

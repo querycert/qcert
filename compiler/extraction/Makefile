@@ -15,37 +15,26 @@
 #
 
 # User-level configuration
-include ../Makefile.config
+include ../../Makefile.config
 # Contains the list of all the Coq modules
-include ../Makefile.coq_modules
-
-## Configuraton
-QCERT_HOME=$(CURDIR)/..
+include ../../Makefile.coq_modules
 
 ## Toplevel
-all: prepare
-
-prepare: lib/StaticConfig.ml lib/QcertJsRuntime.ml
+all: extraction/QcertCompiler.ml
 
 ## Extraction
-../runtimes/javascript/qcert_runtime.ml:
-	$(MAKE) -C ../runtimes/javascript
+VO_FILES = $(MODULES:%=../src/%.vo)
 
-lib/QcertJsRuntime.ml: ../runtimes/javascript/qcert_runtime.ml
-	cp ../runtimes/javascript/qcert_runtime.ml lib/QcertJsRuntime.ml
-
-lib/StaticConfig.ml:
-	echo "(* This file is generated *)" > lib/StaticConfig.ml
-	echo "let qcert_home = \"$(QCERT_HOME)\"" >> lib/StaticConfig.ml
+extraction/QcertCompiler.ml extraction/QcertCompiler.mli:
+	coqc -R ../src Qcert ./QcertExtraction.v
 
 ## Clean
 
 clean:
 
 cleanall: clean
-	$(MAKE) -C ../runtimes/javascript cleanall
-	rm -rf lib/QcertJsRuntime.ml
-	rm -rf lib/StaticConfig.ml
+	rm -f QcertExtraction.glob QcertExtraction.vo .QcertExtraction.aux
+	rm -rf QcertCompiler.ml QcertCompiler.mli
 	rm -rf *~
 
 .NOTPARALLEL: 

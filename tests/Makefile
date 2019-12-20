@@ -43,11 +43,13 @@ tests:
 	@$(MAKE) oql-tests
 	@$(MAKE) lambda_nra-tests
 	@$(MAKE) camp-tests
+ifneq ($(JAVA),)
 ifneq ($(SQL),)
 	@$(MAKE) sql-tests
 endif
 ifneq ($(JRULES),)
 	@$(MAKE) tech_rule-tests
+endif
 endif
 
 .PHONY: oql-tests \

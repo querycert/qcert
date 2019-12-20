@@ -14,10 +14,11 @@
  * limitations under the License.
  *)
 
+open Qcert_coq
 open Util
-open QcertConfig
-
 open QcertCompiler.EnhancedCompiler
+
+open QcertConfig
 
 type result = {
     res_emit : result_file;

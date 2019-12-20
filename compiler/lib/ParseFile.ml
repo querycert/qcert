@@ -16,11 +16,12 @@
 
 (* This module contains parsing utilities *)
 
+open Qcert_coq
 open Util
 open LexUtil
-open ParseUtil
-
 open QcertCompiler.EnhancedCompiler
+
+open ParseUtil
 
 (*****************)
 (* Generic Parse *)
