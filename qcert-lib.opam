@@ -23,7 +23,7 @@ depends: [
   "coq-qcert"
 ]
 build: [
-  ["make" "-j" jobs name]
+  [make "-j" jobs name]
   ["dune" "build" "-j" jobs "-p" name]
 ]
 
