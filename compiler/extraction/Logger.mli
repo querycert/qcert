@@ -17,7 +17,7 @@
 (* This module contains the implementation for the optimization logger *)
 
 open Util
-open SExp
+open Sexp
 
 val nra_log_startPass : string -> 'a -> nra_logger_token_type
 val nra_log_step : nra_logger_token_type -> string -> 'a -> 'a -> nra_logger_token_type

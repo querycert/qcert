@@ -1,5 +1,5 @@
-QcertCompiler.ml
-QcertCompiler.mli
+compiler.ml
+compiler.mli
 /out/
 /*.aux
 /.paths

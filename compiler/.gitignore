@@ -1,2 +1,2 @@
-lib/QcertJsRuntime.ml
-lib/StaticConfig.ml
+lib/js_runtime.ml
+lib/static_config.ml

@@ -151,8 +151,7 @@ qcert-ocaml:
 	@echo "[Q*cert] Extracting Compiler to OCaml"
 	@echo "[Q*cert] "
 	@$(MAKE) qcert-ocaml-extract
-	dune build -p coq-qcert
-	dune build -p qcert-lib
+	dune build @install
 
 clean-qcert-ocaml:
 	- @$(MAKE) -C compiler/extraction clean
