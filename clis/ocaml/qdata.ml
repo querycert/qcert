@@ -20,19 +20,19 @@ open Qcert_coq
 open Qcert_lib
 
 open Util
-open QcertConfig
-open QcertCompiler.EnhancedCompiler
+open Config
+open Compiler.EnhancedCompiler
 
 let verbose = ref false
   
 (* Command line args *)
 let args_list gconf =
-  Arg.align
-    [ ("-dir", Arg.String (QcertArg.set_dir gconf),
+  Stdlib.Arg.align
+    [ ("-dir", Stdlib.Arg.String (Args.set_dir gconf),
        "<dir> Directory for the emited");
-      ("-schema", Arg.String (QcertArg.set_schema_file gconf),
+      ("-schema", Stdlib.Arg.String (Args.set_schema_file gconf),
        "<file.schema> Schema");
-      ("-io", Arg.String (QcertArg.set_io_file gconf),
+      ("-io", Stdlib.Arg.String (Args.set_io_file gconf),
        "<file.io> I/O file (Schema,input data,expected output) for evaluation") ]
 
 let anon_args input_files f = input_files := f :: !input_files
@@ -45,14 +45,14 @@ let parse_args () =
   let input_files = ref [] in
   let gconf =
     { gconf_qname = None;
-      gconf_source = QcertCompiler.L_camp_rule;
-      gconf_target = QcertCompiler.L_javascript;
+      gconf_source = Compiler.L_camp_rule;
+      gconf_target = Compiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
       gconf_dir_target = None;
       gconf_io = None;
-      gconf_schema = TypeUtil.empty_schema;
+      gconf_schema = Type_util.empty_schema;
       gconf_input = [];
       gconf_output = QData.dunit;
       gconf_emit_all = false;
@@ -63,7 +63,7 @@ let parse_args () =
       gconf_eval_debug = false;
       gconf_eval_validate = false;
       gconf_source_sexp = false;
-      gconf_pretty_config = PrettyCommon.default_pretty_config ();
+      gconf_pretty_config = Pretty_common.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
       gconf_stat = false;
@@ -74,7 +74,7 @@ let parse_args () =
       gconf_optim_config = [];
       gconf_prefix = ""; }
   in
-  Arg.parse (args_list gconf) (anon_args input_files) usage;
+  Stdlib.Arg.parse (args_list gconf) (anon_args input_files) usage;
   (complete_configuration gconf, List.rev !input_files)
 
 let anon_args gconf f = ()
@@ -89,9 +89,9 @@ let () =
     | _ -> raise (Qcert_Error "qdata requires I/O file or schema/input files")
     end
   in 
-  let results = QcertCore.main_data gconf file_name in
+  let results = Core.main_data gconf file_name in
   let output_res file_res =
-    if file_res.QcertCore.res_file <> "" then
-      make_file file_res.QcertCore.res_file file_res.QcertCore.res_content
+    if file_res.Core.res_file <> "" then
+      make_file file_res.Core.res_file file_res.Core.res_content
   in
   List.iter output_res results

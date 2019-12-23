@@ -1,9 +1,9 @@
 (ocamllex
-  (modules SExpLexer DataLexer LambdaNRALexer RuleLexer OQLLexer)
+  (modules sexp_lexer data_lexer lambda_nra_lexer rule_lexer oql_lexer)
 )
 
 (menhir
-  (modules SExpParser DataParser LambdaNRAParser RuleParser OQLParser)
+  (modules sexp_parser data_parser lambda_nra_parser rule_parser oql_parser)
   (flags ("-la" "2"))
 )
 

@@ -38,5 +38,5 @@ Extract Constant DesignerRule.designer_rule_to_camp_rule => "(fun fruntime x -> 
 
 Require EnhancedCompiler.
 
-Extraction "QcertCompiler" EnhancedCompiler.EnhancedCompiler.
+Extraction "compiler" EnhancedCompiler.EnhancedCompiler.
 

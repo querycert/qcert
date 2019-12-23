@@ -25,18 +25,18 @@ QCERT_HOME=$(CURDIR)/..
 ## Toplevel
 all: prepare
 
-prepare: lib/StaticConfig.ml lib/QcertJsRuntime.ml
+prepare: lib/static_config.ml lib/js_runtime.ml
 
 ## Extraction
 ../runtimes/javascript/qcert_runtime.ml:
 	$(MAKE) -C ../runtimes/javascript
 
-lib/QcertJsRuntime.ml: ../runtimes/javascript/qcert_runtime.ml
-	cp ../runtimes/javascript/qcert_runtime.ml lib/QcertJsRuntime.ml
+lib/js_runtime.ml: ../runtimes/javascript/qcert_runtime.ml
+	cp ../runtimes/javascript/qcert_runtime.ml lib/js_runtime.ml
 
-lib/StaticConfig.ml:
-	echo "(* This file is generated *)" > lib/StaticConfig.ml
-	echo "let qcert_home = \"$(QCERT_HOME)\"" >> lib/StaticConfig.ml
+lib/static_config.ml:
+	echo "(* This file is generated *)" > lib/static_config.ml
+	echo "let qcert_home = \"$(QCERT_HOME)\"" >> lib/static_config.ml
 
 ## Clean
 
@@ -44,8 +44,8 @@ clean:
 
 cleanall: clean
 	$(MAKE) -C ../runtimes/javascript cleanall
-	rm -rf lib/QcertJsRuntime.ml
-	rm -rf lib/StaticConfig.ml
+	rm -rf lib/js_runtime.ml
+	rm -rf lib/static_config.ml
 	rm -rf *~
 
 .NOTPARALLEL: 

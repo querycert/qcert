@@ -18,11 +18,11 @@ open Js_of_ocaml
 
 open Qcert_coq
 open Util
-open QcertCompiler.EnhancedCompiler
+open Compiler.EnhancedCompiler
 
 open Qcert_lib
-open QcertUtil
-open QcertConfig
+open Qcert_util
+open Config
 
 
 (**********************************)
@@ -48,8 +48,8 @@ let map_array_gen gconf f o =
 (**********************************)
 
 let optim_config_from_json s : QDriver.optim_config =
-  let optim_json = ParseString.parse_json_from_string s in
-  DataUtil.build_optim_config optim_json
+  let optim_json = Parse_string.parse_json_from_string s in
+  Data_util.build_optim_config optim_json
 
 (**********************************)
 (* Equivalent to qcert cmd        *)
@@ -58,13 +58,13 @@ let optim_config_from_json s : QDriver.optim_config =
 let global_config_of_json j =
   let gconf =
     { gconf_qname = None;
-      gconf_source = QcertCompiler.L_camp_rule;
-      gconf_target = QcertCompiler.L_javascript;
+      gconf_source = Compiler.L_camp_rule;
+      gconf_target = Compiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
       gconf_dir_target = None;
-      gconf_schema = TypeUtil.empty_schema;
+      gconf_schema = Type_util.empty_schema;
       gconf_input = [];
       gconf_output = QData.dunit;
       gconf_io = None;
@@ -76,7 +76,7 @@ let global_config_of_json j =
       gconf_eval_debug = false;
       gconf_eval_validate = false;
       gconf_source_sexp = false;
-      gconf_pretty_config = PrettyCommon.default_pretty_config ();
+      gconf_pretty_config = Pretty_common.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
       gconf_stat = false;
@@ -91,23 +91,23 @@ let global_config_of_json j =
   let apply = apply gconf in
   let iter_array = iter_array gconf in
   (* Source/Target *)
-  apply QcertArg.set_qname j##.qname;
-  apply QcertArg.set_source j##.source;
-  apply QcertArg.set_target j##.target;
+  apply Args.set_qname j##.qname;
+  apply Args.set_source j##.source;
+  apply Args.set_target j##.target;
   (* Compilation path *)
-  iter_array QcertArg.add_path j##.path;
+  iter_array Args.add_path j##.path;
   Js.Optdef.iter j##.exactpath (fun b -> gconf.gconf_exact_path <- Js.to_bool b);
   (* Target directory -- XXX is that used? XXX *)
-  apply QcertArg.set_dir j##.dir;
-  apply QcertArg.set_dir j##.dirtarget;
+  apply Args.set_dir j##.dir;
+  apply Args.set_dir j##.dirtarget;
   (* I/O *)
-  apply QcertArg.set_schema_content j##.schema;
-  apply QcertArg.set_output_content j##.output;
-  apply QcertArg.set_input_content j##.input;
+  apply Args.set_schema_content j##.schema;
+  apply Args.set_output_content j##.output;
+  apply Args.set_input_content j##.input;
   (* Cloudant options *)
-  Js.Optdef.iter j##.jsruntime (fun b -> if b then QcertArg.set_link_js_runtime gconf ());
+  Js.Optdef.iter j##.jsruntime (fun b -> if b then Args.set_link_js_runtime gconf ());
   Js.Optdef.iter j##.cld_prefix
-    (fun s -> QcertArg.set_prefix gconf (Js.to_string s));
+    (fun s -> Args.set_prefix gconf (Js.to_string s));
   (* Emit options *)
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
@@ -120,19 +120,19 @@ let global_config_of_json j =
   (* Pretty-printing options *)
   Js.Optdef.iter j##.ascii
     (fun b -> if Js.to_bool b then
-      PrettyCommon.set_ascii gconf.gconf_pretty_config ()
+      Pretty_common.set_ascii gconf.gconf_pretty_config ()
     else
-      PrettyCommon.set_greek gconf.gconf_pretty_config ());
+      Pretty_common.set_greek gconf.gconf_pretty_config ());
   Js.Optdef.iter j##.margin
     (fun num ->
       let n = int_of_float (Js.float_of_number num) in
-      PrettyCommon.set_margin gconf.gconf_pretty_config n);
+      Pretty_common.set_margin gconf.gconf_pretty_config n);
   (* Java options *)
-  apply QcertArg.set_java_imports j##.javaimports;
+  apply Args.set_java_imports j##.javaimports;
   (* NNRCMR options *)
-  apply QcertArg.set_vinit j##.vinit;
+  apply Args.set_vinit j##.vinit;
   (* Optimization configuration *)
-  apply (fun gconf o -> QcertArg.set_optims gconf (optim_config_from_json o)) j##.optims;
+  apply (fun gconf o -> Args.set_optims gconf (optim_config_from_json o)) j##.optims;
   (* Return configuration after applying self-consistency constraints *)
   complete_configuration gconf
 
@@ -144,18 +144,18 @@ let wrap_all wrap_f l =
 let json_of_result res =
   let wrap x =
       object%js
-        val file = Js.string x.QcertCore.res_file
-        val lang = Js.string x.QcertCore.res_lang
-        val value = Js.string x.QcertCore.res_content
+        val file = Js.string x.Core.res_file
+        val lang = Js.string x.Core.res_lang
+        val value = Js.string x.Core.res_content
       end
   in
   object%js
-    val emit = Js.def (wrap res.QcertCore.res_emit)
-    val emitall = Js.def (wrap_all wrap res.QcertCore.res_emit_all)
-    val emitsexp = Js.def (wrap res.QcertCore.res_emit_sexp)
-    val emitsexpall = Js.def (wrap_all wrap res.QcertCore.res_emit_sexp_all)
-    val result = Js.string res.QcertCore.res_emit.QcertCore.res_content
-    val eval = Js.string res.QcertCore.res_eval.QcertCore.res_content
+    val emit = Js.def (wrap res.Core.res_emit)
+    val emitall = Js.def (wrap_all wrap res.Core.res_emit_all)
+    val emitsexp = Js.def (wrap res.Core.res_emit_sexp)
+    val emitsexpall = Js.def (wrap_all wrap res.Core.res_emit_sexp_all)
+    val result = Js.string res.Core.res_emit.Core.res_content
+    val eval = Js.string res.Core.res_eval.Core.res_content
   end
 
 let json_of_error msg =
@@ -184,10 +184,10 @@ let json_of_exported_languages exported_languages =
     end
   in
   object%js
-    val frontend = Js.def (wrap_all wrap exported_languages.QcertCompiler.frontend)
-    val core = Js.def (wrap_all wrap exported_languages.QcertCompiler.coreend)
-    val distributed = Js.def (wrap_all wrap exported_languages.QcertCompiler.distrend)
-    val backend =  Js.def (wrap_all wrap exported_languages.QcertCompiler.backend)
+    val frontend = Js.def (wrap_all wrap exported_languages.Compiler.frontend)
+    val core = Js.def (wrap_all wrap exported_languages.Compiler.coreend)
+    val distributed = Js.def (wrap_all wrap exported_languages.Compiler.distrend)
+    val backend =  Js.def (wrap_all wrap exported_languages.Compiler.backend)
   end
 let language_specs () =
   let exported_languages = QLang.export_language_descriptions  in
@@ -205,13 +205,13 @@ let json_of_source_to_target_path j =
 
 let rec unsafe_json_to_js (j:QData.json) =
   match j with
-  | QcertCompiler.Jnull -> Js.Unsafe.inject (Js.null)
-  | QcertCompiler.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
-  | QcertCompiler.Jbigint n -> Js.Unsafe.inject (Js.number_of_float (float_of_int n)) (* XXX Coerce bigint to number *)
-  | QcertCompiler.Jbool b -> Js.Unsafe.inject (Js.bool b)
-  | QcertCompiler.Jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
-  | QcertCompiler.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
-  | QcertCompiler.Jobject l ->
+  | Compiler.Jnull -> Js.Unsafe.inject (Js.null)
+  | Compiler.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
+  | Compiler.Jbigint n -> Js.Unsafe.inject (Js.number_of_float (float_of_int n)) (* XXX Coerce bigint to number *)
+  | Compiler.Jbool b -> Js.Unsafe.inject (Js.bool b)
+  | Compiler.Jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
+  | Compiler.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
+  | Compiler.Jobject l ->
      Js.Unsafe.inject (Js.Unsafe.obj (Array.of_list (List.map (fun (str,y) -> ((string_of_char_list str, unsafe_json_to_js y))) l)))
   
 
@@ -234,7 +234,7 @@ let validate_output input =
     let gconf = input##.gconf in
     let actual = Js.to_string input##.actual in
     let actual_output =
-      try QcertConfig.data_of_string gconf actual with
+      try Config.data_of_string gconf actual with
       | err ->
           raise (Qcert_Error ("Cannot convert data " ^ actual))
     in
@@ -242,7 +242,7 @@ let validate_output input =
     let queryname = Js.to_string input##.queryName in
     let language_name = Js.to_string input##.source in
     (object%js
-      val result = Js.bool (CheckUtil.validate_result true queryname language_name expected_output (Some actual_output))
+      val result = Js.bool (Check_util.validate_result true queryname language_name expected_output (Some actual_output))
       val error = Js.undefined
      end)
   with
@@ -262,7 +262,7 @@ let qcert_compile input =
     in
     let res =
       begin try
-        QcertCore.main gconf ("Query.string", q_s)
+        Core.main gconf ("Query.string", q_s)
       with Qcert_Error err -> raise (Qcert_Error ("[Compilation error: "^err^"]"))
       | exn -> raise (Qcert_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
       end
