@@ -20,8 +20,8 @@ depends: [
   "dune"
   "menhir"
   "base64"
-  "coq-qcert"
-  "qcert-lib"
+  "coq-qcert" {= version}
+  "qcert-lib" {= version}
 ]
 build: [
   ["dune" "build" "-j" jobs "-p" name]
