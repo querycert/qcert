@@ -20,10 +20,10 @@ depends: [
   "dune"
   "coq" {>= "8.8.2" & < "8.9~"}
   "coq-flocq" {>= "2.6.1" & < "3.0~"}
-  "coq-jsast" {>= "1.0.8"}
+  "coq-jsast" {>= "1.0.9"}
 ]
 build: [
-  ["make" "-j" jobs name]
+  [make "-j" jobs name]
   ["dune" "build" "-j" jobs "-p" name]
 ]
 
