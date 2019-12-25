@@ -65,12 +65,14 @@ ifneq ($(JAVASCRIPT),)
 	@$(MAKE) install-javascript
 endif
 
+install-coq:
+	@$(MAKE) -f Makefile.coq install
+
 install-ocaml:
 	@$(MAKE) -C clis/ocaml install
 
 install-javascript:
 	@$(MAKE) -C clis/nodejs install
-
 
 ## Coq build
 
