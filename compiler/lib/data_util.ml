@@ -92,7 +92,7 @@ let get_io_components (od:QData.json option) : QData.json option * QData.json op
 (* Schema processing first *)
 
 let check_inheritance h =
-  Qcert_util.lift_qerror QType.make_brand_relation h
+  Compiler_util.lift_qerror QType.make_brand_relation h
 
 let build_inheritance h =
   begin match h with

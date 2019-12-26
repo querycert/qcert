@@ -15,6 +15,7 @@ bug-reports: "https://github.com/querycert/qcert/issues"
 dev-repo: "git+https://github.com/querycert/qcert"
 
 build: [
+  [make "configure"]
   [make "-j" jobs name]
   ["dune" "build" "-j" jobs "-p" name]
 ]

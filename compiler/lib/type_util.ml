@@ -63,7 +63,7 @@ let content_schema_to_model (mc: content_schema) : QType.brand_model =
     end
   in
   let brand_context = make_brand_context (fst h) brand_types type_defs in
-  Qcert_util.lift_qerror (QType.make_brand_model (fst h)) brand_context
+  Compiler_util.lift_qerror (QType.make_brand_model (fst h)) brand_context
 
 let localization_of_string (x:char list) =
   begin match string_of_char_list x with
