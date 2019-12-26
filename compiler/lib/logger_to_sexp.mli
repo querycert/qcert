@@ -16,7 +16,6 @@
 
 (* This module contains the implementation for the optimization logger *)
 
-open Qcert_coq
 open Sexp
    
 val logger_nra_to_sexp : Obj.t -> sexp

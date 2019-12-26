@@ -15,7 +15,6 @@
  *)
 
 %{
-  open Qcert_coq
   open Sexp
 %}
 
@@ -28,7 +27,7 @@
 %token <string> STRING
 %token <string> IDENT
 
-%start <Qcert_coq.Sexp.sexp> main
+%start <Sexp.sexp> main
 
 %%
 

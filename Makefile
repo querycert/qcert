@@ -27,7 +27,7 @@ FILES = $(addprefix compiler/src/,$(MODULES:%=%.v))
 ## Full run
 all:
 	@$(MAKE) build
-	@$(MAKE) install
+	@$(MAKE) install-local
 
 build: 
 	@$(MAKE) qcert-compiler
@@ -59,20 +59,28 @@ cleanall: Makefile.coq remove_all_derived
 
 ## Install
 
-install: 
+install-coqdev:
+	@$(MAKE) -f Makefile.coq install
+
+install-local: 
 	@$(MAKE) install-ocaml
 ifneq ($(JAVASCRIPT),)
 	@$(MAKE) install-javascript
 endif
-
-install-coq:
-	@$(MAKE) -f Makefile.coq install
 
 install-ocaml:
 	@$(MAKE) -C clis/ocaml install
 
 install-javascript:
 	@$(MAKE) -C clis/nodejs install
+
+## Opam
+
+coq-qcert:
+	@$(MAKE) prebuild
+	@$(MAKE) qcert-coq
+	@$(MAKE) qcert-ocaml-extract
+
 
 ## Coq build
 
@@ -103,16 +111,6 @@ cleanmost-qcert-compiler:
 	- @$(MAKE) cleanall-prebuild
 	- @$(MAKE) cleanall-qcert-ocaml
 	- @$(MAKE) cleanall-parsersJava
-
-
-## Opam
-
-coq-qcert:
-	@$(MAKE) qcert-coq
-	@$(MAKE) qcert-ocaml-extract
-
-qcert-lib:
-	@$(MAKE) prebuild
 
 
 ## Pre-build

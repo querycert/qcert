@@ -16,7 +16,6 @@
 
 (** This module contains compiler output code *)
 
-open Qcert_coq
 open Compiler.EnhancedCompiler
 
 val output_query : Pretty_common.pretty_config -> QLang.query -> string

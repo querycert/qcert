@@ -16,8 +16,6 @@
 
 (** This module contains compiler output code *)
 
-open Qcert_coq
-
 open Pretty_query
 
 (** Output languages *)

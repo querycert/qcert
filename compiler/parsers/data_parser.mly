@@ -15,7 +15,6 @@
  *)
 
 %{
-  open Qcert_coq
   open Util
   open Compiler.EnhancedCompiler
 %}
@@ -28,7 +27,7 @@
 %token LBRACKET RBRACKET
 %token EOF
   
-%start <Qcert_coq.Compiler.EnhancedCompiler.QData.json> main
+%start <Compiler.EnhancedCompiler.QData.json> main
 %%
 
 main:

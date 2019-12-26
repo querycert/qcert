@@ -9,9 +9,10 @@
 
 (library
  (name qcert_lib)
- (public_name qcert-lib)
- (libraries base64 coq-qcert)
+ (public_name coq-qcert)
+ (libraries base64)
 )
 
+(copy_files extraction/*.{ml,mli})
 (copy_files parsers/*.{mll,mly})
 (copy_files# lib/*.{ml,mli})
