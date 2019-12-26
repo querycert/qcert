@@ -55,7 +55,8 @@ clean:
 	rm -f ../../bin/$(MAIN2)
 
 cleanall: clean
-	rm -rf *~
+	rm -f *~
+	rm -f .merlin
 
 .NOTPARALLEL: 
 

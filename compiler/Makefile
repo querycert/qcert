@@ -46,7 +46,8 @@ cleanall: clean
 	$(MAKE) -C ../runtimes/javascript cleanall
 	rm -rf lib/js_runtime.ml
 	rm -rf lib/static_config.ml
-	rm -rf *~
+	rm -f .merlin */.merlin
+	rm -f *~
 
 .NOTPARALLEL: 
 
