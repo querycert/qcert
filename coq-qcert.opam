@@ -14,6 +14,14 @@ homepage: "https://querycert.github.io"
 bug-reports: "https://github.com/querycert/qcert/issues"
 dev-repo: "git+https://github.com/querycert/qcert"
 
+build: [
+  [make "-j" jobs name]
+  ["dune" "build" "-j" jobs "-p" name]
+]
+install: [
+  [make "install-coqdev"]
+]
+remove: ["rm" "-R" "%{lib}%/coq/user-contrib/Qcert"]
 depends: [
   "ocaml" {>= "4.07.1"}
   "ocamlfind"
@@ -21,10 +29,8 @@ depends: [
   "coq" {>= "8.8.2" & < "8.9~"}
   "coq-flocq" {>= "2.6.1" & < "3.0~"}
   "coq-jsast" {>= "1.0.9"}
-]
-build: [
-  [make "-j" jobs name]
-  ["dune" "build" "-j" jobs "-p" name]
+  "menhir"
+  "base64"
 ]
 
 tags: [ "keyword:databases" "keyword:queries" "keyword:relational" "keyword:compiler" "date:2019-05-29" "logpath:Qcert" ]

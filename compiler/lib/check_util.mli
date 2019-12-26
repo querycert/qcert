@@ -16,7 +16,6 @@
 
 (* Result checking *)
 
-open Qcert_coq
 open Compiler.EnhancedCompiler
 open Config_util
 

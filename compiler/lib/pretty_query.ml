@@ -18,7 +18,6 @@
 
 open Format
 
-open Qcert_coq
 open Util
 open Compiler.EnhancedCompiler
 

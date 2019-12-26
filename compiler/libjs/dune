@@ -1,5 +1,5 @@
 (executable
  (name qcertJS)
- (libraries unix js_of_ocaml qcert_coq qcert_lib)
+ (libraries unix js_of_ocaml qcert_lib)
  (preprocess (pps js_of_ocaml.ppx))
 )

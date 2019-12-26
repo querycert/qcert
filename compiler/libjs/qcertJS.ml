@@ -16,14 +16,12 @@
 
 open Js_of_ocaml
 
-open Qcert_coq
+open Qcert_lib
+
 open Util
 open Compiler.EnhancedCompiler
-
-open Qcert_lib
 open Qcert_util
 open Config
-
 
 (**********************************)
 (* Configuration support          *)
