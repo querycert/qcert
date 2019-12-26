@@ -4,7 +4,6 @@
 
 (menhir
   (modules sexp_parser data_parser lambda_nra_parser rule_parser oql_parser)
-  (flags ("-la" "2"))
 )
 
 (library
