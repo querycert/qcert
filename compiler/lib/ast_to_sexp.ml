@@ -1819,21 +1819,21 @@ let sexp_to_sqlpp (se : sexp) : QLang.sqlpp = sexp_to_sqlpp_expr se
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   begin match lang with
   | L_tech_rule ->
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_designer_rule -> Q_camp_rule (sexp_to_camp_rule se)
   | L_oql ->
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_sql -> Q_sql (sexp_to_sql se)
 	| L_sqlpp -> Q_sqlpp (sexp_to_sqlpp se)
   | L_lambda_nra ->
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_camp_rule -> Q_camp_rule (sexp_to_camp_rule se)
   | L_camp -> Q_camp (sexp_to_camp se)
   | L_nra ->
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_nraenv_core -> Q_nraenv_core (sexp_to_nraenv se)
   | L_nraenv -> 
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_nnrc_core -> Q_nnrc_core (sexp_to_nnrc se)
   | L_nnrc -> Q_nnrc (sexp_to_nnrc se)
   | L_nnrs_core -> Q_nnrs_core (sexp_to_nnrs se)
@@ -1843,14 +1843,14 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_imp_json -> Q_nnrs_imp (sexp_to_imp_json se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
   | L_dnnrc ->
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_dnnrc_typed ->
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_js_ast
   | L_javascript
   | L_java
   | L_spark_df ->
-      raise (Qcert_Error ("sexp to "^(Qcert_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_error err ->
       raise (Qcert_Error ("sexp_to_query: "^(string_of_char_list err)))
   end
@@ -1858,23 +1858,23 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
 let query_to_sexp (q: QLang.query) : sexp =
   begin match q with
   | Q_tech_rule _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_designer_rule _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_oql _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_sql _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_sqlpp q -> sqlpp_to_sexp q
   | Q_lambda_nra _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_camp_rule q -> camp_rule_to_sexp q
   | Q_camp q -> camp_to_sexp q
   | Q_nra _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_nraenv_core q -> nraenv_to_sexp q
   | Q_nraenv _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_nnrc_core q -> nnrc_to_sexp q
   | Q_nnrc q -> nnrc_to_sexp q
   | Q_nnrs_core q -> nnrs_to_sexp q
@@ -1889,7 +1889,7 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_javascript _
   | Q_java _
   | Q_spark_df _ ->
-      SString ((Qcert_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_error err ->
       SString ("query_to_sexp: "^(string_of_char_list err))
   end

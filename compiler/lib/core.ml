@@ -48,10 +48,10 @@ let no_result_file =
 (* Message *)
 
 let fprint_compilation_path ff gconf =
-  let spath = Qcert_util.string_of_path " -> " gconf.gconf_path in
+  let spath = Compiler_util.string_of_path " -> " gconf.gconf_path in
   Format.fprintf ff "Compiling from %s to %s:@\n"
-    (Qcert_util.name_of_language gconf.gconf_source)
-    (Qcert_util.name_of_language gconf.gconf_target);
+    (Compiler_util.name_of_language gconf.gconf_source)
+    (Compiler_util.name_of_language gconf.gconf_target);
   Format.fprintf ff "  %s@." spath
 
 (* Parsing *)
@@ -94,9 +94,9 @@ let compile_query (dv_conf: QDriver.driver_config) (schema: Type_util.schema) (p
   let brand_model = schema.Type_util.sch_brand_model in
   let foreign_typing = schema.Type_util.sch_foreign_typing in
   let dv = QDriver.driver_of_path brand_model dv_conf path in
-  let () = Qcert_util.driver_no_error dv in
+  let () = Compiler_util.driver_no_error dv in
   let queries = QDriver.compile brand_model foreign_typing dv q in
-  let () = List.iter Qcert_util.query_no_error queries in
+  let () = List.iter Compiler_util.query_no_error queries in
   queries
 
 (* Emit *)
@@ -110,7 +110,7 @@ let emit_string (dv_conf: QDriver.driver_config) (schema: Type_util.schema) pret
   let lang = QLang.language_of_query brand_model q in
   let ext = Config_util.suffix_of_language lang in
   let fout = outname (target_f dir fpref) ext in
-  { res_file = fout; res_lang = Qcert_util.name_of_language lang; res_content = s; }
+  { res_file = fout; res_lang = Compiler_util.name_of_language lang; res_content = s; }
 
 (* Emit s-expr *)
 
@@ -120,9 +120,9 @@ let emit_sexpr_string (schema: Type_util.schema) dir file_name q =
   let brand_model = schema.Type_util.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
   let lang = QLang.language_of_query brand_model q in
-  let fpost = Qcert_util.name_of_language lang in
+  let fpost = Compiler_util.name_of_language lang in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
-  { res_file = fout; res_lang = Qcert_util.name_of_language lang; res_content = s; }
+  { res_file = fout; res_lang = Compiler_util.name_of_language lang; res_content = s; }
 
 (* Emit sio file *)
 
@@ -184,7 +184,7 @@ let eval_string (validate:bool) (debug:bool) (ev_input:Data_util.content_input) 
   let globals = schema.Type_util.sch_globals in
   let ev_input = List.map (lift_data_to_ddata globals) ev_input in
   (* print_input ev_input; *)
-  let language_name = Qcert_util.name_of_language (QLang.language_of_query brand_model q) in
+  let language_name = Compiler_util.name_of_language (QLang.language_of_query brand_model q) in
   let ev_output =
     begin match debug with
     | false -> QEval.eval_query brand_relation brand_model q ev_input
@@ -226,7 +226,7 @@ let stat_query (schema: Type_util.schema) q =
 let stat_tree_query (schema: Type_util.schema) dir file_name q =
   let name = char_list_of_string (Filename.chop_extension file_name) in
   let brand_model = schema.Type_util.sch_brand_model in
-  let language_name = Qcert_util.name_of_language (QLang.language_of_query brand_model q) in
+  let language_name = Compiler_util.name_of_language (QLang.language_of_query brand_model q) in
   let stats = QStat.json_stat_tree_of_query brand_model name q in
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_stats.json" in

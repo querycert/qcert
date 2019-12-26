@@ -77,7 +77,6 @@ install-javascript:
 ## Opam
 
 coq-qcert:
-	@$(MAKE) prebuild
 	@$(MAKE) qcert-coq
 	@$(MAKE) qcert-ocaml-extract
 
@@ -85,7 +84,7 @@ coq-qcert:
 ## Coq build
 
 qcert-compiler:
-	@$(MAKE) prebuild
+	@$(MAKE) configure
 	@$(MAKE) qcert-coq
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
 ifneq ($(JAVASCRIPT),)
@@ -96,35 +95,35 @@ ifneq ($(JAVA),)
 endif
 
 clean-qcert-compiler:
-	- @$(MAKE) clean-prebuild
+	- @$(MAKE) clean-configure
 	- @$(MAKE) clean-qcert-coq
 	- @$(MAKE) clean-qcert-ocaml
 	- @$(MAKE) clean-parsersJava
 
 cleanall-qcert-compiler:
-	- @$(MAKE) cleanall-prebuild
+	- @$(MAKE) cleanall-configure
 	- @$(MAKE) cleanall-qcert-coq
 	- @$(MAKE) cleanall-qcert-ocaml
 	- @$(MAKE) cleanall-parsersJava
 
 cleanmost-qcert-compiler:
-	- @$(MAKE) cleanall-prebuild
+	- @$(MAKE) cleanall-configure
 	- @$(MAKE) cleanall-qcert-ocaml
 	- @$(MAKE) cleanall-parsersJava
 
 
 ## Pre-build
 
-prebuild:
+configure: Makefile.coq
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Preparing Build"
+	@echo "[Q*cert] Configuring Build"
 	@echo "[Q*cert] "
 	@$(MAKE) -C compiler
 
-clean-prebuild:
+clean-configure:
 	@$(MAKE) -C compiler clean
 
-cleanall-prebuild:
+cleanall-configure:
 	@$(MAKE) -C compiler cleanall
 
 

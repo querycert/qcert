@@ -16,7 +16,7 @@
 
 open Util
 
-open Qcert_util
+open Compiler_util
 open Config
 
 let set_qname gconf s = gconf.gconf_qname <- Some s

@@ -26,7 +26,7 @@ open Logger_to_sexp
 
 let args_list gconf =
   Stdlib.Arg.align
-    [ ("-version", Stdlib.Arg.Unit Qcert_util.get_version,
+    [ ("-version", Stdlib.Arg.Unit Compiler_util.get_version,
        " Prints the compiler version");
       ("-source", Stdlib.Arg.String (Args.set_source gconf),
        "<lang> Indicates the language for of thesource file (default: Rule)");
@@ -139,7 +139,7 @@ let languages =
 
 
 let languages_string =
-  Qcert_util.string_of_path ", " languages
+  Compiler_util.string_of_path ", " languages
 
 let usage =
   "Q*cert - Query compiler\n"^
