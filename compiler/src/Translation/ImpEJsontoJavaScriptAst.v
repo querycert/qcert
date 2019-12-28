@@ -123,7 +123,11 @@ Section ImpEJsontoJavaScriptAst.
       match json with
       | ejnull => expr_literal literal_null
       | ejnumber n => expr_literal (literal_number n)
-      | ejbigint n => expr_literal (literal_number (float_of_int n)) (* XXX Could be replaced by JavaScript BigInt some fix to JsAst XXX *)
+      | ejbigint n =>
+        expr_object
+          ((propname_identifier "$nat",
+            propbody_val (expr_literal (literal_number (float_of_int n))))::nil)
+      (* XXX Could be replaced by JavaScript BigInt some fix to JsAst XXX *)
       | ejbool b => expr_literal (literal_bool b)
       | ejstring s => expr_literal (literal_string s)
       | ejarray a =>
