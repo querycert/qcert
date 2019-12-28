@@ -209,7 +209,8 @@ Section CompDriver.
       nnrs_imp_to_imp_qcert_top qname q.
 
     Definition imp_qcert_to_imp_json (q: imp_qcert) : imp_json :=
-      imp_qcert_to_imp_json q.
+      (* Note: Obtain brand relation from brand model, baked in imp_json compilation *)
+      imp_qcert_to_imp_json brand_relation_brands q.
 
     Definition imp_json_to_js_ast (q: imp_json) : js_ast :=
       imp_json_to_js_ast q.

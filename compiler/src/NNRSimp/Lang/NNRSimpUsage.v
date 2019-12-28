@@ -22,7 +22,7 @@ Require Import Program.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import CommonRuntime.
 Require Import NNRSimp.
 Require Import NNRSimpVars.
 Require Import NNRSimpEval.
@@ -627,6 +627,4 @@ Section NNRSimpUsage.
 
   End eval.
 
-  
-  
 End NNRSimpUsage.

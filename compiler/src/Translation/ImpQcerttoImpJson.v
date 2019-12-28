@@ -36,6 +36,8 @@ Section ImpJsontoJavaScriptAst.
   Context {fruntime:foreign_runtime}.
   Context {ftejson:foreign_to_ejson}.
 
+  Context (h:brand_relation_t). (* We need a brand relation for the Q*cert side *)
+
 (*Definition mk_imp_json_expr_error msg : imp_json_expr :=
     ImpExprConst (jstring msg). *)
   Definition mk_imp_ejson_expr_error msg : imp_json_expr :=
@@ -104,7 +106,7 @@ Section ImpJsontoJavaScriptAst.
       | OpLeft => mk_left e
       | OpRight => mk_right e
       | OpBrand b =>
-        mk_imp_ejson_runtime_call JSONRuntimeBrand [ brands_to_json_expr b; e ]
+        mk_imp_ejson_runtime_call JSONRuntimeBrand [ brands_to_json_expr (canon_brands h b); e ]
       | OpUnbrand => mk_imp_ejson_runtime_call JSONRuntimeUnbrand el
       | OpCast b =>
         mk_imp_ejson_runtime_call JSONRuntimeCast [ brands_to_json_expr b; e ]
@@ -239,7 +241,7 @@ Section ImpJsontoJavaScriptAst.
     match exp with
     | ImpExprError msg => ImpExprError msg
     | ImpExprVar v => ImpExprVar v
-    | ImpExprConst d => ImpExprConst (@data_to_ejson _ _ _ d)
+    | ImpExprConst d => ImpExprConst (@data_to_ejson _ _ _ (normalize_data h d)) (* XXX Add normalization *)
     | ImpExprOp op el => imp_qcert_op_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     end.
@@ -296,20 +298,18 @@ Section ImpJsontoJavaScriptAst.
            l)
     end.
 
-
-  Section Correctness.
-    Context (h:brand_relation_t). (* We need a brand relation for the Q*cert side *)
-
+  Section Lift.
     Definition lift_bindings (env:bindings) : jbindings :=
       List.map (fun xy => (fst xy, data_to_ejson (snd xy))) env.
     Definition lift_pd_bindings (env:pd_bindings) : pd_jbindings :=
       List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env.
     Definition lift_result (res:option ejson) : option data :=
-      lift (ejson_to_data h) res.
+      lift ejson_to_data res.
     Definition lift_result_env (res:option pd_jbindings) : option pd_bindings :=
-      lift (fun env => List.map (fun xy => (fst xy, lift (ejson_to_data h) (snd xy))) env) res.
+      lift (fun env => List.map (fun xy => (fst xy, lift ejson_to_data (snd xy))) env) res.
+  End Lift.
 
-
+  Section Correctness.
     Lemma map_qcert_json_eval 
           (σ:pd_bindings) (el:list imp_expr) :
       Forall
@@ -332,16 +332,14 @@ Section ImpJsontoJavaScriptAst.
     Qed.
     
     Lemma data_to_bool_json_to_bool_correct j:
-      imp_qcert_data_to_bool (ejson_to_data h j) = imp_json_data_to_bool j.
+      imp_qcert_data_to_bool (ejson_to_data j) = imp_json_data_to_bool j.
     Proof.
-      unfold ejson_to_data.
       unfold imp_qcert_data_to_bool.
       unfold imp_json_data_to_bool.
       destruct j; trivial.
-      generalize (ejson_to_data_pre_jobj_nbool l); intros HH1.
-      generalize (normalize_data_forall_ndbool h _ HH1); intros HH2.
+      generalize (ejson_to_data_jobj_nbool l); intros HH1.
       match_destr.
-      specialize (HH2 b); congruence.
+      specialize (HH1 b); congruence.
     Qed.
 
     Lemma normalize_data_forall_ndnat d :  (forall n, d <> dnat n) -> (forall n, normalize_data h d <> dnat n).
@@ -350,15 +348,13 @@ Section ImpJsontoJavaScriptAst.
     Qed.
 
     Lemma data_to_bool_json_to_nat_correct j:
-      imp_qcert_data_to_Z (ejson_to_data h j) = imp_json_data_to_Z j.
+      imp_qcert_data_to_Z (ejson_to_data j) = imp_json_data_to_Z j.
     Proof.
-      unfold ejson_to_data.
       unfold imp_qcert_data_to_Z.
       unfold imp_json_data_to_Z.
       destruct j; trivial.
-      case_eq (normalize_data h (ejson_to_data_pre (ejobject l))); intros; try reflexivity.
-      generalize (ejson_to_data_object_not_nat h l z); intros.
-      unfold ejson_to_data in H0.
+      case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+      generalize (ejson_to_data_object_not_nat l z); intros.
       contradiction.
     Qed.
 
@@ -378,21 +374,20 @@ Section ImpJsontoJavaScriptAst.
     Qed.
 
     Lemma oflatten_eobject_is_none l l' :
-      oflatten (map (fun x : ejson => normalize_data h (ejson_to_data_pre x)) (ejobject l :: l')) = None.
+      oflatten (map (fun x : ejson => ejson_to_data x) (ejobject l :: l')) = None.
     Proof.
-      Opaque ejson_to_data_pre.
+      Opaque ejson_to_data.
       simpl.
       unfold oflatten.
       simpl.
-      case_eq (normalize_data h (ejson_to_data_pre (ejobject l))); intros; try reflexivity.
-      generalize (ejson_to_data_object_not_coll h l l0); intros.
-      unfold ejson_to_data in H0.
+      case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+      generalize (ejson_to_data_object_not_coll l l0); intros.
       contradiction.
-      Transparent ejson_to_data_pre.
+      Transparent ejson_to_data.
     Qed.
 
     Lemma oflatten_jflatten_roundtrip l :
-      match oflatten (map (normalize_data h) (map ejson_to_data_pre l)) with
+      match oflatten (map ejson_to_data l) with
       | Some a' => Some (dcoll a')
       | None => None
       end =
@@ -400,15 +395,13 @@ Section ImpJsontoJavaScriptAst.
             | Some a' => Some (ejarray a')
             | None => None
             end with
-      | Some a' => Some (ejson_to_data h a')
+      | Some a' => Some (ejson_to_data a')
       | None => None
       end.
     Proof.
-      unfold ejson_to_data.
-      rewrite map_map.
       induction l; [reflexivity|].
       destruct a; try reflexivity.
-      - case_eq (oflatten (map (fun x : ejson => normalize_data h (ejson_to_data_pre x)) l));
+      - case_eq (oflatten (map  ejson_to_data l));
           intros; rewrite H in *.
         + unfold jflatten in *.
           simpl.
@@ -417,9 +410,8 @@ Section ImpJsontoJavaScriptAst.
                                                 | _ => None
                                                     end) l); simpl in *.
           inversion IHl; clear IHl; subst.
-          rewrite (oflatten_cons _ _ (map (normalize_data h) (map ejson_to_data_pre l2))); auto.
+          rewrite (oflatten_cons _ _ (map ejson_to_data l2)); auto.
           simpl.
-          rewrite map_app.
           rewrite map_app.
           reflexivity.
           congruence.
@@ -464,6 +456,7 @@ Section ImpJsontoJavaScriptAst.
         (imp_json_expr_eval (lift_pd_bindings σ)
                             (imp_qcert_unary_op_to_imp_json u (map imp_qcert_expr_to_imp_json el))).
     Proof.
+      Opaque ejson_to_data.
       intros.
       (* elim no params *)
       destruct el; simpl; [reflexivity|].
@@ -488,14 +481,15 @@ Section ImpJsontoJavaScriptAst.
       - Case "OpNeg"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
-        destruct i0; try reflexivity; simpl.
+        destruct i0; try reflexivity.
         unfold unudbool.
-        case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
-        generalize (ejson_to_data_object_not_boolean h l b); intros.
+        case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+        generalize (ejson_to_data_object_not_boolean l b); intros.
         congruence.
       - Case "OpRec"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
-          try reflexivity; simpl.
+          try reflexivity.
+        simpl.
         f_equal.
         apply rec_ejson_key_encode_roundtrip.
       - Case "OpDot"%string.
@@ -521,10 +515,9 @@ Section ImpJsontoJavaScriptAst.
         + destruct l; try reflexivity; simpl.
           destruct l; try reflexivity; simpl.
           f_equal.
-          unfold ejson_to_data; simpl.
           destruct e; reflexivity.
-        + case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
-          generalize (ejson_to_data_object_not_coll h l l0); intros.
+        + case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpFlatten"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
@@ -533,16 +526,16 @@ Section ImpJsontoJavaScriptAst.
         + unfold lift. simpl.
           apply oflatten_jflatten_roundtrip.
         + simpl.
-          case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
-          generalize (ejson_to_data_object_not_coll h l l0); intros.
+          case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpDistinct"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + admit.
-        + case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
-          generalize (ejson_to_data_object_not_coll h l l0); intros.
+        + case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpOrderBy"%string.
         admit. (* XXX Not implemented *)
@@ -550,14 +543,13 @@ Section ImpJsontoJavaScriptAst.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
-        + rewrite map_map.
-          simpl.
-          unfold ejson_to_data; simpl.
+        + Transparent ejson_to_data. unfold ejson_to_data; simpl.
           f_equal; f_equal; f_equal.
           unfold bcount.
           apply map_length.
-        + case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
-          generalize (ejson_to_data_object_not_coll h l l0); intros.
+          Opaque ejson_to_data.
+        + case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpToString"%string.
         admit. (* XXX Not implemented *)
@@ -567,8 +559,8 @@ Section ImpJsontoJavaScriptAst.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
-        case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
-        generalize (ejson_to_data_object_not_string h l s); intros.
+        case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+        generalize (ejson_to_data_object_not_string l s); intros.
         congruence.
       - Case "OpSubstring"%string.
         admit. (* XXX Not implemented *)
@@ -577,20 +569,20 @@ Section ImpJsontoJavaScriptAst.
       - Case "OpLeft"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
-        unfold ejson_to_data; simpl.
         destruct i0; reflexivity.
       - Case "OpRight"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
-        unfold ejson_to_data; simpl.
         destruct i0; reflexivity.
       - Case "OpBrand"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         rewrite of_string_list_over_strings_idempotent; simpl.
+        Transparent ejson_to_data.
         unfold ejson_to_data; simpl.
         rewrite json_brands_of_brands_idempotent; simpl.
         destruct i0; try reflexivity; simpl.
+        Opaque ejson_to_data.
       - Case "OpUnbrand"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
@@ -694,20 +686,19 @@ Section ImpJsontoJavaScriptAst.
         match_destr.
         destruct o; try reflexivity.
         rewrite json_to_data_to_json_idempotent.
-        admit.
+        reflexivity.
       - Case "ImpExprConst"%string.
         simpl.
         f_equal.
         unfold imp_qcert_data_normalize.
         unfold imp_json_data_normalize.
-        rewrite <- json_to_data_to_json_idempotent.
-        unfold normalize_json.
+        rewrite json_to_data_to_json_idempotent.
         reflexivity.
       - Case "ImpExprOp"%string.
         apply imp_qcert_op_to_imp_json_correct; assumption.
       - Case "ImpExprRuntimeCall"%string.
         apply imp_qcert_runtime_call_to_imp_json_expr_correct; assumption.
-    Admitted.
+    Qed.
 
     Lemma imp_qcert_stmt_to_imp_json_stmt_correct (σ:pd_bindings) (stmt:imp_qcert_stmt) :
       forall avoid: list string,
@@ -753,11 +744,11 @@ Section ImpJsontoJavaScriptAst.
           apply Hl; try reflexivity.
           destruct o1; try reflexivity.
           rewrite json_to_data_to_json_idempotent.
-          admit. (** XX Needs a proof of normalization *)
+          reflexivity.
         + apply Hl; try reflexivity.
           destruct o0; try reflexivity.
           rewrite json_to_data_to_json_idempotent.
-          admit. (** XX Needs a proof of normalization *)
+          reflexivity.
       - Case "ImpStmtFor"%string.
         admit.
       - Case "ImpStmtForRange"%string.
@@ -783,7 +774,7 @@ Section ImpJsontoJavaScriptAst.
 
     Lemma imp_qcert_function_to_imp_json_function_correct (d:data) (f:imp_qcert_function) :
       imp_qcert_function_eval h f d =
-      lift (ejson_to_data h) (imp_json_function_eval (imp_qcert_function_to_imp_json f) (data_to_ejson d)).
+      lift ejson_to_data (imp_json_function_eval (imp_qcert_function_to_imp_json f) (data_to_ejson d)).
     Proof.
       destruct f; simpl.
       generalize (imp_qcert_stmt_to_imp_json_stmt_correct [(v0, None); (v, Some d)] i (v::nil)); intros.
@@ -819,7 +810,7 @@ Section ImpJsontoJavaScriptAst.
         rewrite H0 in *; clear H0.
         rewrite H; clear H.
         generalize (@lookup_map_codomain_unfolded string (option ejson) (option data) string_dec (fun x => match x with
-                   | Some a' => Some (ejson_to_data h a')
+                   | Some a' => Some (ejson_to_data a')
                    | None => None
                    end)); intros.
         rewrite H; clear H.
@@ -865,7 +856,7 @@ Section ImpJsontoJavaScriptAst.
 
     Theorem imp_qcert_to_imp_json_correct (σc:bindings) (q:imp_qcert) :
       imp_qcert_eval_top h σc q =
-      imp_json_eval_top_alt h σc (imp_qcert_to_imp_json q).
+      imp_json_eval_top_alt σc (imp_qcert_to_imp_json q).
     Proof.
       unfold imp_qcert_eval_top.
       unfold imp_json_eval_top_alt.

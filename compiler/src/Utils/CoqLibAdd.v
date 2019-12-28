@@ -487,6 +487,24 @@ Section CoqLibAdd.
       f_equal; auto.
     Qed.
 
+    Lemma map_id {A} (c:list A) :
+      map id c = c.
+    Proof.
+      induction c; try reflexivity.
+      simpl.
+      rewrite IHc; reflexivity.
+    Qed.
+
+    Lemma map_eq_id {A} {f:A->A} {l} :
+      Forall (fun x => f x = x) l ->
+      map f l = l.
+    Proof.
+      intros.
+      rewrite <- (map_id l) at 2.
+      assert (Forall (fun x : A => f x = id x) l) by auto; clear H.
+      now rewrite (map_eq H0).
+    Qed.
+    
     Lemma map_cons {A B:Type} (f:A->B) (l:list A) (a:A) : 
       map f (a::l) = (f a)::map f l.
     Proof.

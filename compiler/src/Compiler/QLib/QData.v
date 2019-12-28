@@ -66,8 +66,9 @@ Module QData(runtime:CompilerRuntime).
   (* foreign data is supported via the model *)
   
   (** JSON -> data conversion *)
+  (* Note: make sure to normalize input data *)
   Definition json_to_qdata br (j:JSON.json) : qdata
-    := DatatoEJSON.ejson_to_data br (EJSON.json_to_ejson j).
+    := DataNorm.normalize_data br (DatatoEJSON.ejson_to_data (EJSON.json_to_ejson j)).
 
   (** data -> JSON *string* conversion *)
   Definition qdataStringify s : qdata -> String.string
