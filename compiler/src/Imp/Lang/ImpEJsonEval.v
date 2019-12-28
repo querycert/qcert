@@ -275,8 +275,8 @@ Section ImpEJsonEval.
     Definition pd_jbindings := list (string * option imp_ejson_data).
 
     Definition imp_ejson_expr_eval
-             (σ:pd_jbindings) (e:imp_ejson_expr)
-    : option imp_ejson_data
+               (σ:pd_jbindings) (e:imp_ejson_expr)
+      : option imp_ejson_data
       := @imp_expr_eval
            imp_ejson_data
            imp_ejson_op
@@ -285,6 +285,23 @@ Section ImpEJsonEval.
            imp_ejson_runtime_eval
            imp_ejson_op_eval
            σ e.
+
+    Definition imp_ejson_decls_eval
+               (σ:pd_jbindings) (el:list (string * option imp_ejson_expr))
+      : option pd_jbindings
+      := @imp_decls_eval
+           imp_ejson_data
+           imp_ejson_op
+           imp_ejson_runtime_op
+           imp_ejson_data_normalize
+           imp_ejson_runtime_eval
+           imp_ejson_op_eval
+           σ el.
+
+    Definition imp_ejson_decls_erase
+               (σ:option pd_jbindings) (el:list (string * option imp_ejson_expr))
+      : option pd_jbindings
+      := imp_decls_erase σ el.
 
     Definition imp_ejson_stmt_eval
              (s:imp_ejson_stmt) (σ:pd_jbindings) : option (pd_jbindings)
