@@ -39,8 +39,6 @@ Section JSONNorm.
       json_normalized jnull
   | jnnumber n :
       json_normalized (jnumber n)
-  | jnbigint n :
-      json_normalized (jbigint n)
   | jnbool b :
       json_normalized (jbool b)
   | jnstring s :
@@ -58,7 +56,6 @@ Section JSONNorm.
     induction d using jsonInd2; simpl.
     - apply jnnull.
     - apply jnnumber.
-    - apply jnbigint.
     - apply jnbool.
     - apply jnstring.
     - apply jnarray.

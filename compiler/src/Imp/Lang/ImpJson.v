@@ -17,12 +17,13 @@
 (** Imp with the Json data model *)
 
 Require Import String.
-Require Import Utils.
+Require Import CommonRuntime.
 Require Import Imp.
 
 Section Syntax.
+  Context {ftoejson:foreign_ejson}.
 
-  Definition imp_json_data := json.
+  Definition imp_json_data := ejson.
 
   (* XXX This should contain at least:
          - all JS operators/expressions used in translation from NNRSimp to JsAst
@@ -30,7 +31,7 @@ Section Syntax.
      imp_json_op constructors names are based on JsAst names
      imp_json_runtime_op constructors namess are based on Qcert operators names ??
   *)
-  Definition imp_json_op := json_op. (* See ./Utils/JSONOperators.v *)
+  Definition imp_json_op := ejson_op. (* See ./Utils/JSONOperators.v *)
   Inductive imp_json_runtime_op := (* XXX TODO -- Look at NNRSimptoJavaScriptAst XXX *)
   | JSONRuntimeEqual : imp_json_runtime_op
   | JSONRuntimeCompare : imp_json_runtime_op

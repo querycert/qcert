@@ -38,6 +38,7 @@ Require Import ImpEval.
 Require Import ImpJson.
 
 Section ImpJsonEval.
+  Context {ftoejson:foreign_ejson}.
 
   Local Open Scope string.
 
@@ -49,68 +50,68 @@ Section ImpJsonEval.
 
     Definition imp_json_data_to_bool (d:imp_json_data) : option bool :=
       match d with
-      | jbool b => Some b
+      | ejbool b => Some b
       | _ => None
       end.
 
     Definition imp_json_data_to_list (d:imp_json_data) : option (list imp_json_data) :=
       match d with
-      | jarray c => Some (c)
+      | ejarray c => Some (c)
       | _ => None
       end.
 
-    Definition of_string_list (sl:list json) : option (list string)
-      := lift_map (fun x => match x with jstring s => Some s | _ => None end) sl.
+    Definition of_string_list (sl:list imp_json_data) : option (list string)
+      := lift_map (fun x => match x with ejstring s => Some s | _ => None end) sl.
 
     Definition imp_json_data_to_Z (d:imp_json_data) : option Z :=
       match d with
-      | jobject (("$nat"%string, jbigint n)::nil) => Some n
+      | ejbigint n => Some n
       | _ => None
       end.
 
     Definition imp_json_Z_to_data (n: Z) : imp_json_data :=
       Z_to_json n.
 
-    Definition jflatten (d:list json) : option (list json) :=
+    Definition jflatten (d:list imp_json_data) : option (list imp_json_data) :=
       lift_flat_map (fun x =>
                    match x with
-                   | jarray y => Some y
+                   | ejarray y => Some y
                    | _ => None end) d.
     
     Definition imp_json_runtime_eval (rt:imp_json_runtime_op) (dl:list imp_json_data) : option imp_json_data :=
       match rt with
       | JSONRuntimeEqual =>
-        apply_binary (fun d1 d2 => if json_eq_dec d1 d2 then Some (jbool true) else Some (jbool false)) dl
+        apply_binary (fun d1 d2 => if ejson_eq_dec d1 d2 then Some (ejbool true) else Some (ejbool false)) dl
       | JSONRuntimeCompare =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
-             | (jobject (("nat", jnumber n1)::nil)), (jobject (("nat",jnumber n2)::nil)) =>
+             | ejnumber n1, ejnumber n2 =>
                if float_lt n1 n2
                then
-                 Some (jobject (("nat", jnumber float_one)::nil))
+                 Some (ejnumber float_one)
                else if float_gt n1 n2
                     then
-                      Some (jobject (("nat", jnumber float_neg_one)::nil))
+                      Some (ejnumber float_neg_one)
                     else
-                      Some (jobject (("nat", jnumber float_zero)::nil))
+                      Some (ejnumber float_zero)
              | _, _ => None
              end) dl
       | JSONRuntimeRecConcat =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
-             | (jobject r1), (jobject r2) => Some (jobject (rec_sort (r1++r2)))
+             | (ejobject r1), (ejobject r2) => Some (ejobject (rec_sort (r1++r2)))
              | _, _ => None
              end) dl
       | JSONRuntimeRecMerge =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
-             | (jobject r1), (jobject r2) =>
-               match @merge_bindings json _ json_eq_dec r1 r2 with
-               | Some x => Some (jarray ((jobject x) :: nil))
-               | None => Some (jarray nil)
+             | (ejobject r1), (ejobject r2) =>
+               match @merge_bindings ejson _ ejson_eq_dec r1 r2 with
+               | Some x => Some (ejarray ((ejobject x) :: nil))
+               | None => Some (ejarray nil)
                end
              | _, _ => None
              end) dl
@@ -118,8 +119,8 @@ Section ImpJsonEval.
         apply_unary
           (fun d =>
              match d with
-             | jarray l =>
-               Some (jarray (@bdistinct json json_eq_dec l))
+             | ejarray l =>
+               Some (ejarray (@bdistinct ejson ejson_eq_dec l))
              | _ => None
              end)
           dl
@@ -128,7 +129,7 @@ Section ImpJsonEval.
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
-             | jobject r, jstring s =>
+             | ejobject r, ejstring s =>
                edot r s
              | _, _ => None
              end) dl
@@ -136,54 +137,54 @@ Section ImpJsonEval.
         apply_unary
           (fun d =>
              match d with
-             | jobject (("$left", _)::nil) => Some (jbool true)
-             | jobject (("$right",_)::nil) => Some (jbool false)
+             | ejobject (("$left", _)::nil) => Some (ejbool true)
+             | ejobject (("$right",_)::nil) => Some (ejbool false)
              | _ => None
              end) dl
       | JSONRuntimeToLeft =>
         apply_unary
           (fun d =>
              match d with
-             | jobject (("$left", d)::nil) => Some d
+             | ejobject (("$left", d)::nil) => Some d
              | _ => None
              end) dl
       | JSONRuntimeToRight =>
         apply_unary
           (fun d =>
              match d with
-             | jobject (("$right", d)::nil) => Some d
+             | ejobject (("$right", d)::nil) => Some d
              | _ => None
              end) dl
       | JSONRuntimeRemove =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
-             | jobject r, jstring s =>
-               Some (jobject (rremove r s))
+             | ejobject r, ejstring s =>
+               Some (ejobject (rremove r s))
              | _, _ => None
              end) dl
       | JSONRuntimeProject =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
-             | jobject r, jarray sl =>
-               lift jobject (lift (rproject r) (of_string_list sl))
+             | ejobject r, ejarray sl =>
+               lift ejobject (lift (rproject r) (of_string_list sl))
              | _, _ => None
              end) dl
       | JSONRuntimeSingleton =>
         apply_unary
           (fun d =>
              match d with
-             | jarray (d::nil) => Some (jobject (("$left",d)::nil))
-             | jarray _ => Some (jobject (("$right",jnull)::nil))
+             | ejarray (d::nil) => Some (ejobject (("$left",d)::nil))
+             | ejarray _ => Some (ejobject (("$right",ejnull)::nil))
              | _ => None
              end) dl
       | JSONRuntimeFlatten =>
         apply_unary
           (fun d =>
              match d with
-             | jarray l =>
-               lift jarray (jflatten l)
+             | ejarray l =>
+               lift ejarray (jflatten l)
              | _ => None
              end) dl
       | JSONRuntimeSort => None
@@ -191,14 +192,14 @@ Section ImpJsonEval.
         apply_unary
           (fun d =>
              match d with
-             | jarray l => Some (jobject (("$nat", (jbigint (Z_of_nat (bcount l))))::nil))
+             | ejarray l => Some (ejbigint (Z_of_nat (bcount l)))
              | _ => None
              end) dl
       | JSONRuntimeLength =>
         apply_unary
           (fun d =>
              match d with
-             | jstring s => Some (jobject (("$nat", (jbigint (Z_of_nat (String.length s))))::nil))
+             | ejstring s => Some (ejbigint (Z_of_nat (String.length s)))
              | _ => None
              end) dl
       | JSONRuntimeSubstring => None
@@ -206,11 +207,11 @@ Section ImpJsonEval.
         apply_binary
           (fun d1 d2 =>
              match d1 with
-             | jarray bls =>
+             | ejarray bls =>
                let ob := of_string_list bls in
                lift (fun b =>
-                       jobject
-                         (("$type"%string, jarray (map jstring b))
+                       ejobject
+                         (("$type"%string, ejarray (map ejstring b))
                             ::("$data"%string, d2)
                             ::nil)) ob
              | _ => None
@@ -220,7 +221,7 @@ Section ImpJsonEval.
         apply_unary
           (fun d =>
              match d with
-             | jobject ((s1,jarray j1)::(s2,j2)::nil) =>
+             | ejobject ((s1,ejarray j1)::(s2,j2)::nil) =>
                if (string_dec s1 "$type") then
                  if (string_dec s2 "$data") then Some j2
                  else None
@@ -255,7 +256,7 @@ Section ImpJsonEval.
       end.
 
     Definition imp_json_op_eval (op:imp_json_op) (dl:list imp_json_data) : option imp_json_data :=
-      json_op_eval op dl. (* XXX In Utils.JSONOperators *)
+      ejson_op_eval op dl. (* XXX In Utils.JSONOperators *)
 
   End EvalInstantiation.
 
@@ -328,19 +329,19 @@ Section ImpJsonEval.
 
     Definition imp_json_eval_top σc (q:imp_json) : option imp_json_data :=
       let σc' := List.map (fun xy => (json_key_encode (fst xy), snd xy)) (rec_sort σc) in
-      olift id (imp_json_eval q (jobject σc')).
+      olift id (imp_json_eval q (ejobject σc')).
 
   End Evaluation.
 
   Section Top.
     Context {fruntime:foreign_runtime}.
-    Context {ftjson:foreign_to_JSON}.
+    Context {fdatatoejson:foreign_to_ejson}.
 
     Context (h:list(string*string)).
 
     Definition imp_json_eval_top_alt (cenv: bindings) (q:imp_json) : option data :=
-      let jenv := List.map (fun xy => (fst xy, data_to_json (snd xy))) cenv in
-      lift (json_to_data h) (imp_json_eval_top jenv q).
+      let jenv := List.map (fun xy => (fst xy, data_to_ejson (snd xy))) cenv in
+      lift (ejson_to_data h) (imp_json_eval_top jenv q).
   End Top.
 End ImpJsonEval.
 

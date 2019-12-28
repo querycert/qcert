@@ -14,6 +14,6 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
-Require Export JavaScriptAst.
-Require Export JavaScriptAstUtil.
+Require Export EJSON.
+Require Export EJSONNorm.
+Require Export EJSONOperators.

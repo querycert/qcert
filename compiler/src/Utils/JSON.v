@@ -33,7 +33,6 @@ Section JSON.
   Inductive json : Set :=
   | jnull : json
   | jnumber : float -> json
-  | jbigint : Z -> json
   | jbool : bool -> json
   | jstring : string -> json
   | jarray : list json -> json
@@ -46,7 +45,6 @@ Section JSON.
   Definition json_rect (P : json -> Type)
              (fnull : P jnull)
              (fnumber : forall n : number, P (jnumber n))
-             (fbigint : forall n : Z, P (jbigint n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forallt P c -> P (jarray c))
@@ -56,7 +54,6 @@ Section JSON.
     match j as j0 return (P j0) with
       | jnull => fnull
       | jnumber x => fnumber x
-      | jbigint x => fbigint x
       | jbool x => fbool x
       | jstring x => fstring x
       | jarray x => farray x ((fix F2 (c : list json) : Forallt P c :=
@@ -74,7 +71,6 @@ Section JSON.
   Definition json_ind (P : json -> Prop)
              (fnull : P jnull)
              (fnumber : forall n : number, P (jnumber n))
-             (fbigint : forall n : Z, P (jbigint n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forall P c -> P (jarray c))
@@ -84,7 +80,6 @@ Section JSON.
     match j as j0 return (P j0) with
       | jnull => fnull
       | jnumber x => fnumber x
-      | jbigint x => fbigint x
       | jbool x => fbool x
       | jstring x => fstring x
       | jarray x => farray x ((fix F2 (c : list json) : Forall P c :=
@@ -104,11 +99,10 @@ Section JSON.
   Lemma jsonInd2 (P : json -> Prop)
         (f : P jnull)
         (f0 : forall n : number, P (jnumber n))
-        (f1 : forall n : Z, P (jbigint n))
-        (f2 : forall b : bool, P (jbool b))
-        (f3 : forall s : string, P (jstring s))
-        (f4 : forall c : list json, (forall x, In x c -> P x) -> P (jarray c))
-        (f5 : forall r : list (string * json), (forall x y, In (x,y) r -> P y) -> P (jobject r)):
+        (f1 : forall b : bool, P (jbool b))
+        (f2 : forall s : string, P (jstring s))
+        (f3 : forall c : list json, (forall x, In x c -> P x) -> P (jarray c))
+        (f4 : forall r : list (string * json), (forall x y, In (x,y) r -> P y) -> P (jobject r)):
     forall d, P d.
   Proof.
     intros.
@@ -116,7 +110,7 @@ Section JSON.
     - intros. rewrite Forall_forall in H.
       auto.
     - intros. rewrite Forall_forall in H.
-      apply f5.
+      apply f4.
       intros. apply (H (x,y)). trivial.
   Qed.
 
@@ -128,9 +122,6 @@ Section JSON.
     - destruct (float_eq_dec n f).
       + left; f_equal; trivial.
       + right;intro;apply c;inversion H; reflexivity.
-    - destruct (Z.eq_dec n z).
-      + left; f_equal; trivial.
-      + right;intro;apply n0;inversion H; trivial.
     - destruct (bool_dec b b0).
       + left; f_equal; trivial.
       + right;intro;apply n;inversion H; trivial. 
@@ -160,7 +151,6 @@ Section JSON.
       := match j with
          | jnull => "null"
          | jnumber n => toString n
-         | jbigint n => toString n
          | jbool b => toString b
          | jstring s => stringToStringQuote quotel s
          | jarray ls =>
@@ -176,44 +166,61 @@ Section JSON.
 
   End toString.
 
-  Section preProcess.
-    Fixpoint json_to_qjson (j:json) : json :=
-      match j with
-      | jnull => jnull
-      | jnumber n => jnumber n
-      | jbigint n => jbigint n
-      | jbool b => jbool b
-      | jstring s => jstring s
-      | jarray c => jarray (map json_to_qjson c)
-      | jobject nil => jobject nil
-      | jobject ((s1,j')::nil) =>
-        if (string_dec s1 "$nat") then
-          match j' with
-          | jnumber n => jobject ((s1, jbigint (float_truncate n))::nil)
-          | _ => jobject ((s1, json_to_qjson j')::nil)
-          end
-        else jobject ((s1, json_to_qjson j')::nil)
-      | jobject r => jobject (map (fun x => (fst x, json_to_qjson (snd x))) r)
-      end.
+  Section Encode.
+    Definition json_key_encode (s:string) : string
+      := match s with
+         | String "$"%char s => String "$"%char (String "$"%char s)
+         | _ => s
+         end.
 
-    Fixpoint qjson_to_json (j:json) : json :=
-      match j with
-      | jnull => jnull
-      | jnumber n => jnumber n
-      | jbigint n => jbigint n
-      | jbool b => jbool b
-      | jstring s => jstring s
-      | jarray c => jarray (map qjson_to_json c)
-      | jobject nil => jobject nil
-      | jobject ((s1,j')::nil) =>
-        if (string_dec s1 "$nat") then
-          match j' with
-          | jbigint n => jobject ((s1, jnumber (float_of_int n))::nil)
-          | _ => jobject ((s1, qjson_to_json j')::nil)
-          end
-        else jobject ((s1, qjson_to_json j')::nil)
-      | jobject r => jobject (map (fun x => (fst x, qjson_to_json (snd x))) r)
-      end.
+    Definition json_key_decode (s:string) : string
+      := match s with
+         | EmptyString => EmptyString
+         | String "$"%char (String "$"%char s) =>  String "$"%char s
+         | _ => s
+         end.
 
-  End preProcess.
+    Lemma json_key_encode_decode (s:string) : json_key_decode (json_key_encode s) = s.
+      do 2 (destruct s; simpl; trivial)
+      ; repeat match_destr.
+    Qed.
+
+    Lemma json_key_encode_not_data s : (json_key_encode s) <> "$data"%string.
+    Proof.
+      destruct s; simpl; try discriminate.
+      repeat match_destr.
+    Qed.
+
+    Lemma json_key_encode_not_type s : (json_key_encode s) <> "$type"%string.
+    Proof.
+      destruct s; simpl; try discriminate.
+      repeat match_destr.
+    Qed.
+
+    Lemma json_key_encode_not_foreign s : (json_key_encode s) <> "$foreign"%string.
+    Proof.
+      destruct s; simpl; try discriminate.
+      repeat match_destr.
+    Qed.
+
+    Lemma json_key_encode_not_nat s : (json_key_encode s) <> "$nat"%string.
+    Proof.
+      destruct s; simpl; try discriminate.
+      repeat match_destr.
+    Qed.
+
+    Lemma json_key_encode_not_left s : (json_key_encode s) <> "$left"%string.
+    Proof.
+      destruct s; simpl; try discriminate.
+      repeat match_destr.
+    Qed.
+
+    Lemma json_key_encode_not_right s : (json_key_encode s) <> "$right"%string.
+    Proof.
+      destruct s; simpl; try discriminate.
+      repeat match_destr.
+    Qed.
+
+  End Encode.
+
 End JSON.

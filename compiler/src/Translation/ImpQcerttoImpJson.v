@@ -34,35 +34,35 @@ Section ImpJsontoJavaScriptAst.
   (** Translation *)
 
   Context {fruntime:foreign_runtime}.
-  Context {ftjson:foreign_to_JSON}.
+  Context {ftejson:foreign_to_ejson}.
 
 (*Definition mk_imp_json_expr_error msg : imp_json_expr :=
     ImpExprConst (jstring msg). *)
-  Definition mk_imp_json_expr_error msg : imp_json_expr :=
+  Definition mk_imp_ejson_expr_error msg : imp_json_expr :=
     ImpExprError msg. (* XXX Error should eval to None if we want to prove stuffs! *)
-  Definition mk_imp_json_op op el : imp_json_expr := ImpExprOp op el.
-  Definition mk_imp_json_runtime_call op el : imp_json_expr := ImpExprRuntimeCall op el.
+  Definition mk_imp_ejson_op op el : imp_json_expr := ImpExprOp op el.
+  Definition mk_imp_ejson_runtime_call op el : imp_json_expr := ImpExprRuntimeCall op el.
 
-  Definition mk_string s : imp_json_expr := ImpExprConst (jstring s).
-  Definition mk_string_array sl : imp_json_expr := ImpExprConst (jarray (map jstring sl)).
-  Definition mk_bag el : imp_json_expr := mk_imp_json_op JSONOpArray el.
+  Definition mk_string s : imp_json_expr := ImpExprConst (ejstring s).
+  Definition mk_string_array sl : imp_json_expr := ImpExprConst (ejarray (map ejstring sl)).
+  Definition mk_bag el : imp_json_expr := mk_imp_ejson_op EJSONOpArray el.
   Definition mk_left e : imp_json_expr :=
-    mk_imp_json_op (JSONOpObject ["$left"%string]) [ e ].
+    mk_imp_ejson_op (EJSONOpObject ["$left"%string]) [ e ].
   Definition mk_right e : imp_json_expr :=
-    mk_imp_json_op (JSONOpObject ["$right"%string]) [ e ].
+    mk_imp_ejson_op (EJSONOpObject ["$right"%string]) [ e ].
 
   Definition sortCriteria_to_json_expr (sc: string * SortDesc) : imp_json_expr :=
     let (lbl, c) := sc in
     let o :=
         match c with
-        | Ascending => jobject [ ("asc"%string, jstring lbl) ]
-        | Descending => jobject [ ("desc"%string, jstring lbl) ]
+        | Ascending => ejobject [ ("asc"%string, ejstring lbl) ]
+        | Descending => ejobject [ ("desc"%string, ejstring lbl) ]
         end
     in
     ImpExprConst o.
 
   Definition brands_to_json_expr sl : imp_json_expr :=
-    let j := jarray ((List.map (fun s => jstring s)) sl) in
+    let j := ejarray ((List.map (fun s => ejstring s)) sl) in
     ImpExprConst j.
 
   Definition imp_qcert_unary_op_to_imp_json (op:unary_op) el : imp_json_expr :=
@@ -70,44 +70,44 @@ Section ImpJsontoJavaScriptAst.
     | [e] =>
       match op with
       | OpIdentity => e
-      | OpNeg => mk_imp_json_op JSONOpNot [e]
-      | OpRec s => mk_imp_json_op (JSONOpObject [json_key_encode s]) [e]
-      | OpDot s => mk_imp_json_runtime_call JSONRuntimeDeref [e; ImpExprConst (jstring (json_key_encode s))]
-      | OpRecRemove s => mk_imp_json_runtime_call JSONRuntimeRemove [e; mk_string (json_key_encode s)]
+      | OpNeg => mk_imp_ejson_op EJSONOpNot [e]
+      | OpRec s => mk_imp_ejson_op (EJSONOpObject [json_key_encode s]) [e]
+      | OpDot s => mk_imp_ejson_runtime_call JSONRuntimeDeref [e; ImpExprConst (ejstring (json_key_encode s))]
+      | OpRecRemove s => mk_imp_ejson_runtime_call JSONRuntimeRemove [e; mk_string (json_key_encode s)]
       | OpRecProject fl =>
-        mk_imp_json_runtime_call
+        mk_imp_ejson_runtime_call
           JSONRuntimeProject ([e] ++ [mk_string_array fl])
       | OpBag => mk_bag el
-      | OpSingleton => mk_imp_json_runtime_call JSONRuntimeSingleton el
-      | OpFlatten => mk_imp_json_runtime_call JSONRuntimeFlatten el
-      | OpDistinct => mk_imp_json_runtime_call JSONRuntimeDistinct el
+      | OpSingleton => mk_imp_ejson_runtime_call JSONRuntimeSingleton el
+      | OpFlatten => mk_imp_ejson_runtime_call JSONRuntimeFlatten el
+      | OpDistinct => mk_imp_ejson_runtime_call JSONRuntimeDistinct el
       | OpOrderBy scl =>
-        mk_imp_json_runtime_call
+        mk_imp_ejson_runtime_call
           JSONRuntimeSort (e :: (List.map sortCriteria_to_json_expr scl))
-      | OpCount => mk_imp_json_runtime_call JSONRuntimeCount el
-      | OpToString => mk_imp_json_op JSONOpToString el
-      | OpToText => mk_imp_json_runtime_call JSONRuntimeToText el
-      | OpLength => mk_imp_json_runtime_call JSONRuntimeLength el
+      | OpCount => mk_imp_ejson_runtime_call JSONRuntimeCount el
+      | OpToString => mk_imp_ejson_op EJSONOpToString el
+      | OpToText => mk_imp_ejson_runtime_call JSONRuntimeToText el
+      | OpLength => mk_imp_ejson_runtime_call JSONRuntimeLength el
       | OpSubstring start len => (* XXX Should be split into two different functions *)
-        let start := ImpExprConst (jnumber (float_of_int start)) in
+        let start := ImpExprConst (ejnumber (float_of_int start)) in
         let args :=
             match len with
             | None => [ e; start ]
             | Some len =>
-              let len := ImpExprConst (jnumber (float_of_int len)) in
+              let len := ImpExprConst (ejnumber (float_of_int len)) in
               [ e; start; len ]
             end
         in
-        mk_imp_json_runtime_call JSONRuntimeSubstring args
+        mk_imp_ejson_runtime_call JSONRuntimeSubstring args
       | OpLike pat oescape =>
-        mk_imp_json_expr_error "XXX TODO: ImpQcerttoImpJson: OpLike XXX"
+        mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpJson: OpLike XXX"
       | OpLeft => mk_left e
       | OpRight => mk_right e
       | OpBrand b =>
-        mk_imp_json_runtime_call JSONRuntimeBrand [ brands_to_json_expr b; e ]
-      | OpUnbrand => mk_imp_json_runtime_call JSONRuntimeUnbrand el
+        mk_imp_ejson_runtime_call JSONRuntimeBrand [ brands_to_json_expr b; e ]
+      | OpUnbrand => mk_imp_ejson_runtime_call JSONRuntimeUnbrand el
       | OpCast b =>
-        mk_imp_json_runtime_call JSONRuntimeCast [ brands_to_json_expr b; e ]
+        mk_imp_ejson_runtime_call JSONRuntimeCast [ brands_to_json_expr b; e ]
       | OpNatUnary u =>
         let op :=
             match u with
@@ -116,91 +116,91 @@ Section ImpJsontoJavaScriptAst.
             | NatSqrt => JSONRuntimeNatSqrt
             end
         in
-        mk_imp_json_runtime_call op [ e ]
-      | OpNatSum => mk_imp_json_runtime_call JSONRuntimeNatSum el
-      | OpNatMin => mk_imp_json_runtime_call JSONRuntimeNatMin el
-      | OpNatMax => mk_imp_json_runtime_call JSONRuntimeNatMax el
-      | OpNatMean => mk_imp_json_runtime_call JSONRuntimeNatArithMean el
-      | OpFloatOfNat => mk_imp_json_runtime_call JSONRuntimeFloatOfNat el
+        mk_imp_ejson_runtime_call op [ e ]
+      | OpNatSum => mk_imp_ejson_runtime_call JSONRuntimeNatSum el
+      | OpNatMin => mk_imp_ejson_runtime_call JSONRuntimeNatMin el
+      | OpNatMax => mk_imp_ejson_runtime_call JSONRuntimeNatMax el
+      | OpNatMean => mk_imp_ejson_runtime_call JSONRuntimeNatArithMean el
+      | OpFloatOfNat => mk_imp_ejson_runtime_call JSONRuntimeFloatOfNat el
       | OpFloatUnary u =>
         match u with
-        | FloatNeg => mk_imp_json_op JSONOpNeg [ e ]
-        | FloatSqrt => mk_imp_json_op JSONOpMathSqrt [ e ]
-        | FloatExp => mk_imp_json_op JSONOpMathExp [ e ]
-        | FloatLog => mk_imp_json_op JSONOpMathLog [ e ]
-        | FloatLog10 => mk_imp_json_op JSONOpMathLog10 [ e ]
-        | FloatCeil => mk_imp_json_op JSONOpMathCeil [ e ]
-        | FloatFloor => mk_imp_json_op JSONOpMathFloor [ e ]
-        | FloatAbs => mk_imp_json_op JSONOpMathAbs [ e ]
+        | FloatNeg => mk_imp_ejson_op EJSONOpNeg [ e ]
+        | FloatSqrt => mk_imp_ejson_op EJSONOpMathSqrt [ e ]
+        | FloatExp => mk_imp_ejson_op EJSONOpMathExp [ e ]
+        | FloatLog => mk_imp_ejson_op EJSONOpMathLog [ e ]
+        | FloatLog10 => mk_imp_ejson_op EJSONOpMathLog10 [ e ]
+        | FloatCeil => mk_imp_ejson_op EJSONOpMathCeil [ e ]
+        | FloatFloor => mk_imp_ejson_op EJSONOpMathFloor [ e ]
+        | FloatAbs => mk_imp_ejson_op EJSONOpMathAbs [ e ]
         end
-      | OpFloatTruncate => mk_imp_json_op JSONOpMathTrunc [e]
-      | OpFloatSum => mk_imp_json_runtime_call JSONRuntimeSum el
-      | OpFloatMean => mk_imp_json_runtime_call JSONRuntimeArithMean el
-      | OpFloatBagMin => mk_imp_json_op JSONOpMathMinApply [e]
-      | OpFloatBagMax => mk_imp_json_op JSONOpMathMaxApply [e]
+      | OpFloatTruncate => mk_imp_ejson_op EJSONOpMathTrunc [e]
+      | OpFloatSum => mk_imp_ejson_runtime_call JSONRuntimeSum el
+      | OpFloatMean => mk_imp_ejson_runtime_call JSONRuntimeArithMean el
+      | OpFloatBagMin => mk_imp_ejson_op EJSONOpMathMinApply [e]
+      | OpFloatBagMax => mk_imp_ejson_op EJSONOpMathMaxApply [e]
       | OpForeignUnary fu =>
-        mk_imp_json_expr_error "XXX TODO: ImpQcerttoImpJson.imp_qcert_unary_op_to_imp_json OpForeignUnary"
+        mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpJson.imp_qcert_unary_op_to_imp_json OpForeignUnary"
       end
-    | _ => mk_imp_json_expr_error "wrong number of arguments"
+    | _ => mk_imp_ejson_expr_error "wrong number of arguments"
     end.
 
   Definition imp_qcert_binary_op_to_imp_json (op:binary_op) el : imp_json_expr :=
     match el with
     | [e1; e2] =>
       match op with
-      | OpEqual => mk_imp_json_runtime_call JSONRuntimeEqual el
-      | OpRecConcat => mk_imp_json_runtime_call JSONRuntimeRecConcat el
-      | OpRecMerge => mk_imp_json_runtime_call JSONRuntimeRecMerge el
-      | OpAnd => mk_imp_json_op JSONOpAnd el
-      | OpOr => mk_imp_json_op JSONOpOr el
+      | OpEqual => mk_imp_ejson_runtime_call JSONRuntimeEqual el
+      | OpRecConcat => mk_imp_ejson_runtime_call JSONRuntimeRecConcat el
+      | OpRecMerge => mk_imp_ejson_runtime_call JSONRuntimeRecMerge el
+      | OpAnd => mk_imp_ejson_op EJSONOpAnd el
+      | OpOr => mk_imp_ejson_op EJSONOpOr el
       | OpLt =>
-        mk_imp_json_op JSONOpLt
-                       [ mk_imp_json_runtime_call JSONRuntimeCompare [e1; e2];
-                         ImpExprConst (jnumber zero) ]
+        mk_imp_ejson_op EJSONOpLt
+                       [ mk_imp_ejson_runtime_call JSONRuntimeCompare [e1; e2];
+                         ImpExprConst (ejnumber zero) ]
       | OpLe =>
-        mk_imp_json_op JSONOpLe
-                       [ mk_imp_json_runtime_call JSONRuntimeCompare [e1; e2];
-                         ImpExprConst (jnumber zero) ]
-      | OpBagUnion => mk_imp_json_runtime_call JSONRuntimeBunion [e1; e2]
-      | OpBagDiff => mk_imp_json_runtime_call JSONRuntimeBminus [e1; e2]
-      | OpBagMin => mk_imp_json_runtime_call JSONRuntimeBmin [e1; e2]
-      | OpBagMax => mk_imp_json_runtime_call JSONRuntimeBmax [e1; e2]
-      | OpBagNth => mk_imp_json_runtime_call JSONRuntimeBnth [e1; e2]
-      | OpContains => mk_imp_json_runtime_call JSONRuntimeContains [e1; e2]
-      | OpStringConcat => mk_imp_json_op JSONOpAddString el
-      | OpStringJoin => mk_imp_json_runtime_call JSONRuntimeStringJoin [e1; e2]
+        mk_imp_ejson_op EJSONOpLe
+                       [ mk_imp_ejson_runtime_call JSONRuntimeCompare [e1; e2];
+                         ImpExprConst (ejnumber zero) ]
+      | OpBagUnion => mk_imp_ejson_runtime_call JSONRuntimeBunion [e1; e2]
+      | OpBagDiff => mk_imp_ejson_runtime_call JSONRuntimeBminus [e1; e2]
+      | OpBagMin => mk_imp_ejson_runtime_call JSONRuntimeBmin [e1; e2]
+      | OpBagMax => mk_imp_ejson_runtime_call JSONRuntimeBmax [e1; e2]
+      | OpBagNth => mk_imp_ejson_runtime_call JSONRuntimeBnth [e1; e2]
+      | OpContains => mk_imp_ejson_runtime_call JSONRuntimeContains [e1; e2]
+      | OpStringConcat => mk_imp_ejson_op EJSONOpAddString el
+      | OpStringJoin => mk_imp_ejson_runtime_call JSONRuntimeStringJoin [e1; e2]
       | OpNatBinary opa =>
         match opa with
-        | NatPlus => mk_imp_json_runtime_call JSONRuntimeNatPlus [e1; e2]
-        | NatMinus => mk_imp_json_runtime_call JSONRuntimeNatMinus [e1; e2]
-        | NatMult => mk_imp_json_runtime_call JSONRuntimeNatMult [e1; e2]
-        | NatDiv => mk_imp_json_runtime_call JSONRuntimeNatDiv [e1; e2]
-        | NatRem => mk_imp_json_runtime_call JSONRuntimeNatRem [e1; e2]
-        | NatMin => mk_imp_json_runtime_call JSONRuntimeNatMin [e1; e2]
-        | NatMax => mk_imp_json_runtime_call JSONRuntimeNatMax [e1; e2]
+        | NatPlus => mk_imp_ejson_runtime_call JSONRuntimeNatPlus [e1; e2]
+        | NatMinus => mk_imp_ejson_runtime_call JSONRuntimeNatMinus [e1; e2]
+        | NatMult => mk_imp_ejson_runtime_call JSONRuntimeNatMult [e1; e2]
+        | NatDiv => mk_imp_ejson_runtime_call JSONRuntimeNatDiv [e1; e2]
+        | NatRem => mk_imp_ejson_runtime_call JSONRuntimeNatRem [e1; e2]
+        | NatMin => mk_imp_ejson_runtime_call JSONRuntimeNatMin [e1; e2]
+        | NatMax => mk_imp_ejson_runtime_call JSONRuntimeNatMax [e1; e2]
         end
       | OpFloatBinary opa =>
         match opa with
-        | FloatPlus => mk_imp_json_op JSONOpAddNumber [e1; e2]
-        | FloatMinus => mk_imp_json_op JSONOpSub [e1; e2]
-        | FloatMult => mk_imp_json_op JSONOpMult [e1; e2]
-        | FloatDiv => mk_imp_json_op JSONOpDiv [e1; e2]
-        | FloatPow => mk_imp_json_op JSONOpMathPow [e1; e2]
-        | FloatMin => mk_imp_json_op JSONOpMathMin [e1; e2]
-        | FloatMax => mk_imp_json_op JSONOpMathMax [e1; e2]
+        | FloatPlus => mk_imp_ejson_op EJSONOpAddNumber [e1; e2]
+        | FloatMinus => mk_imp_ejson_op EJSONOpSub [e1; e2]
+        | FloatMult => mk_imp_ejson_op EJSONOpMult [e1; e2]
+        | FloatDiv => mk_imp_ejson_op EJSONOpDiv [e1; e2]
+        | FloatPow => mk_imp_ejson_op EJSONOpMathPow [e1; e2]
+        | FloatMin => mk_imp_ejson_op EJSONOpMathMin [e1; e2]
+        | FloatMax => mk_imp_ejson_op EJSONOpMathMax [e1; e2]
         end
       | OpFloatCompare opa =>
         match opa with
-        | FloatLt => mk_imp_json_op JSONOpLt [e1; e2]
-        | FloatLe => mk_imp_json_op JSONOpLe [e1; e2]
-        | FloatGt => mk_imp_json_op JSONOpGt [e1; e2]
-        | FloatGe => mk_imp_json_op JSONOpGe [e1; e2]
+        | FloatLt => mk_imp_ejson_op EJSONOpLt [e1; e2]
+        | FloatLe => mk_imp_ejson_op EJSONOpLe [e1; e2]
+        | FloatGt => mk_imp_ejson_op EJSONOpGt [e1; e2]
+        | FloatGe => mk_imp_ejson_op EJSONOpGe [e1; e2]
         end
       | OpForeignBinary fb =>
       (* foreign_to_ajavascript_binary_op fb [e1; e2] *)
-        mk_imp_json_expr_error "XXX TODO: ImpQcerttoImpJson.imp_qcert_binary_op_to_imp_json(OpForeignBinary): not yet implemented XXX" (* XXX TODO  *)
+        mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpJson.imp_qcert_binary_op_to_imp_json(OpForeignBinary): not yet implemented XXX" (* XXX TODO  *)
       end
-    | _ => mk_imp_json_expr_error "imp_qcert_binary_op_to_imp_json: wrong number of arguments"
+    | _ => mk_imp_ejson_expr_error "imp_qcert_binary_op_to_imp_json: wrong number of arguments"
     end.
 
   Definition imp_qcert_op_to_imp_json (op:imp_qcert_op) el : imp_json_expr :=
@@ -210,36 +210,36 @@ Section ImpJsontoJavaScriptAst.
     end.
 
   Definition mk_either_expr (el:list imp_json_expr) : imp_json_expr :=
-    mk_imp_json_runtime_call JSONRuntimeEither el.
+    mk_imp_ejson_runtime_call JSONRuntimeEither el.
 
   Definition mk_to_left_expr (el:list imp_json_expr) : imp_json_expr :=
-    mk_imp_json_runtime_call JSONRuntimeToLeft el.
+    mk_imp_ejson_runtime_call JSONRuntimeToLeft el.
 
   Definition mk_to_right_expr (el:list imp_json_expr) : imp_json_expr :=
-    mk_imp_json_runtime_call JSONRuntimeToRight el.
+    mk_imp_ejson_runtime_call JSONRuntimeToRight el.
 
   Definition imp_qcert_runtime_call_to_imp_json
              (op:imp_qcert_runtime_op)
              (el:list imp_json_expr) : imp_json_expr :=
     match op with
     | QcertRuntimeGroupby s ls =>
-      mk_imp_json_runtime_call
+      mk_imp_ejson_runtime_call
         JSONRuntimeGroupBy
-        ((ImpExprConst (jstring s))
-           :: (ImpExprConst (jarray (map jstring ls)))
+        ((ImpExprConst (ejstring s))
+           :: (ImpExprConst (ejarray (map ejstring ls)))
            :: el)
     | QcertRuntimeEither => mk_either_expr el
     | QcertRuntimeToLeft => mk_to_left_expr el
     | QcertRuntimeToRight => mk_to_right_expr el
     | QcertRuntimeDeref =>
-      mk_imp_json_runtime_call JSONRuntimeDeref el (* XXX ???? TODO *)
+      mk_imp_ejson_runtime_call JSONRuntimeDeref el (* XXX ???? TODO *)
     end.
 
   Fixpoint imp_qcert_expr_to_imp_json (exp: imp_qcert_expr) : imp_json_expr :=
     match exp with
     | ImpExprError msg => ImpExprError msg
     | ImpExprVar v => ImpExprVar v
-    | ImpExprConst d => ImpExprConst (@data_to_json _ _ d)
+    | ImpExprConst d => ImpExprConst (@data_to_ejson _ _ _ d)
     | ImpExprOp op el => imp_qcert_op_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_json op (map imp_qcert_expr_to_imp_json el)
     end.
@@ -265,9 +265,9 @@ Section ImpJsontoJavaScriptAst.
       ImpStmtBlock
         [ (src_id, Some e) ]
         [ ImpStmtForRange
-            i_id (ImpExprConst (jnumber zero)) (ImpExprOp JSONOpArrayLength [ src ])
+            i_id (ImpExprConst (ejnumber zero)) (ImpExprOp EJSONOpArrayLength [ src ])
             (ImpStmtBlock
-               [ (v, Some (ImpExprOp JSONOpArrayAccess [ src; i ])) ]
+               [ (v, Some (ImpExprOp EJSONOpArrayAccess [ src; i ])) ]
                [ imp_qcert_stmt_to_imp_json avoid s ]) ]
     | ImpStmtForRange v e1 e2 s =>
       ImpStmtForRange v
@@ -301,13 +301,13 @@ Section ImpJsontoJavaScriptAst.
     Context (h:brand_relation_t). (* We need a brand relation for the Q*cert side *)
 
     Definition lift_bindings (env:bindings) : jbindings :=
-      List.map (fun xy => (fst xy, data_to_json (snd xy))) env.
+      List.map (fun xy => (fst xy, data_to_ejson (snd xy))) env.
     Definition lift_pd_bindings (env:pd_bindings) : pd_jbindings :=
-      List.map (fun xy => (fst xy, lift data_to_json (snd xy))) env.
-    Definition lift_result (res:option json) : option data :=
-      lift (json_to_data h) res.
+      List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env.
+    Definition lift_result (res:option ejson) : option data :=
+      lift (ejson_to_data h) res.
     Definition lift_result_env (res:option pd_jbindings) : option pd_bindings :=
-      lift (fun env => List.map (fun xy => (fst xy, lift (json_to_data h) (snd xy))) env) res.
+      lift (fun env => List.map (fun xy => (fst xy, lift (ejson_to_data h) (snd xy))) env) res.
 
 
     Lemma map_qcert_json_eval 
@@ -332,13 +332,13 @@ Section ImpJsontoJavaScriptAst.
     Qed.
     
     Lemma data_to_bool_json_to_bool_correct j:
-      imp_qcert_data_to_bool (json_to_data h j) = imp_json_data_to_bool j.
+      imp_qcert_data_to_bool (ejson_to_data h j) = imp_json_data_to_bool j.
     Proof.
-      unfold json_to_data.
+      unfold ejson_to_data.
       unfold imp_qcert_data_to_bool.
       unfold imp_json_data_to_bool.
       destruct j; trivial.
-      generalize (json_to_data_pre_jobj_nbool l); intros HH1.
+      generalize (ejson_to_data_pre_jobj_nbool l); intros HH1.
       generalize (normalize_data_forall_ndbool h _ HH1); intros HH2.
       match_destr.
       specialize (HH2 b); congruence.
@@ -349,70 +349,18 @@ Section ImpJsontoJavaScriptAst.
       destruct d; simpl; intuition discriminate.
     Qed.
 
-    (** XXX Not true anymore... how was it ever? 
     Lemma data_to_bool_json_to_nat_correct j:
-      imp_qcert_data_to_Z (json_to_data h j) = imp_json_data_to_Z j.
+      imp_qcert_data_to_Z (ejson_to_data h j) = imp_json_data_to_Z j.
     Proof.
-      unfold json_to_data.
+      unfold ejson_to_data.
       unfold imp_qcert_data_to_Z.
       unfold imp_json_data_to_Z.
       destruct j; trivial.
-      simpl.
-      assert (simpl_eq1:
-                match normalize_data h (json_to_data_pre (jobject l)) with
-                | dnat n => Some n
-                | _ => None
-                end =
-                match json_to_data_pre (jobject l) with
-                | dnat n => Some n
-                | _ => None
-                end)
-             
-        by now destruct (json_to_data_pre (jobject l)).
-      rewrite simpl_eq1; clear simpl_eq1.
-
-      destruct l; trivial.
-      destruct p.
-      assert (simpl_eq: match s with
-  | "$nat"%string =>
-      match j with
-      | jnumber n => match l with
-                     | [] => Some (float_truncate n)
-                     | _ :: _ => None
-                     end
-      | _ => None
-      end
-  | _ => None
-                end =
-                      (match l with
-                      | [] => if string_dec s  ("$nat"%string)
-                                  then match j with
-                                  | jnumber n => Some (float_truncate n)
-                                  | _ => None
-                                       end
-                              else None
-                      | _ :: _ => None
-                       end))
-        by (repeat match_destr).
-      rewrite simpl_eq; clear simpl_eq.      
-      destruct l.
-      - simpl.
-        string_dec_to_equiv.
-        destruct j; simpl
-        ; repeat dest_eqdec; trivial
-        ; destruct (foreign_to_JSON_to_data _); trivial.
-      - simpl.
-        destruct p.
-        string_dec_to_equiv.
-        destruct j; simpl
-        ; repeat dest_eqdec; trivial
-        ; destruct j0; simpl; trivial
-        ; destruct l; simpl; trivial
-        ; try destruct (json_brands l0); trivial.
-        
-        now destruct (json_brands l1).
+      case_eq (normalize_data h (ejson_to_data_pre (ejobject l))); intros; try reflexivity.
+      generalize (ejson_to_data_object_not_nat h l z); intros.
+      unfold ejson_to_data in H0.
+      contradiction.
     Qed.
-     *)
 
     Lemma Forall_singleton σ i:
       Forall
@@ -430,15 +378,15 @@ Section ImpJsontoJavaScriptAst.
     Qed.
 
     Lemma oflatten_jflatten_roundtrip l :
-      match oflatten (map (normalize_data h) (map json_to_data_pre l)) with
+      match oflatten (map (normalize_data h) (map ejson_to_data_pre l)) with
       | Some a' => Some (dcoll a')
       | None => None
       end =
       match match jflatten l with
-            | Some a' => Some (jarray a')
+            | Some a' => Some (ejarray a')
             | None => None
             end with
-      | Some a' => Some (json_to_data h a')
+      | Some a' => Some (ejson_to_data h a')
       | None => None
       end.
     Proof.
@@ -446,7 +394,7 @@ Section ImpJsontoJavaScriptAst.
     Admitted.
 
     Lemma of_string_list_over_strings_idempotent sl :
-      of_string_list (map (fun s : string => jstring s) sl) = Some sl.
+      of_string_list (map (fun s : string => ejstring s) sl) = Some sl.
     Proof.
       induction sl; try reflexivity; simpl.
       unfold of_string_list in *; simpl.
@@ -454,7 +402,7 @@ Section ImpJsontoJavaScriptAst.
     Qed.
 
     Lemma json_brands_of_brands_idempotent b:
-      json_brands (map jstring b) = Some b.
+      ejson_brands (map ejstring b) = Some b.
     Proof.
       induction b; try reflexivity; simpl.
       rewrite IHb.
@@ -500,14 +448,14 @@ Section ImpJsontoJavaScriptAst.
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         unfold unudbool.
-        case_eq (json_to_data h (jobject l)); intros; try reflexivity.
-        generalize (json_to_data_object_not_boolean h l b); intros.
+        case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
+        generalize (ejson_to_data_object_not_boolean h l b); intros.
         congruence.
       - Case "OpRec"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         f_equal.
-        apply rec_json_key_encode_roundtrip.
+        apply rec_ejson_key_encode_roundtrip.
       - Case "OpDot"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
@@ -531,10 +479,10 @@ Section ImpJsontoJavaScriptAst.
         + destruct l; try reflexivity; simpl.
           destruct l; try reflexivity; simpl.
           f_equal.
-          unfold json_to_data; simpl.
-          destruct j; reflexivity.
-        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
-          generalize (json_to_data_object_not_coll h l l0); intros.
+          unfold ejson_to_data; simpl.
+          destruct e; reflexivity.
+        + case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll h l l0); intros.
           congruence.
       - Case "OpFlatten"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
@@ -543,16 +491,16 @@ Section ImpJsontoJavaScriptAst.
         + unfold lift. simpl.
           apply oflatten_jflatten_roundtrip.
         + simpl.
-          case_eq (json_to_data h (jobject l)); intros; try reflexivity.
-          generalize (json_to_data_object_not_coll h l l0); intros.
+          case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll h l l0); intros.
           congruence.
       - Case "OpDistinct"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + admit.
-        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
-          generalize (json_to_data_object_not_coll h l l0); intros.
+        + case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll h l l0); intros.
           congruence.
       - Case "OpOrderBy"%string.
         admit. (* XXX Not implemented *)
@@ -562,12 +510,12 @@ Section ImpJsontoJavaScriptAst.
         destruct i0; try reflexivity; simpl.
         + rewrite map_map.
           simpl.
-          unfold json_to_data; simpl.
+          unfold ejson_to_data; simpl.
           f_equal; f_equal; f_equal.
           unfold bcount.
           apply map_length.
-        + case_eq (json_to_data h (jobject l)); intros; try reflexivity.
-          generalize (json_to_data_object_not_coll h l l0); intros.
+        + case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
+          generalize (ejson_to_data_object_not_coll h l l0); intros.
           congruence.
       - Case "OpToString"%string.
         admit. (* XXX Not implemented *)
@@ -577,8 +525,8 @@ Section ImpJsontoJavaScriptAst.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
-        case_eq (json_to_data h (jobject l)); intros; try reflexivity.
-        generalize (json_to_data_object_not_string h l s); intros.
+        case_eq (ejson_to_data h (ejobject l)); intros; try reflexivity.
+        generalize (ejson_to_data_object_not_string h l s); intros.
         congruence.
       - Case "OpSubstring"%string.
         admit. (* XXX Not implemented *)
@@ -587,18 +535,18 @@ Section ImpJsontoJavaScriptAst.
       - Case "OpLeft"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
-        unfold json_to_data; simpl.
+        unfold ejson_to_data; simpl.
         destruct i0; reflexivity.
       - Case "OpRight"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
-        unfold json_to_data; simpl.
+        unfold ejson_to_data; simpl.
         destruct i0; reflexivity.
       - Case "OpBrand"%string.
         destruct (imp_json_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_json i));
           try reflexivity; simpl.
         rewrite of_string_list_over_strings_idempotent; simpl.
-        unfold json_to_data; simpl.
+        unfold ejson_to_data; simpl.
         rewrite json_brands_of_brands_idempotent; simpl.
         destruct i0; try reflexivity; simpl.
       - Case "OpUnbrand"%string.
@@ -779,7 +727,7 @@ Section ImpJsontoJavaScriptAst.
 
     Lemma imp_qcert_function_to_imp_json_function_correct (d:data) (f:imp_qcert_function) :
       imp_qcert_function_eval h f d =
-      lift (json_to_data h) (imp_json_function_eval (imp_qcert_function_to_imp_json f) (data_to_json d)).
+      lift (ejson_to_data h) (imp_json_function_eval (imp_qcert_function_to_imp_json f) (data_to_ejson d)).
     Proof.
       destruct f; simpl.
       generalize (imp_qcert_stmt_to_imp_json_stmt_correct [(v0, None); (v, Some d)] i (v::nil)); intros.
@@ -794,7 +742,7 @@ Section ImpJsontoJavaScriptAst.
         unfold imp_json_data in *.
         unfold imp_qcert_data in *.
         unfold imp_json_op in *.
-        assert ((@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
+        assert ((@ImpEval.imp_stmt_eval ejson ejson_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
            imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
            (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
            (lift_pd_bindings
@@ -805,29 +753,29 @@ Section ImpJsontoJavaScriptAst.
                     (@pair var (option (@data (@foreign_runtime_data fruntime))) v
                        (@Some (@data (@foreign_runtime_data fruntime)) d))
                     (@nil (prod var (option (@data (@foreign_runtime_data fruntime)))))))))
-                = (@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
+                = (@ImpEval.imp_stmt_eval ejson ejson_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
           imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
           (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
-          (@cons (prod var (option json)) (@pair var (option json) v0 (@None json))
-             (@cons (prod var (option json))
-                (@pair var (option json) v (@Some json (@data_to_json (@foreign_runtime_data fruntime) ftjson d)))
-                (@nil (prod var (option json))))))) by reflexivity.
+          (@cons (prod var (option ejson)) (@pair var (option ejson) v0 (@None ejson))
+             (@cons (prod var (option ejson))
+                (@pair var (option ejson) v (@Some ejson (@data_to_ejson (@foreign_runtime_data fruntime) _ ftejson d)))
+                (@nil (prod var (option ejson))))))) by reflexivity.
         rewrite H0 in *; clear H0.
         rewrite H; clear H.
-        generalize (@lookup_map_codomain_unfolded string (option json) (option data) string_dec (fun x => match x with
-                   | Some a' => Some (json_to_data h a')
+        generalize (@lookup_map_codomain_unfolded string (option ejson) (option data) string_dec (fun x => match x with
+                   | Some a' => Some (ejson_to_data h a')
                    | None => None
                    end)); intros.
         rewrite H; clear H.
         unfold lift.
-        assert (@lookup string (option json) string_dec p v0 = lookup EquivDec.equiv_dec p v0) by reflexivity.
+        assert (@lookup string (option ejson) string_dec p v0 = lookup EquivDec.equiv_dec p v0) by reflexivity.
         rewrite H; clear H.
         case_eq (lookup EquivDec.equiv_dec p v0); intros; try reflexivity.
       - unfold olift.
         unfold imp_json_data in *.
         unfold imp_qcert_data in *.
         unfold imp_json_op in *.
-        assert ((@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
+        assert ((@ImpEval.imp_stmt_eval ejson ejson_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
            imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
            (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
            (lift_pd_bindings
@@ -838,21 +786,21 @@ Section ImpJsontoJavaScriptAst.
                     (@pair var (option (@data (@foreign_runtime_data fruntime))) v
                        (@Some (@data (@foreign_runtime_data fruntime)) d))
                     (@nil (prod var (option (@data (@foreign_runtime_data fruntime)))))))))
-                = (@ImpEval.imp_stmt_eval json json_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
+                = (@ImpEval.imp_stmt_eval ejson ejson_op imp_json_runtime_op imp_json_data_normalize imp_json_data_to_bool
           imp_json_data_to_Z imp_json_data_to_list imp_json_Z_to_data imp_json_runtime_eval imp_json_op_eval
           (imp_qcert_stmt_to_imp_json (@cons var v (@nil var)) i)
-          (@cons (prod var (option json)) (@pair var (option json) v0 (@None json))
-             (@cons (prod var (option json))
-                (@pair var (option json) v (@Some json (@data_to_json (@foreign_runtime_data fruntime) ftjson d)))
-                (@nil (prod var (option json))))))) by reflexivity.
+          (@cons (prod var (option ejson)) (@pair var (option ejson) v0 (@None ejson))
+             (@cons (prod var (option ejson))
+                (@pair var (option ejson) v (@Some ejson (@data_to_ejson (@foreign_runtime_data fruntime) _ ftejson d)))
+                (@nil (prod var (option ejson))))))) by reflexivity.
         rewrite H0 in *; clear H0.
         rewrite H.
         reflexivity.
     Qed.
 
     Lemma push_rec_sort_in_map env :
-      (rec_sort (map (fun xy : string * data => (fst xy, data_to_json (snd xy))) env))
-      = (map (fun xy : string * data => (fst xy, data_to_json (snd xy))) (rec_sort env)).
+      (rec_sort (map (fun xy : string * data => (fst xy, data_to_ejson (snd xy))) env))
+      = (map (fun xy : string * data => (fst xy, data_to_ejson (snd xy))) (rec_sort env)).
     Proof.
       rewrite map_rec_sort.
       - reflexivity.

@@ -18,7 +18,7 @@ Require Import CompilerRuntime.
 Require String.
 Require Data.
 Require JSON.
-Require DatatoJSON.
+Require DatatoEJSON.
 Require Import String.
 
 Module QData(runtime:CompilerRuntime).
@@ -66,16 +66,12 @@ Module QData(runtime:CompilerRuntime).
   (* foreign data is supported via the model *)
   
   (** JSON -> data conversion *)
-  Definition json_to_qdata br : JSON.json -> qdata
-    := DatatoJSON.json_to_data br.
-
-  (** JSON -> JSON for Qcert conversion *)
-  Definition json_to_qjson : JSON.json -> JSON.json
-    := JSON.json_to_qjson.
+  Definition json_to_qdata br (j:JSON.json) : qdata
+    := DatatoEJSON.ejson_to_data br (EJSON.json_to_ejson j).
 
   (** data -> JSON *string* conversion *)
   Definition qdataStringify s : qdata -> String.string
-    := (fun d => JSON.jsonStringify s (DatatoJSON.data_to_json d)).
+    := (fun d => JSON.jsonStringify s (EJSON.ejson_to_json (DatatoEJSON.data_to_ejson d))).
 
   Definition jsonStringify s : JSON.json -> String.string 
     := JSON.jsonStringify s.
@@ -83,6 +79,9 @@ Module QData(runtime:CompilerRuntime).
   Definition data_to_string : qdata -> String.string
     := qdataStringify JSONUtil.quotel_double.
   
+  Definition ejson_to_string : EJSON.ejson -> String.string
+    := (fun j => jsonStringify JSONUtil.quotel_double (EJSON.ejson_to_json j)).
+
   Definition json_to_string : JSON.json -> String.string
     := jsonStringify JSONUtil.quotel_double.
 

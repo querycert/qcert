@@ -16,6 +16,6 @@
 
 Require Export ForeignRuntime.
 Require Export BrandRelation.
+Require Export CommonEJSON.
 Require Export CommonData.
 Require Export Operators.
-

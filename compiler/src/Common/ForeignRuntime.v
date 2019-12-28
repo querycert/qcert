@@ -14,15 +14,17 @@
  * limitations under the License.
  *)
 
+Require Export ForeignEJSON.
 Require Export ForeignData.
-Require Export ForeignDataToJSON.
+Require Export ForeignDataToEJSON.
 Require Export ForeignOperators.
 
 Class foreign_runtime : Type
   := mk_foreign_runtime {
-         foreign_runtime_data :> foreign_data
+         foreign_runtime_ejson :> foreign_ejson
+         ; foreign_runtime_data :> foreign_data
          ; foreign_runtime_unary_op :> foreign_unary_op
          ; foreign_runtime_binary_op :> foreign_binary_op
-         ; foreign_runtime_tojson :> foreign_to_JSON
+         ; foreign_runtime_tojson :> foreign_to_ejson
        }.
 

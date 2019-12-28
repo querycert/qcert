@@ -29,7 +29,6 @@ Require Import Utils.
 Require Import Types.
 Require Import CommonData.
 Require Import ForeignData.
-Require Import ForeignDataToJSON.
 Require Import ForeignOperators.
 Require Import ForeignDataTyping.
 Require Import ForeignOperatorsTyping.
@@ -43,7 +42,6 @@ Section TOperatorsEq.
      same value for every well-typed input.
    *)
   Context {fdata:foreign_data}.
-  Context {ftojson:foreign_to_JSON}.
   Context {fuop:foreign_unary_op}.
   Context {fbop:foreign_binary_op}.
   Context {ftype:foreign_type}.

@@ -47,7 +47,6 @@ Section RTypeToJSON.
       match j with
       | jnull => Unit₀
       | jnumber _ => Unit₀
-      | jbigint _ => Unit₀
       | jbool _ => Unit₀
       | jarray _ => Unit₀
       | jstring "Top" => Top₀
@@ -75,7 +74,6 @@ Section RTypeToJSON.
       match j with
       | jnull => Some Unit₀
       | jnumber _ => None
-      | jbigint _ => None
       | jbool _ => None
       | jarray _ => None
       | jstring "Top" => Some Top₀

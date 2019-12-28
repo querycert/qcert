@@ -19,7 +19,6 @@ Require Import Types.
 Require RType.
 Require String.
 Require Import TypingRuntime.
-Require Import DatatoJSON.
 Require DatatoSparkDF.
 Require Data.
 Require TUtil.

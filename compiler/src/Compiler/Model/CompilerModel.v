@@ -20,8 +20,9 @@ Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
-Require Import ForeignDataToJSON.
+Require Import ForeignDataToEJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
@@ -43,8 +44,9 @@ Module Type CompilerModel.
   Axiom compiler_model_foreign_to_java : foreign_to_java.
   Axiom compiler_model_foreign_to_javascript : foreign_to_javascript.
   Axiom compiler_model_foreign_to_ajavascript : foreign_to_ajavascript.
+  Axiom compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
   Axiom compiler_model_foreign_to_scala : foreign_to_scala.
-  Axiom compiler_model_foreign_to_JSON : foreign_to_JSON.
+  Axiom compiler_model_foreign_to_ejson : foreign_to_ejson.
   Axiom compiler_model_foreign_type_to_JSON : foreign_type_to_JSON.
   Axiom compiler_model_foreign_reduce_op : foreign_reduce_op.
   Axiom compiler_model_foreign_to_reduce_op : foreign_to_reduce_op.
@@ -67,12 +69,14 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := model.compiler_model_foreign_to_javascript.
   Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
     := model.compiler_model_foreign_to_ajavascript.
+  Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
+    := model.compiler_model_foreign_ejson_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := model.compiler_model_foreign_to_scala.
   Definition compiler_foreign_to_java : foreign_to_java
     := model.compiler_model_foreign_to_java.
-  Definition compiler_foreign_to_JSON : foreign_to_JSON
-    := model.compiler_model_foreign_to_JSON.
+  Definition compiler_foreign_to_ejson : foreign_to_ejson
+    := model.compiler_model_foreign_to_ejson.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
     := model.compiler_model_foreign_type_to_JSON.
   Definition compiler_foreign_reduce_op : foreign_reduce_op

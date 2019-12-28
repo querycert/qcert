@@ -61,7 +61,7 @@ Section CompStat.
 
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
-  Context {ftjson:foreign_to_JSON}.
+  Context {ftejson:foreign_to_ejson}.
   Context {bm:brand_model}.
   Context {nraenv_core_logger:optimizer_logger string nraenv_core}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
@@ -463,7 +463,7 @@ Section CompStat.
         | Q_error q => stat_error q
         end
     in
-    jsonStringify quotel_double (data_to_json stat).
+    jsonStringify quotel_double (ejson_to_json (data_to_ejson stat)).
 
   Definition json_stat_tree_of_query (qname:string) (q:query) : string :=
     let stat :=
@@ -497,9 +497,10 @@ Section CompStat.
         end
     in
     jsonStringify quotel_double
-             (data_to_json (drec
-                              (("name", dstring qname)
-                                 :: ("stats", stat)
-                                 :: nil))).
+                  (ejson_to_json
+                     (data_to_ejson (drec
+                                       (("name", dstring qname)
+                                          :: ("stats", stat)
+                                          :: nil)))).
 
 End CompStat.

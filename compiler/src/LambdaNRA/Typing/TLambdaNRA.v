@@ -159,7 +159,7 @@ Section TLambdaNRA.
       simpl; apply (@typed_binary_op_yields_typed_data _ _ _ _ _ _ τ₁ τ₂ τ); assumption.
     - destruct (IHe _ _ _ bt H4) as [dd [edd tdd]].
       rewrite edd.
-      simpl; apply (@typed_unary_op_yields_typed_data _ _ _ _ _ _ _ τ₀ τ); assumption.
+      simpl; apply (@typed_unary_op_yields_typed_data _ _ _ _ _ _ τ₀ τ); assumption.
     - destruct (IHe2 _ _ _ bt H4) as [dd2 [edd2 tdd2]].
       rewrite edd2; simpl.
       dtype_inverter.

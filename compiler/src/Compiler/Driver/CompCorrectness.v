@@ -45,6 +45,7 @@ Require Import CAMPRuntime.
 (* Target languages *)
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
+Require Import ForeignEJSONtoJavaScriptAst.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
 
@@ -128,7 +129,8 @@ Section CompCorrectness.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
-  Context {ftjson:foreign_to_JSON}.
+  Context {ftejson:foreign_to_ejson}.
+  Context {ftjsast:foreign_ejson_to_ajavascript}.
 
   (** Note: All stops are assumed correct (i.e., not moving does not change semantics) *)
   (** Note: True/False is indicated for each edge in the compiler pipeline *)

@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +12,16 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
-Require Export JavaScriptAst.
-Require Export JavaScriptAstUtil.
+Require Import List.
+Require Import String.
+Require Import ForeignEJSON.
+Require Import JavaScriptAst.
+
+Section ForeignEJSONtoJavaScriptAst.
+
+  Class foreign_ejson_to_ajavascript {f:foreign_ejson} : Type
+    := mk_foreign_ejson_to_ajavascript {
+           foreign_ejson_to_ajavascript_expr (fe:foreign_ejson_type) : expr (* XXX This is a JsAst expression *)
+         }.
+
+End ForeignEJSONtoJavaScriptAst.

@@ -25,7 +25,6 @@ Require Import Utils.
 Require Import Types.
 Require Import CommonData.
 Require Import ForeignData.
-Require Import ForeignDataToJSON.
 Require Import ForeignOperators.
 Require Import ForeignDataTyping.
 Require Import Operators.
@@ -38,7 +37,6 @@ Section TUnaryOperators.
   (** Typing rules for unary operators *)
 
   Context {fdata:foreign_data}.
-  Context {ftojson:foreign_to_JSON}.
   Context {fuop:foreign_unary_op}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
