@@ -28,7 +28,6 @@ Require Import String.
 Require Import Utils.
 Require Import BrandRelation.
 Require Import ForeignData.
-Require Import ForeignDataToJSON.
 Require Import Data.
 Require Import DataNorm.
 Require Import Iterators.
@@ -41,7 +40,6 @@ Section OperatorsEq.
   Context {fdata:foreign_data}.
   Context {fuop:foreign_unary_op}.
   Context {fbop:foreign_binary_op}.
-  Context {ftojson:foreign_to_JSON}.
 
   (* Equivalence relation between operators.
      Two plans are equivalent iff they return the same value for every input.

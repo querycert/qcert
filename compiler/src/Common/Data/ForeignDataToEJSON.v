@@ -18,23 +18,23 @@ Require Import List.
 Require Import String.
 Require Import Utils.
 Require Import ForeignData.
-Require Import JSON.
+Require Import ForeignEJSON.
+Require Import EJSON.
 
 Local Open Scope string_scope.
 
-Section ForeignDatatoJSON.
+Section ForeignDatatoEJSON.
 
 (* TODO: properties required to ensure round-tripping *)
 
-Class foreign_to_JSON {fdata:foreign_data}: Type
-  := mk_foreign_to_JSON {
-         foreign_to_JSON_to_data
-           (j:json) : option foreign_data_type
-         ; foreign_to_JSON_from_data
-             (fd:foreign_data_type) : json
-         ; foreign_to_JSON_to_data_to_json (fd:foreign_data_type) :
-             foreign_to_JSON_to_data (foreign_to_JSON_from_data fd) = Some fd
+Class foreign_to_ejson {fejson:foreign_ejson} {fdata:foreign_data}: Type
+  := mk_foreign_to_ejson {
+         foreign_to_ejson_to_data
+           (j:foreign_ejson_type) : foreign_data_type
+         ; foreign_to_ejson_from_data
+             (fd:foreign_data_type) : foreign_ejson_type
+         ; foreign_to_ejson_to_data_to_ejson (fd:foreign_data_type) :
+             foreign_to_ejson_to_data (foreign_to_ejson_from_data fd) = fd
        }.
 
-End ForeignDatatoJSON.
-
+End ForeignDatatoEJSON.

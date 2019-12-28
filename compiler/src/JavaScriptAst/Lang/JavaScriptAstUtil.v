@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,28 +66,4 @@ Section JavaScriptAstUtil.
 
   Definition call_runtime := call_js_function.
 
-  Fixpoint json_to_js_ast (json: json) : expr :=
-    match json with
-    | jnull => expr_literal literal_null
-    | jnumber n => expr_literal (literal_number n)
-    | jbigint n => expr_literal (literal_number (float_of_int n)) (* XXX Could be replaced by JavaScript BigInt some fix to JsAst XXX *)
-    | jbool b => expr_literal (literal_bool b)
-    | jstring s => expr_literal (literal_string s)
-    | jarray a =>
-      let a :=
-          List.map
-            (fun v => Some (json_to_js_ast v))
-            a
-      in
-      expr_array a
-    | jobject o =>
-      expr_object
-        (List.map
-           (fun (prop: (string * JSON.json)) =>
-              let (x, v) := prop in
-              (propname_identifier x, propbody_val (json_to_js_ast v)))
-           o)
-    end.
-
 End JavaScriptAstUtil.
-

@@ -21,8 +21,10 @@ Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
-Require Import ForeignDataToJSON.
+Require Import ForeignEJSON.
+Require Import ForeignDataToEJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignReduceOps.
@@ -81,6 +83,8 @@ Inductive enhanced_data : Set
   | enhancedsqldate : SQL_DATE -> enhanced_data
   | enhancedsqldateinterval : SQL_DATE_INTERVAL -> enhanced_data
 .
+
+Definition enhanced_ejson : Set := enhanced_data.
 
 Inductive enhanced_type : Set
   :=
@@ -194,6 +198,94 @@ Next Obligation.
   - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
 Defined.
 
+Definition from_json (j:json) : option enhanced_ejson :=
+  None. (* XXX To fix *)
+
+Definition to_json (ej:enhanced_ejson) : json :=
+  jnull. (* XXX To fix *)
+
+Lemma to_json_from_json_rountrip (ej:enhanced_ejson) :
+  from_json (to_json ej) = Some ej.
+Proof.
+  admit. (* XXX FALSE NOW! *)
+Admitted.
+
+Program Instance enhanced_foreign_ejson : foreign_ejson
+  := mk_foreign_ejson enhanced_ejson _ _ _ _ _ _ _ _ _.
+Next Obligation.
+  red.
+  unfold equiv, complement.
+  destruct x; destruct y; simpl; try solve [right; inversion 1].
+  - case_eq (STRING_eq s s0).
+    + left; intros.
+      f_equal.
+      apply StringModelPart.STRING_eq_correct in H.
+      trivial.
+    + right; intros.
+      inversion H0.
+      apply StringModelPart.STRING_eq_correct in H2.
+      congruence.
+  - destruct (t == t0).
+    + left; congruence.
+    + right; congruence.
+  - case_eq (TIME_DURATION_eq t t0).
+    + left; intros.
+      f_equal.
+      apply DateTimeModelPart.TIME_DURATION_eq_correct in H.
+      trivial.
+    + right; intros.
+      inversion H0.
+      apply DateTimeModelPart.TIME_DURATION_eq_correct in H2.
+      congruence.
+  - destruct (@equiv_dec _ _ _ (@foreign_data_dec time_point_foreign_data) t t0).
+    + left; congruence.
+    + right; congruence.
+  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_foreign_data) s s0).
+    + left; congruence.
+    + right; congruence.
+  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_interval_foreign_data) s s0).
+    + left; congruence.
+    + right; congruence.
+Defined.
+Next Obligation.
+  (* normalized? *)
+  destruct a.
+  - exact True.
+  - exact (@foreign_data_normalized time_scale_foreign_data t).
+  - exact (@foreign_data_normalized time_duration_foreign_data t).
+  - exact (@foreign_data_normalized time_point_foreign_data t).
+  - exact (@foreign_data_normalized sql_date_foreign_data s).
+  - exact (@foreign_data_normalized sql_date_interval_foreign_data s).
+Defined.
+Next Obligation.
+  destruct a.
+  - simpl; trivial.
+  - exact (@foreign_data_normalize_normalizes time_scale_foreign_data t).
+  - exact (@foreign_data_normalize_normalizes time_duration_foreign_data t).
+  - exact (@foreign_data_normalize_normalizes time_point_foreign_data t).
+  - exact (@foreign_data_normalize_normalizes sql_date_foreign_data s).
+  - exact (@foreign_data_normalize_normalizes sql_date_interval_foreign_data s).
+Defined.
+Next Obligation.
+  constructor.
+  destruct 1.
+  - exact (STRING_tostring s).
+  - exact (toString t).
+  - exact (@toString _ (@foreign_data_tostring time_duration_foreign_data) t).
+  - exact (@toString _ (@foreign_data_tostring time_point_foreign_data) t).
+  - exact (@toString _ (@foreign_data_tostring sql_date_foreign_data) s).
+  - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
+Defined.
+Next Obligation.
+  exact (from_json j).
+Defined.
+Next Obligation.
+  exact (to_json fd).
+Defined.
+Next Obligation.
+  apply to_json_from_json_rountrip.
+Defined.
+
 Definition denhancedstring s := dforeign (enhancedstring s).
 Definition denhancedtimescale ts := dforeign (enhancedtimescale ts).
 Definition denhancedtimeduration td := dforeign (enhancedtimeduration td).
@@ -201,8 +293,6 @@ Definition denhancedtimepoint tp := dforeign (enhancedtimepoint tp).
 
 Definition denhancedsqldate td := dforeign (enhancedsqldate td).
 Definition denhancedsqldateinterval td := dforeign (enhancedsqldateinterval td).
-
-Require Import JSON.
 
 Axiom JENHANCED_string : STRING -> string.
 Extract Constant JENHANCED_string => "(fun s -> Util.string_of_enhanced_string s)".
@@ -420,36 +510,23 @@ Next Obligation.
       ; repeat constructor.
 Qed.
 
-Locate mk_foreign_to_JSON.
-Locate enhanced_foreign_data.
-Program Instance enhanced_foreign_to_JSON : foreign_to_JSON
-  := mk_foreign_to_JSON enhanced_foreign_data _ _ _.
+Program Instance enhanced_foreign_to_ejson : foreign_to_ejson
+  := mk_foreign_to_ejson enhanced_foreign_ejson enhanced_foreign_data _ _ _.
 Next Obligation.
-  (* Todo: For now, we assume that JSON supports floating point *)
-  exact None.
+  exact j. (* XXX Easy since enhanced_ejson is the same as enhanced_data *)
 Defined.
 Next Obligation.
-  destruct fd.
-  - exact (jstring (jenhancedstring s)).
-  - exact (jstring (toString t)).
-  - exact (jstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
-  - exact (jstring (@toString _ time_point_foreign_data.(@foreign_data_tostring ) t)).
-  - exact (jstring (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) s)).
-  - exact (jstring (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) s)).
+  exact fd. (* XXX Easy since enhanced_ejson is the same as enhanced_data *)
 Defined.
-Next Obligation.
-  Locate enhanced_foreign_to_JSON_obligation_1.
-  unfold  enhanced_foreign_to_JSON_obligation_1.
-  destruct fd; simpl.
-Admitted.
 
 Instance enhanced_foreign_runtime :
   foreign_runtime
   := mk_foreign_runtime
+       enhanced_foreign_ejson
        enhanced_foreign_data
        enhanced_foreign_unary_op
        enhanced_foreign_binary_op
-       enhanced_foreign_to_JSON.
+       enhanced_foreign_to_ejson.
 
 (* TODO: fix me *)
 Definition enhanced_to_java_data
@@ -561,6 +638,15 @@ Instance enhanced_foreign_to_ajavascript :
        enhanced_foreign_runtime
        enhanced_to_ajavascript_unary_op
        enhanced_to_ajavascript_binary_op.
+
+Definition enhanced_ejson_to_ajavascript_expr (j:enhanced_ejson) : JsAst.JsSyntax.expr :=
+  JsAst.JsSyntax.expr_literal (JsAst.JsSyntax.literal_null).
+
+Instance enhanced_foreign_ejson_to_ajavascript :
+  @foreign_ejson_to_ajavascript enhanced_foreign_ejson
+  := mk_foreign_ejson_to_ajavascript
+       enhanced_foreign_ejson
+       enhanced_ejson_to_ajavascript_expr.
 
 Definition enhanced_to_scala_unary_op (op: enhanced_unary_op) (d: string) : string :=
   match op with
@@ -1355,10 +1441,12 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_javascript.
   Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
     := enhanced_foreign_to_ajavascript.
+  Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
+    := enhanced_foreign_ejson_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
-  Definition compiler_foreign_to_JSON : foreign_to_JSON
-    := enhanced_foreign_to_JSON.
+  Definition compiler_foreign_to_ejson : foreign_to_ejson
+    := enhanced_foreign_to_ejson.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
     := enhanced_foreign_type_to_JSON.
   Definition compiler_foreign_reduce_op : foreign_reduce_op
@@ -2046,10 +2134,12 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_javascript.
   Definition compiler_model_foreign_to_ajavascript : foreign_to_ajavascript
     := enhanced_foreign_to_ajavascript.
+  Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
+    := enhanced_foreign_ejson_to_ajavascript.
   Definition compiler_model_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
-  Definition compiler_model_foreign_to_JSON : foreign_to_JSON
-    := enhanced_foreign_to_JSON.
+  Definition compiler_model_foreign_to_ejson : foreign_to_ejson
+    := enhanced_foreign_to_ejson.
   Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
     := enhanced_foreign_type_to_JSON.
   Definition compiler_model_foreign_reduce_op : foreign_reduce_op

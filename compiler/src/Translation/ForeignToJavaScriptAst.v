@@ -32,4 +32,3 @@ Class foreign_to_ajavascript {fruntime:foreign_runtime}: Type
              (e1 e2:expr) : expr
        }.
 End ForeigntoJavaScriptAst.
-

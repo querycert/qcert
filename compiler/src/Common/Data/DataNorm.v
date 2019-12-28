@@ -249,5 +249,26 @@ Section DataNorm.
     - constructor; trivial.
   Qed.
   
+  Lemma normalize_data_forall_ndbool d :  (forall b, d <> dbool b) -> (forall b, normalize_data d <> dbool b).
+  Proof.
+    destruct d; simpl; intuition discriminate.
+  Qed.
+
+  Lemma normalize_data_forall_ndnat d :  (forall n, d <> dnat n) -> (forall n, normalize_data d <> dnat n).
+  Proof.
+    destruct d; simpl; intuition discriminate.
+  Qed.
+
+  Lemma normalize_data_forall_ndstring d :  (forall s, d <> dstring s) -> (forall s, normalize_data d <> dstring s).
+  Proof.
+    destruct d; simpl; intuition discriminate.
+  Qed.
+
+  Lemma normalize_data_forall_ndcoll d :  (forall c, d <> dcoll c) -> (forall c, normalize_data d <> dcoll c).
+  Proof.
+    destruct d; simpl; intuition try discriminate.
+    apply (H _ (eq_refl _)).
+  Qed.
+
 End DataNorm.
 

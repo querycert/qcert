@@ -34,7 +34,7 @@ Section DatatoSparkDF.
   Context {m:brand_model}.
 
   Definition data_to_blob (d: data): string :=
-    jsonStringify quotel_double (data_to_json d).
+    jsonStringify quotel_double (ejson_to_json (data_to_ejson d)).
 
   Lemma dataToJS_correctly_escapes_quote_inside_string:
     data_to_blob (dstring "abc""cde") = """abc\""cde"""%string.

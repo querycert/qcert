@@ -99,6 +99,7 @@ Require Import ForeignToSpark.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
 
 (** Compiler Driver *)
@@ -128,7 +129,8 @@ Section CompDriver.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
-  Context {ftjson:foreign_to_JSON}.
+  Context {ftejson:foreign_to_ejson}.
+  Context {ftjsast:foreign_ejson_to_ajavascript}.
 
   Section translations.
     Import ListNotations.

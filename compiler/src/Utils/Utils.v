@@ -39,6 +39,5 @@ Require Export ToString.
 Require Export JSON.
 Require Export JSONUtil.
 Require Export JSONNorm.
-Require Export JSONOperators.
 Require Export OptimizerStep.
 Require Export OptimizerLogger.

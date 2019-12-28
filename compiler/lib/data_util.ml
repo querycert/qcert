@@ -169,12 +169,12 @@ let build_schema (j:QData.json) =
 
 let build_input h input =
   begin match input with
-  | Compiler.Jobject j -> List.map (fun (x,y) -> (x, QData.json_to_qdata h (QData.json_to_qjson y))) j
+  | Compiler.Jobject j -> List.map (fun (x,y) -> (x, QData.json_to_qdata h y)) j
   | _ -> raise (Qcert_Error "Illed formed working memory: input")
   end
 
 let build_output h output =
-  QData.json_to_qdata h (QData.json_to_qjson output)
+  QData.json_to_qdata h output
 
 let build_optim_config j =
   begin match QDriver.json_to_optim_config j with

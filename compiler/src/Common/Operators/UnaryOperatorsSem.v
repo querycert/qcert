@@ -25,8 +25,6 @@ Require Import Data.
 Require Import DataLift.
 Require Import DataNorm.
 Require Import DataSort.
-Require Import DatatoJSON.
-Require Import ForeignDataToJSON.
 Require Import ForeignOperators.
 Require Import Iterators.
 Require Import RecOperators.
@@ -36,7 +34,6 @@ Require Export UnaryOperators.
 
 Section UnaryOperatorsSem.
   Context {fdata:foreign_data}.
-  Context {ftojson:foreign_to_JSON}.
 
   Definition nat_arith_unary_op_eval (op:nat_arith_unary_op) (z:Z) :=
     match op with

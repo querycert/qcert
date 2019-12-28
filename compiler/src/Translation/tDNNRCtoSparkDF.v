@@ -38,12 +38,7 @@ Section tDNNRCtoSparkDF.
   Context {h:brand_relation_t}.
   Context {ftype:foreign_type}.
   Context {m:brand_model}.
-  Context {fdtyping:foreign_data_typing}.
-  Context {fboptyping:foreign_binary_op_typing}.
-  Context {fuoptyping:foreign_unary_op_typing}.
-  Context {fttjs: ForeignToJavaScript.foreign_to_javascript}.
   Context {fts: ForeignToScala.foreign_to_scala}.
-  Context {ftjson:foreign_to_JSON}.
 
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".
