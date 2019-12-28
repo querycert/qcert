@@ -610,6 +610,20 @@ Section ImpJsontoJavaScriptAst.
         admit. (* XXX Not implemented *)
       - Case "OpFloatOfNat"%string.
         admit. (* XXX Not implemented *)
+      - Case "OpFloatUnary"%string.
+        admit.
+      - Case "OpFloatTruncate"%string.
+        admit.
+      - Case "OpFloatSum"%string.
+        admit.
+      - Case "OpFloatMean"%string.
+        admit.
+      - Case "OpFloatBagMin"%string.
+        admit.
+      - Case "OpFloatBagMax"%string.
+        admit.
+      - Case "OpForeignUnary"%string.
+        admit.
     Admitted.
 
     Lemma imp_qcert_binary_op_to_imp_json_expr_correct
