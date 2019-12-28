@@ -337,11 +337,9 @@ Section ImpJsonEval.
     Context {fruntime:foreign_runtime}.
     Context {fdatatoejson:foreign_to_ejson}.
 
-    Context (h:list(string*string)).
-
     Definition imp_json_eval_top_alt (cenv: bindings) (q:imp_json) : option data :=
       let jenv := List.map (fun xy => (fst xy, data_to_ejson (snd xy))) cenv in
-      lift (ejson_to_data h) (imp_json_eval_top jenv q).
+      lift ejson_to_data (imp_json_eval_top jenv q).
   End Top.
 End ImpJsonEval.
 

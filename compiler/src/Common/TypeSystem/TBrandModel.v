@@ -61,65 +61,65 @@ Section TBrandModel.
 
     Section brand_model_types_dec.
 
-Lemma brand_model_domain_dec :
-  {brand_model_domain_t }
-  +  {~ brand_model_domain_t}.
-Proof.
-  apply (incl_list_dec string_dec).
-Defined.
+      Lemma brand_model_domain_dec :
+        {brand_model_domain_t }
+        +  {~ brand_model_domain_t}.
+      Proof.
+        apply (incl_list_dec string_dec).
+      Defined.
 
-Lemma brand_model_subtype_weak_dec :
-  {brand_model_subtype_weak_t}
-  +  {~ brand_model_subtype_weak_t}.
-Proof.
-  unfold brand_model_subtype_weak_t.
-  case_eq (forallb
-             (fun ab =>
-                match lookup string_dec brand_context_types (fst ab) with
-                  | Some ta => match lookup string_dec brand_context_types (snd ab) with
-                                 | Some tb => if subtype_dec ta tb then true else false
-                                 | None => false
-                               end
-                  | None => true
-                end)
-             brand_relation_brands).
-  - left. intros.
-    rewrite forallb_forall in H.
-    specialize (H _ H0).
-    match_case_in H; intros.
-    + rewrite H2 in *.
-      apply lookup_in in H2; simpl in *.
-      generalize (nodup_in_eq brand_context_nodup H1 H2); intros; subst.
-      match_case_in H; intros.
-      * rewrite H3 in *. match_destr_in H.
-        apply lookup_in in H3. simpl in *.
-        exists r0; intuition.
-      * rewrite H3 in H; discriminate.
-    +  rewrite H2 in H; simpl in *.
-        apply lookup_none_nin in H2. apply in_dom in H1. intuition.
-  - right.
-    rewrite forallb_not_existb in H; rewrite negb_false_iff in H.
-    rewrite existsb_exists in H.
-    destruct H as [[? ?] [inn ne]].
-    rewrite negb_true_iff in ne.
-    match_case_in ne; intros.
-    + rewrite H in ne; simpl in *.
-       intro fb. specialize (fb _ _ _ inn (lookup_in _ _ H)).
-       destruct fb as [? [inn2 sub]].
-       match_case_in ne; intros.
-       * rewrite H0 in ne.
-         apply lookup_in in H0.
-         generalize (nodup_in_eq brand_context_nodup H0 inn2); intros; subst.
-         match_destr_in ne.
-         intuition.
-       * apply lookup_none_nin in H0.  apply in_dom in inn2.
-         intuition.
-    + rewrite H in *. discriminate. 
-Defined.
+      Lemma brand_model_subtype_weak_dec :
+        {brand_model_subtype_weak_t}
+        +  {~ brand_model_subtype_weak_t}.
+      Proof.
+        unfold brand_model_subtype_weak_t.
+        case_eq (forallb
+                   (fun ab =>
+                      match lookup string_dec brand_context_types (fst ab) with
+                      | Some ta => match lookup string_dec brand_context_types (snd ab) with
+                                   | Some tb => if subtype_dec ta tb then true else false
+                                   | None => false
+                                   end
+                      | None => true
+                      end)
+                   brand_relation_brands).
+        - left. intros.
+          rewrite forallb_forall in H.
+          specialize (H _ H0).
+          match_case_in H; intros.
+          + rewrite H2 in *.
+            apply lookup_in in H2; simpl in *.
+            generalize (nodup_in_eq brand_context_nodup H1 H2); intros; subst.
+            match_case_in H; intros.
+            * rewrite H3 in *. match_destr_in H.
+              apply lookup_in in H3. simpl in *.
+              exists r0; intuition.
+            * rewrite H3 in H; discriminate.
+          +  rewrite H2 in H; simpl in *.
+             apply lookup_none_nin in H2. apply in_dom in H1. intuition.
+        - right.
+          rewrite forallb_not_existb in H; rewrite negb_false_iff in H.
+          rewrite existsb_exists in H.
+          destruct H as [[? ?] [inn ne]].
+          rewrite negb_true_iff in ne.
+          match_case_in ne; intros.
+          + rewrite H in ne; simpl in *.
+            intro fb. specialize (fb _ _ _ inn (lookup_in _ _ H)).
+            destruct fb as [? [inn2 sub]].
+            match_case_in ne; intros.
+            * rewrite H0 in ne.
+              apply lookup_in in H0.
+              generalize (nodup_in_eq brand_context_nodup H0 inn2); intros; subst.
+              match_destr_in ne.
+              intuition.
+            * apply lookup_none_nin in H0.  apply in_dom in inn2.
+              intuition.
+          + rewrite H in *. discriminate. 
+      Defined.
 
     End brand_model_types_dec.
     
-End brand_model_types.
+  End brand_model_types.
 
   Context {ftype:foreign_type}.
   

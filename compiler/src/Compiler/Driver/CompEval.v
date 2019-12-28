@@ -132,7 +132,7 @@ Section CompEval.
     (* Language: imp_json *)
     (* XXX Is this really what we want to wrap/unwrap in data? *)
     Definition eval_imp_json (q:imp_json) (cenv: bindings) : option data :=
-      ImpJsonEval.imp_json_eval_top_alt h cenv q.
+      ImpJsonEval.imp_json_eval_top_alt cenv q.
 
     (* Language: nnrcmr *)
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=
