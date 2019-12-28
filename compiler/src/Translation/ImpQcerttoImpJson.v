@@ -377,6 +377,20 @@ Section ImpJsontoJavaScriptAst.
       left; reflexivity.
     Qed.
 
+    Lemma oflatten_eobject_is_none l l' :
+      oflatten (map (fun x : ejson => normalize_data h (ejson_to_data_pre x)) (ejobject l :: l')) = None.
+    Proof.
+      Opaque ejson_to_data_pre.
+      simpl.
+      unfold oflatten.
+      simpl.
+      case_eq (normalize_data h (ejson_to_data_pre (ejobject l))); intros; try reflexivity.
+      generalize (ejson_to_data_object_not_coll h l l0); intros.
+      unfold ejson_to_data in H0.
+      contradiction.
+      Transparent ejson_to_data_pre.
+    Qed.
+
     Lemma oflatten_jflatten_roundtrip l :
       match oflatten (map (normalize_data h) (map ejson_to_data_pre l)) with
       | Some a' => Some (dcoll a')
@@ -390,8 +404,36 @@ Section ImpJsontoJavaScriptAst.
       | None => None
       end.
     Proof.
-      admit.
-    Admitted.
+      unfold ejson_to_data.
+      rewrite map_map.
+      induction l; [reflexivity|].
+      destruct a; try reflexivity.
+      - case_eq (oflatten (map (fun x : ejson => normalize_data h (ejson_to_data_pre x)) l));
+          intros; rewrite H in *.
+        + unfold jflatten in *.
+          simpl.
+          destruct (lift_flat_map (fun x : ejson => match x with
+                                                | ejarray y => Some y
+                                                | _ => None
+                                                    end) l); simpl in *.
+          inversion IHl; clear IHl; subst.
+          rewrite (oflatten_cons _ _ (map (normalize_data h) (map ejson_to_data_pre l2))); auto.
+          simpl.
+          rewrite map_app.
+          rewrite map_app.
+          reflexivity.
+          congruence.
+        + unfold jflatten in *.
+          simpl.
+          destruct (lift_flat_map (fun x : ejson => match x with
+                                                | ejarray y => Some y
+                                                | _ => None
+                                                    end) l); simpl in *.
+          congruence.
+          rewrite oflatten_cons_none; auto.
+      - rewrite oflatten_eobject_is_none.
+        reflexivity.
+    Qed.
 
     Lemma of_string_list_over_strings_idempotent sl :
       of_string_list (map (fun s : string => ejstring s) sl) = Some sl.
