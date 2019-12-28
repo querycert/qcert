@@ -62,18 +62,18 @@ MODULES = \
 	Common/TypeSystem/RTypeLattice \
 	Common/TypeSystem/TBrandModelProp \
 	Common/TypeSystem/Types \
-	Common/EJSON/ForeignEJSON \
-	Common/EJSON/EJSON \
-	Common/EJSON/EJSONNorm \
-	Common/EJSON/EJSONOperators \
-	Common/EJSON/CommonEJSON \
+	Common/EJson/ForeignEJson \
+	Common/EJson/EJson \
+	Common/EJson/EJsonNorm \
+	Common/EJson/EJsonOperators \
+	Common/EJson/CommonEJson \
 	Common/DataModel/ForeignData \
 	Common/DataModel/Data \
 	Common/Results/QResult \
 	Common/Data/DataLift \
 	Common/Data/DataNorm \
-	Common/Data/ForeignDataToEJSON \
-	Common/Data/DatatoEJSON \
+	Common/Data/ForeignDataToEJson \
+	Common/Data/DatatoEJson \
 	Common/Data/DataSort \
 	Common/Data/DData \
 	Common/Data/DDataNorm \
@@ -236,9 +236,9 @@ MODULES = \
 	Imp/Lang/ImpQcert \
 	Imp/Lang/ImpQcertSize \
 	Imp/Lang/ImpQcertEval \
-	Imp/Lang/ImpJson \
-	Imp/Lang/ImpJsonSize \
-	Imp/Lang/ImpJsonEval \
+	Imp/Lang/ImpEJson \
+	Imp/Lang/ImpEJsonSize \
+	Imp/Lang/ImpEJsonEval \
 	Imp/ImpRuntime \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
@@ -341,7 +341,7 @@ MODULES = \
 	Translation/SQLtoNRAEnv \
 	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \
-	Translation/ForeignEJSONtoJavaScriptAst \
+	Translation/ForeignToJavaScriptAst \
 	Translation/ForeignToJava \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \
@@ -350,8 +350,8 @@ MODULES = \
 	Translation/NNRStoNNRSimp \
 	Translation/TNNRStoNNRSimp \
 	Translation/NNRSimptoImpQcert \
-	Translation/ImpQcerttoImpJson \
-	Translation/ImpJsontoJavaScriptAst \
+	Translation/ImpQcerttoImpEJson \
+	Translation/ImpEJsontoJavaScriptAst \
 	Translation/JavaScriptAsttoJavaScript \
 	Translation/NNRCtoJava \
 	Translation/DatatoSparkDF \

@@ -14,9 +14,9 @@
  * limitations under the License.
  *)
 
-Require Export ForeignEJSON.
+Require Export ForeignEJson.
 Require Export ForeignData.
-Require Export ForeignDataToEJSON.
+Require Export ForeignDataToEJson.
 Require Export ForeignOperators.
 
 Class foreign_runtime : Type

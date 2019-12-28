@@ -70,7 +70,7 @@ Section CompLang.
     | L_nnrs : language
     | L_nnrs_imp : language
     | L_imp_qcert : language
-    | L_imp_json : language
+    | L_imp_ejson : language
     | L_nnrcmr : language
     | L_dnnrc : language
     | L_dnnrc_typed : language
@@ -116,7 +116,7 @@ Section CompLang.
       | "nnrs"%string => L_nnrs
       | "nnrs_imp"%string => L_nnrs_imp
       | "imp_qcert"%string => L_imp_qcert
-      | "imp_json"%string => L_imp_json
+      | "imp_ejson"%string => L_imp_ejson
       | "nnrcmr"%string => L_nnrcmr
       | "dnnrc"%string => L_dnnrc
       | "dnnrc_typed"%string => L_dnnrc_typed
@@ -147,7 +147,7 @@ Section CompLang.
       | L_nnrs => "nnrs"%string
       | L_nnrs_imp => "nnrs_imp"%string
       | L_imp_qcert => "imp_qcert"%string
-      | L_imp_json => "imp_json"%string
+      | L_imp_ejson => "imp_ejson"%string
       | L_nnrcmr => "nnrcmr"%string
       | L_dnnrc => "dnnrc"%string
       | L_dnnrc_typed => "dnnrc_typed"%string
@@ -208,7 +208,7 @@ Section CompLang.
         :: (L_nnrs,CoreEnd,"NNRS", "Named Nested Relational Calculus imperative")
         :: (L_nnrs_imp,BackEnd,"NNRSimp", "Named Nested Relational Calculus imperative")
         :: (L_imp_qcert,BackEnd,"ImpQcert", "Imperative langauge with Q*cert data model")
-        :: (L_imp_json,BackEnd,"ImpJson", "Imperative langauge with json data model")
+        :: (L_imp_ejson,BackEnd,"ImpJson", "Imperative langauge with json data model")
         :: (L_nnrcmr,DistrEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
         :: (L_dnnrc,DistrEnd,"DNNRC", "Distributed Named Nested Relational Calculus")
         :: (L_dnnrc_typed,DistrEnd,"tDNNRC", "Typed Distributed Named Nested Relational Calculus")
@@ -304,9 +304,7 @@ Section CompLang.
     Definition imp_qcert_expr := imp_qcert_expr.
     Definition imp_qcert_stmt := imp_qcert_stmt.
     Definition imp_qcert := imp_qcert.
-    Definition imp_json_expr := imp_json_expr.
-    Definition imp_json_stmt := imp_json_stmt.
-    Definition imp_json := imp_json.
+    Definition imp_ejson := imp_ejson.
     Definition nnrcmr := nnrcmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
@@ -333,7 +331,7 @@ Section CompLang.
     | Q_nnrs : nnrs -> query
     | Q_nnrs_imp : nnrs_imp -> query
     | Q_imp_qcert : imp_qcert -> query
-    | Q_imp_json : imp_json -> query
+    | Q_imp_ejson : imp_ejson -> query
     | Q_nnrcmr : nnrcmr -> query
     | Q_dnnrc : dnnrc -> query
     | Q_dnnrc_typed : dnnrc_typed -> query
@@ -362,7 +360,7 @@ Section CompLang.
       | Case_aux c "Q_nnrs"%string
       | Case_aux c "Q_nnrs_imp"%string
       | Case_aux c "Q_imp_qcert"%string
-      | Case_aux c "Q_imp_json"%string
+      | Case_aux c "Q_imp_ejson"%string
       | Case_aux c "Q_nnrcmr"%string
       | Case_aux c "Q_dnnrc"%string
       | Case_aux c "Q_dnnrc_typed"%string
@@ -391,7 +389,7 @@ Section CompLang.
       | Q_nnrs _ => L_nnrs
       | Q_nnrs_imp _ => L_nnrs_imp
       | Q_imp_qcert _ => L_imp_qcert
-      | Q_imp_json _ => L_imp_json
+      | Q_imp_ejson _ => L_imp_ejson
       | Q_nnrcmr _ => L_nnrcmr
       | Q_dnnrc _ => L_dnnrc
       | Q_dnnrc_typed _ => L_dnnrc_typed
@@ -426,7 +424,7 @@ Section CompLang.
       | L_nnrs => nnrs
       | L_nnrs_imp => nnrs_imp
       | L_imp_qcert => imp_qcert
-      | L_imp_json => imp_json
+      | L_imp_ejson => imp_ejson
       | L_nnrcmr => nnrcmr
       | L_dnnrc => dnnrc
       | L_dnnrc_typed => dnnrc_typed
@@ -459,7 +457,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_nnrs"%string
   | Case_aux c "L_nnrs_imp"%string
   | Case_aux c "L_imp_qcert"%string
-  | Case_aux c "L_imp_json"%string
+  | Case_aux c "L_imp_ejson"%string
   | Case_aux c "L_nnrcmr"%string
   | Case_aux c "L_dnnrc"%string
   | Case_aux c "L_dnnrc_typed"%string

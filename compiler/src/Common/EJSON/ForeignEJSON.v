@@ -18,7 +18,7 @@ Require Import EquivDec.
 Require Import CoqLibAdd.
 Require Import JSON.
 
-Section ForeignEJSON.
+Section ForeignEJson.
   
   Class foreign_ejson : Type
     := mk_foreign_ejson {
@@ -38,4 +38,4 @@ Section ForeignEJSON.
            ; foreign_ejson_to_json_roundtrip (fd:foreign_ejson_type) : foreign_ejson_from_json (foreign_ejson_to_json fd) = Some fd
       }.
 
-End ForeignEJSON.
+End ForeignEJson.

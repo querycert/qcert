@@ -497,87 +497,87 @@ let pretty_imp_qcert = pretty_imp pretty_imp_qcert_data pretty_imp_qcert_op pret
 
 (** Pretty ImpQcert *)
 
-let pretty_imp_json_data ff d =
+let pretty_imp_ejson_data ff d =
   fprintf ff "%s"
     (string_of_char_list (Compiler.EnhancedCompiler.QData.ejson_to_string d))
 
-let pretty_imp_json_op p sym pretty_imp_expr ff (op, args) =
+let pretty_imp_ejson_op p sym pretty_imp_expr ff (op, args) =
   match op, args with
-  | Compiler.EJSONOpNot, [ e ] ->
+  | Compiler.EJsonOpNot, [ e ] ->
     fprintf ff "@[<hv 2>!@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
-  | EJSONOpNeg, [ e ] ->
+  | EJsonOpNeg, [ e ] ->
     fprintf ff "@[<hv 2>-@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
-  | EJSONOpAnd, [ e1; e2 ] ->
+  | EJsonOpAnd, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ &&@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpOr, [ e1; e2 ] ->
+  | EJsonOpOr, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ ||@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpLt, [ e1; e2 ] ->
+  | EJsonOpLt, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ <@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpLe, [ e1; e2 ] ->
+  | EJsonOpLe, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ <=@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpGt, [ e1; e2 ] ->
+  | EJsonOpGt, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ >@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpGe, [ e1; e2 ] ->
+  | EJsonOpGe, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ >=@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpAddString, [ e1; e2 ] ->
+  | EJsonOpAddString, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ +@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpAddNumber, [ e1; e2 ] ->
+  | EJsonOpAddNumber, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ +@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpSub, [ e1; e2 ] ->
+  | EJsonOpSub, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ -@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpMult, [ e1; e2 ] ->
+  | EJsonOpMult, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ *@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpDiv, [ e1; e2 ] ->
+  | EJsonOpDiv, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ /@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpStrictEqual, [ e1; e2 ] ->
+  | EJsonOpStrictEqual, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ ===@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpStrictDisequal, [ e1; e2 ] ->
+  | EJsonOpStrictDisequal, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@ !==@ @[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpArray, args ->
+  | EJsonOpArray, args ->
     fprintf ff "@[<hv 2>[@[<hv 2>%a@]@]@]"
       (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (pretty_imp_expr 0 sym))
       args
-  | EJSONOpArrayLength, [ e ] ->
+  | EJsonOpArrayLength, [ e ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a).length@]@]" (pretty_imp_expr 0 sym) e
-  | EJSONOpArrayPush, [ e1; e2 ] ->
+  | EJsonOpArrayPush, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@].push@[<hv 2>(%a)@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpArrayAccess, [ e1; e2 ] ->
+  | EJsonOpArrayAccess, [ e1; e2 ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@[<hv 2>[%a]@]@]"
       (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJSONOpToString, [ e ] ->
+  | EJsonOpToString, [ e ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a).toString()@]@]" (pretty_imp_expr 0 sym) e
-  | EJSONOpObject fields, args ->
+  | EJsonOpObject fields, args ->
     let field_arg_list = List.map2 (fun x y -> (string_of_char_list x, y)) fields args in
     fprintf ff "@[<hv 2>[@[<hv 2>%a@]@]@]"
       (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>")
          (fun ff (f,e) -> fprintf ff "@[<hv 2>'%s': %a@]" f (pretty_imp_expr 0 sym) e))
       field_arg_list
-  | EJSONOpAccess field, [ e ] ->
+  | EJsonOpAccess field, [ e ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a)['%s']@]@]" (pretty_imp_expr 0 sym) e (string_of_char_list field)
-  | EJSONOpHasOwnProperty field, [ e ] ->
+  | EJsonOpHasOwnProperty field, [ e ] ->
     fprintf ff "@[<hv 2>@[<hv 2>(%a).hasOwnProperty('%s')@]@]" (pretty_imp_expr 0 sym) e (string_of_char_list field)
   | _ -> assert false
 
-let pretty_imp_json_runtime p sym pretty_imp_expr ff (op, args) =
+let pretty_imp_ejson_runtime p sym pretty_imp_expr ff (op, args) =
   fprintf ff "@[<hv 2>%s(@[<hv 2>%a@]@)@]"
-    (string_of_char_list (Compiler.string_of_json_runtime_op op))
+    (string_of_char_list (Compiler.string_of_ejson_runtime_op op))
     (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (pretty_imp_expr 0 sym)) args
 
-let pretty_imp_json = pretty_imp pretty_imp_json_data pretty_imp_json_op pretty_imp_json_runtime
+let pretty_imp_ejson = pretty_imp pretty_imp_ejson_data pretty_imp_ejson_op pretty_imp_ejson_runtime
 
 
 (** Pretty NNRCMR *)

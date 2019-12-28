@@ -24,10 +24,10 @@ Require Import Assoc.
 Require Import Bindings.
 Require Import SortingAdd.
 Require Import CoqLibAdd.
-Require Import ForeignEJSON.
-Require Import EJSON.
+Require Import ForeignEJson.
+Require Import EJson.
 
-Section EJSONNorm.
+Section EJsonNorm.
   Context {fejson:foreign_ejson}.
 
   Fixpoint normalize_ejson (d:ejson) : ejson :=
@@ -228,5 +228,5 @@ Section EJSONNorm.
     - constructor; trivial.
   Qed.
   
-End EJSONNorm.
+End EJsonNorm.
 

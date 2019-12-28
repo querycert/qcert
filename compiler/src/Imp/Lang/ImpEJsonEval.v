@@ -35,54 +35,52 @@ Require Import Utils.
 Require Import CommonRuntime.
 Require Import Imp.
 Require Import ImpEval.
-Require Import ImpJson.
+Require Import ImpEJson.
 
-Section ImpJsonEval.
+Section ImpEJsonEval.
   Context {ftoejson:foreign_ejson}.
 
   Local Open Scope string.
 
   Section EvalInstantiation.
     (* Instantiate Imp for Qcert data *)
-    Definition imp_json_data_normalize (d:imp_json_data) : imp_json_data :=
-      d.
-      (* normalize_json d. XXX Unclear *)
+    Definition imp_ejson_data_normalize (d:imp_ejson_data) : imp_ejson_data := d.
 
-    Definition imp_json_data_to_bool (d:imp_json_data) : option bool :=
+    Definition imp_ejson_data_to_bool (d:imp_ejson_data) : option bool :=
       match d with
       | ejbool b => Some b
       | _ => None
       end.
 
-    Definition imp_json_data_to_list (d:imp_json_data) : option (list imp_json_data) :=
+    Definition imp_ejson_data_to_list (d:imp_ejson_data) : option (list imp_ejson_data) :=
       match d with
       | ejarray c => Some (c)
       | _ => None
       end.
 
-    Definition of_string_list (sl:list imp_json_data) : option (list string)
+    Definition of_string_list (sl:list imp_ejson_data) : option (list string)
       := lift_map (fun x => match x with ejstring s => Some s | _ => None end) sl.
 
-    Definition imp_json_data_to_Z (d:imp_json_data) : option Z :=
+    Definition imp_ejson_data_to_Z (d:imp_ejson_data) : option Z :=
       match d with
       | ejbigint n => Some n
       | _ => None
       end.
 
-    Definition imp_json_Z_to_data (n: Z) : imp_json_data :=
+    Definition imp_ejson_Z_to_data (n: Z) : imp_ejson_data :=
       Z_to_json n.
 
-    Definition jflatten (d:list imp_json_data) : option (list imp_json_data) :=
+    Definition jflatten (d:list imp_ejson_data) : option (list imp_ejson_data) :=
       lift_flat_map (fun x =>
                    match x with
                    | ejarray y => Some y
                    | _ => None end) d.
     
-    Definition imp_json_runtime_eval (rt:imp_json_runtime_op) (dl:list imp_json_data) : option imp_json_data :=
+    Definition imp_ejson_runtime_eval (rt:imp_ejson_runtime_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
       match rt with
-      | JSONRuntimeEqual =>
+      | EJsonRuntimeEqual =>
         apply_binary (fun d1 d2 => if ejson_eq_dec d1 d2 then Some (ejbool true) else Some (ejbool false)) dl
-      | JSONRuntimeCompare =>
+      | EJsonRuntimeCompare =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
@@ -97,14 +95,14 @@ Section ImpJsonEval.
                       Some (ejnumber float_zero)
              | _, _ => None
              end) dl
-      | JSONRuntimeRecConcat =>
+      | EJsonRuntimeRecConcat =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
              | (ejobject r1), (ejobject r2) => Some (ejobject (rec_sort (r1++r2)))
              | _, _ => None
              end) dl
-      | JSONRuntimeRecMerge =>
+      | EJsonRuntimeRecMerge =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
@@ -115,7 +113,7 @@ Section ImpJsonEval.
                end
              | _, _ => None
              end) dl
-      | JSONRuntimeDistinct =>
+      | EJsonRuntimeDistinct =>
         apply_unary
           (fun d =>
              match d with
@@ -124,8 +122,8 @@ Section ImpJsonEval.
              | _ => None
              end)
           dl
-      | JSONRuntimeGroupBy => None (* XXX TODO *)
-      | JSONRuntimeDeref => (* XXX the one in qcert-runtime is a lot more complex *)
+      | EJsonRuntimeGroupBy => None (* XXX TODO *)
+      | EJsonRuntimeDeref => (* XXX the one in qcert-runtime is a lot more complex *)
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
@@ -133,7 +131,7 @@ Section ImpJsonEval.
                edot r s
              | _, _ => None
              end) dl
-      | JSONRuntimeEither =>
+      | EJsonRuntimeEither =>
         apply_unary
           (fun d =>
              match d with
@@ -141,21 +139,21 @@ Section ImpJsonEval.
              | ejobject (("$right",_)::nil) => Some (ejbool false)
              | _ => None
              end) dl
-      | JSONRuntimeToLeft =>
+      | EJsonRuntimeToLeft =>
         apply_unary
           (fun d =>
              match d with
              | ejobject (("$left", d)::nil) => Some d
              | _ => None
              end) dl
-      | JSONRuntimeToRight =>
+      | EJsonRuntimeToRight =>
         apply_unary
           (fun d =>
              match d with
              | ejobject (("$right", d)::nil) => Some d
              | _ => None
              end) dl
-      | JSONRuntimeRemove =>
+      | EJsonRuntimeRemove =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
@@ -163,7 +161,7 @@ Section ImpJsonEval.
                Some (ejobject (rremove r s))
              | _, _ => None
              end) dl
-      | JSONRuntimeProject =>
+      | EJsonRuntimeProject =>
         apply_binary
           (fun d1 d2 =>
              match d1, d2 with
@@ -171,7 +169,7 @@ Section ImpJsonEval.
                lift ejobject (lift (rproject r) (of_string_list sl))
              | _, _ => None
              end) dl
-      | JSONRuntimeSingleton =>
+      | EJsonRuntimeSingleton =>
         apply_unary
           (fun d =>
              match d with
@@ -179,7 +177,7 @@ Section ImpJsonEval.
              | ejarray _ => Some (ejobject (("$right",ejnull)::nil))
              | _ => None
              end) dl
-      | JSONRuntimeFlatten =>
+      | EJsonRuntimeFlatten =>
         apply_unary
           (fun d =>
              match d with
@@ -187,23 +185,23 @@ Section ImpJsonEval.
                lift ejarray (jflatten l)
              | _ => None
              end) dl
-      | JSONRuntimeSort => None
-      | JSONRuntimeCount =>
+      | EJsonRuntimeSort => None
+      | EJsonRuntimeCount =>
         apply_unary
           (fun d =>
              match d with
              | ejarray l => Some (ejbigint (Z_of_nat (bcount l)))
              | _ => None
              end) dl
-      | JSONRuntimeLength =>
+      | EJsonRuntimeLength =>
         apply_unary
           (fun d =>
              match d with
              | ejstring s => Some (ejbigint (Z_of_nat (String.length s)))
              | _ => None
              end) dl
-      | JSONRuntimeSubstring => None
-      | JSONRuntimeBrand =>
+      | EJsonRuntimeSubstring => None
+      | EJsonRuntimeBrand =>
         apply_binary
           (fun d1 d2 =>
              match d1 with
@@ -217,46 +215,52 @@ Section ImpJsonEval.
              | _ => None
              end
           ) dl
-      | JSONRuntimeUnbrand =>
+      | EJsonRuntimeUnbrand =>
         apply_unary
           (fun d =>
              match d with
+             (* Need to treat both order for consistency with data->ejson *)
              | ejobject ((s1,ejarray j1)::(s2,j2)::nil) =>
                if (string_dec s1 "$type") then
                  if (string_dec s2 "$data") then Some j2
                  else None
                else None
+             | ejobject ((s1,j1)::(s2,ejarray j2)::nil) =>
+               if (string_dec s1 "$data") then
+                 if (string_dec s2 "$type") then Some j1
+                 else None
+               else None
              | _ => None
              end) dl
-      | JSONRuntimeCast => None
-      | JSONRuntimeNatPlus => None
-      | JSONRuntimeNatMinus => None
-      | JSONRuntimeNatMult => None
-      | JSONRuntimeNatDiv => None
-      | JSONRuntimeNatRem => None
-      | JSONRuntimeNatAbs => None
-      | JSONRuntimeNatLog2 => None
-      | JSONRuntimeNatSqrt => None
-      | JSONRuntimeNatSum => None
-      | JSONRuntimeNatMin => None
-      | JSONRuntimeNatMax => None
-      | JSONRuntimeNatArithMean => None
-      | JSONRuntimeFloatOfNat => None
-      | JSONRuntimeSum => None
-      | JSONRuntimeArithMean => None
-      | JSONRuntimeBunion => None
-      | JSONRuntimeBminus => None
-      | JSONRuntimeBmin => None
-      | JSONRuntimeBmax => None
-      | JSONRuntimeBnth => None
-      | JSONRuntimeContains => None
-      | JSONRuntimeToString => None
-      | JSONRuntimeToText => None
-      | JSONRuntimeStringJoin => None
+      | EJsonRuntimeCast => None
+      | EJsonRuntimeNatPlus => None
+      | EJsonRuntimeNatMinus => None
+      | EJsonRuntimeNatMult => None
+      | EJsonRuntimeNatDiv => None
+      | EJsonRuntimeNatRem => None
+      | EJsonRuntimeNatAbs => None
+      | EJsonRuntimeNatLog2 => None
+      | EJsonRuntimeNatSqrt => None
+      | EJsonRuntimeNatSum => None
+      | EJsonRuntimeNatMin => None
+      | EJsonRuntimeNatMax => None
+      | EJsonRuntimeNatArithMean => None
+      | EJsonRuntimeFloatOfNat => None
+      | EJsonRuntimeSum => None
+      | EJsonRuntimeArithMean => None
+      | EJsonRuntimeBunion => None
+      | EJsonRuntimeBminus => None
+      | EJsonRuntimeBmin => None
+      | EJsonRuntimeBmax => None
+      | EJsonRuntimeBnth => None
+      | EJsonRuntimeContains => None
+      | EJsonRuntimeToString => None
+      | EJsonRuntimeToText => None
+      | EJsonRuntimeStringJoin => None
       end.
 
-    Definition imp_json_op_eval (op:imp_json_op) (dl:list imp_json_data) : option imp_json_data :=
-      ejson_op_eval op dl. (* XXX In Utils.JSONOperators *)
+    Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
+      ejson_op_eval op dl. (* XXX In Common.EJson.EJsonOperators *)
 
   End EvalInstantiation.
 
@@ -267,69 +271,69 @@ Section ImpJsonEval.
           returns an optional value. When [None] is returned, it
           denotes an error. An error is always propagated. *)
 
-    Definition jbindings := list (string * imp_json_data).
-    Definition pd_jbindings := list (string * option imp_json_data).
+    Definition jbindings := list (string * imp_ejson_data).
+    Definition pd_jbindings := list (string * option imp_ejson_data).
 
-    Definition imp_json_expr_eval
-             (σ:pd_jbindings) (e:imp_json_expr)
-    : option imp_json_data
+    Definition imp_ejson_expr_eval
+             (σ:pd_jbindings) (e:imp_ejson_expr)
+    : option imp_ejson_data
       := @imp_expr_eval
-           imp_json_data
-           imp_json_op
-           imp_json_runtime_op
-           imp_json_data_normalize
-           imp_json_runtime_eval
-           imp_json_op_eval
+           imp_ejson_data
+           imp_ejson_op
+           imp_ejson_runtime_op
+           imp_ejson_data_normalize
+           imp_ejson_runtime_eval
+           imp_ejson_op_eval
            σ e.
 
-    Definition imp_json_stmt_eval
-             (s:imp_json_stmt) (σ:pd_jbindings) : option (pd_jbindings)
+    Definition imp_ejson_stmt_eval
+             (s:imp_ejson_stmt) (σ:pd_jbindings) : option (pd_jbindings)
       := @imp_stmt_eval
-           imp_json_data
-           imp_json_op
-           imp_json_runtime_op
-           imp_json_data_normalize
-           imp_json_data_to_bool
-           imp_json_data_to_Z
-           imp_json_data_to_list
-           imp_json_Z_to_data
-           imp_json_runtime_eval
-           imp_json_op_eval
+           imp_ejson_data
+           imp_ejson_op
+           imp_ejson_runtime_op
+           imp_ejson_data_normalize
+           imp_ejson_data_to_bool
+           imp_ejson_data_to_Z
+           imp_ejson_data_to_list
+           imp_ejson_Z_to_data
+           imp_ejson_runtime_eval
+           imp_ejson_op_eval
            s σ.
 
-    Definition imp_json_function_eval
-             (f:imp_json_function) args : option imp_json_data
+    Definition imp_ejson_function_eval
+             (f:imp_ejson_function) args : option imp_ejson_data
       := @imp_function_eval
-           imp_json_data
-           imp_json_op
-           imp_json_runtime_op
-           imp_json_data_normalize
-           imp_json_data_to_bool
-           imp_json_data_to_Z
-           imp_json_data_to_list
-           imp_json_Z_to_data
-           imp_json_runtime_eval
-           imp_json_op_eval
+           imp_ejson_data
+           imp_ejson_op
+           imp_ejson_runtime_op
+           imp_ejson_data_normalize
+           imp_ejson_data_to_bool
+           imp_ejson_data_to_Z
+           imp_ejson_data_to_list
+           imp_ejson_Z_to_data
+           imp_ejson_runtime_eval
+           imp_ejson_op_eval
            f args.
 
     Import ListNotations.
-    Definition imp_json_eval (q:imp_json) (d:imp_json_data) : option (option imp_json_data)
+    Definition imp_ejson_eval (q:imp_ejson) (d:imp_ejson_data) : option (option imp_ejson_data)
       := @imp_eval
-           imp_json_data
-           imp_json_op
-           imp_json_runtime_op
-           imp_json_data_normalize
-           imp_json_data_to_bool
-           imp_json_data_to_Z
-           imp_json_data_to_list
-           imp_json_Z_to_data
-           imp_json_runtime_eval
-           imp_json_op_eval
+           imp_ejson_data
+           imp_ejson_op
+           imp_ejson_runtime_op
+           imp_ejson_data_normalize
+           imp_ejson_data_to_bool
+           imp_ejson_data_to_Z
+           imp_ejson_data_to_list
+           imp_ejson_Z_to_data
+           imp_ejson_runtime_eval
+           imp_ejson_op_eval
            q d.
 
-    Definition imp_json_eval_top σc (q:imp_json) : option imp_json_data :=
+    Definition imp_ejson_eval_top_on_ejson σc (q:imp_ejson) : option imp_ejson_data :=
       let σc' := List.map (fun xy => (json_key_encode (fst xy), snd xy)) (rec_sort σc) in
-      olift id (imp_json_eval q (ejobject σc')).
+      olift id (imp_ejson_eval q (ejobject σc')).
 
   End Evaluation.
 
@@ -337,10 +341,10 @@ Section ImpJsonEval.
     Context {fruntime:foreign_runtime}.
     Context {fdatatoejson:foreign_to_ejson}.
 
-    Definition imp_json_eval_top_alt (cenv: bindings) (q:imp_json) : option data :=
+    Definition imp_ejson_eval_top (cenv: bindings) (q:imp_ejson) : option data :=
       let jenv := List.map (fun xy => (fst xy, data_to_ejson (snd xy))) cenv in
-      lift ejson_to_data (imp_json_eval_top jenv q).
+      lift ejson_to_data (imp_ejson_eval_top_on_ejson jenv q).
   End Top.
-End ImpJsonEval.
+End ImpEJsonEval.
 
 (* Arguments imp_stmt_eval_domain_stack {fruntime h s σc σ₁ σ₂}. *)

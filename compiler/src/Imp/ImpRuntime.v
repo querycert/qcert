@@ -17,16 +17,9 @@
 Require Export CommonRuntime.
 Require Export Imp.
 Require Export ImpQcert.
-Require Export ImpJson.
+Require Export ImpEJson.
 Require Export ImpSize.
 Require Export ImpQcertSize.
-Require Export ImpJsonSize.
-(* Require Export ImpVars. *)
-(* Require Export ImpUsage. *)
+Require Export ImpEJsonSize.
 Require Export ImpQcertEval.
-Require Export ImpJsonEval.
-(* Require Export ImpSem. *)
-(* Require Export ImpSemEval. *)
-(* Require Export ImpNorm. *)
-(* Require Export ImpEq. *)
-(* Require Export ImpRename. *)
+Require Export ImpEJsonEval.

@@ -72,7 +72,7 @@ let parse_nnrc_sexp f : QLang.nnrc = Ast_to_sexp.sexp_to_nnrc (parse_sexp f)
 let parse_nnrs_sexp f : QLang.nnrs = Ast_to_sexp.sexp_to_nnrs (parse_sexp f)
 let parse_nnrs_imp_sexp f : QLang.nnrs_imp = Ast_to_sexp.sexp_to_nnrs_imp (parse_sexp f)
 let parse_imp_qcert_sexp f : QLang.imp_qcert = Ast_to_sexp.sexp_to_imp_qcert (parse_sexp f)
-let parse_imp_json_sexp f : QLang.imp_json = Ast_to_sexp.sexp_to_imp_json (parse_sexp f)
+let parse_imp_ejson_sexp f : QLang.imp_ejson = Ast_to_sexp.sexp_to_imp_ejson (parse_sexp f)
 let parse_nnrcmr_sexp f : QLang.nnrcmr = Ast_to_sexp.sexp_to_nnrcmr (parse_sexp f)
 
 (*******************
@@ -98,7 +98,7 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_nnrs -> ("NNRS", Compiler.Q_nnrs (parse_nnrs_sexp f))
   | Compiler.L_nnrs_imp -> ("NNRSimp", Compiler.Q_nnrs_imp (parse_nnrs_imp_sexp f))
   | Compiler.L_imp_qcert -> ("ImpQcert", Compiler.Q_imp_qcert (parse_imp_qcert_sexp f))
-  | Compiler.L_imp_json -> ("ImpJson", Compiler.Q_imp_json (parse_imp_json_sexp f))
+  | Compiler.L_imp_ejson -> ("ImpEJson", Compiler.Q_imp_ejson (parse_imp_ejson_sexp f))
   | Compiler.L_nnrcmr -> ("NNRCMR", Compiler.Q_nnrcmr (parse_nnrcmr_sexp f))
   | Compiler.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")
   | Compiler.L_dnnrc_typed -> raise (Qcert_Error "No parser for typed DNNRC available")

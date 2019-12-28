@@ -41,7 +41,7 @@ val pretty_nnrs : Compiler.nnrs pretty_fun
 val pretty_nnrs_core : Compiler.nnrs_core pretty_fun
 val pretty_nnrs_imp : Compiler.nnrs_imp pretty_fun
 val pretty_imp_qcert : Compiler.imp_qcert pretty_fun
-val pretty_imp_json : Compiler.imp_json pretty_fun
+val pretty_imp_ejson : Compiler.imp_ejson pretty_fun
 val pretty_nnrcmr : Compiler.nnrcmr pretty_fun
 val pretty_dnnrc : Compiler.dnnrc pretty_fun
 val pretty_dnnrc_typed : Compiler.dnnrc_typed pretty_fun
