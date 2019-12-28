@@ -341,9 +341,7 @@ MODULES = \
 	Translation/SQLtoNRAEnv \
 	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \
-	Translation/ForeignToJavaScript \
 	Translation/ForeignEJSONtoJavaScriptAst \
-	Translation/ForeignToJavaScriptAst \
 	Translation/ForeignToJava \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \

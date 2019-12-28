@@ -22,13 +22,11 @@ Require Import Types.
 Require Import Utils.
 Require Import CommonRuntime.
 Require Import ForeignDataTyping.
-Require Import ForeignToJavaScript.
 
 Section DatatoSparkDF.
 
   Context {f:foreign_runtime}.
   Context {h:brand_relation_t}.
-  Context {fttojs: foreign_to_javascript}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
