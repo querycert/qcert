@@ -71,8 +71,8 @@ Require Import NNRCtocNNRC.
 Require Import NNRCtoNNRS.
 Require Import NNRStoNNRSimp.
 Require Import NNRSimptoImpQcert.
-Require Import ImpQcerttoImpJson.
-Require Import ImpJsontoJavaScriptAst.
+Require Import ImpQcerttoImpEJson.
+Require Import ImpEJsontoJavaScriptAst.
 Require Import JavaScriptAsttoJavaScript.
 Require Import NNRCtoDNNRC.
 Require Import NNRCtoNNRCMR.
@@ -97,7 +97,7 @@ Require Import OptimizerLogger.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignToJava.
-Require Import ForeignEJSONtoJavaScriptAst.
+Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 
 (** Compiler Driver *)
@@ -208,12 +208,12 @@ Section CompDriver.
     Definition nnrs_imp_to_imp_qcert (qname: string) (q: nnrs_imp) : imp_qcert :=
       nnrs_imp_to_imp_qcert_top qname q.
 
-    Definition imp_qcert_to_imp_json (q: imp_qcert) : imp_json :=
-      (* Note: Obtain brand relation from brand model, baked in imp_json compilation *)
-      imp_qcert_to_imp_json brand_relation_brands q.
+    Definition imp_qcert_to_imp_ejson (q: imp_qcert) : imp_ejson :=
+      (* Note: Obtain brand relation from brand model, baked in imp_ejson compilation *)
+      imp_qcert_to_imp_ejson brand_relation_brands q.
 
-    Definition imp_json_to_js_ast (q: imp_json) : js_ast :=
-      imp_json_to_js_ast q.
+    Definition imp_ejson_to_js_ast (q: imp_ejson) : js_ast :=
+      imp_ejson_to_js_ast q.
 
     Definition js_ast_to_javascript (q: js_ast) : javascript :=
       List.fold_left (fun acc q => String.append acc (js_ast_to_js_top q)) q  ""%string.
@@ -297,14 +297,14 @@ Section CompDriver.
     | Dv_dnnrc_to_dnnrc_typed : tdbindings -> dnnrc_typed_driver -> dnnrc_driver
   .
 
-  Inductive imp_json_driver : Set :=
-    | Dv_imp_json_stop : imp_json_driver
-    | Dv_imp_json_to_js_ast : js_ast_driver -> imp_json_driver
+  Inductive imp_ejson_driver : Set :=
+    | Dv_imp_ejson_stop : imp_ejson_driver
+    | Dv_imp_ejson_to_js_ast : js_ast_driver -> imp_ejson_driver
   .
 
   Inductive imp_qcert_driver : Set :=
     | Dv_imp_qcert_stop : imp_qcert_driver
-    | Dv_imp_qcert_to_imp_json : imp_json_driver -> imp_qcert_driver
+    | Dv_imp_qcert_to_imp_ejson : imp_ejson_driver -> imp_qcert_driver
   .
 
   Inductive nnrs_imp_driver : Set :=
@@ -439,7 +439,7 @@ Section CompDriver.
   | Dv_nnrs : nnrs_driver -> driver
   | Dv_nnrs_imp : nnrs_imp_driver -> driver
   | Dv_imp_qcert : imp_qcert_driver -> driver
-  | Dv_imp_json : imp_json_driver -> driver
+  | Dv_imp_ejson : imp_ejson_driver -> driver
   | Dv_nnrcmr : nnrcmr_driver -> driver
   | Dv_dnnrc : dnnrc_driver -> driver
   | Dv_dnnrc_typed : dnnrc_typed_driver -> driver
@@ -468,7 +468,7 @@ Section CompDriver.
     | Case_aux c "Dv_nnrs"%string
     | Case_aux c "Dv_nnrs_imp"%string
     | Case_aux c "Dv_imp_qcert"%string
-    | Case_aux c "Dv_imp_json"%string
+    | Case_aux c "Dv_imp_ejson"%string
     | Case_aux c "Dv_nnrcmr"%string
     | Case_aux c "Dv_dnnrc"%string
     | Case_aux c "Dv_dnnrc_typed"%string
@@ -493,7 +493,7 @@ Section CompDriver.
     | Dv_nnrs _ => L_nnrs
     | Dv_nnrs_imp _ => L_nnrs_imp
     | Dv_imp_qcert _ => L_imp_qcert
-    | Dv_imp_json _ => L_imp_json
+    | Dv_imp_ejson _ => L_imp_ejson
     | Dv_nnrcmr _ => L_nnrcmr
     | Dv_camp_rule _ => L_camp_rule
     | Dv_tech_rule _ => L_tech_rule
@@ -536,16 +536,16 @@ Section CompDriver.
     | Dv_spark_df_stop => 1
     end.
 
-  Fixpoint driver_length_imp_json (dv: imp_json_driver) :=
+  Fixpoint driver_length_imp_ejson (dv: imp_ejson_driver) :=
     match dv with
-    | Dv_imp_json_stop => 1
-    | Dv_imp_json_to_js_ast dv => 1 + driver_length_js_ast dv
+    | Dv_imp_ejson_stop => 1
+    | Dv_imp_ejson_to_js_ast dv => 1 + driver_length_js_ast dv
     end.
 
   Fixpoint driver_length_imp_qcert (dv: imp_qcert_driver) :=
     match dv with
     | Dv_imp_qcert_stop => 1
-    | Dv_imp_qcert_to_imp_json dv => 1 + driver_length_imp_json dv
+    | Dv_imp_qcert_to_imp_ejson dv => 1 + driver_length_imp_ejson dv
     end.
 
   Fixpoint driver_length_nnrs_imp (dv: nnrs_imp_driver) :=
@@ -699,7 +699,7 @@ Section CompDriver.
     | Dv_nnrs dv => driver_length_nnrs dv
     | Dv_nnrs_imp dv => driver_length_nnrs_imp dv
     | Dv_imp_qcert dv => driver_length_imp_qcert dv
-    | Dv_imp_json dv => driver_length_imp_json dv
+    | Dv_imp_ejson dv => driver_length_imp_ejson dv
     | Dv_nnrcmr dv => driver_length_nnrcmr dv
     | Dv_dnnrc dv => driver_length_dnnrc dv
     | Dv_dnnrc_typed dv => driver_length_dnnrc_typed dv
@@ -749,24 +749,24 @@ Section CompDriver.
       in
       (Q_spark_df q) :: queries.
 
-    Definition compile_imp_json (dv: imp_json_driver) (q: imp_json) : list query :=
+    Definition compile_imp_ejson (dv: imp_ejson_driver) (q: imp_ejson) : list query :=
       let queries :=
           match dv with
-          | Dv_imp_json_stop => nil
-          | Dv_imp_json_to_js_ast dv =>
-            let q := imp_json_to_js_ast q in
+          | Dv_imp_ejson_stop => nil
+          | Dv_imp_ejson_to_js_ast dv =>
+            let q := imp_ejson_to_js_ast q in
             compile_js_ast dv q
           end
       in
-      (Q_imp_json q) :: queries.
+      (Q_imp_ejson q) :: queries.
 
     Definition compile_imp_qcert (dv: imp_qcert_driver) (q: imp_qcert) : list query :=
       let queries :=
           match dv with
           | Dv_imp_qcert_stop => nil
-          | Dv_imp_qcert_to_imp_json dv =>
-            let q := imp_qcert_to_imp_json q in
-            compile_imp_json dv q
+          | Dv_imp_qcert_to_imp_ejson dv =>
+            let q := imp_qcert_to_imp_ejson q in
+            compile_imp_ejson dv q
           end
       in
       (Q_imp_qcert q) :: queries.
@@ -1062,7 +1062,7 @@ Section CompDriver.
       | (Dv_nnrs dv, Q_nnrs q) => compile_nnrs dv q
       | (Dv_nnrs_imp dv, Q_nnrs_imp q) => compile_nnrs_imp dv q
       | (Dv_imp_qcert dv, Q_imp_qcert q) => compile_imp_qcert dv q
-      | (Dv_imp_json dv, Q_imp_json q) => compile_imp_json dv q
+      | (Dv_imp_ejson dv, Q_imp_ejson q) => compile_imp_ejson dv q
       | (Dv_nnrcmr dv, Q_nnrcmr q) => compile_nnrcmr dv q
       | (Dv_dnnrc dv, Q_dnnrc q) => compile_dnnrc dv q
       | (Dv_dnnrc_typed dv, Q_dnnrc_typed q) => compile_dnnrc_typed dv q
@@ -1099,7 +1099,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1130,7 +1130,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1161,7 +1161,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1192,7 +1192,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1223,7 +1223,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1254,7 +1254,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1285,7 +1285,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1316,7 +1316,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1347,7 +1347,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1378,7 +1378,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1409,7 +1409,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1431,7 +1431,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_js_ast _
@@ -1473,7 +1473,7 @@ Section CompDriver.
       | Dv_nnrs_core _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_js_ast _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1502,7 +1502,7 @@ Section CompDriver.
       | Dv_nnrs_core _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1533,7 +1533,7 @@ Section CompDriver.
       | Dv_nnrs_core _
       | Dv_nnrs _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_js_ast _
       | Dv_nnrcmr _
       | Dv_dnnrc _
@@ -1564,7 +1564,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrs_core _
       | Dv_nnrs _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_dnnrc_typed _
@@ -1580,8 +1580,8 @@ Section CompDriver.
       match dv with
       | Dv_imp_qcert _ =>
           Dv_error ("XXX TODO: imp_qcert optimizer XXX")
-      | Dv_imp_json dv =>
-        Dv_imp_qcert (Dv_imp_qcert_to_imp_json dv)
+      | Dv_imp_ejson dv =>
+        Dv_imp_qcert (Dv_imp_qcert_to_imp_ejson dv)
       | Dv_camp _
       | Dv_nraenv_core _
       | Dv_nraenv _
@@ -1609,12 +1609,12 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-    | L_imp_json =>
+    | L_imp_ejson =>
       match dv with
-      | Dv_imp_json _ =>
+      | Dv_imp_ejson _ =>
           Dv_error ("XXX TODO: imp_qcert optimizer XXX")
       | Dv_js_ast dv =>
-        Dv_imp_json (Dv_imp_json_to_js_ast dv)
+        Dv_imp_ejson (Dv_imp_ejson_to_js_ast dv)
       | Dv_camp _
       | Dv_nraenv_core _
       | Dv_nraenv _
@@ -1653,7 +1653,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
@@ -1695,7 +1695,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_js_ast _
       | Dv_javascript _
@@ -1728,7 +1728,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_js_ast _
@@ -1759,7 +1759,7 @@ Section CompDriver.
       | Dv_nnrs _
       | Dv_nnrs_imp _
       | Dv_imp_qcert _
-      | Dv_imp_json _
+      | Dv_imp_ejson _
       | Dv_nnrcmr _
       | Dv_dnnrc _
       | Dv_js_ast _
@@ -1797,7 +1797,7 @@ Section CompDriver.
     | L_nnrs => Dv_nnrs Dv_nnrs_stop
     | L_nnrs_imp => Dv_nnrs_imp Dv_nnrs_imp_stop
     | L_imp_qcert => Dv_imp_qcert Dv_imp_qcert_stop
-    | L_imp_json => Dv_imp_json Dv_imp_json_stop
+    | L_imp_ejson => Dv_imp_ejson Dv_imp_ejson_stop
     | L_nnrcmr => Dv_nnrcmr Dv_nnrcmr_stop
     | L_dnnrc => Dv_dnnrc Dv_dnnrc_stop
     | L_dnnrc_typed => Dv_dnnrc_typed Dv_dnnrc_typed_stop
@@ -1957,9 +1957,9 @@ Section CompDriver.
     | Dv_nnrs_imp (Dv_nnrs_imp_optim _ dv) => (L_nnrs_imp, Some (Dv_nnrs_imp dv))
     | Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert _ dv) => (L_nnrs_imp, Some (Dv_imp_qcert dv))
     | Dv_imp_qcert (Dv_imp_qcert_stop) => (L_imp_qcert, None)
-    | Dv_imp_qcert (Dv_imp_qcert_to_imp_json dv) => (L_imp_qcert, Some (Dv_imp_json dv))
-    | Dv_imp_json (Dv_imp_json_stop) => (L_imp_json, None)
-    | Dv_imp_json (Dv_imp_json_to_js_ast dv) => (L_imp_json, Some (Dv_js_ast dv))
+    | Dv_imp_qcert (Dv_imp_qcert_to_imp_ejson dv) => (L_imp_qcert, Some (Dv_imp_ejson dv))
+    | Dv_imp_ejson (Dv_imp_ejson_stop) => (L_imp_ejson, None)
+    | Dv_imp_ejson (Dv_imp_ejson_to_js_ast dv) => (L_imp_ejson, Some (Dv_js_ast dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_dnnrc dv) => (L_nnrcmr, Some (Dv_dnnrc dv))
@@ -2083,8 +2083,8 @@ Section CompDriver.
       rewrite (constants_config_of_tdbindings_merges t); reflexivity.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_imp_json:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_imp_json dv))) (Dv_imp_json dv)).
+  Lemma target_language_of_driver_is_postfix_imp_ejson:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_imp_ejson dv))) (Dv_imp_ejson dv)).
   Proof.
     induction dv; simpl.
     - reflexivity.
@@ -2099,7 +2099,7 @@ Section CompDriver.
                  EmptyString
                  nil
                  EmptyString
-                 nil) (lang:=L_imp_json)
+                 nil) (lang:=L_imp_ejson)
       ; [eapply target_language_of_driver_is_postfix_js_ast | | ]; simpl; trivial.
   Qed.
 
@@ -2120,7 +2120,7 @@ Section CompDriver.
                  nil
                  EmptyString
                  nil) (lang:=L_imp_qcert)
-      ; [eapply target_language_of_driver_is_postfix_imp_json | | ]; simpl; trivial.
+      ; [eapply target_language_of_driver_is_postfix_imp_ejson | | ]; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_nnrs_imp:
@@ -2524,7 +2524,7 @@ Section CompDriver.
          target_language_of_driver_is_postfix_nnrs
          target_language_of_driver_is_postfix_nnrs_imp
          target_language_of_driver_is_postfix_imp_qcert
-         target_language_of_driver_is_postfix_imp_json
+         target_language_of_driver_is_postfix_imp_ejson
          target_language_of_driver_is_postfix_nnrcmr
          target_language_of_driver_is_postfix_camp_rule
          target_language_of_driver_is_postfix_tech_rule
@@ -2698,7 +2698,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -2753,7 +2753,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_camp_rule, L_imp_json =>
+      | L_camp_rule, L_imp_ejson =>
         L_camp_rule
           :: L_camp
           :: L_nraenv
@@ -2764,7 +2764,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_camp_rule, L_js_ast =>
         L_camp_rule
@@ -2777,7 +2777,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_camp_rule, L_nnrcmr =>
@@ -2885,7 +2885,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -2945,7 +2945,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_tech_rule, L_imp_json =>
+      | L_tech_rule, L_imp_ejson =>
         L_tech_rule
           :: L_camp_rule
           :: L_camp
@@ -2957,7 +2957,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_tech_rule, L_js_ast =>
         L_tech_rule
@@ -2971,7 +2971,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_tech_rule, L_nnrcmr =>
@@ -3083,7 +3083,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3143,7 +3143,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_designer_rule, L_imp_json =>
+      | L_designer_rule, L_imp_ejson =>
         L_designer_rule
           :: L_camp_rule
           :: L_camp
@@ -3155,7 +3155,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_designer_rule, L_js_ast =>
         L_designer_rule
@@ -3169,7 +3169,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_designer_rule, L_nnrcmr =>
@@ -3260,7 +3260,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3310,7 +3310,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_camp, L_imp_json =>
+      | L_camp, L_imp_ejson =>
         L_camp
           :: L_nraenv
           :: L_nraenv
@@ -3320,7 +3320,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_camp, L_js_ast =>
         L_camp
@@ -3332,7 +3332,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_camp, L_nnrcmr =>
@@ -3428,7 +3428,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3478,7 +3478,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_oql, L_imp_json =>
+      | L_oql, L_imp_ejson =>
         L_oql
           :: L_nraenv
           :: L_nraenv
@@ -3488,7 +3488,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_oql, L_js_ast =>
         L_oql
@@ -3500,7 +3500,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_oql, L_nnrcmr =>
@@ -3597,7 +3597,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3647,7 +3647,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_sql, L_imp_json =>
+      | L_sql, L_imp_ejson =>
         L_sql
           :: L_nraenv
           :: L_nraenv
@@ -3657,7 +3657,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_sql, L_js_ast =>
         L_sql
@@ -3669,7 +3669,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_sql, L_nnrcmr =>
@@ -3766,7 +3766,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3816,7 +3816,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_sqlpp, L_imp_json =>
+      | L_sqlpp, L_imp_ejson =>
         L_sqlpp
           :: L_nraenv
           :: L_nraenv
@@ -3826,7 +3826,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_sqlpp, L_js_ast =>
         L_sqlpp
@@ -3838,7 +3838,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_sqlpp, L_nnrcmr =>
@@ -3935,7 +3935,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3985,7 +3985,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_lambda_nra, L_imp_json =>
+      | L_lambda_nra, L_imp_ejson =>
         L_lambda_nra
           :: L_nraenv
           :: L_nraenv
@@ -3995,7 +3995,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_lambda_nra, L_js_ast =>
         L_lambda_nra
@@ -4007,7 +4007,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_lambda_nra, L_nnrcmr =>
@@ -4095,7 +4095,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4150,7 +4150,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nra, L_imp_json =>
+      | L_nra, L_imp_ejson =>
         L_nra
           :: L_nraenv_core
           :: L_nraenv
@@ -4161,7 +4161,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nra, L_js_ast =>
         L_nra
@@ -4174,7 +4174,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nra, L_nnrcmr =>
@@ -4262,7 +4262,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4312,7 +4312,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nraenv_core, L_imp_json =>
+      | L_nraenv_core, L_imp_ejson =>
         L_nraenv_core
           :: L_nraenv
           :: L_nraenv
@@ -4322,7 +4322,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nraenv_core, L_js_ast =>
         L_nraenv_core
@@ -4334,7 +4334,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nraenv_core, L_nnrcmr =>
@@ -4421,7 +4421,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4466,7 +4466,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nraenv, L_imp_json =>
+      | L_nraenv, L_imp_ejson =>
         L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -4475,7 +4475,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nraenv, L_js_ast =>
         L_nraenv
@@ -4486,7 +4486,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nraenv, L_nnrcmr =>
@@ -4561,7 +4561,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4601,7 +4601,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nnrc_core, L_imp_json =>
+      | L_nnrc_core, L_imp_ejson =>
         L_nnrc_core
           :: L_nnrc
           :: L_nnrc
@@ -4609,7 +4609,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nnrc_core, L_js_ast =>
         L_nnrc_core
@@ -4619,7 +4619,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nnrc_core, L_nnrcmr =>
@@ -4698,7 +4698,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4733,14 +4733,14 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nnrc, L_imp_json =>
+      | L_nnrc, L_imp_ejson =>
         L_nnrc
           :: L_nnrc
           :: L_nnrs
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nnrc, L_js_ast =>
         L_nnrc
@@ -4749,7 +4749,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nnrc, L_nnrcmr =>
@@ -4793,19 +4793,19 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nnrs, L_imp_json =>
+      | L_nnrs, L_imp_ejson =>
         L_nnrs
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nnrs, L_js_ast =>
         L_nnrs
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nnrs, L_javascript =>
@@ -4813,7 +4813,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4838,13 +4838,13 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nnrs_core, L_imp_json =>
+      | L_nnrs_core, L_imp_ejson =>
         L_nnrs_core
           :: L_nnrs
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nnrs_core, L_js_ast =>
         L_nnrs_core
@@ -4852,7 +4852,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nnrs_core, L_javascript =>
@@ -4861,7 +4861,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4875,24 +4875,24 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nnrs_imp, L_imp_json =>
+      | L_nnrs_imp, L_imp_ejson =>
         L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nnrs_imp, L_js_ast =>
         L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nnrs_imp, L_javascript =>
         L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4900,31 +4900,31 @@ Section CompDriver.
       | L_imp_qcert, L_imp_qcert =>
         L_imp_qcert
           :: nil
-      | L_imp_qcert, L_imp_json =>
+      | L_imp_qcert, L_imp_ejson =>
         L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_imp_qcert, L_js_ast =>
         L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_imp_qcert, L_javascript =>
         L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
-      (* From imp_json: *)
-      | L_imp_json, L_imp_json =>
-        L_imp_json
+      (* From imp_ejson: *)
+      | L_imp_ejson, L_imp_ejson =>
+        L_imp_ejson
           :: nil
-      | L_imp_json, L_js_ast =>
-        L_imp_json
+      | L_imp_ejson, L_js_ast =>
+        L_imp_ejson
           :: L_js_ast
           :: nil
-      | L_imp_json, L_javascript =>
-        L_imp_json
+      | L_imp_ejson, L_javascript =>
+        L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4999,7 +4999,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_qcert
           :: nil
-      | L_nnrcmr, L_imp_json =>
+      | L_nnrcmr, L_imp_ejson =>
         L_nnrcmr
           :: L_nnrcmr
           :: L_nnrc
@@ -5008,7 +5008,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: nil
       | L_nnrcmr, L_js_ast =>
         L_nnrcmr
@@ -5019,7 +5019,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_nnrcmr, L_javascript =>
@@ -5031,7 +5031,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_qcert
-          :: L_imp_json
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -5221,14 +5221,14 @@ Section CompDriver.
 
     Hint Resolve exists_path_from_source_target_completeness_js_ast : exists_path_hints.
 
-    Lemma exists_path_from_source_target_completeness_imp_json :
+    Lemma exists_path_from_source_target_completeness_imp_ejson :
       (forall dv,
-          exists_path_from_source_target L_imp_json (target_language_of_driver (Dv_imp_json dv))).
+          exists_path_from_source_target L_imp_ejson (target_language_of_driver (Dv_imp_ejson dv))).
     Proof.
       induction dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_imp_json : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_imp_ejson : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_imp_qcert :
       (forall dv,

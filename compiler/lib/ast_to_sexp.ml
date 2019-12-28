@@ -730,20 +730,20 @@ let sexp_to_imp_qcert (se:sexp) =
 
 (* ImpJson Section *)
 
-let sexp_to_imp_json_data d =
+let sexp_to_imp_ejson_data d =
   assert false (* XXX TODO XXX *)
 
-let sexp_to_imp_json_op op =
+let sexp_to_imp_ejson_op op =
   assert false (* XXX TODO XXX *)
 
-let sexp_to_imp_json_runtime_op op =
+let sexp_to_imp_ejson_runtime_op op =
   assert false (* XXX TODO XXX *)
 
-let rec imp_json_to_sexp q : sexp =
-  imp_to_sexp sexp_to_imp_json_data sexp_to_imp_json_op sexp_to_imp_json_runtime_op q
+let rec imp_ejson_to_sexp q : sexp =
+  imp_to_sexp sexp_to_imp_ejson_data sexp_to_imp_ejson_op sexp_to_imp_ejson_runtime_op q
 
-let sexp_to_imp_json (se:sexp) =
-  sexp_to_imp sexp_to_imp_json_data sexp_to_imp_json_op sexp_to_imp_json_runtime_op se
+let sexp_to_imp_ejson (se:sexp) =
+  sexp_to_imp sexp_to_imp_ejson_data sexp_to_imp_ejson_op sexp_to_imp_ejson_runtime_op se
 
 
 (* NNRCMR section *)
@@ -1840,7 +1840,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_nnrs -> Q_nnrs (sexp_to_nnrs se)
   | L_nnrs_imp -> Q_nnrs_imp (sexp_to_nnrs_imp se)
   | L_imp_qcert -> Q_nnrs_imp (sexp_to_imp_qcert se)
-  | L_imp_json -> Q_nnrs_imp (sexp_to_imp_json se)
+  | L_imp_ejson -> Q_nnrs_imp (sexp_to_imp_ejson se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
   | L_dnnrc ->
       raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
@@ -1881,7 +1881,7 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_nnrs q -> nnrs_to_sexp q
   | Q_nnrs_imp q -> nnrs_imp_to_sexp q
   | Q_imp_qcert q -> imp_qcert_to_sexp q
-  | Q_imp_json q -> imp_json_to_sexp q
+  | Q_imp_ejson q -> imp_ejson_to_sexp q
   | Q_nnrcmr q -> nnrcmr_to_sexp q
   | Q_dnnrc _
   | Q_dnnrc_typed _

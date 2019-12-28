@@ -26,10 +26,10 @@ Require Import CoqLibAdd.
 Require Import StringAdd.
 Require Import Digits.
 Require Import EquivDec.
-Require Import ForeignEJSON.
+Require Import ForeignEJson.
 Require Import Utils.
 
-Section EJSON.
+Section EJson.
   Context {fejson:foreign_ejson}.
 
   Unset Elimination Schemes.
@@ -236,4 +236,4 @@ Section EJSON.
       end.
 
   End preProcess.
-End EJSON.
+End EJson.

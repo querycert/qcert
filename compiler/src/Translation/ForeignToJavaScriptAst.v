@@ -14,14 +14,14 @@
 
 Require Import List.
 Require Import String.
-Require Import ForeignEJSON.
+Require Import ForeignEJson.
 Require Import JavaScriptAst.
 
-Section ForeignEJSONtoJavaScriptAst.
+Section ForeignToJavaScriptAst.
 
   Class foreign_ejson_to_ajavascript {f:foreign_ejson} : Type
     := mk_foreign_ejson_to_ajavascript {
            foreign_ejson_to_ajavascript_expr (fe:foreign_ejson_type) : expr (* XXX This is a JsAst expression *)
          }.
 
-End ForeignEJSONtoJavaScriptAst.
+End ForeignToJavaScriptAst.

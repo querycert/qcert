@@ -20,9 +20,9 @@ Require Import EquivDec.
 Require Import Utils.
 Require Import CommonSystem.
 Require Import ForeignToJava.
-Require Import ForeignEJSONtoJavaScriptAst.
+Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
-Require Import ForeignDataToEJSON.
+Require Import ForeignDataToEJson.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.

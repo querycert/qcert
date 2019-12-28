@@ -59,7 +59,6 @@ Section Imp.
     | ImpStmtFor : var -> imp_expr -> imp_stmt -> imp_stmt                     (**r for loop ([for ($v in e₁) { s₂ }]) *)
     | ImpStmtForRange : var -> imp_expr -> imp_expr -> imp_stmt -> imp_stmt    (**r for loop ([for ($v = e₁ to e₂) { s₂ }]) *)
     | ImpStmtIf : imp_expr -> imp_stmt -> imp_stmt -> imp_stmt                 (**r conditional ([if e₁ { s₂ } else { s₃ }]) *)
-  (*| ImpStmtBreak : imp_stnt *)(* XXX Possible? Useful? -- Used in Qcert JS runtime *)
     .
 
     (* input variable + statements + returned variable *)
@@ -132,48 +131,37 @@ Section Imp.
       Definition imp_expr_rec (P:imp_expr->Set) := imp_expr_rect P.
   
     End RectInd.
+
+    (* Section dec. *)
+    (*   Global Instance imp_expr_eqdec : EqDec imp_expr eq. *)
+    (*   Proof. *)
+    (*     change (forall x y : imp_expr,  {x = y} + {x <> y}). *)
+    (*     decide equality; *)
+    (*       try solve [apply binary_op_eqdec | apply unary_op_eqdec *)
+    (*                  | apply data_eqdec | apply string_eqdec]. *)
+    (*     - decide equality; apply string_dec. *)
+    (*   Defined. *)
+
+    (*   Global Instance imp_stmt_eqdec : EqDec imp_stmt eq. *)
+    (*   Proof. *)
+    (*     change (forall x y : imp_stmt,  {x = y} + {x <> y}). *)
+    (*     decide equality; *)
+    (*       try solve [apply imp_expr_eqdec | apply string_eqdec | apply option_eqdec]. *)
+    (*   Defined. *)
+
+    (*   Global Instance imp_eqdec : EqDec imp eq. *)
+    (*   Proof. *)
+    (*     intros [s1 r1] [s2 r2]. *)
+    (*     destruct (r1 == r2). *)
+    (*     - destruct (s1 == s2). *)
+    (*       + left; congruence. *)
+    (*       + right; congruence. *)
+    (*     - right; congruence. *)
+    (*   Defined. *)
+    (* End dec. *)
+
   End Syntax.
-
-  (* Section dec. *)
-  (*   Context {fruntime:foreign_runtime}. *)
-
-  (*   Global Instance imp_expr_eqdec : EqDec imp_expr eq. *)
-  (*   Proof. *)
-  (*     change (forall x y : imp_expr,  {x = y} + {x <> y}). *)
-  (*     decide equality; *)
-  (*       try solve [apply binary_op_eqdec | apply unary_op_eqdec *)
-  (*                  | apply data_eqdec | apply string_eqdec]. *)
-  (*     - decide equality; apply string_dec. *)
-  (*   Defined. *)
-
-  (*   Global Instance imp_stmt_eqdec : EqDec imp_stmt eq. *)
-  (*   Proof. *)
-  (*     change (forall x y : imp_stmt,  {x = y} + {x <> y}). *)
-  (*     decide equality; *)
-  (*       try solve [apply imp_expr_eqdec | apply string_eqdec | apply option_eqdec]. *)
-  (*   Defined. *)
-
-  (*   Global Instance imp_eqdec : EqDec imp eq. *)
-  (*   Proof. *)
-  (*     intros [s1 r1] [s2 r2]. *)
-  (*     destruct (r1 == r2). *)
-  (*     - destruct (s1 == s2). *)
-  (*       + left; congruence. *)
-  (*       + right; congruence. *)
-  (*     - right; congruence. *)
-  (*   Defined. *)
-  (* End dec. *)
-
-(* Section Env. *)
-(*   Context {fruntime:foreign_runtime}. *)
-
-(*   (* bindings that may or may not be initialized (defined) *) *)
-(*   Definition pd_bindings := list (string*option data). *)
-
-(* End Env. *)
-
 End Imp.
-
 
 Tactic Notation "imp_expr_cases" tactic(first) ident(c) :=
   first;

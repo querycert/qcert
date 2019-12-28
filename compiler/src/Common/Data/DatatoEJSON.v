@@ -19,20 +19,20 @@ Require Import String.
 Require Import Ascii.
 Require Import ZArith.
 Require Import Utils.
-Require Import ForeignEJSON.
-Require Import EJSON.
-Require Import EJSONNorm.
+Require Import ForeignEJson.
+Require Import EJson.
+Require Import EJsonNorm.
 Require Import ForeignData.
-Require Import ForeignDataToEJSON.
+Require Import ForeignDataToEJson.
 Require Import Data.
 
-Section DatatoEJSON.
+Section DatatoEJson.
   Context {fdata:foreign_data}.
   Context {ftoejson:foreign_ejson}.
   Context {fdatatoejson:foreign_to_ejson}.
 
   Section toData.
-    (* EJSON to Data *)
+    (* EJson to Data *)
 
     Fixpoint ejson_brands (d:list ejson) : option (list string) :=
       match d with
@@ -82,7 +82,7 @@ Section DatatoEJSON.
 
   End toData.
 
-  Section toJSON.
+  Section toEJson.
 
     Definition Z_to_json (n: Z) : ejson :=
       ejbigint n.
@@ -102,9 +102,9 @@ Section DatatoEJSON.
       | dforeign fd => ejforeign (foreign_to_ejson_from_data fd)
       end.
 
-  End toJSON.
+  End toEJson.
 
-End DatatoEJSON.
+End DatatoEJson.
 
 Section ModelRoundTrip.
   Context {fdata:foreign_data}.

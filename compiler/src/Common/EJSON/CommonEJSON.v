@@ -14,6 +14,6 @@
  * limitations under the License.
  *)
 
-Require Export EJSON.
-Require Export EJSONNorm.
-Require Export EJSONOperators.
+Require Export EJson.
+Require Export EJsonNorm.
+Require Export EJsonOperators.

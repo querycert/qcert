@@ -39,7 +39,7 @@ let output_query pconf q =
   | Compiler.Q_nnrs_core q -> pretty_query pconf pretty_nnrs_core q
   | Compiler.Q_nnrs_imp q -> pretty_query pconf pretty_nnrs_imp q
   | Compiler.Q_imp_qcert q -> pretty_query pconf pretty_imp_qcert q
-  | Compiler.Q_imp_json q -> pretty_query pconf pretty_imp_json q
+  | Compiler.Q_imp_ejson q -> pretty_query pconf pretty_imp_ejson q
   | Compiler.Q_nnrcmr q -> pretty_query pconf pretty_nnrcmr q
   | Compiler.Q_dnnrc q -> pretty_query pconf pretty_dnnrc q
   | Compiler.Q_dnnrc_typed q -> pretty_query pconf pretty_dnnrc_typed q

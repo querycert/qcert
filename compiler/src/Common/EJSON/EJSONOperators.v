@@ -24,54 +24,54 @@ Require Import ListAdd.
 Require Import Lift.
 Require Import Assoc.
 Require Import Bindings.
-Require Import ForeignEJSON.
-Require Import EJSON.
+Require Import ForeignEJson.
+Require Import EJson.
 
-Section EJSONOperators.
+Section EJsonOperators.
 
   Import ListNotations.
 
   Inductive ejson_op :=     (* XXX TODO XXX *)(* JsAst *)                     (* Syntax *)
-  | EJSONOpNot : ejson_op                          (* unary_op_not *)              (* !v *)
-  | EJSONOpNeg : ejson_op                          (* unary_op_neg *)              (* -v *)
-  | EJSONOpAnd : ejson_op                          (* binary_op_and *)             (* v1 && v2 *)
-  | EJSONOpOr : ejson_op                           (* binary_op_or *)              (* v1 || v2 *)
-  | EJSONOpLt : ejson_op                           (* binary_op_lt *)              (* v1 < v2 *)
-  | EJSONOpLe : ejson_op                           (* binary_op_le *)              (* v1 <= v2 *)
-  | EJSONOpGt : ejson_op                           (* binary_op_gt *)              (* v1 > v2 *)
-  | EJSONOpGe : ejson_op                           (* binary_op_ge *)              (* v1 >= v2 *)
-  | EJSONOpAddString : ejson_op                    (* binary_op_add *)             (* v1 + v2 *)
-  | EJSONOpAddNumber : ejson_op                    (* binary_op_add *)             (* v1 + v2 *)
-  | EJSONOpSub : ejson_op                          (* binary_op_sub *)             (* v1 - v2 *)
-  | EJSONOpMult : ejson_op                         (* binary_op_mult *)            (* v1 * v2 *)
-  | EJSONOpDiv : ejson_op                          (* binary_op_div *)             (* v1 / v2 *)
-  | EJSONOpStrictEqual : ejson_op                  (* binary_op_strict_equal *)    (* v1 === v2 *)
-  | EJSONOpStrictDisequal : ejson_op               (* binary_op_strict_disequal *) (* v1 !== v2 *)
-  (*| EJSONOpIn : ejson_op *)                        (* binary_op_in *)              (* v1 in v2 *) (* XXX either 'in' or hasOwnProperty, not both *)
+  | EJsonOpNot : ejson_op                          (* unary_op_not *)              (* !v *)
+  | EJsonOpNeg : ejson_op                          (* unary_op_neg *)              (* -v *)
+  | EJsonOpAnd : ejson_op                          (* binary_op_and *)             (* v1 && v2 *)
+  | EJsonOpOr : ejson_op                           (* binary_op_or *)              (* v1 || v2 *)
+  | EJsonOpLt : ejson_op                           (* binary_op_lt *)              (* v1 < v2 *)
+  | EJsonOpLe : ejson_op                           (* binary_op_le *)              (* v1 <= v2 *)
+  | EJsonOpGt : ejson_op                           (* binary_op_gt *)              (* v1 > v2 *)
+  | EJsonOpGe : ejson_op                           (* binary_op_ge *)              (* v1 >= v2 *)
+  | EJsonOpAddString : ejson_op                    (* binary_op_add *)             (* v1 + v2 *)
+  | EJsonOpAddNumber : ejson_op                    (* binary_op_add *)             (* v1 + v2 *)
+  | EJsonOpSub : ejson_op                          (* binary_op_sub *)             (* v1 - v2 *)
+  | EJsonOpMult : ejson_op                         (* binary_op_mult *)            (* v1 * v2 *)
+  | EJsonOpDiv : ejson_op                          (* binary_op_div *)             (* v1 / v2 *)
+  | EJsonOpStrictEqual : ejson_op                  (* binary_op_strict_equal *)    (* v1 === v2 *)
+  | EJsonOpStrictDisequal : ejson_op               (* binary_op_strict_disequal *) (* v1 !== v2 *)
+  (*| EJsonOpIn : ejson_op *)                        (* binary_op_in *)              (* v1 in v2 *) (* XXX either 'in' or hasOwnProperty, not both *)
   (* Array Stuff *)
-  | EJSONOpArray : ejson_op                        (* expr_array *)                (* [ v1, ...vn ] XXX Nary? *)
-  | EJSONOpArrayLength : ejson_op                  (* expr_access? *)              (* v.length *)
-  | EJSONOpArrayPush : ejson_op                    (* expr_access? *)              (* v.push(v2) or var v' = v.slice(); v'.push(v2) XXX Does not actually claim to be mutable from a semantic stand-point *)
-  | EJSONOpArrayAccess : ejson_op                  (* array_get *)                 (* v[i] *)
+  | EJsonOpArray : ejson_op                        (* expr_array *)                (* [ v1, ...vn ] XXX Nary? *)
+  | EJsonOpArrayLength : ejson_op                  (* expr_access? *)              (* v.length *)
+  | EJsonOpArrayPush : ejson_op                    (* expr_access? *)              (* v.push(v2) or var v' = v.slice(); v'.push(v2) XXX Does not actually claim to be mutable from a semantic stand-point *)
+  | EJsonOpArrayAccess : ejson_op                  (* array_get *)                 (* v[i] *)
   (* Object Stuff *)
-  | EJSONOpObject : list string -> ejson_op        (* expr_object *)               (* { a1:v1, ...an:vn } XXX Nary? *)
-  | EJSONOpAccess : string -> ejson_op             (* expr_access *)               (* v['a'] or v.a *)
-  | EJSONOpHasOwnProperty : string -> ejson_op     (* expr_call ?? XXX *)          (* v.hasOwnProperty('a') *)
-  | EJSONOpToString : ejson_op                     (* expr_call ?? XXX *)          (* v.toString() *)
+  | EJsonOpObject : list string -> ejson_op        (* expr_object *)               (* { a1:v1, ...an:vn } XXX Nary? *)
+  | EJsonOpAccess : string -> ejson_op             (* expr_access *)               (* v['a'] or v.a *)
+  | EJsonOpHasOwnProperty : string -> ejson_op     (* expr_call ?? XXX *)          (* v.hasOwnProperty('a') *)
+  | EJsonOpToString : ejson_op                     (* expr_call ?? XXX *)          (* v.toString() *)
   (* Math stuff *)
-  | EJSONOpMathMin : ejson_op                      (* expr_call *)                 (* Math.min(e1, e2) *)
-  | EJSONOpMathMax : ejson_op                      (* expr_call *)                 (* Math.max(e1, e2) *)
-  | EJSONOpMathMinApply : ejson_op                 (* expr_call *)                 (* Math.min.apply(Math, e) *)
-  | EJSONOpMathMaxApply : ejson_op                 (* expr_call *)                 (* Math.max.apply(Math, e) *)
-  | EJSONOpMathPow : ejson_op                      (* expr_call *)                 (* Math.pow(e1, e2) *)
-  | EJSONOpMathExp : ejson_op                      (* expr_call *)                 (* Math.exp(e) *)
-  | EJSONOpMathAbs : ejson_op                      (* expr_call *)                 (* Math.abs(e) *)
-  | EJSONOpMathLog : ejson_op                      (* expr_call *)                 (* Math.log2(e) *)
-  | EJSONOpMathLog10 : ejson_op                    (* expr_call *)                 (* Math.log10(e) *)
-  | EJSONOpMathSqrt : ejson_op                     (* expr_call *)                 (* Math.sqrt(e) *)
-  | EJSONOpMathCeil : ejson_op                     (* expr_call *)                 (* Math.ceil(e) *)
-  | EJSONOpMathFloor : ejson_op                    (* expr_call *)                 (* Math.floor(e) *)
-  | EJSONOpMathTrunc : ejson_op                    (* expr_call *)                 (* Math.trunc(e) *)
+  | EJsonOpMathMin : ejson_op                      (* expr_call *)                 (* Math.min(e1, e2) *)
+  | EJsonOpMathMax : ejson_op                      (* expr_call *)                 (* Math.max(e1, e2) *)
+  | EJsonOpMathMinApply : ejson_op                 (* expr_call *)                 (* Math.min.apply(Math, e) *)
+  | EJsonOpMathMaxApply : ejson_op                 (* expr_call *)                 (* Math.max.apply(Math, e) *)
+  | EJsonOpMathPow : ejson_op                      (* expr_call *)                 (* Math.pow(e1, e2) *)
+  | EJsonOpMathExp : ejson_op                      (* expr_call *)                 (* Math.exp(e) *)
+  | EJsonOpMathAbs : ejson_op                      (* expr_call *)                 (* Math.abs(e) *)
+  | EJsonOpMathLog : ejson_op                      (* expr_call *)                 (* Math.log2(e) *)
+  | EJsonOpMathLog10 : ejson_op                    (* expr_call *)                 (* Math.log10(e) *)
+  | EJsonOpMathSqrt : ejson_op                     (* expr_call *)                 (* Math.sqrt(e) *)
+  | EJsonOpMathCeil : ejson_op                     (* expr_call *)                 (* Math.ceil(e) *)
+  | EJsonOpMathFloor : ejson_op                    (* expr_call *)                 (* Math.floor(e) *)
+  | EJsonOpMathTrunc : ejson_op                    (* expr_call *)                 (* Math.trunc(e) *)
   .
 
   Section Evaluation.
@@ -79,98 +79,98 @@ Section EJSONOperators.
 
     Definition ejson_op_eval (op:ejson_op) (j:list ejson) : option ejson :=
       match op with
-      | EJSONOpNot =>
+      | EJsonOpNot =>
         match j with
         | [ejbool b] => Some (ejbool (negb b))
         | _ => None
         end
-      | EJSONOpNeg =>
+      | EJsonOpNeg =>
         match j with
         | [ejnumber n] => Some (ejnumber (float_neg n))
         | _ => None
         end
-      | EJSONOpAnd =>
+      | EJsonOpAnd =>
         match j with
         | [ejbool b1; ejbool b2] => Some (ejbool (andb b1 b2))
         | _ => None
         end
-      | EJSONOpOr =>
+      | EJsonOpOr =>
         match j with
         | [ejbool b1; ejbool b2] => Some (ejbool (orb b1 b2))
         | _ => None
         end
-      | EJSONOpLt =>
+      | EJsonOpLt =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejbool (float_lt n1 n2))
         | _ => None
         end
-      | EJSONOpLe =>
+      | EJsonOpLe =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejbool (float_le n1 n2))
         | _ => None
         end
-      | EJSONOpGt =>
+      | EJsonOpGt =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejbool (float_gt n1 n2))
         | _ => None
         end
-      | EJSONOpGe =>
+      | EJsonOpGe =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejbool (float_ge n1 n2))
         | _ => None
         end
-      | EJSONOpAddString =>
+      | EJsonOpAddString =>
         match j with
         | [ejstring s1; ejstring s2] => Some (ejstring (s1 ++ s2))
         | _ => None
         end
-      | EJSONOpAddNumber =>
+      | EJsonOpAddNumber =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_add n1 n2))
         | _ => None
         end
-      | EJSONOpSub =>
+      | EJsonOpSub =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_sub n1 n2))
         | _ => None
         end
-      | EJSONOpMult =>
+      | EJsonOpMult =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_mult n1 n2))
         | _ => None
         end
-      | EJSONOpDiv =>
+      | EJsonOpDiv =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_div n1 n2))
         | _ => None
         end
-      | EJSONOpStrictEqual => None (* XXX TODO *)
-      | EJSONOpStrictDisequal => None (* XXX TODO *)
-      | EJSONOpArray => Some (ejarray j)
-      | EJSONOpArrayLength =>
+      | EJsonOpStrictEqual => None (* XXX TODO *)
+      | EJsonOpStrictDisequal => None (* XXX TODO *)
+      | EJsonOpArray => Some (ejarray j)
+      | EJsonOpArrayLength =>
         match j with
         | [ejarray ja] => Some (ejnumber (float_of_int (Z_of_nat (List.length ja))))
         | _ => None
         end
-      | EJSONOpArrayPush =>
+      | EJsonOpArrayPush =>
         match j with
         | [ejarray ja; je] => Some (ejarray (ja ++ [je]))
         | _ => None
         end
-      | EJSONOpArrayAccess =>
+      | EJsonOpArrayAccess =>
         match j with
         | [ejarray ja; ejnumber n] => None (* XXX TODO XXX *)
         | _ => None
         end
-      | EJSONOpObject atts =>
+      | EJsonOpObject atts =>
         lift ejobject (zip atts j)
-      | EJSONOpAccess att =>
+      | EJsonOpAccess att =>
         match j with
         | [ejobject jl] =>
           edot jl att
         | _ => None
         end
-      | EJSONOpHasOwnProperty a =>
+      | EJsonOpHasOwnProperty a =>
         match j  with
         | [ejobject jl] =>
           if in_dec string_dec a (domain jl)
@@ -178,21 +178,21 @@ Section EJSONOperators.
           else Some (ejbool false)
         | _ => None
         end
-      | EJSONOpToString => None (* XXX TODO XXX *)
-      | EJSONOpMathMin => None (* XXX TODO XXX *)
-      | EJSONOpMathMax => None (* XXX TODO XXX *)
-      | EJSONOpMathMinApply => None (* XXX TODO XXX *)
-      | EJSONOpMathMaxApply => None (* XXX TODO XXX *)
-      | EJSONOpMathExp => None (* XXX TODO XXX *)
-      | EJSONOpMathPow => None (* XXX TODO XXX *)
-      | EJSONOpMathAbs => None (* XXX TODO XXX *)
-      | EJSONOpMathLog => None (* XXX TODO XXX *)
-      | EJSONOpMathLog10 => None (* XXX TODO XXX *)
-      | EJSONOpMathSqrt => None (* XXX TODO XXX *)
-      | EJSONOpMathCeil => None (* XXX TODO XXX *)
-      | EJSONOpMathFloor => None (* XXX TODO XXX *)
-      | EJSONOpMathTrunc => None (* XXX TODO XXX *)
+      | EJsonOpToString => None (* XXX TODO XXX *)
+      | EJsonOpMathMin => None (* XXX TODO XXX *)
+      | EJsonOpMathMax => None (* XXX TODO XXX *)
+      | EJsonOpMathMinApply => None (* XXX TODO XXX *)
+      | EJsonOpMathMaxApply => None (* XXX TODO XXX *)
+      | EJsonOpMathExp => None (* XXX TODO XXX *)
+      | EJsonOpMathPow => None (* XXX TODO XXX *)
+      | EJsonOpMathAbs => None (* XXX TODO XXX *)
+      | EJsonOpMathLog => None (* XXX TODO XXX *)
+      | EJsonOpMathLog10 => None (* XXX TODO XXX *)
+      | EJsonOpMathSqrt => None (* XXX TODO XXX *)
+      | EJsonOpMathCeil => None (* XXX TODO XXX *)
+      | EJsonOpMathFloor => None (* XXX TODO XXX *)
+      | EJsonOpMathTrunc => None (* XXX TODO XXX *)
       end.
   End Evaluation.
 
-End EJSONOperators.
+End EJsonOperators.

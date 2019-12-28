@@ -128,7 +128,7 @@ let languages =
     Compiler.L_nnrs;
     Compiler.L_nnrs_core;
     Compiler.L_imp_qcert;
-    Compiler.L_imp_json;
+    Compiler.L_imp_ejson;
     Compiler.L_nnrcmr;
     Compiler.L_dnnrc;
     Compiler.L_dnnrc_typed;
