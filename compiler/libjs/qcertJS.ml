@@ -20,7 +20,7 @@ open Qcert_lib
 
 open Util
 open Compiler.EnhancedCompiler
-open Qcert_util
+open Compiler_util
 open Config
 
 (**********************************)
@@ -205,7 +205,6 @@ let rec unsafe_json_to_js (j:QData.json) =
   match j with
   | Compiler.Jnull -> Js.Unsafe.inject (Js.null)
   | Compiler.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
-  | Compiler.Jbigint n -> Js.Unsafe.inject (Js.number_of_float (float_of_int n)) (* XXX Coerce bigint to number *)
   | Compiler.Jbool b -> Js.Unsafe.inject (Js.bool b)
   | Compiler.Jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
   | Compiler.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
