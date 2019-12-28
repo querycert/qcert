@@ -48,7 +48,6 @@ Require Import SparkDFRuntime.
 Require Import CompilerRuntime.
 Require Import CommonSystem.
 
-Require Import ForeignToJavaScript.
 Require Import OptimizerLogger.
 Require Import CompLang.
 Require Import CompDriver.
@@ -71,8 +70,6 @@ Section CompStat.
   Local Open Scope string_scope.
 
   (* Stat for an individual query *)
-  Context {ftojs:foreign_to_javascript}.
-
   Definition stat_error (q: string) : data :=
     drec
       (("error_stat", dstring "no stat available")

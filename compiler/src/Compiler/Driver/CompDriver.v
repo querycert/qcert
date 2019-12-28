@@ -97,8 +97,6 @@ Require Import OptimizerLogger.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignToJava.
-Require Import ForeignToJavaScript.
-Require Import ForeignToJavaScriptAst.
 Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
 
@@ -124,8 +122,6 @@ Section CompDriver.
   Context {nnrs_imp_stmt_logger:optimizer_logger string nnrs_imp_stmt}.
   Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
   Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
-  Context {ftojs:foreign_to_javascript}.
-  Context {ftoajs:foreign_to_ajavascript}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.

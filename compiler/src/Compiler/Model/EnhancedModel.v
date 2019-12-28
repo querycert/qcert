@@ -19,8 +19,6 @@ Require Import EquivDec.
 Require Import Utils.
 Require Import CommonSystem.
 Require Import ForeignToJava.
-Require Import ForeignToJavaScript.
-Require Import ForeignToJavaScriptAst.
 Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignEJSON.
@@ -569,75 +567,6 @@ Instance enhanced_foreign_to_java :
        enhanced_to_java_data
        enhanced_to_java_unary_op
        enhanced_to_java_binary_op.
-
-Definition enhanced_to_javascript_data
-           (quotel:String.string) (fd:enhanced_data) : String.string
-  := match fd with
-     | enhancedstring s => STRING_tostring s
-     | enhancedtimescale ts => toString ts
-     | enhancedtimeduration td => (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) td)
-     | enhancedtimepoint tp => (@toString _ time_point_foreign_data.(@foreign_data_tostring ) tp)
-     | enhancedsqldate tp => (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) tp)
-     | enhancedsqldateinterval tp => (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) tp)
-     end.
-
-(* Java equivalent: JavaScriptBackend.foreign_to_javascript_unary_op *)
-Definition enhanced_to_javascript_unary_op
-             (indent:nat) (eol:String.string)
-             (quotel:String.string) (fu:enhanced_unary_op)
-             (d:String.string) : String.string
-  := match fu with
-     | enhanced_unary_time_op op =>
-       time_to_javascript_unary_op indent eol quotel op d
-     | enhanced_unary_sql_date_op op =>
-       sql_date_to_javascript_unary_op indent eol quotel op d
-     end.
-
-(* Java equivalent: JavaScriptBackend.foreign_to_javascript_binary_op *)
-Definition enhanced_to_javascript_binary_op
-           (indent:nat) (eol:String.string)
-           (quotel:String.string) (fb:enhanced_binary_op)
-           (d1 d2:String.string) : String.string
-  := match fb with
-     | enhanced_binary_time_op op =>
-       time_to_javascript_binary_op indent eol quotel op d1 d2
-     | enhanced_binary_sql_date_op op =>
-       sql_date_to_javascript_binary_op indent eol quotel op d1 d2
-     end.
-
-Definition enhanced_to_ajavascript_unary_op
-             (fu:enhanced_unary_op)
-             (e:JsSyntax.expr) : JsSyntax.expr
-  := match fu with
-     | enhanced_unary_time_op op =>
-       time_to_ajavascript_unary_op op e
-     | enhanced_unary_sql_date_op op =>
-       sql_date_to_ajavascript_unary_op op e
-     end.
-
-Definition enhanced_to_ajavascript_binary_op
-           (fb:enhanced_binary_op)
-           (e1 e2:JsSyntax.expr) : JsSyntax.expr
-  := match fb with
-     | enhanced_binary_time_op op =>
-       time_to_ajavascript_binary_op op e1 e2
-     | enhanced_binary_sql_date_op op =>
-       sql_date_to_ajavascript_binary_op op e1 e2
-     end.
-
-Instance enhanced_foreign_to_javascript :
-  @foreign_to_javascript enhanced_foreign_runtime
-  := mk_foreign_to_javascript
-       enhanced_foreign_runtime
-       enhanced_to_javascript_unary_op
-       enhanced_to_javascript_binary_op.
-
-Instance enhanced_foreign_to_ajavascript :
-  @foreign_to_ajavascript enhanced_foreign_runtime
-  := mk_foreign_to_ajavascript
-       enhanced_foreign_runtime
-       enhanced_to_ajavascript_unary_op
-       enhanced_to_ajavascript_binary_op.
 
 Definition enhanced_ejson_to_ajavascript_expr (j:enhanced_ejson) : JsAst.JsSyntax.expr :=
   JsAst.JsSyntax.expr_literal (JsAst.JsSyntax.literal_null).
@@ -1437,10 +1366,6 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_runtime.
   Definition compiler_foreign_to_java : foreign_to_java
     := enhanced_foreign_to_java.
-  Definition compiler_foreign_to_javascript : foreign_to_javascript
-    := enhanced_foreign_to_javascript.
-  Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
-    := enhanced_foreign_to_ajavascript.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
@@ -2130,10 +2055,6 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := @enhanced_basic_model bm.compiler_brand_model.
   Definition compiler_model_foreign_to_java : foreign_to_java
     := enhanced_foreign_to_java.
-  Definition compiler_model_foreign_to_javascript : foreign_to_javascript
-    := enhanced_foreign_to_javascript.
-  Definition compiler_model_foreign_to_ajavascript : foreign_to_ajavascript
-    := enhanced_foreign_to_ajavascript.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
   Definition compiler_model_foreign_to_scala : foreign_to_scala

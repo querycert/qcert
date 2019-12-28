@@ -45,7 +45,6 @@ Require Import CAMPRuntime.
 (* Target languages *)
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
-Require Import ForeignEJSONtoJavaScriptAst.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
 
@@ -94,8 +93,7 @@ Require Import OptimizerLogger.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignToJava.
-Require Import ForeignToJavaScript.
-Require Import ForeignToJavaScriptAst.
+Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
 
 (** Compiler Driver *)
@@ -124,8 +122,6 @@ Section CompCorrectness.
   Context {imp_qcert_logger:optimizer_logger string imp_qcert}.
   Context {imp_json_logger:optimizer_logger string imp_json}.
   Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
-  Context {ftojs:foreign_to_javascript}.
-  Context {ftoajs:foreign_to_ajavascript}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.

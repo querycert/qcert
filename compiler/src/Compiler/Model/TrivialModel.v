@@ -20,8 +20,6 @@ Require Import EquivDec.
 Require Import Utils.
 Require Import CommonSystem.
 Require Import ForeignToJava.
-Require Import ForeignToJavaScript.
-Require Import ForeignToJavaScriptAst.
 Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJSON.
@@ -275,18 +273,6 @@ Next Obligation.
   destruct fd.
 Defined.
 
-Program Instance trivial_foreign_to_javascript :
-  @foreign_to_javascript trivial_foreign_runtime
-  := mk_foreign_to_javascript
-       trivial_foreign_runtime
-       _ _.
-
-Program Instance trivial_foreign_to_ajavascript :
-  @foreign_to_ajavascript trivial_foreign_runtime
-  := mk_foreign_to_ajavascript
-       trivial_foreign_runtime
-       _ _.
-
 Program Instance trivial_foreign_ejson_to_ajavascript :
   @foreign_ejson_to_ajavascript trivial_foreign_ejson
   := mk_foreign_ejson_to_ajavascript
@@ -354,10 +340,6 @@ Module TrivialRuntime <: CompilerRuntime.
     := trivial_foreign_runtime.
   Definition compiler_foreign_to_java : foreign_to_java
     := trivial_foreign_to_java.
-  Definition compiler_foreign_to_javascript : foreign_to_javascript
-    := trivial_foreign_to_javascript.
-  Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
-    := trivial_foreign_to_ajavascript.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := trivial_foreign_ejson_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
@@ -400,10 +382,6 @@ Module TrivialModel(bm:CompilerBrandModel(TrivialForeignType)) <: CompilerModel.
     := @trivial_basic_model bm.compiler_brand_model.
   Definition compiler_model_foreign_to_java : foreign_to_java
     := trivial_foreign_to_java.
-  Definition compiler_model_foreign_to_javascript : foreign_to_javascript
-    := trivial_foreign_to_javascript.
-  Definition compiler_model_foreign_to_ajavascript : foreign_to_ajavascript
-    := trivial_foreign_to_ajavascript.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := trivial_foreign_ejson_to_ajavascript.
   Definition compiler_model_foreign_to_scala : foreign_to_scala

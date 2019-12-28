@@ -18,8 +18,6 @@ Require Import String.
 Require Import CompilerRuntime.
 Require Import CommonSystem.
 Require Import ForeignToJava.
-Require Import ForeignToJavaScript.
-Require Import ForeignToJavaScriptAst.
 Require Import ForeignEJSONtoJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJSON.
@@ -42,8 +40,6 @@ Set Typeclasses Axioms Are Instances.
 Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
   Axiom compiler_model_foreign_to_java : foreign_to_java.
-  Axiom compiler_model_foreign_to_javascript : foreign_to_javascript.
-  Axiom compiler_model_foreign_to_ajavascript : foreign_to_ajavascript.
   Axiom compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
   Axiom compiler_model_foreign_to_scala : foreign_to_scala.
   Axiom compiler_model_foreign_to_ejson : foreign_to_ejson.
@@ -65,10 +61,6 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := basic_model_foreign_type.
   Definition compiler_foreign_runtime : foreign_runtime
     := basic_model_runtime.
-  Definition compiler_foreign_to_javascript : foreign_to_javascript
-    := model.compiler_model_foreign_to_javascript.
-  Definition compiler_foreign_to_ajavascript : foreign_to_ajavascript
-    := model.compiler_model_foreign_to_ajavascript.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := model.compiler_model_foreign_ejson_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
