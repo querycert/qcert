@@ -225,6 +225,7 @@ Section NNRSimptoImpQcert.
         intros Hn; rewrite Hn; try reflexivity.
     - Case "NNRSimpLet"%string.
       unfold olift.
+      unfold ImpEval.imp_decls_eval in *.
       apply notand in Hbv.
       destruct Hbv as [ Hv Hbv ].
       destruct o; simpl.
@@ -354,6 +355,7 @@ Section NNRSimptoImpQcert.
       destruct i; simpl; try reflexivity.
       destruct b; simpl; auto.
     - Case "NNRSimpEither"%string.
+      unfold ImpEval.imp_decls_eval in *; simpl.
       rewrite app_or_in_iff in Hbv.
       apply notand in Hbv.
       destruct Hbv as [ Hv Hbv ].
@@ -366,7 +368,7 @@ Section NNRSimptoImpQcert.
       apply notand in Hfvs.
       destruct Hfvs as [ Hfvs1 Hfvs2 ].
       rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); auto.
-      unfold imp_qcert_expr_eval.
+      unfold imp_qcert_expr_eval in *.
       match_destr.
       simpl.
       unfold olift.

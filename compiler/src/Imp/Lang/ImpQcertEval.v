@@ -145,6 +145,23 @@ Section ImpQcertEval.
            imp_qcert_op_eval
            σ e.
 
+    Definition imp_qcert_decls_eval
+               (σ:pd_bindings) (el:list (string * option imp_qcert_expr))
+      : option pd_bindings
+      := @imp_decls_eval
+           imp_qcert_data
+           imp_qcert_op
+           imp_qcert_runtime_op
+           imp_qcert_data_normalize
+           imp_qcert_runtime_eval
+           imp_qcert_op_eval
+           σ el.
+
+    Definition imp_qcert_decls_erase
+               (σ:option pd_bindings) (el:list (string * option imp_qcert_expr))
+      : option pd_bindings
+      := imp_decls_erase σ el.
+
     Definition imp_qcert_stmt_eval
              (s:imp_qcert_stmt) (σ:pd_bindings) : option (pd_bindings)
       := @imp_stmt_eval

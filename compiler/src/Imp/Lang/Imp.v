@@ -51,8 +51,6 @@ Section Imp.
   (*| ImpExprIf : imp_expr -> imp_expr -> imp_expr -> imp_expr *)(* XXX Useful? Used in Qcert JS runtime *)
     .
 
-    Set Elimination Schemes.
-
     Inductive imp_stmt :=
     | ImpStmtBlock : list (var * option imp_expr) -> list imp_stmt -> imp_stmt (**r block ([[{let x=e₁; let x=e₂; s₁; s₂}]]) *)
     | ImpStmtAssign : var -> imp_expr -> imp_stmt                              (**r variable assignent ([$v := e]) *)
@@ -60,6 +58,8 @@ Section Imp.
     | ImpStmtForRange : var -> imp_expr -> imp_expr -> imp_stmt -> imp_stmt    (**r for loop ([for ($v = e₁ to e₂) { s₂ }]) *)
     | ImpStmtIf : imp_expr -> imp_stmt -> imp_stmt -> imp_stmt                 (**r conditional ([if e₁ { s₂ } else { s₃ }]) *)
     .
+
+    Set Elimination Schemes.
 
     (* input variable + statements + returned variable *)
     Inductive imp_function :=
@@ -115,21 +115,67 @@ Section Imp.
             | ImpExprVar v => fvar v
             | ImpExprConst d => fconst d
             | ImpExprOp op el =>
-              fop op el ((fix F2 (c : list imp_expr) : Forall P c :=
+              fop op el ((fix F1 (c : list imp_expr) : Forall P c :=
                             match c as c0 with
                             | nil => Forall_nil _
-                            | cons d c0 => @Forall_cons _ P d c0 (F d) (F2 c0)
+                            | cons d c0 => @Forall_cons _ P d c0 (F d) (F1 c0)
                             end) el)
             | ImpExprRuntimeCall rt el =>
-              fruntime rt el ((fix F3 (c : list imp_expr) : Forall P c :=
+              fruntime rt el ((fix F2 (c : list imp_expr) : Forall P c :=
                                  match c as c0 with
                                  | nil => Forall_nil _
-                                 | cons d c0 => @Forall_cons _ P d c0 (F d) (F3 c0)
+                                 | cons d c0 => @Forall_cons _ P d c0 (F d) (F2 c0)
                                  end) el)
             end.
 
       Definition imp_expr_rec (P:imp_expr->Set) := imp_expr_rect P.
-  
+
+      Definition imp_stmt_rect (P : imp_stmt -> Type)
+                 (fblock : forall el : list (var * option imp_expr), forall sl : list imp_stmt,
+                       Forallt P sl -> P (ImpStmtBlock el sl))
+                 (fassign : forall v : string, forall e : imp_expr, P (ImpStmtAssign v e))
+                 (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P (ImpStmtFor v e s))
+                 (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P (ImpStmtForRange v e1 e2 s))
+                 (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P (ImpStmtIf e s1 s2))
+        :=
+          fix F (e : imp_stmt) : P e :=
+            match e as e0 return (P e0) with
+            | ImpStmtBlock el sl =>
+              fblock el sl ((fix F1 (c : list imp_stmt) : Forallt P c :=
+                               match c as c0 with
+                               | nil => Forallt_nil _
+                               | cons d c0 => @Forallt_cons _ P d c0 (F d) (F1 c0)
+                               end) sl)
+            | ImpStmtAssign v e => fassign v e
+            | ImpStmtFor v e s => ffor v e s
+            | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s
+            | ImpStmtIf e s1 s2 => fif e s1 s2
+            end.
+
+      Definition imp_stmt_ind (P : imp_stmt -> Prop)
+                 (fblock : forall el : list (var * option imp_expr), forall sl : list imp_stmt,
+                       Forall P sl -> P (ImpStmtBlock el sl))
+                 (fassign : forall v : string, forall e : imp_expr, P (ImpStmtAssign v e))
+                 (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P (ImpStmtFor v e s))
+                 (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P (ImpStmtForRange v e1 e2 s))
+                 (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P (ImpStmtIf e s1 s2))
+        :=
+          fix F (e : imp_stmt) : P e :=
+            match e as e0 return (P e0) with
+            | ImpStmtBlock el sl =>
+              fblock el sl ((fix F1 (c : list imp_stmt) : Forall P c :=
+                               match c as c0 with
+                               | nil => Forall_nil _
+                               | cons d c0 => @Forall_cons _ P d c0 (F d) (F1 c0)
+                               end) sl)
+            | ImpStmtAssign v e => fassign v e
+            | ImpStmtFor v e s => ffor v e s
+            | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s
+            | ImpStmtIf e s1 s2 => fif e s1 s2
+            end.
+
+      Definition imp_stmt_rec (P:imp_stmt->Set) := imp_stmt_rect P.
+
     End RectInd.
 
     (* Section dec. *)

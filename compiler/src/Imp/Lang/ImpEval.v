@@ -90,45 +90,66 @@ Section ImpEval.
       if n1 <=? n2 then S (Z.to_nat (n2 - n1))
       else 0%nat.
 
+    (* Auxiliary function to eval all the variable declarations in a block *)
+    Definition imp_decls_eval (σ:pd_rbindings) (vl:list (string * option imp_expr)) : option pd_rbindings :=
+      let proc_one_decl c vd :=
+          match c with
+          | None => None
+          | Some σ' =>
+            match vd with
+            | (v, None) =>
+              Some ((v, None) :: σ')
+            | (v, Some e) =>
+              match imp_expr_eval σ' e with
+              | None => None
+              | Some d =>
+                Some ((v, Some d) :: σ')
+              end
+            end
+          end
+      in
+      fold_left proc_one_decl vl (Some σ).
+
+    (* Auxiliary function to erase all the variable declarations in a block *)
+    Definition imp_decls_erase (σ:option pd_rbindings) {A} (vl:list A) : option pd_rbindings :=
+      let proc_one_var v c :=
+          match c with
+          | None => None
+          | Some (_::σ') =>
+            Some σ'
+          | Some nil =>
+            None
+          end
+      in
+      fold_right proc_one_var σ vl.
+
+    Lemma imp_decls_erase_none {A} (vl:list A) :
+      imp_decls_erase None vl = None.
+    Proof.
+      induction vl; simpl; [|rewrite IHvl]; reflexivity.
+    Qed.
+
+    Lemma imp_decls_erase_remove_map {A B} σ (vl:list A) (f:A -> B) :
+      imp_decls_erase σ (map f vl) = imp_decls_erase σ vl.
+    Proof.
+      induction vl; simpl; [|rewrite IHvl]; reflexivity.
+    Qed.
+
     Fixpoint imp_stmt_eval
              (s:imp_stmt) (σ:pd_rbindings) { struct s } : option pd_rbindings :=
       match s with
       | ImpStmtBlock vl sl =>
-        let proc_one_decl c vd :=
-            match c with
-            | None => None
-            | Some σ' =>
-              match vd with
-              | (v, None) =>
-                Some ((v, None) :: σ')
-              | (v, Some e) =>
-                match imp_expr_eval σ' e with
-                | None => None
-                | Some d =>
-                  Some ((v, Some d) :: σ')
-              end
-              end
-            end
-        in
-        let σdeclared := fold_left proc_one_decl vl (Some σ) in
+        let σdeclared := imp_decls_eval σ vl in
         let proc_one_stmt c s :=
             match c with
             | None => None
-            | Some σ' =>
-              imp_stmt_eval s σ'
+            | Some σ' => imp_stmt_eval s σ'
             end
         in
-        let σblock := fold_left proc_one_stmt sl σdeclared in
-        let proc_one_var v c :=
-            match c with
-            | None => None
-            | Some (_::σ') =>
-              Some σ'
-            | Some nil =>
-              None
-            end
+        let σblock :=
+            olift (fun σ' => fold_left proc_one_stmt sl (Some σ')) σdeclared
         in
-        let σerased := fold_right proc_one_var σblock vl in
+        let σerased := imp_decls_erase σblock vl in
         σerased
       | ImpStmtAssign v e =>
         match imp_expr_eval σ e, lookup string_dec σ v with
