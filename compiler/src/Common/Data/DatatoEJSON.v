@@ -262,6 +262,14 @@ Section ModelRoundTrip.
       now destruct i0.
     Qed.
 
+    (* XXX Is this true? *)
+
+    Lemma bdistinct_ejson_to_data_comm l:
+      bdistinct (map ejson_to_data l) = map ejson_to_data (bdistinct l).
+    Proof.
+      admit.
+    Admitted.
+
     (* XXX Some assumptions for the correctness of operators translation -- they do not hold as-is *)
 
     Lemma assoc_lookupr_json_key_encode_roundtrip l s:

@@ -48,10 +48,8 @@ Section ImpQcerttoImpEJson.
   Definition mk_string s : imp_ejson_expr := ImpExprConst (ejstring s).
   Definition mk_string_array sl : imp_ejson_expr := ImpExprConst (ejarray (map ejstring sl)).
   Definition mk_bag el : imp_ejson_expr := mk_imp_ejson_op EJsonOpArray el.
-  Definition mk_left e : imp_ejson_expr :=
-    mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
-  Definition mk_right e : imp_ejson_expr :=
-    mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
+  Definition mk_left e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
+  Definition mk_right e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
 
   Definition sortCriteria_to_ejson_expr (sc: string * SortDesc) : imp_ejson_expr :=
     let (lbl, c) := sc in
@@ -445,12 +443,6 @@ Section ImpQcerttoImpEJson.
       reflexivity.
     Qed.
 
-    Lemma bdistinct_ejson_to_data_comm l:
-      bdistinct (map ejson_to_data l) = map ejson_to_data (bdistinct l).
-    Proof.
-      admit.
-    Admitted.
-
     Lemma ejson_to_data_jobj_nbrand s e b d: (ejson_to_data (ejobject [(s, e)])) <> dbrand b d.
     Proof.
       simpl.
@@ -532,6 +524,58 @@ Section ImpQcerttoImpEJson.
           intros; contradiction.
     Qed.
 
+    Lemma ejson_data_maybe_cast b s s0 e e0 :
+      match ejson_to_data (ejobject [(s, e); (s0, e0)]) with
+      | dbrand b' _ =>
+        if sub_brands_dec h b' b then Some (dsome (ejson_to_data (ejobject [(s, e); (s0, e0)]))) else Some dnone
+      | _ => None
+      end =
+      match
+        match e with
+        | ejarray jl2 =>
+          if string_dec s "$class"
+          then
+            if string_dec s0 "$data"
+            then
+              match ejson_brands jl2 with
+              | Some b2 =>
+                if sub_brands_dec h b2 b
+                then Some (ejobject [("$left"%string, ejobject [(s, e); (s0, e0)])])
+                else Some (ejobject [("$right"%string, ejnull)])
+              | None => None
+              end
+            else None
+          else None
+        | _ => None
+        end
+      with
+      | Some a' => Some (ejson_to_data a')
+      | None => None
+      end.
+    Proof.
+      case_eq (string_dec s "$class"); intros; subst;
+      case_eq (string_dec s0 "$data"); intros; subst.
+      - destruct e; simpl;
+          try (destruct e0; simpl; reflexivity).
+        case_eq (ejson_brands l); intros; [|reflexivity].
+        destruct (sub_brands_dec h l0 b); [|reflexivity].
+        f_equal; simpl; unfold dsome; f_equal.
+        rewrite H1.
+        reflexivity.
+      - case_eq (ejson_to_data (ejobject [("$class"%string, e); (s0, e0)])); intros;
+          try (destruct e; simpl; reflexivity).
+          specialize (ejson_to_data_jobj_nbrand_no_data e s0 e0 b0 d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject [(s, e); ("$data"%string, e0)])); intros;
+          try (destruct e; simpl; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class e s e0 b0 d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject [(s, e); (s0, e0)])); intros;
+          try (destruct e; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b0 d n n0);
+          intros; contradiction.
+    Qed.
+
     Lemma imp_qcert_unary_op_to_imp_ejson_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -587,11 +631,13 @@ Section ImpQcerttoImpEJson.
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         unfold edot.
+        (* XXX This lemma is not true! See DatatoEJson *)
         apply assoc_lookupr_json_key_encode_roundtrip.
       - Case "OpRecRemove"%string.
         destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
+        (* XXX This lemma is not true! See DatatoEJson *)
         apply rremove_json_key_encode_roundtrip.
       - Case "OpRecProject"%string.
         admit. (** XXX This one looks more complicated *)
@@ -689,7 +735,7 @@ Section ImpQcerttoImpEJson.
         destruct p; simpl; trivial;
           destruct l; simpl; trivial.
         + case_eq (ejson_to_data (ejobject [(s, e)])); intros;
-            try (destruct e; simpl; reflexivity).
+            try (destruct e; simpl; reflexivity);
           specialize (ejson_to_data_jobj_nbrand s e b d); intros;
             contradiction.
         + destruct l; simpl; trivial.
@@ -700,7 +746,24 @@ Section ImpQcerttoImpEJson.
             specialize (ejson_to_data_jobj_nbrand_long s e p p0 l b d); intros;
               contradiction.
       - Case "OpCast"%string.
-        admit. (* XXX Not implemented *)
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+          try reflexivity; simpl.
+        rewrite json_brands_of_brands_idempotent.
+        destruct i0; try reflexivity; simpl.
+        destruct l; simpl; trivial;
+        destruct p; simpl; trivial;
+          destruct l; simpl; trivial.
+        + case_eq (ejson_to_data (ejobject [(s, e)])); intros;
+            try (destruct e; simpl; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand s e b0 d); intros;
+            contradiction.
+        + destruct l; simpl; trivial.
+          * destruct p; simpl; trivial.
+            apply ejson_data_maybe_cast.
+          * case_eq (ejson_to_data (ejobject ((s, e) :: p :: p0 :: l))); intros;
+            try (destruct e; simpl; destruct p; destruct e; reflexivity);
+            specialize (ejson_to_data_jobj_nbrand_long s e p p0 l b0 d); intros;
+              contradiction.
       - Case "OpNatUnary"%string.
         admit. (* XXX Not implemented *)
       - Case "OpNatSum"%string.
