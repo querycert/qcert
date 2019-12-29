@@ -318,10 +318,10 @@ Section ImpQcerttoImpEJson.
         (fun exp : imp_expr =>
            imp_qcert_expr_eval h σ exp =
            lift_result
-             (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) el -> 
+             (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) el -> 
       map (fun x : imp_qcert_expr => imp_qcert_expr_eval h σ x) el =
       map (fun x : imp_qcert_expr => lift_result
-             (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson x))) el.
+             (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson x))) el.
     Proof.
       intros.
       apply map_eq.
@@ -364,9 +364,9 @@ Section ImpQcerttoImpEJson.
       Forall
         (fun exp : imp_expr =>
            imp_qcert_expr_eval h σ exp =
-           lift_result (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) [i]
+           lift_result (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) [i]
       -> imp_qcert_expr_eval h σ i
-         = lift_result (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i)).
+         = lift_result (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i)).
     Proof.
       intros.
       rewrite Forall_forall in H.
@@ -451,18 +451,100 @@ Section ImpQcerttoImpEJson.
       admit.
     Admitted.
 
+    Lemma ejson_to_data_jobj_nbrand s e b d: (ejson_to_data (ejobject [(s, e)])) <> dbrand b d.
+    Proof.
+      simpl.
+      repeat match_destr.
+    Qed.
+
+    Lemma ejson_to_data_jobj_nbrand_long s e p p0 l b d:
+      (ejson_to_data (ejobject ((s, e) :: p :: p0 :: l))) <> dbrand b d.
+    Proof.
+      simpl.
+      repeat match_destr.
+    Qed.
+
+    Lemma ejson_to_data_jobj_nbrand_no_data e s0 e0 b d:
+      s0 <> "$data"%string ->
+      ejson_to_data (ejobject [("$class"%string, e); (s0, e0)]) <> dbrand b d.
+    Proof.
+      intros; simpl.
+      repeat match_destr; try congruence.
+    Qed.
+      
+    Lemma ejson_to_data_jobj_nbrand_no_class e s e0 b d:
+      s <> "$class"%string ->
+      ejson_to_data (ejobject [(s, e); ("$data"%string, e0)]) <> dbrand b d.
+    Proof.
+      intros; simpl.
+      repeat match_destr; try congruence.
+    Qed.
+
+    Lemma ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b d:
+      s <> "$class"%string ->
+      s0 <> "$data"%string ->
+      ejson_to_data (ejobject [(s, e); (s0, e0)]) <> dbrand b d.
+    Proof.
+      intros; simpl.
+      repeat match_destr; try congruence.
+    Qed.
+
+    Lemma ejson_data_maybe_brand s s0 e e0 :
+      match ejson_to_data (ejobject [(s, e); (s0, e0)]) with
+      | dbrand _ d' => Some d'
+      | _ => None
+      end =
+      match
+        match e with
+        | ejarray j1 =>
+          if string_dec s "$class"
+          then
+            if string_dec s0 "$data"
+            then match ejson_brands j1 with
+                 | Some _ => Some e0
+                 | None => None
+                 end
+            else None
+          else None
+        | _ => None
+        end
+      with
+      | Some a' => Some (ejson_to_data a')
+      | None => None
+      end.
+    Proof.
+      case_eq (string_dec s "$class"); intros; subst;
+      case_eq (string_dec s0 "$data"); intros; subst.
+      - destruct e; simpl;
+          try (destruct e0; simpl; reflexivity).
+        destruct (ejson_brands l); reflexivity.
+      - case_eq (ejson_to_data (ejobject [("$class"%string, e); (s0, e0)])); intros;
+          try (destruct e; simpl; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_data e s0 e0 b d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject [(s, e); ("$data"%string, e0)])); intros;
+          try (destruct e; simpl; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class e s e0 b d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject [(s, e); (s0, e0)])); intros;
+          try (destruct e; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b d n n0);
+          intros; contradiction.
+    Qed.
+
     Lemma imp_qcert_unary_op_to_imp_ejson_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
         (fun exp : imp_expr =>
            imp_qcert_expr_eval h σ exp =
            lift_result
-             (imp_ejson_expr_eval
+             (imp_ejson_expr_eval h
                 (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) el -> 
       imp_qcert_expr_eval h σ (ImpExprOp (QcertOpUnary u) el) =
       lift_result
-        (imp_ejson_expr_eval (lift_pd_bindings σ)
-                            (imp_qcert_unary_op_to_imp_ejson u (map imp_qcert_expr_to_imp_ejson el))).
+        (imp_ejson_expr_eval h
+                             (lift_pd_bindings σ)
+                             (imp_qcert_unary_op_to_imp_ejson u (map imp_qcert_expr_to_imp_ejson el))).
     Proof.
       Opaque ejson_to_data.
       intros.
@@ -484,10 +566,10 @@ Section ImpQcerttoImpEJson.
       unfold imp_qcert_op_eval, imp_ejson_op_eval.
       unary_op_cases (destruct u) Case; unfold lift_result, lift, olift; simpl.
       - Case "OpIdentity"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
       - Case "OpNeg"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity.
         unfold unudbool.
@@ -495,29 +577,29 @@ Section ImpQcerttoImpEJson.
         generalize (ejson_to_data_object_not_boolean l b); intros.
         congruence.
       - Case "OpRec"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity.
         simpl.
         f_equal.
         apply rec_ejson_key_encode_roundtrip.
       - Case "OpDot"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         unfold edot.
         apply assoc_lookupr_json_key_encode_roundtrip.
       - Case "OpRecRemove"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         apply rremove_json_key_encode_roundtrip.
       - Case "OpRecProject"%string.
         admit. (** XXX This one looks more complicated *)
       - Case "OpBag"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
       - Case "OpSingleton"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + destruct l; try reflexivity; simpl.
@@ -528,7 +610,7 @@ Section ImpQcerttoImpEJson.
           generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpFlatten"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + unfold lift. simpl.
@@ -538,7 +620,7 @@ Section ImpQcerttoImpEJson.
           generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpDistinct"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + simpl.
@@ -556,7 +638,7 @@ Section ImpQcerttoImpEJson.
       - Case "OpOrderBy"%string.
         admit. (* XXX Not implemented *)
       - Case "OpCount"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + Transparent ejson_to_data. unfold ejson_to_data; simpl.
@@ -572,7 +654,7 @@ Section ImpQcerttoImpEJson.
       - Case "OpToText"%string.
         admit. (* XXX Not implemented *)
       - Case "OpLength"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
@@ -583,15 +665,15 @@ Section ImpQcerttoImpEJson.
       - Case "OpLike"%string.
         admit. (* XXX Not implemented *)
       - Case "OpLeft"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; reflexivity.
       - Case "OpRight"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; reflexivity.
       - Case "OpBrand"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         rewrite of_string_list_over_strings_idempotent; simpl.
         Transparent ejson_to_data.
@@ -600,10 +682,23 @@ Section ImpQcerttoImpEJson.
         destruct i0; try reflexivity; simpl.
         Opaque ejson_to_data.
       - Case "OpUnbrand"%string.
-        destruct (imp_ejson_expr_eval (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
+        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
-        admit. (* XXX Shouldn't be too hard with proper lemma(s) tying json_to_data and dbrand *)
+        destruct l; simpl; trivial;
+        destruct p; simpl; trivial;
+          destruct l; simpl; trivial.
+        + case_eq (ejson_to_data (ejobject [(s, e)])); intros;
+            try (destruct e; simpl; reflexivity).
+          specialize (ejson_to_data_jobj_nbrand s e b d); intros;
+            contradiction.
+        + destruct l; simpl; trivial.
+          * destruct p; simpl; trivial.
+            apply ejson_data_maybe_brand.
+          * case_eq (ejson_to_data (ejobject ((s, e) :: p :: p0 :: l))); intros;
+            try (destruct e; simpl; destruct p; destruct e; reflexivity).
+            specialize (ejson_to_data_jobj_nbrand_long s e p p0 l b d); intros;
+              contradiction.
       - Case "OpCast"%string.
         admit. (* XXX Not implemented *)
       - Case "OpNatUnary"%string.
@@ -632,6 +727,7 @@ Section ImpQcerttoImpEJson.
         admit.
       - Case "OpForeignUnary"%string.
         admit.
+        Transparent ejson_to_data.
     Admitted.
 
     Lemma imp_qcert_binary_op_to_imp_ejson_expr_correct
@@ -640,11 +736,11 @@ Section ImpQcerttoImpEJson.
         (fun exp : imp_expr =>
            imp_qcert_expr_eval h σ exp =
            lift_result
-             (imp_ejson_expr_eval
+             (imp_ejson_expr_eval h
                 (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) el -> 
       imp_qcert_expr_eval h σ (ImpExprOp (QcertOpBinary b) el) =
       lift_result
-        (imp_ejson_expr_eval (lift_pd_bindings σ)
+        (imp_ejson_expr_eval h (lift_pd_bindings σ)
                             (imp_qcert_binary_op_to_imp_ejson b (map imp_qcert_expr_to_imp_ejson el))).
     Proof.
     Admitted.
@@ -655,11 +751,11 @@ Section ImpQcerttoImpEJson.
         (fun exp : imp_expr =>
            imp_qcert_expr_eval h σ exp =
            lift_result
-             (imp_ejson_expr_eval
+             (imp_ejson_expr_eval h
                 (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) el -> 
       imp_qcert_expr_eval h σ (ImpExprRuntimeCall rt el) =
       lift_result
-        (imp_ejson_expr_eval (lift_pd_bindings σ)
+        (imp_ejson_expr_eval h (lift_pd_bindings σ)
                             (imp_qcert_runtime_call_to_imp_ejson rt (map imp_qcert_expr_to_imp_ejson el))).
     Proof.
     Admitted.
@@ -670,11 +766,11 @@ Section ImpQcerttoImpEJson.
         (fun exp : imp_expr =>
            imp_qcert_expr_eval h σ exp =
            lift_result
-             (imp_ejson_expr_eval
+             (imp_ejson_expr_eval h
                 (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) el -> 
       imp_qcert_expr_eval h σ (ImpExprOp op el) =
       lift_result
-        (imp_ejson_expr_eval (lift_pd_bindings σ)
+        (imp_ejson_expr_eval h (lift_pd_bindings σ)
                             (imp_qcert_op_to_imp_ejson op (map imp_qcert_expr_to_imp_ejson el))).
     Proof.
       intros.
@@ -686,8 +782,8 @@ Section ImpQcerttoImpEJson.
     Lemma imp_qcert_expr_to_imp_ejson_expr_correct (σ:pd_bindings) (exp:imp_qcert_expr) :
       imp_qcert_expr_eval h σ exp =
       lift_result
-        (imp_ejson_expr_eval (lift_pd_bindings σ)
-                            (imp_qcert_expr_to_imp_ejson exp)).
+        (imp_ejson_expr_eval h (lift_pd_bindings σ)
+                             (imp_qcert_expr_to_imp_ejson exp)).
     Proof.
       imp_expr_cases (induction exp) Case.
       - Case "ImpExprError"%string.
@@ -715,24 +811,45 @@ Section ImpQcerttoImpEJson.
       - Case "ImpExprRuntimeCall"%string.
         apply imp_qcert_runtime_call_to_imp_ejson_expr_correct; assumption.
     Qed.
-
-    Lemma imp_qcert_decls_to_imp_ejson_decls_correct (σ:pd_bindings) (el:list (string * option imp_qcert_expr)) :
+    
+    Lemma map_lift_pd_bindings_eq (σ : pd_bindings) :
+      map (fun xy : string * option ejson => (fst xy, lift ejson_to_data (snd xy))) (lift_pd_bindings σ) = σ.
+    Proof.
+      unfold lift_pd_bindings.
+      rewrite map_map.
+      induction σ; [reflexivity|]; simpl.
+      + destruct a; simpl.
+        destruct o; simpl.
+        * rewrite json_to_data_to_json_idempotent.
+          f_equal; assumption.
+        * f_equal; assumption.
+    Qed.      
+      
+    Lemma imp_qcert_decls_to_imp_ejson_decls_correct
+          (σ:pd_bindings)
+          (el:list (string * option imp_qcert_expr)) :
       imp_qcert_decls_eval h σ el =
       lift_result_env
-        (imp_ejson_decls_eval
+        (imp_ejson_decls_eval h
            (lift_pd_bindings σ)
            (map (fun xy : var * option imp_qcert_expr => (fst xy, lift imp_qcert_expr_to_imp_ejson (snd xy))) el)).
     Proof.
-      admit.
+      unfold imp_qcert_decls_eval;
+        unfold imp_ejson_decls_eval;
+        unfold ImpEval.imp_decls_eval; simpl.
+      revert σ.
+      induction el; simpl; intros; subst.
+      - rewrite map_lift_pd_bindings_eq; reflexivity.
+      - admit.
     Admitted.
-    
+
     Lemma imp_fold_qcert_stmt_to_imp_ejson_stmt_correct avoid (σ:pd_jbindings) sl :
       (Forall
          (fun stmt : imp_stmt =>
             forall (σ : pd_bindings) (avoid : list string),
               imp_qcert_stmt_eval h stmt σ =
               lift_result_env
-                (imp_ejson_stmt_eval
+                (imp_ejson_stmt_eval h
                    (imp_qcert_stmt_to_imp_ejson avoid stmt) (lift_pd_bindings σ))) sl) ->
       (fold_left
          (fun (c : option ImpEval.pd_rbindings) (s : ImpEval.imp_stmt) =>
@@ -752,17 +869,39 @@ Section ImpQcerttoImpEJson.
          (fold_left
             (fun (c : option ImpEval.pd_rbindings) (s : ImpEval.imp_stmt) =>
                match c with
-               | Some σ' => imp_ejson_stmt_eval s σ'
+               | Some σ' => imp_ejson_stmt_eval h s σ'
                | None => None
                end) (map (imp_qcert_stmt_to_imp_ejson avoid) sl) (Some σ))).
-      admit.
+    Proof.
+      intros.
+      revert σ; induction sl; simpl; intros.
+      - reflexivity.
+      - rewrite Forall_forall in H; simpl in H.
+        assert (Forall
+           (fun stmt : imp_stmt =>
+            forall (σ : pd_bindings) (avoid : list string),
+            imp_qcert_stmt_eval h stmt σ =
+            lift_result_env (imp_ejson_stmt_eval h (imp_qcert_stmt_to_imp_ejson avoid stmt) (lift_pd_bindings σ)))
+           sl).
+        rewrite Forall_forall; intros.
+        assert (a = x \/ In x sl) by (right; assumption).
+        specialize (H x H1); clear H1; auto.
+        specialize (IHsl H0); clear H0.
+        assert
+          (forall (σ : pd_bindings) (avoid : list string),
+              imp_qcert_stmt_eval h a σ =
+              lift_result_env (imp_ejson_stmt_eval h (imp_qcert_stmt_to_imp_ejson avoid a) (lift_pd_bindings σ))).
+        apply (H a); left; reflexivity.
+        clear H.
+        unfold lift_result_env, lift in *.
+        admit.
     Admitted.
 
     Lemma imp_qcert_stmt_to_imp_ejson_stmt_correct (σ:pd_bindings) (stmt:imp_qcert_stmt) :
       forall avoid: list string,
          (* (fres_var stmt) avoid -> *)
         imp_qcert_stmt_eval h stmt σ =
-        lift_result_env (imp_ejson_stmt_eval (imp_qcert_stmt_to_imp_ejson avoid stmt) (lift_pd_bindings σ)).
+        lift_result_env (imp_ejson_stmt_eval h (imp_qcert_stmt_to_imp_ejson avoid stmt) (lift_pd_bindings σ)).
     Proof.
       revert σ.
       imp_stmt_cases (induction stmt) Case.
@@ -797,7 +936,7 @@ Section ImpQcerttoImpEJson.
              match
                c return (option (@ImpEval.pd_rbindings (@imp_ejson_data (@foreign_runtime_ejson fruntime))))
              with
-             | Some σ' => @imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) s σ'
+             | Some σ' => @imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) h s σ'
              | None => @None (@ImpEval.pd_rbindings (@imp_ejson_data (@foreign_runtime_ejson fruntime)))
              end)
             (@map (@imp_qcert_stmt fruntime) (@imp_ejson_stmt (@foreign_runtime_ejson fruntime))
@@ -813,7 +952,7 @@ Section ImpQcerttoImpEJson.
             match
               c return (option (@ImpEval.pd_rbindings (@imp_ejson_data (@foreign_runtime_ejson fruntime))))
             with
-            | Some σ' => @imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) s σ'
+            | Some σ' => @imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) h s σ'
             | None => @None (@ImpEval.pd_rbindings (@imp_ejson_data (@foreign_runtime_ejson fruntime)))
             end)
            (@map (@imp_qcert_stmt fruntime) (@imp_ejson_stmt (@foreign_runtime_ejson fruntime))
@@ -823,7 +962,7 @@ Section ImpQcerttoImpEJson.
             (fold_left
                (fun (c : option ImpEval.pd_rbindings) (s : ImpEval.imp_stmt) =>
                   match c with
-                  | Some σ' => imp_ejson_stmt_eval s σ'
+                  | Some σ' => imp_ejson_stmt_eval h s σ'
                   | None => None
                   end)
                (map (imp_qcert_stmt_to_imp_ejson avoid) sl) (Some p)); simpl.
@@ -913,7 +1052,7 @@ Section ImpQcerttoImpEJson.
 
     Lemma imp_qcert_function_to_imp_ejson_function_correct (d:data) (f:imp_qcert_function) :
       imp_qcert_function_eval h f d =
-      lift ejson_to_data (imp_ejson_function_eval (imp_qcert_function_to_imp_ejson f) (data_to_ejson d)).
+      lift ejson_to_data (imp_ejson_function_eval h (imp_qcert_function_to_imp_ejson f) (data_to_ejson d)).
     Proof.
       destruct f; simpl.
       generalize (imp_qcert_stmt_to_imp_ejson_stmt_correct [(v0, None); (v, Some d)] i (v::nil)); intros.
@@ -923,13 +1062,14 @@ Section ImpQcerttoImpEJson.
       rewrite H; clear H.
       unfold lift_result_env.
       unfold lift.
-      case_eq (@ImpEval.imp_stmt_eval _ _ _ imp_ejson_data_normalize imp_ejson_data_to_bool imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data imp_ejson_runtime_eval imp_ejson_op_eval (imp_qcert_stmt_to_imp_ejson [v] i) (lift_pd_bindings [(v0, None); (v, Some d)])); intros.
+      Set Printing All.
+      case_eq (@ImpEval.imp_stmt_eval _ _ _ imp_ejson_data_normalize imp_ejson_data_to_bool imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data (imp_ejson_runtime_eval h) imp_ejson_op_eval (imp_qcert_stmt_to_imp_ejson [v] i) (lift_pd_bindings [(v0, None); (v, Some d)])); intros.
       - unfold olift.
         unfold imp_ejson_data in *.
         unfold imp_qcert_data in *.
         unfold imp_ejson_op in *.
         assert ((@ImpEval.imp_stmt_eval ejson ejson_op imp_ejson_runtime_op imp_ejson_data_normalize imp_ejson_data_to_bool
-           imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data imp_ejson_runtime_eval imp_ejson_op_eval
+           imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data (imp_ejson_runtime_eval h) imp_ejson_op_eval
            (imp_qcert_stmt_to_imp_ejson (@cons var v (@nil var)) i)
            (lift_pd_bindings
               (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
@@ -940,7 +1080,7 @@ Section ImpQcerttoImpEJson.
                        (@Some (@data (@foreign_runtime_data fruntime)) d))
                     (@nil (prod var (option (@data (@foreign_runtime_data fruntime)))))))))
                 = (@ImpEval.imp_stmt_eval ejson ejson_op imp_ejson_runtime_op imp_ejson_data_normalize imp_ejson_data_to_bool
-          imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data imp_ejson_runtime_eval imp_ejson_op_eval
+          imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data (imp_ejson_runtime_eval h) imp_ejson_op_eval
           (imp_qcert_stmt_to_imp_ejson (@cons var v (@nil var)) i)
           (@cons (prod var (option ejson)) (@pair var (option ejson) v0 (@None ejson))
              (@cons (prod var (option ejson))
@@ -962,7 +1102,7 @@ Section ImpQcerttoImpEJson.
         unfold imp_qcert_data in *.
         unfold imp_ejson_op in *.
         assert ((@ImpEval.imp_stmt_eval ejson ejson_op imp_ejson_runtime_op imp_ejson_data_normalize imp_ejson_data_to_bool
-           imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data imp_ejson_runtime_eval imp_ejson_op_eval
+           imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data (imp_ejson_runtime_eval h) imp_ejson_op_eval
            (imp_qcert_stmt_to_imp_ejson (@cons var v (@nil var)) i)
            (lift_pd_bindings
               (@cons (prod var (option (@data (@foreign_runtime_data fruntime))))
@@ -973,7 +1113,7 @@ Section ImpQcerttoImpEJson.
                        (@Some (@data (@foreign_runtime_data fruntime)) d))
                     (@nil (prod var (option (@data (@foreign_runtime_data fruntime)))))))))
                 = (@ImpEval.imp_stmt_eval ejson ejson_op imp_ejson_runtime_op imp_ejson_data_normalize imp_ejson_data_to_bool
-          imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data imp_ejson_runtime_eval imp_ejson_op_eval
+          imp_ejson_data_to_Z imp_ejson_data_to_list imp_ejson_Z_to_data (imp_ejson_runtime_eval h) imp_ejson_op_eval
           (imp_qcert_stmt_to_imp_ejson (@cons var v (@nil var)) i)
           (@cons (prod var (option ejson)) (@pair var (option ejson) v0 (@None ejson))
              (@cons (prod var (option ejson))
@@ -995,7 +1135,7 @@ Section ImpQcerttoImpEJson.
 
     Theorem imp_qcert_to_imp_ejson_correct (σc:bindings) (q:imp_qcert) :
       imp_qcert_eval_top h σc q =
-      imp_ejson_eval_top σc (imp_qcert_to_imp_ejson q).
+      imp_ejson_eval_top h σc (imp_qcert_to_imp_ejson q).
     Proof.
       unfold imp_qcert_eval_top.
       unfold imp_ejson_eval_top.

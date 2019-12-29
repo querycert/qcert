@@ -175,9 +175,9 @@ public class UnaryOperators {
 	private static <V> void tostring(StringBuilder sb, JsonObject o){
 	    if (o.has("$nat")) { // integer
           sb.append(o.get("$nat").getAsLong());
-	    } else if (o.has("$type")) { // branded value
+	    } else if (o.has("$class")) { // branded value
           sb.append("<");
-          sb.append(o.get("$type").getAsString());
+          sb.append(o.get("$class").getAsString());
           sb.append(":");
           tostring(sb,o.get("$data"));
           sb.append(">");
@@ -261,7 +261,7 @@ public class UnaryOperators {
 		for(final String br : brands) {
 			brands_dst.add(br);
 		}
-		dst.add("$type", brands_dst);
+		dst.add("$class", brands_dst);
 		return dst;
 	}
 	public static JsonElement unbrand(JsonElement e) {
@@ -270,7 +270,7 @@ public class UnaryOperators {
 	
 	public static JsonElement cast(Inheritance inheritance, Collection<String> brands, JsonElement e) {
 		final JsonObject er = e.getAsJsonObject();
-		final JsonArray typs = er.get("$type").getAsJsonArray();
+		final JsonArray typs = er.get("$class").getAsJsonArray();
 		Set<String> actualBrands = collToBrands(typs);
 		if(inheritance.isAssignableFrom(brands, actualBrands)) {
 			return left(e);

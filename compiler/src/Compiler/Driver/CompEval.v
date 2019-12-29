@@ -68,6 +68,7 @@ Section CompEval.
   Context {ftejson:foreign_to_ejson}.   (* Necessary for ImpJson evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
 
+  (* XXX This should come from the brand model, to ensure consistency *)
   Context (h:list(string*string)).
 
   (* Evaluation functions *)
@@ -132,7 +133,7 @@ Section CompEval.
     (* Language: imp_ejson *)
     (* XXX Is this really what we want to wrap/unwrap in data? *)
     Definition eval_imp_ejson (q:imp_ejson) (cenv: bindings) : option data :=
-      ImpEJsonEval.imp_ejson_eval_top cenv q.
+      ImpEJsonEval.imp_ejson_eval_top h cenv q.
 
     (* Language: nnrcmr *)
     Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=

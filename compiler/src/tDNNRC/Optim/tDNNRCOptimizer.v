@@ -184,7 +184,7 @@ Section tDNNRCOptimizer.
            * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
            *)
           let ALG := (DNNRCAlg algTypeA
-                            (DSFilter (CUDFCast brands (CCol "$type"))
+                            (DSFilter (CUDFCast brands (CCol "$class"))
                                       (DSVar "map_cast"))
                             (("map_cast"%string, xs)::nil)) in
           (DNNRCUnop t1 OpFlatten

@@ -90,7 +90,7 @@ object QcertRuntime {
           "Right(" + toQcertString(x(0)) + ")"
         else
           "Left(" + toQcertString(x(1)) + ")"
-      case Array("$type", "$data") =>
+      case Array("$class", "$data") =>
         val brands = x.getSeq[String](0).mkString(" & ")
         val data = blobToQcertString(x.getAs[String](1))
         s"<$brands:$data>"
@@ -177,7 +177,7 @@ object QcertRuntime {
 
   def brandStructType(t: DataType): StructType =
     StructType(StructField("$data", t, false)
-      :: StructField("$type", ArrayType(StringType, false), false) :: Nil)
+      :: StructField("$class", ArrayType(StringType, false), false) :: Nil)
 
   // Same thing as with either, need to infer/pass the Spark type. Can we factor this out?
   def brand(v: Long, b: Brand*): BrandedValue =
@@ -199,14 +199,14 @@ object QcertRuntime {
     * This is not a general cast operator, i.e. it does not give access to fields from the .. part of
     * an open record. The input has to be a branded value.
     *
-    * @param v  The value has to be a branded value, that is a Row with fields $data : τ and $type : Array[String].
+    * @param v  The value has to be a branded value, that is a Row with fields $data : τ and $class : Array[String].
     * @param bs The brands we are casting to.
     * @return Either a right, if the cast fails, or a branded value wrapped in left.
     */
   def cast(brandInheritance: BrandInheritance, v: BrandedValue, bs: Brand*): Either = {
     // TODO use castUDF helper
     if (!bs.forall((brand: Brand) =>
-      v.getSeq(1 /* $type */).exists((typ: Brand) =>
+      v.getSeq(1 /* $class */).exists((typ: Brand) =>
         isSubBrand(brandInheritance, typ, brand))))
       none()
     else
@@ -257,9 +257,9 @@ object QcertRuntime {
       b.getAsJsonArray.iterator().asScala.map((e: JsonElement) => fromBlob(t.elementType, e)).toArray
     case t: StructType => t.fieldNames match {
       case Array("$left", "$right") => sys.error("either")
-      case Array("$data", "$type") =>
+      case Array("$data", "$class") =>
         srow(StructType(StructField("$data", StringType, false)
-                     :: StructField("$type", ArrayType(StringType, false), false)
+                     :: StructField("$class", ArrayType(StringType, false), false)
                      :: Nil),
              b.getAsJsonObject.get("data").toString,
              fromBlob(ArrayType(StringType, false), b.getAsJsonObject.get("type")))
@@ -297,7 +297,7 @@ object QcertRuntime {
           "{\"left\":" ++ toBlob(r(0))
         else
           "{\"right\":" ++ toBlob(r(1))
-      case Array("$data", "$type") =>
+      case Array("$data", "$class") =>
         "{\"type\": " ++ toBlob(r(1)) ++ ", \"data\": " ++ toBlob(r(0)) ++ "}"
       case Array("$blob", "$known") =>
         // NOTE we keep the full record in the blob field

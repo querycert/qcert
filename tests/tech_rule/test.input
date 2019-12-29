@@ -1,7 +1,7 @@
 {
   "WORLD": [
     {
-      "$type": [
+      "$class": [
         "tests.entities.Purchase"
       ],
       "$data": {
@@ -12,7 +12,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Purchase"
       ],
       "$data": {
@@ -23,7 +23,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Purchase"
       ],
       "$data": {
@@ -34,7 +34,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Purchase"
       ],
       "$data": {
@@ -45,7 +45,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Purchase"
       ],
       "$data": {
@@ -56,7 +56,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Purchase"
       ],
       "$data": {
@@ -67,7 +67,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Marketer"
       ],
       "$data": {
@@ -80,7 +80,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.ProductRep"
       ],
       "$data": {
@@ -98,7 +98,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.ProductRep"
       ],
       "$data": {
@@ -116,7 +116,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Product"
       ],
       "$data": {
@@ -126,7 +126,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Product"
       ],
       "$data": {
@@ -136,7 +136,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Product"
       ],
       "$data": {
@@ -146,7 +146,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Product"
       ],
       "$data": {
@@ -156,7 +156,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Product"
       ],
       "$data": {
@@ -166,7 +166,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Product"
       ],
       "$data": {
@@ -176,7 +176,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Customer"
       ],
       "$data": {
@@ -186,7 +186,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Customer"
       ],
       "$data": {
@@ -196,7 +196,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Customer"
       ],
       "$data": {
@@ -206,7 +206,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Customer"
       ],
       "$data": {
@@ -216,7 +216,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Customer"
       ],
       "$data": {
@@ -226,7 +226,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.Customer"
       ],
       "$data": {
@@ -236,7 +236,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.MainEntity"
       ],
       "$data": {
@@ -246,7 +246,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.entities.MainEntity"
       ],
       "$data": {
@@ -256,7 +256,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Client"
       ],
       "$data": {
@@ -266,7 +266,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Client"
       ],
       "$data": {
@@ -276,7 +276,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Client"
       ],
       "$data": {
@@ -286,7 +286,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Client"
       ],
       "$data": {
@@ -296,7 +296,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Client"
       ],
       "$data": {
@@ -306,7 +306,7 @@
       }
     },
     {
-      "$type": [
+      "$class": [
         "tests.branding.Client"
       ],
       "$data": {

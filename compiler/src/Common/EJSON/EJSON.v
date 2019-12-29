@@ -219,18 +219,10 @@ Section EJson.
       match j with
       | ejnull => jnull
       | ejnumber n => jnumber n
-      | ejbigint n => jnumber (float_of_int n)
+      | ejbigint n => jobject (("$nat"%string,jnumber (float_of_int n))::nil)
       | ejbool b => jbool b
       | ejstring s => jstring s
       | ejarray c => jarray (map ejson_to_json c)
-      | ejobject nil => jobject nil
-      | ejobject ((s1,j')::nil) =>
-        if (string_dec s1 "$nat") then
-          match j' with
-          | ejbigint n => jobject ((s1, jnumber (float_of_int n))::nil)
-          | _ => jobject ((s1, ejson_to_json j')::nil)
-          end
-        else jobject ((s1, ejson_to_json j')::nil)
       | ejobject r => jobject (map (fun x => (fst x, ejson_to_json (snd x))) r)
       | ejforeign fd => jobject (("$foreign"%string, foreign_ejson_to_json fd)::nil)
       end.

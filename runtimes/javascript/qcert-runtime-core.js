@@ -224,9 +224,9 @@ function toStringQ(v, quote) {
 	      return "" + v.$nat;
     }
     var result2 = "";
-    if (v.$type) { // branded value
+    if (v.$class) { // branded value
         result2 += "<";
-        result2 += v.$type;
+        result2 += v.$class;
         result2 += ":";
         result2 += toStringQ(v.$data, quote);
         result2 += ">";
@@ -345,7 +345,7 @@ function mustBeArray(obj) {
 }
 function cast(brands,v) {
     mustBeArray(brands);
-    var type = v.$type;
+    var type = v.$class;
     mustBeArray(type);
     if (brands.length == 1 && brands[0] == "Any") { /* cast to top of inheritance is built-in */
     	  return left(v);
@@ -378,7 +378,7 @@ function unbrand(v) {
     throw "TypeError: unbrand called on non-object";
 }
 function brand(b,v) {
-    return { "$type" : b, "$data" : v };
+    return { "$class" : b, "$data" : v };
 }
 function either(v) {
     if (v == null)

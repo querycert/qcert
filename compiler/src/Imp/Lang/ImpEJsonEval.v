@@ -39,6 +39,7 @@ Require Import ImpEJson.
 
 Section ImpEJsonEval.
   Context {ftoejson:foreign_ejson}.
+  Context (h:brand_relation_t). (* XXX We should try and bake this in, so it is passed as a value to the runtime *)
 
   Local Open Scope string.
 
@@ -209,7 +210,7 @@ Section ImpEJsonEval.
                let ob := of_string_list bls in
                lift (fun b =>
                        ejobject
-                         (("$type"%string, ejarray (map ejstring b))
+                         (("$class"%string, ejarray (map ejstring b))
                             ::("$data"%string, d2)
                             ::nil)) ob
              | _ => None
@@ -219,20 +220,45 @@ Section ImpEJsonEval.
         apply_unary
           (fun d =>
              match d with
-             (* Need to treat both order for consistency with data->ejson *)
-             | ejobject ((s1,ejarray j1)::(s2,j2)::nil) =>
-               if (string_dec s1 "$type") then
-                 if (string_dec s2 "$data") then Some j2
-                 else None
-               else None
-             | ejobject ((s1,j1)::(s2,ejarray j2)::nil) =>
-               if (string_dec s1 "$data") then
-                 if (string_dec s2 "$type") then Some j1
+             | ejobject ((s,ejarray jl)::(s',j')::nil) =>
+               if (string_dec s "$class") then
+                 if (string_dec s' "$data") then
+                   match ejson_brands jl with
+                   | Some _ => Some j'
+                   | None => None
+                   end
                  else None
                else None
              | _ => None
              end) dl
-      | EJsonRuntimeCast => None
+      | EJsonRuntimeCast =>
+        apply_binary
+          (fun d1 d2 : ejson =>
+             match d1 with
+             | ejarray jl1 =>
+               match ejson_brands jl1 with
+               | Some b1 =>
+                 match d2 with
+                 | ejobject ((s,ejarray jl2)::(s',_)::nil) =>
+                   if (string_dec s "$class") then
+                     if (string_dec s' "$data") then
+                       match ejson_brands jl2 with
+                       | Some b2 =>
+                         if (sub_brands_dec h b2 b1)
+                         then
+                           Some (ejobject (("$left"%string,d2)::nil))
+                         else
+                           Some (ejobject (("$right"%string,ejnull)::nil))
+                       | None => None
+                       end
+                     else None
+                   else None
+                 | _ => None
+                 end
+               | None => None
+               end
+             | _ => None
+             end) dl
       | EJsonRuntimeNatPlus => None
       | EJsonRuntimeNatMinus => None
       | EJsonRuntimeNatMult => None

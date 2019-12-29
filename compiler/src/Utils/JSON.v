@@ -191,7 +191,7 @@ Section JSON.
       repeat match_destr.
     Qed.
 
-    Lemma json_key_encode_not_type s : (json_key_encode s) <> "$type"%string.
+    Lemma json_key_encode_not_class s : (json_key_encode s) <> "$class"%string.
     Proof.
       destruct s; simpl; try discriminate.
       repeat match_destr.

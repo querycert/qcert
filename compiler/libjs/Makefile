@@ -29,10 +29,12 @@ BYTECODE=bc
 JS=js
 
 ## Toplevel
-all: ../../bin/$(MAIN).js
+all:
+	dune build $(MAIN).$(BYTECODE)
+	$(MAKE) ../../bin/$(MAIN).js
 
 ## JavaScript
-../../bin/$(MAIN).js:
+../../bin/$(MAIN).js: $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(BYTECODE)
 	dune build $(MAIN).$(BYTECODE)
 	js_of_ocaml $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(BYTECODE)
 	cp $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(JS) ../../bin/$(MAIN).$(JS)
