@@ -39,7 +39,8 @@ Require Import ImpEJson.
 
 Section ImpEJsonEval.
   Context {ftoejson:foreign_ejson}.
-  Context (h:brand_relation_t). (* XXX We should try and bake this in, so it is passed as a value to the runtime *)
+  (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
+  Context (h:brand_relation_t).
 
   Local Open Scope string.
 

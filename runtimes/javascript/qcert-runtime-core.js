@@ -404,11 +404,7 @@ function toRight(v) {
 }
 function deref(receiver, member) {
     if (typeof receiver === "object" && member in receiver) {
-	      var ans = receiver[member];
-	      if (ans === null) {
-	          return null;
-	      }
-	      return ans;
+	      return receiver[member];
     }
     return undefined;
 }
