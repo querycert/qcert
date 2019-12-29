@@ -41,12 +41,33 @@ Section OperatorsUtils.
          | _ => None
        end.
 
-  Definition darithmean (ns:list data) : option Z
+  Lemma dsum_nil :
+    dsum nil = Some (0%Z).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma Zquot_zero n :
+    Z.quot n 0%Z = 0%Z.
+  Proof.
+    apply Zquot.Zquot_0_r.
+  Qed.
+    
+  Definition darithmean_alt (ns:list data) : option Z
     := match ns with
-         | nil  => Some (0%Z)
-         | _ => lift (fun x => Z.quot x (Z_of_nat (List.length ns))) (dsum ns)
+       | nil  => Some (0%Z) (* Unneeded betwen Z.quot 0 0 = 0 , see Zquot.Zquot_0_r *)
+       | _ => lift (fun x => Z.quot x (Z_of_nat (List.length ns))) (dsum ns)
        end.
 
+  Definition darithmean (ns:list data) : option Z
+    := lift (fun x => Z.quot x (Z_of_nat (List.length ns))) (dsum ns).
+
+  Lemma darithmean_alt_correct (ns:list data):
+    darithmean_alt ns = darithmean ns.
+  Proof.
+    destruct ns; reflexivity.
+  Qed.
+           
   Definition lifted_stringbag (l : list data) : option (list string) :=
     lift_map (ondstring (fun x => x)) l.
   Definition lifted_zbag (l : list data) : option (list Z) :=
