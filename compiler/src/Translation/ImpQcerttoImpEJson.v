@@ -576,6 +576,67 @@ Section ImpQcerttoImpEJson.
           intros; contradiction.
     Qed.
 
+    Lemma dsum_to_ejson_sum l :
+      dsum (map ejson_to_data l) =
+      match ejson_bigints l with
+      | Some zl => Some (fold_right BinInt.Z.add BinNums.Z0 zl)
+      | None => None
+      end.
+    Proof.
+      induction l; [reflexivity|]; simpl in *.
+      Opaque ejson_to_data.
+      destruct a; simpl; trivial.
+      Transparent ejson_to_data.
+      - rewrite IHl; simpl; clear IHl.
+        unfold lift; simpl.
+        destruct (ejson_bigints l); reflexivity.
+      - case_eq (ejson_to_data (ejobject l0)); intros; try reflexivity;
+              generalize (ejson_to_data_object_not_nat l0 z); intros;
+                contradiction.
+    Qed.
+
+    Lemma lifted_zbag_is_ejson_bigint l:
+      lifted_zbag (map ejson_to_data l) = ejson_bigints l.
+    Proof.
+      unfold lifted_zbag.
+      induction l; simpl; try reflexivity.
+      Opaque ejson_to_data.
+      destruct a; simpl; trivial.
+      Transparent ejson_to_data.
+      - rewrite <- IHl; reflexivity.
+      - case_eq (ejson_to_data (ejobject l0)); intros; try reflexivity;
+              generalize (ejson_to_data_object_not_nat l0 z); intros;
+                contradiction.
+    Qed.
+
+    Lemma dmin_to_ejson_min l:
+      match lifted_zbag (map ejson_to_data l) with
+      | Some a' => Some (bnummin a')
+      | None => None
+      end
+      = match ejson_bigints l with
+        | Some zl => Some (bnummin zl)
+        | None => None
+        end.
+    Proof.
+      rewrite lifted_zbag_is_ejson_bigint.
+      reflexivity.
+    Qed.
+
+    Lemma dmax_to_ejson_max l:
+      match lifted_zbag (map ejson_to_data l) with
+      | Some a' => Some (bnummax a')
+      | None => None
+      end
+      = match ejson_bigints l with
+        | Some zl => Some (bnummax zl)
+        | None => None
+        end.
+    Proof.
+      rewrite lifted_zbag_is_ejson_bigint.
+      reflexivity.
+    Qed.
+
     Lemma imp_qcert_unary_op_to_imp_ejson_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -608,45 +669,30 @@ Section ImpQcerttoImpEJson.
       apply Forall_singleton in H.
       rewrite H; clear H.
       unfold imp_qcert_op_eval, imp_ejson_op_eval.
-      unary_op_cases (destruct u) Case; unfold lift_result, lift, olift; simpl.
-      - Case "OpIdentity"%string.
+      unary_op_cases (destruct u) Case; unfold lift_result, lift, olift; simpl;
         destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
           try reflexivity; simpl.
       - Case "OpNeg"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity.
         unfold unudbool.
         case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
         generalize (ejson_to_data_object_not_boolean l b); intros.
         congruence.
       - Case "OpRec"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity.
-        simpl.
-        f_equal.
+        simpl; f_equal.
         apply rec_ejson_key_encode_roundtrip.
       - Case "OpDot"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         unfold edot.
         (* XXX This lemma is not true! See DatatoEJson *)
         apply assoc_lookupr_json_key_encode_roundtrip.
       - Case "OpRecRemove"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         (* XXX This lemma is not true! See DatatoEJson *)
         apply rremove_json_key_encode_roundtrip.
       - Case "OpRecProject"%string.
         admit. (** XXX This one looks more complicated *)
-      - Case "OpBag"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
       - Case "OpSingleton"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + destruct l; try reflexivity; simpl.
           destruct l; try reflexivity; simpl.
@@ -656,8 +702,6 @@ Section ImpQcerttoImpEJson.
           generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpFlatten"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + unfold lift. simpl.
           apply oflatten_jflatten_roundtrip.
@@ -666,8 +710,6 @@ Section ImpQcerttoImpEJson.
           generalize (ejson_to_data_object_not_coll l l0); intros.
           congruence.
       - Case "OpDistinct"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + simpl.
           unfold rondcoll.
@@ -684,8 +726,6 @@ Section ImpQcerttoImpEJson.
       - Case "OpOrderBy"%string.
         admit. (* XXX Not implemented *)
       - Case "OpCount"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         + Transparent ejson_to_data. unfold ejson_to_data; simpl.
           f_equal; f_equal; f_equal.
@@ -700,27 +740,21 @@ Section ImpQcerttoImpEJson.
       - Case "OpToText"%string.
         admit. (* XXX Not implemented *)
       - Case "OpLength"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
         generalize (ejson_to_data_object_not_string l s); intros.
         congruence.
       - Case "OpSubstring"%string.
         admit. (* XXX Not implemented *)
+      - Case "OpSubstring"%string.
+        admit. (* XXX Not implemented *)
       - Case "OpLike"%string.
         admit. (* XXX Not implemented *)
       - Case "OpLeft"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; reflexivity.
       - Case "OpRight"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; reflexivity.
       - Case "OpBrand"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         rewrite of_string_list_over_strings_idempotent; simpl.
         Transparent ejson_to_data.
         unfold ejson_to_data; simpl.
@@ -728,8 +762,6 @@ Section ImpQcerttoImpEJson.
         destruct i0; try reflexivity; simpl.
         Opaque ejson_to_data.
       - Case "OpUnbrand"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         destruct i0; try reflexivity; simpl.
         destruct l; simpl; trivial;
         destruct p; simpl; trivial;
@@ -746,8 +778,6 @@ Section ImpQcerttoImpEJson.
             specialize (ejson_to_data_jobj_nbrand_long s e p p0 l b d); intros;
               contradiction.
       - Case "OpCast"%string.
-        destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
         rewrite json_brands_of_brands_idempotent.
         destruct i0; try reflexivity; simpl.
         destruct l; simpl; trivial;
@@ -765,17 +795,63 @@ Section ImpQcerttoImpEJson.
             specialize (ejson_to_data_jobj_nbrand_long s e p p0 l b0 d); intros;
               contradiction.
       - Case "OpNatUnary"%string.
-        admit. (* XXX Not implemented *)
+        destruct n; simpl in *;
+          destruct i0; try reflexivity; simpl;
+            case_eq (ejson_to_data (ejobject l)); intros; try reflexivity;
+              generalize (ejson_to_data_object_not_nat l z); intros;
+                contradiction.
       - Case "OpNatSum"%string.
-        admit. (* XXX Not implemented *)
+        destruct i0; try reflexivity; simpl; unfold lift, lift_oncoll.
+        + Transparent ejson_to_data.
+          simpl in *.
+          Opaque ejson_to_data.
+          rewrite dsum_to_ejson_sum.
+          destruct (ejson_bigints l); simpl; reflexivity.
+        + case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+            generalize (ejson_to_data_object_not_coll l l0); intros;
+              contradiction.
       - Case "OpNatMin"%string.
-        admit. (* XXX Not implemented *)
+        destruct i0; try reflexivity; simpl; unfold lifted_min, lift.
+        + Transparent ejson_to_data.
+          simpl in *.
+          Opaque ejson_to_data.
+          rewrite dmin_to_ejson_min.
+          destruct (ejson_bigints l); reflexivity.
+        + case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+            generalize (ejson_to_data_object_not_coll l l0); intros;
+              contradiction.
       - Case "OpNatMax"%string.
-        admit. (* XXX Not implemented *)
+        destruct i0; try reflexivity; simpl; unfold lifted_max, lift.
+        + Transparent ejson_to_data.
+          simpl in *.
+          Opaque ejson_to_data.
+          rewrite dmax_to_ejson_max.
+          destruct (ejson_bigints l); reflexivity.
+        + case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+            generalize (ejson_to_data_object_not_coll l l0); intros;
+              contradiction.
       - Case "OpNatMean"%string.
-        admit. (* XXX Not implemented *)
+        destruct i0; try reflexivity; simpl.
+        + unfold lift, lift_oncoll.
+          Transparent ejson_to_data.
+          simpl in *.
+          unfold darithmean.
+          assert (
+              BinInt.Z.of_nat (Datatypes.length (map ejson_to_data l))
+              = BinInt.Z.of_nat (Datatypes.length l)
+            ) by (f_equal; apply map_length).
+          rewrite H; clear H.
+          generalize (BinInt.Z.of_nat (Datatypes.length l)); intros.
+          unfold lift in *.
+          rewrite dsum_to_ejson_sum.
+          destruct (ejson_bigints l); simpl; reflexivity.
+        + case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+            generalize (ejson_to_data_object_not_coll l l0); intros;
+              contradiction.
       - Case "OpFloatOfNat"%string.
         admit. (* XXX Not implemented *)
+      - Case "OpFloatUnary"%string.
+        admit.
       - Case "OpFloatUnary"%string.
         admit.
       - Case "OpFloatTruncate"%string.

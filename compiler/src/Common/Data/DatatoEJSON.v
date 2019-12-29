@@ -45,6 +45,17 @@ Section DatatoEJson.
       | _ => None
       end.
 
+    Fixpoint ejson_bigints (d:list ejson) : option (list Z) :=
+      match d with
+      | nil => Some nil
+      | (ejbigint z1) :: d' =>
+        match ejson_bigints d' with
+        | Some s' => Some (z1::s')
+        | None => None
+        end
+      | _ => None
+      end.
+
     Fixpoint ejson_to_data (j:ejson) : data :=
       match j with
       | ejnull => dunit

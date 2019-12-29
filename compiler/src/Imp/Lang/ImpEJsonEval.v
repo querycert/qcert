@@ -265,13 +265,76 @@ Section ImpEJsonEval.
       | EJsonRuntimeNatMult => None
       | EJsonRuntimeNatDiv => None
       | EJsonRuntimeNatRem => None
-      | EJsonRuntimeNatAbs => None
-      | EJsonRuntimeNatLog2 => None
-      | EJsonRuntimeNatSqrt => None
-      | EJsonRuntimeNatSum => None
-      | EJsonRuntimeNatMin => None
-      | EJsonRuntimeNatMax => None
-      | EJsonRuntimeNatArithMean => None
+      | EJsonRuntimeNatAbs =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejbigint z => Some (ejbigint (Z.abs z))
+             | _ => None
+             end) dl
+      | EJsonRuntimeNatLog2 =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejbigint z => Some (ejbigint (Z.log2 z))
+             | _ => None
+             end) dl
+      | EJsonRuntimeNatSqrt =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejbigint z => Some (ejbigint (Z.sqrt z))
+             | _ => None
+             end) dl
+      | EJsonRuntimeNatSum =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               match ejson_bigints l with
+               | Some zl =>
+                 Some (ejbigint (fold_right Zplus 0%Z zl))
+               | None => None
+               end
+             | _ => None
+             end) dl
+      | EJsonRuntimeNatMin =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               match ejson_bigints l with
+               | Some zl =>
+                 Some (ejbigint (bnummin zl))
+               | None => None
+               end
+             | _ => None
+             end) dl
+      | EJsonRuntimeNatMax =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               match ejson_bigints l with
+               | Some zl =>
+                 Some (ejbigint (bnummax zl))
+               | None => None
+               end
+             | _ => None
+             end) dl
+      | EJsonRuntimeNatArithMean =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               let length := List.length l in
+               match ejson_bigints l with
+               | Some zl =>
+                 Some (ejbigint (Z.quot (fold_right Zplus 0%Z zl) (Z_of_nat length)))
+               | None => None
+               end
+             | _ => None
+             end) dl
       | EJsonRuntimeFloatOfNat => None
       | EJsonRuntimeSum => None
       | EJsonRuntimeArithMean => None
