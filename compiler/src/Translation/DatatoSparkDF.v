@@ -97,8 +97,9 @@ Section DatatoSparkDF.
            (typed_data_to_json r rt)
     | dbrand bs v, Brand₀ bts =>
       (* Recursive brands are an issue. Solution: blob out the data in a brand. *)
-      Some (jobject (("$data"%string, jstring (data_to_blob v))
-                       :: ("$type"%string, jarray (map jstring bs)) :: nil))
+      Some (jobject (("$class"%string, jarray (map jstring bs))
+                       ::("$data"%string, jstring (data_to_blob v))
+                       ::nil))
     | _, _ => None
     end.
 
@@ -127,7 +128,7 @@ Section DatatoSparkDF.
            (("$data"%string,
              jstring
                "{""age"": 35, ""name"": ""Fred"", ""friends"": [{""type"": [""Person""], ""data"": {""age"": 42, ""name"": ""Berta"", ""friends"": []}}]}")
-              :: ("$type"%string, jarray (jstring "Person" :: nil)) :: nil)).
+              :: ("$class"%string, jarray (jstring "Person" :: nil)) :: nil)).
   Proof. vm_compute. reflexivity. Qed.
 
   Lemma test_json_with_nested_brand:
@@ -152,7 +153,7 @@ Section DatatoSparkDF.
                            jarray
                              (jobject
                                 (("$data"%string, jstring "{""age"": 42, ""name"": ""Berta"", ""friends"": []}")
-                                   :: ("$type"%string, jarray (jstring "Person" :: nil)) :: nil) :: nil)) :: nil)) :: nil)).
+                                   :: ("$class"%string, jarray (jstring "Person" :: nil)) :: nil) :: nil)) :: nil)) :: nil)).
   Proof. vm_compute. reflexivity. Qed.
    *)
   

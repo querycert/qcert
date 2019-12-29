@@ -70,7 +70,7 @@ Section tDNNRCtoSparkDF.
     | Either₀ l r =>
       "StructType(Seq(StructField(""$left"", " ++ rtype_to_spark_DataType l ++ "), StructField(""$right"", " ++ rtype_to_spark_DataType r ++ ")))"
     | Brand₀ _ =>
-      "StructType(Seq(StructField(""$data"", StringType), StructField(""$type"", ArrayType(StringType))))"
+      "StructType(Seq(StructField(""$class"", ArrayType(StringType)), StructField(""$data"", StringType)))"
     (* should not occur *)
     | Arrow₀ _ _ => "ARROW TYPE?"
     | Foreign₀ ft => foreign_to_scala_spark_datatype ft
