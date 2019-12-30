@@ -183,15 +183,47 @@ Section EJsonOperators.
       | EJsonOpMathMax => None (* XXX TODO XXX *)
       | EJsonOpMathMinApply => None (* XXX TODO XXX *)
       | EJsonOpMathMaxApply => None (* XXX TODO XXX *)
-      | EJsonOpMathExp => None (* XXX TODO XXX *)
+      | EJsonOpMathExp =>
+        match j with
+        | [ejnumber n] => Some (ejnumber (float_exp n))
+        | _ => None
+        end
       | EJsonOpMathPow => None (* XXX TODO XXX *)
-      | EJsonOpMathAbs => None (* XXX TODO XXX *)
-      | EJsonOpMathLog => None (* XXX TODO XXX *)
-      | EJsonOpMathLog10 => None (* XXX TODO XXX *)
-      | EJsonOpMathSqrt => None (* XXX TODO XXX *)
-      | EJsonOpMathCeil => None (* XXX TODO XXX *)
-      | EJsonOpMathFloor => None (* XXX TODO XXX *)
-      | EJsonOpMathTrunc => None (* XXX TODO XXX *)
+      | EJsonOpMathAbs =>
+        match j with
+        | [ejnumber n] => Some (ejnumber (float_absolute n))
+        | _ => None
+        end
+      | EJsonOpMathLog =>
+        match j with
+        | [ejnumber n] => Some (ejnumber (float_log n))
+        | _ => None
+        end
+      | EJsonOpMathLog10 =>
+        match j with
+        | [ejnumber n] => Some (ejnumber (float_log10 n))
+        | _ => None
+        end
+      | EJsonOpMathSqrt =>
+        match j with
+        | [ejnumber n] => Some (ejnumber (float_sqrt n))
+        | _ => None
+        end
+      | EJsonOpMathCeil =>
+        match j with
+        | [ejnumber n] => Some (ejnumber (float_ceil n))
+        | _ => None
+        end
+      | EJsonOpMathFloor =>
+        match j with
+        | [ejnumber n] => Some (ejnumber (float_floor n))
+        | _ => None
+        end
+      | EJsonOpMathTrunc =>
+        match j with
+        | [ejnumber n] => Some (ejbigint (float_truncate n))
+        | _ => None
+        end
       end.
   End Evaluation.
 

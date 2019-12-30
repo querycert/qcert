@@ -37,7 +37,6 @@ Section Syntax.
   | QcertRuntimeEither : imp_qcert_runtime_op
   | QcertRuntimeToLeft : imp_qcert_runtime_op
   | QcertRuntimeToRight : imp_qcert_runtime_op
-  | QcertRuntimeDeref : imp_qcert_runtime_op
   .
 
   Definition imp_qcert_expr := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
@@ -53,3 +52,11 @@ Section Env.
   Definition pd_bindings := list (string*option data).
 
 End Env.
+
+Tactic Notation "imp_qcert_runtime_op_cases" tactic(first) ident(c) :=
+  first;
+  [ Case_aux c "QcertRuntimeGroupby"%string
+  | Case_aux c "QcertRuntimeEither"%string
+  | Case_aux c "QcertRuntimeLeft"%string
+  | Case_aux c "QcertRuntimeRight"%string
+  ].
