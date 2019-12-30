@@ -70,13 +70,13 @@ Section ImpQcerttoImpEJson.
     | [e] =>
       match op with
       | OpIdentity => e
-      | OpNeg => mk_imp_ejson_op EJsonOpNot [e]
-      | OpRec s => mk_imp_ejson_op (EJsonOpObject [json_key_encode s]) [e]
-      | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeDeref [e; ImpExprConst (ejstring (json_key_encode s))]
-      | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRemove [e; mk_string (json_key_encode s)]
+      | OpNeg => mk_imp_ejson_op EJsonOpNot [ e ]
+      | OpRec s => mk_imp_ejson_op (EJsonOpObject [json_key_encode s]) [ e ]
+      | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeDeref [ e; ImpExprConst (ejstring (json_key_encode s)) ]
+      | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRemove [ e; mk_string (json_key_encode s) ]
       | OpRecProject fl =>
         mk_imp_ejson_runtime_call
-          EJsonRuntimeProject ([e] ++ [mk_string_array fl])
+          EJsonRuntimeProject ([ e ] ++ [ mk_string_array fl ])
       | OpBag => mk_bag el
       | OpSingleton => mk_imp_ejson_runtime_call EJsonRuntimeSingleton el
       | OpFlatten => mk_imp_ejson_runtime_call EJsonRuntimeFlatten el
@@ -123,21 +123,23 @@ Section ImpQcerttoImpEJson.
       | OpNatMean => mk_imp_ejson_runtime_call EJsonRuntimeNatArithMean el
       | OpFloatOfNat => mk_imp_ejson_runtime_call EJsonRuntimeFloatOfNat el
       | OpFloatUnary u =>
-        match u with
-        | FloatNeg => mk_imp_ejson_op EJsonOpNeg [ e ]
-        | FloatSqrt => mk_imp_ejson_op EJsonOpMathSqrt [ e ]
-        | FloatExp => mk_imp_ejson_op EJsonOpMathExp [ e ]
-        | FloatLog => mk_imp_ejson_op EJsonOpMathLog [ e ]
-        | FloatLog10 => mk_imp_ejson_op EJsonOpMathLog10 [ e ]
-        | FloatCeil => mk_imp_ejson_op EJsonOpMathCeil [ e ]
-        | FloatFloor => mk_imp_ejson_op EJsonOpMathFloor [ e ]
-        | FloatAbs => mk_imp_ejson_op EJsonOpMathAbs [ e ]
-        end
-      | OpFloatTruncate => mk_imp_ejson_op EJsonOpMathTrunc [e]
+        let op := 
+            match u with
+            | FloatNeg => EJsonOpNeg
+            | FloatSqrt => EJsonOpMathSqrt
+            | FloatExp => EJsonOpMathExp
+            | FloatLog => EJsonOpMathLog
+            | FloatLog10 => EJsonOpMathLog10
+            | FloatCeil => EJsonOpMathCeil
+            | FloatFloor => EJsonOpMathFloor
+            | FloatAbs => EJsonOpMathAbs
+            end
+        in mk_imp_ejson_op op [ e ]
+      | OpFloatTruncate => mk_imp_ejson_op EJsonOpMathTrunc [ e ]
       | OpFloatSum => mk_imp_ejson_runtime_call EJsonRuntimeSum el
       | OpFloatMean => mk_imp_ejson_runtime_call EJsonRuntimeArithMean el
-      | OpFloatBagMin => mk_imp_ejson_op EJsonOpMathMinApply [e]
-      | OpFloatBagMax => mk_imp_ejson_op EJsonOpMathMaxApply [e]
+      | OpFloatBagMin => mk_imp_ejson_op EJsonOpMathMinApply [ e ]
+      | OpFloatBagMax => mk_imp_ejson_op EJsonOpMathMaxApply [ e ]
       | OpForeignUnary fu =>
         mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson.imp_qcert_unary_op_to_imp_ejson OpForeignUnary"
       end
@@ -231,8 +233,6 @@ Section ImpQcerttoImpEJson.
     | QcertRuntimeEither => mk_either_expr el
     | QcertRuntimeToLeft => mk_to_left_expr el
     | QcertRuntimeToRight => mk_to_right_expr el
-    | QcertRuntimeDeref =>
-      mk_imp_ejson_runtime_call EJsonRuntimeDeref el (* XXX ???? TODO *)
     end.
 
   Fixpoint imp_qcert_expr_to_imp_ejson (exp: imp_qcert_expr) : imp_ejson_expr :=
@@ -654,11 +654,11 @@ Section ImpQcerttoImpEJson.
       Opaque ejson_to_data.
       intros.
       (* elim no params *)
-      destruct el; simpl; [reflexivity|].
+      destruct el; [reflexivity|].
       (* elim two or more params *)
       destruct el; simpl;
-        [|destruct (imp_qcert_expr_eval h σ i); [|reflexivity]; simpl;
-          destruct (imp_qcert_expr_eval h σ i0); [|reflexivity]; simpl;
+        [|destruct (imp_qcert_expr_eval h σ i); [|reflexivity];
+          destruct (imp_qcert_expr_eval h σ i0); [|reflexivity];
           unfold lift, olift;
           case_eq
             (lift_map (fun x : option imp_qcert_data => x)
@@ -671,7 +671,7 @@ Section ImpQcerttoImpEJson.
       unfold imp_qcert_op_eval, imp_ejson_op_eval.
       unary_op_cases (destruct u) Case; unfold lift_result, lift, olift; simpl;
         destruct (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i));
-          try reflexivity; simpl.
+        try reflexivity; simpl.
       - Case "OpNeg"%string.
         destruct i0; try reflexivity.
         unfold unudbool.
@@ -682,14 +682,18 @@ Section ImpQcerttoImpEJson.
         simpl; f_equal.
         apply rec_ejson_key_encode_roundtrip.
       - Case "OpDot"%string.
-        destruct i0; try reflexivity; simpl.
-        unfold edot.
-        (* XXX This lemma is not true! See DatatoEJson *)
-        apply assoc_lookupr_json_key_encode_roundtrip.
+        case_eq (ejson_is_record i0); intros.
+        rewrite (ejson_is_record_some _ l); intros; try assumption.
+        + unfold edot.
+          apply assoc_lookupr_json_key_encode_comm.
+        + case_eq (ejson_to_data i0); intros; try reflexivity.
+          specialize (ejson_is_record_none i0 l H); intros.
+          congruence.
       - Case "OpRecRemove"%string.
         destruct i0; try reflexivity; simpl.
         (* XXX This lemma is not true! See DatatoEJson *)
-        apply rremove_json_key_encode_roundtrip.
+        (* apply rremove_json_key_encode_roundtrip. *)
+        admit.
       - Case "OpRecProject"%string.
         admit. (** XXX This one looks more complicated *)
       - Case "OpSingleton"%string.
@@ -835,6 +839,7 @@ Section ImpQcerttoImpEJson.
         + unfold lift, lift_oncoll.
           Transparent ejson_to_data.
           simpl in *.
+          Opaque ejson_to_data.
           unfold darithmean.
           assert (
               BinInt.Z.of_nat (Datatypes.length (map ejson_to_data l))
@@ -849,13 +854,21 @@ Section ImpQcerttoImpEJson.
             generalize (ejson_to_data_object_not_coll l l0); intros;
               contradiction.
       - Case "OpFloatOfNat"%string.
-        admit. (* XXX Not implemented *)
+        destruct i0; try reflexivity; simpl.
+        case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+        generalize (ejson_to_data_object_not_nat l z); intros;
+          contradiction.
       - Case "OpFloatUnary"%string.
-        admit.
-      - Case "OpFloatUnary"%string.
-        admit.
+        destruct f; simpl;
+        destruct i0; try reflexivity; simpl;
+          try (case_eq (ejson_to_data (ejobject l)); intros; try reflexivity;
+               generalize (ejson_to_data_object_not_float l f); intros;
+               contradiction).
       - Case "OpFloatTruncate"%string.
-        admit.
+        destruct i0; try reflexivity; simpl;
+          try (case_eq (ejson_to_data (ejobject l)); intros; try reflexivity;
+               generalize (ejson_to_data_object_not_float l f); intros;
+               contradiction).
       - Case "OpFloatSum"%string.
         admit.
       - Case "OpFloatMean"%string.
@@ -897,6 +910,17 @@ Section ImpQcerttoImpEJson.
         (imp_ejson_expr_eval h (lift_pd_bindings σ)
                             (imp_qcert_runtime_call_to_imp_ejson rt (map imp_qcert_expr_to_imp_ejson el))).
     Proof.
+      Opaque ejson_to_data.
+      intros.
+      imp_qcert_runtime_op_cases(destruct rt) Case; simpl.
+      - Case "QcertRuntimeGroupby"%string.
+        admit. (* XXX Not implemented *)
+      - Case "QcertRuntimeEither"%string.
+        admit.
+      - Case "QcertRuntimeLeft"%string.
+        admit. (* XXX Not implemented *)
+      - Case "QcertRuntimeRight"%string.
+        admit. (* XXX Not implemented *)
     Admitted.
 
     Lemma imp_qcert_op_to_imp_ejson_correct

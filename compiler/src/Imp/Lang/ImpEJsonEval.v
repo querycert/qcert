@@ -128,10 +128,14 @@ Section ImpEJsonEval.
       | EJsonRuntimeDeref => (* XXX the one in qcert-runtime is a lot more complex *)
         apply_binary
           (fun d1 d2 =>
-             match d1, d2 with
-             | ejobject r, ejstring s =>
-               edot r s
-             | _, _ => None
+             match ejson_is_record d1 with
+             | Some r =>
+               match d2 with
+               | ejstring s =>
+                 edot r s
+               | _ => None
+               end
+             | _ => None
              end) dl
       | EJsonRuntimeEither =>
         apply_unary
@@ -335,7 +339,13 @@ Section ImpEJsonEval.
                end
              | _ => None
              end) dl
-      | EJsonRuntimeFloatOfNat => None
+      | EJsonRuntimeFloatOfNat =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejbigint n => Some (ejnumber (float_of_int n))
+             | _ => None
+             end) dl
       | EJsonRuntimeSum => None
       | EJsonRuntimeArithMean => None
       | EJsonRuntimeBunion => None

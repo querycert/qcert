@@ -479,7 +479,7 @@ let pretty_imp_qcert_op p sym pretty_imp_expr ff (op, args) =
 
 
 let pretty_imp_qcert_runtime p sym pretty_imp_expr ff (op, args) =
-  match op, args with
+  begin match op, args with
   | Compiler.QcertRuntimeGroupby(g,atts), [e] ->
     fprintf ff "@[<hv 2>groupBy@[<hv 2>(%a,@ %a,@ %a)@]@]"
       (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_imp_expr 0 sym) e
@@ -489,9 +489,8 @@ let pretty_imp_qcert_runtime p sym pretty_imp_expr ff (op, args) =
     fprintf ff "@[<hv 2>toLeft@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
   | Compiler.QcertRuntimeToRight, [e] ->
     fprintf ff "@[<hv 2>toRight@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
-  | Compiler.QcertRuntimeDeref, [e] ->
-    fprintf ff "@[<hv 2>deref@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
   | _ -> assert false
+  end
 
 let pretty_imp_qcert = pretty_imp pretty_imp_qcert_data pretty_imp_qcert_op pretty_imp_qcert_runtime
 

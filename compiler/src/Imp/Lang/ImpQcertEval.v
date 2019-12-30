@@ -100,11 +100,6 @@ Section ImpQcertEval.
         | (dright d) :: nil => Some d
         | _ => None
         end
-      | QcertRuntimeDeref => (* XXX Not so sure this should be so high-level *)
-        match dl with
-        | d :: nil => Some d
-        | _ => None
-        end
       end.
 
     Definition imp_qcert_op_eval (op:imp_qcert_op) (dl:list imp_qcert_data) : option imp_qcert_data :=
@@ -115,7 +110,6 @@ Section ImpQcertEval.
           unary_op_eval h uop d
         | _ => None
         end
-
       | QcertOpBinary bop =>
         match dl with
         | [d1;d2] =>
