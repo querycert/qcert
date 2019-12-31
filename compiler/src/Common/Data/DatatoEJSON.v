@@ -412,38 +412,50 @@ Section DatatoEJson.
 
     (* XXX Some assumptions for the correctness of operators translation -- they do not hold as-is *)
 
-    Lemma assoc_lookupr_json_key_encode_comm l s:
-      ejson_object_normalized l ->
-      assoc_lookupr ODT_eqdec (map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x))) l) s =
-      match assoc_lookupr ODT_eqdec l (json_key_encode s) with
-      | Some a' => Some (ejson_to_data a')
+    Lemma ejson_record_of_record r :
+      ejson_is_record (data_to_ejson (drec r)) =
+      Some (map (fun x => (json_key_encode (fst x), data_to_ejson (snd x))) r).
+    Proof.
+      simpl.
+      destruct r; simpl; try reflexivity.
+      destruct p; simpl; try reflexivity.
+      rewrite_string_dec_from_neq (json_key_encode_not_data s).
+      rewrite_string_dec_from_neq (json_key_encode_not_class s).
+      rewrite_string_dec_from_neq (json_key_encode_not_left s).
+      rewrite_string_dec_from_neq (json_key_encode_not_right s).
+      destruct d; simpl; try reflexivity; destruct r; simpl; try reflexivity.
+      destruct r; simpl; try reflexivity.
+    Qed.
+
+    Lemma assoc_lookupr_json_key_encode_comm d s:
+      match match d with
+            | drec r => assoc_lookupr ODT_eqdec r s
+            | _ => None
+            end with
+      | Some a' => Some (data_to_ejson a')
+      | None => None
+      end =
+      match ejson_is_record (data_to_ejson d) with
+      | Some r => assoc_lookupr ODT_eqdec r (json_key_encode s)
       | None => None
       end.
     Proof.
-      intros Hnorm.
-      simpl; induction l; simpl in *; [reflexivity|].
-      destruct a; simpl in *.
-      inversion Hnorm; subst; clear Hnorm; simpl in *.
-      rewrite (IHl H2); clear IHl.
-      destruct (assoc_lookupr string_eqdec l (json_key_encode s)); simpl; [reflexivity|].
-      case_eq (string_eqdec (json_key_encode s) s0); intros.
-      case_eq (string_eqdec s (json_key_decode s0)); intros;
-        try reflexivity.
-      unfold Equivalence.equiv in *;
-      unfold RelationClasses.complement in *;
-      subst;
-      clear H H0;
-      rewrite json_key_encode_decode in c;
-      congruence.
-      unfold Equivalence.equiv in *;
-      unfold RelationClasses.complement in *;
-      subst.
-      case_eq (string_eqdec s (json_key_decode s0)); intros.
-      unfold Equivalence.equiv in *;
-      unfold RelationClasses.complement in *;
-      subst.
-      admit.
-    Admitted.
+      destruct d; try reflexivity.
+      - rewrite ejson_record_of_record; simpl.
+        induction l; simpl; [reflexivity|];
+          destruct a; simpl.
+        rewrite <- IHl; simpl; clear IHl.
+        destruct (assoc_lookupr string_eqdec l s); try reflexivity.
+        destruct (string_eqdec s s0).
+        rewrite e.
+        destruct (string_eqdec (json_key_encode s0) (json_key_encode s0)); try reflexivity.
+        congruence.
+        destruct (string_eqdec (json_key_encode s) (json_key_encode s0)); try reflexivity.
+        apply json_encode_diff in c; try congruence.
+      - destruct d; reflexivity.
+      - destruct d; reflexivity.
+      - simpl. rewrite ejson_brands_map_ejstring; reflexivity.
+    Qed.
 
     Lemma rremove_json_key_encode_comm l s:
       ejson_object_normalized l ->
