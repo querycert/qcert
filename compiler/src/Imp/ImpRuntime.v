@@ -23,3 +23,4 @@ Require Export ImpQcertSize.
 Require Export ImpEJsonSize.
 Require Export ImpQcertEval.
 Require Export ImpEJsonEval.
+Require Export ImpEJsonRewrite.
