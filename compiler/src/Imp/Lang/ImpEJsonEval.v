@@ -69,12 +69,6 @@ Section ImpEJsonEval.
     Definition imp_ejson_Z_to_data (n: Z) : imp_ejson_data :=
       Z_to_json n.
 
-    Definition jflatten (d:list imp_ejson_data) : option (list imp_ejson_data) :=
-      lift_flat_map (fun x =>
-                   match x with
-                   | ejarray y => Some y
-                   | _ => None end) d.
-    
     Definition imp_ejson_runtime_eval (rt:imp_ejson_runtime_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
       match rt with
       | EJsonRuntimeEqual =>

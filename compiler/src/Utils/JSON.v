@@ -304,6 +304,23 @@ Section JSON.
       - intros; subst; reflexivity.
     Qed.
     
+    Lemma in_map_json_key_encode s pl:
+      In s pl -> In (json_key_encode s) (map json_key_encode pl).
+    Proof.
+      apply in_map.
+    Qed.
+
+    Lemma in_map_json_key_encode_inv s pl:
+      In (json_key_encode s) (map json_key_encode pl) -> In s pl.
+    Proof.
+      intros.
+      induction pl; simpl in *; trivial.
+      simpl in *.
+      elim H; intros; clear H.
+      - left; apply json_key_encode_inv; assumption.
+      - auto.
+    Qed.
+
   End Encode.
 
 End JSON.

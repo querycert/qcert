@@ -270,5 +270,10 @@ Section DataNorm.
     apply (H _ (eq_refl _)).
   Qed.
 
+  Lemma normalize_data_dbool d b : normalize_data d = dbool b <-> d = dbool b.
+  Proof.
+    destruct d; simpl; intuition discriminate.
+  Qed.
+
 End DataNorm.
 

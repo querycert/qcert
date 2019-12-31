@@ -19,6 +19,7 @@ Require Import String.
 Require Import Ascii.
 Require Import ZArith.
 Require Import Utils.
+Require Import BrandRelation.
 Require Import ForeignEJson.
 Require Import EJson.
 Require Import EJsonNorm.
@@ -251,39 +252,40 @@ Section DatatoEJson.
         reflexivity.
     Qed.
 
-    Definition ejson_normalized j : Prop :=
-      exists d, j = data_to_ejson d.
-    Definition ejson_idempotent j : Prop :=
-      data_to_ejson (ejson_to_data j) = j.
-
-    Definition ejson_object_normalized (jl:list (string * ejson)) : Prop :=
-      Forall (fun x => ejson_normalized (snd x)) jl.
-
-    Lemma ejson_normalized_idempotent j:
-      ejson_normalized j ->
-      ejson_idempotent j.
+    (* Means we can do inversion on data_to_ejson *)
+    Lemma data_to_ejson_inv j1 j2:
+      data_to_ejson j1 = data_to_ejson j2 -> j1 = j2.
     Proof.
-      unfold ejson_normalized, ejson_idempotent.
-      intros. elim H; intros; subst.
-      rewrite data_to_ejson_idempotent; trivial.
+      intros.
+      rewrite <- (data_to_ejson_idempotent j1).
+      rewrite <- (data_to_ejson_idempotent j2).
+      rewrite H.
+      reflexivity.
     Qed.
 
+    Lemma data_to_ejson_equiv j1 j2:
+      data_to_ejson j1 = data_to_ejson j2 <-> j1 = j2.
+    Proof.
+      split; intros; subst.
+      - apply data_to_ejson_inv; assumption.
+      - reflexivity.
+    Qed.
   End ModelRoundTrip.
 
   Section RuntimeLemmas.
-      Lemma ejson_to_data_jobj_nbool l b : (ejson_to_data (ejobject l)) <> dbool b.
-      Proof.
-        destruct l; simpl; try congruence.
-        destruct p.
-        repeat match_destr.
-      Qed.
+    Lemma ejson_to_data_jobj_nbool l b : (ejson_to_data (ejobject l)) <> dbool b.
+    Proof.
+      destruct l; simpl; try congruence.
+      destruct p.
+      repeat match_destr.
+    Qed.
 
-      Lemma ejson_to_data_jobj_nnat l n : (ejson_to_data (ejobject l)) <> dnat n.
-      Proof.
-        destruct l; simpl; try congruence.
-        destruct p.
-        repeat match_destr.
-      Qed.
+    Lemma ejson_to_data_jobj_nnat l n : (ejson_to_data (ejobject l)) <> dnat n.
+    Proof.
+      destruct l; simpl; try congruence.
+      destruct p.
+      repeat match_destr.
+    Qed.
 
     Lemma ejson_to_data_jobj_nfloat l f : (ejson_to_data (ejobject l)) <> dfloat f.
     Proof.
@@ -352,6 +354,7 @@ Section DatatoEJson.
       now destruct i0.
     Qed.
 
+    (** For dot operator *)
     Lemma assoc_lookupr_json_key_encode_comm d s:
       match match d with
             | drec r => assoc_lookupr ODT_eqdec r s
@@ -381,6 +384,7 @@ Section DatatoEJson.
       - simpl. rewrite ejson_brands_map_ejstring; reflexivity.
     Qed.
 
+    (** For remove operator *)
     Lemma rremove_json_key_encode_comm d s:
       match
         match d with
@@ -411,23 +415,7 @@ Section DatatoEJson.
       - simpl. rewrite ejson_brands_map_ejstring; reflexivity.
     Qed.
 
-    Lemma in_map_json_key_encode s pl:
-      In s pl -> In (json_key_encode s) (map json_key_encode pl).
-    Proof.
-      apply in_map.
-    Qed.
-
-    Lemma in_map_json_key_encode_inv s pl:
-      In (json_key_encode s) (map json_key_encode pl) -> In s pl.
-    Proof.
-      intros.
-      induction pl; simpl in *; trivial.
-      simpl in *.
-      elim H; intros; clear H.
-      - left; apply json_key_encode_inv; assumption.
-      - auto.
-    Qed.
-
+    (** For project operator *)
     Lemma rproject_json_key_encode_comm d pl:
       match match d with
             | drec r => Some (drec (rproject r pl))
@@ -464,21 +452,7 @@ Section DatatoEJson.
       - simpl. rewrite ejson_brands_map_ejstring; reflexivity.
     Qed.
 
-    (* XXX Is this true? *)
-    Lemma data_to_ejson_inv j1 j2:
-      data_to_ejson j1 = data_to_ejson j2 -> j1 = j2.
-    Proof.
-      admit.
-    Admitted.
-
-    Lemma data_to_ejson_equiv j1 j2:
-      data_to_ejson j1 = data_to_ejson j2 <-> j1 = j2.
-    Proof.
-      split; intros; subst.
-      - apply data_to_ejson_inv; assumption.
-      - reflexivity.
-    Qed.
-
+    (** For distinct operator *)
     Lemma mult_ejson_to_data a l :
       mult (bdistinct l) a =
       mult (map data_to_ejson (bdistinct l)) (data_to_ejson a).
@@ -503,6 +477,194 @@ Section DatatoEJson.
       rewrite <- IHl; clear IHl.
       rewrite <- mult_ejson_to_data; simpl.
       destruct (mult (bdistinct l) a); reflexivity.
+    Qed.
+
+    (** For flatten operator *)
+    Lemma lift_flat_map_eobject_is_none l l' :
+      lift_flat_map
+        (fun x : data => match x with
+                         | dcoll y => Some y
+                         | _ => None
+                         end)
+        (map (fun x : ejson => ejson_to_data x) (ejobject l :: l')) = None.
+    Proof.
+      Opaque ejson_to_data.
+      simpl; case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+      generalize (ejson_to_data_object_not_coll l l0); intros.
+      contradiction.
+      Transparent ejson_to_data.
+    Qed.
+
+    Lemma flat_map_jflatten_roundtrip l :
+      match
+        match lift_flat_map (fun x : data => match x with
+                                             | dcoll y => Some y
+                                             | _ => None
+                                             end) l with
+        | Some a' => Some (dcoll a')
+        | None => None
+        end
+      with
+      | Some a' => Some (data_to_ejson a')
+      | None => None
+      end =
+      match jflatten (map data_to_ejson l) with
+      | Some a' => Some (ejarray a')
+      | None => None
+      end.
+    Proof.
+      induction l; [reflexivity|].
+      destruct a; try reflexivity; simpl.
+      unfold jflatten in *; simpl.
+      destruct (lift_flat_map (fun x : data => match x with
+                                               | dcoll y => Some y
+                                               | _ => None
+                                               end) l);
+        destruct (lift_flat_map (fun x : ejson => match x with
+                                                  | ejarray y => Some y
+                                                  | _ => None
+                                                  end) (map data_to_ejson l));
+        simpl; try congruence.
+      simpl in IHl.
+      inversion IHl; clear IHl.
+      subst.
+      f_equal.
+      f_equal.
+      apply map_app.
+    Qed.
+
+    (** For brand-related operators *)
+    Lemma ejson_to_data_jobj_nbrand s e b d: (ejson_to_data (ejobject ((s, e)::nil))) <> dbrand b d.
+    Proof.
+      simpl.
+      repeat match_destr.
+    Qed.
+
+    Lemma ejson_to_data_jobj_nbrand_long s e p p0 l b d:
+      (ejson_to_data (ejobject ((s, e) :: p :: p0 :: l))) <> dbrand b d.
+    Proof.
+      simpl.
+      repeat match_destr.
+    Qed.
+
+    Lemma ejson_to_data_jobj_nbrand_no_data e s0 e0 b d:
+      s0 <> "$data"%string ->
+      ejson_to_data (ejobject (("$class"%string, e)::(s0, e0)::nil)) <> dbrand b d.
+    Proof.
+      intros; simpl.
+      repeat match_destr; try congruence.
+    Qed.
+      
+    Lemma ejson_to_data_jobj_nbrand_no_class e s e0 b d:
+      s <> "$class"%string ->
+      ejson_to_data (ejobject ((s, e)::("$data"%string, e0)::nil)) <> dbrand b d.
+    Proof.
+      intros; simpl.
+      repeat match_destr; try congruence.
+    Qed.
+
+    Lemma ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b d:
+      s <> "$class"%string ->
+      s0 <> "$data"%string ->
+      ejson_to_data (ejobject ((s, e)::(s0, e0)::nil)) <> dbrand b d.
+    Proof.
+      intros; simpl.
+      repeat match_destr; try congruence.
+    Qed.
+
+    Lemma ejson_data_maybe_brand s s0 e e0 :
+      match ejson_to_data (ejobject ((s, e)::(s0, e0)::nil)) with
+      | dbrand _ d' => Some d'
+      | _ => None
+      end =
+      match
+        match e with
+        | ejarray j1 =>
+          if string_dec s "$class"
+          then
+            if string_dec s0 "$data"
+            then match ejson_brands j1 with
+                 | Some _ => Some e0
+                 | None => None
+                 end
+            else None
+          else None
+        | _ => None
+        end
+      with
+      | Some a' => Some (ejson_to_data a')
+      | None => None
+      end.
+    Proof.
+      case_eq (string_dec s "$class"); intros; subst;
+      case_eq (string_dec s0 "$data"); intros; subst.
+      - destruct e; simpl;
+          try (destruct e0; simpl; reflexivity).
+        destruct (ejson_brands l); reflexivity.
+      - case_eq (ejson_to_data (ejobject (("$class"%string, e)::(s0, e0)::nil))); intros;
+          try (destruct e; simpl; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_data e s0 e0 b d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject ((s, e)::("$data"%string, e0)::nil))); intros;
+          try (destruct e; simpl; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class e s e0 b d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject ((s, e)::(s0, e0)::nil))); intros;
+          try (destruct e; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b d n n0);
+          intros; contradiction.
+    Qed.
+
+    Lemma ejson_data_maybe_cast h b s s0 e e0 :
+      match ejson_to_data (ejobject ((s, e)::(s0, e0)::nil)) with
+      | dbrand b' _ =>
+        if sub_brands_dec h b' b then Some (dsome (ejson_to_data (ejobject ((s, e)::(s0, e0)::nil)))) else Some dnone
+      | _ => None
+      end =
+      match
+        match e with
+        | ejarray jl2 =>
+          if string_dec s "$class"
+          then
+            if string_dec s0 "$data"
+            then
+              match ejson_brands jl2 with
+              | Some b2 =>
+                if sub_brands_dec h b2 b
+                then Some (ejobject (("$left"%string, ejobject ((s, e)::(s0, e0)::nil))::nil))
+                else Some (ejobject (("$right"%string, ejnull)::nil))
+              | None => None
+              end
+            else None
+          else None
+        | _ => None
+        end
+      with
+      | Some a' => Some (ejson_to_data a')
+      | None => None
+      end.
+    Proof.
+      case_eq (string_dec s "$class"); intros; subst;
+      case_eq (string_dec s0 "$data"); intros; subst.
+      - destruct e; simpl;
+          try (destruct e0; simpl; reflexivity).
+        case_eq (ejson_brands l); intros; [|reflexivity].
+        destruct (sub_brands_dec h l0 b); [|reflexivity].
+        f_equal; simpl; unfold dsome; f_equal.
+        rewrite H1.
+        reflexivity.
+      - case_eq (ejson_to_data (ejobject (("$class"%string, e)::(s0, e0)::nil))); intros;
+          try (destruct e; simpl; reflexivity).
+          specialize (ejson_to_data_jobj_nbrand_no_data e s0 e0 b0 d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject ((s, e)::("$data"%string, e0)::nil))); intros;
+          try (destruct e; simpl; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class e s e0 b0 d n);
+          intros; contradiction.
+      - case_eq (ejson_to_data (ejobject ((s, e)::(s0, e0)::nil))); intros;
+          try (destruct e; reflexivity);
+          specialize (ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b0 d n n0);
+          intros; contradiction.
     Qed.
 
   End RuntimeLemmas.
