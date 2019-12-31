@@ -221,6 +221,81 @@ Section JSON.
       repeat match_destr.
     Qed.
 
+    Lemma match_not_dollar a s :
+      a <> "$"%char ->
+      match a with
+      | "$"%char => String "$" (String "$" s)
+      | _ => String a s
+      end = String a s.
+    Proof.
+      intros.
+      destruct a; simpl; try congruence.
+      destruct b; simpl; try congruence.
+      destruct b0; simpl; try congruence.
+      destruct b1; simpl; try congruence.
+      destruct b2; simpl; try congruence.
+      destruct b3; simpl; try congruence.
+      destruct b4; simpl; try congruence.
+      destruct b5; simpl; try congruence.
+      destruct b6; simpl; congruence.
+    Qed.
+      
+    Lemma json_encode_inj s s0:
+      (json_key_encode s) = (json_key_encode s0) ->
+      s = s0.
+    Proof.
+      intros.
+      unfold json_key_encode in H.
+      destruct s; destruct s0; simpl in *.
+      - reflexivity.
+      - destruct a; simpl.
+        destruct b; try congruence.
+        destruct b0; try congruence.
+        destruct b1; try congruence.
+        destruct b2; try congruence.
+        destruct b3; try congruence.
+        destruct b4; try congruence.
+        destruct b5; try congruence.
+        destruct b6; try congruence.
+      - destruct a; simpl.
+        destruct b; try congruence.
+        destruct b0; try congruence.
+        destruct b1; try congruence.
+        destruct b2; try congruence.
+        destruct b3; try congruence.
+        destruct b4; try congruence.
+        destruct b5; try congruence.
+        destruct b6; try congruence.
+      - specialize (ascii_dec a "$"%char);
+          specialize (ascii_dec a0 "$"%char);
+          intros.
+        elim H0 ; elim H1; intros; clear H0 H1.
+        + rewrite a1 in H; simpl.
+          rewrite a2 in H; simpl.
+          rewrite a1; rewrite a2.
+          inversion H; reflexivity.
+        + rewrite a1 in H.
+          rewrite (match_not_dollar a s b) in H.
+          inversion H; subst. congruence.
+        + rewrite a1 in H.
+          rewrite (match_not_dollar a0 s0 b) in H.
+          inversion H; subst. congruence.
+        + rewrite (match_not_dollar a s b) in H.
+          rewrite (match_not_dollar a0 s0 b0) in H.
+          assumption.
+    Qed.
+      
+    Lemma json_encode_diff s s0:
+      s <> s0
+      -> (json_key_encode s) <> (json_key_encode s0).
+    Proof.
+      intros.
+      unfold not in *.
+      intros.
+      apply H; clear H.
+      apply json_encode_inj; assumption.
+    Qed.
+
   End Encode.
 
 End JSON.

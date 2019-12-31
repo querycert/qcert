@@ -629,6 +629,13 @@ Section ImpQcerttoImpEJson.
       destruct (lifted_zbag l); reflexivity.
     Qed.
 
+  Ltac rewrite_string_dec_from_neq H
+    :=  let d := fresh "d" in
+        let neq := fresh "neq" in
+        destruct (string_dec_from_neq H) as [d neq]
+        ; repeat rewrite neq in *
+        ; clear d neq.
+
     Lemma imp_qcert_unary_op_to_imp_ejson_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -664,7 +671,8 @@ Section ImpQcerttoImpEJson.
       - Case "OpNeg"%string.
         destruct d; try reflexivity.
       - Case "OpDot"%string.
-        admit.
+        unfold edot.
+        apply assoc_lookupr_json_key_encode_comm.
       - Case "OpRecRemove"%string.
         admit.
       - Case "OpRecProject"%string.
@@ -700,10 +708,27 @@ Section ImpQcerttoImpEJson.
         rewrite of_string_list_over_strings_idempotent; simpl.
         reflexivity.
       - Case "OpUnbrand"%string.
-        admit.
+        case_eq d; intros; simpl; try reflexivity; try (destruct d0; reflexivity).
+        + destruct l; simpl; try reflexivity;
+            destruct p; simpl; try reflexivity;
+          destruct d0; try reflexivity;
+          rewrite_string_dec_from_neq (json_key_encode_not_class s);
+          destruct l0; simpl; try reflexivity;
+          destruct l; simpl; try reflexivity;
+          destruct l; simpl; try reflexivity.
+        + rewrite json_brands_of_brands_idempotent; reflexivity.
       - Case "OpCast"%string.
         rewrite json_brands_of_brands_idempotent.
-        admit.
+        case_eq d; intros; simpl; try reflexivity; try (destruct d0; reflexivity).
+        + destruct l; simpl; try reflexivity;
+            destruct p; simpl; try reflexivity;
+          destruct d0; try reflexivity;
+          rewrite_string_dec_from_neq (json_key_encode_not_class s);
+          destruct l0; simpl; try reflexivity;
+          destruct l; simpl; try reflexivity;
+          destruct l; simpl; try reflexivity.
+        + rewrite json_brands_of_brands_idempotent.
+          destruct (sub_brands_dec h b0 b); reflexivity.
       - Case "OpNatUnary"%string.
         destruct n; simpl in *;
         destruct d; simpl; trivial.
@@ -719,7 +744,13 @@ Section ImpQcerttoImpEJson.
         rewrite dmax_to_ejson_max; reflexivity.
       - Case "OpNatMean"%string.
         destruct d; simpl; trivial.
-        admit.
+        unfold darithmean.
+        unfold lift.
+        generalize (dsum_to_ejson_sum l); intros.
+        rewrite map_length.
+        generalize (BinInt.Z.of_nat (Datatypes.length l)); intro len.
+        destruct (dsum l); destruct (ejson_bigints (map data_to_ejson l)); try congruence.
+        inversion H; subst; reflexivity.
       - Case "OpFloatOfNat"%string.
         destruct d; reflexivity.
       - Case "OpFloatUnary"%string.
