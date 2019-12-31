@@ -267,5 +267,11 @@ Section EJson.
       | _ => None
       end.
 
+    Definition jflatten (d:list ejson) : option (list ejson) :=
+      lift_flat_map (fun x =>
+                       match x with
+                       | ejarray y => Some y
+                       | _ => None end) d.
+    
   End Util.
 End EJson.

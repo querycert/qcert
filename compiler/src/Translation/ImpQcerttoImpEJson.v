@@ -31,310 +31,291 @@ Require Import Fresh.
 Section ImpQcerttoImpEJson.
   Import ListNotations.
 
-  (** Translation *)
-
   Context {fruntime:foreign_runtime}.
   Context {ftejson:foreign_to_ejson}.
 
   Context (h:brand_relation_t). (* We need a brand relation for the Q*cert side *)
 
-(*Definition mk_imp_ejson_expr_error msg : imp_ejson_expr :=
-    ImpExprConst (jstring msg). *)
-  Definition mk_imp_ejson_expr_error msg : imp_ejson_expr :=
-    ImpExprError msg. (* XXX Error should eval to None if we want to prove stuffs! *)
-  Definition mk_imp_ejson_op op el : imp_ejson_expr := ImpExprOp op el.
-  Definition mk_imp_ejson_runtime_call op el : imp_ejson_expr := ImpExprRuntimeCall op el.
+  Section Util.
+    Definition mk_imp_ejson_expr_error msg : imp_ejson_expr :=
+      ImpExprError msg. (* XXX Error should eval to None if we want to prove stuffs! *)
+    Definition mk_imp_ejson_op op el : imp_ejson_expr := ImpExprOp op el.
+    Definition mk_imp_ejson_runtime_call op el : imp_ejson_expr := ImpExprRuntimeCall op el.
 
-  Definition mk_string s : imp_ejson_expr := ImpExprConst (ejstring s).
-  Definition mk_string_array sl : imp_ejson_expr := ImpExprConst (ejarray (map ejstring sl)).
-  Definition mk_bag el : imp_ejson_expr := mk_imp_ejson_op EJsonOpArray el.
-  Definition mk_left e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
-  Definition mk_right e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
+    Definition mk_string s : imp_ejson_expr := ImpExprConst (ejstring s).
+    Definition mk_string_array sl : imp_ejson_expr := ImpExprConst (ejarray (map ejstring sl)).
+    Definition mk_bag el : imp_ejson_expr := mk_imp_ejson_op EJsonOpArray el.
+    Definition mk_left e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
+    Definition mk_right e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
 
-  Definition sortCriteria_to_ejson_expr (sc: string * SortDesc) : imp_ejson_expr :=
-    let (lbl, c) := sc in
-    let o :=
-        match c with
-        | Ascending => ejobject [ ("asc"%string, ejstring lbl) ]
-        | Descending => ejobject [ ("desc"%string, ejstring lbl) ]
+    Definition sortCriteria_to_ejson_expr (sc: string * SortDesc) : imp_ejson_expr :=
+      let (lbl, c) := sc in
+      let o :=
+          match c with
+          | Ascending => ejobject [ ("asc"%string, ejstring lbl) ]
+          | Descending => ejobject [ ("desc"%string, ejstring lbl) ]
+          end
+      in
+      ImpExprConst o.
+
+    Definition brands_to_ejson_expr sl : imp_ejson_expr :=
+      let j := ejarray ((List.map (fun s => ejstring s)) sl) in
+      ImpExprConst j.
+
+    Definition mk_either_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
+      mk_imp_ejson_runtime_call EJsonRuntimeEither el.
+
+    Definition mk_to_left_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
+      mk_imp_ejson_runtime_call EJsonRuntimeToLeft el.
+
+    Definition mk_to_right_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
+      mk_imp_ejson_runtime_call EJsonRuntimeToRight el.
+
+  End Util.
+
+  Section Translation.
+    
+    Definition imp_qcert_unary_op_to_imp_ejson (op:unary_op) el : imp_ejson_expr :=
+      match el with
+      | [e] =>
+        match op with
+        | OpIdentity => e
+        | OpNeg => mk_imp_ejson_op EJsonOpNot [ e ]
+        | OpRec s => mk_imp_ejson_op (EJsonOpObject [json_key_encode s]) [ e ]
+        | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeDeref [ e; ImpExprConst (ejstring (json_key_encode s)) ]
+        | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRemove [ e; mk_string (json_key_encode s) ]
+        | OpRecProject fl =>
+          mk_imp_ejson_runtime_call
+            EJsonRuntimeProject ([ e ] ++ [ mk_string_array (map json_key_encode fl) ])
+        | OpBag => mk_bag el
+        | OpSingleton => mk_imp_ejson_runtime_call EJsonRuntimeSingleton el
+        | OpFlatten => mk_imp_ejson_runtime_call EJsonRuntimeFlatten el
+        | OpDistinct => mk_imp_ejson_runtime_call EJsonRuntimeDistinct el
+        | OpOrderBy scl =>
+          mk_imp_ejson_runtime_call
+            EJsonRuntimeSort (e :: (List.map sortCriteria_to_ejson_expr scl))
+        | OpCount => mk_imp_ejson_runtime_call EJsonRuntimeCount el
+        | OpToString => mk_imp_ejson_op EJsonOpToString el
+        | OpToText => mk_imp_ejson_runtime_call EJsonRuntimeToText el
+        | OpLength => mk_imp_ejson_runtime_call EJsonRuntimeLength el
+        | OpSubstring start len => (* XXX Should be split into two different functions *)
+          let start := ImpExprConst (ejnumber (float_of_int start)) in
+          let args :=
+              match len with
+              | None => [ e; start ]
+              | Some len =>
+                let len := ImpExprConst (ejnumber (float_of_int len)) in
+                [ e; start; len ]
+              end
+          in
+          mk_imp_ejson_runtime_call EJsonRuntimeSubstring args
+        | OpLike pat oescape =>
+          mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson: OpLike XXX"
+        | OpLeft => mk_left e
+        | OpRight => mk_right e
+        | OpBrand b =>
+          mk_imp_ejson_runtime_call EJsonRuntimeBrand [ brands_to_ejson_expr (canon_brands h b); e ]
+        | OpUnbrand => mk_imp_ejson_runtime_call EJsonRuntimeUnbrand el
+        | OpCast b =>
+          mk_imp_ejson_runtime_call EJsonRuntimeCast [ brands_to_ejson_expr b; e ]
+        | OpNatUnary u =>
+          let op :=
+              match u with
+              | NatAbs => EJsonRuntimeNatAbs
+              | NatLog2 => EJsonRuntimeNatLog2
+              | NatSqrt => EJsonRuntimeNatSqrt
+              end
+          in
+          mk_imp_ejson_runtime_call op [ e ]
+        | OpNatSum => mk_imp_ejson_runtime_call EJsonRuntimeNatSum el
+        | OpNatMin => mk_imp_ejson_runtime_call EJsonRuntimeNatMin el
+        | OpNatMax => mk_imp_ejson_runtime_call EJsonRuntimeNatMax el
+        | OpNatMean => mk_imp_ejson_runtime_call EJsonRuntimeNatArithMean el
+        | OpFloatOfNat => mk_imp_ejson_runtime_call EJsonRuntimeFloatOfNat el
+        | OpFloatUnary u =>
+          let op := 
+              match u with
+              | FloatNeg => EJsonOpNeg
+              | FloatSqrt => EJsonOpMathSqrt
+              | FloatExp => EJsonOpMathExp
+              | FloatLog => EJsonOpMathLog
+              | FloatLog10 => EJsonOpMathLog10
+              | FloatCeil => EJsonOpMathCeil
+              | FloatFloor => EJsonOpMathFloor
+              | FloatAbs => EJsonOpMathAbs
+              end
+          in mk_imp_ejson_op op [ e ]
+        | OpFloatTruncate => mk_imp_ejson_op EJsonOpMathTrunc [ e ]
+        | OpFloatSum => mk_imp_ejson_runtime_call EJsonRuntimeSum el
+        | OpFloatMean => mk_imp_ejson_runtime_call EJsonRuntimeArithMean el
+        | OpFloatBagMin => mk_imp_ejson_op EJsonOpMathMinApply [ e ]
+        | OpFloatBagMax => mk_imp_ejson_op EJsonOpMathMaxApply [ e ]
+        | OpForeignUnary fu =>
+          mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson.imp_qcert_unary_op_to_imp_ejson OpForeignUnary"
         end
-    in
-    ImpExprConst o.
+      | _ => mk_imp_ejson_expr_error "wrong number of arguments"
+      end.
 
-  Definition brands_to_ejson_expr sl : imp_ejson_expr :=
-    let j := ejarray ((List.map (fun s => ejstring s)) sl) in
-    ImpExprConst j.
+    Definition imp_qcert_binary_op_to_imp_ejson (op:binary_op) el : imp_ejson_expr :=
+      match el with
+      | [e1; e2] =>
+        match op with
+        | OpEqual => mk_imp_ejson_runtime_call EJsonRuntimeEqual el
+        | OpRecConcat => mk_imp_ejson_runtime_call EJsonRuntimeRecConcat el
+        | OpRecMerge => mk_imp_ejson_runtime_call EJsonRuntimeRecMerge el
+        | OpAnd => mk_imp_ejson_op EJsonOpAnd el
+        | OpOr => mk_imp_ejson_op EJsonOpOr el
+        | OpLt =>
+          mk_imp_ejson_op EJsonOpLt
+                          [ mk_imp_ejson_runtime_call EJsonRuntimeCompare [e1; e2];
+                              ImpExprConst (ejnumber zero) ]
+        | OpLe =>
+          mk_imp_ejson_op EJsonOpLe
+                          [ mk_imp_ejson_runtime_call EJsonRuntimeCompare [e1; e2];
+                              ImpExprConst (ejnumber zero) ]
+        | OpBagUnion => mk_imp_ejson_runtime_call EJsonRuntimeBunion [e1; e2]
+        | OpBagDiff => mk_imp_ejson_runtime_call EJsonRuntimeBminus [e1; e2]
+        | OpBagMin => mk_imp_ejson_runtime_call EJsonRuntimeBmin [e1; e2]
+        | OpBagMax => mk_imp_ejson_runtime_call EJsonRuntimeBmax [e1; e2]
+        | OpBagNth => mk_imp_ejson_runtime_call EJsonRuntimeBnth [e1; e2]
+        | OpContains => mk_imp_ejson_runtime_call EJsonRuntimeContains [e1; e2]
+        | OpStringConcat => mk_imp_ejson_op EJsonOpAddString el
+        | OpStringJoin => mk_imp_ejson_runtime_call EJsonRuntimeStringJoin [e1; e2]
+        | OpNatBinary opa =>
+          match opa with
+          | NatPlus => mk_imp_ejson_runtime_call EJsonRuntimeNatPlus [e1; e2]
+          | NatMinus => mk_imp_ejson_runtime_call EJsonRuntimeNatMinus [e1; e2]
+          | NatMult => mk_imp_ejson_runtime_call EJsonRuntimeNatMult [e1; e2]
+          | NatDiv => mk_imp_ejson_runtime_call EJsonRuntimeNatDiv [e1; e2]
+          | NatRem => mk_imp_ejson_runtime_call EJsonRuntimeNatRem [e1; e2]
+          | NatMin => mk_imp_ejson_runtime_call EJsonRuntimeNatMin [e1; e2]
+          | NatMax => mk_imp_ejson_runtime_call EJsonRuntimeNatMax [e1; e2]
+          end
+        | OpFloatBinary opa =>
+          match opa with
+          | FloatPlus => mk_imp_ejson_op EJsonOpAddNumber [e1; e2]
+          | FloatMinus => mk_imp_ejson_op EJsonOpSub [e1; e2]
+          | FloatMult => mk_imp_ejson_op EJsonOpMult [e1; e2]
+          | FloatDiv => mk_imp_ejson_op EJsonOpDiv [e1; e2]
+          | FloatPow => mk_imp_ejson_op EJsonOpMathPow [e1; e2]
+          | FloatMin => mk_imp_ejson_op EJsonOpMathMin [e1; e2]
+          | FloatMax => mk_imp_ejson_op EJsonOpMathMax [e1; e2]
+          end
+        | OpFloatCompare opa =>
+          match opa with
+          | FloatLt => mk_imp_ejson_op EJsonOpLt [e1; e2]
+          | FloatLe => mk_imp_ejson_op EJsonOpLe [e1; e2]
+          | FloatGt => mk_imp_ejson_op EJsonOpGt [e1; e2]
+          | FloatGe => mk_imp_ejson_op EJsonOpGe [e1; e2]
+          end
+        | OpForeignBinary fb =>
+          (* foreign_to_ajavascript_binary_op fb [e1; e2] *)
+          mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson.imp_qcert_binary_op_to_imp_ejson(OpForeignBinary): not yet implemented XXX" (* XXX TODO  *)
+        end
+      | _ => mk_imp_ejson_expr_error "imp_qcert_binary_op_to_imp_ejson: wrong number of arguments"
+      end.
 
-  Definition imp_qcert_unary_op_to_imp_ejson (op:unary_op) el : imp_ejson_expr :=
-    match el with
-    | [e] =>
+    Definition imp_qcert_op_to_imp_ejson (op:imp_qcert_op) el : imp_ejson_expr :=
       match op with
-      | OpIdentity => e
-      | OpNeg => mk_imp_ejson_op EJsonOpNot [ e ]
-      | OpRec s => mk_imp_ejson_op (EJsonOpObject [json_key_encode s]) [ e ]
-      | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeDeref [ e; ImpExprConst (ejstring (json_key_encode s)) ]
-      | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRemove [ e; mk_string (json_key_encode s) ]
-      | OpRecProject fl =>
-        mk_imp_ejson_runtime_call
-          EJsonRuntimeProject ([ e ] ++ [ mk_string_array (map json_key_encode fl) ])
-      | OpBag => mk_bag el
-      | OpSingleton => mk_imp_ejson_runtime_call EJsonRuntimeSingleton el
-      | OpFlatten => mk_imp_ejson_runtime_call EJsonRuntimeFlatten el
-      | OpDistinct => mk_imp_ejson_runtime_call EJsonRuntimeDistinct el
-      | OpOrderBy scl =>
-        mk_imp_ejson_runtime_call
-          EJsonRuntimeSort (e :: (List.map sortCriteria_to_ejson_expr scl))
-      | OpCount => mk_imp_ejson_runtime_call EJsonRuntimeCount el
-      | OpToString => mk_imp_ejson_op EJsonOpToString el
-      | OpToText => mk_imp_ejson_runtime_call EJsonRuntimeToText el
-      | OpLength => mk_imp_ejson_runtime_call EJsonRuntimeLength el
-      | OpSubstring start len => (* XXX Should be split into two different functions *)
-        let start := ImpExprConst (ejnumber (float_of_int start)) in
-        let args :=
-            match len with
-            | None => [ e; start ]
-            | Some len =>
-              let len := ImpExprConst (ejnumber (float_of_int len)) in
-              [ e; start; len ]
-            end
-        in
-        mk_imp_ejson_runtime_call EJsonRuntimeSubstring args
-      | OpLike pat oescape =>
-        mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson: OpLike XXX"
-      | OpLeft => mk_left e
-      | OpRight => mk_right e
-      | OpBrand b =>
-        mk_imp_ejson_runtime_call EJsonRuntimeBrand [ brands_to_ejson_expr (canon_brands h b); e ]
-      | OpUnbrand => mk_imp_ejson_runtime_call EJsonRuntimeUnbrand el
-      | OpCast b =>
-        mk_imp_ejson_runtime_call EJsonRuntimeCast [ brands_to_ejson_expr b; e ]
-      | OpNatUnary u =>
-        let op :=
-            match u with
-            | NatAbs => EJsonRuntimeNatAbs
-            | NatLog2 => EJsonRuntimeNatLog2
-            | NatSqrt => EJsonRuntimeNatSqrt
-            end
-        in
-        mk_imp_ejson_runtime_call op [ e ]
-      | OpNatSum => mk_imp_ejson_runtime_call EJsonRuntimeNatSum el
-      | OpNatMin => mk_imp_ejson_runtime_call EJsonRuntimeNatMin el
-      | OpNatMax => mk_imp_ejson_runtime_call EJsonRuntimeNatMax el
-      | OpNatMean => mk_imp_ejson_runtime_call EJsonRuntimeNatArithMean el
-      | OpFloatOfNat => mk_imp_ejson_runtime_call EJsonRuntimeFloatOfNat el
-      | OpFloatUnary u =>
-        let op := 
-            match u with
-            | FloatNeg => EJsonOpNeg
-            | FloatSqrt => EJsonOpMathSqrt
-            | FloatExp => EJsonOpMathExp
-            | FloatLog => EJsonOpMathLog
-            | FloatLog10 => EJsonOpMathLog10
-            | FloatCeil => EJsonOpMathCeil
-            | FloatFloor => EJsonOpMathFloor
-            | FloatAbs => EJsonOpMathAbs
-            end
-        in mk_imp_ejson_op op [ e ]
-      | OpFloatTruncate => mk_imp_ejson_op EJsonOpMathTrunc [ e ]
-      | OpFloatSum => mk_imp_ejson_runtime_call EJsonRuntimeSum el
-      | OpFloatMean => mk_imp_ejson_runtime_call EJsonRuntimeArithMean el
-      | OpFloatBagMin => mk_imp_ejson_op EJsonOpMathMinApply [ e ]
-      | OpFloatBagMax => mk_imp_ejson_op EJsonOpMathMaxApply [ e ]
-      | OpForeignUnary fu =>
-        mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson.imp_qcert_unary_op_to_imp_ejson OpForeignUnary"
-      end
-    | _ => mk_imp_ejson_expr_error "wrong number of arguments"
-    end.
+      | QcertOpUnary op => imp_qcert_unary_op_to_imp_ejson op el
+      | QcertOpBinary op => imp_qcert_binary_op_to_imp_ejson op el
+      end.
 
-  Definition imp_qcert_binary_op_to_imp_ejson (op:binary_op) el : imp_ejson_expr :=
-    match el with
-    | [e1; e2] =>
+    Definition imp_qcert_runtime_call_to_imp_ejson
+               (op:imp_qcert_runtime_op)
+               (el:list imp_ejson_expr) : imp_ejson_expr :=
       match op with
-      | OpEqual => mk_imp_ejson_runtime_call EJsonRuntimeEqual el
-      | OpRecConcat => mk_imp_ejson_runtime_call EJsonRuntimeRecConcat el
-      | OpRecMerge => mk_imp_ejson_runtime_call EJsonRuntimeRecMerge el
-      | OpAnd => mk_imp_ejson_op EJsonOpAnd el
-      | OpOr => mk_imp_ejson_op EJsonOpOr el
-      | OpLt =>
-        mk_imp_ejson_op EJsonOpLt
-                       [ mk_imp_ejson_runtime_call EJsonRuntimeCompare [e1; e2];
-                         ImpExprConst (ejnumber zero) ]
-      | OpLe =>
-        mk_imp_ejson_op EJsonOpLe
-                       [ mk_imp_ejson_runtime_call EJsonRuntimeCompare [e1; e2];
-                         ImpExprConst (ejnumber zero) ]
-      | OpBagUnion => mk_imp_ejson_runtime_call EJsonRuntimeBunion [e1; e2]
-      | OpBagDiff => mk_imp_ejson_runtime_call EJsonRuntimeBminus [e1; e2]
-      | OpBagMin => mk_imp_ejson_runtime_call EJsonRuntimeBmin [e1; e2]
-      | OpBagMax => mk_imp_ejson_runtime_call EJsonRuntimeBmax [e1; e2]
-      | OpBagNth => mk_imp_ejson_runtime_call EJsonRuntimeBnth [e1; e2]
-      | OpContains => mk_imp_ejson_runtime_call EJsonRuntimeContains [e1; e2]
-      | OpStringConcat => mk_imp_ejson_op EJsonOpAddString el
-      | OpStringJoin => mk_imp_ejson_runtime_call EJsonRuntimeStringJoin [e1; e2]
-      | OpNatBinary opa =>
-        match opa with
-        | NatPlus => mk_imp_ejson_runtime_call EJsonRuntimeNatPlus [e1; e2]
-        | NatMinus => mk_imp_ejson_runtime_call EJsonRuntimeNatMinus [e1; e2]
-        | NatMult => mk_imp_ejson_runtime_call EJsonRuntimeNatMult [e1; e2]
-        | NatDiv => mk_imp_ejson_runtime_call EJsonRuntimeNatDiv [e1; e2]
-        | NatRem => mk_imp_ejson_runtime_call EJsonRuntimeNatRem [e1; e2]
-        | NatMin => mk_imp_ejson_runtime_call EJsonRuntimeNatMin [e1; e2]
-        | NatMax => mk_imp_ejson_runtime_call EJsonRuntimeNatMax [e1; e2]
-        end
-      | OpFloatBinary opa =>
-        match opa with
-        | FloatPlus => mk_imp_ejson_op EJsonOpAddNumber [e1; e2]
-        | FloatMinus => mk_imp_ejson_op EJsonOpSub [e1; e2]
-        | FloatMult => mk_imp_ejson_op EJsonOpMult [e1; e2]
-        | FloatDiv => mk_imp_ejson_op EJsonOpDiv [e1; e2]
-        | FloatPow => mk_imp_ejson_op EJsonOpMathPow [e1; e2]
-        | FloatMin => mk_imp_ejson_op EJsonOpMathMin [e1; e2]
-        | FloatMax => mk_imp_ejson_op EJsonOpMathMax [e1; e2]
-        end
-      | OpFloatCompare opa =>
-        match opa with
-        | FloatLt => mk_imp_ejson_op EJsonOpLt [e1; e2]
-        | FloatLe => mk_imp_ejson_op EJsonOpLe [e1; e2]
-        | FloatGt => mk_imp_ejson_op EJsonOpGt [e1; e2]
-        | FloatGe => mk_imp_ejson_op EJsonOpGe [e1; e2]
-        end
-      | OpForeignBinary fb =>
-      (* foreign_to_ajavascript_binary_op fb [e1; e2] *)
-        mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson.imp_qcert_binary_op_to_imp_ejson(OpForeignBinary): not yet implemented XXX" (* XXX TODO  *)
-      end
-    | _ => mk_imp_ejson_expr_error "imp_qcert_binary_op_to_imp_ejson: wrong number of arguments"
-    end.
+      | QcertRuntimeGroupby s ls =>
+        mk_imp_ejson_runtime_call
+          EJsonRuntimeGroupBy
+          ((ImpExprConst (ejstring s))
+             :: (ImpExprConst (ejarray (map ejstring ls)))
+             :: el)
+      | QcertRuntimeEither => mk_either_expr el
+      | QcertRuntimeToLeft => mk_to_left_expr el
+      | QcertRuntimeToRight => mk_to_right_expr el
+      end.
 
-  Definition imp_qcert_op_to_imp_ejson (op:imp_qcert_op) el : imp_ejson_expr :=
-    match op with
-    | QcertOpUnary op => imp_qcert_unary_op_to_imp_ejson op el
-    | QcertOpBinary op => imp_qcert_binary_op_to_imp_ejson op el
-    end.
+    Fixpoint imp_qcert_expr_to_imp_ejson (exp: imp_qcert_expr) : imp_ejson_expr :=
+      match exp with
+      | ImpExprError msg => ImpExprError msg
+      | ImpExprVar v => ImpExprVar v
+      | ImpExprConst d => ImpExprConst (@data_to_ejson _ _ _ (normalize_data h d)) (* XXX Add normalization *)
+      | ImpExprOp op el => imp_qcert_op_to_imp_ejson op (map imp_qcert_expr_to_imp_ejson el)
+      | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_ejson op (map imp_qcert_expr_to_imp_ejson el)
+      end.
 
-  Definition mk_either_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
-    mk_imp_ejson_runtime_call EJsonRuntimeEither el.
+    Fixpoint imp_qcert_stmt_to_imp_ejson (avoid: list string) (stmt: imp_qcert_stmt): imp_ejson_stmt :=
+      match stmt with
+      | ImpStmtBlock lv ls =>
+        ImpStmtBlock
+          (*** XXX Why change the avoid list here ? *)
+          (* (map (fun xy => (fst xy, *)
+          (*                  lift imp_qcert_expr_to_imp_ejson (snd xy))) lv) *)
+          (* (map (imp_qcert_stmt_to_imp_ejson ((List.map fst lv) ++ avoid)) ls) *)
+          (map (fun xy => (fst xy, lift imp_qcert_expr_to_imp_ejson (snd xy))) lv)
+          (map (imp_qcert_stmt_to_imp_ejson avoid) ls)
+      | ImpStmtAssign v e =>
+        ImpStmtAssign v (imp_qcert_expr_to_imp_ejson e)
+      | ImpStmtFor v e s =>
+        let avoid := v :: avoid in
+        let e := imp_qcert_expr_to_imp_ejson e in
+        let src_id := fresh_var "src" avoid in
+        let avoid := src_id :: avoid in
+        let i_id := fresh_var "i" avoid in
+        let avoid := i_id :: avoid in
+        let src := ImpExprVar src_id in
+        let i := ImpExprVar i_id in
+        ImpStmtBlock
+          [ (src_id, Some e) ]
+          [ ImpStmtForRange
+              i_id (ImpExprConst (ejnumber zero)) (ImpExprOp EJsonOpArrayLength [ src ])
+              (ImpStmtBlock
+                 [ (v, Some (ImpExprOp EJsonOpArrayAccess [ src; i ])) ]
+                 [ imp_qcert_stmt_to_imp_ejson avoid s ]) ]
+      | ImpStmtForRange v e1 e2 s =>
+        ImpStmtForRange v
+                        (imp_qcert_expr_to_imp_ejson e1)
+                        (imp_qcert_expr_to_imp_ejson e2)
+                        (imp_qcert_stmt_to_imp_ejson (v :: avoid) s)
+      | ImpStmtIf e s1 s2 =>
+        ImpStmtIf (imp_qcert_expr_to_imp_ejson e)
+                  (imp_qcert_stmt_to_imp_ejson avoid s1)
+                  (imp_qcert_stmt_to_imp_ejson avoid s2)
+      end.
 
-  Definition mk_to_left_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
-    mk_imp_ejson_runtime_call EJsonRuntimeToLeft el.
+    Definition imp_qcert_function_to_imp_ejson (f:imp_qcert_function) : imp_ejson_function :=
+      match f with
+      | ImpFun v s ret => ImpFun v (imp_qcert_stmt_to_imp_ejson [v] s) ret
+      end.
 
-  Definition mk_to_right_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
-    mk_imp_ejson_runtime_call EJsonRuntimeToRight el.
-
-  Definition imp_qcert_runtime_call_to_imp_ejson
-             (op:imp_qcert_runtime_op)
-             (el:list imp_ejson_expr) : imp_ejson_expr :=
-    match op with
-    | QcertRuntimeGroupby s ls =>
-      mk_imp_ejson_runtime_call
-        EJsonRuntimeGroupBy
-        ((ImpExprConst (ejstring s))
-           :: (ImpExprConst (ejarray (map ejstring ls)))
-           :: el)
-    | QcertRuntimeEither => mk_either_expr el
-    | QcertRuntimeToLeft => mk_to_left_expr el
-    | QcertRuntimeToRight => mk_to_right_expr el
-    end.
-
-  Fixpoint imp_qcert_expr_to_imp_ejson (exp: imp_qcert_expr) : imp_ejson_expr :=
-    match exp with
-    | ImpExprError msg => ImpExprError msg
-    | ImpExprVar v => ImpExprVar v
-    | ImpExprConst d => ImpExprConst (@data_to_ejson _ _ _ (normalize_data h d)) (* XXX Add normalization *)
-    | ImpExprOp op el => imp_qcert_op_to_imp_ejson op (map imp_qcert_expr_to_imp_ejson el)
-    | ImpExprRuntimeCall op el => imp_qcert_runtime_call_to_imp_ejson op (map imp_qcert_expr_to_imp_ejson el)
-    end.
-
-  Fixpoint imp_qcert_stmt_to_imp_ejson (avoid: list string) (stmt: imp_qcert_stmt): imp_ejson_stmt :=
-    match stmt with
-    | ImpStmtBlock lv ls =>
-      ImpStmtBlock
-        (*** XXX Why change the avoid list here ? *)
-        (* (map (fun xy => (fst xy, *)
-        (*                  lift imp_qcert_expr_to_imp_ejson (snd xy))) lv) *)
-        (* (map (imp_qcert_stmt_to_imp_ejson ((List.map fst lv) ++ avoid)) ls) *)
-        (map (fun xy => (fst xy, lift imp_qcert_expr_to_imp_ejson (snd xy))) lv)
-        (map (imp_qcert_stmt_to_imp_ejson avoid) ls)
-    | ImpStmtAssign v e =>
-      ImpStmtAssign v (imp_qcert_expr_to_imp_ejson e)
-    | ImpStmtFor v e s =>
-      let avoid := v :: avoid in
-      let e := imp_qcert_expr_to_imp_ejson e in
-      let src_id := fresh_var "src" avoid in
-      let avoid := src_id :: avoid in
-      let i_id := fresh_var "i" avoid in
-      let avoid := i_id :: avoid in
-      let src := ImpExprVar src_id in
-      let i := ImpExprVar i_id in
-      ImpStmtBlock
-        [ (src_id, Some e) ]
-        [ ImpStmtForRange
-            i_id (ImpExprConst (ejnumber zero)) (ImpExprOp EJsonOpArrayLength [ src ])
-            (ImpStmtBlock
-               [ (v, Some (ImpExprOp EJsonOpArrayAccess [ src; i ])) ]
-               [ imp_qcert_stmt_to_imp_ejson avoid s ]) ]
-    | ImpStmtForRange v e1 e2 s =>
-      ImpStmtForRange v
-                      (imp_qcert_expr_to_imp_ejson e1)
-                      (imp_qcert_expr_to_imp_ejson e2)
-                      (imp_qcert_stmt_to_imp_ejson (v :: avoid) s)
-    | ImpStmtIf e s1 s2 =>
-      ImpStmtIf (imp_qcert_expr_to_imp_ejson e)
-                (imp_qcert_stmt_to_imp_ejson avoid s1)
-                (imp_qcert_stmt_to_imp_ejson avoid s2)
-    end.
-
-  Definition imp_qcert_function_to_imp_ejson (f:imp_qcert_function) : imp_ejson_function :=
-    match f with
-    | ImpFun v s ret => ImpFun v (imp_qcert_stmt_to_imp_ejson [v] s) ret
-    end.
-
-  Fixpoint imp_qcert_to_imp_ejson (i:imp_qcert) : imp_ejson :=
-    match i with
-    | ImpLib l =>
-      ImpLib
-        (List.map
-           (fun (decl: string * imp_qcert_function) =>
-              let (name, def) := decl in (name, imp_qcert_function_to_imp_ejson def))
-           l)
-    end.
-
-  Section Lift.
-    Definition lift_bindings (env:bindings) : jbindings :=
-      List.map (fun xy => (fst xy, data_to_ejson (snd xy))) env.
-    Definition lift_pd_bindings (env:pd_bindings) : pd_jbindings :=
-      List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env.
-    Definition lift_result (res:option ejson) : option data :=
-      lift ejson_to_data res.
-    Definition unlift_result (res:option data) : option ejson :=
-      lift data_to_ejson res.
-    Definition lift_result_env (res:option pd_jbindings) : option pd_bindings :=
-      lift (fun env => List.map (fun xy => (fst xy, lift ejson_to_data (snd xy))) env) res.
-    Definition unlift_result_env (res:option pd_bindings) : option pd_jbindings :=
-      lift (fun env => List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env) res.
-  End Lift.
+    Fixpoint imp_qcert_to_imp_ejson (i:imp_qcert) : imp_ejson :=
+      match i with
+      | ImpLib l =>
+        ImpLib
+          (List.map
+             (fun (decl: string * imp_qcert_function) =>
+                let (name, def) := decl in (name, imp_qcert_function_to_imp_ejson def))
+             l)
+      end.
+  End Translation.
 
   Section Correctness.
-    Lemma map_qcert_ejson_eval
-          (σ:pd_bindings) (el:list imp_expr) :
-      Forall
-        (fun exp : imp_expr =>
-           imp_qcert_expr_eval h σ exp =
-           lift_result
-             (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp))) el -> 
-      map (fun x : imp_qcert_expr => imp_qcert_expr_eval h σ x) el =
-      map (fun x : imp_qcert_expr => lift_result
-             (imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson x))) el.
-    Proof.
-      intros.
-      apply map_eq.
-      assumption.
-    Qed.
+    Section Lift.
+      Definition lift_bindings (env:bindings) : jbindings :=
+        List.map (fun xy => (fst xy, data_to_ejson (snd xy))) env.
+      Definition lift_pd_bindings (env:pd_bindings) : pd_jbindings :=
+        List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env.
+      Definition lift_result (res:option ejson) : option data :=
+        lift ejson_to_data res.
+      Definition unlift_result (res:option data) : option ejson :=
+        lift data_to_ejson res.
+      Definition lift_result_env (res:option pd_jbindings) : option pd_bindings :=
+        lift (fun env => List.map (fun xy => (fst xy, lift ejson_to_data (snd xy))) env) res.
+      Definition unlift_result_env (res:option pd_bindings) : option pd_jbindings :=
+        lift (fun env => List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env) res.
+    End Lift.
 
-    Lemma normalize_data_dbool d b : normalize_data h d = dbool b <-> d = dbool b.
-    Proof.
-      destruct d; simpl; intuition discriminate.
-    Qed.
-    
     Lemma data_to_bool_ejson_to_bool_correct j:
       imp_qcert_data_to_bool (ejson_to_data j) = imp_ejson_data_to_bool j.
     Proof.
@@ -346,12 +327,7 @@ Section ImpQcerttoImpEJson.
       specialize (HH1 b); congruence.
     Qed.
 
-    Lemma normalize_data_forall_ndnat d :  (forall n, d <> dnat n) -> (forall n, normalize_data h d <> dnat n).
-    Proof.
-      destruct d; simpl; intuition discriminate.
-    Qed.
-
-    Lemma data_to_bool_ejson_to_nat_correct j:
+    Lemma data_to_bigint_ejson_to_nat_correct j:
       imp_qcert_data_to_Z (ejson_to_data j) = imp_ejson_data_to_Z j.
     Proof.
       unfold imp_qcert_data_to_Z.
@@ -360,199 +336,6 @@ Section ImpQcerttoImpEJson.
       case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
       generalize (ejson_to_data_object_not_nat l z); intros.
       contradiction.
-    Qed.
-
-    Lemma Forall_singleton σ i:
-      Forall
-        (fun exp : imp_expr =>
-           unlift_result (imp_qcert_expr_eval h σ exp) =
-           imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp)) [i]
-      -> unlift_result (imp_qcert_expr_eval h σ i)
-         = imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson i).
-    Proof.
-      intros.
-      rewrite Forall_forall in H.
-      specialize (H i).
-      apply H.
-      left; reflexivity.
-    Qed.
-
-    Lemma oflatten_eobject_is_none l l' :
-      oflatten (map (fun x : ejson => ejson_to_data x) (ejobject l :: l')) = None.
-    Proof.
-      Opaque ejson_to_data.
-      simpl.
-      unfold oflatten.
-      simpl.
-      case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
-      generalize (ejson_to_data_object_not_coll l l0); intros.
-      contradiction.
-      Transparent ejson_to_data.
-    Qed.
-
-    Lemma oflatten_jflatten_roundtrip l :
-      match match oflatten l with
-            | Some a' => Some (dcoll a')
-            | None => None
-            end with
-      | Some a' => Some (data_to_ejson a')
-      | None => None
-      end = match jflatten (map data_to_ejson l) with
-            | Some a' => Some (ejarray a')
-            | None => None
-            end.
-    Proof.
-      induction l; [reflexivity|].
-      destruct a; try reflexivity.
-      simpl.
-      unfold jflatten, oflatten in *; simpl.
-      destruct (lift_flat_map (fun x : data => match x with
-                                               | dcoll y => Some y
-                                               | _ => None
-                                               end) l);
-        destruct (lift_flat_map (fun x : ejson => match x with
-                                          | ejarray y => Some y
-                                          | _ => None
-                                                  end) (map data_to_ejson l)); simpl; try congruence.
-      simpl in IHl.
-      inversion IHl; clear IHl.
-      subst.
-      f_equal.
-      f_equal.
-      apply map_app.
-    Qed.
-
-    Lemma ejson_to_data_jobj_nbrand s e b d: (ejson_to_data (ejobject [(s, e)])) <> dbrand b d.
-    Proof.
-      simpl.
-      repeat match_destr.
-    Qed.
-
-    Lemma ejson_to_data_jobj_nbrand_long s e p p0 l b d:
-      (ejson_to_data (ejobject ((s, e) :: p :: p0 :: l))) <> dbrand b d.
-    Proof.
-      simpl.
-      repeat match_destr.
-    Qed.
-
-    Lemma ejson_to_data_jobj_nbrand_no_data e s0 e0 b d:
-      s0 <> "$data"%string ->
-      ejson_to_data (ejobject [("$class"%string, e); (s0, e0)]) <> dbrand b d.
-    Proof.
-      intros; simpl.
-      repeat match_destr; try congruence.
-    Qed.
-      
-    Lemma ejson_to_data_jobj_nbrand_no_class e s e0 b d:
-      s <> "$class"%string ->
-      ejson_to_data (ejobject [(s, e); ("$data"%string, e0)]) <> dbrand b d.
-    Proof.
-      intros; simpl.
-      repeat match_destr; try congruence.
-    Qed.
-
-    Lemma ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b d:
-      s <> "$class"%string ->
-      s0 <> "$data"%string ->
-      ejson_to_data (ejobject [(s, e); (s0, e0)]) <> dbrand b d.
-    Proof.
-      intros; simpl.
-      repeat match_destr; try congruence.
-    Qed.
-
-    Lemma ejson_data_maybe_brand s s0 e e0 :
-      match ejson_to_data (ejobject [(s, e); (s0, e0)]) with
-      | dbrand _ d' => Some d'
-      | _ => None
-      end =
-      match
-        match e with
-        | ejarray j1 =>
-          if string_dec s "$class"
-          then
-            if string_dec s0 "$data"
-            then match ejson_brands j1 with
-                 | Some _ => Some e0
-                 | None => None
-                 end
-            else None
-          else None
-        | _ => None
-        end
-      with
-      | Some a' => Some (ejson_to_data a')
-      | None => None
-      end.
-    Proof.
-      case_eq (string_dec s "$class"); intros; subst;
-      case_eq (string_dec s0 "$data"); intros; subst.
-      - destruct e; simpl;
-          try (destruct e0; simpl; reflexivity).
-        destruct (ejson_brands l); reflexivity.
-      - case_eq (ejson_to_data (ejobject [("$class"%string, e); (s0, e0)])); intros;
-          try (destruct e; simpl; reflexivity);
-          specialize (ejson_to_data_jobj_nbrand_no_data e s0 e0 b d n);
-          intros; contradiction.
-      - case_eq (ejson_to_data (ejobject [(s, e); ("$data"%string, e0)])); intros;
-          try (destruct e; simpl; reflexivity);
-          specialize (ejson_to_data_jobj_nbrand_no_class e s e0 b d n);
-          intros; contradiction.
-      - case_eq (ejson_to_data (ejobject [(s, e); (s0, e0)])); intros;
-          try (destruct e; reflexivity);
-          specialize (ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b d n n0);
-          intros; contradiction.
-    Qed.
-
-    Lemma ejson_data_maybe_cast b s s0 e e0 :
-      match ejson_to_data (ejobject [(s, e); (s0, e0)]) with
-      | dbrand b' _ =>
-        if sub_brands_dec h b' b then Some (dsome (ejson_to_data (ejobject [(s, e); (s0, e0)]))) else Some dnone
-      | _ => None
-      end =
-      match
-        match e with
-        | ejarray jl2 =>
-          if string_dec s "$class"
-          then
-            if string_dec s0 "$data"
-            then
-              match ejson_brands jl2 with
-              | Some b2 =>
-                if sub_brands_dec h b2 b
-                then Some (ejobject [("$left"%string, ejobject [(s, e); (s0, e0)])])
-                else Some (ejobject [("$right"%string, ejnull)])
-              | None => None
-              end
-            else None
-          else None
-        | _ => None
-        end
-      with
-      | Some a' => Some (ejson_to_data a')
-      | None => None
-      end.
-    Proof.
-      case_eq (string_dec s "$class"); intros; subst;
-      case_eq (string_dec s0 "$data"); intros; subst.
-      - destruct e; simpl;
-          try (destruct e0; simpl; reflexivity).
-        case_eq (ejson_brands l); intros; [|reflexivity].
-        destruct (sub_brands_dec h l0 b); [|reflexivity].
-        f_equal; simpl; unfold dsome; f_equal.
-        rewrite H1.
-        reflexivity.
-      - case_eq (ejson_to_data (ejobject [("$class"%string, e); (s0, e0)])); intros;
-          try (destruct e; simpl; reflexivity).
-          specialize (ejson_to_data_jobj_nbrand_no_data e s0 e0 b0 d n);
-          intros; contradiction.
-      - case_eq (ejson_to_data (ejobject [(s, e); ("$data"%string, e0)])); intros;
-          try (destruct e; simpl; reflexivity);
-          specialize (ejson_to_data_jobj_nbrand_no_class e s e0 b0 d n);
-          intros; contradiction.
-      - case_eq (ejson_to_data (ejobject [(s, e); (s0, e0)])); intros;
-          try (destruct e; reflexivity);
-          specialize (ejson_to_data_jobj_nbrand_no_class_no_data s e s0 e0 b0 d n n0);
-          intros; contradiction.
     Qed.
 
     Lemma dsum_to_ejson_sum l :
@@ -613,12 +396,12 @@ Section ImpQcerttoImpEJson.
       destruct (lifted_zbag l); reflexivity.
     Qed.
 
-  Ltac rewrite_string_dec_from_neq H
-    :=  let d := fresh "d" in
-        let neq := fresh "neq" in
-        destruct (string_dec_from_neq H) as [d neq]
-        ; repeat rewrite neq in *
-        ; clear d neq.
+    Ltac rewrite_string_dec_from_neq H
+      :=  let d := fresh "d" in
+          let neq := fresh "neq" in
+          destruct (string_dec_from_neq H) as [d neq]
+          ; repeat rewrite neq in *
+          ; clear d neq.
 
     Lemma imp_qcert_unary_op_to_imp_ejson_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
@@ -647,7 +430,7 @@ Section ImpQcerttoImpEJson.
           unfold imp_qcert_data, ImpEval.imp_expr, imp_qcert_expr, imp_qcert_data, foreign_runtime_data in *;
           rewrite H0; reflexivity].
       (* just one param *)
-      apply Forall_singleton in H.
+      apply Forall_inv in H.
       unary_op_cases (destruct u) Case; unfold lift_result, lift, olift; simpl;
         try (rewrite <- H; clear H;
              destruct (imp_qcert_expr_eval h σ i);
@@ -667,7 +450,7 @@ Section ImpQcerttoImpEJson.
         destruct l; try reflexivity; simpl.
       - Case "OpFlatten"%string.
         destruct d; try reflexivity; simpl.
-        apply oflatten_jflatten_roundtrip.
+        apply flat_map_jflatten_roundtrip.
       - Case "OpDistinct"%string.
         destruct d; simpl; try reflexivity.
         rewrite bdistinct_ejson_to_data_comm; reflexivity.
@@ -780,17 +563,19 @@ Section ImpQcerttoImpEJson.
       imp_ejson_expr_eval h (lift_pd_bindings σ)
                           (imp_qcert_runtime_call_to_imp_ejson rt (map imp_qcert_expr_to_imp_ejson el)).
     Proof.
-      Opaque ejson_to_data.
-      intros.
-      imp_qcert_runtime_op_cases(destruct rt) Case; simpl.
-      - Case "QcertRuntimeGroupby"%string.
-        admit. (* XXX Not implemented *)
-      - Case "QcertRuntimeEither"%string.
-        admit.
-      - Case "QcertRuntimeLeft"%string.
-        admit. (* XXX Not implemented *)
-      - Case "QcertRuntimeRight"%string.
-        admit. (* XXX Not implemented *)
+      Opaque ejson_to_data. {
+        intros.
+        imp_qcert_runtime_op_cases(destruct rt) Case; simpl.
+        - Case "QcertRuntimeGroupby"%string.
+          admit. (* XXX Not implemented *)
+        - Case "QcertRuntimeEither"%string.
+          admit.
+        - Case "QcertRuntimeLeft"%string.
+          admit. (* XXX Not implemented *)
+        - Case "QcertRuntimeRight"%string.
+          admit. (* XXX Not implemented *)
+      }
+      Transparent ejson_to_data.
     Admitted.
 
     (* XXX This lemma looses the key assumption that the ejson returned is idempotent to data *)
