@@ -134,8 +134,8 @@ Section Imp.
                  (fblock : forall el : list (var * option imp_expr), forall sl : list imp_stmt,
                        Forallt P sl -> P (ImpStmtBlock el sl))
                  (fassign : forall v : string, forall e : imp_expr, P (ImpStmtAssign v e))
-                 (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P (ImpStmtFor v e s))
-                 (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P (ImpStmtForRange v e1 e2 s))
+                 (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P s -> P (ImpStmtFor v e s))
+                 (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P s -> P (ImpStmtForRange v e1 e2 s))
                  (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P s1 -> P s2 -> P (ImpStmtIf e s1 s2))
         :=
           fix F (e : imp_stmt) : P e :=
@@ -147,8 +147,8 @@ Section Imp.
                                | cons d c0 => @Forallt_cons _ P d c0 (F d) (F1 c0)
                                end) sl)
             | ImpStmtAssign v e => fassign v e
-            | ImpStmtFor v e s => ffor v e s
-            | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s
+            | ImpStmtFor v e s => ffor v e s (F s)
+            | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s (F s)
             | ImpStmtIf e s1 s2 => fif e s1 s2 (F s1) (F s2)
             end.
 
@@ -156,8 +156,8 @@ Section Imp.
                  (fblock : forall el : list (var * option imp_expr), forall sl : list imp_stmt,
                        Forall P sl -> P (ImpStmtBlock el sl))
                  (fassign : forall v : string, forall e : imp_expr, P (ImpStmtAssign v e))
-                 (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P (ImpStmtFor v e s))
-                 (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P (ImpStmtForRange v e1 e2 s))
+                 (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P s -> P (ImpStmtFor v e s))
+                 (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P s -> P (ImpStmtForRange v e1 e2 s))
                  (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P s1 -> P s2 -> P (ImpStmtIf e s1 s2))
         :=
           fix F (e : imp_stmt) : P e :=
@@ -169,8 +169,8 @@ Section Imp.
                                | cons d c0 => @Forall_cons _ P d c0 (F d) (F1 c0)
                                end) sl)
             | ImpStmtAssign v e => fassign v e
-            | ImpStmtFor v e s => ffor v e s
-            | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s
+            | ImpStmtFor v e s => ffor v e s (F s)
+            | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s (F s)
             | ImpStmtIf e s1 s2 => fif e s1 s2 (F s1) (F s2)
             end.
 
