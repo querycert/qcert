@@ -162,10 +162,14 @@ Section ImpEJsonEval.
       | EJsonRuntimeRemove =>
         apply_binary
           (fun d1 d2 =>
-             match d1, d2 with
-             | ejobject r, ejstring s =>
-               Some (ejobject (rremove r s))
-             | _, _ => None
+             match ejson_is_record d1 with
+             | Some r =>
+               match d2 with
+               | ejstring s =>
+                 Some (ejobject (rremove r s))
+               | _ => None
+               end
+             | _ => None
              end) dl
       | EJsonRuntimeProject =>
         apply_binary

@@ -136,7 +136,7 @@ Section Imp.
                  (fassign : forall v : string, forall e : imp_expr, P (ImpStmtAssign v e))
                  (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P (ImpStmtFor v e s))
                  (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P (ImpStmtForRange v e1 e2 s))
-                 (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P (ImpStmtIf e s1 s2))
+                 (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P s1 -> P s2 -> P (ImpStmtIf e s1 s2))
         :=
           fix F (e : imp_stmt) : P e :=
             match e as e0 return (P e0) with
@@ -149,7 +149,7 @@ Section Imp.
             | ImpStmtAssign v e => fassign v e
             | ImpStmtFor v e s => ffor v e s
             | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s
-            | ImpStmtIf e s1 s2 => fif e s1 s2
+            | ImpStmtIf e s1 s2 => fif e s1 s2 (F s1) (F s2)
             end.
 
       Definition imp_stmt_ind (P : imp_stmt -> Prop)
@@ -158,7 +158,7 @@ Section Imp.
                  (fassign : forall v : string, forall e : imp_expr, P (ImpStmtAssign v e))
                  (ffor : forall v : string, forall e : imp_expr, forall s : imp_stmt, P (ImpStmtFor v e s))
                  (fforrange : forall v : string, forall e1 e2 : imp_expr, forall s : imp_stmt, P (ImpStmtForRange v e1 e2 s))
-                 (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P (ImpStmtIf e s1 s2))
+                 (fif : forall e : imp_expr, forall s1 s2 : imp_stmt, P s1 -> P s2 -> P (ImpStmtIf e s1 s2))
         :=
           fix F (e : imp_stmt) : P e :=
             match e as e0 return (P e0) with
@@ -171,7 +171,7 @@ Section Imp.
             | ImpStmtAssign v e => fassign v e
             | ImpStmtFor v e s => ffor v e s
             | ImpStmtForRange v e1 e2 s => fforrange v e1 e2 s
-            | ImpStmtIf e s1 s2 => fif e s1 s2
+            | ImpStmtIf e s1 s2 => fif e s1 s2 (F s1) (F s2)
             end.
 
       Definition imp_stmt_rec (P:imp_stmt->Set) := imp_stmt_rect P.

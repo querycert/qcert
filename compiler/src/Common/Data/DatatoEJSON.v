@@ -31,6 +31,19 @@ Section DatatoEJson.
   Context {ftoejson:foreign_ejson}.
   Context {fdatatoejson:foreign_to_ejson}.
 
+  Lemma string_dec_from_neq {a b} (pf:a <> b) : exists pf2, string_dec a b = right pf2.
+  Proof.
+    destruct (string_dec a b); try congruence.
+    eauto.
+  Qed.
+
+  Ltac rewrite_string_dec_from_neq H
+    :=  let d := fresh "d" in
+        let neq := fresh "neq" in
+        destruct (string_dec_from_neq H) as [d neq]
+        ; repeat rewrite neq in *
+        ; clear d neq.
+
   Section toData.
     (* EJson to Data *)
 
@@ -142,29 +155,6 @@ Section DatatoEJson.
       inversion H; subst; try reflexivity.
     Qed.
 
-    Lemma ejson_is_record_some_inv (j:ejson) r :
-      ejson_to_data j = drec (map (fun x => (json_key_decode (fst x), ejson_to_data (snd x))) r) ->
-      ejson_is_record j = Some r.
-    Proof.
-      intros.
-      case_eq (ejson_is_record j); intros.
-      + apply ejson_is_record_some in H0.
-        rewrite H in H0; clear H.
-        inversion H0; clear H0.
-        revert r H1.
-        induction l; destruct r; simpl in *; try congruence; intros.
-        inversion H1; clear H1.
-        specialize (IHl r H3); clear H3.
-        inversion IHl; clear IHl; subst.
-        destruct p; destruct a; simpl in *.
-        admit.
-      + specialize
-          (ejson_is_record_none
-             j (map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x))) r) H0);
-          intros.
-        congruence.
-    Admitted.
-
   End toData.
 
   Section toEJson.
@@ -190,118 +180,118 @@ Section DatatoEJson.
 
   End toEJson.
 
-End DatatoEJson.
+  Section ModelRoundTrip.
+    Lemma ejson_brands_map_ejstring b : ejson_brands (map ejstring b) = Some b.
+    Proof.
+      induction b; simpl; trivial.
+      now rewrite IHb.
+    Qed.
 
-Section ModelRoundTrip.
-  Context {fdata:foreign_data}.
-  Context {ftoejson:foreign_ejson}.
-  Context {fdatatoejson:foreign_to_ejson}.
+    Lemma data_to_ejson_idempotent d:
+      ejson_to_data (data_to_ejson d) = d.
+    Proof.
+      induction d; simpl; trivial.
+      - f_equal.
+        repeat rewrite map_map.
+        now apply map_eq_id.
+      - destruct r; simpl; trivial.
+        destruct p; simpl.
+        rewrite_string_dec_from_neq (json_key_encode_not_data s).
+        rewrite_string_dec_from_neq (json_key_encode_not_class s).
+        rewrite_string_dec_from_neq (json_key_encode_not_left s).
+        rewrite_string_dec_from_neq (json_key_encode_not_right s).
+        assert (eq_simpl:
+                  (match data_to_ejson d with
+                   | ejarray j1 =>
+                     match map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r with
+                     | nil => drec ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d)) :: nil)
+                     | (s2, j2) :: nil =>
+                       drec
+                         ((json_key_decode (json_key_encode s), dcoll (map ejson_to_data j1))
+                            :: (json_key_decode s2, ejson_to_data j2) :: nil)
+                     | (s2, j2) :: _ :: _ =>
+                       drec
+                         ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d))
+                            :: map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x)))
+                            (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r))
+                     end
+                   | _ =>
+                     match map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r with
+                     | nil => drec ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d)) :: nil)
+                     | _ :: _ =>
+                       drec
+                         ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d))
+                            :: map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x)))
+                            (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r))
+                     end
+                   end= drec ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d))::(map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x))) (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r))))).
+        {
+          destruct (data_to_ejson d); simpl
+          ; destruct (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r      ); simpl; trivial
+          ; destruct p
+          ; destruct l; simpl; trivial
+          ; destruct e; simpl; trivial
+          ; destruct l0; simpl; trivial.
+        }
+        rewrite eq_simpl; clear eq_simpl.
+        rewrite json_key_encode_decode.
+        invcs H.
+        simpl in *.
+        rewrite H2.
+        f_equal.
+        f_equal.
+        repeat rewrite map_map; simpl.
+        f_equal.
+        apply map_eq_id.
+        revert H3.
+        apply Forall_impl; intros.
+        rewrite json_key_encode_decode.
+        rewrite H; trivial.
+        destruct a; reflexivity.
+      - rewrite IHd.
+        now destruct (data_to_ejson d).
+      - rewrite IHd.
+        now destruct (data_to_ejson d).
+      - rewrite ejson_brands_map_ejstring.
+        rewrite IHd.
+        reflexivity.
+      - rewrite foreign_to_ejson_to_data_to_ejson.
+        reflexivity.
+    Qed.
 
-  Lemma ejson_brands_map_ejstring b : ejson_brands (map ejstring b) = Some b.
-  Proof.
-    induction b; simpl; trivial.
-    now rewrite IHb.
-  Qed.
+    Definition ejson_normalized j : Prop :=
+      exists d, j = data_to_ejson d.
+    Definition ejson_idempotent j : Prop :=
+      data_to_ejson (ejson_to_data j) = j.
 
-  Lemma string_dec_from_neq {a b} (pf:a <> b) : exists pf2, string_dec a b = right pf2.
-  Proof.
-    destruct (string_dec a b); try congruence.
-    eauto.
-  Qed.
+    Definition ejson_object_normalized (jl:list (string * ejson)) : Prop :=
+      Forall (fun x => ejson_normalized (snd x)) jl.
 
-  Ltac rewrite_string_dec_from_neq H
-    :=  let d := fresh "d" in
-        let neq := fresh "neq" in
-        destruct (string_dec_from_neq H) as [d neq]
-        ; repeat rewrite neq in *
-        ; clear d neq.
+    Lemma ejson_normalized_idempotent j:
+      ejson_normalized j ->
+      ejson_idempotent j.
+    Proof.
+      unfold ejson_normalized, ejson_idempotent.
+      intros. elim H; intros; subst.
+      rewrite data_to_ejson_idempotent; trivial.
+    Qed.
 
-  Lemma json_to_data_to_json_idempotent d:
-    ejson_to_data (data_to_ejson d) = d.
-  Proof.
-    induction d; simpl; trivial.
-    - f_equal.
-      repeat rewrite map_map.
-      now apply map_eq_id.
-    - destruct r; simpl; trivial.
-      destruct p; simpl.
-      rewrite_string_dec_from_neq (json_key_encode_not_data s).
-      rewrite_string_dec_from_neq (json_key_encode_not_class s).
-      rewrite_string_dec_from_neq (json_key_encode_not_left s).
-      rewrite_string_dec_from_neq (json_key_encode_not_right s).
-      assert (eq_simpl:
-                (match data_to_ejson d with
-                 | ejarray j1 =>
-                   match map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r with
-                   | nil => drec ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d)) :: nil)
-                   | (s2, j2) :: nil =>
-                     drec
-                       ((json_key_decode (json_key_encode s), dcoll (map ejson_to_data j1))
-                          :: (json_key_decode s2, ejson_to_data j2) :: nil)
-                   | (s2, j2) :: _ :: _ =>
-                     drec
-                       ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d))
-                          :: map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x)))
-                          (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r))
-                   end
-                 | _ =>
-                   match map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r with
-                   | nil => drec ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d)) :: nil)
-                   | _ :: _ =>
-                     drec
-                       ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d))
-                          :: map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x)))
-                          (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r))
-                   end
-                 end= drec ((json_key_decode (json_key_encode s), ejson_to_data (data_to_ejson d))::(map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x))) (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r))))).
-      {
-        destruct (data_to_ejson d); simpl
-        ; destruct (map (fun x : string * data => (json_key_encode (fst x), data_to_ejson (snd x))) r      ); simpl; trivial
-        ; destruct p
-        ; destruct l; simpl; trivial
-        ; destruct e; simpl; trivial
-        ; destruct l0; simpl; trivial.
-      }
-      rewrite eq_simpl; clear eq_simpl.
-      rewrite json_key_encode_decode.
-      invcs H.
-      simpl in *.
-      rewrite H2.
-      f_equal.
-      f_equal.
-      repeat rewrite map_map; simpl.
-      f_equal.
-      apply map_eq_id.
-      revert H3.
-      apply Forall_impl; intros.
-      rewrite json_key_encode_decode.
-      rewrite H; trivial.
-      destruct a; reflexivity.
-    - rewrite IHd.
-      now destruct (data_to_ejson d).
-    - rewrite IHd.
-      now destruct (data_to_ejson d).
-    - rewrite ejson_brands_map_ejstring.
-      rewrite IHd.
-      reflexivity.
-    - rewrite foreign_to_ejson_to_data_to_ejson.
-      reflexivity.
-  Qed.
+  End ModelRoundTrip.
 
   Section RuntimeLemmas.
-    Lemma ejson_to_data_jobj_nbool l b : (ejson_to_data (ejobject l)) <> dbool b.
-    Proof.
-      destruct l; simpl; try congruence.
-      destruct p.
-      repeat match_destr.
-    Qed.
+      Lemma ejson_to_data_jobj_nbool l b : (ejson_to_data (ejobject l)) <> dbool b.
+      Proof.
+        destruct l; simpl; try congruence.
+        destruct p.
+        repeat match_destr.
+      Qed.
 
-    Lemma ejson_to_data_jobj_nnat l n : (ejson_to_data (ejobject l)) <> dnat n.
-    Proof.
-      destruct l; simpl; try congruence.
-      destruct p.
-      repeat match_destr.
-    Qed.
+      Lemma ejson_to_data_jobj_nnat l n : (ejson_to_data (ejobject l)) <> dnat n.
+      Proof.
+        destruct l; simpl; try congruence.
+        destruct p.
+        repeat match_destr.
+      Qed.
 
     Lemma ejson_to_data_jobj_nfloat l f : (ejson_to_data (ejobject l)) <> dfloat f.
     Proof.
@@ -372,77 +362,22 @@ Section ModelRoundTrip.
 
     (* XXX Is this true? *)
     Lemma ejson_to_data_inv j1 j2:
+      ejson_normalized j1 ->
+      ejson_normalized j2 ->
       (ejson_to_data j1) = (ejson_to_data j2) -> j1 = j2.
     Proof.
-      revert j2.
-      induction j1; destruct j2; intros; simpl in *; try congruence;
-        try(
-            destruct l; simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct e; simpl in *; try congruence;
-            destruct l; simpl in *; try congruence;
-            destruct (string_dec s "$left"); simpl in *; try congruence;
-            destruct (string_dec s "$right"); simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct l; simpl in *; try congruence;
-            destruct (string_dec s "$class"); simpl in *; try congruence;
-            destruct (string_dec s0 "$data"); simpl in *; try congruence;
-            destruct (ejson_brands l0); try congruence
-          );
-        try(
-            destruct l; simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct e; simpl in *; try congruence;
-            destruct l; simpl in *; try congruence;
-            destruct (string_dec s0 "$left"); simpl in *; try congruence;
-            destruct (string_dec s0 "$right"); simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct l; simpl in *; try congruence;
-            destruct (string_dec s0 "$class"); simpl in *; try congruence;
-            destruct (string_dec s1 "$data"); simpl in *; try congruence;
-            destruct (ejson_brands l0); try congruence
-          );
-        try(
-            destruct r; simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct e; simpl in *; try congruence;
-            destruct r; simpl in *; try congruence;
-            destruct (string_dec s "$left"); simpl in *; try congruence;
-            destruct (string_dec s "$right"); simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct r; simpl in *; try congruence;
-            destruct (string_dec s "$class"); simpl in *; try congruence;
-            destruct (string_dec s0 "$data"); simpl in *; try congruence;
-            destruct (ejson_brands l); try congruence
-          );
-        try(
-            destruct r; simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct e; simpl in *; try congruence;
-            destruct r; simpl in *; try congruence;
-            destruct (string_dec s0 "$left"); simpl in *; try congruence;
-            destruct (string_dec s0 "$right"); simpl in *; try congruence;
-            destruct p; simpl in *; try congruence;
-            destruct r; simpl in *; try congruence;
-            destruct (string_dec s0 "$class"); simpl in *; try congruence;
-            destruct (string_dec s1 "$data"); simpl in *; try congruence;
-            destruct (ejson_brands l); try congruence
-          ).
-      - inversion H0; clear H0.
-        rewrite Forall_forall in H.
-        admit.
-      - admit.
-      - admit.
-      - admit.
+      admit.
     Admitted.
 
     (* XXX Is this true? *)
     Lemma ejson_to_data_equiv j1 j2:
+      ejson_normalized j1 ->
+      ejson_normalized j2 ->
       j1 = j2 <-> (ejson_to_data j1) = (ejson_to_data j2).
     Proof.
       split.
       - intros; subst; reflexivity.
-      - apply ejson_to_data_inv.
+      - apply ejson_to_data_inv; trivial.
     Qed.
 
     Lemma mult_ejson_to_data a l :
@@ -461,8 +396,10 @@ Section ModelRoundTrip.
           unfold RelationClasses.complement in *.
           rewrite <- ejson_to_data_equiv in e.
           congruence.
+          admit.
+          admit.
       - apply IHl.
-    Qed.
+    Admitted.
 
     Lemma bdistinct_ejson_to_data_comm l:
       bdistinct (map ejson_to_data l) = map ejson_to_data (bdistinct l).
@@ -476,15 +413,18 @@ Section ModelRoundTrip.
     (* XXX Some assumptions for the correctness of operators translation -- they do not hold as-is *)
 
     Lemma assoc_lookupr_json_key_encode_comm l s:
+      ejson_object_normalized l ->
       assoc_lookupr ODT_eqdec (map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x))) l) s =
       match assoc_lookupr ODT_eqdec l (json_key_encode s) with
       | Some a' => Some (ejson_to_data a')
       | None => None
       end.
     Proof.
+      intros Hnorm.
       simpl; induction l; simpl in *; [reflexivity|].
       destruct a; simpl in *.
-      rewrite IHl; clear IHl.
+      inversion Hnorm; subst; clear Hnorm; simpl in *.
+      rewrite (IHl H2); clear IHl.
       destruct (assoc_lookupr string_eqdec l (json_key_encode s)); simpl; [reflexivity|].
       case_eq (string_eqdec (json_key_encode s) s0); intros.
       case_eq (string_eqdec s (json_key_decode s0)); intros;
@@ -505,14 +445,13 @@ Section ModelRoundTrip.
       admit.
     Admitted.
 
-    Lemma rremove_json_key_encode_roundtrip l s:
-      match ejson_to_data (ejobject l) with
-      | drec r => Some (drec (rremove r s))
-      | _ => None
-      end = Some (ejson_to_data (ejobject (rremove l (json_key_encode s)))).
+    Lemma rremove_json_key_encode_comm l s:
+      ejson_object_normalized l ->
+      drec (rremove (map (fun x : string * ejson => (json_key_decode (fst x), ejson_to_data (snd x))) l) s) =
+      ejson_to_data (ejobject (rremove l (json_key_encode s))).
     Proof.
       admit.
     Admitted.
 
   End RuntimeLemmas.
-End ModelRoundTrip.
+End DatatoEJson.
