@@ -20,11 +20,7 @@ Require Import Bool.
 Require Import Arith.
 Require Import Utils.
 Require Import CommonRuntime.
-Require Import Imp.
-Require Import ImpQcert.
-Require Import ImpQcertEval.
-Require Import ImpEJson.
-Require Import ImpEJsonEval.
+Require Import ImpRuntime.
 Require Import JsAst.JsNumber.
 Require Import Fresh.
 
@@ -71,6 +67,55 @@ Section ImpQcerttoImpEJson.
     Definition mk_to_right_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
       mk_imp_ejson_runtime_call EJsonRuntimeToRight el.
 
+    Lemma imp_qcert_data_to_list_comm d :
+      lift (map ejson_to_data) (imp_ejson_data_to_list (data_to_ejson d)) =
+      imp_qcert_data_to_list d.
+    Proof.
+      unfold lift.
+      destruct d; simpl; try reflexivity.
+      f_equal.
+      rewrite map_map.
+      rewrite map_eq_id; try reflexivity.
+      rewrite Forall_forall; intros.
+      rewrite data_to_ejson_idempotent.
+      reflexivity.
+    Qed.
+
+    Lemma imp_ejson_data_to_list_comm d :
+      (imp_ejson_data_to_list (data_to_ejson d)) =
+      lift (map data_to_ejson) (imp_qcert_data_to_list d).
+    Proof.
+      unfold lift.
+      destruct d; simpl; reflexivity.
+    Qed.
+
+    Lemma data_to_bool_ejson_to_bool_correct j:
+      imp_qcert_data_to_bool (ejson_to_data j) = imp_ejson_data_to_bool j.
+    Proof.
+      unfold imp_qcert_data_to_bool.
+      unfold imp_ejson_data_to_bool.
+      destruct j; trivial.
+      generalize (ejson_to_data_jobj_nbool l); intros HH1.
+      match_destr.
+      specialize (HH1 b); congruence.
+    Qed.
+
+    Lemma ejson_to_data_to_Z_comm j:
+      imp_qcert_data_to_Z (ejson_to_data j) = imp_ejson_data_to_Z j.
+    Proof.
+      unfold imp_qcert_data_to_Z.
+      unfold imp_ejson_data_to_Z.
+      destruct j; trivial.
+      case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
+      generalize (ejson_to_data_object_not_nat l z); intros.
+      contradiction.
+    Qed.
+
+    Lemma data_to_ejson_to_Z_comm d:
+      imp_qcert_data_to_Z d = imp_ejson_data_to_Z (data_to_ejson d).
+    Proof.
+      destruct d; try reflexivity.
+    Qed.
   End Util.
 
   Section Translation.
@@ -270,40 +315,6 @@ Section ImpQcerttoImpEJson.
 
     Section ForRewrite.
       (* Rewriting functional for into imperative for loop is now isolated *)
-      Fixpoint imp_ejson_stmt_for_rewrite (avoid: list string) (stmt: imp_ejson_stmt): imp_ejson_stmt :=
-        match stmt with
-        | ImpStmtBlock lv ls =>
-          ImpStmtBlock
-            lv
-            (map (imp_ejson_stmt_for_rewrite ((List.map fst lv) ++ avoid)) ls)
-        | ImpStmtAssign v e =>
-          ImpStmtAssign v e
-        | ImpStmtFor v e s =>
-          let avoid := v :: avoid in
-          let src_id := fresh_var "src" avoid in
-          let avoid := src_id :: avoid in
-          let i_id := fresh_var "i" avoid in
-          let avoid := i_id :: avoid in
-          let src := ImpExprVar src_id in
-          let i := ImpExprVar i_id in
-          ImpStmtBlock
-            [ (src_id, Some e) ]
-            [ ImpStmtForRange
-                i_id (ImpExprConst (ejnumber zero)) (ImpExprOp EJsonOpArrayLength [ src ])
-                (ImpStmtBlock
-                   [ (v, Some (ImpExprOp EJsonOpArrayAccess [ src; i ])) ]
-                   [ imp_ejson_stmt_for_rewrite avoid s ]) ]
-        | ImpStmtForRange v e1 e2 s =>
-          ImpStmtForRange v
-                          e1
-                          e2
-                          (imp_ejson_stmt_for_rewrite (v :: avoid) s)
-        | ImpStmtIf e s1 s2 =>
-          ImpStmtIf e
-                    (imp_ejson_stmt_for_rewrite avoid s1)
-                    (imp_ejson_stmt_for_rewrite avoid s2)
-        end.
-
       (* If we want to combine both rewrites into a single pass *)
       Fixpoint imp_qcert_stmt_to_imp_ejson_combined (avoid: list string) (stmt: imp_qcert_stmt): imp_ejson_stmt :=
         match stmt with
@@ -416,28 +427,6 @@ Section ImpQcerttoImpEJson.
       Definition unlift_result_env (res:option pd_bindings) : option pd_jbindings :=
         lift (fun env => List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env) res.
     End Lift.
-
-    Lemma data_to_bool_ejson_to_bool_correct j:
-      imp_qcert_data_to_bool (ejson_to_data j) = imp_ejson_data_to_bool j.
-    Proof.
-      unfold imp_qcert_data_to_bool.
-      unfold imp_ejson_data_to_bool.
-      destruct j; trivial.
-      generalize (ejson_to_data_jobj_nbool l); intros HH1.
-      match_destr.
-      specialize (HH1 b); congruence.
-    Qed.
-
-    Lemma data_to_bigint_ejson_to_nat_correct j:
-      imp_qcert_data_to_Z (ejson_to_data j) = imp_ejson_data_to_Z j.
-    Proof.
-      unfold imp_qcert_data_to_Z.
-      unfold imp_ejson_data_to_Z.
-      destruct j; trivial.
-      case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
-      generalize (ejson_to_data_object_not_nat l z); intros.
-      contradiction.
-    Qed.
 
     Lemma dsum_to_ejson_sum l :
       match match dsum l with
@@ -906,6 +895,7 @@ Section ImpQcerttoImpEJson.
           induction el; simpl in *; try reflexivity.
           rewrite <- IHel; clear IHel.
           destruct a; simpl.
+          Set Printing All.
           destruct (@ImpEval.imp_decls_erase (@imp_qcert_data fruntime)
           (@fold_left (option (@ImpEval.pd_rbindings (@imp_qcert_data fruntime)))
              (@ImpEval.imp_stmt (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op)
@@ -916,7 +906,8 @@ Section ImpQcerttoImpEJson.
               | Some σ' => @imp_qcert_stmt_eval fruntime h s σ'
               | None => @None (@ImpEval.pd_rbindings (@imp_qcert_data fruntime))
               end) sl (@Some (@ImpEval.pd_rbindings (@imp_qcert_data fruntime)) p))
-          (prod var (option (@imp_expr (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op)))
+          (prod var
+             (option (@Imp.imp_expr (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op)))
           el); [|reflexivity].
           destruct p0; simpl; try reflexivity.
         + repeat rewrite ImpEval.imp_decls_erase_none; reflexivity.
@@ -925,10 +916,8 @@ Section ImpQcerttoImpEJson.
         simpl.
         specialize (imp_qcert_expr_to_imp_ejson_expr_correct σ e).
         unfold imp_ejson_expr_eval in *.
-        intros He.
-        rewrite <- He.
-        unfold unlift_result.
-        unfold lift.
+        intros He; rewrite <- He; clear He.
+        unfold unlift_result, lift.
         unfold imp_qcert_expr_eval.
         destruct (@ImpEval.imp_expr_eval (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op
           (@imp_qcert_data_normalize fruntime h) (@imp_qcert_runtime_eval fruntime)
@@ -941,7 +930,6 @@ Section ImpQcerttoImpEJson.
         match_destr.
         unfold unlift_result_env, lift.
         assert (forall (x: pd_bindings) y,  x = y -> Some x = Some y) as Hsome; try congruence.
-        clear He.
         induction σ; try reflexivity.
         simpl.
         destruct a; simpl.
@@ -950,9 +938,108 @@ Section ImpQcerttoImpEJson.
           inversion IHσ; clear IHσ; intros.
           rewrite H0; reflexivity.
       - Case "ImpStmtFor"%string.
-        admit.
+        intros.
+        simpl.
+        specialize (imp_qcert_expr_to_imp_ejson_expr_correct σ e).
+        unfold imp_ejson_expr_eval in *.
+        intros He; rewrite <- He; clear He.
+        unfold unlift_result, lift.
+        unfold imp_qcert_expr_eval.
+        destruct (@ImpEval.imp_expr_eval (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op
+          (@imp_qcert_data_normalize fruntime h) (@imp_qcert_runtime_eval fruntime)
+          (@imp_qcert_op_eval fruntime h) σ e);
+          try reflexivity.
+        rewrite imp_ejson_data_to_list_comm; simpl.
+        destruct (imp_qcert_data_to_list i); try reflexivity; simpl; clear i.
+        revert σ.
+        induction l; try reflexivity; simpl; intros.
+        specialize (IHstmt ((v, Some a) :: σ)); simpl in IHstmt.
+        assert ((@imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) h (imp_qcert_stmt_to_imp_ejson stmt)
+                (@cons (prod string (option (@ejson (@foreign_runtime_ejson fruntime))))
+                   (@pair string (option (@ejson (@foreign_runtime_ejson fruntime))) v
+                      (@Some (@ejson (@foreign_runtime_ejson fruntime))
+                         (@data_to_ejson (@foreign_runtime_data fruntime) (@foreign_runtime_ejson fruntime)
+                                         ftejson a))) (lift_pd_bindings σ))) =
+                @imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) h (imp_qcert_stmt_to_imp_ejson stmt)
+        (@cons (prod var (option (@imp_ejson_data (@foreign_runtime_ejson fruntime))))
+           (@pair var (option (@imp_ejson_data (@foreign_runtime_ejson fruntime))) v
+              (@Some (@imp_ejson_data (@foreign_runtime_ejson fruntime))
+                 (@data_to_ejson (@foreign_runtime_data fruntime) (@foreign_runtime_ejson fruntime) ftejson a)))
+           (lift_pd_bindings σ))) by reflexivity.
+        rewrite H in IHstmt; clear H.
+        rewrite <- IHstmt; clear IHstmt.
+        assert (
+            (@imp_qcert_stmt_eval fruntime h stmt
+           (@cons (prod string (option (@imp_qcert_data fruntime)))
+                  (@pair string (option (@imp_qcert_data fruntime)) v (@Some (@imp_qcert_data fruntime) a)) σ))
+            = @imp_qcert_stmt_eval fruntime h stmt
+           (@cons (prod var (option (@imp_qcert_data fruntime)))
+                  (@pair var (option (@imp_qcert_data fruntime)) v (@Some (@imp_qcert_data fruntime) a)) σ)) by reflexivity.
+        rewrite <- H; clear H.
+        destruct (imp_qcert_stmt_eval h stmt ((v, Some a) :: σ)); try reflexivity; simpl.
+        destruct p; try reflexivity; simpl.
+        unfold lift_pd_bindings in IHl.
+        rewrite <- IHl.
+        reflexivity.
       - Case "ImpStmtForRange"%string.
-        admit. (* XXX TODO: eval XXX *)
+        intros.
+        simpl.
+        specialize (imp_qcert_expr_to_imp_ejson_expr_correct σ e1).
+        unfold imp_ejson_expr_eval in *.
+        intros He; rewrite <- He; clear He.
+        unfold unlift_result, lift.
+        unfold imp_qcert_expr_eval.
+        destruct (@ImpEval.imp_expr_eval (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op
+          (@imp_qcert_data_normalize fruntime h) (@imp_qcert_runtime_eval fruntime)
+          (@imp_qcert_op_eval fruntime h) σ e1);
+          try reflexivity; simpl.
+        rewrite data_to_ejson_to_Z_comm;
+          destruct (imp_ejson_data_to_Z (data_to_ejson i)); try reflexivity.
+        specialize (imp_qcert_expr_to_imp_ejson_expr_correct σ e2).
+        unfold imp_ejson_expr_eval in *.
+        intros He; rewrite <- He; clear He.
+        unfold unlift_result, olift, lift.
+        unfold imp_qcert_expr_eval.
+        destruct (@ImpEval.imp_expr_eval (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op
+          (@imp_qcert_data_normalize fruntime h) (@imp_qcert_runtime_eval fruntime)
+          (@imp_qcert_op_eval fruntime h) σ e2);
+          try reflexivity; simpl.
+        rewrite data_to_ejson_to_Z_comm;
+          destruct (imp_ejson_data_to_Z (data_to_ejson i0)); try reflexivity.
+        generalize (ImpEval.nb_iter z z0); intros. (* XXX I think we do not care how n is built for this part *)
+        revert σ z.
+        induction n; try reflexivity; simpl; intros.
+        specialize (IHstmt ((v, Some (imp_qcert_Z_to_data z)) :: σ)); simpl in IHstmt.
+        assert ((@imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) h (imp_qcert_stmt_to_imp_ejson stmt)
+                (@cons (prod string (option (@ejson (@foreign_runtime_ejson fruntime))))
+                   (@pair string (option (@ejson (@foreign_runtime_ejson fruntime))) v
+                      (@Some (@ejson (@foreign_runtime_ejson fruntime))
+                             (@ejbigint (@foreign_runtime_ejson fruntime) z))) (lift_pd_bindings σ)))
+                =
+                @imp_ejson_stmt_eval (@foreign_runtime_ejson fruntime) h (imp_qcert_stmt_to_imp_ejson stmt)
+                                     (@cons (prod var (option (@imp_ejson_data (@foreign_runtime_ejson fruntime))))
+                                            (@pair var (option (@imp_ejson_data (@foreign_runtime_ejson fruntime))) v
+                                                   (@Some (@imp_ejson_data (@foreign_runtime_ejson fruntime))
+                                                          (@imp_ejson_Z_to_data (@foreign_runtime_ejson fruntime) z))) (lift_pd_bindings σ))) by reflexivity.
+        rewrite H in IHstmt; clear H.
+        rewrite <- IHstmt; clear IHstmt.
+        assert
+          (@imp_qcert_stmt_eval
+             fruntime h stmt
+             (@cons (prod string (option (@imp_qcert_data fruntime)))
+                    (@pair string (option (@imp_qcert_data fruntime)) v
+                           (@Some (@imp_qcert_data fruntime) (@imp_qcert_Z_to_data fruntime z))) σ)
+           =
+           @imp_qcert_stmt_eval fruntime h stmt
+           (@cons (prod var (option (@imp_qcert_data fruntime)))
+              (@pair var (option (@imp_qcert_data fruntime)) v
+                 (@Some (@imp_qcert_data fruntime) (@imp_qcert_Z_to_data fruntime z))) σ)) by reflexivity.
+        rewrite <- H; clear H.
+        destruct (imp_qcert_stmt_eval h stmt ((v, Some (imp_qcert_Z_to_data z)) :: σ)); try reflexivity.
+        destruct p; try reflexivity; simpl.
+        unfold lift_pd_bindings in IHn.
+        rewrite IHn.
+reflexivity.
       - Case "ImpStmtIf"%string.
         intros σ.
         simpl.
@@ -972,18 +1059,9 @@ Section ImpQcerttoImpEJson.
         rewrite data_to_ejson_idempotent.
         match_destr.
         match_destr.
-    (* Qed. *)
-    Admitted.
+    Qed.
 
     Section CorrectnessForRewrite.
-      Lemma imp_ejson_stmt_for_rewrite_correct (σ : pd_jbindings) (stmt:imp_ejson_stmt) :
-        forall avoid,
-          imp_ejson_stmt_eval h stmt σ =
-          imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite avoid stmt)  σ.
-      Proof.
-        admit.
-      Admitted.
-
       Lemma imp_qcert_stmt_to_imp_ejson_stmt_combined_correct (σ:pd_bindings) (stmt:imp_qcert_stmt) :
         forall avoid,
           unlift_result_env (imp_qcert_stmt_eval h stmt σ) =
@@ -992,7 +1070,7 @@ Section ImpQcerttoImpEJson.
         intros.
         rewrite imp_qcert_stmt_to_imp_ejson_combined_idem; simpl.
         rewrite imp_qcert_stmt_to_imp_ejson_stmt_correct.
-        rewrite (imp_ejson_stmt_for_rewrite_correct (lift_pd_bindings σ) _ avoid).
+        rewrite (imp_ejson_stmt_for_rewrite_correct h (lift_pd_bindings σ) _ avoid).
         reflexivity.
       Qed.
 
@@ -1099,3 +1177,4 @@ Section ImpQcerttoImpEJson.
   End Correctness.
 
 End ImpQcerttoImpEJson.
+
