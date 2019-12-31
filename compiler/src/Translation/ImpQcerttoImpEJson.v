@@ -76,7 +76,7 @@ Section ImpQcerttoImpEJson.
       | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRemove [ e; mk_string (json_key_encode s) ]
       | OpRecProject fl =>
         mk_imp_ejson_runtime_call
-          EJsonRuntimeProject ([ e ] ++ [ mk_string_array fl ])
+          EJsonRuntimeProject ([ e ] ++ [ mk_string_array (map json_key_encode fl) ])
       | OpBag => mk_bag el
       | OpSingleton => mk_imp_ejson_runtime_call EJsonRuntimeSingleton el
       | OpFlatten => mk_imp_ejson_runtime_call EJsonRuntimeFlatten el
@@ -422,22 +422,6 @@ Section ImpQcerttoImpEJson.
       apply map_app.
     Qed.
 
-    Lemma of_string_list_over_strings_idempotent sl :
-      of_string_list (map (fun s : string => ejstring s) sl) = Some sl.
-    Proof.
-      induction sl; try reflexivity; simpl.
-      unfold of_string_list in *; simpl.
-      rewrite IHsl; reflexivity.
-    Qed.
-
-    Lemma json_brands_of_brands_idempotent b:
-      ejson_brands (map ejstring b) = Some b.
-    Proof.
-      induction b; try reflexivity; simpl.
-      rewrite IHb.
-      reflexivity.
-    Qed.
-
     Lemma ejson_to_data_jobj_nbrand s e b d: (ejson_to_data (ejobject [(s, e)])) <> dbrand b d.
     Proof.
       simpl.
@@ -674,9 +658,9 @@ Section ImpQcerttoImpEJson.
         unfold edot.
         apply assoc_lookupr_json_key_encode_comm.
       - Case "OpRecRemove"%string.
-        admit.
+        apply rremove_json_key_encode_comm.
       - Case "OpRecProject"%string.
-        admit. (** XXX This one looks more complicated *)
+        apply rproject_json_key_encode_comm.
       - Case "OpSingleton"%string.
         destruct d; try reflexivity.
         destruct l; try reflexivity; simpl.
@@ -685,7 +669,8 @@ Section ImpQcerttoImpEJson.
         destruct d; try reflexivity; simpl.
         apply oflatten_jflatten_roundtrip.
       - Case "OpDistinct"%string.
-        admit.
+        destruct d; simpl; try reflexivity.
+        rewrite bdistinct_ejson_to_data_comm; reflexivity.
       - Case "OpOrderBy"%string.
         admit. (* XXX Not implemented *)
       - Case "OpCount"%string.
@@ -705,7 +690,7 @@ Section ImpQcerttoImpEJson.
       - Case "OpLike"%string.
         admit. (* XXX Not implemented *)
       - Case "OpBrand"%string.
-        rewrite of_string_list_over_strings_idempotent; simpl.
+        rewrite of_string_list_map_ejstring; simpl.
         reflexivity.
       - Case "OpUnbrand"%string.
         case_eq d; intros; simpl; try reflexivity; try (destruct d0; reflexivity).
@@ -716,9 +701,9 @@ Section ImpQcerttoImpEJson.
           destruct l0; simpl; try reflexivity;
           destruct l; simpl; try reflexivity;
           destruct l; simpl; try reflexivity.
-        + rewrite json_brands_of_brands_idempotent; reflexivity.
+        + rewrite ejson_brands_map_ejstring; reflexivity.
       - Case "OpCast"%string.
-        rewrite json_brands_of_brands_idempotent.
+        rewrite ejson_brands_map_ejstring.
         case_eq d; intros; simpl; try reflexivity; try (destruct d0; reflexivity).
         + destruct l; simpl; try reflexivity;
             destruct p; simpl; try reflexivity;
@@ -727,7 +712,7 @@ Section ImpQcerttoImpEJson.
           destruct l0; simpl; try reflexivity;
           destruct l; simpl; try reflexivity;
           destruct l; simpl; try reflexivity.
-        + rewrite json_brands_of_brands_idempotent.
+        + rewrite ejson_brands_map_ejstring.
           destruct (sub_brands_dec h b0 b); reflexivity.
       - Case "OpNatUnary"%string.
         destruct n; simpl in *;

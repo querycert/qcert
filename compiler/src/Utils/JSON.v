@@ -240,7 +240,7 @@ Section JSON.
       destruct b6; simpl; congruence.
     Qed.
       
-    Lemma json_encode_inj s s0:
+    Lemma json_key_encode_inv s s0:
       (json_key_encode s) = (json_key_encode s0) ->
       s = s0.
     Proof.
@@ -285,7 +285,7 @@ Section JSON.
           assumption.
     Qed.
       
-    Lemma json_encode_diff s s0:
+    Lemma json_key_encode_diff s s0:
       s <> s0
       -> (json_key_encode s) <> (json_key_encode s0).
     Proof.
@@ -293,9 +293,17 @@ Section JSON.
       unfold not in *.
       intros.
       apply H; clear H.
-      apply json_encode_inj; assumption.
+      apply json_key_encode_inv; assumption.
     Qed.
 
+    Lemma json_key_encode_eq s s0:
+      (json_key_encode s) = (json_key_encode s0) <-> s = s0.
+    Proof.
+      split.
+      - apply json_key_encode_inv.
+      - intros; subst; reflexivity.
+    Qed.
+    
   End Encode.
 
 End JSON.

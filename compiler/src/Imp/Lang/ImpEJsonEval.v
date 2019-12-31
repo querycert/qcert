@@ -60,9 +60,6 @@ Section ImpEJsonEval.
       | _ => None
       end.
 
-    Definition of_string_list (sl:list imp_ejson_data) : option (list string)
-      := lift_map (fun x => match x with ejstring s => Some s | _ => None end) sl.
-
     Definition imp_ejson_data_to_Z (d:imp_ejson_data) : option Z :=
       match d with
       | ejbigint n => Some n
@@ -174,10 +171,16 @@ Section ImpEJsonEval.
       | EJsonRuntimeProject =>
         apply_binary
           (fun d1 d2 =>
-             match d1, d2 with
-             | ejobject r, ejarray sl =>
-               lift ejobject (lift (rproject r) (of_string_list sl))
-             | _, _ => None
+             match ejson_is_record d1 with
+             | Some r =>
+               match d2 with
+               | ejarray sl =>
+                 lift ejobject
+                      (lift (rproject r)
+                            (of_string_list sl))
+               | _ => None
+               end
+             | _ => None
              end) dl
       | EJsonRuntimeSingleton =>
         apply_unary

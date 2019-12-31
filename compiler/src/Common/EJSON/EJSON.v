@@ -228,4 +228,44 @@ Section EJson.
       end.
 
   End preProcess.
+
+  Section Util.
+    Fixpoint of_string_list (d:list ejson) : option (list string) :=
+      match d with
+      | nil => Some nil
+      | (ejstring s1) :: d' =>
+        match of_string_list d' with
+        | Some s' => Some (s1::s')
+        | None => None
+        end
+      | _ => None
+      end.
+
+    Lemma of_string_list_map_ejstring sl :
+      of_string_list (map ejstring sl) = Some sl.
+    Proof.
+      induction sl; try reflexivity; simpl.
+      unfold of_string_list in *; simpl.
+      rewrite IHsl; reflexivity.
+    Qed.
+
+    Definition ejson_brands (d:list ejson) : option (list string) := of_string_list d.
+
+    Lemma ejson_brands_map_ejstring b : ejson_brands (map ejstring b) = Some b.
+    Proof.
+      apply of_string_list_map_ejstring.
+    Qed.
+    
+    Fixpoint ejson_bigints (d:list ejson) : option (list Z) :=
+      match d with
+      | nil => Some nil
+      | (ejbigint z1) :: d' =>
+        match ejson_bigints d' with
+        | Some s' => Some (z1::s')
+        | None => None
+        end
+      | _ => None
+      end.
+
+  End Util.
 End EJson.
