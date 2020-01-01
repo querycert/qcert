@@ -81,7 +81,7 @@ Module QData(runtime:CompilerRuntime).
     := qdataStringify JSONUtil.quotel_double.
   
   Definition ejson_to_string : EJson.ejson -> String.string
-    := (fun j => jsonStringify JSONUtil.quotel_double (EJson.ejson_to_json j)).
+    := (fun j => EJson.ejsonStringify JSONUtil.quotel_double j).
 
   Definition json_to_string : JSON.json -> String.string
     := jsonStringify JSONUtil.quotel_double.

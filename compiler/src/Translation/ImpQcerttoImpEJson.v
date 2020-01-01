@@ -670,7 +670,11 @@ Section ImpQcerttoImpEJson.
              destruct (imp_qcert_expr_eval h σ i0);
              try reflexivity; simpl; unfold unlift_result, lift; simpl).
       - Case "OpEqual"%string.
-        admit.
+        destruct (data_eq_dec d d0);
+          destruct (ejson_eq_dec (data_to_ejson d) (data_to_ejson d0));
+          try reflexivity; subst.
+        + congruence.
+        + apply data_to_ejson_inv in e; congruence.
       - Case "OpRecConcat"%string.
         admit.
       - Case "OpRecMerge"%string.
@@ -727,7 +731,7 @@ Section ImpQcerttoImpEJson.
     Admitted.
 
     Lemma imp_qcert_runtime_call_to_imp_ejson_correct
-            (σ:pd_bindings) (rt:imp_qcert_runtime_op) (el:list imp_expr) :
+          (σ:pd_bindings) (rt:imp_qcert_runtime_op) (el:list imp_expr) :
       Forall
         (fun exp : imp_expr =>
            unlift_result (imp_qcert_expr_eval h σ exp) =
@@ -1260,4 +1264,3 @@ reflexivity.
   End Correctness.
 
 End ImpQcerttoImpEJson.
-

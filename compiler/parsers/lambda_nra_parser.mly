@@ -45,6 +45,69 @@
     | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
+  let static_int e =
+    begin match e with
+    | Compiler.LNRAConst (Compiler.Dnat i) -> i
+    | _ -> raise Not_found
+    end
+    
+  let resolve_call fname el =
+    begin match fname,el with
+    | "not", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opneg e
+    | "flatten", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opflatten e
+    | "sum", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opnatsum e
+    | "fsum", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opfloatsum e
+    | "avg", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opnatmean e
+    | "favg", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opfloatmean e
+    | "count", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opcount e
+    | "length", [e] ->
+	      QLambdaNRA.launop QOps.Unary.oplength e
+    | "max", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opnatmax e
+    | "min", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opnatmin e
+    | "toString", [e] ->
+	      QLambdaNRA.launop QOps.Unary.optostring e
+    | "nth", [e1;e2] ->
+	      QLambdaNRA.labinop QOps.Binary.opbagnth e1 e2
+    | "stringJoin", [e1;e2] ->
+	      QLambdaNRA.labinop QOps.Binary.opstringjoin e1 e2
+    | "substring", [e1;e2] ->
+	      let start =
+	        begin try static_int e2 with
+	        | Not_found ->
+	            raise (Qcert_Error
+		                   ("Second parameter of substring should be an integer constant"))
+	        end
+	      in
+	      QLambdaNRA.launop (QOps.Unary.opsubstring start None) e1
+    | "substring", [e1;e2;e3] ->
+	      let start =
+	        begin try static_int e2 with
+	        | Not_found ->
+	            raise (Qcert_Error
+		                   ("Second parameter of substring should be an integer constant"))
+	        end
+	      in
+	      let len =
+	        begin try static_int e3 with
+	        | Not_found ->
+	            raise (Qcert_Error
+		                   ("Third parameter of substring should be an integer constant"))
+	        end
+	      in
+	      QLambdaNRA.launop (QOps.Unary.opsubstring start (Some len)) e1
+    | _, _ ->
+	      raise (Qcert_Error
+		             ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))
+    end
 %}
 
 %token NULL
@@ -99,6 +162,9 @@ expr:
     { QLambdaNRA.laconst (QData.dfloat f) }
 | s = STRING
     { QLambdaNRA.laconst (QData.dstring (char_list_of_string s)) }
+(* Call *)
+| fn = IDENT LPAREN el = exprlist RPAREN
+    { resolve_call fn el }
 (* Expressions *)
 | v = IDENT
     { QLambdaNRA.lavar (char_list_of_string v) }
@@ -136,6 +202,15 @@ expr:
     { QLambdaNRA.labinop QOps.Binary.opand e1 e2 }
 | e1 = expr OR e2 = expr
     { QLambdaNRA.labinop QOps.Binary.opor e1 e2 }
+
+(* expression list *)
+exprlist:
+| 
+    { [] }
+| e = expr
+    { [e] }
+| e = expr COMMA el = exprlist
+    { e :: el }
 
 reclist:
 | 
