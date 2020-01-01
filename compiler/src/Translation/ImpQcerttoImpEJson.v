@@ -127,11 +127,11 @@ Section ImpQcerttoImpEJson.
         | OpIdentity => e
         | OpNeg => mk_imp_ejson_op EJsonOpNot [ e ]
         | OpRec s => mk_imp_ejson_op (EJsonOpObject [json_key_encode s]) [ e ]
-        | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeDeref [ e; ImpExprConst (ejstring (json_key_encode s)) ]
-        | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRemove [ e; mk_string (json_key_encode s) ]
+        | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeRecDot [ e; ImpExprConst (ejstring (json_key_encode s)) ]
+        | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRecRemove [ e; mk_string (json_key_encode s) ]
         | OpRecProject fl =>
           mk_imp_ejson_runtime_call
-            EJsonRuntimeProject ([ e ] ++ [ mk_string_array (map json_key_encode fl) ])
+            EJsonRuntimeRecProject ([ e ] ++ [ mk_string_array (map json_key_encode fl) ])
         | OpBag => mk_bag el
         | OpSingleton => mk_imp_ejson_runtime_call EJsonRuntimeSingleton el
         | OpFlatten => mk_imp_ejson_runtime_call EJsonRuntimeFlatten el
@@ -191,8 +191,8 @@ Section ImpQcerttoImpEJson.
               end
           in mk_imp_ejson_op op [ e ]
         | OpFloatTruncate => mk_imp_ejson_op EJsonOpMathTrunc [ e ]
-        | OpFloatSum => mk_imp_ejson_runtime_call EJsonRuntimeSum el
-        | OpFloatMean => mk_imp_ejson_runtime_call EJsonRuntimeArithMean el
+        | OpFloatSum => mk_imp_ejson_runtime_call EJsonRuntimeFloatSum el
+        | OpFloatMean => mk_imp_ejson_runtime_call EJsonRuntimeFloatArithMean el
         | OpFloatBagMin => mk_imp_ejson_op EJsonOpMathMinApply [ e ]
         | OpFloatBagMax => mk_imp_ejson_op EJsonOpMathMaxApply [ e ]
         | OpForeignUnary fu =>
@@ -218,11 +218,11 @@ Section ImpQcerttoImpEJson.
           mk_imp_ejson_op EJsonOpLe
                           [ mk_imp_ejson_runtime_call EJsonRuntimeCompare [e1; e2];
                               ImpExprConst (ejnumber zero) ]
-        | OpBagUnion => mk_imp_ejson_runtime_call EJsonRuntimeBunion [e1; e2]
-        | OpBagDiff => mk_imp_ejson_runtime_call EJsonRuntimeBminus [e1; e2]
-        | OpBagMin => mk_imp_ejson_runtime_call EJsonRuntimeBmin [e1; e2]
-        | OpBagMax => mk_imp_ejson_runtime_call EJsonRuntimeBmax [e1; e2]
-        | OpBagNth => mk_imp_ejson_runtime_call EJsonRuntimeBnth [e1; e2]
+        | OpBagUnion => mk_imp_ejson_runtime_call EJsonRuntimeUnion [e1; e2]
+        | OpBagDiff => mk_imp_ejson_runtime_call EJsonRuntimeMinus [e1; e2]
+        | OpBagMin => mk_imp_ejson_runtime_call EJsonRuntimeMin [e1; e2]
+        | OpBagMax => mk_imp_ejson_runtime_call EJsonRuntimeMax [e1; e2]
+        | OpBagNth => mk_imp_ejson_runtime_call EJsonRuntimeNth [e1; e2]
         | OpContains => mk_imp_ejson_runtime_call EJsonRuntimeContains [e1; e2]
         | OpStringConcat => mk_imp_ejson_op EJsonOpAddString el
         | OpStringJoin => mk_imp_ejson_runtime_call EJsonRuntimeStringJoin [e1; e2]
@@ -233,8 +233,8 @@ Section ImpQcerttoImpEJson.
           | NatMult => mk_imp_ejson_runtime_call EJsonRuntimeNatMult [e1; e2]
           | NatDiv => mk_imp_ejson_runtime_call EJsonRuntimeNatDiv [e1; e2]
           | NatRem => mk_imp_ejson_runtime_call EJsonRuntimeNatRem [e1; e2]
-          | NatMin => mk_imp_ejson_runtime_call EJsonRuntimeNatMin [e1; e2]
-          | NatMax => mk_imp_ejson_runtime_call EJsonRuntimeNatMax [e1; e2]
+          | NatMin => mk_imp_ejson_runtime_call EJsonRuntimeNatMinPair [e1; e2]
+          | NatMax => mk_imp_ejson_runtime_call EJsonRuntimeNatMaxPair [e1; e2]
           end
         | OpFloatBinary opa =>
           match opa with
@@ -641,6 +641,89 @@ Section ImpQcerttoImpEJson.
       imp_ejson_expr_eval h (lift_pd_bindings σ)
                           (imp_qcert_binary_op_to_imp_ejson b (map imp_qcert_expr_to_imp_ejson el)).
     Proof.
+      Opaque ejson_to_data.
+      intros.
+      (* elim no params *)
+      destruct el; [reflexivity|].
+      (* elim one params *)
+      destruct el; [simpl; destruct (imp_qcert_expr_eval h σ i); reflexivity|].
+      (* elim two or more params *)
+      destruct el; simpl;
+        [|destruct (imp_qcert_expr_eval h σ i); [|reflexivity];
+          destruct (imp_qcert_expr_eval h σ i0); [|reflexivity];
+          destruct (imp_qcert_expr_eval h σ i1); [|reflexivity];
+          unfold lift, olift;
+          case_eq
+            (lift_map (fun x : option imp_qcert_data => x)
+                      (map (fun x : imp_qcert_expr => imp_qcert_expr_eval h σ x) el)); intros;
+          unfold imp_qcert_data, ImpEval.imp_expr, imp_qcert_expr, imp_qcert_data, foreign_runtime_data in *;
+          rewrite H0; reflexivity].
+      (* just two param *)
+      inversion H; clear H; intros; subst; apply Forall_inv in H3.
+      binary_op_cases (destruct b) Case; unfold lift_result, lift, olift; simpl;
+        (* try (destruct n; simpl); *)
+        try (rewrite <- H2; clear H2;
+             destruct (imp_qcert_expr_eval h σ i);
+             try reflexivity; simpl; unfold unlift_result, lift; simpl;
+             try (destruct n);
+             rewrite <- H3; clear H3;
+             destruct (imp_qcert_expr_eval h σ i0);
+             try reflexivity; simpl; unfold unlift_result, lift; simpl).
+      - Case "OpEqual"%string.
+        admit.
+      - Case "OpRecConcat"%string.
+        admit.
+      - Case "OpRecMerge"%string.
+        admit.
+      - Case "OpAnd"%string.
+        destruct d; destruct d0; reflexivity.
+      - Case "OpOr"%string.
+        destruct d; destruct d0; reflexivity.
+      - Case "OpLt"%string.
+        admit.
+      - Case "OpLe"%string.
+        admit.
+      - Case "OpBagUnion"%string.
+        unfold rondcoll2, ondcoll2, lift; simpl.
+        destruct d; destruct d0; simpl; try reflexivity.
+        unfold bunion.
+        rewrite map_app.
+        reflexivity.
+      - Case "OpBagDiff"%string.
+        unfold rondcoll2, ondcoll2, lift; simpl.
+        destruct d; destruct d0; simpl; try reflexivity.
+        unfold bminus.
+        admit.
+      - Case "OpBagMin"%string.
+        admit.
+      - Case "OpBagMax"%string.
+        admit.
+      - Case "OpBagNth"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpContains"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpStringConcat"%string.
+        destruct d; destruct d0; reflexivity.
+      - Case "OpStringJoin"%string.
+        admit. (* XXX Not implemented *)
+      - Case "OpNatBinary"%string.
+        destruct n;
+          simpl;
+          rewrite <- H2; clear H2;
+            destruct (imp_qcert_expr_eval h σ i);
+            try reflexivity; simpl; unfold unlift_result, lift; simpl;
+              try (destruct n);
+              rewrite <- H3; clear H3;
+                destruct (imp_qcert_expr_eval h σ i0);
+                try reflexivity; simpl; unfold unlift_result, lift; simpl;
+                  destruct d; destruct d0; try reflexivity.
+      - Case "OpFloatBinary"%string.
+        admit.
+      - Case "OpFloatCompare"%string.
+        admit.
+      - Case "OpForeignBinary"%string.
+        admit.
+      Transparent ejson_to_data.
     Admitted.
 
     Lemma imp_qcert_runtime_call_to_imp_ejson_correct

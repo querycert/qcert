@@ -71,6 +71,7 @@ Section ImpEJsonEval.
 
     Definition imp_ejson_runtime_eval (rt:imp_ejson_runtime_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
       match rt with
+      (* Generic *)
       | EJsonRuntimeEqual =>
         apply_binary (fun d1 d2 => if ejson_eq_dec d1 d2 then Some (ejbool true) else Some (ejbool false)) dl
       | EJsonRuntimeCompare =>
@@ -86,8 +87,20 @@ Section ImpEJsonEval.
                       Some (ejnumber float_neg_one)
                     else
                       Some (ejnumber float_zero)
+             | ejbigint n1, ejbigint n2 =>
+               if Z_lt_dec n1 n2
+               then
+                 Some (ejnumber float_one)
+               else if Z_gt_dec n1 n2
+                    then
+                      Some (ejnumber float_neg_one)
+                    else
+                      Some (ejnumber float_zero)
              | _, _ => None
              end) dl
+      | EJsonRuntimeToString => None
+      | EJsonRuntimeToText => None
+      (* Record *)
       | EJsonRuntimeRecConcat =>
         apply_binary
           (fun d1 d2 =>
@@ -106,17 +119,33 @@ Section ImpEJsonEval.
                end
              | _, _ => None
              end) dl
-      | EJsonRuntimeDistinct =>
-        apply_unary
-          (fun d =>
-             match d with
-             | ejarray l =>
-               Some (ejarray (@bdistinct ejson ejson_eq_dec l))
+      | EJsonRuntimeRecRemove =>
+        apply_binary
+          (fun d1 d2 =>
+             match ejson_is_record d1 with
+             | Some r =>
+               match d2 with
+               | ejstring s =>
+                 Some (ejobject (rremove r s))
+               | _ => None
+               end
              | _ => None
-             end)
-          dl
-      | EJsonRuntimeGroupBy => None (* XXX TODO *)
-      | EJsonRuntimeDeref => (* XXX the one in qcert-runtime is a lot more complex *)
+             end) dl
+      | EJsonRuntimeRecProject =>
+        apply_binary
+          (fun d1 d2 =>
+             match ejson_is_record d1 with
+             | Some r =>
+               match d2 with
+               | ejarray sl =>
+                 lift ejobject
+                      (lift (rproject r)
+                            (of_string_list sl))
+               | _ => None
+               end
+             | _ => None
+             end) dl
+      | EJsonRuntimeRecDot => (* XXX the one in qcert-runtime is a lot more complex *)
         apply_binary
           (fun d1 d2 =>
              match ejson_is_record d1 with
@@ -128,6 +157,7 @@ Section ImpEJsonEval.
                end
              | _ => None
              end) dl
+      (* Sums *)
       | EJsonRuntimeEither =>
         apply_unary
           (fun d =>
@@ -150,64 +180,7 @@ Section ImpEJsonEval.
              | ejobject (("$right", d)::nil) => Some d
              | _ => None
              end) dl
-      | EJsonRuntimeRemove =>
-        apply_binary
-          (fun d1 d2 =>
-             match ejson_is_record d1 with
-             | Some r =>
-               match d2 with
-               | ejstring s =>
-                 Some (ejobject (rremove r s))
-               | _ => None
-               end
-             | _ => None
-             end) dl
-      | EJsonRuntimeProject =>
-        apply_binary
-          (fun d1 d2 =>
-             match ejson_is_record d1 with
-             | Some r =>
-               match d2 with
-               | ejarray sl =>
-                 lift ejobject
-                      (lift (rproject r)
-                            (of_string_list sl))
-               | _ => None
-               end
-             | _ => None
-             end) dl
-      | EJsonRuntimeSingleton =>
-        apply_unary
-          (fun d =>
-             match d with
-             | ejarray (d::nil) => Some (ejobject (("$left",d)::nil))
-             | ejarray _ => Some (ejobject (("$right",ejnull)::nil))
-             | _ => None
-             end) dl
-      | EJsonRuntimeFlatten =>
-        apply_unary
-          (fun d =>
-             match d with
-             | ejarray l =>
-               lift ejarray (jflatten l)
-             | _ => None
-             end) dl
-      | EJsonRuntimeSort => None
-      | EJsonRuntimeCount =>
-        apply_unary
-          (fun d =>
-             match d with
-             | ejarray l => Some (ejbigint (Z_of_nat (bcount l)))
-             | _ => None
-             end) dl
-      | EJsonRuntimeLength =>
-        apply_unary
-          (fun d =>
-             match d with
-             | ejstring s => Some (ejbigint (Z_of_nat (String.length s)))
-             | _ => None
-             end) dl
-      | EJsonRuntimeSubstring => None
+      (* Brand *)
       | EJsonRuntimeBrand =>
         apply_binary
           (fun d1 d2 =>
@@ -265,11 +238,137 @@ Section ImpEJsonEval.
                end
              | _ => None
              end) dl
-      | EJsonRuntimeNatPlus => None
-      | EJsonRuntimeNatMinus => None
-      | EJsonRuntimeNatMult => None
-      | EJsonRuntimeNatDiv => None
-      | EJsonRuntimeNatRem => None
+
+      (* Collections *)
+      | EJsonRuntimeDistinct =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               Some (ejarray (@bdistinct ejson ejson_eq_dec l))
+             | _ => None
+             end)
+          dl
+      | EJsonRuntimeSingleton =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray (d::nil) => Some (ejobject (("$left",d)::nil))
+             | ejarray _ => Some (ejobject (("$right",ejnull)::nil))
+             | _ => None
+             end) dl
+      | EJsonRuntimeFlatten =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               lift ejarray (jflatten l)
+             | _ => None
+             end) dl
+      | EJsonRuntimeUnion =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejarray l1, ejarray l2 =>
+               Some (ejarray (bunion l1 l2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeMinus =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejarray l1, ejarray l2 =>
+               Some (ejarray (bminus l1 l2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeMin =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejarray l1, ejarray l2 =>
+               Some (ejarray (bmin l1 l2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeMax =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejarray l1, ejarray l2 =>
+               Some (ejarray (bmax l1 l2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeNth => None (* XXX TODO *)
+      | EJsonRuntimeCount =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l => Some (ejbigint (Z_of_nat (bcount l)))
+             | _ => None
+             end) dl
+      | EJsonRuntimeContains => None (* XXX TODO *)
+      | EJsonRuntimeSort => None (* XXX TODO *)
+      | EJsonRuntimeGroupBy => None (* XXX TODO *)
+      (* String *)
+      | EJsonRuntimeLength =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejstring s => Some (ejbigint (Z_of_nat (String.length s)))
+             | _ => None
+             end) dl
+      | EJsonRuntimeSubstring => None (* XXX TODO *)
+      | EJsonRuntimeSubstringEnd => None (* XXX TODO *)
+      | EJsonRuntimeStringJoin => None (* XXX TODO *)
+      (* Integer *)
+      | EJsonRuntimeNatPlus =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbigint (Z.add n1 n2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeNatMinus =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbigint (Z.sub n1 n2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeNatMult =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbigint (Z.mul n1 n2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeNatDiv =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbigint (Z.quot n1 n2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeNatRem =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbigint (Z.rem n1 n2))
+             | _, _ => None
+             end
+          ) dl
       | EJsonRuntimeNatAbs =>
         apply_unary
           (fun d =>
@@ -291,6 +390,24 @@ Section ImpEJsonEval.
              | ejbigint z => Some (ejbigint (Z.sqrt z))
              | _ => None
              end) dl
+      | EJsonRuntimeNatMinPair =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbigint (Z.min n1 n2))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeNatMaxPair =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbigint (Z.max n1 n2))
+             | _, _ => None
+             end
+          ) dl
       | EJsonRuntimeNatSum =>
         apply_unary
           (fun d =>
@@ -347,17 +464,8 @@ Section ImpEJsonEval.
              | ejbigint n => Some (ejnumber (float_of_int n))
              | _ => None
              end) dl
-      | EJsonRuntimeSum => None
-      | EJsonRuntimeArithMean => None
-      | EJsonRuntimeBunion => None
-      | EJsonRuntimeBminus => None
-      | EJsonRuntimeBmin => None
-      | EJsonRuntimeBmax => None
-      | EJsonRuntimeBnth => None
-      | EJsonRuntimeContains => None
-      | EJsonRuntimeToString => None
-      | EJsonRuntimeToText => None
-      | EJsonRuntimeStringJoin => None
+      | EJsonRuntimeFloatSum => None (* XXX TODO *)
+      | EJsonRuntimeFloatArithMean => None (* XXX TODO *)
       end.
 
     Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
