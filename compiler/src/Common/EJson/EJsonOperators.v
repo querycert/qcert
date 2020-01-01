@@ -19,6 +19,7 @@
 Require Import String.
 Require Import List.
 Require Import ZArith.
+Require Import Utils.
 Require Import Float.
 Require Import ListAdd.
 Require Import Lift.
@@ -31,7 +32,7 @@ Section EJsonOperators.
 
   Import ListNotations.
 
-  Inductive ejson_op :=     (* XXX TODO XXX *)(* JsAst *)                     (* Syntax *)
+  Inductive ejson_op :=
   | EJsonOpNot : ejson_op                          (* unary_op_not *)              (* !v *)
   | EJsonOpNeg : ejson_op                          (* unary_op_neg *)              (* -v *)
   | EJsonOpAnd : ejson_op                          (* binary_op_and *)             (* v1 && v2 *)
@@ -47,7 +48,6 @@ Section EJsonOperators.
   | EJsonOpDiv : ejson_op                          (* binary_op_div *)             (* v1 / v2 *)
   | EJsonOpStrictEqual : ejson_op                  (* binary_op_strict_equal *)    (* v1 === v2 *)
   | EJsonOpStrictDisequal : ejson_op               (* binary_op_strict_disequal *) (* v1 !== v2 *)
-  (*| EJsonOpIn : ejson_op *)                        (* binary_op_in *)              (* v1 in v2 *) (* XXX either 'in' or hasOwnProperty, not both *)
   (* Array Stuff *)
   | EJsonOpArray : ejson_op                        (* expr_array *)                (* [ v1, ...vn ] XXX Nary? *)
   | EJsonOpArrayLength : ejson_op                  (* expr_access? *)              (* v.length *)
@@ -149,7 +149,7 @@ Section EJsonOperators.
       | EJsonOpArray => Some (ejarray j)
       | EJsonOpArrayLength =>
         match j with
-        | [ejarray ja] => Some (ejnumber (float_of_int (Z_of_nat (List.length ja))))
+        | [ejarray ja] => Some (ejbigint (Z_of_nat (List.length ja)))
         | _ => None
         end
       | EJsonOpArrayPush =>
@@ -159,7 +159,14 @@ Section EJsonOperators.
         end
       | EJsonOpArrayAccess =>
         match j with
-        | [ejarray ja; ejnumber n] => None (* XXX TODO XXX *)
+        | [ejarray ja; ejbigint n] =>
+          let natish := ZToSignedNat n in
+          if (fst natish) then
+            match List.nth_error ja (snd natish) with
+            | None => None
+            | Some d => Some d
+            end
+          else None
         | _ => None
         end
       | EJsonOpObject atts =>

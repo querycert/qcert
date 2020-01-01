@@ -73,6 +73,7 @@ let global_config_of_json j =
       gconf_eval_all = false;
       gconf_eval_debug = false;
       gconf_eval_validate = false;
+      gconf_quiet = false;
       gconf_source_sexp = false;
       gconf_pretty_config = Pretty_common.default_pretty_config ();
       gconf_java_imports = "";

@@ -176,8 +176,8 @@ Section ImpEval.
         | _ => None
         end
       | ImpStmtForRange v e1 e2 s =>
-        match (olift DataToZ (imp_expr_eval σ e1), olift DataToZ (imp_expr_eval σ e2)) with
-        | (Some n1, Some n2) =>
+        match olift DataToZ (imp_expr_eval σ e1), olift DataToZ (imp_expr_eval σ e2) with
+        | Some n1, Some n2 =>
           let fix for_range n n1 σ₁ :=
              match n with
              | O => Some σ₁
@@ -189,7 +189,7 @@ Section ImpEval.
              end
           in
           for_range (nb_iter n1 n2) n1 σ
-        | _ => None
+        | _, _ => None
         end
       | ImpStmtIf e1 s1 s2 =>
         match imp_expr_eval σ e1 with

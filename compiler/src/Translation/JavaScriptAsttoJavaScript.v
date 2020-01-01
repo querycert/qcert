@@ -114,7 +114,7 @@ Section ToString.
   | expr_access e1 e2 =>
     string_of_expr e1 i ++ "[" ++ string_of_expr e2 (i+1) ++ "]"
   | expr_member e s =>
-    string_of_expr e i ++ "." ++ s
+    string_of_expr e i ++ "[" ++ quotel ++ s ++ quotel ++ "]"
   | expr_new e args =>
     let args := List.map (fun e => string_of_expr e (i+1)) args in
     "new " ++ string_of_expr e i ++ "(" ++ comma_list args ++ ")"

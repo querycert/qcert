@@ -105,6 +105,7 @@ oql-string-tests:
                             -eval-validate -output oql/string$(N).out || exit 1;))
 oql-string-tests-js:
 	@$(foreach N,$(OQLSTRINGNUM), \
+	       $(QCERTCOMP) -source oql -target javascript oql/string$(N).oql -schema oql/string.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/string.input \
@@ -132,6 +133,7 @@ oql-world-tests:
                             -eval-validate -output oql/world$(N).out || exit 1;))
 oql-world-tests-js:
 	@$(foreach N,$(OQLWORLDNUM), \
+	       $(QCERTCOMP) -source oql -target javascript oql/world$(N).oql -schema oql/world.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/world.input \
@@ -159,6 +161,7 @@ oql-persons-tests:
                             -eval-validate -output oql/persons$(N).out || exit 1;))
 oql-persons-tests-js:
 	@$(foreach N,$(OQLPERSONSNUM), \
+	       $(QCERTCOMP) -source oql -target javascript oql/persons$(N).oql -schema oql/persons.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/persons.input \
@@ -187,6 +190,7 @@ oql-employees-tests:
                             -eval-validate -output oql/employees$(N).out || exit 1;))
 oql-employees-tests-js:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
+	       $(QCERTCOMP) -source oql -target javascript oql/employees$(N).oql -schema oql/employees.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source oql \
                           --input oql/employees.input \
@@ -230,6 +234,7 @@ lambda_nra-persons-tests:
                             -eval-validate -output lambda_nra/persons$(N).out || exit 1;))
 lambda_nra-persons-tests-js:
 	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
+	       $(QCERTCOMP) -source lambda_nra -target javascript lambda_nra/persons$(N).lnra -schema lambda_nra/persons.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source lambda_nra \
                           --input lambda_nra/persons.input \
@@ -273,6 +278,7 @@ camp-world-tests:
                             -eval-validate -output camp/world$(N).out || exit 1;))
 camp-world-tests-js:
 	@$(foreach N,$(CAMPWORLDNUM), \
+	       $(QCERTCOMP) -source camp -target javascript camp/world$(N).camp -schema camp/world.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js compile \
                           --source camp \
                           --input camp/world.input \
@@ -316,8 +322,8 @@ sql-org-tests:
                             -eval-validate -output sql/org$(N).out || exit 1;))
 sql-org-tests-js:
 	@$(foreach N,$(SQLORGNUM), \
-	       $(QCERTCOMP) -source sql  -target js sql/org$(N).sql \
-                            -eval-validate -schema sql/org.schema; \
+	       $(QCERTCOMP) -source sql -target js sql/org$(N).sql \
+                            -eval-validate -schema sql/org.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
                           --input sql/org.input \
                           --schema sql/org.schema \
@@ -362,13 +368,13 @@ tech_rule-test-tests:
 tech_rule-test-tests-js:
 	@$(foreach N,$(TECHRULETESTNUM), \
 	       $(QCERTCOMP) -source tech_rule  -target js tech_rule/test$(N).arl \
-                            -eval-validate -schema tech_rule/test.schema; \
-	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
-                          -input tech_rule/test.input \
-                          -schema tech_rule/test.schema \
-                          -output tech_rule/test$(N).out \
-                          tech_rule/test$(N).js || exit 1;)
+                            -eval-validate -schema tech_rule/test.schema -quiet; \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --input tech_rule/test.input \
+                          --schema tech_rule/test.schema \
+                          --output tech_rule/test$(N).out \
+                          --eval-validate \
+                          --query tech_rule/test$(N).js || exit 1 ;)
 tech_rule-test-tests-java:
 	@$(foreach N,$(TECHRULETESTNUM), \
 	       $(QCERTCOMP) -source tech_rule -target java tech_rule/test$(N).arl \
@@ -403,13 +409,13 @@ designer_rule-test-tests:
 designer_rule-test-tests-js:
 	@$(foreach N,$(DESIGNERRULETESTNUM), \
 	       $(QCERTCOMP) -source designer_rule -target js designer_rule/test$(N).agg \
-                            -eval-validate -schema designer_rule/test.schema; \
-	       $(JAVARUN) -cp $(CPATH) testing.runners.RunJavascript \
-                          -runtime ../runtimes/javascript/qcert-runtime.js \
-                          -input designer_rule/test.input \
-                          -schema designer_rule/test.schema \
-                          -output designer_rule/test$(N).out \
-                          designer_rule/test$(N).js || exit 1;)
+                            -eval-validate -schema designer_rule/test.schema -quiet; \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --input designer_rule/test.input \
+                          --schema designer_rule/test.schema \
+                          --output designer_rule/test$(N).out \
+                          --eval-validate \
+                          --query designer_rule/test$(N).js || exit 1 ;)
 
 clean:
 	@rm -rf log

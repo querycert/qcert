@@ -337,7 +337,10 @@ Section ImpQcerttoImpEJson.
           ImpStmtBlock
             [ (src_id, Some e) ]
             [ ImpStmtForRange
-                i_id (ImpExprConst (ejnumber zero)) (ImpExprOp EJsonOpArrayLength [ src ])
+                i_id
+                (ImpExprConst (ejbigint 0))
+                (* XXX Use src.length - 1, consistent with semantic of 'for i1 to i2 do ... done' loop *)
+                (ImpExprRuntimeCall EJsonRuntimeNatMinus [ ImpExprOp EJsonOpArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
                 (ImpStmtBlock
                    [ (v, Some (ImpExprOp EJsonOpArrayAccess [ src; i ])) ]
                    [ imp_qcert_stmt_to_imp_ejson_combined avoid s ]) ]

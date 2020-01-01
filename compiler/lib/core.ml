@@ -48,11 +48,14 @@ let no_result_file =
 (* Message *)
 
 let fprint_compilation_path ff gconf =
-  let spath = Compiler_util.string_of_path " -> " gconf.gconf_path in
-  Format.fprintf ff "Compiling from %s to %s:@\n"
-    (Compiler_util.name_of_language gconf.gconf_source)
-    (Compiler_util.name_of_language gconf.gconf_target);
-  Format.fprintf ff "  %s@." spath
+  if not gconf.gconf_quiet then
+    begin
+      let spath = Compiler_util.string_of_path " -> " gconf.gconf_path in
+      Format.fprintf ff "Compiling from %s to %s:@\n"
+        (Compiler_util.name_of_language gconf.gconf_source)
+        (Compiler_util.name_of_language gconf.gconf_target);
+      Format.fprintf ff "  %s@." spath
+    end
 
 (* Parsing *)
 
@@ -178,7 +181,7 @@ let print_input_var (v:char list * QData.qddata) =
 let print_input ev_input =
   List.iter print_input_var ev_input
 
-let eval_string (validate:bool) (debug:bool) (ev_input:Data_util.content_input) (expected_output:Data_util.content_output) (schema: Type_util.schema) dir file_name q =
+let eval_string (validate:bool) (debug:bool) (quiet:bool) (ev_input:Data_util.content_input) (expected_output:Data_util.content_output) (schema: Type_util.schema) dir file_name q =
   let brand_model = schema.Type_util.sch_brand_model in
   let brand_relation = Type_util.brand_relation_of_brand_model brand_model in
   let globals = schema.Type_util.sch_globals in
@@ -206,7 +209,7 @@ let eval_string (validate:bool) (debug:bool) (ev_input:Data_util.content_input) 
   let queryname = Filename.chop_extension file_name in
   let res_validates =
     if validate
-    then Check_util.validate_result false queryname language_name expected_output (Some ev_data)
+    then Check_util.validate_result quiet queryname language_name expected_output (Some ev_data)
     else true
   in
   let s = string_of_char_list (QData.qdataStringify (char_list_of_string "\"") ev_data) in
@@ -352,6 +355,7 @@ let main gconf (file_name, query_s) =
       eval_string
         gconf.gconf_eval_validate
         gconf.gconf_eval_debug
+        gconf.gconf_quiet
         input
         expected_output
         schema
@@ -372,6 +376,7 @@ let main gconf (file_name, query_s) =
               eval_string
                 gconf.gconf_eval_validate
                 gconf.gconf_eval_debug
+                gconf.gconf_quiet
                 input
                 expected_output
                 schema

@@ -107,6 +107,8 @@ let args_list gconf =
        "<imports> Additional imports for the Java runtime (only for Java target)");
       ("-vinit", Stdlib.Arg.String (Args.set_vinit gconf),
        "<init> Set the name of the init variable (only for SparkRDD and Cloudant targets)");
+      ("-quiet", Stdlib.Arg.Unit (Args.set_quiet gconf),
+       " compile quietly");
     ]
 
 let anon_args input_files f = input_files := f :: !input_files
@@ -170,6 +172,7 @@ let parse_args () =
       gconf_eval_all = false;
       gconf_eval_debug = false;
       gconf_eval_validate = false;
+      gconf_quiet = false;
       gconf_source_sexp = false;
       gconf_pretty_config = Pretty_common.default_pretty_config ();
       gconf_java_imports = "";
