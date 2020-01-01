@@ -33,28 +33,45 @@ Section ImpEJson.
        imp_ejson_runtime_op constructors namess are based on Qcert operators names ??
      *)
     Definition imp_ejson_op := ejson_op. (* See ./Common/EJson/EJsonOperators.v *)
-    Inductive imp_ejson_runtime_op := (* XXX TODO -- Look at NNRSimptoJavaScriptAst XXX *)
+    Inductive imp_ejson_runtime_op :=
+    (* Generic *)
     | EJsonRuntimeEqual : imp_ejson_runtime_op
     | EJsonRuntimeCompare : imp_ejson_runtime_op
+    | EJsonRuntimeToString : imp_ejson_runtime_op
+    | EJsonRuntimeToText : imp_ejson_runtime_op
+    (* Record *)
     | EJsonRuntimeRecConcat : imp_ejson_runtime_op
     | EJsonRuntimeRecMerge : imp_ejson_runtime_op
-    | EJsonRuntimeDistinct : imp_ejson_runtime_op
-    | EJsonRuntimeGroupBy : imp_ejson_runtime_op
-    | EJsonRuntimeDeref : imp_ejson_runtime_op
+    | EJsonRuntimeRecRemove: imp_ejson_runtime_op
+    | EJsonRuntimeRecProject: imp_ejson_runtime_op
+    | EJsonRuntimeRecDot : imp_ejson_runtime_op
+    (* Sum *)
     | EJsonRuntimeEither : imp_ejson_runtime_op
     | EJsonRuntimeToLeft: imp_ejson_runtime_op
     | EJsonRuntimeToRight: imp_ejson_runtime_op
-    | EJsonRuntimeRemove: imp_ejson_runtime_op
-    | EJsonRuntimeProject: imp_ejson_runtime_op
-    | EJsonRuntimeSingleton : imp_ejson_runtime_op
-    | EJsonRuntimeFlatten : imp_ejson_runtime_op
-    | EJsonRuntimeSort : imp_ejson_runtime_op
-    | EJsonRuntimeCount : imp_ejson_runtime_op
-    | EJsonRuntimeLength : imp_ejson_runtime_op
-    | EJsonRuntimeSubstring : imp_ejson_runtime_op
+    (* Brand *)
     | EJsonRuntimeBrand : imp_ejson_runtime_op
     | EJsonRuntimeUnbrand : imp_ejson_runtime_op
     | EJsonRuntimeCast : imp_ejson_runtime_op
+    (* Collection *)
+    | EJsonRuntimeDistinct : imp_ejson_runtime_op
+    | EJsonRuntimeSingleton : imp_ejson_runtime_op
+    | EJsonRuntimeFlatten : imp_ejson_runtime_op
+    | EJsonRuntimeUnion : imp_ejson_runtime_op
+    | EJsonRuntimeMinus : imp_ejson_runtime_op
+    | EJsonRuntimeMin : imp_ejson_runtime_op
+    | EJsonRuntimeMax : imp_ejson_runtime_op
+    | EJsonRuntimeNth : imp_ejson_runtime_op
+    | EJsonRuntimeCount : imp_ejson_runtime_op
+    | EJsonRuntimeContains : imp_ejson_runtime_op
+    | EJsonRuntimeSort : imp_ejson_runtime_op
+    | EJsonRuntimeGroupBy : imp_ejson_runtime_op
+    (* String *)
+    | EJsonRuntimeLength : imp_ejson_runtime_op
+    | EJsonRuntimeSubstring : imp_ejson_runtime_op
+    | EJsonRuntimeSubstringEnd : imp_ejson_runtime_op
+    | EJsonRuntimeStringJoin : imp_ejson_runtime_op
+    (* Integer *)
     | EJsonRuntimeNatPlus : imp_ejson_runtime_op
     | EJsonRuntimeNatMinus : imp_ejson_runtime_op
     | EJsonRuntimeNatMult : imp_ejson_runtime_op
@@ -63,22 +80,16 @@ Section ImpEJson.
     | EJsonRuntimeNatAbs : imp_ejson_runtime_op
     | EJsonRuntimeNatLog2 : imp_ejson_runtime_op
     | EJsonRuntimeNatSqrt : imp_ejson_runtime_op
+    | EJsonRuntimeNatMinPair : imp_ejson_runtime_op
+    | EJsonRuntimeNatMaxPair : imp_ejson_runtime_op
     | EJsonRuntimeNatSum : imp_ejson_runtime_op
     | EJsonRuntimeNatMin : imp_ejson_runtime_op
     | EJsonRuntimeNatMax : imp_ejson_runtime_op
     | EJsonRuntimeNatArithMean : imp_ejson_runtime_op
     | EJsonRuntimeFloatOfNat : imp_ejson_runtime_op
-    | EJsonRuntimeSum : imp_ejson_runtime_op
-    | EJsonRuntimeArithMean : imp_ejson_runtime_op
-    | EJsonRuntimeBunion : imp_ejson_runtime_op
-    | EJsonRuntimeBminus : imp_ejson_runtime_op
-    | EJsonRuntimeBmin : imp_ejson_runtime_op
-    | EJsonRuntimeBmax : imp_ejson_runtime_op
-    | EJsonRuntimeBnth : imp_ejson_runtime_op
-    | EJsonRuntimeContains : imp_ejson_runtime_op
-    | EJsonRuntimeStringJoin : imp_ejson_runtime_op
-    | EJsonRuntimeToString : imp_ejson_runtime_op
-    | EJsonRuntimeToText : imp_ejson_runtime_op
+    (* Float *)
+    | EJsonRuntimeFloatSum : imp_ejson_runtime_op
+    | EJsonRuntimeFloatArithMean : imp_ejson_runtime_op
     .
 
     Definition imp_ejson_expr := @imp_expr imp_ejson_data imp_ejson_op imp_ejson_runtime_op.
@@ -94,27 +105,44 @@ Section ImpEJson.
 
     Definition string_of_ejson_runtime_op (op: imp_ejson_runtime_op) :=
       match op with
+      (* Generic *)
       | EJsonRuntimeEqual => "equal"
       | EJsonRuntimeCompare => "compare"
-      | EJsonRuntimeRecConcat => "concat"
-      | EJsonRuntimeRecMerge => "mergeConcat"
-      | EJsonRuntimeDistinct => "distinct"
-      | EJsonRuntimeGroupBy => "groupBy" (* XXX TODO: to check XXX *)
-      | EJsonRuntimeDeref => "deref"
+      | EJsonRuntimeToString => "toString"
+      | EJsonRuntimeToText => "toText"
+      (* Records *)
+      | EJsonRuntimeRecConcat => "recConcat"
+      | EJsonRuntimeRecMerge => "recMerge"
+      | EJsonRuntimeRecRemove=> "recRemove"
+      | EJsonRuntimeRecProject=> "recProject"
+      | EJsonRuntimeRecDot => "recDot"
+      (* Sums *)
       | EJsonRuntimeEither => "either"
       | EJsonRuntimeToLeft=> "toLeft"
       | EJsonRuntimeToRight=> "toRight"
-      | EJsonRuntimeRemove=> "remove"
-      | EJsonRuntimeProject=> "project"
-      | EJsonRuntimeSingleton => "singleton"
-      | EJsonRuntimeFlatten => "flatten"
-      | EJsonRuntimeSort => "sort"
-      | EJsonRuntimeCount => "count"
-      | EJsonRuntimeLength => "stringLength"
-      | EJsonRuntimeSubstring => "substring"
+      (* Brands *)
       | EJsonRuntimeBrand => "brand"
       | EJsonRuntimeUnbrand => "unbrand"
       | EJsonRuntimeCast => "cast"
+      (* Collections *)
+      | EJsonRuntimeDistinct => "distinct"
+      | EJsonRuntimeSingleton => "singleton"
+      | EJsonRuntimeFlatten => "flatten"
+      | EJsonRuntimeUnion => "union"
+      | EJsonRuntimeMinus => "minus"
+      | EJsonRuntimeMin => "min"
+      | EJsonRuntimeMax => "max"
+      | EJsonRuntimeNth => "nth"
+      | EJsonRuntimeCount => "count"
+      | EJsonRuntimeContains => "contains"
+      | EJsonRuntimeSort => "sort"
+      | EJsonRuntimeGroupBy => "groupBy" (* XXX TODO: to check XXX *)
+      (* String *)
+      | EJsonRuntimeLength => "length"
+      | EJsonRuntimeSubstring => "substring"
+      | EJsonRuntimeSubstringEnd => "substringEnd"
+      | EJsonRuntimeStringJoin => "stringJoin"
+      (* Integer *)
       | EJsonRuntimeNatPlus => "natPlus"
       | EJsonRuntimeNatMinus => "natMinus"
       | EJsonRuntimeNatMult => "natMult"
@@ -123,22 +151,16 @@ Section ImpEJson.
       | EJsonRuntimeNatAbs => "natAbs"
       | EJsonRuntimeNatLog2 => "natLog2"
       | EJsonRuntimeNatSqrt => "natSqrt"
-      | EJsonRuntimeNatSum => "natSum"
+      | EJsonRuntimeNatMinPair => "natMinPair"
+      | EJsonRuntimeNatMaxPair => "natMaxPair"
       | EJsonRuntimeNatMin => "natMin"
       | EJsonRuntimeNatMax => "natMax"
+      | EJsonRuntimeNatSum => "natSum"
       | EJsonRuntimeNatArithMean => "natArithMean"
       | EJsonRuntimeFloatOfNat => "floatOfNat"
-      | EJsonRuntimeSum => "sum"
-      | EJsonRuntimeArithMean => "arithMean"
-      | EJsonRuntimeBunion => "bunion"
-      | EJsonRuntimeBminus => "bminus"
-      | EJsonRuntimeBmin => "bmin"
-      | EJsonRuntimeBmax => "bmax"
-      | EJsonRuntimeBnth => "bnth"
-      | EJsonRuntimeContains => "contains"
-      | EJsonRuntimeStringJoin => "stringJoin"
-      | EJsonRuntimeToString => "toString"
-      | EJsonRuntimeToText => "toText"
+      (* Float *)
+      | EJsonRuntimeFloatSum => "floatSum"
+      | EJsonRuntimeFloatArithMean => "floatArithMean"
       end.
 
   End Util.

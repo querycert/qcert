@@ -667,5 +667,15 @@ Section DatatoEJson.
           intros; contradiction.
     Qed.
 
+    (** Bag operators *)
+    Lemma bunion_map_comm l l0:
+      map data_to_ejson (bunion l l0) =
+      bunion (map data_to_ejson l) (map data_to_ejson l0).
+    Proof.
+      unfold bunion.
+      rewrite map_app.
+      reflexivity.
+    Qed.
+      
   End RuntimeLemmas.
 End DatatoEJson.
