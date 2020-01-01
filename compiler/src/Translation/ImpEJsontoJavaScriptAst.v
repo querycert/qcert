@@ -31,6 +31,14 @@ Section ImpEJsontoJavaScriptAst.
     Definition scope l := stat_block l. (* XXX TODO XXX *)
     Definition prog_to_string (x: prog) : string := "". (* XXX TODO: prog_to_string XXX *)
 
+    (* XXX Should be done earlier *)
+    Definition box_nat e :=
+      expr_object
+        ((propname_identifier "$nat"%string,
+          propbody_val e)::nil).
+    Definition unbox_nat e :=
+      expr_member e "$nat"%string.
+
     Definition mk_expr_error := expr_literal literal_null.
     Definition mk_unary_expr (f:expr -> expr) (el:list expr) : expr :=
       match el with
@@ -40,7 +48,7 @@ Section ImpEJsontoJavaScriptAst.
 
     Definition mk_unary_op (op:unary_op) (el:list expr) : expr :=
       mk_unary_expr (expr_unary_op op) el.
-    
+
     Definition mk_binary_expr (f:expr -> expr -> expr) (el:list expr) : expr :=
       match el with
       | [e1;e2] => f e1 e2
@@ -83,7 +91,7 @@ Section ImpEJsontoJavaScriptAst.
       | EJsonOpStrictEqual => mk_binary_op binary_op_strict_equal el
       | EJsonOpStrictDisequal => mk_binary_op binary_op_strict_disequal el
       | EJsonOpArray => expr_array (List.map Some el)
-      | EJsonOpArrayLength => mk_unary_expr (fun e => expr_member e  "length") el
+      | EJsonOpArrayLength => mk_unary_expr (fun e => box_nat (expr_member e  "length")) el
       | EJsonOpArrayPush => mk_binary_expr array_push el
       | EJsonOpArrayAccess => mk_binary_expr array_get el
       | EJsonOpObject atts => mk_object atts el
@@ -118,15 +126,12 @@ Section ImpEJsontoJavaScriptAst.
 
     Context {ft:foreign_ejson}.
     Context {ftjast:foreign_ejson_to_ajavascript}.
-  
+
     Fixpoint ejson_to_js_ast (json: ejson) : expr :=
       match json with
       | ejnull => expr_literal literal_null
       | ejnumber n => expr_literal (literal_number n)
-      | ejbigint n =>
-        expr_object
-          ((propname_identifier "$nat",
-            propbody_val (expr_literal (literal_number (float_of_int n))))::nil)
+      | ejbigint n => box_nat (expr_literal (literal_number (float_of_int n)))
       (* XXX Could be replaced by JavaScript BigInt some fix to JsAst XXX *)
       | ejbool b => expr_literal (literal_bool b)
       | ejstring s => expr_literal (literal_string s)
@@ -176,8 +181,9 @@ Section ImpEJsontoJavaScriptAst.
       | ImpStmtForRange x e1 e2 s =>
         stat_for_let
           nil
-          [ (x, Some (imp_ejson_expr_to_js_ast e1)) ]
-          (Some (expr_binary_op (expr_identifier x) binary_op_lt (imp_ejson_expr_to_js_ast e2)))
+          [ (x, Some (unbox_nat (imp_ejson_expr_to_js_ast e1))) ]
+          (* XXX Use binary_op_le, consistent with semantic of 'for i1 to i2 do ... done' loop *)
+          (Some (expr_binary_op (expr_identifier x) binary_op_le (unbox_nat (imp_ejson_expr_to_js_ast e2))))
           (Some (expr_unary_op unary_op_post_incr (expr_identifier x)))
           (imp_ejson_stmt_to_js_ast s)
       | ImpStmtIf e s1 s2 =>

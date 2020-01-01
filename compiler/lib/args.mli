@@ -37,6 +37,7 @@ val set_eval : Config.global_config -> unit -> unit
 val set_eval_all : Config.global_config -> unit -> unit
 val set_eval_debug : Config.global_config -> unit -> unit
 val set_eval_validate : Config.global_config -> unit -> unit
+val set_quiet : Config.global_config -> unit -> unit
 val set_source_sexp : Config.global_config -> unit -> unit
 val set_java_imports : Config.global_config -> string -> unit
 val set_vinit : Config.global_config -> string -> unit
