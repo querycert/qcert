@@ -524,7 +524,7 @@ Next Obligation.
   exact fd. (* XXX Easy since enhanced_ejson is the same as enhanced_data *)
 Defined.
 
-(* TODO: fix me *)
+(* XXX TODO: fix me *)
 Definition enhanced_to_java_data
            (quotel:String.string) (fd:enhanced_data) : java_json
   := match fd with

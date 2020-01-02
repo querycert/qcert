@@ -129,6 +129,16 @@ Section ImpQcerttoImpEJson.
       destruct a; reflexivity.
     Qed.
 
+    Lemma ejson_lifted_stringbag_comm l:
+      lifted_stringbag l =
+      ejson_strings (map data_to_ejson l).
+    Proof.
+      induction l; simpl; try reflexivity.
+      unfold lifted_stringbag in *; simpl.
+      rewrite IHl; simpl; clear IHl.
+      destruct a; reflexivity.
+    Qed.
+
   End Util.
 
   Section Translation.
@@ -743,7 +753,10 @@ Section ImpQcerttoImpEJson.
       - Case "OpStringConcat"%string.
         destruct d; destruct d0; reflexivity.
       - Case "OpStringJoin"%string.
-        admit. (* XXX Not implemented *)
+        destruct d; destruct d0; try reflexivity.
+        unfold lifted_join, lift; simpl.
+        rewrite <- ejson_lifted_stringbag_comm.
+        destruct (lifted_stringbag l); reflexivity.
       - Case "OpNatBinary"%string.
         destruct n;
           simpl;
