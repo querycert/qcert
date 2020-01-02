@@ -153,20 +153,22 @@ Section ImpQcerttoImpEJson.
           mk_imp_ejson_runtime_call
             EJsonRuntimeSort (e :: (List.map sortCriteria_to_ejson_expr scl))
         | OpCount => mk_imp_ejson_runtime_call EJsonRuntimeCount el
-        | OpToString => mk_imp_ejson_op EJsonOpToString el
+        | OpToString => mk_imp_ejson_runtime_call EJsonRuntimeToString el
         | OpToText => mk_imp_ejson_runtime_call EJsonRuntimeToText el
         | OpLength => mk_imp_ejson_runtime_call EJsonRuntimeLength el
-        | OpSubstring start len => (* XXX Should be split into two different functions *)
-          let start := ImpExprConst (ejnumber (float_of_int start)) in
-          let args :=
-              match len with
-              | None => [ e; start ]
-              | Some len =>
-                let len := ImpExprConst (ejnumber (float_of_int len)) in
+        | OpSubstring start len =>
+          let start := ImpExprConst (ejbigint start) in
+          match len with
+          | Some len =>
+            let args :=
+                let len := ImpExprConst (ejbigint len) in
                 [ e; start; len ]
-              end
-          in
-          mk_imp_ejson_runtime_call EJsonRuntimeSubstring args
+            in
+            mk_imp_ejson_runtime_call EJsonRuntimeSubstring args
+          | None =>
+            let args := [ e; start ] in
+            mk_imp_ejson_runtime_call EJsonRuntimeSubstringEnd args
+          end
         | OpLike pat oescape =>
           mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson: OpLike XXX"
         | OpLeft => mk_left e
@@ -575,7 +577,11 @@ Section ImpQcerttoImpEJson.
       - Case "OpLength"%string.
         destruct d; reflexivity.
       - Case "OpSubstring"%string.
-        admit. (* XXX Not implemented *)
+        destruct o; simpl.
+        + rewrite <- H. destruct (imp_qcert_expr_eval h σ i); try reflexivity. simpl.
+          destruct d; reflexivity.
+        + rewrite <- H. destruct (imp_qcert_expr_eval h σ i); try reflexivity. simpl.
+          destruct d; reflexivity.
       - Case "OpLike"%string.
         admit. (* XXX Not implemented *)
       - Case "OpBrand"%string.
@@ -643,9 +649,15 @@ Section ImpQcerttoImpEJson.
         rewrite <- ejson_lifted_fbag_comm.
         destruct (lifted_fbag l); try reflexivity.
       - Case "OpFloatBagMin"%string.
-        admit.
+        destruct d; try reflexivity; simpl.
+        unfold lifted_fmin, lift; simpl.
+        rewrite <- ejson_lifted_fbag_comm.
+        destruct (lifted_fbag l); try reflexivity.
       - Case "OpFloatBagMax"%string.
-        admit.
+        destruct d; try reflexivity; simpl.
+        unfold lifted_fmax, lift; simpl.
+        rewrite <- ejson_lifted_fbag_comm.
+        destruct (lifted_fbag l); try reflexivity.
       - Case "OpForeignUnary"%string.
         admit.
         Transparent ejson_to_data.
@@ -744,7 +756,16 @@ Section ImpQcerttoImpEJson.
                 try reflexivity; simpl; unfold unlift_result, lift; simpl;
                   destruct d; destruct d0; try reflexivity.
       - Case "OpFloatBinary"%string.
-        admit.
+        destruct f;
+          simpl;
+          rewrite <- H2; clear H2;
+            destruct (imp_qcert_expr_eval h σ i);
+            try reflexivity; simpl; unfold unlift_result, lift; simpl;
+              try (destruct n);
+              rewrite <- H3; clear H3;
+                destruct (imp_qcert_expr_eval h σ i0);
+                try reflexivity; simpl; unfold unlift_result, lift; simpl;
+                  destruct d; destruct d0; try reflexivity.
       - Case "OpFloatCompare"%string.
         admit.
       - Case "OpForeignBinary"%string.

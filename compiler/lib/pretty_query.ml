@@ -566,8 +566,6 @@ let pretty_imp_ejson_op p sym pretty_imp_expr ff (op, args) =
   | EJsonOpArrayAccess, [ e1; e2 ] ->
       fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@[<hv 2>[%a]@]@]"
         (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
-  | EJsonOpToString, [ e ] ->
-      fprintf ff "@[<hv 2>@[<hv 2>(%a).toString()@]@]" (pretty_imp_expr 0 sym) e
   | EJsonOpObject fields, args ->
       let field_arg_list = List.map2 (fun x y -> (string_of_char_list x, y)) fields args in
       fprintf ff "@[<hv 2>[@[<hv 2>%a@]@]@]"
