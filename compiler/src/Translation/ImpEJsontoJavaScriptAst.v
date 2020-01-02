@@ -115,7 +115,6 @@ Section ImpEJsontoJavaScriptAst.
       | EJsonOpObject atts => mk_object atts el
       | EJsonOpAccess att => mk_binary_expr expr_access (el++[expr_literal (literal_string att)])
       | EJsonOpHasOwnProperty att => mk_binary_expr object_hasOwnProperty (el++[expr_literal (literal_string att)])
-      | EJsonOpToString => expr_call (expr_identifier "toString") el
       | EJsonOpMathMin => expr_call (expr_member (expr_identifier "Math") "min") el
       | EJsonOpMathMax => expr_call (expr_member (expr_identifier "Math") "max") el
       | EJsonOpMathMinApply =>

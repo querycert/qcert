@@ -63,6 +63,11 @@ Section ImpEval.
       | d1 :: d2 :: nil => f d1 d2
       | _ => None
       end.
+    Definition apply_ternary (f: Data -> Data -> Data -> option Data) (dl: list Data) : option Data :=
+      match dl with
+      | d1 :: d2 :: d3 :: nil => f d1 d2 d3
+      | _ => None
+      end.
   End Util.
 
   (** ** Evaluation Semantics *)

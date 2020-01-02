@@ -14,6 +14,8 @@
 
 (* Unary operators *)
 
+Require Import Bool.
+Require Import EquivDec.
 Require Import String.
 Require Import List.
 Require Import ZArith.
@@ -47,15 +49,14 @@ Section EJsonOperators.
   | EJsonOpStrictEqual : ejson_op                  (* binary_op_strict_equal *)    (* v1 === v2 *)
   | EJsonOpStrictDisequal : ejson_op               (* binary_op_strict_disequal *) (* v1 !== v2 *)
   (* Array Stuff *)
-  | EJsonOpArray : ejson_op                        (* expr_array *)                (* [ v1, ...vn ] XXX Nary? *)
-  | EJsonOpArrayLength : ejson_op                  (* expr_access? *)              (* v.length *)
-  | EJsonOpArrayPush : ejson_op                    (* expr_access? *)              (* v.push(v2) or var v' = v.slice(); v'.push(v2) XXX Does not actually claim to be mutable from a semantic stand-point *)
+  | EJsonOpArray : ejson_op                        (* expr_array *)                (* [ v1, ...vn ] *)
+  | EJsonOpArrayLength : ejson_op                  (* expr_member *)               (* v.length *)
+  | EJsonOpArrayPush : ejson_op                    (* array_push *)                (* var v' = v.slice(); v'.push(v2) XXX Does not actually claim to be mutable from a semantic stand-point *)
   | EJsonOpArrayAccess : ejson_op                  (* array_get *)                 (* v[i] *)
   (* Object Stuff *)
-  | EJsonOpObject : list string -> ejson_op        (* expr_object *)               (* { a1:v1, ...an:vn } XXX Nary? *)
-  | EJsonOpAccess : string -> ejson_op             (* expr_access *)               (* v['a'] or v.a *)
-  | EJsonOpHasOwnProperty : string -> ejson_op     (* expr_call ?? XXX *)          (* v.hasOwnProperty('a') *)
-  | EJsonOpToString : ejson_op                     (* expr_call ?? XXX *)          (* v.toString() *)
+  | EJsonOpObject : list string -> ejson_op        (* expr_object *)               (* { a1:v1, ...an:vn } *)
+  | EJsonOpAccess : string -> ejson_op             (* expr_member *)               (* v['a'] *)
+  | EJsonOpHasOwnProperty : string -> ejson_op     (* object_hasOwnProperty *)     (* v.hasOwnProperty('a') *)
   (* Math stuff *)
   | EJsonOpMathMin : ejson_op                      (* expr_call *)                 (* Math.min(e1, e2) *)
   | EJsonOpMathMax : ejson_op                      (* expr_call *)                 (* Math.max(e1, e2) *)
@@ -142,8 +143,26 @@ Section EJsonOperators.
         | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_div n1 n2))
         | _ => None
         end
-      | EJsonOpStrictEqual => None (* XXX TODO *)
-      | EJsonOpStrictDisequal => None (* XXX TODO *)
+      | EJsonOpStrictEqual =>
+        (* XXX Only defined on atomic values, is this right? *)
+        match j with
+        | [ejnull; ejnull] => Some (ejbool true)
+        | [ejbool b1; ejbool b2] => Some (ejbool (if bool_dec b1 b2 then true else false))
+        | [ejnumber n1; ejnumber n2] => Some (ejbool (if float_eq_dec n1 n2 then true else false))
+        | [ejbigint n1; ejbigint n2] => Some (ejbool (if Z.eq_dec n1 n2 then true else false))
+        | [ejstring s1; ejstring s2] => Some (ejbool (if string_dec s1 s2 then true else false))
+        | _ => Some (ejbool false)
+        end
+      | EJsonOpStrictDisequal =>
+        (* XXX Only defined on atomic values, is this right? *)
+        match j with
+        | [ejnull; ejnull] => Some (ejbool false)
+        | [ejbool b1; ejbool b2] => Some (ejbool (if bool_dec b1 b2 then false else true))
+        | [ejnumber n1; ejnumber n2] => Some (ejbool (if float_eq_dec n1 n2 then false else true))
+        | [ejbigint n1; ejbigint n2] => Some (ejbool (if Z.eq_dec n1 n2 then false else true))
+        | [ejstring s1; ejstring s2] => Some (ejbool (if string_dec s1 s2 then false else true))
+        | _ => Some (ejbool false)
+        end
       | EJsonOpArray => Some (ejarray j)
       | EJsonOpArrayLength =>
         match j with
@@ -176,24 +195,53 @@ Section EJsonOperators.
         | _ => None
         end
       | EJsonOpHasOwnProperty a =>
-        match j  with
+        match j with
         | [ejobject jl] =>
           if in_dec string_dec a (domain jl)
           then Some (ejbool true)
           else Some (ejbool false)
         | _ => None
         end
-      | EJsonOpToString => None (* XXX TODO XXX *)
-      | EJsonOpMathMin => None (* XXX TODO XXX *)
-      | EJsonOpMathMax => None (* XXX TODO XXX *)
-      | EJsonOpMathMinApply => None (* XXX TODO XXX *)
-      | EJsonOpMathMaxApply => None (* XXX TODO XXX *)
+      | EJsonOpMathMin =>
+        match j with
+        | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_min n1 n2))
+        | _ => None
+        end
+      | EJsonOpMathMax =>
+        match j with
+        | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_max n1 n2))
+        | _ => None
+        end
+      | EJsonOpMathMinApply =>
+        match j with
+        | [ejarray l] =>
+          match ejson_numbers l with
+          | Some nl =>
+            Some (ejnumber (float_list_min nl))
+          | None => None
+          end
+        | _ => None
+        end
+      | EJsonOpMathMaxApply =>
+        match j with
+        | [ejarray l] =>
+          match ejson_numbers l with
+          | Some nl =>
+            Some (ejnumber (float_list_max nl))
+          | None => None
+          end
+        | _ => None
+        end
       | EJsonOpMathExp =>
         match j with
         | [ejnumber n] => Some (ejnumber (float_exp n))
         | _ => None
         end
-      | EJsonOpMathPow => None (* XXX TODO XXX *)
+      | EJsonOpMathPow =>
+        match j with
+        | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_pow n1 n2))
+        | _ => None
+        end
       | EJsonOpMathAbs =>
         match j with
         | [ejnumber n] => Some (ejnumber (float_absolute n))

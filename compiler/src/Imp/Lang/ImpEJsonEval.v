@@ -320,8 +320,42 @@ Section ImpEJsonEval.
              | ejstring s => Some (ejbigint (Z_of_nat (String.length s)))
              | _ => None
              end) dl
-      | EJsonRuntimeSubstring => None (* XXX TODO *)
-      | EJsonRuntimeSubstringEnd => None (* XXX TODO *)
+      | EJsonRuntimeSubstring =>
+        apply_ternary
+          (fun d1 d2 d3 =>
+             match d1, d2, d3 with
+             | ejstring s, ejbigint start, ejbigint len =>              
+               let real_start :=
+                   (match start with
+                    | 0%Z => 0
+                    | Z.pos p => Pos.to_nat p
+                    | Z.neg n => (String.length s) - (Pos.to_nat n)
+                    end) in
+               let real_len :=
+                   match len with
+                   | 0%Z => 0
+                   | Z.pos p => Pos.to_nat p
+                   | Z.neg n => 0
+                   end
+               in
+               Some (ejstring (substring real_start real_len s))
+             | _, _, _ => None
+             end) dl
+      | EJsonRuntimeSubstringEnd =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejstring s, ejbigint start =>              
+               let real_start :=
+                   (match start with
+                    | 0%Z => 0
+                    | Z.pos p => Pos.to_nat p
+                    | Z.neg n => (String.length s) - (Pos.to_nat n)
+                    end) in
+               let real_len := (String.length s) - real_start in
+               Some (ejstring (substring real_start real_len s))
+             | _, _ => None
+             end) dl
       | EJsonRuntimeStringJoin => None (* XXX TODO *)
       (* Integer *)
       | EJsonRuntimeNatPlus =>

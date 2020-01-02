@@ -400,10 +400,10 @@ function length(v) {
     return { "$nat" : v.length };
 }
 function substring(v, start, len) {
-    return v.substring(start,len);
+    return v.substring(start.$nat,len.$nat);
 }
 function substringEnd(v, start) {
-    return v.substring(start);
+    return v.substring(start.$nat);
 }
 function stringJoin(sep, v) {
     return v.join(sep);
