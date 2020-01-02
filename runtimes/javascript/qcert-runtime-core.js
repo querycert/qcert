@@ -47,6 +47,10 @@ function sub_brand(b1,b2) {
 function mkWorld(v) {
     return { "WORLD" : v };
 }
+// from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FRegular_Expressions
+function escapeRegExp(string){
+    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
 
 /* Generic */
 function equal(v1, v2) {
@@ -408,6 +412,12 @@ function substringEnd(v, start) {
 function stringJoin(sep, v) {
     return v.join(sep);
 }
+function like(pat, s) {
+    var reg1 = escapeRegExp(pat);
+    var reg2 = reg1.replace(/_/g, '.').replace(/%/g, '.*');
+    var reg3 = new RegExp(reg2);
+    return reg3.test(s);
+}
 
 /* Integer */
 function natPlus(v1, v2) {
@@ -487,10 +497,6 @@ function floatArithMean(b) {
 }
 
 /* Not used */
-// from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FRegular_Expressions
-function escapeRegExp(string){
-    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-}
 function fastdistinct(b) { // Not used
     b1 = b.slice(); /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
     b1.sort(compare);

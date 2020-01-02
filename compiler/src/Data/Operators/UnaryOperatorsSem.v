@@ -160,9 +160,9 @@ Section UnaryOperatorsSem.
                   (substring real_start real_olen s)))
       | _ => None
       end
-    | OpLike pat oescape =>
+    | OpLike pat =>
       match d with
-      | dstring s => Some (dbool (string_like s pat oescape))
+      | dstring s => Some (dbool (string_like s pat None))
       | _ => None
       end
     | OpLeft => Some (dleft d)

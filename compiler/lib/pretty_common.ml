@@ -494,9 +494,7 @@ let pretty_unary_op p sym callb ff u a =
   | Compiler.OpLength -> pretty_unary_exp sym callb "length" ff a
   | Compiler.OpSubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
   | Compiler.OpSubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
-  | Compiler.OpLike (n1,None) -> pretty_unary_exp sym callb ("like["^(string_of_char_list n1)^"]") ff a
-  (* for some reason using String.str gives a compile error *)
-  | Compiler.OpLike (n1,Some n2) -> pretty_unary_exp sym callb ("like["^(string_of_char_list n1)^" ESCAPE "^(string_of_char_list [n2])^"]") ff a
+  | Compiler.OpLike n1 -> pretty_unary_exp sym callb ("like["^(string_of_char_list n1)^"]") ff a
   (* resets precedence back to 0 *)
   | Compiler.OpCast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
   | Compiler.OpUnbrand ->

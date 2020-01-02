@@ -356,7 +356,27 @@ Section ImpEJsonEval.
                Some (ejstring (substring real_start real_len s))
              | _, _ => None
              end) dl
-      | EJsonRuntimeStringJoin => None (* XXX TODO *)
+      | EJsonRuntimeStringJoin =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejstring sep, ejarray l =>
+               match ejson_strings l with
+               | Some sl => Some (ejstring (String.concat sep sl))
+               | None => None
+               end
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeLike =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejstring sreg, ejstring starget =>
+               Some (ejbool (string_like starget sreg None))
+             | _, _ => None
+             end
+          ) dl
       (* Integer *)
       | EJsonRuntimeNatPlus =>
         apply_binary

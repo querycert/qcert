@@ -451,13 +451,13 @@ public class UnaryOperators {
 	
 	public static class AnyCharLikeClause implements LikeClause {
 		public String getRegex() {
-			return Pattern.quote(".");
+			return ".";
 		}		
 	}
 
 	public static class AnyStringLikeClause implements LikeClause {
 		public String getRegex() {
-			return Pattern.quote(".*");
+			return ".*";
 		}
 	}
 

@@ -324,7 +324,7 @@ Section SQLtoNRAEnv.
                          (sql_expr_to_nraenv true acc expr1)
                          (sql_expr_to_nraenv false acc expr2)
            | SCondLike expr1 slike =>
-             NRAEnvUnop (OpLike slike None) (sql_expr_to_nraenv true acc expr1)
+             NRAEnvUnop (OpLike slike) (sql_expr_to_nraenv true acc expr1)
            | SCondBetween expr1 expr2 expr3 =>
              NRAEnvBinop OpAnd
                          (NRAEnvBinop OpLe

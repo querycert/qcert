@@ -318,7 +318,7 @@ Section TOperatorsInfer.
         | String₀ => Some String
         | _ => None
         end
-      | OpLike _ _ =>
+      | OpLike _ =>
         match `τ₁ with
         | String₀ => Some Bool
         | _ => None

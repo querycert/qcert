@@ -220,7 +220,7 @@ Section TOperatorsInferSub.
         if (subtype_dec τ₁ String)
         then Some (String, String)
         else None
-      | OpLike _ _ =>
+      | OpLike _ =>
         if (subtype_dec τ₁ String)
         then Some (Bool, String)
         else None

@@ -259,8 +259,7 @@ let unary_op_to_sexp (u:unary_op) : sexp =
   | OpLength -> STerm ("OpLength",[])
   | OpSubstring (n,None) -> STerm ("OpSubstring",[SInt n])
   | OpSubstring (n1,(Some n2)) -> STerm ("OpSubstring",[SInt n1;SInt n2])
-  | OpLike (p,None) -> STerm ("OpLike",[coq_string_to_sstring p])
-  | OpLike (p,(Some esc)) -> STerm ("OpLike",[coq_string_to_sstring p;coq_string_to_sstring [esc]])
+  | OpLike p -> STerm ("OpLike",[coq_string_to_sstring p])
   | OpCast bl -> STerm ("OpCast", dbrands_to_sexp bl)
   | OpUnbrand -> STerm ("OpUnbrand",[])
   | OpSingleton -> STerm ("OpSingleton",[])
@@ -308,9 +307,7 @@ let sexp_to_unary_op (se:sexp) : unary_op =
   | STerm ("OpLength",[]) -> OpLength
   | STerm ("OpSubstring",[SInt n1]) -> OpSubstring (n1,None)
   | STerm ("OpSubstring",[SInt n1;SInt n2]) -> OpSubstring (n1,Some n2)
-  | STerm ("OpLike",[p]) -> OpLike (sstring_to_coq_string p,None)
-  | STerm ("OpLike",[p;SString esc]) ->
-     OpLike (sstring_to_coq_string p,Some (esc.[0]))
+  | STerm ("OpLike",[p]) -> OpLike (sstring_to_coq_string p)
   | STerm ("OpCast", bl) -> OpCast (sexp_to_dbrands bl)
   | STerm ("OpUnbrand",[]) -> OpUnbrand
   | STerm ("OpSingleton",[]) -> OpSingleton

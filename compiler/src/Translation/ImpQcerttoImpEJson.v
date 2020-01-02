@@ -169,8 +169,8 @@ Section ImpQcerttoImpEJson.
             let args := [ e; start ] in
             mk_imp_ejson_runtime_call EJsonRuntimeSubstringEnd args
           end
-        | OpLike pat oescape =>
-          mk_imp_ejson_expr_error "XXX TODO: ImpQcerttoImpEJson: OpLike XXX"
+        | OpLike pat =>
+          mk_imp_ejson_runtime_call EJsonRuntimeLike [ ImpExprConst (ejstring pat); e ]
         | OpLeft => mk_left e
         | OpRight => mk_right e
         | OpBrand b =>
@@ -583,7 +583,7 @@ Section ImpQcerttoImpEJson.
         + rewrite <- H. destruct (imp_qcert_expr_eval h σ i); try reflexivity. simpl.
           destruct d; reflexivity.
       - Case "OpLike"%string.
-        admit. (* XXX Not implemented *)
+        destruct d; simpl; trivial.
       - Case "OpBrand"%string.
         rewrite of_string_list_map_ejstring; simpl.
         reflexivity.

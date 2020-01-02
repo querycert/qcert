@@ -210,7 +210,7 @@ oql-employees-tests-java:
                           employees$(N) || exit 1;)
 
 ## λ-NRA
-LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7 8 9
+LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7 8 9 10
 LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert imp_ejson # dnnrc_typed
 
 lambda_nra-tests:
