@@ -104,15 +104,15 @@ Section ImpEJsonEval.
       | EJsonRuntimeRecConcat =>
         apply_binary
           (fun d1 d2 =>
-             match d1, d2 with
-             | (ejobject r1), (ejobject r2) => Some (ejobject (rec_sort (r1++r2)))
+             match ejson_is_record d1, ejson_is_record d2 with
+             | Some r1, Some r2 => Some (ejobject (rec_sort (r1++r2)))
              | _, _ => None
              end) dl
       | EJsonRuntimeRecMerge =>
         apply_binary
           (fun d1 d2 =>
-             match d1, d2 with
-             | (ejobject r1), (ejobject r2) =>
+             match ejson_is_record d1, ejson_is_record d2 with
+             | Some r1, Some r2 =>
                match @merge_bindings ejson _ ejson_eq_dec r1 r2 with
                | Some x => Some (ejarray ((ejobject x) :: nil))
                | None => Some (ejarray nil)
@@ -301,7 +301,20 @@ Section ImpEJsonEval.
              | _, _ => None
              end
           ) dl
-      | EJsonRuntimeNth => None (* XXX TODO *)
+      | EJsonRuntimeNth =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | (ejarray c), (ejbigint n) =>
+               let natish := ZToSignedNat n in
+               if (fst natish) then
+                 match List.nth_error c (snd natish) with
+                 | Some d => Some (ejobject (("$left",d)::nil))
+                 | None => Some (ejobject (("$right",ejnull)::nil))
+                 end
+               else Some (ejobject (("$right",ejnull)::nil))
+             | _, _ => None
+             end) dl
       | EJsonRuntimeCount =>
         apply_unary
           (fun d =>
@@ -309,7 +322,15 @@ Section ImpEJsonEval.
              | ejarray l => Some (ejbigint (Z_of_nat (bcount l)))
              | _ => None
              end) dl
-      | EJsonRuntimeContains => None (* XXX TODO *)
+      | EJsonRuntimeContains =>
+        apply_binary
+          (fun d1 d2 =>
+             match d2 with
+             | ejarray l =>
+               if in_dec ejson_eq_dec d1 l
+               then Some (ejbool true) else Some (ejbool false)
+             | _ => None
+             end) dl
       | EJsonRuntimeSort => None (* XXX TODO *)
       | EJsonRuntimeGroupBy => None (* XXX TODO *)
       (* String *)

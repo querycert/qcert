@@ -96,8 +96,8 @@ Section BinaryOperatorsSem.
         let natish := ZToSignedNat n in
         if (fst natish) then
           match List.nth_error c (snd natish) with
-          | None => Some dnone
           | Some d => Some (dsome d)
+          | None => Some dnone
           end
         else Some dnone
       | _, _ => None
