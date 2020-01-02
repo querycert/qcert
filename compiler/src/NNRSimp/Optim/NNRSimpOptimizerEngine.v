@@ -26,7 +26,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NNRSimpSystem.
 
 Section NNRSimpOptimizerEngine.

@@ -20,12 +20,16 @@ Require Import String.
 Require Import EquivDec.
 Require Import Types.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import ForeignDataTyping.
+Require Import EJsonRuntime.
+Require Import ForeignDataToEJson.
+Require Import DatatoEJson.
 
 Section DatatoSparkDF.
 
-  Context {f:foreign_runtime}.
+  Context {fruntime:foreign_runtime}.
+  Context {fdatatoejson:foreign_to_ejson}.
   Context {h:brand_relation_t}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.

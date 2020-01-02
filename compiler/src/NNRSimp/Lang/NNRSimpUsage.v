@@ -22,7 +22,7 @@ Require Import Program.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NNRSimp.
 Require Import NNRSimpVars.
 Require Import NNRSimpEval.

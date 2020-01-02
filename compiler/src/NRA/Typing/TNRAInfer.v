@@ -21,7 +21,7 @@ Require Import Eqdep_dec.
 Require Import Bool.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NRA.
 Require Import TNRA.
 Require Import Program.

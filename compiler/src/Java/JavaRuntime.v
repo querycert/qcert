@@ -14,6 +14,5 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
 Require Export Java.
 

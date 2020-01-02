@@ -19,7 +19,7 @@ Require Import List.
 Require Import Sorting.Mergesort.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import NNRCSystem.

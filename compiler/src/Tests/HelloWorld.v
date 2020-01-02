@@ -16,8 +16,8 @@ Require Import String.
 Require Import List.
 Require Import Qcert.Compiler.Driver.CompLang.
 Require Import Qcert.Compiler.EnhancedCompiler.
-Require Import Qcert.Common.DataModel.Data.
-Require Import Qcert.Common.Operators.BinaryOperators.
+Require Import Qcert.Data.Model.Data.
+Require Import Qcert.Data.Operators.BinaryOperators.
 Require Import Qcert.NRAEnv.Lang.NRAEnv.
 
 Section HelloWorld.

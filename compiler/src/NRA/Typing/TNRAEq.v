@@ -21,7 +21,7 @@ Require Import EquivDec.
 Require Import Program.
 Require Import List.
 Require Import String.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NRA.
 Require Import NRAEq.
 Require Import TNRA.

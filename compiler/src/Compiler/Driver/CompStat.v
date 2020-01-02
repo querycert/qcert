@@ -40,13 +40,14 @@ Require Import DNNRCRuntime.
 Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
 (** Target languages *)
+Require Import ForeignDataToEJson.
+Require Import DatatoEJson.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
 
 Require Import CompilerRuntime.
-Require Import CommonSystem.
 
 Require Import OptimizerLogger.
 Require Import CompLang.
@@ -59,7 +60,7 @@ Section CompStat.
   Local Open Scope list_scope.
 
   Context {ft:foreign_type}.
-  Context {fr:foreign_runtime}.
+  Context {fruntime:foreign_runtime}.
   Context {ftejson:foreign_to_ejson}.
   Context {bm:brand_model}.
   Context {nraenv_core_logger:optimizer_logger string nraenv_core}.

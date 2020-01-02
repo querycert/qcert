@@ -14,7 +14,8 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
+Require Export DataRuntime.
+Require Export EJsonRuntime.
 Require Export Imp.
 Require Export ImpQcert.
 Require Export ImpEJson.

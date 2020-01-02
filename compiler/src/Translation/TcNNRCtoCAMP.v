@@ -24,7 +24,7 @@ Require Import EquivDec.
 Require Import Eqdep_dec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import cNNRCSystem.
 Require Import CAMPSystem.
 Require Import cNNRCtoCAMP.

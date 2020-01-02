@@ -22,7 +22,7 @@ Require Import ListSet.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import cNNRCSystem.
 Require Import NNRCSystem.
 Require Import NNRCRewriteUtil.

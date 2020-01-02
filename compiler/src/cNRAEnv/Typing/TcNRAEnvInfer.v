@@ -23,7 +23,7 @@ Require Import Eqdep_dec.
 Require Import Bool.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import cNRAEnv.
 Require Import TcNRAEnv.
 Require Import Program.

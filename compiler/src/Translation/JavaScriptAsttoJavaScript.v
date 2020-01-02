@@ -19,7 +19,6 @@ Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonRuntime.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JsAst.JsNumber.

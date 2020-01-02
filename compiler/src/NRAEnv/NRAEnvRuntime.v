@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
+Require Export DataRuntime.
 Require Export cNRAEnvRuntime. (* Always include core support *)
 Require Export NRAEnv.
 Require Export NRAEnvSize.

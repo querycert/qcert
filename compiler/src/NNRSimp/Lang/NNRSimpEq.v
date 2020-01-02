@@ -23,7 +23,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NNRSimp.
 Require Import NNRSimpNorm.
 Require Import NNRSimpEval.

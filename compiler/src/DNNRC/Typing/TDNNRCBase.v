@@ -21,7 +21,7 @@ Require Import Program.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import DNNRCBase.
 
 Section TDNNRCBase.

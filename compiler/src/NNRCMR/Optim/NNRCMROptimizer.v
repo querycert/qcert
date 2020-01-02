@@ -25,7 +25,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import cNNRCSystem.
 Require Import NNRCOptim.
 Require Import OptimizerLogger.

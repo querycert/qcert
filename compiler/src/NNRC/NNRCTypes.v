@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export CommonTypes.
+Require Export DataTypes.
 Require Export cNNRCTypes. (* Always include core support *)
 Require Export TNNRC.
 Require Export TNNRCEq.

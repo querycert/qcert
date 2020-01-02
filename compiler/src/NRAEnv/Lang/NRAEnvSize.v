@@ -15,7 +15,7 @@
  *)
 
 Require Import Omega.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRAEnv.
 
 Section NRAEnvSize.

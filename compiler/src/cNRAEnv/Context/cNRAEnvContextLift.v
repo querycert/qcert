@@ -28,7 +28,7 @@ Require Import String.
 Require Import NPeano.
 Require Import Arith.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRARuntime.
 Require Import NRAOptim.
 Require Import cNRAEnv.

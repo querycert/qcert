@@ -14,6 +14,6 @@
  * limitations under the License.
  *)
 
-Require Export CommonTypes.
+Require Export DataTypes.
 Require Export TCAMPRule.
 

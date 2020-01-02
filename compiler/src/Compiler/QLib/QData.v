@@ -67,6 +67,7 @@ Module QData(runtime:CompilerRuntime).
   
   (** JSON -> data conversion *)
   (* Note: make sure to normalize input data *)
+
   Definition json_to_qdata br (j:JSON.json) : qdata
     := DataNorm.normalize_data br (DatatoEJson.ejson_to_data (EJson.json_to_ejson j)).
 

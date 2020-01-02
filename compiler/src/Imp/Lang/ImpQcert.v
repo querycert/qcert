@@ -18,40 +18,40 @@
 
 Require Import String.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import Imp.
 
-Section Syntax.
-
+Section ImpQcert.
   Context {fruntime:foreign_runtime}.
+  Section Syntax.
 
-  Definition imp_qcert_data := data.
+    Definition imp_qcert_data := data.
 
-  Inductive imp_qcert_op :=
-  | QcertOpUnary : unary_op -> imp_qcert_op
-  | QcertOpBinary : binary_op -> imp_qcert_op
-  .
+    Inductive imp_qcert_op :=
+    | QcertOpUnary : unary_op -> imp_qcert_op
+    | QcertOpBinary : binary_op -> imp_qcert_op
+    .
 
-  Inductive imp_qcert_runtime_op :=
-  | QcertRuntimeGroupby : string -> list string -> imp_qcert_runtime_op
-  | QcertRuntimeEither : imp_qcert_runtime_op
-  | QcertRuntimeToLeft : imp_qcert_runtime_op
-  | QcertRuntimeToRight : imp_qcert_runtime_op
-  .
+    Inductive imp_qcert_runtime_op :=
+    | QcertRuntimeGroupby : string -> list string -> imp_qcert_runtime_op
+    | QcertRuntimeEither : imp_qcert_runtime_op
+    | QcertRuntimeToLeft : imp_qcert_runtime_op
+    | QcertRuntimeToRight : imp_qcert_runtime_op
+    .
 
-  Definition imp_qcert_expr := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
-  Definition imp_qcert_stmt := @imp_stmt imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
-  Definition imp_qcert_function := @imp_function imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
-  Definition imp_qcert := @imp imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
-End Syntax.
+    Definition imp_qcert_expr := @imp_expr imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+    Definition imp_qcert_stmt := @imp_stmt imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+    Definition imp_qcert_function := @imp_function imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+    Definition imp_qcert := @imp imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
+  End Syntax.
 
-Section Env.
-  Context {fruntime:foreign_runtime}.
+  Section Env.
 
-  (* bindings that may or may not be initialized (defined) *)
-  Definition pd_bindings := list (string*option data).
+    (* bindings that may or may not be initialized (defined) *)
+    Definition pd_bindings := list (string*option data).
 
-End Env.
+  End Env.
+End ImpQcert.
 
 Tactic Notation "imp_qcert_runtime_op_cases" tactic(first) ident(c) :=
   first;

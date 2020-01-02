@@ -20,7 +20,7 @@ Require Import Ascii.
 Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NNRCRuntime.
 Require Import ForeignToJava.
 

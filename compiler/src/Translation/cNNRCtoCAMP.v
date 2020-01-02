@@ -25,7 +25,7 @@ Require Import Permutation.
 Require Import Eqdep_dec.
 Require Import Omega.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import CAMPRuntime.
 Require Import cNNRCRuntime.
 Require Import NNRCSize.

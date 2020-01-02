@@ -26,7 +26,7 @@ Require Import Program.
 Require Import Arith.
 Require Import List.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRARuntime.
 Require Import cNRAEnvRuntime.
 Require Import NRAContext.

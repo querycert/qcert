@@ -22,7 +22,6 @@ Require Import ZArith.
 (* Common *)
 Require Import Utils.
 
-Require Import CommonSystem.
 Require Import TypingRuntime.
 Require Import ForeignReduceOps.
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export CommonRuntime.
+Require Export DataRuntime.
 Require Export NNRS.
 Require Export NNRSSize.
 Require Export NNRSVars.

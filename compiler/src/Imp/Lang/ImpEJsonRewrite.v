@@ -22,18 +22,16 @@ Require Import List.
 Require Import Bool.
 Require Import Arith.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import JsAst.JsNumber.
+Require Import EJsonRuntime.
 Require Import Imp.
 Require Import ImpEJson.
 Require Import ImpEJsonEval.
-Require Import JsAst.JsNumber.
-Require Import Fresh.
 
 Section ImpEJsonRewrite.
   Import ListNotations.
 
-  Context {fruntime:foreign_runtime}.
-  Context {ftejson:foreign_to_ejson}.
+  Context {fejson:foreign_ejson}.
 
   Section ForRewrite.
     (* Rewriting functional for into imperative for loop is now isolated *)
@@ -76,14 +74,14 @@ Section ImpEJsonRewrite.
       end.
   End ForRewrite.
 
-    Section CorrectnessForRewrite.
-      Lemma imp_ejson_stmt_for_rewrite_correct h (σ : pd_jbindings) (stmt:imp_ejson_stmt) :
-        forall avoid,
-          imp_ejson_stmt_eval h stmt σ =
-          imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite avoid stmt)  σ.
-      Proof.
-        admit.
-      Admitted.
-    End CorrectnessForRewrite.
-    
+  Section CorrectnessForRewrite.
+    Lemma imp_ejson_stmt_for_rewrite_correct h (σ : pd_jbindings) (stmt:imp_ejson_stmt) :
+      forall avoid,
+        imp_ejson_stmt_eval h stmt σ =
+        imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite avoid stmt)  σ.
+    Proof.
+      admit.
+    Admitted.
+  End CorrectnessForRewrite.
+
 End ImpEJsonRewrite.

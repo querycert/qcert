@@ -20,7 +20,6 @@ Require Import Morphisms.
 
 (* Common libraries *)
 Require Import Utils.
-Require Import CommonSystem.
 Require Import TypingRuntime.
 
 (* Query languages *)
@@ -94,6 +93,7 @@ Require Import NNRSimpOptim.
 Require Import OptimizerLogger.
 
 (* Foreign Datatypes Support *)
+Require Import ForeignDataToEJson.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignToJava.
@@ -111,7 +111,8 @@ Section CompDriver.
 
   (* Context *)
   Context {ft:foreign_type}.
-  Context {fr:foreign_runtime}.
+  Context {fruntime:foreign_runtime}.
+  Context {ftejson:foreign_to_ejson}.
   Context {fredop:foreign_reduce_op}.
   Context {ftoredop:foreign_to_reduce_op}.
   Context {bm:brand_model}.
@@ -121,11 +122,10 @@ Section CompDriver.
   Context {nnrs_imp_expr_logger:optimizer_logger string nnrs_imp_expr}.
   Context {nnrs_imp_stmt_logger:optimizer_logger string nnrs_imp_stmt}.
   Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
-  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
+  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base _ (type_annotation unit) dataframe)}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
-  Context {ftejson:foreign_to_ejson}.
   Context {ftjsast:foreign_ejson_to_ajavascript}.
 
   Section translations.
@@ -242,7 +242,7 @@ Section CompDriver.
 
     Definition dnnrc_typed_to_spark_df
                (tenv:tdbindings) (name:string) (q:dnnrc_typed) : spark_df :=
-      @dnnrc_typed_to_spark_df_top _ _ bm _ unit tenv name q.
+      @dnnrc_typed_to_spark_df_top _ _ _ bm _ unit tenv name q.
 
   End translations.
 

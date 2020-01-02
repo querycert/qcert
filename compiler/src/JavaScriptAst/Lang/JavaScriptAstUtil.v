@@ -14,7 +14,6 @@
 
 Require Import List.
 Require Import Utils.
-Require Import CommonRuntime.
 Require Import JsAst.JsSyntax.
 Require Import JavaScriptAst.
 
@@ -43,23 +42,6 @@ Section JavaScriptAstUtil.
       (List.map
          (fun s => Some (expr_literal (literal_string s)))
          sl).
-
-  Definition sortCriteria_to_js_ast (sc: string * SortDesc) :=
-    let (lbl, c) := sc in
-    match c with
-    | Ascending =>
-      expr_object
-        [ (propname_identifier "asc", propbody_val (expr_literal (literal_string lbl))) ]
-    | Descending =>
-      expr_object
-        [ (propname_identifier "desc", propbody_val (expr_literal (literal_string lbl))) ]
-    end.
-
-  Definition sortCriterias_to_js_ast (scl: SortCriterias) :=
-    expr_array
-      (List.map
-         (fun sc => Some (sortCriteria_to_js_ast sc))
-         scl).
 
   Definition call_js_function (f: string) (args: list expr) : expr:= (* TODO: review *)
     expr_call (expr_identifier f) args.

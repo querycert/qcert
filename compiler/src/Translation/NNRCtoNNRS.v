@@ -23,7 +23,7 @@ Require Import Morphisms.
 Require Import Permutation.
 Require Import Eqdep_dec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import cNNRC.
 Require Import NNRC.
 Require Import NNRCEq.
@@ -1063,7 +1063,7 @@ Section NNRCtoNNRS.
 
   Theorem nnrc_to_nnrs_top_correct
           h σc (s:nnrc) (globals:list var) :
-    @nnrc_eval_top _ h s σc = nnrs_eval_top h σc (nnrc_to_nnrs_top globals s).
+    nnrc_eval_top h s σc = nnrs_eval_top h σc (nnrc_to_nnrs_top globals s).
   Proof.
     unfold nnrc_to_nnrs_top, stratified_nnrc_stmt_to_nnrs.
     destruct ((nnrc_stmt_to_nnrs_stmt_stratified_some
@@ -1190,7 +1190,7 @@ Section NNRCtoNNRS.
 
     Theorem nnrc_core_to_nnrs_core_correct
           h σc (s:nnrc_core) (globals:list var) :
-    @nnrc_core_eval_top _ h s σc = nnrs_core_eval_top h σc (nnrc_core_to_nnrs_core_top globals s).
+    nnrc_core_eval_top h s σc = nnrs_core_eval_top h σc (nnrc_core_to_nnrs_core_top globals s).
     Proof.
       destruct s as [q pf].
       generalize (nnrc_to_nnrs_top_correct h σc q globals); intros HH.

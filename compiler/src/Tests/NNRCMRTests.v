@@ -23,7 +23,7 @@ Local Open Scope string.
 Require Import List.
 Import ListNotations.
 
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import CAMPRuntime.
 Require Import CAMPRuleRuntime.
 Require Import TrivialModel.

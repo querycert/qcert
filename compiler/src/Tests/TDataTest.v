@@ -25,7 +25,7 @@ Import ListNotations.
 
 Require Import Utils.
 Require Import CAMPTest.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import TrivialModel.
 Require Import Program.
 Require Import TCAMPTest.

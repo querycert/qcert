@@ -17,7 +17,7 @@
 Require Import String.
 Require Import List.
 Require Import Compare_dec.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NRAExt.
 Require Import TNRA.
 

@@ -20,7 +20,7 @@ Require Import Morphisms.
 
 (* Common libraries *)
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import TypingRuntime.
 
 (* Query languages *)
@@ -90,6 +90,7 @@ Require Import OptimizerLogger.
 
 
 (* Foreign Datatypes Support *)
+Require Import ForeignDataToEJson.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignToJava.
@@ -109,7 +110,8 @@ Section CompCorrectness.
 
   (* Context *)
   Context {ft:foreign_type}.
-  Context {fr:foreign_runtime}.
+  Context {fruntime:foreign_runtime}.
+  Context {ftejson:foreign_to_ejson}.
   Context {fredop:foreign_reduce_op}.
   Context {ftoredop:foreign_to_reduce_op}.
   Context {bm:brand_model}.
@@ -121,11 +123,10 @@ Section CompCorrectness.
   Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
   Context {imp_qcert_logger:optimizer_logger string imp_qcert}.
   Context {imp_ejson_logger:optimizer_logger string imp_ejson}.
-  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
+  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base _ (type_annotation unit) dataframe)}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
-  Context {ftejson:foreign_to_ejson}.
   Context {ftjsast:foreign_ejson_to_ajavascript}.
 
   (** Note: All stops are assumed correct (i.e., not moving does not change semantics) *)
@@ -1202,6 +1203,7 @@ Section CompCorrectness.
       unfold eval_nnrs_imp.
       unfold nnrs_to_nnrs_imp.
       rewrite <- nnrs_to_nnrs_imp_top_correct.
+      unfold nnrc_to_nnrs.
       rewrite <- nnrc_to_nnrs_top_correct.
       reflexivity.
     Qed.

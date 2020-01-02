@@ -28,7 +28,7 @@ Require Import EquivDec.
 Require Import Equivalence.
 Require Import Program.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NNRSimpSystem.
 Require Import NNRSimpUnflatten.
 

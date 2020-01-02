@@ -20,7 +20,7 @@ Require Import EquivDec.
 Require Import Omega.
 Require Import Compare_dec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import cNRAEnvRuntime.
 Require Import cNNRCRuntime.
 Require Import NNRC.

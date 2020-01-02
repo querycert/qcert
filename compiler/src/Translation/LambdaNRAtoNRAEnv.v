@@ -20,7 +20,7 @@ Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import LambdaNRARuntime.
 Require Import NRAEnvRuntime.
 

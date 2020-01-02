@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export CommonTypes.
+Require Export DataTypes.
 Require Export cNRAEnvTypes. (* Always include core support *)
 Require Export TNRAEnv.
 Require Export TNRAEnvEq.
