@@ -321,6 +321,107 @@ Section JSON.
       - auto.
     Qed.
 
+    Lemma match_one_dollar_character a s0:
+      exists b s,
+        match a with
+        | "$"%char => String "$" (String "$" s0)
+        | _ => String a s0
+        end = String b s.
+    Proof.
+      specialize (ascii_dec a "$"%char); intros.
+      elim H; intros.
+      rewrite a0.
+      - exists "$"%char.  exists (String "$" s0); reflexivity.
+      - exists a. exists s0.
+        rewrite (match_not_dollar a s0 b).
+        reflexivity.
+    Qed.
+        
+    Lemma json_key_encode_lt s s0:
+      StringOrder.lt s s0 -> StringOrder.lt (json_key_encode s) (json_key_encode s0).
+    Proof.
+      revert s0.
+      induction s; destruct s0; intros; simpl.
+      - auto.
+      - unfold StringOrder.lt, StringOrder.compare in *.
+        elim (match_one_dollar_character a s0); intros.
+        elim H0; clear H0; intros.
+        rewrite H0.
+        reflexivity.
+      - inversion H.
+      - inversion H; clear H.
+        specialize (ascii_dec a "$"%char); specialize (ascii_dec a0 "$"%char); intros.
+        elim H; clear H; elim H0; clear H0; intros.
+        + rewrite a1 in *; rewrite a2 in *.
+          inversion H1.
+          auto.
+        + rewrite a1 in *.
+          rewrite (match_not_dollar a s b).
+          case_eq (AsciiOrder.compare a "$"); intros; rewrite H in H1.
+          * rewrite AsciiOrder.compare_eq_iff in H; congruence.
+          * unfold StringOrder.lt; simpl. rewrite H. assumption.
+          * congruence.
+        + rewrite a1 in *.
+          rewrite (match_not_dollar a0 s0 b).
+          case_eq (AsciiOrder.compare "$" a0); intros; rewrite H in H1.
+          * rewrite AsciiOrder.compare_eq_iff in H; congruence.
+          * unfold StringOrder.lt; simpl; rewrite H; assumption.
+          * congruence.
+        + rewrite (match_not_dollar a s b).
+          rewrite (match_not_dollar a0 s0 b0).
+          case_eq (AsciiOrder.compare a a0); intros; rewrite H in H1.
+          unfold StringOrder.lt; simpl. rewrite H. assumption.
+          unfold StringOrder.lt; simpl. rewrite H. assumption.
+          congruence.
+    Qed.
+
+    Lemma json_key_encode_lt_inv s s0:
+      StringOrder.lt (json_key_encode s) (json_key_encode s0) -> StringOrder.lt s s0.
+    Proof.
+      revert s0.
+      induction s; destruct s0; intros; simpl.
+      - auto.
+      - unfold StringOrder.lt, StringOrder.compare in *.
+        reflexivity.
+      - inversion H.
+        specialize (ascii_dec a "$"%char); intros.
+        elim H0; clear H0; intros.
+        + rewrite a0 in H1; simpl in H1; congruence.
+        + rewrite (match_not_dollar a s b) in H1; assumption.
+      - inversion H; clear H.
+        specialize (ascii_dec a "$"%char); specialize (ascii_dec a0 "$"%char); intros.
+        elim H; clear H; elim H0; clear H0; intros.
+        + rewrite a1 in *; rewrite a2 in *.
+          inversion H1.
+          unfold StringOrder.lt; simpl; assumption.
+        + rewrite a1 in *.
+          rewrite (match_not_dollar a s b) in H1.
+          inversion H1.
+          case_eq (AsciiOrder.compare a "$"); intros; rewrite H in H0.
+          * rewrite AsciiOrder.compare_eq_iff in H; congruence.
+          * unfold StringOrder.lt; simpl; rewrite H; assumption.
+          * congruence.
+        + rewrite a1 in *.
+          rewrite (match_not_dollar a0 s0 b) in H1.
+          inversion H1.
+          case_eq (AsciiOrder.compare "$" a0); intros; rewrite H in H0.
+          * rewrite AsciiOrder.compare_eq_iff in H; congruence.
+          * unfold StringOrder.lt; simpl; rewrite H; assumption.
+          * congruence.
+        + rewrite (match_not_dollar a s b) in H1.
+          rewrite (match_not_dollar a0 s0 b0) in H1.
+          unfold StringOrder.lt.
+          assumption.
+    Qed.
+
+    Lemma json_key_encode_lt_idem s s0:
+      StringOrder.lt s s0 <-> StringOrder.lt (json_key_encode s) (json_key_encode s0).
+    Proof.
+      split.
+      - apply json_key_encode_lt.
+      - apply json_key_encode_lt_inv.
+    Qed.
+
   End Encode.
 
 End JSON.

@@ -556,8 +556,7 @@ Section ImpQcerttoImpEJson.
       - Case "OpNeg"%string.
         destruct d; try reflexivity.
       - Case "OpDot"%string.
-        unfold edot.
-        apply assoc_lookupr_json_key_encode_comm.
+        apply edot_json_key_encode_comm.
       - Case "OpRecRemove"%string.
         apply rremove_json_key_encode_comm.
       - Case "OpRecProject"%string.
@@ -720,9 +719,9 @@ Section ImpQcerttoImpEJson.
         + congruence.
         + apply data_to_ejson_inv in e; congruence.
       - Case "OpRecConcat"%string.
-        admit.
+        apply rconcat_json_key_encode_comm.
       - Case "OpRecMerge"%string.
-        admit.
+        apply rmerge_json_key_encode_comm.
       - Case "OpAnd"%string.
         destruct d; destruct d0; reflexivity.
       - Case "OpOr"%string.
@@ -747,9 +746,17 @@ Section ImpQcerttoImpEJson.
       - Case "OpBagMax"%string.
         admit.
       - Case "OpBagNth"%string.
-        admit. (* XXX Not implemented *)
+        destruct d; destruct d0; simpl; try reflexivity.
+        destruct (fst (ZToSignedNat z)); try reflexivity.
+        rewrite <- nth_error_to_ejson_comm; simpl.
+        destruct (nth_error l (snd (ZToSignedNat z))); reflexivity.
       - Case "OpContains"%string.
-        admit. (* XXX Not implemented *)
+        unfold ondcoll, lift; simpl.
+        destruct d0; simpl; try reflexivity.
+        destruct (in_dec data_eq_dec d l); destruct (in_dec ejson_eq_dec (data_to_ejson d) (map data_to_ejson l));
+          try reflexivity; simpl.
+        + rewrite <- in_data_to_ejson_comm in i1; congruence.
+        + rewrite in_data_to_ejson_comm in i1; congruence.
       - Case "OpStringConcat"%string.
         destruct d; destruct d0; reflexivity.
       - Case "OpStringJoin"%string.
@@ -780,7 +787,16 @@ Section ImpQcerttoImpEJson.
                 try reflexivity; simpl; unfold unlift_result, lift; simpl;
                   destruct d; destruct d0; try reflexivity.
       - Case "OpFloatCompare"%string.
-        admit.
+        destruct f;
+          simpl;
+          rewrite <- H2; clear H2;
+            destruct (imp_qcert_expr_eval h σ i);
+            try reflexivity; simpl; unfold unlift_result, lift; simpl;
+              try (destruct n);
+              rewrite <- H3; clear H3;
+                destruct (imp_qcert_expr_eval h σ i0);
+                try reflexivity; simpl; unfold unlift_result, lift; simpl;
+                  destruct d; destruct d0; try reflexivity.
       - Case "OpForeignBinary"%string.
         admit.
       Transparent ejson_to_data.
