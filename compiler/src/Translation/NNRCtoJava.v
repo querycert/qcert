@@ -290,9 +290,9 @@ Section NNRCtoJava.
 
     Definition like_clause_to_java (lc:like_clause)
       := match lc with
-         | like_literal literal => "new UnaryOperator.LiteralLikeClause(" ++ (mk_java_string literal) ++ ")"
-         | like_any_char => "new UnaryOperator.AnyCharLikeClause()"
-         | like_any_string => "new UnaryOperator.AnyStringLikeClause()"
+         | like_literal literal => "new UnaryOperators.LiteralLikeClause(" ++ (mk_java_string literal) ++ ")"
+         | like_any_char => "new UnaryOperators.AnyCharLikeClause()"
+         | like_any_string => "new UnaryOperators.AnyStringLikeClause()"
          end.
     
     Fixpoint nnrcToJava
@@ -337,9 +337,9 @@ Section NNRCtoJava.
                        | Some len => mk_java_unary_opn "substring" (map toString [start; len]) e1
                        | None => mk_java_unary_op1 "substring" (toString start) e1
                        end
-                     | OpLike pat oescape =>
-                       let lc := make_like_clause pat oescape in
-                       mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (map_concat "," like_clause_to_java lc) ++ "}") e1
+                     | OpLike pat =>
+                       let lc := make_like_clause pat None in
+                       mk_java_unary_op1 "string_like" ("new UnaryOperators.LikeClause[]{" ++ (map_concat "," like_clause_to_java lc) ++ "}") e1
                      | OpLeft => mk_java_unary_op0 "left" e1
                      | OpRight => mk_java_unary_op0 "right" e1
                      | OpBrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1

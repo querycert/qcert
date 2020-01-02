@@ -276,6 +276,17 @@ Section EJson.
       | _ => None
       end.
 
+    Fixpoint ejson_strings (d:list ejson) : option (list string) :=
+      match d with
+      | nil => Some nil
+      | (ejstring n) :: d' =>
+        match ejson_strings d' with
+        | Some s' => Some (n::s')
+        | None => None
+        end
+      | _ => None
+      end.
+
     Definition jflatten (d:list ejson) : option (list ejson) :=
       lift_flat_map (fun x =>
                        match x with

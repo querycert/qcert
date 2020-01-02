@@ -445,10 +445,7 @@ uop:
 | ASUBSTRING LPAREN s = INT COMMA len = INT RPAREN
   { QOps.Unary.opsubstring s (Some len) }
 | ALIKE LPAREN s = STRING RPAREN
-  { QOps.Unary.oplike (char_list_of_string s) None }
-(* This should really be a CHAR escape character, but I don't know how to do that *)
-| ALIKE LPAREN s = STRING ESCAPE esc = STRING RPAREN
-    { QOps.Unary.oplike (char_list_of_string s) (Some (esc.[0])) }
+  { QOps.Unary.oplike (char_list_of_string s) }
 | ANUMMIN
     { QOps.Unary.opnatmin }
 | ANUMMAX

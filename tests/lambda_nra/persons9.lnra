@@ -1,4 +1,4 @@
-/* Example of simple filter */
+/* Example of simple map */
 
 Persons.map{ p => p.name }
 

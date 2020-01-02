@@ -86,7 +86,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPGe  e1 e2
   		=> NRAEnvBinop OpLe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
   	| SPLike  e s
-  		=> NRAEnvUnop (OpLike s None) (sqlpp_to_nraenv e)
+  		=> NRAEnvUnop (OpLike s) (sqlpp_to_nraenv e)
   	| SPAnd  e1 e2
   		=> NRAEnvBinop OpAnd (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPOr  e1 e2

@@ -64,8 +64,7 @@ Section UnaryOperators.
   | OpToText : unary_op                               (**r unspecified conversion from any data to a string *)
   | OpLength : unary_op                               (**r the length of a string *)
   | OpSubstring : Z -> option Z -> unary_op           (**r returns the substring starting with the nth character, for m characters (or the rest of the string) *)
-  | OpLike (pattern:string)
-              (escape:option ascii) : unary_op        (**r like expression (as in sql) *)
+  | OpLike (pattern:string) : unary_op                (**r like expression (as in sql) *)
   | OpLeft : unary_op                                 (**r create a left value *)
   | OpRight : unary_op                                (**r create a right value *)
   | OpBrand : brands -> unary_op                      (**r brands a value *)
@@ -116,7 +115,6 @@ Section UnaryOperators.
     - apply option_eqdec.
     - apply Z_eqdec.
     - apply equiv_dec.
-    - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
     - apply nat_arith_unary_op_eqdec.
     - apply float_arith_unary_op_eqdec.
@@ -191,13 +189,8 @@ Section UnaryOperators.
                                      | Some len => " " ++ (toString len)
                                      end
                                     ) ++ ")"
-            | OpLike pattern oescape =>
-              "(OpLike " ++ pattern
-                            ++ (match oescape with
-                                | None => ""
-                                | Some escape => " ESCAPE " ++ (String escape EmptyString)
-                                end
-                               ) ++ ")"
+            | OpLike pattern =>
+              "(OpLike " ++ pattern ++ ")"
             | OpLeft => "OpLeft"
             | OpRight => "OpRight"
             | OpBrand b => "(OpBrand " ++ (@toString _ ToString_brands b)++ ")"

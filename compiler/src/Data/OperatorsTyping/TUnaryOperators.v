@@ -81,8 +81,8 @@ Section TUnaryOperators.
         unary_op_type OpLength String Nat
     | type_OpSubstring start olen:
         unary_op_type (OpSubstring start olen) String String
-    | type_OpLike pat oescape:
-        unary_op_type (OpLike pat oescape) String Bool
+    | type_OpLike pat:
+        unary_op_type (OpLike pat) String Bool
     | type_OpLeft τl τr:
         unary_op_type OpLeft τl (Either τl τr)
     | type_OpRight τl τr:

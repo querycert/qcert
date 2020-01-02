@@ -216,9 +216,9 @@ Section tDNNRCtoSparkDF.
           | Some len => ", " ++ toString len
           | None => ""
           end ++ ")"
-    | OpLike pat oescape =>
+    | OpLike pat =>
       "ALike currently implemented.  Please implement as in the java backend"
-(*      let lc := make_like_clause pat oescape in
+(*      let lc := make_like_clause pat None in
       mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (joinStrings "," (map like_clause_to_scala lc)) ++ "}") e1
 *)
     | OpLeft => prefix "left"

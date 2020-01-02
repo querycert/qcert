@@ -51,6 +51,12 @@
     | _ -> raise Not_found
     end
     
+  let static_string e =
+    begin match e with
+    | Compiler.LNRAConst (Compiler.Dstring s) -> s
+    | _ -> raise Not_found
+    end
+    
   let resolve_call fname el =
     begin match fname,el with
     | "not", [e] ->
@@ -79,6 +85,15 @@
 	      QLambdaNRA.labinop QOps.Binary.opbagnth e1 e2
     | "stringJoin", [e1;e2] ->
 	      QLambdaNRA.labinop QOps.Binary.opstringjoin e1 e2
+    | "like", [e1;e2] ->
+	      let pat =
+	        begin try static_string e1 with
+	        | Not_found ->
+	            raise (Qcert_Error
+		                   ("First parameter of like should be a string constant"))
+	        end
+	      in
+	      QLambdaNRA.launop (QOps.Unary.oplike pat) e2
     | "substring", [e1;e2] ->
 	      let start =
 	        begin try static_int e2 with
