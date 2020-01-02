@@ -118,6 +118,17 @@ Section ImpQcerttoImpEJson.
     Proof.
       destruct d; try reflexivity.
     Qed.
+
+    Lemma ejson_lifted_fbag_comm l:
+      lifted_fbag l =
+      ejson_numbers (map data_to_ejson l).
+    Proof.
+      induction l; simpl; try reflexivity.
+      unfold lifted_fbag in *; simpl.
+      rewrite IHl; simpl; clear IHl.
+      destruct a; reflexivity.
+    Qed.
+
   End Util.
 
   Section Translation.
@@ -622,9 +633,15 @@ Section ImpQcerttoImpEJson.
       - Case "OpFloatTruncate"%string.
         destruct d; reflexivity.
       - Case "OpFloatSum"%string.
-        admit.
+        destruct d; try reflexivity; simpl.
+        unfold lifted_fsum, lift; simpl.
+        rewrite <- ejson_lifted_fbag_comm.
+        destruct (lifted_fbag l); reflexivity.
       - Case "OpFloatMean"%string.
-        admit.
+        destruct d; try reflexivity; simpl.
+        unfold lifted_farithmean, lift; simpl.
+        rewrite <- ejson_lifted_fbag_comm.
+        destruct (lifted_fbag l); try reflexivity.
       - Case "OpFloatBagMin"%string.
         admit.
       - Case "OpFloatBagMax"%string.

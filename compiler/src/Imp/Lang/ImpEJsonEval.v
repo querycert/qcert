@@ -145,7 +145,7 @@ Section ImpEJsonEval.
                end
              | _ => None
              end) dl
-      | EJsonRuntimeRecDot => (* XXX the one in qcert-runtime is a lot more complex *)
+      | EJsonRuntimeRecDot =>
         apply_binary
           (fun d1 d2 =>
              match ejson_is_record d1 with
@@ -464,10 +464,32 @@ Section ImpEJsonEval.
              | ejbigint n => Some (ejnumber (float_of_int n))
              | _ => None
              end) dl
-      | EJsonRuntimeFloatSum => None (* XXX TODO *)
-      | EJsonRuntimeFloatArithMean => None (* XXX TODO *)
+      | EJsonRuntimeFloatSum =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               match ejson_numbers l with
+               | Some nl =>
+                 Some (ejnumber (float_list_sum nl))
+               | None => None
+               end
+             | _ => None
+             end) dl
+      | EJsonRuntimeFloatArithMean =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               match ejson_numbers l with
+               | Some nl =>
+                 Some (ejnumber (float_list_arithmean nl))
+               | None => None
+               end
+             | _ => None
+             end) dl
       end.
-
+    
     Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
       ejson_op_eval op dl. (* XXX In Common.EJson.EJsonOperators *)
 
