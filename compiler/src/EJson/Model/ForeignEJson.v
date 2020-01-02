@@ -21,10 +21,6 @@ Section ForeignEJson.
   Class foreign_ejson : Type
     := mk_foreign_ejson {
            foreign_ejson_type : Set
-(* TODO: #35 is needed before we can generalize this
-  ; foreign_ejson_equiv (a b : foreign_ejson_type) : Prop
-  ; foreign_ejson_equiv_equiv :> Equivalence foreign_ejson_equiv
- *) 
            ; foreign_ejson_dec :> EqDec foreign_ejson_type eq
            ; foreign_ejson_normalized (a : foreign_ejson_type) : Prop
            ; foreign_ejson_normalize (a : foreign_ejson_type) : foreign_ejson_type
