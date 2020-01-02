@@ -18,7 +18,7 @@ Require Import Bool.
 Require Import String.
 Require Import List.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NRASystem.
 Require Import CAMPSystem.
 Require Import CAMPtoNRA.

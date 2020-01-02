@@ -19,7 +19,7 @@ Require Import List.
 Require Import Compare_dec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NRA.
 
 Section TNRA.

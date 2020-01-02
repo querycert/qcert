@@ -17,7 +17,7 @@
 Require Import EquivDec.
 Require Import List.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 
 Section ForeignReduceOps.
   Class foreign_reduce_op {fdata:foreign_data}

@@ -15,7 +15,8 @@
  *)
 
 Require Import String.
-Require Import CommonRuntime.
+Require Import EJsonRuntime.
+Require Import DataRuntime.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
@@ -39,10 +40,10 @@ Set Typeclasses Axioms Are Instances.
 Module Type CompilerRuntime.
   Axiom compiler_foreign_type : foreign_type.
   Axiom compiler_foreign_runtime : foreign_runtime.
+  Axiom compiler_foreign_to_ejson : foreign_to_ejson.
   Axiom compiler_foreign_to_java : foreign_to_java.
   Axiom compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
   Axiom compiler_foreign_to_scala : foreign_to_scala.
-  Axiom compiler_foreign_to_ejson : foreign_to_ejson.
   Axiom compiler_foreign_type_to_JSON : foreign_type_to_JSON.
   Axiom compiler_foreign_reduce_op : foreign_reduce_op.
   Axiom compiler_foreign_to_reduce_op : foreign_to_reduce_op.

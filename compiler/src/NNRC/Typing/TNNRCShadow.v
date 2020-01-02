@@ -22,7 +22,7 @@ Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import cNNRC.
 Require Import cNNRCShadow.
 Require Import TcNNRC.

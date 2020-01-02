@@ -19,6 +19,7 @@ Require Import List.
 Require Import Bool.
 Require Import Arith.
 Require Import Utils.
+Require Import EJsonRuntime.
 Require Import Imp.
 Require Import ImpEJson.
 Require Import JavaScriptAstRuntime.
@@ -72,6 +73,23 @@ Section ImpEJsontoJavaScriptAst.
 
     Definition mk_runtime_call (op: imp_ejson_runtime_op) (el: list expr) :=
       call_runtime (string_of_ejson_runtime_op op) el.
+
+    Definition sortCriteria_to_js_ast (sc: string * SortDesc) :=
+      let (lbl, c) := sc in
+      match c with
+      | Ascending =>
+        expr_object
+          [ (propname_identifier "asc", propbody_val (expr_literal (literal_string lbl))) ]
+      | Descending =>
+        expr_object
+          [ (propname_identifier "desc", propbody_val (expr_literal (literal_string lbl))) ]
+      end.
+
+    Definition sortCriterias_to_js_ast (scl: SortCriterias) :=
+      expr_array
+        (List.map
+           (fun sc => Some (sortCriteria_to_js_ast sc))
+           scl).
 
     Definition imp_ejson_op_to_js_ast (op:imp_ejson_op) el : expr :=
       match op with

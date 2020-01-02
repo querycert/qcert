@@ -23,7 +23,7 @@ Require Import List.
 Require Import Compare_dec.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRA.
 
 Section NRAExt.

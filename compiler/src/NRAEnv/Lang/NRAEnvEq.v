@@ -23,7 +23,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import cNRAEnv.
 Require Import cNRAEnvEq.
 Require Import NRAEnv.

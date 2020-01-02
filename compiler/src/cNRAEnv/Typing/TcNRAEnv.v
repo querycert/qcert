@@ -21,7 +21,7 @@ Require Import Compare_dec.
 Require Import Eqdep_dec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import cNRAEnv.
 Require Import cNRAEnvEq.
 Require Import NRASystem.

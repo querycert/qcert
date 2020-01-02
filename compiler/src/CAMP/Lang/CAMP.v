@@ -38,7 +38,7 @@ Require Import List.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import CAMPUtil.
   
 Section CAMP.

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export CommonTypes.
+Require Export DataTypes.
 Require Export TcNRAEnv.
 Require Export TcNRAEnvEq.
 Require Export TcNRAEnvIgnore.

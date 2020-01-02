@@ -31,7 +31,7 @@ Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NNRS.
 
 Section NNRSSem.

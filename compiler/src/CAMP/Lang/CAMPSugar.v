@@ -19,7 +19,7 @@ Require Import List.
 Require Import EquivDec.
 Require Import ZArith.
 Require Import Utils.
-Require Import CommonRuntime.  
+Require Import DataRuntime.  
 Require Export CAMP.
 
 Section CAMPSugar.

@@ -19,7 +19,6 @@ Require Import Omega.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
-Require Import CommonRuntime.
 Require Import Imp.
 
 Section ImpSize.

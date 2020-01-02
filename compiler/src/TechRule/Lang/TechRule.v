@@ -24,7 +24,7 @@ Java. *)
 - translating from TechRule: CAMPRule *)
 
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Export CAMPRuleRuntime.
 
 Section TechRule.

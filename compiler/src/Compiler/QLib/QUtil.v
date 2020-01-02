@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import CompilerRuntime.
 Require Import NNRCMRRuntime.
 Require Import tDNNRCRuntime.
@@ -47,11 +47,11 @@ Module QUtil(runtime:CompilerRuntime).
   Definition qcert_version := qcert_version.
 
   Section results.
-    Definition qerror {fdata:foreign_data} : Set := QResult.qerror.
-    Definition qresult {fdata:foreign_data} (A:Set) : Set := QResult.qresult A.
+    Definition qerror {fdata:foreign_data} : Set := DataResult.qerror.
+    Definition qresult {fdata:foreign_data} (A:Set) : Set := DataResult.qresult A.
 
-    Definition qsuccess {fdata:foreign_data} (A:Set) : A -> qresult A := QResult.qsuccess.
-    Definition qfailure {fdata:foreign_data} (A:Set) : qerror -> qresult A := QResult.qfailure.
+    Definition qsuccess {fdata:foreign_data} (A:Set) : A -> qresult A := DataResult.qsuccess.
+    Definition qfailure {fdata:foreign_data} (A:Set) : qerror -> qresult A := DataResult.qfailure.
   End results.
 
   Definition string_of_ejson_runtime_op := ImpEJson.string_of_ejson_runtime_op.

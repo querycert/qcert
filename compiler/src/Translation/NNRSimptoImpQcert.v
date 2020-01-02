@@ -23,7 +23,7 @@ Require Import Morphisms.
 Require Import Permutation.
 Require Import Eqdep_dec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NNRSimpRuntime.
 Require Import Imp.
 Require Import ImpQcert.

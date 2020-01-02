@@ -25,7 +25,7 @@ Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NNRS.
 Require Import NNRSVars.
 Require Import NNRSRename.

@@ -22,7 +22,7 @@ Require Import List.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 
 Section CAMPUtil.
   Local Open Scope string.

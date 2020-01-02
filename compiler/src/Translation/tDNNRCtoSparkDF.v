@@ -24,17 +24,19 @@ Require Import List.
 Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import NNRCRuntime.
 Require Import tDNNRCSystem.
 Require Import ForeignToScala.
+Require Import ForeignDataToEJson.
 Require Import DatatoSparkDF.
 
 Local Open Scope string_scope.
 
 Section tDNNRCtoSparkDF.
 
-  Context {f:foreign_runtime}.
+  Context {fruntime:foreign_runtime}.
+  Context {fdatatoejson:foreign_to_ejson}.
   Context {h:brand_relation_t}.
   Context {ftype:foreign_type}.
   Context {m:brand_model}.

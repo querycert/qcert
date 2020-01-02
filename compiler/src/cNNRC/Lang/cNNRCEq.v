@@ -23,7 +23,7 @@ Require Import String.
 Require Import List.
 Require Import Arith.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import cNNRC.
 Require Import cNNRCNorm.
 

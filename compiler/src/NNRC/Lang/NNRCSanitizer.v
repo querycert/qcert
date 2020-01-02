@@ -21,7 +21,7 @@ Require Import Utils.
 Require Import cNNRCShadow.
 Require Import NNRC.
 Require Import NNRCShadow.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 
 Local Open Scope string_scope.
 

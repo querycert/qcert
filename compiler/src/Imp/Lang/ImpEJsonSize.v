@@ -19,14 +19,14 @@ Require Import Omega.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import EJsonRuntime.
 Require Import Imp.
 Require Import ImpSize.
 Require Import ImpEJson.
 
 Section ImpEJsonSize.
 
-  Context {fruntime:foreign_runtime}.
+  Context {ftoejson:foreign_ejson}.
 
   Definition imp_ejson_expr_size (e:imp_ejson_expr) : nat :=
     imp_expr_size e.

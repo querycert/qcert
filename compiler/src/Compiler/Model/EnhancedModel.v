@@ -17,7 +17,7 @@
 Require Import List.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
@@ -508,23 +508,21 @@ Next Obligation.
       ; repeat constructor.
 Qed.
 
+Instance enhanced_foreign_runtime :
+  foreign_runtime
+  := mk_foreign_runtime
+       enhanced_foreign_data
+       enhanced_foreign_unary_op
+       enhanced_foreign_binary_op.
+
 Program Instance enhanced_foreign_to_ejson : foreign_to_ejson
-  := mk_foreign_to_ejson enhanced_foreign_ejson enhanced_foreign_data _ _ _.
+  := mk_foreign_to_ejson enhanced_foreign_runtime enhanced_foreign_ejson _ _ _.
 Next Obligation.
   exact j. (* XXX Easy since enhanced_ejson is the same as enhanced_data *)
 Defined.
 Next Obligation.
   exact fd. (* XXX Easy since enhanced_ejson is the same as enhanced_data *)
 Defined.
-
-Instance enhanced_foreign_runtime :
-  foreign_runtime
-  := mk_foreign_runtime
-       enhanced_foreign_ejson
-       enhanced_foreign_data
-       enhanced_foreign_unary_op
-       enhanced_foreign_binary_op
-       enhanced_foreign_to_ejson.
 
 (* TODO: fix me *)
 Definition enhanced_to_java_data
@@ -1366,12 +1364,12 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_runtime.
   Definition compiler_foreign_to_java : foreign_to_java
     := enhanced_foreign_to_java.
+  Definition compiler_foreign_to_ejson : foreign_to_ejson
+    := enhanced_foreign_to_ejson.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
-  Definition compiler_foreign_to_ejson : foreign_to_ejson
-    := enhanced_foreign_to_ejson.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
     := enhanced_foreign_type_to_JSON.
   Definition compiler_foreign_reduce_op : foreign_reduce_op
@@ -2053,14 +2051,16 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_type.
   Definition compiler_basic_model : @basic_model
     := @enhanced_basic_model bm.compiler_brand_model.
+  Definition compiler_model_foreign_runtime : foreign_runtime
+    := enhanced_foreign_runtime.
+  Definition compiler_model_foreign_to_ejson : foreign_to_ejson
+    := enhanced_foreign_to_ejson.
   Definition compiler_model_foreign_to_java : foreign_to_java
     := enhanced_foreign_to_java.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
   Definition compiler_model_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
-  Definition compiler_model_foreign_to_ejson : foreign_to_ejson
-    := enhanced_foreign_to_ejson.
   Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
     := enhanced_foreign_type_to_JSON.
   Definition compiler_model_foreign_reduce_op : foreign_reduce_op

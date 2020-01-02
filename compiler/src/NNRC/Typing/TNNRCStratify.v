@@ -32,7 +32,7 @@ Require Import Morphisms.
 Require Import Permutation.
 Require Import Eqdep_dec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import cNNRCSystem.
 Require Import NNRCRuntime.
 Require Import cNNRCTypes. (* Always include core support *)

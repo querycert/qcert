@@ -19,7 +19,7 @@ Require Import List.
 Require Import String.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 
 Section CompEnv.
   (*********

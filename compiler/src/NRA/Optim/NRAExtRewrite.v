@@ -15,7 +15,7 @@
  *)
 
 Require Import List.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRA.
 Require Import NRAEq.
 Require Import NRAExt.

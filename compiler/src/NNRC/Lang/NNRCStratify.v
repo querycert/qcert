@@ -30,7 +30,7 @@ Require Import Permutation.
 Require Import Eqdep_dec.
 Require Import Program.Basics.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import cNNRC.
 Require Import cNNRCNorm.
 Require Import cNNRCVars.

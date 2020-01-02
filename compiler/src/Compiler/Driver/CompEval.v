@@ -20,7 +20,7 @@ Require Import EquivDec.
 
 (* Common *)
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import TypingRuntime.
 
 (** Query languages *)
@@ -49,6 +49,7 @@ Require Import JavaRuntime.
 Require Import SparkDFRuntime.
 
 (* Foreign Support *)
+Require Import ForeignDataToEJson.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 
@@ -62,10 +63,10 @@ Section CompEval.
 
   (* Context *)
 
-  Context {fruntime:foreign_runtime}.   (* Necessary for everything, including data *)
+  Context {fruntime:foreign_runtime}.   (* Necessary for Everything *)
+  Context {ftejson:foreign_to_ejson}.   (* Necessary for ImpJson evaluation *)
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)
-  Context {ftejson:foreign_to_ejson}.   (* Necessary for ImpJson evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
 
   (* XXX This should come from the brand model, to ensure consistency *)

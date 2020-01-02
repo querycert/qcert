@@ -17,16 +17,17 @@
 MODULES = \
 	Version \
 	Utils/CoqLibAdd \
+	Utils/Lift \
 	Utils/ListAdd \
 	Utils/StringAdd \
 	Utils/SortingAdd \
 	Utils/Float \
 	Utils/Lattice \
 	Utils/Monoid \
-	Utils/Lift \
-	Utils/LiftIterators \
 	Utils/Assoc \
 	Utils/Sublist \
+	Utils/LiftIterators \
+	Utils/Bag \
 	Utils/GroupByDomain \
 	Utils/Interleaved \
 	Utils/Compat \
@@ -34,7 +35,6 @@ MODULES = \
 	Utils/BindingsNat \
 	Utils/Digits \
 	Utils/Fresh \
-	Utils/Bag \
 	Utils/Var \
 	Utils/Closure \
 	Utils/Result \
@@ -44,76 +44,78 @@ MODULES = \
 	Utils/JSONNorm \
 	Utils/OptimizerStep \
 	Utils/OptimizerLogger \
+	Utils/SortingDesc \
 	Utils/Utils \
-	Common/Brands/BrandRelation \
-	Common/TypeSystem/ForeignType \
-	Common/TypeSystem/ForeignTypeToJSON \
-	Common/TypeSystem/RType \
-	Common/TypeSystem/RTypeNorm \
-	Common/TypeSystem/RTypetoJSON \
-	Common/TypeSystem/DType \
-	Common/TypeSystem/DTypetoJSON \
-	Common/TypeSystem/TBrandContext \
-	Common/TypeSystem/RSubtype \
-	Common/TypeSystem/RSubtypeProp \
-	Common/TypeSystem/RTypeMeetJoin \
-	Common/TypeSystem/RConsistentSubtype \
-	Common/TypeSystem/TBrandModel \
-	Common/TypeSystem/RTypeLattice \
-	Common/TypeSystem/TBrandModelProp \
-	Common/TypeSystem/Types \
-	Common/EJson/ForeignEJson \
-	Common/EJson/EJson \
-	Common/EJson/EJsonNorm \
-	Common/EJson/EJsonOperators \
-	Common/EJson/CommonEJson \
-	Common/DataModel/ForeignData \
-	Common/DataModel/Data \
-	Common/Results/QResult \
-	Common/Data/DataLift \
-	Common/Data/DataNorm \
-	Common/Data/ForeignDataToEJson \
-	Common/Data/DatatoEJson \
-	Common/Data/DataSort \
-	Common/Data/DData \
-	Common/Data/DDataNorm \
-	Common/Data/Constants \
-	Common/Data/DConstants \
-	Common/Data/CommonData \
-	Common/DataTyping/ForeignDataTyping \
-	Common/DataTyping/TData \
-	Common/DataTyping/TDData \
-	Common/DataTyping/TDataInfer \
-	Common/DataTyping/TBindings \
-	Common/DataTyping/TDBindings \
-	Common/Schema/Schema \
-	Common/Operators/ForeignOperators \
-	Common/Operators/RecOperators \
-	Common/Operators/Iterators \
-	Common/Operators/OperatorsUtils \
-	Common/Operators/SortBy \
-	Common/Operators/GroupBy \
-	Common/Operators/UnaryOperators \
-	Common/Operators/UnaryOperatorsSem \
-	Common/Operators/BinaryOperators \
-	Common/Operators/BinaryOperatorsSem \
-	Common/Operators/OperatorsEq \
-	Common/Operators/Operators \
-	Common/OperatorsTyping/ForeignOperatorsTyping \
-	Common/OperatorsTyping/TUtil \
-	Common/OperatorsTyping/TSortBy \
-	Common/OperatorsTyping/TGroupBy \
-	Common/OperatorsTyping/TUnaryOperators \
-	Common/OperatorsTyping/TBinaryOperators \
-	Common/OperatorsTyping/TOperatorsEq \
-	Common/OperatorsTyping/TOperatorsInfer \
-	Common/OperatorsTyping/TOperatorsInferSub \
-	Common/ForeignRuntime \
-	Common/CommonRuntime \
-	Common/ForeignTyping \
-	Common/CommonTypes \
-	Common/CommonSystem \
-	Common/TypingRuntime \
+	Brands/BrandRelation \
+	TypeSystem/ForeignType \
+	TypeSystem/ForeignTypeToJSON \
+	TypeSystem/RType \
+	TypeSystem/RTypeNorm \
+	TypeSystem/RTypetoJSON \
+	TypeSystem/DType \
+	TypeSystem/DTypetoJSON \
+	TypeSystem/TBrandContext \
+	TypeSystem/RSubtype \
+	TypeSystem/RSubtypeProp \
+	TypeSystem/RTypeMeetJoin \
+	TypeSystem/RConsistentSubtype \
+	TypeSystem/TBrandModel \
+	TypeSystem/RTypeLattice \
+	TypeSystem/TBrandModelProp \
+	TypeSystem/Types \
+	EJson/Model/ForeignEJson \
+	EJson/Model/EJson \
+	EJson/Model/EJsonNorm \
+	EJson/Operators/EJsonOperators \
+	EJson/EJsonRuntime \
+	EJson/EJsonSystem \
+	Data/Model/ForeignData \
+	Data/Model/Data \
+	Data/Model/DataResult \
+	Data/Model/DataLift \
+	Data/Model/DataNorm \
+	Data/Model/DataSort \
+	Data/Model/DData \
+	Data/Model/DDataNorm \
+	Data/Model/Constants \
+	Data/Model/DConstants \
+	Data/Model/DataModel \
+	Data/ModelTyping/ForeignDataTyping \
+	Data/ModelTyping/TData \
+	Data/ModelTyping/TDData \
+	Data/ModelTyping/TDataInfer \
+	Data/ModelTyping/TBindings \
+	Data/ModelTyping/TDBindings \
+	Data/ModelTyping/Schema \
+	Data/Operators/ForeignOperators \
+	Data/Operators/RecOperators \
+	Data/Operators/Iterators \
+	Data/Operators/OperatorsUtils \
+	Data/Operators/SortBy \
+	Data/Operators/GroupBy \
+	Data/Operators/UnaryOperators \
+	Data/Operators/UnaryOperatorsSem \
+	Data/Operators/BinaryOperators \
+	Data/Operators/BinaryOperatorsSem \
+	Data/Operators/OperatorsEq \
+	Data/Operators/Operators \
+	Data/OperatorsTyping/ForeignOperatorsTyping \
+	Data/OperatorsTyping/TUtil \
+	Data/OperatorsTyping/TSortBy \
+	Data/OperatorsTyping/TGroupBy \
+	Data/OperatorsTyping/TUnaryOperators \
+	Data/OperatorsTyping/TBinaryOperators \
+	Data/OperatorsTyping/TOperatorsEq \
+	Data/OperatorsTyping/TOperatorsInfer \
+	Data/OperatorsTyping/TOperatorsInferSub \
+	Data/ForeignRuntime \
+	Data/DataRuntime \
+	Data/ForeignTyping \
+	Data/DataTypes \
+	Data/DataSystem \
+	Data/TypingRuntime \
+	TranslationModel/ForeignDataToEJson \
+	TranslationModel/DatatoEJson \
 	NRA/Lang/NRA \
 	NRA/Lang/NRASugar \
 	NRA/Lang/NRASize \
@@ -175,9 +177,9 @@ MODULES = \
 	cNNRC/cNNRCSystem \
 	NNRC/Lang/NNRC \
 	NNRC/Lang/NNRCSugar \
+	NNRC/Lang/NNRCSize \
 	NNRC/Lang/NNRCShadow \
 	NNRC/Lang/NNRCEq \
-	NNRC/Lang/NNRCSize \
 	NNRC/Lang/NNRCSanitizer \
 	NNRC/Lang/NNRCStratify \
 	NNRC/Typing/TNNRC \

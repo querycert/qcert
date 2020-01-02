@@ -22,7 +22,7 @@ Require Import ListSet.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import cNNRCRuntime.
 Require Import NNRC.
 Require Import NNRCShadow.

@@ -19,8 +19,6 @@ Require Import Utils.
 Require Import List.
 Require Import EquivDec.
 
-Require Import CommonSystem.
-
 (** Query languages *)
 Require Import SQLRuntime.
 Require Import SQLPPRuntime.
@@ -281,6 +279,7 @@ Section CompLang.
     Context {bm:brand_model}.
 
     Context {fr:foreign_runtime}.
+    Context {fejson:foreign_ejson}.
     Context {fredop:foreign_reduce_op}.
 
     Definition camp_rule := camp_rule.

@@ -32,13 +32,14 @@ Require Import Peano_dec.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import BrandRelation.
+Require Import EJsonRuntime.
 Require Import Imp.
 Require Import ImpEval.
 Require Import ImpEJson.
 
 Section ImpEJsonEval.
-  Context {ftoejson:foreign_ejson}.
+  Context {fejson:foreign_ejson}.
   (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
   Context (h:brand_relation_t).
 
@@ -66,8 +67,7 @@ Section ImpEJsonEval.
       | _ => None
       end.
 
-    Definition imp_ejson_Z_to_data (n: Z) : imp_ejson_data :=
-      Z_to_json n.
+    Definition imp_ejson_Z_to_data (n: Z) : imp_ejson_data := ejbigint n.
 
     Definition imp_ejson_runtime_eval (rt:imp_ejson_runtime_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
       match rt with
@@ -563,14 +563,18 @@ Section ImpEJsonEval.
 
   End Evaluation.
 
-  Section Top.
-    Context {fruntime:foreign_runtime}.
-    Context {fdatatoejson:foreign_to_ejson}.
-
-    Definition imp_ejson_eval_top (cenv: bindings) (q:imp_ejson) : option data :=
-      let jenv := List.map (fun xy => (fst xy, data_to_ejson (snd xy))) cenv in
-      lift ejson_to_data (imp_ejson_eval_top_on_ejson jenv q).
-  End Top.
 End ImpEJsonEval.
 
+Require Import DataRuntime.
+Require Import ForeignDataToEJson.
+Require Import DatatoEJson.
+Section Top.
+  Context {fruntime:foreign_runtime}.
+  Context {fdatatoejson:foreign_to_ejson}.
+  (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
+  Context (h:brand_relation_t).
+  Definition imp_ejson_eval_top (cenv: bindings) (q:imp_ejson) : option data :=
+    let jenv := List.map (fun xy => (fst xy, data_to_ejson(snd xy))) cenv in
+    lift ejson_to_data (imp_ejson_eval_top_on_ejson h jenv q).
+End Top.
 (* Arguments imp_stmt_eval_domain_stack {fruntime h s σc σ₁ σ₂}. *)

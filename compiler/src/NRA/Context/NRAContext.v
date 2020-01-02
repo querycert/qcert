@@ -31,7 +31,7 @@ Require Import Arith.
 Require Import Bool.
 Require Import Utils.
 Require Import BindingsNat. (* Part of Utils, but not automatically exported *)
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRA.
 Require Import NRAEq.
 

@@ -21,7 +21,7 @@ Require Import EquivDec.
 Require Import Compare_dec.
 Require Import Program.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRARuntime.
 Require Import cNNRCRuntime.
 Require Import NNRC NNRCSize.

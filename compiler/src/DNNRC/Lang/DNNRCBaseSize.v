@@ -16,7 +16,7 @@
 
 Require Import List.
 Require Import Omega.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import DNNRCBase.
 
 Section size.

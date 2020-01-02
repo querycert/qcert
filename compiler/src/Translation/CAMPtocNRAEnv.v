@@ -18,7 +18,7 @@ Require Import String.
 Require Import List.
 Require Import Omega.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRARuntime.
 Require Import cNRAEnvRuntime.
 Require Import CAMPRuntime.

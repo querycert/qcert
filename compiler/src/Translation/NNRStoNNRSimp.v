@@ -25,7 +25,7 @@ Require Import Eqdep_dec.
 Require Import Program.    
 
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NNRSRuntime.
 Require Import NNRSimpRuntime.
 Require Import NNRSCrossShadow.

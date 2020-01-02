@@ -17,7 +17,7 @@
 (** Imp with the Json data model *)
 
 Require Import String.
-Require Import CommonRuntime.
+Require Import EJsonRuntime.
 Require Import Imp.
 
 Section ImpEJson.

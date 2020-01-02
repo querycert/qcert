@@ -22,7 +22,7 @@ Require Import Morphisms.
 Require Import Setoid.
 Require Import EquivDec.
 Require Import Program.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRA.
 Require Import NRAEq.
 Require Import NRAExt.

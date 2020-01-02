@@ -18,7 +18,7 @@ Require Import String.
 Require Import List.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Export CAMPRule.
 Require Import TCAMP.
 

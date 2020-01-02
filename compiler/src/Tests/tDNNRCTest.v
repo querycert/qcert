@@ -21,7 +21,6 @@ Require Import EquivDec.
 Require Import Morphisms.
 
 Require Import Utils.
-Require Import CommonRuntime.
 
 Require Import LambdaNRA.
 Require Import LambdaNRAEq.
@@ -32,7 +31,7 @@ Require Import LambdaNRATest.
 Import TrivialCompiler.
 Require Import CompDriver.
 Require Import CAMPTest.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import TrivialModel.
 Require Import TDataTest.
 

@@ -41,3 +41,4 @@ Require Export JSONUtil.
 Require Export JSONNorm.
 Require Export OptimizerStep.
 Require Export OptimizerLogger.
+Require Export SortingDesc.

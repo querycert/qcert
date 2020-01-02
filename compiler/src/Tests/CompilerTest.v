@@ -18,7 +18,7 @@ Require Import ZArith.
 Require Import String.
 Require Import List.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 Require Import CAMPRuntime.
 Require Import CAMPRuleRuntime.
 Require Import TrivialModel.

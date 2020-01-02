@@ -18,7 +18,7 @@
 
 Require Import List.
 Require Import Utils.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 
 Delimit Scope data_scope with data.
 

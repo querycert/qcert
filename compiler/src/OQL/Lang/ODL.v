@@ -35,7 +35,7 @@ Require Import List.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Utils.
-Require Import CommonSystem.
+Require Import DataSystem.
 
 Section ODL.
   Inductive odl_export : Set :=

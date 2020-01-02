@@ -16,7 +16,7 @@
 
 Require Import String.
 Require Import List.
-Require Import CommonRuntime.
+Require Import DataRuntime.
 Require Import NRARuntime.
 Require Import cNRAEnvRuntime.
 
