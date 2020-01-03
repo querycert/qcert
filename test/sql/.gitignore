@@ -1,6 +1,4 @@
-/tpc/*.sql
 /tpc/*.data
-/tpc/dss.ddl
 /tpc/*.json
 /tpc/linuxOnly/*.zip
 /tpc/linuxOnly/tpch_2_17_0
