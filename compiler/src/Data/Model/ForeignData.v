@@ -21,17 +21,17 @@ Section ForeignData.
   
   Class foreign_data : Type
     := mk_foreign_data {
-           foreign_data_type : Set
+           foreign_data_model : Set
 (* TODO: #35 is needed before we can generalize this
-  ; foreign_data_equiv (a b : foreign_data_type) : Prop
+  ; foreign_data_equiv (a b : foreign_data_model) : Prop
   ; foreign_data_equiv_equiv :> Equivalence foreign_data_equiv
  *) 
-           ; foreign_data_dec :> EqDec foreign_data_type eq
-           ; foreign_data_normalized (a : foreign_data_type) : Prop
-           ; foreign_data_normalize (a : foreign_data_type) : foreign_data_type
-           ; foreign_data_normalize_normalizes (a : foreign_data_type) : foreign_data_normalized (foreign_data_normalize a)
-           ; foreign_data_normalize_idempotent (a : foreign_data_type) : foreign_data_normalized a -> foreign_data_normalize a = a
-           ; foreign_data_tostring :> ToString foreign_data_type
+           ; foreign_data_dec :> EqDec foreign_data_model eq
+           ; foreign_data_normalized (a : foreign_data_model) : Prop
+           ; foreign_data_normalize (a : foreign_data_model) : foreign_data_model
+           ; foreign_data_normalize_normalizes (a : foreign_data_model) : foreign_data_normalized (foreign_data_normalize a)
+           ; foreign_data_normalize_idempotent (a : foreign_data_model) : foreign_data_normalized a -> foreign_data_normalize a = a
+           ; foreign_data_tostring :> ToString foreign_data_model
       }.
 
 End ForeignData.

@@ -12,30 +12,24 @@
  * limitations under the License.
  *)
 
+Require Import List.
 Require Import String.
-Require Import Omega.
-Require Import EquivDec.
-Require Import Decidable.
 Require Import Utils.
-Require Import DataRuntime.
-Require Import Imp.
-Require Import ImpQcert.
-Require Import ImpSize.
+Require Import ForeignType.
 
-Section ImpQcertSize.
+Local Open Scope string_scope.
 
-  Context {fruntime:foreign_runtime}.
+Section ForeignTypeToJSON.
 
-  Definition imp_qcert_expr_size (e:imp_qcert_expr) : nat :=
-    imp_expr_size e.
+  (* TODO: properties required to ensure round-tripping *)
 
-  Definition imp_qcert_stmt_size (stmt:imp_qcert_stmt) : nat :=
-    imp_stmt_size stmt.
+  Class foreign_type_to_JSON {ftype:foreign_type}: Type
+    := mk_foreign_type_to_JSON {
+           foreign_to_string_to_type
+             (s:string) : option foreign_type_type
+           ; foreign_to_string_from_type
+               (fd:foreign_type_type) : string
+         }.
 
-  Definition imp_qcert_function_size (q:imp_qcert_function) : nat :=
-    imp_function_size q.
+End ForeignTypeToJSON.
 
-  Fixpoint imp_qcert_size (q: imp_qcert) : nat :=
-    imp_size q.
-
-End ImpQcertSize.

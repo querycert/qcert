@@ -19,6 +19,7 @@ Require Export RecOperators.
 Require Export GroupBy.
 Require Export SortBy.
 Require Export OperatorsUtils.
+Require Export ForeignOperators.
 Require Export UnaryOperators.
 Require Export BinaryOperators.
 Require Export UnaryOperatorsSem.

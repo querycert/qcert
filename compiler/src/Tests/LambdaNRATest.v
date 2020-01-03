@@ -100,7 +100,7 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
                            (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime)))))))
             (@LNRAUnop TrivialModel.trivial_foreign_runtime
                (@OpDot TrivialModel.trivial_foreign_data
-                  (@TrivialModel.trivial_foreign_unary_op)
+                  (@TrivialModel.trivial_foreign_operators)
                   (String (Ascii.Ascii true false false false false true true false)
                      (String (Ascii.Ascii false false true false false true true false)
                         (String (Ascii.Ascii false false true false false true true false)
@@ -127,7 +127,7 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
                           EmptyString)
                        (@LNRAUnop TrivialModel.trivial_foreign_runtime
                           (@OpDot TrivialModel.trivial_foreign_data
-                             (@TrivialModel.trivial_foreign_unary_op)
+                             (@TrivialModel.trivial_foreign_operators)
                              (String
                                 (Ascii.Ascii true true false false false true true false)
                                 (String

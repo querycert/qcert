@@ -20,7 +20,6 @@ Require Export ForeignOperators.
 Class foreign_runtime : Type
   := mk_foreign_runtime {
          foreign_runtime_data :> foreign_data
-         ; foreign_runtime_unary_op :> foreign_unary_op
-         ; foreign_runtime_binary_op :> foreign_binary_op
+         ; foreign_runtime_operators :> foreign_operators
        }.
 

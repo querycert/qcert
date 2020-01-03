@@ -32,6 +32,7 @@ Section ImpEJsonRewrite.
   Import ListNotations.
 
   Context {fejson:foreign_ejson}.
+  Context {fejruntime:foreign_ejson_runtime}.
 
   Section ForRewrite.
     (* Rewriting functional for into imperative for loop is now isolated *)

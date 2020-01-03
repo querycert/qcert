@@ -55,10 +55,10 @@ Section UnaryOperatorsSem.
     end.
 
   Context (h:brand_relation_t).
-  Context {fuop:foreign_unary_op}.
+  Context {foperators:foreign_operators}.
 
   Global Instance ToString_data : ToString data
-    := { toString := foreign_unary_op_data_tostring }.
+    := { toString := foreign_operators_unary_data_tostring }.
 
   Fixpoint defaultDataToString (d:data) : string
     := match d with
@@ -132,9 +132,9 @@ Section UnaryOperatorsSem.
     | OpCount =>
       lift dnat (ondcoll (fun z => Z_of_nat (bcount z)) d)
     | OpToString =>
-      Some (dstring (foreign_unary_op_data_tostring d))
+      Some (dstring (foreign_operators_unary_data_tostring d))
     | OpToText =>
-      Some (dstring (foreign_unary_op_data_totext d))
+      Some (dstring (foreign_operators_unary_data_totext d))
     | OpLength =>
       unndstring (fun s => Z_of_nat (String.length s)) d
     | OpSubstring start olen =>
@@ -225,7 +225,7 @@ Section UnaryOperatorsSem.
       lift_oncoll lifted_fmin d
     | OpFloatBagMax =>
       lift_oncoll lifted_fmax d
-    | OpForeignUnary fu => foreign_unary_op_interp h fu d
+    | OpForeignUnary fu => foreign_operators_unary_interp h fu d
     end.
 
   Lemma data_normalized_edot l s o :
@@ -392,7 +392,7 @@ Section UnaryOperatorsSem.
       eauto.
     - Case "OpForeignUnary"%string.
       intros eqq dn.
-      eapply foreign_unary_op_normalized in eqq; eauto.
+      eapply foreign_operators_unary_normalized in eqq; eauto.
   Qed.
 
 End UnaryOperatorsSem.

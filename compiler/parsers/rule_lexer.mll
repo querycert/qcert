@@ -95,8 +95,7 @@
 	  "AToString", ATOSTRING;
  	  "ASubstring", ASUBSTRING;
 	  "ALike", ALIKE;
- 	  "ESCAPE", ESCAPE;
-	  "ANumMin", ANUMMIN;
+ 	  "ANumMin", ANUMMIN;
 	  "ANumMax", ANUMMAX;
 	  "AArithMean", AARITHMEAN;
 	  "AUArith", AUARITH;

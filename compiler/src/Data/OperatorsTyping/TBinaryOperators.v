@@ -37,11 +37,11 @@ Section TBinaryOperators.
   (** Typing rules for binary operators *)
 
   Context {fdata:foreign_data}.
-  Context {fbop:foreign_binary_op}.
+  Context {foperators:foreign_operators}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {h:brand_model}.
-  Context {fboptyping:foreign_binary_op_typing}.
+  Context {foptyping:foreign_operators_typing}.
 
   Section typ.
     Inductive binary_op_type: binary_op -> rtype -> rtype -> rtype -> Prop :=
@@ -93,7 +93,7 @@ Section TBinaryOperators.
     | type_OpFloatCompare (b:float_compare_binary_op) :
         binary_op_type (OpFloatCompare b) Float Float Bool
     | type_OpForeignBinary {fb τin₁ τin₂ τout} :
-        foreign_binary_op_typing_has_type fb τin₁ τin₂ τout ->
+        foreign_operators_typing_binary_has_type fb τin₁ τin₂ τout ->
         binary_op_type (OpForeignBinary fb) τin₁ τin₂ τout.
 
   End typ.
@@ -749,7 +749,7 @@ Section TBinaryOperators.
       dependent induction H; dependent induction H0; simpl.
       eauto.
     - Case "type_OpForeignBinary"%string.
-      eapply foreign_binary_op_typing_sound; eauto.
+      eapply foreign_operators_typing_binary_sound; eauto.
   Qed.
 
   (** Additional auxiliary lemmas *)
@@ -775,26 +775,26 @@ Section TBinaryOperators.
   
 End TBinaryOperators.
 
-  Tactic Notation "binary_op_type_cases" tactic(first) ident(c) :=
-    first;
-    [ Case_aux c "type_OpEqual"%string
-    | Case_aux c "type_OpRecConcat"%string
-    | Case_aux c "type_OpRecMerge_closed"%string
-    | Case_aux c "type_OpRecMerge_open"%string
-    | Case_aux c "type_OpAnd"%string
-    | Case_aux c "type_OpOr"%string
-    | Case_aux c "type_OpLt"%string
-    | Case_aux c "type_OpLe"%string
-    | Case_aux c "type_OpBagUnion"%string
-    | Case_aux c "type_OpBagDiff"%string
-    | Case_aux c "type_OpBagMin"%string
-    | Case_aux c "type_OpBagMax"%string
-    | Case_aux c "type_OpBagNth"%string
-    | Case_aux c "type_OpContains"%string
-    | Case_aux c "type_OpStringConcat"%string
-    | Case_aux c "type_OpStringJoin"%string
-    | Case_aux c "type_OpNatBinary"%string
-    | Case_aux c "type_OpFloatBinary"%string
-    | Case_aux c "type_OpFloatCompare"%string
-    | Case_aux c "type_OpForeignBinary"%string].
+Tactic Notation "binary_op_type_cases" tactic(first) ident(c) :=
+  first;
+  [ Case_aux c "type_OpEqual"%string
+  | Case_aux c "type_OpRecConcat"%string
+  | Case_aux c "type_OpRecMerge_closed"%string
+  | Case_aux c "type_OpRecMerge_open"%string
+  | Case_aux c "type_OpAnd"%string
+  | Case_aux c "type_OpOr"%string
+  | Case_aux c "type_OpLt"%string
+  | Case_aux c "type_OpLe"%string
+  | Case_aux c "type_OpBagUnion"%string
+  | Case_aux c "type_OpBagDiff"%string
+  | Case_aux c "type_OpBagMin"%string
+  | Case_aux c "type_OpBagMax"%string
+  | Case_aux c "type_OpBagNth"%string
+  | Case_aux c "type_OpContains"%string
+  | Case_aux c "type_OpStringConcat"%string
+  | Case_aux c "type_OpStringJoin"%string
+  | Case_aux c "type_OpNatBinary"%string
+  | Case_aux c "type_OpFloatBinary"%string
+  | Case_aux c "type_OpFloatCompare"%string
+  | Case_aux c "type_OpForeignBinary"%string].
 

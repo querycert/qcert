@@ -15,17 +15,18 @@
 Require Import EquivDec.
 Require Import List.
 Require Import Utils.
-Require Import EJsonRuntime.
+Require Import ForeignEJson.
+Require Import EJson.
 
 Section ForeignEJsonRuntime.
   Class foreign_ejson_runtime {fejson:foreign_ejson}
   : Type
     := mk_foreign_ejson_runtime {
-           foreign_ejson_runtime_type : Set
-           ; foreign_ejson_runtime_dec :> EqDec foreign_ejson_runtime_type eq
-           ; foreign_ejson_runtime_tostring :> ToString foreign_ejson_runtime_type
+           foreign_ejson_runtime_operators : Set
+           ; foreign_ejson_runtime_dec :> EqDec foreign_ejson_runtime_operators eq
+           ; foreign_ejson_runtime_tostring :> ToString foreign_ejson_runtime_operators
            ; foreign_ejson_runtime_interp 
-               (f:foreign_ejson_runtime_type)
+               (f:foreign_ejson_runtime_operators)
                (dl:list ejson) : option ejson                                 
          }.
 

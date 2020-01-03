@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +25,10 @@ Require Import ForeignToJavaScriptAst.
 
 Section ImpEJsontoJavaScriptAst.
   Import ListNotations.
+
+  Context {ft:foreign_ejson}.
+  Context {ftjast:foreign_ejson_to_ajavascript}.
+  Context {fejruntime:foreign_ejson_runtime}.
 
   Section Util.
     Definition scope l := stat_block l. (* XXX TODO XXX *)
@@ -71,7 +73,8 @@ Section ImpEJsontoJavaScriptAst.
       | None => mk_expr_error
       end.
 
-    Definition mk_runtime_call (op: imp_ejson_runtime_op) (el: list expr) :=
+    Definition mk_runtime_call
+               (op: imp_ejson_runtime_op) (el: list expr) :=
       call_runtime (string_of_ejson_runtime_op op) el.
 
     Definition sortCriteria_to_js_ast (sc: string * SortDesc) :=
@@ -140,9 +143,6 @@ Section ImpEJsontoJavaScriptAst.
 
   (** Translation *)
   Section Translation.
-
-    Context {ft:foreign_ejson}.
-    Context {ftjast:foreign_ejson_to_ajavascript}.
 
     Fixpoint ejson_to_js_ast (json: ejson) : expr :=
       match json with

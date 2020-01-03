@@ -25,6 +25,8 @@ Import ListNotations.
 
 Require Import Utils.
 Require Import CAMPTest.
+Require Import JSONSystem.
+Require Import TypeToJSON.
 Require Import DataSystem.
 Require Import TrivialModel.
 Require Import Program.

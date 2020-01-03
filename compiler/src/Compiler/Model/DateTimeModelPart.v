@@ -75,7 +75,7 @@ Definition time_scale_to_java_string
   := "TimeScale." ++ time_scale_to_string ts.
     
 Program Instance time_scale_foreign_data : foreign_data
-  := {foreign_data_type := time_scale
+  := {foreign_data_model := time_scale
       ; foreign_data_dec := time_scale_eqdec
       ; foreign_data_tostring := time_scale_tostring
       ; foreign_data_normalized ts := True
@@ -97,7 +97,7 @@ Axiom TIME_DURATION_tostring : TIME_DURATION -> String.string.
 Extract Inlined Constant TIME_DURATION_tostring => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance time_duration_foreign_data : foreign_data
-  := {foreign_data_type := TIME_DURATION}.
+  := {foreign_data_model := TIME_DURATION}.
 Next Obligation.
   intros x y.
   case_eq (TIME_DURATION_eq x y); intros eqq.
@@ -137,7 +137,7 @@ Axiom TIME_POINT_tostring : TIME_POINT -> String.string.
 Extract Inlined Constant TIME_POINT_tostring => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance time_point_foreign_data : foreign_data
-  := {foreign_data_type := TIME_POINT}.
+  := {foreign_data_model := TIME_POINT}.
 Next Obligation.
   intros x y.
   case_eq (TIME_POINT_eq x y); intros eqq.

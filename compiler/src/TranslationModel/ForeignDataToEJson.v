@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,15 +28,15 @@ Class foreign_to_ejson
   : Type
   := mk_foreign_to_ejson {
          foreign_to_ejson_ejson :> foreign_ejson
-         ; foreign_to_ejson_runtime: foreign_ejson_runtime
+         ; foreign_to_ejson_runtime :> foreign_ejson_runtime
          ; foreign_to_ejson_to_data
-             (j:foreign_ejson_type) : foreign_data_type
+             (j:foreign_ejson_model) : foreign_data_model
          ; foreign_to_ejson_from_data
-             (fd:foreign_data_type) : foreign_ejson_type
-         ; foreign_to_ejson_to_data_to_ejson (fd:foreign_data_type) :
+             (fd:foreign_data_model) : foreign_ejson_model
+         ; foreign_to_ejson_to_data_to_ejson (fd:foreign_data_model) :
              foreign_to_ejson_to_data (foreign_to_ejson_from_data fd) = fd
          ; foreign_to_ejson_runtime_of_unary_op
-               (uop:unary_op) : option foreign_ejson_runtime_type
+               (uop:unary_op) : option foreign_ejson_runtime_operators
          ; foreign_to_ejson_runtime_of_binary_op
-               (uop:binary_op) : option foreign_ejson_runtime_type
+               (uop:binary_op) : option foreign_ejson_runtime_operators
        }.

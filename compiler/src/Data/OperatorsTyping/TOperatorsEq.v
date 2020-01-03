@@ -42,13 +42,11 @@ Section TOperatorsEq.
      same value for every well-typed input.
    *)
   Context {fdata:foreign_data}.
-  Context {fuop:foreign_unary_op}.
-  Context {fbop:foreign_binary_op}.
+  Context {foperators:foreign_operators}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
-  Context {fuoptyping:foreign_unary_op_typing}.
-  Context {fboptyping:foreign_binary_op_typing}.
+  Context {foptyping:foreign_operators_typing}.
 
   Definition typed_unary_op τin τout := {u:unary_op|unary_op_type u τin τout}.
 

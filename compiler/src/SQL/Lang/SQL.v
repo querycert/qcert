@@ -84,15 +84,15 @@ Section SQL.
   Definition sql_order_spec : Set := SortCriterias.
   Inductive sql_bin_cond : Set :=
   | SEq | SLe | SLt | SGe | SGt | SDiff
-  | SBinaryForeignCond (fb : foreign_binary_op_type) : sql_bin_cond.
+  | SBinaryForeignCond (fb : foreign_operators_binary) : sql_bin_cond.
   Inductive sql_un_expr : Set :=
   | SMinus : sql_un_expr
   | SSubstring : Z -> option Z -> sql_un_expr
-  | SUnaryForeignExpr (fu:foreign_unary_op_type) : sql_un_expr.
+  | SUnaryForeignExpr (fu:foreign_operators_unary) : sql_un_expr.
   Inductive sql_bin_expr : Set :=
   | SPlus | SSubtract | SMult | SDivide
   | SConcat
-  | SBinaryForeignExpr (fb : foreign_binary_op_type) : sql_bin_expr.
+  | SBinaryForeignExpr (fb : foreign_operators_binary) : sql_bin_expr.
   Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
   Inductive sql_distinct : Set := SDistinct | SAll.
@@ -292,4 +292,3 @@ Section SQL.
     
   End FreeVars.
 End SQL.
-

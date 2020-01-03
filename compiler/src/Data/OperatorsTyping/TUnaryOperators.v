@@ -37,11 +37,11 @@ Section TUnaryOperators.
   (** Typing rules for unary operators *)
 
   Context {fdata:foreign_data}.
-  Context {fuop:foreign_unary_op}.
+  Context {foperators:foreign_operators}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
-  Context {fuoptyping:foreign_unary_op_typing}.
+  Context {foptyping:foreign_operators_typing}.
 
   Section typ.
     Inductive unary_op_type : unary_op -> rtype -> rtype -> Prop :=
@@ -118,7 +118,7 @@ Section TUnaryOperators.
     | type_OpFloatMax:
         unary_op_type OpFloatBagMax (Coll Float) Float
     | type_OpForeignUnary {fu τin τout} :
-        foreign_unary_op_typing_has_type fu τin τout ->
+        foreign_operators_typing_unary_has_type fu τin τout ->
         unary_op_type (OpForeignUnary fu) τin τout.
 
   End typ.
@@ -578,7 +578,7 @@ Section TUnaryOperators.
       destruct (some_lift e0); subst.
       rewrite e1; simpl; eauto.
     - Case "type_OpForeignUnary"%string.
-      eapply foreign_unary_op_typing_sound; eauto.
+      eapply foreign_operators_typing_unary_sound; eauto.
   Qed.
 
 End TUnaryOperators.

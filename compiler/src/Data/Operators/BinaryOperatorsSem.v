@@ -63,7 +63,7 @@ Section BinaryOperatorsSem.
 
   Context (h:brand_relation_t).
   Context {fdata:foreign_data}.
-  Context {fbop:foreign_binary_op}.
+  Context {foperators:foreign_operators}.
 
   Definition binary_op_eval (bop:binary_op) (d1 d2:data) : option data :=
     match bop with
@@ -128,7 +128,7 @@ Section BinaryOperatorsSem.
         | dfloat f1, dfloat f2 => Some (dbool (float_compare_binary_op_eval op f1 f2))
         | _, _ => None
         end
-    | OpForeignBinary fb => foreign_binary_op_interp h fb d1 d2
+    | OpForeignBinary fb => foreign_operators_binary_interp h fb d1 d2
     end.
 
   Lemma binary_op_eval_normalized {b d1 d2 o} :
@@ -184,7 +184,7 @@ Section BinaryOperatorsSem.
       unfold lifted_join in H.
       apply some_lift in H; destruct H; subst.
       eauto.
-    - eapply foreign_binary_op_normalized; eauto.
+    - eapply foreign_operators_binary_normalized; eauto.
   Qed.
   
 End BinaryOperatorsSem.

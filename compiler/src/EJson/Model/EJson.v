@@ -40,7 +40,7 @@ Section EJson.
   | ejstring : string -> ejson
   | ejarray : list ejson -> ejson
   | ejobject : list (string * ejson) -> ejson
-  | ejforeign : foreign_ejson_type -> ejson
+  | ejforeign : foreign_ejson_model -> ejson
   .
 
   Set Elimination Schemes.
@@ -187,45 +187,6 @@ Section EJson.
          end.
 
   End toString.
-
-  Section preProcess.
-    Fixpoint json_to_ejson (j:json) : ejson :=
-      match j with
-      | jnull => ejnull
-      | jnumber n => ejnumber n
-      | jbool b => ejbool b
-      | jstring s => ejstring s
-      | jarray c => ejarray (map json_to_ejson c)
-      | jobject nil => ejobject nil
-      | jobject ((s1,j')::nil) =>
-        if (string_dec s1 "$nat") then
-          match j' with
-          | jnumber n => ejbigint (float_truncate n)
-          | _ => ejobject ((json_key_decode s1, json_to_ejson j')::nil)
-          end
-        else
-          if (string_dec s1 "$foreign") then
-            match foreign_ejson_from_json j' with
-            | Some fd => ejforeign fd
-            | None => ejobject ((json_key_decode s1, json_to_ejson j')::nil)
-            end
-          else ejobject ((s1, json_to_ejson j')::nil)
-      | jobject r => ejobject (map (fun x => (fst x, json_to_ejson (snd x))) r)
-      end.
-
-    Fixpoint ejson_to_json (j:ejson) : json :=
-      match j with
-      | ejnull => jnull
-      | ejnumber n => jnumber n
-      | ejbigint n => jobject (("$nat"%string,jnumber (float_of_int n))::nil)
-      | ejbool b => jbool b
-      | ejstring s => jstring s
-      | ejarray c => jarray (map ejson_to_json c)
-      | ejobject r => jobject (map (fun x => (fst x, ejson_to_json (snd x))) r)
-      | ejforeign fd => jobject (("$foreign"%string, foreign_ejson_to_json fd)::nil)
-      end.
-
-  End preProcess.
 
   Section Util.
     Fixpoint of_string_list (d:list ejson) : option (list string) :=

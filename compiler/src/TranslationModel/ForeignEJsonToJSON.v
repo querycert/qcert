@@ -14,14 +14,21 @@
 
 Require Import List.
 Require Import String.
+Require Import Utils.
+
 Require Import ForeignEJson.
-Require Import JavaScriptAst.
+Require Import JSONRuntime.
 
-Section ForeignToJavaScriptAst.
+Local Open Scope string_scope.
 
-  Class foreign_ejson_to_ajavascript {f:foreign_ejson} : Type
-    := mk_foreign_ejson_to_ajavascript {
-           foreign_ejson_to_ajavascript_expr (fe:foreign_ejson_type) : expr (* XXX This is a JsAst expression *)
-         }.
-
-End ForeignToJavaScriptAst.
+Class foreign_to_json
+      {fejson:foreign_ejson}
+  : Type
+  := mk_foreign_to_json {
+         foreign_to_json_to_ejson
+             (fd:json) : option foreign_ejson_model
+         ; foreign_to_json_from_ejson
+             (j:foreign_ejson_model) : json
+         ; foreign_to_json_to_ejson_to_json (fd:foreign_ejson_model) :
+             foreign_to_json_to_ejson (foreign_to_json_from_ejson fd) = Some fd
+       }.

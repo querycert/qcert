@@ -31,7 +31,6 @@ Require Import DataLift.
 Require Import RecOperators.
 
 Section Iterators.
-
   Context {fdata:foreign_data}.
 
   Section MapUtils.

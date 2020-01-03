@@ -12,24 +12,27 @@
  * limitations under the License.
  *)
 
-Require Import Orders.
-Require Import Equivalence.
-Require Import EquivDec.
-Require Import Compare_dec.
-Require Import Omega.
-Require Import String.
+(** This module provides support for operators application. *)
+
 Require Import List.
-Require Import ZArith.
 
-Section SortingDesc.
-  Inductive SortDesc : Set := | Descending | Ascending.
-  Definition SortCriteria : Set := string * SortDesc.
-  Definition SortCriterias : Set := list SortCriteria.
+Section Apply.
+  Context {A:Set}.
 
-  Lemma sort_desc_eq_dec : forall x y:SortDesc, {x=y}+{x<>y}.
-  Proof.
-    decide equality.
-  Defined.
-  
-End SortingDesc.
+  Definition apply_unary (f: A -> option A) (dl: list A) : option A :=
+    match dl with
+    | d :: nil => f d
+    | _ => None
+    end.
+  Definition apply_binary (f: A -> A -> option A) (dl: list A) : option A :=
+    match dl with
+    | d1 :: d2 :: nil => f d1 d2
+    | _ => None
+    end.
+  Definition apply_ternary (f: A -> A -> A -> option A) (dl: list A) : option A :=
+    match dl with
+    | d1 :: d2 :: d3 :: nil => f d1 d2 d3
+    | _ => None
+    end.
+End Apply.
 

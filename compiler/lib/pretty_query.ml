@@ -581,7 +581,7 @@ let pretty_imp_ejson_op p sym pretty_imp_expr ff (op, args) =
 
 let pretty_imp_ejson_runtime p sym pretty_imp_expr ff (op, args) =
   fprintf ff "@[<hv 2>%s(@[<hv 2>%a@])@]"
-    (string_of_char_list (Compiler.string_of_ejson_runtime_op op))
+    (string_of_char_list (QUtil.string_of_ejson_runtime_op op))
     (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (pretty_imp_expr 0 sym)) args
 
 let pretty_imp_ejson = pretty_imp pretty_imp_ejson_data pretty_imp_ejson_op pretty_imp_ejson_runtime

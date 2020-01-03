@@ -280,6 +280,7 @@ Section CompLang.
 
     Context {fr:foreign_runtime}.
     Context {fejson:foreign_ejson}.
+    Context {fejruntime:foreign_ejson_runtime}.
     Context {fredop:foreign_reduce_op}.
 
     Definition camp_rule := camp_rule.

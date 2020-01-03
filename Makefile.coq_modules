@@ -39,21 +39,18 @@ MODULES = \
 	Utils/Closure \
 	Utils/Result \
 	Utils/ToString \
-	Utils/JSON \
-	Utils/JSONUtil \
-	Utils/JSONNorm \
 	Utils/OptimizerStep \
 	Utils/OptimizerLogger \
 	Utils/SortingDesc \
+	Utils/Apply \
+	Utils/EmitUtil \
+	Utils/Encode \
 	Utils/Utils \
 	Brands/BrandRelation \
 	TypeSystem/ForeignType \
-	TypeSystem/ForeignTypeToJSON \
 	TypeSystem/RType \
 	TypeSystem/RTypeNorm \
-	TypeSystem/RTypetoJSON \
 	TypeSystem/DType \
-	TypeSystem/DTypetoJSON \
 	TypeSystem/TBrandContext \
 	TypeSystem/RSubtype \
 	TypeSystem/RSubtypeProp \
@@ -63,11 +60,16 @@ MODULES = \
 	TypeSystem/RTypeLattice \
 	TypeSystem/TBrandModelProp \
 	TypeSystem/Types \
+	JSON/Model/JSON \
+	JSON/Model/JSONNorm \
+	JSON/JSONRuntime \
+	JSON/JSONSystem \
 	EJson/Model/ForeignEJson \
 	EJson/Model/EJson \
 	EJson/Model/EJsonNorm \
 	EJson/Operators/ForeignEJsonRuntime \
 	EJson/Operators/EJsonOperators \
+	EJson/Operators/EJsonRuntimeOperators \
 	EJson/EJsonRuntime \
 	EJson/EJsonSystem \
 	Data/Model/ForeignData \
@@ -115,7 +117,12 @@ MODULES = \
 	Data/DataTypes \
 	Data/DataSystem \
 	TranslationModel/ForeignDataToEJson \
-	TranslationModel/DatatoEJson \
+	TranslationModel/DataToEJson \
+	TranslationModel/ForeignEJsonToJSON \
+	TranslationModel/EJsonToJSON \
+	TranslationModel/ForeignTypeToJSON \
+	TranslationModel/TypeToJSON \
+	TranslationModel/DTypeToJSON \
 	NRA/Lang/NRA \
 	NRA/Lang/NRASugar \
 	NRA/Lang/NRASize \
@@ -318,7 +325,11 @@ MODULES = \
 	Java/JavaRuntime \
 	SparkDF/Lang/SparkDF \
 	SparkDF/SparkDFRuntime \
-	Translation/ForeignToReduceOps \
+	TranslationOperators/ForeignToReduceOps \
+	TranslationOperators/ForeignToJavaScriptAst \
+	TranslationOperators/ForeignToJava \
+	TranslationOperators/ForeignToScala \
+	TranslationOperators/ForeignToSpark \
 	Translation/NRAtocNNRC \
 	Translation/cNRAEnvtocNNRC \
 	Translation/cNRAEnvtoNRA \
@@ -344,14 +355,8 @@ MODULES = \
 	Translation/SQLtoNRAEnv \
 	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \
-	Translation/ForeignToJavaScriptAst \
-	Translation/ForeignToJava \
-	Translation/ForeignToScala \
-	Translation/ForeignToSpark \
 	Translation/NNRCtoNNRS \
-	Translation/TNNRCtoNNRS \
 	Translation/NNRStoNNRSimp \
-	Translation/TNNRStoNNRSimp \
 	Translation/NNRSimptoImpQcert \
 	Translation/ImpQcerttoImpEJson \
 	Translation/ImpEJsontoJavaScriptAst \
@@ -367,6 +372,8 @@ MODULES = \
 	Translation/TCAMPtoNRAEnv \
 	Translation/TLambdaNRAtoNRAEnv \
 	Translation/TOQLtoNRAEnv \
+	Translation/TNNRCtoNNRS \
+	Translation/TNNRStoNNRSimp \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
 	Compiler/Model/StringModelPart \

@@ -17,13 +17,14 @@
 Require Import String.
 Require Import CompilerRuntime.
 Require Import DataSystem.
-Require Import ForeignToJava.
-Require Import ForeignToJavaScriptAst.
-Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
+Require Import ForeignEJsonToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
+Require Import ForeignToJava.
+Require Import ForeignToJavaScriptAst.
+Require Import ForeignToScala.
 Require Import ForeignToSpark.
 Require Import OptimizerLogger.
 Require Import ForeignType.
@@ -41,6 +42,7 @@ Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
   Axiom compiler_model_foreign_runtime : foreign_runtime.
   Axiom compiler_model_foreign_to_ejson : foreign_to_ejson.
+  Axiom compiler_model_foreign_to_json : foreign_to_json.
   Axiom compiler_model_foreign_to_java : foreign_to_java.
   Axiom compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
   Axiom compiler_model_foreign_to_scala : foreign_to_scala.
@@ -64,6 +66,8 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := model.compiler_model_foreign_runtime.
   Definition compiler_foreign_to_ejson : foreign_to_ejson
     := model.compiler_model_foreign_to_ejson.
+  Definition compiler_foreign_to_json : foreign_to_json
+    := model.compiler_model_foreign_to_json.
   Definition compiler_foreign_to_java : foreign_to_java
     := model.compiler_model_foreign_to_java.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript

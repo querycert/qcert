@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,24 +49,6 @@ Section ImpEval.
   
   Definition rbindings := list (string * Data).
   Definition pd_rbindings := list (string * option Data).
-
-  Section Util.
-    Definition apply_unary (f: Data -> option Data) (dl: list Data) : option Data :=
-      match dl with
-      | d :: nil => f d
-      | _ => None
-      end.
-    Definition apply_binary (f: Data -> Data -> option Data) (dl: list Data) : option Data :=
-      match dl with
-      | d1 :: d2 :: nil => f d1 d2
-      | _ => None
-      end.
-    Definition apply_ternary (f: Data -> Data -> Data -> option Data) (dl: list Data) : option Data :=
-      match dl with
-      | d1 :: d2 :: d3 :: nil => f d1 d2 d3
-      | _ => None
-      end.
-  End Util.
 
   (** ** Evaluation Semantics *)
   Section Evaluation.
