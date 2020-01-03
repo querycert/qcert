@@ -98,8 +98,8 @@ Section ImpEJsonEval.
                       Some (ejnumber float_zero)
              | _, _ => None
              end) dl
-      | EJsonRuntimeToString => None
-      | EJsonRuntimeToText => None
+      | EJsonRuntimeToString => None (* XXX TODO *)
+      | EJsonRuntimeToText => None (* XXX TODO *)
       (* Record *)
       | EJsonRuntimeRecConcat =>
         apply_binary
@@ -399,6 +399,24 @@ Section ImpEJsonEval.
              end
           ) dl
       (* Integer *)
+      | EJsonRuntimeNatLt =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbool (if Z_lt_dec n1 n2 then true else false))
+             | _, _ => None
+             end
+          ) dl
+      | EJsonRuntimeNatLe =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejbigint n1, ejbigint n2 =>
+               Some (ejbool (if Z_le_dec n1 n2 then true else false))
+             | _, _ => None
+             end
+          ) dl
       | EJsonRuntimeNatPlus =>
         apply_binary
           (fun d1 d2 =>
@@ -564,7 +582,7 @@ Section ImpEJsonEval.
              | _ => None
              end) dl
       end.
-    
+
     Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
       ejson_op_eval op dl. (* XXX In Common.EJson.EJsonOperators *)
 

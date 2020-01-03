@@ -420,6 +420,12 @@ function like(pat, s) {
 }
 
 /* Integer */
+function natLt(v1, v2) {
+    return v1.$nat < v2.$nat;
+}
+function natLe(v1, v2) {
+    return v1.$nat <= v2.$nat;
+}
 function natPlus(v1, v2) {
     return { "$nat" : v1.$nat + v2.$nat };
 }

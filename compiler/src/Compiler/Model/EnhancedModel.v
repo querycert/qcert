@@ -25,6 +25,7 @@ Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
 Require Import ForeignTypeToJSON.
 Require Import ForeignToSpark.
+Require Import ForeignEJsonRuntime.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import CompilerRuntime.
@@ -515,13 +516,33 @@ Instance enhanced_foreign_runtime :
        enhanced_foreign_unary_op
        enhanced_foreign_binary_op.
 
+(* XXX TODO *)
+Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
+  mk_foreign_ejson_runtime enhanced_foreign_ejson Empty_set _ _ _.
+Next Obligation.
+  intros [].
+Defined.
+Next Obligation.
+  constructor.
+  intros [].
+Defined.
+Next Obligation.
+  exact None.
+Defined.
+
 Program Instance enhanced_foreign_to_ejson : foreign_to_ejson
-  := mk_foreign_to_ejson enhanced_foreign_runtime enhanced_foreign_ejson _ _ _.
+  := mk_foreign_to_ejson enhanced_foreign_runtime enhanced_foreign_ejson _ _ _ _ _ _.
 Next Obligation.
   exact j. (* XXX Easy since enhanced_ejson is the same as enhanced_data *)
 Defined.
 Next Obligation.
   exact fd. (* XXX Easy since enhanced_ejson is the same as enhanced_data *)
+Defined.
+Next Obligation.
+  exact None.
+Defined.
+Next Obligation.
+  exact None.
 Defined.
 
 (* XXX TODO: fix me *)

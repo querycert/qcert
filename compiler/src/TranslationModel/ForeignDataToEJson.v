@@ -17,19 +17,28 @@
 Require Import List.
 Require Import String.
 Require Import Utils.
+
+Require Import DataRuntime.
 Require Import ForeignRuntime.
 Require Import ForeignEJson.
+Require Import ForeignEJsonRuntime.
 
 Local Open Scope string_scope.
 
-Class foreign_to_ejson {fruntime:foreign_runtime}
+Class foreign_to_ejson
+      {fruntime:foreign_runtime}
   : Type
   := mk_foreign_to_ejson {
-         foreign_ejson_ejson :> foreign_ejson
+         foreign_to_ejson_ejson :> foreign_ejson
+         ; foreign_to_ejson_runtime: foreign_ejson_runtime
          ; foreign_to_ejson_to_data
              (j:foreign_ejson_type) : foreign_data_type
          ; foreign_to_ejson_from_data
              (fd:foreign_data_type) : foreign_ejson_type
          ; foreign_to_ejson_to_data_to_ejson (fd:foreign_data_type) :
              foreign_to_ejson_to_data (foreign_to_ejson_from_data fd) = fd
+         ; foreign_to_ejson_runtime_of_unary_op
+               (uop:unary_op) : option foreign_ejson_runtime_type
+         ; foreign_to_ejson_runtime_of_binary_op
+               (uop:binary_op) : option foreign_ejson_runtime_type
        }.
