@@ -73,6 +73,8 @@ Section ImpEJson.
     | EJsonRuntimeStringJoin : imp_ejson_runtime_op
     | EJsonRuntimeLike : imp_ejson_runtime_op
     (* Integer *)
+    | EJsonRuntimeNatLt : imp_ejson_runtime_op
+    | EJsonRuntimeNatLe : imp_ejson_runtime_op
     | EJsonRuntimeNatPlus : imp_ejson_runtime_op
     | EJsonRuntimeNatMinus : imp_ejson_runtime_op
     | EJsonRuntimeNatMult : imp_ejson_runtime_op
@@ -145,6 +147,8 @@ Section ImpEJson.
       | EJsonRuntimeStringJoin => "stringJoin"
       | EJsonRuntimeLike => "like"
       (* Integer *)
+      | EJsonRuntimeNatLt => "natLt"
+      | EJsonRuntimeNatLe => "natLe"
       | EJsonRuntimeNatPlus => "natPlus"
       | EJsonRuntimeNatMinus => "natMinus"
       | EJsonRuntimeNatMult => "natMult"

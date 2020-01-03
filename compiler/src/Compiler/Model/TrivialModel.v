@@ -25,6 +25,7 @@ Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
 Require Import ForeignTypeToJSON.
+Require Import ForeignEJsonRuntime.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
@@ -121,8 +122,27 @@ Instance trivial_foreign_runtime :
        trivial_foreign_unary_op
        trivial_foreign_binary_op.
 
+Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime :=
+  mk_foreign_ejson_runtime trivial_foreign_ejson Empty_set _ _ _.
+Next Obligation.
+  intros [].
+Defined.
+Next Obligation.
+  constructor.
+  intros [].
+Defined.
+Next Obligation.
+  exact None.
+Defined.
+
 Program Instance trivial_foreign_to_ejson : foreign_to_ejson
-  := mk_foreign_to_ejson _ _ _ _ _.
+  := mk_foreign_to_ejson trivial_foreign_runtime trivial_foreign_ejson trivial_foreign_ejson_runtime _ _ _ _ _.
+Next Obligation.
+  exact None.
+Defined.
+Next Obligation.
+  exact None.
+Defined.
 
 Program Instance trivial_foreign_type : foreign_type
   := mk_foreign_type Empty_set _ _ _ _ _ _ _.

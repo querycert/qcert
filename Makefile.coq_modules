@@ -66,6 +66,7 @@ MODULES = \
 	EJson/Model/ForeignEJson \
 	EJson/Model/EJson \
 	EJson/Model/EJsonNorm \
+	EJson/Operators/ForeignEJsonRuntime \
 	EJson/Operators/EJsonOperators \
 	EJson/EJsonRuntime \
 	EJson/EJsonSystem \

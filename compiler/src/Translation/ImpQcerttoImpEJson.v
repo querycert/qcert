@@ -235,14 +235,8 @@ Section ImpQcerttoImpEJson.
         | OpRecMerge => mk_imp_ejson_runtime_call EJsonRuntimeRecMerge el
         | OpAnd => mk_imp_ejson_op EJsonOpAnd el
         | OpOr => mk_imp_ejson_op EJsonOpOr el
-        | OpLt =>
-          mk_imp_ejson_op EJsonOpLt
-                          [ mk_imp_ejson_runtime_call EJsonRuntimeCompare [e1; e2];
-                              ImpExprConst (ejnumber zero) ]
-        | OpLe =>
-          mk_imp_ejson_op EJsonOpLe
-                          [ mk_imp_ejson_runtime_call EJsonRuntimeCompare [e1; e2];
-                              ImpExprConst (ejnumber zero) ]
+        | OpLt => mk_imp_ejson_runtime_call EJsonRuntimeNatLt el
+        | OpLe => mk_imp_ejson_runtime_call EJsonRuntimeNatLe el
         | OpBagUnion => mk_imp_ejson_runtime_call EJsonRuntimeUnion [e1; e2]
         | OpBagDiff => mk_imp_ejson_runtime_call EJsonRuntimeMinus [e1; e2]
         | OpBagMin => mk_imp_ejson_runtime_call EJsonRuntimeMin [e1; e2]
@@ -727,9 +721,9 @@ Section ImpQcerttoImpEJson.
       - Case "OpOr"%string.
         destruct d; destruct d0; reflexivity.
       - Case "OpLt"%string.
-        admit.
+        destruct d; destruct d0; reflexivity.
       - Case "OpLe"%string.
-        admit.
+        destruct d; destruct d0; reflexivity.
       - Case "OpBagUnion"%string.
         unfold rondcoll2, ondcoll2, lift; simpl.
         destruct d; destruct d0; simpl; try reflexivity.
@@ -998,29 +992,29 @@ Section ImpQcerttoImpEJson.
           induction sl; simpl; [reflexivity|].
           clear a a0.
           unfold imp_ejson_data in *.
-          assert ((@fold_left (option (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-              (@ImpEval.imp_stmt (@ejson (@foreign_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op)
-              (fun (c : option (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-                 (s : @ImpEval.imp_stmt (@ejson (@foreign_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op)
+          assert ((@fold_left (option (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+              (@ImpEval.imp_stmt (@ejson (@foreign_to_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op)
+              (fun (c : option (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+                 (s : @ImpEval.imp_stmt (@ejson (@foreign_to_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op)
                =>
-               match c return (option (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson)))) with
-               | Some σ' => @imp_ejson_stmt_eval (@foreign_ejson_ejson fruntime ftejson) h s σ'
-               | None => @None (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson)))
+               match c return (option (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson)))) with
+               | Some σ' => @imp_ejson_stmt_eval (@foreign_to_ejson_ejson fruntime ftejson) h s σ'
+               | None => @None (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson)))
                end)
               (@map (@imp_qcert_stmt fruntime)
-                 (@imp_ejson_stmt (@foreign_ejson_ejson fruntime ftejson)) imp_qcert_stmt_to_imp_ejson sl)
-              (@None (list (prod string (option (@ejson (@foreign_ejson_ejson fruntime ftejson)))))))
+                 (@imp_ejson_stmt (@foreign_to_ejson_ejson fruntime ftejson)) imp_qcert_stmt_to_imp_ejson sl)
+              (@None (list (prod string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson)))))))
               =
-              (@fold_left (option (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-       (@ImpEval.imp_stmt (@ejson (@foreign_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op)
-       (fun (c : option (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-          (s : @ImpEval.imp_stmt (@ejson (@foreign_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op) =>
-        match c return (option (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson)))) with
-        | Some σ' => @imp_ejson_stmt_eval (@foreign_ejson_ejson fruntime ftejson) h s σ'
-        | None => @None (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson)))
+              (@fold_left (option (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+       (@ImpEval.imp_stmt (@ejson (@foreign_to_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op)
+       (fun (c : option (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+          (s : @ImpEval.imp_stmt (@ejson (@foreign_to_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op) =>
+        match c return (option (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson)))) with
+        | Some σ' => @imp_ejson_stmt_eval (@foreign_to_ejson_ejson fruntime ftejson) h s σ'
+        | None => @None (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson)))
         end)
-       (@map (@imp_qcert_stmt fruntime) (@imp_ejson_stmt (@foreign_ejson_ejson fruntime ftejson))
-          imp_qcert_stmt_to_imp_ejson sl) (@None (@ImpEval.pd_rbindings (@ejson (@foreign_ejson_ejson fruntime ftejson)))))) by reflexivity.
+       (@map (@imp_qcert_stmt fruntime) (@imp_ejson_stmt (@foreign_to_ejson_ejson fruntime ftejson))
+          imp_qcert_stmt_to_imp_ejson sl) (@None (@ImpEval.pd_rbindings (@ejson (@foreign_to_ejson_ejson fruntime ftejson)))))) by reflexivity.
           rewrite <- H; clear H.
           rewrite <- IHsl; clear IHsl.
           reflexivity.
@@ -1113,15 +1107,15 @@ Section ImpQcerttoImpEJson.
         revert σ.
         induction l; try reflexivity; simpl; intros.
         specialize (IHstmt ((v, Some a) :: σ)); simpl in IHstmt.
-        assert (@imp_ejson_stmt_eval (@foreign_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
-        (@cons (prod var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))))
-           (@pair var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))) v
-              (@Some (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson a)))
+        assert (@imp_ejson_stmt_eval (@foreign_to_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
+        (@cons (prod var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))))
+           (@pair var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))) v
+              (@Some (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson a)))
            (lift_pd_bindings σ)) =
-                (@imp_ejson_stmt_eval (@foreign_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
-                (@cons (prod string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-                   (@pair string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))) v
-                      (@Some (@ejson (@foreign_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson a)))
+                (@imp_ejson_stmt_eval (@foreign_to_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
+                (@cons (prod string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+                   (@pair string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))) v
+                      (@Some (@ejson (@foreign_to_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson a)))
                    (lift_pd_bindings σ)))) by reflexivity.
         rewrite <- H in IHstmt; clear H.
         rewrite <- IHstmt; clear IHstmt.
@@ -1167,16 +1161,16 @@ Section ImpQcerttoImpEJson.
         revert σ z.
         induction n; try reflexivity; simpl; intros.
         specialize (IHstmt ((v, Some (imp_qcert_Z_to_data z)) :: σ)); simpl in IHstmt.
-        assert ((@imp_ejson_stmt_eval (@foreign_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
-                (@cons (prod string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-                   (@pair string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))) v
-                      (@Some (@ejson (@foreign_ejson_ejson fruntime ftejson)) (@ejbigint (@foreign_ejson_ejson fruntime ftejson) z)))
+        assert ((@imp_ejson_stmt_eval (@foreign_to_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
+                (@cons (prod string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+                   (@pair string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))) v
+                      (@Some (@ejson (@foreign_to_ejson_ejson fruntime ftejson)) (@ejbigint (@foreign_to_ejson_ejson fruntime ftejson) z)))
                    (lift_pd_bindings σ)))
-                  = (@imp_ejson_stmt_eval (@foreign_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
-        (@cons (prod var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))))
-           (@pair var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))) v
-              (@Some (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))
-                 (@imp_ejson_Z_to_data (@foreign_ejson_ejson fruntime ftejson) z))) (lift_pd_bindings σ)))) by reflexivity.
+                  = (@imp_ejson_stmt_eval (@foreign_to_ejson_ejson fruntime ftejson) h (imp_qcert_stmt_to_imp_ejson stmt)
+        (@cons (prod var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))))
+           (@pair var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))) v
+              (@Some (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))
+                 (@imp_ejson_Z_to_data (@foreign_to_ejson_ejson fruntime ftejson) z))) (lift_pd_bindings σ)))) by reflexivity.
         rewrite H in IHstmt; clear H.
         rewrite <- IHstmt; clear IHstmt.
         assert
@@ -1245,38 +1239,38 @@ reflexivity.
       unfold lift.
       Set Printing All.
       
-      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson)) imp_ejson_op
-           imp_ejson_runtime_op (@imp_ejson_data_normalize (@foreign_ejson_ejson fruntime ftejson))
-           (@imp_ejson_data_to_bool (@foreign_ejson_ejson fruntime ftejson))
-           (@imp_ejson_data_to_Z (@foreign_ejson_ejson fruntime ftejson))
-           (@imp_ejson_data_to_list (@foreign_ejson_ejson fruntime ftejson))
-           (@imp_ejson_Z_to_data (@foreign_ejson_ejson fruntime ftejson))
-           (@imp_ejson_runtime_eval (@foreign_ejson_ejson fruntime ftejson) h)
-           (@imp_ejson_op_eval (@foreign_ejson_ejson fruntime ftejson))
+      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson)) imp_ejson_op
+           imp_ejson_runtime_op (@imp_ejson_data_normalize (@foreign_to_ejson_ejson fruntime ftejson))
+           (@imp_ejson_data_to_bool (@foreign_to_ejson_ejson fruntime ftejson))
+           (@imp_ejson_data_to_Z (@foreign_to_ejson_ejson fruntime ftejson))
+           (@imp_ejson_data_to_list (@foreign_to_ejson_ejson fruntime ftejson))
+           (@imp_ejson_Z_to_data (@foreign_to_ejson_ejson fruntime ftejson))
+           (@imp_ejson_runtime_eval (@foreign_to_ejson_ejson fruntime ftejson) h)
+           (@imp_ejson_op_eval (@foreign_to_ejson_ejson fruntime ftejson))
            (imp_qcert_stmt_to_imp_ejson_combined (@cons var v (@nil var)) i)
-           (@cons (prod string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-              (@pair string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))) v0
-                 (@None (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-              (@cons (prod string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))))
-                 (@pair string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))) v
-                    (@Some (@ejson (@foreign_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson d)))
-                 (@nil (prod string (option (@ejson (@foreign_ejson_ejson fruntime ftejson))))))))
-             = @ImpEval.imp_stmt_eval (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op
-          (@imp_ejson_data_normalize (@foreign_ejson_ejson fruntime ftejson))
-          (@imp_ejson_data_to_bool (@foreign_ejson_ejson fruntime ftejson))
-          (@imp_ejson_data_to_Z (@foreign_ejson_ejson fruntime ftejson))
-          (@imp_ejson_data_to_list (@foreign_ejson_ejson fruntime ftejson))
-          (@imp_ejson_Z_to_data (@foreign_ejson_ejson fruntime ftejson))
-          (@imp_ejson_runtime_eval (@foreign_ejson_ejson fruntime ftejson) h)
-          (@imp_ejson_op_eval (@foreign_ejson_ejson fruntime ftejson))
+           (@cons (prod string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+              (@pair string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))) v0
+                 (@None (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+              (@cons (prod string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))
+                 (@pair string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))) v
+                    (@Some (@ejson (@foreign_to_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson d)))
+                 (@nil (prod string (option (@ejson (@foreign_to_ejson_ejson fruntime ftejson))))))))
+             = @ImpEval.imp_stmt_eval (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson)) imp_ejson_op imp_ejson_runtime_op
+          (@imp_ejson_data_normalize (@foreign_to_ejson_ejson fruntime ftejson))
+          (@imp_ejson_data_to_bool (@foreign_to_ejson_ejson fruntime ftejson))
+          (@imp_ejson_data_to_Z (@foreign_to_ejson_ejson fruntime ftejson))
+          (@imp_ejson_data_to_list (@foreign_to_ejson_ejson fruntime ftejson))
+          (@imp_ejson_Z_to_data (@foreign_to_ejson_ejson fruntime ftejson))
+          (@imp_ejson_runtime_eval (@foreign_to_ejson_ejson fruntime ftejson) h)
+          (@imp_ejson_op_eval (@foreign_to_ejson_ejson fruntime ftejson))
           (imp_qcert_stmt_to_imp_ejson_combined (@cons var v (@nil var)) i)
-          (@cons (prod var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))))
-             (@pair var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))) v0
-                (@None (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))))
-             (@cons (prod var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))))
-                (@pair var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson))) v
-                   (@Some (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson d)))
-                (@nil (prod var (option (@imp_ejson_data (@foreign_ejson_ejson fruntime ftejson)))))))) by reflexivity.
+          (@cons (prod var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))))
+             (@pair var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))) v0
+                (@None (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))))
+             (@cons (prod var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))))
+                (@pair var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson))) v
+                   (@Some (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson)) (@data_to_ejson fruntime ftejson d)))
+                (@nil (prod var (option (@imp_ejson_data (@foreign_to_ejson_ejson fruntime ftejson)))))))) by reflexivity.
       rewrite <- H0; clear H0.
       rewrite <- H; clear H.
       unfold unlift_result_env; unfold lift; simpl.
