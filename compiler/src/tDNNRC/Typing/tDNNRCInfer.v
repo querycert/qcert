@@ -70,8 +70,7 @@ Section tDNNRCInfer.
   Context {ftype:foreign_type}.
   Context {m:brand_model}.
   Context {fdtyping:foreign_data_typing}.
-  Context {fboptyping:foreign_binary_op_typing}.
-  Context {fuoptyping:foreign_unary_op_typing}.
+  Context {foptyping:foreign_operators_typing}.
   Context {plug_type:Set}.
   Context {plug:AlgPlug plug_type}.
 

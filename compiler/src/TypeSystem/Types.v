@@ -16,9 +16,7 @@
 
 Require Export ForeignType.
 Require Export RType.
-Require Export RTypetoJSON.
 Require Export DType.
-Require Export DTypetoJSON.
 Require Export RTypeMeetJoin.
 Require Export RSubtype.
 Require Export RSubtypeProp.

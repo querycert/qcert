@@ -32,14 +32,13 @@ Require Import Data.
 Require Import DataNorm.
 Require Import Iterators.
 Require Import OperatorsUtils.
+Require Import ForeignOperators.
 Require Import BinaryOperatorsSem.
 Require Import UnaryOperatorsSem.
-Require Import ForeignOperators.
 
 Section OperatorsEq.
   Context {fdata:foreign_data}.
-  Context {fuop:foreign_unary_op}.
-  Context {fbop:foreign_binary_op}.
+  Context {foperators:foreign_operators}.
 
   (* Equivalence relation between operators.
      Two plans are equivalent iff they return the same value for every input.

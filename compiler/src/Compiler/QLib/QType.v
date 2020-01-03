@@ -17,6 +17,8 @@
 Require Import CompilerRuntime.
 Require Import Types.
 Require RType.
+Require TypeToJSON.
+Require DTypeToJSON.
 Require String.
 Require DatatoSparkDF.
 Require Data.
@@ -71,9 +73,9 @@ Module QType(runtime:CompilerRuntime).
 
   (* Additional support for json to rtype conversion *)
   
-  Definition json_to_rtype {m:brand_relation} := json_to_rtype.  
+  Definition json_to_rtype {m:brand_relation} := TypeToJSON.json_to_rtype.  
 
-  Definition json_to_rtype_with_fail {m:brand_relation} := json_to_rtype_with_fail.
+  Definition json_to_rtype_with_fail {m:brand_relation} := TypeToJSON.json_to_rtype_with_fail.
 
   (* Additional support for distributed types *)
   
@@ -82,9 +84,10 @@ Module QType(runtime:CompilerRuntime).
   Definition dt {m:brand_relation} : Set
     := qcert_dtype.
 
-  Definition json_to_drtype {m:brand_relation} : JSON.json -> qcert_dtype := json_to_drtype.
+  Definition json_to_drtype {m:brand_relation} : JSON.json -> qcert_dtype := DTypeToJSON.json_to_drtype.
 
-  Definition json_to_vrtype_with_fail {m:brand_relation} : JSON.json -> option (String.string * qtype) := json_to_vrtype_with_fail.
+  Definition json_to_vrtype_with_fail {m:brand_relation} : JSON.json -> option (String.string * qtype) :=
+    TypeToJSON.json_to_vrtype_with_fail.
 
   Definition tlocal {m:brand_relation}  : qtype -> qcert_dtype := DType.Tlocal.
   Definition tdistr {m:brand_relation}  : qtype -> qcert_dtype := DType.Tdistr.

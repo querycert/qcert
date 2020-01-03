@@ -23,40 +23,38 @@ Require Import Data.
 Require Import DataNorm.
 
 Section ForeignOperators.
-  Class foreign_unary_op {fdata:foreign_data}
+  Class foreign_operators {fdata:foreign_data}
   : Type
-    := mk_foreign_unary_op {
-           foreign_unary_op_type : Set
-           ; foreign_unary_op_dec :> EqDec foreign_unary_op_type eq
-           ; foreign_unary_op_tostring :> ToString foreign_unary_op_type
-           ; foreign_unary_op_interp
+    := mk_foreign_operators {
+           (* Unary operators *)
+           foreign_operators_unary : Set
+           ; foreign_operators_unary_dec :> EqDec foreign_operators_unary eq
+           ; foreign_operators_unary_tostring :> ToString foreign_operators_unary
+           ; foreign_operators_unary_interp
                (br:brand_relation_t)
-               (op:foreign_unary_op_type)
+               (op:foreign_operators_unary)
                (d:data) : option data
-           ; foreign_unary_op_normalized
+           ; foreign_operators_unary_normalized
                (br:brand_relation_t)
-               (op:foreign_unary_op_type) (d o:data) :
-               foreign_unary_op_interp br op d = Some o ->
+               (op:foreign_operators_unary) (d o:data) :
+               foreign_operators_unary_interp br op d = Some o ->
                data_normalized br d ->
                data_normalized br o
-           ; foreign_unary_op_data_tostring : data -> string
-           ; foreign_unary_op_data_totext : data -> string
-         }.
+           ; foreign_operators_unary_data_tostring : data -> string
+           ; foreign_operators_unary_data_totext : data -> string
 
-  Class foreign_binary_op {fdata:foreign_data}
-    : Type
-    := mk_foreign_binary_op {
-           foreign_binary_op_type : Set
-           ; foreign_binary_op_dec :> EqDec foreign_binary_op_type eq
-           ; foreign_binary_op_tostring :> ToString foreign_binary_op_type
-           ; foreign_binary_op_interp
+           (* Binary operators *)
+           ; foreign_operators_binary : Set
+           ; foreign_operators_binary_dec :> EqDec foreign_operators_binary eq
+           ; foreign_operators_binary_tostring :> ToString foreign_operators_binary
+           ; foreign_operators_binary_interp
                (br:brand_relation_t)
-               (op:foreign_binary_op_type)
+               (op:foreign_operators_binary)
                (d1 d2:data) : option data
-           ; foreign_binary_op_normalized
+           ; foreign_operators_binary_normalized
                (br:brand_relation_t)
-               (op:foreign_binary_op_type) (d1 d2 o:data) :
-               foreign_binary_op_interp br op d1 d2 = Some o ->
+               (op:foreign_operators_binary) (d1 d2 o:data) :
+               foreign_operators_binary_interp br op d1 d2 = Some o ->
                data_normalized br d1 ->
                data_normalized br d2 ->
                data_normalized br o

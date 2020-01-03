@@ -52,7 +52,7 @@ Axiom SQL_DATE_INTERVAL_tostring : SQL_DATE_INTERVAL -> String.string.
 Extract Inlined Constant SQL_DATE_INTERVAL_tostring => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance sql_date_interval_foreign_data : foreign_data
-  := {foreign_data_type := SQL_DATE_INTERVAL}.
+  := {foreign_data_model := SQL_DATE_INTERVAL}.
 Next Obligation.
   intros x y.
   case_eq (SQL_DATE_INTERVAL_eq x y); intros eqq.
@@ -92,7 +92,7 @@ Axiom SQL_DATE_tostring : SQL_DATE -> String.string.
 Extract Inlined Constant SQL_DATE_tostring => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance sql_date_foreign_data : foreign_data
-  := {foreign_data_type := SQL_DATE}.
+  := {foreign_data_model := SQL_DATE}.
 Next Obligation.
   intros x y.
   case_eq (SQL_DATE_eq x y); intros eqq.

@@ -22,9 +22,10 @@ Require Import Types.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import ForeignDataTyping.
+Require Import JSONRuntime.
 Require Import EJsonRuntime.
 Require Import ForeignDataToEJson.
-Require Import DatatoEJson.
+Require Import DataToEJson.
 
 Section DatatoSparkDF.
 
@@ -36,7 +37,7 @@ Section DatatoSparkDF.
   Context {m:brand_model}.
 
   Definition data_to_blob (d: data): string :=
-    jsonStringify quotel_double (ejson_to_json (data_to_ejson d)).
+    ejsonStringify quotel_double (data_to_ejson d).
 
   Lemma dataToJS_correctly_escapes_quote_inside_string:
     data_to_blob (dstring "abc""cde") = """abc\""cde"""%string.

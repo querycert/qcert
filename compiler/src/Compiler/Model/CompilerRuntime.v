@@ -21,6 +21,7 @@ Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
+Require Import ForeignEJsonToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
@@ -41,6 +42,7 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_type : foreign_type.
   Axiom compiler_foreign_runtime : foreign_runtime.
   Axiom compiler_foreign_to_ejson : foreign_to_ejson.
+  Axiom compiler_foreign_to_json : foreign_to_json.
   Axiom compiler_foreign_to_java : foreign_to_java.
   Axiom compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
   Axiom compiler_foreign_to_scala : foreign_to_scala.

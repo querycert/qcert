@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +23,7 @@ Require Import RTypeNorm.
 Require Import ForeignType.
 Require Import ForeignTypeToJSON.
 
-Section RTypeToJSON.
+Section TypeToJSON.
 
   Fixpoint json_brands (d:list json) : option (list string) :=
     match d with
@@ -125,5 +123,5 @@ Section RTypeToJSON.
       end.
 
   End toVType.
-End RTypeToJSON.
+End TypeToJSON.
 

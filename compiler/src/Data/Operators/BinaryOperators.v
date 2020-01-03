@@ -22,7 +22,7 @@ Require Import ForeignOperators.
 
 Section BinaryOperators.
   Context {fdata:foreign_data}.
-  Context {fbop:foreign_binary_op}.
+  Context {foperators:foreign_operators}.
 
   Inductive nat_arith_binary_op
     := NatPlus     (**r addition *)
@@ -72,7 +72,7 @@ Section BinaryOperators.
   | OpFloatBinary : float_arith_binary_op -> binary_op    (**r arithmetic operators on floats *)
   | OpFloatCompare : float_compare_binary_op -> binary_op (**r comparison operators on floats *)
   | OpForeignBinary
-      (fb : foreign_binary_op_type) : binary_op         (**r foreign binary operators *)
+      (fb : foreign_operators_binary) : binary_op         (**r foreign binary operators *)
   .
 
   Global Instance nat_arith_binary_op_eqdec : EqDec nat_arith_binary_op eq.
@@ -100,7 +100,7 @@ Section BinaryOperators.
     apply nat_arith_binary_op_eqdec.
     apply float_arith_binary_op_eqdec.
     apply float_compare_binary_op_eqdec.
-    apply foreign_binary_op_dec.
+    apply foreign_operators_binary_dec.
   Defined.
 
   Local Open Scope string.

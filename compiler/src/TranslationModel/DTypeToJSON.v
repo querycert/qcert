@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,10 +22,10 @@ Require Import RType.
 Require Import RTypeNorm.
 Require Import ForeignType.
 Require Import ForeignTypeToJSON.
-Require Import RTypetoJSON.
 Require Import DType.
+Require Import TypeToJSON.
 
-Section DTypetoJSON.
+Section DTypeToJSON.
   
   Context {ftype:foreign_type}.
   Context {ftypeToJSON:foreign_type_to_JSON}.
@@ -45,5 +43,5 @@ Section DTypetoJSON.
     | _ => lift Tlocal (json_to_rtype_with_fail j)
     end.
 
-End DTypetoJSON.
+End DTypeToJSON.
 

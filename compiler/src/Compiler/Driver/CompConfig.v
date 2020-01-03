@@ -22,11 +22,13 @@ Require Import ZArith.
 (* Common *)
 Require Import Utils.
 
+Require Export JSONSystem.
 Require Export DataSystem.
 Require Import ForeignReduceOps.
 
 Require Import OptimizerLogger.
-Require Import CompLang CompEnv.
+Require Import CompLang.
+Require Import CompEnv.
 
 Require Import NNRCOptimizer.
 Require Import NRAEnvOptimizer.

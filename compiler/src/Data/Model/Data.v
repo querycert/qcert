@@ -55,7 +55,7 @@ Section Data.
   | dleft : data -> data
   | dright : data -> data
   | dbrand : brands -> data -> data
-  | dforeign : foreign_data_type -> data
+  | dforeign : foreign_data_model -> data
   .
 
   Set Elimination Schemes.

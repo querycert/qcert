@@ -44,10 +44,10 @@ Section TOperatorsInferSub.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
-  Section b.
+  Context {foperators:foreign_operators}.
+  Context {foptyping:foreign_operators_typing}.
 
-    Context {fbop:foreign_binary_op}.
-    Context {fboptyping:foreign_binary_op_typing}.
+  Section b.
 
     (* returns an optional tuple containing:
        1) the inferred type of the binary operation
@@ -148,15 +148,12 @@ Section TOperatorsInferSub.
         | _, _ => None
         end
       | OpForeignBinary fb =>
-        foreign_binary_op_typing_infer_sub fb τ₁ τ₂
+        foreign_operators_typing_binary_infer_sub fb τ₁ τ₂
       end.
 
   End b.
 
   Section u.
-    Context {fuop:foreign_unary_op}.
-    Context {fuoptyping:foreign_unary_op_typing}.
-
     (* returns an optional tuple containing:
        1) the inferred type of the binary operation
        2) the required type of the argument (will be a non-proper supertype of τ₁)
@@ -281,7 +278,7 @@ Section TOperatorsInferSub.
         then Some (Float, Coll Float)
         else None
       | OpForeignUnary fu =>
-        foreign_unary_op_typing_infer_sub fu τ₁
+        foreign_operators_typing_unary_infer_sub fu τ₁
       end.
 
   End u.

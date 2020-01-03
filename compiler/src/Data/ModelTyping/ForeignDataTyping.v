@@ -27,26 +27,26 @@ Section ForeignDataTyping.
     : Type
     := mk_foreign_data_typing {
            foreign_data_typing_has_type
-             (d:foreign_data_type)
+             (d:foreign_data_model)
              (τ:foreign_type_type) : Prop
            ; foreign_data_typing_normalized 
-               {d:foreign_data_type}
+               {d:foreign_data_model}
                {τ:foreign_type_type} :
                foreign_data_typing_has_type d τ ->
                foreign_data_normalized d
            ; foreign_data_typing_subtype
-               {d:foreign_data_type}
+               {d:foreign_data_model}
                {τ₁ τ₂:foreign_type_type} :
                foreign_data_typing_has_type d τ₁ ->
                τ₁ ≤ τ₂ ->
                foreign_data_typing_has_type d τ₂
            ; foreign_data_typing_meet 
-               {d:foreign_data_type}
+               {d:foreign_data_model}
                {τ₁ τ₂:foreign_type_type} :
                foreign_data_typing_has_type d τ₁ ->
                foreign_data_typing_has_type d τ₂ ->
                foreign_data_typing_has_type d (τ₁ ⊓ τ₂)
-           ; foreign_data_typing_infer (d:foreign_data_type)
+           ; foreign_data_typing_infer (d:foreign_data_model)
              : option foreign_type_type
            ; foreign_data_typing_infer_normalized {d} :
                foreign_data_normalized d ->

@@ -107,10 +107,10 @@ Section TOperatorsInfer.
               | [H:binary_op_type _ _ _ _ |- _ ] => inversion H; clear H
               end; try autorewrite with type_canon in *; try unfold equiv, complement, rtype in *; simpl in *; try rtype_equalizer; try subst; try discriminate; try reflexivity).
 
-  Section b.
+  Context {foperators:foreign_operators}.
+  Context {foptyping:foreign_operators_typing}.
 
-    Context {fbop:foreign_binary_op}.
-    Context {fboptyping:foreign_binary_op_typing}.
+  Section b.
 
     Definition infer_binary_op_type (b:binary_op) (τ₁ τ₂:rtype) : option rtype :=
       match b with
@@ -177,7 +177,7 @@ Section TOperatorsInfer.
         | _ => None
         end
       | OpForeignBinary fb =>
-        foreign_binary_op_typing_infer fb τ₁ τ₂
+        foreign_operators_typing_binary_infer fb τ₁ τ₂
       end.
 
     Lemma infer_concat_trec {τ₁ τ₂ τout} :
@@ -210,7 +210,7 @@ Section TOperatorsInfer.
       Hint Resolve infer_concat_trec infer_merge_tmerge.
       binary_op_cases (case_eq b) Case; intros; simpl in *; destructer;
         try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
-      - constructor; apply foreign_binary_op_typing_infer_correct;
+      - constructor; apply foreign_operators_typing_binary_infer_correct;
         apply H0.
     Qed.
   
@@ -222,7 +222,7 @@ Section TOperatorsInfer.
       intros binf btype.
       binary_op_cases (destruct b) Case; intros; simpl in *; destructer;
       try solve[ erewrite Rec_pr_irrel; reflexivity ].
-      - apply (foreign_binary_op_typing_infer_least binf H0). (* Handles foreign binary_op *)
+      - apply (foreign_operators_typing_binary_infer_least binf H0). (* Handles foreign binary_op *)
     Qed.
 
     Theorem infer_binary_op_type_complete {b:binary_op} {τ₁ τ₂:rtype} (τout:rtype) :
@@ -233,7 +233,7 @@ Section TOperatorsInfer.
       binary_op_cases (destruct b) Case; intros; simpl in *; try destructer;
       try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity ].
       - Case "OpForeignBinary"%string.
-        apply (foreign_binary_op_typing_infer_complete binf H0).
+        apply (foreign_operators_typing_binary_infer_complete binf H0).
     Qed.
 
   End b.
@@ -265,9 +265,6 @@ Section TOperatorsInfer.
   (** Type inference for unary operators *)
 
   Section u.
-    Context {fuop:foreign_unary_op}.
-    Context {fuoptyping:foreign_unary_op_typing}.
-    
     Definition infer_unary_op_type (u:unary_op) (τ₁:rtype) : option rtype :=
       match u with
       | OpIdentity => Some τ₁
@@ -378,7 +375,7 @@ Section TOperatorsInfer.
         | _ => None
         end
       | OpForeignUnary fu =>
-        foreign_unary_op_typing_infer fu τ₁
+        foreign_operators_typing_unary_infer fu τ₁
       end.
 
     (** XXX TO GENERALIZE XXX *)
@@ -504,7 +501,7 @@ Section TOperatorsInfer.
       unary_op_cases (case_eq u) Case; intros; simpl in *; destructer; unfold olift in *; try autorewrite with type_canon in *; destructer;
         try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
       - constructor.
-      - constructor; apply foreign_unary_op_typing_infer_correct;
+      - constructor; apply foreign_operators_typing_unary_infer_correct;
         apply H0.
     Qed.
 
@@ -521,7 +518,7 @@ Section TOperatorsInfer.
         subst.
         rewrite brands_type_of_canon.
         reflexivity.
-      - apply (foreign_unary_op_typing_infer_least uinf H0). (* Handles foreign unary_op *)
+      - apply (foreign_operators_typing_unary_infer_least uinf H0). (* Handles foreign unary_op *)
     Qed.
 
     Lemma infer_unary_op_type_complete (u:unary_op) (τ₁ τout:rtype) :
@@ -532,7 +529,7 @@ Section TOperatorsInfer.
       unary_op_cases (destruct u) Case; inversion utype; intros; simpl in *; destructer; unfold tunrecdot, tunrecremove, tunrecproject, tunrecsortable, tsingleton in *; destructer; try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity ].
       - Case "OpForeignUnary"%string.
         inversion utype.
-        apply (foreign_unary_op_typing_infer_complete uinf H1).
+        apply (foreign_operators_typing_unary_infer_complete uinf H1).
     Qed.
 
   End u.

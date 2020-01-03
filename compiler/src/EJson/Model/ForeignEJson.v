@@ -20,16 +20,13 @@ Section ForeignEJson.
   
   Class foreign_ejson : Type
     := mk_foreign_ejson {
-           foreign_ejson_type : Set
-           ; foreign_ejson_dec :> EqDec foreign_ejson_type eq
-           ; foreign_ejson_normalized (a : foreign_ejson_type) : Prop
-           ; foreign_ejson_normalize (a : foreign_ejson_type) : foreign_ejson_type
-           ; foreign_ejson_normalize_normalizes (a : foreign_ejson_type) : foreign_ejson_normalized (foreign_ejson_normalize a)
-           ; foreign_ejson_normalize_idempotent (a : foreign_ejson_type) : foreign_ejson_normalized a -> foreign_ejson_normalize a = a
-           ; foreign_ejson_tostring :> ToString foreign_ejson_type
-           ; foreign_ejson_from_json (j:json) : option foreign_ejson_type
-           ; foreign_ejson_to_json (fd:foreign_ejson_type) : json
-           ; foreign_ejson_to_json_roundtrip (fd:foreign_ejson_type) : foreign_ejson_from_json (foreign_ejson_to_json fd) = Some fd
+           foreign_ejson_model : Set
+           ; foreign_ejson_dec :> EqDec foreign_ejson_model eq
+           ; foreign_ejson_normalized (a : foreign_ejson_model) : Prop
+           ; foreign_ejson_normalize (a : foreign_ejson_model) : foreign_ejson_model
+           ; foreign_ejson_normalize_normalizes (a : foreign_ejson_model) : foreign_ejson_normalized (foreign_ejson_normalize a)
+           ; foreign_ejson_normalize_idempotent (a : foreign_ejson_model) : foreign_ejson_normalized a -> foreign_ejson_normalize a = a
+           ; foreign_ejson_tostring :> ToString foreign_ejson_model
       }.
 
 End ForeignEJson.

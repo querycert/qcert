@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,12 +15,14 @@
 Require Import List.
 Require Import EquivDec.
 Require Import Utils.
+Require Import JSONSystem.
 Require Import DataSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
+Require Import ForeignEJsonToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignEJsonRuntime.
@@ -197,20 +197,8 @@ Next Obligation.
   - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
 Defined.
 
-Definition from_json (j:json) : option enhanced_ejson :=
-  None. (* XXX To fix *)
-
-Definition to_json (ej:enhanced_ejson) : json :=
-  jnull. (* XXX To fix *)
-
-Lemma to_json_from_json_rountrip (ej:enhanced_ejson) :
-  from_json (to_json ej) = Some ej.
-Proof.
-  admit. (* XXX FALSE NOW! *)
-Admitted.
-
 Program Instance enhanced_foreign_ejson : foreign_ejson
-  := mk_foreign_ejson enhanced_ejson _ _ _ _ _ _ _ _ _.
+  := mk_foreign_ejson enhanced_ejson _ _ _ _ _ _.
 Next Obligation.
   red.
   unfold equiv, complement.
@@ -274,15 +262,6 @@ Next Obligation.
   - exact (@toString _ (@foreign_data_tostring time_point_foreign_data) t).
   - exact (@toString _ (@foreign_data_tostring sql_date_foreign_data) s).
   - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
-Defined.
-Next Obligation.
-  exact (from_json j).
-Defined.
-Next Obligation.
-  exact (to_json fd).
-Defined.
-Next Obligation.
-  apply to_json_from_json_rountrip.
 Defined.
 
 Definition denhancedstring s := dforeign (enhancedstring s).
@@ -349,41 +328,6 @@ Definition enhanced_unary_op_interp
      end.
 
 Require Import String.
-
-Program Instance enhanced_foreign_unary_op : foreign_unary_op
-  := { foreign_unary_op_type := enhanced_unary_op
-       ; foreign_unary_op_interp := enhanced_unary_op_interp
-       ; foreign_unary_op_data_tostring := defaultDataToString
-       ; foreign_unary_op_data_totext := defaultDataToString }.
-Next Obligation.
-  red; unfold equiv; intros.
-  change ({x = y} + {x <> y}).
-  decide equality.
-  - decide equality.
-  - decide equality.
-    decide equality.
-Defined.
-Next Obligation.
-  constructor; intros op.
-  destruct op.
-  - exact (time_unary_op_tostring t).
-  - exact (sql_date_unary_op_tostring s).
-Defined.
-Next Obligation.
-  destruct op; simpl in H.
-  - destruct t; simpl in H;
-      unfold ondtimepoint, ondstring, denhancedtimepoint, denhancedtimeduration, lift in H; simpl in H;
-        destruct d; simpl in H; try discriminate.
-    + destruct f; invcs H; repeat constructor.
-    + invcs H; repeat constructor.
-    + invcs H; repeat constructor.
-  - destruct s; simpl in H;
-      unfold ondsqldate, denhancedsqldate, denhancedsqldateinterval, lift in H; simpl in H;
-        destruct d; simpl in H; try discriminate.
-    + destruct f; invcs H; repeat constructor.
-    + invcs H; repeat constructor.
-    + invcs H; repeat constructor.
-Defined.
 
 Inductive enhanced_binary_op
   :=
@@ -473,9 +417,42 @@ Definition enhanced_binary_op_interp
      | enhanced_binary_sql_date_op f => sql_date_binary_op_interp f d1 d2
      end.
 
-Program Instance enhanced_foreign_binary_op : foreign_binary_op
-  := { foreign_binary_op_type := enhanced_binary_op
-       ; foreign_binary_op_interp := enhanced_binary_op_interp }.
+Program Instance enhanced_foreign_operators : foreign_operators
+  := { foreign_operators_unary := enhanced_unary_op
+       ; foreign_operators_unary_interp := enhanced_unary_op_interp
+       ; foreign_operators_unary_data_tostring := defaultDataToString
+       ; foreign_operators_unary_data_totext := defaultDataToString
+       ; foreign_operators_binary := enhanced_binary_op
+       ; foreign_operators_binary_interp := enhanced_binary_op_interp }.
+Next Obligation.
+  red; unfold equiv; intros.
+  change ({x = y} + {x <> y}).
+  decide equality.
+  - decide equality.
+  - decide equality.
+    decide equality.
+Defined.
+Next Obligation.
+  constructor; intros op.
+  destruct op.
+  - exact (time_unary_op_tostring t).
+  - exact (sql_date_unary_op_tostring s).
+Defined.
+Next Obligation.
+  destruct op; simpl in H.
+  - destruct t; simpl in H;
+      unfold ondtimepoint, ondstring, denhancedtimepoint, denhancedtimeduration, lift in H; simpl in H;
+        destruct d; simpl in H; try discriminate.
+    + destruct f; invcs H; repeat constructor.
+    + invcs H; repeat constructor.
+    + invcs H; repeat constructor.
+  - destruct s; simpl in H;
+      unfold ondsqldate, denhancedsqldate, denhancedsqldateinterval, lift in H; simpl in H;
+        destruct d; simpl in H; try discriminate.
+    + destruct f; invcs H; repeat constructor.
+    + invcs H; repeat constructor.
+    + invcs H; repeat constructor.
+Defined.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
@@ -513,8 +490,7 @@ Instance enhanced_foreign_runtime :
   foreign_runtime
   := mk_foreign_runtime
        enhanced_foreign_data
-       enhanced_foreign_unary_op
-       enhanced_foreign_binary_op.
+       enhanced_foreign_operators.
 
 (* XXX TODO *)
 Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
@@ -530,6 +506,7 @@ Next Obligation.
   exact None.
 Defined.
 
+(* XXX TODO *)
 Program Instance enhanced_foreign_to_ejson : foreign_to_ejson
   := mk_foreign_to_ejson enhanced_foreign_runtime enhanced_foreign_ejson _ _ _ _ _ _.
 Next Obligation.
@@ -544,6 +521,19 @@ Defined.
 Next Obligation.
   exact None.
 Defined.
+
+(* XXX TODO *)
+Program Instance enhanced_foreign_to_json : foreign_to_json
+  := mk_foreign_to_json enhanced_foreign_ejson _ _ _.
+Next Obligation.
+  exact None.
+Defined.
+Next Obligation.
+  exact jnull.
+Defined.
+Next Obligation.
+  admit.
+Admitted.
 
 (* XXX TODO: fix me *)
 Definition enhanced_to_java_data
@@ -1387,6 +1377,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_java.
   Definition compiler_foreign_to_ejson : foreign_to_ejson
     := enhanced_foreign_to_ejson.
+  Definition compiler_foreign_to_json : foreign_to_json
+    := enhanced_foreign_to_json.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
   Definition compiler_foreign_to_scala : foreign_to_scala
@@ -1589,7 +1581,7 @@ Qed.
 
   Lemma enhanced_unary_op_typing_infer_correct
         {model:brand_model}
-        (fu:foreign_unary_op_type)
+        (fu:foreign_operators_unary)
         {τ₁ τout} :
     enhanced_unary_op_typing_infer fu τ₁ = Some τout ->
     enhanced_unary_op_has_type fu τ₁ τout.
@@ -1628,7 +1620,7 @@ Qed.
 
   Lemma enhanced_unary_op_typing_infer_least
         {model:brand_model}
-        (fu:foreign_unary_op_type)
+        (fu:foreign_operators_unary)
         {τ₁ τout₁ τout₂} :
     enhanced_unary_op_typing_infer fu τ₁ = Some τout₁ ->
     enhanced_unary_op_has_type fu τ₁ τout₂ ->
@@ -1678,7 +1670,7 @@ Qed.
 
   Lemma enhanced_unary_op_typing_infer_complete
         {model:brand_model}
-        (fu:foreign_unary_op_type)
+        (fu:foreign_operators_unary)
         {τ₁ τout} : 
     enhanced_unary_op_typing_infer fu τ₁ = None ->
     ~ enhanced_unary_op_has_type fu τ₁ τout.
@@ -1708,7 +1700,7 @@ Qed.
     end.
     
 Lemma enhanced_unary_op_typing_sound {model : brand_model}
-      (fu : foreign_unary_op_type) (τin τout : rtype) :
+      (fu : foreign_operators_unary) (τin τout : rtype) :
   enhanced_unary_op_has_type fu τin τout ->
   forall din : data,
     din ▹ τin ->
@@ -1720,23 +1712,6 @@ Proof.
   - eapply time_unary_op_typing_sound; eauto.
   - eapply sql_date_unary_op_typing_sound; eauto.
 Qed.
-
-Instance enhanced_foreign_unary_op_typing
-        {model:brand_model} :
-  @foreign_unary_op_typing
-    enhanced_foreign_data
-    enhanced_foreign_unary_op
-    enhanced_foreign_type
-    enhanced_foreign_data_typing
-    model
-  := { foreign_unary_op_typing_has_type := enhanced_unary_op_has_type
-       ; foreign_unary_op_typing_sound := enhanced_unary_op_typing_sound
-       ; foreign_unary_op_typing_infer := enhanced_unary_op_typing_infer
-       ; foreign_unary_op_typing_infer_correct := enhanced_unary_op_typing_infer_correct
-       ; foreign_unary_op_typing_infer_least := enhanced_unary_op_typing_infer_least
-       ; foreign_unary_op_typing_infer_complete := enhanced_unary_op_typing_infer_complete
-       ; foreign_unary_op_typing_infer_sub := enhanced_unary_op_typing_infer_sub
-     }.
 
 Inductive time_binary_op_has_type {model:brand_model} :
   time_binary_op -> rtype -> rtype -> rtype -> Prop
@@ -1918,7 +1893,7 @@ Definition enhanced_binary_op_typing_infer {model:brand_model} (op:enhanced_bina
 
 Lemma enhanced_binary_op_typing_infer_correct
       {model:brand_model}
-      (fb:foreign_binary_op_type)
+      (fb:foreign_operators_binary)
       {τ₁ τ₂ τout} :
   enhanced_binary_op_typing_infer fb τ₁ τ₂ = Some τout ->
   enhanced_binary_op_has_type fb τ₁ τ₂ τout.
@@ -1953,7 +1928,7 @@ Qed.
 
 Lemma enhanced_binary_op_typing_infer_least
       {model:brand_model}
-      (fb:foreign_binary_op_type)
+      (fb:foreign_operators_binary)
       {τ₁ τ₂ τout₁ τout₂} : 
   enhanced_binary_op_typing_infer fb τ₁ τ₂ = Some τout₁ ->
   enhanced_binary_op_has_type fb τ₁ τ₂ τout₂ ->
@@ -1989,7 +1964,7 @@ Qed.
 
 Lemma enhanced_binary_op_typing_infer_complete
       {model:brand_model}
-      (fb:foreign_binary_op_type)
+      (fb:foreign_operators_binary)
       {τ₁ τ₂ τout} : 
   enhanced_binary_op_typing_infer fb τ₁ τ₂ = None ->
   ~ enhanced_binary_op_has_type fb τ₁ τ₂ τout.
@@ -2008,7 +1983,7 @@ Definition enhanced_binary_op_typing_infer_sub {model:brand_model} (op:enhanced_
   end.
 
 Lemma enhanced_binary_op_typing_sound {model : brand_model}
-      (fu : foreign_binary_op_type) (τin₁ τin₂ τout : rtype) :
+      (fu : foreign_operators_binary) (τin₁ τin₂ τout : rtype) :
   enhanced_binary_op_has_type fu τin₁ τin₂ τout ->
   forall din₁ din₂ : data,
     din₁ ▹ τin₁ ->
@@ -2022,21 +1997,28 @@ Proof.
   - eapply sql_date_binary_op_typing_sound; eauto.
 Qed.
 
-Program Instance enhanced_foreign_binary_op_typing
+Instance enhanced_foreign_operators_typing
         {model:brand_model} :
-  @foreign_binary_op_typing
+  @foreign_operators_typing
     enhanced_foreign_data
-    enhanced_foreign_binary_op
+    enhanced_foreign_operators
     enhanced_foreign_type
     enhanced_foreign_data_typing
     model
-  := { foreign_binary_op_typing_has_type := enhanced_binary_op_has_type
-       ; foreign_binary_op_typing_sound := enhanced_binary_op_typing_sound
-       ; foreign_binary_op_typing_infer := enhanced_binary_op_typing_infer
-       ; foreign_binary_op_typing_infer_correct := enhanced_binary_op_typing_infer_correct
-       ; foreign_binary_op_typing_infer_least := enhanced_binary_op_typing_infer_least
-       ; foreign_binary_op_typing_infer_complete := enhanced_binary_op_typing_infer_complete
-       ; foreign_binary_op_typing_infer_sub := enhanced_binary_op_typing_infer_sub
+  := { foreign_operators_typing_unary_has_type := enhanced_unary_op_has_type
+       ; foreign_operators_typing_unary_sound := enhanced_unary_op_typing_sound
+       ; foreign_operators_typing_unary_infer := enhanced_unary_op_typing_infer
+       ; foreign_operators_typing_unary_infer_correct := enhanced_unary_op_typing_infer_correct
+       ; foreign_operators_typing_unary_infer_least := enhanced_unary_op_typing_infer_least
+       ; foreign_operators_typing_unary_infer_complete := enhanced_unary_op_typing_infer_complete
+       ; foreign_operators_typing_unary_infer_sub := enhanced_unary_op_typing_infer_sub
+       ; foreign_operators_typing_binary_has_type := enhanced_binary_op_has_type
+       ; foreign_operators_typing_binary_sound := enhanced_binary_op_typing_sound
+       ; foreign_operators_typing_binary_infer := enhanced_binary_op_typing_infer
+       ; foreign_operators_typing_binary_infer_correct := enhanced_binary_op_typing_infer_correct
+       ; foreign_operators_typing_binary_infer_least := enhanced_binary_op_typing_infer_least
+       ; foreign_operators_typing_binary_infer_complete := enhanced_binary_op_typing_infer_complete
+       ; foreign_operators_typing_binary_infer_sub := enhanced_binary_op_typing_infer_sub
      }.
 
 Instance enhanced_foreign_typing {model:brand_model}:
@@ -2049,8 +2031,7 @@ Instance enhanced_foreign_typing {model:brand_model}:
        enhanced_foreign_type
        model
        enhanced_foreign_data_typing
-       enhanced_foreign_unary_op_typing
-       enhanced_foreign_binary_op_typing.
+       enhanced_foreign_operators_typing.
 
 Instance enhanced_basic_model {model:brand_model} :
   basic_model
@@ -2076,6 +2057,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_runtime.
   Definition compiler_model_foreign_to_ejson : foreign_to_ejson
     := enhanced_foreign_to_ejson.
+  Definition compiler_model_foreign_to_json : foreign_to_json
+    := enhanced_foreign_to_json.
   Definition compiler_model_foreign_to_java : foreign_to_java
     := enhanced_foreign_to_java.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript

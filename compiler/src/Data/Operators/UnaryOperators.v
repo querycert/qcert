@@ -29,7 +29,7 @@ Require Import OperatorsUtils.
 
 Section UnaryOperators.
   Context {fdata:foreign_data}.
-  Context {fuop:foreign_unary_op}.
+  Context {foperators:foreign_operators}.
   
   Inductive nat_arith_unary_op
     := NatAbs  (**r absolute value *) 
@@ -48,42 +48,42 @@ Section UnaryOperators.
   .
 
   Inductive unary_op : Set :=
-  | OpIdentity : unary_op                             (**r identity, returns its value *)
-  | OpNeg : unary_op                                  (**r boolean negation *)
-  | OpRec : string -> unary_op                        (**r create a record with a single field *)
-  | OpDot : string -> unary_op                        (**r record field access *)
-  | OpRecRemove : string -> unary_op                  (**r record remove the given fields *)
-  | OpRecProject : list string -> unary_op            (**r record projects on the given fields *)
-  | OpBag : unary_op                                  (**r create a singleton bag *)
-  | OpSingleton : unary_op                            (**r value within a singleton bag *)
-  | OpFlatten : unary_op                              (**r flattens a bag of bags *)
-  | OpDistinct: unary_op                              (**r distinct values in a bag *)
-  | OpOrderBy : SortCriterias -> unary_op             (**r sorts a collection of records *)
-  | OpCount : unary_op                                (**r bag count *)
-  | OpToString : unary_op                             (**r convert any data to a string *)
-  | OpToText : unary_op                               (**r unspecified conversion from any data to a string *)
-  | OpLength : unary_op                               (**r the length of a string *)
-  | OpSubstring : Z -> option Z -> unary_op           (**r returns the substring starting with the nth character, for m characters (or the rest of the string) *)
-  | OpLike (pattern:string) : unary_op                (**r like expression (as in sql) *)
-  | OpLeft : unary_op                                 (**r create a left value *)
-  | OpRight : unary_op                                (**r create a right value *)
-  | OpBrand : brands -> unary_op                      (**r brands a value *)
-  | OpUnbrand : unary_op                              (**r content of a branded value *)
-  | OpCast : brands -> unary_op                       (**r coerce a branded value into one of its sub-brands *)
-  | OpNatUnary : nat_arith_unary_op -> unary_op       (**r arithmetic operations on natural floats *)
-  | OpNatSum : unary_op                               (**r sum of natural floats in a bag *)
-  | OpNatMin : unary_op                               (**r minimum of natural floats in a bag *)
-  | OpNatMax : unary_op                               (**r maximum of natural floats in a bag *)
-  | OpNatMean : unary_op                              (**r arithmetic mean of natural floats in a bag *)
+  | OpIdentity : unary_op                            (**r identity, returns its value *)
+  | OpNeg : unary_op                                 (**r boolean negation *)
+  | OpRec : string -> unary_op                       (**r create a record with a single field *)
+  | OpDot : string -> unary_op                       (**r record field access *)
+  | OpRecRemove : string -> unary_op                 (**r record remove the given fields *)
+  | OpRecProject : list string -> unary_op           (**r record projects on the given fields *)
+  | OpBag : unary_op                                 (**r create a singleton bag *)
+  | OpSingleton : unary_op                           (**r value within a singleton bag *)
+  | OpFlatten : unary_op                             (**r flattens a bag of bags *)
+  | OpDistinct: unary_op                             (**r distinct values in a bag *)
+  | OpOrderBy : SortCriterias -> unary_op            (**r sorts a collection of records *)
+  | OpCount : unary_op                               (**r bag count *)
+  | OpToString : unary_op                            (**r convert any data to a string *)
+  | OpToText : unary_op                              (**r unspecified conversion from any data to a string *)
+  | OpLength : unary_op                              (**r the length of a string *)
+  | OpSubstring : Z -> option Z -> unary_op          (**r returns the substring starting with the nth character, for m characters (or the rest of the string) *)
+  | OpLike (pattern:string) : unary_op               (**r like expression (as in sql) *)
+  | OpLeft : unary_op                                (**r create a left value *)
+  | OpRight : unary_op                               (**r create a right value *)
+  | OpBrand : brands -> unary_op                     (**r brands a value *)
+  | OpUnbrand : unary_op                             (**r content of a branded value *)
+  | OpCast : brands -> unary_op                      (**r coerce a branded value into one of its sub-brands *)
+  | OpNatUnary : nat_arith_unary_op -> unary_op      (**r arithmetic operations on natural floats *)
+  | OpNatSum : unary_op                              (**r sum of natural floats in a bag *)
+  | OpNatMin : unary_op                              (**r minimum of natural floats in a bag *)
+  | OpNatMax : unary_op                              (**r maximum of natural floats in a bag *)
+  | OpNatMean : unary_op                             (**r arithmetic mean of natural floats in a bag *)
   | OpFloatOfNat : unary_op                          (**r coercion from natural float to float *)
-  | OpFloatUnary : float_arith_unary_op -> unary_op (**r arithmetic operations on floats *)
+  | OpFloatUnary : float_arith_unary_op -> unary_op  (**r arithmetic operations on floats *)
   | OpFloatTruncate : unary_op                       (**r truncate *)
   | OpFloatSum : unary_op                            (**r sum *) 
   | OpFloatMean : unary_op                           (**r arithmetic mean *)
   | OpFloatBagMin : unary_op                         (**r minimum *)
   | OpFloatBagMax : unary_op                         (**r maximum *)
   | OpForeignUnary
-      (fu:foreign_unary_op_type) : unary_op           (**r foreign unary operators *)
+      (fu:foreign_operators_unary) : unary_op        (**r foreign unary operators *)
   .
 
   Global Instance nat_arith_unary_op_eqdec : EqDec nat_arith_unary_op eq.
@@ -118,7 +118,7 @@ Section UnaryOperators.
     - induction b; decide equality; apply string_dec.
     - apply nat_arith_unary_op_eqdec.
     - apply float_arith_unary_op_eqdec.
-    - apply foreign_unary_op_dec.
+    - apply foreign_operators_unary_dec.
   Defined.
 
   Local Open Scope string.

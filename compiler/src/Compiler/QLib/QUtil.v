@@ -54,7 +54,7 @@ Module QUtil(runtime:CompilerRuntime).
     Definition qfailure {fdata:foreign_data} (A:Set) : qerror -> qresult A := DataResult.qfailure.
   End results.
 
-  Definition string_of_ejson_runtime_op := ImpEJson.string_of_ejson_runtime_op.
+  Definition string_of_ejson_runtime_op := EJsonRuntimeOperators.string_of_ejson_runtime_op.
 
 End QUtil.
 

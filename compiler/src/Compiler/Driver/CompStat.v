@@ -41,7 +41,7 @@ Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
 (** Target languages *)
 Require Import ForeignDataToEJson.
-Require Import DatatoEJson.
+Require Import DataToEJson.
 Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
@@ -461,7 +461,7 @@ Section CompStat.
         | Q_error q => stat_error q
         end
     in
-    jsonStringify quotel_double (ejson_to_json (data_to_ejson stat)).
+    ejsonStringify quotel_double (data_to_ejson stat).
 
   Definition json_stat_tree_of_query (qname:string) (q:query) : string :=
     let stat :=
@@ -494,11 +494,10 @@ Section CompStat.
         | Q_error q => stat_tree_error q
         end
     in
-    jsonStringify quotel_double
-                  (ejson_to_json
-                     (data_to_ejson (drec
-                                       (("name", dstring qname)
-                                          :: ("stats", stat)
-                                          :: nil)))).
+    ejsonStringify quotel_double
+                   (data_to_ejson (drec
+                                     (("name", dstring qname)
+                                        :: ("stats", stat)
+                                        :: nil))).
 
 End CompStat.

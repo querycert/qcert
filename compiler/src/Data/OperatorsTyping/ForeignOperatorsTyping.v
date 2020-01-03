@@ -24,99 +24,92 @@ Require Import TData.
 
 Section ForeignOperatorsTyping.
 
-  Class foreign_unary_op_typing
+  Class foreign_operators_typing
         {fdata:foreign_data}
-        {fuop:foreign_unary_op}
+        {foperators:foreign_operators}
         {ftype:foreign_type}
         {fdtyping:foreign_data_typing}
         {model:brand_model}
     : Type
-    := mk_foreign_unary_op_typing {
-           foreign_unary_op_typing_has_type
-             (fu:foreign_unary_op_type) 
+    := mk_foreign_operators_typing {
+           (* Unary operators *)
+           foreign_operators_typing_unary_has_type
+             (fu:foreign_operators_unary) 
              (τin τout : rtype) : Prop
-           ; foreign_unary_op_typing_sound
-               {fu:foreign_unary_op_type}
+           ; foreign_operators_typing_unary_sound
+               {fu:foreign_operators_unary}
                {τin τout : rtype}
-               (optyp:foreign_unary_op_typing_has_type fu τin τout)
+               (optyp:foreign_operators_typing_unary_has_type fu τin τout)
                {din:data}
                (dtin:din ▹ τin) :
                (exists dout,
-                   foreign_unary_op_interp brand_relation_brands fu din
+                   foreign_operators_unary_interp brand_relation_brands fu din
                    = Some dout
                    /\ dout ▹ τout)
-           ; foreign_unary_op_typing_infer (fu:foreign_unary_op_type)
+           ; foreign_operators_typing_unary_infer (fu:foreign_operators_unary)
              : rtype -> option rtype
-           ; foreign_unary_op_typing_infer_correct
-               {fu:foreign_unary_op_type}
+           ; foreign_operators_typing_unary_infer_correct
+               {fu:foreign_operators_unary}
                {τ₁ τout} :
-               foreign_unary_op_typing_infer fu τ₁ = Some τout ->
-               foreign_unary_op_typing_has_type fu τ₁ τout
-           ; foreign_unary_op_typing_infer_least
-               {fu:foreign_unary_op_type}
+               foreign_operators_typing_unary_infer fu τ₁ = Some τout ->
+               foreign_operators_typing_unary_has_type fu τ₁ τout
+           ; foreign_operators_typing_unary_infer_least
+               {fu:foreign_operators_unary}
                {τ₁ τout₁ τout₂} : 
-               foreign_unary_op_typing_infer fu τ₁ = Some τout₁ ->
-               foreign_unary_op_typing_has_type fu τ₁ τout₂ ->
+               foreign_operators_typing_unary_infer fu τ₁ = Some τout₁ ->
+               foreign_operators_typing_unary_has_type fu τ₁ τout₂ ->
                τout₁ ≤ τout₂
-           ; foreign_unary_op_typing_infer_complete
-               {fu:foreign_unary_op_type}
+           ; foreign_operators_typing_unary_infer_complete
+               {fu:foreign_operators_unary}
                {τ₁ τout} : 
-               foreign_unary_op_typing_infer fu τ₁ = None ->
-               ~ foreign_unary_op_typing_has_type fu τ₁ τout
+               foreign_operators_typing_unary_infer fu τ₁ = None ->
+               ~ foreign_operators_typing_unary_has_type fu τ₁ τout
            (* returns an optional tuple containing:
-       1) the inferred type of the binary operation
-       2) the required type of the first argument (will be a non-proper supertype of τ₁)
+              1) the inferred type of the binary operation
+              2) the required type of the first argument (will be a non-proper supertype of τ₁)
             *)
-           ; foreign_unary_op_typing_infer_sub (fu:foreign_unary_op_type)
+           ; foreign_operators_typing_unary_infer_sub (fu:foreign_operators_unary)
              : rtype -> option (rtype*rtype)
-         }.
 
-    Class foreign_binary_op_typing
-        {fdata:foreign_data}
-        {fbop:foreign_binary_op}
-        {ftype:foreign_type}
-        {fdtyping:foreign_data_typing}
-        {model:brand_model}
-    : Type
-    := mk_foreign_binary_op_typing {
-           foreign_binary_op_typing_has_type
-             (fb:foreign_binary_op_type) 
+           (* Binary operators *)
+           ; foreign_operators_typing_binary_has_type
+             (fb:foreign_operators_binary) 
              (τin₁ τin₂ τout : rtype) : Prop
-           ; foreign_binary_op_typing_sound
-               {fb:foreign_binary_op_type}
+           ; foreign_operators_typing_binary_sound
+               {fb:foreign_operators_binary}
                {τin₁ τin₂ τout : rtype}
-               (optyp:foreign_binary_op_typing_has_type fb τin₁ τin₂ τout)
+               (optyp:foreign_operators_typing_binary_has_type fb τin₁ τin₂ τout)
                {din₁ din₂:data}
                (dtin:din₁ ▹ τin₁)
                (dtin:din₂ ▹ τin₂) :
                (exists dout,
-                   foreign_binary_op_interp brand_relation_brands fb din₁ din₂
+                   foreign_operators_binary_interp brand_relation_brands fb din₁ din₂
                    = Some dout
                    /\ dout ▹ τout)
-           ; foreign_binary_op_typing_infer (fb:foreign_binary_op_type)
+           ; foreign_operators_typing_binary_infer (fb:foreign_operators_binary)
              : rtype -> rtype -> option rtype
-           ; foreign_binary_op_typing_infer_correct
-               {fb:foreign_binary_op_type}
+           ; foreign_operators_typing_binary_infer_correct
+               {fb:foreign_operators_binary}
                {τ₁ τ₂ τout} :
-               foreign_binary_op_typing_infer fb τ₁ τ₂ = Some τout ->
-               foreign_binary_op_typing_has_type fb τ₁ τ₂ τout
-           ; foreign_binary_op_typing_infer_least
-               {fb:foreign_binary_op_type}
+               foreign_operators_typing_binary_infer fb τ₁ τ₂ = Some τout ->
+               foreign_operators_typing_binary_has_type fb τ₁ τ₂ τout
+           ; foreign_operators_typing_binary_infer_least
+               {fb:foreign_operators_binary}
                {τ₁ τ₂ τout₁ τout₂} : 
-               foreign_binary_op_typing_infer fb τ₁ τ₂ = Some τout₁ ->
-               foreign_binary_op_typing_has_type fb τ₁ τ₂ τout₂ ->
+               foreign_operators_typing_binary_infer fb τ₁ τ₂ = Some τout₁ ->
+               foreign_operators_typing_binary_has_type fb τ₁ τ₂ τout₂ ->
                τout₁ ≤ τout₂
-           ; foreign_binary_op_typing_infer_complete
-               {fb:foreign_binary_op_type}
+           ; foreign_operators_typing_binary_infer_complete
+               {fb:foreign_operators_binary}
                {τ₁ τ₂ τout} : 
-               foreign_binary_op_typing_infer fb τ₁ τ₂ = None ->
-               ~ foreign_binary_op_typing_has_type fb τ₁ τ₂ τout
+               foreign_operators_typing_binary_infer fb τ₁ τ₂ = None ->
+               ~ foreign_operators_typing_binary_has_type fb τ₁ τ₂ τout
            (* returns an optional tuple containing:
-       1) the inferred type of the binary operation
-       2) the required type of the first argument (will be a non-proper supertype of τ₁)
-       3)  the required type of the second argument (will be a non-proper supertype of τ₂) 
+              1) the inferred type of the binary operation
+              2) the required type of the first argument (will be a non-proper supertype of τ₁)
+              3)  the required type of the second argument (will be a non-proper supertype of τ₂) 
             *)
-           ; foreign_binary_op_typing_infer_sub (fb:foreign_binary_op_type)
+           ; foreign_operators_typing_binary_infer_sub (fb:foreign_operators_binary)
              : rtype -> rtype -> option (rtype*rtype*rtype)
 
          }.

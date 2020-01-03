@@ -26,7 +26,6 @@ Class foreign_typing
   : Type
   := mk_foreign_typing {
           foreign_typing_data :> foreign_data_typing
-         ; foreign_typing_unary_op :> foreign_unary_op_typing
-         ; foreign_typing_binary_op :> foreign_binary_op_typing
+         ; foreign_typing_operators :> foreign_operators_typing
        }.
 

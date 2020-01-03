@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,22 +14,14 @@
 
 Require Import List.
 Require Import String.
-Require Import Utils.
-Require Import ForeignType.
+Require Import ForeignEJson.
+Require Import JavaScriptAst.
 
-Local Open Scope string_scope.
+Section ForeignToJavaScriptAst.
 
-Section ForeignTypeToJSON.
-
-  (* TODO: properties required to ensure round-tripping *)
-
-  Class foreign_type_to_JSON {ftype:foreign_type}: Type
-    := mk_foreign_type_to_JSON {
-           foreign_to_string_to_type
-             (s:string) : option foreign_type_type
-           ; foreign_to_string_from_type
-               (fd:foreign_type_type) : string
+  Class foreign_ejson_to_ajavascript {f:foreign_ejson} : Type
+    := mk_foreign_ejson_to_ajavascript {
+           foreign_ejson_to_ajavascript_expr (fe:foreign_ejson_model) : expr (* XXX This is a JsAst expression *)
          }.
 
-End ForeignTypeToJSON.
-
+End ForeignToJavaScriptAst.

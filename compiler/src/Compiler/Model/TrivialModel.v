@@ -24,6 +24,7 @@ Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
+Require Import ForeignEJsonToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignEJsonRuntime.
 Require Import ForeignReduceOps.
@@ -57,9 +58,11 @@ Next Obligation.
   constructor; intros [].
 Defined.
 
-Program Instance trivial_foreign_unary_op:
-  foreign_unary_op
-  := mk_foreign_unary_op trivial_foreign_data Empty_set _ _ _ _ defaultDataToString defaultDataToString.
+Program Instance trivial_foreign_operators:
+  foreign_operators
+  := mk_foreign_operators trivial_foreign_data
+                          Empty_set _ _ _ _ defaultDataToString defaultDataToString
+                          Empty_set _ _ _ _.
 Next Obligation.
   intros []. 
 Defined.
@@ -73,10 +76,6 @@ Defined.
 Next Obligation.
   destruct op. 
 Defined.
-
-Program Instance trivial_foreign_binary_op:
-  foreign_binary_op
-  := mk_foreign_binary_op trivial_foreign_data Empty_set _ _ _ _.
 Next Obligation.
   intros []. 
 Defined.
@@ -92,7 +91,7 @@ Next Obligation.
 Defined.
 
 Program Instance trivial_foreign_ejson : foreign_ejson
-  := mk_foreign_ejson Empty_set _ _ _ _ _ _ _ _ _.
+  := mk_foreign_ejson Empty_set _ _ _ _ _ _.
 Next Obligation.
   intros [].
 Defined.
@@ -105,22 +104,12 @@ Defined.
 Next Obligation.
   constructor; intros [].
 Defined.
-Next Obligation.
-  exact None.
-Defined.
-Next Obligation.
-  exact jnull.
-Defined.
-Next Obligation.
-  destruct fd.
-Defined.
 
 Instance trivial_foreign_runtime :
   foreign_runtime
   := mk_foreign_runtime
        trivial_foreign_data
-       trivial_foreign_unary_op
-       trivial_foreign_binary_op.
+       trivial_foreign_operators.
 
 Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime :=
   mk_foreign_ejson_runtime trivial_foreign_ejson Empty_set _ _ _.
@@ -142,6 +131,18 @@ Next Obligation.
 Defined.
 Next Obligation.
   exact None.
+Defined.
+
+Program Instance trivial_foreign_to_json : foreign_to_json
+  := mk_foreign_to_json trivial_foreign_ejson _ _ _.
+Next Obligation.
+  exact None.
+Defined.
+Next Obligation.
+  destruct j.
+Defined.
+Next Obligation.
+  destruct fd.
 Defined.
 
 Program Instance trivial_foreign_type : foreign_type
@@ -196,17 +197,18 @@ Next Obligation.
   destruct d.
 Defined.
 
-Program Instance trivial_foreign_unary_op_typing
+Program Instance trivial_foreign_operators_typing
         {model:brand_model} :
-  @foreign_unary_op_typing
+  @foreign_operators_typing
     trivial_foreign_data
-    trivial_foreign_unary_op
+    trivial_foreign_operators
     trivial_foreign_type
     trivial_foreign_data_typing
     model
-  := mk_foreign_unary_op_typing
-       _ _ _ _ _ _
-       _ _ _ _ _ _.
+  := mk_foreign_operators_typing
+       _ _ _ _ _
+       _ _ _ _ _ _ _
+       _ _ _ _ _ _ _.
 Next Obligation.
   destruct fu.
 Defined.
@@ -228,18 +230,6 @@ Defined.
 Next Obligation.
   destruct fu.
 Defined.
-
-Program Instance trivial_foreign_binary_op_typing
-        {model:brand_model} :
-  @foreign_binary_op_typing
-    trivial_foreign_data
-    trivial_foreign_binary_op
-    trivial_foreign_type
-    trivial_foreign_data_typing
-    model
-  := mk_foreign_binary_op_typing
-       _ _ _ _ _ _
-       _ _ _ _ _ _.
 Next Obligation.
   destruct fb.
 Defined.
@@ -272,8 +262,7 @@ Instance trivial_foreign_typing {model:brand_model}:
        trivial_foreign_type
        model
        trivial_foreign_data_typing
-       trivial_foreign_unary_op_typing
-       trivial_foreign_binary_op_typing.
+       trivial_foreign_operators_typing.
 
 Instance trivial_basic_model {model:brand_model} :
   basic_model
@@ -359,6 +348,8 @@ Module TrivialRuntime <: CompilerRuntime.
     := trivial_foreign_runtime.
   Definition compiler_foreign_to_ejson : foreign_to_ejson
     := trivial_foreign_to_ejson.
+  Definition compiler_foreign_to_json : foreign_to_json
+    := trivial_foreign_to_json.
   Definition compiler_foreign_to_java : foreign_to_java
     := trivial_foreign_to_java.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
@@ -403,6 +394,8 @@ Module TrivialModel(bm:CompilerBrandModel(TrivialForeignType)) <: CompilerModel.
     := trivial_foreign_runtime.
   Definition compiler_model_foreign_to_ejson : foreign_to_ejson
     := trivial_foreign_to_ejson.
+  Definition compiler_model_foreign_to_json : foreign_to_json
+    := trivial_foreign_to_json.
   Definition compiler_model_foreign_to_java : foreign_to_java
     := trivial_foreign_to_java.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
