@@ -21,7 +21,6 @@ Require Import EquivDec.
 (* Common *)
 Require Import Utils.
 Require Import DataSystem.
-Require Import TypingRuntime.
 
 (** Query languages *)
 Require Import SQLRuntime.

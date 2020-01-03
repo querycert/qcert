@@ -31,7 +31,6 @@ Require Import CompLang.
 Require Import CompConfig.
 Require Import CompDriver.
 Require Import CompilerRuntime.
-Require Import TypingRuntime.
 Require Import JSON.
 
 Module QDriver(runtime:CompilerRuntime).

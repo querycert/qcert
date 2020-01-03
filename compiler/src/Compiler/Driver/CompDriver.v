@@ -20,7 +20,6 @@ Require Import Morphisms.
 
 (* Common libraries *)
 Require Import Utils.
-Require Import TypingRuntime.
 
 (* Query languages *)
 Require Import SQLRuntime.

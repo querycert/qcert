@@ -29,7 +29,6 @@ Require Import OQLRuntime.
 Require Import CompLang.
 Require Import CompStat.
 Require Import CompilerRuntime.
-Require Import TypingRuntime.
 
 Module QStat(runtime:CompilerRuntime).
 

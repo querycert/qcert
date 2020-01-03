@@ -22,7 +22,7 @@ Require Import ZArith.
 (* Common *)
 Require Import Utils.
 
-Require Import TypingRuntime.
+Require Export DataSystem.
 Require Import ForeignReduceOps.
 
 Require Import OptimizerLogger.
