@@ -114,7 +114,6 @@ MODULES = \
 	Data/ForeignTyping \
 	Data/DataTypes \
 	Data/DataSystem \
-	Data/TypingRuntime \
 	TranslationModel/ForeignDataToEJson \
 	TranslationModel/DatatoEJson \
 	NRA/Lang/NRA \

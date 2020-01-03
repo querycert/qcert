@@ -18,7 +18,6 @@ Require Import CompilerRuntime.
 Require Import Types.
 Require RType.
 Require String.
-Require Import TypingRuntime.
 Require DatatoSparkDF.
 Require Data.
 Require TUtil.
@@ -95,7 +94,7 @@ Module QType(runtime:CompilerRuntime).
   Definition qtype_uncoll (m:brand_model) : qtype -> option qtype
     := @TUtil.tuncoll _ m.
   
-  Definition data_to_sjson (m:brand_model) : data -> qtype -> option String.string
+  Definition data_to_sjson (m:brand_model) : Data.data -> qtype -> option String.string
     := @DatatoSparkDF.data_to_sjson _ _ _ m.
 
   (* Additional support for brand models extraction -- will have to be tested/consolidated *)
@@ -104,7 +103,6 @@ Module QType(runtime:CompilerRuntime).
   Definition make_brand_relation := Schema.mk_brand_relation.
   Definition brand_model : Set := brand_model.
   Definition make_brand_model := Schema.make_brand_model_from_decls_fails.
-  Definition typing_runtime : Set := typing_runtime.
 
 End QType.
 

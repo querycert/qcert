@@ -71,7 +71,7 @@ Require Import List.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Utils.
-Require Import DataSystem.
+Require Import DataRuntime.
 
 Section SQL.
   Context {fruntime:foreign_runtime}.
