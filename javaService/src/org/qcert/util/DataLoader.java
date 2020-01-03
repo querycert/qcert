@@ -244,13 +244,17 @@ public class DataLoader {
 		case "String":
 			return new JsonPrimitive(value);
 		case "Nat":
-		case "Float":
+      JsonObject ans = new JsonObject();
 			/* We are a little loosy-goosy with numbers since the sources of information are often inexact */
 			try {
-			    return new JsonPrimitive(Integer.parseInt(value));
+			    ans.add("nat",new JsonPrimitive(Integer.parseInt(value)));
+			    return ans;
 			} catch (NumberFormatException ig) {
-			    return new JsonPrimitive(Double.parseDouble(value));
+			    ans.add("nat",new JsonPrimitive(Double.parseDouble(value)));
+			    return ans;
 			}
+		case "Float":
+        return new JsonPrimitive(Double.parseDouble(value));
 		case "ESqlDate":
 			return formatDate(value);
 		case "Bool":
