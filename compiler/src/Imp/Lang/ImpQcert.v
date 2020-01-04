@@ -43,12 +43,6 @@ Section ImpQcert.
     Definition imp_qcert := @imp imp_qcert_data imp_qcert_op imp_qcert_runtime_op.
   End Syntax.
 
-  Section Env.
-
-    (* bindings that may or may not be initialized (defined) *)
-    Definition pd_bindings := list (string*option data).
-
-  End Env.
 End ImpQcert.
 
 Tactic Notation "imp_qcert_runtime_op_cases" tactic(first) ident(c) :=

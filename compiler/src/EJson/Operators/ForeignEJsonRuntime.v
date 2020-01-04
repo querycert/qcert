@@ -19,14 +19,15 @@ Require Import ForeignEJson.
 Require Import EJson.
 
 Section ForeignEJsonRuntime.
-  Class foreign_ejson_runtime {fejson:foreign_ejson}
+  Class foreign_ejson_runtime
+        {fejson:foreign_ejson}
   : Type
     := mk_foreign_ejson_runtime {
-           foreign_ejson_runtime_operators : Set
-           ; foreign_ejson_runtime_dec :> EqDec foreign_ejson_runtime_operators eq
-           ; foreign_ejson_runtime_tostring :> ToString foreign_ejson_runtime_operators
-           ; foreign_ejson_runtime_interp 
-               (f:foreign_ejson_runtime_operators)
+           foreign_ejson_runtime_op : Set
+           ; foreign_ejson_runtime_op_dec :> EqDec foreign_ejson_runtime_op eq
+           ; foreign_ejson_runtime_op_tostring :> ToString foreign_ejson_runtime_op
+           ; foreign_ejson_runtime_op_interp 
+               (f:foreign_ejson_runtime_op)
                (dl:list ejson) : option ejson                                 
          }.
 

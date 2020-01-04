@@ -108,8 +108,6 @@ val pretty_unary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> Com
 val pretty_binary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> Compiler.binary_op -> 'a -> 'a -> unit
 
 (* Useful for SExp support *)
-val timescale_as_string : Compiler.time_scale -> string
-
 val string_of_foreign_data : Compiler.enhanced_data -> string
 val foreign_data_of_string : string -> Compiler.enhanced_data
 

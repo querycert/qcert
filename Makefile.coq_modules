@@ -330,6 +330,7 @@ MODULES = \
 	TranslationOperators/ForeignToJava \
 	TranslationOperators/ForeignToScala \
 	TranslationOperators/ForeignToSpark \
+	TranslationOperators/ForeignToEJsonRuntime \
 	Translation/NRAtocNNRC \
 	Translation/cNRAEnvtocNNRC \
 	Translation/cNRAEnvtoNRA \
@@ -376,8 +377,6 @@ MODULES = \
 	Translation/TNNRStoNNRSimp \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
-	Compiler/Model/StringModelPart \
-	Compiler/Model/DateTimeModelPart \
 	Compiler/Model/SqlDateModelPart \
 	Compiler/Model/EnhancedModel \
 	Compiler/Model/TrivialModel \

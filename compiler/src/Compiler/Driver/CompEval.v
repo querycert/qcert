@@ -63,6 +63,7 @@ Section CompEval.
   (* Context *)
 
   Context {fruntime:foreign_runtime}.   (* Necessary for Everything *)
+  Context {fejson:foreign_ejson}.       (* Necessary for ImpJson evaluation *)
   Context {ftejson:foreign_to_ejson}.   (* Necessary for ImpJson evaluation *)
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)

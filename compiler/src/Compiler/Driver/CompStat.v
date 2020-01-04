@@ -61,6 +61,7 @@ Section CompStat.
 
   Context {ft:foreign_type}.
   Context {fruntime:foreign_runtime}.
+  Context {fejson:foreign_ejson}.
   Context {ftejson:foreign_to_ejson}.
   Context {bm:brand_model}.
   Context {nraenv_core_logger:optimizer_logger string nraenv_core}.

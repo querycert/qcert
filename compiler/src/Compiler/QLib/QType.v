@@ -98,7 +98,7 @@ Module QType(runtime:CompilerRuntime).
     := @TUtil.tuncoll _ m.
   
   Definition data_to_sjson (m:brand_model) : Data.data -> qtype -> option String.string
-    := @DatatoSparkDF.data_to_sjson _ _ _ m.
+    := @DatatoSparkDF.data_to_sjson _ _ _ _ m.
 
   (* Additional support for brand models extraction -- will have to be tested/consolidated *)
 

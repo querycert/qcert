@@ -25,18 +25,14 @@ Local Open Scope string_scope.
 
 Class foreign_to_ejson
       {fruntime:foreign_runtime}
+      {fesjon:foreign_ejson}
   : Type
   := mk_foreign_to_ejson {
-         foreign_to_ejson_ejson :> foreign_ejson
-         ; foreign_to_ejson_runtime :> foreign_ejson_runtime
+         foreign_to_ejson_runtime :> foreign_ejson_runtime
          ; foreign_to_ejson_to_data
              (j:foreign_ejson_model) : foreign_data_model
          ; foreign_to_ejson_from_data
              (fd:foreign_data_model) : foreign_ejson_model
          ; foreign_to_ejson_to_data_to_ejson (fd:foreign_data_model) :
              foreign_to_ejson_to_data (foreign_to_ejson_from_data fd) = fd
-         ; foreign_to_ejson_runtime_of_unary_op
-               (uop:unary_op) : option foreign_ejson_runtime_operators
-         ; foreign_to_ejson_runtime_of_binary_op
-               (uop:binary_op) : option foreign_ejson_runtime_operators
        }.

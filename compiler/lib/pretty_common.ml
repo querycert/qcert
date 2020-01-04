@@ -191,57 +191,17 @@ let rec pretty_sharp sym ff name =
 
 (** Pretty data *)
 
-let timescale_as_string ts =
-  begin match ts with
-  | Compiler.Ts_second -> "SECOND"
-  | Compiler.Ts_minute ->  "MINUTE"
-  | Compiler.Ts_hour -> "HOUR"
-  | Compiler.Ts_day -> "DAY"
-  | Compiler.Ts_week -> "WEEK"
-  | Compiler.Ts_month -> "MONTH"
-  | Compiler.Ts_year -> "YEAR"
-  end
-
-let pretty_timescale ff ts =
-  fprintf ff "%s" (timescale_as_string ts)
-
 let string_of_foreign_data (fd:Compiler.enhanced_data) : string =
   begin match fd with
-  | Compiler.Enhancedstring s -> "S\"" ^ s ^ "\""
-  | Compiler.Enhancedtimescale ts -> timescale_as_string ts
-  | Compiler.Enhancedtimeduration td -> raise Not_found
-  | Compiler.Enhancedtimepoint tp -> raise Not_found
   | Compiler.Enhancedsqldate td -> raise Not_found
   | Compiler.Enhancedsqldateinterval tp -> raise Not_found
   end
 
 let foreign_data_of_string s =
-  begin match s with
-  | "SECOND" -> Compiler.Enhancedtimescale Compiler.Ts_second
-  | "MINUTE" -> Compiler.Enhancedtimescale Compiler.Ts_minute
-  | "HOUR" -> Compiler.Enhancedtimescale Compiler.Ts_hour
-  | "DAY" -> Compiler.Enhancedtimescale Compiler.Ts_day
-  | "WEEK" -> Compiler.Enhancedtimescale Compiler.Ts_week
-  | "MONTH" -> Compiler.Enhancedtimescale Compiler.Ts_month
-  | "YEAR" -> Compiler.Enhancedtimescale Compiler.Ts_year
-  | _ ->
-      try
-	if (s.[0] = 'S' && s.[1] = '"')
-	then
-	  Compiler.Enhancedstring (String.sub s 2 ((String.length s) - 3))
-	else
-	  raise Not_found
-      with
-      | _ ->
-	  raise Not_found
-  end
+	raise Not_found
 
 let pretty_foreign_data ff fd =
   begin match fd with
-  | Compiler.Enhancedstring s -> fprintf ff "S\"%s\"" s
-  | Compiler.Enhancedtimescale ts -> pretty_timescale ff ts
-  | Compiler.Enhancedtimeduration td -> raise Not_found
-  | Compiler.Enhancedtimepoint tp -> raise Not_found
   | Compiler.Enhancedsqldate td -> raise Not_found
   | Compiler.Enhancedsqldateinterval tp -> raise Not_found
   end
@@ -433,24 +393,18 @@ let sql_date_component_to_string part =
 
 let string_of_foreign_unary_op fu : string =
   begin match fu with
-  | Compiler.Enhanced_unary_time_op Compiler.Uop_time_to_scale -> "TimeToScale"
-  | Compiler.Enhanced_unary_time_op Compiler.Uop_time_from_string -> "TimeFromString"
-  | Compiler.Enhanced_unary_time_op Compiler.Uop_time_duration_from_string -> "TimeDurationFromString"
-  | Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_get_date_component part) -> "(SqlGetDateComponent " ^ (sql_date_component_to_string part) ^ ")"
-  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string -> "SqlDateFromString"
-  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string -> "SqlDateIntervalFromString"
+  | Compiler.Uop_sql_get_date_component part -> "(SqlGetDateComponent " ^ (sql_date_component_to_string part) ^ ")"
+  | Compiler.Uop_sql_date_from_string -> "SqlDateFromString"
+  | Compiler.Uop_sql_date_interval_from_string -> "SqlDateIntervalFromString"
   end
 
 let foreign_unary_op_of_string s =
   begin match s with
-  | "TimeToScale" -> Compiler.Enhanced_unary_time_op Compiler.Uop_time_to_scale
-  | "TimeFromString" -> Compiler.Enhanced_unary_time_op Compiler.Uop_time_from_string
-  | "TimeDurationFromString" -> Compiler.Enhanced_unary_time_op Compiler.Uop_time_duration_from_string
-  | "(SqlGetDateComponent DAY)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_get_date_component Compiler.Sql_date_DAY)
-  | "(SqlGetDateComponent MONTH)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_get_date_component Compiler.Sql_date_MONTH)
-  | "(SqlGetDateComponent YEAR)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_get_date_component Compiler.Sql_date_YEAR)
-  | "SqlDateFromString" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string
-  | "SqlDateIntervalFromString" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string
+  | "(SqlGetDateComponent DAY)"->  Compiler.Uop_sql_get_date_component Compiler.Sql_date_DAY
+  | "(SqlGetDateComponent MONTH)"->  Compiler.Uop_sql_get_date_component Compiler.Sql_date_MONTH
+  | "(SqlGetDateComponent YEAR)"->  Compiler.Uop_sql_get_date_component Compiler.Sql_date_YEAR
+  | "SqlDateFromString" -> Compiler.Uop_sql_date_from_string
+  | "SqlDateIntervalFromString" -> Compiler.Uop_sql_date_interval_from_string
   | _ -> raise Not_found
   end
 
@@ -623,80 +577,44 @@ let pretty_float_compare_binary_op p sym callb ff ba a1 a2 =
 
 let string_of_foreign_binary_op fb =
   begin match fb with
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_as -> "time_as"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_shift -> "time_shift"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_ne -> "time_ne"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_lt -> "time_lt"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_le -> "time_le"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_gt -> "time_gt"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_ge -> "time_ge"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_duration_from_scale -> "time_duration_from_scale"
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_duration_between -> "time_duration_between"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_plus -> "sql_date_plus"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_minus -> "sql_date_minus"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_ne -> "sql_date_ne"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_lt -> "sql_date_lt"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_le -> "sql_date_le"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_gt -> "sql_date_gt"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_ge -> "sql_date_ge"
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_interval_between -> "sql_date_interval_between"
+  | Compiler.Bop_sql_date_plus -> "sql_date_plus"
+  | Compiler.Bop_sql_date_minus -> "sql_date_minus"
+  | Compiler.Bop_sql_date_ne -> "sql_date_ne"
+  | Compiler.Bop_sql_date_lt -> "sql_date_lt"
+  | Compiler.Bop_sql_date_le -> "sql_date_le"
+  | Compiler.Bop_sql_date_gt -> "sql_date_gt"
+  | Compiler.Bop_sql_date_ge -> "sql_date_ge"
+  | Compiler.Bop_sql_date_interval_between -> "sql_date_interval_between"
   end
 
 let foreign_binary_op_of_string fb =
   match fb with
-  | "time_as" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_as
-  | "time_shift" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_shift
-  | "time_ne" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_ne
-  | "time_lt" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_lt
-  | "time_le" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_le
-  | "time_gt" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_gt
-  | "time_ge" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_ge
-  | "time_duration_from_scale" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_duration_from_scale
-  | "time_duration_between" -> Compiler.Enhanced_binary_time_op Compiler.Bop_time_duration_between
-  | "sql_date_plus" -> Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_plus
-  | "sql_date_ne" -> Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_ne
-  | "sql_date_lt" -> Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_lt
-  | "sql_date_le" -> Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_le
-  | "sql_date_gt" -> Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_gt
-  | "sql_date_ge" -> Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_ge
-  | "sql_date_interval_between" -> Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_interval_between
+  | "sql_date_plus" -> Compiler.Bop_sql_date_plus
+  | "sql_date_ne" -> Compiler.Bop_sql_date_ne
+  | "sql_date_lt" -> Compiler.Bop_sql_date_lt
+  | "sql_date_le" -> Compiler.Bop_sql_date_le
+  | "sql_date_gt" -> Compiler.Bop_sql_date_gt
+  | "sql_date_ge" -> Compiler.Bop_sql_date_ge
+  | "sql_date_interval_between" -> Compiler.Bop_sql_date_interval_between
   | _ -> raise Not_found
 
 let pretty_foreign_binary_op p sym callb ff fb a1 a2 =
   match fb with
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_as ->
-     pretty_infix_exp p 18 sym callb ("Tas",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_shift ->
-     pretty_infix_exp p 18 sym callb ("T+",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_ne ->
-     pretty_infix_exp p 18 sym callb ("T!=",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_lt ->
-     pretty_infix_exp p 18 sym callb ("T<",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_le ->
-     pretty_infix_exp p 18 sym callb ("T<=",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_gt ->
-     pretty_infix_exp p 18 sym callb ("T>",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_ge ->
-     pretty_infix_exp p 18 sym callb ("T>=",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_duration_from_scale ->
-     pretty_infix_exp p 18 sym callb ("TD_fs",1) ff a1 a2
-  | Compiler.Enhanced_binary_time_op Compiler.Bop_time_duration_between ->
-     pretty_infix_exp p 18 sym callb ("TD_be",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_plus ->
+  | Compiler.Bop_sql_date_plus ->
      pretty_infix_exp p 18 sym callb ("SD+",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_minus ->
+  | Compiler.Bop_sql_date_minus ->
      pretty_infix_exp p 18 sym callb ("SD-",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_ne ->
+  | Compiler.Bop_sql_date_ne ->
      pretty_infix_exp p 18 sym callb ("SD!=",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_lt ->
+  | Compiler.Bop_sql_date_lt ->
      pretty_infix_exp p 18 sym callb ("SD<",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_le ->
+  | Compiler.Bop_sql_date_le ->
      pretty_infix_exp p 18 sym callb ("SD<=",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_gt ->
+  | Compiler.Bop_sql_date_gt ->
      pretty_infix_exp p 18 sym callb ("SD>",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_ge ->
+  | Compiler.Bop_sql_date_ge ->
      pretty_infix_exp p 18 sym callb ("SD>=",1) ff a1 a2
-  | Compiler.Enhanced_binary_sql_date_op Compiler.Bop_sql_date_interval_between ->
+  | Compiler.Bop_sql_date_interval_between ->
      pretty_infix_exp p 18 sym callb ("SDD_be",1) ff a1 a2
 
 let string_of_binary_op b =
