@@ -276,9 +276,11 @@ public class DataLoader {
 		String[] names = {"year",  "month", "day"};
 		JsonObject ans = new JsonObject();
 		JsonObject ansIn = new JsonObject();
+		JsonObject ansIn2 = new JsonObject();
 		for (int i = 0; i < 3; i++) {
-			ansIn.add(names[i], new JsonPrimitive(dateParts[i]));
+      ansIn2.add(names[i], new JsonPrimitive(Integer.parseInt(dateParts[i])));
 		}
+    ansIn.add("$date", ansIn2);
     ans.add("$foreign", ansIn);
 		return ans;
 	}
