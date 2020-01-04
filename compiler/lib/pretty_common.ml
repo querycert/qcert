@@ -393,18 +393,18 @@ let sql_date_component_to_string part =
 
 let string_of_foreign_unary_op fu : string =
   begin match fu with
-  | Compiler.Uop_sql_get_date_component part -> "(SqlGetDateComponent " ^ (sql_date_component_to_string part) ^ ")"
-  | Compiler.Uop_sql_date_from_string -> "SqlDateFromString"
-  | Compiler.Uop_sql_date_interval_from_string -> "SqlDateIntervalFromString"
+  | Compiler.Uop_sql_date_get_component part -> "(sql_date_get_component " ^ (sql_date_component_to_string part) ^ ")"
+  | Compiler.Uop_sql_date_from_string -> "sql_date_from_string"
+  | Compiler.Uop_sql_date_interval_from_string -> "sql_date_interval_from_string"
   end
 
 let foreign_unary_op_of_string s =
   begin match s with
-  | "(SqlGetDateComponent DAY)"->  Compiler.Uop_sql_get_date_component Compiler.Sql_date_DAY
-  | "(SqlGetDateComponent MONTH)"->  Compiler.Uop_sql_get_date_component Compiler.Sql_date_MONTH
-  | "(SqlGetDateComponent YEAR)"->  Compiler.Uop_sql_get_date_component Compiler.Sql_date_YEAR
-  | "SqlDateFromString" -> Compiler.Uop_sql_date_from_string
-  | "SqlDateIntervalFromString" -> Compiler.Uop_sql_date_interval_from_string
+  | "(sql_date_get_component DAY)"->  Compiler.Uop_sql_date_get_component Compiler.Sql_date_DAY
+  | "(sql_date_get_component MONTH)"->  Compiler.Uop_sql_date_get_component Compiler.Sql_date_MONTH
+  | "(sql_date_get_component YEAR)"->  Compiler.Uop_sql_date_get_component Compiler.Sql_date_YEAR
+  | "sql_date_from_string" -> Compiler.Uop_sql_date_from_string
+  | "sql_date_interval_from_string" -> Compiler.Uop_sql_date_interval_from_string
   | _ -> raise Not_found
   end
 
@@ -585,10 +585,11 @@ let string_of_foreign_binary_op fb =
   | Compiler.Bop_sql_date_gt -> "sql_date_gt"
   | Compiler.Bop_sql_date_ge -> "sql_date_ge"
   | Compiler.Bop_sql_date_interval_between -> "sql_date_interval_between"
+  | Compiler.Bop_sql_date_set_component part -> "(sql_date_set_component " ^ (sql_date_component_to_string part) ^ ")"
   end
 
 let foreign_binary_op_of_string fb =
-  match fb with
+  begin match fb with
   | "sql_date_plus" -> Compiler.Bop_sql_date_plus
   | "sql_date_ne" -> Compiler.Bop_sql_date_ne
   | "sql_date_lt" -> Compiler.Bop_sql_date_lt
@@ -596,26 +597,37 @@ let foreign_binary_op_of_string fb =
   | "sql_date_gt" -> Compiler.Bop_sql_date_gt
   | "sql_date_ge" -> Compiler.Bop_sql_date_ge
   | "sql_date_interval_between" -> Compiler.Bop_sql_date_interval_between
+  | "(sql_date_set_component DAY)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_DAY
+  | "(sql_date_set_component MONTH)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_MONTH
+  | "(sql_date_set_component YEAR)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_YEAR
   | _ -> raise Not_found
+  end
 
 let pretty_foreign_binary_op p sym callb ff fb a1 a2 =
-  match fb with
+  begin match fb with
   | Compiler.Bop_sql_date_plus ->
-     pretty_infix_exp p 18 sym callb ("SD+",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SD+",1) ff a1 a2
   | Compiler.Bop_sql_date_minus ->
-     pretty_infix_exp p 18 sym callb ("SD-",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SD-",1) ff a1 a2
   | Compiler.Bop_sql_date_ne ->
-     pretty_infix_exp p 18 sym callb ("SD!=",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SD!=",1) ff a1 a2
   | Compiler.Bop_sql_date_lt ->
-     pretty_infix_exp p 18 sym callb ("SD<",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SD<",1) ff a1 a2
   | Compiler.Bop_sql_date_le ->
-     pretty_infix_exp p 18 sym callb ("SD<=",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SD<=",1) ff a1 a2
   | Compiler.Bop_sql_date_gt ->
-     pretty_infix_exp p 18 sym callb ("SD>",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SD>",1) ff a1 a2
   | Compiler.Bop_sql_date_ge ->
-     pretty_infix_exp p 18 sym callb ("SD>=",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SD>=",1) ff a1 a2
   | Compiler.Bop_sql_date_interval_between ->
-     pretty_infix_exp p 18 sym callb ("SDD_be",1) ff a1 a2
+      pretty_infix_exp p 18 sym callb ("SDD_be",1) ff a1 a2
+  | Compiler.Bop_sql_date_set_component Compiler.Sql_date_YEAR ->
+      pretty_infix_exp p 18 sym callb ("SDsY",1) ff a1 a2
+  | Compiler.Bop_sql_date_set_component Compiler.Sql_date_MONTH ->
+      pretty_infix_exp p 18 sym callb ("SDsM",1) ff a1 a2
+  | Compiler.Bop_sql_date_set_component Compiler.Sql_date_DAY ->
+      pretty_infix_exp p 18 sym callb ("SDsD",1) ff a1 a2
+  end
 
 let string_of_binary_op b =
   begin match b with
@@ -628,7 +640,7 @@ let string_of_binary_op b =
   | Compiler.OpNatBinary ba -> string_of_nat_arith_binary_op ba
   | Compiler.OpFloatBinary ba -> string_of_float_arith_binary_op ba
   | Compiler.OpFloatCompare ba -> string_of_float_compare_binary_op ba
-  | Compiler.OpLt -> "alt"
+  | Compiler.OpLt ->  "alt"
   | Compiler.OpLe -> "ale"
   | Compiler.OpBagDiff -> "aminus"
   | Compiler.OpBagMin -> "amin"

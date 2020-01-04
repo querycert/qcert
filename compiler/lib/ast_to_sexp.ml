@@ -1163,13 +1163,13 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_agg_expr SMax (sexp_to_sql_expr expr1)
   | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
   | STerm ("extract",[STerm ("year",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_get_date_component Sql_date_YEAR)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_date_get_component Sql_date_YEAR)))
 	(sexp_to_sql_expr expr1)
   | STerm ("extract",[STerm ("month",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_get_date_component Sql_date_MONTH)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_date_get_component Sql_date_MONTH)))
 	(sexp_to_sql_expr expr1)
   | STerm ("extract",[STerm ("day",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_get_date_component Sql_date_DAY)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_date_get_component Sql_date_DAY)))
 	(sexp_to_sql_expr expr1)
   | STerm ("function",[SString "date_minus";expr1;expr2]) ->
       QSQL.sql_expr_binary (SBinaryForeignExpr (Obj.magic (Bop_sql_date_minus)))

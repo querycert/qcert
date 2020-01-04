@@ -48,8 +48,8 @@ Extract Inlined Constant SQL_DATE_INTERVAL_eq => "(fun x y -> x = y)".
 Conjecture SQL_DATE_INTERVAL_eq_correct :
   forall f1 f2, (SQL_DATE_INTERVAL_eq f1 f2 = true <-> f1 = f2).
 
-Axiom SQL_DATE_INTERVAL_tostring : SQL_DATE_INTERVAL -> String.string.
-Extract Inlined Constant SQL_DATE_INTERVAL_tostring => "(fun x -> Util.char_list_of_string x)".
+Axiom SQL_DATE_INTERVAL_to_string : SQL_DATE_INTERVAL -> String.string.
+Extract Inlined Constant SQL_DATE_INTERVAL_to_string => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance sql_date_interval_foreign_data : foreign_data
   := {foreign_data_model := SQL_DATE_INTERVAL}.
@@ -74,7 +74,7 @@ Qed.
 Next Obligation.
   constructor.
   intros f.
-  exact (SQL_DATE_INTERVAL_tostring f).
+  exact (SQL_DATE_INTERVAL_to_string f).
 Defined.
 
 (* Now we define a sql date. *)
@@ -88,8 +88,8 @@ Extract Inlined Constant SQL_DATE_eq => "(fun x y -> x = y)".
 Conjecture SQL_DATE_eq_correct :
   forall f1 f2, (SQL_DATE_eq f1 f2 = true <-> f1 = f2).
 
-Axiom SQL_DATE_tostring : SQL_DATE -> String.string.
-Extract Inlined Constant SQL_DATE_tostring => "(fun x -> Util.char_list_of_string x)".
+Axiom SQL_DATE_to_string : SQL_DATE -> String.string.
+Extract Inlined Constant SQL_DATE_to_string => "(fun x -> Util.char_list_of_string x)".
 
 Program Instance sql_date_foreign_data : foreign_data
   := {foreign_data_model := SQL_DATE}.
@@ -114,14 +114,20 @@ Qed.
 Next Obligation.
   constructor.
   intros f.
-  exact (SQL_DATE_tostring f).
+  exact (SQL_DATE_to_string f).
 Defined.
 
 Axiom SQL_DATE_from_string : String.string -> SQL_DATE.
 Extract Inlined Constant SQL_DATE_from_string => "(fun x -> Util.string_of_char_list x)".
 
+Axiom SQL_DATE_from_string_correct :
+  forall s, SQL_DATE_from_string (SQL_DATE_to_string s) = s.
+
 Axiom SQL_DATE_INTERVAL_from_string : String.string -> SQL_DATE_INTERVAL.
 Extract Inlined Constant SQL_DATE_INTERVAL_from_string => "(fun x -> Util.string_of_char_list x)".
+
+Axiom SQL_DATE_INTERVAL_from_string_correct :
+  forall s, SQL_DATE_INTERVAL_from_string (SQL_DATE_INTERVAL_to_string s) = s.
 
 Inductive sql_date_component
   :=
@@ -142,9 +148,12 @@ Global Instance sql_date_component_to_string : ToString sql_date_component
 Axiom SQL_DATE_get_component : sql_date_component -> SQL_DATE -> Z.
 Extract Inlined Constant SQL_DATE_get_component => "(fun x y -> 0)".
   
+Axiom SQL_DATE_set_component : sql_date_component -> SQL_DATE -> Z -> SQL_DATE.
+Extract Inlined Constant SQL_DATE_set_component => "(fun x y z -> y)".
+  
 Inductive sql_date_unary_op
   :=
-  | uop_sql_get_date_component : sql_date_component -> sql_date_unary_op
+  | uop_sql_date_get_component : sql_date_component -> sql_date_unary_op
   | uop_sql_date_from_string
   | uop_sql_date_interval_from_string
 .
@@ -153,8 +162,7 @@ Local Open Scope string.
 
 Definition sql_date_unary_op_tostring (f:sql_date_unary_op) : String.string
   := match f with
-     | uop_sql_get_date_component part =>
-       "(ASqlGetDateComponent" ++ (sql_date_component_tostring part) ++ ")"
+     | uop_sql_date_get_component part => "(ASqlGetDateComponent" ++ (sql_date_component_tostring part) ++ ")"
      | uop_sql_date_from_string => "ASqlDateFromString"
      | uop_sql_date_interval_from_string => "ASqlDateDurationFromString"
      end.
@@ -174,30 +182,10 @@ Definition sql_date_to_java_unary_op
              (quotel:String.string) (fu:sql_date_unary_op)
              (d:java_json) : java_json
   := match fu with
-     | uop_sql_get_date_component part =>
-       mk_java_unary_op1 "sql_get_date_component" (sql_date_component_to_java_string part) d
+     | uop_sql_date_get_component part =>
+       mk_java_unary_op1 "sql_date_get_component" (sql_date_component_to_java_string part) d
      | uop_sql_date_from_string => mk_java_unary_op0 "sql_date_from_string" d
      | uop_sql_date_interval_from_string => mk_java_unary_op0 "sql_date_interval_from_string" d
-     end.
-
-Definition sql_date_to_javascript_unary_op
-             (indent:nat) (eol:String.string)
-             (quotel:String.string) (fu:sql_date_unary_op)
-             (d:String.string) : String.string
-  := match fu with
-     | uop_sql_get_date_component part => "sqlGetDateComponent(" ++ (toString part) ++ ", " ++ d ++ ")"
-     | uop_sql_date_from_string => "sqlDateFromString(" ++ d ++ ")"
-     | uop_sql_date_interval_from_string => "sqlDateDurationFromString(" ++ d ++ ")"
-     end.
-
-Definition sql_date_to_ajavascript_unary_op
-             (fu:sql_date_unary_op)
-             (e:JsSyntax.expr) : JsSyntax.expr
-  := match fu with
-     | uop_sql_get_date_component part =>
-       call_runtime "sqlGetDateComponent" [ expr_literal (literal_string (toString part)); e ]
-     | uop_sql_date_from_string => call_runtime "sqlDateFromString" [ e ]
-     | uop_sql_date_interval_from_string => call_runtime "sqlDateDurationFromString" [ e ]
      end.
 
 Axiom SQL_DATE_plus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
@@ -234,7 +222,7 @@ Inductive sql_date_binary_op
   | bop_sql_date_gt
   | bop_sql_date_ge
   | bop_sql_date_interval_between
-.
+  | bop_sql_date_set_component : sql_date_component -> sql_date_binary_op.
 
 Definition sql_date_binary_op_tostring (f:sql_date_binary_op) : String.string
   := match f with
@@ -246,11 +234,8 @@ Definition sql_date_binary_op_tostring (f:sql_date_binary_op) : String.string
      | bop_sql_date_gt => "ASqlDateGt"
      | bop_sql_date_ge => "ASqlDateGe"
      | bop_sql_date_interval_between => "ASqlDateDurationBetween"
+     | bop_sql_date_set_component part => "(ASqlSetDateComponent" ++ (sql_date_component_tostring part) ++ ")"
      end.
-
-(* Java equivalent: JavaScriptBackend.jsFunc *)
-Definition jsFunc (name d1 d2:string)
-  := name ++ "(" ++ d1 ++ ", " ++ d2 ++ ")".
 
 Definition sql_date_to_java_binary_op
              (indent:nat) (eol:String.string)
@@ -265,35 +250,6 @@ Definition sql_date_to_java_binary_op
      | bop_sql_date_gt =>  mk_java_binary_op0 "sql_date_gt" d1 d2
      | bop_sql_date_ge => mk_java_binary_op0 "sql_date_ge" d1 d2
      | bop_sql_date_interval_between => mk_java_binary_op0 "sql_date_interval_between" d1 d2
-
+     | bop_sql_date_set_component part => mk_java_binary_op0 "sql_date_set_component" d1 d2
      end.
-
-Definition sql_date_to_javascript_binary_op
-             (indent:nat) (eol:String.string)
-             (quotel:String.string) (fb:sql_date_binary_op)
-             (d1 d2:String.string) : String.string
-  := match fb with
-     | bop_sql_date_plus => jsFunc "sqlDatePointPlus" d1 d2
-     | bop_sql_date_minus => jsFunc "sqlDatePointMinus" d1 d2
-     | bop_sql_date_ne =>  jsFunc "sqlDatePointNe" d1 d2
-     | bop_sql_date_lt =>  jsFunc "sqlDatePointLt" d1 d2
-     | bop_sql_date_le =>  jsFunc "sqlDatePointLe" d1 d2
-     | bop_sql_date_gt =>  jsFunc "sqlDatePointGt" d1 d2
-     | bop_sql_date_ge => jsFunc "sqlDatePointGe" d1 d2
-     | bop_sql_date_interval_between => jsFunc "sqlDateDurationBetween" d1 d2
-     end.  
-
-Definition sql_date_to_ajavascript_binary_op
-             (fb:sql_date_binary_op)
-             (e1 e2:JsSyntax.expr) : JsSyntax.expr
-  := match fb with
-     | bop_sql_date_plus => call_runtime "sqlDatePointPlus" [ e1; e2 ]
-     | bop_sql_date_minus => call_runtime "sqlDatePointMinus" [ e1; e2 ]
-     | bop_sql_date_ne =>  call_runtime "sqlDatePointNe" [ e1; e2 ]
-     | bop_sql_date_lt =>  call_runtime "sqlDatePointLt" [ e1; e2 ]
-     | bop_sql_date_le =>  call_runtime "sqlDatePointLe" [ e1; e2 ]
-     | bop_sql_date_gt =>  call_runtime "sqlDatePointGt" [ e1; e2 ]
-     | bop_sql_date_ge => call_runtime "sqlDatePointGe" [ e1; e2 ]
-     | bop_sql_date_interval_between => call_runtime "sqlDateDurationBetween" [ e1; e2 ]
-     end.  
 

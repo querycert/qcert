@@ -28,7 +28,7 @@ function makeDate(year, month, day) {
 function mustBeDate(date) {
     if (typeof date === "object" && "year" in date && "month" in date && "day" in date)
 	      return;
-    throw "Expected a date but got " + JSON.stringify(date));
+    throw ("Expected a date but got " + JSON.stringify(date));
 }
 
 function mustBeDuration(duration) {
@@ -36,13 +36,13 @@ function mustBeDuration(duration) {
 	      mustBeUnit(duration.unit);
 	      return;
     }
-    throw "Expected a duration but got " + JSON.stringify(duration);
+    throw ("Expected a duration but got " + JSON.stringify(duration));
 }
 
 function mustBeUnit(unit) {
     if (unit === DAY || unit === MONTH || unit === YEAR)
 	      return;
-    throw "Expected a duration unit but got " + JSON.stringify(unit);
+    throw ("Expected a duration unit but got " + JSON.stringify(unit));
 }
 
 function compareDates(date1, date2) {
@@ -175,10 +175,10 @@ function durationMinus(date, duration) {
     case YEAR:
 	      return dateNewYear(date, date.year - duration.duration);
     default:
-	      throw ("Unexpected bad unit (not supposed to happen)");
+	      throw "Unexpected bad unit (not supposed to happen)";
     }
 }
 
 function durationBetween(date1, date) {
-    throw ("We don't know how to do 'duration between' dates yet");
+    throw "We don't know how to do 'duration between' dates yet";
 }

@@ -13,7 +13,9 @@
  *)
 
 Require Import List.
+Require Import ZArith.
 Require Import EquivDec.
+Require Import ToString.
 Require Import Utils.
 Require Import JSONSystem.
 Require Import EJsonSystem.
@@ -194,7 +196,7 @@ Definition ondstring {A} (f : String.string -> A) (d : data) : option A
 
 Definition sql_date_unary_op_interp (op:sql_date_unary_op) (d:data) : option data
   := match op with
-     | uop_sql_get_date_component part =>
+     | uop_sql_date_get_component part =>
        lift dnat (ondsqldate (SQL_DATE_get_component part) d)
      | uop_sql_date_from_string =>
        lift denhancedsqldate (ondstring SQL_DATE_from_string d)
@@ -223,6 +225,12 @@ Definition ondsqldate2 {A} (f : SQL_DATE -> SQL_DATE -> A) (d1 d2 : data) : opti
      | _, _ => None
      end.
 
+Definition ondsqldatez2 {A} (f : SQL_DATE -> Z -> A) (d1 d2 : data) : option A
+  := match d1, d2 with
+     | dforeign (enhancedsqldate fd1), dnat z => Some (f fd1 z)
+     | _, _ => None
+     end.
+
 Definition rondboolsqldate2 (f: SQL_DATE -> SQL_DATE -> bool) (d1 d2:data) : option data
   := lift dbool (ondsqldate2 f d1 d2).
 
@@ -246,7 +254,10 @@ Definition sql_date_binary_op_interp
      | bop_sql_date_le => rondboolsqldate2 SQL_DATE_le d1 d2
      | bop_sql_date_gt => rondboolsqldate2 SQL_DATE_gt d1 d2
      | bop_sql_date_ge => rondboolsqldate2 SQL_DATE_ge d1 d2
-     | bop_sql_date_interval_between => lift denhancedsqldateinterval (ondsqldate2 SQL_DATE_INTERVAL_between d1 d2)
+     | bop_sql_date_interval_between =>
+       lift denhancedsqldateinterval (ondsqldate2 SQL_DATE_INTERVAL_between d1 d2)
+     | bop_sql_date_set_component part =>
+       lift denhancedsqldate (ondsqldatez2 (SQL_DATE_set_component part) d1 d2)
      end.
 
 Definition enhanced_binary_op_interp
@@ -290,6 +301,7 @@ Next Obligation.
   change ({x = y} + {x <> y}).
   decide equality.
   - decide equality.
+    decide equality.
 Defined.
 Next Obligation.
   constructor; intros op.
@@ -362,35 +374,124 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
          | _ => None
          end) dl
   | enhanced_EJsonRuntimeDateGetYear =>
-    None (* XXX TODO *)
+    apply_unary
+      (fun d : ejson =>
+         match d with
+         | ejforeign (enhancedsqldate s) =>
+           Some (ejbigint (SQL_DATE_get_component sql_date_YEAR s))
+         | _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateGetMonth =>
-    None (* XXX TODO *)
+    apply_unary
+      (fun d : ejson =>
+         match d with
+         | ejforeign (enhancedsqldate fd) =>
+           Some (ejbigint (SQL_DATE_get_component sql_date_MONTH fd))
+         | _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateGetDay =>
-    None (* XXX TODO *)
+    apply_unary
+      (fun d : ejson =>
+         match d with
+         | ejforeign (enhancedsqldate fd) =>
+           Some (ejbigint (SQL_DATE_get_component sql_date_DAY fd))
+         | _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateNe =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd1), ejforeign (enhancedsqldate fd2) =>
+           Some (ejbool (SQL_DATE_ne fd1 fd2))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateLt =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd1), ejforeign (enhancedsqldate fd2) =>
+           Some (ejbool (SQL_DATE_lt fd1 fd2))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateLe =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd1), ejforeign (enhancedsqldate fd2) =>
+           Some (ejbool (SQL_DATE_le fd1 fd2))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateGt =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd1), ejforeign (enhancedsqldate fd2) =>
+           Some (ejbool (SQL_DATE_gt fd1 fd2))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateGe =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd1), ejforeign (enhancedsqldate fd2) =>
+           Some (ejbool (SQL_DATE_ge fd1 fd2))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateSetYear =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd), ejbigint n =>
+           Some (ejforeign (enhancedsqldate (SQL_DATE_set_component sql_date_YEAR fd n)))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateSetMonth =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd), ejbigint n =>
+           Some (ejforeign (enhancedsqldate (SQL_DATE_set_component sql_date_MONTH fd n)))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDateSetDay =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd), ejbigint n =>
+           Some (ejforeign (enhancedsqldate (SQL_DATE_set_component sql_date_DAY fd n)))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDurationFromString =>
-    None (* XXX TODO *)
+    apply_unary
+      (fun d : ejson =>
+         match d with
+         | ejstring s => Some (ejforeign (enhancedsqldateinterval (SQL_DATE_INTERVAL_from_string s)))
+         | _ => None
+         end) dl
   | enhanced_EJsonRuntimeDurationPlus =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd), ejforeign (enhancedsqldateinterval id) =>
+           Some (ejforeign (enhancedsqldate (SQL_DATE_plus fd id)))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDurationMinus =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd), ejforeign (enhancedsqldateinterval id) =>
+           Some (ejforeign (enhancedsqldate (SQL_DATE_minus fd id)))
+         | _, _ => None
+         end) dl
   | enhanced_EJsonRuntimeDurationBetween =>
-    None (* XXX TODO *)
+    apply_binary
+      (fun d1 d2 : ejson =>
+         match d1, d2 with
+         | ejforeign (enhancedsqldate fd1), ejforeign (enhancedsqldate fd2) =>
+           Some (ejforeign (enhancedsqldateinterval (SQL_DATE_INTERVAL_between fd1 fd2)))
+         | _, _ => None
+         end) dl
   end.
 
 Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
@@ -408,7 +509,6 @@ Next Obligation.
   exact (enhanced_foreign_ejson_runtime_op_interp f dl).
 Defined.
 
-(* XXX TODO *)
 Program Instance enhanced_foreign_to_ejson : foreign_to_ejson
   := mk_foreign_to_ejson enhanced_foreign_runtime enhanced_foreign_ejson _ _ _ _.
 Next Obligation.
@@ -422,9 +522,9 @@ Definition sql_date_unary_op_to_ejson (op:enhanced_unary_op) : enhanced_foreign_
   := match op with
      | enhanced_unary_sql_date_op dop =>
        match dop with
-       | uop_sql_get_date_component sql_date_YEAR => enhanced_EJsonRuntimeDateGetYear
-       | uop_sql_get_date_component sql_date_MONTH => enhanced_EJsonRuntimeDateGetMonth
-       | uop_sql_get_date_component sql_date_DAY => enhanced_EJsonRuntimeDateGetDay
+       | uop_sql_date_get_component sql_date_YEAR => enhanced_EJsonRuntimeDateGetYear
+       | uop_sql_date_get_component sql_date_MONTH => enhanced_EJsonRuntimeDateGetMonth
+       | uop_sql_date_get_component sql_date_DAY => enhanced_EJsonRuntimeDateGetDay
        | uop_sql_date_from_string => enhanced_EJsonRuntimeDateFromString
        | uop_sql_date_interval_from_string => enhanced_EJsonRuntimeDurationFromString
        end
@@ -439,13 +539,12 @@ Proof.
   intros.
   destruct uop.
   destruct s; simpl.
-  - destruct s; simpl; try reflexivity.
-    admit.
-    admit.
-    admit.
+  - destruct s; simpl; try reflexivity;
+      destruct d; try reflexivity; simpl;
+        destruct f; reflexivity.
   - destruct d; simpl; try reflexivity.
-  - admit.
-Admitted.
+  - destruct d; simpl; try reflexivity.
+Qed.
 
 Definition sql_date_binary_op_to_ejson (op:enhanced_binary_op) : enhanced_foreign_ejson_runtime_op
   := match op with
@@ -459,6 +558,9 @@ Definition sql_date_binary_op_to_ejson (op:enhanced_binary_op) : enhanced_foreig
        | bop_sql_date_gt => enhanced_EJsonRuntimeDateGt
        | bop_sql_date_ge => enhanced_EJsonRuntimeDateGe
        | bop_sql_date_interval_between =>enhanced_EJsonRuntimeDurationBetween
+       | bop_sql_date_set_component sql_date_YEAR => enhanced_EJsonRuntimeDateSetYear
+       | bop_sql_date_set_component sql_date_MONTH => enhanced_EJsonRuntimeDateSetMonth
+       | bop_sql_date_set_component sql_date_DAY => enhanced_EJsonRuntimeDateSetDay
        end
      end.
 
@@ -471,15 +573,40 @@ Proof.
   intros.
   destruct bop.
   destruct s; simpl.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-Admitted.
+  - destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
+    destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
+    destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
+    destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
+    destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
+    destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - destruct d1; destruct d2; try reflexivity;
+      destruct f; simpl; try reflexivity;
+        destruct f0; try reflexivity.
+  - destruct s; simpl;
+      destruct d1; destruct d2; try reflexivity;
+        destruct f; simpl; try reflexivity;
+          destruct f0; try reflexivity.
+Qed.
 
 Program Instance enhanced_foreign_to_ejson_runtime :
   foreign_to_ejson_runtime :=
@@ -502,18 +629,46 @@ Next Obligation.
   apply sql_date_binary_op_to_ejson_correct.
 Defined.
 
-(* XXX TODO *)
+Definition enhanced_foreign_json_to_ejson (j:json) : option enhanced_ejson :=
+  match j with
+  | jobject (("$date"%string,jstring s)::nil) =>
+    Some (enhancedsqldate (SQL_DATE_from_string s))
+  | jobject (("$interval"%string,jstring s)::nil) =>
+    Some (enhancedsqldateinterval (SQL_DATE_INTERVAL_from_string s))
+  | _ => None
+  end.
+
+Definition enhanced_foreign_ejson_to_json (ej:enhanced_ejson) : json :=
+  match ej with
+  | enhancedsqldate fd =>
+    jobject
+      (("$date"%string,
+        jstring (SQL_DATE_to_string fd))::nil)
+  | enhancedsqldateinterval fd =>
+    jobject
+      (("$interval"%string,
+        jstring (SQL_DATE_INTERVAL_to_string fd))::nil)
+  end.
+
+Lemma enhanced_foreign_json_to_ejson_correct (ej:enhanced_ejson) :
+  enhanced_foreign_json_to_ejson (enhanced_foreign_ejson_to_json ej) = Some ej.
+Proof.
+  destruct ej; try reflexivity.
+  - simpl. rewrite SQL_DATE_from_string_correct; reflexivity.
+  - simpl. rewrite SQL_DATE_INTERVAL_from_string_correct; reflexivity.
+Qed.
+
 Program Instance enhanced_foreign_to_json : foreign_to_json
   := mk_foreign_to_json enhanced_foreign_ejson _ _ _.
 Next Obligation.
-  exact None.
+  exact (enhanced_foreign_json_to_ejson fd).
 Defined.
 Next Obligation.
-  exact jnull.
+  exact (enhanced_foreign_ejson_to_json j).
 Defined.
 Next Obligation.
-  admit.
-Admitted.
+  apply enhanced_foreign_json_to_ejson_correct.
+Defined.
 
 (* XXX TODO: fix me *)
 Definition enhanced_to_java_data
@@ -579,18 +734,16 @@ Instance enhanced_foreign_to_scala {ftype: foreign_type}:
     timescale/timepoint.  just using a string may work for now.
 *)
 
+Inductive enhanced_numeric_type :=
+| enhanced_numeric_int
+| enhanced_numeric_float.
 
-
-  Inductive enhanced_numeric_type :=
-  | enhanced_numeric_int
-  | enhanced_numeric_float.
-
-  Global Instance enhanced_numeric_type_eqdec : EqDec enhanced_numeric_type eq.
-  Proof.
-    red. unfold equiv, complement.
-    change (forall x y : enhanced_numeric_type, {x = y} + {x <> y}).
-    decide equality.
-  Defined.
+Global Instance enhanced_numeric_type_eqdec : EqDec enhanced_numeric_type eq.
+Proof.
+  red. unfold equiv, complement.
+  change (forall x y : enhanced_numeric_type, {x = y} + {x <> y}).
+  decide equality.
+Defined.
 
 Inductive enhanced_reduce_op
   := RedOpCount : enhanced_reduce_op
@@ -1413,14 +1566,14 @@ Definition isString {model : brand_model} (τ:rtype) :=
 Inductive sql_date_unary_op_has_type {model:brand_model} :
   sql_date_unary_op -> rtype -> rtype -> Prop
   :=
-  | tuop_sql_get_date_component part : sql_date_unary_op_has_type (uop_sql_get_date_component part) SqlDate Nat
+  | tuop_sql_date_get_component part : sql_date_unary_op_has_type (uop_sql_date_get_component part) SqlDate Nat
   | tuop_sql_date_from_string : sql_date_unary_op_has_type uop_sql_date_from_string RType.String SqlDate
   | tuop_sql_date_interval_from_string : sql_date_unary_op_has_type uop_sql_date_interval_from_string RType.String SqlDateInterval
 .
 
 Definition sql_date_unary_op_type_infer {model : brand_model} (op:sql_date_unary_op) (τ₁:rtype) : option rtype :=
   match op with
-  | uop_sql_get_date_component part =>
+  | uop_sql_date_get_component part =>
     if isSqlDate τ₁ then Some Nat else None
   | uop_sql_date_from_string =>
     if isString τ₁ then Some SqlDate else None
@@ -1430,7 +1583,7 @@ Definition sql_date_unary_op_type_infer {model : brand_model} (op:sql_date_unary
 
 Definition sql_date_unary_op_type_infer_sub {model : brand_model} (op:sql_date_unary_op) (τ₁:rtype) : option (rtype*rtype) :=
   match op with
-  | uop_sql_get_date_component part =>
+  | uop_sql_date_get_component part =>
     enforce_unary_op_schema (τ₁,SqlDate) Nat
   | uop_sql_date_from_string =>
     enforce_unary_op_schema (τ₁,RType.String) SqlDate
@@ -1577,6 +1730,7 @@ Inductive sql_date_binary_op_has_type {model:brand_model} :
       sql_date_binary_op_has_type bop_sql_date_ge SqlDate SqlDate Bool
   | tbop_sql_date_interval_between  :
       sql_date_binary_op_has_type bop_sql_date_interval_between SqlDate SqlDate SqlDateInterval
+  | tbop_sql_date_set_component part : sql_date_binary_op_has_type (bop_sql_date_set_component part) SqlDate Nat SqlDate
 .
 
 Definition sql_date_binary_op_type_infer {model : brand_model} (op:sql_date_binary_op) (τ₁ τ₂:rtype) :=
@@ -1597,6 +1751,8 @@ Definition sql_date_binary_op_type_infer {model : brand_model} (op:sql_date_bina
     if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
   | bop_sql_date_interval_between  =>
     if isSqlDate τ₁ && isSqlDate τ₂ then Some SqlDateInterval else None
+  | bop_sql_date_set_component part =>
+    if isSqlDate τ₁ && isNat τ₂ then Some SqlDate else None
   end.
 
 Lemma sql_date_binary_op_typing_sound {model : brand_model}
@@ -1619,7 +1775,7 @@ Proof.
         eexists; split; try reflexivity;
           repeat constructor.
 Qed.
-         
+
 Definition sql_date_binary_op_type_infer_sub {model : brand_model} (op:sql_date_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype) :=
   match op with
   | bop_sql_date_plus => enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDateInterval) SqlDate
@@ -1632,6 +1788,8 @@ Definition sql_date_binary_op_type_infer_sub {model : brand_model} (op:sql_date_
     enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDate) Bool
   | bop_sql_date_interval_between  =>
     enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDate) SqlDateInterval
+  | bop_sql_date_set_component part =>
+    enforce_binary_op_schema (τ₁,SqlDate) (τ₂,Nat) SqlDate
   end.
 
 Inductive enhanced_binary_op_has_type {model:brand_model} :
@@ -1850,15 +2008,15 @@ Module CompEnhanced.
 
     Module Ops.
       Module Unary.
-        Definition sql_get_date_component (component:sql_date_component)
-          := OpForeignUnary (enhanced_unary_sql_date_op (uop_sql_get_date_component component)).
+        Definition sql_date_get_component (component:sql_date_component)
+          := OpForeignUnary (enhanced_unary_sql_date_op (uop_sql_date_get_component component)).
         Definition sql_date_from_string
           := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_from_string).
         Definition sql_date_interval_from_string
           := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_interval_from_string).
 
         (* for coq style syntax *)
-        Definition OpSqlGetDateComponent := sql_get_date_component.
+        Definition OpSqlGetDateComponent := sql_date_get_component.
         Definition OpSqlDateFromString := sql_date_from_string.
         Definition OpSqlDateIntervalFromString := sql_date_interval_from_string.
         
@@ -1883,6 +2041,8 @@ Module CompEnhanced.
 
         Definition sql_date_interval_between 
           := OpForeignBinary (enhanced_binary_sql_date_op (bop_sql_date_interval_between)).
+        Definition sql_date_set_component (component:sql_date_component)
+          := OpForeignBinary (enhanced_binary_sql_date_op (bop_sql_date_set_component component)).
         
         (* for coq style syntax *)
         Definition OpSqlDatePlus := sql_date_plus.

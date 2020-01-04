@@ -440,6 +440,4 @@ uop:
 | SQLDATEINTERVALFROMSTRING
     { Enhanced.Ops.Unary.sql_date_interval_from_string }
 | LPAREN SQLGETDATECOMPONENT c = sql_date_component RPAREN
-    { Enhanced.Ops.Unary.sql_get_date_component c }
-
-
+    { Enhanced.Ops.Unary.sql_date_get_component c }
