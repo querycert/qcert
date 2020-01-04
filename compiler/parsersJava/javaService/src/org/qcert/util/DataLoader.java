@@ -247,10 +247,10 @@ public class DataLoader {
       JsonObject ans = new JsonObject();
 			/* We are a little loosy-goosy with numbers since the sources of information are often inexact */
 			try {
-			    ans.add("nat",new JsonPrimitive(Integer.parseInt(value)));
+			    ans.add("$nat",new JsonPrimitive(Integer.parseInt(value)));
 			    return ans;
 			} catch (NumberFormatException ig) {
-			    ans.add("nat",new JsonPrimitive(Double.parseDouble(value)));
+			    ans.add("$nat",new JsonPrimitive(Double.parseDouble(value)));
 			    return ans;
 			}
 		case "Float":
@@ -275,9 +275,11 @@ public class DataLoader {
 		assert dateParts.length == 3;
 		String[] names = {"year",  "month", "day"};
 		JsonObject ans = new JsonObject();
+		JsonObject ansIn = new JsonObject();
 		for (int i = 0; i < 3; i++) {
-			ans.add(names[i], new JsonPrimitive(dateParts[i]));
+			ansIn.add(names[i], new JsonPrimitive(dateParts[i]));
 		}
+    ans.add("$foreign", ansIn);
 		return ans;
 	}
 

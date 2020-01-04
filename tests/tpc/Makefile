@@ -3,12 +3,11 @@ JAVA=java
 
 # Usually no need to edit below this point.
 
-QCERT=../../..
-SQLPARSER=$(QCERT)/sqlParser
-JAVARUNNERS=$(QCERT)/javaRunners
-JAVASERVICE=$(QCERT)/javaService
+QCERT=../..
+SQLPARSER=$(QCERT)/compiler/parsersJava/sqlParser
+JAVASERVICE=$(QCERT)/compiler/parsersJava/javaService
 JAVASCRIPT=$(QCERT)/runtimes/javascript
-QCERTCOMP=$(QCERT)/bin/qcert
+gQCERTCOMP=$(QCERT)/bin/qcert
 
 # Set up Java classpath
 ifeq ($(OS),Windows_NT)
