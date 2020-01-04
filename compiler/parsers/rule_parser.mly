@@ -29,9 +29,8 @@
 %token DUNIT DNAT DFLOAT DBOOL DSTRING
 %token DCOLL DREC
 %token DLEFT DRIGHT DBRAND
-%token DTIMESCALE
 
-%token SECOND MINUTE HOUR DAY WEEK MONTH YEAR
+%token DAY MONTH YEAR
 
 %token PCONST PUNOP PBINOP
 %token PMAP PASSERT PORELSE
@@ -56,15 +55,9 @@
 
 %token AFLOATSUM AFLOATARITHMEAN AFLOATLISTMIN AFLOATLISTMAX
 
-%token TIMEAS TIMESHIFT
-%token TIMENE TIMELT TIMELE TIMEGT TIMEGE
-%token TIMEDURATIONFROMSCALE TIMEDURATIONBETWEEN
-
 %token SQLDATEPLUS SQLDATEMINUS
 %token SQLDATENE SQLDATELT SQLDATELE SQLDATEGT SQLDATEGE
 %token SQLDATEINTERVALBETWEEN
-
-%token TIMEFROMSTRING TIMEDURATIONFROMSTRING
 
 %token SQLDATEFROMSTRING SQLDATEINTERVALFROMSTRING
 %token SQLGETDATECOMPONENT
@@ -241,24 +234,6 @@ data:
     { QData.dright d }
 | DBRAND sl = stringlist d = data
     { QData.dbrand sl d }
-| DTIMESCALE ts = timescale
-    { Enhanced.Data.dtime_scale ts }
-
-timescale:
-| SECOND
-  {Enhanced.Data.second}
-| MINUTE
-  {Enhanced.Data.minute}
-| HOUR
-  {Enhanced.Data.hour}
-| DAY
-  {Enhanced.Data.day}
-| WEEK
-  {Enhanced.Data.week}
-| MONTH
-  {Enhanced.Data.month}
-| YEAR
-  {Enhanced.Data.year}
 
 datalist:
 | 
@@ -320,24 +295,6 @@ bop:
 | FLOATMAX
   { QOps.Binary.FloatArith.opfloatmax }
 
-| TIMEAS
-  { Enhanced.Ops.Binary.time_as }
-| TIMESHIFT
-  { Enhanced.Ops.Binary.time_shift }
-| TIMENE
-  { Enhanced.Ops.Binary.time_ne }
-| TIMELT
-  { Enhanced.Ops.Binary.time_lt }
-| TIMELE
-  { Enhanced.Ops.Binary.time_le }
-| TIMEGT
-  { Enhanced.Ops.Binary.time_gt }
-| TIMEGE
-  { Enhanced.Ops.Binary.time_ge }
-| TIMEDURATIONFROMSCALE
-  { Enhanced.Ops.Binary.time_duration_from_scale }
-| TIMEDURATIONBETWEEN
-  { Enhanced.Ops.Binary.time_duration_between }
 | SQLDATEPLUS
   { Enhanced.Ops.Binary.sql_date_plus }
 | SQLDATEMINUS
@@ -478,10 +435,6 @@ uop:
     { QOps.Unary.opfloatmin }
 | AFLOATLISTMAX
     { QOps.Unary.opfloatmax }
-| TIMEFROMSTRING
-    { Enhanced.Ops.Unary.time_from_string }
-| TIMEDURATIONFROMSTRING
-    { Enhanced.Ops.Unary.time_duration_from_string }
 | SQLDATEFROMSTRING
     { Enhanced.Ops.Unary.sql_date_from_string }
 | SQLDATEINTERVALFROMSTRING

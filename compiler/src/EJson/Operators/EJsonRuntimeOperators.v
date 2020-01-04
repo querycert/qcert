@@ -91,7 +91,7 @@ Section EJsonRuntimeOperators.
     | EJsonRuntimeFloatSum : ejson_runtime_op
     | EJsonRuntimeFloatArithMean : ejson_runtime_op
     (* Foreign *)
-    | EJsonRuntimeForeign (fop:foreign_ejson_runtime_operators) : ejson_runtime_op
+    | EJsonRuntimeForeign (fop:foreign_ejson_runtime_op) : ejson_runtime_op
     .
 
   End Syntax.
@@ -684,7 +684,7 @@ Section EJsonRuntimeOperators.
              end) dl
       (* Foreign *)
       | EJsonRuntimeForeign fop =>
-        foreign_ejson_runtime_interp fop dl
+        foreign_ejson_runtime_op_interp fop dl
       end.
   End Evaluation.
 End EJsonRuntimeOperators.

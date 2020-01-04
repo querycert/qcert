@@ -23,6 +23,7 @@ Require Import ForeignDataToEJson.
 
 Section DataToEJson.
   Context {fruntime:foreign_runtime}.
+  Context {fejson:foreign_ejson}.
   Context {fdatatoejson:foreign_to_ejson}.
 
   Lemma string_dec_from_neq {a b} (pf:a <> b) : exists pf2, string_dec a b = right pf2.
@@ -844,4 +845,20 @@ Section DataToEJson.
     Qed.
 
   End RuntimeLemmas.
+
+  Section Lift.
+    Definition lift_bindings (env:bindings) : jbindings :=
+      List.map (fun xy => (fst xy, data_to_ejson (snd xy))) env.
+    Definition lift_pd_bindings (env:pd_bindings) : pd_jbindings :=
+      List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env.
+    Definition lift_result (res:option ejson) : option data :=
+      lift ejson_to_data res.
+    Definition unlift_result (res:option data) : option ejson :=
+      lift data_to_ejson res.
+    Definition lift_result_env (res:option pd_jbindings) : option pd_bindings :=
+      lift (fun env => List.map (fun xy => (fst xy, lift ejson_to_data (snd xy))) env) res.
+    Definition unlift_result_env (res:option pd_bindings) : option pd_jbindings :=
+      lift (fun env => List.map (fun xy => (fst xy, lift data_to_ejson (snd xy))) env) res.
+  End Lift.
+
 End DataToEJson.

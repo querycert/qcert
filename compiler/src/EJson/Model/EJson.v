@@ -274,4 +274,10 @@ Section EJson.
       end.
 
   End Util.
+
+  Section Env.
+    Definition jbindings := list (string * ejson).
+    Definition pd_jbindings := list (string * option ejson).
+  End Env.
+
 End EJson.

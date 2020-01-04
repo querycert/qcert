@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +26,7 @@ Require Import DataSystem.
 Require Import NNRCRuntime.
 Require Import tDNNRCSystem.
 Require Import ForeignToScala.
+Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
 Require Import DatatoSparkDF.
 
@@ -36,6 +35,7 @@ Local Open Scope string_scope.
 Section tDNNRCtoSparkDF.
 
   Context {fruntime:foreign_runtime}.
+  Context {fejson:foreign_ejson}.
   Context {fdatatoejson:foreign_to_ejson}.
   Context {h:brand_relation_t}.
   Context {ftype:foreign_type}.

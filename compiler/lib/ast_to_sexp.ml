@@ -60,10 +60,6 @@ let rec sstring_list_with_order_to_coq_string_list sl =
 
 let foreign_data_to_sexp (fd:enhanced_data) : sexp =
   begin match fd with
-  | Enhancedstring s -> STerm ("enhanced_string", (SString s)::[])
-  | Enhancedtimescale ts -> STerm ("dtime_scale", (SString (Pretty_common.timescale_as_string ts))::[])
-  | Enhancedtimeduration td -> raise Not_found
-  | Enhancedtimepoint tp -> raise Not_found
   | Enhancedsqldate td -> raise Not_found
   | Enhancedsqldateinterval tp -> raise Not_found
   end
@@ -196,15 +192,6 @@ let sexp_to_binary_op (se:sexp) : binary_op =
   | STerm ("OpStringJoin",[]) -> OpStringJoin
   | SString fbop -> OpForeignBinary (Obj.magic (Pretty_common.foreign_binary_op_of_string fbop))
   (* WARNING: Those are not printed, only parsed *)
-  | STerm ("OpTimeAs",[]) -> Enhanced.Ops.Binary.coq_OpTimeAs
-  | STerm ("OpTimeShift",[]) -> Enhanced.Ops.Binary.coq_OpTimeShift
-  | STerm ("OpTimeNe",[]) -> Enhanced.Ops.Binary.coq_OpTimeNe
-  | STerm ("OpTimeLt",[]) -> Enhanced.Ops.Binary.coq_OpTimeLt
-  | STerm ("OpTimeLe",[]) -> Enhanced.Ops.Binary.coq_OpTimeLe
-  | STerm ("OpTimeGt",[]) -> Enhanced.Ops.Binary.coq_OpTimeGt
-  | STerm ("OpTimeGe",[]) -> Enhanced.Ops.Binary.coq_OpTimeGe
-  | STerm ("OpTimeDurationFromScale",[]) -> Enhanced.Ops.Binary.coq_OpTimeDurationFromScale
-  | STerm ("OpTimeDurationBetween",[]) -> Enhanced.Ops.Binary.coq_OpTimeDurationBetween
   | STerm ("OpSqlDatePlus",[]) -> Enhanced.Ops.Binary.coq_OpSqlDatePlus
   | STerm ("OpSqlDateMinus",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateMinus
   | STerm ("OpSqlDateNe",[]) -> Enhanced.Ops.Binary.coq_OpSqlDateNe
@@ -329,9 +316,6 @@ let sexp_to_unary_op (se:sexp) : unary_op =
   | STerm ("OpFloatBagMin",[]) -> OpFloatBagMin
   | STerm ("OpFloatBagMax",[]) -> OpFloatBagMax
   (* WARNING: Those are not printed, only parsed *)
-  | STerm ("OpTimeToSscale",[]) -> Enhanced.Ops.Unary.coq_OpTimeToSscale
-  | STerm ("OpTimeFromString",[]) -> Enhanced.Ops.Unary.coq_OpTimeFromString
-  | STerm ("OpTimeDurationFromString",[]) -> Enhanced.Ops.Unary.coq_OpTimeDurationFromString
   | STerm ("OpSqlDateFromString",[]) -> Enhanced.Ops.Unary.coq_OpSqlDateFromString
   | STerm ("OpSqlDateIntervalromString",[]) -> Enhanced.Ops.Unary.coq_OpSqlDateIntervalFromString
   | STerm ("OpSqlGetDateComponent",[part]) -> Enhanced.Ops.Unary.coq_OpSqlGetDateComponent (sstring_to_sql_date_component part)
@@ -1129,19 +1113,19 @@ and sexp_to_sql_expr expr =
 (*  | STerm ("const_list",const_list) ->
       List.fold_left (QSQL.sql_binary (map (fun e -> (QSQL.sql_unary sexp_to_sql_expr const_list)) *)
   | STerm ("cast",[STerm ("as",[SString "DATE"]); expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Uop_sql_date_from_string)))
 	(sexp_to_sql_expr expr1)
   | STerm ("literal",[SString "date"; SString sdate]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_date_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string sdate)))
   | STerm ("interval",[SString sinterval; STerm ("year",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_date_interval_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-YEAR"))))
   | STerm ("interval",[SString sinterval; STerm ("month",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_date_interval_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-MONTH"))))
   | STerm ("interval",[SString sinterval; STerm ("day",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_date_interval_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-DAY"))))
   | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
       QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
@@ -1179,19 +1163,19 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_agg_expr SMax (sexp_to_sql_expr expr1)
   | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
   | STerm ("extract",[STerm ("year",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op (Uop_sql_get_date_component Sql_date_YEAR))))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_get_date_component Sql_date_YEAR)))
 	(sexp_to_sql_expr expr1)
   | STerm ("extract",[STerm ("month",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op (Uop_sql_get_date_component Sql_date_MONTH))))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_get_date_component Sql_date_MONTH)))
 	(sexp_to_sql_expr expr1)
   | STerm ("extract",[STerm ("day",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op (Uop_sql_get_date_component Sql_date_DAY))))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Uop_sql_get_date_component Sql_date_DAY)))
 	(sexp_to_sql_expr expr1)
   | STerm ("function",[SString "date_minus";expr1;expr2]) ->
-      QSQL.sql_expr_binary (SBinaryForeignExpr (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_minus)))
+      QSQL.sql_expr_binary (SBinaryForeignExpr (Obj.magic (Bop_sql_date_minus)))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "date_plus";expr1;expr2]) ->
-      QSQL.sql_expr_binary (SBinaryForeignExpr (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_plus)))
+      QSQL.sql_expr_binary (SBinaryForeignExpr (Obj.magic (Bop_sql_date_plus)))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "concat";expr1;expr2]) ->
       QSQL.sql_expr_binary SConcat
@@ -1250,24 +1234,24 @@ and sexp_to_sql_cond cond =
   | STerm ("isNull",[expr1]) ->
       QSQL.sql_cond_binary SEq (sexp_to_sql_expr expr1) (QSQL.sql_expr_const (Dunit))
   | STerm ("function",[SString "date_le";expr1;expr2]) ->
-      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_le)))
+      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic Bop_sql_date_le))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "date_lt";expr1;expr2]) ->
-      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_lt)))
+      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic Bop_sql_date_lt))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "date_gt";expr1;expr2]) ->
-      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_gt)))
+      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic Bop_sql_date_gt))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "date_ge";expr1;expr2]) ->
-      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_ge)))
+      QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic Bop_sql_date_ge))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "date_between";expr1;expr2;expr3]) ->
       let sql_expr1 = (sexp_to_sql_expr expr1) in
       let sql_expr2 = (sexp_to_sql_expr expr2) in
       let sql_expr3 = (sexp_to_sql_expr expr3) in
       QSQL.sql_cond_and
-	(QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_le))) sql_expr2 sql_expr1)
-	(QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic (Enhanced_binary_sql_date_op Bop_sql_date_le))) sql_expr1 sql_expr3)
+	(QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic Bop_sql_date_le)) sql_expr2 sql_expr1)
+	(QSQL.sql_cond_binary (SBinaryForeignCond (Obj.magic Bop_sql_date_le)) sql_expr1 sql_expr3)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL condition: " ^ sterm))
   | _ ->

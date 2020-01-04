@@ -36,15 +36,6 @@
 	  "AFloatLe", FLOATLE;
 	  "AFloatGt", FLOATGT;
 	  "AFloatGe", FLOATGE;*)
-	  "ATimeAs", TIMEAS;
-	  "ATimeShift", TIMESHIFT;
-	  "ATimeNe", TIMENE;
-	  "ATimeLt", TIMELT;
-	  "ATimeLe", TIMELE;
-	  "ATimeGt", TIMEGT;
-	  "ATimeGe", TIMEGE;
-	  "ATimeDurationFromScale", TIMEDURATIONFROMSCALE;
-	  "ATimeDurationBetween", TIMEDURATIONBETWEEN;
 	  "ASqlDatePlus", SQLDATEPLUS;
  	  "ASqlDateMinus", SQLDATEMINUS;
 	  "ASqlDateNe", SQLDATENE;
@@ -112,8 +103,6 @@
           "AFloatArithMean", AFLOATARITHMEAN;
           "AFloatListMin", AFLOATLISTMIN;
           "AFloatListMax", AFLOATLISTMAX;
-	  "ATimeFromString", TIMEFROMSTRING;
-	  "ATimeDurationFromString", TIMEDURATIONFROMSTRING;
 	  "ASqlDateFromString", SQLDATEFROMSTRING;
 	  "ASqlDateIntervalFromString", SQLDATEINTERVALFROMSTRING;
  	  "ASqlGetDateComponent", SQLGETDATECOMPONENT;
@@ -134,12 +123,7 @@
 	  "dbrand", DBRAND;
 	  "true", TRUE;
 	  "false", FALSE;
-	  "dtime_scale", DTIMESCALE;
-	  "SECOND", SECOND;
-	  "MINUTE", MINUTE;
-	  "HOUR", HOUR;
 	  "DAY", DAY;
-	  "WEEK", WEEK;
 	  "MONTH", MONTH;
 	  "YEAR", YEAR;
 	  (* Pattern *)

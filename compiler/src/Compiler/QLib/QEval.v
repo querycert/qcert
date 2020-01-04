@@ -58,9 +58,9 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_input : Set := eval_input.
   Definition eval_output : Set := eval_output.
 
-  Definition eval_query {bm:brand_model} : query -> eval_input -> eval_output := @eval_query _ _ _ _ bm h.
+  Definition eval_query {bm:brand_model} : query -> eval_input -> eval_output := @eval_query _ _ _ _ _ bm h.
 
-  Definition eval_query_debug {bm:brand_model} : query -> eval_input -> eval_output := @eval_query_debug _ _ _ _ _ h.
+  Definition eval_query_debug {bm:brand_model} : query -> eval_input -> eval_output := @eval_query_debug _ _ _ _ _ _ h.
 
   (* Eval for single 'world' collection *)
   Definition eval_camp_rule_world : camp_rule -> world_env -> option data := @eval_camp_rule_world _ h.

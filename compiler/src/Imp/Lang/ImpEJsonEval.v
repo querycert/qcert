@@ -81,9 +81,6 @@ Section ImpEJsonEval.
           returns an optional value. When [None] is returned, it
           denotes an error. An error is always propagated. *)
 
-    Definition jbindings := list (string * imp_ejson_data).
-    Definition pd_jbindings := list (string * option imp_ejson_data).
-
     Definition imp_ejson_expr_eval
                (σ:pd_jbindings) (e:imp_ejson_expr)
       : option imp_ejson_data
@@ -171,6 +168,7 @@ Require Import ForeignDataToEJson.
 Require Import DataToEJson.
 Section Top.
   Context {fruntime:foreign_runtime}.
+  Context {fejson:foreign_ejson}.
   Context {fdatatoejson:foreign_to_ejson}.
   Context {fejruntime:foreign_ejson_runtime}.
   (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)

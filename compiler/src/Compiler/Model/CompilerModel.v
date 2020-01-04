@@ -17,7 +17,9 @@
 Require Import String.
 Require Import CompilerRuntime.
 Require Import DataSystem.
+Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
+Require Import ForeignToEJsonRuntime.
 Require Import ForeignEJsonToJSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
@@ -41,7 +43,9 @@ Set Typeclasses Axioms Are Instances.
 Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
   Axiom compiler_model_foreign_runtime : foreign_runtime.
+  Axiom compiler_model_foreign_ejson : foreign_ejson.
   Axiom compiler_model_foreign_to_ejson : foreign_to_ejson.
+  Axiom compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
   Axiom compiler_model_foreign_to_json : foreign_to_json.
   Axiom compiler_model_foreign_to_java : foreign_to_java.
   Axiom compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
@@ -64,8 +68,12 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := basic_model_foreign_type.
   Definition compiler_foreign_runtime : foreign_runtime
     := model.compiler_model_foreign_runtime.
+  Definition compiler_foreign_ejson : foreign_ejson
+    := model.compiler_model_foreign_ejson.
   Definition compiler_foreign_to_ejson : foreign_to_ejson
     := model.compiler_model_foreign_to_ejson.
+  Definition compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime
+    := model.compiler_model_foreign_to_ejson_runtime.
   Definition compiler_foreign_to_json : foreign_to_json
     := model.compiler_model_foreign_to_json.
   Definition compiler_foreign_to_java : foreign_to_java

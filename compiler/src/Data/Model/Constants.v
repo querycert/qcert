@@ -29,5 +29,7 @@ Section Constants.
   Definition mkWorld (world:list data) : list (string*data)
     := (WORLD,(dcoll world))::nil.
 
+  (* bindings that may or may not be initialized (defined) *)
+  Definition pd_bindings := list (string*option data).
 End Constants.
 
