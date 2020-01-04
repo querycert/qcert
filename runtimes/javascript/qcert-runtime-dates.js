@@ -21,28 +21,34 @@ var DAY = "DAY";
 var MONTH = "MONTH";
 var YEAR = "YEAR";
 
-function makeDate(year, month, day) {
-    return {"year": year, "month": month, "day": day};
+function boxDate(year, month, day) {
+    return { "$foreign" : { "$date" : {"year": year, "month": month, "day": day} } };
 }
 
 function mustBeDate(date) {
-    if (typeof date === "object" && "year" in date && "month" in date && "day" in date)
-	      return;
-    throw ("Expected a date but got " + JSON.stringify(date));
-}
-
-function mustBeDuration(duration) {
-    if (typeof duration === "object" && "duration" in duration && "unit" in duration) {
-	      mustBeUnit(duration.unit);
-	      return;
+    if ("$foreign" in date && "$date" in date["$foreign"]) {
+        var d = date.$foreign.$date;
+        if (typeof d === "object" && "year" in d && "month" in d && "day" in d)
+	          return d;
     }
-    throw ("Expected a duration but got " + JSON.stringify(duration));
+    throw new Error("Expected a date but got " + JSON.stringify(date));
 }
 
 function mustBeUnit(unit) {
     if (unit === DAY || unit === MONTH || unit === YEAR)
 	      return;
-    throw ("Expected a duration unit but got " + JSON.stringify(unit));
+    throw new Error("Expected a duration unit but got " + JSON.stringify(unit));
+}
+
+function mustBeDuration(duration) {
+    if (duration.$foreign && duration.$foreign.$interval) {
+        var i = duration.$foreign.$interval;
+        if (typeof i === "object" && "duration" in i && "unit" in i) {
+	          mustBeUnit(i.unit);
+	          return i;
+        }
+    }
+    throw new Error("Expected a duration but got " + JSON.stringify(duration));
 }
 
 function compareDates(date1, date2) {
@@ -65,73 +71,77 @@ function compareDates(date1, date2) {
 function dateFromString(stringDate) {
     if (typeof stringDate === "string") {
 	      parts = stringDate.split("-");
-	      if (parts.length === 3)
-	          return makeDate(Number(parts[0]), Number(parts[1]), Number(parts[2]));
-	      throw ("Malformed string date: " + stringDate);
+	      if (parts.length === 3) {
+            return boxDate(Number(parts[0]), Number(parts[1]), Number(parts[2]));
+        }
+	      throw new Error("Malformed string date: " + stringDate);
     }
-    throw ("Expected a date in string form but got " + JSON.stringify(stringDate));
+    throw new Error("Expected a date in string form but got " + JSON.stringify(stringDate));
 }
 
 function dateGetYear(date) {
-    mustBeDate(date);
-	  return date.year;
+    var d = mustBeDate(date);
+	  return d.year;
 }
 
 function dateGetMonth(date) {
-    mustBeDate(date);
-	  return date.month;
+    var d = mustBeDate(date);
+	  return d.month;
 }
 
 function dateGetDay(date) {
-    mustBeDate(date);
-	  return date.day;
+    var d = mustBeDate(date);
+	  return d.day;
 }
 
 function dateNe(date1, date2) {
-    mustBeDate(date1);
-    mustBeDate(date2);
-    return compareDates(date1, date2) != 0;
+    var d1 = mustBeDate(date1);
+    var d2 = mustBeDate(date2);
+    return compareDates(d1, d2) != 0;
 }
 
 function dateLt(date1, date2) {
-    mustBeDate(date1);
-    mustBeDate(date2);
-    return compareDates(date1, date2) < 0;
+    var d1 = mustBeDate(date1);
+    var d2 = mustBeDate(date2);
+    return compareDates(d1, d2) < 0;
 }
 
 function dateLe(date1, date2) {
-    mustBeDate(date1);
-    mustBeDate(date2);
-    return compareDates(date1, date2) <= 0;
+    var d1 = mustBeDate(date1);
+    var d2 = mustBeDate(date2);
+    return compareDates(d1, d2) <= 0;
 }
 
 function dateGt(date1, date2) {
-    mustBeDate(date1);
-    mustBeDate(date2);
-    return compareDates(date1, date2) > 0;
+    var d1 = mustBeDate(date1);
+    var d2 = mustBeDate(date2);
+    return compareDates(d1, d2) > 0;
 }
 
 function dateGe(date1, date2) {
-    mustBeDate(date1);
-    mustBeDate(date2);
-    return compareDates(date1, date2) >= 0;
+    var d1 = mustBeDate(date1);
+    var d2 = mustBeDate(date2);
+    return compareDates(d1, d2) >= 0;
 }
 
 
 function dateSetYear(date, year) {
-    return makeDate(year, date.month, date.day);
+    var d = mustBeDate(date);
+    return boxDate(year, d.month, d.day);
 }
 
 function dateSetMonth(date, month) {
+    var d = mustBeDate(date);
     /* Use Javascript Date object to normalize out-of-range month */
-    var jsDate = new Date(date.year, month-1, date.day);
-    return makeDate(jsDate.getFullYear(), jsDate.getMonth()+1, jsDate.getDate());
+    var jsDate = new Date(d.year, month-1, d.day);
+    return boxDate(jsDate.getFullYear(), jsDate.getMonth()+1, jsDate.getDate());
 }
 
 function dateSetDay(date, day) {
+    var d = mustBeDate(date);
     /* Use Javascript Date object to normalize out-of-range day */
-    var jsDate = new Date(date.year, date.month-1, day);
-    return makeDate(jsDate.getFullYear(), jsDate.getMonth()+1, jsDate.getDate());
+    var jsDate = new Date(d.year, d.month-1, day);
+    return boxDate(jsDate.getFullYear(), jsDate.getMonth()+1, jsDate.getDate());
 }
 
 /* Duration */
@@ -143,42 +153,42 @@ function durationFromString(stringDuration) {
 	      if (parts.length === 2) {
 	          mustBeUnit(parts[1]);
 	          return {"duration": Number(parts[0]), "unit": parts[1]};
-	          throw ("Malformed string duration: " + stringDuration);
+	          throw new Error("Malformed string duration: " + stringDuration);
 	      }
-	      throw ("Expected a duration in string form but got " + JSON.stringify(stringDuration));
+	      throw new Error("Expected a duration in string form but got " + JSON.stringify(stringDuration));
     }
 }
 
 function durationPlus(date, duration) {
-    mustBeDate(date);
-    mustBeDuration(duration);
-    switch(duration.unit) {
+    var d = mustBeDate(date);
+    var i = mustBeDuration(duration);
+    switch(i.unit) {
     case DAY:
-	      return dateNewDay(date, date.day + duration.duration);
+	      return dateSetDay(d, d.day + i.duration);
     case MONTH:
-	      return dateNewMonth(date, date.month + duration.duration);
+	      return dateSetMonth(d, d.month + i.duration);
     case YEAR:
-	      return dateNewYear(date, date.year + duration.duration);
+	      return dateSetYear(d, d.year + i.duration);
     default:
-	      throw "Unexpected state (not supposed to happen)";
+	      throw new Error("Unexpected state (not supposed to happen)");
     }
 }
 
 function durationMinus(date, duration) {
-    mustBeDate(date);
-    mustBeDuration(duration);
-    switch(duration.unit) {
+    var d = mustBeDate(date);
+    var i = mustBeDuration(duration);
+    switch(i.unit) {
     case DAY:
-	      return dateNewDay(date, date.day - duration.duration);
+	      return dateNewDay(d, d.day - i.duration);
     case MONTH:
-	      return dateNewMonth(date, date.month - duration.duration);
+	      return dateNewMonth(d, d.month - i.duration);
     case YEAR:
-	      return dateNewYear(date, date.year - duration.duration);
+	      return dateNewYear(de, d.year - i.duration);
     default:
-	      throw "Unexpected bad unit (not supposed to happen)";
+	      throw new Error("Unexpected bad unit (not supposed to happen)");
     }
 }
 
 function durationBetween(date1, date) {
-    throw "We don't know how to do 'duration between' dates yet";
+    throw new Error("We don't know how to do 'duration between' dates yet");
 }

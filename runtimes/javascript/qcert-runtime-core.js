@@ -26,7 +26,7 @@ function mustBeArray(obj) {
     if (Array.isArray(obj)) {
 	      return;
     }
-    throw "Expected an array but got: " + JSON.stringify(obj);
+    throw new Error("Expected an array but got: " + JSON.stringify(obj));
 }
 function mkLeft(v) {
     return { "$left" : v };
@@ -200,7 +200,7 @@ function recDot(receiver, member) {
     if (typeof receiver === "object" && member in receiver) {
 	      return receiver[member];
     }
-    throw "TypeError: recDot called on non-record";
+    throw new Error("TypeError: recDot called on non-record");
 }
 
 /* Sum */
@@ -211,21 +211,21 @@ function either(v) {
         } else if ("$right" in v) {
             return false;
         } else {
-            throw "TypeError: either called on non-sum";
+            throw new Error("TypeError: either called on non-sum");
         }
-    throw "TypeError: either called on non-sum";
+    throw new Error("TypeError: either called on non-sum");
 }
 function toLeft(v) {
     if (typeof v === "object" && "$left" in v) {
 	      return v.$left;
     }
-    throw "TypeError: toLeft called on non-sum";
+    throw new Error("TypeError: toLeft called on non-sum");
 }
 function toRight(v) {
     if (typeof v === "object" && "$right" in v) {
 	      return v.$right;
     }
-    throw "TypeError: toRight called on non-sum";
+    throw new Error("TypeError: toRight called on non-sum");
 }
 
 /* Brand */
@@ -236,7 +236,7 @@ function unbrand(v) {
     if (typeof v === "object" && "$class" in v && "$data" in v) {
 	      return v.$data;
     }
-    throw "TypeError: unbrand called on non-object";
+    throw new Error("TypeError: unbrand called on non-object");
 }
 function cast(brands,v) {
     mustBeArray(brands);
@@ -396,7 +396,7 @@ function sort(b,scl) {
     return result;
 }
 function groupBy(l) { // Not implemented
-    throw "groupBy not implemented";
+    throw new Error("groupBy not implemented");
 }
 
 /* String */
