@@ -20,9 +20,8 @@ Require Import Equivalence.
 Require Import Utils.
 Require Import ForeignData.
 Require Import ForeignToJava.
-Require Import NNRCtoJava.
 Require Import ForeignOperators.
-Require Import JavaScriptAstRuntime.
+Require Import JavaRuntime.
 
 Import ListNotations.
 

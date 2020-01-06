@@ -23,113 +23,53 @@ Require Import JavaRuntime.
 Require Import NNRCRuntime.
 Require Import ForeignToJava.
 
+Import ListNotations.
 Local Open Scope string_scope.
 Local Open Scope nstring_scope.
 
-Section sanitizer.
-  Import ListNotations.
-  
-  Definition unshadow_java {fruntime:foreign_runtime} (avoid:list var) (e:nnrc) : nnrc
-    := unshadow javaSafeSeparator javaIdentifierSanitize (avoid++javaAvoidList) e.
-
-  Definition javaSanitizeNNRC {fruntime:foreign_runtime} (e:nnrc) : nnrc
-    := unshadow_java nil e.
-
-End sanitizer.
-
 Section NNRCtoJava.
+  Section sanitizer.
+    Definition unshadow_java {fruntime:foreign_runtime} (avoid:list var) (e:nnrc) : nnrc
+      := unshadow javaSafeSeparator javaIdentifierSanitize (avoid++javaAvoidList) e.
+
+    Definition javaSanitizeNNRC {fruntime:foreign_runtime} (e:nnrc) : nnrc
+      := unshadow_java nil e.
+
+  End sanitizer.
 
   Context {fruntime:foreign_runtime}.
 
-  Section javaUtil.
-    Definition eol_newline := ^String (Ascii.ascii_of_nat 10) EmptyString.
-    Definition eol_backn := ^"\n".
-    Definition quotel_double := ^"""".
-    Definition quotel_backdouble := ^"\""".
-    
-    Fixpoint indent (i : nat) : nstring
-      := match i with
-         | 0 => ^""
-         | S j => ^"  " +++ (indent j)
-         end.
-
-  End javaUtil.
-
   Section DataJava.
-    Definition from_java_json (obj:java_json)
-      := match obj with
-         | mk_java_json s => s
-         end.
-
-    (* Given a list of strings that construct objects, create a JsonArray holding them *)
-    Definition mk_java_json_array (l:list java_json) : java_json
-      := mk_java_json (^"RuntimeUtils.createJsonArray"
-                         +++ nstring_bracket (^"(") (nstring_map_concat (^", ") from_java_json l) (^")")).
-
-    Definition mk_java_json_object (quotel:nstring) (l:list (nstring*java_json)) : java_json
-       := mk_java_json (^"new RuntimeUtils.JsonObjectBuilder()" 
-                           +++ (nstring_map_concat (^"")
-                                                   (fun elem =>
-                                                      nstring_bracket
-                                                        (^".add(")
-                                                        (quotel +++ (fst elem) +++ quotel +++ (^", ") +++
-                                                                (from_java_json (snd elem)))
-                                                        (^")")) l)
-                           +++ ^".toJsonObject()").
-               
-    Definition mk_java_json_primitive (obj:nstring) : java_json
-      := mk_java_json (^"new JsonPrimitive(" +++ obj +++ ^")").
-    
-    Definition mk_java_json_string quotel (s:nstring)
-      := mk_java_json_primitive
-           (nstring_bracket quotel s quotel).    
+    Context {ftojavajson:foreign_to_java}.
 
     Definition mk_java_json_brands (quotel:nstring) (b:brands) : java_json
       := mk_java_json_array (map (mk_java_json_string quotel) (map nstring_quote b)).
 
-    Definition java_json_NULL : java_json
-       := mk_java_json (^"JsonNull.INSTANCE").
- 
-    Import ListNotations.
-
-    Definition mk_java_json_nat quotel n : java_json
-      := mk_java_json_object quotel
-                             [(^"$nat", (mk_java_json_primitive (^Z_to_string10 n)))].
-
-    Definition mk_java_json_number n : java_json
-      := mk_java_json_primitive (^float_to_string n).
-
-    Definition mk_java_json_bool (b:bool) : java_json
-      := mk_java_json_primitive 
-           (if b then ^"true" else ^"false").
-
-    Context {ftojavajson:foreign_to_java}.
-
     Fixpoint mk_java_json_data (quotel:nstring) (d : data) : java_json :=
       match d with
-         | dunit => java_json_NULL
-         | dnat n => mk_java_json_nat quotel n
-         | dfloat n => mk_java_json_number n
-         | dbool b => mk_java_json_bool b
-         | dstring s => mk_java_json_string quotel (^s)
-         | dcoll ls => mk_java_json_array (map (mk_java_json_data quotel) ls)
-         | drec ls => mk_java_json_object
-                        quotel
-                        (map (fun kv =>
-                                let '(k,v) := kv in
-                                (^k, (mk_java_json_data quotel v))) ls)
-         | dleft d => mk_java_json_object quotel
-                                         [(^"$left", (mk_java_json_data quotel d))]
-
-         | dright d => mk_java_json_object quotel
-                                         [(^"$right", (mk_java_json_data quotel d))]
-
-         | dbrand b d =>
-           mk_java_json_object quotel
-                              [(^"$data", mk_java_json_data quotel d)
-                               ; (^"$type", mk_java_json_brands quotel b)]
-         | dforeign fd => foreign_to_java_data quotel fd
-         end.
+      | dunit => java_json_NULL
+      | dnat n => mk_java_json_nat quotel n
+      | dfloat n => mk_java_json_number n
+      | dbool b => mk_java_json_bool b
+      | dstring s => mk_java_json_string quotel (^s)
+      | dcoll ls => mk_java_json_array (map (mk_java_json_data quotel) ls)
+      | drec ls => mk_java_json_object
+                     quotel
+                     (map (fun kv =>
+                             let '(k,v) := kv in
+                             (^k, (mk_java_json_data quotel v))) ls)
+      | dleft d => mk_java_json_object quotel
+                                       [(^"$left", (mk_java_json_data quotel d))]
+                                       
+      | dright d => mk_java_json_object quotel
+                                        [(^"$right", (mk_java_json_data quotel d))]
+                                        
+      | dbrand b d =>
+        mk_java_json_object quotel
+                            [(^"$data", mk_java_json_data quotel d)
+                             ; (^"$type", mk_java_json_brands quotel b)]
+      | dforeign fd => foreign_to_java_data quotel fd
+      end.
 
   End DataJava.
 
@@ -152,42 +92,6 @@ Section NNRCtoJava.
   Section NNRCJava.
     Context {ftojavajson:foreign_to_java}.
     Import ListNotations.
-
-    Definition mk_java_string (s:nstring) : nstring
-      := quotel_double +++ s +++ quotel_double.
-
-    Definition mk_java_unary_op0 (opname:nstring) (e:java_json) : java_json
-      := mk_java_json (^"UnaryOperators." +++ opname +++ ^"(" +++ (from_java_json e) +++ ^")").
-
-    Definition mk_java_unary_op1 (opname:nstring) (s:nstring) (e:java_json) : java_json
-      := mk_java_json
-           (^"UnaryOperators."
-              +++ opname
-              +++ ^"("
-              +++ s +++ ^", "
-              +++ (from_java_json e) +++ ^")").
-
-    Definition mk_java_unary_opn (opname:nstring) (sn:list nstring) (e:java_json) : java_json
-      := mk_java_json
-           (^"UnaryOperators."
-              +++ opname
-              +++ ^"("
-              +++ (nstring_concat (^", ") (List.app sn [(from_java_json e)]))
-              +++ ^")").
-
-    Definition mk_java_collection(typ:nstring) (s:list nstring) : nstring
-      := ^"new RuntimeUtils.CollectionBuilder<" +++ typ +++ ^">("
-           +++ (^nat_to_string10 (Datatypes.length s)) +++ (^")")
-           +++ nstring_map_concat (^"") (fun elem => ^".add(" +++ elem +++ ^")") s
-           +++ ^".result()".
-
-    Definition mk_java_string_collection(s:list nstring) : nstring
-      := mk_java_collection (^"String") (map mk_java_string s).
-    
-    Definition mk_java_binary_op0 (opname:nstring) (e1 e2:java_json) : java_json
-      := mk_java_json (^"BinaryOperators." +++ opname
-                                           +++ ^"(" +++ (from_java_json e1)
-                                                    +++ ^", " +++ (from_java_json e2) +++ ^")").
 
     Definition uarithToJavaMethod (u:nat_arith_unary_op) :=
       match u with
@@ -455,7 +359,7 @@ Section NNRCtoJava.
     Definition nnrc_to_java_top (class_name:string) (imports:string) (e:nnrc) : java :=
       let input_f := "query" in
       let input_v := "constants" in
-      nnrcToJavaClass (^class_name) "" imports input_v e eol_newline quotel_double ((input_v, ^input_v)::nil) (^input_f).
+      nnrcToJavaClass (^class_name) "" imports input_v e neol_newline nquotel_double ((input_v, ^input_v)::nil) (^input_f).
 
   End NNRCJava.
 

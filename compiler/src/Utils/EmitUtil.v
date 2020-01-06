@@ -23,6 +23,34 @@ Local Open Scope nstring_scope.
 Import ListNotations.
 
 Section EmitUtil.
+  Section Whitespace.
+    Definition eol_newline : string := String (Ascii.ascii_of_nat 10) EmptyString.
+    Definition eol_backn : string := "\n".
+
+    Definition neol_newline : nstring := ^eol_newline.
+    Definition neol_backn : nstring := ^eol_backn.
+
+    Definition quotel_double : string := """".
+    Definition quotel_backdouble : string := "\""".
+
+    Definition nquotel_double : nstring := ^quotel_double.
+    Definition nquotel_backdouble : nstring := ^quotel_backdouble.
+
+    (* Java equivalent: JavaScriptBackend.indent *)
+    Fixpoint indent (i : nat) : nstring :=
+      match i with
+      | 0 => ^EmptyString
+      | S j => ^"  " +++ (indent j)
+      end.
+
+    Definition string_bracket (open s close:string) : string :=
+      append open (append s close).
+
+    Definition nstring_bracket (open s close:nstring) : nstring :=
+      nstring_append open (nstring_append s close).
+
+  End Whitespace.
+
   Section JSIdentifiers.
     (* javascript allows identifiers that begin with a unicode letter, underscore, or dollar sign.
        We avoid beginning with an underscore or dollar sign to 
@@ -163,33 +191,5 @@ Section EmitUtil.
     ["abstract"; "assert"; "boolean"; "break"; "byte"; "case"; "catch"; "char"; "class"; "const"; "continue"; "default"; "do"; "double"; "else"; "enum"; "extends"; "false"; "final"; "finally"; "float"; "for"; "goto"; "if"; "implements"; "import"; "instanceof"; "int"; "interface"; "long"; "native"; "new"; "null"; "package"; "private"; "protected"; "public"; "return"; "short"; "static"; "strictfp"; "super"; "switch"; "synchronized"; "this"; "throw"; "throws"; "transient"; "true"; "try"; "void"; "volatile"; "while"].
 
   End JavaIdentifiers.
-
-  Section Whitespace.
-    Definition eol_newline : string := String (Ascii.ascii_of_nat 10) EmptyString.
-    Definition eol_backn : string := "\n".
-
-    Definition neol_newline : nstring := ^eol_newline.
-    Definition neol_backn : nstring := ^eol_backn.
-
-    Definition quotel_double : string := """".
-    Definition quotel_backdouble : string := "\""".
-    
-    Definition nquotel_double : nstring := ^quotel_double.
-    Definition nquotel_backdouble : nstring := ^quotel_backdouble.
-
-    (* Java equivalent: JavaScriptBackend.indent *)
-    Fixpoint indent (i : nat) : nstring :=
-      match i with
-      | 0 => ^EmptyString
-      | S j => ^"  " +++ (indent j)
-      end.
-
-    Definition string_bracket (open s close:string) : string :=
-      append open (append s close).
-
-    Definition nstring_bracket (open s close:nstring) : nstring :=
-      nstring_append open (nstring_append s close).
-
-  End Whitespace.
 
 End EmitUtil.

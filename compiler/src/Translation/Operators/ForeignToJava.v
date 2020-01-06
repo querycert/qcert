@@ -16,15 +16,11 @@ Require Import List.
 Require Import String.
 Require Import Utils.
 Require Import ForeignRuntime.
-Require Import OperatorsUtils.
+Require Import JavaRuntime.
 
 Local Open Scope string_scope.
 
 Section ForeigntoJava.
-  (* data of this type is a java expression that constructs a json element *)
-  Inductive java_json : Set
-    := mk_java_json : nstring -> java_json.
-
   Class foreign_to_java {fruntime:foreign_runtime}: Type
     := mk_foreign_to_java {
            foreign_to_java_data
