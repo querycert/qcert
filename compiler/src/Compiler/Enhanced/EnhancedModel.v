@@ -34,7 +34,8 @@ Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import CompilerRuntime.
 Require Import CompilerModel.
-Require Import SqlDateModelPart.
+Require Import SqlDateComponent.
+Require Import LoggerComponent.
 Require NNRCMR.
 Require Import OptimizerLogger.
 Require Import String.
@@ -47,7 +48,6 @@ Require Import tDNNRC.
 Require Import Dataframe.
 
 Import ListNotations.
-
 Local Open Scope list_scope.
 
 Inductive enhanced_data : Set :=
@@ -1090,174 +1090,6 @@ Program Instance enhanced_foreign_to_spark : foreign_to_spark
        enhanced_to_spark_reduce_op
        to_spark_nnrcmr.
 
-(* nra optimizer logger support *)
-Axiom OPTIMIZER_LOGGER_nraenv_token_type : Set.
-Extract Constant OPTIMIZER_LOGGER_nraenv_token_type => "Util.nra_logger_token_type".
-
-Axiom OPTIMIZER_LOGGER_nraenv_startPass :
-  String.string -> nraenv -> OPTIMIZER_LOGGER_nraenv_token_type.
-
-Extract Constant OPTIMIZER_LOGGER_nraenv_startPass =>
-"(fun name input -> Logger.nra_log_startPass (Util.string_of_char_list name) input)".
-
-Axiom OPTIMIZER_LOGGER_nraenv_step :
-  OPTIMIZER_LOGGER_nraenv_token_type -> String.string ->
-  nraenv -> nraenv ->
-  OPTIMIZER_LOGGER_nraenv_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_step =>
-"(fun token name input output -> Logger.nra_log_step token (Util.string_of_char_list name) input output)".
-
-Axiom OPTIMIZER_LOGGER_nraenv_endPass :
-  OPTIMIZER_LOGGER_nraenv_token_type -> nraenv -> OPTIMIZER_LOGGER_nraenv_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_endPass =>
-"(fun token output -> Logger.nra_log_endPass token output)".
-
-Instance foreign_nraenv_optimizer_logger :
-  optimizer_logger string nraenv
-  :=
-    {
-      optimizer_logger_token_type := OPTIMIZER_LOGGER_nraenv_token_type
-      ; logStartPass := OPTIMIZER_LOGGER_nraenv_startPass
-      ; logStep :=  OPTIMIZER_LOGGER_nraenv_step
-      ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_endPass
-    } .
-
-(* nrc optimizer logger support *)
-Axiom OPTIMIZER_LOGGER_nnrc_token_type : Set.
-Extract Constant OPTIMIZER_LOGGER_nnrc_token_type => "Util.nrc_logger_token_type".
-
-Axiom OPTIMIZER_LOGGER_nnrc_startPass :
-  String.string -> nnrc -> OPTIMIZER_LOGGER_nnrc_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_startPass =>
-"(fun name input -> Logger.nrc_log_startPass (Util.string_of_char_list name) input)".
-
-Axiom OPTIMIZER_LOGGER_nnrc_step :
-  OPTIMIZER_LOGGER_nnrc_token_type -> String.string ->
-  nnrc -> nnrc ->
-  OPTIMIZER_LOGGER_nnrc_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_step =>
-"(fun token name input output -> Logger.nrc_log_step token (Util.string_of_char_list name) input output)".
-
-Axiom OPTIMIZER_LOGGER_nnrc_endPass :
-  OPTIMIZER_LOGGER_nnrc_token_type -> nnrc -> OPTIMIZER_LOGGER_nnrc_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_endPass =>
-"(fun token output -> Logger.nrc_log_endPass token output)".
-
-Instance foreign_nnrc_optimizer_logger :
-  optimizer_logger string nnrc
-  :=
-    {
-      optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrc_token_type
-      ; logStartPass := OPTIMIZER_LOGGER_nnrc_startPass
-      ; logStep :=  OPTIMIZER_LOGGER_nnrc_step
-      ; logEndPass :=  OPTIMIZER_LOGGER_nnrc_endPass
-    } .
-
-(* nnrs_imp optimizer logger support *)
-Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_token_type : Set.
-Extract Constant OPTIMIZER_LOGGER_nnrs_imp_expr_token_type => "Util.nnrs_imp_expr_logger_token_type".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_startPass :
-  String.string -> nnrs_imp_expr -> OPTIMIZER_LOGGER_nnrs_imp_expr_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_startPass =>
-"(fun name input -> Logger.nnrs_imp_expr_log_startPass (Util.string_of_char_list name) input)".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_step :
-  OPTIMIZER_LOGGER_nnrs_imp_expr_token_type -> String.string ->
-  nnrs_imp_expr -> nnrs_imp_expr ->
-  OPTIMIZER_LOGGER_nnrs_imp_expr_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_step =>
-"(fun token name input output -> Logger.nnrs_imp_expr_log_step token (Util.string_of_char_list name) input output)".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_expr_endPass :
-  OPTIMIZER_LOGGER_nnrs_imp_expr_token_type -> nnrs_imp_expr -> OPTIMIZER_LOGGER_nnrs_imp_expr_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_endPass =>
-"(fun token output -> Logger.nnrs_imp_expr_log_endPass token output)".
-
-Instance foreign_nnrs_imp_expr_optimizer_logger :
-  optimizer_logger string nnrs_imp_expr
-  :=
-    {
-      optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrs_imp_expr_token_type
-      ; logStartPass := OPTIMIZER_LOGGER_nnrs_imp_expr_startPass
-      ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_expr_step
-      ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_expr_endPass
-    } .
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type : Set.
-Extract Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type => "Util.nnrs_imp_stmt_logger_token_type".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_startPass :
-  String.string -> nnrs_imp_stmt -> OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_startPass =>
-"(fun name input -> Logger.nnrs_imp_stmt_log_startPass (Util.string_of_char_list name) input)".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_step :
-  OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type -> String.string ->
-  nnrs_imp_stmt -> nnrs_imp_stmt ->
-  OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_step =>
-"(fun token name input output -> Logger.nnrs_imp_stmt_log_step token (Util.string_of_char_list name) input output)".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass :
-  OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type -> nnrs_imp_stmt -> OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass =>
-"(fun token output -> Logger.nnrs_imp_stmt_log_endPass token output)".
-
-Instance foreign_nnrs_imp_stmt_optimizer_logger :
-  optimizer_logger string nnrs_imp_stmt
-  :=
-    {
-      optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type
-      ; logStartPass := OPTIMIZER_LOGGER_nnrs_imp_stmt_startPass
-      ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_stmt_step
-      ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass
-    } .
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_token_type : Set.
-Extract Constant OPTIMIZER_LOGGER_nnrs_imp_token_type => "Util.nnrs_imp_logger_token_type".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_startPass :
-  String.string -> nnrs_imp -> OPTIMIZER_LOGGER_nnrs_imp_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_startPass =>
-"(fun name input -> Logger.nnrs_imp_log_startPass (Util.string_of_char_list name) input)".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_step :
-  OPTIMIZER_LOGGER_nnrs_imp_token_type -> String.string ->
-  nnrs_imp -> nnrs_imp ->
-  OPTIMIZER_LOGGER_nnrs_imp_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_step =>
-"(fun token name input output -> Logger.nnrs_imp_log_step token (Util.string_of_char_list name) input output)".
-
-Axiom OPTIMIZER_LOGGER_nnrs_imp_endPass :
-  OPTIMIZER_LOGGER_nnrs_imp_token_type -> nnrs_imp -> OPTIMIZER_LOGGER_nnrs_imp_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_endPass =>
-"(fun token output -> Logger.nnrs_imp_log_endPass token output)".
-
-Instance foreign_nnrs_imp_optimizer_logger :
-  optimizer_logger string nnrs_imp
-  :=
-    {
-      optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrs_imp_token_type
-      ; logStartPass := OPTIMIZER_LOGGER_nnrs_imp_startPass
-      ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_step
-      ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_endPass
-    } .
-
 (** Foreign typing, used to build the basic_model *)
 
 Definition enhanced_type_join (t1 t2:enhanced_type)
@@ -1410,43 +1242,66 @@ Next Obligation.
   ; invcs H; invcs H0; constructor.
 Defined.
 
-Definition dnnrc_for_log {br:brand_relation}
-  := (@dnnrc_base enhanced_foreign_runtime (type_annotation unit) dataframe).
+(** Loggers *)
+Section Loggers.
+  Instance foreign_nraenv_optimizer_logger :
+    optimizer_logger string nraenv
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_nraenv_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_nraenv_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nraenv_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_endPass
+      } .
+  Instance foreign_nnrc_optimizer_logger :
+    optimizer_logger string nnrc
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrc_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_nnrc_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nnrc_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nnrc_endPass
+      } .
+  Instance foreign_nnrs_imp_expr_optimizer_logger :
+    optimizer_logger string nnrs_imp_expr
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrs_imp_expr_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_nnrs_imp_expr_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_expr_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_expr_endPass
+      } .
+  Instance foreign_nnrs_imp_stmt_optimizer_logger :
+    optimizer_logger string nnrs_imp_stmt
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_nnrs_imp_stmt_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_stmt_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass
+      } .
+  Instance foreign_nnrs_imp_optimizer_logger :
+    optimizer_logger string nnrs_imp
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrs_imp_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_nnrs_imp_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_endPass
+      } .
+  Definition dnnrc_for_log {br:brand_relation}
+    := (@dnnrc_base enhanced_foreign_runtime (type_annotation unit) dataframe).
 
-(* dnnrc optimizer logger support *)
-Axiom OPTIMIZER_LOGGER_dnnrc_token_type : Set.
-Extract Constant OPTIMIZER_LOGGER_dnnrc_token_type => "Util.dnrc_logger_token_type".
-
-Axiom OPTIMIZER_LOGGER_dnnrc_startPass :
-  forall {br:brand_relation}, String.string -> dnnrc_for_log -> OPTIMIZER_LOGGER_dnnrc_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_startPass =>
-"(fun br name input -> Logger.dnrc_log_startPass (Util.string_of_char_list name) input)".
-
-Axiom OPTIMIZER_LOGGER_dnnrc_step :
-  forall  {br:brand_relation}, 
-    OPTIMIZER_LOGGER_dnnrc_token_type -> String.string ->
-    dnnrc_for_log -> dnnrc_for_log ->
-    OPTIMIZER_LOGGER_dnnrc_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_step =>
-"(fun br token name input output -> Logger.dnrc_log_step token (Util.string_of_char_list name) input output)".
-
-Axiom OPTIMIZER_LOGGER_dnnrc_endPass :
-  forall {br:brand_relation}, OPTIMIZER_LOGGER_dnnrc_token_type -> dnnrc_for_log -> OPTIMIZER_LOGGER_dnnrc_token_type.
-
-Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_endPass =>
-"(fun br token output -> Logger.dnrc_log_endPass token output)".
-
-Instance foreign_dnnrc_optimizer_logger  {br:brand_relation} :
-  optimizer_logger string dnnrc_for_log
-  :=
-    {
-      optimizer_logger_token_type := OPTIMIZER_LOGGER_dnnrc_token_type
-      ; logStartPass := OPTIMIZER_LOGGER_dnnrc_startPass
-      ; logStep :=  OPTIMIZER_LOGGER_dnnrc_step
-      ; logEndPass :=  OPTIMIZER_LOGGER_dnnrc_endPass
-    } .
+  Instance foreign_dnnrc_optimizer_logger {br:brand_relation} :
+    optimizer_logger string dnnrc_for_log
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_dnnrc_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_dnnrc_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_dnnrc_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_dnnrc_endPass
+      } .
+End Loggers.
 
 Module EnhancedRuntime <: CompilerRuntime.
   Definition compiler_foreign_type : foreign_type
