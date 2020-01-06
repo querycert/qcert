@@ -32,11 +32,6 @@ Section DNNRCBase.
   Section plug.
     Context {plug_type:Set}.
 
-    Definition coll_bindings := list (string * (list data)).
-
-    Definition bindings_of_coll_bindings (cb:coll_bindings) : bindings :=
-      map (fun xy => (fst xy, dcoll (snd xy))) cb.
-    
     Class AlgPlug :=
       mkAlgPlug {
           plug_eval : brand_relation_t -> coll_bindings -> plug_type -> option data

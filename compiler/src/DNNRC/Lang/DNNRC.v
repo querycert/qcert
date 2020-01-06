@@ -23,6 +23,9 @@ Section DNNRC.
 
   Definition dnnrc := @dnnrc_base _ unit dataframe.
 
+  Global Program Instance SparkIRPlug : (@AlgPlug _ dataframe) :=
+    mkAlgPlug wrap_dataframe_eval dataframe_eval_normalized.
+
   Section Top.
     Context (h:brand_relation_t).
 
