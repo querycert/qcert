@@ -21,6 +21,7 @@ MODULES = \
 	Utils/ListAdd \
 	Utils/StringAdd \
 	Utils/SortingAdd \
+	Utils/NativeString \
 	Utils/Float \
 	Utils/Lattice \
 	Utils/Monoid \
@@ -116,13 +117,13 @@ MODULES = \
 	Data/ForeignTyping \
 	Data/DataTypes \
 	Data/DataSystem \
-	TranslationModel/ForeignDataToEJson \
-	TranslationModel/DataToEJson \
-	TranslationModel/ForeignEJsonToJSON \
-	TranslationModel/EJsonToJSON \
-	TranslationModel/ForeignTypeToJSON \
-	TranslationModel/TypeToJSON \
-	TranslationModel/DTypeToJSON \
+	Translation/Model/ForeignDataToEJson \
+	Translation/Model/DataToEJson \
+	Translation/Model/ForeignEJsonToJSON \
+	Translation/Model/EJsonToJSON \
+	Translation/Model/ForeignTypeToJSON \
+	Translation/Model/TypeToJSON \
+	Translation/Model/DTypeToJSON \
 	NRA/Lang/NRA \
 	NRA/Lang/NRASugar \
 	NRA/Lang/NRASize \
@@ -325,86 +326,86 @@ MODULES = \
 	Java/JavaRuntime \
 	SparkDF/Lang/SparkDF \
 	SparkDF/SparkDFRuntime \
-	TranslationOperators/ForeignToReduceOps \
-	TranslationOperators/ForeignToJavaScriptAst \
-	TranslationOperators/ForeignToJava \
-	TranslationOperators/ForeignToScala \
-	TranslationOperators/ForeignToSpark \
-	TranslationOperators/ForeignToEJsonRuntime \
-	Translation/NRAtocNNRC \
-	Translation/cNRAEnvtocNNRC \
-	Translation/cNRAEnvtoNRA \
-	Translation/cNRAEnvtoNRAEnv \
-	Translation/NRAtocNRAEnv \
-	Translation/NRAEnvtocNRAEnv \
-	Translation/NRAEnvtoNNRC \
-	Translation/cNNRCtoCAMP \
-	Translation/cNNRCtoNNRC \
-	Translation/NNRCtocNNRC \
-	Translation/NNRCtoNNRCMR \
-	Translation/NNRCtoDNNRC \
-	Translation/NNRCMRtoNNRC \
-	Translation/NNRCMRtoDNNRC \
-	Translation/DNNRCtotDNNRC \
-	Translation/TechRuletoCAMPRule \
-	Translation/DesignerRuletoCAMPRule \
-	Translation/CAMPRuletoCAMP \
-	Translation/CAMPtoNRA \
-	Translation/CAMPtocNRAEnv \
-	Translation/CAMPtoNRAEnv \
-	Translation/LambdaNRAtoNRAEnv \
-	Translation/SQLtoNRAEnv \
-	Translation/SQLPPtoNRAEnv \
-	Translation/OQLtoNRAEnv \
-	Translation/NNRCtoNNRS \
-	Translation/NNRStoNNRSimp \
-	Translation/NNRSimptoImpQcert \
-	Translation/ImpQcerttoImpEJson \
-	Translation/ImpEJsontoJavaScriptAst \
-	Translation/JavaScriptAsttoJavaScript \
-	Translation/NNRCtoJava \
-	Translation/DatatoSparkDF \
-	Translation/tDNNRCtoSparkDF \
-	Translation/TNRAtocNNRC \
-	Translation/TcNRAEnvtocNNRC \
-	Translation/TcNNRCtoCAMP \
-	Translation/TCAMPtoNRA \
-	Translation/TCAMPtocNRAEnv \
-	Translation/TCAMPtoNRAEnv \
-	Translation/TLambdaNRAtoNRAEnv \
-	Translation/TOQLtoNRAEnv \
-	Translation/TNNRCtoNNRS \
-	Translation/TNNRStoNNRSimp \
+	Translation/Operators/ForeignToReduceOps \
+	Translation/Operators/ForeignToJavaScriptAst \
+	Translation/Operators/ForeignToJava \
+	Translation/Operators/ForeignToScala \
+	Translation/Operators/ForeignToSpark \
+	Translation/Operators/ForeignToEJsonRuntime \
+	Translation/Lang/NRAtocNNRC \
+	Translation/Lang/cNRAEnvtocNNRC \
+	Translation/Lang/cNRAEnvtoNRA \
+	Translation/Lang/cNRAEnvtoNRAEnv \
+	Translation/Lang/NRAtocNRAEnv \
+	Translation/Lang/NRAEnvtocNRAEnv \
+	Translation/Lang/NRAEnvtoNNRC \
+	Translation/Lang/cNNRCtoCAMP \
+	Translation/Lang/cNNRCtoNNRC \
+	Translation/Lang/NNRCtocNNRC \
+	Translation/Lang/NNRCtoNNRCMR \
+	Translation/Lang/NNRCtoDNNRC \
+	Translation/Lang/NNRCMRtoNNRC \
+	Translation/Lang/NNRCMRtoDNNRC \
+	Translation/Lang/DNNRCtotDNNRC \
+	Translation/Lang/TechRuletoCAMPRule \
+	Translation/Lang/DesignerRuletoCAMPRule \
+	Translation/Lang/CAMPRuletoCAMP \
+	Translation/Lang/CAMPtoNRA \
+	Translation/Lang/CAMPtocNRAEnv \
+	Translation/Lang/CAMPtoNRAEnv \
+	Translation/Lang/LambdaNRAtoNRAEnv \
+	Translation/Lang/SQLtoNRAEnv \
+	Translation/Lang/SQLPPtoNRAEnv \
+	Translation/Lang/OQLtoNRAEnv \
+	Translation/Lang/NNRCtoNNRS \
+	Translation/Lang/NNRStoNNRSimp \
+	Translation/Lang/NNRSimptoImpQcert \
+	Translation/Lang/ImpQcerttoImpEJson \
+	Translation/Lang/ImpEJsontoJavaScriptAst \
+	Translation/Lang/JavaScriptAsttoJavaScript \
+	Translation/Lang/NNRCtoJava \
+	Translation/Lang/DatatoSparkDF \
+	Translation/Lang/tDNNRCtoSparkDF \
+	Translation/Typing/TNRAtocNNRC \
+	Translation/Typing/TcNRAEnvtocNNRC \
+	Translation/Typing/TcNNRCtoCAMP \
+	Translation/Typing/TCAMPtoNRA \
+	Translation/Typing/TCAMPtocNRAEnv \
+	Translation/Typing/TCAMPtoNRAEnv \
+	Translation/Typing/TLambdaNRAtoNRAEnv \
+	Translation/Typing/TOQLtoNRAEnv \
+	Translation/Typing/TNNRCtoNNRS \
+	Translation/Typing/TNNRStoNNRSimp \
+	Driver/CompLang \
+	Driver/CompEnv \
+	Driver/CompConfig \
+	Driver/CompDriver \
+	Driver/CompStat \
+	Driver/CompEval \
+	Driver/CompCorrectness \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
-	Compiler/Model/SqlDateModelPart \
-	Compiler/Model/EnhancedModel \
-	Compiler/Model/TrivialModel \
-	Compiler/Driver/CompLang \
-	Compiler/Driver/CompEnv \
-	Compiler/Driver/CompConfig \
-	Compiler/Driver/CompDriver \
-	Compiler/Driver/CompStat \
-	Compiler/Driver/CompEval \
-	Compiler/Driver/CompCorrectness \
-	Compiler/QLib/QData \
-	Compiler/QLib/QOperators \
-	Compiler/QLib/QCAMP \
-	Compiler/QLib/QCAMPRule \
-	Compiler/QLib/QOQL \
-	Compiler/QLib/QSQL \
-	Compiler/QLib/QSQLPP \
-	Compiler/QLib/QLambdaNRA \
-	Compiler/QLib/QLang \
-	Compiler/QLib/QDriver \
-	Compiler/QLib/QStat \
-	Compiler/QLib/QUtil \
-	Compiler/QLib/QEval \
-	Compiler/QLib/QType \
+	Compiler/Lib/QData \
+	Compiler/Lib/QOperators \
+	Compiler/Lib/QCAMP \
+	Compiler/Lib/QCAMPRule \
+	Compiler/Lib/QOQL \
+	Compiler/Lib/QSQL \
+	Compiler/Lib/QSQLPP \
+	Compiler/Lib/QLambdaNRA \
+	Compiler/Lib/QLang \
+	Compiler/Lib/QDriver \
+	Compiler/Lib/QStat \
+	Compiler/Lib/QUtil \
+	Compiler/Lib/QEval \
+	Compiler/Lib/QType \
 	Compiler/QLib \
-	Compiler/EnhancedCompiler \
-	Compiler/TrivialCompiler \
-	Compiler/CompilerExports \
+	Compiler/Trivial/TrivialModel \
+	Compiler/Trivial/TrivialCompiler \
+	Compiler/Enhanced/SqlDateModelPart \
+	Compiler/Enhanced/EnhancedModel \
+	Compiler/Enhanced/EnhancedCompiler \
+	Compiler/QcertExports \
 	Extraction/ExtrOcamlFloatNatIntZInt \
 	Tests/TDataTest \
 	Tests/NRATest \

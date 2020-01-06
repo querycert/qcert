@@ -156,7 +156,7 @@ Section UnaryOperators.
   
   Definition ToString_SortCriteria (sc : string * SortDesc) :=
     let (att,sd) := sc in
-    bracketString "(" (att ++ "," ++ (ToString_SortDesc sd)) ")".
+    string_bracket "(" (att ++ "," ++ (ToString_SortDesc sd)) ")".
   
   Global Instance ToString_unary_op : ToString unary_op
     := {toString :=
@@ -168,7 +168,7 @@ Section UnaryOperators.
             | OpDot s => "(OpDot " ++ s ++ ")"
             | OpRecRemove s => "(OpRecRemove " ++ s ++ ")"
             | OpRecProject ls => "(OpRecProject "
-                                      ++ (bracketString "[" (concat "," ls) "]")
+                                      ++ (string_bracket "[" (concat "," ls) "]")
                                       ++ ")"
             | OpBag => "OpBag"
             | OpSingleton => "OpSingleton"
@@ -176,7 +176,7 @@ Section UnaryOperators.
             | OpDistinct => "OpDistinct"
             | OpOrderBy ls =>
               "(OpOrderBy"
-                ++ (bracketString "[" (concat "," (List.map ToString_SortCriteria ls)) "]")
+                ++ (string_bracket "[" (concat "," (List.map ToString_SortCriteria ls)) "]")
                 ++ ")"
             | OpCount => "OpCount"
             | OpToString => "OpToString"

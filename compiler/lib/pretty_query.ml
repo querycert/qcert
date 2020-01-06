@@ -1,18 +1,16 @@
 (*
-* Copyright 2015-2017 IBM Corporation
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-      *
-      * http://www.apache.org/licenses/LICENSE-2.0
-      *
-      * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *)
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *)
 
 (* This module contains pretty-printers for intermediate languages *)
 
@@ -826,17 +824,17 @@ let pretty_javascript greek margin annot inheritance link_runtime q =
     then Js_runtime.runtime
     else ""
   in
-  runtime ^ string_of_char_list q
+  runtime ^ q
 
 (** Pretty Java *)
 
 let pretty_java greek margin annot inheritance link_runtime q =
-  string_of_char_list q
+  q
 
 (** Pretty SparkDF *)
 
 let pretty_spark_df greek margin annot inheritance link_runtime q =
-  string_of_char_list q
+  q
 
 (** Pretty Error *)
 
