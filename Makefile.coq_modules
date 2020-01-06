@@ -255,6 +255,7 @@ MODULES = \
 	Imp/Lang/ImpEJsonEval \
 	Imp/Lang/ImpEJsonRewrite \
 	Imp/ImpRuntime \
+	Imp/ImpSystem \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \
@@ -295,8 +296,10 @@ MODULES = \
 	CAMPRule/CAMPRuleSystem \
 	TechRule/Lang/TechRule \
 	TechRule/TechRuleRuntime \
+	TechRule/TechRuleSystem \
 	DesignerRule/Lang/DesignerRule \
 	DesignerRule/DesignerRuleRuntime \
+	DesignerRule/DesignerRuleSystem \
 	LambdaNRA/Lang/LambdaNRA \
 	LambdaNRA/Lang/LambdaNRASugar \
 	LambdaNRA/Lang/LambdaNRAEq \
@@ -322,12 +325,16 @@ MODULES = \
 	JavaScriptAst/Lang/JavaScriptAst \
 	JavaScriptAst/Lang/JavaScriptAstUtil \
 	JavaScriptAst/JavaScriptAstRuntime \
+	JavaScriptAst/JavaScriptAstSystem \
 	JavaScript/Lang/JavaScript \
 	JavaScript/JavaScriptRuntime \
+	JavaScript/JavaScriptSystem \
 	Java/Lang/Java \
 	Java/JavaRuntime \
+	Java/JavaSystem \
 	SparkDF/Lang/SparkDF \
 	SparkDF/SparkDFRuntime \
+	SparkDF/SparkDFSystem \
 	Translation/Operators/ForeignToReduceOps \
 	Translation/Operators/ForeignToJavaScriptAst \
 	Translation/Operators/ForeignToJava \
@@ -404,8 +411,8 @@ MODULES = \
 	Compiler/QLib \
 	Compiler/Trivial/TrivialModel \
 	Compiler/Trivial/TrivialCompiler \
-	Compiler/Enhanced/SqlDateComponent \
-	Compiler/Enhanced/LoggerComponent \
+	Compiler/Component/SqlDateComponent \
+	Compiler/Component/LoggerComponent \
 	Compiler/Enhanced/EnhancedData \
 	Compiler/Enhanced/EnhancedEJson \
 	Compiler/Enhanced/EnhancedDataToEJson \

@@ -15,6 +15,7 @@
 Require Import String.
 Require Import Utils.
 Require Import DataSystem.
+Require Import JavaSystem.
 Require Import ForeignToJava.
 Require Import SqlDateComponent.
 Require Import EnhancedData.

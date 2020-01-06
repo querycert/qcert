@@ -26,27 +26,48 @@ Local Open Scope nstring_scope.
 
 Section ToString.
 
-  Definition eol:nstring := ^ (String (Ascii.ascii_of_nat 10) EmptyString).
-  Definition quotel:nstring := ^"""".
+  Section Util.
+    Definition eol:nstring := ^String (Ascii.ascii_of_nat 10) EmptyString.
+    Definition quotel:nstring := ^"""".
 
-  Fixpoint indent (i : nat) : nstring :=
-    match i with
-    | 0 => ^""
-    | S j => ^"  " +++ (indent j)
-    end.
+    Fixpoint indent (i : nat) : nstring :=
+      match i with
+      | 0 => ^""
+      | S j => ^"  " +++ (indent j)
+      end.
 
-  Definition comma_list_string l := nstring_concat (^", ") (map nstring_quote l).
-  Definition comma_list l := nstring_concat (^", ") l.
+    Definition comma_list_string l := nstring_concat (^", ") (map nstring_quote l).
+    Definition comma_list l := nstring_concat (^", ") l.
 
-  Definition nstring_of_literal
-             (c: literal)
-    : nstring :=
+    Definition js_quote_char (a:ascii) : nstring :=
+      match a with
+      | "008"%char => ^"\b"
+      | "009"%char => ^"\t"
+      | "010"%char => ^"\n"
+      | "013"%char => ^"\r"
+      | """"%char => ^"\"""
+      | "\"%char => ^"\\"
+      | _ => ^String a EmptyString
+      end.
+
+    Definition js_quote_string (s:string) : nstring :=
+      nstring_flat_map js_quote_char (^s).
+
+    Definition js_quote_number (n:number) : nstring :=
+      if (float_eq n float_infinity) then ^"Infinity"
+      else if (float_eq n float_neg_infinity) then ^"-Infinity"
+      else if (float_eq n float_nan) then ^"NaN"
+      else ^to_string n.
+
+  End Util.
+
+  Definition nstring_of_literal (c: literal) : nstring :=
     match c with
     | literal_null => ^"null"
     | literal_bool true => ^"true"
     | literal_bool false => ^"false"
-    | literal_number n => ^ to_string n
-    | literal_string s => quotel +++ ^s +++ quotel
+    | literal_number n => js_quote_number n
+    | literal_string s => quotel +++ js_quote_string s +++ quotel
     end.
 
   Definition nstring_of_propname (name: propname) : nstring :=
@@ -73,19 +94,19 @@ Section ToString.
                eol +++ (indent (i+1)) +++
                    match body with
                    | propbody_val e =>
-                     quotel +++ nstring_of_propname name +++ quotel +++ ^": " +++ ^"(" +++ nstring_of_expr e (i+1) +++ ^")"
+                     quotel +++ nstring_of_propname name +++ quotel
+                            +++ ^": " +++ ^"(" +++ nstring_of_expr e (i+1) +++ ^")"
                    | propbody_get funcbody =>
-                     ^"get " +++ quotel +++ nstring_of_propname name +++ quotel +++ ^"() {" +++
-                      nstring_of_funcbody funcbody (i+1) +++ ^"}"
+                     ^"get " +++ quotel +++ nstring_of_propname name +++ quotel
+                             +++ ^"() {" +++ (nstring_of_funcbody funcbody (i+1)) +++ ^"}"
                    | propbody_set args funcbody =>
-                     ^"set " +++ quotel +++ nstring_of_propname name +++ quotel +++ ^"(" +++ comma_list_string args +++ ^") {" +++
-                      nstring_of_funcbody funcbody (i+1) +++
-                      ^"}"
+                     ^"set " +++ quotel +++ nstring_of_propname name +++ quotel
+                             +++ ^"(" +++ comma_list_string args +++ ^") {"
+                             +++ nstring_of_funcbody funcbody (i+1) +++ ^"}"
                    end)
             o
       in
-      ^"{" +++ comma_list props +++ eol +++
-       indent i +++ ^"}"
+      ^"{" +++ comma_list props +++ eol +++ indent i +++ ^"}"
     | expr_array a =>
       let l :=
           List.map

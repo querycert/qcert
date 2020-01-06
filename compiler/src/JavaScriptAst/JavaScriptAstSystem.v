@@ -12,6 +12,4 @@
  * limitations under the License.
  *)
 
-Require Export DataRuntime.
-Require Export DesignerRule.
-
+Require Export JavaScriptAstRuntime.
