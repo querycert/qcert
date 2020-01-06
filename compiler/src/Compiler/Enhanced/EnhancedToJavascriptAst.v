@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +12,19 @@
  * limitations under the License.
  *)
 
-(* This module contains the implementation for the optimization logger *)
+Require Import EJsonSystem.
+Require Import ForeignToJavaScriptAst.
 
-open Sexp
-   
-val logger_nraenv_to_sexp : Obj.t -> sexp
-val logger_nnrc_to_sexp : Obj.t -> sexp
-val logger_nnrs_imp_expr_to_sexp : Obj.t -> sexp
-val logger_nnrs_imp_stmt_to_sexp : Obj.t -> sexp
-val logger_nnrs_imp_to_sexp : Obj.t -> sexp
-val logger_dnnrc_to_sexp : Obj.t -> sexp
+Require Import EnhancedData.
+Require Import EnhancedEJson.
+
+(* XXX TODO This is very wrong *)
+Definition enhanced_ejson_to_ajavascript_expr (j:enhanced_ejson) : JsAst.JsSyntax.expr :=
+  JsAst.JsSyntax.expr_literal (JsAst.JsSyntax.literal_null).
+
+Instance enhanced_foreign_ejson_to_ajavascript :
+  @foreign_ejson_to_ajavascript enhanced_foreign_ejson
+  := mk_foreign_ejson_to_ajavascript
+       enhanced_foreign_ejson
+       enhanced_ejson_to_ajavascript_expr.
+

@@ -15,7 +15,7 @@
 (* Compiler Top *)
 Require Export EnhancedCompiler EnhancedModel.
 Require Export QDriver.
-Module Export CD := QDriver EnhancedModel.EnhancedRuntime.
+Module Export CD := QDriver EnhancedRuntime.EnhancedRuntime.
 
 Export EnhancedCompiler.QEval.
 Export CompEnhanced.

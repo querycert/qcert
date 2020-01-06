@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,12 +19,12 @@
 exception Qcert_Error of string
 
 (* this can't go in Logger, since that creates a circular dependency *)
-type nra_logger_token_type = string
-type nrc_logger_token_type = string
+type nraenv_logger_token_type = string
+type nnrc_logger_token_type = string
 type nnrs_imp_expr_logger_token_type = string
 type nnrs_imp_stmt_logger_token_type = string
 type nnrs_imp_logger_token_type = string
-type dnrc_logger_token_type = string
+type dnnrc_logger_token_type = string
 
 (**************)
 (* Data types *)
