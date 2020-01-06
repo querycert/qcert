@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -472,36 +470,57 @@ Qed.
 
 End RSubtype.
 
-Lemma subtype_ext {ftype:foreign_type} {br:brand_relation} {a b pfa pfb} :
-  subtype (exist _ a pfa) (exist _ b pfb) ->
-             forall pfa' pfb',
-               subtype (exist _ a pfa') (exist _ b pfb').
-Proof.
-  intros.
-  rewrite (rtype_ext pfa' pfa).
-  rewrite (rtype_ext pfb' pfb).
-  trivial.
-Qed.
+Section Misc.
+  Context  {ftype:foreign_type}.
+  Context  {br:brand_relation}.
 
-Lemma subtype_Either_inv {ftype:foreign_type} {br:brand_relation} {τl τr τl' τr'} :
-  subtype (Either τl τr) (Either τl' τr') ->
-  subtype τl τl'  /\
-  subtype τr τr'.
-Proof.
-  inversion 1; rtype_equalizer; subst.
-  - subst; split; econstructor.
-  - subst. intuition.
-Qed.
+  Lemma subtype_ext {a b pfa pfb} :
+    subtype (exist _ a pfa) (exist _ b pfb) ->
+    forall pfa' pfb',
+      subtype (exist _ a pfa') (exist _ b pfb').
+  Proof.
+    intros.
+    rewrite (rtype_ext pfa' pfa).
+    rewrite (rtype_ext pfb' pfb).
+    trivial.
+  Qed.
 
-Lemma subtype_Arrow_inv {ftype:foreign_type} {br:brand_relation} {τl τr τl' τr'} :
-  subtype (Arrow τl τr) (Arrow τl' τr') ->
-  subtype τl' τl  /\
-  subtype τr τr'.
-Proof.
-  inversion 1; rtype_equalizer; subst.
-  - subst; split; econstructor.
-  - subst. intuition.
-Qed.
+  Lemma subtype_Either_inv {τl τr τl' τr'} :
+    subtype (Either τl τr) (Either τl' τr') ->
+    subtype τl τl'  /\
+    subtype τr τr'.
+  Proof.
+    inversion 1; rtype_equalizer; subst.
+    - subst; split; econstructor.
+    - subst. intuition.
+  Qed.
+
+  Lemma subtype_Arrow_inv {τl τr τl' τr'} :
+    subtype (Arrow τl τr) (Arrow τl' τr') ->
+    subtype τl' τl  /\
+    subtype τr τr'.
+  Proof.
+    inversion 1; rtype_equalizer; subst.
+    - subst; split; econstructor.
+    - subst. intuition.
+  Qed.
+
+  Definition check_subtype_pairs (l:list (rtype*rtype)) : bool
+    := forallb (fun τs => if subtype_dec (fst τs) (snd τs) then true else false) l.
+
+  Definition enforce_unary_op_schema (ts1:rtype*rtype) (tr:rtype)
+    : option (rtype*rtype)
+    := if check_subtype_pairs (ts1::nil)
+       then Some (tr, (snd ts1))
+       else None.
+
+  Definition enforce_binary_op_schema (ts1:rtype*rtype) (ts2:rtype*rtype) (tr:rtype)
+    : option (rtype*rtype*rtype)
+    := if check_subtype_pairs (ts1::ts2::nil)
+       then Some (tr, (snd ts1), (snd ts2))
+       else None.
+
+End Misc.
 
 Notation "r1 <: r2" := (subtype r1 r2) (at level 70).
 

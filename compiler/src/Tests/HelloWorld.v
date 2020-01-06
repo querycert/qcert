@@ -14,8 +14,8 @@
 
 Require Import String.
 Require Import List.
-Require Import Qcert.Compiler.Driver.CompLang.
-Require Import Qcert.Compiler.EnhancedCompiler.
+Require Import Qcert.Driver.CompLang.
+Require Import Qcert.Compiler.Enhanced.EnhancedCompiler.
 Require Import Qcert.Data.Model.Data.
 Require Import Qcert.Data.Operators.BinaryOperators.
 Require Import Qcert.NRAEnv.Lang.NRAEnv.

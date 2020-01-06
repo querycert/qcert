@@ -67,12 +67,12 @@ Section UnaryOperatorsSem.
        | dfloat n => toString n
        | dbool b => toString b
        | dstring s => stringToString s
-       | dcoll l => bracketString 
+       | dcoll l => string_bracket 
                       "["%string
                       (String.concat ", "%string
                               (string_sort (map defaultDataToString l)))
                       "]"%string
-       | drec lsd => bracketString
+       | drec lsd => string_bracket
                        "{"%string
                        (String.concat ", "%string 
                                (map (fun xy => let '(x,y):=xy in 
@@ -80,15 +80,15 @@ Section UnaryOperatorsSem.
                                                                                   (defaultDataToString y)))
                                     ) lsd))
                        "}"%string
-       | dleft d => bracketString
+       | dleft d => string_bracket
                       "Left("%string
                       (defaultDataToString d)
                       ")"%string
-       | dright d => bracketString
+       | dright d => string_bracket
                        "Right("%string
                        (defaultDataToString d)
                        ")"%string
-       | dbrand b d => (bracketString
+       | dbrand b d => (string_bracket
                           "<"
                           (append (@toString _ ToString_brands b)
                                   (append ":" (defaultDataToString d)))

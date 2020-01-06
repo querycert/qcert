@@ -18,6 +18,7 @@ Require Export CoqLibAdd.
 Require Export ListAdd.
 Require Export StringAdd.
 Require Export SortingAdd.
+Require Export NativeString.
 Require Export Float.
 Require Export Digits.
 Require Export Lattice.

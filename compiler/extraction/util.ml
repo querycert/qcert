@@ -41,11 +41,17 @@ let string_of_char_list l =
   Bytes.to_string b
 
 let char_list_of_string s =
-  let l = ref [] in
-  String.iter (fun c -> l := c :: !l) s;
-  List.rev !l
+  let rec exp i l =
+    if i < 0 then l else exp (i - 1) (s.[i] :: l) in
+  exp (String.length s - 1) []
 
 let string = string_of_char_list
+
+let flat_map_string f s =
+  let sl = ref [] in
+  String.iter (fun c -> sl := (f c) :: !sl) s;
+  let sl' = List.rev !sl in
+  String.concat "" sl'
 
 (* coq Z's are now replaced by native OCaml ints, but here is the way to get things back to coq Z's:
 

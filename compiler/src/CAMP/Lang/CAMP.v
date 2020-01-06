@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -205,7 +203,7 @@ Section CAMP.
   
   Fixpoint toString_camp_with_path (p:camp) (loc:camp_src_path) :=
     match loc with
-    | nil => bracketString "<<<"  (toString p) ">>>"
+    | nil => string_bracket "<<<"  (toString p) ">>>"
     | pos::loc' =>
       match p with
       | pconst d => "(pconst " ++ toString d ++ ")"
@@ -314,7 +312,7 @@ Section CAMP.
       := mk_err (" because the given field (" ++ s ++
                                               ") is not a valid constant") (pgetConstant s) bind it
                 ++ " The set of constants for this execution is: " ++
-                (bracketString "{" (String.concat "; " (domain constant_env)) "}")
+                (string_bracket "{" (String.concat "; " (domain constant_env)) "}")
                 ++ "\n".
 
     (** The alternative traced evaluation is defined as follows. *)
