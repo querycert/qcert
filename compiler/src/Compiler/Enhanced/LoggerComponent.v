@@ -23,7 +23,7 @@ Require Import OptimizerLogger.
 Section Test.
   Context {A:Type}.
 
-  (* nra optimizer logger support *)
+  (* nraenv optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_nraenv_token_type : Set.
   Axiom OPTIMIZER_LOGGER_nraenv_startPass :
     String.string -> A -> OPTIMIZER_LOGGER_nraenv_token_type.
@@ -32,7 +32,7 @@ Section Test.
   Axiom OPTIMIZER_LOGGER_nraenv_endPass :
     OPTIMIZER_LOGGER_nraenv_token_type -> A -> OPTIMIZER_LOGGER_nraenv_token_type.
 
-  (* nrc optimizer logger support *)
+  (* nnrc optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_nnrc_token_type : Set.
   Axiom OPTIMIZER_LOGGER_nnrc_startPass :
     String.string -> A -> OPTIMIZER_LOGGER_nnrc_token_type.
@@ -98,7 +98,7 @@ Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_startPass =>
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_step =>
 "(fun token name input output -> Logger.nnrc_log_step token (Util.string_of_char_list name) input output)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_endPass =>
-"(fun token output -> Logger.nrc_log_endPass token output)".
+"(fun token output -> Logger.nnrc_log_endPass token output)".
 
 Extract Constant OPTIMIZER_LOGGER_nnrs_imp_expr_token_type => "Util.nnrs_imp_expr_logger_token_type".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_startPass =>

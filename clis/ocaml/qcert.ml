@@ -75,15 +75,15 @@ let args_list gconf =
       ("-emit-optim-config", Stdlib.Arg.Unit (Args.set_emit_optim_config gconf),
        " Emit the optimizer configuration (JSON format)");
       ("-log-optims", Stdlib.Arg.String
-			(fun s -> nra_set_trace logger_nra_to_sexp s;
-				  nrc_set_trace logger_nrc_to_sexp s;
-				  dnrc_set_trace logger_dnrc_to_sexp s;
+			(fun s -> nraenv_set_trace logger_nraenv_to_sexp s;
+				  nnrc_set_trace logger_nnrc_to_sexp s;
+				  dnnrc_set_trace logger_dnnrc_to_sexp s;
         nnrs_imp_all_set_trace logger_nnrs_imp_expr_to_sexp logger_nnrs_imp_stmt_to_sexp logger_nnrs_imp_to_sexp s
       ),
        " Enable optimization logging");
-      ("-log-optims-nra", Stdlib.Arg.String (nra_set_trace logger_nra_to_sexp),
+      ("-log-optims-nra", Stdlib.Arg.String (nraenv_set_trace logger_nraenv_to_sexp),
        " Enable optimization logging for nra");
-      ("-log-optims-nrc", Stdlib.Arg.String (nrc_set_trace logger_nrc_to_sexp),
+      ("-log-optims-nrc", Stdlib.Arg.String (nnrc_set_trace logger_nnrc_to_sexp),
        " Enable optimization logging for nrc");
       ("-log-optims-nnrs-imp", Stdlib.Arg.String (nnrs_imp_all_set_trace logger_nnrs_imp_expr_to_sexp logger_nnrs_imp_stmt_to_sexp logger_nnrs_imp_to_sexp),
        " Enable optimization logging for nnrs-imp");
@@ -93,7 +93,7 @@ let args_list gconf =
        " Enable optimization logging for nnrs-imp-stmt");
       ("-log-optims-nnrs-imp-top", Stdlib.Arg.String (nnrs_imp_set_trace logger_nnrs_imp_to_sexp),
        " Enable optimization logging for nnrs-imp top level");
-      ("-log-optims-dnrc", Stdlib.Arg.String (dnrc_set_trace logger_dnrc_to_sexp),
+      ("-log-optims-dnrc", Stdlib.Arg.String (dnnrc_set_trace logger_dnnrc_to_sexp),
        " Enable optimization logging for dnrc");
       ("-ascii", Stdlib.Arg.Unit (Pretty_common.set_ascii gconf.gconf_pretty_config),
        " Avoid unicode symbols in emited queries");

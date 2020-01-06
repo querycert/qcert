@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,15 +17,15 @@
 open Util
 open Sexp
 
-val nraenv_log_startPass : string -> 'a -> nra_logger_token_type
-val nraenv_log_step : nra_logger_token_type -> string -> 'a -> 'a -> nra_logger_token_type
-val nraenv_log_endPass : nra_logger_token_type -> 'a -> nra_logger_token_type
+val nraenv_log_startPass : string -> 'a -> nraenv_logger_token_type
+val nraenv_log_step : nraenv_logger_token_type -> string -> 'a -> 'a -> nraenv_logger_token_type
+val nraenv_log_endPass : nraenv_logger_token_type -> 'a -> nraenv_logger_token_type
 
 val nraenv_set_trace : (Obj.t->sexp) -> string -> unit
 
-val nnrcc_log_startPass : string -> 'a -> nrc_logger_token_type
-val nnrc_log_step : nrc_logger_token_type -> string -> 'a -> 'a -> nrc_logger_token_type
-val nnrc_log_endPass : nrc_logger_token_type -> 'a -> nrc_logger_token_type
+val nnrc_log_startPass : string -> 'a -> nnrc_logger_token_type
+val nnrc_log_step : nnrc_logger_token_type -> string -> 'a -> 'a -> nnrc_logger_token_type
+val nnrc_log_endPass : nnrc_logger_token_type -> 'a -> nnrc_logger_token_type
 
 val nnrc_set_trace : (Obj.t->sexp) -> string -> unit
 
@@ -52,8 +50,8 @@ val nnrs_imp_set_trace : (Obj.t->sexp) -> string -> unit
 val nnrs_imp_all_set_trace : (Obj.t->sexp) -> (Obj.t->sexp) -> (Obj.t->sexp) -> string -> unit
 
   
-val dnnrc_log_startPass : string -> 'a -> dnrc_logger_token_type
-val dnnrc_log_step : dnrc_logger_token_type -> string -> 'a -> 'a -> dnrc_logger_token_type
-val dnnrc_log_endPass : dnrc_logger_token_type -> 'a -> dnrc_logger_token_type
+val dnnrc_log_startPass : string -> 'a -> dnnrc_logger_token_type
+val dnnrc_log_step : dnnrc_logger_token_type -> string -> 'a -> 'a -> dnnrc_logger_token_type
+val dnnrc_log_endPass : dnnrc_logger_token_type -> 'a -> dnnrc_logger_token_type
 
 val dnnrc_set_trace : (Obj.t->sexp) -> string -> unit

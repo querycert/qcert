@@ -20,10 +20,10 @@ open Sexp
 
 open Ast_to_sexp
 
-let logger_nra_to_sexp exp
+let logger_nraenv_to_sexp exp
   = nraenv_to_sexp (Obj.magic exp)
   
-let logger_nrc_to_sexp exp
+let logger_nnrc_to_sexp exp
   = nnrc_to_sexp (Obj.magic exp)
 
 let logger_nnrs_imp_expr_to_sexp exp
@@ -35,5 +35,5 @@ let logger_nnrs_imp_stmt_to_sexp exp
 let logger_nnrs_imp_to_sexp exp
   = nnrs_imp_to_sexp (Obj.magic exp)
 
-let logger_dnrc_to_sexp exp
-  = SString "DNRC->SEXP not yet implemented"
+let logger_dnnrc_to_sexp exp
+  = SString "DNNRC->SEXP not yet implemented"

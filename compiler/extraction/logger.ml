@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,15 +34,15 @@ let logger_verbosity_of_string conv s =
 
 (* TODO: refactor this code *)
 
-(* nra logger *)
-let nra_trace = ref LOG_NONE
-let nra_set_trace conv (s:string) = nra_trace := (logger_verbosity_of_string conv s)
+(* nraenv logger *)
+let nraenv_trace = ref LOG_NONE
+let nraenv_set_trace conv (s:string) = nraenv_trace := (logger_verbosity_of_string conv s)
 
-let nra_log_startPass name input =
-  if !nra_trace != LOG_NONE
+let nraenv_log_startPass name input =
+  if !nraenv_trace != LOG_NONE
   then
     (begin
-	    match !nra_trace with
+	    match !nraenv_trace with
 	    | LOG_PHASES_AND_NAMES ->
 	        print_string "starting nra optimization pass: "; print_endline name
 	    | LOG_VERBOSE_SEXP conv -> print_string ("(phase \"nra\" \""^name^"\"")
@@ -54,15 +52,15 @@ let nra_log_startPass name input =
   else
     name
 
-let nra_log_step tok name input output =
-  if !nra_trace != LOG_NONE
+let nraenv_log_step tok name input output =
+  if !nraenv_trace != LOG_NONE
   then
     begin
       if (input == output)
       then () (* (print_string "skipping optimization: "; print_endline name) *)
       else
 	      begin
-	        match !nra_trace with
+	        match !nraenv_trace with
 	        | LOG_NAMES ->
 	            (print_string "running nra optimization: "; print_endline name) ;
 	        | LOG_PHASES_AND_NAMES ->
@@ -79,11 +77,11 @@ let nra_log_step tok name input output =
   else
     tok
 
-let nra_log_endPass tok output =
-  if !nra_trace != LOG_NONE
+let nraenv_log_endPass tok output =
+  if !nraenv_trace != LOG_NONE
   then
     (begin
-	    match !nra_trace with
+	    match !nraenv_trace with
 	    | LOG_PHASES_AND_NAMES ->
 	        print_endline "ending nra optimization pass: "
 	    | LOG_VERBOSE_SEXP conv -> print_endline ")"
@@ -95,14 +93,14 @@ let nra_log_endPass tok output =
 
 (* nrc logger *)
   
-let nrc_trace = ref LOG_NONE
-let nrc_set_trace conv s = nrc_trace := (logger_verbosity_of_string conv s)
+let nnrc_trace = ref LOG_NONE
+let nnrc_set_trace conv s = nnrc_trace := (logger_verbosity_of_string conv s)
 
-let nrc_log_startPass name input =
-  if !nrc_trace != LOG_NONE
+let nnrc_log_startPass name input =
+  if !nnrc_trace != LOG_NONE
   then
     (begin
-	    match !nrc_trace with
+	    match !nnrc_trace with
 	    | LOG_PHASES_AND_NAMES ->
 	        print_string "starting nrc optimization pass: "; print_endline name
 	    | LOG_VERBOSE_SEXP conv -> print_string ("(phase \"nrc\" \""^name^"\"")
@@ -112,15 +110,15 @@ let nrc_log_startPass name input =
   else
     name
 
-let nrc_log_step tok name input output =
-  if !nrc_trace != LOG_NONE
+let nnrc_log_step tok name input output =
+  if !nnrc_trace != LOG_NONE
   then
     begin
       if (input == output)
       then () (* (print_string "skipping optimization: "; print_endline name) *)
       else
 	      begin
-	        match !nrc_trace with
+	        match !nnrc_trace with
 	        | LOG_NAMES ->
 	            (print_string "running nrc optimization: "; print_endline name) ;
 	        | LOG_PHASES_AND_NAMES ->
@@ -139,11 +137,11 @@ let nrc_log_step tok name input output =
   else
     tok
 
-let nrc_log_endPass tok output =
-  if !nrc_trace != LOG_NONE
+let nnrc_log_endPass tok output =
+  if !nnrc_trace != LOG_NONE
   then
     (begin
-	match !nrc_trace with
+	match !nnrc_trace with
 	| LOG_PHASES_AND_NAMES ->
 	   print_endline "ending nrc optimization pass: "
 	| LOG_VERBOSE_SEXP conv -> print_endline ")"
@@ -335,14 +333,14 @@ let nnrs_imp_all_set_trace conv_e conv_s conv_t s =
 
 (* dnrc logger *)
   
-let dnrc_trace = ref LOG_NONE
-let dnrc_set_trace conv s = dnrc_trace := (logger_verbosity_of_string conv s)
+let dnnrc_trace = ref LOG_NONE
+let dnnrc_set_trace conv s = dnnrc_trace := (logger_verbosity_of_string conv s)
 
-let dnrc_log_startPass name input =
-  if !dnrc_trace != LOG_NONE
+let dnnrc_log_startPass name input =
+  if !dnnrc_trace != LOG_NONE
   then
     (begin
-	match !dnrc_trace with
+	match !dnnrc_trace with
 	| LOG_PHASES_AND_NAMES ->
 	   print_string "starting dnrc optimization pass: "; print_endline name
 	| LOG_VERBOSE_SEXP conv -> print_string ("(phase \"dnrc\" \""^name^"\"")
@@ -352,15 +350,15 @@ let dnrc_log_startPass name input =
   else
     name
   
-let dnrc_log_step tok name input output =
-  if !dnrc_trace != LOG_NONE
+let dnnrc_log_step tok name input output =
+  if !dnnrc_trace != LOG_NONE
   then
     begin
      if (input == output)
       then () (* (print_string "skipping optimization: "; print_endline name) *)
       else
 	     begin
-	       match !dnrc_trace with
+	       match !dnnrc_trace with
          | LOG_NONE -> ()
 	       | LOG_NAMES ->
 	           (print_string "running dnrc optimization: "; print_endline name) ;
@@ -374,11 +372,11 @@ let dnrc_log_step tok name input output =
   else
     tok
 
-let dnrc_log_endPass tok output =
-  if !dnrc_trace != LOG_NONE
+let dnnrc_log_endPass tok output =
+  if !dnnrc_trace != LOG_NONE
   then
     (begin
-	    match !dnrc_trace with
+	    match !dnnrc_trace with
 	    | LOG_PHASES_AND_NAMES ->
 	        print_endline "ending dnrc optimization pass: "
 	    | LOG_VERBOSE_SEXP conv -> print_endline ")"

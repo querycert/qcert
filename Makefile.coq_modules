@@ -404,6 +404,21 @@ MODULES = \
 	Compiler/Trivial/TrivialCompiler \
 	Compiler/Enhanced/SqlDateComponent \
 	Compiler/Enhanced/LoggerComponent \
+	Compiler/Enhanced/EnhancedData \
+	Compiler/Enhanced/EnhancedEJson \
+	Compiler/Enhanced/EnhancedDataToEJson \
+	Compiler/Enhanced/EnhancedEJsonToJSON \
+	Compiler/Enhanced/EnhancedToJava \
+	Compiler/Enhanced/EnhancedToJavascriptAst \
+	Compiler/Enhanced/EnhancedReduceOps \
+	Compiler/Enhanced/EnhancedToReduceOps \
+	Compiler/Enhanced/EnhancedToSpark \
+	Compiler/Enhanced/EnhancedType \
+	Compiler/Enhanced/EnhancedToScala \
+	Compiler/Enhanced/EnhancedTypeToJSON \
+	Compiler/Enhanced/EnhancedDataTyping \
+	Compiler/Enhanced/EnhancedRuntime \
+	Compiler/Enhanced/EnhancedTyping \
 	Compiler/Enhanced/EnhancedModel \
 	Compiler/Enhanced/EnhancedCompiler \
 	Compiler/QcertExports \
