@@ -117,6 +117,10 @@ MODULES = \
 	Data/ForeignTyping \
 	Data/DataTypes \
 	Data/DataSystem \
+	Dataframe/Lang/Dataframe \
+	Dataframe/Lang/DataframeSize \
+	Dataframe/DataframeRuntime \
+	Dataframe/DataframeSystem \
 	Translation/Model/ForeignDataToEJson \
 	Translation/Model/DataToEJson \
 	Translation/Model/ForeignEJsonToJSON \
@@ -261,8 +265,6 @@ MODULES = \
 	DNNRC/Lang/DNNRCBase \
 	DNNRC/Lang/DNNRCBaseSize \
 	DNNRC/Lang/DNNRCBaseEq \
-	DNNRC/Lang/Dataframe \
-	DNNRC/Lang/DataframeSize \
 	DNNRC/Lang/DNNRC \
 	DNNRC/Typing/TDNNRCBase \
 	DNNRC/DNNRCRuntime \

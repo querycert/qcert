@@ -70,5 +70,10 @@ Section DConstants.
     reflexivity.
   Qed.
 
+  (* For Dataframes *)
+  Definition coll_bindings := list (string * (list data)).
+  Definition bindings_of_coll_bindings (cb:coll_bindings) : bindings :=
+    map (fun xy => (fst xy, dcoll (snd xy))) cb.
+
 End DConstants.
 

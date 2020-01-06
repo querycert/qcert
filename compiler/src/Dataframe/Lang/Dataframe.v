@@ -21,7 +21,6 @@ Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
 Require Import DataSystem.
-Require Import DNNRCBase.
 
 Section Dataframe.
   Context {fruntime:foreign_runtime}.
@@ -447,9 +446,6 @@ Section Dataframe.
             apply dnrec_sort.
             apply Forall_app; auto.
     Qed.
-
-    Global Program Instance SparkIRPlug : (@AlgPlug _ dataframe) :=
-      mkAlgPlug wrap_dataframe_eval dataframe_eval_normalized.
 
   End DataframePlug.
 
