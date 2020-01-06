@@ -402,7 +402,8 @@ MODULES = \
 	Compiler/QLib \
 	Compiler/Trivial/TrivialModel \
 	Compiler/Trivial/TrivialCompiler \
-	Compiler/Enhanced/SqlDateModelPart \
+	Compiler/Enhanced/SqlDateComponent \
+	Compiler/Enhanced/LoggerComponent \
 	Compiler/Enhanced/EnhancedModel \
 	Compiler/Enhanced/EnhancedCompiler \
 	Compiler/QcertExports \
