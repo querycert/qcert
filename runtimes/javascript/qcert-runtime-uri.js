@@ -12,16 +12,12 @@
  * limitations under the License.
  */
 
-package org.qcert.runtime;
+/* JavaScript runtime for Uri component */
 
-import com.google.gson.*;
+function uriEncode(v) {
+  return encodeURIComponent(v);
+}
 
-public interface JavaQuery {
-	/**
-	 * 
-	 * @param inheritance a Map from classes to the set of their ancestors
-	 * @param world a ({@link com.google.gson})json encoding of the world.
-	 * @return a ({@link com.google.gson})json encoding of the result of running this query
-	 */
-	JsonElement query(Inheritance inheritance, JsonElement world);
+function uriDecode(v) {
+  return decodeURIComponent(v);
 }

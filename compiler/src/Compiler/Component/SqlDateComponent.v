@@ -308,7 +308,7 @@ Section SqlDateOperators.
       | EJsonRuntimeDateSetMonth => "dateSetMonth"
       | EJsonRuntimeDateSetDay => "dateSetDay"
       | EJsonRuntimeDurationFromString => "durationFromString"
-      | EJsonRuntimeDurationPlus => "durationlus"
+      | EJsonRuntimeDurationPlus => "durationPlus"
       | EJsonRuntimeDurationMinus => "durationMinus"
       | EJsonRuntimeDurationBetween => "durationBetween"
       end.

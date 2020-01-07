@@ -1,6 +1,4 @@
 #
-# Copyright 2015-2016 IBM Corporation
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,8 +15,8 @@
 ############# Shouldn't have to be changed after this
 all: qcert-runtime.js qcert_runtime.ml
 
-qcert-runtime.js: qcert-runtime-core.js qcert-runtime-dates.js
-	(for i in qcert-runtime-core.js qcert-runtime-dates.js; do \
+qcert-runtime.js: qcert-runtime-core.js qcert-runtime-sql-date.js qcert-runtime-uri.js
+	(for i in qcert-runtime-core.js qcert-runtime-sql-date.js qcert-runtime-uri.js; do \
          cat $$i; \
          done) > qcert-runtime.js
 

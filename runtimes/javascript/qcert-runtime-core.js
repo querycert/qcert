@@ -1,6 +1,4 @@
 /*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +12,7 @@
  * limitations under the License.
  */
 
-/* "standard library" (implementation of unary and binary operators) */
+/* JavaScript runtime for core unary and binary operators operators */
 /* XXX TODO
    -- never use 'in' always use 'hasObjectProperty()' instead
    -- never use '==' or '!=' always use '===' or '!==' instead
