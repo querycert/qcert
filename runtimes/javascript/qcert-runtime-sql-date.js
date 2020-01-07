@@ -1,6 +1,4 @@
 /*
- * Copyright 2016 Joshua Auerbach
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +12,7 @@
  * limitations under the License.
  */
 
-/* Addendum to "standard library" with limited support for SQL-style dates and durations (aka "intervals") */
+/* JavaScript runtime for SqlDate component */
 
 /* Utilities */
 var DAY = "DAY";
