@@ -411,8 +411,9 @@ MODULES = \
 	Compiler/QLib \
 	Compiler/Trivial/TrivialModel \
 	Compiler/Trivial/TrivialCompiler \
-	Compiler/Component/SqlDateComponent \
 	Compiler/Component/LoggerComponent \
+	Compiler/Component/SqlDateComponent \
+	Compiler/Component/UriComponent \
 	Compiler/Enhanced/EnhancedData \
 	Compiler/Enhanced/EnhancedEJson \
 	Compiler/Enhanced/EnhancedDataToEJson \

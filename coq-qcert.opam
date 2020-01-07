@@ -32,6 +32,8 @@ depends: [
   "coq-jsast" {>= "1.0.9"}
   "menhir"
   "base64"
+  "uri"
+  "calendar"
 ]
 
 tags: [ "keyword:databases" "keyword:queries" "keyword:relational" "keyword:compiler" "date:2019-05-29" "logpath:Qcert" ]

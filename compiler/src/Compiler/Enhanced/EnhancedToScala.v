@@ -36,6 +36,7 @@ Local Open Scope nstring_scope.
 Definition enhanced_to_scala_unary_op (op: enhanced_unary_op) (d: nstring) : nstring :=
   match op with
   | enhanced_unary_sql_date_op op => ^"EnhancedModel: SQL date ops not supported for now."
+  | enhanced_unary_uri_op op => ^"EnhancedModel: URI ops not supported for now."
   end.
 
 Definition enhanced_to_scala_spark_datatype (ft: foreign_type_type) : nstring :=

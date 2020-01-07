@@ -9,7 +9,7 @@
 (library
  (name qcert_lib)
  (public_name coq-qcert)
- (libraries base64)
+ (libraries base64 uri calendar)
 )
 
 (copy_files extraction/*.{ml,mli})

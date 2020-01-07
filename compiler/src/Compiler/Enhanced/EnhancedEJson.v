@@ -17,14 +17,14 @@ Require Import ZArith.
 Require Import EquivDec.
 Require Import RelationClasses.
 Require Import Equivalence.
-Require Import ToString.
 Require Import String.
+
 Require Import Utils.
-Require Import JSONSystem.
 Require Import EJsonSystem.
 Require Import ForeignData.
 Require Import ForeignEJson.
 Require Import SqlDateComponent.
+Require Import UriComponent.
 
 Require Import EnhancedData.
 
@@ -65,77 +65,50 @@ Next Obligation.
 Defined.
 
 Inductive enhanced_foreign_ejson_runtime_op :=
-| enhanced_EJsonRuntimeDateFromString
-| enhanced_EJsonRuntimeDateGetYear
-| enhanced_EJsonRuntimeDateGetMonth
-| enhanced_EJsonRuntimeDateGetDay
-| enhanced_EJsonRuntimeDateNe
-| enhanced_EJsonRuntimeDateLt
-| enhanced_EJsonRuntimeDateLe
-| enhanced_EJsonRuntimeDateGt
-| enhanced_EJsonRuntimeDateGe
-| enhanced_EJsonRuntimeDateSetYear
-| enhanced_EJsonRuntimeDateSetMonth
-| enhanced_EJsonRuntimeDateSetDay
-| enhanced_EJsonRuntimeDurationFromString
-| enhanced_EJsonRuntimeDurationPlus
-| enhanced_EJsonRuntimeDurationMinus
-| enhanced_EJsonRuntimeDurationBetween.
+| enhanced_ejson_sql_date : ejson_sql_date_runtime_op -> enhanced_foreign_ejson_runtime_op
+| enhanced_ejson_uri : ejson_uri_runtime_op -> enhanced_foreign_ejson_runtime_op
+.
 
 Definition enhanced_foreign_ejson_runtime_op_tostring op : string :=
   match op with
-  | enhanced_EJsonRuntimeDateFromString => "dateFromString"
-  | enhanced_EJsonRuntimeDateGetYear => "dateGetYear"
-  | enhanced_EJsonRuntimeDateGetMonth => "dateGetMonth"
-  | enhanced_EJsonRuntimeDateGetDay => "dateGetDay"
-  | enhanced_EJsonRuntimeDateNe => "dateNe"
-  | enhanced_EJsonRuntimeDateLt => "dateLt"
-  | enhanced_EJsonRuntimeDateLe => "dateLe"
-  | enhanced_EJsonRuntimeDateGt => "dateGt"
-  | enhanced_EJsonRuntimeDateGe => "dateGe"
-  | enhanced_EJsonRuntimeDateSetYear => "dateSetYear"
-  | enhanced_EJsonRuntimeDateSetMonth => "dateSetMonth"
-  | enhanced_EJsonRuntimeDateSetDay => "dateSetDay"
-  | enhanced_EJsonRuntimeDurationFromString => "durationFromString"
-  | enhanced_EJsonRuntimeDurationPlus => "durationlus"
-  | enhanced_EJsonRuntimeDurationMinus => "durationMinus"
-  | enhanced_EJsonRuntimeDurationBetween => "durationBetween"
+  | enhanced_ejson_sql_date sop => ejson_sql_date_runtime_op_tostring sop
+  | enhanced_ejson_uri sop => ejson_uri_runtime_op_tostring sop
   end.
 
-Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option ejson :=
+Definition enhanced_ejson_sql_date_runtime_op_interp op (dl:list ejson) : option ejson :=
   match op with
-  | enhanced_EJsonRuntimeDateFromString =>
+  | EJsonRuntimeDateFromString =>
     apply_unary
       (fun d : ejson =>
          match d with
          | ejstring s => Some (ejforeign (enhancedsqldate (SQL_DATE_from_string s)))
          | _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateGetYear =>
+  | EJsonRuntimeDateGetYear =>
     apply_unary
       (fun d : ejson =>
          match d with
          | ejforeign (enhancedsqldate s) =>
-           Some (ejbigint (SQL_DATE_get_component sql_date_YEAR s))
+           Some (ejbigint (SQL_DATE_get_year s))
          | _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateGetMonth =>
+  | EJsonRuntimeDateGetMonth =>
     apply_unary
       (fun d : ejson =>
          match d with
          | ejforeign (enhancedsqldate fd) =>
-           Some (ejbigint (SQL_DATE_get_component sql_date_MONTH fd))
+           Some (ejbigint (SQL_DATE_get_month fd))
          | _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateGetDay =>
+  | EJsonRuntimeDateGetDay =>
     apply_unary
       (fun d : ejson =>
          match d with
          | ejforeign (enhancedsqldate fd) =>
-           Some (ejbigint (SQL_DATE_get_component sql_date_DAY fd))
+           Some (ejbigint (SQL_DATE_get_day fd))
          | _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateNe =>
+  | EJsonRuntimeDateNe =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -143,7 +116,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
            Some (ejbool (SQL_DATE_ne fd1 fd2))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateLt =>
+  | EJsonRuntimeDateLt =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -151,7 +124,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
            Some (ejbool (SQL_DATE_lt fd1 fd2))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateLe =>
+  | EJsonRuntimeDateLe =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -159,7 +132,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
            Some (ejbool (SQL_DATE_le fd1 fd2))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateGt =>
+  | EJsonRuntimeDateGt =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -167,7 +140,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
            Some (ejbool (SQL_DATE_gt fd1 fd2))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateGe =>
+  | EJsonRuntimeDateGe =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -175,38 +148,38 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
            Some (ejbool (SQL_DATE_ge fd1 fd2))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateSetYear =>
+  | EJsonRuntimeDateSetYear =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
          | ejforeign (enhancedsqldate fd), ejbigint n =>
-           Some (ejforeign (enhancedsqldate (SQL_DATE_set_component sql_date_YEAR fd n)))
+           Some (ejforeign (enhancedsqldate (SQL_DATE_set_year fd n)))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateSetMonth =>
+  | EJsonRuntimeDateSetMonth =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
          | ejforeign (enhancedsqldate fd), ejbigint n =>
-           Some (ejforeign (enhancedsqldate (SQL_DATE_set_component sql_date_MONTH fd n)))
+           Some (ejforeign (enhancedsqldate (SQL_DATE_set_month fd n)))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDateSetDay =>
+  | EJsonRuntimeDateSetDay =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
          | ejforeign (enhancedsqldate fd), ejbigint n =>
-           Some (ejforeign (enhancedsqldate (SQL_DATE_set_component sql_date_DAY fd n)))
+           Some (ejforeign (enhancedsqldate (SQL_DATE_set_day fd n)))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDurationFromString =>
+  | EJsonRuntimeDurationFromString =>
     apply_unary
       (fun d : ejson =>
          match d with
          | ejstring s => Some (ejforeign (enhancedsqldateinterval (SQL_DATE_INTERVAL_from_string s)))
          | _ => None
          end) dl
-  | enhanced_EJsonRuntimeDurationPlus =>
+  | EJsonRuntimeDurationPlus =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -214,7 +187,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
            Some (ejforeign (enhancedsqldate (SQL_DATE_plus fd id)))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDurationMinus =>
+  | EJsonRuntimeDurationMinus =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -222,7 +195,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
            Some (ejforeign (enhancedsqldate (SQL_DATE_minus fd id)))
          | _, _ => None
          end) dl
-  | enhanced_EJsonRuntimeDurationBetween =>
+  | EJsonRuntimeDurationBetween =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
@@ -232,11 +205,39 @@ Definition enhanced_foreign_ejson_runtime_op_interp op (dl:list ejson) : option 
          end) dl
   end.
 
+Definition enhanced_ejson_uri_runtime_op_interp op (dl:list ejson) : option ejson :=
+  match op with
+  | EJsonRuntimeUriEncode =>
+    apply_unary
+      (fun d : ejson =>
+         match d with
+         | ejstring s => Some (ejstring (URI_encode s))
+         | _ => None
+         end) dl
+  | EJsonRuntimeUriDecode =>
+    apply_unary
+      (fun d : ejson =>
+         match d with
+         | ejstring s => Some (ejstring (URI_decode s))
+         | _ => None
+         end) dl
+  end.
+
+Definition enhanced_foreign_ejson_runtime_op_interp op :=
+  match op with
+  | enhanced_ejson_sql_date sop =>
+    enhanced_ejson_sql_date_runtime_op_interp sop
+  | enhanced_ejson_uri sop =>
+    enhanced_ejson_uri_runtime_op_interp sop
+  end.
+
 Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
   mk_foreign_ejson_runtime enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
+  decide equality.
+  decide equality.
   decide equality.
 Defined.
 Next Obligation.

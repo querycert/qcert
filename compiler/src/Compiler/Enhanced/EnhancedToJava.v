@@ -18,6 +18,7 @@ Require Import DataSystem.
 Require Import JavaSystem.
 Require Import ForeignToJava.
 Require Import SqlDateComponent.
+Require Import UriComponent.
 Require Import EnhancedData.
 
 Local Open Scope nstring_scope.
@@ -37,6 +38,8 @@ Definition enhanced_to_java_unary_op
   := match fu with
      | enhanced_unary_sql_date_op op =>
        sql_date_to_java_unary_op indent eol quotel op d
+     | enhanced_unary_uri_op op =>
+       uri_to_java_unary_op indent eol quotel op d
      end.
 
 Definition enhanced_to_java_binary_op
