@@ -22,6 +22,7 @@ Require Import String.
 Require Import Utils.
 Require Import DataSystem.
 Require Import SqlDateComponent.
+Require Import UriComponent.
 
 Require Import EnhancedData.
 Require Import EnhancedEJson.
@@ -84,12 +85,15 @@ Proof.
   - exact None.
 Defined.
 
-Inductive sql_date_unary_op_has_type {model:brand_model} :
-  sql_date_unary_op -> rtype -> rtype -> Prop
-  :=
-  | tuop_sql_date_get_component part : sql_date_unary_op_has_type (uop_sql_date_get_component part) SqlDate Nat
-  | tuop_sql_date_from_string : sql_date_unary_op_has_type uop_sql_date_from_string RType.String SqlDate
-  | tuop_sql_date_interval_from_string : sql_date_unary_op_has_type uop_sql_date_interval_from_string RType.String SqlDateInterval
+Inductive sql_date_unary_op_has_type {model:brand_model} : sql_date_unary_op -> rtype -> rtype -> Prop :=
+| tuop_sql_date_get_component part : sql_date_unary_op_has_type (uop_sql_date_get_component part) SqlDate Nat
+| tuop_sql_date_from_string : sql_date_unary_op_has_type uop_sql_date_from_string RType.String SqlDate
+| tuop_sql_date_interval_from_string : sql_date_unary_op_has_type uop_sql_date_interval_from_string RType.String SqlDateInterval
+.
+
+Inductive uri_unary_op_has_type {model:brand_model} : uri_unary_op -> rtype -> rtype -> Prop :=
+| tuop_uri_encode : uri_unary_op_has_type uop_uri_encode RType.String RType.String
+| tuop_uri_decode : uri_unary_op_has_type uop_uri_decode RType.String RType.String
 .
 
 Definition sql_date_unary_op_type_infer {model : brand_model} (op:sql_date_unary_op) (τ₁:rtype) : option rtype :=
@@ -100,6 +104,14 @@ Definition sql_date_unary_op_type_infer {model : brand_model} (op:sql_date_unary
     if isString τ₁ then Some SqlDate else None
   | uop_sql_date_interval_from_string =>
     if isString τ₁ then Some SqlDateInterval else None
+  end.
+
+Definition uri_unary_op_type_infer {model : brand_model} (op:uri_unary_op) (τ₁:rtype) : option rtype :=
+  match op with
+  | uop_uri_encode =>
+    if isString τ₁ then Some RType.String else None
+  | uop_uri_decode =>
+    if isString τ₁ then Some RType.String else None
   end.
 
 Definition sql_date_unary_op_type_infer_sub {model : brand_model} (op:sql_date_unary_op) (τ₁:rtype) : option (rtype*rtype) :=
@@ -125,6 +137,30 @@ Proof.
               try invcs H0;
               try invcs H3;
               simpl; unfold denhancedsqldate, denhancedsqldateinterval; simpl;
+              eexists; split; try reflexivity; repeat constructor;
+              repeat constructor].
+  destruct part;
+    inversion 1; subst;
+      try invcs H0;
+      try invcs H3;
+      simpl; unfold denhancedsqldate, denhancedsqldateinterval; simpl;
+        eexists; split; try reflexivity; repeat constructor;
+          destruct part; repeat constructor.
+Qed.
+
+Lemma uri_unary_op_typing_sound {model : brand_model}
+      (fu : uri_unary_op) (τin τout : rtype) :
+  uri_unary_op_has_type fu τin τout ->
+  forall din : data,
+    din ▹ τin ->
+    exists dout : data,
+      uri_unary_op_interp fu din = Some dout /\ dout ▹ τout.
+Proof.
+  inversion 1; subst;
+    try solve[inversion 1; subst;
+              try invcs H0;
+              try invcs H3;
+              simpl; simpl;
               eexists; split; try reflexivity;
               repeat constructor].
 Qed.
@@ -133,10 +169,14 @@ Inductive enhanced_unary_op_has_type {model:brand_model} : enhanced_unary_op -> 
   :=
   | tenhanced_unary_sql_date_op fu τin τout:
       sql_date_unary_op_has_type fu τin τout ->
-      enhanced_unary_op_has_type (enhanced_unary_sql_date_op fu) τin τout.
+      enhanced_unary_op_has_type (enhanced_unary_sql_date_op fu) τin τout
+  | tenhanced_unary_uri_op fu τin τout:
+      uri_unary_op_has_type fu τin τout ->
+      enhanced_unary_op_has_type (enhanced_unary_uri_op fu) τin τout.
 
 Definition enhanced_unary_op_typing_infer {model:brand_model} (fu:enhanced_unary_op) (τ:rtype) : option rtype :=
   match fu with
+  | enhanced_unary_uri_op op => uri_unary_op_type_infer op τ
   | enhanced_unary_sql_date_op op => sql_date_unary_op_type_infer op τ
   end.
 
@@ -163,6 +203,12 @@ Proof.
         destruct x; simpl in *; try congruence.
       inversion H; subst; clear H; constructor.
       rewrite String_canon; constructor.
+  - destruct u; simpl in *;
+      destruct τ₁; simpl in *; try congruence;
+        destruct x; simpl in *; try congruence;
+          inversion H; subst; clear H; constructor;
+            try (rewrite String_canon; constructor);
+            rewrite String_canon; constructor.
 Qed.
 
 Lemma enhanced_unary_op_typing_infer_least
@@ -194,6 +240,14 @@ Proof.
         inversion H0; subst; clear H0;
           inversion H1; subst; clear H1;
             reflexivity.
+  - destruct u; simpl in *;
+      destruct τ₁; simpl in *; try congruence;
+        destruct x; simpl in *; try congruence;
+          inversion H; subst; clear H;
+            try (rewrite String_canon in H0);
+            inversion H0; subst; clear H0;
+              inversion H1; subst; clear H1;
+                reflexivity.
 Qed.
 
 Lemma enhanced_unary_op_typing_infer_complete
@@ -212,11 +266,26 @@ Proof.
             inversion H0; subst; clear H0;
               inversion H2; subst; clear H2.
     + simpl in H; congruence.
+  - destruct u; simpl in *;
+      destruct τ₁; simpl in *; try congruence;
+        destruct x; simpl in *; try congruence;
+          unfold not; intros;
+            inversion H0; subst; clear H0;
+              inversion H2; subst; clear H2; inversion H.
 Qed.
+
+Definition uri_unary_op_type_infer_sub {model : brand_model} (op:uri_unary_op) (τ₁:rtype) : option (rtype*rtype) :=
+  match op with
+  | uop_uri_encode =>
+    enforce_unary_op_schema (τ₁,RType.String) RType.String
+  | uop_uri_decode =>
+    enforce_unary_op_schema (τ₁,RType.String) RType.String
+  end.
 
 Definition enhanced_unary_op_typing_infer_sub {model:brand_model} (fu:enhanced_unary_op) (τ:rtype) : option (rtype*rtype) :=
   match fu with
   | enhanced_unary_sql_date_op op => sql_date_unary_op_type_infer_sub op τ
+  | enhanced_unary_uri_op op => uri_unary_op_type_infer_sub op τ
   end.
 
 Lemma enhanced_unary_op_typing_sound {model : brand_model}
@@ -230,6 +299,7 @@ Proof.
   intros.
   destruct H.
   - eapply sql_date_unary_op_typing_sound; eauto.
+  - eapply uri_unary_op_typing_sound; eauto.
 Qed.
 
 Inductive sql_date_binary_op_has_type {model:brand_model} :
@@ -293,6 +363,7 @@ Proof.
         invcs H3;
         try invcs H4;
         simpl; 
+        try (destruct part);
         eexists; split; try reflexivity;
           repeat constructor.
 Qed.

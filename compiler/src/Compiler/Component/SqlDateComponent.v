@@ -18,7 +18,7 @@ Require Import ZArith.
 Require Import EquivDec.
 Require Import Equivalence.
 Require Import Utils.
-Require Import ForeignData.
+Require Import DataSystem.
 Require Import ForeignToJava.
 Require Import ForeignOperators.
 Require Import JavaRuntime.
@@ -38,79 +38,91 @@ Import ListNotations.
 (** Axioms Section *)
 (* DATE_INTERVAL *)
 Axiom SQL_DATE_INTERVAL : Set.
-Extract Constant SQL_DATE_INTERVAL => "string".
+Extract Constant SQL_DATE_INTERVAL => "Sql_date_component.interval".
 
 Axiom SQL_DATE_INTERVAL_eq : SQL_DATE_INTERVAL -> SQL_DATE_INTERVAL -> bool.
-Extract Inlined Constant SQL_DATE_INTERVAL_eq => "(fun x y -> x = y)".
+Extract Inlined Constant SQL_DATE_INTERVAL_eq => "(fun x y -> Sql_date_component.interval_eq x y)".
 
 Conjecture SQL_DATE_INTERVAL_eq_correct :
   forall f1 f2, (SQL_DATE_INTERVAL_eq f1 f2 = true <-> f1 = f2).
 
 Axiom SQL_DATE_INTERVAL_to_string : SQL_DATE_INTERVAL -> String.string.
-Extract Inlined Constant SQL_DATE_INTERVAL_to_string => "(fun x -> Util.char_list_of_string x)".
+Extract Inlined Constant SQL_DATE_INTERVAL_to_string => "(fun x -> Sql_date_component.interval_to_string x)".
 
 Axiom SQL_DATE_INTERVAL_from_string : String.string -> SQL_DATE_INTERVAL.
-Extract Inlined Constant SQL_DATE_INTERVAL_from_string => "(fun x -> Util.string_of_char_list x)".
+Extract Inlined Constant SQL_DATE_INTERVAL_from_string => "(fun x -> Sql_date_component.interval_from_string x)".
 
 Axiom SQL_DATE_INTERVAL_from_string_correct :
   forall s, SQL_DATE_INTERVAL_from_string (SQL_DATE_INTERVAL_to_string s) = s.
 
 (* DATE *)
 Axiom SQL_DATE : Set.
-Extract Constant SQL_DATE => "string".
+Extract Constant SQL_DATE => "Sql_date_component.date".
 
 Axiom SQL_DATE_eq : SQL_DATE -> SQL_DATE -> bool.
-Extract Inlined Constant SQL_DATE_eq => "(fun x y -> x = y)".
+Extract Inlined Constant SQL_DATE_eq => "(fun x y -> Sql_date_component.date_eq x y)".
 
 Conjecture SQL_DATE_eq_correct :
   forall f1 f2, (SQL_DATE_eq f1 f2 = true <-> f1 = f2).
 
 Axiom SQL_DATE_to_string : SQL_DATE -> String.string.
-Extract Inlined Constant SQL_DATE_to_string => "(fun x -> Util.char_list_of_string x)".
+Extract Inlined Constant SQL_DATE_to_string => "(fun x -> Sql_date_component.date_to_string x)".
 
 Axiom SQL_DATE_from_string : String.string -> SQL_DATE.
-Extract Inlined Constant SQL_DATE_from_string => "(fun x -> Util.string_of_char_list x)".
+Extract Inlined Constant SQL_DATE_from_string => "(fun x -> Sql_date_component.date_from_string x)".
 
 Axiom SQL_DATE_from_string_correct :
   forall s, SQL_DATE_from_string (SQL_DATE_to_string s) = s.
 
 (* Operators *)
-Inductive sql_date_component :=
-| sql_date_DAY
-| sql_date_MONTH
-| sql_date_YEAR.
-
-Axiom SQL_DATE_get_component : sql_date_component -> SQL_DATE -> Z.
-Extract Inlined Constant SQL_DATE_get_component => "(fun x y -> 0)".
-
-Axiom SQL_DATE_set_component : sql_date_component -> SQL_DATE -> Z -> SQL_DATE.
-Extract Inlined Constant SQL_DATE_set_component => "(fun x y z -> y)".
-  
-Axiom SQL_DATE_plus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
-Extract Inlined Constant SQL_DATE_plus => "(fun x y -> x)".
-
-Axiom SQL_DATE_minus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
-Extract Inlined Constant SQL_DATE_minus => "(fun x y -> x)".
-
 Axiom SQL_DATE_ne : SQL_DATE -> SQL_DATE -> bool.
-Extract Inlined Constant SQL_DATE_ne => "(fun x y -> x <> y)".
+Extract Inlined Constant SQL_DATE_ne => "(fun x y -> Sql_date_component.date_neq x y)".
 
 Axiom SQL_DATE_lt : SQL_DATE -> SQL_DATE -> bool.
-Extract Inlined Constant SQL_DATE_lt => "(fun x y -> x < y)".
+Extract Inlined Constant SQL_DATE_lt => "(fun x y -> Sql_date_component.date_lt x y)".
 
 Axiom SQL_DATE_le : SQL_DATE -> SQL_DATE -> bool.
-Extract Inlined Constant SQL_DATE_le => "(fun x y -> x <= y)".
+Extract Inlined Constant SQL_DATE_le => "(fun x y -> Sql_date_component.date_le x y)".
 
 Axiom SQL_DATE_gt : SQL_DATE -> SQL_DATE -> bool.
-Extract Inlined Constant SQL_DATE_gt => "(fun x y -> x > y)".
+Extract Inlined Constant SQL_DATE_gt => "(fun x y -> Sql_date_component.date_gt x y)".
 
 Axiom SQL_DATE_ge : SQL_DATE -> SQL_DATE -> bool.
-Extract Inlined Constant SQL_DATE_ge => "(fun x y -> x >= y)".
+Extract Inlined Constant SQL_DATE_ge => "(fun x y -> Sql_date_component.date_ge x y)".
+
+Axiom SQL_DATE_get_year : SQL_DATE -> Z.
+Extract Inlined Constant SQL_DATE_get_year => "(fun x -> Sql_date_component.get_year x)".
+
+Axiom SQL_DATE_get_month : SQL_DATE -> Z.
+Extract Inlined Constant SQL_DATE_get_month => "(fun x -> Sql_date_component.get_month x)".
+
+Axiom SQL_DATE_get_day : SQL_DATE -> Z.
+Extract Inlined Constant SQL_DATE_get_day => "(fun x -> Sql_date_component.get_day x)".
+
+Axiom SQL_DATE_set_year : SQL_DATE -> Z  -> SQL_DATE.
+Extract Inlined Constant SQL_DATE_set_year => "(fun x y -> Sql_date_component.set_year x y)".
+
+Axiom SQL_DATE_set_month : SQL_DATE -> Z  -> SQL_DATE.
+Extract Inlined Constant SQL_DATE_set_month => "(fun x y -> Sql_date_component.set_month x y)".
+
+Axiom SQL_DATE_set_day : SQL_DATE -> Z  -> SQL_DATE.
+Extract Inlined Constant SQL_DATE_set_day => "(fun x y -> Sql_date_component.set_day x y)".
+
+Axiom SQL_DATE_plus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
+Extract Inlined Constant SQL_DATE_plus => "(fun x y -> Sql_date_component.plus x y)".
+
+Axiom SQL_DATE_minus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
+Extract Inlined Constant SQL_DATE_minus => "(fun x y -> Sql_date_component.minus x y)".
 
 Axiom SQL_DATE_INTERVAL_between : SQL_DATE -> SQL_DATE -> SQL_DATE_INTERVAL.
-Extract Inlined Constant SQL_DATE_INTERVAL_between => "(fun x y -> """")".
+Extract Inlined Constant SQL_DATE_INTERVAL_between => "(fun x y -> Sql_date_component.between x y)".
 
 Section SqlDateModel.
+  Inductive sql_date_component :=
+  | sql_date_DAY
+  | sql_date_MONTH
+  | sql_date_YEAR.
+
   (** Equality *)
   Section Equality.
     Program Instance sql_date_interval_foreign_data : foreign_data
@@ -201,7 +213,7 @@ Section SqlDateOperators.
   | bop_sql_date_interval_between
   | bop_sql_date_set_component : sql_date_component -> sql_date_binary_op
   .
-    
+
   Section toString.
     Definition sql_date_unary_op_tostring (f:sql_date_unary_op) : String.string :=
       match f with
@@ -261,4 +273,45 @@ Section SqlDateOperators.
 
   End toJava.
 
+  Section toEJson.
+    Inductive ejson_sql_date_runtime_op :=
+    | EJsonRuntimeDateFromString
+    | EJsonRuntimeDateGetYear
+    | EJsonRuntimeDateGetMonth
+    | EJsonRuntimeDateGetDay
+    | EJsonRuntimeDateNe
+    | EJsonRuntimeDateLt
+    | EJsonRuntimeDateLe
+    | EJsonRuntimeDateGt
+    | EJsonRuntimeDateGe
+    | EJsonRuntimeDateSetYear
+    | EJsonRuntimeDateSetMonth
+    | EJsonRuntimeDateSetDay
+    | EJsonRuntimeDurationFromString
+    | EJsonRuntimeDurationPlus
+    | EJsonRuntimeDurationMinus
+    | EJsonRuntimeDurationBetween
+    .
+
+    Definition ejson_sql_date_runtime_op_tostring op : string :=
+      match op with
+      | EJsonRuntimeDateFromString => "dateFromString"
+      | EJsonRuntimeDateGetYear => "dateGetYear"
+      | EJsonRuntimeDateGetMonth => "dateGetMonth"
+      | EJsonRuntimeDateGetDay => "dateGetDay"
+      | EJsonRuntimeDateNe => "dateNe"
+      | EJsonRuntimeDateLt => "dateLt"
+      | EJsonRuntimeDateLe => "dateLe"
+      | EJsonRuntimeDateGt => "dateGt"
+      | EJsonRuntimeDateGe => "dateGe"
+      | EJsonRuntimeDateSetYear => "dateSetYear"
+      | EJsonRuntimeDateSetMonth => "dateSetMonth"
+      | EJsonRuntimeDateSetDay => "dateSetDay"
+      | EJsonRuntimeDurationFromString => "durationFromString"
+      | EJsonRuntimeDurationPlus => "durationlus"
+      | EJsonRuntimeDurationMinus => "durationMinus"
+      | EJsonRuntimeDurationBetween => "durationBetween"
+      end.
+
+  End toEJson.
 End SqlDateOperators.

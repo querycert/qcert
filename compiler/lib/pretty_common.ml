@@ -393,18 +393,22 @@ let sql_date_component_to_string part =
 
 let string_of_foreign_unary_op fu : string =
   begin match fu with
-  | Compiler.Uop_sql_date_get_component part -> "(sql_date_get_component " ^ (sql_date_component_to_string part) ^ ")"
-  | Compiler.Uop_sql_date_from_string -> "sql_date_from_string"
-  | Compiler.Uop_sql_date_interval_from_string -> "sql_date_interval_from_string"
+  | Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component part) -> "(sql_date_get_component " ^ (sql_date_component_to_string part) ^ ")"
+  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string -> "sql_date_from_string"
+  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string -> "sql_date_interval_from_string"
+  | Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_encode -> "uri_encode"
+  | Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_decode -> "uri_decode"
   end
 
 let foreign_unary_op_of_string s =
   begin match s with
-  | "(sql_date_get_component DAY)"->  Compiler.Uop_sql_date_get_component Compiler.Sql_date_DAY
-  | "(sql_date_get_component MONTH)"->  Compiler.Uop_sql_date_get_component Compiler.Sql_date_MONTH
-  | "(sql_date_get_component YEAR)"->  Compiler.Uop_sql_date_get_component Compiler.Sql_date_YEAR
-  | "sql_date_from_string" -> Compiler.Uop_sql_date_from_string
-  | "sql_date_interval_from_string" -> Compiler.Uop_sql_date_interval_from_string
+  | "(sql_date_get_component DAY)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_DAY)
+  | "(sql_date_get_component MONTH)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_MONTH)
+  | "(sql_date_get_component YEAR)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_YEAR)
+  | "sql_date_from_string" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string
+  | "sql_date_interval_from_string" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string
+  | "uri_encode" -> Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_encode
+  | "uri_decode" -> Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_decode
   | _ -> raise Not_found
   end
 

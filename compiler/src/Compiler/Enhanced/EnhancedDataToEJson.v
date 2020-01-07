@@ -27,6 +27,7 @@ Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
 
 Require Import SqlDateComponent.
+Require Import UriComponent.
 
 Require Import EnhancedData.
 Require Import EnhancedEJson.
@@ -43,17 +44,22 @@ Next Obligation.
   exact fd. (* XXX enhanced_ejson is the same as enhanced_data *)
 Defined.
 
-Definition sql_date_unary_op_to_ejson (op:enhanced_unary_op) : enhanced_foreign_ejson_runtime_op
-  := match op with
-     | enhanced_unary_sql_date_op dop =>
-       match dop with
-       | uop_sql_date_get_component sql_date_YEAR => enhanced_EJsonRuntimeDateGetYear
-       | uop_sql_date_get_component sql_date_MONTH => enhanced_EJsonRuntimeDateGetMonth
-       | uop_sql_date_get_component sql_date_DAY => enhanced_EJsonRuntimeDateGetDay
-       | uop_sql_date_from_string => enhanced_EJsonRuntimeDateFromString
-       | uop_sql_date_interval_from_string => enhanced_EJsonRuntimeDurationFromString
-       end
-     end.
+Definition sql_date_unary_op_to_ejson (op:enhanced_unary_op) : enhanced_foreign_ejson_runtime_op :=
+  match op with
+  | enhanced_unary_sql_date_op dop =>
+    match dop with
+    | uop_sql_date_get_component sql_date_YEAR => enhanced_ejson_sql_date EJsonRuntimeDateGetYear
+    | uop_sql_date_get_component sql_date_MONTH => enhanced_ejson_sql_date EJsonRuntimeDateGetMonth
+    | uop_sql_date_get_component sql_date_DAY => enhanced_ejson_sql_date EJsonRuntimeDateGetDay
+    | uop_sql_date_from_string => enhanced_ejson_sql_date EJsonRuntimeDateFromString
+    | uop_sql_date_interval_from_string => enhanced_ejson_sql_date EJsonRuntimeDurationFromString
+    end
+  | enhanced_unary_uri_op uop =>
+    match uop with
+    | uop_uri_encode => enhanced_ejson_uri EJsonRuntimeUriEncode
+    | uop_uri_decode => enhanced_ejson_uri EJsonRuntimeUriDecode
+    end
+  end.
 
 Lemma sql_date_unary_op_to_ejson_correct (uop:enhanced_unary_op) :
   forall br d,
@@ -63,29 +69,30 @@ Lemma sql_date_unary_op_to_ejson_correct (uop:enhanced_unary_op) :
 Proof.
   intros.
   destruct uop.
-  destruct s; simpl.
-  - destruct s; simpl; try reflexivity;
-      destruct d; try reflexivity; simpl;
-        destruct f; reflexivity.
-  - destruct d; simpl; try reflexivity.
-  - destruct d; simpl; try reflexivity.
+  - destruct s; simpl; try (destruct d; simpl; try reflexivity);
+      try (destruct s; simpl; try reflexivity;
+           destruct d; try reflexivity; simpl;
+           destruct f; reflexivity;
+           destruct s; simpl; try reflexivity);
+      destruct s; destruct f; simpl; try reflexivity.
+  - destruct d; destruct u; simpl; try reflexivity.
 Qed.
 
 Definition sql_date_binary_op_to_ejson (op:enhanced_binary_op) : enhanced_foreign_ejson_runtime_op
   := match op with
      | enhanced_binary_sql_date_op dop =>
        match dop with
-       | bop_sql_date_plus => enhanced_EJsonRuntimeDurationPlus
-       | bop_sql_date_minus => enhanced_EJsonRuntimeDurationMinus
-       | bop_sql_date_ne => enhanced_EJsonRuntimeDateNe
-       | bop_sql_date_lt => enhanced_EJsonRuntimeDateLt
-       | bop_sql_date_le => enhanced_EJsonRuntimeDateLe
-       | bop_sql_date_gt => enhanced_EJsonRuntimeDateGt
-       | bop_sql_date_ge => enhanced_EJsonRuntimeDateGe
-       | bop_sql_date_interval_between =>enhanced_EJsonRuntimeDurationBetween
-       | bop_sql_date_set_component sql_date_YEAR => enhanced_EJsonRuntimeDateSetYear
-       | bop_sql_date_set_component sql_date_MONTH => enhanced_EJsonRuntimeDateSetMonth
-       | bop_sql_date_set_component sql_date_DAY => enhanced_EJsonRuntimeDateSetDay
+       | bop_sql_date_plus => enhanced_ejson_sql_date EJsonRuntimeDurationPlus
+       | bop_sql_date_minus => enhanced_ejson_sql_date EJsonRuntimeDurationMinus
+       | bop_sql_date_ne => enhanced_ejson_sql_date EJsonRuntimeDateNe
+       | bop_sql_date_lt => enhanced_ejson_sql_date EJsonRuntimeDateLt
+       | bop_sql_date_le => enhanced_ejson_sql_date EJsonRuntimeDateLe
+       | bop_sql_date_gt => enhanced_ejson_sql_date EJsonRuntimeDateGt
+       | bop_sql_date_ge => enhanced_ejson_sql_date EJsonRuntimeDateGe
+       | bop_sql_date_interval_between => enhanced_ejson_sql_date EJsonRuntimeDurationBetween
+       | bop_sql_date_set_component sql_date_YEAR => enhanced_ejson_sql_date EJsonRuntimeDateSetYear
+       | bop_sql_date_set_component sql_date_MONTH => enhanced_ejson_sql_date EJsonRuntimeDateSetMonth
+       | bop_sql_date_set_component sql_date_DAY => enhanced_ejson_sql_date EJsonRuntimeDateSetDay
        end
      end.
 
@@ -97,36 +104,10 @@ Lemma sql_date_binary_op_to_ejson_correct (bop:enhanced_binary_op) :
 Proof.
   intros.
   destruct bop.
-  destruct s; simpl.
-  - destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
-  - destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
-  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
-    destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
-  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
-    destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
-  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
-    destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
-  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
-    destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
-  - unfold rondboolsqldate2, lift, ondsqldate2; simpl.
-    destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
-  - destruct d1; destruct d2; try reflexivity;
-      destruct f; simpl; try reflexivity;
-        destruct f0; try reflexivity.
+  destruct s; simpl;
+    try (destruct d1; destruct d2; try reflexivity;
+         destruct f; simpl; try reflexivity;
+         destruct f0; try reflexivity).
   - destruct s; simpl;
       destruct d1; destruct d2; try reflexivity;
         destruct f; simpl; try reflexivity;
