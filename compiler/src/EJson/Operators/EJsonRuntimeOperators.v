@@ -379,7 +379,7 @@ Section EJsonRuntimeOperators.
           (fun d1 d2 =>
              match d1, d2 with
              | ejarray l1, ejarray l2 =>
-               Some (ejarray (bminus l1 l2))
+               Some (ejarray (bminus l2 l1))
              | _, _ => None
              end
           ) dl
