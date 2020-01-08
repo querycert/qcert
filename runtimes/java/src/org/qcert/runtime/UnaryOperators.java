@@ -25,10 +25,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-import java.net.*;
-import java.io.UnsupportedEncodingException;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
 
 import com.google.gson.*;
 
@@ -453,24 +449,5 @@ public class UnaryOperators {
             return Pattern.quote(literal);
         }
 
-    }
-
-    public static JsonElement uriEncode(JsonElement elem) {
-        final String str = elem.getAsString();
-        String result;
-
-        try {
-            result = URLEncoder.encode(str, "UTF-8")
-                .replaceAll("\\+", "%20")
-                .replaceAll("\\%21", "!")
-                .replaceAll("\\%27", "'")
-                .replaceAll("\\%28", "(")
-                .replaceAll("\\%29", ")")
-                .replaceAll("\\%7E", "~");
-        } catch (UnsupportedEncodingException e) {
-            result = str;
-        }
-
-        return new JsonPrimitive(result);
     }
 }
