@@ -1,0 +1,2 @@
+/* Uri Encode */
+getYear(date("2020-01-01"))

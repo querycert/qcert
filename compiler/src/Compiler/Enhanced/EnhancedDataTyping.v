@@ -31,13 +31,13 @@ Require Import SqlDateComponent.
 Inductive enhanced_has_type : enhanced_data -> enhanced_type -> Prop :=
 | enhanced_has_type_top fd : enhanced_has_type fd enhancedTop
 | enhanced_has_type_sqldate (tp:SQL_DATE) : enhanced_has_type (enhancedsqldate tp) enhancedSqlDate
-| enhanced_has_type_sqldateinterval (tp:SQL_DATE_INTERVAL) : enhanced_has_type (enhancedsqldateinterval tp) enhancedSqlDateInterval
+| enhanced_has_type_sqldateperiod (tp:SQL_DATE_PERIOD) : enhanced_has_type (enhancedsqldateperiod tp) enhancedSqlDatePeriod
 .
 
 Definition enhanced_infer_type (d:enhanced_data) : option enhanced_type
   := match d with
      | enhancedsqldate _ => Some enhancedSqlDate
-     | enhancedsqldateinterval _ => Some enhancedSqlDateInterval
+     | enhancedsqldateperiod _ => Some enhancedSqlDatePeriod
      end.
 
 Program Instance enhanced_foreign_data_typing :

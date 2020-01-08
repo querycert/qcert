@@ -194,7 +194,7 @@ let rec pretty_sharp sym ff name =
 let string_of_foreign_data (fd:Compiler.enhanced_data) : string =
   begin match fd with
   | Compiler.Enhancedsqldate td -> raise Not_found
-  | Compiler.Enhancedsqldateinterval tp -> raise Not_found
+  | Compiler.Enhancedsqldateperiod tp -> raise Not_found
   end
 
 let foreign_data_of_string s =
@@ -203,7 +203,7 @@ let foreign_data_of_string s =
 let pretty_foreign_data ff fd =
   begin match fd with
   | Compiler.Enhancedsqldate td -> raise Not_found
-  | Compiler.Enhancedsqldateinterval tp -> raise Not_found
+  | Compiler.Enhancedsqldateperiod tp -> raise Not_found
   end
 
 let rec pretty_data ff d =
@@ -395,7 +395,7 @@ let string_of_foreign_unary_op fu : string =
   begin match fu with
   | Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component part) -> "(sql_date_get_component " ^ (sql_date_component_to_string part) ^ ")"
   | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string -> "sql_date_from_string"
-  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string -> "sql_date_interval_from_string"
+  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_period_from_string -> "sql_date_period_from_string"
   | Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_encode -> "uri_encode"
   | Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_decode -> "uri_decode"
   end
@@ -406,7 +406,7 @@ let foreign_unary_op_of_string s =
   | "(sql_date_get_component MONTH)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_MONTH)
   | "(sql_date_get_component YEAR)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_YEAR)
   | "sql_date_from_string" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string
-  | "sql_date_interval_from_string" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string
+  | "sql_date_period_from_string" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_period_from_string
   | "uri_encode" -> Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_encode
   | "uri_decode" -> Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_decode
   | _ -> raise Not_found
@@ -588,7 +588,7 @@ let string_of_foreign_binary_op fb =
   | Compiler.Bop_sql_date_le -> "sql_date_le"
   | Compiler.Bop_sql_date_gt -> "sql_date_gt"
   | Compiler.Bop_sql_date_ge -> "sql_date_ge"
-  | Compiler.Bop_sql_date_interval_between -> "sql_date_interval_between"
+  | Compiler.Bop_sql_date_period_between -> "sql_date_period_between"
   | Compiler.Bop_sql_date_set_component part -> "(sql_date_set_component " ^ (sql_date_component_to_string part) ^ ")"
   end
 
@@ -600,7 +600,7 @@ let foreign_binary_op_of_string fb =
   | "sql_date_le" -> Compiler.Bop_sql_date_le
   | "sql_date_gt" -> Compiler.Bop_sql_date_gt
   | "sql_date_ge" -> Compiler.Bop_sql_date_ge
-  | "sql_date_interval_between" -> Compiler.Bop_sql_date_interval_between
+  | "sql_date_period_between" -> Compiler.Bop_sql_date_period_between
   | "(sql_date_set_component DAY)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_DAY
   | "(sql_date_set_component MONTH)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_MONTH
   | "(sql_date_set_component YEAR)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_YEAR
@@ -623,7 +623,7 @@ let pretty_foreign_binary_op p sym callb ff fb a1 a2 =
       pretty_infix_exp p 18 sym callb ("SD>",1) ff a1 a2
   | Compiler.Bop_sql_date_ge ->
       pretty_infix_exp p 18 sym callb ("SD>=",1) ff a1 a2
-  | Compiler.Bop_sql_date_interval_between ->
+  | Compiler.Bop_sql_date_period_between ->
       pretty_infix_exp p 18 sym callb ("SDD_be",1) ff a1 a2
   | Compiler.Bop_sql_date_set_component Compiler.Sql_date_YEAR ->
       pretty_infix_exp p 18 sym callb ("SDsY",1) ff a1 a2

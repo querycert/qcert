@@ -310,7 +310,7 @@ bop:
 | SQLDATEGE
   { Enhanced.Ops.Binary.sql_date_ge }
 | SQLDATEINTERVALBETWEEN
-  { Enhanced.Ops.Binary.sql_date_interval_between }
+  { Enhanced.Ops.Binary.sql_date_period_between }
 | AEQ
     { QOps.Binary.opequal }
 | AUNION
@@ -438,6 +438,6 @@ uop:
 | SQLDATEFROMSTRING
     { Enhanced.Ops.Unary.sql_date_from_string }
 | SQLDATEINTERVALFROMSTRING
-    { Enhanced.Ops.Unary.sql_date_interval_from_string }
+    { Enhanced.Ops.Unary.sql_date_period_from_string }
 | LPAREN SQLGETDATECOMPONENT c = sql_date_component RPAREN
     { Enhanced.Ops.Unary.sql_date_get_component c }

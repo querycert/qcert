@@ -61,7 +61,7 @@ endif
 	camp-tests \
 	camp-world-tests camp-world-tests-js camp-world-tests-java \
 	sql-tests \
-	sql-org-tests sql-org-tests-js sql-org-tests-java \
+	sql-org-tests sql-org-tests-js sql-org-tests-java sql-mini-tests sql-mini-tests-js sql-mini-tests-java \
 	tech_rule-tests \
 	tech_rule-test-tests tech_rule-test-tests-js tech_rule-test-tests-java \
 	designer_rule-tests \
@@ -69,7 +69,7 @@ endif
 	clean
 
 ## OQL
-OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12
+OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12 13 14
 OQLWORLDNUM=1 2
 OQLSTRINGNUM=1 2 3
 OQLEMPLOYEESNUM=1 2
@@ -299,6 +299,7 @@ camp-world-tests-java:
 
 ## SQL
 SQLORGNUM=1 2 3 4 5 6 7 8 9 10 11
+SQLMININUM=1
 SQLTARGETS=nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
 
 sql-tests:
@@ -306,11 +307,14 @@ sql-tests:
 	@echo "[Q*cert] SQL tests"
 	@echo "[Q*cert] "
 	@$(MAKE) sql-org-tests
+	@$(MAKE) sql-mini-tests
 ifneq ($(JAVASCRIPT),)
 	@$(MAKE) sql-org-tests-js
+	@$(MAKE) sql-mini-tests-js
 endif
 ifneq ($(JAVA),)
 	@$(MAKE) sql-org-tests-java
+	@$(MAKE) sql-mini-tests-java
 endif
 
 sql-org-tests:
@@ -341,6 +345,33 @@ sql-org-tests-java:
                           -output sql/org$(N).out \
                           org$(N) || exit 1;)
 
+sql-mini-tests:
+	@$(foreach N,$(SQLMININUM), \
+            $(foreach T,$(SQLTARGETS), \
+	       $(QCERTCOMP) -source sql -target $(T) sql/mini$(N).sql \
+                            -eval -input sql/mini.input \
+                            -schema sql/mini.schema \
+                            -eval-validate -output sql/mini$(N).out || exit 1;))
+sql-mini-tests-js:
+	@$(foreach N,$(SQLMININUM), \
+	       $(QCERTCOMP) -source sql -target js sql/mini$(N).sql \
+                            -eval-validate -schema sql/mini.schema -quiet; \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --input sql/mini.input \
+                          --schema sql/mini.schema \
+                          --output sql/mini$(N).out \
+                          --eval-validate \
+                          --query sql/mini$(N).js || exit 1 ;)
+sql-mini-tests-java:
+	@$(foreach N,$(SQLMININUM), \
+	       $(QCERTCOMP) -source sql -target java sql/mini$(N).sql \
+                            -eval-validate -schema sql/mini.schema; \
+	       $(JAVAC) -cp $(CPATH) sql/mini$(N).java; \
+	       $(JAVARUN) -cp $(CPATH):sql testing.runners.RunJava \
+                          -input sql/mini.input \
+                          -schema sql/mini.schema \
+                          -output sql/mini$(N).out \
+                          mini$(N) || exit 1;)
 
 ## TECHRULE
 TECHRULETESTNUM=01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22 #20

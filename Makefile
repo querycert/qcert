@@ -107,7 +107,7 @@ cleanall-qcert-compiler:
 cleanmost-qcert-compiler:
 	- @$(MAKE) cleanall-configure
 	- @$(MAKE) cleanall-qcert-ocaml
-	- @$(MAKE) cleanall-parsersJava
+	- @$(MAKE) cleanmost-parsersJava
 
 
 ## Pre-build
@@ -212,6 +212,14 @@ cleanall-parsersJava:
 	- @$(MAKE) -C compiler/parsersJava/sqlParser cleanall
 	- @$(MAKE) -C compiler/parsersJava/sqlppParser cleanall
 	- @$(MAKE) -C compiler/parsersJava/jrulesParser cleanall
+	- @rm -rf bin/services
+	- @rm -f bin/javaService.jar
+
+cleanmost-parsersJava:
+	- @$(MAKE) -C compiler/parsersJava/javaService cleanmost
+	- @$(MAKE) -C compiler/parsersJava/sqlParser cleanmost
+	- @$(MAKE) -C compiler/parsersJava/sqlppParser cleanmost
+	- @$(MAKE) -C compiler/parsersJava/jrulesParser cleanmost
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 

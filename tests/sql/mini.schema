@@ -1,0 +1,41 @@
+{
+  "inheritance": [],
+  "brandTypes": [],
+  "typeDefs": [],
+  "globals": {
+    "nation": {
+      "dist": "distr",
+      "type": {
+        "$coll": {
+          "n_nationkey": "Nat",
+          "n_name": "String",
+          "n_regionkey": "Nat",
+          "n_comment": "String"
+        }
+      }
+    },
+    "lineitem": {
+      "dist": "distr",
+      "type": {
+        "$coll": {
+          "l_orderkey": "Nat",
+          "l_partkey": "Nat",
+          "l_suppkey": "Nat",
+          "l_linenumber": "Nat",
+          "l_quantity": "Nat",
+          "l_extendedprice": "Nat",
+          "l_discount": "Nat",
+          "l_tax": "Nat",
+          "l_returnflag": "String",
+          "l_linestatus": "String",
+          "l_shipdate": "ESqlDate",
+          "l_commitdate": "ESqlDate",
+          "l_receiptdate": "ESqlDate",
+          "l_shipinstruct": "String",
+          "l_shipmode": "String",
+          "l_comment": "String"
+        }
+      }
+    }
+  }
+}

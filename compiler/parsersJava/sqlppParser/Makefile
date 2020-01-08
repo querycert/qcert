@@ -105,6 +105,8 @@ clean:
 cleanall: clean
 	@rm -f $(DEPENDENCIES)
 
+cleanmost: clean
+
 cleantests:
 	-@rm tests/*.js tests/*.txt tests/*.sexp
 

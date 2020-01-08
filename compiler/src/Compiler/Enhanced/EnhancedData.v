@@ -29,11 +29,11 @@ Local Open Scope list_scope.
 
 Inductive enhanced_data : Set :=
 | enhancedsqldate : SQL_DATE -> enhanced_data
-| enhancedsqldateinterval : SQL_DATE_INTERVAL -> enhanced_data
+| enhancedsqldateperiod : SQL_DATE_PERIOD -> enhanced_data
 .
 
 Existing Instance sql_date_foreign_data.
-Existing Instance sql_date_interval_foreign_data.
+Existing Instance sql_date_period_foreign_data.
 
 Program Instance enhanced_foreign_data : foreign_data :=
   mk_foreign_data enhanced_data _ _ _ _ _ _.
@@ -44,7 +44,7 @@ Next Obligation.
   - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_foreign_data) s s0).
     + left; congruence.
     + right; congruence.
-  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_interval_foreign_data) s s0).
+  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_period_foreign_data) s s0).
     + left; congruence.
     + right; congruence.
 Defined.
@@ -52,22 +52,22 @@ Next Obligation.
   (* normalized? *)
   destruct a.
   - exact (@foreign_data_normalized sql_date_foreign_data s).
-  - exact (@foreign_data_normalized sql_date_interval_foreign_data s).
+  - exact (@foreign_data_normalized sql_date_period_foreign_data s).
 Defined.
 Next Obligation.
   destruct a.
   - exact (@foreign_data_normalize_normalizes sql_date_foreign_data s).
-  - exact (@foreign_data_normalize_normalizes sql_date_interval_foreign_data s).
+  - exact (@foreign_data_normalize_normalizes sql_date_period_foreign_data s).
 Defined.
 Next Obligation.
   constructor.
   destruct 1.
   - exact (@toString _ (@foreign_data_tostring sql_date_foreign_data) s).
-  - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
+  - exact (@toString _ (@foreign_data_tostring sql_date_period_foreign_data) s).
 Defined.
 
 Definition denhancedsqldate td := dforeign (enhancedsqldate td).
-Definition denhancedsqldateinterval td := dforeign (enhancedsqldateinterval td).
+Definition denhancedsqldateperiod td := dforeign (enhancedsqldateperiod td).
 
 Inductive enhanced_unary_op :=
 | enhanced_unary_sql_date_op : sql_date_unary_op -> enhanced_unary_op
@@ -122,8 +122,8 @@ Definition sql_date_unary_op_interp (op:sql_date_unary_op) (d:data) : option dat
     lift dnat (ondsqldate SQL_DATE_get_day d)
   | uop_sql_date_from_string =>
     lift denhancedsqldate (ondstring SQL_DATE_from_string d)
-  | uop_sql_date_interval_from_string =>
-    lift denhancedsqldateinterval (ondstring SQL_DATE_INTERVAL_from_string d)
+  | uop_sql_date_period_from_string =>
+    lift denhancedsqldateperiod (ondstring SQL_DATE_PERIOD_from_string d)
   end.
 
 Definition uri_unary_op_interp (op:uri_unary_op) (d:data) : option data :=
@@ -146,13 +146,13 @@ Definition sql_date_binary_op_interp
   match op with
   | bop_sql_date_plus
     => match d1, d2 with
-       | dforeign (enhancedsqldate tp), dforeign (enhancedsqldateinterval td)
+       | dforeign (enhancedsqldate tp), dforeign (enhancedsqldateperiod td)
          => Some (denhancedsqldate (SQL_DATE_plus tp td))
        | _,_ => None
        end
   | bop_sql_date_minus
     => match d1, d2 with
-       | dforeign (enhancedsqldate tp), dforeign (enhancedsqldateinterval td)
+       | dforeign (enhancedsqldate tp), dforeign (enhancedsqldateperiod td)
          => Some (denhancedsqldate (SQL_DATE_minus tp td))
        | _,_ => None
        end
@@ -161,8 +161,8 @@ Definition sql_date_binary_op_interp
   | bop_sql_date_le => rondboolsqldate2 SQL_DATE_le d1 d2
   | bop_sql_date_gt => rondboolsqldate2 SQL_DATE_gt d1 d2
   | bop_sql_date_ge => rondboolsqldate2 SQL_DATE_ge d1 d2
-  | bop_sql_date_interval_between =>
-    lift denhancedsqldateinterval (ondsqldate2 SQL_DATE_INTERVAL_between d1 d2)
+  | bop_sql_date_period_between =>
+    lift denhancedsqldateperiod (ondsqldate2 SQL_DATE_PERIOD_between d1 d2)
   | bop_sql_date_set_component sql_date_YEAR =>
     lift denhancedsqldate (ondsqldatez2 SQL_DATE_set_year d1 d2)
   | bop_sql_date_set_component sql_date_MONTH =>
@@ -203,7 +203,7 @@ Defined.
 Next Obligation.
   destruct op; simpl in H.
   - destruct s; simpl in H;
-      unfold ondsqldate, denhancedsqldate, denhancedsqldateinterval, lift in H; simpl in H;
+      unfold ondsqldate, denhancedsqldate, denhancedsqldateperiod, lift in H; simpl in H;
         destruct d; simpl in H; try (destruct s; discriminate); try discriminate.
     + destruct s; destruct f; invcs H; repeat constructor.
     + invcs H; repeat constructor.

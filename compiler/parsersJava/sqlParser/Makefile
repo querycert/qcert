@@ -56,3 +56,5 @@ clean:
 cleanall: clean
 	@rm -f $(DEPENDENCIES)
 
+cleanmost: clean
+

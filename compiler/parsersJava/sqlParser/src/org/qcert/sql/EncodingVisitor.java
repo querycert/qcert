@@ -557,7 +557,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitIntervalLiteral(IntervalLiteral node, StringBuilder builder) {
-		nodeWithString("interval", node.getValue(), builder);
+		nodeWithString("period", node.getValue(), builder);
 		if (node.getSign() == Sign.NEGATIVE) {
 			builder.append("(negative) ");
 		}

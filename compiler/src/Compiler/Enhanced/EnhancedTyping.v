@@ -40,7 +40,7 @@ Require Import EnhancedTypeToJSON.
 Require Import EnhancedRuntime.
 
 Definition SqlDate {br:brand_relation} : rtype := Foreign enhancedSqlDate.
-Definition SqlDateInterval {br:brand_relation} : rtype := Foreign enhancedSqlDateInterval.
+Definition SqlDatePeriod {br:brand_relation} : rtype := Foreign enhancedSqlDatePeriod.
 
 Definition isSqlDate {model : brand_model} (τ:rtype) :=
   match proj1_sig τ with
@@ -48,9 +48,9 @@ Definition isSqlDate {model : brand_model} (τ:rtype) :=
   | _ => false
   end.
 
-Definition isSqlDateInterval {model : brand_model} (τ:rtype) :=
+Definition isSqlDatePeriod {model : brand_model} (τ:rtype) :=
   match proj1_sig τ with
-  | Foreign₀ enhancedSqlDateInterval => true
+  | Foreign₀ enhancedSqlDatePeriod => true
   | _ => false
   end.
 
@@ -88,7 +88,7 @@ Defined.
 Inductive sql_date_unary_op_has_type {model:brand_model} : sql_date_unary_op -> rtype -> rtype -> Prop :=
 | tuop_sql_date_get_component part : sql_date_unary_op_has_type (uop_sql_date_get_component part) SqlDate Nat
 | tuop_sql_date_from_string : sql_date_unary_op_has_type uop_sql_date_from_string RType.String SqlDate
-| tuop_sql_date_interval_from_string : sql_date_unary_op_has_type uop_sql_date_interval_from_string RType.String SqlDateInterval
+| tuop_sql_date_period_from_string : sql_date_unary_op_has_type uop_sql_date_period_from_string RType.String SqlDatePeriod
 .
 
 Inductive uri_unary_op_has_type {model:brand_model} : uri_unary_op -> rtype -> rtype -> Prop :=
@@ -102,8 +102,8 @@ Definition sql_date_unary_op_type_infer {model : brand_model} (op:sql_date_unary
     if isSqlDate τ₁ then Some Nat else None
   | uop_sql_date_from_string =>
     if isString τ₁ then Some SqlDate else None
-  | uop_sql_date_interval_from_string =>
-    if isString τ₁ then Some SqlDateInterval else None
+  | uop_sql_date_period_from_string =>
+    if isString τ₁ then Some SqlDatePeriod else None
   end.
 
 Definition uri_unary_op_type_infer {model : brand_model} (op:uri_unary_op) (τ₁:rtype) : option rtype :=
@@ -120,8 +120,8 @@ Definition sql_date_unary_op_type_infer_sub {model : brand_model} (op:sql_date_u
     enforce_unary_op_schema (τ₁,SqlDate) Nat
   | uop_sql_date_from_string =>
     enforce_unary_op_schema (τ₁,RType.String) SqlDate
-  | uop_sql_date_interval_from_string =>
-    enforce_unary_op_schema (τ₁,RType.String) SqlDateInterval
+  | uop_sql_date_period_from_string =>
+    enforce_unary_op_schema (τ₁,RType.String) SqlDatePeriod
   end.
 
 Lemma sql_date_unary_op_typing_sound {model : brand_model}
@@ -136,14 +136,14 @@ Proof.
     try solve[inversion 1; subst;
               try invcs H0;
               try invcs H3;
-              simpl; unfold denhancedsqldate, denhancedsqldateinterval; simpl;
+              simpl; unfold denhancedsqldate, denhancedsqldateperiod; simpl;
               eexists; split; try reflexivity; repeat constructor;
               repeat constructor].
   destruct part;
     inversion 1; subst;
       try invcs H0;
       try invcs H3;
-      simpl; unfold denhancedsqldate, denhancedsqldateinterval; simpl;
+      simpl; unfold denhancedsqldate, denhancedsqldateperiod; simpl;
         eexists; split; try reflexivity; repeat constructor;
           destruct part; repeat constructor.
 Qed.
@@ -306,9 +306,9 @@ Inductive sql_date_binary_op_has_type {model:brand_model} :
   sql_date_binary_op -> rtype -> rtype -> rtype -> Prop
   :=
   | tbop_sql_date_plus :
-      sql_date_binary_op_has_type bop_sql_date_plus SqlDate SqlDateInterval SqlDate 
+      sql_date_binary_op_has_type bop_sql_date_plus SqlDate SqlDatePeriod SqlDate 
   | tbop_sql_date_minus :
-      sql_date_binary_op_has_type bop_sql_date_minus SqlDate SqlDateInterval SqlDate 
+      sql_date_binary_op_has_type bop_sql_date_minus SqlDate SqlDatePeriod SqlDate 
   | tbop_sql_date_ne :
       sql_date_binary_op_has_type bop_sql_date_ne SqlDate SqlDate Bool 
   | tbop_sql_date_lt :
@@ -319,17 +319,17 @@ Inductive sql_date_binary_op_has_type {model:brand_model} :
       sql_date_binary_op_has_type bop_sql_date_gt SqlDate SqlDate Bool 
   | tbop_sql_date_ge :
       sql_date_binary_op_has_type bop_sql_date_ge SqlDate SqlDate Bool
-  | tbop_sql_date_interval_between  :
-      sql_date_binary_op_has_type bop_sql_date_interval_between SqlDate SqlDate SqlDateInterval
+  | tbop_sql_date_period_between  :
+      sql_date_binary_op_has_type bop_sql_date_period_between SqlDate SqlDate SqlDatePeriod
   | tbop_sql_date_set_component part : sql_date_binary_op_has_type (bop_sql_date_set_component part) SqlDate Nat SqlDate
 .
 
 Definition sql_date_binary_op_type_infer {model : brand_model} (op:sql_date_binary_op) (τ₁ τ₂:rtype) :=
   match op with
   | bop_sql_date_plus =>
-    if isSqlDate τ₁ && isSqlDateInterval τ₂ then Some SqlDate else None
+    if isSqlDate τ₁ && isSqlDatePeriod τ₂ then Some SqlDate else None
   | bop_sql_date_minus =>
-    if isSqlDate τ₁ && isSqlDateInterval τ₂ then Some SqlDate else None
+    if isSqlDate τ₁ && isSqlDatePeriod τ₂ then Some SqlDate else None
   | bop_sql_date_ne =>
     if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
   | bop_sql_date_lt =>
@@ -340,8 +340,8 @@ Definition sql_date_binary_op_type_infer {model : brand_model} (op:sql_date_bina
     if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
   | bop_sql_date_ge =>
     if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
-  | bop_sql_date_interval_between  =>
-    if isSqlDate τ₁ && isSqlDate τ₂ then Some SqlDateInterval else None
+  | bop_sql_date_period_between  =>
+    if isSqlDate τ₁ && isSqlDate τ₂ then Some SqlDatePeriod else None
   | bop_sql_date_set_component part =>
     if isSqlDate τ₁ && isNat τ₂ then Some SqlDate else None
   end.
@@ -370,16 +370,16 @@ Qed.
 
 Definition sql_date_binary_op_type_infer_sub {model : brand_model} (op:sql_date_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype) :=
   match op with
-  | bop_sql_date_plus => enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDateInterval) SqlDate
-  | bop_sql_date_minus => enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDateInterval) SqlDate
+  | bop_sql_date_plus => enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDatePeriod) SqlDate
+  | bop_sql_date_minus => enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDatePeriod) SqlDate
   | bop_sql_date_ne
   | bop_sql_date_lt
   | bop_sql_date_le
   | bop_sql_date_gt
   | bop_sql_date_ge =>
     enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDate) Bool
-  | bop_sql_date_interval_between  =>
-    enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDate) SqlDateInterval
+  | bop_sql_date_period_between  =>
+    enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDate) SqlDatePeriod
   | bop_sql_date_set_component part =>
     enforce_binary_op_schema (τ₁,SqlDate) (τ₂,Nat) SqlDate
   end.
@@ -407,7 +407,7 @@ Proof.
   destruct fb; simpl.
   - destruct s; simpl in *;
       destruct τ₁; destruct τ₂; simpl in *; try discriminate;
-        unfold isSqlDate, isSqlDateInterval, isNat in *
+        unfold isSqlDate, isSqlDatePeriod, isNat in *
         ; destruct x; simpl in H; try discriminate
         ; destruct ft; simpl in H; try discriminate
         ; destruct x0; simpl in H; try discriminate
@@ -431,7 +431,7 @@ Proof.
   destruct fb; simpl.
   - destruct s; simpl in *;
       destruct τ₁; destruct τ₂; simpl in *; try discriminate
-      ; unfold isSqlDate, isSqlDateInterval, isNat in *
+      ; unfold isSqlDate, isSqlDatePeriod, isNat in *
       ; destruct x; simpl in H; try discriminate
       ; destruct ft; simpl in H; try discriminate
       ; destruct x0; simpl in H; try discriminate

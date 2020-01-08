@@ -28,39 +28,37 @@ import com.google.gson.JsonParser;
 /** Content of I/O files
  */
 public class QIO {
-
     JsonObject _schema;
     JsonArray _inheritance;
     JsonElement[] _output;
     JsonObject _input;
-
     /**
      * Parse the I/O file containing schema, input and output in JSON
      * @param ioFile the path to the I/O file
      * @return a QIO object
      */
     QIO(String ioFile) throws IOException {
-	JsonElement rawIo = new JsonParser().parse(new FileReader(ioFile));
-	if (rawIo.isJsonObject()) {
-	    // All acceptable input formats are JSON objects
-	    JsonObject io = rawIo.getAsJsonObject();
-	    // Attempt to obtain inheritance (else use empty array)
-	    if (io.has("schema")) {
-		_schema = io.get("schema").getAsJsonObject();
-		if (_schema.has("inheritance"))
-		    _inheritance = _schema.get("inheritance").getAsJsonArray();
-	    }
-	    if (_inheritance == null)
-		_inheritance = new JsonArray();
-	    // Attempt to obtain output (else leave output argument as is)
-	    _output = new JsonElement[1];
-	    if (io.has("output")) {
-		_output[0]= io.get("output");
-	    }
-	    // Let input contain just the input object
-	    if (io.has("input"))
-		_input = io.get("input").getAsJsonObject();
-	}
+        JsonElement rawIo = new JsonParser().parse(new FileReader(ioFile));
+        if (rawIo.isJsonObject()) {
+            // All acceptable input formats are JSON objects
+            JsonObject io = rawIo.getAsJsonObject();
+            // Attempt to obtain inheritance (else use empty array)
+            if (io.has("schema")) {
+                _schema = io.get("schema").getAsJsonObject();
+                if (_schema.has("inheritance"))
+                    _inheritance = _schema.get("inheritance").getAsJsonArray();
+            }
+            if (_inheritance == null)
+                _inheritance = new JsonArray();
+            // Attempt to obtain output (else leave output argument as is)
+            _output = new JsonElement[1];
+            if (io.has("output")) {
+                _output[0]= io.get("output");
+            }
+            // Let input contain just the input object
+            if (io.has("input"))
+                _input = io.get("input").getAsJsonObject();
+        }
     }
 
     /**
@@ -71,44 +69,44 @@ public class QIO {
      * @return a QIO object
      */
     QIO(String schemaFile, String inputFile, String outputFile) throws IOException {
-	if (inputFile == null) throw new IllegalArgumentException("Must have input file");
-	// Set the input
-	JsonElement rawInput = new JsonParser().parse(new FileReader(inputFile));
-	_input = rawInput.getAsJsonObject();
-	// Set the schema and inheritance
-	if (schemaFile != null) {
-	    JsonElement rawSchema = new JsonParser().parse(new FileReader(schemaFile));
-	    _schema = rawSchema.getAsJsonObject();
-	    if (_schema.has("inheritance"))
-		_inheritance = _schema.get("inheritance").getAsJsonArray();
-	}
-	if (_inheritance == null)
-	    _inheritance = new JsonArray();
-	// Set the output
-	_output = new JsonElement[1];
-	if (outputFile != null) {
-	    JsonElement rawOutput = new JsonParser().parse(new FileReader(outputFile));
-	    _output[0]= rawOutput;
-	}
+        if (inputFile == null) throw new IllegalArgumentException("Must have input file");
+        // Set the input
+        JsonElement rawInput = new JsonParser().parse(new FileReader(inputFile));
+        _input = rawInput.getAsJsonObject();
+        // Set the schema and inheritance
+        if (schemaFile != null) {
+            JsonElement rawSchema = new JsonParser().parse(new FileReader(schemaFile));
+            _schema = rawSchema.getAsJsonObject();
+            if (_schema.has("inheritance"))
+                _inheritance = _schema.get("inheritance").getAsJsonArray();
+        }
+        if (_inheritance == null)
+            _inheritance = new JsonArray();
+        // Set the output
+        _output = new JsonElement[1];
+        if (outputFile != null) {
+            JsonElement rawOutput = new JsonParser().parse(new FileReader(outputFile));
+            _output[0]= rawOutput;
+        }
     }
 
     // Return schema
     public JsonObject getSchema() {
-	return _schema;
+        return _schema;
     }
 	
     // Return inheritance derivation
     public JsonArray getInheritance() {
-	return _inheritance;
+        return _inheritance;
     }
 	
     // Return expected output
     public JsonElement[] getOutput() {
-	return _output;
+        return _output;
     }
 	
     // Return input
     public JsonObject getInput() {
-	return _input;
+        return _input;
     }
 }

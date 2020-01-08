@@ -42,7 +42,7 @@ Next Obligation.
   - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_foreign_data) s s0).
     + left; congruence.
     + right; congruence.
-  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_interval_foreign_data) s s0).
+  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_period_foreign_data) s s0).
     + left; congruence.
     + right; congruence.
 Defined.
@@ -50,18 +50,18 @@ Next Obligation.
   (* normalized? *)
   destruct a.
   - exact (@foreign_data_normalized sql_date_foreign_data s).
-  - exact (@foreign_data_normalized sql_date_interval_foreign_data s).
+  - exact (@foreign_data_normalized sql_date_period_foreign_data s).
 Defined.
 Next Obligation.
   destruct a.
   - exact (@foreign_data_normalize_normalizes sql_date_foreign_data s).
-  - exact (@foreign_data_normalize_normalizes sql_date_interval_foreign_data s).
+  - exact (@foreign_data_normalize_normalizes sql_date_period_foreign_data s).
 Defined.
 Next Obligation.
   constructor.
   destruct 1.
   - exact (@toString _ (@foreign_data_tostring sql_date_foreign_data) s).
-  - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
+  - exact (@toString _ (@foreign_data_tostring sql_date_period_foreign_data) s).
 Defined.
 
 Inductive enhanced_foreign_ejson_runtime_op :=
@@ -172,35 +172,35 @@ Definition enhanced_ejson_sql_date_runtime_op_interp op (dl:list ejson) : option
            Some (ejforeign (enhancedsqldate (SQL_DATE_set_day fd n)))
          | _, _ => None
          end) dl
-  | EJsonRuntimeDurationFromString =>
+  | EJsonRuntimePeriodFromString =>
     apply_unary
       (fun d : ejson =>
          match d with
-         | ejstring s => Some (ejforeign (enhancedsqldateinterval (SQL_DATE_INTERVAL_from_string s)))
+         | ejstring s => Some (ejforeign (enhancedsqldateperiod (SQL_DATE_PERIOD_from_string s)))
          | _ => None
          end) dl
-  | EJsonRuntimeDurationPlus =>
+  | EJsonRuntimePeriodPlus =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
-         | ejforeign (enhancedsqldate fd), ejforeign (enhancedsqldateinterval id) =>
+         | ejforeign (enhancedsqldate fd), ejforeign (enhancedsqldateperiod id) =>
            Some (ejforeign (enhancedsqldate (SQL_DATE_plus fd id)))
          | _, _ => None
          end) dl
-  | EJsonRuntimeDurationMinus =>
+  | EJsonRuntimePeriodMinus =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
-         | ejforeign (enhancedsqldate fd), ejforeign (enhancedsqldateinterval id) =>
+         | ejforeign (enhancedsqldate fd), ejforeign (enhancedsqldateperiod id) =>
            Some (ejforeign (enhancedsqldate (SQL_DATE_minus fd id)))
          | _, _ => None
          end) dl
-  | EJsonRuntimeDurationBetween =>
+  | EJsonRuntimePeriodBetween =>
     apply_binary
       (fun d1 d2 : ejson =>
          match d1, d2 with
          | ejforeign (enhancedsqldate fd1), ejforeign (enhancedsqldate fd2) =>
-           Some (ejforeign (enhancedsqldateinterval (SQL_DATE_INTERVAL_between fd1 fd2)))
+           Some (ejforeign (enhancedsqldateperiod (SQL_DATE_PERIOD_between fd1 fd2)))
          | _, _ => None
          end) dl
   end.

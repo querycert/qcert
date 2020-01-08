@@ -29,6 +29,7 @@ Class foreign_to_json
              (fd:json) : option foreign_ejson_model
          ; foreign_to_json_from_ejson
              (j:foreign_ejson_model) : json
+         (* XXX TO ADD BACK 
          ; foreign_to_json_to_ejson_to_json (fd:foreign_ejson_model) :
-             foreign_to_json_to_ejson (foreign_to_json_from_ejson fd) = Some fd
+             foreign_to_json_to_ejson (foreign_to_json_from_ejson fd) = Some fd *)
        }.

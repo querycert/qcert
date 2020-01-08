@@ -1,0 +1,1686 @@
+{
+  "lineitem": [
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 3,
+            "day": 20
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.02
+      },
+      "l_shipmode": "AIR",
+      "l_suppkey": {
+        "$nat": 4
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 3,
+            "day": 13
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 3,
+            "day": 17
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 53
+      },
+      "l_orderkey": {
+        "$nat": 1
+      },
+      "l_quantity": {
+        "$nat": 217
+      },
+      "l_linestatus": "O",
+      "l_comment": "egular courts above the",
+      "l_extendedprice": {
+        "$nat": 17954.55
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.04
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 4,
+            "day": 20
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.06
+      },
+      "l_shipmode": "MAIL",
+      "l_suppkey": {
+        "$nat": 9
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 4,
+            "day": 12
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 2,
+            "day": 28
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 68
+      },
+      "l_orderkey": {
+        "$nat": 1
+      },
+      "l_quantity": {
+        "$nat": 36
+      },
+      "l_linestatus": "O",
+      "l_comment": "ly final dependencies: slyly bold ",
+      "l_extendedprice": {
+        "$nat": 34850.16
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.09
+      },
+      "l_shipinstruct": "TAKE BACK RETURN"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 1,
+            "day": 31
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.02
+      },
+      "l_shipmode": "REG AIR",
+      "l_suppkey": {
+        "$nat": 5
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 1,
+            "day": 29
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 3,
+            "day": 5
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 64
+      },
+      "l_orderkey": {
+        "$nat": 1
+      },
+      "l_quantity": {
+        "$nat": 8
+      },
+      "l_linestatus": "O",
+      "l_comment": "riously. regular, express dep",
+      "l_extendedprice": {
+        "$nat": 7712.48
+      },
+      "l_linenumber": {
+        "$nat": 3
+      },
+      "l_discount": {
+        "$nat": 0.1
+      },
+      "l_shipinstruct": "TAKE BACK RETURN"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 5,
+            "day": 16
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.06
+      },
+      "l_shipmode": "AIR",
+      "l_suppkey": {
+        "$nat": 6
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 4,
+            "day": 21
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 3,
+            "day": 30
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 3
+      },
+      "l_orderkey": {
+        "$nat": 1
+      },
+      "l_quantity": {
+        "$nat": 28
+      },
+      "l_linestatus": "O",
+      "l_comment": "lites. fluffily even de",
+      "l_extendedprice": {
+        "$nat": 25284.0
+      },
+      "l_linenumber": {
+        "$nat": 4
+      },
+      "l_discount": {
+        "$nat": 0.09
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 4,
+            "day": 1
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.04
+      },
+      "l_shipmode": "FOB",
+      "l_suppkey": {
+        "$nat": 8
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 3,
+            "day": 30
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 3,
+            "day": 14
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 25
+      },
+      "l_orderkey": {
+        "$nat": 1
+      },
+      "l_quantity": {
+        "$nat": 24
+      },
+      "l_linestatus": "O",
+      "l_comment": " pending foxes. slyly re",
+      "l_extendedprice": {
+        "$nat": 22200.48
+      },
+      "l_linenumber": {
+        "$nat": 5
+      },
+      "l_discount": {
+        "$nat": 0.1
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 2,
+            "day": 3
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.02
+      },
+      "l_shipmode": "MAIL",
+      "l_suppkey": {
+        "$nat": 3
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 1,
+            "day": 30
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 2,
+            "day": 7
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 16
+      },
+      "l_orderkey": {
+        "$nat": 1
+      },
+      "l_quantity": {
+        "$nat": 32
+      },
+      "l_linestatus": "O",
+      "l_comment": "arefully slyly ex",
+      "l_extendedprice": {
+        "$nat": 29312.32
+      },
+      "l_linenumber": {
+        "$nat": 6
+      },
+      "l_discount": {
+        "$nat": 0.07
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 2,
+            "day": 2
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.05
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 2
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 1,
+            "day": 28
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 1,
+            "day": 14
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 107
+      },
+      "l_orderkey": {
+        "$nat": 2
+      },
+      "l_quantity": {
+        "$nat": 38
+      },
+      "l_linestatus": "O",
+      "l_comment": "ven requests. deposits breach a",
+      "l_extendedprice": {
+        "$nat": 38269.8
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.0
+      },
+      "l_shipinstruct": "TAKE BACK RETURN"
+    },
+    {
+      "l_returnflag": "R",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 4
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.0
+      },
+      "l_shipmode": "AIR",
+      "l_suppkey": {
+        "$nat": 2
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 2,
+            "day": 2
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 2,
+            "day": 23
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 5
+      },
+      "l_orderkey": {
+        "$nat": 3
+      },
+      "l_quantity": {
+        "$nat": 14
+      },
+      "l_linestatus": "F",
+      "l_comment": "ongside of the furiously brave acco",
+      "l_extendedprice": {
+        "$nat": 40725.0
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.06
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "R",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 20
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.0
+      },
+      "l_shipmode": "AIR",
+      "l_suppkey": {
+        "$nat": 10
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 9
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 24
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 20
+      },
+      "l_orderkey": {
+        "$nat": 3
+      },
+      "l_quantity": {
+        "$nat": 9
+      },
+      "l_linestatus": "F",
+      "l_comment": " unusual accounts. eve",
+      "l_extendedprice": {
+        "$nat": 45080.98
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.1
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "A",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 23
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.07
+      },
+      "l_shipmode": "SHIP",
+      "l_suppkey": {
+        "$nat": 8
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 16
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1993,
+            "month": 11,
+            "day": 22
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 129
+      },
+      "l_orderkey": {
+        "$nat": 3
+      },
+      "l_quantity": {
+        "$nat": 27
+      },
+      "l_linestatus": "F",
+      "l_comment": "nal foxes wake. ",
+      "l_extendedprice": {
+        "$nat": 27786.24
+      },
+      "l_linenumber": {
+        "$nat": 3
+      },
+      "l_discount": {
+        "$nat": 0.06
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "A",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 7
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.06
+      },
+      "l_shipmode": "TRUCK",
+      "l_suppkey": {
+        "$nat": 5
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1993,
+            "month": 12,
+            "day": 4
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 8
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 30
+      },
+      "l_orderkey": {
+        "$nat": 3
+      },
+      "l_quantity": {
+        "$nat": 2
+      },
+      "l_linestatus": "F",
+      "l_comment": "y. fluffily pending d",
+      "l_extendedprice": {
+        "$nat": 1860.06
+      },
+      "l_linenumber": {
+        "$nat": 4
+      },
+      "l_discount": {
+        "$nat": 0.01
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "R",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 10
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.0
+      },
+      "l_shipmode": "FOB",
+      "l_suppkey": {
+        "$nat": 5
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1993,
+            "month": 12,
+            "day": 14
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 11
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 184
+      },
+      "l_orderkey": {
+        "$nat": 3
+      },
+      "l_quantity": {
+        "$nat": 28
+      },
+      "l_linestatus": "F",
+      "l_comment": "ages nag slyly pending",
+      "l_extendedprice": {
+        "$nat": 30357.04
+      },
+      "l_linenumber": {
+        "$nat": 5
+      },
+      "l_discount": {
+        "$nat": 0.04
+      },
+      "l_shipinstruct": "TAKE BACK RETURN"
+    },
+    {
+      "l_returnflag": "A",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1993,
+            "month": 12,
+            "day": 20
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.02
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 8
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1993,
+            "month": 10,
+            "day": 29
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1993,
+            "month": 12,
+            "day": 18
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 63
+      },
+      "l_orderkey": {
+        "$nat": 3
+      },
+      "l_quantity": {
+        "$nat": 26
+      },
+      "l_linestatus": "F",
+      "l_comment": "ges sleep after the caref",
+      "l_extendedprice": {
+        "$nat": 25039.56
+      },
+      "l_linenumber": {
+        "$nat": 6
+      },
+      "l_discount": {
+        "$nat": 0.1
+      },
+      "l_shipinstruct": "TAKE BACK RETURN"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 1,
+            "day": 18
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.08
+      },
+      "l_shipmode": "REG AIR",
+      "l_suppkey": {
+        "$nat": 10
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 1,
+            "day": 10
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 12,
+            "day": 14
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 89
+      },
+      "l_orderkey": {
+        "$nat": 4
+      },
+      "l_quantity": {
+        "$nat": 30
+      },
+      "l_linestatus": "O",
+      "l_comment": "- quickly regular packages sleep. idly",
+      "l_extendedprice": {
+        "$nat": 29672.4
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.03
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "R",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 2,
+            "day": 23
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.0
+      },
+      "l_shipmode": "MAIL",
+      "l_suppkey": {
+        "$nat": 2
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 2,
+            "day": 2
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 1,
+            "day": 4
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 5
+      },
+      "l_orderkey": {
+        "$nat": 31
+      },
+      "l_quantity": {
+        "$nat": 14
+      },
+      "l_linestatus": "F",
+      "l_comment": "ongside of the furiously brave acco",
+      "l_extendedprice": {
+        "$nat": 40725.0
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.06
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 7,
+            "day": 31
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.07
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 5
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 7,
+            "day": 6
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 5,
+            "day": 14
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 2
+      },
+      "l_orderkey": {
+        "$nat": 65
+      },
+      "l_quantity": {
+        "$nat": 21
+      },
+      "l_linestatus": "O",
+      "l_comment": "bove the even packages. accounts nag carefu",
+      "l_extendedprice": {
+        "$nat": 18942.0
+      },
+      "l_linenumber": {
+        "$nat": 3
+      },
+      "l_discount": {
+        "$nat": 0.09
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "R",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 2,
+            "day": 20
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.08
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 10
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 2,
+            "day": 19
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 3,
+            "day": 11
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 116
+      },
+      "l_orderkey": {
+        "$nat": 66
+      },
+      "l_quantity": {
+        "$nat": 31
+      },
+      "l_linestatus": "F",
+      "l_comment": "ut the unusual accounts sleep at the bo",
+      "l_extendedprice": {
+        "$nat": 31499.41
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.0
+      },
+      "l_shipinstruct": "TAKE BACK RETURN"
+    },
+    {
+      "l_returnflag": "A",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 3,
+            "day": 18
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.07
+      },
+      "l_shipmode": "MAIL",
+      "l_suppkey": {
+        "$nat": 5
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 2,
+            "day": 21
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1994,
+            "month": 3,
+            "day": 1
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 174
+      },
+      "l_orderkey": {
+        "$nat": 66
+      },
+      "l_quantity": {
+        "$nat": 41
+      },
+      "l_linestatus": "F",
+      "l_comment": " regular de",
+      "l_extendedprice": {
+        "$nat": 44040.97
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.04
+      },
+      "l_shipinstruct": "COLLECT COD"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 20
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.04
+      },
+      "l_shipmode": "SHIP",
+      "l_suppkey": {
+        "$nat": 5
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 5,
+            "day": 17
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 31
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 22
+      },
+      "l_orderkey": {
+        "$nat": 67
+      },
+      "l_quantity": {
+        "$nat": 4
+      },
+      "l_linestatus": "O",
+      "l_comment": " cajole thinly expres",
+      "l_extendedprice": {
+        "$nat": 3688.08
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.09
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 22
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.05
+      },
+      "l_shipmode": "REG AIR",
+      "l_suppkey": {
+        "$nat": 10
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 27
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1995,
+            "month": 9,
+            "day": 21
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 21
+      },
+      "l_orderkey": {
+        "$nat": 67
+      },
+      "l_quantity": {
+        "$nat": 12
+      },
+      "l_linestatus": "O",
+      "l_comment": " even packages cajole",
+      "l_extendedprice": {
+        "$nat": 11052.24
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.09
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 2,
+            "day": 21
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.07
+      },
+      "l_shipmode": "TRUCK",
+      "l_suppkey": {
+        "$nat": 4
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 2,
+            "day": 20
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 2,
+            "day": 12
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 174
+      },
+      "l_orderkey": {
+        "$nat": 67
+      },
+      "l_quantity": {
+        "$nat": 5
+      },
+      "l_linestatus": "O",
+      "l_comment": "y unusual packages thrash pinto ",
+      "l_extendedprice": {
+        "$nat": 5370.85
+      },
+      "l_linenumber": {
+        "$nat": 3
+      },
+      "l_discount": {
+        "$nat": 0.03
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 4,
+            "day": 13
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.06
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 9
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 3,
+            "day": 18
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1997,
+            "month": 1,
+            "day": 29
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 88
+      },
+      "l_orderkey": {
+        "$nat": 67
+      },
+      "l_quantity": {
+        "$nat": 44
+      },
+      "l_linestatus": "O",
+      "l_comment": "se quickly above the even, express reques",
+      "l_extendedprice": {
+        "$nat": 43475.52
+      },
+      "l_linenumber": {
+        "$nat": 4
+      },
+      "l_discount": {
+        "$nat": 0.08
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "R",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 5,
+            "day": 1
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.06
+      },
+      "l_shipmode": "SHIP",
+      "l_suppkey": {
+        "$nat": 9
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 4,
+            "day": 10
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 4,
+            "day": 16
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 30
+      },
+      "l_orderkey": {
+        "$nat": 1282
+      },
+      "l_quantity": {
+        "$nat": 10
+      },
+      "l_linestatus": "F",
+      "l_comment": "r theodolite",
+      "l_extendedprice": {
+        "$nat": 9300.3
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.09
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "R",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 5,
+            "day": 13
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.03
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 1
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 5,
+            "day": 7
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 4,
+            "day": 7
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 160
+      },
+      "l_orderkey": {
+        "$nat": 1282
+      },
+      "l_quantity": {
+        "$nat": 19
+      },
+      "l_linestatus": "F",
+      "l_comment": "ts x-ray across the furi",
+      "l_extendedprice": {
+        "$nat": 20143.04
+      },
+      "l_linenumber": {
+        "$nat": 3
+      },
+      "l_discount": {
+        "$nat": 0.01
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "A",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 7,
+            "day": 5
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.05
+      },
+      "l_shipmode": "REG AIR",
+      "l_suppkey": {
+        "$nat": 10
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 6,
+            "day": 20
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1992,
+            "month": 4,
+            "day": 17
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 59
+      },
+      "l_orderkey": {
+        "$nat": 1282
+      },
+      "l_quantity": {
+        "$nat": 19
+      },
+      "l_linestatus": "F",
+      "l_comment": "nto beans. carefully close theodo",
+      "l_extendedprice": {
+        "$nat": 18221.95
+      },
+      "l_linenumber": {
+        "$nat": 4
+      },
+      "l_discount": {
+        "$nat": 0.0
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 11,
+            "day": 12
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.03
+      },
+      "l_shipmode": "TRUCK",
+      "l_suppkey": {
+        "$nat": 7
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 21
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 29
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 93
+      },
+      "l_orderkey": {
+        "$nat": 1283
+      },
+      "l_quantity": {
+        "$nat": 47
+      },
+      "l_linestatus": "O",
+      "l_comment": "even instructions boost slyly blithely ",
+      "l_extendedprice": {
+        "$nat": 46675.23
+      },
+      "l_linenumber": {
+        "$nat": 1
+      },
+      "l_discount": {
+        "$nat": 0.05
+      },
+      "l_shipinstruct": "DELIVER IN PERSON"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 8
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.08
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 1
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 7
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 12
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 106
+      },
+      "l_orderkey": {
+        "$nat": 1283
+      },
+      "l_quantity": {
+        "$nat": 1
+      },
+      "l_linestatus": "O",
+      "l_comment": "d the sauternes. slyly ev",
+      "l_extendedprice": {
+        "$nat": 1006.1
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.0
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 8
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.08
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 1
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 7
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 12
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 19
+      },
+      "l_orderkey": {
+        "$nat": 1284
+      },
+      "l_quantity": {
+        "$nat": 1
+      },
+      "l_linestatus": "O",
+      "l_comment": "d the sauternes. slyly ev",
+      "l_extendedprice": {
+        "$nat": 1006.1
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.0
+      },
+      "l_shipinstruct": "NONE"
+    },
+    {
+      "l_returnflag": "N",
+      "l_receiptdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 8
+          }
+        }
+      },
+      "l_tax": {
+        "$nat": 0.08
+      },
+      "l_shipmode": "RAIL",
+      "l_suppkey": {
+        "$nat": 1
+      },
+      "l_shipdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 7
+          }
+        }
+      },
+      "l_commitdate": {
+        "$foreign": {
+          "$date": {
+            "year": 1996,
+            "month": 10,
+            "day": 12
+          }
+        }
+      },
+      "l_partkey": {
+        "$nat": 19
+      },
+      "l_orderkey": {
+        "$nat": 1284
+      },
+      "l_quantity": {
+        "$nat": 100
+      },
+      "l_linestatus": "O",
+      "l_comment": "d the sauternes. slyly ev",
+      "l_extendedprice": {
+        "$nat": 1006.1
+      },
+      "l_linenumber": {
+        "$nat": 2
+      },
+      "l_discount": {
+        "$nat": 0.0
+      },
+      "l_shipinstruct": "NONE"
+    }
+  ]
+}

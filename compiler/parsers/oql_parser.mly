@@ -77,6 +77,14 @@
 	        end
 	      in
 	      QOQL.ounop (QOps.Unary.opsubstring start (Some len)) e1
+    | "date", [e] ->
+        QOQL.ounop Compiler.CompEnhanced.Enhanced.Ops.Unary.sql_date_from_string e
+    | "getYear", [e] ->
+        QOQL.ounop (Compiler.CompEnhanced.Enhanced.Ops.Unary.sql_date_get_component Sql_date_YEAR) e
+    | "encode", [e] ->
+        QOQL.ounop Compiler.CompEnhanced.Enhanced.Ops.Unary.uri_encode e
+    | "decode", [e] ->
+        QOQL.ounop Compiler.CompEnhanced.Enhanced.Ops.Unary.uri_decode e
     | _, _ ->
 	      raise (Qcert_Error
 		             ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))

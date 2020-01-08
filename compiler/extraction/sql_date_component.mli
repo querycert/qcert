@@ -13,16 +13,17 @@
  *)
 
 (** Interval *)
-type interval
-val interval_eq : interval -> interval -> bool
-val interval_to_string : interval -> char list
-val interval_from_string : char list -> interval
+type period
+val period_eq : period -> period -> bool
+val period_to_string : period -> char list
+val period_from_string : char list -> period
 
 (** Date *)
 type date
 
 val date_to_string : date -> char list
 val date_from_string : char list -> date
+val date_from_parts : int -> int -> int -> date
 
 (** Comparisons *)
 val date_eq : date -> date -> bool
@@ -43,7 +44,7 @@ val set_month : date -> int -> date
 val set_year : date -> int -> date
 
 (** Arithmetics *)
-val between : date -> date -> interval
-val plus : date -> interval -> date
-val minus : date -> interval -> date
+val between : date -> date -> period
+val plus : date -> period -> date
+val minus : date -> period -> date
 

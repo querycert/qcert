@@ -36,7 +36,7 @@ Inductive enhanced_type : Set :=
 | enhancedTop : enhanced_type
 | enhancedBottom : enhanced_type
 | enhancedSqlDate : enhanced_type
-| enhancedSqlDateInterval : enhanced_type
+| enhancedSqlDatePeriod : enhanced_type
 .
 
 Definition enhanced_type_to_string (et:enhanced_type) : string :=
@@ -44,7 +44,7 @@ Definition enhanced_type_to_string (et:enhanced_type) : string :=
   | enhancedTop => "ETop"
   | enhancedBottom => "EBottom"
   | enhancedSqlDate => "ESqlDate"
-  | enhancedSqlDateInterval => "ESqlDateInterval"
+  | enhancedSqlDatePeriod => "ESqlDatePeriod"
   end.
 
 Definition string_to_enhanced_type (s:string) : option enhanced_type :=
@@ -52,7 +52,7 @@ Definition string_to_enhanced_type (s:string) : option enhanced_type :=
   | "ETop"%string => Some enhancedTop
   | "EBottom"%string => Some enhancedBottom
   | "ESqlDate"%string => Some enhancedSqlDate
-  | "ESqlDateInterval"%string => Some enhancedSqlDateInterval
+  | "ESqlDatePeriod"%string => Some enhancedSqlDatePeriod
   | _ => None
   end.
 
@@ -61,7 +61,7 @@ Definition enhanced_type_join (t1 t2:enhanced_type)
      | enhancedBottom, _ => t2
      | _, enhancedBottom => t1
      | enhancedSqlDate, enhancedSqlDate => enhancedSqlDate
-     | enhancedSqlDateInterval, enhancedSqlDateInterval => enhancedSqlDateInterval
+     | enhancedSqlDatePeriod, enhancedSqlDatePeriod => enhancedSqlDatePeriod
      | _, _ => enhancedTop
      end.
 
@@ -70,7 +70,7 @@ Definition enhanced_type_meet (t1 t2:enhanced_type)
      | enhancedTop, _ => t2
      | _, enhancedTop => t1
      | enhancedSqlDate, enhancedSqlDate => enhancedSqlDate
-     | enhancedSqlDateInterval, enhancedSqlDateInterval => enhancedSqlDateInterval
+     | enhancedSqlDatePeriod, enhancedSqlDatePeriod => enhancedSqlDatePeriod
      | _, _ => enhancedBottom
      end.
 
