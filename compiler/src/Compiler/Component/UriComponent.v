@@ -55,14 +55,16 @@ Section UriOperators.
   End toString.
 
   Section toJava.
+    Definition cname : nstring := ^"UriComponent".
+
     (* Code generation *)
     Definition uri_to_java_unary_op
                (indent:nat) (eol:nstring)
                (quotel:nstring) (fu:uri_unary_op)
                (d:java_json) : java_json
       := match fu with
-         | uop_uri_encode => mk_java_unary_op0 (^"uriEncode") d
-         | uop_uri_decode => mk_java_unary_op0 (^"uriDecode") d
+         | uop_uri_encode => mk_java_unary_op0_foreign cname (^"uriEncode") d
+         | uop_uri_decode => mk_java_unary_op0_foreign cname (^"uriDecode") d
          end.
 
   End toJava.
