@@ -7,7 +7,7 @@ QCERT=../..
 SQLPARSER=$(QCERT)/compiler/parsersJava/sqlParser
 JAVASERVICE=$(QCERT)/compiler/parsersJava/javaService
 JAVASCRIPT=$(QCERT)/runtimes/javascript
-gQCERTCOMP=$(QCERT)/bin/qcert
+QCERTCOMP=$(QCERT)/bin/qcert
 
 # Set up Java classpath
 ifeq ($(OS),Windows_NT)

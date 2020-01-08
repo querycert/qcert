@@ -36,24 +36,21 @@ Import ListNotations.
      *)
 
 (** Axioms Section *)
-(* DATE_INTERVAL *)
-Axiom SQL_DATE_INTERVAL : Set.
-Extract Constant SQL_DATE_INTERVAL => "Sql_date_component.interval".
+(* DATE_PERIOD *)
+Axiom SQL_DATE_PERIOD : Set.
+Extract Constant SQL_DATE_PERIOD => "Sql_date_component.period".
 
-Axiom SQL_DATE_INTERVAL_eq : SQL_DATE_INTERVAL -> SQL_DATE_INTERVAL -> bool.
-Extract Inlined Constant SQL_DATE_INTERVAL_eq => "(fun x y -> Sql_date_component.interval_eq x y)".
+Axiom SQL_DATE_PERIOD_eq : SQL_DATE_PERIOD -> SQL_DATE_PERIOD -> bool.
+Extract Inlined Constant SQL_DATE_PERIOD_eq => "(fun x y -> Sql_date_component.period_eq x y)".
 
-Conjecture SQL_DATE_INTERVAL_eq_correct :
-  forall f1 f2, (SQL_DATE_INTERVAL_eq f1 f2 = true <-> f1 = f2).
+Conjecture SQL_DATE_PERIOD_eq_correct :
+  forall f1 f2, (SQL_DATE_PERIOD_eq f1 f2 = true <-> f1 = f2).
 
-Axiom SQL_DATE_INTERVAL_to_string : SQL_DATE_INTERVAL -> String.string.
-Extract Inlined Constant SQL_DATE_INTERVAL_to_string => "(fun x -> Sql_date_component.interval_to_string x)".
+Axiom SQL_DATE_PERIOD_to_string : SQL_DATE_PERIOD -> String.string.
+Extract Inlined Constant SQL_DATE_PERIOD_to_string => "(fun x -> Sql_date_component.period_to_string x)".
 
-Axiom SQL_DATE_INTERVAL_from_string : String.string -> SQL_DATE_INTERVAL.
-Extract Inlined Constant SQL_DATE_INTERVAL_from_string => "(fun x -> Sql_date_component.interval_from_string x)".
-
-Axiom SQL_DATE_INTERVAL_from_string_correct :
-  forall s, SQL_DATE_INTERVAL_from_string (SQL_DATE_INTERVAL_to_string s) = s.
+Axiom SQL_DATE_PERIOD_from_string : String.string -> SQL_DATE_PERIOD.
+Extract Inlined Constant SQL_DATE_PERIOD_from_string => "(fun x -> Sql_date_component.period_from_string x)".
 
 (* DATE *)
 Axiom SQL_DATE : Set.
@@ -70,9 +67,6 @@ Extract Inlined Constant SQL_DATE_to_string => "(fun x -> Sql_date_component.dat
 
 Axiom SQL_DATE_from_string : String.string -> SQL_DATE.
 Extract Inlined Constant SQL_DATE_from_string => "(fun x -> Sql_date_component.date_from_string x)".
-
-Axiom SQL_DATE_from_string_correct :
-  forall s, SQL_DATE_from_string (SQL_DATE_to_string s) = s.
 
 (* Operators *)
 Axiom SQL_DATE_ne : SQL_DATE -> SQL_DATE -> bool.
@@ -108,14 +102,18 @@ Extract Inlined Constant SQL_DATE_set_month => "(fun x y -> Sql_date_component.s
 Axiom SQL_DATE_set_day : SQL_DATE -> Z  -> SQL_DATE.
 Extract Inlined Constant SQL_DATE_set_day => "(fun x y -> Sql_date_component.set_day x y)".
 
-Axiom SQL_DATE_plus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
+Axiom SQL_DATE_plus : SQL_DATE -> SQL_DATE_PERIOD -> SQL_DATE.
 Extract Inlined Constant SQL_DATE_plus => "(fun x y -> Sql_date_component.plus x y)".
 
-Axiom SQL_DATE_minus : SQL_DATE -> SQL_DATE_INTERVAL -> SQL_DATE.
+Axiom SQL_DATE_minus : SQL_DATE -> SQL_DATE_PERIOD -> SQL_DATE.
 Extract Inlined Constant SQL_DATE_minus => "(fun x y -> Sql_date_component.minus x y)".
 
-Axiom SQL_DATE_INTERVAL_between : SQL_DATE -> SQL_DATE -> SQL_DATE_INTERVAL.
-Extract Inlined Constant SQL_DATE_INTERVAL_between => "(fun x y -> Sql_date_component.between x y)".
+Axiom SQL_DATE_PERIOD_between : SQL_DATE -> SQL_DATE -> SQL_DATE_PERIOD.
+Extract Inlined Constant SQL_DATE_PERIOD_between => "(fun x y -> Sql_date_component.between x y)".
+
+(* For serialization *)
+Axiom SQL_DATE_from_parts : Z -> Z -> Z -> SQL_DATE.
+Extract Inlined Constant SQL_DATE_from_parts => "(fun x y z -> Sql_date_component.date_from_parts x y z)".
 
 Section SqlDateModel.
   Inductive sql_date_component :=
@@ -125,18 +123,18 @@ Section SqlDateModel.
 
   (** Equality *)
   Section Equality.
-    Program Instance sql_date_interval_foreign_data : foreign_data
-      := {foreign_data_model := SQL_DATE_INTERVAL}.
+    Program Instance sql_date_period_foreign_data : foreign_data
+      := {foreign_data_model := SQL_DATE_PERIOD}.
     Next Obligation.
       intros x y.
-      case_eq (SQL_DATE_INTERVAL_eq x y); intros eqq.
+      case_eq (SQL_DATE_PERIOD_eq x y); intros eqq.
       + left.
         f_equal.
-        apply SQL_DATE_INTERVAL_eq_correct in eqq.
+        apply SQL_DATE_PERIOD_eq_correct in eqq.
         trivial.
       + right; intros eqq2.
         red in eqq2.
-        apply SQL_DATE_INTERVAL_eq_correct in eqq2. 
+        apply SQL_DATE_PERIOD_eq_correct in eqq2. 
         congruence.
     Defined.
     Next Obligation.
@@ -148,7 +146,7 @@ Section SqlDateModel.
     Next Obligation.
       constructor.
       intros f.
-      exact (SQL_DATE_INTERVAL_to_string f).
+      exact (SQL_DATE_PERIOD_to_string f).
     Defined.
 
     Program Instance sql_date_foreign_data : foreign_data
@@ -199,7 +197,7 @@ Section SqlDateOperators.
   Inductive sql_date_unary_op :=
   | uop_sql_date_get_component : sql_date_component -> sql_date_unary_op
   | uop_sql_date_from_string
-  | uop_sql_date_interval_from_string
+  | uop_sql_date_period_from_string
   .
 
   Inductive sql_date_binary_op :=
@@ -210,7 +208,7 @@ Section SqlDateOperators.
   | bop_sql_date_le
   | bop_sql_date_gt
   | bop_sql_date_ge
-  | bop_sql_date_interval_between
+  | bop_sql_date_period_between
   | bop_sql_date_set_component : sql_date_component -> sql_date_binary_op
   .
 
@@ -219,27 +217,7 @@ Section SqlDateOperators.
       match f with
       | uop_sql_date_get_component part => "(ASqlGetDateComponent" ++ (sql_date_component_tostring part) ++ ")"
       | uop_sql_date_from_string => "ASqlDateFromString"
-      | uop_sql_date_interval_from_string => "ASqlDateDurationFromString"
-      end.
-  End toString.
-
-  Section toJava.
-    Definition sql_date_component_to_java_string (part:sql_date_component): string :=
-      match part with
-      | sql_date_DAY => "UnaryOperators.DAY"
-      | sql_date_MONTH => "UnaryOperators.MONTH"
-      | sql_date_YEAR => "UnaryOperators.YEAR"
-      end.
-
-    Definition sql_date_to_java_unary_op
-               (indent:nat) (eol:nstring)
-               (quotel:nstring) (fu:sql_date_unary_op)
-               (d:java_json) : java_json :=
-      match fu with
-      | uop_sql_date_get_component part =>
-        mk_java_unary_op1 (^"sql_date_get_component") (^sql_date_component_to_java_string part) d
-      | uop_sql_date_from_string => mk_java_unary_op0 (^"sql_date_from_string") d
-      | uop_sql_date_interval_from_string => mk_java_unary_op0 (^"sql_date_interval_from_string") d
+      | uop_sql_date_period_from_string => "ASqlDatePeriodFromString"
       end.
 
     Definition sql_date_binary_op_tostring (f:sql_date_binary_op) : String.string :=
@@ -251,8 +229,26 @@ Section SqlDateOperators.
       | bop_sql_date_le => "ASqlDateLe"
       | bop_sql_date_gt => "ASqlDateGt"
       | bop_sql_date_ge => "ASqlDateGe"
-      | bop_sql_date_interval_between => "ASqlDateDurationBetween"
+      | bop_sql_date_period_between => "ASqlDatePeriodBetween"
       | bop_sql_date_set_component part => "(ASqlSetDateComponent" ++ (sql_date_component_tostring part) ++ ")"
+      end.
+  End toString.
+
+  Section toJava.
+    Definition cname : nstring := ^"SqlDateComponent".
+
+    Definition sql_date_component_to_java_string (part:sql_date_component): nstring :=
+      cname +++ ^"." +++ (^sql_date_component_tostring part).
+
+    Definition sql_date_to_java_unary_op
+               (indent:nat) (eol:nstring)
+               (quotel:nstring) (fu:sql_date_unary_op)
+               (d:java_json) : java_json :=
+      match fu with
+      | uop_sql_date_get_component part =>
+        mk_java_unary_op1_foreign cname (^"sql_date_get_component") (sql_date_component_to_java_string part) d
+      | uop_sql_date_from_string => mk_java_unary_op0_foreign cname (^"sql_date_from_string") d
+      | uop_sql_date_period_from_string => mk_java_unary_op0_foreign cname (^"sql_date_period_from_string") d
       end.
 
     Definition sql_date_to_java_binary_op
@@ -260,15 +256,15 @@ Section SqlDateOperators.
                (quotel:nstring) (fb:sql_date_binary_op)
                (d1 d2:java_json) : java_json :=
       match fb with
-      | bop_sql_date_plus => mk_java_binary_op0 (^"sql_date_plus") d1 d2
-      | bop_sql_date_minus => mk_java_binary_op0 (^"sql_date_minus") d1 d2
-      | bop_sql_date_ne =>  mk_java_binary_op0 (^"sql_date_ne") d1 d2
-      | bop_sql_date_lt =>  mk_java_binary_op0 (^"sql_date_lt") d1 d2
-      | bop_sql_date_le =>  mk_java_binary_op0 (^"sql_date_le") d1 d2
-      | bop_sql_date_gt =>  mk_java_binary_op0 (^"sql_date_gt") d1 d2
-      | bop_sql_date_ge => mk_java_binary_op0 (^"sql_date_ge") d1 d2
-      | bop_sql_date_interval_between => mk_java_binary_op0 (^"sql_date_interval_between") d1 d2
-      | bop_sql_date_set_component part => mk_java_binary_op0 (^"sql_date_set_component") d1 d2
+      | bop_sql_date_plus => mk_java_binary_op0_foreign cname (^"sql_date_plus") d1 d2
+      | bop_sql_date_minus => mk_java_binary_op0_foreign cname (^"sql_date_minus") d1 d2
+      | bop_sql_date_ne =>  mk_java_binary_op0_foreign cname (^"sql_date_ne") d1 d2
+      | bop_sql_date_lt =>  mk_java_binary_op0_foreign cname (^"sql_date_lt") d1 d2
+      | bop_sql_date_le =>  mk_java_binary_op0_foreign cname (^"sql_date_le") d1 d2
+      | bop_sql_date_gt =>  mk_java_binary_op0_foreign cname (^"sql_date_gt") d1 d2
+      | bop_sql_date_ge => mk_java_binary_op0_foreign cname (^"sql_date_ge") d1 d2
+      | bop_sql_date_period_between => mk_java_binary_op0_foreign cname (^"sql_date_period_between") d1 d2
+      | bop_sql_date_set_component part => mk_java_binary_opn_foreign cname (^"sql_date_set_component") [sql_date_component_to_java_string part] d1 d2
       end.
 
   End toJava.
@@ -287,10 +283,10 @@ Section SqlDateOperators.
     | EJsonRuntimeDateSetYear
     | EJsonRuntimeDateSetMonth
     | EJsonRuntimeDateSetDay
-    | EJsonRuntimeDurationFromString
-    | EJsonRuntimeDurationPlus
-    | EJsonRuntimeDurationMinus
-    | EJsonRuntimeDurationBetween
+    | EJsonRuntimePeriodFromString
+    | EJsonRuntimePeriodPlus
+    | EJsonRuntimePeriodMinus
+    | EJsonRuntimePeriodBetween
     .
 
     Definition ejson_sql_date_runtime_op_tostring op : string :=
@@ -307,10 +303,10 @@ Section SqlDateOperators.
       | EJsonRuntimeDateSetYear => "dateSetYear"
       | EJsonRuntimeDateSetMonth => "dateSetMonth"
       | EJsonRuntimeDateSetDay => "dateSetDay"
-      | EJsonRuntimeDurationFromString => "durationFromString"
-      | EJsonRuntimeDurationPlus => "durationPlus"
-      | EJsonRuntimeDurationMinus => "durationMinus"
-      | EJsonRuntimeDurationBetween => "durationBetween"
+      | EJsonRuntimePeriodFromString => "periodFromString"
+      | EJsonRuntimePeriodPlus => "periodPlus"
+      | EJsonRuntimePeriodMinus => "periodMinus"
+      | EJsonRuntimePeriodBetween => "periodBetween"
       end.
 
   End toEJson.

@@ -81,3 +81,4 @@ clean:
 cleanall: clean
 	@rm -f $(OSS_DEPENDENCIES) # Be careful not to delete jrules-engine.jar
 
+cleanmost: clean

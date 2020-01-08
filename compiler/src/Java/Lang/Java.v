@@ -74,30 +74,46 @@ Section Java.
     Definition mk_java_string (s:nstring) : nstring
       := nquotel_double +++ s +++ nquotel_double.
 
+    Definition mk_java_call (cname:nstring) (mname:nstring) (el:list java_json) : java_json
+      := mk_java_json
+           (cname
+              +++ ^"." +++ mname +++ ^"(" +++ (nstring_concat (^", ") (map from_java_json el)) +++ ^")").
+    
     Definition mk_java_unary_op0 (opname:nstring) (e:java_json) : java_json
-      := mk_java_json (^"UnaryOperators." +++ opname +++ ^"(" +++ (from_java_json e) +++ ^")").
+      := mk_java_call (^"UnaryOperators") opname [e].
 
-    Definition mk_java_unary_op1 (opname:nstring) (s:nstring) (e:java_json) : java_json :=
-      mk_java_json
-        (^"UnaryOperators." +++ opname +++ ^"(" +++ s +++ ^", " +++ (from_java_json e) +++ ^")").
+    Definition mk_java_unary_op1 (opname:nstring) (s:nstring) (e:java_json) : java_json
+      := mk_java_call (^"UnaryOperators") opname [mk_java_json s;e].
 
     Definition mk_java_unary_opn (opname:nstring) (sn:list nstring) (e:java_json) : java_json
-      := mk_java_json
-           (^"UnaryOperators."
-              +++ opname +++ ^"(" +++ (nstring_concat (^", ") (List.app sn [(from_java_json e)])) +++ ^")").
+      := mk_java_call (^"UnaryOperators") opname (app (map mk_java_json sn) [e]).
 
-    Definition mk_java_collection(typ:nstring) (s:list nstring) : nstring :=
-      ^"new RuntimeUtils.CollectionBuilder<"
-         +++ typ +++ ^">(" +++ (^nat_to_string10 (Datatypes.length s)) +++ (^")")
-                           +++ nstring_map_concat (^"") (fun elem => ^".add(" +++ elem +++ ^")") s
-                           +++ ^".result()".
+    Definition mk_java_binary_op0 (opname:nstring) (e1 e2:java_json) : java_json
+      := mk_java_call (^"BinaryOperators") opname [e1;e2].
 
-    Definition mk_java_string_collection(s:list nstring) : nstring :=
-      mk_java_collection (^"String") (map mk_java_string s).
+    Definition mk_java_binary_opn (opname:nstring) (sn:list nstring) (e1 e2:java_json) : java_json
+      := mk_java_call (^"BinaryOperators") opname (app (map mk_java_json sn) [e1;e2]).
 
-    Definition mk_java_binary_op0 (opname:nstring) (e1 e2:java_json) : java_json :=
-      mk_java_json (^"BinaryOperators."
-                       +++ opname +++ ^"(" +++ (from_java_json e1) +++ ^", " +++ (from_java_json e2) +++ ^")").
+    Definition mk_java_unary_op0_foreign (cname:nstring) (opname:nstring) (e:java_json) : java_json
+      := mk_java_call cname opname [e].
+
+    Definition mk_java_unary_op1_foreign (cname:nstring) (opname:nstring) (s:nstring) (e:java_json) : java_json
+      := mk_java_call cname opname [mk_java_json s;e].
+
+    Definition mk_java_binary_op0_foreign (cname:nstring) (opname:nstring) (e1 e2:java_json) : java_json
+      := mk_java_call cname opname [e1;e2].
+
+    Definition mk_java_binary_opn_foreign (cname:nstring) (opname:nstring) (sn:list nstring) (e1 e2:java_json) : java_json
+      := mk_java_call cname opname (app (map mk_java_json sn) [e1;e2]).
+
+    Definition mk_java_collection(typ:nstring) (s:list nstring) : nstring
+      := ^"new RuntimeUtils.CollectionBuilder<"
+            +++ typ +++ ^">(" +++ (^nat_to_string10 (Datatypes.length s)) +++ (^")")
+                              +++ nstring_map_concat (^"") (fun elem => ^".add(" +++ elem +++ ^")") s
+                              +++ ^".result()".
+
+    Definition mk_java_string_collection(s:list nstring) : nstring
+      := mk_java_collection (^"String") (map mk_java_string s).
+
   End Ast.
 End Java.
-

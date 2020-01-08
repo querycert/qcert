@@ -37,10 +37,24 @@ Local Open Scope list_scope.
 
 Definition enhanced_foreign_json_to_ejson (j:json) : option enhanced_ejson :=
   match j with
-  | jobject (("$date"%string,jstring s)::nil) =>
-    Some (enhancedsqldate (SQL_DATE_from_string s))
-  | jobject (("$interval"%string,jstring s)::nil) =>
-    Some (enhancedsqldateinterval (SQL_DATE_INTERVAL_from_string s))
+  | jobject
+      (("$date"%string,jobject
+                         (("day"%string,jnumber day)
+                            ::("month"%string,jnumber month)
+                            ::("year"%string, jnumber year)
+                            ::nil))::nil)
+  | jobject
+      (("$date"%string,jobject
+                         (("year"%string, jnumber year)
+                            ::("month"%string,jnumber month)
+                            ::("day"%string,jnumber day)
+                            ::nil))::nil) =>
+    Some (enhancedsqldate (SQL_DATE_from_parts
+                             (float_truncate year)
+                             (float_truncate month)
+                             (float_truncate day)))
+  | jobject (("$period"%string,jstring s)::nil) =>
+    Some (enhancedsqldateperiod (SQL_DATE_PERIOD_from_string s))
   | _ => None
   end.
 
@@ -50,29 +64,18 @@ Definition enhanced_foreign_ejson_to_json (ej:enhanced_ejson) : json :=
     jobject
       (("$date"%string,
         jstring (SQL_DATE_to_string fd))::nil)
-  | enhancedsqldateinterval fd =>
+  | enhancedsqldateperiod fd =>
     jobject
-      (("$interval"%string,
-        jstring (SQL_DATE_INTERVAL_to_string fd))::nil)
+      (("$period"%string,
+        jstring (SQL_DATE_PERIOD_to_string fd))::nil)
   end.
 
-Lemma enhanced_foreign_json_to_ejson_correct (ej:enhanced_ejson) :
-  enhanced_foreign_json_to_ejson (enhanced_foreign_ejson_to_json ej) = Some ej.
-Proof.
-  destruct ej; try reflexivity.
-  - simpl. rewrite SQL_DATE_from_string_correct; reflexivity.
-  - simpl. rewrite SQL_DATE_INTERVAL_from_string_correct; reflexivity.
-Qed.
-
 Program Instance enhanced_foreign_to_json : foreign_to_json
-  := mk_foreign_to_json enhanced_foreign_ejson _ _ _.
+  := mk_foreign_to_json enhanced_foreign_ejson _ _.
 Next Obligation.
   exact (enhanced_foreign_json_to_ejson fd).
 Defined.
 Next Obligation.
   exact (enhanced_foreign_ejson_to_json j).
-Defined.
-Next Obligation.
-  apply enhanced_foreign_json_to_ejson_correct.
 Defined.
 

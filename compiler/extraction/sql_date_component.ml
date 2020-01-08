@@ -19,11 +19,11 @@ let undefined_error op =
   raise (Failure ("Operation " ^ op ^ " not defined in REPL"))
 
 (** Interval *)
-type interval = Date.Period.t
-let interval_eq (d1:interval) (d2:interval) : bool = Date.Period.equal d1 d2
-let interval_to_string (x:interval) : char list = Util.char_list_of_string "_" (* XXX To be figured out *)
-let interval_from_string (x:char list) : interval = undefined_error "interval_from_string"
-
+type period = Date.Period.t
+let period_eq (d1:period) (d2:period) : bool = Date.Period.equal d1 d2
+let period_to_string (x:period) : char list = Util.char_list_of_string "_" (* XXX To be figured out *)
+let period_from_string (x:char list) : period = undefined_error "period_from_string"
+    
 (** Date *)
 type date = Date.t
 
@@ -34,6 +34,8 @@ let date_from_string (x:char list) : date =
   with
   | _ -> Date.make 1 1 1
   end
+let date_from_parts y m d =
+  Date.make y m d
 
 (** Comparisons *)
 let date_eq (x1:date) (x2:date) : bool = Date.compare x1 x2 = 0
@@ -54,7 +56,7 @@ let set_month (x:date) (z:int) : date = Date.make (get_year x) z (get_day x)
 let set_day (x:date) (z:int) : date = Date.make (get_year x) (get_month x) z
 
 (** Arithmetics *)
-let between (x1:date) (x2:date) : interval = Date.sub x1 x2
-let plus (x1:date) (d1:interval) : date = Date.add x1 d1
-let minus (x1:date) (d1:interval) : date = Date.rem x1 d1
+let between (x1:date) (x2:date) : period = Date.sub x1 x2
+let plus (x1:date) (d1:period) : date = Date.add x1 d1
+let minus (x1:date) (d1:period) : date = Date.rem x1 d1
 

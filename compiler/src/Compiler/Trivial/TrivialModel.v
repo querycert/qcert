@@ -142,15 +142,12 @@ Next Obligation.
 Defined.
 
 Program Instance trivial_foreign_to_json : foreign_to_json
-  := mk_foreign_to_json trivial_foreign_ejson _ _ _.
+  := mk_foreign_to_json trivial_foreign_ejson _ _.
 Next Obligation.
   exact None.
 Defined.
 Next Obligation.
   destruct j.
-Defined.
-Next Obligation.
-  destruct fd.
 Defined.
 
 Program Instance trivial_foreign_type : foreign_type

@@ -46,8 +46,9 @@ Require Import tDNNRC.
 Require Import Dataframe.
 Require Import CompilerRuntime.
 Require Import CompilerModel.
-Require Import SqlDateComponent.
 Require Import LoggerComponent.
+Require Import SqlDateComponent.
+Require Import UriComponent.
 
 Require Import EnhancedData.
 Require Import EnhancedEJson.
@@ -146,24 +147,30 @@ Module CompEnhanced.
       Definition dsql_date (d:SQL_DATE) : data
         := dforeign (enhancedsqldate d).
 
-      Definition dsql_date_interval (d:SQL_DATE_INTERVAL) : data
-        := dforeign (enhancedsqldateinterval d).
+      Definition dsql_date_period (d:SQL_DATE_PERIOD) : data
+        := dforeign (enhancedsqldateperiod d).
 
     End Data.
 
     Module Ops.
       Module Unary.
+        (* for ocaml *)
         Definition sql_date_get_component (component:sql_date_component)
           := OpForeignUnary (enhanced_unary_sql_date_op (uop_sql_date_get_component component)).
         Definition sql_date_from_string
           := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_from_string).
-        Definition sql_date_interval_from_string
-          := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_interval_from_string).
+        Definition sql_date_period_from_string
+          := OpForeignUnary (enhanced_unary_sql_date_op uop_sql_date_period_from_string).
+
+        Definition uri_encode
+          := OpForeignUnary (enhanced_unary_uri_op (uop_uri_encode)).
+        Definition uri_decode
+          := OpForeignUnary (enhanced_unary_uri_op (uop_uri_decode)).
 
         (* for coq style syntax *)
         Definition OpSqlGetDateComponent := sql_date_get_component.
         Definition OpSqlDateFromString := sql_date_from_string.
-        Definition OpSqlDateIntervalFromString := sql_date_interval_from_string.
+        Definition OpSqlDatePeriodFromString := sql_date_period_from_string.
 
       End Unary.
 
@@ -184,8 +191,8 @@ Module CompEnhanced.
         Definition sql_date_ge 
           := OpForeignBinary (enhanced_binary_sql_date_op bop_sql_date_ge).
 
-        Definition sql_date_interval_between 
-          := OpForeignBinary (enhanced_binary_sql_date_op (bop_sql_date_interval_between)).
+        Definition sql_date_period_between 
+          := OpForeignBinary (enhanced_binary_sql_date_op (bop_sql_date_period_between)).
         Definition sql_date_set_component (component:sql_date_component)
           := OpForeignBinary (enhanced_binary_sql_date_op (bop_sql_date_set_component component)).
         
@@ -198,7 +205,7 @@ Module CompEnhanced.
         Definition OpSqlDateGt := sql_date_gt.
         Definition OpSqlDateGe := sql_date_ge.
 
-        Definition OpSqlDateIntervalBetween := sql_date_interval_between.
+        Definition OpSqlDatePeriodBetween := sql_date_period_between.
 
       End Binary.
     End Ops.

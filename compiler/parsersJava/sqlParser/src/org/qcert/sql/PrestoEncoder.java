@@ -201,7 +201,7 @@ public class PrestoEncoder {
 			else if (savedInteger != null) {
 				String unit = getUnit(token.getText());
 				if (unit != null) {
-					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
+					buffer.append("period '").append(savedInteger.getText()).append("' ").append(unit);
 					savedInteger = null;
 					savedWS.clear();
 				} else if (token.getType() == SqlBaseLexer.WS)

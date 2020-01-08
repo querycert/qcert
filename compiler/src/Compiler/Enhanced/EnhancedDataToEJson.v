@@ -52,7 +52,7 @@ Definition sql_date_unary_op_to_ejson (op:enhanced_unary_op) : enhanced_foreign_
     | uop_sql_date_get_component sql_date_MONTH => enhanced_ejson_sql_date EJsonRuntimeDateGetMonth
     | uop_sql_date_get_component sql_date_DAY => enhanced_ejson_sql_date EJsonRuntimeDateGetDay
     | uop_sql_date_from_string => enhanced_ejson_sql_date EJsonRuntimeDateFromString
-    | uop_sql_date_interval_from_string => enhanced_ejson_sql_date EJsonRuntimeDurationFromString
+    | uop_sql_date_period_from_string => enhanced_ejson_sql_date EJsonRuntimePeriodFromString
     end
   | enhanced_unary_uri_op uop =>
     match uop with
@@ -82,14 +82,14 @@ Definition sql_date_binary_op_to_ejson (op:enhanced_binary_op) : enhanced_foreig
   := match op with
      | enhanced_binary_sql_date_op dop =>
        match dop with
-       | bop_sql_date_plus => enhanced_ejson_sql_date EJsonRuntimeDurationPlus
-       | bop_sql_date_minus => enhanced_ejson_sql_date EJsonRuntimeDurationMinus
+       | bop_sql_date_plus => enhanced_ejson_sql_date EJsonRuntimePeriodPlus
+       | bop_sql_date_minus => enhanced_ejson_sql_date EJsonRuntimePeriodMinus
        | bop_sql_date_ne => enhanced_ejson_sql_date EJsonRuntimeDateNe
        | bop_sql_date_lt => enhanced_ejson_sql_date EJsonRuntimeDateLt
        | bop_sql_date_le => enhanced_ejson_sql_date EJsonRuntimeDateLe
        | bop_sql_date_gt => enhanced_ejson_sql_date EJsonRuntimeDateGt
        | bop_sql_date_ge => enhanced_ejson_sql_date EJsonRuntimeDateGe
-       | bop_sql_date_interval_between => enhanced_ejson_sql_date EJsonRuntimeDurationBetween
+       | bop_sql_date_period_between => enhanced_ejson_sql_date EJsonRuntimePeriodBetween
        | bop_sql_date_set_component sql_date_YEAR => enhanced_ejson_sql_date EJsonRuntimeDateSetYear
        | bop_sql_date_set_component sql_date_MONTH => enhanced_ejson_sql_date EJsonRuntimeDateSetMonth
        | bop_sql_date_set_component sql_date_DAY => enhanced_ejson_sql_date EJsonRuntimeDateSetDay

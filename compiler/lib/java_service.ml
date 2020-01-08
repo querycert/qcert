@@ -40,11 +40,11 @@ let main (verb: string) (s: string) =
     close_out toProcess;
     let result = input_line fromProcess in
     close_in fromProcess;
-  	(*
-		Format.printf "Output for verb %s: %s" verb result;
-		Format.print_newline ();
-		*)
+    (*
+		  Format.printf ">> Output for verb %s: %s" verb result;
+		  Format.print_newline ();
+     *)
     result
-  with exn ->
-    raise (Qcert_Error ("Java Service: "^(Printexc.to_string exn)))
+  with
+  | exn -> raise (Qcert_Error ("Java Service: "^(Printexc.to_string exn)))
   end

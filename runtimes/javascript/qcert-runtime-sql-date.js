@@ -20,7 +20,7 @@ var MONTH = "MONTH";
 var YEAR = "YEAR";
 
 function boxDate(year, month, day) {
-    return { "$foreign" : { "$date" : {"year": year, "month": month, "day": day} } };
+    return { "$foreign" : { "$date" : { "day": day, "month": month, "year": year } } };
 }
 
 function mustBeDate(date) {
@@ -35,18 +35,18 @@ function mustBeDate(date) {
 function mustBeUnit(unit) {
     if (unit === DAY || unit === MONTH || unit === YEAR)
 	      return;
-    throw new Error("Expected a duration unit but got " + JSON.stringify(unit));
+    throw new Error("Expected a period unit but got " + JSON.stringify(unit));
 }
 
-function mustBeDuration(duration) {
-    if (duration.$foreign && duration.$foreign.$interval) {
-        var i = duration.$foreign.$interval;
-        if (typeof i === "object" && "duration" in i && "unit" in i) {
+function mustBePeriod(period) {
+    if (period.$foreign && period.$foreign.$interval) {
+        var i = period.$foreign.$interval;
+        if (typeof i === "object" && "period" in i && "unit" in i) {
 	          mustBeUnit(i.unit);
 	          return i;
         }
     }
-    throw new Error("Expected a duration but got " + JSON.stringify(duration));
+    throw new Error("Expected a period but got " + JSON.stringify(period));
 }
 
 function compareDates(date1, date2) {
@@ -79,17 +79,17 @@ function dateFromString(stringDate) {
 
 function dateGetYear(date) {
     var d = mustBeDate(date);
-	  return d.year;
+	  return { "$nat" : d.year };
 }
 
 function dateGetMonth(date) {
     var d = mustBeDate(date);
-	  return d.month;
+	  return { "$nat" : d.month };
 }
 
 function dateGetDay(date) {
     var d = mustBeDate(date);
-	  return d.day;
+	  return { "$nat" : d.day };
 }
 
 function dateNe(date1, date2) {
@@ -142,51 +142,51 @@ function dateSetDay(date, day) {
     return boxDate(jsDate.getFullYear(), jsDate.getMonth()+1, jsDate.getDate());
 }
 
-/* Duration */
-function durationFromString(stringDuration) {
-    // TODO verify what the string format for durations is going to be.
+/* Period */
+function periodFromString(stringPeriod) {
+    // TODO verify what the string format for periods is going to be.
     // Here we assume a number adjoined to a valid unit with a dash.
-    if (typeof stringDuration === "string") {
-	      parts = stringDuration.split("-");
+    if (typeof stringPeriod === "string") {
+	      parts = stringPeriod.split("-");
 	      if (parts.length === 2) {
 	          mustBeUnit(parts[1]);
-	          return {"duration": Number(parts[0]), "unit": parts[1]};
-	          throw new Error("Malformed string duration: " + stringDuration);
+	          return {"period": Number(parts[0]), "unit": parts[1]};
+	          throw new Error("Malformed string period: " + stringPeriod);
 	      }
-	      throw new Error("Expected a duration in string form but got " + JSON.stringify(stringDuration));
+	      throw new Error("Expected a period in string form but got " + JSON.stringify(stringPeriod));
     }
 }
 
-function durationPlus(date, duration) {
+function periodPlus(date, period) {
     var d = mustBeDate(date);
-    var i = mustBeDuration(duration);
+    var i = mustBePeriod(period);
     switch(i.unit) {
     case DAY:
-	      return dateSetDay(d, d.day + i.duration);
+	      return dateSetDay(d, d.day + i.period);
     case MONTH:
-	      return dateSetMonth(d, d.month + i.duration);
+	      return dateSetMonth(d, d.month + i.period);
     case YEAR:
-	      return dateSetYear(d, d.year + i.duration);
+	      return dateSetYear(d, d.year + i.period);
     default:
 	      throw new Error("Unexpected state (not supposed to happen)");
     }
 }
 
-function durationMinus(date, duration) {
+function periodMinus(date, period) {
     var d = mustBeDate(date);
-    var i = mustBeDuration(duration);
+    var i = mustBePeriod(period);
     switch(i.unit) {
     case DAY:
-	      return dateNewDay(d, d.day - i.duration);
+	      return dateNewDay(d, d.day - i.period);
     case MONTH:
-	      return dateNewMonth(d, d.month - i.duration);
+	      return dateNewMonth(d, d.month - i.period);
     case YEAR:
-	      return dateNewYear(de, d.year - i.duration);
+	      return dateNewYear(de, d.year - i.period);
     default:
 	      throw new Error("Unexpected bad unit (not supposed to happen)");
     }
 }
 
-function durationBetween(date1, date) {
-    throw new Error("We don't know how to do 'duration between' dates yet");
+function periodBetween(date1, date) {
+    throw new Error("We don't know how to do 'period between' dates yet");
 }

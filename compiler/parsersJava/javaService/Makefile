@@ -66,3 +66,6 @@ cleanall: clean
 	@rm -f $(DEPENDENCIES)
 	@rm -f services/*.jar
 
+cleanmost: clean
+	@rm -f services/*.jar
+
