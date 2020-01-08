@@ -714,18 +714,23 @@ Section ImpQcerttoImpEJson.
       - Case "OpBagUnion"%string.
         unfold rondcoll2, ondcoll2, lift; simpl.
         destruct d; destruct d0; simpl; try reflexivity.
-        unfold bunion.
-        rewrite map_app.
-        reflexivity.
+        f_equal; f_equal.
+        apply bunion_ejson_to_data_comm.
       - Case "OpBagDiff"%string.
         unfold rondcoll2, ondcoll2, lift; simpl.
         destruct d; destruct d0; simpl; try reflexivity.
-        unfold bminus.
-        admit.
+        f_equal; f_equal.
+        apply bminus_ejson_to_data_comm.
       - Case "OpBagMin"%string.
-        admit.
+        unfold rondcoll2, ondcoll2, lift; simpl.
+        destruct d; destruct d0; simpl; try reflexivity.
+        f_equal; f_equal.
+        apply bmin_ejson_to_data_comm.
       - Case "OpBagMax"%string.
-        admit.
+        unfold rondcoll2, ondcoll2, lift; simpl.
+        destruct d; destruct d0; simpl; try reflexivity.
+        f_equal; f_equal.
+        apply bmax_ejson_to_data_comm.
       - Case "OpBagNth"%string.
         destruct d; destruct d0; simpl; try reflexivity.
         destruct (fst (ZToSignedNat z)); try reflexivity.
@@ -782,7 +787,7 @@ Section ImpQcerttoImpEJson.
         rewrite <- (foreign_to_ejson_runtime_of_binary_op_correct fb h).
         reflexivity.
       Transparent ejson_to_data.
-    Admitted.
+    Qed.
 
     Lemma imp_qcert_runtime_call_to_imp_ejson_correct
           (σ:pd_bindings) (rt:imp_qcert_runtime_op) (el:list imp_expr) :

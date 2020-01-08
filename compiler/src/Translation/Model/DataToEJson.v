@@ -844,6 +844,56 @@ Section DataToEJson.
       - apply in_map; assumption.
     Qed.
 
+    (** For bag union operator *)
+    Lemma bunion_ejson_to_data_comm l1 l2:
+      map data_to_ejson (bunion l1 l2) = bunion (map data_to_ejson l1) (map data_to_ejson l2).
+    Proof.
+      unfold bunion.
+      rewrite map_app.
+      reflexivity.
+    Qed.
+
+    (** For bag minus operator *)
+    Lemma remove_one_ejson_to_data_comm d l:
+      map data_to_ejson (remove_one d l) = remove_one (data_to_ejson d) (map data_to_ejson l).
+    Proof.
+      induction l; [reflexivity|]; simpl.
+      rewrite <- IHl; clear IHl.
+      destruct (EquivDec.equiv_dec d a);
+        destruct (EquivDec.equiv_dec (data_to_ejson d) (data_to_ejson a));
+        try reflexivity; simpl.
+      - rewrite e in c; congruence.
+      - apply data_to_ejson_inv in e; subst; congruence.
+    Qed.
+
+    Lemma bminus_ejson_to_data_comm l1 l2:
+      map data_to_ejson (bminus l1 l2) = bminus (map data_to_ejson l1) (map data_to_ejson l2).
+    Proof.
+      revert l2; induction l1; simpl in *; intros; [reflexivity|].
+      rewrite IHl1.
+      rewrite remove_one_ejson_to_data_comm; reflexivity.
+    Qed.
+    
+    (** For bag min operator *)
+    Lemma bmin_ejson_to_data_comm l1 l2:
+      map data_to_ejson (bmin l1 l2) = bmin (map data_to_ejson l1) (map data_to_ejson l2).
+    Proof.
+      unfold bmin.
+      rewrite bminus_ejson_to_data_comm.
+      rewrite bminus_ejson_to_data_comm.
+      reflexivity.
+    Qed.
+    
+    (** For bag max operator *)
+    Lemma bmax_ejson_to_data_comm l1 l2:
+      map data_to_ejson (bmax l1 l2) = bmax (map data_to_ejson l1) (map data_to_ejson l2).
+    Proof.
+      unfold bmax.
+      rewrite bunion_ejson_to_data_comm.
+      rewrite bminus_ejson_to_data_comm.
+      reflexivity.
+    Qed.
+    
   End RuntimeLemmas.
 
   Section Lift.
