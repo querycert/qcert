@@ -87,9 +87,9 @@ Section DataToEJson.
       inversion H; subst; try reflexivity.
     Qed.
 
-    Lemma ejson_is_record_none (j:ejson) r :
+    Lemma ejson_is_record_none (j:ejson):
       ejson_is_record j = None ->
-      ejson_to_data j <> drec r.
+      (forall r, ejson_to_data j <> drec r).
     Proof.
       intros.
       destruct j; simpl in *; try congruence.
@@ -106,6 +106,52 @@ Section DataToEJson.
       destruct l; simpl in *; try congruence;
       destruct (ejson_brands l0); simpl in *; try congruence;
       inversion H; subst; try reflexivity.
+    Qed.
+
+    Lemma ejson_is_either_some_left (j:ejson) jl :
+      ejson_is_either j = Some (Some jl, None) ->
+      ejson_to_data j = dleft (ejson_to_data jl).
+    Proof.
+      intros; destruct j; simpl in *; try congruence.
+      destruct l; simpl in *; try congruence;
+        destruct p; simpl in *; try congruence;
+          destruct l; simpl in *; try congruence.
+      destruct (string_dec s "$left"); simpl in *; try congruence;
+        destruct (string_dec s "$right"); simpl in *; try congruence; subst.
+      inversion H; subst.
+      destruct jl; reflexivity.
+    Qed.
+
+    Lemma ejson_is_either_some_right (j:ejson) jr :
+      ejson_is_either j = Some (None, Some jr) ->
+      ejson_to_data j = dright (ejson_to_data jr).
+    Proof.
+      intros; destruct j; simpl in *; try congruence.
+      destruct l; simpl in *; try congruence;
+        destruct p; simpl in *; try congruence;
+          destruct l; simpl in *; try congruence.
+      destruct (string_dec s "$left"); simpl in *; try congruence;
+        destruct (string_dec s "$right"); simpl in *; try congruence; subst.
+      inversion H; subst.
+      destruct jr; reflexivity.
+    Qed.
+      
+    Lemma ejson_is_either_none (j:ejson) :
+      ejson_is_either j = None ->
+      (forall jl jr, ejson_to_data j <> dleft jl /\ ejson_to_data j <> dright jr).
+    Proof.
+      intros; split; intros;
+      destruct j; simpl in *; try congruence;
+        destruct l; simpl in *; try congruence;
+          destruct p; simpl in *; try congruence;
+            destruct l; simpl in *; try congruence;
+              destruct (string_dec s "$left"); simpl in *; try congruence;
+                destruct (string_dec s "$right"); simpl in *; try congruence; subst;
+                  try (destruct e; try congruence);
+                  destruct p; try congruence;
+                    destruct e; try congruence;
+                      destruct l; try congruence;
+                        repeat match_destr.
     Qed.
 
   End toData.
