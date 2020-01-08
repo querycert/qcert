@@ -274,5 +274,66 @@ Section Encode.
     - apply key_encode_lt_inv.
   Qed.
 
+  Lemma match_not_left {A} s (x y:A):
+    s <> "$left"%string ->
+    match s with
+    | "$left"%string => Some y
+    | _ => None
+    end = None.
+  Proof.
+    intros.
+    repeat (destruct s; simpl; try congruence;
+    destruct a; simpl; try congruence;
+    destruct b; simpl; try congruence;
+    destruct b0; simpl; try congruence;
+    destruct b1; simpl; try congruence;
+    destruct b2; simpl; try congruence;
+    destruct b3; simpl; try congruence;
+    destruct b4; simpl; try congruence;
+    destruct b5; simpl; try congruence;
+    destruct b6; simpl; try congruence).
+  Qed.
+
+  Lemma match_not_right {A} s (x y:A):
+    s <> "$right"%string ->
+    match s with
+    | "$right"%string => Some y
+    | _ => None
+    end = None.
+  Proof.
+    intros.
+    repeat (destruct s; simpl; try congruence;
+    destruct a; simpl; try congruence;
+    destruct b; simpl; try congruence;
+    destruct b0; simpl; try congruence;
+    destruct b1; simpl; try congruence;
+    destruct b2; simpl; try congruence;
+    destruct b3; simpl; try congruence;
+    destruct b4; simpl; try congruence;
+    destruct b5; simpl; try congruence;
+    destruct b6; simpl; try congruence).
+  Qed.
+
+  Lemma match_neither_left_nor_right {A} s (x y:A):
+    s <> "$right"%string -> s <> "$left"%string ->
+    match s with
+    | "$right"%string => Some x
+    | "$left"%string => Some y
+    | _ => None
+    end = None.
+  Proof.
+    intros.
+    repeat (destruct s; simpl; try congruence;
+    destruct a; simpl; try congruence;
+    destruct b; simpl; try congruence;
+    destruct b0; simpl; try congruence;
+    destruct b1; simpl; try congruence;
+    destruct b2; simpl; try congruence;
+    destruct b3; simpl; try congruence;
+    destruct b4; simpl; try congruence;
+    destruct b5; simpl; try congruence;
+    destruct b6; simpl; try congruence).
+  Qed.
+
 End Encode.
 

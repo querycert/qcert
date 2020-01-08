@@ -273,6 +273,16 @@ Section EJson.
       | _ => None
       end.
 
+    Definition ejson_is_either (j:ejson) : option (option ejson * option ejson) :=
+      match j with
+      | ejobject ((s1,j')::nil) =>
+        if (string_dec s1 "$left") then Some (Some j', None)
+        else if (string_dec s1 "$right") then Some (None, Some j')
+             else None
+      | ejobject r => None
+      | _ => None
+      end.
+
   End Util.
 
   Section Env.

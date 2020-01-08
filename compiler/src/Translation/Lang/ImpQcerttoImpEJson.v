@@ -789,6 +789,53 @@ Section ImpQcerttoImpEJson.
       Transparent ejson_to_data.
     Qed.
 
+    (* XXX To generalize, move somewhere esle *)
+    Lemma Forall_lift_map σ el :
+      Forall
+        (fun exp : imp_expr =>
+           unlift_result (imp_qcert_expr_eval h σ exp) =
+           imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson exp)) el ->
+      lift (map data_to_ejson) (lift_map (fun x : ImpEval.imp_expr => imp_qcert_expr_eval h σ x) el)
+      =
+      (lift_map
+         (fun x : imp_qcert_expr =>
+            imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_qcert_expr_to_imp_ejson x)) el).
+    Proof.
+      intros.
+      induction el; [reflexivity|]; simpl.
+      inversion H; subst; clear H.
+      rewrite <- H2; clear H2.
+      specialize (IHel H3); clear H3.
+      rewrite <- IHel.
+      unfold lift; simpl.
+      destruct (imp_qcert_expr_eval h σ a); try reflexivity.
+      destruct (lift_map (fun x : ImpEval.imp_expr => imp_qcert_expr_eval h σ x) el); reflexivity.
+    Qed.
+
+    Lemma data_to_ejson_drec_not_left l jl:
+      data_to_ejson (drec l) <> ejobject [("$left"%string, jl)].
+    Proof.
+      unfold not; intros.
+      destruct l; simpl in *; try congruence.
+      destruct p; simpl in *; try congruence.
+      inversion H; subst.
+      rewrite H1 in *.
+      specialize (key_encode_not_left s); intros.
+      congruence.
+    Qed.
+
+    Lemma data_to_ejson_drec_not_right l jl:
+      data_to_ejson (drec l) <> ejobject [("$right"%string, jl)].
+    Proof.
+      unfold not; intros.
+      destruct l; simpl in *; try congruence.
+      destruct p; simpl in *; try congruence.
+      inversion H; subst.
+      rewrite H1 in *.
+      specialize (key_encode_not_right s); intros.
+      congruence.
+    Qed.
+
     Lemma imp_qcert_runtime_call_to_imp_ejson_correct
           (σ:pd_bindings) (rt:imp_qcert_runtime_op) (el:list imp_expr) :
       Forall
@@ -801,15 +848,64 @@ Section ImpQcerttoImpEJson.
     Proof.
       Opaque ejson_to_data. {
         intros.
-        imp_qcert_runtime_op_cases(destruct rt) Case; simpl.
+        imp_qcert_runtime_op_cases(destruct rt) Case; simpl in *;
+        repeat rewrite lift_map_map_fusion;
+        rewrite <- (Forall_lift_map _ _ H); clear H;
+          unfold unlift_result, olift, lift;
+          assert (@lift_map (@ImpEval.imp_expr (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op)
+                            (@imp_qcert_data fruntime)
+                            (fun x : @ImpEval.imp_expr (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op =>
+                               @imp_qcert_expr_eval fruntime h σ x) el
+                  =
+                  @lift_map (@ImpEval.imp_expr (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op)
+                            (@data (@foreign_runtime_data fruntime))
+                            (fun x : @ImpEval.imp_expr (@imp_qcert_data fruntime) (@imp_qcert_op fruntime) imp_qcert_runtime_op => @imp_qcert_expr_eval fruntime h σ x) el) by reflexivity;
+          rewrite H; clear H;
+          destruct ((lift_map (fun x : ImpEval.imp_expr => imp_qcert_expr_eval h σ x) el));
+            try reflexivity; simpl.
         - Case "QcertRuntimeGroupby"%string.
           admit. (* XXX Not implemented *)
         - Case "QcertRuntimeEither"%string.
-          admit.
+          destruct l; try reflexivity; simpl.
+          destruct l; simpl in *; [|destruct d; congruence].
+          case_eq d; intros;
+            try (destruct d; simpl in *; congruence).
+          case_eq (data_to_ejson (drec l)); intros; try reflexivity.
+          destruct l0; simpl; try reflexivity.
+          destruct p; simpl; try reflexivity.
+          destruct l0; simpl; try reflexivity; [|repeat match_destr].
+          specialize (data_to_ejson_drec_not_left l e);
+            specialize (data_to_ejson_drec_not_right l e); intros.
+          rewrite H0 in *; clear H0.
+          case_eq (string_dec s "$right"%string); intros; subst; try congruence.
+          case_eq (string_dec s "$left"%string); intros; subst; try congruence.
+          rewrite match_neither_left_nor_right; try reflexivity; assumption.
         - Case "QcertRuntimeLeft"%string.
-          admit. (* XXX Not implemented *)
+          destruct l; try reflexivity; simpl.
+          destruct l; simpl in *; [|destruct d; congruence].
+          case_eq d; intros;
+            try (destruct d; simpl in *; congruence).
+          case_eq (data_to_ejson (drec l)); intros; try reflexivity.
+          destruct l0; simpl; try reflexivity.
+          destruct p; simpl; try reflexivity.
+          destruct l0; simpl; try reflexivity; [|repeat match_destr].
+          specialize (data_to_ejson_drec_not_left l e); intros.
+          rewrite H0 in *; clear H0.
+          case_eq (string_dec s "$left"%string); intros; subst; try congruence.
+          rewrite match_not_left; try reflexivity; assumption.
         - Case "QcertRuntimeRight"%string.
-          admit. (* XXX Not implemented *)
+          destruct l; try reflexivity; simpl.
+          destruct l; simpl in *; [|destruct d; congruence].
+          case_eq d; intros;
+            try (destruct d; simpl in *; congruence).
+          case_eq (data_to_ejson (drec l)); intros; try reflexivity.
+          destruct l0; simpl; try reflexivity.
+          destruct p; simpl; try reflexivity.
+          destruct l0; simpl; try reflexivity; [|repeat match_destr].
+          specialize (data_to_ejson_drec_not_right l e); intros.
+          rewrite H0 in *; clear H0.
+          case_eq (string_dec s "$right"%string); intros; subst; try congruence.
+          rewrite match_not_right; try reflexivity; assumption.
       }
       Transparent ejson_to_data.
     Admitted.
