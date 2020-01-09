@@ -300,7 +300,7 @@ camp-world-tests-java:
 ## SQL
 SQLORGNUM=1 2 3 4 5 6 7 8 9 10 11
 SQLMININUM=1
-SQLTARGETS=nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert # dnnrc_typed
+SQLTARGETS=nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_qcert imp_ejson # dnnrc_typed
 
 sql-tests:
 	@echo "[Q*cert] "
