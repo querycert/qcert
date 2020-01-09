@@ -20,7 +20,6 @@ Require Import Equivalence.
 Require Import Utils.
 Require Import DataSystem.
 Require Import ForeignToJava.
-Require Import ForeignOperators.
 Require Import JavaRuntime.
 
 Import ListNotations.
@@ -116,6 +115,7 @@ Axiom SQL_DATE_from_parts : Z -> Z -> Z -> SQL_DATE.
 Extract Inlined Constant SQL_DATE_from_parts => "(fun x y z -> Sql_date_component.date_from_parts x y z)".
 
 Section SqlDateModel.
+  (** Ast *)
   Inductive sql_date_component :=
   | sql_date_DAY
   | sql_date_MONTH

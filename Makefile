@@ -110,20 +110,33 @@ cleanmost-qcert-compiler:
 	- @$(MAKE) cleanmost-parsersJava
 
 
-## Pre-build
+## Configuration
 
-configure: Makefile.coq
+./runtimes/javascript/qcert_runtime.ml:
+	$(MAKE) -C ./runtimes/javascript
+
+./compiler/lib/js_runtime.ml: ./runtimes/javascript/qcert_runtime.ml
+	cp ./runtimes/javascript/qcert_runtime.ml ./compiler/lib/js_runtime.ml
+
+./compiler/lib/static_config.ml:
+	echo "(* This file is generated *)" > ./compiler/lib/static_config.ml
+	echo "let qcert_home = \"$(CURDIR)\"" >> ./compiler/lib/static_config.ml
+
+prepare: ./compiler/lib/js_runtime.ml ./compiler/lib/static_config.ml Makefile.coq
+
+configure:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Configuring Build"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler
+	@$(MAKE) prepare
 
 clean-configure:
-	@$(MAKE) -C compiler clean
 
 cleanall-configure:
-	@$(MAKE) -C compiler cleanall
-
+	$(MAKE) -C ./runtimes/javascript cleanall
+	rm -rf ./compiler/lib/js_runtime.ml
+	rm -rf ./compiler/lib/static_config.ml
+	rm -f ./compiler/.merlin compiler/*/.merlin
 
 ## Compiler Core
 
