@@ -34,7 +34,7 @@ clean:
 
 cleanall: clean
 	rm -f QcertExtraction.glob QcertExtraction.vo .QcertExtraction.aux
-	rm -rf QcertCompiler.ml QcertCompiler.mli
+	rm -rf compiler.ml compiler.mli
 	rm -rf *~
 
 .NOTPARALLEL: 
