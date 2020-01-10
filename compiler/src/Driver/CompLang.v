@@ -306,7 +306,7 @@ Section CompLang.
     Definition nnrcmr := nnrcmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
-    Definition js_ast := list funcdecl.
+    Definition js_ast := js_ast.
     Definition javascript := javascript.
     Definition java := java.
     Definition spark_df := spark_df.

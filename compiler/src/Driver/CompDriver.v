@@ -212,12 +212,11 @@ Section CompDriver.
       (* Note: Obtain brand relation from brand model, baked in imp_ejson compilation *)
       imp_qcert_to_imp_ejson brand_relation_brands q.
 
-    Definition imp_ejson_to_js_ast (q: imp_ejson) : js_ast :=
-      imp_ejson_to_js_ast q.
+    Definition imp_ejson_to_js_ast (cname:option string) (q: imp_ejson) : js_ast :=
+      imp_ejson_to_js_ast cname q.
 
     Local Open Scope nstring_scope.
-    Definition js_ast_to_javascript (q: js_ast) : javascript :=
-      List.fold_left (fun acc q => nstring_append acc (js_ast_to_js_top q)) q  (^ (""%string)).
+    Definition js_ast_to_javascript (q: js_ast) : javascript := js_ast_to_js_top q.
 
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)
@@ -300,7 +299,7 @@ Section CompDriver.
 
   Inductive imp_ejson_driver : Set :=
     | Dv_imp_ejson_stop : imp_ejson_driver
-    | Dv_imp_ejson_to_js_ast : js_ast_driver -> imp_ejson_driver
+    | Dv_imp_ejson_to_js_ast : option string -> js_ast_driver -> imp_ejson_driver
   .
 
   Inductive imp_qcert_driver : Set :=
@@ -540,7 +539,7 @@ Section CompDriver.
   Fixpoint driver_length_imp_ejson (dv: imp_ejson_driver) :=
     match dv with
     | Dv_imp_ejson_stop => 1
-    | Dv_imp_ejson_to_js_ast dv => 1 + driver_length_js_ast dv
+    | Dv_imp_ejson_to_js_ast _ dv => 1 + driver_length_js_ast dv
     end.
 
   Fixpoint driver_length_imp_qcert (dv: imp_qcert_driver) :=
@@ -754,8 +753,8 @@ Section CompDriver.
       let queries :=
           match dv with
           | Dv_imp_ejson_stop => nil
-          | Dv_imp_ejson_to_js_ast dv =>
-            let q := imp_ejson_to_js_ast q in
+          | Dv_imp_ejson_to_js_ast cname dv =>
+            let q := imp_ejson_to_js_ast cname q in
             compile_js_ast dv q
           end
       in
@@ -1458,7 +1457,7 @@ Section CompDriver.
       | Dv_nnrs dv => Dv_nnrc (Dv_nnrc_to_nnrs (vars_of_constants_config config.(comp_constants)) dv)
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (vdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_dnnrc dv => Dv_nnrc (Dv_nnrc_to_dnnrc (vdbindings_of_constants_config config.(comp_constants)) dv)
-      | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
+      | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java (java_class_name_of_config config) config.(comp_java_imports) dv)
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc config.(comp_optim_config)) dv)
       | Dv_nnrc_core dv => Dv_nnrc (Dv_nnrc_to_nnrc_core dv)
       | Dv_javascript _
@@ -1615,7 +1614,7 @@ Section CompDriver.
       | Dv_imp_ejson _ =>
           Dv_error ("XXX TODO: imp_qcert optimizer XXX")
       | Dv_js_ast dv =>
-        Dv_imp_ejson (Dv_imp_ejson_to_js_ast dv)
+        Dv_imp_ejson (Dv_imp_ejson_to_js_ast config.(comp_class_name) dv)
       | Dv_camp _
       | Dv_nraenv_core _
       | Dv_nraenv _
@@ -1874,7 +1873,7 @@ Section CompDriver.
         | Dv_nnrc (Dv_nnrc_to_dnnrc vdbindings _) =>
           vdbindings = (vdbindings_of_constants_config config.(comp_constants))
         | Dv_nnrc (Dv_nnrc_to_java class_name imports _) =>
-          class_name = config.(comp_class_name) /\ imports = config.(comp_java_imports)
+          class_name = java_class_name_of_config config /\ imports = config.(comp_java_imports)
         | Dv_nraenv (Dv_nraenv_optim opc _) =>
           opc = (get_optim_config L_nraenv config.(comp_optim_config))
         | Dv_nnrc (Dv_nnrc_optim opc _) =>
@@ -1891,6 +1890,8 @@ Section CompDriver.
           tdbindings = tdbindings_of_constants_config config.(comp_constants)
         | Dv_dnnrc_typed (Dv_dnnrc_typed_to_spark_df tdbindings qname _) =>
           (tdbindings = tdbindings_of_constants_config config.(comp_constants)) /\ qname = config.(comp_qname)
+        | Dv_imp_ejson (Dv_imp_ejson_to_js_ast cname _) =>
+          cname = config.(comp_class_name)
         | _ => True
         end.
 
@@ -1960,7 +1961,7 @@ Section CompDriver.
     | Dv_imp_qcert (Dv_imp_qcert_stop) => (L_imp_qcert, None)
     | Dv_imp_qcert (Dv_imp_qcert_to_imp_ejson dv) => (L_imp_qcert, Some (Dv_imp_ejson dv))
     | Dv_imp_ejson (Dv_imp_ejson_stop) => (L_imp_ejson, None)
-    | Dv_imp_ejson (Dv_imp_ejson_to_js_ast dv) => (L_imp_ejson, Some (Dv_js_ast dv))
+    | Dv_imp_ejson (Dv_imp_ejson_to_js_ast _ dv) => (L_imp_ejson, Some (Dv_js_ast dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_dnnrc dv) => (L_nnrcmr, Some (Dv_dnnrc dv))
@@ -2014,7 +2015,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2052,7 +2053,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  s
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  (constants_config_of_tdbindings t)
@@ -2074,7 +2075,7 @@ Section CompDriver.
                (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  (constants_config_of_tdbindings t)
@@ -2095,7 +2096,7 @@ Section CompDriver.
                (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 o
                  nil
                  EmptyString
                  nil
@@ -2115,7 +2116,7 @@ Section CompDriver.
                (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2135,7 +2136,7 @@ Section CompDriver.
                (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2148,7 +2149,7 @@ Section CompDriver.
                (config:=mkDvConfig
                  s
                  s
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2168,7 +2169,7 @@ Section CompDriver.
                (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2188,7 +2189,7 @@ Section CompDriver.
            (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2270,7 +2271,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2281,7 +2282,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  (one_constant_config_of_avoid_list l)
@@ -2295,7 +2296,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  (one_constant_config_of_avoid_list l)
@@ -2308,7 +2309,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2319,7 +2320,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  (one_constant_config_of_avoid_list l)
@@ -2335,7 +2336,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  v
                  (constants_config_of_tdbindings x)
@@ -2350,7 +2351,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  (constants_config_of_tdbindings x)
@@ -2363,7 +2364,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 s
+                 (Some s)
                  nil
                  EmptyString
                  nil
@@ -2374,7 +2375,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
-                 EmptyString
+                 None
                  nil
                  EmptyString
                  nil
@@ -2602,12 +2603,14 @@ Section CompDriver.
           rewrite H0; rewrite H3; reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc (vdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.
-        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (comp_class_name config0) (comp_java_imports config0) j)));
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (java_class_name_of_config config0) (comp_java_imports config0) j)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
         * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_optim (get_optim_config L_nnrs_imp (comp_optim_config config0)) n)))
           ; try reflexivity.
         * destruct (H_config (Dv_nnrs_imp (Dv_nnrs_imp_to_imp_qcert config0.(comp_qname_lowercase) i)));
+            try reflexivity.
+        * destruct (H_config (Dv_imp_ejson (Dv_imp_ejson_to_js_ast config0.(comp_class_name) j)));
             try reflexivity.
         * destruct (H_config (Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed (tdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.

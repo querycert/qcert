@@ -170,7 +170,7 @@ Section CompCorrectness.
   Fixpoint driver_correct_imp_ejson (dv: imp_ejson_driver) :=
     match dv with
     | Dv_imp_ejson_stop => True
-    | Dv_imp_ejson_to_js_ast dv => False /\ driver_correct_js_ast dv
+    | Dv_imp_ejson_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 
   Fixpoint driver_correct_imp_qcert (dv: imp_qcert_driver) :=
