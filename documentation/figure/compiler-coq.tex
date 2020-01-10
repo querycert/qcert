@@ -62,48 +62,48 @@
  \node[lang, coqp, hyperlink node=\coqurl{cNNRC.Lang}{cNNRC}{nnrc_core},
        below=2em of nnrc]
       (cnnrc) {cNNRC};
-
- % NNRCMR/CldMR
- \node[lang, coqc, hyperlink node=\coqurl{NNRCMR.Lang}{NNRCMR}{nnrcmr},
-       right=of nnrc]
-      (nnrcmr) {NNRCMR};
- \node[lang, coqc, hyperlink node=\coqurl{CldMR.Lang}{CldMR}{cldmr},
-       right=3em of nnrcmr]
-      (cldmr) {CldMR};
  \node[lang, coqp, hyperlink node=\coqurl{NNRS.Lang}{NNRS}{nnrs},
-       above=3em of nnrcmr]
-      (NNRS) {NNRS};
- \node[lang, coqc, hyperlink node=\coqurl{JavaScriptAst.Lang}{JavaScriptAst}{ajavascript},
-       above=3em of cldmr]
-      (ajs) {JavaScript AST};
+       right=1.5 of nnrc]
+      (nnrs) {NNRS};
+
+ % Imperative
+ \node[lang, coqp, hyperlink node=\coqurl{NNRSimp.Lang}{NNRSimp}{nnrsimp},
+       right=of nnrs]
+      (nnrsimp) {NNRSimp};
+ \node[lang, coqp, hyperlink node=\coqurl{Imp.Lang}{ImpQcert}{imp_qcert},
+       right=of nnrsimp]
+      (impqcert) {Imp Qcert};
+ \node[lang, coqp, hyperlink node=\coqurl{Imp.Lang}{ImpEJson}{imp_ejson},
+       right=of impqcert]
+      (impjson) {Imp Json};
+
+ % NNRCMR
+ \node[lang, coqc, hyperlink node=\coqurl{NNRCMR.Lang}{NNRCMR}{nnrcmr}]
+      at (nnrs |- cnnrc)
+      (nnrcmr) {NNRCMR};
 
  % Target
- \node[lang, target, hyperlink node=\coqurl{Cloudant.Lang}{Cloudant}{cloudant},
-       right=2.5em of cldmr]
-      (cloudant) {Cloudant};
- \node[lang, target, hyperlink node=\coqurl{Java.Lang}{Java}{java},
-       above=0.5em of cloudant]
-      (java) {Java};
+ \node[lang, coqc, hyperlink node=\coqurl{JavaScriptAst.Lang}{JavaScriptAst}{ajavascript},
+       right=of impjson]
+      (ajs) {JavaScript AST};
  \node[lang, target, hyperlink node=\coqurl{JavaScript.Lang}{JavaScript}{js},
-       above=1em of java]
-      (js) {JavaScript};
- \node[lang, target,
-       hyperlink node=\coqurl{SparkRDD.Lang}{SparkRDD}{spark_rdd},
-       below=0.25em of cloudant]
-      (sparkmr) {Spark RDDs};
- \node[lang, target,
-       hyperlink node=\coqurl{SparkDF.Lang}{SparkDF}{spark_df},
-       below=0.25em of sparkmr]
-      (sparkdf) {Spark DataFrames};
+       right=of ajs]
+       (js) {JavaScript};
+ \node[lang, target, hyperlink node=\coqurl{Java.Lang}{Java}{java},
+       above=1em of js]
+      (java) {Java};
 
 % DNNRC
- \node[lang, coqc, hyperlink node=\coqurl{tDNNRC.Lang}{tDNNRC}{dnnrc_dataframe_typed},
-       below=of cldmr, left=of sparkdf]
-      (tdnnrc) {tDNNRC};
  \node[lang, coqp, hyperlink node=\coqurl{DNNRC.Lang}{DNNRC}{dnnrc_dataframe}]
-      at (nnrcmr |- tdnnrc)
+      at (nnrcmr |- nra)
       (dnnrc) {DNNRC};
-
+ \node[lang, coqc, hyperlink node=\coqurl{tDNNRC.Lang}{tDNNRC}{dnnrc_dataframe_typed}]
+      at (nnrsimp |- dnnrc)
+      (tdnnrc) {tDNNRC};
+ \node[lang, target,
+       hyperlink node=\coqurl{SparkDF.Lang}{SparkDF}{spark_df}]
+      at (java |- tdnnrc)
+      (sparkdf) {Spark DataFrames};
 
  % Sources
  \path[trans] (techrule.east) -- (rule.west);
@@ -160,12 +160,12 @@
    \transref{3}{\coqurl{Translation}{NNRCMRtoNNRC}{nnrc_of_nnrcmr_top}};
  \path[trans, tcoqp, dashed] (nnrc) -- (dnnrc)
    \transref{6}{\coqurl{Translation}{NNRCtoDNNRC}{nnrc_to_dnnrc_top}};
- \path[trans, tcoqp] (nnrc) -- (NNRS)
+ \path[trans, tcoqp] (nnrc) -- (nnrs)
    \transref{3}{\coqurl{Translation}{NNRCtoNNRS}{nnrc_to_nnrs_top}};
  \path[trans, tcoqc] (ajs) -- (js)
    \transref{30}{\coqurl{Translation}{JavaScriptAsttoJavaScript}{js_ast_to_js_top}};
  \path[trans, tcoqc] (nnrc)
-   .. controls ([yshift=2em] nnrcmr.north) ..
+   .. controls ([yshift=2em] nnrs.north) ..
    (java.west)
    \transref{30}{\coqurl{Translation}{NNRCtoJava}{nnrc_to_java_top}};
 
@@ -180,23 +180,19 @@
    \transref{30}{\coqurl{Translation}{cNNRCtoCAMP}{nnrc_core_to_camp_top}};
 
  % *NNRS
- \path[trans, tcoqc] (NNRS) -- (ajs)
-   \transref{6}{\coqurl{Translation}{NNRStoJavaScriptAst}{nnrs_to_js_ast_top}};
+ \path[trans, tcoqp] (nnrs) -- (nnrsimp)
+   \transref{3}{\coqurl{Translation}{NNRStoNNRSimp}{nnrs_to_nnrs_imp_top}};
+ \path[trans, tcoqp] (nnrsimp) -- (impqcert)
+   \transref{6}{\coqurl{Translation}{NNRSimptoImpQcert}{nnrs_imp_to_imp_qcert_top}};
+ \path[trans, tcoqp] (impqcert) -- (impjson)
+   \transref{6}{\coqurl{Translation}{ImpQcertoImpEJson}{imp_qcert_to_imp_ejson_top}};
+ \path[trans, tcoqc] (impjson) -- (ajs)
+   \transref{6}{\coqurl{Translation}{ImpEJsontoJavaScriptAst}{imp_ejson_to_js_ast_top}};
 
  % NNRCMR
  \tikzoptim[ccoqc]{nnrcmr}{\coqurl{NNRCMR.Optim}{NNRCMROptimizer}{run_nnrcmr_optims}}
- \path[trans, tcoqc] (nnrcmr) -- (cldmr)
-   \transref{3}{\coqurl{Translation}{NNRCMRtoCldMR}{nnrcmr_to_cldmr_top}};
- \path[trans, tcoqc] (nnrcmr)
-   .. controls ([yshift=-1em] cldmr.south) ..
-   (sparkmr)
-   \transref{10}{\coqurl{Translation}{NNRCMRtoSparkRDD}{nnrcmr_to_spark_rdd_top}};
  \path[trans, tcoqc] (nnrcmr) -- (dnnrc)
    \transref{5}{\coqurl{Translation}{NNRCMRtoDNNRC}{dnnrc_of_nnrcmr}};
-
- % CldMR
- \path[trans, tcoqc] (cldmr) -- (cloudant)
-   \transref{3}{\coqurl{Translation}{CldMRtoCloudant}{cldmr_to_cloudant_top}};
 
  % DNNRC
  \path[trans, tcoqc] (dnnrc) -- (tdnnrc)
