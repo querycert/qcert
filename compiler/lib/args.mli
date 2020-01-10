@@ -15,6 +15,7 @@
 open Compiler.EnhancedCompiler
 
 val set_qname : Config.global_config -> string -> unit
+val set_class_name : Config.global_config -> string -> unit
 val set_source : Config.global_config -> string -> unit
 val set_target : Config.global_config -> string -> unit
 val set_exact_path : Config.global_config -> unit -> unit

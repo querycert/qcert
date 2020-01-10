@@ -42,6 +42,7 @@ let parse_args () =
   let input_files = ref [] in
   let gconf =
     { gconf_qname = None;
+      gconf_class_name = None;
       gconf_source = Compiler.L_camp_rule;
       gconf_target = Compiler.L_javascript;
       gconf_path = [];

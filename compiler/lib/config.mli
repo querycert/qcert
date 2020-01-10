@@ -19,7 +19,8 @@ type io_kind =
   | IO_components of string option * string option * string option
   
 type global_config = {
-    mutable gconf_qname : string option;
+    mutable gconf_qname : string option; (* Source query name *)
+    mutable gconf_class_name : string option; (* Target class name *)
     mutable gconf_source : QLang.language;
     mutable gconf_target : QLang.language;
     mutable gconf_path : QLang.language list; (* the first element of the path must be source and the last target *)
@@ -54,7 +55,7 @@ type global_config = {
 
 val complete_configuration : global_config -> global_config
 
-val driver_conf_of_global_conf : global_config -> string -> string -> QDriver.driver_config
+val driver_conf_of_global_conf : global_config -> string -> string option -> QDriver.driver_config
 
 val data_of_string : global_config -> string -> QData.qdata
 

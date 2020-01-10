@@ -54,6 +54,7 @@ let optim_config_from_json s : QDriver.optim_config =
 let global_config_of_json j =
   let gconf =
     { gconf_qname = None;
+      gconf_class_name = None;
       gconf_source = Compiler.L_camp_rule;
       gconf_target = Compiler.L_javascript;
       gconf_path = [];
@@ -89,6 +90,7 @@ let global_config_of_json j =
   let iter_array = iter_array gconf in
   (* Source/Target *)
   apply Args.set_qname j##.qname;
+  apply Args.set_class_name j##.classname;
   apply Args.set_source j##.source;
   apply Args.set_target j##.target;
   (* Compilation path *)

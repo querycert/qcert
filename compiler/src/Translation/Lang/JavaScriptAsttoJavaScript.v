@@ -379,17 +379,36 @@ Section ToString.
 
   Definition nstring_of_funcdecl
              (f:funcdecl)
+             (i: nat) (* indentation level *)
     : nstring :=
-    ^"function " +++ ^ (f.(funcdecl_name)) +++ ^"(" +++ (comma_list_string f.(funcdecl_parameters)) +++ ^") {" +++ eol
-     +++ nstring_of_funcbody f.(funcdecl_body) 2 +++ eol
-                                               +++ ^"}" +++ eol
+    eol +++ indent i
+        +++ ^"function " +++ ^ (f.(funcdecl_name)) +++ ^"(" +++ (comma_list_string f.(funcdecl_parameters)) +++ ^") {" +++ eol
+    +++ nstring_of_funcbody f.(funcdecl_body) (i+1) +++ eol +++ indent i +++ ^"}"
   .
 
+  Definition nstring_of_method
+             (f:funcdecl)
+             (i: nat) (* indentation level *)
+    : nstring :=
+    (* XXX All methods are declare as static *)
+    eol +++ indent i +++ ^"static " +++ ^ (f.(funcdecl_name)) +++ ^"(" +++ (comma_list_string f.(funcdecl_parameters)) +++ ^") {" +++ eol
+        +++ nstring_of_funcbody f.(funcdecl_body) (i+1) +++ eol +++ indent i +++ ^"}"
+  .
+
+  Definition nstring_of_decl(d:js_ast_decl)
+    : nstring :=
+    match d with
+    | JsAstFuncDecl fd => nstring_of_funcdecl fd 0
+    | JsAstClassDecl cn cd =>
+      ^"class " +++ ^cn +++ ^"{"
+                +++ List.fold_left (fun acc q => nstring_append acc (nstring_of_method q 1)) cd (^ (""%string)) +++ eol
+                +++ ^"}" +++ eol
+    end.
 End ToString.
 
 Section JavaScriptAsttoJavaScript.
 
-  Definition js_ast_to_js_top (f:funcdecl) : javascript :=
-    nstring_of_funcdecl f.
+  Definition js_ast_to_js_top (ja:js_ast) : javascript :=
+    List.fold_left (fun acc f => nstring_append acc (nstring_of_decl f)) ja (^ (""%string)).
 
 End JavaScriptAsttoJavaScript.

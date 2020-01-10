@@ -22,7 +22,8 @@ type io_kind =
   | IO_components of string option * string option * string option
   
 type global_config = {
-    mutable gconf_qname : string option; (* Query name *)
+    mutable gconf_qname : string option; (* Source query name *)
+    mutable gconf_class_name : string option; (* Target class name *)
     mutable gconf_source : QLang.language;
     mutable gconf_target : QLang.language;
     mutable gconf_path : QLang.language list; (* the first element of the path must be source and the last target *)
@@ -133,10 +134,16 @@ let complete_configuration gconf =
 
 let driver_conf_of_global_conf gconf qname cname =
   let brand_rel = Type_util.brand_relation_of_brand_model gconf.gconf_schema.Type_util.sch_brand_model in
+  let qcname =
+    begin match cname with
+    | None -> None
+    | Some cn -> Some (char_list_of_string cn)
+    end
+  in
   let constants_config = gconf.gconf_schema.Type_util.sch_globals in
   { Compiler.comp_qname = char_list_of_string qname;
     Compiler.comp_qname_lowercase = char_list_of_string (String.lowercase_ascii (gconf.gconf_prefix ^ qname));
-    comp_class_name = char_list_of_string cname;
+    comp_class_name = qcname;
     comp_brand_rel = brand_rel;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
     comp_constants = constants_config;

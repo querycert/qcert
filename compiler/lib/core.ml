@@ -282,7 +282,7 @@ let main gconf (file_name, query_s) =
     | Some name -> name
     end
   in
-  let class_name = basename in
+  let class_name = gconf.gconf_class_name in
   let dv_conf = driver_conf_of_global_conf gconf qname class_name in
   let queries = compile_query dv_conf schema gconf.gconf_path q_source in
   let q_target =

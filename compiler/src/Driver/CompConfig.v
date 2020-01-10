@@ -527,12 +527,18 @@ Section CompConfig.
     mkDvConfig
       { comp_qname : string;
         comp_qname_lowercase : string;
-        comp_class_name : string; (* Class name different from rule name in Java case *)
+        comp_class_name : option string; (* Class name can be different from query name *)
         comp_brand_rel : list (string * string) (* brand_relation *);
         comp_mr_vinit : string;
         comp_constants : constants_config;
         comp_java_imports : string;
         comp_optim_config : optim_config; }.
+
+  Definition java_class_name_of_config c : string :=
+    match c.(comp_class_name) with
+    | None => c.(comp_qname)    (* Revert to query name *)
+    | Some cn => cn
+    end.
 
   (* Trivial driver configuration -- used in some proofs *)
 
@@ -540,7 +546,7 @@ Section CompConfig.
     := mkDvConfig
          EmptyString
          EmptyString
-         EmptyString
+         None
          nil
          EmptyString
          nil
@@ -553,7 +559,7 @@ Section CompConfig.
     mkDvConfig
       (* comp_qname = *) "query"
       (* comp_qname_lowercase = *) "query"
-      (* class_name = *) "query"
+      (* class_name = *) None
       (* comp_brand_rel = *) nil
       (* comp_mr_vinit = *) init_vinit
       (* comp_tdbindings = *) nil

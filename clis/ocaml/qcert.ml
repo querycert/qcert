@@ -34,6 +34,8 @@ let args_list gconf =
        "<lang> Specify an intermediate language in the compilation path");
       ("-exact-path", Stdlib.Arg.Unit (Args.set_exact_path gconf),
        " Use exactly the given path (do not infer intermediate steps nor add optimization)");
+      ("-class-name", Stdlib.Arg.String (Args.set_class_name gconf),
+       "<string> Indicates a class name for the target (default: none)");
       ("-dir", Stdlib.Arg.String (Args.set_dir gconf),
        "<dir> Directory for the emited code");
       ("-dir-target", Stdlib.Arg.String (Args.set_dir_target gconf),
@@ -153,6 +155,7 @@ let parse_args () =
   let input_files = ref [] in
   let gconf =
     { gconf_qname = None;
+      gconf_class_name = None;
       gconf_source = Compiler.L_camp_rule;
       gconf_target = Compiler.L_javascript;
       gconf_path = [];
