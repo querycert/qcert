@@ -189,10 +189,7 @@ Program Instance enhanced_foreign_operators : foreign_operators
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
-  decide equality.
-  - decide equality.
-    decide equality.
-  - decide equality.
+  repeat (decide equality).
 Defined.
 Next Obligation.
   constructor; intros op.
@@ -214,9 +211,7 @@ Defined.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
-  decide equality.
-  - decide equality.
-    decide equality.
+  repeat (decide equality).
 Defined.
 Next Obligation.
   constructor; intros op.

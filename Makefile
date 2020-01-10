@@ -110,7 +110,7 @@ cleanmost-qcert-compiler:
 	- @$(MAKE) cleanmost-parsersJava
 
 
-## Configuration
+## Configure
 
 ./runtimes/javascript/qcert_runtime.ml:
 	$(MAKE) -C ./runtimes/javascript

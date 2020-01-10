@@ -22,7 +22,6 @@ Require Import String.
 Require Import Utils.
 Require Import EJsonSystem.
 Require Import DataSystem.
-Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
 
@@ -35,8 +34,8 @@ Require Import EnhancedEJson.
 Import ListNotations.
 Local Open Scope list_scope.
 
-Program Instance enhanced_foreign_to_ejson : foreign_to_ejson
-  := mk_foreign_to_ejson enhanced_foreign_runtime enhanced_foreign_ejson _ _ _ _.
+Program Instance enhanced_foreign_to_ejson : foreign_to_ejson :=
+  mk_foreign_to_ejson enhanced_foreign_runtime enhanced_foreign_ejson _ _ _ _.
 Next Obligation.
   exact j. (* XXX enhanced_ejson is the same as enhanced_data *)
 Defined.
@@ -44,7 +43,7 @@ Next Obligation.
   exact fd. (* XXX enhanced_ejson is the same as enhanced_data *)
 Defined.
 
-Definition sql_date_unary_op_to_ejson (op:enhanced_unary_op) : enhanced_foreign_ejson_runtime_op :=
+Definition unary_op_to_ejson (op:enhanced_unary_op) : enhanced_foreign_ejson_runtime_op :=
   match op with
   | enhanced_unary_sql_date_op dop =>
     match dop with
@@ -61,10 +60,10 @@ Definition sql_date_unary_op_to_ejson (op:enhanced_unary_op) : enhanced_foreign_
     end
   end.
 
-Lemma sql_date_unary_op_to_ejson_correct (uop:enhanced_unary_op) :
+Lemma unary_op_to_ejson_correct (uop:enhanced_unary_op) :
   forall br d,
     lift DataToEJson.data_to_ejson (enhanced_unary_op_interp br uop d) =
-    enhanced_foreign_ejson_runtime_op_interp (sql_date_unary_op_to_ejson uop)
+    enhanced_foreign_ejson_runtime_op_interp (unary_op_to_ejson uop)
                                              [DataToEJson.data_to_ejson d].
 Proof.
   intros.
@@ -78,28 +77,28 @@ Proof.
   - destruct d; destruct u; simpl; try reflexivity.
 Qed.
 
-Definition sql_date_binary_op_to_ejson (op:enhanced_binary_op) : enhanced_foreign_ejson_runtime_op
-  := match op with
-     | enhanced_binary_sql_date_op dop =>
-       match dop with
-       | bop_sql_date_plus => enhanced_ejson_sql_date EJsonRuntimePeriodPlus
-       | bop_sql_date_minus => enhanced_ejson_sql_date EJsonRuntimePeriodMinus
-       | bop_sql_date_ne => enhanced_ejson_sql_date EJsonRuntimeDateNe
-       | bop_sql_date_lt => enhanced_ejson_sql_date EJsonRuntimeDateLt
-       | bop_sql_date_le => enhanced_ejson_sql_date EJsonRuntimeDateLe
-       | bop_sql_date_gt => enhanced_ejson_sql_date EJsonRuntimeDateGt
-       | bop_sql_date_ge => enhanced_ejson_sql_date EJsonRuntimeDateGe
-       | bop_sql_date_period_between => enhanced_ejson_sql_date EJsonRuntimePeriodBetween
-       | bop_sql_date_set_component sql_date_YEAR => enhanced_ejson_sql_date EJsonRuntimeDateSetYear
-       | bop_sql_date_set_component sql_date_MONTH => enhanced_ejson_sql_date EJsonRuntimeDateSetMonth
-       | bop_sql_date_set_component sql_date_DAY => enhanced_ejson_sql_date EJsonRuntimeDateSetDay
-       end
-     end.
+Definition binary_op_to_ejson (op:enhanced_binary_op) : enhanced_foreign_ejson_runtime_op :=
+  match op with
+  | enhanced_binary_sql_date_op dop =>
+    match dop with
+    | bop_sql_date_plus => enhanced_ejson_sql_date EJsonRuntimePeriodPlus
+    | bop_sql_date_minus => enhanced_ejson_sql_date EJsonRuntimePeriodMinus
+    | bop_sql_date_ne => enhanced_ejson_sql_date EJsonRuntimeDateNe
+    | bop_sql_date_lt => enhanced_ejson_sql_date EJsonRuntimeDateLt
+    | bop_sql_date_le => enhanced_ejson_sql_date EJsonRuntimeDateLe
+    | bop_sql_date_gt => enhanced_ejson_sql_date EJsonRuntimeDateGt
+    | bop_sql_date_ge => enhanced_ejson_sql_date EJsonRuntimeDateGe
+    | bop_sql_date_period_between => enhanced_ejson_sql_date EJsonRuntimePeriodBetween
+    | bop_sql_date_set_component sql_date_YEAR => enhanced_ejson_sql_date EJsonRuntimeDateSetYear
+    | bop_sql_date_set_component sql_date_MONTH => enhanced_ejson_sql_date EJsonRuntimeDateSetMonth
+    | bop_sql_date_set_component sql_date_DAY => enhanced_ejson_sql_date EJsonRuntimeDateSetDay
+    end
+  end.
 
-Lemma sql_date_binary_op_to_ejson_correct (bop:enhanced_binary_op) :
+Lemma binary_op_to_ejson_correct (bop:enhanced_binary_op) :
   forall br d1 d2,
     lift DataToEJson.data_to_ejson (enhanced_binary_op_interp br bop d1 d2) =
-    enhanced_foreign_ejson_runtime_op_interp (sql_date_binary_op_to_ejson bop)
+    enhanced_foreign_ejson_runtime_op_interp (binary_op_to_ejson bop)
                                              [DataToEJson.data_to_ejson d1;DataToEJson.data_to_ejson d2].
 Proof.
   intros.
@@ -114,8 +113,7 @@ Proof.
           destruct f0; try reflexivity.
 Qed.
 
-Program Instance enhanced_foreign_to_ejson_runtime :
-  foreign_to_ejson_runtime :=
+Program Instance enhanced_foreign_to_ejson_runtime : foreign_to_ejson_runtime :=
   mk_foreign_to_ejson_runtime
     enhanced_foreign_runtime
     enhanced_foreign_ejson
@@ -123,15 +121,15 @@ Program Instance enhanced_foreign_to_ejson_runtime :
     enhanced_foreign_ejson_runtime
     _ _ _ _.
 Next Obligation.
-  exact (sql_date_unary_op_to_ejson uop).
+  exact (unary_op_to_ejson uop).
 Defined.
 Next Obligation.
-  apply sql_date_unary_op_to_ejson_correct.
+  apply unary_op_to_ejson_correct.
 Defined.
 Next Obligation.
-  exact (sql_date_binary_op_to_ejson bop).
+  exact (binary_op_to_ejson bop).
 Defined.
 Next Obligation.
-  apply sql_date_binary_op_to_ejson_correct.
+  apply binary_op_to_ejson_correct.
 Defined.
 
