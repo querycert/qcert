@@ -23,10 +23,10 @@ Require Import Utils.
 Require Import JSONSystem.
 Require Import DataSystem.
 
+Require Import SqlDateComponent.
+
 Require Import EnhancedData.
 Require Import EnhancedType.
-
-Require Import SqlDateComponent.
 
 Inductive enhanced_has_type : enhanced_data -> enhanced_type -> Prop :=
 | enhanced_has_type_top fd : enhanced_has_type fd enhancedTop

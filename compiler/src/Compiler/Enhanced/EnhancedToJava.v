@@ -27,7 +27,7 @@ Local Open Scope nstring_scope.
 Definition enhanced_to_java_data
            (quotel:nstring) (fd:enhanced_data) : java_json
   := match fd with
-     | enhancedsqldate tp => mk_java_json (^@toString _ sql_date_foreign_data.(@foreign_data_tostring ) tp)
+     | enhancedsqldate tp => mk_java_json (^@toString _ sql_date_foreign_data.(@foreign_data_tostring) tp)
      | enhancedsqldateperiod tp => mk_java_json (^@toString _ sql_date_period_foreign_data.(@foreign_data_tostring ) tp)
      end.
 

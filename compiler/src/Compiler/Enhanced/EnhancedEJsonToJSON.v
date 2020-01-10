@@ -22,7 +22,6 @@ Require Import String.
 Require Import Utils.
 Require Import EJsonSystem.
 Require Import JSONSystem.
-Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
 Require Import ForeignEJsonToJSON.
 Require Import ForeignToEJsonRuntime.
