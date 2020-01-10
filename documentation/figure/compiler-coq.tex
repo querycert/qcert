@@ -115,92 +115,92 @@
 
  % ASTs
  \path[trans, tcoqp] (rule) -- (camp)
-   \transref{3}{\coqurl{Translation}{CAMPRuletoCAMP}{camp_rule_to_camp_top}};
+   \transref{3}{\coqurl{Translation.Lang}{CAMPRuletoCAMP}{camp_rule_to_camp_top}};
  \path[trans, tcoqp] (lnra.east) -- (nraenv)
-   \transref{10}{\coqurl{Translation}{LambdaNRAtoNRAEnv}{lambda_nra_to_nraenv_top}};
+   \transref{10}{\coqurl{Translation.Lang}{LambdaNRAtoNRAEnv}{lambda_nra_to_nraenv_top}};
  \path[trans, tcoqc] (sql.east) -- (nraenv)
-   \transref{10}{\coqurl{Translation}{SQLtoNRAEnv}{sql_to_nraenv_top}};
+   \transref{10}{\coqurl{Translation.Lang}{SQLtoNRAEnv}{sql_to_nraenv_top}};
  \path[trans, tcoqc] (sqlpp.east) -- (nraenv)
-   \transref{10}{\coqurl{Translation}{SQLPPtoNRAEnv}{sqlpp_to_nraenv_top}};
+   \transref{10}{\coqurl{Translation.Lang}{SQLPPtoNRAEnv}{sqlpp_to_nraenv_top}};
  \path[trans, tcoqp] (oql.east) -- (nraenv)
-   \transref{15}{\coqurl{Translation}{OQLtoNRAEnv}{oql_to_nraenv_top}};
+   \transref{15}{\coqurl{Translation.Lang}{OQLtoNRAEnv}{oql_to_nraenv_top}};
 
  % CAMP
  \path[trans, tcoqp] (camp.east) -- (nraenv.west)
-   \transref{3}{\coqurl{Translation}{CAMPtoNRAEnv}{camp_to_nraenv_top}};
+   \transref{3}{\coqurl{Translation.Lang}{CAMPtoNRAEnv}{camp_to_nraenv_top}};
  \path[trans, tcoqp] (camp.east) -- (cnraenv.west)
-   \transref{3}{\coqurl{Translation}{CAMPtocNRAEnv}{camp_to_nraenv_core_top}};
+   \transref{3}{\coqurl{Translation.Lang}{CAMPtocNRAEnv}{camp_to_nraenv_core_top}};
  \path[trans, tcoqp] (camp.east) -- (nra.west)
-   \transref{3}{\coqurl{Translation}{CAMPtoNRA}{camp_to_nra_top}};
+   \transref{3}{\coqurl{Translation.Lang}{CAMPtoNRA}{camp_to_nra_top}};
 
  % *NRA*
  \tikzoptimdashed[ccoqp]{nraenv}{\coqurl{NRAEnv.Optim}{NRAEnvOptimizer}{run_nraenv_optims}}
  \path[trans, tcoqp] (nraenv.east) -- (nnrc.west)
-   \transref{3}{\coqurl{Translation}{NRAEnvtoNNRC}{nraenv_to_nnrc_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NRAEnvtoNNRC}{nraenv_to_nnrc_top}};
  \path[trans, tcoqp] ([xshift=0.25em] nraenv.south) -- ([xshift=0.25em] cnraenv.north)
-   \transref{3}{\coqurl{Translation}{NRAEnvtocNRAEnv}{nraenv_to_nraenv_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NRAEnvtocNRAEnv}{nraenv_to_nraenv_top}};
  \path[trans, tcoqp] ([xshift=-0.25em] cnraenv.north) -- ([xshift=-0.25em] nraenv.south)
-   \transref{3}{\coqurl{Translation}{cNRAEnvtoNRAEnv}{nraenv_core_to_nraenv_top}};
+   \transref{3}{\coqurl{Translation.Lang}{cNRAEnvtoNRAEnv}{nraenv_core_to_nraenv_top}};
 
  \path[trans, tcoqp] ([xshift=0.25em] cnraenv.south) -- ([xshift=0.25em] nra.north)
-   \transref{3}{\coqurl{Translation}{cNRAEnvtoNRA}{nraenv_core_to_nra_top}};
+   \transref{3}{\coqurl{Translation.Lang}{cNRAEnvtoNRA}{nraenv_core_to_nra_top}};
  \path[trans, tcoqp] ([xshift=-0.25em] nra.north) -- ([xshift=-0.25em] cnraenv.south)
-   \transref{3}{\coqurl{Translation}{NRAtocNRAEnv}{nra_to_nraenv_core_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NRAtocNRAEnv}{nra_to_nraenv_core_top}};
  \path[trans, tcoqp] (cnraenv) -- (cnnrc)
-   \transref{3}{\coqurl{Translation}{cNRAEnvtocNNRC}{nraenv_core_to_nnrc_core_top}};
+   \transref{3}{\coqurl{Translation.Lang}{cNRAEnvtocNNRC}{nraenv_core_to_nnrc_core_top}};
 
  \path[trans, tcoqp] (nra.east) -- (cnnrc)
-   \transref{5}{\coqurl{Translation}{NRAtocNNRC}{nra_to_nnrc_core_top}};
+   \transref{5}{\coqurl{Translation.Lang}{NRAtocNNRC}{nra_to_nnrc_core_top}};
 
  % *NNRC
  \tikzoptimdashed[ccoqp]{nnrc}{\coqurl{NNRC.Optim}{NNRCOptimizer}{run_nnrc_optims}}
  \path[trans, tcoqc] ([yshift=0.25em] nnrc.east) -- ([yshift=0.25em] nnrcmr.west)
-   \transref{3}{\coqurl{Translation}{NNRCtoNNRCMR}{nnrc_to_nnrcmr_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NNRCtoNNRCMR}{nnrc_to_nnrcmr_top}};
  \path[trans, tcoqc] ([yshift=-0.25em] nnrcmr.west) -- ([yshift=-0.25em] nnrc.east)
-   \transref{3}{\coqurl{Translation}{NNRCMRtoNNRC}{nnrc_of_nnrcmr_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NNRCMRtoNNRC}{nnrc_of_nnrcmr_top}};
  \path[trans, tcoqp, dashed] (nnrc) -- (dnnrc)
-   \transref{6}{\coqurl{Translation}{NNRCtoDNNRC}{nnrc_to_dnnrc_top}};
+   \transref{6}{\coqurl{Translation.Lang}{NNRCtoDNNRC}{nnrc_to_dnnrc_top}};
  \path[trans, tcoqp] (nnrc) -- (nnrs)
-   \transref{3}{\coqurl{Translation}{NNRCtoNNRS}{nnrc_to_nnrs_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NNRCtoNNRS}{nnrc_to_nnrs_top}};
  \path[trans, tcoqc] (ajs) -- (js)
-   \transref{30}{\coqurl{Translation}{JavaScriptAsttoJavaScript}{js_ast_to_js_top}};
+   \transref{30}{\coqurl{Translation.Lang}{JavaScriptAsttoJavaScript}{js_ast_to_js_top}};
  \path[trans, tcoqc] (nnrc)
    .. controls ([yshift=2em] nnrs.north) ..
    (java.west)
-   \transref{30}{\coqurl{Translation}{NNRCtoJava}{nnrc_to_java_top}};
+   \transref{30}{\coqurl{Translation.Lang}{NNRCtoJava}{nnrc_to_java_top}};
 
  \path[trans, tcoqp] ([xshift=0.25em] nnrc.south) -- ([xshift=0.25em] cnnrc.north)
-   \transref{3}{\coqurl{Translation}{NNRCtocNNRC}{nnrc_to_nnrc_core_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NNRCtocNNRC}{nnrc_to_nnrc_core_top}};
  \path[trans, tcoqp] ([xshift=-0.25em] cnnrc.north) -- ([xshift=-0.25em] nnrc.south)
-   \transref{3}{\coqurl{Translation}{cNNRCtoNNRC}{nnrc_core_to_nnrc_top}};
+   \transref{3}{\coqurl{Translation.Lang}{cNNRCtoNNRC}{nnrc_core_to_nnrc_top}};
 
  \path[trans, tcoqp, dashed] (cnnrc.south)
    .. controls ([yshift=-7em] nra.south) and +(0, -1.5) ..
    (camp.south)
-   \transref{30}{\coqurl{Translation}{cNNRCtoCAMP}{nnrc_core_to_camp_top}};
+   \transref{30}{\coqurl{Translation.Lang}{cNNRCtoCAMP}{nnrc_core_to_camp_top}};
 
  % *NNRS
  \path[trans, tcoqp] (nnrs) -- (nnrsimp)
-   \transref{3}{\coqurl{Translation}{NNRStoNNRSimp}{nnrs_to_nnrs_imp_top}};
+   \transref{3}{\coqurl{Translation.Lang}{NNRStoNNRSimp}{nnrs_to_nnrs_imp_top}};
  \path[trans, tcoqp] (nnrsimp) -- (impqcert)
-   \transref{6}{\coqurl{Translation}{NNRSimptoImpQcert}{nnrs_imp_to_imp_qcert_top}};
+   \transref{6}{\coqurl{Translation.Lang}{NNRSimptoImpQcert}{nnrs_imp_to_imp_qcert_top}};
  \path[trans, tcoqp] (impqcert) -- (impjson)
-   \transref{6}{\coqurl{Translation}{ImpQcertoImpEJson}{imp_qcert_to_imp_ejson_top}};
+   \transref{6}{\coqurl{Translation.Lang}{ImpQcertoImpEJson}{imp_qcert_to_imp_ejson_top}};
  \path[trans, tcoqc] (impjson) -- (ajs)
-   \transref{6}{\coqurl{Translation}{ImpEJsontoJavaScriptAst}{imp_ejson_to_js_ast_top}};
+   \transref{6}{\coqurl{Translation.Lang}{ImpEJsontoJavaScriptAst}{imp_ejson_to_js_ast_top}};
 
  % NNRCMR
  \tikzoptim[ccoqc]{nnrcmr}{\coqurl{NNRCMR.Optim}{NNRCMROptimizer}{run_nnrcmr_optims}}
  \path[trans, tcoqc] (nnrcmr) -- (dnnrc)
-   \transref{5}{\coqurl{Translation}{NNRCMRtoDNNRC}{dnnrc_of_nnrcmr}};
+   \transref{5}{\coqurl{Translation.Lang}{NNRCMRtoDNNRC}{dnnrc_of_nnrcmr}};
 
  % DNNRC
  \path[trans, tcoqc] (dnnrc) -- (tdnnrc)
-   \transref{3}{\coqurl{Translation}{DNNRCtotDNNRC}{dnnrc_to_dnnrc_typed_top}};
+   \transref{3}{\coqurl{Translation.Lang}{DNNRCtotDNNRC}{dnnrc_to_dnnrc_typed_top}};
 
  \tikzoptim[ccoqc]{tdnnrc}{\coqurl{tDNNRC.Optim}{tDNNRCOptimizer}{run_dnnrc_optims}}
  \path[trans, tcoqc] (tdnnrc) -- (sparkdf)
-   \transref{3}{\coqurl{Translation}{tDNNRCtoSparkDF}{dnnrc_typed_to_spark_df_top}};
+   \transref{3}{\coqurl{Translation.Lang}{tDNNRCtoSparkDF}{dnnrc_typed_to_spark_df_top}};
 
 \end{tikzpicture}
 \vspace*{-5em}
