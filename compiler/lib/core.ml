@@ -181,15 +181,14 @@ let print_input ev_input =
 
 let eval_string (validate:bool) (debug:bool) (quiet:bool) (ev_input:Data_util.content_input) (expected_output:Data_util.content_output) (schema: Type_util.schema) dir file_name q =
   let brand_model = schema.Type_util.sch_brand_model in
-  let brand_relation = Type_util.brand_relation_of_brand_model brand_model in
   let globals = schema.Type_util.sch_globals in
   let ev_input = List.map (lift_data_to_ddata globals) ev_input in
   (* print_input ev_input; *)
   let language_name = Compiler_util.name_of_language (QLang.language_of_query brand_model q) in
   let ev_output =
     begin match debug with
-    | false -> QEval.eval_query brand_relation brand_model q ev_input
-    | true -> QEval.eval_query_debug brand_relation brand_model q ev_input
+    | false -> QEval.eval_query brand_model q ev_input
+    | true -> QEval.eval_query_debug brand_model q ev_input
     end
   in
   let ev_data =

@@ -68,7 +68,7 @@ Section CompEval.
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
 
   (* XXX This should come from the brand model, to ensure consistency *)
-  Context (h:list(string*string)).
+  Definition h := brand_relation_brands.
 
   (* Evaluation functions *)
   Section EvalFunctions.
@@ -314,4 +314,15 @@ Section CompEval.
 
   End EvalWorld.
 
+  Section Util.
+    Lemma lift_input_idem d:
+      (lift_input (List.map (fun xy : string * data => (fst xy, Dlocal (snd xy))) d)) = d.
+    Proof.
+      induction d; simpl; [reflexivity| ].
+      destruct a; simpl.
+      f_equal.
+      assumption.
+    Qed.
+    
+  End Util.
 End CompEval.

@@ -49,21 +49,22 @@ Require Import LoggerComponent.
 Require Import SqlDateComponent.
 Require Import UriComponent.
 
-Require Import EnhancedData.
-Require Import EnhancedEJson.
-Require Import EnhancedDataToEJson.
-Require Import EnhancedEJsonToJSON.
-Require Import EnhancedToJava.
-Require Import EnhancedToJavascriptAst.
-Require Import EnhancedReduceOps.
-Require Import EnhancedToReduceOps.
-Require Import EnhancedToSpark.
-Require Import EnhancedType.
-Require Import EnhancedToScala.
-Require Import EnhancedDataTyping.
-Require Import EnhancedTypeToJSON.
-Require Import EnhancedRuntime.
-Require Import EnhancedTyping.
+(* XXX Export those for convenience *)
+Require Export EnhancedData.
+Require Export EnhancedEJson.
+Require Export EnhancedDataToEJson.
+Require Export EnhancedEJsonToJSON.
+Require Export EnhancedToJava.
+Require Export EnhancedToJavascriptAst.
+Require Export EnhancedReduceOps.
+Require Export EnhancedToReduceOps.
+Require Export EnhancedToSpark.
+Require Export EnhancedType.
+Require Export EnhancedToScala.
+Require Export EnhancedDataTyping.
+Require Export EnhancedTypeToJSON.
+Require Export EnhancedRuntime.
+Require Export EnhancedTyping.
 
 Instance enhanced_basic_model {model:brand_model} :
   basic_model

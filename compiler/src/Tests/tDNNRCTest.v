@@ -71,7 +71,7 @@ Section tDNNRCTests.
     mkDistConstants (("Persons"%string,Vdistr)::nil) (("Persons"%string,persons)::nil).
   Definition ev :=
     match env with
-    | Some denv => lift (fun x => @eval_dnnrc_typed _ _ _ [] x denv) e
+    | Some denv => lift (fun x => @eval_dnnrc_typed _ _ _ x denv) e
     | None => None
     end.
 

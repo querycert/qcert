@@ -30,8 +30,6 @@ val schema_of_io_json : QData.json -> schema
 val inheritance_of_schema : schema -> (char list * char list) list
 val raw_inheritance_of_schema : schema -> QData.json
 
-val brand_relation_of_brand_model : QType.brand_model -> Compiler.brand_relation
-
 type content_sdata = (char list * char list) list
 val content_sdata_of_data : schema -> content_input -> content_sdata
 

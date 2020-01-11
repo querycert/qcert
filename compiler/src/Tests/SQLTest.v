@@ -38,7 +38,8 @@ Require Import SQL.
 Require Import SQLtoNRAEnv.
 Require Import EnhancedModel.
 Require Import CompEval.
-  
+Require Import EnhancedCompiler.
+
 Section SQLTest.
   Open Scope Z_scope.
 
@@ -144,8 +145,9 @@ Section SQLTest.
   Definition sql_just_query_to_nraenv (q:sql_query)
     := sql_to_nraenv_top (SRunQuery q::nil).
 
+  Definition bm := EnhancedCompiler.QType.empty_brand_model tt eq_refl.
   Definition sql_just_query_eval (q:sql_query)
-    := @eval_nraenv _ nil (sql_to_nraenv_top (SRunQuery q::nil)).
+    := @eval_nraenv _ enhanced_foreign_type bm (sql_to_nraenv_top (SRunQuery q::nil)).
 
   (* sql1:
        select name

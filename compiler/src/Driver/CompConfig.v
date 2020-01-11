@@ -528,7 +528,6 @@ Section CompConfig.
       { comp_qname : string;
         comp_qname_lowercase : string;
         comp_class_name : option string; (* Class name can be different from query name *)
-        comp_brand_rel : list (string * string) (* brand_relation *);
         comp_mr_vinit : string;
         comp_constants : constants_config;
         comp_java_imports : string;
@@ -547,7 +546,6 @@ Section CompConfig.
          EmptyString
          EmptyString
          None
-         nil
          EmptyString
          nil
          EmptyString
@@ -560,7 +558,6 @@ Section CompConfig.
       (* comp_qname = *) "query"
       (* comp_qname_lowercase = *) "query"
       (* class_name = *) None
-      (* comp_brand_rel = *) nil
       (* comp_mr_vinit = *) init_vinit
       (* comp_tdbindings = *) nil
       (* comp_java_imports = *) ""
