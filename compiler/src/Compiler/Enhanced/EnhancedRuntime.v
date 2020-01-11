@@ -17,7 +17,6 @@ Require Import ZArith.
 Require Import EquivDec.
 Require Import RelationClasses.
 Require Import Equivalence.
-Require Import ToString.
 Require Import String.
 Require Import Utils.
 Require Import JSONSystem.
@@ -65,7 +64,7 @@ Require Import EnhancedTypeToJSON.
 
 (** Loggers *)
 Section Loggers.
-  Instance foreign_nraenv_optimizer_logger :
+  Global Instance foreign_nraenv_optimizer_logger :
     optimizer_logger string nraenv
     :=
       {
@@ -74,7 +73,7 @@ Section Loggers.
         ; logStep :=  OPTIMIZER_LOGGER_nraenv_step
         ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_endPass
       } .
-  Instance foreign_nnrc_optimizer_logger :
+  Global Instance foreign_nnrc_optimizer_logger :
     optimizer_logger string nnrc
     :=
       {
@@ -83,7 +82,7 @@ Section Loggers.
         ; logStep :=  OPTIMIZER_LOGGER_nnrc_step
         ; logEndPass :=  OPTIMIZER_LOGGER_nnrc_endPass
       } .
-  Instance foreign_nnrs_imp_expr_optimizer_logger :
+  Global Instance foreign_nnrs_imp_expr_optimizer_logger :
     optimizer_logger string nnrs_imp_expr
     :=
       {
@@ -92,7 +91,7 @@ Section Loggers.
         ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_expr_step
         ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_expr_endPass
       } .
-  Instance foreign_nnrs_imp_stmt_optimizer_logger :
+  Global Instance foreign_nnrs_imp_stmt_optimizer_logger :
     optimizer_logger string nnrs_imp_stmt
     :=
       {
@@ -101,7 +100,7 @@ Section Loggers.
         ; logStep :=  OPTIMIZER_LOGGER_nnrs_imp_stmt_step
         ; logEndPass :=  OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass
       } .
-  Instance foreign_nnrs_imp_optimizer_logger :
+  Global Instance foreign_nnrs_imp_optimizer_logger :
     optimizer_logger string nnrs_imp
     :=
       {
@@ -113,7 +112,7 @@ Section Loggers.
   Definition dnnrc_for_log {br:brand_relation}
     := (@dnnrc_base enhanced_foreign_runtime (type_annotation unit) dataframe).
 
-  Instance foreign_dnnrc_optimizer_logger {br:brand_relation} :
+  Global Instance foreign_dnnrc_optimizer_logger {br:brand_relation} :
     optimizer_logger string dnnrc_for_log
     :=
       {

@@ -2016,7 +2016,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2054,7 +2053,6 @@ Section CompDriver.
                  s
                  EmptyString
                  None
-                 nil
                  EmptyString
                  (constants_config_of_tdbindings t)
                  EmptyString
@@ -2076,7 +2074,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  (constants_config_of_tdbindings t)
                  EmptyString
@@ -2097,7 +2094,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  o
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2117,7 +2113,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2137,7 +2132,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2150,7 +2144,6 @@ Section CompDriver.
                  s
                  s
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2170,7 +2163,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2190,7 +2182,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2272,7 +2263,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2283,7 +2273,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  (one_constant_config_of_avoid_list l)
                  EmptyString
@@ -2297,7 +2286,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  (one_constant_config_of_avoid_list l)
                  EmptyString
@@ -2310,7 +2298,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -2321,7 +2308,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  (one_constant_config_of_avoid_list l)
                  EmptyString
@@ -2337,7 +2323,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  v
                  (constants_config_of_tdbindings x)
                  EmptyString
@@ -2352,7 +2337,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  (constants_config_of_tdbindings x)
                  EmptyString
@@ -2365,7 +2349,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  (Some s)
-                 nil
                  EmptyString
                  nil
                  s0
@@ -2376,7 +2359,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  None
-                 nil
                  EmptyString
                  nil
                  EmptyString
@@ -5591,6 +5573,26 @@ Section CompDriver.
                (NNRCLet init_venv (NNRCConst (drec nil))
                   (NNRCLet init_vid (NNRCConst dunit)
                      (nnrc_to_nnrc_base (NRAEnvtoNNRC.nraenv_to_nnrc q init_vid init_venv))))))).
+      reflexivity.
+    Qed.
+
+    Definition compile_nraenv_to_imp_ejson_verified (conf:driver_config) (q:query) : query :=
+      let dv := driver_of_path conf (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::L_imp_ejson::nil) in
+      match List.rev (compile dv q) with
+      | nil => Q_error "No compilation result!"
+      | target :: _ => target
+      end.
+
+    Lemma compile_nraenv_to_imp_ejson_verified_yields_result conf q :
+      exists q', compile_nraenv_to_imp_ejson_verified conf (Q_nraenv q) = Q_imp_ejson q'.
+    Proof.
+      unfold compile_nraenv_to_imp_ejson_verified.
+      exists (imp_qcert_to_imp_ejson (nnrs_imp_to_imp_qcert (comp_qname_lowercase conf)
+         (nnrs_to_nnrs_imp
+            (nnrc_to_nnrs (vars_of_constants_config (comp_constants conf))
+               (NNRCLet init_venv (NNRCConst (drec nil))
+                  (NNRCLet init_vid (NNRCConst dunit)
+                     (nnrc_to_nnrc_base (NRAEnvtoNNRC.nraenv_to_nnrc q init_vid init_venv)))))))).
       reflexivity.
     Qed.
 
