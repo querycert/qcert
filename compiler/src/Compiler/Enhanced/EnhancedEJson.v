@@ -232,7 +232,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op :=
   end.
 
 Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _.
+  mk_foreign_ejson_runtime enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _ _ _.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
@@ -247,4 +247,9 @@ Defined.
 Next Obligation.
   exact (enhanced_foreign_ejson_runtime_op_interp f dl).
 Defined.
-
+Next Obligation.
+  exact (defaultEJsonToString H).
+Defined.
+Next Obligation.
+  exact (defaultEJsonToString H).
+Defined.

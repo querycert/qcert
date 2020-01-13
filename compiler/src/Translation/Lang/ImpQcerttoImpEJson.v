@@ -560,9 +560,9 @@ Section ImpQcerttoImpEJson.
         rewrite map_length.
         reflexivity.
       - Case "OpToString"%string.
-        admit. (* XXX Not implemented *)
+        rewrite <- foreign_to_ejson_runtime_tostring_correct; reflexivity.
       - Case "OpToText"%string.
-        admit. (* XXX Not implemented *)
+        rewrite <- foreign_to_ejson_runtime_totext_correct; reflexivity.
       - Case "OpLength"%string.
         destruct d; reflexivity.
       - Case "OpSubstring"%string.

@@ -46,7 +46,14 @@ Section ForeignToEJsonRuntime.
                  lift data_to_ejson (foreign_operators_binary_interp br bop d1 d2) =
                  foreign_ejson_runtime_op_interp (foreign_to_ejson_runtime_of_binary_op bop)
                                                  (data_to_ejson d1::data_to_ejson d2::nil)
+             ; foreign_to_ejson_runtime_tostring_correct
+                 (d:data) :
+                 foreign_operators_unary_data_tostring d =
+                 foreign_ejson_runtime_tostring (data_to_ejson d)
+             ; foreign_to_ejson_runtime_totext_correct
+                 (d:data) :
+                 foreign_operators_unary_data_totext d =
+                 foreign_ejson_runtime_totext (data_to_ejson d)
          }.
 
 End ForeignToEJsonRuntime.
-

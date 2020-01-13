@@ -68,7 +68,7 @@ Section UnaryOperatorsSem.
        | dcoll l => string_bracket 
                       "["%string
                       (String.concat ", "%string
-                              (string_sort (map defaultDataToString l)))
+                              (map defaultDataToString l))
                       "]"%string
        | drec lsd => string_bracket
                        "{"%string
