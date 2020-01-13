@@ -387,6 +387,7 @@ MODULES = \
 	Driver/CompEnv \
 	Driver/CompConfig \
 	Driver/CompDriver \
+	Driver/CompCustom \
 	Driver/CompStat \
 	Driver/CompEval \
 	Driver/CompCorrectness \

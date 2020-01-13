@@ -201,7 +201,7 @@ Section ImpEval.
 
     Definition imp_eval (q:imp) (d:Data) : option (option Data)
       := match q with
-         | ImpLib [ (_, f) ] => Some (imp_function_eval f d)
+         | ImpLib [ (fname, f) ] => Some (imp_function_eval f d)
          (* XXX What happens when more than one functions ? XXX *)
          | _ => None
          end.

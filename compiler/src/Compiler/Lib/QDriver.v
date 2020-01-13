@@ -28,6 +28,7 @@ Require Import CompEnv.
 Require Import CompLang.
 Require Import CompConfig.
 Require Import CompDriver.
+Require Import CompCustom.
 Require Import CompilerRuntime.
 Require Import JSON.
 
@@ -78,8 +79,9 @@ Module QDriver(runtime:CompilerRuntime).
     Definition mk_constant_config := mkConstantConfig.
     
     (* Comp *)
-    (* XXX TODO : use driver *)
-    Definition get_driver_from_source_target : driver_config -> language -> language -> driver := get_driver_from_source_target.
+    Definition get_driver_from_source_target
+      : driver_config -> language -> language -> driver
+      := get_driver_from_source_target.
 
     (* Some macros, that aren't really just about source-target *)
 
@@ -88,6 +90,7 @@ Module QDriver(runtime:CompilerRuntime).
       driver_config -> language -> language -> query -> query
       := compile_from_source_target.
 
+    (* Custom *)
     Definition compile_nraenv_to_imp_qcert_verified :
       driver_config -> query -> query
       := compile_nraenv_to_imp_qcert_verified.
