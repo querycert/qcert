@@ -61,12 +61,13 @@ class QcertRunner {
     }
 
     /* Link compile query and load it as Node module */
-    static loadQuery(schema,compiledQuery) {
+    static loadQuery(schema,queryFile,compiledQuery) {
         try {
+            const queryName = queryFile.split('/').pop().split('.')[0];
             const inheritance = schema && schema.inheritance ? schema.inheritance : [];
             const inheritanceString = `const inheritance = ${JSON.stringify(inheritance)};`;
             const linkedQuery =
-                  inheritanceString + QcertRuntimeString + compiledQuery + 'module.exports = { query };\n';
+                  inheritanceString + QcertRuntimeString + compiledQuery + `\nconst query = ${queryName};\nmodule.exports = { query };\n`;
             const { query } = requireFromString(linkedQuery, 'query.js');
             return query;
         } catch(err) {
@@ -76,8 +77,8 @@ class QcertRunner {
     }
 
     /* execute compiled query */
-    static executeCompiled(schema,compiledQuery,input) {
-        const query = QcertRunner.loadQuery(schema,compiledQuery);
+    static executeCompiled(schema,queryFile,compiledQuery,input) {
+        const query = QcertRunner.loadQuery(schema,queryFile,compiledQuery);
         return query(input);
     }
 
@@ -108,13 +109,13 @@ class QcertRunner {
         const compiledQuery = QcertRunner.compile(source,schema,sourceQuery,output);
         if (validate) {
             if (output) {
-                let result = QcertRunner.executeCompiled(schema,compiledQuery.result,input);
+                let result = QcertRunner.executeCompiled(schema,queryFile,compiledQuery.result,input);
                 return QcertRunner.validate(compiledQuery.gconf,queryFile,source,output,result)
             } else {
                 throw new Error('Cannot validate result without expected result (--output option)');
             }
         } else {
-            return QcertRunner.executeCompiled(schema,compiledQuery.result,input);
+            return QcertRunner.executeCompiled(schema,queryFile,compiledQuery.result,input);
         }
     }
 
@@ -123,13 +124,13 @@ class QcertRunner {
         const gconf = QcertRunner.configure('oql',schema,compiledQuery,output);
         if (validate) {
             if (output) {
-                let result = QcertRunner.executeCompiled(schema,compiledQuery,input);
+                let result = QcertRunner.executeCompiled(schema,queryFile,compiledQuery,input);
                 return QcertRunner.validate(gconf,queryFile,'js',output,result)
             } else {
                 throw new Error('Cannot validate result without expected result (--output option)');
             }
         } else {
-            return QcertRunner.executeCompiled(schema,compiledQuery,input);
+            return QcertRunner.executeCompiled(schema,queryFile,compiledQuery,input);
         }
     }
 }
