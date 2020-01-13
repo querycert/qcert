@@ -100,6 +100,7 @@ Require Import CompLang.
 Require Import CompEnv.
 Require Import CompConfig.
 Require Import CompDriver.
+Require Import CompCustom.
 Require Import CompEval.
 
 Section CompCorrectness.
@@ -2031,7 +2032,7 @@ input data returns the same output data. *)
       Qed.
 
       Lemma nraenv_to_imp_qcert_correct conf (qnra:nraenv) (x:imp_qcert):
-        CompDriver.compile_nraenv_to_imp_qcert_verified conf (Q_nraenv qnra) = Q_imp_qcert x ->
+        compile_nraenv_to_imp_qcert_verified conf (Q_nraenv qnra) = Q_imp_qcert x ->
         forall d : bindings, nraenv_eval_top h qnra d =
                              imp_qcert_eval_top h d x.
       Proof.
@@ -2103,7 +2104,7 @@ input data returns the same output data. *)
       Qed.
 
       Lemma nraenv_to_imp_ejson_correct conf (qnra:nraenv) (x:imp_ejson):
-        CompDriver.compile_nraenv_to_imp_ejson_verified conf (Q_nraenv qnra) = Q_imp_ejson x ->
+        compile_nraenv_to_imp_ejson_verified conf (Q_nraenv qnra) = Q_imp_ejson x ->
         forall d : bindings, nraenv_eval_top h qnra d =
                              imp_ejson_eval_top h d x.
       Proof.
