@@ -358,13 +358,14 @@ Section CAMPTest.
 
   Example R9_result := eval_camp_rule CPRModel R9 exampleWM.
 
-  Example R9_expected := map dconst
-    ["Customer : James Do purchased: [Croissant, Dough]";
-     "Customer : Joan Doe purchased: []";
-     "Customer : Jill Does purchased: [Libretto]";
-     "Customer : Jim Does purchased: [Stiletto]";
-     "Customer : Jane Doe purchased: []";
-     "Customer : John Doe purchased: [Potatoe, Tomatoe]"].
+  Example R9_expected :=
+    map dconst
+        ["Customer : John Doe purchased: [Tomatoe, Potatoe]";
+         "Customer : Jane Doe purchased: []";
+         "Customer : Jim Does purchased: [Stiletto]";
+         "Customer : Jill Does purchased: [Libretto]";
+         "Customer : Joan Doe purchased: []";
+         "Customer : James Do purchased: [Dough, Croissant]"].
 
   Example R9_verify : validate_success R9_result R9_expected = true.
   Proof. fast_refl. Qed.

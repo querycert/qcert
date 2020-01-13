@@ -17,6 +17,7 @@ Require Import EquivDec.
 
 Require Import Utils.
 Require Import DataSystem.
+Require Import EJsonSystem.
 Require Import ForeignEJson.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
@@ -60,8 +61,8 @@ Defined.
 Program Instance trivial_foreign_operators:
   foreign_operators
   := mk_foreign_operators trivial_foreign_data
-                          Empty_set _ _ _ _ defaultDataToString defaultDataToString
-                          Empty_set _ _ _ _.
+                          Empty_set _ _ _ _
+                          Empty_set _ _ _ _ defaultDataToString defaultDataToString.
 Next Obligation.
   intros []. 
 Defined.
@@ -111,7 +112,7 @@ Instance trivial_foreign_runtime :
        trivial_foreign_operators.
 
 Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime trivial_foreign_ejson Empty_set _ _ _.
+  mk_foreign_ejson_runtime trivial_foreign_ejson Empty_set _ _ _ defaultEJsonToString defaultEJsonToString.
 Next Obligation.
   intros [].
 Defined.
@@ -133,13 +134,19 @@ Program Instance trivial_foreign_to_ejson_runtime :
        trivial_foreign_ejson
        trivial_foreign_to_ejson
        trivial_foreign_ejson_runtime
-       _ _ _ _.
+       _ _ _ _ _ _.
 Next Obligation.
   destruct uop.
 Defined.
 Next Obligation.
   destruct bop.
 Defined.
+Next Obligation.
+  admit.
+Admitted.
+Next Obligation.
+  admit.
+Admitted.
 
 Program Instance trivial_foreign_to_json : foreign_to_json
   := mk_foreign_to_json trivial_foreign_ejson _ _.

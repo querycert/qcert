@@ -38,9 +38,6 @@ Section ForeignOperators.
                foreign_operators_unary_interp br op d = Some o ->
                data_normalized br d ->
                data_normalized br o
-           ; foreign_operators_unary_data_tostring : data -> string
-           ; foreign_operators_unary_data_totext : data -> string
-
            (* Binary operators *)
            ; foreign_operators_binary : Set
            ; foreign_operators_binary_dec :> EqDec foreign_operators_binary eq
@@ -56,6 +53,9 @@ Section ForeignOperators.
                data_normalized br d1 ->
                data_normalized br d2 ->
                data_normalized br o
+           (* ToString / ToText operators *)
+           ; foreign_operators_unary_data_tostring : data -> string
+           ; foreign_operators_unary_data_totext : data -> string
          }.
 
 End ForeignOperators.

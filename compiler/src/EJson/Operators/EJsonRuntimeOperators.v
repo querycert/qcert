@@ -18,10 +18,12 @@ Require Import String.
 Require Import List.
 Require Import ZArith.
 Require Import Utils.
+Require Import OperatorsUtils.
 Require Import BrandRelation.
 Require Import ForeignEJson.
 Require Import EJson.
 Require Import ForeignEJsonRuntime.
+Require Import DataSort.
 
 Section EJsonRuntimeOperators.
   Local Open Scope string.
@@ -164,6 +166,103 @@ Section EJsonRuntimeOperators.
       | EJsonRuntimeForeign fop => toString fop
       end.
 
+  Fixpoint defaultEJsonToString (j:ejson) : string
+    := match j with
+       | ejnull => "unit"%string
+       | ejbigint n => toString n
+       | ejnumber n => toString n
+       | ejbool b => toString b
+       | ejstring s => stringToString s
+       | ejarray l => string_bracket 
+                        "["%string
+                        (String.concat ", "%string
+                                       (map defaultEJsonToString l))
+                        "]"%string
+       | ejobject ((s1,j')::nil) =>
+         if (string_dec s1 "$left") then
+           string_bracket
+             "Left("%string
+             (defaultEJsonToString j')
+             ")"%string
+         else if (string_dec s1 "$right") then
+           string_bracket
+             "Right("%string
+             (defaultEJsonToString j')
+             ")"%string
+              else
+                string_bracket
+                  "{"%string
+                  (String.concat ", "%string 
+                                 (map (fun xy => let '(x,y):=xy in 
+                                                 (append (stringToString (key_encode x)) (append "->"%string
+                                                                                                 (defaultEJsonToString y)))
+                                      ) ((s1,j')::nil)))
+                       "}"%string
+      | ejobject ((s1,ejarray j1)::(s2,j2)::nil) =>
+        if (string_dec s1 "$class") then
+          if (string_dec s2 "$data") then
+            match (ejson_brands j1) with
+            | Some br =>
+              (string_bracket
+                 "<"
+                 (append (@toString _ ToString_brands br)
+                         (append ":" (defaultEJsonToString j2)))
+                 ">")
+            | None =>
+                string_bracket
+                  "{"%string
+                  (String.concat ", "%string
+                                 ((append (stringToString (key_encode s1))
+                                          (append "->"%string (string_bracket 
+                                                                 "["%string
+                                                                 (String.concat ", "%string
+                                                                                (map defaultEJsonToString j1))
+                                                                 "]"%string)))
+                                    :: (append (stringToString (key_encode s2)) (append "->"%string
+                                                                                        (defaultEJsonToString j2)))
+                                    :: nil))
+                  "}"%string
+            end
+          else
+                string_bracket
+                  "{"%string
+                  (String.concat ", "%string
+                                 ((append (stringToString (key_encode s1))
+                                          (append "->"%string (string_bracket 
+                                                                 "["%string
+                                                                 (String.concat ", "%string
+                                                                                (map defaultEJsonToString j1))
+                                                                 "]"%string)))
+                                    :: (append (stringToString (key_encode s2)) (append "->"%string
+                                                                                        (defaultEJsonToString j2)))
+                                    :: nil))
+                  "}"%string
+        else
+          string_bracket
+            "{"%string
+            (String.concat ", "%string
+                           ((append (stringToString (key_encode s1))
+                                    (append "->"%string (string_bracket 
+                                                           "["%string
+                                                           (String.concat ", "%string
+                                                                          (map defaultEJsonToString j1))
+                                                           "]"%string)))
+                              :: (append (stringToString (key_encode s2)) (append "->"%string
+                                                                                  (defaultEJsonToString j2)))
+                              :: nil))
+            "}"%string
+      | ejobject r =>
+        string_bracket
+          "{"%string
+          (String.concat ", "%string 
+                         (map (fun xy => let '(x,y):=xy in 
+                                         (append (stringToString (key_encode x)) (append "->"%string
+                                                                                         (defaultEJsonToString y)))
+                              ) r))
+                       "}"%string
+       | ejforeign fd => toString fd
+       end.
+    
   End Util.
 
   Section Evaluation.
@@ -198,8 +297,16 @@ Section EJsonRuntimeOperators.
                       Some (ejnumber float_zero)
              | _, _ => None
              end) dl
-      | EJsonRuntimeToString => None (* XXX TODO *)
-      | EJsonRuntimeToText => None (* XXX TODO *)
+      | EJsonRuntimeToString =>
+        apply_unary
+          (fun d =>
+             Some (ejstring (foreign_ejson_runtime_tostring d))
+          ) dl
+      | EJsonRuntimeToText =>
+        apply_unary
+          (fun d =>
+             Some (ejstring (foreign_ejson_runtime_totext d))
+          ) dl
       (* Record *)
       | EJsonRuntimeRecConcat =>
         apply_binary

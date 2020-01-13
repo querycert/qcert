@@ -12,6 +12,7 @@
  * limitations under the License.
  *)
 
+Require Import String.
 Require Import EquivDec.
 Require Import List.
 Require Import Utils.
@@ -29,6 +30,9 @@ Section ForeignEJsonRuntime.
            ; foreign_ejson_runtime_op_interp 
                (f:foreign_ejson_runtime_op)
                (dl:list ejson) : option ejson                                 
+           (* ToString / ToText operators *)
+           ; foreign_ejson_runtime_tostring : ejson -> string
+           ; foreign_ejson_runtime_totext : ejson -> string
          }.
 
 End ForeignEJsonRuntime.

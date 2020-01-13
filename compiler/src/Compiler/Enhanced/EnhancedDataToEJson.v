@@ -118,7 +118,7 @@ Program Instance enhanced_foreign_to_ejson_runtime : foreign_to_ejson_runtime :=
     enhanced_foreign_ejson
     enhanced_foreign_to_ejson
     enhanced_foreign_ejson_runtime
-    _ _ _ _.
+    _ _ _ _ _ _.
 Next Obligation.
   exact (unary_op_to_ejson uop).
 Defined.
@@ -131,4 +131,10 @@ Defined.
 Next Obligation.
   apply binary_op_to_ejson_correct.
 Defined.
-
+(* XXX TODO ToString ToText correctness *)
+Next Obligation.
+  admit.
+Admitted.
+Next Obligation.
+  admit.
+Admitted.
