@@ -353,7 +353,9 @@ Section ToString.
          | element_stat s =>
            nstring_of_stat s i
          | element_func_decl f params body =>
-           ^"XXX TODO XXX"
+           eol +++ indent i
+               +++ ^"function " +++ ^f +++ ^"(" +++ (comma_list_string params) +++ ^") {" +++ eol
+               +++ nstring_of_funcbody body (i+1) +++ eol +++ indent i +++ ^"}"
          end
 
   with nstring_of_prog
@@ -398,8 +400,9 @@ Section ToString.
   Definition nstring_of_decl(d:js_ast_decl)
     : nstring :=
     match d with
-    | JsAstFuncDecl fd => nstring_of_funcdecl fd 0
-    | JsAstClassDecl cn cd =>
+    | topcomment c => ^"/*" +++ ^c +++ ^"*/"
+    | topelement fd => nstring_of_element fd 0
+    | topclass cn cd =>
       ^"class " +++ ^cn +++ ^"{"
                 +++ List.fold_left (fun acc q => nstring_append acc (nstring_of_method q 1)) cd (^ (""%string)) +++ eol
                 +++ ^"}" +++ eol

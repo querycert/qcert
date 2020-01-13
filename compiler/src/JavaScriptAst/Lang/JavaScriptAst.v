@@ -16,8 +16,9 @@ Require Export JsAst.JsSyntax.
 
 Section JavaScriptAst.
   Inductive js_ast_decl :=
-  | JsAstFuncDecl : funcdecl -> js_ast_decl                  (** Function declarations *)
-  | JsAstClassDecl : string -> list funcdecl -> js_ast_decl  (** Class declarations *)
+  | topcomment : string -> js_ast_decl                 (** comment *)
+  | topelement : element -> js_ast_decl                (** Program element *)
+  | topclass : string -> list funcdecl -> js_ast_decl  (** Class declarations *)
   .
 
   Definition js_ast := list js_ast_decl.

@@ -5554,7 +5554,7 @@ Section CompDriver.
 
   End CompPaths.
 
-  Section Verified.
+  Section Custom.
     Definition compile_nraenv_to_imp_qcert_verified (conf:driver_config) (q:query) : query :=
       let dv := driver_of_path conf (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::nil) in
       match List.rev (compile dv q) with
@@ -5596,6 +5596,20 @@ Section CompDriver.
       reflexivity.
     Qed.
 
-  End Verified.
+    Definition compile_nnrc_to_javascript (conf:driver_config) (q:query) : query :=
+      let dv := driver_of_path conf (L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::L_imp_ejson::L_js_ast::L_javascript::nil) in
+      match List.rev (compile dv q) with
+      | nil => Q_error "No compilation result!"
+      | target :: _ => target
+      end.
+
+    Definition compile_nnrc_to_java (conf:driver_config) (q:query) : query :=
+      let dv := driver_of_path conf (L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::L_imp_ejson::L_js_ast::L_javascript::nil) in
+      match List.rev (compile dv q) with
+      | nil => Q_error "No compilation result!"
+      | target :: _ => target
+      end.
+
+  End Custom.
 
 End CompDriver.

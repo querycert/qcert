@@ -222,20 +222,33 @@ Section ImpEJsontoJavaScriptAst.
       end.
 
     Definition imp_ejson_to_js_ast (classname:option string) (q: imp) : js_ast :=
-      let decls :=
-          match q with
-          | ImpLib l =>
-            List.map
-              (fun (decl: string * imp_function) =>
-                 let (x, f) := decl in
-                 let (args, body) := imp_ejson_function_to_js_ast f in
-                 funcdecl_intro x args body)
-              l
-          end
-      in
       match classname with
-      | None => map JsAstFuncDecl decls
-      | Some cname => (JsAstClassDecl cname decls::nil)
+      | None =>
+        let decls :=
+            match q with
+            | ImpLib l =>
+              List.map
+                (fun (decl: string * imp_function) =>
+                   let (x, f) := decl in
+                   let (args, body) := imp_ejson_function_to_js_ast f in
+                   element_func_decl x args body)
+                l
+            end
+        in
+        map topelement decls        
+      | Some cname =>
+        let decls :=
+            match q with
+            | ImpLib l =>
+              List.map
+                (fun (decl: string * imp_function) =>
+                   let (x, f) := decl in
+                   let (args, body) := imp_ejson_function_to_js_ast f in
+                   funcdecl_intro x args body)
+                l
+            end
+        in
+        topclass cname decls::nil
       end.
   End Translation.
 
