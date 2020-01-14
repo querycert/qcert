@@ -16,7 +16,7 @@
 
 open Util
 open Lex_util
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 
 (*****************)
@@ -79,32 +79,32 @@ let parse_nnrcmr_sexp f : QLang.nnrcmr = Ast_to_sexp.sexp_to_nnrcmr (parse_sexp 
 
 let parse_query l f : (string * QLang.query) =
   begin match l with
-  | Compiler.L_camp_rule -> let (n,r) = parse_rule f in (n, Compiler.Q_camp_rule r)
-  | Compiler.L_camp -> let (n,c) = parse_camp f in (n, Compiler.Q_camp c)
-  | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
-  | Compiler.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")
-  | Compiler.L_sqlpp -> raise (Qcert_Error "SQL++ should be parsed from String, not lexer")
-  | Compiler.L_tech_rule -> raise (Qcert_Error "Technical rule should be parsed from String, not lexer")
-  | Compiler.L_designer_rule -> raise (Qcert_Error "Designer rule should be parsed from binary file contents, not lexer")
-  | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))
-  | Compiler.L_nra -> raise (Qcert_Error "No parser for NRA available")
-  | Compiler.L_nraenv_core -> ("NRAEnvCore", Compiler.Q_nraenv_core (parse_nraenv_sexp f))
-  | Compiler.L_nraenv -> raise (Qcert_Error "No parser for NRAEnv available")
-  | Compiler.L_nnrc_core -> ("NNRCCore", Compiler.Q_nnrc_core (parse_nnrc_sexp f))
-  | Compiler.L_nnrc -> ("NNRC", Compiler.Q_nnrc (parse_nnrc_sexp f))
-  | Compiler.L_nnrs_core -> ("NNRSCore", Compiler.Q_nnrs_core (parse_nnrs_sexp f)) (* XXX TODO: check is core XXX *)
-  | Compiler.L_nnrs -> ("NNRS", Compiler.Q_nnrs (parse_nnrs_sexp f))
-  | Compiler.L_nnrs_imp -> ("NNRSimp", Compiler.Q_nnrs_imp (parse_nnrs_imp_sexp f))
-  | Compiler.L_imp_qcert -> ("ImpQcert", Compiler.Q_imp_qcert (parse_imp_qcert_sexp f))
-  | Compiler.L_imp_ejson -> ("ImpEJson", Compiler.Q_imp_ejson (parse_imp_ejson_sexp f))
-  | Compiler.L_nnrcmr -> ("NNRCMR", Compiler.Q_nnrcmr (parse_nnrcmr_sexp f))
-  | Compiler.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")
-  | Compiler.L_dnnrc_typed -> raise (Qcert_Error "No parser for typed DNNRC available")
-  | Compiler.L_js_ast -> raise (Qcert_Error "No parser for Javascript AST available")
-  | Compiler.L_javascript -> raise (Qcert_Error "No parser for Javascript available")
-  | Compiler.L_java -> raise (Qcert_Error "No parser for Java available")
-  | Compiler.L_spark_df -> raise (Qcert_Error "No parser for Spark (Dataframe) available")
-  | Compiler.L_error err ->
+  | Core.L_camp_rule -> let (n,r) = parse_rule f in (n, Core.Q_camp_rule r)
+  | Core.L_camp -> let (n,c) = parse_camp f in (n, Core.Q_camp c)
+  | Core.L_oql -> ("OQL", Core.Q_oql (parse_oql f))
+  | Core.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")
+  | Core.L_sqlpp -> raise (Qcert_Error "SQL++ should be parsed from String, not lexer")
+  | Core.L_tech_rule -> raise (Qcert_Error "Technical rule should be parsed from String, not lexer")
+  | Core.L_designer_rule -> raise (Qcert_Error "Designer rule should be parsed from binary file contents, not lexer")
+  | Core.L_lambda_nra -> ("LambdaNRA", Core.Q_lambda_nra (parse_lambda_nra f))
+  | Core.L_nra -> raise (Qcert_Error "No parser for NRA available")
+  | Core.L_nraenv_core -> ("NRAEnvCore", Core.Q_nraenv_core (parse_nraenv_sexp f))
+  | Core.L_nraenv -> raise (Qcert_Error "No parser for NRAEnv available")
+  | Core.L_nnrc_core -> ("NNRCCore", Core.Q_nnrc_core (parse_nnrc_sexp f))
+  | Core.L_nnrc -> ("NNRC", Core.Q_nnrc (parse_nnrc_sexp f))
+  | Core.L_nnrs_core -> ("NNRSCore", Core.Q_nnrs_core (parse_nnrs_sexp f)) (* XXX TODO: check is core XXX *)
+  | Core.L_nnrs -> ("NNRS", Core.Q_nnrs (parse_nnrs_sexp f))
+  | Core.L_nnrs_imp -> ("NNRSimp", Core.Q_nnrs_imp (parse_nnrs_imp_sexp f))
+  | Core.L_imp_qcert -> ("ImpQcert", Core.Q_imp_qcert (parse_imp_qcert_sexp f))
+  | Core.L_imp_ejson -> ("ImpEJson", Core.Q_imp_ejson (parse_imp_ejson_sexp f))
+  | Core.L_nnrcmr -> ("NNRCMR", Core.Q_nnrcmr (parse_nnrcmr_sexp f))
+  | Core.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")
+  | Core.L_dnnrc_typed -> raise (Qcert_Error "No parser for typed DNNRC available")
+  | Core.L_js_ast -> raise (Qcert_Error "No parser for Javascript AST available")
+  | Core.L_javascript -> raise (Qcert_Error "No parser for Javascript available")
+  | Core.L_java -> raise (Qcert_Error "No parser for Java available")
+  | Core.L_spark_df -> raise (Qcert_Error "No parser for Spark (Dataframe) available")
+  | Core.L_error err ->
       let err = string_of_char_list err in
       raise (Qcert_Error ("No parser for Error language available: "^err))
   end

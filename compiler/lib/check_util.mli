@@ -14,7 +14,7 @@
 
 (* Result checking *)
 
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 open Config_util
 
 (* Check result *)

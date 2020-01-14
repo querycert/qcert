@@ -1,5 +1,5 @@
-compiler.ml
-compiler.mli
+core.ml
+core.mli
 /out/
 /*.aux
 /.paths

@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 open Data_util
 
@@ -20,7 +20,7 @@ open Data_util
 
 type schema = {
     sch_brand_model : QType.brand_model;
-    sch_foreign_typing : Compiler.foreign_typing;
+    sch_foreign_typing : Core.foreign_typing;
     sch_io_schema : content_schema option;
     sch_globals : QDriver.constants_config;
   }

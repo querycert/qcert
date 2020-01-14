@@ -14,11 +14,11 @@
 
 %{
   open Util
-  open Compiler.EnhancedCompiler
+  open Core.EnhancedCompiler
 
   let static_int e =
     begin match e with
-    | Compiler.OConst (Compiler.Dnat i) -> i
+    | Core.OConst (Core.Dnat i) -> i
     | _ -> raise Not_found
     end
     
@@ -76,13 +76,13 @@
 	      in
 	      QOQL.ounop (QOps.Unary.opsubstring start (Some len)) e1
     | "date", [e] ->
-        QOQL.ounop Compiler.CompEnhanced.Enhanced.Ops.Unary.sql_date_from_string e
+        QOQL.ounop Core.CompEnhanced.Enhanced.Ops.Unary.sql_date_from_string e
     | "getYear", [e] ->
-        QOQL.ounop (Compiler.CompEnhanced.Enhanced.Ops.Unary.sql_date_get_component Sql_date_YEAR) e
+        QOQL.ounop (Core.CompEnhanced.Enhanced.Ops.Unary.sql_date_get_component Sql_date_YEAR) e
     | "encode", [e] ->
-        QOQL.ounop Compiler.CompEnhanced.Enhanced.Ops.Unary.uri_encode e
+        QOQL.ounop Core.CompEnhanced.Enhanced.Ops.Unary.uri_encode e
     | "decode", [e] ->
-        QOQL.ounop Compiler.CompEnhanced.Enhanced.Ops.Unary.uri_decode e
+        QOQL.ounop Core.CompEnhanced.Enhanced.Ops.Unary.uri_decode e
     | _, _ ->
 	      raise (Qcert_Error
 		             ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))
@@ -121,7 +121,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <Compiler.EnhancedCompiler.QOQL.program> main
+%start <Core.EnhancedCompiler.QOQL.program> main
 
 %%
 

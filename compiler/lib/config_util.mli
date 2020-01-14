@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 

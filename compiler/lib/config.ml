@@ -13,7 +13,7 @@
  *)
 
 open Util
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 open Data_util
 
@@ -140,8 +140,8 @@ let driver_conf_of_global_conf gconf qname cname =
     end
   in
   let constants_config = gconf.gconf_schema.Type_util.sch_globals in
-  { Compiler.comp_qname = char_list_of_string qname;
-    Compiler.comp_qname_lowercase = char_list_of_string (String.lowercase_ascii (gconf.gconf_prefix ^ qname));
+  { Core.comp_qname = char_list_of_string qname;
+    Core.comp_qname_lowercase = char_list_of_string (String.lowercase_ascii (gconf.gconf_prefix ^ qname));
     comp_class_name = qcname;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
     comp_constants = constants_config;

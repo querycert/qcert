@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 type io_kind =
   | IO_file of string option

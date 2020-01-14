@@ -17,8 +17,8 @@
 open Util
 open Sexp
 
-open Compiler
-open Compiler.EnhancedCompiler
+open Core
+open Core.EnhancedCompiler
 
 (****************
  * AST <-> Sexp *
@@ -1111,19 +1111,19 @@ and sexp_to_sql_expr expr =
 (*  | STerm ("const_list",const_list) ->
       List.fold_left (QSQL.sql_binary (map (fun e -> (QSQL.sql_unary sexp_to_sql_expr const_list)) *)
   | STerm ("cast",[STerm ("as",[SString "DATE"]); expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_from_string)))
 	(sexp_to_sql_expr expr1)
   | STerm ("literal",[SString "date"; SString sdate]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string sdate)))
   | STerm ("period",[SString speriod; STerm ("year",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Uop_sql_date_period_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_period_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (speriod ^ "-YEAR"))))
   | STerm ("period",[SString speriod; STerm ("month",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Uop_sql_date_period_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_period_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (speriod ^ "-MONTH"))))
   | STerm ("period",[SString speriod; STerm ("day",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Uop_sql_date_period_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_period_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (speriod ^ "-DAY"))))
   | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
       QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
@@ -1161,13 +1161,13 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_agg_expr SMax (sexp_to_sql_expr expr1)
   | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
   | STerm ("extract",[STerm ("year",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op (Uop_sql_date_get_component Sql_date_YEAR))))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op (Uop_sql_date_get_component Sql_date_YEAR))))
 	(sexp_to_sql_expr expr1)
   | STerm ("extract",[STerm ("month",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op (Uop_sql_date_get_component Sql_date_MONTH))))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op (Uop_sql_date_get_component Sql_date_MONTH))))
 	(sexp_to_sql_expr expr1)
   | STerm ("extract",[STerm ("day",[]);expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op (Uop_sql_date_get_component Sql_date_DAY))))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op (Uop_sql_date_get_component Sql_date_DAY))))
 	(sexp_to_sql_expr expr1)
   | STerm ("function",[SString "date_minus";expr1;expr2]) ->
       QSQL.sql_expr_binary (SBinaryForeignExpr (Obj.magic (Bop_sql_date_minus)))
