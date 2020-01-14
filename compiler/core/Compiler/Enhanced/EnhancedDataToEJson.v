@@ -112,6 +112,13 @@ Proof.
           destruct f0; try reflexivity.
 Qed.
 
+Lemma enhanced_foreign_data_to_string_correct:
+  forall fd : foreign_data_model,
+    toString fd = toString (foreign_to_ejson_from_data fd).
+Proof.
+  reflexivity.
+Qed.
+
 Program Instance enhanced_foreign_to_ejson_runtime : foreign_to_ejson_runtime :=
   mk_foreign_to_ejson_runtime
     enhanced_foreign_runtime
@@ -131,10 +138,13 @@ Defined.
 Next Obligation.
   apply binary_op_to_ejson_correct.
 Defined.
-(* XXX TODO ToString ToText correctness *)
 Next Obligation.
-  admit.
-Admitted.
+  specialize (default_to_ejson_tostring_correct enhanced_foreign_data_to_string_correct); intros.
+  rewrite H.
+  reflexivity.
+Qed.
 Next Obligation.
-  admit.
-Admitted.
+  specialize (default_to_ejson_tostring_correct enhanced_foreign_data_to_string_correct); intros.
+  rewrite H.
+  reflexivity.
+Qed.

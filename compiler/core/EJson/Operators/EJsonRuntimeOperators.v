@@ -185,19 +185,19 @@ Section EJsonRuntimeOperators.
              (defaultEJsonToString j')
              ")"%string
          else if (string_dec s1 "$right") then
-           string_bracket
-             "Right("%string
-             (defaultEJsonToString j')
-             ")"%string
+                string_bracket
+                  "Right("%string
+                  (defaultEJsonToString j')
+                  ")"%string
               else
                 string_bracket
                   "{"%string
                   (String.concat ", "%string 
                                  (map (fun xy => let '(x,y):=xy in 
-                                                 (append (stringToString (key_encode x)) (append "->"%string
+                                                 (append (stringToString (key_decode x)) (append "->"%string
                                                                                                  (defaultEJsonToString y)))
                                       ) ((s1,j')::nil)))
-                       "}"%string
+                  "}"%string
       | ejobject ((s1,ejarray j1)::(s2,j2)::nil) =>
         if (string_dec s1 "$class") then
           if (string_dec s2 "$data") then
@@ -205,61 +205,45 @@ Section EJsonRuntimeOperators.
             | Some br =>
               (string_bracket
                  "<"
-                 (append (@toString _ ToString_brands br)
-                         (append ":" (defaultEJsonToString j2)))
+                 (append (@toString _ ToString_brands br) (append ":" (defaultEJsonToString j2)))
                  ">")
             | None =>
                 string_bracket
                   "{"%string
                   (String.concat ", "%string
-                                 ((append (stringToString (key_encode s1))
+                                 ((append (stringToString (key_decode s1))
                                           (append "->"%string (string_bracket 
-                                                                 "["%string
-                                                                 (String.concat ", "%string
-                                                                                (map defaultEJsonToString j1))
-                                                                 "]"%string)))
-                                    :: (append (stringToString (key_encode s2)) (append "->"%string
-                                                                                        (defaultEJsonToString j2)))
+                                                                 "["%string (String.concat ", "%string (map defaultEJsonToString j1)) "]"%string)))
+                                    :: (append (stringToString (key_decode s2)) (append "->"%string (defaultEJsonToString j2)))
                                     :: nil))
                   "}"%string
             end
           else
-                string_bracket
-                  "{"%string
-                  (String.concat ", "%string
-                                 ((append (stringToString (key_encode s1))
-                                          (append "->"%string (string_bracket 
-                                                                 "["%string
-                                                                 (String.concat ", "%string
-                                                                                (map defaultEJsonToString j1))
-                                                                 "]"%string)))
-                                    :: (append (stringToString (key_encode s2)) (append "->"%string
-                                                                                        (defaultEJsonToString j2)))
-                                    :: nil))
-                  "}"%string
+            string_bracket
+              "{"%string
+              (String.concat ", "%string
+                             ((append (stringToString (key_decode s1))
+                                      (append "->"%string (string_bracket "["%string (String.concat ", "%string (map defaultEJsonToString j1)) "]"%string)))
+                                :: (append (stringToString (key_decode s2)) (append "->"%string (defaultEJsonToString j2)))
+                                :: nil))
+              "}"%string
         else
           string_bracket
             "{"%string
             (String.concat ", "%string
-                           ((append (stringToString (key_encode s1))
-                                    (append "->"%string (string_bracket 
-                                                           "["%string
-                                                           (String.concat ", "%string
-                                                                          (map defaultEJsonToString j1))
-                                                           "]"%string)))
-                              :: (append (stringToString (key_encode s2)) (append "->"%string
-                                                                                  (defaultEJsonToString j2)))
+                           ((append (stringToString (key_decode s1))
+                                    (append "->"%string (string_bracket "["%string (String.concat ", "%string (map defaultEJsonToString j1)) "]"%string)))
+                              :: (append (stringToString (key_decode s2)) (append "->"%string (defaultEJsonToString j2)))
                               :: nil))
             "}"%string
       | ejobject r =>
         string_bracket
           "{"%string
-          (String.concat ", "%string 
-                         (map (fun xy => let '(x,y):=xy in 
-                                         (append (stringToString (key_encode x)) (append "->"%string
-                                                                                         (defaultEJsonToString y)))
+          (String.concat ", "%string
+                         (map (fun xy => let '(x,y):=xy in
+                                         (append (stringToString (key_decode x)) (append "->"%string (defaultEJsonToString y)))
                               ) r))
-                       "}"%string
+          "}"%string
        | ejforeign fd => toString fd
        end.
     
