@@ -20,7 +20,7 @@ include Makefile.coq_modules
 #
 CP=cp
 
-FILES = $(addprefix compiler/src/,$(MODULES:%=%.v))
+FILES = $(addprefix compiler/core/,$(MODULES:%=%.v))
 
 ## Full run
 all:
@@ -365,7 +365,7 @@ cleanall-test: clean-test
 
 ## Documentation
 docs:
-	@$(MAKE) -C compiler/src documentation
+	@$(MAKE) -C compiler/core documentation
 
 ## Misc
 

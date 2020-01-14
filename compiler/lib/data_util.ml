@@ -13,7 +13,7 @@
  *)
 
 open Util
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
@@ -69,7 +69,7 @@ let get_io_components (od:QData.json option) : QData.json option * QData.json op
   | Some d ->
       begin	try
 	      begin match d with
-	      | Compiler.Jobject r ->
+	      | Core.Jobject r ->
 	          let input = get_field_opt "input" r in
 	          let output = get_field_opt "output" r in
 	          let schema = get_field_opt "schema" r in
@@ -94,12 +94,12 @@ let check_inheritance h =
 
 let build_inheritance h =
   begin match h with
-  | Compiler.Jarray l ->
+  | Core.Jarray l ->
     let raw_h =
       List.map (function
-          | Compiler.Jobject
-              ( [(['s';'u';'b'], Compiler.Jstring sub); (['s';'u';'p'], Compiler.Jstring sup)]
-              | [(['s';'u';'p'], Compiler.Jstring sup); (['s';'u';'b'], Compiler.Jstring sub)] ) ->
+          | Core.Jobject
+              ( [(['s';'u';'b'], Core.Jstring sub); (['s';'u';'p'], Core.Jstring sup)]
+              | [(['s';'u';'p'], Core.Jstring sup); (['s';'u';'b'], Core.Jstring sub)] ) ->
             (sub, sup)
           | _ ->
             raise (Qcert_Error "Ill-formed inheritance"))
@@ -112,11 +112,11 @@ let build_inheritance h =
 
 let build_brandTypes bts =
   begin match bts with
-  | Compiler.Jarray l ->
+  | Core.Jarray l ->
       List.map (function
-        | Compiler.Jobject
-            ( [(['b';'r';'a';'n';'d'], Compiler.Jstring brandName); (['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName)]
-        | [(['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName); (['b';'r';'a';'n';'d'], Compiler.Jstring brandName)] ) ->
+        | Core.Jobject
+            ( [(['b';'r';'a';'n';'d'], Core.Jstring brandName); (['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName)]
+        | [(['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName); (['b';'r';'a';'n';'d'], Core.Jstring brandName)] ) ->
             (string_of_char_list brandName, string_of_char_list typeName)
         | _ ->
             raise (Qcert_Error "Ill-formed brandTypes"))
@@ -127,11 +127,11 @@ let build_brandTypes bts =
 
 let build_typeDefs bts =
   begin match bts with
-  | Compiler.Jarray l ->
+  | Core.Jarray l ->
       List.map (function
-        | Compiler.Jobject
-            ( [(['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName); (['t';'y';'p';'e';'D';'e';'f'], typeDef)]
-        | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName)] ) ->
+        | Core.Jobject
+            ( [(['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName); (['t';'y';'p';'e';'D';'e';'f'], typeDef)]
+        | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName)] ) ->
             (string_of_char_list typeName, typeDef)
         | _ ->
             raise (Qcert_Error "Ill-formed typeDefs"))
@@ -142,7 +142,7 @@ let build_typeDefs bts =
 
 let build_globals globals =
   begin match globals with
-  | Compiler.Jobject l ->
+  | Core.Jobject l ->
       List.map (function (varname, typeDef) -> (string_of_char_list varname, typeDef)) l
   | _ ->
       raise (Qcert_Error "Ill-formed globals")
@@ -152,7 +152,7 @@ let missing_inheritance_default = QData.jarray []  (* Empty array i.e., empty in
 
 let build_schema (j:QData.json) =
   begin match j with
-  | Compiler.Jobject r ->
+  | Core.Jobject r ->
       let inheritance = get_field_defaults "inheritance" r missing_inheritance_default in
       let brandTypes = get_field_opt "brandTypes" r in
       let typeDefs = get_field_opt "typeDefs" r in
@@ -167,7 +167,7 @@ let build_schema (j:QData.json) =
 
 let build_input h input =
   begin match input with
-  | Compiler.Jobject j -> List.map (fun (x,y) -> (x, QData.json_to_qdata h y)) j
+  | Core.Jobject j -> List.map (fun (x,y) -> (x, QData.json_to_qdata h y)) j
   | _ -> raise (Qcert_Error "Illed formed working memory: input")
   end
 
@@ -176,6 +176,6 @@ let build_output h output =
 
 let build_optim_config j =
   begin match QDriver.json_to_optim_config j with
-  | Compiler.Inl e -> raise (Qcert_Error (string_of_char_list e))
-  | Compiler.Inr oc -> oc
+  | Core.Inl e -> raise (Qcert_Error (string_of_char_list e))
+  | Core.Inr oc -> oc
   end

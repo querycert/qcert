@@ -13,7 +13,7 @@
  *)
 
 open Util
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 open Config
 
@@ -79,7 +79,7 @@ let parse_string (gconf: global_config) (query_s: string) =
   let slang = gconf.gconf_source in
   let the_query =
     begin match slang with
-    | Compiler.L_tech_rule -> src_and_schema query_s schema
+    | Core.L_tech_rule -> src_and_schema query_s schema
     | _ -> query_s
     end in
   if gconf.gconf_source_sexp
@@ -143,13 +143,13 @@ let lift_data_to_ddata globals (var:char list * QData.qdata) =
   let vname = fst var in
   let data = snd var in
   let loc =
-    begin try (List.assoc vname globals).Compiler.constant_localization with
-    | Not_found -> Compiler.Vlocal
+    begin try (List.assoc vname globals).Core.constant_localization with
+    | Not_found -> Core.Vlocal
     end
   in
   begin match loc with
-  | Compiler.Vlocal -> (vname,QData.dlocal data)
-  | Compiler.Vdistr ->
+  | Core.Vlocal -> (vname,QData.dlocal data)
+  | Core.Vdistr ->
       begin match QData.ddistr data with
       | Some dd -> (vname,dd)
       | None -> raise  (Qcert_Error ("Distributed variable " ^ (string_of_char_list vname) ^ " should be initialized with an input collection"))
@@ -160,15 +160,15 @@ let lift_data_to_ddata globals (var:char list * QData.qdata) =
 
 let get_dist (dd:QData.qddata) =
   begin match dd with
-  | Compiler.Ddistr _ -> "distributed"
-  | Compiler.Dlocal _ -> "local"
+  | Core.Ddistr _ -> "distributed"
+  | Core.Dlocal _ -> "local"
   end
 
 let get_value (dd:QData.qddata) =
   begin match dd with
-  | Compiler.Ddistr d ->
+  | Core.Ddistr d ->
       string_of_char_list (QData.qdataStringify (char_list_of_string "\"") (QData.dcoll d))
-  | Compiler.Dlocal d ->
+  | Core.Dlocal d ->
       string_of_char_list (QData.qdataStringify (char_list_of_string "\"") d)
   end
     
@@ -193,13 +193,13 @@ let eval_string (validate:bool) (debug:bool) (quiet:bool) (ev_input:Data_util.co
   in
   let ev_data =
     begin match ev_output with
-    | Compiler.Ev_out_unsupported msg ->
+    | Core.Ev_out_unsupported msg ->
         QData.drec [(char_list_of_string "error", QData.dstring msg)]
-    | Compiler.Ev_out_failed ->
+    | Core.Ev_out_failed ->
         QData.drec [(char_list_of_string "error", QData.dstring (char_list_of_string "Eval failed"))]
-    | Compiler.Ev_out_returned d ->
+    | Core.Ev_out_returned d ->
         d
-    | Compiler.Ev_out_returned_debug s ->
+    | Core.Ev_out_returned_debug s ->
         QData.drec [(char_list_of_string "debug", QData.dstring s)]
     end
   in
@@ -233,7 +233,7 @@ let stat_tree_query (schema: Type_util.schema) dir file_name q =
   { res_file = fout; res_lang = language_name; res_content = string stats; }
 
 (* Optim config *)
-let json_of_optim_config (optim_config:Compiler.optim_config) =
+let json_of_optim_config (optim_config:Core.optim_config) =
   let optim_config =
     if optim_config = []
     then

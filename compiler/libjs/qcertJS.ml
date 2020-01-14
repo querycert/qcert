@@ -17,7 +17,7 @@ open Js_of_ocaml
 open Qcert_lib
 
 open Util
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 open Compiler_util
 open Config
 
@@ -55,8 +55,8 @@ let global_config_of_json j =
   let gconf =
     { gconf_qname = None;
       gconf_class_name = None;
-      gconf_source = Compiler.L_camp_rule;
-      gconf_target = Compiler.L_javascript;
+      gconf_source = Core.L_camp_rule;
+      gconf_target = Core.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
@@ -143,18 +143,18 @@ let wrap_all wrap_f l =
 let json_of_result res =
   let wrap x =
       object%js
-        val file = Js.string x.Core.res_file
-        val lang = Js.string x.Core.res_lang
-        val value = Js.string x.Core.res_content
+        val file = Js.string x.Compile.res_file
+        val lang = Js.string x.Compile.res_lang
+        val value = Js.string x.Compile.res_content
       end
   in
   object%js
-    val emit = Js.def (wrap res.Core.res_emit)
-    val emitall = Js.def (wrap_all wrap res.Core.res_emit_all)
-    val emitsexp = Js.def (wrap res.Core.res_emit_sexp)
-    val emitsexpall = Js.def (wrap_all wrap res.Core.res_emit_sexp_all)
-    val result = Js.string res.Core.res_emit.Core.res_content
-    val eval = Js.string res.Core.res_eval.Core.res_content
+    val emit = Js.def (wrap res.Compile.res_emit)
+    val emitall = Js.def (wrap_all wrap res.Compile.res_emit_all)
+    val emitsexp = Js.def (wrap res.Compile.res_emit_sexp)
+    val emitsexpall = Js.def (wrap_all wrap res.Compile.res_emit_sexp_all)
+    val result = Js.string res.Compile.res_emit.Compile.res_content
+    val eval = Js.string res.Compile.res_eval.Compile.res_content
   end
 
 let json_of_error msg =
@@ -183,10 +183,10 @@ let json_of_exported_languages exported_languages =
     end
   in
   object%js
-    val frontend = Js.def (wrap_all wrap exported_languages.Compiler.frontend)
-    val core = Js.def (wrap_all wrap exported_languages.Compiler.coreend)
-    val distributed = Js.def (wrap_all wrap exported_languages.Compiler.distrend)
-    val backend =  Js.def (wrap_all wrap exported_languages.Compiler.backend)
+    val frontend = Js.def (wrap_all wrap exported_languages.Core.frontend)
+    val core = Js.def (wrap_all wrap exported_languages.Core.coreend)
+    val distributed = Js.def (wrap_all wrap exported_languages.Core.distrend)
+    val backend =  Js.def (wrap_all wrap exported_languages.Core.backend)
   end
 let language_specs () =
   let exported_languages = QLang.export_language_descriptions  in
@@ -204,12 +204,12 @@ let json_of_source_to_target_path j =
 
 let rec unsafe_json_to_js (j:QData.json) =
   match j with
-  | Compiler.Jnull -> Js.Unsafe.inject (Js.null)
-  | Compiler.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
-  | Compiler.Jbool b -> Js.Unsafe.inject (Js.bool b)
-  | Compiler.Jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
-  | Compiler.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
-  | Compiler.Jobject l ->
+  | Core.Jnull -> Js.Unsafe.inject (Js.null)
+  | Core.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
+  | Core.Jbool b -> Js.Unsafe.inject (Js.bool b)
+  | Core.Jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
+  | Core.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
+  | Core.Jobject l ->
      Js.Unsafe.inject (Js.Unsafe.obj (Array.of_list (List.map (fun (str,y) -> ((string_of_char_list str, unsafe_json_to_js y))) l)))
   
 
@@ -260,7 +260,7 @@ let qcert_compile input =
     in
     let res =
       begin try
-        Core.main gconf ("Query.string", q_s)
+        Compile.main gconf ("Query.string", q_s)
       with Qcert_Error err -> raise (Qcert_Error ("[Compilation error: "^err^"]"))
       | exn -> raise (Qcert_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
       end

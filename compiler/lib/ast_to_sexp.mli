@@ -15,7 +15,7 @@
 (* This module contains parsing utilities *)
 
 open Sexp
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 (******************
  * AST <-> S-Expr *

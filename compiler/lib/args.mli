@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 val set_qname : Config.global_config -> string -> unit
 val set_class_name : Config.global_config -> string -> unit

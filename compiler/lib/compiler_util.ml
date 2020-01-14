@@ -13,25 +13,25 @@
  *)
 
 open Util
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 let qcert_error_of_qerror e =
   begin match e with
- | Compiler.CompilationError cl -> "[CompilationError] " ^ (string_of_char_list cl)
- | Compiler.TypeError cl -> "[TypeError] " ^ (string_of_char_list cl)
- | Compiler.UserError d -> "[UserError] " ^ (string_of_char_list (QData.qdataStringify [] d))
+ | Core.CompilationError cl -> "[CompilationError] " ^ (string_of_char_list cl)
+ | Core.TypeError cl -> "[TypeError] " ^ (string_of_char_list cl)
+ | Core.UserError d -> "[UserError] " ^ (string_of_char_list (QData.qdataStringify [] d))
   end
 
 let lift_qerror f x =
   begin match f x with
-    | Compiler.Success y -> y
-    | Compiler.Failure e -> raise (Qcert_Error (qcert_error_of_qerror e))
+    | Core.Success y -> y
+    | Core.Failure e -> raise (Qcert_Error (qcert_error_of_qerror e))
   end
 
 let lift_qerror_as_option f x =
   begin match f x with
-    | Compiler.Success y -> Some y
-    | Compiler.Failure e -> Format.eprintf "[Warning] %s@." (qcert_error_of_qerror e) ; None
+    | Core.Success y -> Some y
+    | Core.Failure e -> Format.eprintf "[Warning] %s@." (qcert_error_of_qerror e) ; None
   end
 
 let language_of_name name =
@@ -39,7 +39,7 @@ let language_of_name name =
     char_list_of_string (String.lowercase_ascii name)
   in
   begin match QLang.language_of_name_case_sensitive name with
-  | Compiler.L_error err -> raise (Qcert_Error ("Unknown language: "^(string err)))
+  | Core.L_error err -> raise (Qcert_Error ("Unknown language: "^(string err)))
   | lang -> lang
   end
 
@@ -54,19 +54,19 @@ let name_of_query (q: QLang.query) =
 
 let driver_no_error dv =
   begin match dv with
-  | Compiler.Dv_error err -> raise (Qcert_Error (string err))
+  | Core.Dv_error err -> raise (Qcert_Error (string err))
   | _ -> ()
   end
 
 let language_no_error lang =
   begin match lang with
-  | Compiler.L_error err -> raise (Qcert_Error (string err))
+  | Core.L_error err -> raise (Qcert_Error (string err))
   | _ -> ()
   end
 
 let query_no_error q =
   begin match q with
-  | Compiler.Q_error err ->
+  | Core.Q_error err ->
       Format.eprintf "[Compilation error] %s@." (string err)
   | _ -> ()
   end

@@ -17,7 +17,7 @@
 open Format
 
 open Util
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 (** Character sets *)
 
@@ -36,7 +36,7 @@ let default_pretty_config () =
   { margin = 120;
     charset = Greek;
     type_annotations = false;
-    inheritance = Compiler.Jarray [];
+    inheritance = Core.Jarray [];
     link_js_runtime = false; }
 
 let set_ascii conf () = conf.charset <- Ascii
@@ -189,10 +189,10 @@ let rec pretty_sharp sym ff name =
 
 (** Pretty data *)
 
-let string_of_foreign_data (fd:Compiler.enhanced_data) : string =
+let string_of_foreign_data (fd:Core.enhanced_data) : string =
   begin match fd with
-  | Compiler.Enhancedsqldate td -> raise Not_found
-  | Compiler.Enhancedsqldateperiod tp -> raise Not_found
+  | Core.Enhancedsqldate td -> raise Not_found
+  | Core.Enhancedsqldateperiod tp -> raise Not_found
   end
 
 let foreign_data_of_string s =
@@ -200,26 +200,26 @@ let foreign_data_of_string s =
 
 let pretty_foreign_data ff fd =
   begin match fd with
-  | Compiler.Enhancedsqldate td -> raise Not_found
-  | Compiler.Enhancedsqldateperiod tp -> raise Not_found
+  | Core.Enhancedsqldate td -> raise Not_found
+  | Core.Enhancedsqldateperiod tp -> raise Not_found
   end
 
 let rec pretty_data ff d =
   begin match d with
-  | Compiler.Dunit -> fprintf ff "null"
-  | Compiler.Dnat n -> fprintf ff "%d" n
-  | Compiler.Dfloat f -> fprintf ff "%f" f
-  | Compiler.Dbool true -> fprintf ff "true"
-  | Compiler.Dbool false -> fprintf ff "false"
-  | Compiler.Dstring s -> fprintf ff "\"%s\"" (string_of_char_list s)
-  | Compiler.Dcoll dl -> fprintf ff "{@[<hv 0>%a@]}" pretty_coll dl
-  | Compiler.Drec rl -> fprintf ff "[@[<hv 0>%a@]]" pretty_rec rl
-  | Compiler.Dleft d -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@]" pretty_data d
-  | Compiler.Dright d -> fprintf ff "@[<hv 2>right {@,%a@;<0 -2>}@]" pretty_data d
-  | Compiler.Dbrand (brands,d) -> fprintf ff "@[<hv 2>brands [@[<hv 0>%a@]] {@,%a@;<0 -2>}@]"
+  | Core.Dunit -> fprintf ff "null"
+  | Core.Dnat n -> fprintf ff "%d" n
+  | Core.Dfloat f -> fprintf ff "%f" f
+  | Core.Dbool true -> fprintf ff "true"
+  | Core.Dbool false -> fprintf ff "false"
+  | Core.Dstring s -> fprintf ff "\"%s\"" (string_of_char_list s)
+  | Core.Dcoll dl -> fprintf ff "{@[<hv 0>%a@]}" pretty_coll dl
+  | Core.Drec rl -> fprintf ff "[@[<hv 0>%a@]]" pretty_rec rl
+  | Core.Dleft d -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@]" pretty_data d
+  | Core.Dright d -> fprintf ff "@[<hv 2>right {@,%a@;<0 -2>}@]" pretty_data d
+  | Core.Dbrand (brands,d) -> fprintf ff "@[<hv 2>brands [@[<hv 0>%a@]] {@,%a@;<0 -2>}@]"
 				      pretty_names brands
 				      pretty_data d
-  | Compiler.Dforeign fd -> pretty_foreign_data ff (Obj.magic fd)
+  | Core.Dforeign fd -> pretty_foreign_data ff (Obj.magic fd)
   end
 
 and pretty_coll ff dl =
@@ -238,20 +238,20 @@ and pretty_rec ff rl =
 
 let rec pretty_rtype_aux sym ff rt =
   begin match rt with
-  | Compiler.Bottom_UU2080_ -> fprintf ff "%a" pretty_sym sym.bot
-  | Compiler.Top_UU2080_ ->  fprintf ff "%a" pretty_sym sym.top
-  | Compiler.Unit_UU2080_ -> fprintf ff "Unit"
-  | Compiler.Nat_UU2080_ -> fprintf ff "Nat"
-  | Compiler.Float_UU2080_ -> fprintf ff "Float"
-  | Compiler.Bool_UU2080_ -> fprintf ff "Bool"
-  | Compiler.String_UU2080_ -> fprintf ff "String"
-  | Compiler.Coll_UU2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
-  | Compiler.Rec_UU2080_ (Compiler.Closed,rl) -> fprintf ff "[@[<hv 0>%a@]|]" (pretty_rec_type sym) rl
-  | Compiler.Rec_UU2080_ (Compiler.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
-  | Compiler.Either_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
-  | Compiler.Arrow_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
-  | Compiler.Brand_UU2080_ bds -> fprintf ff "@[<hv 2>Brands [BRANDS]@]"
-  | Compiler.Foreign_UU2080_ rf -> fprintf ff "Foreign"
+  | Core.Bottom_UU2080_ -> fprintf ff "%a" pretty_sym sym.bot
+  | Core.Top_UU2080_ ->  fprintf ff "%a" pretty_sym sym.top
+  | Core.Unit_UU2080_ -> fprintf ff "Unit"
+  | Core.Nat_UU2080_ -> fprintf ff "Nat"
+  | Core.Float_UU2080_ -> fprintf ff "Float"
+  | Core.Bool_UU2080_ -> fprintf ff "Bool"
+  | Core.String_UU2080_ -> fprintf ff "String"
+  | Core.Coll_UU2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
+  | Core.Rec_UU2080_ (Core.Closed,rl) -> fprintf ff "[@[<hv 0>%a@]|]" (pretty_rec_type sym) rl
+  | Core.Rec_UU2080_ (Core.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
+  | Core.Either_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Core.Arrow_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Core.Brand_UU2080_ bds -> fprintf ff "@[<hv 2>Brands [BRANDS]@]"
+  | Core.Foreign_UU2080_ rf -> fprintf ff "Foreign"
   end
 
 and pretty_rec_type sym ff rl =
@@ -262,14 +262,14 @@ and pretty_rec_type sym ff rl =
 
 let pretty_drtype_aux sym ff drt =
   match drt with
-  | Compiler.Tlocal tr -> fprintf ff "L%a" (pretty_rtype_aux sym) tr
-  | Compiler.Tdistr tr -> fprintf ff "D%a" (pretty_rtype_aux sym) tr
+  | Core.Tlocal tr -> fprintf ff "L%a" (pretty_rtype_aux sym) tr
+  | Core.Tdistr tr -> fprintf ff "D%a" (pretty_rtype_aux sym) tr
 
-let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.type_annotation) =
+let pretty_annotate_annotated_rtype greek subpr ff (at:'a Core.type_annotation) =
   let sym = if greek then greeksym else textsym in
   let inf = QUtil.ta_inferred [] at in
   let req = QUtil.ta_required [] at in
-  if Compiler.equiv_dec (Compiler.drtype_eqdec Compiler.EnhancedRuntime.compiler_foreign_type []) inf req
+  if Core.equiv_dec (Core.drtype_eqdec Core.EnhancedRuntime.compiler_foreign_type []) inf req
   then
     fprintf ff "@[%a%a%a%a@]"
 	    pretty_sym sym.lpangle
@@ -339,16 +339,16 @@ let pretty_unary_exp sym callb thisname ff a =
 
 let string_of_nat_arith_unary_op ua =
   begin match ua with
-  | Compiler.NatAbs -> "abs"
-  | Compiler.NatLog2 -> "log2"
-  | Compiler.NatSqrt -> "sqrt"
+  | Core.NatAbs -> "abs"
+  | Core.NatLog2 -> "log2"
+  | Core.NatSqrt -> "sqrt"
   end
 
 let nat_arith_unary_op_of_string s =
   begin match s with
-  | "abs" -> Compiler.NatAbs
-  | "log2" -> Compiler.NatLog2
-  | "sqrt" -> Compiler.NatSqrt
+  | "abs" -> Core.NatAbs
+  | "log2" -> Core.NatLog2
+  | "sqrt" -> Core.NatSqrt
   | _ -> raise Not_found
   end
 
@@ -357,25 +357,25 @@ let pretty_nat_arith_unary_op p sym callb ff ua a =
 
 let string_of_float_arith_unary_op ua =
   begin match ua with
-  | Compiler.FloatNeg -> "Fneg"
-  | Compiler.FloatSqrt -> "Fsqrt"
-  | Compiler.FloatExp -> "Fexp"
-  | Compiler.FloatLog -> "Flog"
-  | Compiler.FloatLog10 -> "Flog10"
-  | Compiler.FloatCeil -> "Fceil"
-  | Compiler.FloatFloor -> "Ffloor"
-  | Compiler.FloatAbs -> "Fabs"
+  | Core.FloatNeg -> "Fneg"
+  | Core.FloatSqrt -> "Fsqrt"
+  | Core.FloatExp -> "Fexp"
+  | Core.FloatLog -> "Flog"
+  | Core.FloatLog10 -> "Flog10"
+  | Core.FloatCeil -> "Fceil"
+  | Core.FloatFloor -> "Ffloor"
+  | Core.FloatAbs -> "Fabs"
   end
 
 let float_arith_unary_op_of_string s =
   begin match s with
-  | "Fneg" -> Compiler.FloatNeg
-  | "Fsqrt" -> Compiler.FloatSqrt
-  | "Fexp" -> Compiler.FloatExp
-  | "Flog" -> Compiler.FloatLog
-  | "Flog10" -> Compiler.FloatLog10
-  | "Fceil" -> Compiler.FloatCeil
-  | "Ffloor" -> Compiler.FloatFloor
+  | "Fneg" -> Core.FloatNeg
+  | "Fsqrt" -> Core.FloatSqrt
+  | "Fexp" -> Core.FloatExp
+  | "Flog" -> Core.FloatLog
+  | "Flog10" -> Core.FloatLog10
+  | "Fceil" -> Core.FloatCeil
+  | "Ffloor" -> Core.FloatFloor
   | _ -> raise Not_found
   end
 
@@ -384,29 +384,29 @@ let pretty_float_arith_unary_op p sym callb ff ua a =
 
 let sql_date_component_to_string part =
   begin match part with
-  | Compiler.Sql_date_DAY -> "DAY"
-  | Compiler.Sql_date_MONTH -> "MONTH"
-  | Compiler.Sql_date_YEAR -> "YEAR"
+  | Core.Sql_date_DAY -> "DAY"
+  | Core.Sql_date_MONTH -> "MONTH"
+  | Core.Sql_date_YEAR -> "YEAR"
   end
 
 let string_of_foreign_unary_op fu : string =
   begin match fu with
-  | Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component part) -> "(sql_date_get_component " ^ (sql_date_component_to_string part) ^ ")"
-  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string -> "sql_date_from_string"
-  | Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_period_from_string -> "sql_date_period_from_string"
-  | Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_encode -> "uri_encode"
-  | Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_decode -> "uri_decode"
+  | Core.Enhanced_unary_sql_date_op (Core.Uop_sql_date_get_component part) -> "(sql_date_get_component " ^ (sql_date_component_to_string part) ^ ")"
+  | Core.Enhanced_unary_sql_date_op Core.Uop_sql_date_from_string -> "sql_date_from_string"
+  | Core.Enhanced_unary_sql_date_op Core.Uop_sql_date_period_from_string -> "sql_date_period_from_string"
+  | Core.Enhanced_unary_uri_op Core.Uop_uri_encode -> "uri_encode"
+  | Core.Enhanced_unary_uri_op Core.Uop_uri_decode -> "uri_decode"
   end
 
 let foreign_unary_op_of_string s =
   begin match s with
-  | "(sql_date_get_component DAY)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_DAY)
-  | "(sql_date_get_component MONTH)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_MONTH)
-  | "(sql_date_get_component YEAR)"->  Compiler.Enhanced_unary_sql_date_op (Compiler.Uop_sql_date_get_component Compiler.Sql_date_YEAR)
-  | "sql_date_from_string" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string
-  | "sql_date_period_from_string" -> Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_period_from_string
-  | "uri_encode" -> Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_encode
-  | "uri_decode" -> Compiler.Enhanced_unary_uri_op Compiler.Uop_uri_decode
+  | "(sql_date_get_component DAY)"->  Core.Enhanced_unary_sql_date_op (Core.Uop_sql_date_get_component Core.Sql_date_DAY)
+  | "(sql_date_get_component MONTH)"->  Core.Enhanced_unary_sql_date_op (Core.Uop_sql_date_get_component Core.Sql_date_MONTH)
+  | "(sql_date_get_component YEAR)"->  Core.Enhanced_unary_sql_date_op (Core.Uop_sql_date_get_component Core.Sql_date_YEAR)
+  | "sql_date_from_string" -> Core.Enhanced_unary_sql_date_op Core.Uop_sql_date_from_string
+  | "sql_date_period_from_string" -> Core.Enhanced_unary_sql_date_op Core.Uop_sql_date_period_from_string
+  | "uri_encode" -> Core.Enhanced_unary_uri_op Core.Uop_uri_encode
+  | "uri_decode" -> Core.Enhanced_unary_uri_op Core.Uop_uri_decode
   | _ -> raise Not_found
   end
 
@@ -415,266 +415,266 @@ let pretty_foreign_unary_op p sym callb ff fu a =
 
 let pretty_unary_op p sym callb ff u a =
   begin match u with
-  | Compiler.OpIdentity -> pretty_unary_exp sym callb "id" ff a
-  | Compiler.OpNeg ->
+  | Core.OpIdentity -> pretty_unary_exp sym callb "id" ff a
+  | Core.OpNeg ->
       if (p > 25)
       then
 	fprintf ff "@[<hv 0>%a(%a)@]" pretty_sym sym.neg (callb 0 sym) a
       else
 	fprintf ff "@[<hv 0>%a%a@]" pretty_sym sym.neg (callb 25 sym) a
   (* resets precedence back to 0 *)
-  | Compiler.OpBag -> fprintf ff "@[<hv 2>{@,%a@;<0 -2>}@]" (callb 0 sym) a
-  | Compiler.OpCount -> pretty_unary_exp sym callb "count" ff a
-  | Compiler.OpFlatten -> pretty_unary_exp sym callb "flatten" ff a
-  | Compiler.OpLeft -> pretty_unary_exp sym callb "left" ff a
-  | Compiler.OpRight -> pretty_unary_exp sym callb "right" ff a
+  | Core.OpBag -> fprintf ff "@[<hv 2>{@,%a@;<0 -2>}@]" (callb 0 sym) a
+  | Core.OpCount -> pretty_unary_exp sym callb "count" ff a
+  | Core.OpFlatten -> pretty_unary_exp sym callb "flatten" ff a
+  | Core.OpLeft -> pretty_unary_exp sym callb "left" ff a
+  | Core.OpRight -> pretty_unary_exp sym callb "right" ff a
   (* resets precedence back to 0 *)
-  | Compiler.OpBrand brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "brand" (pretty_squared_names sym) brands (callb 0 sym) a
+  | Core.OpBrand brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "brand" (pretty_squared_names sym) brands (callb 0 sym) a
   (* resets precedence back to 0 *)
-  | Compiler.OpRec att -> fprintf ff "@[<hv 2>[ %s :@ %a ]@]" (string_of_char_list att) (callb 0 sym) a
-  | Compiler.OpDot att ->
+  | Core.OpRec att -> fprintf ff "@[<hv 2>[ %s :@ %a ]@]" (string_of_char_list att) (callb 0 sym) a
+  | Core.OpDot att ->
       if p > 23
       then fprintf ff "@[<hv 0>(%a.%s)@]" (callb 23 sym) a (string_of_char_list att)
       else fprintf ff "@[<hv 0>%a.%s@]" (callb 23 sym) a (string_of_char_list att)
   (* resets precedence back to 0 *)
-  | Compiler.OpRecRemove att ->
+  | Core.OpRecRemove att ->
       fprintf ff "@[<hv 0>%a%a%a(%a)@]" pretty_sym sym.neg pretty_sym sym.pi (pretty_squared_names sym) [att] (callb 0 sym) a
   (* resets precedence back to 0 *)
-  | Compiler.OpRecProject atts ->
+  | Core.OpRecProject atts ->
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.pi (pretty_squared_names sym) atts (callb 0 sym) a
-  | Compiler.OpDistinct -> pretty_unary_exp sym callb "distinct" ff a
-  | Compiler.OpOrderBy atts ->
+  | Core.OpDistinct -> pretty_unary_exp sym callb "distinct" ff a
+  | Core.OpOrderBy atts ->
       fprintf ff "@[<hv 0>%s%a(%a)@]" "sort" (pretty_squared_names sym) (List.map fst atts) (callb 0 sym) a
-  | Compiler.OpToString -> pretty_unary_exp sym callb "toString" ff a
-  | Compiler.OpToText -> pretty_unary_exp sym callb "toText" ff a
-  | Compiler.OpLength -> pretty_unary_exp sym callb "length" ff a
-  | Compiler.OpSubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
-  | Compiler.OpSubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
-  | Compiler.OpLike n1 -> pretty_unary_exp sym callb ("like["^(string_of_char_list n1)^"]") ff a
+  | Core.OpToString -> pretty_unary_exp sym callb "toString" ff a
+  | Core.OpToText -> pretty_unary_exp sym callb "toText" ff a
+  | Core.OpLength -> pretty_unary_exp sym callb "length" ff a
+  | Core.OpSubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
+  | Core.OpSubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
+  | Core.OpLike n1 -> pretty_unary_exp sym callb ("like["^(string_of_char_list n1)^"]") ff a
   (* resets precedence back to 0 *)
-  | Compiler.OpCast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
-  | Compiler.OpUnbrand ->
+  | Core.OpCast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
+  | Core.OpUnbrand ->
       if p > 24
       then fprintf ff "@[<hv 0>(!%a)@]" (callb 24 sym) a
       else fprintf ff "@[<hv 0>!%a@]" (callb 24 sym) a
-  | Compiler.OpSingleton -> pretty_unary_exp sym callb "singleton" ff a
-  | Compiler.OpNatUnary ua -> pretty_nat_arith_unary_op p sym callb ff ua a
-  | Compiler.OpNatSum -> pretty_unary_exp sym callb "sum" ff a
-  | Compiler.OpNatMean -> pretty_unary_exp sym callb "avg" ff a
-  | Compiler.OpNatMin -> pretty_unary_exp sym callb "min" ff a
-  | Compiler.OpNatMax -> pretty_unary_exp sym callb "max" ff a
-  | Compiler.OpFloatOfNat -> pretty_unary_exp sym callb "Fof_int" ff a
-  | Compiler.OpFloatUnary ua -> pretty_float_arith_unary_op p sym callb ff ua a
-  | Compiler.OpFloatTruncate -> pretty_unary_exp sym callb "Ftruncate" ff a
-  | Compiler.OpFloatSum -> pretty_unary_exp sym callb "Fsum" ff a
-  | Compiler.OpFloatMean -> pretty_unary_exp sym callb "Favg" ff a
-  | Compiler.OpFloatBagMin -> pretty_unary_exp sym callb "Flist_min" ff a
-  | Compiler.OpFloatBagMax -> pretty_unary_exp sym callb "Flist_max" ff a
-  | Compiler.OpForeignUnary fu -> pretty_foreign_unary_op p sym callb ff (Obj.magic fu) a
+  | Core.OpSingleton -> pretty_unary_exp sym callb "singleton" ff a
+  | Core.OpNatUnary ua -> pretty_nat_arith_unary_op p sym callb ff ua a
+  | Core.OpNatSum -> pretty_unary_exp sym callb "sum" ff a
+  | Core.OpNatMean -> pretty_unary_exp sym callb "avg" ff a
+  | Core.OpNatMin -> pretty_unary_exp sym callb "min" ff a
+  | Core.OpNatMax -> pretty_unary_exp sym callb "max" ff a
+  | Core.OpFloatOfNat -> pretty_unary_exp sym callb "Fof_int" ff a
+  | Core.OpFloatUnary ua -> pretty_float_arith_unary_op p sym callb ff ua a
+  | Core.OpFloatTruncate -> pretty_unary_exp sym callb "Ftruncate" ff a
+  | Core.OpFloatSum -> pretty_unary_exp sym callb "Fsum" ff a
+  | Core.OpFloatMean -> pretty_unary_exp sym callb "Favg" ff a
+  | Core.OpFloatBagMin -> pretty_unary_exp sym callb "Flist_min" ff a
+  | Core.OpFloatBagMax -> pretty_unary_exp sym callb "Flist_max" ff a
+  | Core.OpForeignUnary fu -> pretty_foreign_unary_op p sym callb ff (Obj.magic fu) a
   end
 
 let string_of_nat_arith_binary_op ba =
   begin match ba with
-  | Compiler.NatPlus -> "plus"
-  | Compiler.NatMinus -> "minus"
-  | Compiler.NatMult -> "mult"
-  | Compiler.NatMin -> "min"
-  | Compiler.NatMax -> "max"
-  | Compiler.NatDiv -> "divide"
-  | Compiler.NatRem -> "rem"
+  | Core.NatPlus -> "plus"
+  | Core.NatMinus -> "minus"
+  | Core.NatMult -> "mult"
+  | Core.NatMin -> "min"
+  | Core.NatMax -> "max"
+  | Core.NatDiv -> "divide"
+  | Core.NatRem -> "rem"
   end
 
 let nat_arith_binary_op_of_string s =
   begin match s with
-  | "plus" -> Compiler.NatPlus
-  | "minus" -> Compiler.NatMinus
-  | "mult" -> Compiler.NatMult
-  | "min" -> Compiler.NatMin
-  | "max" -> Compiler.NatMax
-  | "divide" -> Compiler.NatDiv
-  | "rem" -> Compiler.NatRem
+  | "plus" -> Core.NatPlus
+  | "minus" -> Core.NatMinus
+  | "mult" -> Core.NatMult
+  | "min" -> Core.NatMin
+  | "max" -> Core.NatMax
+  | "divide" -> Core.NatDiv
+  | "rem" -> Core.NatRem
   | _ -> raise Not_found
   end
 
 let pretty_nat_arith_binary_op p sym callb ff ba a1 a2 =
   begin match ba with
-  | Compiler.NatPlus -> pretty_infix_exp p 18 sym callb ("+",1) ff a1 a2
-  | Compiler.NatMinus -> pretty_infix_exp p 18 sym callb ("-",1) ff a1 a2
-  | Compiler.NatMult -> pretty_infix_exp p 19 sym callb ("*",1) ff a1 a2
-  | Compiler.NatMin -> pretty_infix_exp p 20 sym callb ("min",3) ff a1 a2
-  | Compiler.NatMax -> pretty_infix_exp p 20 sym callb ("max",3) ff a1 a2
-  | Compiler.NatDiv -> pretty_infix_exp p 19 sym callb ("/",1) ff a1 a2
-  | Compiler.NatRem -> pretty_infix_exp p 19 sym callb ("%",1) ff a1 a2
+  | Core.NatPlus -> pretty_infix_exp p 18 sym callb ("+",1) ff a1 a2
+  | Core.NatMinus -> pretty_infix_exp p 18 sym callb ("-",1) ff a1 a2
+  | Core.NatMult -> pretty_infix_exp p 19 sym callb ("*",1) ff a1 a2
+  | Core.NatMin -> pretty_infix_exp p 20 sym callb ("min",3) ff a1 a2
+  | Core.NatMax -> pretty_infix_exp p 20 sym callb ("max",3) ff a1 a2
+  | Core.NatDiv -> pretty_infix_exp p 19 sym callb ("/",1) ff a1 a2
+  | Core.NatRem -> pretty_infix_exp p 19 sym callb ("%",1) ff a1 a2
   end
 
 let string_of_float_arith_binary_op ba =
   begin match ba with
-  | Compiler.FloatPlus -> "float_plus"
-  | Compiler.FloatMinus -> "float_minus"
-  | Compiler.FloatMult -> "float_mult"
-  | Compiler.FloatDiv -> "float_div"
-  | Compiler.FloatPow -> "float_pow"
-  | Compiler.FloatMin -> "float_min"
-  | Compiler.FloatMax -> "float_max"
+  | Core.FloatPlus -> "float_plus"
+  | Core.FloatMinus -> "float_minus"
+  | Core.FloatMult -> "float_mult"
+  | Core.FloatDiv -> "float_div"
+  | Core.FloatPow -> "float_pow"
+  | Core.FloatMin -> "float_min"
+  | Core.FloatMax -> "float_max"
   end
 
 let float_arith_binary_op_of_string ba =
   begin match ba with
-  | "float_plus" -> Compiler.FloatPlus
-  | "float_minus" -> Compiler.FloatMinus
-  | "float_mult" -> Compiler.FloatMult
-  | "float_div" -> Compiler.FloatDiv
-  | "float_pow" -> Compiler.FloatPow
-  | "float_min" -> Compiler.FloatMin
-  | "float_max" -> Compiler.FloatMax
+  | "float_plus" -> Core.FloatPlus
+  | "float_minus" -> Core.FloatMinus
+  | "float_mult" -> Core.FloatMult
+  | "float_div" -> Core.FloatDiv
+  | "float_pow" -> Core.FloatPow
+  | "float_min" -> Core.FloatMin
+  | "float_max" -> Core.FloatMax
   | _ -> raise Not_found
   end
 
 let string_of_float_compare_binary_op ba =
   begin match ba with
-  | Compiler.FloatLt -> "FloatLt"
-  | Compiler.FloatLe -> "FloatLe"
-  | Compiler.FloatGt -> "FloatGt"
-  | Compiler.FloatGe -> "FloatGe"
+  | Core.FloatLt -> "FloatLt"
+  | Core.FloatLe -> "FloatLe"
+  | Core.FloatGt -> "FloatGt"
+  | Core.FloatGe -> "FloatGe"
   end
 
 let float_compare_binary_op_of_string s =
   begin match s with
-  | "FloatLt" -> Compiler.FloatLt
-  | "FloatLe" -> Compiler.FloatLe
-  | "FloatGt" -> Compiler.FloatGt
-  | "FloatGe" -> Compiler.FloatGe
+  | "FloatLt" -> Core.FloatLt
+  | "FloatLe" -> Core.FloatLe
+  | "FloatGt" -> Core.FloatGt
+  | "FloatGe" -> Core.FloatGe
   | _ -> raise Not_found
   end
 
 let pretty_float_arith_binary_op p sym callb ff ba a1 a2 =
   begin match ba with
-  | Compiler.FloatPlus ->
+  | Core.FloatPlus ->
      pretty_infix_exp p 18 sym callb ("F+",1) ff a1 a2
-  | Compiler.FloatMinus ->
+  | Core.FloatMinus ->
      pretty_infix_exp p 18 sym callb ("F-",1) ff a1 a2
-  | Compiler.FloatMult ->
+  | Core.FloatMult ->
      pretty_infix_exp p 18 sym callb ("F*",1) ff a1 a2
-  | Compiler.FloatDiv ->
+  | Core.FloatDiv ->
      pretty_infix_exp p 18 sym callb ("F/",1) ff a1 a2
-  | Compiler.FloatPow ->
+  | Core.FloatPow ->
      pretty_infix_exp p 18 sym callb ("F^",1) ff a1 a2
-  | Compiler.FloatMin ->
+  | Core.FloatMin ->
      pretty_infix_exp p 20 sym callb ("Fmin",3) ff a1 a2
-  | Compiler.FloatMax ->
+  | Core.FloatMax ->
      pretty_infix_exp p 20 sym callb ("Fmax",3) ff a1 a2
   end
 
 let pretty_float_compare_binary_op p sym callb ff ba a1 a2 =
   begin match ba with
-  | Compiler.FloatLt ->
+  | Core.FloatLt ->
     pretty_infix_exp p 18 sym callb ("F<",1) ff a1 a2
-  | Compiler.FloatLe ->
+  | Core.FloatLe ->
     pretty_infix_exp p 18 sym callb ("F<=",1) ff a1 a2
-  | Compiler.FloatGt ->
+  | Core.FloatGt ->
     pretty_infix_exp p 18 sym callb ("F>",1) ff a1 a2
-  | Compiler.FloatGe ->
+  | Core.FloatGe ->
     pretty_infix_exp p 18 sym callb ("F>=",1) ff a1 a2
   end
 
 let string_of_foreign_binary_op fb =
   begin match fb with
-  | Compiler.Bop_sql_date_plus -> "sql_date_plus"
-  | Compiler.Bop_sql_date_minus -> "sql_date_minus"
-  | Compiler.Bop_sql_date_ne -> "sql_date_ne"
-  | Compiler.Bop_sql_date_lt -> "sql_date_lt"
-  | Compiler.Bop_sql_date_le -> "sql_date_le"
-  | Compiler.Bop_sql_date_gt -> "sql_date_gt"
-  | Compiler.Bop_sql_date_ge -> "sql_date_ge"
-  | Compiler.Bop_sql_date_period_between -> "sql_date_period_between"
-  | Compiler.Bop_sql_date_set_component part -> "(sql_date_set_component " ^ (sql_date_component_to_string part) ^ ")"
+  | Core.Bop_sql_date_plus -> "sql_date_plus"
+  | Core.Bop_sql_date_minus -> "sql_date_minus"
+  | Core.Bop_sql_date_ne -> "sql_date_ne"
+  | Core.Bop_sql_date_lt -> "sql_date_lt"
+  | Core.Bop_sql_date_le -> "sql_date_le"
+  | Core.Bop_sql_date_gt -> "sql_date_gt"
+  | Core.Bop_sql_date_ge -> "sql_date_ge"
+  | Core.Bop_sql_date_period_between -> "sql_date_period_between"
+  | Core.Bop_sql_date_set_component part -> "(sql_date_set_component " ^ (sql_date_component_to_string part) ^ ")"
   end
 
 let foreign_binary_op_of_string fb =
   begin match fb with
-  | "sql_date_plus" -> Compiler.Bop_sql_date_plus
-  | "sql_date_ne" -> Compiler.Bop_sql_date_ne
-  | "sql_date_lt" -> Compiler.Bop_sql_date_lt
-  | "sql_date_le" -> Compiler.Bop_sql_date_le
-  | "sql_date_gt" -> Compiler.Bop_sql_date_gt
-  | "sql_date_ge" -> Compiler.Bop_sql_date_ge
-  | "sql_date_period_between" -> Compiler.Bop_sql_date_period_between
-  | "(sql_date_set_component DAY)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_DAY
-  | "(sql_date_set_component MONTH)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_MONTH
-  | "(sql_date_set_component YEAR)"->  Compiler.Bop_sql_date_set_component Compiler.Sql_date_YEAR
+  | "sql_date_plus" -> Core.Bop_sql_date_plus
+  | "sql_date_ne" -> Core.Bop_sql_date_ne
+  | "sql_date_lt" -> Core.Bop_sql_date_lt
+  | "sql_date_le" -> Core.Bop_sql_date_le
+  | "sql_date_gt" -> Core.Bop_sql_date_gt
+  | "sql_date_ge" -> Core.Bop_sql_date_ge
+  | "sql_date_period_between" -> Core.Bop_sql_date_period_between
+  | "(sql_date_set_component DAY)"->  Core.Bop_sql_date_set_component Core.Sql_date_DAY
+  | "(sql_date_set_component MONTH)"->  Core.Bop_sql_date_set_component Core.Sql_date_MONTH
+  | "(sql_date_set_component YEAR)"->  Core.Bop_sql_date_set_component Core.Sql_date_YEAR
   | _ -> raise Not_found
   end
 
 let pretty_foreign_binary_op p sym callb ff fb a1 a2 =
   begin match fb with
-  | Compiler.Bop_sql_date_plus ->
+  | Core.Bop_sql_date_plus ->
       pretty_infix_exp p 18 sym callb ("SD+",1) ff a1 a2
-  | Compiler.Bop_sql_date_minus ->
+  | Core.Bop_sql_date_minus ->
       pretty_infix_exp p 18 sym callb ("SD-",1) ff a1 a2
-  | Compiler.Bop_sql_date_ne ->
+  | Core.Bop_sql_date_ne ->
       pretty_infix_exp p 18 sym callb ("SD!=",1) ff a1 a2
-  | Compiler.Bop_sql_date_lt ->
+  | Core.Bop_sql_date_lt ->
       pretty_infix_exp p 18 sym callb ("SD<",1) ff a1 a2
-  | Compiler.Bop_sql_date_le ->
+  | Core.Bop_sql_date_le ->
       pretty_infix_exp p 18 sym callb ("SD<=",1) ff a1 a2
-  | Compiler.Bop_sql_date_gt ->
+  | Core.Bop_sql_date_gt ->
       pretty_infix_exp p 18 sym callb ("SD>",1) ff a1 a2
-  | Compiler.Bop_sql_date_ge ->
+  | Core.Bop_sql_date_ge ->
       pretty_infix_exp p 18 sym callb ("SD>=",1) ff a1 a2
-  | Compiler.Bop_sql_date_period_between ->
+  | Core.Bop_sql_date_period_between ->
       pretty_infix_exp p 18 sym callb ("SDD_be",1) ff a1 a2
-  | Compiler.Bop_sql_date_set_component Compiler.Sql_date_YEAR ->
+  | Core.Bop_sql_date_set_component Core.Sql_date_YEAR ->
       pretty_infix_exp p 18 sym callb ("SDsY",1) ff a1 a2
-  | Compiler.Bop_sql_date_set_component Compiler.Sql_date_MONTH ->
+  | Core.Bop_sql_date_set_component Core.Sql_date_MONTH ->
       pretty_infix_exp p 18 sym callb ("SDsM",1) ff a1 a2
-  | Compiler.Bop_sql_date_set_component Compiler.Sql_date_DAY ->
+  | Core.Bop_sql_date_set_component Core.Sql_date_DAY ->
       pretty_infix_exp p 18 sym callb ("SDsD",1) ff a1 a2
   end
 
 let string_of_binary_op b =
   begin match b with
-  | Compiler.OpEqual -> "aeq"
-  | Compiler.OpBagUnion -> "aunion"
-  | Compiler.OpRecConcat -> "aconcat"
-  | Compiler.OpRecMerge -> "amergeconcat"
-  | Compiler.OpAnd -> "aand"
-  | Compiler.OpOr -> "aor"
-  | Compiler.OpNatBinary ba -> string_of_nat_arith_binary_op ba
-  | Compiler.OpFloatBinary ba -> string_of_float_arith_binary_op ba
-  | Compiler.OpFloatCompare ba -> string_of_float_compare_binary_op ba
-  | Compiler.OpLt ->  "alt"
-  | Compiler.OpLe -> "ale"
-  | Compiler.OpBagDiff -> "aminus"
-  | Compiler.OpBagMin -> "amin"
-  | Compiler.OpBagMax -> "amax"
-  | Compiler.OpBagNth -> "anth"
-  | Compiler.OpContains -> "acontains"
-  | Compiler.OpStringConcat -> "asconcat"
-  | Compiler.OpStringJoin -> "asjoin"
-  | Compiler.OpForeignBinary fb -> string_of_foreign_binary_op (Obj.magic fb)
+  | Core.OpEqual -> "aeq"
+  | Core.OpBagUnion -> "aunion"
+  | Core.OpRecConcat -> "aconcat"
+  | Core.OpRecMerge -> "amergeconcat"
+  | Core.OpAnd -> "aand"
+  | Core.OpOr -> "aor"
+  | Core.OpNatBinary ba -> string_of_nat_arith_binary_op ba
+  | Core.OpFloatBinary ba -> string_of_float_arith_binary_op ba
+  | Core.OpFloatCompare ba -> string_of_float_compare_binary_op ba
+  | Core.OpLt ->  "alt"
+  | Core.OpLe -> "ale"
+  | Core.OpBagDiff -> "aminus"
+  | Core.OpBagMin -> "amin"
+  | Core.OpBagMax -> "amax"
+  | Core.OpBagNth -> "anth"
+  | Core.OpContains -> "acontains"
+  | Core.OpStringConcat -> "asconcat"
+  | Core.OpStringJoin -> "asjoin"
+  | Core.OpForeignBinary fb -> string_of_foreign_binary_op (Obj.magic fb)
   end
 
 let pretty_binary_op p sym callb ff b a1 a2 =
   begin match b with
-  | Compiler.OpEqual -> pretty_infix_exp p 15 sym callb ("=",1) ff a1 a2
-  | Compiler.OpBagUnion -> pretty_infix_exp p 18 sym callb sym.cup ff a1 a2
-  | Compiler.OpRecConcat -> pretty_infix_exp p 19 sym callb ("[+]",3) ff a1 a2
-  | Compiler.OpRecMerge -> pretty_infix_exp p 18 sym callb ("[*]",3) ff a1 a2
-  | Compiler.OpAnd -> pretty_infix_exp p 19 sym callb sym.wedge ff a1 a2
-  | Compiler.OpOr -> pretty_infix_exp p 18 sym callb sym.vee ff a1 a2
-  | Compiler.OpNatBinary ba -> (pretty_nat_arith_binary_op p sym callb) ff ba a1 a2
-  | Compiler.OpFloatBinary ba -> (pretty_float_arith_binary_op p sym callb) ff ba a1 a2
-  | Compiler.OpFloatCompare ba -> (pretty_float_compare_binary_op p sym callb) ff ba a1 a2
-  | Compiler.OpLt -> pretty_infix_exp p 17 sym callb ("<",1) ff a1 a2
-  | Compiler.OpLe -> pretty_infix_exp p 17 sym callb sym.leq ff a1 a2
-  | Compiler.OpBagDiff -> pretty_infix_exp p 18 sym callb ("\\",1) ff a1 a2
-  | Compiler.OpBagMin -> pretty_infix_exp p 20 sym callb ("{min}",5) ff a1 a2
-  | Compiler.OpBagMax -> pretty_infix_exp p 20 sym callb ("{max}",5) ff a1 a2
-  | Compiler.OpBagNth -> pretty_infix_exp p 20 sym callb ("{nth}",5) ff a1 a2
-  | Compiler.OpContains -> pretty_infix_exp p 16 sym callb sym.sin ff a1 a2
-  | Compiler.OpStringConcat -> pretty_infix_exp p 18 sym callb ("^",1) ff a1 a2
-  | Compiler.OpStringJoin -> pretty_infix_exp p 16 sym callb ("{join}",5) ff a1 a2
-  | Compiler.OpForeignBinary fb -> pretty_foreign_binary_op p sym callb ff (Obj.magic fb) a1 a2
+  | Core.OpEqual -> pretty_infix_exp p 15 sym callb ("=",1) ff a1 a2
+  | Core.OpBagUnion -> pretty_infix_exp p 18 sym callb sym.cup ff a1 a2
+  | Core.OpRecConcat -> pretty_infix_exp p 19 sym callb ("[+]",3) ff a1 a2
+  | Core.OpRecMerge -> pretty_infix_exp p 18 sym callb ("[*]",3) ff a1 a2
+  | Core.OpAnd -> pretty_infix_exp p 19 sym callb sym.wedge ff a1 a2
+  | Core.OpOr -> pretty_infix_exp p 18 sym callb sym.vee ff a1 a2
+  | Core.OpNatBinary ba -> (pretty_nat_arith_binary_op p sym callb) ff ba a1 a2
+  | Core.OpFloatBinary ba -> (pretty_float_arith_binary_op p sym callb) ff ba a1 a2
+  | Core.OpFloatCompare ba -> (pretty_float_compare_binary_op p sym callb) ff ba a1 a2
+  | Core.OpLt -> pretty_infix_exp p 17 sym callb ("<",1) ff a1 a2
+  | Core.OpLe -> pretty_infix_exp p 17 sym callb sym.leq ff a1 a2
+  | Core.OpBagDiff -> pretty_infix_exp p 18 sym callb ("\\",1) ff a1 a2
+  | Core.OpBagMin -> pretty_infix_exp p 20 sym callb ("{min}",5) ff a1 a2
+  | Core.OpBagMax -> pretty_infix_exp p 20 sym callb ("{max}",5) ff a1 a2
+  | Core.OpBagNth -> pretty_infix_exp p 20 sym callb ("{nth}",5) ff a1 a2
+  | Core.OpContains -> pretty_infix_exp p 16 sym callb sym.sin ff a1 a2
+  | Core.OpStringConcat -> pretty_infix_exp p 18 sym callb ("^",1) ff a1 a2
+  | Core.OpStringJoin -> pretty_infix_exp p 16 sym callb ("{join}",5) ff a1 a2
+  | Core.OpForeignBinary fb -> pretty_foreign_binary_op p sym callb ff (Obj.magic fb) a1 a2
   end
 
 

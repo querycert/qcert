@@ -20,13 +20,13 @@ include ../../Makefile.config
 include ../../Makefile.coq_modules
 
 ## Toplevel
-all: extraction/QcertCompiler.ml
+all: ./core.ml
 
 ## Extraction
 VO_FILES = $(MODULES:%=../src/%.vo)
 
-extraction/QcertCompiler.ml extraction/QcertCompiler.mli:
-	coqc -R ../src Qcert ./QcertExtraction.v
+./core.ml ./core.mli:
+	coqc -R ../core Qcert ./QcertExtraction.v
 
 ## Clean
 
@@ -34,7 +34,7 @@ clean:
 
 cleanall: clean
 	rm -f QcertExtraction.glob QcertExtraction.vo .QcertExtraction.aux
-	rm -rf compiler.ml compiler.mli
+	rm -rf core.ml core.mli
 	rm -rf *~
 
 .NOTPARALLEL: 

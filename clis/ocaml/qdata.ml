@@ -18,7 +18,7 @@ open Qcert_lib
 
 open Util
 open Config
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 
 let verbose = ref false
   
@@ -43,8 +43,8 @@ let parse_args () =
   let gconf =
     { gconf_qname = None;
       gconf_class_name = None;
-      gconf_source = Compiler.L_camp_rule;
-      gconf_target = Compiler.L_javascript;
+      gconf_source = Core.L_camp_rule;
+      gconf_target = Core.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
@@ -88,9 +88,9 @@ let () =
     | _ -> raise (Qcert_Error "qdata requires I/O file or schema/input files")
     end
   in 
-  let results = Core.main_data gconf file_name in
+  let results = Compile.main_data gconf file_name in
   let output_res file_res =
-    if file_res.Core.res_file <> "" then
-      make_file file_res.Core.res_file file_res.Core.res_content
+    if file_res.Compile.res_file <> "" then
+      make_file file_res.Compile.res_file file_res.Compile.res_content
   in
   List.iter output_res results

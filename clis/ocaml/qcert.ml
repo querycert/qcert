@@ -17,7 +17,7 @@ open Qcert_lib
 open Util
 open Logger
 open Config
-open Compiler.EnhancedCompiler
+open Core.EnhancedCompiler
 open Logger_to_sexp
 
 (* Command line args *)
@@ -114,30 +114,30 @@ let args_list gconf =
 let anon_args input_files f = input_files := f :: !input_files
 
 let languages =
-  [ Compiler.L_camp_rule;
-    Compiler.L_camp;
-    Compiler.L_tech_rule;
-    Compiler.L_designer_rule;
-    Compiler.L_oql;
-    Compiler.L_sql;
-    Compiler.L_sqlpp;
-    Compiler.L_lambda_nra;
-    Compiler.L_nra;
-    Compiler.L_nraenv;
-    Compiler.L_nraenv_core;
-    Compiler.L_nnrc;
-    Compiler.L_nnrc_core;
-    Compiler.L_nnrs;
-    Compiler.L_nnrs_core;
-    Compiler.L_imp_qcert;
-    Compiler.L_imp_ejson;
-    Compiler.L_nnrcmr;
-    Compiler.L_dnnrc;
-    Compiler.L_dnnrc_typed;
-    Compiler.L_js_ast;
-    Compiler.L_javascript;
-    Compiler.L_java;
-    Compiler.L_spark_df; ]
+  [ Core.L_camp_rule;
+    Core.L_camp;
+    Core.L_tech_rule;
+    Core.L_designer_rule;
+    Core.L_oql;
+    Core.L_sql;
+    Core.L_sqlpp;
+    Core.L_lambda_nra;
+    Core.L_nra;
+    Core.L_nraenv;
+    Core.L_nraenv_core;
+    Core.L_nnrc;
+    Core.L_nnrc_core;
+    Core.L_nnrs;
+    Core.L_nnrs_core;
+    Core.L_imp_qcert;
+    Core.L_imp_ejson;
+    Core.L_nnrcmr;
+    Core.L_dnnrc;
+    Core.L_dnnrc_typed;
+    Core.L_js_ast;
+    Core.L_javascript;
+    Core.L_java;
+    Core.L_spark_df; ]
 
 
 let languages_string =
@@ -156,8 +156,8 @@ let parse_args () =
   let gconf =
     { gconf_qname = None;
       gconf_class_name = None;
-      gconf_source = Compiler.L_camp_rule;
-      gconf_target = Compiler.L_javascript;
+      gconf_source = Core.L_camp_rule;
+      gconf_target = Core.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
@@ -198,35 +198,35 @@ let process_file f file_name =
 let () =
   let gconf, input_files = parse_args () in
   (* XXX qcert goes quiet if in eval-validate mode... - to be discussed with Louis XXX *)
-  if gconf.gconf_eval_validate then () else Format.printf "%a" Core.fprint_compilation_path gconf;
-  let results = List.map (process_file (Core.main gconf)) input_files in
+  if gconf.gconf_eval_validate then () else Format.printf "%a" Compile.fprint_compilation_path gconf;
+  let results = List.map (process_file (Compile.main gconf)) input_files in
   let output_res file_res =
-    if file_res.Core.res_file <> "" then
-      make_file file_res.Core.res_file file_res.Core.res_content
+    if file_res.Compile.res_file <> "" then
+      make_file file_res.Compile.res_file file_res.Compile.res_content
   in
   let output_stats res =
-    if res.Core.res_stat <> "" then
-      Format.printf "%s@." res.Core.res_stat;
-    if res.Core.res_stat_all <> [] then
+    if res.Compile.res_stat <> "" then
+      Format.printf "%s@." res.Compile.res_stat;
+    if res.Compile.res_stat_all <> [] then
       Format.printf "[ @[%a@] ]@."
         (Format.pp_print_list
            ~pp_sep:(fun ff () -> Format.fprintf ff ",@\n")
            (fun ff stat -> Format.fprintf ff "%s" stat))
-        res.Core.res_stat_all;
-    output_res res.Core.res_stat_tree
+        res.Compile.res_stat_all;
+    output_res res.Compile.res_stat_tree
   in
   let res_validates = ref true in
   List.iter
     (fun res ->
-      res_validates := !res_validates && res.Core.res_validates;
-      output_res res.Core.res_emit;
-      List.iter output_res res.Core.res_emit_all;
-      output_res res.Core.res_eval;
-      List.iter output_res res.Core.res_eval_all;
-      output_res res.Core.res_emit_sexp;
-      List.iter output_res res.Core.res_emit_sexp_all;
+      res_validates := !res_validates && res.Compile.res_validates;
+      output_res res.Compile.res_emit;
+      List.iter output_res res.Compile.res_emit_all;
+      output_res res.Compile.res_eval;
+      List.iter output_res res.Compile.res_eval_all;
+      output_res res.Compile.res_emit_sexp;
+      List.iter output_res res.Compile.res_emit_sexp_all;
       output_stats res;
-      output_res res.Core.res_optim_config;)
+      output_res res.Compile.res_optim_config;)
     results;
   if !res_validates
   then exit 0
