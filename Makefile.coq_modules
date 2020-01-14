@@ -115,10 +115,6 @@ MODULES = \
 	Data/ForeignTyping \
 	Data/DataTypes \
 	Data/DataSystem \
-	Dataframe/Lang/Dataframe \
-	Dataframe/Lang/DataframeSize \
-	Dataframe/DataframeRuntime \
-	Dataframe/DataframeSystem \
 	Translation/Model/ForeignDataToEJson \
 	Translation/Model/DataToEJson \
 	Translation/Model/ForeignEJsonToJSON \
@@ -126,6 +122,10 @@ MODULES = \
 	Translation/Model/ForeignTypeToJSON \
 	Translation/Model/TypeToJSON \
 	Translation/Model/DTypeToJSON \
+	Dataframe/Lang/Dataframe \
+	Dataframe/Lang/DataframeSize \
+	Dataframe/DataframeRuntime \
+	Dataframe/DataframeSystem \
 	NRA/Lang/NRA \
 	NRA/Lang/NRASugar \
 	NRA/Lang/NRASize \
