@@ -127,6 +127,13 @@ Defined.
 Program Instance trivial_foreign_to_ejson : foreign_to_ejson
   := mk_foreign_to_ejson trivial_foreign_runtime trivial_foreign_ejson trivial_foreign_ejson_runtime _ _ _.
 
+Lemma trivial_foreign_data_to_string_correct:
+  forall fd : foreign_data_model,
+    toString fd = toString (foreign_to_ejson_from_data fd).
+Proof.
+  reflexivity.
+Qed.
+
 Program Instance trivial_foreign_to_ejson_runtime :
   foreign_to_ejson_runtime
   := mk_foreign_to_ejson_runtime
@@ -142,11 +149,15 @@ Next Obligation.
   destruct bop.
 Defined.
 Next Obligation.
-  admit.
-Admitted.
+  specialize (default_to_ejson_tostring_correct trivial_foreign_data_to_string_correct); intros.
+  rewrite H.
+  reflexivity.
+Qed.
 Next Obligation.
-  admit.
-Admitted.
+  specialize (default_to_ejson_tostring_correct trivial_foreign_data_to_string_correct); intros.
+  rewrite H.
+  reflexivity.
+Qed.
 
 Program Instance trivial_foreign_to_json : foreign_to_json
   := mk_foreign_to_json trivial_foreign_ejson _ _.
