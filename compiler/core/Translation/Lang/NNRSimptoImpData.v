@@ -24,108 +24,108 @@ Require Import Utils.
 Require Import DataRuntime.
 Require Import NNRSimpRuntime.
 Require Import Imp.
-Require Import ImpQcert.
-Require Import ImpQcertEval.
+Require Import ImpData.
+Require Import ImpDataEval.
 
-Section NNRSimptoImpQcert.
+Section NNRSimptoImpData.
   Import ListNotations.
 
   Context {fruntime:foreign_runtime}.
 
   (** Translation *)
   Section Translation.
-    Fixpoint nnrs_imp_expr_to_imp_qcert (constants: string) (exp: nnrs_imp_expr): imp_qcert_expr :=
+    Fixpoint nnrs_imp_expr_to_imp_data (constants: string) (exp: nnrs_imp_expr): imp_data_expr :=
       match exp with
       | NNRSimpGetConstant x =>
-        ImpExprOp (QcertOpUnary (OpDot x)) [ ImpExprVar constants ]
+        ImpExprOp (DataOpUnary (OpDot x)) [ ImpExprVar constants ]
       | NNRSimpVar x =>
         ImpExprVar x
       | NNRSimpConst d =>
         ImpExprConst d
       | NNRSimpBinop op e1 e2 =>
-        let e1' := nnrs_imp_expr_to_imp_qcert constants e1 in
-        let e2' := nnrs_imp_expr_to_imp_qcert constants e2 in
-        ImpExprOp (QcertOpBinary op) [e1'; e2']
+        let e1' := nnrs_imp_expr_to_imp_data constants e1 in
+        let e2' := nnrs_imp_expr_to_imp_data constants e2 in
+        ImpExprOp (DataOpBinary op) [e1'; e2']
       | NNRSimpUnop op e =>
-        let e' := nnrs_imp_expr_to_imp_qcert constants e in
-        ImpExprOp (QcertOpUnary op) [e']
+        let e' := nnrs_imp_expr_to_imp_data constants e in
+        ImpExprOp (DataOpUnary op) [e']
       | NNRSimpGroupBy g fields e =>
-        let e' := nnrs_imp_expr_to_imp_qcert constants e in
-        ImpExprRuntimeCall (QcertRuntimeGroupby g fields) [ e' ]
+        let e' := nnrs_imp_expr_to_imp_data constants e in
+        ImpExprRuntimeCall (DataRuntimeGroupby g fields) [ e' ]
       end.
 
-    Fixpoint nnrs_imp_stmt_to_imp_qcert (constants: string) (stmt: nnrs_imp_stmt): imp_qcert_stmt :=
+    Fixpoint nnrs_imp_stmt_to_imp_data (constants: string) (stmt: nnrs_imp_stmt): imp_data_stmt :=
       match stmt with
       | NNRSimpSkip =>
-        @ImpStmtBlock imp_qcert_data imp_qcert_op imp_qcert_runtime_op  [] []
+        @ImpStmtBlock imp_data_data imp_data_op imp_data_runtime_op  [] []
       | NNRSimpSeq s1 s2 =>
         ImpStmtBlock
           []
-          [ nnrs_imp_stmt_to_imp_qcert constants s1;
-              nnrs_imp_stmt_to_imp_qcert constants s2 ]
+          [ nnrs_imp_stmt_to_imp_data constants s1;
+              nnrs_imp_stmt_to_imp_data constants s2 ]
       | NNRSimpLet x e s =>
         ImpStmtBlock
-          [ (x, lift (nnrs_imp_expr_to_imp_qcert constants) e) ]
-          [ nnrs_imp_stmt_to_imp_qcert constants s ]
+          [ (x, lift (nnrs_imp_expr_to_imp_data constants) e) ]
+          [ nnrs_imp_stmt_to_imp_data constants s ]
       | NNRSimpAssign x e =>
-        ImpStmtAssign x (nnrs_imp_expr_to_imp_qcert constants e)
+        ImpStmtAssign x (nnrs_imp_expr_to_imp_data constants e)
       (* | NNRSimpPush x e => *)
-      (*   stat_expr (array_push (expr_identifier x) (nnrs_imp_expr_to_imp_qcert e)) *)
+      (*   stat_expr (array_push (expr_identifier x) (nnrs_imp_expr_to_imp_data e)) *)
       | NNRSimpFor x e s =>
-        ImpStmtFor x (nnrs_imp_expr_to_imp_qcert constants e) (nnrs_imp_stmt_to_imp_qcert constants s)
+        ImpStmtFor x (nnrs_imp_expr_to_imp_data constants e) (nnrs_imp_stmt_to_imp_data constants s)
       | NNRSimpIf e s1 s2 =>
         ImpStmtIf
-          (nnrs_imp_expr_to_imp_qcert constants e)
-          (nnrs_imp_stmt_to_imp_qcert constants s1)
-          (nnrs_imp_stmt_to_imp_qcert constants s2)
+          (nnrs_imp_expr_to_imp_data constants e)
+          (nnrs_imp_stmt_to_imp_data constants s1)
+          (nnrs_imp_stmt_to_imp_data constants s2)
       (* | NNRSimpEither (NNRSimpVar x) x1 s1 x2 s2 => *)
       (*   let e' := ImpExprVar x  in *)
       (*   ImpStmtIf *)
-      (*     (ImpExprRuntimeCall QcertRuntimeEither [e']) *)
+      (*     (ImpExprRuntimeCall DataRuntimeEither [e']) *)
       (*     (ImpStmtBlock (* var x1 = toLeft(e); s1 *) *)
-      (*        [ (x1, Some (ImpExprRuntimeCall QcertRuntimeToLeft [e'])) ] *)
-      (*        [ nnrs_imp_stmt_to_imp_qcert s1 ]) *)
+      (*        [ (x1, Some (ImpExprRuntimeCall DataRuntimeToLeft [e'])) ] *)
+      (*        [ nnrs_imp_stmt_to_imp_data s1 ]) *)
       (*     (ImpStmtBlock (* var x2 = toRight(e); s2 *) *)
-      (*        [ (x2, Some (ImpExprRuntimeCall QcertRuntimeToRight [e'])) ] *)
-      (*        [ nnrs_imp_stmt_to_imp_qcert s2 ]) *)
+      (*        [ (x2, Some (ImpExprRuntimeCall DataRuntimeToRight [e'])) ] *)
+      (*        [ nnrs_imp_stmt_to_imp_data s2 ]) *)
       | NNRSimpEither e x1 s1 x2 s2 =>
         (* XXX TODO: introduce a variable for e here or earlier in compilation? XXX *)
-        let e' := nnrs_imp_expr_to_imp_qcert constants e in
+        let e' := nnrs_imp_expr_to_imp_data constants e in
         ImpStmtIf
-          (ImpExprRuntimeCall QcertRuntimeEither [e'])
+          (ImpExprRuntimeCall DataRuntimeEither [e'])
           (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
-             [ (x1, Some (ImpExprRuntimeCall QcertRuntimeToLeft [e'])) ]
-             [ nnrs_imp_stmt_to_imp_qcert constants s1 ])
+             [ (x1, Some (ImpExprRuntimeCall DataRuntimeToLeft [e'])) ]
+             [ nnrs_imp_stmt_to_imp_data constants s1 ])
           (ImpStmtBlock (* var x2 = toRight(e); s2 *)
-             [ (x2, Some (ImpExprRuntimeCall QcertRuntimeToRight [e'])) ]
-             [ nnrs_imp_stmt_to_imp_qcert constants s2 ])
+             [ (x2, Some (ImpExprRuntimeCall DataRuntimeToRight [e'])) ]
+             [ nnrs_imp_stmt_to_imp_data constants s2 ])
       end.
 
-    Definition nnrs_imp_to_imp_qcert_function (q: nnrs_imp): imp_function :=
+    Definition nnrs_imp_to_imp_data_function (q: nnrs_imp): imp_function :=
       let (stmt, ret) := q in
       let constants :=
           let fv := nnrs_imp_stmt_free_vars stmt in
           let bv := nnrs_imp_stmt_bound_vars stmt in
           fresh_var "constants"%string (ret :: fv ++ bv)
       in
-      let body := nnrs_imp_stmt_to_imp_qcert constants stmt in
+      let body := nnrs_imp_stmt_to_imp_data constants stmt in
       ImpFun constants body ret.
 
     (* XXX Danger: string hypothesis on the encoding of the queries XXX *)
-    Definition nnrs_imp_to_imp_qcert_top (qname: string) (q: nnrs_imp): imp :=
-      ImpLib [ (qname, nnrs_imp_to_imp_qcert_function q) ].
+    Definition nnrs_imp_to_imp_data_top (qname: string) (q: nnrs_imp): imp :=
+      ImpLib [ (qname, nnrs_imp_to_imp_data_function q) ].
 
   End Translation.
 
   Section Correctness.
-    Lemma nnrs_imp_expr_to_imp_qcert_correct h (σc:bindings) (σ:pd_bindings) (exp:nnrs_imp_expr) :
+    Lemma nnrs_imp_expr_to_imp_data_correct h (σc:bindings) (σ:pd_bindings) (exp:nnrs_imp_expr) :
       forall constants: string,
         let σ0 : pd_bindings :=
             σ ++ [(constants,  Some (drec σc))]
         in
         ~ In constants (nnrs_imp_expr_free_vars exp) ->
         lookup equiv_dec σ constants = None ->
-        nnrs_imp_expr_eval h σc σ exp = imp_qcert_expr_eval h σ0 (nnrs_imp_expr_to_imp_qcert constants exp).
+        nnrs_imp_expr_eval h σc σ exp = imp_data_expr_eval h σ0 (nnrs_imp_expr_to_imp_data constants exp).
     Proof.
       intros constants.
       nnrs_imp_expr_cases (induction exp) Case; simpl.
@@ -134,7 +134,7 @@ Section NNRSimptoImpQcert.
         rewrite (lookup_app equiv_dec constants).
         unfold olift.
         unfold Var.var.
-        unfold imp_qcert_data.
+        unfold imp_data_data.
         case_eq (lookup equiv_dec σ constants); try congruence.
         intros.
         unfold lookup.
@@ -147,7 +147,7 @@ Section NNRSimptoImpQcert.
         unfold id.
         unfold olift.
         unfold Var.var.
-        unfold imp_qcert_data.
+        unfold imp_data_data.
         case_eq (lookup equiv_dec σ v); try reflexivity.
         intros Hv.
         case_eq (lookup equiv_dec [(constants, Some (drec σc))] v); try congruence.
@@ -183,7 +183,7 @@ Section NNRSimptoImpQcert.
         match_destr.
     Qed.
 
-    Lemma nnrs_imp_stmt_to_imp_qcert_correct h (σc:bindings) (σ:pd_bindings) (stmt:nnrs_imp_stmt) :
+    Lemma nnrs_imp_stmt_to_imp_data_correct h (σc:bindings) (σ:pd_bindings) (stmt:nnrs_imp_stmt) :
       forall constants: string,
         let σ0 : pd_bindings :=
             σ ++ [(constants,  Some (drec σc))]
@@ -193,7 +193,7 @@ Section NNRSimptoImpQcert.
         lookup equiv_dec σ constants = None ->
         olift (fun σr => Some (σr ++ [(constants,  Some (drec σc))]))
               (nnrs_imp_stmt_eval h σc stmt σ) =
-        imp_qcert_stmt_eval h (nnrs_imp_stmt_to_imp_qcert constants stmt) σ0.
+        imp_data_stmt_eval h (nnrs_imp_stmt_to_imp_data constants stmt) σ0.
     Proof.
       intros constants.
       simpl.
@@ -224,18 +224,18 @@ Section NNRSimptoImpQcert.
         unfold olift.
         apply notand in Hfv.
         destruct Hfv as [ Hv Hfv ].
-        rewrite (nnrs_imp_expr_to_imp_qcert_correct h _ _ _ constants); trivial.
-        case_eq (imp_qcert_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_qcert constants n)).
-        + unfold imp_qcert_expr_eval.
+        rewrite (nnrs_imp_expr_to_imp_data_correct h _ _ _ constants); trivial.
+        case_eq (imp_data_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_data constants n)).
+        + unfold imp_data_expr_eval.
           intros d Hn; rewrite Hn.
           rewrite (lookup_remove_nin); trivial.
           rewrite app_nil_r.
-          unfold imp_qcert_data.
+          unfold imp_data_data.
           case_eq (lookup string_dec σ v); try reflexivity.
           intros.
           rewrite update_app_in; try reflexivity.
           apply (lookup_in_domain equiv_dec σ H).
-        + unfold imp_qcert_expr_eval.
+        + unfold imp_data_expr_eval.
           intros Hn; rewrite Hn; try reflexivity.
       - Case "NNRSimpLet"%string.
         unfold olift.
@@ -246,18 +246,18 @@ Section NNRSimptoImpQcert.
         + rewrite app_or_in_iff in Hfv.
           apply notand in Hfv.
           destruct Hfv as [ Hfvn Hfvs ].
-          rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); trivial.
+          rewrite (nnrs_imp_expr_to_imp_data_correct _ _ _ _ constants); trivial.
           unfold lift.
-          case_eq (imp_qcert_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_qcert constants n)).
+          case_eq (imp_data_expr_eval h (σ ++ [(constants, Some (drec σc))]) (nnrs_imp_expr_to_imp_data constants n)).
           * intros d Hn.
-            unfold imp_qcert_expr_eval in *.
+            unfold imp_data_expr_eval in *.
             rewrite Hn.
             unfold olift in *.
             rewrite app_comm_cons.
             rewrite <- IHstmt; trivial.
             ** case_eq (nnrs_imp_stmt_eval h σc stmt ((v, Some d) :: σ)).
                *** unfold Var.var.
-                   unfold imp_qcert_data.
+                   unfold imp_data_data.
                    intros σ' Hs.
                    rewrite Hs.
                    case_eq σ'; try reflexivity.
@@ -266,7 +266,7 @@ Section NNRSimptoImpQcert.
                    apply nnrs_imp_stmt_eval_domain_stack in Hs.
                    simpl in Hs; congruence.
                *** unfold Var.var.
-                   unfold imp_qcert_data.
+                   unfold imp_data_data.
                    intros Hs.
                    rewrite Hs.
                    reflexivity.
@@ -276,7 +276,7 @@ Section NNRSimptoImpQcert.
                match_destr.
                congruence.
           * intros Hn.
-            unfold imp_qcert_expr_eval in *.
+            unfold imp_data_expr_eval in *.
             rewrite Hn.
             reflexivity.
         + rewrite app_comm_cons.
@@ -284,7 +284,7 @@ Section NNRSimptoImpQcert.
           * unfold olift.
             case_eq (nnrs_imp_stmt_eval h σc stmt ((v, None) :: σ)).
             ** unfold Var.var.
-               unfold imp_qcert_data.
+               unfold imp_data_data.
                intros σ' Hs.
                rewrite Hs.
                case_eq σ'; try reflexivity.
@@ -293,7 +293,7 @@ Section NNRSimptoImpQcert.
                apply nnrs_imp_stmt_eval_domain_stack in Hs.
                simpl in Hs; congruence.
             ** unfold Var.var.
-               unfold imp_qcert_data.
+               unfold imp_data_data.
                intros Hs.
                rewrite Hs.
                reflexivity.
@@ -308,8 +308,8 @@ Section NNRSimptoImpQcert.
         rewrite app_or_in_iff in Hfv.
         apply notand in Hfv.
         destruct Hfv as [ Hfvn Hfvs ].
-        rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); trivial.
-        unfold imp_qcert_expr_eval.
+        rewrite (nnrs_imp_expr_to_imp_data_correct _ _ _ _ constants); trivial.
+        unfold imp_data_expr_eval.
         match_destr.
         destruct i; simpl; try reflexivity.
         revert Hσ.
@@ -323,7 +323,7 @@ Section NNRSimptoImpQcert.
           case_eq (nnrs_imp_stmt_eval h σc stmt ((v, Some a) :: σ)).
           ** unfold Var.var in *.
              unfold var in *.
-             unfold imp_qcert_data in *.
+             unfold imp_data_data in *.
              intros σ' Hs.
              rewrite Hs.
              case_eq σ'.
@@ -344,7 +344,7 @@ Section NNRSimptoImpQcert.
                  trivial.
           ** unfold Var.var in *.
              unfold var in *.
-             unfold imp_qcert_data in *.
+             unfold imp_data_data in *.
              intros Hs.
              rewrite Hs.
              reflexivity.
@@ -363,8 +363,8 @@ Section NNRSimptoImpQcert.
         destruct Hfv as [ Hfvn Hfvs ].
         apply notand in Hfvs.
         destruct Hfvs as [ Hfvs1 Hfvs2 ].
-        rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); auto.
-        unfold imp_qcert_expr_eval.
+        rewrite (nnrs_imp_expr_to_imp_data_correct _ _ _ _ constants); auto.
+        unfold imp_data_expr_eval.
         match_destr; simpl.
         destruct i; simpl; try reflexivity.
         destruct b; simpl; auto.
@@ -381,8 +381,8 @@ Section NNRSimptoImpQcert.
         destruct Hfv as [ Hfvn Hfvs ].
         apply notand in Hfvs.
         destruct Hfvs as [ Hfvs1 Hfvs2 ].
-        rewrite (nnrs_imp_expr_to_imp_qcert_correct _ _ _ _ constants); auto.
-        unfold imp_qcert_expr_eval in *.
+        rewrite (nnrs_imp_expr_to_imp_data_correct _ _ _ _ constants); auto.
+        unfold imp_data_expr_eval in *.
         match_destr.
         simpl.
         unfold olift.
@@ -392,7 +392,7 @@ Section NNRSimptoImpQcert.
           ** unfold olift.
              case_eq (nnrs_imp_stmt_eval h σc stmt1 ((v, Some d) :: σ)).
              *** unfold Var.var in *.
-                 unfold imp_qcert_data in *.
+                 unfold imp_data_data in *.
                  unfold NNRSimp.pd_bindings.
                  intros σ' Hs.
                  rewrite Hs.
@@ -402,7 +402,7 @@ Section NNRSimptoImpQcert.
                  apply nnrs_imp_stmt_eval_domain_stack in Hs.
                  simpl in Hs; congruence.
              *** unfold Var.var.
-                 unfold imp_qcert_data.
+                 unfold imp_data_data.
                  intros Hs.
                  rewrite Hs.
                  reflexivity.
@@ -415,7 +415,7 @@ Section NNRSimptoImpQcert.
           ** case_eq (nnrs_imp_stmt_eval h σc stmt2 ((v0, Some d) :: σ)).
              *** unfold olift.
                  unfold Var.var in *.
-                 unfold imp_qcert_data in *.
+                 unfold imp_data_data in *.
                  intros σ' Hs.
                  rewrite Hs.
                  case_eq σ'; try reflexivity.
@@ -424,7 +424,7 @@ Section NNRSimptoImpQcert.
                  apply nnrs_imp_stmt_eval_domain_stack in Hs.
                  simpl in Hs; congruence.
              *** unfold Var.var.
-                 unfold imp_qcert_data.
+                 unfold imp_data_data.
                  intros Hs.
                  rewrite Hs.
                  reflexivity.
@@ -440,9 +440,9 @@ Section NNRSimptoImpQcert.
              congruence.
     Qed.
 
-    Lemma nnrs_imp_to_imp_qcert_function_correct h (σc:bindings) (q:nnrs_imp) :
+    Lemma nnrs_imp_to_imp_data_function_correct h (σc:bindings) (q:nnrs_imp) :
       olift id (nnrs_imp_eval h (rec_sort σc) q) =
-      imp_qcert_function_eval h (nnrs_imp_to_imp_qcert_function q) (drec (rec_sort σc)).
+      imp_data_function_eval h (nnrs_imp_to_imp_data_function q) (drec (rec_sort σc)).
     Proof.
       unfold olift, id.
       elim q; intros stmt ret.
@@ -454,24 +454,24 @@ Section NNRSimptoImpQcert.
       intros Hfresh.
       destruct Hfresh as [Hret Hfresh].
       destruct Hfresh as [Hfv Hbv].
-      specialize (nnrs_imp_stmt_to_imp_qcert_correct h (rec_sort σc) [(ret, None)] stmt constants).
+      specialize (nnrs_imp_stmt_to_imp_data_correct h (rec_sort σc) [(ret, None)] stmt constants).
       simpl.
-      unfold imp_qcert_stmt_eval.
+      unfold imp_data_stmt_eval.
       unfold Var.var.
       unfold var.
-      unfold imp_qcert_data.
+      unfold imp_data_data.
       intros Hstmt.
       rewrite <- Hstmt; clear Hstmt; trivial;
         [ | case (equiv_dec constants ret); congruence ];
         unfold Var.var;
         unfold var;
-        unfold imp_qcert_data.
+        unfold imp_data_data.
       unfold olift.
       unfold lift.
       case_eq (nnrs_imp_stmt_eval h (rec_sort σc) stmt [(ret, None)]);
         unfold Var.var;
         unfold var;
-        unfold imp_qcert_data;
+        unfold imp_data_data;
         [ | intros Hstmt; rewrite  Hstmt; reflexivity].
       intros σ Hstmt.
       rewrite  Hstmt.
@@ -484,20 +484,20 @@ Section NNRSimptoImpQcert.
       case (equiv_dec s s); try congruence.
     Qed.
 
-    Theorem nnrs_imp_to_imp_qcert_top_correct h (σc:bindings) (qname: string) (q:nnrs_imp) :
+    Theorem nnrs_imp_to_imp_data_top_correct h (σc:bindings) (qname: string) (q:nnrs_imp) :
       nnrs_imp_eval_top h σc q =
-      imp_qcert_eval_top h σc (nnrs_imp_to_imp_qcert_top qname q).
+      imp_data_eval_top h σc (nnrs_imp_to_imp_data_top qname q).
     Proof.
       unfold nnrs_imp_eval_top.
       unfold nnrs_imp_eval.
-      unfold imp_qcert_eval_top.
-      unfold imp_qcert_eval.
-      unfold nnrs_imp_to_imp_qcert_top.
-      generalize (nnrs_imp_to_imp_qcert_function_correct h σc q); intros.
+      unfold imp_data_eval_top.
+      unfold imp_data_eval.
+      unfold nnrs_imp_to_imp_data_top.
+      generalize (nnrs_imp_to_imp_data_function_correct h σc q); intros.
       simpl in *.
       unfold nnrs_imp_eval in *.
       auto.
     Qed.
   End Correctness.
 
-End NNRSimptoImpQcert.
+End NNRSimptoImpData.

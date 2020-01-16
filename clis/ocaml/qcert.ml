@@ -129,7 +129,7 @@ let languages =
     Core.L_nnrc_core;
     Core.L_nnrs;
     Core.L_nnrs_core;
-    Core.L_imp_qcert;
+    Core.L_imp_data;
     Core.L_imp_ejson;
     Core.L_nnrcmr;
     Core.L_dnnrc;

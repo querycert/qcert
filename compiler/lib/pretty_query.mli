@@ -38,7 +38,7 @@ val pretty_nnrc : Core.nnrc pretty_fun
 val pretty_nnrs : Core.nnrs pretty_fun
 val pretty_nnrs_core : Core.nnrs_core pretty_fun
 val pretty_nnrs_imp : Core.nnrs_imp pretty_fun
-val pretty_imp_qcert : Core.imp_qcert pretty_fun
+val pretty_imp_data : Core.imp_data pretty_fun
 val pretty_imp_ejson : Core.imp_ejson pretty_fun
 val pretty_nnrcmr : Core.nnrcmr pretty_fun
 val pretty_dnnrc : Core.dnnrc pretty_fun

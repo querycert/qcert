@@ -66,8 +66,8 @@ Require Import NRAtocNRAEnv.
 Require Import NNRCtocNNRC.
 Require Import NNRCtoNNRS.
 Require Import NNRStoNNRSimp.
-Require Import NNRSimptoImpQcert.
-Require Import ImpQcerttoImpEJson.
+Require Import NNRSimptoImpData.
+Require Import ImpDatatoImpEJson.
 Require Import ImpEJsontoJavaScriptAst.
 Require Import JavaScriptAsttoJavaScript.
 Require Import NNRCtoDNNRC.
@@ -130,22 +130,22 @@ Section CompCustom.
   Context {ftjsast:foreign_ejson_to_ajavascript}.
 
   Section Verified.
-    Definition compile_nraenv_to_imp_qcert_verified (conf:driver_config) (q:query) : query :=
+    Definition compile_nraenv_to_imp_data_verified (conf:driver_config) (q:query) : query :=
       let dv := driver_of_path
                   conf
-                  (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::nil)
+                  (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_data::nil)
       in
       match List.rev (compile dv q) with
       | nil => Q_error "No compilation result!"
       | target :: _ => target
       end.
 
-    Lemma compile_nraenv_to_imp_qcert_verified_yields_result conf q :
-      exists q', compile_nraenv_to_imp_qcert_verified conf (Q_nraenv q) = Q_imp_qcert q'.
+    Lemma compile_nraenv_to_imp_data_verified_yields_result conf q :
+      exists q', compile_nraenv_to_imp_data_verified conf (Q_nraenv q) = Q_imp_data q'.
     Proof.
-      unfold compile_nraenv_to_imp_qcert_verified.
+      unfold compile_nraenv_to_imp_data_verified.
       simpl.
-      exists (nnrs_imp_to_imp_qcert
+      exists (nnrs_imp_to_imp_data
                 (comp_qname_lowercase conf)
                 (nnrs_to_nnrs_imp
                    (nnrc_to_nnrs (vars_of_constants_config (comp_constants conf))
@@ -160,7 +160,7 @@ Section CompCustom.
       let dv :=
           driver_of_path
             conf
-            (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::L_imp_ejson::nil)
+            (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_data::L_imp_ejson::nil)
       in
       match List.rev (compile dv q) with
       | nil => Q_error "No compilation result!"
@@ -171,8 +171,8 @@ Section CompCustom.
       exists q', compile_nraenv_to_imp_ejson_verified conf (Q_nraenv q) = Q_imp_ejson q'.
     Proof.
       unfold compile_nraenv_to_imp_ejson_verified.
-      exists (imp_qcert_to_imp_ejson
-                (nnrs_imp_to_imp_qcert
+      exists (imp_data_to_imp_ejson
+                (nnrs_imp_to_imp_data
                    (comp_qname_lowercase conf)
                    (nnrs_to_nnrs_imp
                       (nnrc_to_nnrs
@@ -188,7 +188,7 @@ Section CompCustom.
 
   Section Others.
     Definition compile_nnrc_to_javascript_ast (conf:driver_config) (q:query) : query :=
-      let dv := driver_of_path conf (L_nnrc::L_nnrs::L_nnrs_imp::L_imp_qcert::L_imp_ejson::L_js_ast::nil) in
+      let dv := driver_of_path conf (L_nnrc::L_nnrs::L_nnrs_imp::L_imp_data::L_imp_ejson::L_js_ast::nil) in
       match List.rev (compile dv q) with
       | nil => Q_error "No compilation result!"
       | target :: _ => target

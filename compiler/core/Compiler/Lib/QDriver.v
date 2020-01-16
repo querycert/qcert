@@ -91,9 +91,9 @@ Module QDriver(runtime:CompilerRuntime).
       := compile_from_source_target.
 
     (* Custom *)
-    Definition compile_nraenv_to_imp_qcert_verified :
+    Definition compile_nraenv_to_imp_data_verified :
       driver_config -> query -> query
-      := compile_nraenv_to_imp_qcert_verified.
+      := compile_nraenv_to_imp_data_verified.
 
     Definition compile_nraenv_to_imp_ejson_verified :
       driver_config -> query -> query

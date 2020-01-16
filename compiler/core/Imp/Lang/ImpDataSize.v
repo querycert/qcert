@@ -19,23 +19,23 @@ Require Import Decidable.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import Imp.
-Require Import ImpQcert.
+Require Import ImpData.
 Require Import ImpSize.
 
-Section ImpQcertSize.
+Section ImpDataSize.
 
   Context {fruntime:foreign_runtime}.
 
-  Definition imp_qcert_expr_size (e:imp_qcert_expr) : nat :=
+  Definition imp_data_expr_size (e:imp_data_expr) : nat :=
     imp_expr_size e.
 
-  Definition imp_qcert_stmt_size (stmt:imp_qcert_stmt) : nat :=
+  Definition imp_data_stmt_size (stmt:imp_data_stmt) : nat :=
     imp_stmt_size stmt.
 
-  Definition imp_qcert_function_size (q:imp_qcert_function) : nat :=
+  Definition imp_data_function_size (q:imp_data_function) : nat :=
     imp_function_size q.
 
-  Fixpoint imp_qcert_size (q: imp_qcert) : nat :=
+  Fixpoint imp_data_size (q: imp_data) : nat :=
     imp_size q.
 
-End ImpQcertSize.
+End ImpDataSize.
