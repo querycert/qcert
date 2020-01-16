@@ -23,7 +23,8 @@ Section ImpEJson.
     Context {ftoejson:foreign_ejson}.
     Context {fejruntime:foreign_ejson_runtime}.
 
-    Definition imp_ejson_data := ejson.
+    Definition imp_ejson_model := ejson.
+    Definition imp_ejson_constant := ejson.
 
     (* XXX This should contain at least:
        - all JS operators/expressions used in translation from NNRSimp to JsAst
@@ -33,10 +34,10 @@ Section ImpEJson.
      *)
     Definition imp_ejson_op := ejson_op. (* See ./EJson/Operators/EJsonOperators.v *)
     Definition imp_ejson_runtime_op := ejson_runtime_op.  (* See ./EJson/Operators/EJsonRuntimeOperators.v *)
-    Definition imp_ejson_expr := @imp_expr imp_ejson_data imp_ejson_op imp_ejson_runtime_op.
-    Definition imp_ejson_stmt := @imp_stmt imp_ejson_data imp_ejson_op imp_ejson_runtime_op.
-    Definition imp_ejson_function := @imp_function imp_ejson_data imp_ejson_op imp_ejson_runtime_op.
-    Definition imp_ejson := @imp imp_ejson_data imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson_expr := @imp_expr imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson_stmt := @imp_stmt imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson_function := @imp_function imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson := @imp imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
 
   End Syntax.
 

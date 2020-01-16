@@ -71,9 +71,9 @@ Section ImpDatatoImpEJson.
     Definition mk_to_right_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
       mk_imp_ejson_runtime_call EJsonRuntimeToRight el.
 
-    Lemma imp_data_data_to_list_comm d :
-      lift (map ejson_to_data) (imp_ejson_data_to_list (data_to_ejson d)) =
-      imp_data_data_to_list d.
+    Lemma imp_data_model_to_list_comm d :
+      lift (map ejson_to_data) (imp_ejson_model_to_list (data_to_ejson d)) =
+      imp_data_model_to_list d.
     Proof.
       unfold lift.
       destruct d; simpl; try reflexivity.
@@ -85,19 +85,19 @@ Section ImpDatatoImpEJson.
       reflexivity.
     Qed.
 
-    Lemma imp_ejson_data_to_list_comm d :
-      (imp_ejson_data_to_list (data_to_ejson d)) =
-      lift (map data_to_ejson) (imp_data_data_to_list d).
+    Lemma imp_ejson_model_to_list_comm d :
+      (imp_ejson_model_to_list (data_to_ejson d)) =
+      lift (map data_to_ejson) (imp_data_model_to_list d).
     Proof.
       unfold lift.
       destruct d; simpl; reflexivity.
     Qed.
 
     Lemma data_to_bool_ejson_to_bool_correct j:
-      imp_data_data_to_bool (ejson_to_data j) = imp_ejson_data_to_bool j.
+      imp_data_model_to_bool (ejson_to_data j) = imp_ejson_model_to_bool j.
     Proof.
-      unfold imp_data_data_to_bool.
-      unfold imp_ejson_data_to_bool.
+      unfold imp_data_model_to_bool.
+      unfold imp_ejson_model_to_bool.
       destruct j; trivial.
       generalize (ejson_to_data_jobj_nbool l); intros HH1.
       match_destr.
@@ -105,10 +105,10 @@ Section ImpDatatoImpEJson.
     Qed.
 
     Lemma ejson_to_data_to_Z_comm j:
-      imp_data_data_to_Z (ejson_to_data j) = imp_ejson_data_to_Z j.
+      imp_data_model_to_Z (ejson_to_data j) = imp_ejson_model_to_Z j.
     Proof.
-      unfold imp_data_data_to_Z.
-      unfold imp_ejson_data_to_Z.
+      unfold imp_data_model_to_Z.
+      unfold imp_ejson_model_to_Z.
       destruct j; trivial.
       case_eq (ejson_to_data (ejobject l)); intros; try reflexivity.
       generalize (ejson_to_data_object_not_nat l z); intros.
@@ -116,7 +116,7 @@ Section ImpDatatoImpEJson.
     Qed.
 
     Lemma data_to_ejson_to_Z_comm d:
-      imp_data_data_to_Z d = imp_ejson_data_to_Z (data_to_ejson d).
+      imp_data_model_to_Z d = imp_ejson_model_to_Z (data_to_ejson d).
     Proof.
       destruct d; try reflexivity.
     Qed.
@@ -523,9 +523,9 @@ Section ImpDatatoImpEJson.
           destruct (imp_data_expr_eval h σ i0); [|reflexivity];
           unfold lift, olift;
           case_eq
-            (lift_map (fun x : option imp_data_data => x)
+            (lift_map (fun x : option imp_data_model => x)
                       (map (fun x : imp_data_expr => imp_data_expr_eval h σ x) el)); intros;
-          unfold imp_data_data, ImpEval.imp_expr, imp_data_expr, imp_data_data, foreign_runtime_data in *;
+          unfold imp_data_model, ImpEval.imp_expr, imp_data_expr, imp_data_model, foreign_runtime_data in *;
           rewrite H0; reflexivity].
       (* just one param *)
       apply Forall_inv in H.
@@ -678,9 +678,9 @@ Section ImpDatatoImpEJson.
           destruct (imp_data_expr_eval h σ i1); [|reflexivity];
           unfold lift, olift;
           case_eq
-            (lift_map (fun x : option imp_data_data => x)
+            (lift_map (fun x : option imp_data_model => x)
                       (map (fun x : imp_data_expr => imp_data_expr_eval h σ x) el)); intros;
-          unfold imp_data_data, ImpEval.imp_expr, imp_data_expr, imp_data_data, foreign_runtime_data in *;
+          unfold imp_data_model, ImpEval.imp_expr, imp_data_expr, imp_data_model, foreign_runtime_data in *;
           rewrite H0; reflexivity].
       (* just two param *)
       inversion H; clear H; intros; subst; apply Forall_inv in H3.
@@ -852,14 +852,17 @@ Section ImpDatatoImpEJson.
         repeat rewrite lift_map_map_fusion;
         rewrite <- (Forall_lift_map _ _ H); clear H;
           unfold unlift_result, olift, lift;
-          assert (@lift_map (@ImpEval.imp_expr (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
-                            (@imp_data_data fruntime)
-                            (fun x : @ImpEval.imp_expr (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op =>
-                               @imp_data_expr_eval fruntime h σ x) el
+          assert (@lift_map (@ImpEval.imp_expr (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
+          (@imp_data_model fruntime)
+          (fun x : @ImpEval.imp_expr (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op =>
+           @imp_data_expr_eval fruntime h σ x) el
                   =
-                  @lift_map (@ImpEval.imp_expr (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
-                            (@data (@foreign_runtime_data fruntime))
-                            (fun x : @ImpEval.imp_expr (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op => @imp_data_expr_eval fruntime h σ x) el) by reflexivity;
+                  @lift_map
+              (@ImpEval.imp_expr (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
+              (@data (@foreign_runtime_data fruntime))
+              (fun
+                 x : @ImpEval.imp_expr (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op
+               => @imp_data_expr_eval fruntime h σ x) el) by reflexivity;
           rewrite H; clear H;
           destruct ((lift_map (fun x : ImpEval.imp_expr => imp_data_expr_eval h σ x) el));
             try reflexivity; simpl.
@@ -961,7 +964,7 @@ Section ImpDatatoImpEJson.
         unfold lift_pd_bindings.
         rewrite lookup_map_codomain_unfolded; simpl.
         unfold olift, lift.
-        unfold imp_data_data.
+        unfold imp_data_model.
         destruct (lookup EquivDec.equiv_dec σ v); reflexivity.
       - Case "ImpExprConst"%string.
         reflexivity.
@@ -1011,9 +1014,10 @@ Section ImpDatatoImpEJson.
             unfold ImpEval.imp_decls_eval in *; simpl in *; intros.
           rewrite <- H; clear H.
           unfold unlift_result, lift.
-          destruct (@ImpEval.imp_expr_eval (@imp_data_data fruntime)
+          destruct (@ImpEval.imp_expr_eval (@imp_data_model fruntime)
+                                           (@imp_data_constant fruntime)
                                            (@imp_data_op fruntime) imp_data_runtime_op
-                                           (@imp_data_data_normalize fruntime h)
+                                           (@imp_data_model_normalize fruntime h)
                                            (@imp_data_runtime_eval fruntime)
              (@imp_data_op_eval fruntime h) σ i); simpl.
           * rewrite IHel; clear IHel.
@@ -1085,7 +1089,7 @@ Section ImpDatatoImpEJson.
         + clear IHsl.
           induction sl; simpl; [reflexivity|].
           clear a a0.
-          unfold imp_ejson_data in *.
+          unfold imp_ejson_model in *.
           assert ((@fold_left (option (@ImpEval.pd_rbindings (@ejson fejson)))
               (@ImpEval.imp_stmt (@ejson fejson) imp_ejson_op imp_ejson_runtime_op)
               (fun (c : option (@ImpEval.pd_rbindings (@ejson fejson)))
@@ -1129,9 +1133,9 @@ Section ImpDatatoImpEJson.
         intros Hel.
         rewrite <- Hel; clear Hel.
         unfold unlift_result_env; unfold lift.
-        destruct (@ImpEval.imp_decls_eval (@imp_data_data fruntime)
+        destruct (@ImpEval.imp_decls_eval (@imp_data_model fruntime) (@imp_data_constant fruntime)
               (@imp_data_op fruntime) imp_data_runtime_op
-              (@imp_data_data_normalize fruntime h)
+              (@imp_data_model_normalize fruntime h)
               (@imp_data_runtime_eval fruntime)
               (@imp_data_op_eval fruntime h) σ el
             ); simpl; intros.
@@ -1151,18 +1155,18 @@ Section ImpDatatoImpEJson.
           induction el; simpl in *; try reflexivity.
           rewrite <- IHel; clear IHel.
           destruct a; simpl.
-          destruct (@ImpEval.imp_decls_erase (@imp_data_data fruntime)
-          (@fold_left (option (@ImpEval.pd_rbindings (@imp_data_data fruntime)))
-             (@ImpEval.imp_stmt (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
-             (fun (c : option (@ImpEval.pd_rbindings (@imp_data_data fruntime)))
-                (s : @ImpEval.imp_stmt (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
+          destruct (@ImpEval.imp_decls_erase (@imp_data_model fruntime)
+          (@fold_left (option (@ImpEval.pd_rbindings (@imp_data_model fruntime)))
+             (@ImpEval.imp_stmt (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
+             (fun (c : option (@ImpEval.pd_rbindings (@imp_data_model fruntime)))
+                (s : @ImpEval.imp_stmt (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op)
               =>
-              match c return (option (@ImpEval.pd_rbindings (@imp_data_data fruntime))) with
+              match c return (option (@ImpEval.pd_rbindings (@imp_data_model fruntime))) with
               | Some σ' => @imp_data_stmt_eval fruntime h s σ'
-              | None => @None (@ImpEval.pd_rbindings (@imp_data_data fruntime))
-              end) sl (@Some (@ImpEval.pd_rbindings (@imp_data_data fruntime)) p))
+              | None => @None (@ImpEval.pd_rbindings (@imp_data_model fruntime))
+              end) sl (@Some (@ImpEval.pd_rbindings (@imp_data_model fruntime)) p))
           (prod var
-             (option (@Imp.imp_expr (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op)))
+             (option (@Imp.imp_expr (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op)))
           el); [|reflexivity].
           destruct p0; simpl; try reflexivity.
         + repeat rewrite ImpEval.imp_decls_erase_none; reflexivity.
@@ -1174,14 +1178,14 @@ Section ImpDatatoImpEJson.
         intros He; rewrite <- He; clear He.
         unfold unlift_result, lift.
         unfold imp_data_expr_eval.
-        destruct (@ImpEval.imp_expr_eval (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op
-          (@imp_data_data_normalize fruntime h) (@imp_data_runtime_eval fruntime)
+        destruct (@ImpEval.imp_expr_eval (@imp_data_model fruntime) (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op
+          (@imp_data_model_normalize fruntime h) (@imp_data_runtime_eval fruntime)
           (@imp_data_op_eval fruntime h) σ e);
           try reflexivity.
         unfold lift_pd_bindings.
         rewrite lookup_map_codomain_unfolded.
         unfold lift.
-        unfold imp_data_data, foreign_runtime_data.
+        unfold imp_data_model, foreign_runtime_data.
         match_destr.
         unfold unlift_result_env, lift.
         assert (forall (x: pd_bindings) y,  x = y -> Some x = Some y) as Hsome; try congruence.
@@ -1200,20 +1204,20 @@ Section ImpDatatoImpEJson.
         intros He; rewrite <- He; clear He.
         unfold unlift_result, lift.
         unfold imp_data_expr_eval.
-        destruct (@ImpEval.imp_expr_eval (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op
-          (@imp_data_data_normalize fruntime h) (@imp_data_runtime_eval fruntime)
+        destruct (@ImpEval.imp_expr_eval (@imp_data_model fruntime) (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op
+          (@imp_data_model_normalize fruntime h) (@imp_data_runtime_eval fruntime)
           (@imp_data_op_eval fruntime h) σ e);
           try reflexivity.
-        rewrite imp_ejson_data_to_list_comm; simpl.
-        destruct (imp_data_data_to_list i); try reflexivity; simpl; clear i.
+        rewrite imp_ejson_model_to_list_comm; simpl.
+        destruct (imp_data_model_to_list i); try reflexivity; simpl; clear i.
         revert σ.
         induction l; try reflexivity; simpl; intros.
         specialize (IHstmt ((v, Some a) :: σ)); simpl in IHstmt.
         Set Printing All.
         assert (@imp_ejson_stmt_eval fejson _ h (imp_data_stmt_to_imp_ejson stmt)
-        (@cons (prod var (option (@imp_ejson_data fejson)))
-           (@pair var (option (@imp_ejson_data fejson)) v
-              (@Some (@imp_ejson_data fejson) (@data_to_ejson fruntime fejson ftejson a)))
+        (@cons (prod var (option (@imp_ejson_model fejson)))
+           (@pair var (option (@imp_ejson_model fejson)) v
+              (@Some (@imp_ejson_model fejson) (@data_to_ejson fruntime fejson ftejson a)))
            (lift_pd_bindings σ)) =
                 (@imp_ejson_stmt_eval fejson _ h (imp_data_stmt_to_imp_ejson stmt)
                 (@cons (prod string (option (@ejson fejson)))
@@ -1224,11 +1228,11 @@ Section ImpDatatoImpEJson.
         rewrite <- IHstmt; clear IHstmt.
         assert (
             (@imp_data_stmt_eval fruntime h stmt
-           (@cons (prod string (option (@imp_data_data fruntime)))
-                  (@pair string (option (@imp_data_data fruntime)) v (@Some (@imp_data_data fruntime) a)) σ))
+           (@cons (prod string (option (@imp_data_model fruntime)))
+                  (@pair string (option (@imp_data_model fruntime)) v (@Some (@imp_data_model fruntime) a)) σ))
             = @imp_data_stmt_eval fruntime h stmt
-           (@cons (prod var (option (@imp_data_data fruntime)))
-                  (@pair var (option (@imp_data_data fruntime)) v (@Some (@imp_data_data fruntime) a)) σ)) by reflexivity.
+           (@cons (prod var (option (@imp_data_model fruntime)))
+                  (@pair var (option (@imp_data_model fruntime)) v (@Some (@imp_data_model fruntime) a)) σ)) by reflexivity.
         rewrite <- H; clear H.
         destruct (imp_data_stmt_eval h stmt ((v, Some a) :: σ)); try reflexivity; simpl.
         destruct p; try reflexivity; simpl.
@@ -1243,23 +1247,23 @@ Section ImpDatatoImpEJson.
         intros He; rewrite <- He; clear He.
         unfold unlift_result, lift.
         unfold imp_data_expr_eval.
-        destruct (@ImpEval.imp_expr_eval (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op
-          (@imp_data_data_normalize fruntime h) (@imp_data_runtime_eval fruntime)
+        destruct (@ImpEval.imp_expr_eval (@imp_data_model fruntime) (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op
+          (@imp_data_model_normalize fruntime h) (@imp_data_runtime_eval fruntime)
           (@imp_data_op_eval fruntime h) σ e1);
           try reflexivity; simpl.
         rewrite data_to_ejson_to_Z_comm;
-          destruct (imp_ejson_data_to_Z (data_to_ejson i)); try reflexivity.
+          destruct (imp_ejson_model_to_Z (data_to_ejson i)); try reflexivity.
         specialize (imp_data_expr_to_imp_ejson_expr_correct σ e2).
         unfold imp_ejson_expr_eval in *.
         intros He; rewrite <- He; clear He.
         unfold unlift_result, olift, lift.
         unfold imp_data_expr_eval.
-        destruct (@ImpEval.imp_expr_eval (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op
-          (@imp_data_data_normalize fruntime h) (@imp_data_runtime_eval fruntime)
+        destruct (@ImpEval.imp_expr_eval (@imp_data_model fruntime) (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op
+          (@imp_data_model_normalize fruntime h) (@imp_data_runtime_eval fruntime)
           (@imp_data_op_eval fruntime h) σ e2);
           try reflexivity; simpl.
         rewrite data_to_ejson_to_Z_comm;
-          destruct (imp_ejson_data_to_Z (data_to_ejson i0)); try reflexivity.
+          destruct (imp_ejson_model_to_Z (data_to_ejson i0)); try reflexivity.
         generalize (ImpEval.nb_iter z z0); intros. (* XXX I think we do not care how n is built for this part *)
         revert σ z.
         induction n; try reflexivity; simpl; intros.
@@ -1270,23 +1274,23 @@ Section ImpDatatoImpEJson.
                       (@Some (@ejson fejson) (@ejbigint fejson z)))
                    (lift_pd_bindings σ)))
                   = (@imp_ejson_stmt_eval fejson _ h (imp_data_stmt_to_imp_ejson stmt)
-        (@cons (prod var (option (@imp_ejson_data fejson)))
-           (@pair var (option (@imp_ejson_data fejson)) v
-              (@Some (@imp_ejson_data fejson)
+        (@cons (prod var (option (@imp_ejson_model fejson)))
+           (@pair var (option (@imp_ejson_model fejson)) v
+              (@Some (@imp_ejson_model fejson)
                  (@imp_ejson_Z_to_data fejson z))) (lift_pd_bindings σ)))) by reflexivity.
         rewrite H in IHstmt; clear H.
         rewrite <- IHstmt; clear IHstmt.
         assert
           (@imp_data_stmt_eval
              fruntime h stmt
-             (@cons (prod string (option (@imp_data_data fruntime)))
-                    (@pair string (option (@imp_data_data fruntime)) v
-                           (@Some (@imp_data_data fruntime) (@imp_data_Z_to_data fruntime z))) σ)
+             (@cons (prod string (option (@imp_data_model fruntime)))
+                    (@pair string (option (@imp_data_model fruntime)) v
+                           (@Some (@imp_data_model fruntime) (@imp_data_Z_to_data fruntime z))) σ)
            =
            @imp_data_stmt_eval fruntime h stmt
-           (@cons (prod var (option (@imp_data_data fruntime)))
-              (@pair var (option (@imp_data_data fruntime)) v
-                 (@Some (@imp_data_data fruntime) (@imp_data_Z_to_data fruntime z))) σ)) by reflexivity.
+           (@cons (prod var (option (@imp_data_model fruntime)))
+              (@pair var (option (@imp_data_model fruntime)) v
+                 (@Some (@imp_data_model fruntime) (@imp_data_Z_to_data fruntime z))) σ)) by reflexivity.
         rewrite <- H; clear H.
         destruct (imp_data_stmt_eval h stmt ((v, Some (imp_data_Z_to_data z)) :: σ)); try reflexivity.
         destruct p; try reflexivity; simpl.
@@ -1304,8 +1308,8 @@ reflexivity.
         unfold lift.
         unfold imp_ejson_expr_eval.
         unfold imp_data_expr_eval.
-        destruct (@ImpEval.imp_expr_eval (@imp_data_data fruntime) (@imp_data_op fruntime) imp_data_runtime_op
-           (@imp_data_data_normalize fruntime h) (@imp_data_runtime_eval fruntime)
+        destruct (@ImpEval.imp_expr_eval (@imp_data_model fruntime) (@imp_data_constant fruntime) (@imp_data_op fruntime) imp_data_runtime_op
+           (@imp_data_model_normalize fruntime h) (@imp_data_runtime_eval fruntime)
            (@imp_data_op_eval fruntime h) σ e);
           try reflexivity.
         rewrite <- data_to_bool_ejson_to_bool_correct.
@@ -1337,16 +1341,16 @@ reflexivity.
       generalize (imp_data_stmt_to_imp_ejson_stmt_combined_correct [(v0, None); (v, Some d)] i (v::nil)); intros.
       unfold imp_data_stmt_eval in H.
       unfold imp_ejson_stmt_eval in H.
-      unfold imp_data_data in *.
+      unfold imp_data_model in *.
       simpl in H.
       unfold lift.
       Set Printing All.
       
-      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_data fejson) imp_ejson_op
-           imp_ejson_runtime_op (@imp_ejson_data_normalize fejson)
-           (@imp_ejson_data_to_bool fejson)
-           (@imp_ejson_data_to_Z fejson)
-           (@imp_ejson_data_to_list fejson)
+      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op
+           imp_ejson_runtime_op (@imp_ejson_model_normalize fejson)
+           (@imp_ejson_model_to_bool fejson)
+           (@imp_ejson_model_to_Z fejson)
+           (@imp_ejson_model_to_list fejson)
            (@imp_ejson_Z_to_data fejson)
            (@imp_ejson_runtime_eval fejson _ h)
            (@imp_ejson_op_eval fejson)
@@ -1358,22 +1362,22 @@ reflexivity.
                  (@pair string (option (@ejson fejson)) v
                     (@Some (@ejson fejson) (@data_to_ejson fruntime fejson ftejson d)))
                  (@nil (prod string (option (@ejson fejson)))))))
-             = @ImpEval.imp_stmt_eval (@imp_ejson_data fejson) imp_ejson_op imp_ejson_runtime_op
-          (@imp_ejson_data_normalize fejson)
-          (@imp_ejson_data_to_bool fejson)
-          (@imp_ejson_data_to_Z fejson)
-          (@imp_ejson_data_to_list fejson)
+             = @ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op imp_ejson_runtime_op
+          (@imp_ejson_model_normalize fejson)
+          (@imp_ejson_model_to_bool fejson)
+          (@imp_ejson_model_to_Z fejson)
+          (@imp_ejson_model_to_list fejson)
           (@imp_ejson_Z_to_data fejson)
           (@imp_ejson_runtime_eval fejson _ h)
           (@imp_ejson_op_eval fejson)
           (imp_data_stmt_to_imp_ejson_combined (@cons var v (@nil var)) i)
-          (@cons (prod var (option (@imp_ejson_data fejson)))
-             (@pair var (option (@imp_ejson_data fejson)) v0
-                (@None (@imp_ejson_data fejson)))
-             (@cons (prod var (option (@imp_ejson_data fejson)))
-                (@pair var (option (@imp_ejson_data fejson)) v
-                   (@Some (@imp_ejson_data fejson) (@data_to_ejson fruntime fejson ftejson d)))
-                (@nil (prod var (option (@imp_ejson_data fejson))))))) by reflexivity.
+          (@cons (prod var (option (@imp_ejson_model fejson)))
+             (@pair var (option (@imp_ejson_model fejson)) v0
+                (@None (@imp_ejson_model fejson)))
+             (@cons (prod var (option (@imp_ejson_model fejson)))
+                (@pair var (option (@imp_ejson_model fejson)) v
+                   (@Some (@imp_ejson_model fejson) (@data_to_ejson fruntime fejson ftejson d)))
+                (@nil (prod var (option (@imp_ejson_model fejson))))))) by reflexivity.
       rewrite <- H0; clear H0.
       rewrite <- H; clear H.
       unfold unlift_result_env; unfold lift; simpl.

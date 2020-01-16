@@ -31,29 +31,30 @@ Require Import Imp.
 Section ImpEval.
   Import ListNotations.
 
-  Context {Data: Type}.
+  Context {Model: Type}.
+  Context {Constant: Type}.
   Context {Op: Type}.
   Context {Runtime: Type}.
 
-  Context {DataNormalize: Data -> Data}.
-  Context {DataToBool: Data -> option bool}.
-  Context {DataToZ: Data -> option Z}.
-  Context {DataToList: Data -> option (list Data)}.
-  Context {ZToData: Z -> Data}.
+  Context {ConstantNormalize: Constant -> Model}.
+  Context {ModelToBool: Model -> option bool}.
+  Context {ModelToZ: Model -> option Z}.
+  Context {ModelToList: Model -> option (list Model)}.
+  Context {ZToModel: Z -> Model}.
 
-  Context {RuntimeEval: Runtime -> list Data -> option Data}.
-  Context {OpEval: Op -> list Data -> option Data}.
+  Context {RuntimeEval: Runtime -> list Model -> option Model}.
+  Context {OpEval: Op -> list Model -> option Model}.
 
-  Definition imp_expr := @imp_expr Data Op Runtime.
-  Definition imp_stmt := @imp_stmt Data Op Runtime.
+  Definition imp_expr := @imp_expr Constant Op Runtime.
+  Definition imp_stmt := @imp_stmt Constant Op Runtime.
   
-  Definition rbindings := list (string * Data).
-  Definition pd_rbindings := list (string * option Data).
+  Definition rbindings := list (string * Model).
+  Definition pd_rbindings := list (string * option Model).
 
   (** ** Evaluation Semantics *)
   Section Evaluation.
     Fixpoint imp_expr_eval
-             (σ:pd_rbindings) (e:imp_expr) {struct e} : option Data
+             (σ:pd_rbindings) (e:imp_expr) {struct e} : option Model
       :=
         match e with
         | ImpExprError msg =>
@@ -61,7 +62,7 @@ Section ImpEval.
         | ImpExprVar v =>
           olift (fun x => x) (lookup equiv_dec σ v)
         | ImpExprConst d =>
-          Some (DataNormalize d)
+          Some (ConstantNormalize d)
         | ImpExprOp op el =>
           olift (OpEval op) (lift_map (fun x => x) (map (imp_expr_eval σ) el))
         | ImpExprRuntimeCall rt el =>
@@ -143,9 +144,9 @@ Section ImpEval.
       | ImpStmtFor v e s =>
         match imp_expr_eval σ e with
         | Some d =>
-          match DataToList d with
+          match ModelToList d with
           | Some c1 =>
-            let fix for_fun (dl:list Data) σ₁ :=
+            let fix for_fun (dl:list Model) σ₁ :=
                 match dl with
                 | nil => Some σ₁
                 | d::dl' =>
@@ -160,13 +161,13 @@ Section ImpEval.
         | _ => None
         end
       | ImpStmtForRange v e1 e2 s =>
-        match olift DataToZ (imp_expr_eval σ e1), olift DataToZ (imp_expr_eval σ e2) with
+        match olift ModelToZ (imp_expr_eval σ e1), olift ModelToZ (imp_expr_eval σ e2) with
         | Some n1, Some n2 =>
           let fix for_range n n1 σ₁ :=
              match n with
              | O => Some σ₁
              | S n' =>
-               match imp_stmt_eval s ((v, Some (ZToData n1)) :: σ₁) with
+               match imp_stmt_eval s ((v, Some (ZToModel n1)) :: σ₁) with
                | Some (_::σ₂) => for_range n' (n1 + 1) σ₂
                | _ => None
                end
@@ -179,7 +180,7 @@ Section ImpEval.
         match imp_expr_eval σ e1 with
         | None => None
         | Some d =>
-          match DataToBool d with
+          match ModelToBool d with
           | None => None
           | Some b =>
             if b then imp_stmt_eval s1 σ
@@ -188,7 +189,7 @@ Section ImpEval.
         end
       end.
 
-    Definition imp_function_eval f (v:Data) : option Data :=
+    Definition imp_function_eval f (v:Model) : option Model :=
       match f with
       | ImpFun x s ret =>
         let σ := [ (ret, None); (x, Some v) ] in
@@ -199,7 +200,7 @@ Section ImpEval.
         end
       end.
 
-    Definition imp_eval (q:imp) (d:Data) : option (option Data)
+    Definition imp_eval (q:imp) (d:Model) : option (option Model)
       := match q with
          | ImpLib [ (fname, f) ] => Some (imp_function_eval f d)
          (* XXX What happens when more than one functions ? XXX *)

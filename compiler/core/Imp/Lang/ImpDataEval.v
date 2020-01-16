@@ -46,31 +46,31 @@ Section ImpDataEval.
 
   Section EvalInstantiation.
     (* Instantiate Imp for Data data *)
-    Definition imp_data_data_normalize (d:imp_data_data) : imp_data_data :=
+    Definition imp_data_model_normalize (d:imp_data_constant) : imp_data_model :=
       normalize_data h d.
 
-    Definition imp_data_data_to_bool (d:imp_data_data) : option bool :=
+    Definition imp_data_model_to_bool (d:imp_data_model) : option bool :=
       match d with
       | dbool b => Some b
       | _ => None
       end.
 
-    Definition imp_data_data_to_Z (d:imp_data_data) : option Z :=
+    Definition imp_data_model_to_Z (d:imp_data_model) : option Z :=
       match d with
       | dnat n => Some n
       | _ => None
       end.
 
-    Definition imp_data_Z_to_data (n:Z) : imp_data_data :=
+    Definition imp_data_Z_to_data (n:Z) : imp_data_model :=
       dnat n.
 
-    Definition imp_data_data_to_list (d:imp_data_data) : option (list imp_data_data) :=
+    Definition imp_data_model_to_list (d:imp_data_model) : option (list imp_data_model) :=
       match d with
       | dcoll c => Some (c)
       | _ => None
       end.
 
-    Definition imp_data_runtime_eval (rt:imp_data_runtime_op) (dl:list imp_data_data) : option imp_data_data :=
+    Definition imp_data_runtime_eval (rt:imp_data_runtime_op) (dl:list imp_data_model) : option imp_data_model :=
       match rt with
       | DataRuntimeGroupby g kl =>
         match dl with
@@ -99,7 +99,7 @@ Section ImpDataEval.
         end
       end.
 
-    Definition imp_data_op_eval (op:imp_data_op) (dl:list imp_data_data) : option imp_data_data :=
+    Definition imp_data_op_eval (op:imp_data_op) (dl:list imp_data_model) : option imp_data_model :=
       match op with
       | DataOpUnary uop =>
         match dl with
@@ -128,10 +128,11 @@ Section ImpDataEval.
              (σ:pd_bindings) (e:imp_data_expr)
     : option data
       := @imp_expr_eval
-           imp_data_data
+           imp_data_model
+           imp_data_constant
            imp_data_op
            imp_data_runtime_op
-           imp_data_data_normalize
+           imp_data_model_normalize
            imp_data_runtime_eval
            imp_data_op_eval
            σ e.
@@ -140,10 +141,11 @@ Section ImpDataEval.
                (σ:pd_bindings) (el:list (string * option imp_data_expr))
       : option pd_bindings
       := @imp_decls_eval
-           imp_data_data
+           imp_data_model
+           imp_data_constant
            imp_data_op
            imp_data_runtime_op
-           imp_data_data_normalize
+           imp_data_model_normalize
            imp_data_runtime_eval
            imp_data_op_eval
            σ el.
@@ -156,28 +158,30 @@ Section ImpDataEval.
     Definition imp_data_stmt_eval
              (s:imp_data_stmt) (σ:pd_bindings) : option (pd_bindings)
       := @imp_stmt_eval
-           imp_data_data
+           imp_data_model
+           imp_data_constant
            imp_data_op
            imp_data_runtime_op
-           imp_data_data_normalize
-           imp_data_data_to_bool
-           imp_data_data_to_Z
-           imp_data_data_to_list
+           imp_data_model_normalize
+           imp_data_model_to_bool
+           imp_data_model_to_Z
+           imp_data_model_to_list
            imp_data_Z_to_data
            imp_data_runtime_eval
            imp_data_op_eval
            s σ.
 
     Definition imp_data_function_eval
-             (f:imp_data_function) args : option imp_data_data
+             (f:imp_data_function) args : option imp_data_model
       := @imp_function_eval
-           imp_data_data
+           imp_data_model
+           imp_data_constant
            imp_data_op
            imp_data_runtime_op
-           imp_data_data_normalize
-           imp_data_data_to_bool
-           imp_data_data_to_Z
-           imp_data_data_to_list
+           imp_data_model_normalize
+           imp_data_model_to_bool
+           imp_data_model_to_Z
+           imp_data_model_to_list
            imp_data_Z_to_data
            imp_data_runtime_eval
            imp_data_op_eval
@@ -185,13 +189,14 @@ Section ImpDataEval.
 
     Definition imp_data_eval (q:imp_data) (d: data) : option (option data)
       := @imp_eval
-           imp_data_data
+           imp_data_model
+           imp_data_constant
            imp_data_op
            imp_data_runtime_op
-           imp_data_data_normalize
-           imp_data_data_to_bool
-           imp_data_data_to_Z
-           imp_data_data_to_list
+           imp_data_model_normalize
+           imp_data_model_to_bool
+           imp_data_model_to_Z
+           imp_data_model_to_list
            imp_data_Z_to_data
            imp_data_runtime_eval
            imp_data_op_eval
