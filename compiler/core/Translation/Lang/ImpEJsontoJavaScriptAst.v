@@ -221,35 +221,59 @@ Section ImpEJsontoJavaScriptAst.
         ([v], funcbody_intro prog (prog_to_string prog))
       end.
 
+    Definition imp_ejson_function_to_funcelement (fname:string) (fbody: imp_function) : element :=
+      let (args, body) := imp_ejson_function_to_js_ast fbody in
+      element_func_decl fname args body.
+
+    Definition imp_ejson_function_to_funcdecl (fname:string) (fbody: imp_function) : funcdecl :=
+      let (args, body) := imp_ejson_function_to_js_ast fbody in
+      funcdecl_intro fname args body.
+
+    Definition imp_ejson_function_to_topdecl (fname:string) (fbody: imp_function) : topdecl :=
+      elementdecl (imp_ejson_function_to_funcelement fname fbody).
+
     Definition imp_ejson_to_js_ast (classname:option string) (q: imp) : js_ast :=
       match classname with
       | None =>
-        let decls :=
-            match q with
-            | ImpLib l =>
-              List.map
-                (fun (decl: string * imp_function) =>
-                   let (x, f) := decl in
-                   let (args, body) := imp_ejson_function_to_js_ast f in
-                   element_func_decl x args body)
-                l
-            end
-        in
-        map elementdecl decls        
+        match q with
+        | ImpLib l =>
+          List.map
+            (fun (decl: string * imp_function) =>
+               let (fname, fbody) := decl in
+               imp_ejson_function_to_topdecl fname fbody)
+            l
+        end
       | Some cname =>
         let decls :=
             match q with
             | ImpLib l =>
               List.map
                 (fun (decl: string * imp_function) =>
-                   let (x, f) := decl in
-                   let (args, body) := imp_ejson_function_to_js_ast f in
-                   funcdecl_intro x args body)
+                   let (fname, fbody) := decl in
+                   imp_ejson_function_to_funcdecl fname fbody)
                 l
             end
         in
         classdecl cname decls::nil
       end.
+
+    Definition imp_ejson_to_function (q: imp_ejson) : list topdecl :=
+        match q with
+        | ImpLib [(fname,fbody)] =>
+          (imp_ejson_function_to_topdecl fname fbody)::nil
+        | _ => nil
+        end.
+
+    Definition imp_ejson_to_method (q: imp_ejson) : list funcdecl :=
+        match q with
+        | ImpLib [(fname,fbody)] =>
+          (imp_ejson_function_to_funcdecl fname fbody)::nil
+        | _ => nil
+        end.
+
+    Definition imp_ejson_table_to_topdecls (cname:string) (q: list imp_ejson) : list topdecl :=
+      classdecl cname (concat (map imp_ejson_to_method q))::nil.
+
   End Translation.
 
 End ImpEJsontoJavaScriptAst.
