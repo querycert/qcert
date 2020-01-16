@@ -70,12 +70,12 @@
  \node[lang, coqp, hyperlink node=\coqurl{NNRSimp.Lang}{NNRSimp}{nnrsimp},
        right=of nnrs]
       (nnrsimp) {NNRSimp};
- \node[lang, coqp, hyperlink node=\coqurl{Imp.Lang}{ImpQcert}{imp_qcert},
+ \node[lang, coqp, hyperlink node=\coqurl{Imp.Lang}{ImpData}{imp_data},
        right=of nnrsimp]
-      (impqcert) {Imp Qcert};
+      (impdata) {Imp (Data)};
  \node[lang, coqp, hyperlink node=\coqurl{Imp.Lang}{ImpEJson}{imp_ejson},
        right=of impqcert]
-      (impjson) {Imp Json};
+      (impjson) {Imp (Json)};
 
  % NNRCMR
  \node[lang, coqc, hyperlink node=\coqurl{NNRCMR.Lang}{NNRCMR}{nnrcmr}]
@@ -182,10 +182,10 @@
  % *NNRS
  \path[trans, tcoqp] (nnrs) -- (nnrsimp)
    \transref{3}{\coqurl{Translation.Lang}{NNRStoNNRSimp}{nnrs_to_nnrs_imp_top}};
- \path[trans, tcoqp] (nnrsimp) -- (impqcert)
-   \transref{6}{\coqurl{Translation.Lang}{NNRSimptoImpQcert}{nnrs_imp_to_imp_qcert_top}};
- \path[trans, tcoqp] (impqcert) -- (impjson)
-   \transref{6}{\coqurl{Translation.Lang}{ImpQcertoImpEJson}{imp_qcert_to_imp_ejson_top}};
+ \path[trans, tcoqp] (nnrsimp) -- (impdata)
+   \transref{6}{\coqurl{Translation.Lang}{NNRSimptoImpQcert}{nnrs_imp_to_imp_data_top}};
+ \path[trans, tcoqp] (impdata) -- (impjson)
+   \transref{6}{\coqurl{Translation.Lang}{ImpDatatoImpEJson}{imp_data_to_imp_ejson_top}};
  \path[trans, tcoqc] (impjson) -- (ajs)
    \transref{6}{\coqurl{Translation.Lang}{ImpEJsontoJavaScriptAst}{imp_ejson_to_js_ast_top}};
 
