@@ -1180,7 +1180,7 @@ Section NNRCtoNNRS.
 
     Program Definition nnrc_core_to_nnrs_core_top
             (globals:list var) (s:nnrc_core) : nnrs_core
-      :=nnrc_to_nnrs_top globals s.
+      := nnrc_to_nnrs_top globals s.
     Next Obligation.
       destruct s; simpl.
       apply nnrc_to_nnrs_top_preserves_core; trivial.

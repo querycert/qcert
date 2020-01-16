@@ -15,13 +15,16 @@
 Require Export JsAst.JsSyntax.
 
 Section JavaScriptAst.
-  Inductive js_ast_decl :=
-  | topcomment : string -> js_ast_decl                 (** comment *)
-  | topelement : element -> js_ast_decl                (** Program element *)
-  | topclass : string -> list funcdecl -> js_ast_decl  (** Class declarations *)
+  (* XXX Might be better folded in JsSyntax *)
+  Inductive topdecl :=
+  | strictmode : topdecl                            (** strict mode declaration *)
+  | comment : string -> topdecl                     (** comment *)
+  | elementdecl : element -> topdecl                (** Program element *)
+  | classdecl : string -> list funcdecl -> topdecl  (** Class declarations *)
+  | constdecl : string -> expr -> topdecl           (** Constant declarations *)
   .
 
-  Definition js_ast := list js_ast_decl.
+  Definition js_ast := list topdecl.
 
 End JavaScriptAst.
 

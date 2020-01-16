@@ -397,15 +397,18 @@ Section ToString.
         +++ nstring_of_funcbody f.(funcdecl_body) (i+1) +++ eol +++ indent i +++ ^"}"
   .
 
-  Definition nstring_of_decl(d:js_ast_decl)
+  Definition nstring_of_decl(d:topdecl)
     : nstring :=
     match d with
-    | topcomment c => ^"/*" +++ ^c +++ ^"*/"
-    | topelement fd => nstring_of_element fd 0
-    | topclass cn cd =>
-      ^"class " +++ ^cn +++ ^"{"
-                +++ List.fold_left (fun acc q => nstring_append acc (nstring_of_method q 1)) cd (^ (""%string)) +++ eol
-                +++ ^"}" +++ eol
+    | strictmode => eol +++ ^"'use strict';"
+    | comment c => eol +++ ^"/*" +++ ^c +++ ^"*/"
+    | elementdecl fd => nstring_of_element fd 0
+    | classdecl cn cd =>
+      eol +++ ^"class " +++ ^cn +++ ^"{"
+          +++ List.fold_left (fun acc q => nstring_append acc (nstring_of_method q 1)) cd (^ (""%string)) +++ eol
+          +++ ^"}"
+    | constdecl x e =>
+      eol +++ ^"const " +++ ^x +++ ^"=" +++ nstring_of_expr e 0
     end.
 End ToString.
 

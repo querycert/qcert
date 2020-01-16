@@ -235,7 +235,7 @@ Section ImpEJsontoJavaScriptAst.
                 l
             end
         in
-        map topelement decls        
+        map elementdecl decls        
       | Some cname =>
         let decls :=
             match q with
@@ -248,7 +248,7 @@ Section ImpEJsontoJavaScriptAst.
                 l
             end
         in
-        topclass cname decls::nil
+        classdecl cname decls::nil
       end.
   End Translation.
 
