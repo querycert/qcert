@@ -44,33 +44,33 @@ Section ImpEJsonEval.
 
   Section EvalInstantiation.
     (* Instantiate Imp for Qcert data *)
-    Definition imp_ejson_data_normalize (d:imp_ejson_data) : imp_ejson_data := d.
+    Definition imp_ejson_model_normalize (d:imp_ejson_constant) : imp_ejson_model := d.
 
-    Definition imp_ejson_data_to_bool (d:imp_ejson_data) : option bool :=
+    Definition imp_ejson_model_to_bool (d:imp_ejson_model) : option bool :=
       match d with
       | ejbool b => Some b
       | _ => None
       end.
 
-    Definition imp_ejson_data_to_list (d:imp_ejson_data) : option (list imp_ejson_data) :=
+    Definition imp_ejson_model_to_list (d:imp_ejson_model) : option (list imp_ejson_model) :=
       match d with
       | ejarray c => Some (c)
       | _ => None
       end.
 
-    Definition imp_ejson_data_to_Z (d:imp_ejson_data) : option Z :=
+    Definition imp_ejson_model_to_Z (d:imp_ejson_model) : option Z :=
       match d with
       | ejbigint n => Some n
       | _ => None
       end.
 
-    Definition imp_ejson_Z_to_data (n: Z) : imp_ejson_data := ejbigint n.
+    Definition imp_ejson_Z_to_data (n: Z) : imp_ejson_model := ejbigint n.
 
-    Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list imp_ejson_data) : option imp_ejson_data :=
+    Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list imp_ejson_model) : option imp_ejson_model :=
       ejson_op_eval op dl. (* XXX In Common.EJson.EJsonOperators *)
 
     Definition imp_ejson_runtime_eval (op:imp_ejson_runtime_op)
-               (dl:list imp_ejson_data) : option imp_ejson_data :=
+               (dl:list imp_ejson_model) : option imp_ejson_model :=
       ejson_runtime_eval h op dl. (* XXX In Common.EJson.EJsonOperators *)
   End EvalInstantiation.
 
@@ -83,12 +83,13 @@ Section ImpEJsonEval.
 
     Definition imp_ejson_expr_eval
                (σ:pd_jbindings) (e:imp_ejson_expr)
-      : option imp_ejson_data
+      : option imp_ejson_model
       := @imp_expr_eval
-           imp_ejson_data
+           imp_ejson_model
+           imp_ejson_constant
            imp_ejson_op
            imp_ejson_runtime_op
-           imp_ejson_data_normalize
+           imp_ejson_model_normalize
            imp_ejson_runtime_eval
            imp_ejson_op_eval
            σ e.
@@ -97,10 +98,11 @@ Section ImpEJsonEval.
                (σ:pd_jbindings) (el:list (string * option imp_ejson_expr))
       : option pd_jbindings
       := @imp_decls_eval
-           imp_ejson_data
+           imp_ejson_model
+           imp_ejson_constant
            imp_ejson_op
            imp_ejson_runtime_op
-           imp_ejson_data_normalize
+           imp_ejson_model_normalize
            imp_ejson_runtime_eval
            imp_ejson_op_eval
            σ el.
@@ -113,49 +115,52 @@ Section ImpEJsonEval.
     Definition imp_ejson_stmt_eval
              (s:imp_ejson_stmt) (σ:pd_jbindings) : option (pd_jbindings)
       := @imp_stmt_eval
-           imp_ejson_data
+           imp_ejson_model
+           imp_ejson_constant
            imp_ejson_op
            imp_ejson_runtime_op
-           imp_ejson_data_normalize
-           imp_ejson_data_to_bool
-           imp_ejson_data_to_Z
-           imp_ejson_data_to_list
+           imp_ejson_model_normalize
+           imp_ejson_model_to_bool
+           imp_ejson_model_to_Z
+           imp_ejson_model_to_list
            imp_ejson_Z_to_data
            imp_ejson_runtime_eval
            imp_ejson_op_eval
            s σ.
 
     Definition imp_ejson_function_eval
-             (f:imp_ejson_function) args : option imp_ejson_data
+             (f:imp_ejson_function) args : option imp_ejson_model
       := @imp_function_eval
-           imp_ejson_data
+           imp_ejson_model
+           imp_ejson_constant
            imp_ejson_op
            imp_ejson_runtime_op
-           imp_ejson_data_normalize
-           imp_ejson_data_to_bool
-           imp_ejson_data_to_Z
-           imp_ejson_data_to_list
+           imp_ejson_model_normalize
+           imp_ejson_model_to_bool
+           imp_ejson_model_to_Z
+           imp_ejson_model_to_list
            imp_ejson_Z_to_data
            imp_ejson_runtime_eval
            imp_ejson_op_eval
            f args.
 
     Import ListNotations.
-    Definition imp_ejson_eval (q:imp_ejson) (d:imp_ejson_data) : option (option imp_ejson_data)
+    Definition imp_ejson_eval (q:imp_ejson) (d:imp_ejson_model) : option (option imp_ejson_model)
       := @imp_eval
-           imp_ejson_data
+           imp_ejson_model
+           imp_ejson_constant
            imp_ejson_op
            imp_ejson_runtime_op
-           imp_ejson_data_normalize
-           imp_ejson_data_to_bool
-           imp_ejson_data_to_Z
-           imp_ejson_data_to_list
+           imp_ejson_model_normalize
+           imp_ejson_model_to_bool
+           imp_ejson_model_to_Z
+           imp_ejson_model_to_list
            imp_ejson_Z_to_data
            imp_ejson_runtime_eval
            imp_ejson_op_eval
            q d.
 
-    Definition imp_ejson_eval_top_on_ejson σc (q:imp_ejson) : option imp_ejson_data :=
+    Definition imp_ejson_eval_top_on_ejson σc (q:imp_ejson) : option imp_ejson_model :=
       let σc' := List.map (fun xy => (key_encode (fst xy), snd xy)) (rec_sort σc) in
       olift id (imp_ejson_eval q (ejobject σc')).
 

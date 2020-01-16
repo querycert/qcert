@@ -21,14 +21,14 @@ Require Import Imp.
 
 Section ImpSize.
 
-  Context {Data: Type}.
+  Context {Model: Type}.
   Context {Op: Type}.
   Context {Runtime: Type}.
 
-  Definition imp_expr := @Imp.imp_expr Data Op Runtime.
-  Definition imp_stmt := @Imp.imp_stmt Data Op Runtime.
-  Definition imp_function := @Imp.imp_function Data Op Runtime.
-  Definition imp := @Imp.imp Data Op Runtime.
+  Definition imp_expr := @Imp.imp_expr Model Op Runtime.
+  Definition imp_stmt := @Imp.imp_stmt Model Op Runtime.
+  Definition imp_function := @Imp.imp_function Model Op Runtime.
+  Definition imp := @Imp.imp Model Op Runtime.
 
 
   Fixpoint imp_expr_size (e:imp_expr) : nat

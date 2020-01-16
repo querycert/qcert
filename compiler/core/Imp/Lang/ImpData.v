@@ -23,7 +23,8 @@ Section ImpData.
   Context {fruntime:foreign_runtime}.
   Section Syntax.
 
-    Definition imp_data_data := data.
+    Definition imp_data_model := data.
+    Definition imp_data_constant := data.
 
     Inductive imp_data_op :=
     | DataOpUnary : unary_op -> imp_data_op
@@ -37,10 +38,10 @@ Section ImpData.
     | DataRuntimeToRight : imp_data_runtime_op
     .
 
-    Definition imp_data_expr := @imp_expr imp_data_data imp_data_op imp_data_runtime_op.
-    Definition imp_data_stmt := @imp_stmt imp_data_data imp_data_op imp_data_runtime_op.
-    Definition imp_data_function := @imp_function imp_data_data imp_data_op imp_data_runtime_op.
-    Definition imp_data := @imp imp_data_data imp_data_op imp_data_runtime_op.
+    Definition imp_data_expr := @imp_expr imp_data_constant imp_data_op imp_data_runtime_op.
+    Definition imp_data_stmt := @imp_stmt imp_data_constant imp_data_op imp_data_runtime_op.
+    Definition imp_data_function := @imp_function imp_data_constant imp_data_op imp_data_runtime_op.
+    Definition imp_data := @imp imp_data_constant imp_data_op imp_data_runtime_op.
   End Syntax.
 
 End ImpData.

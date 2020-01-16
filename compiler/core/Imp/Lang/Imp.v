@@ -31,8 +31,7 @@ Require Import Utils.
 Section Imp.
 
   Section Syntax.
-
-    Context {Data: Type}.
+    Context {Constant: Type}.
     Context {Op: Type}.
     Context {Runtime: Type}.
 
@@ -43,7 +42,7 @@ Section Imp.
     Inductive imp_expr :=
     | ImpExprError : string -> imp_expr                          (**r raises an error *)
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
-    | ImpExprConst : Data -> imp_expr                            (**r constant data ([d]) *)
+    | ImpExprConst : Constant -> imp_expr                        (**r constant data ([d]) *)
     | ImpExprOp : Op -> list imp_expr -> imp_expr                (**r operator ([e₁ ⊠ e₂]) *)
     | ImpExprRuntimeCall : Runtime -> list imp_expr -> imp_expr  (**r runtime function call *)
   (*| ImpExprIf : imp_expr -> imp_expr -> imp_expr -> imp_expr *)(* XXX Useful? Used in Qcert JS runtime *)
@@ -73,7 +72,7 @@ Section Imp.
       Definition imp_expr_rect (P : imp_expr -> Type)
                  (ferror : forall v : string, P (ImpExprError v))
                  (fvar : forall v : string, P (ImpExprVar v))
-                 (fconst : forall d : Data, P (ImpExprConst d))
+                 (fconst : forall d : Constant, P (ImpExprConst d))
                  (fop : forall op : Op, forall el : list imp_expr,
                        Forallt P el -> P (ImpExprOp op el))
                  (fruntime : forall rt : Runtime, forall el : list imp_expr,
@@ -101,7 +100,7 @@ Section Imp.
       Definition imp_expr_ind (P : imp_expr -> Prop)
                  (ferror : forall v : string, P (ImpExprError v))
                  (fvar : forall v : string, P (ImpExprVar v))
-                 (fconst : forall d : Data, P (ImpExprConst d))
+                 (fconst : forall d : Constant, P (ImpExprConst d))
                  (fop : forall op : Op, forall el : list imp_expr,
                        Forall P el -> P (ImpExprOp op el))
                  (fruntime : forall rt : Runtime, forall el : list imp_expr,

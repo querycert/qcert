@@ -57,7 +57,7 @@ Section NNRSimptoImpData.
     Fixpoint nnrs_imp_stmt_to_imp_data (constants: string) (stmt: nnrs_imp_stmt): imp_data_stmt :=
       match stmt with
       | NNRSimpSkip =>
-        @ImpStmtBlock imp_data_data imp_data_op imp_data_runtime_op  [] []
+        @ImpStmtBlock imp_data_model imp_data_op imp_data_runtime_op  [] []
       | NNRSimpSeq s1 s2 =>
         ImpStmtBlock
           []
@@ -134,7 +134,7 @@ Section NNRSimptoImpData.
         rewrite (lookup_app equiv_dec constants).
         unfold olift.
         unfold Var.var.
-        unfold imp_data_data.
+        unfold imp_data_model.
         case_eq (lookup equiv_dec σ constants); try congruence.
         intros.
         unfold lookup.
@@ -147,7 +147,7 @@ Section NNRSimptoImpData.
         unfold id.
         unfold olift.
         unfold Var.var.
-        unfold imp_data_data.
+        unfold imp_data_model.
         case_eq (lookup equiv_dec σ v); try reflexivity.
         intros Hv.
         case_eq (lookup equiv_dec [(constants, Some (drec σc))] v); try congruence.
@@ -230,7 +230,7 @@ Section NNRSimptoImpData.
           intros d Hn; rewrite Hn.
           rewrite (lookup_remove_nin); trivial.
           rewrite app_nil_r.
-          unfold imp_data_data.
+          unfold imp_data_model.
           case_eq (lookup string_dec σ v); try reflexivity.
           intros.
           rewrite update_app_in; try reflexivity.
@@ -257,7 +257,7 @@ Section NNRSimptoImpData.
             rewrite <- IHstmt; trivial.
             ** case_eq (nnrs_imp_stmt_eval h σc stmt ((v, Some d) :: σ)).
                *** unfold Var.var.
-                   unfold imp_data_data.
+                   unfold imp_data_model.
                    intros σ' Hs.
                    rewrite Hs.
                    case_eq σ'; try reflexivity.
@@ -266,7 +266,7 @@ Section NNRSimptoImpData.
                    apply nnrs_imp_stmt_eval_domain_stack in Hs.
                    simpl in Hs; congruence.
                *** unfold Var.var.
-                   unfold imp_data_data.
+                   unfold imp_data_model.
                    intros Hs.
                    rewrite Hs.
                    reflexivity.
@@ -284,7 +284,7 @@ Section NNRSimptoImpData.
           * unfold olift.
             case_eq (nnrs_imp_stmt_eval h σc stmt ((v, None) :: σ)).
             ** unfold Var.var.
-               unfold imp_data_data.
+               unfold imp_data_model.
                intros σ' Hs.
                rewrite Hs.
                case_eq σ'; try reflexivity.
@@ -293,7 +293,7 @@ Section NNRSimptoImpData.
                apply nnrs_imp_stmt_eval_domain_stack in Hs.
                simpl in Hs; congruence.
             ** unfold Var.var.
-               unfold imp_data_data.
+               unfold imp_data_model.
                intros Hs.
                rewrite Hs.
                reflexivity.
@@ -323,7 +323,7 @@ Section NNRSimptoImpData.
           case_eq (nnrs_imp_stmt_eval h σc stmt ((v, Some a) :: σ)).
           ** unfold Var.var in *.
              unfold var in *.
-             unfold imp_data_data in *.
+             unfold imp_data_model in *.
              intros σ' Hs.
              rewrite Hs.
              case_eq σ'.
@@ -344,7 +344,7 @@ Section NNRSimptoImpData.
                  trivial.
           ** unfold Var.var in *.
              unfold var in *.
-             unfold imp_data_data in *.
+             unfold imp_data_model in *.
              intros Hs.
              rewrite Hs.
              reflexivity.
@@ -392,7 +392,7 @@ Section NNRSimptoImpData.
           ** unfold olift.
              case_eq (nnrs_imp_stmt_eval h σc stmt1 ((v, Some d) :: σ)).
              *** unfold Var.var in *.
-                 unfold imp_data_data in *.
+                 unfold imp_data_model in *.
                  unfold NNRSimp.pd_bindings.
                  intros σ' Hs.
                  rewrite Hs.
@@ -402,7 +402,7 @@ Section NNRSimptoImpData.
                  apply nnrs_imp_stmt_eval_domain_stack in Hs.
                  simpl in Hs; congruence.
              *** unfold Var.var.
-                 unfold imp_data_data.
+                 unfold imp_data_model.
                  intros Hs.
                  rewrite Hs.
                  reflexivity.
@@ -415,7 +415,7 @@ Section NNRSimptoImpData.
           ** case_eq (nnrs_imp_stmt_eval h σc stmt2 ((v0, Some d) :: σ)).
              *** unfold olift.
                  unfold Var.var in *.
-                 unfold imp_data_data in *.
+                 unfold imp_data_model in *.
                  intros σ' Hs.
                  rewrite Hs.
                  case_eq σ'; try reflexivity.
@@ -424,7 +424,7 @@ Section NNRSimptoImpData.
                  apply nnrs_imp_stmt_eval_domain_stack in Hs.
                  simpl in Hs; congruence.
              *** unfold Var.var.
-                 unfold imp_data_data.
+                 unfold imp_data_model.
                  intros Hs.
                  rewrite Hs.
                  reflexivity.
@@ -459,19 +459,19 @@ Section NNRSimptoImpData.
       unfold imp_data_stmt_eval.
       unfold Var.var.
       unfold var.
-      unfold imp_data_data.
+      unfold imp_data_model.
       intros Hstmt.
       rewrite <- Hstmt; clear Hstmt; trivial;
         [ | case (equiv_dec constants ret); congruence ];
         unfold Var.var;
         unfold var;
-        unfold imp_data_data.
+        unfold imp_data_model.
       unfold olift.
       unfold lift.
       case_eq (nnrs_imp_stmt_eval h (rec_sort σc) stmt [(ret, None)]);
         unfold Var.var;
         unfold var;
-        unfold imp_data_data;
+        unfold imp_data_model;
         [ | intros Hstmt; rewrite  Hstmt; reflexivity].
       intros σ Hstmt.
       rewrite  Hstmt.
