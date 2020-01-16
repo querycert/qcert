@@ -1,5 +1,5 @@
 <project name="dependencies" default="getoss">
-	<property name="repo" value="http://central.maven.org/maven2/"/>
+	<property name="repo" value="https://repo1.maven.org/maven2/"/>
 	<property name="asm" value="asm/asm/3.1/asm-3.1.jar"/>
 	<property name="asm-commons" value="asm/asm-commons/3.1/asm-commons-3.1.jar"/>
 	<property name="asm-tree" value="asm/asm-tree/3.1/asm-tree-3.1.jar"/>

@@ -1,6 +1,6 @@
 <project name="dependencies" default="get">
 
-<property name="repo" value="http://central.maven.org/maven2/"/>
+<property name="repo" value="https://repo1.maven.org/maven2/"/>
 	
 <property name="commonscodec" value="commons-codec/commons-codec/1.9/commons-codec-1.9.jar"/>
 <property name="commonscodec-src" value="commons-codec/commons-codec/1.9/commons-codec-1.9-sources.jar"/>

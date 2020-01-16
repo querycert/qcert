@@ -1,6 +1,6 @@
 <project name="dependencies" default="get">
 
-<property name="repo" value="http://central.maven.org/maven2/"/>
+<property name="repo" value="https://repo1.maven.org/maven2/"/>
 	
 <!-- Supports main functionality (binaries should be exported to bin/services) -->
 <property name="nanohttpd" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1.jar"/>

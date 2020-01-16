@@ -43,7 +43,7 @@ Module QLang(runtime:CompilerRuntime).
     Definition nnrs_imp_expr := nnrs_imp_expr.
     Definition nnrs_imp_stmt := nnrs_imp_stmt.
     Definition nnrs_imp := nnrs_imp.
-    Definition imp_qcert := imp_qcert.
+    Definition imp_data := imp_data.
     Definition imp_ejson := imp_ejson.
     Definition nnrcmr := nnrcmr.
     Definition dnnrc := dnnrc.

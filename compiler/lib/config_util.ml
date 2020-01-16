@@ -87,7 +87,7 @@ let suffix_dnnrcsexp () = "_dnnrc.sexp"
 let suffix_nnrs () = "_nnrs.txt"
 let suffix_nnrs_core () = "_nnrs_core.txt"
 let suffix_nnrs_imp () = "_nnrs_imp.txt"
-let suffix_imp_qcert () = "_imp_qcert.txt"
+let suffix_imp_data () = "_imp_data.txt"
 let suffix_imp_ejson () = "_imp_ejson.txt"
 let suffix_nnrcmr () = "_nnrcmr.txt"
 let suffix_nnrcmr_spark_df () = "_nnrcmr_spark_df.txt"
@@ -121,7 +121,7 @@ let suffix_of_language lang =
   | Core.L_nnrs -> suffix_nnrs ()
   | Core.L_nnrs_core -> suffix_nnrs_core ()
   | Core.L_nnrs_imp -> suffix_nnrs_imp ()
-  | Core.L_imp_qcert -> suffix_imp_qcert ()
+  | Core.L_imp_data -> suffix_imp_data ()
   | Core.L_imp_ejson -> suffix_imp_ejson ()
   | Core.L_nnrcmr -> suffix_nnrcmr ()
   | Core.L_js_ast -> suffix_js_ast ()

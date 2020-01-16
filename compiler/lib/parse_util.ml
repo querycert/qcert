@@ -69,7 +69,7 @@ let parse_nraenv_sexp f : QLang.nraenv_core = Ast_to_sexp.sexp_to_nraenv (parse_
 let parse_nnrc_sexp f : QLang.nnrc = Ast_to_sexp.sexp_to_nnrc (parse_sexp f)
 let parse_nnrs_sexp f : QLang.nnrs = Ast_to_sexp.sexp_to_nnrs (parse_sexp f)
 let parse_nnrs_imp_sexp f : QLang.nnrs_imp = Ast_to_sexp.sexp_to_nnrs_imp (parse_sexp f)
-let parse_imp_qcert_sexp f : QLang.imp_qcert = Ast_to_sexp.sexp_to_imp_qcert (parse_sexp f)
+let parse_imp_data_sexp f : QLang.imp_data = Ast_to_sexp.sexp_to_imp_data (parse_sexp f)
 let parse_imp_ejson_sexp f : QLang.imp_ejson = Ast_to_sexp.sexp_to_imp_ejson (parse_sexp f)
 let parse_nnrcmr_sexp f : QLang.nnrcmr = Ast_to_sexp.sexp_to_nnrcmr (parse_sexp f)
 
@@ -95,7 +95,7 @@ let parse_query l f : (string * QLang.query) =
   | Core.L_nnrs_core -> ("NNRSCore", Core.Q_nnrs_core (parse_nnrs_sexp f)) (* XXX TODO: check is core XXX *)
   | Core.L_nnrs -> ("NNRS", Core.Q_nnrs (parse_nnrs_sexp f))
   | Core.L_nnrs_imp -> ("NNRSimp", Core.Q_nnrs_imp (parse_nnrs_imp_sexp f))
-  | Core.L_imp_qcert -> ("ImpQcert", Core.Q_imp_qcert (parse_imp_qcert_sexp f))
+  | Core.L_imp_data -> ("ImpData", Core.Q_imp_data (parse_imp_data_sexp f))
   | Core.L_imp_ejson -> ("ImpEJson", Core.Q_imp_ejson (parse_imp_ejson_sexp f))
   | Core.L_nnrcmr -> ("NNRCMR", Core.Q_nnrcmr (parse_nnrcmr_sexp f))
   | Core.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")

@@ -113,9 +113,9 @@ Section CompStat.
       (("imp_ejson_size", dnat (Z_of_nat (imp_ejson_size q)))
          :: nil).
 
-  Definition stat_imp_qcert (q: imp_qcert) : data :=
+  Definition stat_imp_data (q: imp_data) : data :=
     drec
-      (("imp_qcert_size", dnat (Z_of_nat (imp_qcert_size q)))
+      (("imp_data_size", dnat (Z_of_nat (imp_data_size q)))
          :: nil).
 
   Definition stat_nnrs_imp (q: nnrs_imp) : data :=
@@ -253,9 +253,9 @@ Section CompStat.
       (("imp_ejson", stat_imp_ejson q)
          :: nil).
 
-  Definition stat_tree_imp_qcert (q: imp_qcert) : data :=
+  Definition stat_tree_imp_data (q: imp_data) : data :=
     drec
-      (("imp_qcert", stat_imp_qcert q)
+      (("imp_data", stat_imp_data q)
          :: nil).
 
   Definition stat_tree_nnrs_imp (q: nnrs_imp) : data :=
@@ -446,7 +446,7 @@ Section CompStat.
         | Q_nnrs_core q => stat_nnrs_core q
         | Q_nnrs q => stat_nnrs q
         | Q_nnrs_imp q => stat_nnrs_imp q
-        | Q_imp_qcert q => stat_imp_qcert q
+        | Q_imp_data q => stat_imp_data q
         | Q_imp_ejson q => stat_imp_ejson q
         | Q_nnrcmr q => stat_nnrcmr q
         | Q_dnnrc q => stat_dnnrc q
@@ -479,7 +479,7 @@ Section CompStat.
         | Q_nnrs_core q => stat_tree_nnrs_core q
         | Q_nnrs q => stat_tree_nnrs q
         | Q_nnrs_imp q => stat_tree_nnrs_imp q
-        | Q_imp_qcert q => stat_tree_imp_qcert q
+        | Q_imp_data q => stat_tree_imp_data q
         | Q_imp_ejson q => stat_tree_imp_ejson q
         | Q_nnrcmr q => stat_tree_nnrcmr q
         | Q_dnnrc q => stat_tree_dnnrc q

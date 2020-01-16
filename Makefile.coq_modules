@@ -245,9 +245,9 @@ MODULES = \
 	Imp/Lang/Imp \
 	Imp/Lang/ImpSize \
 	Imp/Lang/ImpEval \
-	Imp/Lang/ImpQcert \
-	Imp/Lang/ImpQcertSize \
-	Imp/Lang/ImpQcertEval \
+	Imp/Lang/ImpData \
+	Imp/Lang/ImpDataSize \
+	Imp/Lang/ImpDataEval \
 	Imp/Lang/ImpEJson \
 	Imp/Lang/ImpEJsonSize \
 	Imp/Lang/ImpEJsonEval \
@@ -366,8 +366,8 @@ MODULES = \
 	Translation/Lang/OQLtoNRAEnv \
 	Translation/Lang/NNRCtoNNRS \
 	Translation/Lang/NNRStoNNRSimp \
-	Translation/Lang/NNRSimptoImpQcert \
-	Translation/Lang/ImpQcerttoImpEJson \
+	Translation/Lang/NNRSimptoImpData \
+	Translation/Lang/ImpDatatoImpEJson \
 	Translation/Lang/ImpEJsontoJavaScriptAst \
 	Translation/Lang/JavaScriptAsttoJavaScript \
 	Translation/Lang/NNRCtoJava \

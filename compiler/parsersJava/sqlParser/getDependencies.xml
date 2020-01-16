@@ -1,6 +1,6 @@
 <project name="dependencies" default="get">
 
-<property name="repo" value="http://central.maven.org/maven2/"/>
+<property name="repo" value="https://repo1.maven.org/maven2/"/>
 <!-- The following property is also defined in export.xml.  Should be the same. -->	
 <property name="presto-version" value="0.154"/>
 	

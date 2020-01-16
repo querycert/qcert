@@ -36,7 +36,7 @@ let output_query pconf q =
   | Core.Q_nnrs q -> pretty_query pconf pretty_nnrs q
   | Core.Q_nnrs_core q -> pretty_query pconf pretty_nnrs_core q
   | Core.Q_nnrs_imp q -> pretty_query pconf pretty_nnrs_imp q
-  | Core.Q_imp_qcert q -> pretty_query pconf pretty_imp_qcert q
+  | Core.Q_imp_data q -> pretty_query pconf pretty_imp_data q
   | Core.Q_imp_ejson q -> pretty_query pconf pretty_imp_ejson q
   | Core.Q_nnrcmr q -> pretty_query pconf pretty_nnrcmr q
   | Core.Q_dnnrc q -> pretty_query pconf pretty_dnnrc q

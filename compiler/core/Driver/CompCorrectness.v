@@ -67,8 +67,8 @@ Require Import NNRCtoNNRS.
 Require Import NNRCtoDNNRC.
 Require Import NNRCtoNNRCMR.
 Require Import NNRStoNNRSimp.
-Require Import NNRSimptoImpQcert.
-Require Import ImpQcerttoImpEJson.
+Require Import NNRSimptoImpData.
+Require Import ImpDatatoImpEJson.
 Require Import NNRCtoJava.
 Require Import cNNRCtoCAMP.
 Require Import cNNRCtoNNRC.
@@ -122,7 +122,7 @@ Section CompCorrectness.
   Context {nnrs_imp_expr_logger:optimizer_logger string nnrs_imp_expr}.
   Context {nnrs_imp_stmt_logger:optimizer_logger string nnrs_imp_stmt}.
   Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
-  Context {imp_qcert_logger:optimizer_logger string imp_qcert}.
+  Context {imp_data_logger:optimizer_logger string imp_data}.
   Context {imp_ejson_logger:optimizer_logger string imp_ejson}.
   Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base _ (type_annotation unit) dataframe)}.
   Context {ftojava:foreign_to_java}.
@@ -174,17 +174,17 @@ Section CompCorrectness.
     | Dv_imp_ejson_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 
-  Definition driver_correct_imp_qcert (dv: imp_qcert_driver) :=
+  Definition driver_correct_imp_data (dv: imp_data_driver) :=
     match dv with
-    | Dv_imp_qcert_stop => True
-    | Dv_imp_qcert_to_imp_ejson dv => True /\ driver_correct_imp_ejson dv
+    | Dv_imp_data_stop => True
+    | Dv_imp_data_to_imp_ejson dv => True /\ driver_correct_imp_ejson dv
     end.
 
   Fixpoint driver_correct_nnrs_imp (dv: nnrs_imp_driver) :=
     match dv with
     | Dv_nnrs_imp_stop => True
     | Dv_nnrs_imp_optim _ dv => False /\ driver_correct_nnrs_imp dv
-    | Dv_nnrs_imp_to_imp_qcert _ dv => driver_correct_imp_qcert dv
+    | Dv_nnrs_imp_to_imp_data _ dv => driver_correct_imp_data dv
     end.
 
   Definition driver_correct_nnrs (dv: nnrs_driver) :=
@@ -317,7 +317,7 @@ Section CompCorrectness.
     | Dv_nnrs_core dv => driver_correct_nnrs_core dv
     | Dv_nnrs dv => driver_correct_nnrs dv
     | Dv_nnrs_imp dv => driver_correct_nnrs_imp dv
-    | Dv_imp_qcert dv => driver_correct_imp_qcert dv
+    | Dv_imp_data dv => driver_correct_imp_data dv
     | Dv_imp_ejson dv => driver_correct_imp_ejson dv
     | Dv_nnrcmr dv => driver_correct_nnrcmr dv
     | Dv_dnnrc dv => driver_correct_dnnrc dv
@@ -349,7 +349,7 @@ Section CompCorrectness.
     Ltac prove_same_outputs :=
       unfold eval_camp_rule, eval_camp,
       eval_nra, eval_nraenv, eval_nraenv_core,
-      eval_nnrc, eval_nnrc_core, eval_nnrs, eval_nnrs_imp, eval_imp_qcert, eval_imp_ejson, eval_nnrcmr,
+      eval_nnrc, eval_nnrc_core, eval_nnrs, eval_nnrs_imp, eval_imp_data, eval_imp_ejson, eval_nnrcmr,
       eval_dnnrc, eval_dnnrc_typed;
       try match goal with
       | [ |- equal_outputs (lift_output (camp_rule_eval_top ?h ?c (lift_input ?i)))
@@ -437,7 +437,7 @@ Section CompCorrectness.
     | (Dv_nnrs_core _, Q_nnrs_core _) => True
     | (Dv_nnrs _, Q_nnrs _) => True
     | (Dv_nnrs_imp _, Q_nnrs_imp _) => True
-    | (Dv_imp_qcert _, Q_imp_qcert _) => True
+    | (Dv_imp_data _, Q_imp_data _) => True
     | (Dv_imp_ejson _, Q_imp_ejson _) => True
     | (Dv_nnrcmr _, Q_nnrcmr _) => True
     | (Dv_dnnrc _, Q_dnnrc _) => True
@@ -461,10 +461,10 @@ Section CompCorrectness.
       destruct dv; simpl in *; intuition; subst; eauto.
     Qed.
 
-    Lemma correct_driver_succeeds_imp_qcert:
-      forall dv, driver_correct (Dv_imp_qcert dv) ->
+    Lemma correct_driver_succeeds_imp_data:
+      forall dv, driver_correct (Dv_imp_data dv) ->
                  (forall q, Forall query_not_error
-                                   (compile (Dv_imp_qcert dv) (Q_imp_qcert q))).
+                                   (compile (Dv_imp_data dv) (Q_imp_data q))).
     Proof.
       intros.
       rewrite Forall_forall; intros.
@@ -948,7 +948,7 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_nnrs_core; auto.
       - apply correct_driver_succeeds_nnrs; auto.
       - apply correct_driver_succeeds_nnrs_imp; auto.
-      - apply correct_driver_succeeds_imp_qcert; auto.
+      - apply correct_driver_succeeds_imp_data; auto.
       - apply correct_driver_succeeds_imp_ejson; auto.
       - apply correct_driver_succeeds_nnrcmr; auto.
       - apply correct_driver_succeeds_dnnrc; auto.
@@ -1224,17 +1224,17 @@ Section CompCorrectness.
       reflexivity.
     Qed.
 
-    Lemma nnrc_core_to_imp_qcert_preserves_eval l qname (q:nnrc_core) :
+    Lemma nnrc_core_to_imp_data_preserves_eval l qname (q:nnrc_core) :
       query_preserves_eval (Q_nnrc_core q)
-       (Q_imp_qcert (nnrs_imp_to_imp_qcert qname (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l (proj1_sig q))))).
+       (Q_imp_data (nnrs_imp_to_imp_data qname (nnrs_to_nnrs_imp (nnrc_to_nnrs_top l (proj1_sig q))))).
     Proof.
       unfold query_preserves_eval; intros.
       simpl.
       unfold eval_nnrc_core.
-      unfold eval_imp_qcert.
+      unfold eval_imp_data.
       unfold nnrs_to_nnrs_imp.
-      unfold nnrs_imp_to_imp_qcert.
-      rewrite <- nnrs_imp_to_imp_qcert_top_correct.
+      unfold nnrs_imp_to_imp_data.
+      rewrite <- nnrs_imp_to_imp_data_top_correct.
       rewrite <- nnrs_to_nnrs_imp_top_correct.
       rewrite <- nnrc_to_nnrs_top_correct.
       rewrite nnrc_core_to_nnrc_top_correct.
@@ -1253,27 +1253,27 @@ Section CompCorrectness.
       reflexivity.
     Qed.
 
-    Lemma nnrs_imp_to_imp_qcert_preserves_eval qname q :
-      query_preserves_eval (Q_nnrs_imp q) (Q_imp_qcert (nnrs_imp_to_imp_qcert qname q)).
+    Lemma nnrs_imp_to_imp_data_preserves_eval qname q :
+      query_preserves_eval (Q_nnrs_imp q) (Q_imp_data (nnrs_imp_to_imp_data qname q)).
     Proof.
       unfold query_preserves_eval; intros.
       simpl.
       unfold eval_nnrs_imp.
-      unfold eval_imp_qcert.
-      unfold nnrs_imp_to_imp_qcert.
-      rewrite <- nnrs_imp_to_imp_qcert_top_correct.
+      unfold eval_imp_data.
+      unfold nnrs_imp_to_imp_data.
+      rewrite <- nnrs_imp_to_imp_data_top_correct.
       reflexivity.
     Qed.
 
-    Lemma imp_qcert_to_imp_ejson_preserves_eval q :
-      query_preserves_eval (Q_imp_qcert q) (Q_imp_ejson (imp_qcert_to_imp_ejson q)).
+    Lemma imp_data_to_imp_ejson_preserves_eval q :
+      query_preserves_eval (Q_imp_data q) (Q_imp_ejson (imp_data_to_imp_ejson q)).
     Proof.
       unfold query_preserves_eval; intros.
       simpl.
-      unfold eval_imp_qcert.
+      unfold eval_imp_data.
       unfold eval_imp_ejson.
-      unfold imp_qcert_to_imp_ejson.
-      rewrite <- imp_qcert_to_imp_ejson_correct.
+      unfold imp_data_to_imp_ejson.
+      rewrite <- imp_data_to_imp_ejson_correct.
       reflexivity.
     Qed.
 
@@ -1330,10 +1330,10 @@ Section CompCorrectness.
       ; try solve[trivial_same_query; reflexivity].
     Qed.
 
-    Lemma correct_driver_preserves_eval_imp_qcert:
-      forall dv, driver_correct (Dv_imp_qcert dv) ->
-                 (forall q, Forall (query_preserves_eval (Q_imp_qcert q))
-                                   (compile (Dv_imp_qcert dv) (Q_imp_qcert q))).
+    Lemma correct_driver_preserves_eval_imp_data:
+      forall dv, driver_correct (Dv_imp_data dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_imp_data q))
+                                   (compile (Dv_imp_data dv) (Q_imp_data q))).
     Proof.
       intros.
       rewrite Forall_forall; intros.
@@ -1344,7 +1344,7 @@ Section CompCorrectness.
       - destruct H0; [ rewrite <- H0; reflexivity | ].
         simpl in H0. intuition.
         + rewrite <- H1.
-          apply imp_qcert_to_imp_ejson_preserves_eval.
+          apply imp_data_to_imp_ejson_preserves_eval.
         + destruct i; simpl in *; try contradiction; intuition.
     Qed.
 
@@ -1356,11 +1356,11 @@ Section CompCorrectness.
       intros.
       rewrite Forall_forall; intros.
       destruct dv; simpl in *; intuition; subst; simpl; intuition.
-      apply (nnrs_imp_to_imp_qcert_preserves_eval).
-      apply (query_preserves_eval_trans (Q_nnrs_imp q) (Q_imp_qcert (nnrs_imp_to_imp_qcert s q))); intuition.
-      apply (nnrs_imp_to_imp_qcert_preserves_eval).
+      apply (nnrs_imp_to_imp_data_preserves_eval).
+      apply (query_preserves_eval_trans (Q_nnrs_imp q) (Q_imp_data (nnrs_imp_to_imp_data s q))); intuition.
+      apply (nnrs_imp_to_imp_data_preserves_eval).
       destruct i; simpl in *; intuition; subst.
-      - apply (imp_qcert_to_imp_ejson_preserves_eval).
+      - apply (imp_data_to_imp_ejson_preserves_eval).
       - destruct i; simpl in *; intuition; subst.
     Qed.
 
@@ -1975,7 +1975,7 @@ input data returns the same output data. *)
       - apply correct_driver_preserves_eval_nnrs_core; auto.
       - apply correct_driver_preserves_eval_nnrs; auto.
       - apply correct_driver_preserves_eval_nnrs_imp; auto.
-      - apply correct_driver_preserves_eval_imp_qcert; auto.
+      - apply correct_driver_preserves_eval_imp_data; auto.
       - apply correct_driver_preserves_eval_imp_ejson; auto.
       - apply correct_driver_preserves_eval_nnrcmr; auto.
       - apply correct_driver_preserves_eval_dnnrc; auto.
@@ -1989,16 +1989,16 @@ input data returns the same output data. *)
   End eval_preserved.
 
   Section CustomVerified.
-    Section NRAEnvtoImpQcert.
-      Lemma driver_nraenv_to_imp_qcert_verified_correct conf :
-        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)).
+    Section NRAEnvtoImpData.
+      Lemma driver_nraenv_to_imp_data_verified_correct conf :
+        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil)).
       Proof.
         simpl; split; auto.
       Qed.
 
-      Lemma driver_nraenv_to_imp_qcert_verified_matches_query conf q :
+      Lemma driver_nraenv_to_imp_data_verified_matches_query conf q :
         driver_matches_query
-          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil)) 
+          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil)) 
           (Q_nraenv q).
       Proof.
         unfold driver_of_path.
@@ -2007,18 +2007,18 @@ input data returns the same output data. *)
         auto.
       Qed.
 
-      Lemma compile_nraenv_to_imp_qcert_verified_correct conf q q' :
-        compile_nraenv_to_imp_qcert_verified conf (Q_nraenv q) = q' ->
+      Lemma compile_nraenv_to_imp_data_verified_correct conf q q' :
+        compile_nraenv_to_imp_data_verified conf (Q_nraenv q) = q' ->
         exists q'',
-          (q' = Q_imp_qcert q'' /\ (@query_preserves_eval (Q_nraenv q) (Q_imp_qcert q''))).
+          (q' = Q_imp_data q'' /\ (@query_preserves_eval (Q_nraenv q) (Q_imp_data q''))).
       Proof.
-        elim (compile_nraenv_to_imp_qcert_verified_yields_result conf q); intros.
-        unfold compile_nraenv_to_imp_qcert_verified in *.
+        elim (compile_nraenv_to_imp_data_verified_yields_result conf q); intros.
+        unfold compile_nraenv_to_imp_data_verified in *.
         generalize (@compile_with_correct_driver_preserves_eval
-                                                                (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: nil))
+                                                                (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil))
                                                                 (Q_nraenv q)
-                                                                (driver_nraenv_to_imp_qcert_verified_correct conf)
-                                                                (driver_nraenv_to_imp_qcert_verified_matches_query conf q)).
+                                                                (driver_nraenv_to_imp_data_verified_correct conf)
+                                                                (driver_nraenv_to_imp_data_verified_matches_query conf q)).
         intro Heval.
         rewrite H in H0.
         rewrite <- H0.
@@ -2031,13 +2031,13 @@ input data returns the same output data. *)
           auto.
       Qed.
 
-      Lemma nraenv_to_imp_qcert_correct conf (qnra:nraenv) (x:imp_qcert):
-        compile_nraenv_to_imp_qcert_verified conf (Q_nraenv qnra) = Q_imp_qcert x ->
+      Lemma nraenv_to_imp_data_correct conf (qnra:nraenv) (x:imp_data):
+        compile_nraenv_to_imp_data_verified conf (Q_nraenv qnra) = Q_imp_data x ->
         forall d : bindings, nraenv_eval_top h qnra d =
-                             imp_qcert_eval_top h d x.
+                             imp_data_eval_top h d x.
       Proof.
         intros.
-        generalize (compile_nraenv_to_imp_qcert_verified_correct conf qnra (Q_imp_qcert x) H); intros; clear H.
+        generalize (compile_nraenv_to_imp_data_verified_correct conf qnra (Q_imp_data x) H); intros; clear H.
         elim H0; clear H0; intros.
         elim H; clear H; intros.
         unfold query_preserves_eval in H0.
@@ -2046,32 +2046,32 @@ input data returns the same output data. *)
         simpl in H0.
         inversion H; clear H; subst.
         case_eq (eval_nraenv qnra (lift_input (map (fun xy : string * data => (fst xy, Dlocal (snd xy))) d))); intros;
-          case_eq (eval_imp_qcert x0 (lift_input (map (fun xy : string * data => (fst xy, Dlocal (snd xy))) d))); intros;
+          case_eq (eval_imp_data x0 (lift_input (map (fun xy : string * data => (fst xy, Dlocal (snd xy))) d))); intros;
             rewrite H in H0; simpl in H0;
               rewrite H1 in H0; simpl in H0;
                 try contradiction;
                 rewrite lift_input_idem in H; rewrite lift_input_idem in H1.
         - unfold eval_nraenv in H; rewrite H.
-          unfold eval_imp_qcert in H1; rewrite H1.
+          unfold eval_imp_data in H1; rewrite H1.
           case_eq (data_eq_dec d0 d1); intros.
           subst; auto.
           rewrite H2 in H0; contradiction.
         - unfold eval_nraenv in H; rewrite H.
-          unfold eval_imp_qcert in H1; rewrite H1.
+          unfold eval_imp_data in H1; rewrite H1.
           auto.
       Qed.
-    End NRAEnvtoImpQcert.
+    End NRAEnvtoImpData.
 
     Section NRAEnvtoImpEJson.
       Lemma driver_nraenv_to_imp_ejson_verified_correct conf :
-        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: L_imp_ejson :: nil)).
+        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil)).
       Proof.
         simpl; split; split; auto.
       Qed.
 
       Lemma driver_nraenv_to_imp_ejson_verified_matches_query conf q :
         driver_matches_query
-          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: L_imp_ejson :: nil)) 
+          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil)) 
           (Q_nraenv q).
       Proof.
         unfold driver_of_path; simpl.
@@ -2087,7 +2087,7 @@ input data returns the same output data. *)
         elim (compile_nraenv_to_imp_ejson_verified_yields_result conf q); intros.
         unfold compile_nraenv_to_imp_ejson_verified in *.
         generalize (@compile_with_correct_driver_preserves_eval
-                                                                (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_qcert :: L_imp_ejson :: nil))
+                                                                (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil))
                                                                 (Q_nraenv q)
                                                                 (driver_nraenv_to_imp_ejson_verified_correct conf)
                                                                 (driver_nraenv_to_imp_ejson_verified_matches_query conf q)).

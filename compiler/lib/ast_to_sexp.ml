@@ -690,22 +690,22 @@ let sexp_to_imp sexp_to_data sexp_to_op sexp_to_runtime_op (se:sexp) =
   assert false (* XXX TODO XXX *)
 
 
-(* ImpQcert Section *)
+(* ImpData Section *)
 
-let sexp_to_imp_qcert_data d =
+let sexp_to_imp_data_data d =
   assert false (* XXX TODO XXX *)
 
-let sexp_to_imp_qcert_op op =
+let sexp_to_imp_data_op op =
   assert false (* XXX TODO XXX *)
 
-let sexp_to_imp_qcert_runtime_op op =
+let sexp_to_imp_data_runtime_op op =
   assert false (* XXX TODO XXX *)
 
-let rec imp_qcert_to_sexp q : sexp =
-  imp_to_sexp sexp_to_imp_qcert_data sexp_to_imp_qcert_op sexp_to_imp_qcert_runtime_op q
+let rec imp_data_to_sexp q : sexp =
+  imp_to_sexp sexp_to_imp_data_data sexp_to_imp_data_op sexp_to_imp_data_runtime_op q
 
-let sexp_to_imp_qcert (se:sexp) =
-  sexp_to_imp sexp_to_imp_qcert_data sexp_to_imp_qcert_op sexp_to_imp_qcert_runtime_op se
+let sexp_to_imp_data (se:sexp) =
+  sexp_to_imp sexp_to_imp_data_data sexp_to_imp_data_op sexp_to_imp_data_runtime_op se
 
 (* ImpJson Section *)
 
@@ -1818,7 +1818,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_nnrs_core -> Q_nnrs_core (sexp_to_nnrs se)
   | L_nnrs -> Q_nnrs (sexp_to_nnrs se)
   | L_nnrs_imp -> Q_nnrs_imp (sexp_to_nnrs_imp se)
-  | L_imp_qcert -> Q_nnrs_imp (sexp_to_imp_qcert se)
+  | L_imp_data -> Q_nnrs_imp (sexp_to_imp_data se)
   | L_imp_ejson -> Q_nnrs_imp (sexp_to_imp_ejson se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
   | L_dnnrc ->
@@ -1859,7 +1859,7 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_nnrs_core q -> nnrs_to_sexp q
   | Q_nnrs q -> nnrs_to_sexp q
   | Q_nnrs_imp q -> nnrs_imp_to_sexp q
-  | Q_imp_qcert q -> imp_qcert_to_sexp q
+  | Q_imp_data q -> imp_data_to_sexp q
   | Q_imp_ejson q -> imp_ejson_to_sexp q
   | Q_nnrcmr q -> nnrcmr_to_sexp q
   | Q_dnnrc _

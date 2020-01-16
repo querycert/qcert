@@ -472,36 +472,36 @@ let pretty_imp pretty_data pretty_op pretty_runtime greek margin annot inheritan
     flush_str_formatter ()
   end
 
-(** Pretty ImpQcert *)
+(** Pretty ImpData *)
 
-let pretty_imp_qcert_data = pretty_data
+let pretty_imp_data_data = pretty_data
 
-let pretty_imp_qcert_op p sym pretty_imp_expr ff (op, args) =
+let pretty_imp_data_op p sym pretty_imp_expr ff (op, args) =
   begin match op, args with
-  | Core.QcertOpUnary u, [ e ] ->
+  | Core.DataOpUnary u, [ e ] ->
       (pretty_unary_op p sym pretty_imp_expr) ff u e
-  | Core.QcertOpBinary b, [e1;e2] ->
+  | Core.DataOpBinary b, [e1;e2] ->
       (pretty_binary_op p sym pretty_imp_expr) ff b e1 e2
   | _ -> assert false
   end
 
-let pretty_imp_qcert_runtime p sym pretty_imp_expr ff (op, args) =
+let pretty_imp_data_runtime p sym pretty_imp_expr ff (op, args) =
   begin match op, args with
-  | Core.QcertRuntimeGroupby(g,atts), [e] ->
+  | Core.DataRuntimeGroupby(g,atts), [e] ->
       fprintf ff "@[<hv 2>groupBy@[<hv 2>(%a,@ %a,@ %a)@]@]"
         (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_imp_expr 0 sym) e
-  | Core.QcertRuntimeEither, [e] ->
+  | Core.DataRuntimeEither, [e] ->
       fprintf ff "@[<hv 2>either@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
-  | Core.QcertRuntimeToLeft, [e] ->
+  | Core.DataRuntimeToLeft, [e] ->
       fprintf ff "@[<hv 2>toLeft@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
-  | Core.QcertRuntimeToRight, [e] ->
+  | Core.DataRuntimeToRight, [e] ->
       fprintf ff "@[<hv 2>toRight@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
   | _ -> assert false
   end
 
-let pretty_imp_qcert = pretty_imp pretty_imp_qcert_data pretty_imp_qcert_op pretty_imp_qcert_runtime
+let pretty_imp_data = pretty_imp pretty_imp_data_data pretty_imp_data_op pretty_imp_data_runtime
 
-(** Pretty ImpQcert *)
+(** Pretty ImpData *)
 
 let pretty_imp_ejson_data ff d =
   fprintf ff "%s"
