@@ -74,7 +74,7 @@
        right=of nnrsimp]
       (impdata) {Imp (Data)};
  \node[lang, coqp, hyperlink node=\coqurl{Imp.Lang}{ImpEJson}{imp_ejson},
-       right=of impqcert]
+       right=of impdata]
       (impjson) {Imp (Json)};
 
  % NNRCMR
@@ -183,7 +183,7 @@
  \path[trans, tcoqp] (nnrs) -- (nnrsimp)
    \transref{3}{\coqurl{Translation.Lang}{NNRStoNNRSimp}{nnrs_to_nnrs_imp_top}};
  \path[trans, tcoqp] (nnrsimp) -- (impdata)
-   \transref{6}{\coqurl{Translation.Lang}{NNRSimptoImpQcert}{nnrs_imp_to_imp_data_top}};
+   \transref{6}{\coqurl{Translation.Lang}{NNRSimptoImpData}{nnrs_imp_to_imp_data_top}};
  \path[trans, tcoqp] (impdata) -- (impjson)
    \transref{6}{\coqurl{Translation.Lang}{ImpDatatoImpEJson}{imp_data_to_imp_ejson_top}};
  \path[trans, tcoqc] (impjson) -- (ajs)

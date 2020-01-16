@@ -99,6 +99,10 @@ Module QDriver(runtime:CompilerRuntime).
       driver_config -> query -> query
       := compile_nraenv_to_imp_ejson_verified.
 
+    Definition compile_nnrc_to_javascript_ast :
+      driver_config -> query -> query
+      := compile_nnrc_to_javascript_ast.
+
     (* Used in CompTest: *)
     Definition camp_rule_to_nraenv_optim : camp_rule -> nraenv := camp_rule_to_nraenv_optim.
     Definition camp_rule_to_nnrc_optim : camp_rule -> nnrc := camp_rule_to_nnrc_optim.
