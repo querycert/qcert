@@ -161,7 +161,7 @@ qcert-ocaml:
 	dune build @install
 
 qcert-ocaml-extract:
-	- @$(MAKE) -C compiler/extraction clean
+	- @$(MAKE) -C compiler/extraction
 
 clean-qcert-ocaml:
 	- @$(MAKE) -C compiler/extraction clean
