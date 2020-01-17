@@ -214,7 +214,7 @@ Section ImpEJsontoJavaScriptAst.
       match f with
       | ImpFun v s ret =>
         let body := imp_ejson_stmt_to_js_ast s in
-        let ret := scope (body :: stat_return (Some (expr_identifier ret)) :: nil) in
+        let ret := scope (stat_let_decl ((ret,None)::nil) :: body :: stat_return (Some (expr_identifier ret)) :: nil) in
         let prog :=
             prog_intro strictness_true [ element_stat ret ]
         in
