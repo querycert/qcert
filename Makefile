@@ -112,17 +112,17 @@ cleanmost-qcert-compiler:
 
 ## Configure
 
-./runtimes/javascript/qcert_runtime.ml:
-	$(MAKE) -C ./runtimes/javascript
+runtimes/javascript/qcert_runtime.ml:
+	$(MAKE) -C runtimes/javascript
 
-./compiler/lib/js_runtime.ml: ./runtimes/javascript/qcert_runtime.ml
-	cp ./runtimes/javascript/qcert_runtime.ml ./compiler/lib/js_runtime.ml
+compiler/lib/js_runtime.ml: runtimes/javascript/qcert_runtime.ml
+	cp runtimes/javascript/qcert_runtime.ml compiler/lib/js_runtime.ml
 
-./compiler/lib/static_config.ml:
-	echo "(* This file is generated *)" > ./compiler/lib/static_config.ml
-	echo "let qcert_home = \"$(CURDIR)\"" >> ./compiler/lib/static_config.ml
+compiler/lib/static_config.ml:
+	echo "(* This file is generated *)" > compiler/lib/static_config.ml
+	echo "let qcert_home = \"$(CURDIR)\"" >> compiler/lib/static_config.ml
 
-prepare: ./compiler/lib/js_runtime.ml ./compiler/lib/static_config.ml Makefile.coq
+prepare: compiler/lib/js_runtime.ml compiler/lib/static_config.ml Makefile.coq
 
 configure:
 	@echo "[Q*cert] "
@@ -133,10 +133,10 @@ configure:
 clean-configure:
 
 cleanall-configure:
-	$(MAKE) -C ./runtimes/javascript cleanall
-	rm -rf ./compiler/lib/js_runtime.ml
-	rm -rf ./compiler/lib/static_config.ml
-	rm -f ./compiler/.merlin compiler/*/.merlin
+	$(MAKE) -C runtimes/javascript cleanall
+	rm -rf compiler/lib/js_runtime.ml
+	rm -rf compiler/lib/static_config.ml
+	rm -f compiler/.merlin compiler/*/.merlin
 
 ## Compiler Core
 
@@ -370,7 +370,7 @@ docs:
 ## Misc
 
 clean_detritus:
-	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 ./scripts/remove_detritus_derived_file.sh
+	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 scripts/remove_detritus_derived_file.sh
 
 remove_all_derived:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
