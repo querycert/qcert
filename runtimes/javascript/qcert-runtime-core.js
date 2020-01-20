@@ -21,25 +21,40 @@ function mustBeArray(obj) {
     }
     throw new Error('Expected an array but got: ' + JSON.stringify(obj));
 }
-function natBox(v) {
+function boxNat(v) {
     return { '$nat': v };
 }
-function natUnbox(v) {
-    return v.$nat;
+function unboxNat(v) {
+    return v['$nat'];
 }
-function mkLeft(v) {
+function isNat(v) {
+    return Object.prototype.hasOwnProperty.call(v,'$nat');
+}
+function boxLeft(v) {
     return { '$left' : v };
 }
-function mkRight(v) {
+function unboxLeft(v) {
+    return v['$left'];
+}
+function isLeft(v) {
+    return Object.prototype.hasOwnProperty.call(v,'$left');
+}
+function boxRight(v) {
     return { '$right' : v };
+}
+function unboxRight(v) {
+    return v['$right'];
+}
+function isRight(v) {
+    return Object.prototype.hasOwnProperty.call(v,'$right');
 }
 function sub_brand(b1,b2) {
     var bsub=null;
     var bsup=null;
-    for (var i=0; i<inheritance.length; i = i+1) {
+    for (var i=0; i<inheritance.length; i=i+1) {
         bsub = inheritance[i].sub;
         bsup = inheritance[i].sup;
-        if ((b1 === bsub) && (b2 === bsup)) return true;
+        if ((b1 === bsub) && (b2 === bsup)) { return true; }
     }
     return false;
 }
@@ -55,16 +70,18 @@ function equal(v1, v2) {
 function compare(v1, v2) {
     var t1 = typeof v1, t2 = typeof v2;
     if (t1 === 'object' && v1 !== null) {
-        if (Object.prototype.hasOwnProperty.call(v1,'$nat')) { t1 = 'number'; v1 = v1.$nat; }
+        if (isNat(v1)) { t1 = 'number'; v1 = unboxNat(v1); }
     };
     if (t2 === 'object' && v2 !== null) {
-        if (Object.prototype.hasOwnProperty.call(v2,'$nat')) { t2 = 'number'; v2 = v2.$nat; }
+        if (isNat(v2)) { t2 = 'number'; v2 = unboxNat(v2); }
     };
-    if (t1 != t2)
+    if (t1 != t2) {
         return t1 < t2 ? -1 : +1;
+    }
     var a1 = {}.toString.apply(v1), a2 = {}.toString.apply(v2);
-    if (a1 != a2)
+    if (a1 != a2) {
         return a1 < a2 ? -1 : +1;
+    }
     if (a1 === '[object Array]') {
         v1 = v1.slice(); /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
         v2 = v2.slice(); /* So we do the sort/compare on a clone of the original array */
@@ -78,21 +95,25 @@ function compare(v1, v2) {
         for (var f2 in v2) { fields2.push(f2); }
         fields1 = fields1.sort(compare);
         fields2 = fields2.sort(compare);
-        for (var i = 0; i < fields1.length; i = i+1) {
-            if (!(Object.prototype.hasOwnProperty.call(v2,fields1[i])))
+        for (var i = 0; i < fields1.length; i=i+1) {
+            if (!(Object.prototype.hasOwnProperty.call(v2,fields1[i]))) {
                 return -1;
+            }
             var fc = compare(v1[fields1[i]], v2[fields1[i]]);
-            if (fc != 0)
+            if (fc != 0) {
                 return fc;
+            }
         }
-        for (var i = 0; i < fields2.length; i = i+1) {
-            if (!(Object.prototype.hasOwnProperty.call(v1,fields2[i])))
+        for (var i = 0; i < fields2.length; i=i+1) {
+            if (!(Object.prototype.hasOwnProperty.call(v1,fields2[i]))) {
                 return +1;
+            }
         }
         return 0;
     }
-    if (v1 != v2)
+    if (v1 != v2) {
         return v1 < v2 ? -1 : +1;
+    }
     return 0;
 }
 function toString(v) {
@@ -102,30 +123,34 @@ function toText(v) {
     return toStringQ(v, '');
 }
 function toStringQ(v, quote) {
-    if (v === null)
+    if (v === null) {
         return 'null';
+    }
     var t = typeof v;
-    if (t === 'string')
+    if (t === 'string') {
         return quote + v + quote;
-    if (t === 'boolean')
+    }
+    if (t === 'boolean') {
         return '' + v;
+    }
     if (t === 'number') {
-        if (Math.floor(v) === v) return (new Number(v)).toFixed(1); // Make sure there is always decimal point
-        else return '' + v;
+        if (Math.floor(v) === v) { return (new Number(v)).toFixed(1); } // Make sure there is always decimal point
+        else { return '' + v; }
     }
     if ({}.toString.apply(v) === '[object Array]') {
         v = v.slice();
         v.sort();
         var result = '[';
-        for (var i=0, n=v.length; i<n; i = i+1) {
-            if (i > 0)
+        for (var i=0, n=v.length; i<n; i=i+1) {
+            if (i > 0) {
                 result += ', ';
+            }
             result += toStringQ(v[i], quote);
         }
         return result + ']';
     }
-    if(Object.prototype.hasOwnProperty.call(v,'$nat')){
-        return '' + v.$nat;
+    if (isNat(v)) {
+        return '' + unboxNat(v);
     }
     var result2 = '';
     if (v.$class) { // branded value
@@ -143,8 +168,8 @@ function toStringQ(v, quote) {
         sortable.sort(function(a, b) { return a.key.localeCompare(b.key); });
         var result2 = '{';
         var first = true;
-        for (var i=0, n=sortable.length; i<n; i = i+1) {
-            if (first) first = false; else result2 += ', ';
+        for (var i=0, n=sortable.length; i<n; i=i+1) {
+            if (first) { first = false; } else { result2 += ', '; }
             result2 += toStringQ(sortable[i].key, quote) + '->' + toStringQ(sortable[i].val, quote);
         }
         result2 += '}';
@@ -155,17 +180,21 @@ function toStringQ(v, quote) {
 /* Record */
 function recConcat(r1, r2) {
     var result = { };
-    for (var key2 in r2)
+    for (var key2 in r2) {
         result[key2] = r2[key2];
-    for (var key1 in r1)
-        if (!(Object.prototype.hasOwnProperty.call(r2,key1)))
+    }
+    for (var key1 in r1) {
+        if (!(Object.prototype.hasOwnProperty.call(r2,key1))) {
             result[key1] = r1[key1];
+        }
+    }
     return result;
 }
 function recMerge(r1, r2) {
     var result = { };
-    for (var key1 in r1)
+    for (var key1 in r1) {
         result[key1] = r1[key1];
+    }
     for (var key2 in r2) {
         if (Object.prototype.hasOwnProperty.call(r1,key2)) {
             if (!equal(r1[key2], r2[key2])) {
@@ -179,16 +208,19 @@ function recMerge(r1, r2) {
 }
 function recRemove(r, f) {
     var result = { };
-    for (var key in r)
-        if (key != f)
+    for (var key in r) {
+        if (key != f) {
             result[key] = r[key];
+        }
+    }
     return result;
 }
 function recProject(r1, p2) {
     var result = { };
     for (var key1 in r1) {
-        if (!(p2.indexOf(key1) === -1))
+        if (!(p2.indexOf(key1) === -1)) {
             result[key1] = r1[key1];
+        }
     }
     return result;
 }
@@ -202,9 +234,9 @@ function recDot(receiver, member) {
 /* Sum */
 function either(v) {
     if (typeof v === 'object') {
-        if (Object.prototype.hasOwnProperty.call(v,'$left')) {
+        if (isLeft(v)) {
             return true;
-        } else if (Object.prototype.hasOwnProperty.call(v,'$right')) {
+        } else if (isRight(v)) {
             return false;
         } else {
             throw new Error('TypeError: either called on non-sum');
@@ -213,14 +245,14 @@ function either(v) {
     throw new Error('TypeError: either called on non-sum');
 }
 function toLeft(v) {
-    if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v,'$left')) {
-        return v.$left;
+    if (typeof v === 'object' && isLeft(v)) {
+        return unboxLeft(v);
     }
     throw new Error('TypeError: toLeft called on non-sum');
 }
 function toRight(v) {
-    if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v,'$right')) {
-        return v.$right;
+    if (typeof v === 'object' && isRight(v)) {
+        return unboxRight(v);
     }
     throw new Error('TypeError: toRight called on non-sum');
 }
@@ -240,30 +272,31 @@ function cast(brands,v) {
     var type = v.$class;
     mustBeArray(type);
     if (brands.length === 1 && brands[0] === 'Any') { /* cast to top of inheritance is built-in */
-        return mkLeft(v);
+        return boxLeft(v);
     }
     brands:
     for (var i in brands) {
         var b = brands[i];
         for (var j in type) {
             var t = type[j];
-            if (equal(t,b) || sub_brand(t,b))
+            if (equal(t,b) || sub_brand(t,b)) {
                 continue brands;
+            }
         }
         /* the brand b does not appear in the type, so the cast fails */
-        return mkRight(null);
+        return boxRight(null);
     }
     /* All brands appear in the type, so the cast succeeds */
-    return mkLeft(v);
+    return boxLeft(v);
 }
 
 /* Collection */
 function distinct(b) {
     var result = [ ];
-    for (var i=0; i<b.length; i = i+1) {
+    for (var i=0; i<b.length; i=i+1) {
         var v = b[i];
         var dup = false;
-        for (var j=0; j<result.length; j = j+1) {
+        for (var j=0; j<result.length; j=j+1) {
             if (equal(v,result[j])) { dup = true; break; }
         }
         if (!(dup)) { result.push(v); } else { dup = false; }
@@ -272,26 +305,29 @@ function distinct(b) {
 }
 function singleton(v) {
     if (v.length === 1) {
-        return mkLeft(v[0]);
+        return boxLeft(v[0]);
     } else {
-        return mkRight(null); /* Not a singleton */
+        return boxRight(null); /* Not a singleton */
     }
 }
 function flatten(aOuter) {
     var result = [ ];
     for (var iOuter=0, nOuter=aOuter.length; iOuter<nOuter; iOuter = iOuter+1) {
         var aInner = aOuter[iOuter];
-        for (var iInner=0, nInner=aInner.length; iInner<nInner; iInner = iInner+1)
+        for (var iInner=0, nInner=aInner.length; iInner<nInner; iInner = iInner+1) {
             result.push(aInner[iInner]);
+        }
     }
     return result;
 }
 function union(b1, b2) {
     var result = [ ];
-    for (var i1=0; i1<b1.length; i1 = i1+1)
+    for (var i1=0; i1<b1.length; i1=i1+1) {
         result.push(b1[i1]);
-    for (var i2=0; i2<b2.length; i2 = i2+1)
+    }
+    for (var i2=0; i2<b2.length; i2=i2+1) {
         result.push(b2[i2]);
+    }
     return result;
 }
 function minus(b1, b2) {
@@ -306,7 +342,7 @@ function minus(b1, b2) {
     for (var i1=0; i1<v1.length; i1=i1+1) {
         while ((i2 < length2) && (compare(v1[i1],v2[i2]) === 1)) i2=i2+1;
         if (i2 < length2) {
-            if(compare(v1[i1],v2[i2]) === (-1)) { result.push(v1[i1]); } else { i2=i2+1; }
+            if (compare(v1[i1],v2[i2]) === (-1)) { result.push(v1[i1]); } else { i2=i2+1; }
         } else {
             result.push(v1[i1]);
         }
@@ -325,7 +361,7 @@ function min(b1, b2) {
     for (var i1=0; i1<v1.length; i1=i1+1) {
         while ((i2 < length2) && (compare(v1[i1],v2[i2]) === 1)) i2=i2+1;
         if (i2 < length2) {
-            if(compare(v1[i1],v2[i2]) === 0) result.push(v1[i1]);
+            if (compare(v1[i1],v2[i2]) === 0) result.push(v1[i1]);
         }
     }
     return result;
@@ -342,7 +378,7 @@ function max(b1, b2) {
     for (var i1=0; i1<v1.length; i1=i1+1) {
         while ((i2 < length2) && (compare(v1[i1],v2[i2]) === 1)) { result.push(v2[i2]); i2=i2+1; }
         if (i2 < length2) {
-            if(compare(v1[i1],v2[i2]) === 0) i2=i2+1;
+            if (compare(v1[i1],v2[i2]) === 0) i2=i2+1;
         }
         result.push(v1[i1]);
     }
@@ -351,34 +387,36 @@ function max(b1, b2) {
 }
 function nth(b1, n) {
     var index = n;
-    if(Object.prototype.hasOwnProperty.call(n,'$nat')){
-        index = n.$nat;
+    if (isNat(n)){
+        index = unboxNat(n);
     }
     if (b1[index]) {
-        return mkLeft(b1[index]);
+        return boxLeft(b1[index]);
     } else {
-        return mkRight(null);
+        return boxRight(null);
     }
 }
 function count(v) {
-    return natBox(v.length);
+    return boxNat(v.length);
 }
 function contains(v, b) {
-    for (var i=0; i<b.length; i = i+1)
-        if (equal(v, toLeft(b[i])))
+    for (var i=0; i<b.length; i=i+1) {
+        if (equal(v, toLeft(b[i]))) {
             return true;
+        }
+    }
     return false;
 }
 function compareOfMultipleCriterias(scl) {
     return function(a,b) {
         var current_compare = 0;
-        for (var i=0; i<scl.length; i = i+1) {
+        for (var i=0; i<scl.length; i=i+1) {
             var sc = scl[i];
             if (Object.prototype.hasOwnProperty.call(sc,'asc')) { current_compare = compare(recDot(a,sc['asc']), recDot(b,sc['asc'])); }
             else if (Object.prototype.hasOwnProperty.call(sc,'desc')) { current_compare = -(compare(recDot(a,sc['asc']), recDot(b,sc['asc']))); }
 
             if (current_compare === -1) { return -1; }
-            else if(current_compare === 1) { return 1; }
+            else if (current_compare === 1) { return 1; }
         }
         return current_compare;
     }
@@ -398,13 +436,13 @@ function groupBy(l) { // Not implemented
 
 /* String */
 function length(v) {
-    return natBox(v.length);
+    return boxNat(v.length);
 }
 function substring(v, start, len) {
-    return v.substring(natUnbox(start),natUnbox(len));
+    return v.substring(unboxNat(start),unboxNat(len));
 }
 function substringEnd(v, start) {
-    return v.substring(natUnbox(start));
+    return v.substring(unboxNat(start));
 }
 function stringJoin(sep, v) {
     return v.join(sep);
@@ -418,86 +456,90 @@ function like(pat, s) {
 
 /* Integer */
 function natLt(v1, v2) {
-    return natUnbox(v1) < natUnbox(v2);
+    return unboxNat(v1) < unboxNat(v2);
 }
 function natLe(v1, v2) {
-    return natUnbox(v1) <= natUnbox(v2);
+    return unboxNat(v1) <= unboxNat(v2);
 }
 function natPlus(v1, v2) {
-    return natBox(natUnbox(v1) + natUnbox(v2));
+    return boxNat(unboxNat(v1) + unboxNat(v2));
 }
 function natMinus(v1, v2) {
-    return natBox(natUnbox(v1) - natUnbox(v2));
+    return boxNat(unboxNat(v1) - unboxNat(v2));
 }
 function natMult(v1, v2) {
-    return natBox(natUnbox(v1) * natUnbox(v2));
+    return boxNat(unboxNat(v1) * unboxNat(v2));
 }
 function natDiv(v1, v2) {
-    return natBox(Math.floor(natUnbox(v1) / natUnbox(v2)));
+    return boxNat(Math.floor(unboxNat(v1) / unboxNat(v2)));
 }
 function natRem(v1, v2) {
-    return natBox(Math.floor(natUnbox(v1) % natUnbox(v2)));
+    return boxNat(Math.floor(unboxNat(v1) % unboxNat(v2)));
 }
 function natAbs(v) {
-    return natBox(Math.abs(natUnbox(v1),natUnbox(v2)));
+    return boxNat(Math.abs(unboxNat(v1),unboxNat(v2)));
 }
 function natLog2(v) {
-    return natBox(Math.floor(Math.log2(natUnbox(v)))); // Default Z.log2 is log_inf, biggest integer lower than log2
+    return boxNat(Math.floor(Math.log2(unboxNat(v)))); // Default Z.log2 is log_inf, biggest integer lower than log2
 }
 function natSqrt(v) {
-    return natBox(Math.floor(Math.sqrt(natUnbox(v)))); // See Z.sqrt biggest integer lower than sqrt
+    return boxNat(Math.floor(Math.sqrt(unboxNat(v)))); // See Z.sqrt biggest integer lower than sqrt
 }
 function natMinPair(v1, v2) {
-    return natBox(Math.min(natUnbox(v1),natUnbox(v2)));
+    return boxNat(Math.min(unboxNat(v1),unboxNat(v2)));
 }
 function natMaxPair(v1, v2) {
-    return natBox(Math.max(natUnbox(v1),natUnbox(v2)));
+    return boxNat(Math.max(unboxNat(v1),unboxNat(v2)));
 }
 function natSum(b) {
     var result = 0;
-    for (var i=0; i<b.length; i = i+1)
-        result += natUnbox(b[i]);
-    return natBox(result);
+    for (var i=0; i<b.length; i=i+1) {
+        result += unboxNat(b[i]);
+    }
+    return boxNat(result);
 }
 function natMin(b) {
     var numbers = [ ];
-    for (var i=0; i<b.length; i = i+1)
-        numbers.push(natUnbox(b[i]));
-    return natBox(Math.min.apply(Math,numbers));
+    for (var i=0; i<b.length; i=i+1) {
+        numbers.push(unboxNat(b[i]));
+    }
+    return boxNat(Math.min.apply(Math,numbers));
 }
 function natMax(b) {
     var numbers = [ ];
-    for (var i=0; i<b.length; i = i+1)
-        numbers.push(natUnbox(b[i]));
-    return natBox(Math.max.apply(Math,numbers));
+    for (var i=0; i<b.length; i=i+1) {
+        numbers.push(unboxNat(b[i]));
+    }
+    return boxNat(Math.max.apply(Math,numbers));
 }
 function natArithMean(b) {
     var len = b.length;
-    if(len === 0) {
-        return natBox(0);
+    if (len === 0) {
+        return boxNat(0);
     } else {
-        return natBox(Math.floor(natSum(b)/len));
+        return boxNat(Math.floor(natSum(b)/len));
     }
 }
 function floatOfNat(v) {
-    return natUnbox(v);
+    return unboxNat(v);
 }
 
 /* Float */
 function floatSum(b) {
     var result = 0;
-    for (var i=0; i<b.length; i = i+1)
+    for (var i=0; i<b.length; i=i+1) {
         result += b[i];
+    }
     return result;
 }
 function floatArithMean(b) {
     var len = b.length;
-    if(len === 0) {
+    if (len === 0) {
         return 0;
     } else {
         return floatSum(b)/len;
     }
 }
 function natOfFloat(v) {
-    return natBox(Math.trunc(v));
+    return boxNat(Math.trunc(v));
 }
