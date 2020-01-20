@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +12,7 @@
  * limitations under the License.
  *)
 
-(* This includes some rewrites/simplification rules for the Nested relational calculus *)
+(* This includes some rewrites/simplification rules for NNRSimp *)
 
 Require Import String.
 Require Import List.

@@ -92,6 +92,7 @@ Section EJsonRuntimeOperators.
     (* Float *)
     | EJsonRuntimeFloatSum : ejson_runtime_op
     | EJsonRuntimeFloatArithMean : ejson_runtime_op
+    | EJsonRuntimeNatOfFloat : ejson_runtime_op
     (* Foreign *)
     | EJsonRuntimeForeign (fop:foreign_ejson_runtime_op) : ejson_runtime_op
     .
@@ -162,6 +163,7 @@ Section EJsonRuntimeOperators.
       (* Float *)
       | EJsonRuntimeFloatSum => "floatSum"
       | EJsonRuntimeFloatArithMean => "floatArithMean"
+      | EJsonRuntimeNatOfFloat => "natOfFloat"
       (* Foreign *)
       | EJsonRuntimeForeign fop => toString fop
       end.
@@ -771,6 +773,13 @@ Section EJsonRuntimeOperators.
                  Some (ejnumber (float_list_arithmean nl))
                | None => None
                end
+             | _ => None
+             end) dl
+      | EJsonRuntimeNatOfFloat =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejnumber f => Some (ejbigint (float_truncate f))
              | _ => None
              end) dl
       (* Foreign *)

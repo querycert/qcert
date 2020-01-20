@@ -14,17 +14,9 @@
 
 Require Import String.
 Require Import List.
-Require Import Arith.
-Require Import EquivDec.
-Require Import Morphisms.
-Require Import Arith.
 Require Import ZArith.
-Require Import ZArith.BinIntDef.
-Require Import Max.
 Require Import Bool.
-Require Import Peano_dec.
 Require Import EquivDec.
-Require Import Decidable.
 Require Import Utils.
 Require Import Imp.
 

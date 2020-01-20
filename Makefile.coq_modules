@@ -245,6 +245,7 @@ MODULES = \
 	Imp/Lang/Imp \
 	Imp/Lang/ImpSize \
 	Imp/Lang/ImpEval \
+	Imp/Lang/ImpEq \
 	Imp/Lang/ImpData \
 	Imp/Lang/ImpDataSize \
 	Imp/Lang/ImpDataEval \

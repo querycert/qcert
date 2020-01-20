@@ -217,7 +217,7 @@ Section ImpDatatoImpEJson.
               | FloatAbs => EJsonOpMathAbs
               end
           in mk_imp_ejson_op op [ e ]
-        | OpFloatTruncate => mk_imp_ejson_op EJsonOpMathTrunc [ e ]
+        | OpFloatTruncate => mk_imp_ejson_runtime_call EJsonRuntimeNatOfFloat [ e ]
         | OpFloatSum => mk_imp_ejson_runtime_call EJsonRuntimeFloatSum el
         | OpFloatMean => mk_imp_ejson_runtime_call EJsonRuntimeFloatArithMean el
         | OpFloatBagMin => mk_imp_ejson_op EJsonOpMathMinApply [ e ]

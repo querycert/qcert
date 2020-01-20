@@ -274,7 +274,7 @@ Section EJsonOperators.
         end
       | EJsonOpMathTrunc =>
         match j with
-        | [ejnumber n] => Some (ejbigint (float_truncate n))
+        | [ejnumber n] => Some (ejnumber (float_of_int (float_truncate n))) (* XXX yields a number to be consistent with JS semantics *)
         | _ => None
         end
       end.
