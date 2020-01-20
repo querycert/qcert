@@ -503,3 +503,6 @@ function floatArithMean(b) {
         return floatSum(b)/len;
     }
 }
+function natOfFloat(v) {
+    return natBox(Math.trunc(v));
+}

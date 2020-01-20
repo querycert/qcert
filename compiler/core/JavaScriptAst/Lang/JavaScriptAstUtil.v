@@ -43,7 +43,7 @@ Section JavaScriptAstUtil.
          (fun s => Some (expr_literal (literal_string s)))
          sl).
 
-  Definition call_js_function (f: string) (args: list expr) : expr:= (* TODO: review *)
+  Definition call_js_function (f: string) (args: list expr) : expr := (* TODO: review *)
     expr_call (expr_identifier f) args.
 
   Definition call_runtime := call_js_function.
