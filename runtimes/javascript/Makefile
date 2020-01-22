@@ -15,8 +15,8 @@
 ############# Shouldn't have to be changed after this
 all: qcert-runtime.js qcert_runtime.ml
 
-qcert-runtime.js: qcert-runtime-core.js qcert-runtime-sql-date.js qcert-runtime-uri.js
-	(for i in qcert-runtime-core.js qcert-runtime-sql-date.js qcert-runtime-uri.js; do \
+qcert-runtime.js: qcert-runtime-core.js qcert-runtime-tostring.js qcert-runtime-sql-date.js qcert-runtime-uri.js
+	(for i in qcert-runtime-core.js qcert-runtime-tostring.js qcert-runtime-sql-date.js qcert-runtime-uri.js; do \
          cat $$i; \
          done) > qcert-runtime.js
 

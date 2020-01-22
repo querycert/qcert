@@ -116,66 +116,6 @@ function compare(v1, v2) {
     }
     return 0;
 }
-function toString(v) {
-    return toStringQ(v, '');
-}
-function toText(v) {
-    return toStringQ(v, '');
-}
-function toStringQ(v, quote) {
-    if (v === null) {
-        return 'null';
-    }
-    var t = typeof v;
-    if (t === 'string') {
-        return quote + v + quote;
-    }
-    if (t === 'boolean') {
-        return '' + v;
-    }
-    if (t === 'number') {
-        if (Math.floor(v) === v) { return (new Number(v)).toFixed(1); } // Make sure there is always decimal point
-        else { return '' + v; }
-    }
-    if ({}.toString.apply(v) === '[object Array]') {
-        v = v.slice();
-        v.sort();
-        var result = '[';
-        for (var i=0, n=v.length; i<n; i=i+1) {
-            if (i > 0) {
-                result += ', ';
-            }
-            result += toStringQ(v[i], quote);
-        }
-        return result + ']';
-    }
-    if (isNat(v)) {
-        return '' + unboxNat(v);
-    }
-    var result2 = '';
-    if (v.$class) { // branded value
-        result2 += '<';
-        result2 += v.$class;
-        result2 += ':';
-        result2 += toStringQ(v.$data, quote);
-        result2 += '>';
-    } else { // record
-        // First need to sort
-        var sortable = [];
-        for (var key in v) {
-            sortable.push({ key: key, val: v[key] });
-        }
-        sortable.sort(function(a, b) { return a.key.localeCompare(b.key); });
-        var result2 = '{';
-        var first = true;
-        for (var i=0, n=sortable.length; i<n; i=i+1) {
-            if (first) { first = false; } else { result2 += ', '; }
-            result2 += toStringQ(sortable[i].key, quote) + '->' + toStringQ(sortable[i].val, quote);
-        }
-        result2 += '}';
-    }
-    return result2 + '';
-}
 
 /* Record */
 function recConcat(r1, r2) {
