@@ -80,10 +80,10 @@ Section SortBy.
   Open Scope Z_scope.
   Definition persons :=
     mkpersons
-      (("John",23,1008,"IBM")
-         :: ("Jane",24,1009,"AIG")
-         :: ("Jill",25,1010,"IBM")
-         :: ("Jack",27,1010,"CMU")
+      (("John",23,1008,"ACME")
+         :: ("Jane",24,1009,"AIGO")
+         :: ("Jill",25,1010,"ACME")
+         :: ("Jack",27,1010,"CMUD")
          :: nil)%string.
 
   (*

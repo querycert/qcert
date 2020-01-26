@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -95,7 +93,7 @@ Section NRATest.
            match x with (name, age, zip, company) => mkperson name age zip company
            end) l.
 
-  Definition p1 := mkperson "John" 23 1008 "IBM".
+  Definition p1 := mkperson "John" 23 1008 "ACME".
   Definition p2 := mkperson "Jane" 24 1009 "AIG".
 
   Definition myc x1 x2 :=
@@ -111,9 +109,9 @@ Section NRATest.
 
   Definition persons :=
     mkpersons
-      (("John",23,1008,"IBM")
+      (("John",23,1008,"ACME")
          :: ("Jane",24,1009,"AIG")
-         :: ("Jill",25,1010,"IBM")
+         :: ("Jill",25,1010,"ACME")
          :: ("Jack",27,1010,"CMU")
          :: nil).
   
@@ -122,7 +120,7 @@ Section NRATest.
   (* Company table *)
 
   Definition companies : data :=
-    {| [|("cname", dstring "IBM"); ("stock", dnat 200); ("ticker", dstring "IBM") |];
+    {| [|("cname", dstring "ACME"); ("stock", dnat 200); ("ticker", dstring "ACME") |];
        [|("cname", dstring "AIG"); ("stock", dnat 20);  ("ticker", dstring "AIG") |];
        [|("cname", dstring "AMD"); ("stock", dnat 25);  ("ticker", dstring "AMD") |] |}.
 

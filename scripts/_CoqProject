@@ -1,3 +1,0 @@
--R bin ""
-KOPITIAM_0 = "DefaultOutput bin"
-KOPITIAM_1 = "AbstractLoadPath dk.itu.sdg.kopitiam/lp/coq/8.4"

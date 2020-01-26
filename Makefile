@@ -30,12 +30,12 @@ all:
 build: 
 	@$(MAKE) qcert-compiler
 	@$(MAKE) MAKEFLAGS= qcert-runtimes
-	@$(MAKE) MAKEFLAGS= qcert-clis
+	@$(MAKE) MAKEFLAGS= qcert-cli
 
 clean: Makefile.coq remove_all_derived
 	- @$(MAKE) clean-qcert-compiler
 	- @$(MAKE) clean-runtimes
-	- @$(MAKE) clean-clis
+	- @$(MAKE) clean-cli
 	- @$(MAKE) clean-demo
 	- @$(MAKE) clean-test
 	- @rm -f Makefile.coq
@@ -44,7 +44,7 @@ clean: Makefile.coq remove_all_derived
 cleanmost: Makefile.coq
 	- @$(MAKE) cleanmost-qcert-compiler
 	- @$(MAKE) cleanall-runtimes
-	- @$(MAKE) cleanall-clis
+	- @$(MAKE) cleanall-cli
 	- @$(MAKE) cleanall-demo
 	- @$(MAKE) cleanall-test
 	- @rm -f Makefile.coq
@@ -67,10 +67,10 @@ ifneq ($(JAVASCRIPT),)
 endif
 
 install-ocaml:
-	@$(MAKE) -C clis/ocaml install
+	@$(MAKE) -C cli/ocaml install
 
 install-javascript:
-	@$(MAKE) -C clis/nodejs install
+	@$(MAKE) -C cli/nodejs install
 
 ## Opam
 
@@ -89,25 +89,25 @@ ifneq ($(JAVASCRIPT),)
 	@$(MAKE) MAKEFLAGS= qcert-javascript
 endif
 ifneq ($(JAVA),)
-	@$(MAKE) MAKEFLAGS= qcert-parsersJava
+	@$(MAKE) MAKEFLAGS= qcert-parsingJava
 endif
 
 clean-qcert-compiler:
 	- @$(MAKE) clean-configure
 	- @$(MAKE) clean-qcert-coq
 	- @$(MAKE) clean-qcert-ocaml
-	- @$(MAKE) clean-parsersJava
+	- @$(MAKE) clean-parsingJava
 
 cleanall-qcert-compiler:
 	- @$(MAKE) cleanall-configure
 	- @$(MAKE) cleanall-qcert-coq
 	- @$(MAKE) cleanall-qcert-ocaml
-	- @$(MAKE) cleanall-parsersJava
+	- @$(MAKE) cleanall-parsingJava
 
 cleanmost-qcert-compiler:
 	- @$(MAKE) cleanall-configure
 	- @$(MAKE) cleanall-qcert-ocaml
-	- @$(MAKE) cleanmost-parsersJava
+	- @$(MAKE) cleanmost-parsingJava
 
 
 ## Configure
@@ -183,7 +183,7 @@ qcert-javascript:
 
 ## Java Parsers
 
-qcert-parsersJava:
+qcert-parsingJava:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building Java Parsers"
 	@echo "[Q*cert] "
@@ -191,48 +191,48 @@ ifneq ($(SQL),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] SQL Parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler/parsersJava/sqlParser
+	@$(MAKE) -C compiler/parsingJava/sqlParser
 endif
 ifneq ($(SQLPP),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] SQL++ Parser"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler/parsersJava/sqlppParser
+	@$(MAKE) -C compiler/parsingJava/sqlppParser
 endif
 ifneq ($(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] ODM Rules Parsers"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler/parsersJava/jrulesParser
+	@$(MAKE) -C compiler/parsingJava/jrulesParser
 endif
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Installing Parser Service"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler/parsersJava/javaService all install
+	@$(MAKE) -C compiler/parsingJava/javaService all install
 endif
 
-clean-parsersJava:
-	- @$(MAKE) -C compiler/parsersJava/javaService clean
-	- @$(MAKE) -C compiler/parsersJava/sqlParser clean
-	- @$(MAKE) -C compiler/parsersJava/sqlppParser clean
-	- @$(MAKE) -C compiler/parsersJava/jrulesParser clean
+clean-parsingJava:
+	- @$(MAKE) -C compiler/parsingJava/javaService clean
+	- @$(MAKE) -C compiler/parsingJava/sqlParser clean
+	- @$(MAKE) -C compiler/parsingJava/sqlppParser clean
+	- @$(MAKE) -C compiler/parsingJava/jrulesParser clean
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
-cleanall-parsersJava:
-	- @$(MAKE) -C compiler/parsersJava/javaService cleanall
-	- @$(MAKE) -C compiler/parsersJava/sqlParser cleanall
-	- @$(MAKE) -C compiler/parsersJava/sqlppParser cleanall
-	- @$(MAKE) -C compiler/parsersJava/jrulesParser cleanall
+cleanall-parsingJava:
+	- @$(MAKE) -C compiler/parsingJava/javaService cleanall
+	- @$(MAKE) -C compiler/parsingJava/sqlParser cleanall
+	- @$(MAKE) -C compiler/parsingJava/sqlppParser cleanall
+	- @$(MAKE) -C compiler/parsingJava/jrulesParser cleanall
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
-cleanmost-parsersJava:
-	- @$(MAKE) -C compiler/parsersJava/javaService cleanmost
-	- @$(MAKE) -C compiler/parsersJava/sqlParser cleanmost
-	- @$(MAKE) -C compiler/parsersJava/sqlppParser cleanmost
-	- @$(MAKE) -C compiler/parsersJava/jrulesParser cleanmost
+cleanmost-parsingJava:
+	- @$(MAKE) -C compiler/parsingJava/javaService cleanmost
+	- @$(MAKE) -C compiler/parsingJava/sqlParser cleanmost
+	- @$(MAKE) -C compiler/parsingJava/sqlppParser cleanmost
+	- @$(MAKE) -C compiler/parsingJava/jrulesParser cleanmost
 	- @rm -rf bin/services
 	- @rm -f bin/javaService.jar
 
@@ -285,10 +285,10 @@ cleanall-runtimes:
 	- @rm -f bin/javaRunner.jar
 
 
-## CLIs
-qcert-clis:
+## CLI
+qcert-cli:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Building CLIs"
+	@echo "[Q*cert] Building CLI"
 	@echo "[Q*cert] "
 	@$(MAKE) ocaml-cli
 ifneq ($(JAVASCRIPT),)
@@ -302,30 +302,30 @@ ocaml-cli:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] OCaml CLI"
 	@echo "[Q*cert] "
-	@$(MAKE) -C clis/ocaml all
+	@$(MAKE) -C cli/ocaml all
 
 javascript-cli:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Node.js CLI"
 	@echo "[Q*cert] "
-	@$(MAKE) -C clis/nodejs all
+	@$(MAKE) -C cli/nodejs all
 
 java-cli:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Java CLI"
 	@echo "[Q*cert] "
-	@$(MAKE) -C clis/java all install
+	@$(MAKE) -C cli/java all install
 
-clean-clis:
-	- @$(MAKE) -C clis/ocaml clean
-	- @$(MAKE) -C clis/nodejs clean
-	- @$(MAKE) -C clis/java clean
+clean-cli:
+	- @$(MAKE) -C cli/ocaml clean
+	- @$(MAKE) -C cli/nodejs clean
+	- @$(MAKE) -C cli/java clean
 	- @rm -f bin/javaRunner.jar
 
-cleanall-clis:
-	- @$(MAKE) -C clis/ocaml cleanall
-	- @$(MAKE) -C clis/nodejs cleanall
-	- @$(MAKE) -C clis/java cleanall
+cleanall-cli:
+	- @$(MAKE) -C cli/ocaml cleanall
+	- @$(MAKE) -C cli/nodejs cleanall
+	- @$(MAKE) -C cli/java cleanall
 	- @rm -f bin/javaRunner.jar
 
 

@@ -1,6 +1,4 @@
 #
-# Copyright 2015-2016 IBM Corporation
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,12 +18,13 @@ include ../../Makefile.config
 include ../../Makefile.coq_modules
 
 ## Toplevel
-all: ./core.ml
+all: core.ml
 
 ## Extraction
-VO_FILES = $(MODULES:%=../src/%.vo)
+VO_FILES = $(MODULES:%=../core/%.vo)
 
-./core.ml ./core.mli:
+core.ml core.mli:
+	echo $(VO_FILES)
 	coqc -R ../core Qcert ./QcertExtraction.v
 
 ## Clean

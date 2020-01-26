@@ -55,9 +55,8 @@ Section UExample.
 
   (* Removes a person *)
   Definition u3 :=
-    Δbinop AMinus (mkpersons (("John",23,1008,"IBM") :: nil)).
+    Δbinop AMinus (mkpersons (("John",23,1008,"ACME") :: nil)).
 
   Eval compute in (update u3 persons).
 
 End UExample.
-

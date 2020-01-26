@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +95,7 @@ Section OQLTest.
            match x with (name, age, zip, company) => mkemployee name age zip company
            end) l.
 
-  Definition p1 := mkemployee "John" 23 1008 "IBM".
+  Definition p1 := mkemployee "John" 23 1008 "ACME".
   Definition p2 := mkemployee "Jane" 24 1009 "AIG".
 
   Definition myc x1 x2 :=
@@ -113,9 +111,9 @@ Section OQLTest.
 
   Definition employees :=
     mkemployees
-      (("John",23,1008,"IBM")
+      (("John",23,1008,"ACME")
          :: ("Jane",24,1009,"AIG")
-         :: ("Jill",25,1010,"IBM")
+         :: ("Jill",25,1010,"ACME")
          :: ("Jack",27,1010,"CMU")
          :: nil).
   
@@ -124,7 +122,7 @@ Section OQLTest.
   (* Company table *)
 
   Definition companies : data :=
-    {| dbrand ("Company"::nil) [|("cname", dstring "IBM"); ("stock", dnat 200); ("ticker", dstring "IBM");
+    {| dbrand ("Company"::nil) [|("cname", dstring "ACME"); ("stock", dnat 200); ("ticker", dstring "ACME");
                                  ("departments", dcoll ((dstring "Cloud") :: (dstring "Cognitive") :: nil)) |];
        dbrand ("Company"::nil) [|("cname", dstring "AIG"); ("stock", dnat 20);  ("ticker", dstring "AIG");
                                  ("departments", dcoll ((dstring "Insurance") :: (dstring "Derivatives") :: nil)) |];

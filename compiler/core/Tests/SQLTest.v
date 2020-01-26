@@ -1,6 +1,4 @@
 (*
- * Copyright 2015-2016 IBM Corporation
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,7 +99,7 @@ Section SQLTest.
            match x with (name, age, zip, company, position) => mkperson name age zip company position
            end) l.
 
-  Definition p1 := mkperson "John" 23 1008 "IBM" "CEO".
+  Definition p1 := mkperson "John" 23 1008 "ACME" "CEO".
   Definition p2 := mkperson "Jane" 24 1009 "AIG" "CFO".
 
   Definition mkpersons l :=
@@ -109,14 +107,14 @@ Section SQLTest.
 
   Definition persons :=
     mkpersons
-      (("John",30,1008,"IBM", "CEO")
+      (("John",30,1008,"ACME", "CEO")
          :: ("Jane",12,1009,"AIG", "CFO")
          :: ("Joan",30,1008,"AIG", "CEO")
          :: ("Jade",30,1008,"AIG", "VP Sales")
          :: ("Jacques",30,1008,"AIG", "VP Compliance")
-         :: ("Jill",25,1010,"IBM", "CFO")
-         :: ("Joo",24,1010,"IBM", "VP Engineering")
-         :: ("Just",12,1010,"IBM", "VP M&A")
+         :: ("Jill",25,1010,"ACME", "CFO")
+         :: ("Joo",24,1010,"ACME", "VP Engineering")
+         :: ("Just",12,1010,"ACME", "VP M&A")
          :: ("Jack",56,1010,"Apricot", "CEO")
          :: ("Jerome",56,1010,"Apricot", "Dean")
          :: nil).
@@ -126,7 +124,7 @@ Section SQLTest.
   (* Company table *)
 
   Definition companies : data :=
-    {| [|("cname", dstring "IBM"); ("stock", dnat 200); ("ticker", dstring "IBM") |];
+    {| [|("cname", dstring "ACME"); ("stock", dnat 200); ("ticker", dstring "ACME") |];
        [|("cname", dstring "AIG"); ("stock", dnat 20);  ("ticker", dstring "AIG") |];
        [|("cname", dstring "AMD"); ("stock", dnat 25);  ("ticker", dstring "AMD") |];
        [|("cname", dstring "Apricot"); ("stock", dnat 135);  ("ticker", dstring "APR") |] |}.
@@ -193,13 +191,13 @@ Section SQLTest.
   (* sql4:
        select name
        from persons
-       where company = 'IBM'
+       where company = 'ACME'
        order by age *)
   Definition sql4 :=
     SQuery (SSelectColumn "name"::nil)
            (SFromTable "persons"::nil)
            (Some (SCondBinary SEq (SExprColumn "company")
-                              (SExprConst (dstring "IBM"))))
+                              (SExprConst (dstring "ACME"))))
            None (Some (("age",Ascending)::nil)).
 
   Definition sql4_vars := sql_query_free_variables sql4.
@@ -238,13 +236,13 @@ Section SQLTest.
          from
             ( select name
               from persons
-              where company = 'IBM'
-              order by age ) as IBMers
+              where company = 'ACME'
+              order by age ) as ACMEers
    *)
   Definition sql7 :=
     SQuery (SSelectExpr ""
                         (SExprAggExpr SCount SExprStar)::nil)
-           (SFromQuery ("IBMers",None) sql4 :: nil) None None None.
+           (SFromQuery ("ACMEers",None) sql4 :: nil) None None None.
 
   Definition sql7_vars := sql_query_free_variables sql7.
   
@@ -336,13 +334,13 @@ Section SQLTest.
   (* sql13:
        select name
        from persons
-       where company = 'IBM'
+       where company = 'ACME'
        order by age *)
   Definition sql13 :=
     SQuery (SSelectColumn "name"::SSelectColumn "age"::nil)
            (SFromTable "persons"::nil)
            (Some (SCondBinary SEq (SExprColumn "company")
-                              (SExprConst (dstring "IBM"))))
+                              (SExprConst (dstring "ACME"))))
            None (Some (("age",Ascending)::nil)).
 
   Definition sql13_vars := sql_query_free_variables sql13.
@@ -355,12 +353,12 @@ Section SQLTest.
            from
               ( select name,age
                 from persons
-                where company = 'IBM'
+                where company = 'ACME'
                 order by age ) as (nom,age)
    *)
   Definition sql14 :=
     SQuery (SSelectColumn "nom"::nil)
-           (SFromQuery ("IBMers",Some ("nom"::"age"::nil)) sql13 :: nil)
+           (SFromQuery ("ACMEers",Some ("nom"::"age"::nil)) sql13 :: nil)
            None None None.
 
   Definition sql14_vars := sql_query_free_variables sql14.
