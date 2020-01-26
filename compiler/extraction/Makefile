@@ -23,8 +23,7 @@ all: core.ml
 ## Extraction
 VO_FILES = $(MODULES:%=../core/%.vo)
 
-core.ml core.mli:
-	echo $(VO_FILES)
+core.ml core.mli: $(VO_FILES)
 	coqc -R ../core Qcert ./QcertExtraction.v
 
 ## Clean
