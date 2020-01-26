@@ -22,6 +22,7 @@ Require Import OperatorsUtils.
 Require Import BrandRelation.
 Require Import ForeignEJson.
 Require Import EJson.
+Require Import EJsonGroupBy.
 Require Import ForeignEJsonRuntime.
 Require Import DataSort.
 
@@ -135,7 +136,7 @@ Section EJsonRuntimeOperators.
       | EJsonRuntimeCount => "count"
       | EJsonRuntimeContains => "contains"
       | EJsonRuntimeSort => "sort"
-      | EJsonRuntimeGroupBy => "groupBy" (* XXX TODO: to check XXX *)
+      | EJsonRuntimeGroupBy => "groupBy"
       (* String *)
       | EJsonRuntimeLength => "length"
       | EJsonRuntimeSubstring => "substring"
@@ -525,7 +526,26 @@ Section EJsonRuntimeOperators.
              | _ => None
              end) dl
       | EJsonRuntimeSort => None (* XXX TODO *)
-      | EJsonRuntimeGroupBy => None (* XXX TODO *)
+      | EJsonRuntimeGroupBy =>
+        apply_ternary
+          (fun d1 d2 d3 =>
+             match d3 with
+             | ejarray l =>
+               match d1 with
+               | ejstring g =>
+                 match d2 with
+                 | ejarray sl =>
+                   match of_string_list sl with
+                   | Some kl =>
+                     lift ejarray (ejson_group_by_nested_eval_table g kl l)
+                   | None => None
+                   end
+                 | _ => None
+                 end
+               | _ => None
+               end
+             | _ => None
+             end) dl
       (* String *)
       | EJsonRuntimeLength =>
         apply_unary

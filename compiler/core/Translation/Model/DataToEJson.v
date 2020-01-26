@@ -447,6 +447,20 @@ Section DataToEJson.
     Qed.
 
     (** For project operator *)
+    Lemma map_rproject_key_encode_correct l pl:
+      map (fun x : string * data => (key_encode (fst x), data_to_ejson (snd x))) (rproject l pl) =
+      rproject (map (fun x : string * data => (key_encode (fst x), data_to_ejson (snd x))) l) (map key_encode pl).
+    Proof.
+      induction l; simpl; [try reflexivity|];
+        destruct a; simpl.
+      destruct (in_dec string_dec s pl);
+        destruct (in_dec string_dec (key_encode s) (map key_encode pl)); subst.
+      + simpl; rewrite IHl; reflexivity.
+      + apply in_map_key_encode in i; congruence.
+      + apply in_map_key_encode_inv in i; congruence.
+      + assumption.
+    Qed.
+
     Lemma rproject_key_encode_comm d pl:
       match match d with
             | drec r => Some (drec (rproject r pl))
@@ -470,14 +484,7 @@ Section DataToEJson.
       destruct d; try reflexivity.
       - rewrite of_string_list_map_ejstring.
         rewrite ejson_record_of_record; simpl; f_equal; f_equal.
-        induction l; simpl; [try reflexivity|];
-          destruct a; simpl.
-        destruct (in_dec string_dec s pl);
-          destruct (in_dec string_dec (key_encode s) (map key_encode pl)); subst.
-        + simpl; rewrite IHl; reflexivity.
-        + apply in_map_key_encode in i; congruence.
-        + apply in_map_key_encode_inv in i; congruence.
-        + assumption.
+        apply map_rproject_key_encode_correct.
       - destruct d; reflexivity.
       - destruct d; reflexivity.
       - simpl. rewrite ejson_brands_map_ejstring; reflexivity.
@@ -939,7 +946,278 @@ Section DataToEJson.
       rewrite bminus_ejson_to_data_comm.
       reflexivity.
     Qed.
-    
+
+    (** For groupby *)
+    Definition data_to_ejson_partition (l:list (data * list data)) : list (ejson * list ejson) :=
+      (map (fun xy => (data_to_ejson (fst xy),
+                       (map data_to_ejson (snd xy))))) l.
+
+    Lemma ejson_lift_map_rproject_correct kl l:
+      lift (map data_to_ejson)
+           (lift_map (fun d : data => match d with
+                                      | drec r => Some (drec (rproject r kl))
+                                      | _ => None
+                                      end) l)
+      =
+      lift_map
+        (fun d : ejson =>
+           match ejson_is_record d with
+           | Some r => Some (ejobject (rproject r (map key_encode kl)))
+           | None => None
+           end) (map data_to_ejson l).
+    Proof.
+      induction l; try reflexivity; unfold lift in *; simpl in *.
+      rewrite <- IHl; clear IHl.
+      destruct (lift_map (fun d : data => match d with
+                                    | drec r => Some (drec (rproject r kl))
+                                    | _ => None
+                                          end) l); try reflexivity.
+      destruct a; try reflexivity.
+      rewrite ejson_record_of_record; simpl.
+      - f_equal; f_equal; f_equal.
+        apply map_rproject_key_encode_correct.
+      - destruct a; reflexivity.
+      - destruct a; reflexivity.
+      - simpl; rewrite ejson_brands_map_ejstring; reflexivity.
+      - destruct a; try reflexivity;
+        try (rewrite ejson_record_of_record; try reflexivity).
+        + destruct a; reflexivity.
+        + destruct a; reflexivity.
+        + simpl; rewrite ejson_brands_map_ejstring; reflexivity.
+    Qed.
+
+    Lemma data_to_ejson_drec_inv  kl l:
+      ejobject (map (fun x : string * data => (key_encode (fst x), data_to_ejson (snd x))) (rproject l kl))
+      = data_to_ejson (drec (rproject l kl)).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma ejson_key_is_eq_r_correct kl a a0:
+      (key_is_eq_r (fun d : data => match d with
+                                    | drec r => Some (drec (rproject r kl))
+                                    | _ => None
+                                    end) a0 a)
+      =
+      ejson_key_is_eq_r
+        (fun j : ejson =>
+           match ejson_is_record j with
+           | Some r => Some (ejobject (rproject r (map key_encode kl)))
+           | None => None
+           end) (data_to_ejson a0) (data_to_ejson a).
+    Proof.
+      unfold key_is_eq_r.
+      unfold ejson_key_is_eq_r.
+      destruct a0; try reflexivity.
+      - rewrite ejson_record_of_record.
+        rewrite <- map_rproject_key_encode_correct.
+        unfold olift2.
+        rewrite data_to_ejson_drec_inv.
+        generalize (drec (rproject l kl)); intros.
+        case_eq (data_eq_dec d a);
+          case_eq (ejson_eq_dec (data_to_ejson d) (data_to_ejson a)); intros; try congruence.
+        clear H.
+        apply data_to_ejson_inv in e.
+        subst. congruence.
+      - simpl; destruct (data_to_ejson a0); try reflexivity.
+      - simpl; destruct (data_to_ejson a0); try reflexivity.
+      - simpl; rewrite ejson_brands_map_ejstring; reflexivity.
+    Qed.
+
+    Lemma ejson_group_of_key_correct kl a l1:
+      lift (map data_to_ejson)
+           (group_of_key (fun d : data => match d with
+                                          | drec r => Some (drec (rproject r kl))
+                                          | _ => None
+                                          end) a l1) =
+      ejson_group_of_key
+        (fun j : ejson =>
+           match ejson_is_record j with
+           | Some r => Some (ejobject (rproject r (map key_encode kl)))
+           | None => None
+           end) (data_to_ejson a) (map data_to_ejson l1).
+    Proof.
+      unfold group_of_key.
+      unfold ejson_group_of_key.
+      unfold lift; simpl.
+      induction l1; try reflexivity; simpl in *.
+      rewrite <- ejson_key_is_eq_r_correct.
+      destruct (key_is_eq_r (fun d : data => match d with
+                                   | drec r => Some (drec (rproject r kl))
+                                   | _ => None
+                                             end) a0 a); try reflexivity.
+      rewrite <- IHl1; clear IHl1.
+      destruct (lift_filter
+        (fun d : data =>
+         key_is_eq_r (fun d0 : data => match d0 with
+                                       | drec r => Some (drec (rproject r kl))
+                                       | _ => None
+                                       end) d a) l1); try reflexivity.
+      destruct b; reflexivity.
+    Qed.
+
+    Lemma ejson_lift_map_group_of_key_correct kl l1 l2:
+      lift data_to_ejson_partition
+           (lift_map
+              (fun k : data =>
+                 match
+                   group_of_key (fun d : data => match d with
+                                                 | drec r => Some (drec (rproject r kl))
+                                                 | _ => None
+                                                 end) k l1
+                 with
+                 | Some x' => Some (k, x')
+                 | None => None
+                 end) l2)
+      = lift_map
+          (fun k : ejson =>
+             match
+               ejson_group_of_key
+                 (fun j : ejson =>
+                    match ejson_is_record j with
+                    | Some r => Some (ejobject (rproject r (map key_encode kl)))
+                    | None => None
+                    end) k (map data_to_ejson l1)
+             with
+             | Some x' => Some (k, x')
+             | None => None
+             end) (map data_to_ejson l2).
+    Proof.
+      unfold lift.
+      induction l2; try reflexivity; simpl.
+      rewrite <- ejson_group_of_key_correct.
+      destruct (group_of_key (fun d : data => match d with
+                                      | drec r => Some (drec (rproject r kl))
+                                      | _ => None
+                                              end) a l1); try reflexivity; simpl.
+      rewrite <- IHl2; clear IHl2.
+      unfold lift; simpl in *.
+      destruct (lift_map
+        (fun k : data =>
+         match
+           group_of_key (fun d : data => match d with
+                                         | drec r => Some (drec (rproject r kl))
+                                         | _ => None
+                                         end) k l1
+         with
+         | Some x' => Some (k, x')
+         | None => None
+         end) l2); reflexivity.
+    Qed.
+
+    Lemma ejson_group_by_nested_eval_correct kl l:
+      lift data_to_ejson_partition
+           (group_by_nested_eval
+              (fun d : data => match d with
+                               | drec r => Some (drec (rproject r kl))
+                               | _ => None
+                               end) l)
+      =
+      (ejson_group_by_nested_eval
+         (fun j : ejson =>
+            match ejson_is_record j with
+            | Some r => Some (ejobject (rproject r (map key_encode kl)))
+            | None => None
+            end) (map data_to_ejson l)).
+    Proof.
+      unfold group_by_nested_eval.
+      unfold ejson_group_by_nested_eval.
+      unfold olift, lift; simpl.
+      rewrite <- ejson_lift_map_rproject_correct.
+      destruct (lift_map (fun d : data => match d with
+                                          | drec r => Some (drec (rproject r kl))
+                                          | _ => None
+                                          end) l); try reflexivity.
+      simpl.
+      rewrite <- bdistinct_ejson_to_data_comm.
+      generalize (bdistinct l0); intros.
+      specialize (ejson_lift_map_group_of_key_correct kl l1); intros.
+      rewrite <- ejson_lift_map_group_of_key_correct.
+      reflexivity.
+    Qed.
+
+    Lemma ejson_group_to_partitions_correct g a:
+      lift data_to_ejson (group_to_partitions g a)
+      =
+      ejson_group_to_partitions (key_encode g) (data_to_ejson (fst a), map data_to_ejson (snd a)).
+    Proof.
+      destruct a; simpl in *.
+      unfold lift.
+      unfold group_to_partitions.
+      unfold ejson_group_to_partitions.
+      simpl.
+      destruct d; try reflexivity.
+      - rewrite ejson_record_of_record; simpl.
+        unfold rec_concat_sort; rewrite rec_concat_key_encode_comm; reflexivity.
+      - destruct d; reflexivity.
+      - destruct d; reflexivity.
+      - simpl; rewrite ejson_brands_map_ejstring; reflexivity.
+    Qed.
+
+    Lemma ejson_to_partition_correct g ol:
+      lift (map data_to_ejson) (olift (to_partitions g) ol)
+      = olift (ejson_to_partitions (key_encode g)) (lift data_to_ejson_partition ol).
+    Proof.
+      unfold olift, lift.
+      destruct ol; simpl; try reflexivity.
+      unfold to_partitions.
+      unfold ejson_to_partitions.
+      induction l; simpl; try reflexivity.
+      rewrite <- ejson_group_to_partitions_correct.
+      destruct (group_to_partitions g a); try reflexivity; simpl.
+      rewrite <- IHl; clear IHl.
+      unfold lift.
+      destruct (lift_map (group_to_partitions g) l); reflexivity.
+    Qed.
+
+    Lemma ejson_group_by_nested_eval_keys_correct g kl l:
+      lift (map data_to_ejson)
+           (group_by_nested_eval_keys_partition
+              g
+              (fun d : data => match d with
+                               | drec r => Some (drec (rproject r kl))
+                               | _ => None
+                               end) l)
+      =
+      ejson_group_by_nested_eval_keys_partition
+        (key_encode g)
+        (fun j : ejson =>
+           match ejson_is_record j with
+           | Some r => Some (ejobject (rproject r (map key_encode kl)))
+           | None => None
+           end) (map data_to_ejson l).
+    Proof.
+      unfold lift; simpl.
+      unfold group_by_nested_eval_keys_partition.
+      unfold ejson_group_by_nested_eval_keys_partition.
+      rewrite <- ejson_group_by_nested_eval_correct.
+      rewrite <- ejson_to_partition_correct.
+      reflexivity.
+    Qed.
+
+    Lemma group_by_data_to_ejson_correct g kl l:
+      match match group_by_nested_eval_table g kl l with
+            | Some dl' => Some (dcoll dl')
+            | None => None
+            end with
+      | Some a' => Some (data_to_ejson a')
+      | None => None
+      end =
+      match ejson_group_by_nested_eval_table (key_encode g) (map key_encode kl) (map data_to_ejson l) with
+      | Some a' => Some (ejarray a')
+      | None => None
+      end.
+    Proof.
+      unfold group_by_nested_eval_table.
+      unfold ejson_group_by_nested_eval_table.
+      rewrite <- ejson_group_by_nested_eval_keys_correct.
+      destruct (group_by_nested_eval_keys_partition g
+        (fun d : data => match d with
+                         | drec r => Some (drec (rproject r kl))
+                         | _ => None
+                         end) l); reflexivity.
+    Qed.
+
   End RuntimeLemmas.
 
   Section Lift.

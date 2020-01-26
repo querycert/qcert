@@ -1,0 +1,2 @@
+[{"count" : {"$nat":2}, "l_returnflag" : "R"},
+ {"count" : {"$nat":2}, "l_returnflag" : "A"}]

@@ -178,7 +178,7 @@ qcert-javascript:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Extracting Compiler to JavaScript"
 	@echo "[Q*cert] "
-	@$(MAKE) -C compiler/libjs
+	@$(MAKE) -C compiler/libJS
 
 
 ## Java Parsers

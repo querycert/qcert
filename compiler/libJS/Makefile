@@ -32,10 +32,10 @@ all:
 	$(MAKE) ../../bin/$(MAIN).js
 
 ## JavaScript
-../../bin/$(MAIN).js: $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(BYTECODE)
+../../bin/$(MAIN).js: $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(BYTECODE)
 	dune build $(MAIN).$(BYTECODE)
-	js_of_ocaml $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(BYTECODE)
-	cp $(QCERT_HOME)/_build/default/compiler/libjs/$(MAIN).$(JS) ../../bin/$(MAIN).$(JS)
+	js_of_ocaml $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(BYTECODE)
+	cp $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(JS) ../../bin/$(MAIN).$(JS)
 
 ## Clean
 

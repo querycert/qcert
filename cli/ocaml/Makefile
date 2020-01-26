@@ -28,12 +28,12 @@ NATIVE=exe
 BYTECODE=bc
 
 ## Toplevel
-all: $(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN).$(NATIVE) $(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN2).$(NATIVE)
+all: $(QCERT_HOME)/_build/default/cli/ocaml/$(MAIN).$(NATIVE) $(QCERT_HOME)/_build/default/cli/ocaml/$(MAIN2).$(NATIVE)
 
-$(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN).$(NATIVE):
+$(QCERT_HOME)/_build/default/cli/ocaml/$(MAIN).$(NATIVE):
 	dune build $(MAIN).$(NATIVE)
 
-$(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN2).$(NATIVE):
+$(QCERT_HOME)/_build/default/cli/ocaml/$(MAIN2).$(NATIVE):
 	dune build $(MAIN2).$(NATIVE)
 
 ## Install
@@ -41,10 +41,10 @@ $(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN2).$(NATIVE):
 install: ../../bin/$(MAIN) ../../bin/$(MAIN2)
 
 ../../bin/$(MAIN):
-	cp $(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN).$(NATIVE) ../../bin/$(MAIN)
+	cp $(QCERT_HOME)/_build/default/cli/ocaml/$(MAIN).$(NATIVE) ../../bin/$(MAIN)
 
 ../../bin/$(MAIN2):
-	cp $(QCERT_HOME)/_build/default/clis/ocaml/$(MAIN2).$(NATIVE) ../../bin/$(MAIN2)
+	cp $(QCERT_HOME)/_build/default/cli/ocaml/$(MAIN2).$(NATIVE) ../../bin/$(MAIN2)
 
 ## Clean
 

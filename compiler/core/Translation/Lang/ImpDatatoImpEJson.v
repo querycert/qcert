@@ -293,8 +293,8 @@ Section ImpDatatoImpEJson.
       | DataRuntimeGroupby s ls =>
         mk_imp_ejson_runtime_call
           EJsonRuntimeGroupBy
-          ((ImpExprConst (ejstring s))
-             :: (ImpExprConst (ejarray (map ejstring ls)))
+          ((ImpExprConst (ejstring (key_encode s)))
+             :: (ImpExprConst (ejarray (map ejstring (map key_encode ls))))
              :: el)
       | DataRuntimeEither => mk_either_expr el
       | DataRuntimeToLeft => mk_to_left_expr el
@@ -867,7 +867,12 @@ Section ImpDatatoImpEJson.
           destruct ((lift_map (fun x : ImpEval.imp_expr => imp_data_expr_eval h σ x) el));
             try reflexivity; simpl.
         - Case "DataRuntimeGroupby"%string.
-          admit. (* XXX Not implemented *)
+          destruct l0; try reflexivity; simpl.
+          destruct l0; [|destruct d; reflexivity]; simpl.
+          rewrite of_string_list_map_ejstring.
+          destruct d; try reflexivity; simpl.
+          unfold lift.
+          apply group_by_data_to_ejson_correct.
         - Case "DataRuntimeEither"%string.
           destruct l; try reflexivity; simpl.
           destruct l; simpl in *; [|destruct d; congruence].
@@ -911,7 +916,7 @@ Section ImpDatatoImpEJson.
           rewrite match_not_right; try reflexivity; assumption.
       }
       Transparent ejson_to_data.
-    Admitted.
+    Qed.
 
     (* XXX This lemma looses the key assumption that the ejson returned is idempotent to data *)
     Lemma relax_assumption_temp σ el:
