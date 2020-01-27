@@ -1991,14 +1991,14 @@ input data returns the same output data. *)
   Section CustomVerified.
     Section NRAEnvtoImpData.
       Lemma driver_nraenv_to_imp_data_verified_correct conf :
-        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil)).
+        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil)).
       Proof.
         simpl; split; auto.
       Qed.
 
       Lemma driver_nraenv_to_imp_data_verified_matches_query conf q :
         driver_matches_query
-          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil)) 
+          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil)) 
           (Q_nraenv q).
       Proof.
         unfold driver_of_path.
@@ -2015,10 +2015,10 @@ input data returns the same output data. *)
         elim (compile_nraenv_to_imp_data_verified_yields_result conf q); intros.
         unfold compile_nraenv_to_imp_data_verified in *.
         generalize (@compile_with_correct_driver_preserves_eval
-                                                                (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil))
-                                                                (Q_nraenv q)
-                                                                (driver_nraenv_to_imp_data_verified_correct conf)
-                                                                (driver_nraenv_to_imp_data_verified_matches_query conf q)).
+                      (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: nil))
+                      (Q_nraenv q)
+                      (driver_nraenv_to_imp_data_verified_correct conf)
+                      (driver_nraenv_to_imp_data_verified_matches_query conf q)).
         intro Heval.
         rewrite H in H0.
         rewrite <- H0.
@@ -2027,7 +2027,7 @@ input data returns the same output data. *)
         - reflexivity.
         - rewrite Forall_forall in Heval.
           apply Heval; clear Heval.
-          right; right; right; right; right; right; left; simpl.
+          right; right; right; right; left; simpl.
           auto.
       Qed.
 
@@ -2064,14 +2064,14 @@ input data returns the same output data. *)
 
     Section NRAEnvtoImpEJson.
       Lemma driver_nraenv_to_imp_ejson_verified_correct conf :
-        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil)).
+        driver_correct (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil)).
       Proof.
         simpl; split; split; auto.
       Qed.
 
       Lemma driver_nraenv_to_imp_ejson_verified_matches_query conf q :
         driver_matches_query
-          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil)) 
+          (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil)) 
           (Q_nraenv q).
       Proof.
         unfold driver_of_path; simpl.
@@ -2087,7 +2087,7 @@ input data returns the same output data. *)
         elim (compile_nraenv_to_imp_ejson_verified_yields_result conf q); intros.
         unfold compile_nraenv_to_imp_ejson_verified in *.
         generalize (@compile_with_correct_driver_preserves_eval
-                                                                (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrc_core :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil))
+                                                                (driver_of_path conf (L_nraenv :: L_nnrc :: L_nnrs :: L_nnrs_imp :: L_imp_data :: L_imp_ejson :: nil))
                                                                 (Q_nraenv q)
                                                                 (driver_nraenv_to_imp_ejson_verified_correct conf)
                                                                 (driver_nraenv_to_imp_ejson_verified_matches_query conf q)).
@@ -2099,7 +2099,7 @@ input data returns the same output data. *)
         - reflexivity.
         - rewrite Forall_forall in Heval.
           apply Heval; clear Heval.
-          right; right; right; right; right; right; right; left.
+          right; right; right; right; right; left.
           auto.
       Qed.
 

@@ -133,7 +133,7 @@ Section CompCustom.
     Definition compile_nraenv_to_imp_data_verified (conf:driver_config) (q:query) : query :=
       let dv := driver_of_path
                   conf
-                  (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_data::nil)
+                  (L_nraenv::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_data::nil)
       in
       match List.rev (compile dv q) with
       | nil => Q_error "No compilation result!"
@@ -151,8 +151,7 @@ Section CompCustom.
                    (nnrc_to_nnrs (vars_of_constants_config (comp_constants conf))
                                  (NNRCLet init_venv (NNRCConst (drec nil))
                                           (NNRCLet init_vid (NNRCConst dunit)
-                                                   (nnrc_to_nnrc_base
-                                                      (NRAEnvtoNNRC.nraenv_to_nnrc q init_vid init_venv))))))).
+                                                   (NRAEnvtoNNRC.nraenv_to_nnrc q init_vid init_venv)))))).
       reflexivity.
     Qed.
 
@@ -160,7 +159,7 @@ Section CompCustom.
       let dv :=
           driver_of_path
             conf
-            (L_nraenv::L_nnrc::L_nnrc_core::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_data::L_imp_ejson::nil)
+            (L_nraenv::L_nnrc::L_nnrs::L_nnrs_imp::L_imp_data::L_imp_ejson::nil)
       in
       match List.rev (compile dv q) with
       | nil => Q_error "No compilation result!"
@@ -179,8 +178,7 @@ Section CompCustom.
                          (vars_of_constants_config (comp_constants conf))
                          (NNRCLet init_venv (NNRCConst (drec nil))
                                   (NNRCLet init_vid (NNRCConst dunit)
-                                           (nnrc_to_nnrc_base
-                                              (NRAEnvtoNNRC.nraenv_to_nnrc q init_vid init_venv)))))))).
+                                           (NRAEnvtoNNRC.nraenv_to_nnrc q init_vid init_venv))))))).
       reflexivity.
     Qed.
 
