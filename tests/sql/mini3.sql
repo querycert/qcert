@@ -1,5 +1,5 @@
-select
-	distinct( l_returnflag )
+select distinct
+	l_returnflag
 from
 	lineitem
 where

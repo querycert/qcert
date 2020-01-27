@@ -183,7 +183,7 @@ Section CompCorrectness.
   Fixpoint driver_correct_nnrs_imp (dv: nnrs_imp_driver) :=
     match dv with
     | Dv_nnrs_imp_stop => True
-    | Dv_nnrs_imp_optim _ dv => False /\ driver_correct_nnrs_imp dv
+    | Dv_nnrs_imp_optim _ dv => False /\ driver_correct_nnrs_imp dv (* XXX We should be able to prove this one *)
     | Dv_nnrs_imp_to_imp_data _ dv => driver_correct_imp_data dv
     end.
 

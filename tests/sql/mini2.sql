@@ -1,6 +1,6 @@
 select
 	l_returnflag,
-  count(*) as count
+	count(*) as count
 from
 	lineitem
 where
