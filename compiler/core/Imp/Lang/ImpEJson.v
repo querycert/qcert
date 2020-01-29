@@ -15,14 +15,17 @@
 (** Imp with the Json data model *)
 
 Require Import String.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Utils.
 Require Import EJsonRuntime.
 Require Import Imp.
 
 Section ImpEJson.
-  Section Syntax.
-    Context {ftoejson:foreign_ejson}.
-    Context {fejruntime:foreign_ejson_runtime}.
+  Context {ftoejson:foreign_ejson}.
+  Context {fejruntime:foreign_ejson_runtime}.
 
+  Section Syntax.
     Definition imp_ejson_model := ejson.
     Definition imp_ejson_constant := ejson.
 
@@ -40,5 +43,40 @@ Section ImpEJson.
     Definition imp_ejson := @imp imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
 
   End Syntax.
+
+  Section dec.
+    Global Instance imp_ejson_constant_eqdec : EqDec imp_ejson_constant eq.
+    Proof.
+      apply ejson_eqdec.
+    Qed.
+
+    Global Instance imp_ejson_op_eqdec : EqDec imp_ejson_op eq.
+    Proof.
+      change (forall x y : imp_ejson_op,  {x = y} + {x <> y}).
+      decide equality.
+      - revert l0; induction l; intros; destruct l0; simpl in *; try solve[right; inversion 1].
+        left; reflexivity.
+        elim (IHl l0); intros; clear IHl.
+        + subst; destruct (string_dec a s); subst; [left; reflexivity| right; congruence].
+        + right; congruence.
+      - apply string_eqdec.
+      - apply string_eqdec.
+    Qed.
+
+    Global Instance imp_ejson_runtime_op_eqdec : EqDec imp_ejson_runtime_op eq.
+    Proof.
+      change (forall x y : imp_ejson_runtime_op,  {x = y} + {x <> y}).
+      decide equality.
+      apply foreign_ejson_runtime_op_dec.
+    Qed.
+
+    Global Instance imp_ejson_expr_eqdec : EqDec imp_ejson_expr eq.
+    Proof.
+      apply (@imp_expr_eqdec imp_ejson_constant imp_ejson_op imp_ejson_runtime_op).
+      apply imp_ejson_constant_eqdec.
+      apply imp_ejson_op_eqdec.
+      apply imp_ejson_runtime_op_eqdec.
+    Qed.
+  End dec.
 
 End ImpEJson.

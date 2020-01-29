@@ -15,6 +15,8 @@
 (** Imp with the Q*cert data model *)
 
 Require Import String.
+Require Import EquivDec.
+Require Import Decidable.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import Imp.
@@ -44,6 +46,41 @@ Section ImpData.
     Definition imp_data := @imp imp_data_constant imp_data_op imp_data_runtime_op.
   End Syntax.
 
+  Section dec.
+    Global Instance imp_data_constant_eqdec : EqDec imp_data_constant eq.
+    Proof.
+      apply data_eqdec.
+    Qed.
+
+    Global Instance imp_data_op_eqdec : EqDec imp_data_op eq.
+    Proof.
+      change (forall x y : imp_data_op,  {x = y} + {x <> y}).
+      decide equality.
+      apply unary_op_eqdec.
+      apply binary_op_eqdec.
+    Qed.
+
+    Global Instance imp_data_runtime_op_eqdec : EqDec imp_data_runtime_op eq.
+    Proof.
+      change (forall x y : imp_data_runtime_op,  {x = y} + {x <> y}).
+      decide equality.
+      - clear a.
+        revert l0; induction l; intros; destruct l0; simpl in *; try solve[right; inversion 1].
+        left; reflexivity.
+        elim (IHl l0); intros; clear IHl.
+        + subst; destruct (string_dec a s1); subst; [left; reflexivity| right; congruence].
+        + right; congruence.
+      - apply string_eqdec.
+    Qed.
+
+    Global Instance imp_data_expr_eqdec : EqDec imp_data_expr eq.
+    Proof.
+      apply (@imp_expr_eqdec imp_data_constant imp_data_op imp_data_runtime_op).
+      apply imp_data_constant_eqdec.
+      apply imp_data_op_eqdec.
+      apply imp_data_runtime_op_eqdec.
+    Qed.
+  End dec.
 End ImpData.
 
 Tactic Notation "imp_data_runtime_op_cases" tactic(first) ident(c) :=

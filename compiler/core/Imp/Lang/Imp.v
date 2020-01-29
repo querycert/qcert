@@ -175,33 +175,90 @@ Section Imp.
 
     End RectInd.
 
-    (* Section dec. *)
-    (*   Global Instance imp_expr_eqdec : EqDec imp_expr eq. *)
-    (*   Proof. *)
-    (*     change (forall x y : imp_expr,  {x = y} + {x <> y}). *)
-    (*     decide equality; *)
-    (*       try solve [apply binary_op_eqdec | apply unary_op_eqdec *)
-    (*                  | apply data_eqdec | apply string_eqdec]. *)
-    (*     - decide equality; apply string_dec. *)
-    (*   Defined. *)
+    Section dec.
+      Context {Constant_eqdec: EqDec Constant eq}.
+      Context {Op_eqdec: EqDec Op eq}.
+      Context {Runtime_eqdec: EqDec Runtime eq}.
 
-    (*   Global Instance imp_stmt_eqdec : EqDec imp_stmt eq. *)
-    (*   Proof. *)
-    (*     change (forall x y : imp_stmt,  {x = y} + {x <> y}). *)
-    (*     decide equality; *)
-    (*       try solve [apply imp_expr_eqdec | apply string_eqdec | apply option_eqdec]. *)
-    (*   Defined. *)
+      Global Instance imp_expr_eqdec : EqDec imp_expr eq.
+      Proof.
+        change (forall x y : imp_expr,  {x = y} + {x <> y}).
+        decide equality;
+          try solve [apply binary_op_eqdec | apply unary_op_eqdec
+                     | apply Constant_eqdec | apply Op_eqdec | apply Runtime_eqdec | apply string_eqdec].
+        - revert l; induction el; intros; destruct l; simpl in *; try solve[right ;inversion 1].
+          left; reflexivity.
+          inversion X; subst; clear X.
+          elim (X0 i); intros; subst; clear X0.
+          + specialize (IHel X1); clear X1.
+            elim (IHel l); intros; clear IHel.
+            * subst; left; reflexivity.
+            * right; congruence.
+          + right; congruence.
+        - revert l; induction el; intros; destruct l; simpl in *; try solve[right ;inversion 1].
+          left; reflexivity.
+          inversion X; subst; clear X.
+          elim (X0 i); intros; subst; clear X0.
+          + specialize (IHel X1); clear X1.
+            elim (IHel l); intros; clear IHel.
+            * subst; left; reflexivity.
+            * right; congruence.
+          + right; congruence.
+      Defined.
 
-    (*   Global Instance imp_eqdec : EqDec imp eq. *)
-    (*   Proof. *)
-    (*     intros [s1 r1] [s2 r2]. *)
-    (*     destruct (r1 == r2). *)
-    (*     - destruct (s1 == s2). *)
-    (*       + left; congruence. *)
-    (*       + right; congruence. *)
-    (*     - right; congruence. *)
-    (*   Defined. *)
-    (* End dec. *)
+      Global Instance imp_stmt_eqdec : EqDec imp_stmt eq.
+      Proof.
+        change (forall x y : imp_stmt,  {x = y} + {x <> y}).
+        decide equality;
+          try solve [apply imp_expr_eqdec | apply string_eqdec | apply option_eqdec].
+        - subst; clear l.
+          revert l0; induction sl; intros; destruct l0; simpl in *; try solve[right ;inversion 1].
+          left; reflexivity.
+          inversion X; subst; clear X.
+          elim (X0 i); intros; subst; clear X0.
+          + specialize (IHsl X1); clear X1.
+            elim (IHsl l0); intros; clear IHsl.
+            * subst; left; reflexivity.
+            * right; congruence.
+          + right; congruence.
+        - clear X.
+          revert l; induction el; intros; destruct l; simpl in *; try solve[right ;inversion 1].
+          left; reflexivity.
+          destruct a; simpl in *; destruct o; simpl in *;
+          destruct p; simpl in *; destruct o; simpl in *.
+          + elim (IHel l); intros; clear IHel.
+            * elim (imp_expr_eqdec i i0); intros; [|right; congruence].
+              assert (i = i0); auto; clear a0; subst;
+                destruct (string_dec v v0); subst; [left; reflexivity| right; congruence].
+            * right; congruence.
+          + right; congruence.
+          + right; congruence.
+          + elim (IHel l); intros; clear IHel.
+            * destruct (string_dec v v0); subst; [left; reflexivity| right; congruence].
+            * right; congruence.
+      Qed.
+
+      Global Instance imp_function_eqdec : EqDec imp_function eq.
+      Proof.
+        change (forall x y : imp_function,  {x = y} + {x <> y}).
+        decide equality; subst;
+          try solve [apply imp_stmt_eqdec | apply string_eqdec | apply option_eqdec].
+      Qed.
+        
+      Global Instance imp_eqdec : EqDec imp eq.
+      Proof.
+        change (forall x y : imp,  {x = y} + {x <> y}).
+        decide equality.
+        revert l0; induction l; intros; destruct l0; simpl in *; try solve[right ;inversion 1].
+        left; reflexivity.
+        destruct a; simpl in *; destruct p; simpl in *.
+        + elim (IHl l0); intros; clear IHl.
+          * elim (imp_function_eqdec i i0); intros; [|right; congruence].
+            assert (i = i0); auto; clear a0; subst;
+              destruct (string_dec s s0); subst; [left; reflexivity| right; congruence].
+          * right; congruence.
+      Qed.
+    End dec.
 
   End Syntax.
 End Imp.
