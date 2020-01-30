@@ -686,7 +686,7 @@ Section NNRStoNNRSimp.
       eauto.
   Qed.
 
-    Theorem nnrs_to_nnrs_imp_top_correct (sep:string) (s:nnrs) :
+  Theorem nnrs_to_nnrs_imp_top_correct (sep:string) (s:nnrs) :
     forall h σc,
       nnrs_eval_top h σc s = nnrs_imp_eval_top h σc (nnrs_to_nnrs_imp_top sep s).
     Proof.

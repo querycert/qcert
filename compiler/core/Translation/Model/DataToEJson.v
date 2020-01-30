@@ -174,6 +174,17 @@ Section DataToEJson.
       | dforeign fd => ejforeign (foreign_to_ejson_from_data fd)
       end.
 
+    Lemma data_to_ejson_on_drec r:
+      data_to_ejson (drec (rec_sort r))
+      = ejobject (rec_sort (map (fun xy : string * data => (key_encode (fst xy), data_to_ejson (snd xy))) r)).
+    Proof.
+      simpl.
+      rewrite map_rec_sort.
+      reflexivity.
+      intros.
+      apply rec_field_lt_key_eq.
+    Qed.
+
     Lemma ejson_record_of_record r :
       ejson_is_record (data_to_ejson (drec r)) =
       Some (map (fun x => (key_encode (fst x), data_to_ejson (snd x))) r).
@@ -715,20 +726,6 @@ Section DataToEJson.
       reflexivity.
     Qed.
 
-    Lemma rec_field_lt_key_eq x y:
-      rec_field_lt x y <->
-      rec_field_lt
-        (key_encode (fst x), data_to_ejson (snd x)) (key_encode (fst y), data_to_ejson (snd y)).
-    Proof.
-      split; intros.
-      - unfold rec_field_lt in *; simpl in *.
-        destruct x; destruct y; simpl in *.
-        rewrite <- key_encode_lt_idem; assumption.
-      - unfold rec_field_lt in *; simpl in *.
-        destruct x; destruct y; simpl in *.
-        rewrite key_encode_lt_idem; assumption.
-    Qed.
-    
     (** For record concatenation operator *)
     Lemma rec_concat_key_encode_comm l l0 :
       map (fun x : string * data => (key_encode (fst x), data_to_ejson (snd x))) (rec_sort (l ++ l0)) =

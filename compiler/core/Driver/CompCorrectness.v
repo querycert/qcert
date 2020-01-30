@@ -19,6 +19,8 @@ Require Import Morphisms.
 (* Common libraries *)
 Require Import Utils.
 Require Import DataSystem.
+Require Import EJsonSystem.
+Require Import DataToEJson.
 
 (* Query languages *)
 Require Import SQLRuntime.
@@ -2133,6 +2135,91 @@ input data returns the same output data. *)
           auto.
       Qed.
     End NRAEnvtoImpEJson.
+
+    Section NNRCtoImpEJson.
+      Definition nnrc_expr_to_imp_ejson_function
+                 {bm:brand_model}
+                 (globals:list string)
+                 (fbody:nnrc) : imp_ejson_function :=
+        imp_data_function_to_imp_ejson
+          h
+          (nnrs_imp_to_imp_data_function
+             (nnrs_to_nnrs_imp
+                (nnrc_to_nnrs
+                      globals fbody))).
+
+      Lemma imp_data_function_to_imp_ejson_correct h q params:
+        lift data_to_ejson (imp_data_function_eval h q (drec (rec_sort params)))
+        =  imp_ejson_function_eval
+             h
+             (imp_data_function_to_imp_ejson h q)
+             (ejobject
+                (rec_sort
+                   (map (fun xy : string * data => (key_encode (fst xy), data_to_ejson (snd xy))) params))).
+      Proof.
+        rewrite imp_data_function_to_imp_ejson_function_aux_correct.
+        rewrite data_to_ejson_on_drec.
+        reflexivity.
+      Qed.
+
+      Lemma eval_nnrc_to_imp_correct e params:
+        nnrc_eval_top h e params
+        = lift ejson_to_data
+               (imp_ejson_function_eval
+                  h
+                  (nnrc_expr_to_imp_ejson_function nil e)
+                  (ejobject
+                     (rec_sort (map (fun xy : string * data => (key_encode (fst xy),
+                                                                DataToEJson.data_to_ejson (snd xy))) params)))).
+      Proof.
+        unfold nnrc_expr_to_imp_ejson_function.
+        rewrite <- imp_data_function_to_imp_ejson_correct.
+        rewrite <- nnrs_imp_to_imp_data_function_correct.
+        unfold olift, lift.
+        generalize (nnrs_to_nnrs_imp_top_correct
+                      "$"%string
+                      (nnrc_to_nnrs nil e) h params); intros.
+        unfold nnrs_eval_top in *.
+        unfold nnrs_imp_eval_top in *.
+        unfold olift in H.
+        unfold nnrs_to_nnrs_imp_top in *.
+        unfold nnrs_to_nnrs_imp.
+        unfold nnrs_to_nnrs_imp_top.
+        assert (@nnrs_imp_eval fruntime (@h ft bm)
+            (@rec_sort string ODT_string (@data (@foreign_runtime_data fruntime)) params)
+            (@NNRStoNNRSimp.nnrs_to_nnrs_imp fruntime
+               (@nnrs_uncross_shadow fruntime
+                  (String.String (Ascii false false true false false true false false) EmptyString)
+                  (@nnrc_to_nnrs fruntime (@nil var) e)))
+            = @nnrs_imp_eval fruntime (@h ft bm)
+            (@rec_sort string ODT_string (@data (@foreign_runtime_data fruntime)) params)
+            (@NNRStoNNRSimp.nnrs_to_nnrs_imp fruntime
+               (@nnrs_uncross_shadow fruntime
+                  (String.String (Ascii false false true false false true false false) EmptyString)
+                  (@nnrc_to_nnrs fruntime (@nil string) e)))
+               ) by reflexivity.
+        rewrite <- H0; clear H0.
+        rewrite <- H; clear H.
+        generalize (nnrc_to_nnrs_top_correct h params e nil); intros.
+        unfold nnrc_to_nnrs.
+        unfold nnrc_eval_top in H; unfold nnrs_eval_top in H; unfold olift in H.
+        assert (
+            @nnrs_eval fruntime (@h ft bm)
+            (@rec_sort string ODT_string (@data (@foreign_runtime_data fruntime)) params)
+            (@nnrc_to_nnrs_top fruntime (@nil Var.var) e)
+            = @nnrs_eval fruntime (@h ft bm)
+            (@rec_sort string ODT_string (@data (@foreign_runtime_data fruntime)) params)
+            (@nnrc_to_nnrs_top fruntime (@nil var) e)
+          ) by reflexivity.
+        rewrite <- H0; clear H0.
+        rewrite <- H; clear H.
+        unfold nnrc_eval_top.
+        destruct (nnrc_eval nil e); try reflexivity.
+        rewrite data_to_ejson_idempotent.
+        reflexivity.
+      Qed.
+
+    End NNRCtoImpEJson.
 
   End CustomVerified.
 End CompCorrectness.

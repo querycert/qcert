@@ -17,6 +17,7 @@ Require Import Ascii.
 Require Import String.
 Require Import CoqLibAdd.
 Require Import StringAdd.
+Require Import Bindings.
 
 Section Encode.
   Definition key_encode (s:string) : string
@@ -333,6 +334,20 @@ Section Encode.
     destruct b4; simpl; try congruence;
     destruct b5; simpl; try congruence;
     destruct b6; simpl; try congruence).
+  Qed.
+
+  Lemma rec_field_lt_key_eq {A B} (x:string * A) (y:string * A) (f:A -> B) :
+    rec_field_lt x y <->
+    rec_field_lt
+      (key_encode (fst x), f (snd x)) (key_encode (fst y), f (snd y)).
+  Proof.
+    split; intros.
+    - unfold rec_field_lt in *; simpl in *.
+      destruct x; destruct y; simpl in *.
+      rewrite <- key_encode_lt_idem; assumption.
+    - unfold rec_field_lt in *; simpl in *.
+      destruct x; destruct y; simpl in *.
+      rewrite key_encode_lt_idem; assumption.
   Qed.
 
 End Encode.
