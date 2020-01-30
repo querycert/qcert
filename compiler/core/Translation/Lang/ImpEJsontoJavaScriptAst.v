@@ -274,6 +274,12 @@ Section ImpEJsontoJavaScriptAst.
     Definition imp_ejson_table_to_topdecls (cname:string) (q: list imp_ejson) : list topdecl :=
       classdecl cname (concat (map imp_ejson_to_method q))::nil.
 
+    Definition imp_ejson_table_to_class (cname:string) (q: imp_ejson) : topdecl :=
+      match q with
+      | ImpLib l =>
+        classdecl cname (map (fun xy => imp_ejson_function_to_funcdecl (fst xy) (snd xy)) l)
+      end.
+
   End Translation.
 
 End ImpEJsontoJavaScriptAst.

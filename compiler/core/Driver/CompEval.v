@@ -130,7 +130,6 @@ Section CompEval.
       ImpDataEval.imp_data_eval_top h cenv q.
 
     (* Language: imp_ejson *)
-    (* XXX Is this really what we want to wrap/unwrap in data? *)
     Definition eval_imp_ejson (q:imp_ejson) (cenv: bindings) : option data :=
       ImpEJsonEval.imp_ejson_eval_top h cenv q.
 
