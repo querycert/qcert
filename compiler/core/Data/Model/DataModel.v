@@ -16,7 +16,6 @@ Require Export Data.
 Require Export DataResult.
 Require Export DataLift.
 Require Export DataNorm.
-Require Export DataSort.
 Require Export DData.
 Require Export DDataNorm.
 Require Export Constants.

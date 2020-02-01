@@ -69,6 +69,7 @@ MODULES = \
 	EJson/Operators/ForeignEJsonRuntime \
 	EJson/Operators/EJsonOperators \
 	EJson/Operators/EJsonGroupBy \
+	EJson/Operators/EJsonSortBy \
 	EJson/Operators/EJsonRuntimeOperators \
 	EJson/EJsonRuntime \
 	EJson/EJsonSystem \
@@ -77,7 +78,6 @@ MODULES = \
 	Data/Model/DataResult \
 	Data/Model/DataLift \
 	Data/Model/DataNorm \
-	Data/Model/DataSort \
 	Data/Model/DData \
 	Data/Model/DDataNorm \
 	Data/Model/Constants \

@@ -23,11 +23,7 @@ Require Import ZArith.
 Require Import Utils.
 Require Import ForeignData.
 Require Import Data.
-Require Import DataSort.
-Require Import Iterators.
 Require Import DataNorm.
-Require Import ForeignData.
-Require Import Utils.
 
 Section SortBy.
   Context {fdata:foreign_data}.
@@ -36,11 +32,15 @@ Section SortBy.
   
   Definition get_criteria (d:data) (sc:SortCriteria) : option sdata :=
     let (att,sk) := sc in (* XXX IGNORES sort kind (asc|desc) XXX *)
-    match theotherdot d att with
-    | Some (dnat n) => Some (sdnat n)
-    | Some (dstring s) => Some (sdstring s)
-    | Some _ => None
-    | None => None
+    match d with
+    | drec r =>
+      match edot r att with
+      | Some (dnat n) => Some (sdnat n)
+      | Some (dstring s) => Some (sdstring s)
+      | Some _ => None
+      | None => None
+      end
+    | _ => None
     end.
 
   Definition get_criterias (d:data) (scl:SortCriterias) : option (list sdata) :=
@@ -96,60 +96,6 @@ End SortBy.
 
 Section SortByProps.
   Context {fdata:foreign_data}.
-
-  Lemma dict_field_le_anti :
-    forall x y : sortable_data, ~ dict_field_le x y -> ~ dict_field_le y x -> x = y.
-  Proof.
-    unfold dict_field_le.
-    intros.
-    rewrite LexicographicDataOrder.le_lteq in *.
-    intuition.
-    destruct (LexicographicDataOrder.compare_spec (fst x) (fst y)); congruence.
-  Qed.
-
-  Lemma in_sort_sortable d l : 
-    In d (sort_sortable_coll l) <-> In d l.
-  Proof.
-    unfold sort_sortable_coll, dict_sort.
-    split; intros ind.
-    - apply in_insertion_sort in ind; trivial.
-    - apply insertion_sort_in; trivial.
-      apply dict_field_le_anti.
-  Qed.
-    
-  Lemma in_csc_ssc d l :
-    In d (coll_of_sortable_coll (sort_sortable_coll l)) <->
-    In d (coll_of_sortable_coll l).
-  Proof.
-    unfold coll_of_sortable_coll.
-    repeat rewrite in_map_iff.
-    split; intros [[??] [??]]; simpl in *; subst.
-    - rewrite in_sort_sortable in *.
-      eexists; split; try eassumption; reflexivity.
-    - exists (l0, d); split; trivial.
-      rewrite in_sort_sortable.
-      trivial.
-  Qed.
-
-  Lemma in_csc_cons d s l :
-      In d (coll_of_sortable_coll (s :: l)) <->
-      (d = snd s \/ In d (coll_of_sortable_coll l)).
-  Proof.
-    unfold coll_of_sortable_coll.
-    repeat rewrite in_map_iff.
-    destruct s; simpl.
-    split; intros ind.
-    - destruct ind as [[? ?] [? ind]]; simpl in *; subst.
-      destruct ind.
-      + invcs H; tauto.
-      + right.
-        exists (l1, d); auto.
-    - destruct ind as [| [[??] [??]]].
-      + subst.
-        exists (l0, d0); auto.
-      + simpl in *; subst.
-        exists (l1, d); auto.
-  Qed.
 
   Lemma sortable_data_normalized h a sc sd :
     data_normalized h a ->

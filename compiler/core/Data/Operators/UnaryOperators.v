@@ -21,7 +21,6 @@ Require Import EquivDec.
 Require Import Utils.
 Require Import BrandRelation.
 Require Import ForeignData.
-Require Import DataSort.
 Require Import ForeignOperators.
 Require Import OperatorsUtils.
 

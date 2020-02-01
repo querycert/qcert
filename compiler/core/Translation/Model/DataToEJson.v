@@ -1215,6 +1215,124 @@ Section DataToEJson.
                          end) l); reflexivity.
     Qed.
 
+    (** For OrderBy *)
+    Definition sortCriteria_to_ejson (sc: string * SortDesc) : ejson :=
+      let (lbl, c) := sc in
+      match c with
+      | Ascending => ejobject (("asc"%string, ejstring (key_encode lbl))::nil)
+      | Descending => ejobject (("desc"%string, ejstring (key_encode lbl))::nil)
+      end.
+
+    Lemma get_criteria_to_ejson_correct a x:
+      get_criteria a x
+      = ejson_get_criteria (data_to_ejson a) (sortCriteria_to_ejson x).
+    Proof.
+      destruct x; simpl.
+      destruct s0; simpl.
+      (* asc *)
+      - unfold edot.
+        destruct a; try reflexivity.
+        + rewrite ejson_record_of_record; simpl.
+          rewrite <- assoc_lookupr_key_encode_comm.
+          destruct (assoc_lookupr string_eqdec l s); try reflexivity.
+          destruct d; simpl; reflexivity.
+        + destruct a; reflexivity.
+        + destruct a; reflexivity.
+        + simpl; rewrite ejson_brands_map_ejstring; reflexivity.
+      (* desc *)
+      - unfold edot.
+        destruct a; try reflexivity.
+        + rewrite ejson_record_of_record; simpl.
+          rewrite <- assoc_lookupr_key_encode_comm.
+          destruct (assoc_lookupr string_eqdec l s); try reflexivity.
+          destruct d; simpl; reflexivity.
+        + destruct a; reflexivity.
+        + destruct a; reflexivity.
+        + simpl; rewrite ejson_brands_map_ejstring; reflexivity.
+    Qed.
+
+    Lemma sortable_data_ejson_correct a s :
+      lift (fun xy => (fst xy, data_to_ejson (snd xy))) (sortable_data_of_data a s)
+      = ejson_sortable_data_of_ejson (data_to_ejson a) (map sortCriteria_to_ejson s).
+    Proof.
+      unfold sortable_data_of_data.
+      unfold ejson_sortable_data_of_ejson.
+      unfold lift.
+      unfold get_criterias.
+      unfold ejson_get_criterias.
+      rewrite lift_map_map_fusion.
+      induction s; simpl; try reflexivity.
+      rewrite get_criteria_to_ejson_correct.
+      destruct (ejson_get_criteria (data_to_ejson a) (sortCriteria_to_ejson a0)); try reflexivity; simpl.
+      unfold lift.
+      destruct (lift_map (get_criteria a) s);
+        destruct (lift_map (fun x : string * SortDesc =>
+                              ejson_get_criteria (data_to_ejson a) (sortCriteria_to_ejson x))
+                           s); try congruence.
+      simpl.
+      inversion IHs.
+      subst.
+      reflexivity.
+    Qed.
+
+    Lemma sortable_coll_to_ejson_correct s l:
+      lift (map (fun xy => (fst xy, data_to_ejson (snd xy)))) (sortable_coll_of_coll s l)
+      = ejson_sortable_coll_of_coll (map sortCriteria_to_ejson s) (map data_to_ejson l).
+    Proof.
+      unfold sortable_coll_of_coll.
+      unfold ejson_sortable_coll_of_coll.
+      unfold lift.
+      induction l; try reflexivity; simpl.
+      rewrite <- IHl; clear IHl.
+      rewrite <- sortable_data_ejson_correct.
+      destruct (sortable_data_of_data a s); try reflexivity; simpl.
+      destruct s0; simpl.
+      unfold lift.
+      destruct (lift_map (fun d0 : data => sortable_data_of_data d0 s) l); reflexivity.
+    Qed.
+
+    Lemma sort_sortable_coll_data_to_ejson_comm l:
+      sort_sortable_coll (map (fun xy : list sdata * data => (fst xy, data_to_ejson (snd xy))) l)
+      = map (fun xy : list sdata * data => (fst xy, data_to_ejson (snd xy))) (sort_sortable_coll l).
+    Proof.
+      unfold sort_sortable_coll.
+      unfold dict_sort.
+      rewrite (map_insertion_sort
+                 (@dict_field_le_dec (@data (@foreign_runtime_data fruntime)))
+                 (@dict_field_le_dec (@ejson fejson))).
+      reflexivity.
+      intros.
+      split; intros;
+      destruct x; destruct y; simpl in *.
+      - unfold dict_field_le; simpl; auto.
+      - unfold dict_field_le; simpl; auto.
+    Qed.
+
+    Lemma coll_of_sortable_coll_data_to_ejson_comm l:
+      coll_of_sortable_coll (map (fun xy : list sdata * data => (fst xy, data_to_ejson (snd xy))) l)
+      = map data_to_ejson (coll_of_sortable_coll l).
+    Proof.
+      unfold coll_of_sortable_coll.
+      rewrite map_map; rewrite map_map; reflexivity.
+    Qed.
+
+    Lemma order_by_to_ejson_correct s d :
+      match data_sort s d with
+      | Some a' => Some (data_to_ejson a')
+      | None => None
+      end = ejson_sort (map sortCriteria_to_ejson s) (data_to_ejson d).
+    Proof.
+      unfold data_sort.
+      unfold ejson_sort.
+      destruct d; simpl; try reflexivity.
+      rewrite <- sortable_coll_to_ejson_correct.
+      unfold lift.
+      destruct (sortable_coll_of_coll s l); try reflexivity; simpl.
+      rewrite sort_sortable_coll_data_to_ejson_comm.
+      rewrite coll_of_sortable_coll_data_to_ejson_comm.
+      reflexivity.
+    Qed.
+
   End RuntimeLemmas.
 
   Section Lift.

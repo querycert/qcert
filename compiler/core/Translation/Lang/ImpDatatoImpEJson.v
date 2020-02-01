@@ -48,15 +48,8 @@ Section ImpDatatoImpEJson.
     Definition mk_left e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
     Definition mk_right e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
 
-    Definition sortCriteria_to_ejson_expr (sc: string * SortDesc) : imp_ejson_expr :=
-      let (lbl, c) := sc in
-      let o :=
-          match c with
-          | Ascending => ejobject [ ("asc"%string, ejstring lbl) ]
-          | Descending => ejobject [ ("desc"%string, ejstring lbl) ]
-          end
-      in
-      ImpExprConst o.
+    Definition sortCriterias_to_ejson_expr (scl: list (string * SortDesc)) : imp_ejson_expr :=
+      ImpExprConst (ejarray (map sortCriteria_to_ejson scl)).
 
     Definition brands_to_ejson_expr sl : imp_ejson_expr :=
       let j := ejarray ((List.map (fun s => ejstring s)) sl) in
@@ -163,7 +156,7 @@ Section ImpDatatoImpEJson.
         | OpDistinct => mk_imp_ejson_runtime_call EJsonRuntimeDistinct el
         | OpOrderBy scl =>
           mk_imp_ejson_runtime_call
-            EJsonRuntimeSort (e :: (List.map sortCriteria_to_ejson_expr scl))
+            EJsonRuntimeSort (sortCriterias_to_ejson_expr scl :: e :: nil)
         | OpCount => mk_imp_ejson_runtime_call EJsonRuntimeCount el
         | OpToString => mk_imp_ejson_runtime_call EJsonRuntimeToString el
         | OpToText => mk_imp_ejson_runtime_call EJsonRuntimeToText el
@@ -552,7 +545,7 @@ Section ImpDatatoImpEJson.
         destruct d; simpl; try reflexivity.
         rewrite bdistinct_ejson_to_data_comm; reflexivity.
       - Case "OpOrderBy"%string.
-        admit. (* XXX Not implemented *)
+        apply order_by_to_ejson_correct.
       - Case "OpCount"%string.
         destruct d; simpl; try reflexivity.
         destruct l; simpl in *; try reflexivity.
@@ -651,7 +644,7 @@ Section ImpDatatoImpEJson.
         rewrite <- (foreign_to_ejson_runtime_of_unary_op_correct fu h).
         reflexivity.
         Transparent ejson_to_data.
-    Admitted.
+    Qed.
 
     Lemma imp_data_binary_op_to_imp_ejson_expr_correct
            (σ:pd_bindings) (b:binary_op) (el:list imp_expr) :

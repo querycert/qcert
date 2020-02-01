@@ -23,8 +23,8 @@ Require Import BrandRelation.
 Require Import ForeignEJson.
 Require Import EJson.
 Require Import EJsonGroupBy.
+Require Import EJsonSortBy.
 Require Import ForeignEJsonRuntime.
-Require Import DataSort.
 
 Section EJsonRuntimeOperators.
   Local Open Scope string.
@@ -525,7 +525,14 @@ Section EJsonRuntimeOperators.
                then Some (ejbool true) else Some (ejbool false)
              | _ => None
              end) dl
-      | EJsonRuntimeSort => None (* XXX TODO *)
+      | EJsonRuntimeSort =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1 with
+             | ejarray l1 =>
+               ejson_sort l1 d2
+             | _ => None
+             end) dl
       | EJsonRuntimeGroupBy =>
         apply_ternary
           (fun d1 d2 d3 =>

@@ -22,7 +22,6 @@ Require Import ForeignData.
 Require Import Data.
 Require Import DataLift.
 Require Import DataNorm.
-Require Import DataSort.
 Require Import ForeignOperators.
 Require Import Iterators.
 Require Import RecOperators.

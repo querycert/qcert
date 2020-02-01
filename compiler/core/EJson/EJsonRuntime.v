@@ -18,4 +18,5 @@ Require Export EJsonNorm.
 Require Export ForeignEJsonRuntime.
 Require Export EJsonOperators.
 Require Export EJsonGroupBy.
+Require Export EJsonSortBy.
 Require Export EJsonRuntimeOperators.
