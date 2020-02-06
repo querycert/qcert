@@ -250,9 +250,11 @@ MODULES = \
 	Imp/Lang/ImpEq \
 	Imp/Lang/ImpData \
 	Imp/Lang/ImpDataSize \
+	Imp/Lang/ImpDataVars \
 	Imp/Lang/ImpDataEval \
 	Imp/Lang/ImpEJson \
 	Imp/Lang/ImpEJsonSize \
+	Imp/Lang/ImpEJsonVars \
 	Imp/Lang/ImpEJsonEval \
 	Imp/Lang/ImpEJsonRewrite \
 	Imp/ImpRuntime \

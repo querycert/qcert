@@ -12,17 +12,26 @@
  * limitations under the License.
  *)
 
-Require Export DataRuntime.
-Require Export EJsonRuntime.
-Require Export Imp.
-Require Export ImpSize.
-Require Export ImpVars.
-Require Export ImpData.
-Require Export ImpDataSize.
-Require Export ImpDataVars.
-Require Export ImpDataEval.
-Require Export ImpEJson.
-Require Export ImpEJsonSize.
-Require Export ImpEJsonVars.
-Require Export ImpEJsonEval.
-Require Export ImpEJsonRewrite.
+Require Import String.
+Require Import EJsonRuntime.
+Require Import Imp.
+Require Import ImpEJson.
+Require Import ImpVars.
+
+Section ImpEJsonVars.
+
+
+  Context {ftoejson:foreign_ejson}.
+  Context {fejruntime:foreign_ejson_runtime}.
+
+  Definition imp_ejson_expr_free_vars (e:imp_ejson_expr) : list var :=
+    imp_expr_free_vars e.
+
+  Definition imp_ejson_stmt_free_vars (stmt:imp_ejson_stmt) : list var :=
+    imp_stmt_free_vars stmt.
+
+  Definition imp_ejson_stmt_bound_vars (stmt:imp_ejson_stmt) : list var :=
+    imp_stmt_bound_vars stmt.
+
+
+End ImpEJsonVars.
