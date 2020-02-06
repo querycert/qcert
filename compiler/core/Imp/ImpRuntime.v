@@ -16,6 +16,7 @@ Require Export DataRuntime.
 Require Export EJsonRuntime.
 Require Export Imp.
 Require Export ImpSize.
+Require Export ImpVars.
 Require Export ImpData.
 Require Export ImpDataSize.
 Require Export ImpDataEval.

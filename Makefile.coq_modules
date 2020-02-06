@@ -245,6 +245,7 @@ MODULES = \
 	NNRSimp/NNRSimpOptim \
 	Imp/Lang/Imp \
 	Imp/Lang/ImpSize \
+	Imp/Lang/ImpVars \
 	Imp/Lang/ImpEval \
 	Imp/Lang/ImpEq \
 	Imp/Lang/ImpData \
