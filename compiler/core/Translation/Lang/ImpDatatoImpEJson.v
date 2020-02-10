@@ -329,18 +329,17 @@ Section ImpDatatoImpEJson.
     Section ForRewrite.
       (* Rewriting functional for into imperative for loop is now isolated *)
       (* If we want to combine both rewrites into a single pass *)
-      Fixpoint imp_data_stmt_to_imp_ejson_combined (avoid: list string) (stmt: imp_data_stmt): imp_ejson_stmt :=
+      Fixpoint imp_data_stmt_to_imp_ejson_combined (stmt: imp_data_stmt): imp_ejson_stmt :=
         match stmt with
         | ImpStmtBlock lv ls =>
           ImpStmtBlock
             (map (fun xy => (fst xy,
                              lift imp_data_expr_to_imp_ejson (snd xy))) lv)
-            (map (imp_data_stmt_to_imp_ejson_combined ((List.map fst lv) ++ avoid)) ls)
+            (map (imp_data_stmt_to_imp_ejson_combined) ls)
         | ImpStmtAssign v e =>
           ImpStmtAssign v (imp_data_expr_to_imp_ejson e)
         | ImpStmtFor v e s =>
-          let avoid := v :: avoid in
-          let e := imp_data_expr_to_imp_ejson e in
+          let avoid := imp_data_stmt_free_vars stmt ++ imp_data_stmt_bound_vars stmt in
           let src_id := fresh_var "src" avoid in
           let avoid := src_id :: avoid in
           let i_id := fresh_var "i" avoid in
@@ -348,7 +347,7 @@ Section ImpDatatoImpEJson.
           let src := ImpExprVar src_id in
           let i := ImpExprVar i_id in
           ImpStmtBlock
-            [ (src_id, Some e) ]
+            [ (src_id, Some (imp_data_expr_to_imp_ejson e)) ]
             [ ImpStmtForRange
                 i_id
                 (ImpExprConst (ejbigint 0))
@@ -356,23 +355,23 @@ Section ImpDatatoImpEJson.
                 (ImpExprRuntimeCall EJsonRuntimeNatMinus [ ImpExprOp EJsonOpArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
                 (ImpStmtBlock
                    [ (v, Some (ImpExprOp EJsonOpArrayAccess [ src; i ])) ]
-                   [ imp_data_stmt_to_imp_ejson_combined avoid s ]) ]
+                   [ imp_data_stmt_to_imp_ejson_combined s ]) ]
         | ImpStmtForRange v e1 e2 s =>
           ImpStmtForRange v
                           (imp_data_expr_to_imp_ejson e1)
                           (imp_data_expr_to_imp_ejson e2)
-                          (imp_data_stmt_to_imp_ejson_combined (v :: avoid) s)
+                          (imp_data_stmt_to_imp_ejson_combined s)
         | ImpStmtIf e s1 s2 =>
           ImpStmtIf (imp_data_expr_to_imp_ejson e)
-                    (imp_data_stmt_to_imp_ejson_combined avoid s1)
-                    (imp_data_stmt_to_imp_ejson_combined avoid s2)
+                    (imp_data_stmt_to_imp_ejson_combined s1)
+                    (imp_data_stmt_to_imp_ejson_combined s2)
         end.
 
-      Lemma imp_data_stmt_to_imp_ejson_combined_idem avoid (stmt: imp_data_stmt):
-        imp_data_stmt_to_imp_ejson_combined avoid stmt =
-        imp_ejson_stmt_for_rewrite avoid (imp_data_stmt_to_imp_ejson stmt).
+      Lemma imp_data_stmt_to_imp_ejson_combined_idem (stmt: imp_data_stmt):
+        imp_data_stmt_to_imp_ejson_combined stmt =
+        imp_ejson_stmt_for_rewrite (imp_data_stmt_to_imp_ejson stmt).
       Proof.
-        revert avoid.
+        (* revert avoid. *)
         imp_stmt_cases (induction stmt) Case; intros; simpl.
         + Case "ImpStmtBlock"%string.
           repeat rewrite map_map.
@@ -381,18 +380,18 @@ Section ImpDatatoImpEJson.
             (Hforall:
                Forall
                  (fun stmt : imp_stmt =>
-                    imp_data_stmt_to_imp_ejson_combined (map fst el ++ avoid) stmt =
-                    imp_ejson_stmt_for_rewrite (map fst el ++ avoid) (imp_data_stmt_to_imp_ejson stmt)) sl)
+                    imp_data_stmt_to_imp_ejson_combined (* (map fst el ++ avoid) *) stmt =
+                    imp_ejson_stmt_for_rewrite (* (map fst el ++ avoid) *) (imp_data_stmt_to_imp_ejson stmt)) sl)
             by
               (apply (@Forall_impl
                         imp_stmt
                         (fun stmt : imp_stmt =>
                            forall avoid : list string,
-                             imp_data_stmt_to_imp_ejson_combined avoid stmt =
-                             imp_ejson_stmt_for_rewrite avoid (imp_data_stmt_to_imp_ejson stmt))
+                             imp_data_stmt_to_imp_ejson_combined (* avoid *) stmt =
+                             imp_ejson_stmt_for_rewrite (* avoid *) (imp_data_stmt_to_imp_ejson stmt))
                         (fun stmt : imp_stmt =>
-                           imp_data_stmt_to_imp_ejson_combined (map fst el ++ avoid) stmt =
-                           imp_ejson_stmt_for_rewrite (map fst el ++ avoid) (imp_data_stmt_to_imp_ejson stmt)));
+                           imp_data_stmt_to_imp_ejson_combined (* (map fst el ++ avoid) *) stmt =
+                           imp_ejson_stmt_for_rewrite (* (map fst el ++ avoid) *) (imp_data_stmt_to_imp_ejson stmt)));
                try assumption; intros; apply H0); clear H.
           apply (map_eq Hforall).
         + Case "ImpStmtAssign"%string.
