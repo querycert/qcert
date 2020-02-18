@@ -231,6 +231,11 @@ function cast(brands,v) {
 }
 
 /* Collection */
+function iterColl(b, f) {
+    for (let i = 0; i < b.length; i++) {
+	f(b[i]);
+    }
+}
 function distinct(b) {
     var result = [ ];
     for (var i=0; i<b.length; i=i+1) {
