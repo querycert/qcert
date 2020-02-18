@@ -193,8 +193,17 @@ Section ImpEJsontoJavaScriptAst.
       | ImpStmtAssign x e =>
         stat_expr (expr_assign (expr_identifier x) None (imp_ejson_expr_to_js_ast e))
       | ImpStmtFor x e s =>
-        stat_for_in_let nil x None (imp_ejson_expr_to_js_ast e)
-                        (imp_ejson_stmt_to_js_ast s)
+        let c := imp_ejson_expr_to_js_ast e in
+        let prog :=
+            prog_intro strictness_true [ element_stat (imp_ejson_stmt_to_js_ast s)]
+        in
+        let f :=
+            expr_function None [x]
+                          (funcbody_intro prog (prog_to_string prog))
+        in
+        call_runtime "iterColl" [c; f]
+        (* stat_for_in_let nil x None (imp_ejson_expr_to_js_ast e) *)
+        (*                 (imp_ejson_stmt_to_js_ast s) *)
       | ImpStmtForRange x e1 e2 s =>
         stat_for_let
           nil
