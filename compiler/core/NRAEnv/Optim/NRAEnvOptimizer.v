@@ -2997,20 +2997,20 @@ Section NRAEnvOptimizer.
     apply eq_refl.
   Qed.
 
-  Definition run_nraenv_optims 
+  Definition nraenv_optim_top
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nraenv}
              (opc:optim_phases_config)
     : nraenv -> nraenv :=
     run_phases tnraenv_map_deep nraenv_size tnraenv_optim_list opc.
 
-  Lemma run_nraenv_optims_correctness
+  Lemma nraenv_optim_top_correctness
         {model:basic_model} {logger:optimizer_logger string nraenv}
         (opc:optim_phases_config)
         (p:nraenv) :
-    tnraenv_rewrites_to p ( run_nraenv_optims opc p).
+    tnraenv_rewrites_to p (nraenv_optim_top opc p).
   Proof.
-    unfold run_nraenv_optims.
+    unfold nraenv_optim_top.
     apply run_phases_correctness.
     - intros. apply nraenv_map_deep_correctness; auto.
     - apply tnraenv_optim_list_correct.
@@ -3221,23 +3221,23 @@ Section NRAEnvOptimizer.
   End default.
 
   Definition toptim_old_nraenv_head {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv}
-    := run_nraenv_optims (("head",nraenv_default_head_optim_list,5)::nil).
+    := nraenv_optim_top (("head",nraenv_default_head_optim_list,5)::nil).
 
   Lemma toptim_old_nraenv_head_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
     p ⇒ₓ toptim_old_nraenv_head p.
   Proof.
     unfold toptim_old_nraenv_head.
-    apply run_nraenv_optims_correctness.
+    apply nraenv_optim_top_correctness.
   Qed.
   
   Definition toptim_old_nraenv_tail {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} 
-    := run_nraenv_optims (("tail",nraenv_default_head_optim_list,15)::nil).
+    := nraenv_optim_top (("tail",nraenv_default_head_optim_list,15)::nil).
 
   Lemma toptim_old_nraenv_tail_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
     p ⇒ₓ toptim_old_nraenv_tail p.
   Proof.
     unfold toptim_old_nraenv_tail.
-    apply run_nraenv_optims_correctness.
+    apply nraenv_optim_top_correctness.
   Qed.
 
   Definition toptim_old_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} :=

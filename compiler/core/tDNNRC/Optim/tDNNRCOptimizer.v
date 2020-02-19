@@ -468,14 +468,13 @@ Section tDNNRCOptimizer.
     apply eq_refl.
   Qed.
   
-  Definition run_dnnrc_optims {A}
+  Definition dnnrc_optim_top {A}
              {logger:optimizer_logger string (@dnnrc_base _ (type_annotation A) dataframe)}
-             (phaseName:string)
              (optims:list string)
              (iterationsBetweenCostCheck:nat)
     : @dnnrc_base _ (type_annotation A) dataframe -> @dnnrc_base _ (type_annotation A) dataframe :=
     run_phase dnnrc_base_map_deep (dnnrc_base_size (* dataframe_size *)) dnnrc_optim_list
-              ("[dnnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
+              "[dnnrc] " optims iterationsBetweenCostCheck.
 
   Definition dnnrc_default_optim_list : list string
     := [
@@ -492,9 +491,9 @@ Section tDNNRCOptimizer.
     vm_compute; trivial.
   Qed.
 
-  Definition dnnrcToDataframeRewrite {A:Set}
+  Definition dnnrc_optim_top_default {A:Set}
              {logger:optimizer_logger string (@dnnrc_base _ (type_annotation A) dataframe)}
-    := run_dnnrc_optims "" dnnrc_default_optim_list 6.
+    := dnnrc_optim_top dnnrc_default_optim_list 6.
 
 End tDNNRCOptimizer.
 
