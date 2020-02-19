@@ -120,6 +120,7 @@ MODULES = \
 	Translation/Model/DataToEJson \
 	Translation/Model/ForeignEJsonToJSON \
 	Translation/Model/EJsonToJSON \
+	Translation/Model/EJsonToEJsonMut \
 	Translation/Model/ForeignTypeToJSON \
 	Translation/Model/TypeToJSON \
 	Translation/Model/DTypeToJSON \
