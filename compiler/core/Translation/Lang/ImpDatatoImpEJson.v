@@ -1334,119 +1334,115 @@ reflexivity.
       imp_data_function_eval h f d =
       lift ejson_to_data (imp_ejson_function_eval h (imp_data_function_to_imp_ejson f) (data_to_ejson d)).
     Proof.
-      admit.
-    Admitted.
-    (*   destruct f; simpl. *)
-    (*   generalize (imp_data_stmt_to_imp_ejson_stmt_combined_correct [(v0, None); (v, Some d)] i (v::nil)); intros. *)
-    (*   unfold imp_data_stmt_eval in H. *)
-    (*   unfold imp_ejson_stmt_eval in H. *)
-    (*   unfold imp_data_model in *. *)
-    (*   simpl in H. *)
-    (*   unfold lift. *)
-    (*   assert ((@ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op *)
-    (*        imp_ejson_runtime_op (@imp_ejson_model_normalize fejson) *)
-    (*        (@imp_ejson_model_to_bool fejson) *)
-    (*        (@imp_ejson_model_to_Z fejson) *)
-    (*        (@imp_ejson_model_to_list fejson) *)
-    (*        (@imp_ejson_Z_to_data fejson) *)
-    (*        (@imp_ejson_runtime_eval fejson _ h) *)
-    (*        (@imp_ejson_op_eval fejson) *)
-    (*        (imp_data_stmt_to_imp_ejson_combined (@cons var v (@nil var)) i) *)
-    (*        (@cons (prod string (option (@ejson fejson))) *)
-    (*           (@pair string (option (@ejson fejson)) v0 *)
-    (*              (@None (@ejson fejson))) *)
-    (*           (@cons (prod string (option (@ejson fejson))) *)
-    (*              (@pair string (option (@ejson fejson)) v *)
-    (*                 (@Some (@ejson fejson) (@data_to_ejson fruntime fejson ftejson d))) *)
-    (*              (@nil (prod string (option (@ejson fejson))))))) *)
-    (*          = @ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op imp_ejson_runtime_op *)
-    (*       (@imp_ejson_model_normalize fejson) *)
-    (*       (@imp_ejson_model_to_bool fejson) *)
-    (*       (@imp_ejson_model_to_Z fejson) *)
-    (*       (@imp_ejson_model_to_list fejson) *)
-    (*       (@imp_ejson_Z_to_data fejson) *)
-    (*       (@imp_ejson_runtime_eval fejson _ h) *)
-    (*       (@imp_ejson_op_eval fejson) *)
-    (*       (imp_data_stmt_to_imp_ejson_combined (@cons var v (@nil var)) i) *)
-    (*       (@cons (prod var (option (@imp_ejson_model fejson))) *)
-    (*          (@pair var (option (@imp_ejson_model fejson)) v0 *)
-    (*             (@None (@imp_ejson_model fejson))) *)
-    (*          (@cons (prod var (option (@imp_ejson_model fejson))) *)
-    (*             (@pair var (option (@imp_ejson_model fejson)) v *)
-    (*                (@Some (@imp_ejson_model fejson) (@data_to_ejson fruntime fejson ftejson d))) *)
-    (*             (@nil (prod var (option (@imp_ejson_model fejson))))))) by reflexivity. *)
-    (*   rewrite <- H0; clear H0. *)
-    (*   rewrite <- H; clear H. *)
-    (*   unfold unlift_result_env; unfold lift; simpl. *)
-    (*   destruct (ImpEval.imp_stmt_eval i [(v0, None); (v, Some d)]); [|reflexivity]. *)
-    (*   unfold olift; simpl in *. *)
-    (*   induction p; simpl; [reflexivity|]. *)
-    (*   destruct a; simpl. *)
-    (*   unfold EquivDec.equiv_dec. *)
-    (*   destruct (string_eqdec v0 s); simpl. *)
-    (*   - destruct o; [|reflexivity]; simpl in *. *)
-    (*     rewrite data_to_ejson_idempotent; trivial. *)
-    (*   - assumption. *)
-    (* Qed. *)
+      destruct f; simpl.
+      generalize (imp_data_stmt_to_imp_ejson_stmt_correct [(v0, None); (v, Some d)] i); intros.
+      unfold imp_data_stmt_eval in H.
+      unfold imp_ejson_stmt_eval in H.
+      unfold imp_data_model in *.
+      simpl in H.
+      unfold lift.
+      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op
+           imp_ejson_runtime_op (@imp_ejson_model_normalize fejson)
+           (@imp_ejson_model_to_bool fejson)
+           (@imp_ejson_model_to_Z fejson)
+           (@imp_ejson_model_to_list fejson)
+           (@imp_ejson_Z_to_data fejson)
+           (@imp_ejson_runtime_eval fejson _ h)
+           (@imp_ejson_op_eval fejson)
+           (imp_data_stmt_to_imp_ejson i)
+           (@cons (prod string (option (@ejson fejson)))
+              (@pair string (option (@ejson fejson)) v0
+                 (@None (@ejson fejson)))
+              (@cons (prod string (option (@ejson fejson)))
+                 (@pair string (option (@ejson fejson)) v
+                    (@Some (@ejson fejson) (@data_to_ejson fruntime fejson ftejson d)))
+                 (@nil (prod string (option (@ejson fejson)))))))
+             = @ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op imp_ejson_runtime_op
+          (@imp_ejson_model_normalize fejson)
+          (@imp_ejson_model_to_bool fejson)
+          (@imp_ejson_model_to_Z fejson)
+          (@imp_ejson_model_to_list fejson)
+          (@imp_ejson_Z_to_data fejson)
+          (@imp_ejson_runtime_eval fejson _ h)
+          (@imp_ejson_op_eval fejson)
+          (imp_data_stmt_to_imp_ejson i)
+          (@cons (prod var (option (@imp_ejson_model fejson)))
+             (@pair var (option (@imp_ejson_model fejson)) v0
+                (@None (@imp_ejson_model fejson)))
+             (@cons (prod var (option (@imp_ejson_model fejson)))
+                (@pair var (option (@imp_ejson_model fejson)) v
+                   (@Some (@imp_ejson_model fejson) (@data_to_ejson fruntime fejson ftejson d)))
+                (@nil (prod var (option (@imp_ejson_model fejson))))))) by reflexivity.
+      rewrite <- H0; clear H0.
+      rewrite <- H; clear H.
+      unfold unlift_result_env; unfold lift; simpl.
+      destruct (ImpEval.imp_stmt_eval i [(v0, None); (v, Some d)]); [|reflexivity].
+      unfold olift; simpl in *.
+      induction p; simpl; [reflexivity|].
+      destruct a; simpl.
+      unfold EquivDec.equiv_dec.
+      destruct (string_eqdec v0 s); simpl.
+      - destruct o; [|reflexivity]; simpl in *.
+        rewrite data_to_ejson_idempotent; trivial.
+      - assumption.
+    Qed.
 
     Lemma imp_data_function_to_imp_ejson_function_aux_correct (d:data) (f:imp_data_function) :
       lift data_to_ejson (imp_data_function_eval h f d) =
       imp_ejson_function_eval h (imp_data_function_to_imp_ejson f) (data_to_ejson d).
     Proof.
-      admit.
-    Admitted.
-    (*   destruct f; simpl. *)
-    (*   generalize (imp_data_stmt_to_imp_ejson_stmt_combined_correct [(v0, None); (v, Some d)] i (v::nil)); intros. *)
-    (*   unfold imp_data_stmt_eval in H. *)
-    (*   unfold imp_ejson_stmt_eval in H. *)
-    (*   unfold imp_data_model in *. *)
-    (*   simpl in H. *)
-    (*   unfold lift. *)
-    (*   assert ((@ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op *)
-    (*        imp_ejson_runtime_op (@imp_ejson_model_normalize fejson) *)
-    (*        (@imp_ejson_model_to_bool fejson) *)
-    (*        (@imp_ejson_model_to_Z fejson) *)
-    (*        (@imp_ejson_model_to_list fejson) *)
-    (*        (@imp_ejson_Z_to_data fejson) *)
-    (*        (@imp_ejson_runtime_eval fejson _ h) *)
-    (*        (@imp_ejson_op_eval fejson) *)
-    (*        (imp_data_stmt_to_imp_ejson_combined (@cons var v (@nil var)) i) *)
-    (*        (@cons (prod string (option (@ejson fejson))) *)
-    (*           (@pair string (option (@ejson fejson)) v0 *)
-    (*              (@None (@ejson fejson))) *)
-    (*           (@cons (prod string (option (@ejson fejson))) *)
-    (*              (@pair string (option (@ejson fejson)) v *)
-    (*                 (@Some (@ejson fejson) (@data_to_ejson fruntime fejson ftejson d))) *)
-    (*              (@nil (prod string (option (@ejson fejson))))))) *)
-    (*          = @ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op imp_ejson_runtime_op *)
-    (*       (@imp_ejson_model_normalize fejson) *)
-    (*       (@imp_ejson_model_to_bool fejson) *)
-    (*       (@imp_ejson_model_to_Z fejson) *)
-    (*       (@imp_ejson_model_to_list fejson) *)
-    (*       (@imp_ejson_Z_to_data fejson) *)
-    (*       (@imp_ejson_runtime_eval fejson _ h) *)
-    (*       (@imp_ejson_op_eval fejson) *)
-    (*       (imp_data_stmt_to_imp_ejson_combined (@cons var v (@nil var)) i) *)
-    (*       (@cons (prod var (option (@imp_ejson_model fejson))) *)
-    (*          (@pair var (option (@imp_ejson_model fejson)) v0 *)
-    (*             (@None (@imp_ejson_model fejson))) *)
-    (*          (@cons (prod var (option (@imp_ejson_model fejson))) *)
-    (*             (@pair var (option (@imp_ejson_model fejson)) v *)
-    (*                (@Some (@imp_ejson_model fejson) (@data_to_ejson fruntime fejson ftejson d))) *)
-    (*             (@nil (prod var (option (@imp_ejson_model fejson))))))) by reflexivity. *)
-    (*   rewrite <- H0; clear H0. *)
-    (*   rewrite <- H; clear H. *)
-    (*   unfold unlift_result_env; unfold lift; simpl. *)
-    (*   destruct (ImpEval.imp_stmt_eval i [(v0, None); (v, Some d)]); [|reflexivity]. *)
-    (*   unfold olift; simpl in *. *)
-    (*   induction p; simpl; [reflexivity|]. *)
-    (*   destruct a; simpl. *)
-    (*   unfold EquivDec.equiv_dec. *)
-    (*   destruct (string_eqdec v0 s); simpl. *)
-    (*   - destruct o; [|reflexivity]; simpl in *. *)
-    (*     reflexivity. *)
-    (*   - assumption. *)
-    (* Qed. *)
+      destruct f; simpl.
+      generalize (imp_data_stmt_to_imp_ejson_stmt_correct [(v0, None); (v, Some d)] i); intros.
+      unfold imp_data_stmt_eval in H.
+      unfold imp_ejson_stmt_eval in H.
+      unfold imp_data_model in *.
+      simpl in H.
+      unfold lift.
+      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op
+           imp_ejson_runtime_op (@imp_ejson_model_normalize fejson)
+           (@imp_ejson_model_to_bool fejson)
+           (@imp_ejson_model_to_Z fejson)
+           (@imp_ejson_model_to_list fejson)
+           (@imp_ejson_Z_to_data fejson)
+           (@imp_ejson_runtime_eval fejson _ h)
+           (@imp_ejson_op_eval fejson)
+           (imp_data_stmt_to_imp_ejson i)
+           (@cons (prod string (option (@ejson fejson)))
+              (@pair string (option (@ejson fejson)) v0
+                 (@None (@ejson fejson)))
+              (@cons (prod string (option (@ejson fejson)))
+                 (@pair string (option (@ejson fejson)) v
+                    (@Some (@ejson fejson) (@data_to_ejson fruntime fejson ftejson d)))
+                 (@nil (prod string (option (@ejson fejson)))))))
+             = @ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op imp_ejson_runtime_op
+          (@imp_ejson_model_normalize fejson)
+          (@imp_ejson_model_to_bool fejson)
+          (@imp_ejson_model_to_Z fejson)
+          (@imp_ejson_model_to_list fejson)
+          (@imp_ejson_Z_to_data fejson)
+          (@imp_ejson_runtime_eval fejson _ h)
+          (@imp_ejson_op_eval fejson)
+          (imp_data_stmt_to_imp_ejson i)
+          (@cons (prod var (option (@imp_ejson_model fejson)))
+             (@pair var (option (@imp_ejson_model fejson)) v0
+                (@None (@imp_ejson_model fejson)))
+             (@cons (prod var (option (@imp_ejson_model fejson)))
+                (@pair var (option (@imp_ejson_model fejson)) v
+                   (@Some (@imp_ejson_model fejson) (@data_to_ejson fruntime fejson ftejson d)))
+                (@nil (prod var (option (@imp_ejson_model fejson))))))) by reflexivity.
+      rewrite <- H0; clear H0.
+      rewrite <- H; clear H.
+      unfold unlift_result_env; unfold lift; simpl.
+      destruct (ImpEval.imp_stmt_eval i [(v0, None); (v, Some d)]); [|reflexivity].
+      unfold olift; simpl in *.
+      induction p; simpl; [reflexivity|].
+      destruct a; simpl.
+      unfold EquivDec.equiv_dec.
+      destruct (string_eqdec v0 s); simpl.
+      - destruct o; [|reflexivity]; simpl in *.
+        reflexivity.
+      - assumption.
+    Qed.
 
     Lemma push_rec_sort_in_map env :
       (rec_sort (map (fun xy : string * data => (fst xy, data_to_ejson (snd xy))) env))
