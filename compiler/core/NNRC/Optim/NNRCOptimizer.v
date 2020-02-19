@@ -1115,20 +1115,20 @@ Section NNRCOptimizer.
   Qed.
 
   (* *************************** *)
-  Definition run_nnrc_optims 
+  Definition nnrc_optim_top 
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nnrc}
              (opc:optim_phases_config)
     : nnrc -> nnrc :=
     run_phases tnnrc_map_deep NNRCSize.nnrc_size tnnrc_optim_list opc.
 
-  Lemma run_nnrc_optims_correctness
+  Lemma nnrc_optim_top_correctness
         {model:basic_model} {logger:optimizer_logger string nnrc}
         (opc:optim_phases_config)
         (p:nnrc) :
-    tnnrc_rewrites_to p (run_nnrc_optims opc p).
+    tnnrc_rewrites_to p (nnrc_optim_top opc p).
   Proof.
-    unfold run_nnrc_optims.
+    unfold nnrc_optim_top.
     apply run_phases_correctness.
     - intros. apply tnnrc_map_deep_correctness; auto.
     - apply tnnrc_optim_list_correct.
@@ -1178,16 +1178,16 @@ Section NNRCOptimizer.
   End default.
   
   (* Java equivalent: NnrcOptimizer.trew *)
-  Definition run_nnrc_optims_default
+  Definition nnrc_optim_top_default
              {fruntime:foreign_runtime} {logger:optimizer_logger string nnrc}
-    := run_nnrc_optims default_nnrc_optim_phases.
+    := nnrc_optim_top default_nnrc_optim_phases.
 
-  Lemma run_nnrc_optims_default_correct
+  Lemma nnrc_optim_top_default_correct
         {model:basic_model} {logger:optimizer_logger string nnrc} p:
-    tnnrc_rewrites_to p (run_nnrc_optims_default p).
+    tnnrc_rewrites_to p (nnrc_optim_top_default p).
   Proof.
-    unfold run_nnrc_optims_default.
-    apply run_nnrc_optims_correctness.
+    unfold nnrc_optim_top_default.
+    apply nnrc_optim_top_correctness.
   Qed.
 
 End NNRCOptimizer.

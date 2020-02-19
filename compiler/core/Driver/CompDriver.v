@@ -249,26 +249,28 @@ Section CompDriver.
   (** Optimization functions *)
   Section optimizations.
     Definition nraenv_optim (opc:optim_phases_config) (q: nraenv) : nraenv
-      := NRAEnvOptimizer.run_nraenv_optims opc q.
+      := nraenv_optim_top opc q.
     Definition nraenv_optim_default (q: nraenv) : nraenv
       := nraenv_optim default_nraenv_optim_phases q.
 
     Definition nnrc_optim (opc:optim_phases_config) (q: nnrc) : nnrc
-      := run_nnrc_optims opc q.
+      := nnrc_optim_top opc q.
     Definition nnrc_optim_default (q:nnrc) : nnrc
       := nnrc_optim (get_default_optim_config L_nnrc) q.
 
     Definition nnrs_imp_optim (opc:optim_phases3_config) (q: nnrs_imp) : nnrs_imp
-      := run_nnrs_imp_optims opc q.
-
+      := nnrs_imp_optim_top opc q.
     Definition nnrs_imp_optim_default (q:nnrs_imp) : nnrs_imp
-      := run_nnrs_imp_optims (get_default_optim_config L_nnrs_imp) q.
+      := nnrs_imp_optim (get_default_optim_config L_nnrs_imp) q.
 
     Definition nnrcmr_optim (q: nnrcmr) : nnrcmr
-      := run_nnrcmr_optims q.
+      := nnrcmr_optim_top q.
 
     Definition dnnrc_typed_optim (q:dnnrc_typed) : dnnrc_typed
-      := dnnrcToDataframeRewrite q.
+      := dnnrc_optim_top_default q. (* XXX Should allow optimization phases and configuration *)
+
+    Definition imp_ejson_optim (q:imp_ejson) : imp_ejson
+      := q. (* XXX TODO *)
   End optimizations.
 
   (** Drivers *)
@@ -299,6 +301,7 @@ Section CompDriver.
 
   Inductive imp_ejson_driver : Set :=
     | Dv_imp_ejson_stop : imp_ejson_driver
+    | Dv_imp_ejson_optim : imp_ejson_driver -> imp_ejson_driver
     | Dv_imp_ejson_to_js_ast : option string -> js_ast_driver -> imp_ejson_driver
   .
 
@@ -539,6 +542,7 @@ Section CompDriver.
   Fixpoint driver_length_imp_ejson (dv: imp_ejson_driver) :=
     match dv with
     | Dv_imp_ejson_stop => 1
+    | Dv_imp_ejson_optim dv =>  1 + driver_length_imp_ejson dv
     | Dv_imp_ejson_to_js_ast _ dv => 1 + driver_length_js_ast dv
     end.
 
@@ -749,10 +753,13 @@ Section CompDriver.
       in
       (Q_spark_df q) :: queries.
 
-    Definition compile_imp_ejson (dv: imp_ejson_driver) (q: imp_ejson) : list query :=
+    Fixpoint compile_imp_ejson (dv: imp_ejson_driver) (q: imp_ejson) : list query :=
       let queries :=
           match dv with
           | Dv_imp_ejson_stop => nil
+          | Dv_imp_ejson_optim dv =>
+            let q := imp_ejson_optim q in
+            compile_imp_ejson dv q
           | Dv_imp_ejson_to_js_ast cname dv =>
             let q := imp_ejson_to_js_ast cname q in
             compile_js_ast dv q
@@ -1611,8 +1618,8 @@ Section CompDriver.
       end
     | L_imp_ejson =>
       match dv with
-      | Dv_imp_ejson _ =>
-          Dv_error ("XXX TODO: imp_data optimizer XXX")
+      | Dv_imp_ejson dv =>
+        Dv_imp_ejson (Dv_imp_ejson_optim dv)
       | Dv_js_ast dv =>
         Dv_imp_ejson (Dv_imp_ejson_to_js_ast config.(comp_class_name) dv)
       | Dv_camp _
@@ -1961,6 +1968,7 @@ Section CompDriver.
     | Dv_imp_data (Dv_imp_data_stop) => (L_imp_data, None)
     | Dv_imp_data (Dv_imp_data_to_imp_ejson dv) => (L_imp_data, Some (Dv_imp_ejson dv))
     | Dv_imp_ejson (Dv_imp_ejson_stop) => (L_imp_ejson, None)
+    | Dv_imp_ejson (Dv_imp_ejson_optim dv) => (L_imp_ejson, Some (Dv_imp_ejson dv))
     | Dv_imp_ejson (Dv_imp_ejson_to_js_ast _ dv) => (L_imp_ejson, Some (Dv_js_ast dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
@@ -2087,6 +2095,18 @@ Section CompDriver.
   Proof.
     induction dv; simpl.
     - reflexivity.
+    - rewrite target_language_of_driver_equation
+      ; simpl.
+      eapply is_postfix_plus_one with
+               (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 None
+                 EmptyString
+                 nil
+                 EmptyString
+                 nil) (lang:=L_imp_ejson)
+      ; simpl; eauto.
     - rewrite target_language_of_driver_equation
       ; simpl.
       eapply is_postfix_plus_one with
