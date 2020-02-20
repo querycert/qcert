@@ -86,7 +86,7 @@ Require Import NNRCOptim.
 Require Import NNRCMROptim.
 Require Import tDNNRCOptim.
 Require Import NNRSimpOptim.
-(* Require Import ImpOptim. *)
+Require Import ImpOptim.
 Require Import OptimizerLogger.
 
 (* Foreign Datatypes Support *)
@@ -270,7 +270,7 @@ Section CompDriver.
       := dnnrc_optim_top_default q. (* XXX Should allow optimization phases and configuration *)
 
     Definition imp_ejson_optim (q:imp_ejson) : imp_ejson
-      := q. (* XXX TODO *)
+      := imp_ejson_optim_top q. (* XXX TODO *)
   End optimizations.
 
   (** Drivers *)
