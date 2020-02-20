@@ -12,11 +12,6 @@
  * limitations under the License.
  *)
 
-(** NNRSimp is a variant of the named nested relational calculus
-     (NNRC) that is meant to be more imperative in feel.  It is used
-     as an intermediate language between NNRC and more imperative /
-     statement oriented backends *)
-
 Require Import String.
 Require Import List.
 Require Import Arith.

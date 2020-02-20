@@ -25,4 +25,3 @@ Require Export ImpEJson.
 Require Export ImpEJsonSize.
 Require Export ImpEJsonVars.
 Require Export ImpEJsonEval.
-Require Export ImpEJsonRewrite.
