@@ -194,11 +194,8 @@ Section ImpEJsonRewrite.
        | _ => None
        end.
     Proof.
-    Qed.
-
-
-
-
+      admit.
+    Admitted.
 
     (* Lemma for_range_ind h src i j n s σ : *)
     (*   let for_range_stmt := ImpStmtForRange i j n s in *)
@@ -335,10 +332,8 @@ Section ImpEJsonRewrite.
         rewrite IHl; clear IHl.
         unfold olift.
         simpl.
-
-
-    Qed.
-
+        admit.
+    Admitted.
 
     Lemma for_body h src i v n n' a stmt σ1:
       (* match *)
