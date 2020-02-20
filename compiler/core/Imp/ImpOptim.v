@@ -13,4 +13,6 @@
  *)
 
 Require Export ImpOptimizerEngine.
+Require Export ImpEJsonRewrite.
+Require Export ImpEJsonOptimizer.
 

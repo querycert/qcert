@@ -12,10 +12,7 @@
  * limitations under the License.
  *)
 
-(** NNRSimp is a variant of the named nested relational calculus
-     (NNRC) that is meant to be more imperative in feel.  It is used
-     as an intermediate language between NNRC and more imperative /
-     statement oriented backends *)
+(** Imp is a simpl imperative intermediate language. *)
 
 Require Import String.
 Require Import List.
@@ -80,6 +77,16 @@ Section ImpEJsonRewrite.
                   (imp_ejson_stmt_for_rewrite s2)
       end.
 
+    Definition imp_ejson_function_rewrite (f:imp_function) : imp_function :=
+      match f with
+      | ImpFun v1 s v2 =>
+        ImpFun v1 (imp_ejson_stmt_for_rewrite s) v2
+      end.
+    Definition imp_ejson_rewrite (q:imp_ejson) : imp_ejson :=
+      match q with
+      | ImpLib l =>
+        ImpLib (map (fun xy => (fst xy, imp_ejson_function_rewrite (snd xy))) l)
+      end.
   End ForRewrite.
 
   Section CorrectnessForRewrite.
@@ -557,6 +564,51 @@ Set Printing Depth 100.
         rewrite <- (IHstmt2 σ0).
         reflexivity.
     Admitted.
+
+    (* XXX Added to connect the underlying proof on Imp statements to the Imp optimizer *)
+    Lemma imp_ejson_function_rewrite_correct h (j : ejson) (f:imp_ejson_function) :
+        imp_ejson_function_eval h f j =
+        imp_ejson_function_eval h (imp_ejson_function_rewrite f) j.
+    Proof.
+      destruct f; simpl.
+      generalize (imp_ejson_stmt_for_rewrite_correct h [(v0, None); (v, Some j)] i); intros Hstmt.
+      unfold imp_ejson_stmt_eval in Hstmt.
+      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op
+               (@imp_ejson_runtime_op fejson fejruntime) (@imp_ejson_model_normalize fejson)
+               (@imp_ejson_model_to_bool fejson) (@imp_ejson_model_to_Z fejson) (@imp_ejson_model_to_list fejson)
+               (@imp_ejson_Z_to_data fejson) (@imp_ejson_runtime_eval fejson fejruntime h)
+               (@imp_ejson_op_eval fejson) i
+               (@cons (prod var (option (@ejson fejson)))
+                  (@pair var (option (@ejson fejson)) v0 (@None (@ejson fejson)))
+                  (@cons (prod var (option (@ejson fejson)))
+                     (@pair var (option (@ejson fejson)) v (@Some (@ejson fejson) j))
+                     (@nil (prod var (option (@ejson fejson)))))))
+              = @ImpEval.imp_stmt_eval (@imp_ejson_model fejson) (@imp_ejson_constant fejson) imp_ejson_op
+        (@imp_ejson_runtime_op fejson fejruntime) (@imp_ejson_model_normalize fejson)
+        (@imp_ejson_model_to_bool fejson) (@imp_ejson_model_to_Z fejson) (@imp_ejson_model_to_list fejson)
+        (@imp_ejson_Z_to_data fejson) (@imp_ejson_runtime_eval fejson fejruntime h) (@imp_ejson_op_eval fejson) i
+        (@cons (prod var (option (@imp_ejson_model fejson)))
+           (@pair var (option (@imp_ejson_model fejson)) v0 (@None (@imp_ejson_model fejson)))
+           (@cons (prod var (option (@imp_ejson_model fejson)))
+              (@pair var (option (@imp_ejson_model fejson)) v (@Some (@imp_ejson_model fejson) j))
+              (@nil (prod var (option (@imp_ejson_model fejson))))))) by reflexivity.
+      rewrite H in Hstmt; clear H.
+      rewrite Hstmt; clear Hstmt.
+      reflexivity.
+    Qed.
+
+    Lemma imp_ejson_rewrite_correct h (j : ejson) (q:imp_ejson) :
+        imp_ejson_eval h q j =
+        imp_ejson_eval h (imp_ejson_rewrite q) j.
+    Proof.
+      destruct q; destruct l; [reflexivity|].
+      destruct p; destruct l; [|reflexivity].
+      simpl.
+      generalize (imp_ejson_function_rewrite_correct h j i); intros Hfun;
+        unfold imp_ejson_function_eval in Hfun.
+      rewrite Hfun.
+      reflexivity.
+    Qed.
   End CorrectnessForRewrite.
 
 End ImpEJsonRewrite.

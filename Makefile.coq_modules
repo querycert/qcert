@@ -257,10 +257,11 @@ MODULES = \
 	Imp/Lang/ImpEJsonSize \
 	Imp/Lang/ImpEJsonVars \
 	Imp/Lang/ImpEJsonEval \
-	Imp/Lang/ImpEJsonRewrite \
 	Imp/ImpRuntime \
 	Imp/ImpSystem \
 	Imp/Optim/ImpOptimizerEngine \
+	Imp/Optim/ImpEJsonRewrite \
+	Imp/Optim/ImpEJsonOptimizer \
 	Imp/ImpOptim \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \
