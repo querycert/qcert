@@ -30,6 +30,17 @@ function unboxNat(v) {
 function isNat(v) {
     return Object.prototype.hasOwnProperty.call(v,'$nat');
 }
+function boxColl(v, len) {
+    len = (typeof len !== 'undefined') ?  len : v.length;
+    return { '$coll': v, 'length': len };
+}
+function unboxColl(v) {
+    return v['$coll'];
+}
+function isBoxColl(obj) {
+    return (Object.prototype.hasOwnProperty.call(obj,'$coll') &&
+            Object.prototype.hasOwnProperty.call(obj,'length'));
+}
 function boxLeft(v) {
     return { '$left' : v };
 }
@@ -71,9 +82,15 @@ function compare(v1, v2) {
     var t1 = typeof v1, t2 = typeof v2;
     if (t1 === 'object' && v1 !== null) {
         if (isNat(v1)) { t1 = 'number'; v1 = unboxNat(v1); }
+        if (isBoxColl(v1)) {
+	    t1 = 'collection'; v1 = unboxColl(v1).slice(0, v1.length);
+	}
     };
     if (t2 === 'object' && v2 !== null) {
         if (isNat(v2)) { t2 = 'number'; v2 = unboxNat(v2); }
+        if (isBoxColl(v2)) {
+	    t2 = 'collection'; v2 = unboxColl(v2).slice(0, v2.length);
+	}
     };
     if (t1 != t2) {
         return t1 < t2 ? -1 : +1;
@@ -173,16 +190,22 @@ function recDot(receiver, member) {
 
 /* Array */
 function array(...args) {
-    return Array.of(...args);
+    return boxColl(Array.of(...args));
 }
 function arrayLength(v) {
     return boxNat(v.length);
 }
 function arrayPush(v1,v2) {
-    return union(v1,[v2]);
+    var content1 = unboxColl(v1);
+    if (content1.length !== v1.length) {
+	content1 = content1.slice(0, v1.length);
+    }
+    content1.push(v2);
+    return boxColl(content1);
 }
 function arrayAccess(v1,v2) {
-    return v1[unboxNat(v2)];
+    var content1 = unboxColl(v1);
+    return content1[unboxNat(v2)];
 }
 
 /* Sum */
@@ -246,53 +269,58 @@ function cast(brands,v) {
 
 /* Collection */
 function iterColl(b, f) {
+    var content = unboxColl(b);
     for (let i = 0; i < b.length; i++) {
-	f(b[i]);
+	f(content[i]);
     }
 }
 function distinct(b) {
     var result = [ ];
+    var content = unboxColl(b);
     for (var i=0; i<b.length; i=i+1) {
-        var v = b[i];
+        var v = content[i];
         var dup = false;
         for (var j=i+1; j<b.length; j=j+1) {
-            if (equal(v,b[j])) { dup = true; break; }
+            if (equal(v,content[j])) { dup = true; break; }
         }
         if (!(dup)) { result.push(v); } else { dup = false; }
     }
-    return result;
+    return boxColl(result);
 }
 function singleton(v) {
+    var content = unboxColl(v);
     if (v.length === 1) {
-        return boxLeft(v[0]);
+        return boxLeft(content[0]);
     } else {
         return boxRight(null); /* Not a singleton */
     }
 }
 function flatten(aOuter) {
     var result = [ ];
+    var aOuterContent = unboxColl(aOuter);
     for (var iOuter=0, nOuter=aOuter.length; iOuter<nOuter; iOuter = iOuter+1) {
-        var aInner = aOuter[iOuter];
+        var aInner = aOuterContent[iOuter];
+        var aInnerContent = unboxColl(aInner);
         for (var iInner=0, nInner=aInner.length; iInner<nInner; iInner = iInner+1) {
-            result.push(aInner[iInner]);
+            result.push(aInnerContent[iInner]);
         }
     }
-    return result;
+    return boxColl(result);
 }
 function union(b1, b2) {
-    var result = [ ];
-    for (var i1=0; i1<b1.length; i1=i1+1) {
-        result.push(b1[i1]);
+    var content1 = unboxColl(b1);
+    var content2 = unboxColl(b2);
+    if (content1.length !== b1.length) {
+	content1 = content1.slice(0, b1.length);
     }
-    for (var i2=0; i2<b2.length; i2=i2+1) {
-        result.push(b2[i2]);
-    }
+    content1.push(...content2);
+    var result = boxColl(content1);
     return result;
 }
 function minus(b1, b2) {
     var result = [ ];
-    var v1 = b1.slice();
-    var v2 = b2.slice();
+    var v1 = unboxColl(b1).slice(0, b1.length);
+    var v2 = unboxColl(b2).slice(0, b2.length);
     v1.sort(compare);
     v2.sort(compare);
     var i2=0;
@@ -306,12 +334,12 @@ function minus(b1, b2) {
             result.push(v1[i1]);
         }
     }
-    return result;
+    return boxColl(result);
 }
 function min(b1, b2) {
     var result = [ ];
-    var v1 = b1.slice();
-    var v2 = b2.slice();
+    var v1 = unboxColl(b1).slice(0, b1.length);
+    var v2 = unboxColl(b2).slice(0, b2.length);
     v1.sort(compare);
     v2.sort(compare);
     var i2=0;
@@ -323,12 +351,12 @@ function min(b1, b2) {
             if (compare(v1[i1],v2[i2]) === 0) result.push(v1[i1]);
         }
     }
-    return result;
+    return boxColl(result);
 }
 function max(b1, b2) {
     var result = [ ];
-    var v1 = b1.slice();
-    var v2 = b2.slice();
+    var v1 = unboxColl(b1).slice(0, b1.length);
+    var v2 = unboxColl(b2).slice(0, b2.length);
     v1.sort(compare);
     v2.sort(compare);
     var i2=0;
@@ -342,15 +370,16 @@ function max(b1, b2) {
         result.push(v1[i1]);
     }
     while (i2 < length2) { result.push(v2[i2]); i2=i2+1; }
-    return result;
+    return boxColl(result);
 }
 function nth(b1, n) {
     var index = n;
+    var content = unboxColl(b1);
     if (isNat(n)){
         index = unboxNat(n);
     }
-    if (b1[index]) {
-        return boxLeft(b1[index]);
+    if (content[index]) {
+        return boxLeft(content[index]);
     } else {
         return boxRight(null);
     }
@@ -359,8 +388,9 @@ function count(v) {
     return boxNat(v.length);
 }
 function contains(v, b) {
+    var content = unboxColl(b);
     for (var i=0; i<b.length; i=i+1) {
-        if (equal(v, b[i])) {
+        if (equal(v, content[i])) {
             return true;
         }
     }
@@ -382,15 +412,15 @@ function compareOfMultipleCriterias(scl) {
     
 }
 function sort(b,scl) {
-    var result = [ ];
     if (scl.length === 0) { return b; } // Check for no sorting criteria
     var compareFun = compareOfMultipleCriterias(scl);
-    result = b.slice(); /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
+    /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
+    var result = unboxColl(b).slice(0, b.length);
     result.sort(compareFun);
-    return result;
+    return boxColl(result);
 }
 function groupByOfKey(l,k,keysf) {
-    result = [ ];
+    var result = [ ];
     l.forEach((x) => {
         if (equal(keysf(x),k)) {
             result.push(x);
@@ -434,7 +464,8 @@ function substringEnd(v, start) {
     return v.substring(unboxNat(start));
 }
 function stringJoin(sep, v) {
-    return v.join(sep);
+    var content = unboxColl(v).slice(0, v.length);
+    return content.join(sep);
 }
 function like(pat, s) {
     var reg1 = escapeRegExp(pat);
