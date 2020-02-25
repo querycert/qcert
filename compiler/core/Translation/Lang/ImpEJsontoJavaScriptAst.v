@@ -120,14 +120,6 @@ Section ImpEJsontoJavaScriptAst.
       | EJsonOpHasOwnProperty att => mk_binary_expr object_hasOwnProperty (el++[expr_literal (literal_string att)])
       | EJsonOpMathMin => expr_call (expr_member (expr_identifier "Math") "min") el
       | EJsonOpMathMax => expr_call (expr_member (expr_identifier "Math") "max") el
-      | EJsonOpMathMinApply =>
-        expr_call
-          (expr_member (expr_member (expr_identifier "Math") "min") "apply")
-          (expr_identifier "Math" :: el)
-      | EJsonOpMathMaxApply =>
-        expr_call
-          (expr_member (expr_member (expr_identifier "Math") "max") "apply")
-          (expr_identifier "Math" :: el)
       | EJsonOpMathPow => expr_call (expr_member (expr_identifier "Math") "pow") el
       | EJsonOpMathExp => expr_call (expr_member (expr_identifier "Math") "exp") el
       | EJsonOpMathAbs => expr_call (expr_member (expr_identifier "Math") "abs") el

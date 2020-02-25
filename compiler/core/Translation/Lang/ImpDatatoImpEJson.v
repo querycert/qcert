@@ -213,8 +213,8 @@ Section ImpDatatoImpEJson.
         | OpFloatTruncate => mk_imp_ejson_runtime_call EJsonRuntimeNatOfFloat [ e ]
         | OpFloatSum => mk_imp_ejson_runtime_call EJsonRuntimeFloatSum el
         | OpFloatMean => mk_imp_ejson_runtime_call EJsonRuntimeFloatArithMean el
-        | OpFloatBagMin => mk_imp_ejson_op EJsonOpMathMinApply [ e ]
-        | OpFloatBagMax => mk_imp_ejson_op EJsonOpMathMaxApply [ e ]
+        | OpFloatBagMin => mk_imp_ejson_runtime_call EJsonRuntimeFloatMin [ e ]
+        | OpFloatBagMax => mk_imp_ejson_runtime_call EJsonRuntimeFloatMax [ e ]
         | OpForeignUnary fu =>
           mk_imp_ejson_runtime_call (EJsonRuntimeForeign (foreign_to_ejson_runtime_of_unary_op fu)) el
         end

@@ -75,8 +75,12 @@
 	      QLambdaNRA.launop QOps.Unary.oplength e
     | "max", [e] ->
 	      QLambdaNRA.launop QOps.Unary.opnatmax e
+    | "fmax", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opfloatmax e
     | "min", [e] ->
 	      QLambdaNRA.launop QOps.Unary.opnatmin e
+    | "fmin", [e] ->
+	      QLambdaNRA.launop QOps.Unary.opfloatmin e
     | "toString", [e] ->
 	      QLambdaNRA.launop QOps.Unary.optostring e
     | "nth", [e1;e2] ->
@@ -129,7 +133,7 @@
 %token <string> STRING
 %token <string> IDENT
 
-%token OR AND NOT AVG
+%token OR AND NOT
 %token STRUCT
 %token EQUAL NEQUAL EQUALGT
 %token GT LT
@@ -187,8 +191,6 @@ expr:
     { QLambdaNRA.ladot (char_list_of_string a) e }
 | e = expr ARROW a = IDENT
     { QLambdaNRA.laarrow (char_list_of_string a) e }
-| e = expr DOT AVG LPAREN RPAREN
-    { QLambdaNRA.launop QOps.Unary.opfloatmean e }
 | STRUCT LPAREN r = reclist RPAREN
     { QLambdaNRA.lastruct r }
 | e = expr DOT a = IDENT LPAREN el=params RPAREN
