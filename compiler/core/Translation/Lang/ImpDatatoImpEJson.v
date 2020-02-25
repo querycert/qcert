@@ -44,7 +44,7 @@ Section ImpDatatoImpEJson.
 
     Definition mk_string s : imp_ejson_expr := ImpExprConst (ejstring s).
     Definition mk_string_array sl : imp_ejson_expr := ImpExprConst (ejarray (map ejstring sl)).
-    Definition mk_bag el : imp_ejson_expr := mk_imp_ejson_op EJsonOpArray el.
+    Definition mk_bag el : imp_ejson_expr := mk_imp_ejson_runtime_call EJsonRuntimeArray el.
     Definition mk_left e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
     Definition mk_right e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
 

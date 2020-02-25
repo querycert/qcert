@@ -45,6 +45,11 @@ Section EJsonRuntimeOperators.
     | EJsonRuntimeRecRemove: ejson_runtime_op
     | EJsonRuntimeRecProject: ejson_runtime_op
     | EJsonRuntimeRecDot : ejson_runtime_op
+    (* Array *)
+    | EJsonRuntimeArray : ejson_runtime_op
+    | EJsonRuntimeArrayLength : ejson_runtime_op
+    | EJsonRuntimeArrayPush : ejson_runtime_op
+    | EJsonRuntimeArrayAccess : ejson_runtime_op
     (* Sum *)
     | EJsonRuntimeEither : ejson_runtime_op
     | EJsonRuntimeToLeft: ejson_runtime_op
@@ -112,21 +117,26 @@ Section EJsonRuntimeOperators.
       | EJsonRuntimeCompare => "compare"
       | EJsonRuntimeToString => "toString"
       | EJsonRuntimeToText => "toText"
-      (* Records *)
+      (* Record *)
       | EJsonRuntimeRecConcat => "recConcat"
       | EJsonRuntimeRecMerge => "recMerge"
       | EJsonRuntimeRecRemove=> "recRemove"
       | EJsonRuntimeRecProject=> "recProject"
       | EJsonRuntimeRecDot => "recDot"
-      (* Sums *)
+      (* Array *)
+      | EJsonRuntimeArray => "array"
+      | EJsonRuntimeArrayLength => "arrayLength"
+      | EJsonRuntimeArrayPush => "arrayPush"
+      | EJsonRuntimeArrayAccess => "arrayAccess"
+      (* Sum *)
       | EJsonRuntimeEither => "either"
       | EJsonRuntimeToLeft=> "toLeft"
       | EJsonRuntimeToRight=> "toRight"
-      (* Brands *)
+      (* Brand *)
       | EJsonRuntimeBrand => "brand"
       | EJsonRuntimeUnbrand => "unbrand"
       | EJsonRuntimeCast => "cast"
-      (* Collections *)
+      (* Collection *)
       | EJsonRuntimeDistinct => "distinct"
       | EJsonRuntimeSingleton => "singleton"
       | EJsonRuntimeFlatten => "flatten"
@@ -355,7 +365,38 @@ Section EJsonRuntimeOperators.
                end
              | _ => None
              end) dl
-      (* Sums *)
+      (* Array *)
+      | EJsonRuntimeArray =>
+        Some (ejarray dl) (* XXX n-ary *)
+      | EJsonRuntimeArrayLength =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray ja => Some (ejbigint (Z_of_nat (List.length ja)))
+             | _ => None
+             end) dl
+      | EJsonRuntimeArrayPush =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1 with
+             | ejarray ja => Some (ejarray (ja ++ (d2::nil)))
+             | _ => None
+             end) dl
+      | EJsonRuntimeArrayAccess =>
+        apply_binary
+          (fun d1 d2 =>
+             match d1, d2 with
+             | ejarray ja, ejbigint n =>
+               let natish := ZToSignedNat n in
+               if (fst natish) then
+                 match List.nth_error ja (snd natish) with
+                 | None => None
+                 | Some d => Some d
+                 end
+               else None
+             | _, _ => None
+             end) dl
+      (* Sum *)
       | EJsonRuntimeEither =>
         apply_unary
           (fun d =>
@@ -437,7 +478,7 @@ Section EJsonRuntimeOperators.
              | _ => None
              end) dl
 
-      (* Collections *)
+      (* Collection *)
       | EJsonRuntimeDistinct =>
         apply_unary
           (fun d =>

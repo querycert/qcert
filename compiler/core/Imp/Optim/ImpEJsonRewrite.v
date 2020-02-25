@@ -64,9 +64,9 @@ Section ImpEJsonRewrite.
               (ImpExprConst (ejbigint 0))
               (* XXX Use src.length - 1, consistent with semantic of 'for i1 to i2 do ... done' loop *)
               (ImpExprRuntimeCall EJsonRuntimeNatMinus
-                                  [ ImpExprOp EJsonOpArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
+                                  [ ImpExprRuntimeCall EJsonRuntimeArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
               (ImpStmtBlock
-                 [ (v, Some (ImpExprOp EJsonOpArrayAccess [ src; i ])) ]
+                 [ (v, Some (ImpExprRuntimeCall EJsonRuntimeArrayAccess [ src; i ])) ]
                  [ imp_ejson_stmt_for_rewrite s ]) ]
       | ImpStmtForRange v e1 e2 s =>
         ImpStmtForRange v e1 e2
@@ -159,7 +159,7 @@ Section ImpEJsonRewrite.
                   match
                     match
                       match
-                        olift (imp_ejson_op_eval EJsonOpArrayAccess)
+                        olift (imp_ejson_runtime_eval h EJsonRuntimeArrayAccess)
                           match
                             olift (fun x : option imp_ejson_model => x)
                               ((fix
@@ -228,9 +228,9 @@ Section ImpEJsonRewrite.
               (ImpExprConst (ejbigint 0))
               (* XXX Use src.length - 1, consistent with semantic of 'for i1 to i2 do ... done' loop *)
               (ImpExprRuntimeCall EJsonRuntimeNatMinus
-                                  [ ImpExprOp EJsonOpArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
+                                  [ ImpExprRuntimeCall EJsonRuntimeArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
               (ImpStmtBlock
-                 [ (v, Some (ImpExprOp EJsonOpArrayAccess [ src; i ])) ]
+                 [ (v, Some (ImpExprRuntimeCall EJsonRuntimeArrayAccess [ src; i ])) ]
                  [ stmt ]) ]
       in
       imp_ejson_stmt_eval h for_stmt σ =
@@ -356,7 +356,7 @@ Section ImpEJsonRewrite.
       (*      :: σ₁) *)
       (*     [(v, *)
       (*      Some *)
-      (*        (ImpExprOp EJsonOpArrayAccess *)
+      (*        (ImpExprOp EJsonRuntimeArrayAccess *)
       (*           [ImpExprVar *)
       (*              (fresh_var "src" *)
       (*                 ((ImpVars.imp_expr_free_vars e ++ *)
@@ -377,14 +377,14 @@ Section ImpEJsonRewrite.
       (* end *)
       imp_ejson_decls_eval h
         ((i, Some (imp_ejson_Z_to_data n)) :: σ1)
-        [(v, Some (ImpExprOp EJsonOpArrayAccess [ImpExprVar src; ImpExprVar i]))]
+        [(v, Some (ImpExprRuntimeCall EJsonRuntimeArrayAccess [ImpExprVar src; ImpExprVar i]))]
       =
       Some ((v, a) :: (i, n') :: σ1)
       ->
       match
         imp_ejson_decls_eval h
           ((i, Some (imp_ejson_Z_to_data n)) :: σ1)
-          [(v, Some (ImpExprOp EJsonOpArrayAccess [ImpExprVar src; ImpExprVar i]))]
+          [(v, Some (ImpExprRuntimeCall EJsonRuntimeArrayAccess [ImpExprVar src; ImpExprVar i]))]
       with
       | Some σ2 => imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite stmt) σ2
       | None => None
