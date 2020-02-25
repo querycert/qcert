@@ -1,0 +1,4 @@
+/* Example of min aggregate */
+
+fmin(Persons.filter{ p => p.age = 32 }.map{ p => p.salary })
+

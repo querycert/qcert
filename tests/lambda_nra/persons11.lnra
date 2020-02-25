@@ -1,0 +1,4 @@
+/* Example of max aggregate */
+
+fmax(Persons.filter{ p => p.age = 32 }.map{ p => p.salary })
+

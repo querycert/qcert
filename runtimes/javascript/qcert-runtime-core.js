@@ -515,6 +515,12 @@ function floatArithMean(b) {
         return floatSum(b)/len;
     }
 }
+function floatMin(b) {
+    return Math.min.apply(Math,b);
+}
+function floatMax(b) {
+    return Math.max.apply(Math,b);
+}
 function natOfFloat(v) {
     return boxNat(Math.trunc(v));
 }
