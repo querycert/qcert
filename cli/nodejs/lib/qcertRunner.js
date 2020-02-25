@@ -18,6 +18,9 @@ const Logger = require('./logger');
 const QcertLib = require('./qcertLib');
 const QcertRuntimeString = Fs.readFileSync(Path.join(__dirname,'../extracted/qcert-runtime.js'),'utf8');
 
+/* Runtime variations */
+const BoxedCollections = require('./boxedCollections');
+
 /* Generic Node module require from string */
 function requireFromString(src, filename) {
     var Module = module.constructor;
@@ -98,7 +101,7 @@ class QcertRunner {
                 return `[${queryName} js] OK`;
             } else {
                 const expected = JSON.stringify(output);
-                const actual = JSON.stringify(result);
+                const actual = JSON.stringify(QcertRunner.result);
                 throw new Error (`[${queryName} js] ERROR\nExpected: ${expected}\nActual: ${actual}`);
             }
         }
@@ -124,7 +127,13 @@ class QcertRunner {
         const gconf = QcertRunner.configure('oql',schema,compiledQuery,output);
         if (validate) {
             if (output) {
+                //Uncomment to test roundtripping
+                //console.log('BOXED INPUT ' + JSON.stringify(BoxedCollections.boxColl(input)));
+                //console.log('UNBOXED INPUT ' + JSON.stringify(BoxedCollections.unboxColl(input)));
+
+                //BoxedCollections.boxColl(input);
                 let result = QcertRunner.executeCompiled(schema,queryFile,compiledQuery,input);
+                //BoxedCollections.unboxColl(result);
                 return QcertRunner.validate(gconf,queryFile,'js',output,result)
             } else {
                 throw new Error('Cannot validate result without expected result (--output option)');
