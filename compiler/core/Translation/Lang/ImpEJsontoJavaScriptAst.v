@@ -77,6 +77,14 @@ Section ImpEJsontoJavaScriptAst.
                (op: imp_ejson_runtime_op) (el: list expr) :=
       call_runtime (string_of_ejson_runtime_op op) el.
 
+    (* XXX For range *)
+    Definition mk_integer_plus_one
+               (e:expr) :=
+      mk_runtime_call EJsonRuntimeNatPlus [e;box_nat (expr_literal (literal_number (float_of_int 1)))].
+    Definition mk_integer_le
+               (e1 e2: expr) :=
+      mk_runtime_call EJsonRuntimeNatLe [e1;e2].
+
     Definition sortCriteria_to_js_ast (sc: string * SortDesc) :=
       let (lbl, c) := sc in
       match c with
@@ -112,7 +120,7 @@ Section ImpEJsontoJavaScriptAst.
       | EJsonOpStrictEqual => mk_binary_op binary_op_strict_equal el
       | EJsonOpStrictDisequal => mk_binary_op binary_op_strict_disequal el
       | EJsonOpArray => expr_array (List.map Some el)
-      | EJsonOpArrayLength => mk_unary_expr (fun e => box_nat (expr_member e  "length")) el
+      | EJsonOpArrayLength => mk_unary_expr (fun e => expr_member e  "length") el
       | EJsonOpArrayPush => mk_binary_expr array_push el
       | EJsonOpArrayAccess => mk_binary_expr array_get el
       | EJsonOpObject atts => mk_object atts el
@@ -199,10 +207,10 @@ Section ImpEJsontoJavaScriptAst.
       | ImpStmtForRange x e1 e2 s =>
         stat_for_let
           nil
-          [ (x, Some (unbox_nat (imp_ejson_expr_to_js_ast e1))) ]
+          [ (x, Some (imp_ejson_expr_to_js_ast e1)) ]
           (* XXX Use binary_op_le, consistent with semantic of 'for i1 to i2 do ... done' loop *)
-          (Some (expr_binary_op (expr_identifier x) binary_op_le (unbox_nat (imp_ejson_expr_to_js_ast e2))))
-          (Some (expr_unary_op unary_op_post_incr (expr_identifier x)))
+          (Some (mk_integer_le (expr_identifier x) (imp_ejson_expr_to_js_ast e2)))
+          (Some (expr_assign (expr_identifier x) None (mk_integer_plus_one (expr_identifier x))))
           (imp_ejson_stmt_to_js_ast s)
       | ImpStmtIf e s1 s2 =>
         stat_if

@@ -171,6 +171,20 @@ function recDot(receiver, member) {
     throw new Error('TypeError: recDot called on non-record');
 }
 
+/* Array */
+function array(...args) {
+    return Array.of(...args);
+}
+function arrayLength(v) {
+    return boxNat(v.length);
+}
+function arrayPush(v1,v2) {
+    return union(v1,[v2]);
+}
+function arrayAccess(v1,v2) {
+    return v1[unboxNat(v2)];
+}
+
 /* Sum */
 function either(v) {
     if (typeof v === 'object') {
