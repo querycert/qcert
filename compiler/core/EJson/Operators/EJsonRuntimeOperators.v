@@ -93,6 +93,8 @@ Section EJsonRuntimeOperators.
     (* Float *)
     | EJsonRuntimeFloatSum : ejson_runtime_op
     | EJsonRuntimeFloatArithMean : ejson_runtime_op
+    | EJsonRuntimeFloatMin : ejson_runtime_op
+    | EJsonRuntimeFloatMax : ejson_runtime_op
     | EJsonRuntimeNatOfFloat : ejson_runtime_op
     (* Foreign *)
     | EJsonRuntimeForeign (fop:foreign_ejson_runtime_op) : ejson_runtime_op
@@ -164,6 +166,8 @@ Section EJsonRuntimeOperators.
       (* Float *)
       | EJsonRuntimeFloatSum => "floatSum"
       | EJsonRuntimeFloatArithMean => "floatArithMean"
+      | EJsonRuntimeFloatMin => "floatMin"
+      | EJsonRuntimeFloatMax => "floatMax"
       | EJsonRuntimeNatOfFloat => "natOfFloat"
       (* Foreign *)
       | EJsonRuntimeForeign fop => toString fop
@@ -798,6 +802,30 @@ Section EJsonRuntimeOperators.
                match ejson_numbers l with
                | Some nl =>
                  Some (ejnumber (float_list_arithmean nl))
+               | None => None
+               end
+             | _ => None
+             end) dl
+      | EJsonRuntimeFloatMin =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               match ejson_numbers l with
+               | Some nl =>
+                 Some (ejnumber (float_list_min nl))
+               | None => None
+               end
+             | _ => None
+             end) dl
+      | EJsonRuntimeFloatMax =>
+        apply_unary
+          (fun d =>
+             match d with
+             | ejarray l =>
+               match ejson_numbers l with
+               | Some nl =>
+                 Some (ejnumber (float_list_max nl))
                | None => None
                end
              | _ => None

@@ -23,7 +23,6 @@
 	[ ("null",NULL);
 	  ("struct",STRUCT);
 	  ("not",NOT);
-	  ("avg",AVG);
 	]; tbl
     end
     

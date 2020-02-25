@@ -60,8 +60,6 @@ Section EJsonOperators.
   (* Math stuff *)
   | EJsonOpMathMin : ejson_op                      (* expr_call *)                 (* Math.min(e1, e2) *)
   | EJsonOpMathMax : ejson_op                      (* expr_call *)                 (* Math.max(e1, e2) *)
-  | EJsonOpMathMinApply : ejson_op                 (* expr_call *)                 (* Math.min.apply(Math, e) *)
-  | EJsonOpMathMaxApply : ejson_op                 (* expr_call *)                 (* Math.max.apply(Math, e) *)
   | EJsonOpMathPow : ejson_op                      (* expr_call *)                 (* Math.pow(e1, e2) *)
   | EJsonOpMathExp : ejson_op                      (* expr_call *)                 (* Math.exp(e) *)
   | EJsonOpMathAbs : ejson_op                      (* expr_call *)                 (* Math.abs(e) *)
@@ -210,26 +208,6 @@ Section EJsonOperators.
       | EJsonOpMathMax =>
         match j with
         | [ejnumber n1; ejnumber n2] => Some (ejnumber (float_max n1 n2))
-        | _ => None
-        end
-      | EJsonOpMathMinApply =>
-        match j with
-        | [ejarray l] =>
-          match ejson_numbers l with
-          | Some nl =>
-            Some (ejnumber (float_list_min nl))
-          | None => None
-          end
-        | _ => None
-        end
-      | EJsonOpMathMaxApply =>
-        match j with
-        | [ejarray l] =>
-          match ejson_numbers l with
-          | Some nl =>
-            Some (ejnumber (float_list_max nl))
-          | None => None
-          end
         | _ => None
         end
       | EJsonOpMathExp =>
