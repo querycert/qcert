@@ -32,14 +32,17 @@ function isNat(v) {
 }
 function boxColl(v, len) {
     len = (typeof len !== 'undefined') ?  len : v.length;
-    return { '$coll': v, 'length': len };
+    return { '$coll': v, '$length': len };
 }
 function unboxColl(v) {
     return v['$coll'];
 }
 function isBoxColl(obj) {
     return (Object.prototype.hasOwnProperty.call(obj,'$coll') &&
-            Object.prototype.hasOwnProperty.call(obj,'length'));
+            Object.prototype.hasOwnProperty.call(obj,'$length'));
+}
+function collLength(v) {
+    return v['$length'];
 }
 function boxLeft(v) {
     return { '$left' : v };
@@ -83,13 +86,13 @@ function compare(v1, v2) {
     if (t1 === 'object' && v1 !== null) {
         if (isNat(v1)) { t1 = 'number'; v1 = unboxNat(v1); }
         if (isBoxColl(v1)) {
-	    t1 = 'collection'; v1 = unboxColl(v1).slice(0, v1.length);
+	    t1 = 'collection'; v1 = unboxColl(v1).slice(0, collLength(v1));
 	}
     };
     if (t2 === 'object' && v2 !== null) {
         if (isNat(v2)) { t2 = 'number'; v2 = unboxNat(v2); }
         if (isBoxColl(v2)) {
-	    t2 = 'collection'; v2 = unboxColl(v2).slice(0, v2.length);
+	    t2 = 'collection'; v2 = unboxColl(v2).slice(0, collLength(v2));
 	}
     };
     if (t1 != t2) {
@@ -197,8 +200,8 @@ function arrayLength(v) {
 }
 function arrayPush(v1,v2) {
     var content1 = unboxColl(v1);
-    if (content1.length !== v1.length) {
-	content1 = content1.slice(0, v1.length);
+    if (content1.length !== collLength(v1)) {
+	content1 = content1.slice(0, collLength(length));
     }
     content1.push(v2);
     return boxColl(content1);
@@ -270,17 +273,17 @@ function cast(brands,v) {
 /* Collection */
 function iterColl(b, f) {
     var content = unboxColl(b);
-    for (let i = 0; i < b.length; i++) {
+    for (let i = 0; i < collLength(b); i++) {
 	f(content[i]);
     }
 }
 function distinct(b) {
     var result = [ ];
     var content = unboxColl(b);
-    for (var i=0; i<b.length; i=i+1) {
+    for (var i=0; i < collLength(b); i=i+1) {
         var v = content[i];
         var dup = false;
-        for (var j=i+1; j<b.length; j=j+1) {
+        for (var j=i+1; j < collLength(b); j=j+1) {
             if (equal(v,content[j])) { dup = true; break; }
         }
         if (!(dup)) { result.push(v); } else { dup = false; }
@@ -289,7 +292,7 @@ function distinct(b) {
 }
 function singleton(v) {
     var content = unboxColl(v);
-    if (v.length === 1) {
+    if (collLength(v) === 1) {
         return boxLeft(content[0]);
     } else {
         return boxRight(null); /* Not a singleton */
@@ -298,10 +301,10 @@ function singleton(v) {
 function flatten(aOuter) {
     var result = [ ];
     var aOuterContent = unboxColl(aOuter);
-    for (var iOuter=0, nOuter=aOuter.length; iOuter<nOuter; iOuter = iOuter+1) {
+    for (var iOuter=0, nOuter=collLength(aOuter); iOuter<nOuter; iOuter = iOuter+1) {
         var aInner = aOuterContent[iOuter];
         var aInnerContent = unboxColl(aInner);
-        for (var iInner=0, nInner=aInner.length; iInner<nInner; iInner = iInner+1) {
+        for (var iInner=0, nInner=collLength(aInner); iInner<nInner; iInner = iInner+1) {
             result.push(aInnerContent[iInner]);
         }
     }
@@ -310,8 +313,8 @@ function flatten(aOuter) {
 function union(b1, b2) {
     var content1 = unboxColl(b1);
     var content2 = unboxColl(b2);
-    if (content1.length !== b1.length) {
-	content1 = content1.slice(0, b1.length);
+    if (content1.length !== collLength(b1)) {
+	content1 = content1.slice(0, collLength(b1));
     }
     content1.push(...content2);
     var result = boxColl(content1);
@@ -319,8 +322,8 @@ function union(b1, b2) {
 }
 function minus(b1, b2) {
     var result = [ ];
-    var v1 = unboxColl(b1).slice(0, b1.length);
-    var v2 = unboxColl(b2).slice(0, b2.length);
+    var v1 = unboxColl(b1).slice(0, collLength(b1));
+    var v2 = unboxColl(b2).slice(0, collLength(b2));
     v1.sort(compare);
     v2.sort(compare);
     var i2=0;
@@ -338,8 +341,8 @@ function minus(b1, b2) {
 }
 function min(b1, b2) {
     var result = [ ];
-    var v1 = unboxColl(b1).slice(0, b1.length);
-    var v2 = unboxColl(b2).slice(0, b2.length);
+    var v1 = unboxColl(b1).slice(0, collLength(b1));
+    var v2 = unboxColl(b2).slice(0, collLength(b2));
     v1.sort(compare);
     v2.sort(compare);
     var i2=0;
@@ -355,8 +358,8 @@ function min(b1, b2) {
 }
 function max(b1, b2) {
     var result = [ ];
-    var v1 = unboxColl(b1).slice(0, b1.length);
-    var v2 = unboxColl(b2).slice(0, b2.length);
+    var v1 = unboxColl(b1).slice(0, collLength(b1));
+    var v2 = unboxColl(b2).slice(0, collLength(b2));
     v1.sort(compare);
     v2.sort(compare);
     var i2=0;
@@ -385,11 +388,11 @@ function nth(b1, n) {
     }
 }
 function count(v) {
-    return boxNat(v.length);
+    return arrayLength(v);
 }
 function contains(v, b) {
     var content = unboxColl(b);
-    for (var i=0; i<b.length; i=i+1) {
+    for (var i=0; i<collLength(b); i=i+1) {
         if (equal(v, content[i])) {
             return true;
         }
@@ -464,7 +467,7 @@ function substringEnd(v, start) {
     return v.substring(unboxNat(start));
 }
 function stringJoin(sep, v) {
-    var content = unboxColl(v).slice(0, v.length);
+    var content = unboxColl(v).slice(0, collLength(v));
     return content.join(sep);
 }
 function like(pat, s) {
@@ -512,28 +515,32 @@ function natMaxPair(v1, v2) {
     return boxNat(Math.max(unboxNat(v1),unboxNat(v2)));
 }
 function natSum(b) {
+    var content = unboxColl(b);
     var result = 0;
-    for (var i=0; i<b.length; i=i+1) {
-        result += unboxNat(b[i]);
+    for (var i=0; i<collLength(b); i=i+1) {
+        result += unboxNat(content[i]);
     }
     return boxNat(result);
 }
 function natMin(b) {
+    var content = unboxColl(b);
     var numbers = [ ];
-    for (var i=0; i<b.length; i=i+1) {
-        numbers.push(unboxNat(b[i]));
+    for (var i=0; i<collLength(b); i=i+1) {
+        numbers.push(unboxNat(content[i]));
     }
     return boxNat(Math.min.apply(Math,numbers));
 }
 function natMax(b) {
+    var content = unboxColl(b);
     var numbers = [ ];
-    for (var i=0; i<b.length; i=i+1) {
-        numbers.push(unboxNat(b[i]));
+    for (var i=0; i<collLength(b); i=i+1) {
+        numbers.push(unboxNat(content[i]));
     }
     return boxNat(Math.max.apply(Math,numbers));
 }
 function natArithMean(b) {
-    var len = b.length;
+    var content = unboxColl(b);
+    var len = collLength(b);
     if (len === 0) {
         return boxNat(0);
     } else {
@@ -546,14 +553,15 @@ function floatOfNat(v) {
 
 /* Float */
 function floatSum(b) {
+    var content = unboxColl(b);
     var result = 0;
-    for (var i=0; i<b.length; i=i+1) {
-        result += b[i];
+    for (var i=0; i<collLength(b); i=i+1) {
+        result += content[i];
     }
     return result;
 }
 function floatArithMean(b) {
-    var len = b.length;
+    var len = collLength(b);
     if (len === 0) {
         return 0;
     } else {
@@ -561,10 +569,12 @@ function floatArithMean(b) {
     }
 }
 function floatMin(b) {
-    return Math.min.apply(Math,b);
+    var content = unboxColl(b).slice(0, collLength(b));
+    return Math.min.apply(Math,content);
 }
 function floatMax(b) {
-    return Math.max.apply(Math,b);
+    var content = unboxColl(b).slice(0, collLength(b));
+    return Math.max.apply(Math,content);
 }
 function natOfFloat(v) {
     return boxNat(Math.trunc(v));
