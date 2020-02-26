@@ -506,7 +506,7 @@ function natArithMean(b) {
     if (len === 0) {
         return boxNat(0);
     } else {
-        return boxNat(Math.floor(natSum(b)/len));
+        return boxNat(Math.floor(unboxNat(natSum(b))/len));
     }
 }
 function floatOfNat(v) {
