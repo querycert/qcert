@@ -65,9 +65,10 @@ function isRight(v) {
 function sub_brand(b1,b2) {
     var bsub=null;
     var bsup=null;
-    for (var i=0; i<inheritance.length; i=i+1) {
-        bsub = inheritance[i].sub;
-        bsup = inheritance[i].sup;
+    var inheritanceUnbox = isBoxColl(inheritance)?unboxColl(inheritance):inheritance;
+    for (var i=0; i<inheritanceUnbox.length; i=i+1) {
+        bsub = inheritanceUnbox[i].sub;
+        bsup = inheritanceUnbox[i].sup;
         if ((b1 === bsub) && (b2 === bsup)) { return true; }
     }
     return false;
@@ -248,15 +249,16 @@ function unbrand(v) {
     throw new Error('TypeError: unbrand called on non-object');
 }
 function cast(brands,v) {
-    mustBeArray(brands);
-    var type = v.$class;
+    var brandsUnbox = isBoxColl(brands) ? unboxColl(brands) : brands;
+    mustBeArray(brandsUnbox);
+    var type = isBoxColl(v.$class) ? unboxColl(v.$class) : v.$class;
     mustBeArray(type);
-    if (brands.length === 1 && brands[0] === 'Any') { /* cast to top of inheritance is built-in */
+    if (brandsUnbox.length === 1 && brandsUnbox[0] === 'Any') { /* cast to top of inheritance is built-in */
         return boxLeft(v);
     }
     brands:
-    for (var i in brands) {
-        var b = brands[i];
+    for (var i in brandsUnbox) {
+        var b = brandsUnbox[i];
         for (var j in type) {
             var t = type[j];
             if (equal(t,b) || sub_brand(t,b)) {
