@@ -60,6 +60,7 @@ require('yargs')
             Logger.info(result);
         } catch(err) {
             Logger.error(err.message);
+            throw err;
         };
     })
     .command('execute', 'Run a query', (yargs) => {
@@ -95,6 +96,7 @@ require('yargs')
             Logger.info(result);
         } catch(err) {
             Logger.error(err.message);
+            throw err;
         };
     })
     .option('verbose', {
