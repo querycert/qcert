@@ -1,0 +1,4 @@
+/* Example of nat sum */
+
+sum(Persons.map{ p => p.age })
+
