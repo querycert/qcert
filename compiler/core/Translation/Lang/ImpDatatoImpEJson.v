@@ -42,18 +42,32 @@ Section ImpDatatoImpEJson.
     Definition mk_imp_ejson_op op el : imp_ejson_expr := ImpExprOp op el.
     Definition mk_imp_ejson_runtime_call op el : imp_ejson_expr := ImpExprRuntimeCall op el.
 
-    Definition mk_string s : imp_ejson_expr := ImpExprConst (ejstring s).
-    Definition mk_string_array sl : imp_ejson_expr := ImpExprConst (ejarray (map ejstring sl)).
-    Definition mk_bag el : imp_ejson_expr := mk_imp_ejson_runtime_call EJsonRuntimeArray el.
+    Definition mk_string s : imp_ejson_expr := ImpExprConst (cejstring s).
     Definition mk_left e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
     Definition mk_right e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
 
+    Definition mk_array el : imp_ejson_expr := mk_imp_ejson_runtime_call EJsonRuntimeArray el.
+    Definition mk_object (el:list (string * imp_ejson_expr)) : imp_ejson_expr :=
+      mk_imp_ejson_op (EJsonOpObject (map fst el)) (map snd el).
+    Definition mk_string_array sl : imp_ejson_expr := mk_array (map ImpExprConst (map cejstring sl)).
+
+    Fixpoint ejson_to_expr (j:ejson) : imp_ejson_expr
+      := match j with
+         | ejnull => ImpExprConst cejnull
+         | ejnumber f => ImpExprConst (cejnumber f)
+         | ejbigint n => ImpExprConst (cejbigint n)
+         | ejbool b => ImpExprConst (cejbool b)
+         | ejstring s => ImpExprConst (cejstring s)
+         | ejarray ls => mk_array (map ejson_to_expr ls)
+         | ejobject ls => mk_object (map (fun xy => (fst xy, ejson_to_expr (snd xy))) ls)
+         | ejforeign fd => ImpExprConst (cejforeign fd)
+         end.
+
     Definition sortCriterias_to_ejson_expr (scl: list (string * SortDesc)) : imp_ejson_expr :=
-      ImpExprConst (ejarray (map sortCriteria_to_ejson scl)).
+      mk_array (map ejson_to_expr (map sortCriteria_to_ejson scl)).
 
     Definition brands_to_ejson_expr sl : imp_ejson_expr :=
-      let j := ejarray ((List.map (fun s => ejstring s)) sl) in
-      ImpExprConst j.
+      mk_string_array sl.
 
     Definition mk_either_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
       mk_imp_ejson_runtime_call EJsonRuntimeEither el.
@@ -145,12 +159,12 @@ Section ImpDatatoImpEJson.
         | OpIdentity => e
         | OpNeg => mk_imp_ejson_op EJsonOpNot [ e ]
         | OpRec s => mk_imp_ejson_op (EJsonOpObject [key_encode s]) [ e ]
-        | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeRecDot [ e; ImpExprConst (ejstring (key_encode s)) ]
+        | OpDot s => mk_imp_ejson_runtime_call EJsonRuntimeRecDot [ e; ImpExprConst (cejstring (key_encode s)) ]
         | OpRecRemove s => mk_imp_ejson_runtime_call EJsonRuntimeRecRemove [ e; mk_string (key_encode s) ]
         | OpRecProject fl =>
           mk_imp_ejson_runtime_call
             EJsonRuntimeRecProject ([ e ] ++ [ mk_string_array (map key_encode fl) ])
-        | OpBag => mk_bag el
+        | OpBag => mk_array el
         | OpSingleton => mk_imp_ejson_runtime_call EJsonRuntimeSingleton el
         | OpFlatten => mk_imp_ejson_runtime_call EJsonRuntimeFlatten el
         | OpDistinct => mk_imp_ejson_runtime_call EJsonRuntimeDistinct el
@@ -162,11 +176,11 @@ Section ImpDatatoImpEJson.
         | OpToText => mk_imp_ejson_runtime_call EJsonRuntimeToText el
         | OpLength => mk_imp_ejson_runtime_call EJsonRuntimeLength el
         | OpSubstring start len =>
-          let start := ImpExprConst (ejbigint start) in
+          let start := ImpExprConst (cejbigint start) in
           match len with
           | Some len =>
             let args :=
-                let len := ImpExprConst (ejbigint len) in
+                let len := ImpExprConst (cejbigint len) in
                 [ e; start; len ]
             in
             mk_imp_ejson_runtime_call EJsonRuntimeSubstring args
@@ -175,7 +189,7 @@ Section ImpDatatoImpEJson.
             mk_imp_ejson_runtime_call EJsonRuntimeSubstringEnd args
           end
         | OpLike pat =>
-          mk_imp_ejson_runtime_call EJsonRuntimeLike [ ImpExprConst (ejstring pat); e ]
+          mk_imp_ejson_runtime_call EJsonRuntimeLike [ ImpExprConst (cejstring pat); e ]
         | OpLeft => mk_left e
         | OpRight => mk_right e
         | OpBrand b =>
@@ -286,8 +300,8 @@ Section ImpDatatoImpEJson.
       | DataRuntimeGroupby s ls =>
         mk_imp_ejson_runtime_call
           EJsonRuntimeGroupBy
-          ((ImpExprConst (ejstring (key_encode s)))
-             :: (ImpExprConst (ejarray (map ejstring (map key_encode ls))))
+          ((ImpExprConst (cejstring (key_encode s)))
+             :: (mk_string_array (map key_encode ls))
              :: el)
       | DataRuntimeEither => mk_either_expr el
       | DataRuntimeToLeft => mk_to_left_expr el
@@ -298,7 +312,7 @@ Section ImpDatatoImpEJson.
       match exp with
       | ImpExprError msg => ImpExprError msg
       | ImpExprVar v => ImpExprVar v
-      | ImpExprConst d => ImpExprConst (data_to_ejson (normalize_data h d))
+      | ImpExprConst d => ejson_to_expr (data_to_ejson (normalize_data h d))
       | ImpExprOp op el => imp_data_op_to_imp_ejson op (map imp_data_expr_to_imp_ejson el)
       | ImpExprRuntimeCall op el => imp_data_runtime_call_to_imp_ejson op (map imp_data_expr_to_imp_ejson el)
       end.
@@ -408,6 +422,55 @@ Section ImpDatatoImpEJson.
           ; repeat rewrite neq in *
           ; clear d neq.
 
+    Lemma eval_ejson_to_expr_string_array_correct σ l:
+      olift (imp_ejson_runtime_eval h EJsonRuntimeArray)
+            (lift_map (fun x : option imp_ejson_model => x)
+                      (map (fun x : imp_ejson_expr => imp_ejson_expr_eval h (lift_pd_bindings σ) x)
+                           (map ImpExprConst (map cejstring l))))
+      = Some (ejarray (map ejstring l)).
+    Proof.
+      rewrite map_map; rewrite map_map; simpl in *.
+      unfold olift; rewrite lift_map_map_fusion.
+      induction l; simpl; [reflexivity|].
+      unfold lift; simpl in *.
+      destruct (@lift_map
+                  string (@imp_ejson_model fejson)
+                  (fun x : string => @Some (@imp_ejson_model fejson) (@ejstring fejson x)) l);
+        simpl; try congruence.
+      inversion IHl; reflexivity.
+    Qed.
+
+    Lemma eval_ejson_to_expr_sort_criteria_correct σ a:
+      imp_ejson_expr_eval h (lift_pd_bindings σ) (ejson_to_expr (sortCriteria_to_ejson a))
+      = Some (sortCriteria_to_ejson a).
+    Proof.
+      destruct a; simpl.
+      destruct s0; reflexivity.
+    Qed.
+
+    Lemma eval_ejson_to_expr_sort_criterias_correct σ s:
+      olift (imp_ejson_runtime_eval h EJsonRuntimeArray)
+            (lift_map (fun x : option imp_ejson_model => x)
+                      (map (fun x : imp_ejson_expr => imp_ejson_expr_eval h (lift_pd_bindings σ) x)
+                           (map ejson_to_expr (map sortCriteria_to_ejson s))))
+      = Some (ejarray (map sortCriteria_to_ejson s)).
+    Proof.
+      rewrite map_map.
+      rewrite map_map.
+      simpl in *.
+      unfold olift.
+      rewrite lift_map_map_fusion.
+      induction s; simpl; [reflexivity|].
+      unfold lift; simpl in *.
+      destruct (@lift_map (prod string SortDesc) (@imp_ejson_model fejson)
+              (fun x : prod string SortDesc =>
+               @imp_ejson_expr_eval fejson fejruntime h (@lift_pd_bindings fruntime fejson ftejson σ)
+                 (ejson_to_expr (@sortCriteria_to_ejson fejson x))) s);
+        simpl; try congruence.
+      rewrite eval_ejson_to_expr_sort_criteria_correct; simpl.
+      inversion IHs; reflexivity.
+    Qed.
+
     Lemma imp_data_unary_op_to_imp_ejson_expr_correct
            (σ:pd_bindings) (u:unary_op) (el:list imp_expr) :
       Forall
@@ -447,6 +510,7 @@ Section ImpDatatoImpEJson.
       - Case "OpRecRemove"%string.
         apply rremove_key_encode_comm.
       - Case "OpRecProject"%string.
+        rewrite eval_ejson_to_expr_string_array_correct.
         apply rproject_key_encode_comm.
       - Case "OpSingleton"%string.
         destruct d; try reflexivity.
@@ -459,7 +523,11 @@ Section ImpDatatoImpEJson.
         destruct d; simpl; try reflexivity.
         rewrite bdistinct_ejson_to_data_comm; reflexivity.
       - Case "OpOrderBy"%string.
+        rewrite eval_ejson_to_expr_sort_criterias_correct; simpl.
         apply order_by_to_ejson_correct.
+      - Case "OpOrderBy"%string. (* XXX None case *)
+        rewrite eval_ejson_to_expr_sort_criterias_correct; simpl.
+        reflexivity.
       - Case "OpCount"%string.
         destruct d; simpl; try reflexivity.
         destruct l; simpl in *; try reflexivity.
@@ -481,7 +549,11 @@ Section ImpDatatoImpEJson.
       - Case "OpLike"%string.
         destruct d; simpl; trivial.
       - Case "OpBrand"%string.
+        rewrite eval_ejson_to_expr_string_array_correct; simpl.
         rewrite of_string_list_map_ejstring; simpl.
+        reflexivity.
+      - Case "OpBrand"%string. (* XXX None case *)
+        rewrite eval_ejson_to_expr_string_array_correct; simpl.
         reflexivity.
       - Case "OpUnbrand"%string.
         case_eq d; intros; simpl; try reflexivity; try (destruct d0; reflexivity).
@@ -494,6 +566,7 @@ Section ImpDatatoImpEJson.
           destruct l; simpl; try reflexivity.
         + rewrite ejson_brands_map_ejstring; reflexivity.
       - Case "OpCast"%string.
+        rewrite eval_ejson_to_expr_string_array_correct; simpl.
         rewrite ejson_brands_map_ejstring.
         case_eq d; intros; simpl; try reflexivity; try (destruct d0; reflexivity).
         + destruct l; simpl; try reflexivity;
@@ -505,6 +578,9 @@ Section ImpDatatoImpEJson.
           destruct l; simpl; try reflexivity.
         + rewrite ejson_brands_map_ejstring.
           destruct (sub_brands_dec h b0 b); reflexivity.
+      - Case "OpCast"%string. (* XXX None case *)
+        rewrite eval_ejson_to_expr_string_array_correct; simpl.
+        reflexivity.
       - Case "OpNatUnary"%string.
         destruct n; simpl in *;
         destruct d; simpl; trivial.
@@ -774,12 +850,15 @@ Section ImpDatatoImpEJson.
           destruct ((lift_map (fun x : ImpEval.imp_expr => imp_data_expr_eval h σ x) el));
             try reflexivity; simpl.
         - Case "DataRuntimeGroupby"%string.
+          rewrite lift_map_map.
           destruct l0; try reflexivity; simpl.
           destruct l0; [|destruct d; reflexivity]; simpl.
-          rewrite of_string_list_map_ejstring.
           destruct d; try reflexivity; simpl.
+          rewrite of_string_list_map_ejstring_f.
           unfold lift.
           apply group_by_data_to_ejson_correct.
+        - Case "DataRuntimeGroupby"%string. (* XXX None case *)
+          rewrite lift_map_map; reflexivity.
         - Case "DataRuntimeEither"%string.
           destruct l; try reflexivity; simpl.
           destruct l; simpl in *; [|destruct d; congruence].
@@ -825,28 +904,6 @@ Section ImpDatatoImpEJson.
       Transparent ejson_to_data.
     Qed.
 
-    (* XXX This lemma looses the key assumption that the ejson returned is idempotent to data *)
-    Lemma relax_assumption_temp σ el:
-      Forall
-        (fun exp : imp_expr =>
-           unlift_result (imp_data_expr_eval h σ exp) =
-           imp_ejson_expr_eval h (lift_pd_bindings σ) (imp_data_expr_to_imp_ejson exp)) el -> 
-      Forall
-        (fun exp : imp_expr =>
-           imp_data_expr_eval h σ exp =
-           lift_result
-             (imp_ejson_expr_eval h
-                                  (lift_pd_bindings σ) (imp_data_expr_to_imp_ejson exp))) el.
-    Proof.
-      intros.
-      rewrite Forall_forall;
-        rewrite Forall_forall in H; intros.
-      specialize (H x H0).
-      rewrite <- H.
-      unfold unlift_result, lift_result, lift; simpl.
-      destruct (imp_data_expr_eval h σ x); [rewrite data_to_ejson_idempotent|]; reflexivity.
-    Qed.
-
     Lemma imp_data_op_to_imp_ejson_correct
           (σ:pd_bindings) (op:imp_data_op) (el:list imp_expr) :
       Forall
@@ -861,6 +918,66 @@ Section ImpDatatoImpEJson.
       destruct op.
       + rewrite (imp_data_unary_op_to_imp_ejson_expr_correct σ u el H); reflexivity.
       + rewrite (imp_data_binary_op_to_imp_ejson_expr_correct σ b el H); reflexivity.
+    Qed.
+
+    Lemma ejson_to_expr_string_array_to_constant (l:list string) :
+      map ejson_to_expr (map ejstring l)
+      = map ImpExprConst (map cejstring l).
+    Proof.
+      induction l; [reflexivity|]; simpl.
+      rewrite IHl; reflexivity.
+    Qed.
+
+    Lemma zip_both_map {A} {B} (l:list (A * B)) :
+      zip (map fst l) (map snd l) = Some l.
+    Proof.
+      induction l; [reflexivity|].
+      simpl.
+      rewrite IHl; simpl.
+      destruct a; reflexivity.
+    Qed.
+      
+    Lemma eval_map_snd_ejson_constant_to_expr_correct σ r:
+      Forall
+        (fun ab : string * ejson =>
+           imp_ejson_expr_eval h (lift_pd_bindings σ) (ejson_to_expr (snd ab)) = Some (snd ab)) r ->
+      lift_map
+        (fun x : string * ejson => imp_ejson_expr_eval h (lift_pd_bindings σ) (ejson_to_expr (snd x))) r
+      =
+      Some (map snd r).
+    Proof.
+      intros.
+      induction r; [reflexivity|].
+      inversion H; intros; subst; clear H.
+      specialize (IHr H3); clear H3.
+      simpl.
+      rewrite H2.
+      rewrite IHr.
+      reflexivity.
+    Qed.
+
+    Lemma eval_ejson_constant_to_expr_correct σ j:
+      imp_ejson_expr_eval h (lift_pd_bindings σ) (ejson_to_expr j)
+      = Some j.
+    Proof.
+      induction j; simpl in *; try reflexivity.
+      - repeat rewrite map_map.
+        rewrite lift_map_map_fusion; simpl.
+        unfold olift; simpl.
+        induction c; simpl in *; [reflexivity|].
+        inversion H; intros; clear H; subst.
+        specialize (IHc H3); clear H3.
+        destruct (lift_map (fun x : ejson => imp_ejson_expr_eval h (lift_pd_bindings σ) (ejson_to_expr x)) c)
+        ; try congruence.
+        rewrite H2; clear H2.
+        inversion IHc; subst; reflexivity.
+      - repeat rewrite map_map; simpl.
+        unfold olift.
+        rewrite lift_map_map_fusion.
+        simpl.
+        rewrite (eval_map_snd_ejson_constant_to_expr_correct _ _ H); clear H.
+        unfold lift; simpl.
+        rewrite zip_both_map; reflexivity.
     Qed.
 
     Lemma imp_data_expr_to_imp_ejson_expr_correct (σ:pd_bindings) (exp:imp_data_expr) :
@@ -879,6 +996,7 @@ Section ImpDatatoImpEJson.
         unfold imp_data_model.
         destruct (lookup EquivDec.equiv_dec σ v); reflexivity.
       - Case "ImpExprConst"%string.
+        rewrite eval_ejson_constant_to_expr_correct.
         reflexivity.
       - Case "ImpExprOp"%string.
         rewrite <- imp_data_op_to_imp_ejson_correct; [reflexivity|assumption].
@@ -1001,30 +1119,30 @@ Section ImpDatatoImpEJson.
         + clear IHsl.
           induction sl; simpl; [reflexivity|].
           clear a a0.
-          unfold imp_ejson_model in *.
+          unfold imp_ejson_constant in *.
+          Set Printing All.
           assert ((@fold_left (option (@ImpEval.pd_rbindings (@ejson fejson)))
-              (@ImpEval.imp_stmt (@ejson fejson) imp_ejson_op imp_ejson_runtime_op)
+              (@ImpEval.imp_stmt (@cejson fejson) imp_ejson_op (@imp_ejson_runtime_op fejson fejruntime))
               (fun (c : option (@ImpEval.pd_rbindings (@ejson fejson)))
-                 (s : @ImpEval.imp_stmt (@ejson fejson) imp_ejson_op imp_ejson_runtime_op)
+                 (s : @ImpEval.imp_stmt (@cejson fejson) imp_ejson_op (@imp_ejson_runtime_op fejson fejruntime))
                =>
                match c return (option (@ImpEval.pd_rbindings (@ejson fejson))) with
-               | Some σ' => @imp_ejson_stmt_eval fejson _ h s σ'
+               | Some σ' => @imp_ejson_stmt_eval fejson fejruntime h s σ'
                | None => @None (@ImpEval.pd_rbindings (@ejson fejson))
                end)
-              (@map (@imp_data_stmt fruntime)
-                 (@imp_ejson_stmt fejson _) imp_data_stmt_to_imp_ejson sl)
+              (@map (@imp_data_stmt fruntime) (@imp_ejson_stmt fejson fejruntime) imp_data_stmt_to_imp_ejson sl)
               (@None (list (prod string (option (@ejson fejson))))))
               =
               (@fold_left (option (@ImpEval.pd_rbindings (@ejson fejson)))
-       (@ImpEval.imp_stmt (@ejson fejson) imp_ejson_op imp_ejson_runtime_op)
+       (@ImpEval.imp_stmt (@cejson fejson) imp_ejson_op (@imp_ejson_runtime_op fejson fejruntime))
        (fun (c : option (@ImpEval.pd_rbindings (@ejson fejson)))
-          (s : @ImpEval.imp_stmt (@ejson fejson) imp_ejson_op imp_ejson_runtime_op) =>
+          (s : @ImpEval.imp_stmt (@cejson fejson) imp_ejson_op (@imp_ejson_runtime_op fejson fejruntime)) =>
         match c return (option (@ImpEval.pd_rbindings (@ejson fejson))) with
-        | Some σ' => @imp_ejson_stmt_eval fejson _ h s σ'
+        | Some σ' => @imp_ejson_stmt_eval fejson fejruntime h s σ'
         | None => @None (@ImpEval.pd_rbindings (@ejson fejson))
-        end)
-       (@map (@imp_data_stmt fruntime) (@imp_ejson_stmt fejson _)
-          imp_data_stmt_to_imp_ejson sl) (@None (@ImpEval.pd_rbindings (@ejson fejson))))) by reflexivity.
+        end) (@map (@imp_data_stmt fruntime) (@imp_ejson_stmt fejson fejruntime) imp_data_stmt_to_imp_ejson sl)
+       (@None (@ImpEval.pd_rbindings (@ejson fejson))))
+) by reflexivity.
           rewrite <- H; clear H.
           rewrite <- IHsl; clear IHsl.
           reflexivity.

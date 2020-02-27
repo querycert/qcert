@@ -144,29 +144,15 @@ Section ImpEJsontoJavaScriptAst.
   (** Translation *)
   Section Translation.
 
-    Fixpoint ejson_to_js_ast (json: ejson) : expr :=
+    Definition cejson_to_js_ast (json: cejson) : expr :=
       match json with
-      | ejnull => expr_literal literal_null
-      | ejnumber n => expr_literal (literal_number n)
-      | ejbigint n => box_nat (expr_literal (literal_number (float_of_int n)))
-      (* XXX Could be replaced by JavaScript BigInt some fix to JsAst XXX *)
-      | ejbool b => expr_literal (literal_bool b)
-      | ejstring s => expr_literal (literal_string s)
-      | ejarray a =>
-        let a :=
-            List.map
-              (fun v => Some (ejson_to_js_ast v))
-              a
-        in
-        expr_array a
-      | ejobject o =>
-        expr_object
-          (List.map
-             (fun (prop: (string * EJson.ejson)) =>
-                let (x, v) := prop in
-                (propname_identifier x, propbody_val (ejson_to_js_ast v)))
-             o)
-      | ejforeign fd =>
+      | cejnull => expr_literal literal_null
+      | cejnumber n => expr_literal (literal_number n)
+      | cejbigint n => box_nat (expr_literal (literal_number (float_of_int n)))
+      (* XXX Could be replaced by JavaScript BigInt with some fix to JsAst XXX *)
+      | cejbool b => expr_literal (literal_bool b)
+      | cejstring s => expr_literal (literal_string s)
+      | cejforeign fd =>
         foreign_ejson_to_ajavascript_expr fd
       end.
 
@@ -174,7 +160,7 @@ Section ImpEJsontoJavaScriptAst.
       match exp with
       | ImpExprError v => mk_expr_error
       | ImpExprVar v => expr_identifier v
-      | ImpExprConst j => ejson_to_js_ast j
+      | ImpExprConst j => cejson_to_js_ast j
       | ImpExprOp op el => imp_ejson_op_to_js_ast op (map imp_ejson_expr_to_js_ast el)
       | ImpExprRuntimeCall rop el => mk_runtime_call rop (map imp_ejson_expr_to_js_ast el)
       end.
