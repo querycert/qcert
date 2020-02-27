@@ -82,6 +82,8 @@ Module QData(runtime:CompilerRuntime).
   
   Definition ejson_to_string : EJson.ejson -> String.string
     := (fun j => EJson.ejsonStringify EmitUtil.quotel_double j).
+  Definition cejson_to_string : EJson.cejson -> String.string
+    := (fun j => EJson.cejsonStringify EmitUtil.quotel_double j).
 
   Definition json_to_string : JSON.json -> String.string
     := jsonStringify EmitUtil.quotel_double.

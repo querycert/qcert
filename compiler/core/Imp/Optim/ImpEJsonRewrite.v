@@ -61,10 +61,10 @@ Section ImpEJsonRewrite.
           [ (src_id, Some e) ]
           [ ImpStmtForRange
               i_id
-              (ImpExprConst (ejbigint 0))
+              (ImpExprConst (cejbigint 0))
               (* XXX Use src.length - 1, consistent with semantic of 'for i1 to i2 do ... done' loop *)
               (ImpExprRuntimeCall EJsonRuntimeNatMinus
-                                  [ ImpExprRuntimeCall EJsonRuntimeArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
+                                  [ ImpExprRuntimeCall EJsonRuntimeArrayLength [ src ] ; ImpExprConst (cejbigint 1) ])
               (ImpStmtBlock
                  [ (v, Some (ImpExprRuntimeCall EJsonRuntimeArrayAccess [ src; i ])) ]
                  [ imp_ejson_stmt_for_rewrite s ]) ]
@@ -225,10 +225,10 @@ Section ImpEJsonRewrite.
           [ (src_id, Some e) ]
           [ ImpStmtForRange
               i_id
-              (ImpExprConst (ejbigint 0))
+              (ImpExprConst (cejbigint 0))
               (* XXX Use src.length - 1, consistent with semantic of 'for i1 to i2 do ... done' loop *)
               (ImpExprRuntimeCall EJsonRuntimeNatMinus
-                                  [ ImpExprRuntimeCall EJsonRuntimeArrayLength [ src ] ; ImpExprConst (ejbigint 1) ])
+                                  [ ImpExprRuntimeCall EJsonRuntimeArrayLength [ src ] ; ImpExprConst (cejbigint 1) ])
               (ImpStmtBlock
                  [ (v, Some (ImpExprRuntimeCall EJsonRuntimeArrayAccess [ src; i ])) ]
                  [ stmt ]) ]
@@ -485,7 +485,7 @@ Set Printing Depth 100.
                         (String (Ascii.Ascii true false false true false true true false) EmptyString)
                         (@cons var v
                            (@app var
-                              (@ImpVars.imp_expr_free_vars (@imp_ejson_model fejson) imp_ejson_op
+                              (@ImpVars.imp_expr_free_vars (@imp_ejson_constant fejson) imp_ejson_op
                                  (@imp_ejson_runtime_op fejson fejruntime) e)
                               (@remove string string_eqdec v
                                  (@imp_ejson_stmt_free_vars fejson fejruntime stmt)))))
@@ -503,13 +503,13 @@ Set Printing Depth 100.
                                     EmptyString)
                                  (@cons var v
                                     (@app var
-                                       (@ImpVars.imp_expr_free_vars (@imp_ejson_model fejson) imp_ejson_op
+                                       (@ImpVars.imp_expr_free_vars (@imp_ejson_constant fejson) imp_ejson_op
                                           (@imp_ejson_runtime_op fejson fejruntime) e)
                                        (@remove string string_eqdec v
                                           (@imp_ejson_stmt_free_vars fejson fejruntime stmt)))))
                               (@cons var v
                                  (@app var
-                                    (@ImpVars.imp_expr_free_vars (@imp_ejson_model fejson) imp_ejson_op
+                                    (@ImpVars.imp_expr_free_vars (@imp_ejson_constant fejson) imp_ejson_op
                                        (@imp_ejson_runtime_op fejson fejruntime) e)
                                     (@remove string string_eqdec v
                                        (@imp_ejson_stmt_free_vars fejson fejruntime stmt))))))
