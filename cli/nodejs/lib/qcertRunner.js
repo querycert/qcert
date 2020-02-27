@@ -125,13 +125,9 @@ class QcertRunner {
     /* run compiled query */
     static execute(schema,input,queryFile,compiledQuery,output,validate) {
         const gconf = QcertRunner.configure('oql',schema,compiledQuery,output);
+        input = BoxedCollections.boxColl(input);
         if (validate) {
             if (output) {
-                //Uncomment to test roundtripping
-                //console.log('BOXED INPUT ' + JSON.stringify(BoxedCollections.boxColl(input)));
-                //console.log('UNBOXED INPUT ' + JSON.stringify(BoxedCollections.unboxColl(input)));
-
-                input = BoxedCollections.boxColl(input);
                 let result = QcertRunner.executeCompiled(schema,queryFile,compiledQuery,input);
                 result = BoxedCollections.unboxColl(result);
                 return QcertRunner.validate(gconf,queryFile,'js',output,result)
