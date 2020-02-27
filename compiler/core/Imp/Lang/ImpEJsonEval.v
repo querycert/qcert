@@ -39,7 +39,15 @@ Section ImpEJsonEval.
 
   Section EvalInstantiation.
     (* Instantiate Imp for Qcert data *)
-    Definition imp_ejson_model_normalize (d:imp_ejson_constant) : imp_ejson_model := d.
+    Definition imp_ejson_model_normalize (c:imp_ejson_constant) : imp_ejson_model :=
+      match c with
+      | cejnull => ejnull
+      | cejnumber f => ejnumber f
+      | cejbigint n => ejbigint n
+      | cejbool b => ejbool b
+      | cejstring s => ejstring s
+      | cejforeign f => ejforeign f
+      end.
 
     Definition imp_ejson_model_to_bool (d:imp_ejson_model) : option bool :=
       match d with

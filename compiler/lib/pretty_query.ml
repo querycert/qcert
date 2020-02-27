@@ -387,11 +387,11 @@ let pretty_nnrs_imp greek margin annot inheritance link_runtime q =
 
 (** Pretty Imp *)
 
-let pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e =
+let pretty_imp_expr pretty_constant pretty_op pretty_runtime p sym ff e =
   let rec pretty_imp_expr p sym ff e =
     begin match e with
     | Core.ImpExprVar v -> fprintf ff "%s"  (string_of_char_list v)
-    | Core.ImpExprConst d -> fprintf ff "%a" pretty_data d
+    | Core.ImpExprConst d -> fprintf ff "%a" pretty_constant d
     | Core.ImpExprOp (op,args) -> (pretty_op p sym pretty_imp_expr) ff (op, args)
     | Core.ImpExprRuntimeCall (op,args) -> (pretty_runtime p sym pretty_imp_expr) ff (op, args)
     | Core.ImpExprError msg -> fprintf ff "error %s"  (string_of_char_list msg)
@@ -399,8 +399,8 @@ let pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e =
   in
   pretty_imp_expr p sym ff e
 
-let pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym ff stmt =
-  let pretty_imp_expr p sym ff e = pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e in
+let pretty_imp_stmt pretty_constant pretty_op pretty_runtime p sym ff stmt =
+  let pretty_imp_expr p sym ff e = pretty_imp_expr pretty_constant pretty_op pretty_runtime p sym ff e in
   let pretty_decl p sym ff (v, e_opt) =
     begin match e_opt with
     | None ->
@@ -443,38 +443,38 @@ let pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym ff stmt =
   pretty_imp_stmt p sym ff stmt
 
 
-let pretty_imp_return pretty_data pretty_op pretty_runtime p sym ff ret =
-  let pretty_imp_expr p sym ff e = pretty_imp_expr pretty_data pretty_op pretty_runtime p sym ff e in
+let pretty_imp_return pretty_constant pretty_op pretty_runtime p sym ff ret =
+  let pretty_imp_expr p sym ff e = pretty_imp_expr pretty_constant pretty_op pretty_runtime p sym ff e in
   fprintf ff "@[<hv 2>return@;<1 0>%a;@;<0 -2>@]"
     (pretty_imp_expr 0 sym) (Core.ImpExprVar ret)
 
-let pretty_imp_function pretty_data pretty_op pretty_runtime p sym ff f =
+let pretty_imp_function pretty_constant pretty_op pretty_runtime p sym ff f =
   let Core.ImpFun (arg, body, ret) = f in
   fprintf ff "@[<hv 0>function (%a) {@;<1 2>%a@;<1 2>%a@ }@]"
     (fun ff v -> fprintf ff "%s" (string_of_char_list v)) arg
-    (pretty_imp_stmt pretty_data pretty_op pretty_runtime p sym) body
-    (pretty_imp_return pretty_data pretty_op pretty_runtime p sym) ret
+    (pretty_imp_stmt pretty_constant pretty_op pretty_runtime p sym) body
+    (pretty_imp_return pretty_constant pretty_op pretty_runtime p sym) ret
 
-let pretty_imp_aux pretty_data pretty_op pretty_runtime p sym ff ((* ImpLib *) l) =
+let pretty_imp_aux pretty_constant pretty_op pretty_runtime p sym ff ((* ImpLib *) l) =
   List.iter
     (fun (f, def) ->
       fprintf ff "@[<hv 0>@[<hv 2>define %s as@ %a@]@;<0 0>@]"
         (string_of_char_list f)
-        (pretty_imp_function pretty_data pretty_op pretty_runtime p sym) def)
+        (pretty_imp_function pretty_constant pretty_op pretty_runtime p sym) def)
     l
 
-let pretty_imp pretty_data pretty_op pretty_runtime greek margin annot inheritance link_runtime q =
+let pretty_imp pretty_constant pretty_op pretty_runtime greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
     pp_set_margin ff margin;
-    fprintf ff "@[%a@]@." (pretty_imp_aux pretty_data pretty_op pretty_runtime 0 sym) q;
+    fprintf ff "@[%a@]@." (pretty_imp_aux pretty_constant pretty_op pretty_runtime 0 sym) q;
     flush_str_formatter ()
   end
 
 (** Pretty ImpData *)
 
-let pretty_imp_data_data = pretty_data
+let pretty_imp_data_constant = pretty_data
 
 let pretty_imp_data_op p sym pretty_imp_expr ff (op, args) =
   begin match op, args with
@@ -499,13 +499,13 @@ let pretty_imp_data_runtime p sym pretty_imp_expr ff (op, args) =
   | _ -> assert false
   end
 
-let pretty_imp_data = pretty_imp pretty_imp_data_data pretty_imp_data_op pretty_imp_data_runtime
+let pretty_imp_data = pretty_imp pretty_imp_data_constant pretty_imp_data_op pretty_imp_data_runtime
 
 (** Pretty ImpData *)
 
-let pretty_imp_ejson_data ff d =
+let pretty_imp_ejson_constant ff d =
   fprintf ff "%s"
-    (string_of_char_list (Core.EnhancedCompiler.QData.ejson_to_string d))
+    (string_of_char_list (Core.EnhancedCompiler.QData.cejson_to_string d))
 
 let pretty_imp_ejson_op p sym pretty_imp_expr ff (op, args) =
   begin match op, args with
@@ -582,7 +582,7 @@ let pretty_imp_ejson_runtime p sym pretty_imp_expr ff (op, args) =
     (string_of_char_list (QUtil.string_of_ejson_runtime_op op))
     (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (pretty_imp_expr 0 sym)) args
 
-let pretty_imp_ejson = pretty_imp pretty_imp_ejson_data pretty_imp_ejson_op pretty_imp_ejson_runtime
+let pretty_imp_ejson = pretty_imp pretty_imp_ejson_constant pretty_imp_ejson_op pretty_imp_ejson_runtime
 
 (** Pretty NNRCMR *)
 
