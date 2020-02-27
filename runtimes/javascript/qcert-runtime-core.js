@@ -379,11 +379,11 @@ function max(b1, b2) {
 }
 function nth(b1, n) {
     var index = n;
-    var content = unboxColl(b1).slice(0, collLength(b1));
+    var content = unboxColl(b1);
     if (isNat(n)){
         index = unboxNat(n);
     }
-    if (content[index]) {
+    if (0 < index && index < collLength(b1)) {
         return boxLeft(content[index]);
     } else {
         return boxRight(null);
