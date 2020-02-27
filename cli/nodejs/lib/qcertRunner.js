@@ -131,9 +131,9 @@ class QcertRunner {
                 //console.log('BOXED INPUT ' + JSON.stringify(BoxedCollections.boxColl(input)));
                 //console.log('UNBOXED INPUT ' + JSON.stringify(BoxedCollections.unboxColl(input)));
 
-                BoxedCollections.boxColl(input);
+                input = BoxedCollections.boxColl(input);
                 let result = QcertRunner.executeCompiled(schema,queryFile,compiledQuery,input);
-                BoxedCollections.unboxColl(result);
+                result = BoxedCollections.unboxColl(result);
                 return QcertRunner.validate(gconf,queryFile,'js',output,result)
             } else {
                 throw new Error('Cannot validate result without expected result (--output option)');
