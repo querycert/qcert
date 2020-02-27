@@ -33,8 +33,8 @@ class BoxedCollections {
         let result = input;
         var t = typeof input;
         if ({}.toString.apply(input) === '[object Array]') {
-            input.forEach(x => BoxedCollections.unboxColl(x));
-        } else if (typeof input === 'object') {
+            result = input.map(x => BoxedCollections.unboxColl(x));
+        } else if (input && typeof input === 'object') {
             if (Object.prototype.hasOwnProperty.call(input,'$coll')
                 && Object.prototype.hasOwnProperty.call(input,'$length')) {
                 result = BoxedCollections.unboxColl(input.$coll.slice(0,input.$length));

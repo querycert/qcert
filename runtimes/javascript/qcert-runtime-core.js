@@ -87,8 +87,8 @@ function compare(v1, v2) {
     if (t1 === 'object' && v1 !== null) {
         if (isNat(v1)) { t1 = 'number'; v1 = unboxNat(v1); }
         if (isBoxColl(v1)) {
-	    t1 = 'collection'; v1 = unboxColl(v1).slice(0, collLength(v1));
-	}
+	          t1 = 'collection'; v1 = unboxColl(v1).slice(0, collLength(v1));
+	      }
     };
     if (t2 === 'object' && v2 !== null) {
         if (isNat(v2)) { t2 = 'number'; v2 = unboxNat(v2); }
@@ -197,12 +197,12 @@ function array(...args) {
     return boxColl(Array.of(...args));
 }
 function arrayLength(v) {
-    return boxNat(v.length);
+    return boxNat(v.$length);
 }
 function arrayPush(v1,v2) {
     var content1 = unboxColl(v1);
     if (content1.length !== collLength(v1)) {
-	content1 = content1.slice(0, collLength(length));
+	      content1 = content1.slice(0, collLength(length));
     }
     content1.push(v2);
     return boxColl(content1);
@@ -276,7 +276,7 @@ function cast(brands,v) {
 function iterColl(b, f) {
     var content = unboxColl(b);
     for (let i = 0; i < collLength(b); i++) {
-	f(content[i]);
+	      f(content[i]);
     }
 }
 function distinct(b) {
@@ -316,7 +316,7 @@ function union(b1, b2) {
     var content1 = unboxColl(b1);
     var content2 = unboxColl(b2);
     if (content1.length !== collLength(b1)) {
-	content1 = content1.slice(0, collLength(b1));
+	      content1 = content1.slice(0, collLength(b1));
     }
     content1.push(...content2);
     var result = boxColl(content1);
@@ -379,7 +379,7 @@ function max(b1, b2) {
 }
 function nth(b1, n) {
     var index = n;
-    var content = unboxColl(b1);
+    var content = unboxColl(b1).slice(0, collLength(b1));
     if (isNat(n)){
         index = unboxNat(n);
     }
@@ -434,14 +434,16 @@ function groupByOfKey(l,k,keysf) {
     return result;
 }
 function groupByNested(l,keysf) {
-    var keys = distinct(l.map(keysf));
+    var keys = unboxColl(distinct(boxColl(l.map(keysf))));
     var result = [ ];
     keys.forEach((k) => {
-        result.push({ 'keys': k, 'group' : groupByOfKey(l,k,keysf) });
+        result.push({ 'keys': k, 'group' : boxColl(groupByOfKey(l,k,keysf)) });
     });
     return result;
 }
 function groupBy(g,kl,l) {
+    l = unboxColl(l);
+    kl = unboxColl(kl);
     // g is partition name
     // kl is key list
     // l is input collection of records
@@ -455,7 +457,7 @@ function groupBy(g,kl,l) {
         gRec[g] = x.group;
         result.push(recConcat(x.keys, gRec));
     });
-    return result;
+    return boxColl(result);
 }
 
 /* String */
