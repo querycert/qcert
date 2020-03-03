@@ -341,7 +341,7 @@ function count(v) {
 }
 function contains(v, b) {
     for (var i=0; i<b.length; i=i+1) {
-        if (equal(v, toLeft(b[i]))) {
+        if (equal(v, b[i])) {
             return true;
         }
     }
