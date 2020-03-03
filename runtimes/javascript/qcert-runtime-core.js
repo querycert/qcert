@@ -383,7 +383,7 @@ function nth(b1, n) {
     if (isNat(n)){
         index = unboxNat(n);
     }
-    if (0 < index && index < collLength(b1)) {
+    if (0 <= index && index < collLength(b1)) {
         return boxLeft(content[index]);
     } else {
         return boxRight(null);
@@ -420,7 +420,7 @@ function sort(b,scl) {
     if (scl.length === 0) { return b; } // Check for no sorting criteria
     var compareFun = compareOfMultipleCriterias(scl);
     /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
-    var result = unboxColl(b).slice(0, b.length);
+    var result = unboxColl(b).slice(0, collLength(b));
     result.sort(compareFun);
     return boxColl(result);
 }
@@ -431,19 +431,19 @@ function groupByOfKey(l,k,keysf) {
             result.push(x);
         }
     });
-    return result;
+    return boxColl(result);
 }
 function groupByNested(l,keysf) {
     var keys = unboxColl(distinct(boxColl(l.map(keysf))));
     var result = [ ];
     keys.forEach((k) => {
-        result.push({ 'keys': k, 'group' : boxColl(groupByOfKey(l,k,keysf)) });
+        result.push({ 'keys': k, 'group' : groupByOfKey(l,k,keysf) });
     });
     return result;
 }
 function groupBy(g,kl,l) {
-    l = unboxColl(l);
-    kl = unboxColl(kl);
+    l = unboxColl(l).slice(0, collLength(l));
+    kl = unboxColl(kl).slice(0, collLength(kl));
     // g is partition name
     // kl is key list
     // l is input collection of records
