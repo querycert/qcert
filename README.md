@@ -126,7 +126,7 @@ To run the resulting JavaScript, you can use the provided node CLI.
 You will need to pass it the following: (i) the compiled query (`tests/oql/persons1.js` in our example), (ii) the schema for that query, (iii) some input data. From the command line, you can do it as follows:
 
 ```
-$ node clis/nodejs/bin/qcertRun.js execute \
+$ node cli/nodejs/bin/qcertRun.js execute \
        --input tests/oql/persons.input \
        --schema tests/oql/persons.schema \
        --query tests/oql/persons1.js
