@@ -1887,10 +1887,9 @@ Section TNRAEnvRewrite.
     intros. nraenv_core_inferer.
     econstructor; eauto.
     inversion H3.
-    subst.
-    admit. (* XXX TODO XXX *)
-  Admitted.
-  (* Qed. *)
+    rtype_equalizer; subst.
+    constructor.
+  Qed.
 
   (* χ⟨ q₂ ⟩(σ⟨ q₁ ⟩({ q })) ⇒ χ⟨ q₂ ◯ q ⟩(σ⟨ q₁ ◯ q ⟩({ ID })) *)
 
