@@ -1857,7 +1857,20 @@ Section TNRAEnvRewrite.
     apply (rewrites_typed_with_untyped _ _ (envmap_singleton q₁ q₂)).
     intros. nraenv_core_inferer.
   Qed.
-  
+
+  (* nth 0 { P } ) ⇒ₓ left P *)
+
+  Lemma tenvnth0_bag_arrow q :
+    cNRAEnvBinop OpBagNth (‵{| q |}) ‵ (dnat 0) ⇒
+    cNRAEnvUnop OpLeft q.
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (envnth0_bag q)).
+    intros. nraenv_core_inferer.
+    econstructor; eauto.
+    admit. (* XXX TODO XXX *)
+  Admitted.
+  (* Qed. *)
+
   (* χ⟨ q₂ ⟩(σ⟨ q₁ ⟩({ q })) ⇒ χ⟨ q₂ ◯ q ⟩(σ⟨ q₁ ◯ q ⟩({ ID })) *)
 
   Lemma tmap_full_over_select_arrow q q₁ q₂:
@@ -3210,6 +3223,14 @@ Hint Rewrite @tenvmap_into_id_arrow : tnraenv_core_optim.
 
 Hint Rewrite @tenvmap_map_compose_arrow : tnraenv_core_optim.
 Hint Rewrite @tenvmap_singleton_arrow : tnraenv_core_optim.
+
+(*
+       -- Those remove a nth
+       tenvnth0_bag : nth 0 { P } ) ⇒ₓ left P
+*)
+
+Hint Rewrite @tenvnth0_bag_arrow : tnraenv_core_optim.
+
 
 (*
        -- Those remove over flatten
