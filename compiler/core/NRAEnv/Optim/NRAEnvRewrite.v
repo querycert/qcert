@@ -125,6 +125,16 @@ Section ROptimEnv.
     destruct o; reflexivity.
   Qed.
 
+  (* nth 0 { P } ) ⇒ₓ left P *)
+  Lemma envnth0_bag (p: nraenv_core) :
+    cNRAEnvBinop OpBagNth (‵{| p |}) ‵ (dnat 0) ≡ₑ
+    cNRAEnvUnop OpLeft p.
+  Proof.
+    unfold nraenv_core_eq; intros ? ? _ ? _ ? _; simpl.
+    generalize (h ⊢ₑ p @ₑ x ⊣ c;env); intros.
+    destruct o; try reflexivity; simpl.
+  Qed.
+
   (* χ⟨ P1 ⟩( χ⟨ P2 ⟩( P3 ) ) ≡ χ⟨ P1 ◯ P2 ⟩( P3 ) *)
 
   Lemma envmap_map_compose (p1 p2 p3:nraenv_core) :
@@ -1820,6 +1830,14 @@ Hint Rewrite @envmap_into_id_flatten : nraenv_core_optim.
 
 Hint Rewrite @envmap_map_compose : nraenv_core_optim.
 Hint Rewrite @envmap_singleton : nraenv_core_optim.
+
+(*
+       -- Those remove a nth
+       envnth0_bag : nth 0 { P } ) ⇒ₓ left P
+*)
+
+Hint Rewrite @envnth0_bag : nraenv_core_optim.
+
 
 (*
        -- Those remove over flatten
