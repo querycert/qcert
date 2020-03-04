@@ -716,6 +716,31 @@ Section NRAEnvOptimizer.
   Definition tmap_singleton_step_correct {model:basic_model}
     := mkOptimizerStepModel tmap_singleton_step tmap_singleton_fun_correctness.
 
+  (* nth 0 { P } ) ⇒ₓ left P *)
+  Definition nth0_bag_fun {fruntime:foreign_runtime} (p: nraenv) :=
+    match p with
+        NRAEnvBinop OpBagNth (NRAEnvUnop OpBag p) (NRAEnvConst (dnat 0)) => NRAEnvUnop OpLeft p
+      | _ => p
+    end.
+
+  Lemma nth0_bag_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ nth0_bag_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tenvnth0_bag_arrow.
+  Qed.
+  Hint Rewrite @nth0_bag_fun_correctness : optim_correct.
+
+  Definition nth0_bag_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "nth0bag" (* name *)
+         "Take the element of a bag of one element" (* description *)
+         "nth0_bag_fun" (* lemma name *)
+         nth0_bag_fun (* lemma *).
+
+  Definition nth0_bag_step_correct {model:basic_model}
+    := mkOptimizerStepModel nth0_bag_step nth0_bag_fun_correctness.
+
   (* p ◯ ID ⇒ₓ p *)
   Definition tapp_over_id_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1874,7 +1899,8 @@ Section NRAEnvOptimizer.
     p ⇒ₓ tappenv_over_either_nil_fun p.
   Proof.
     destruct p; simpl; try reflexivity.
-    destruct p1; simpl; try reflexivity.
+    
+destruct p1; simpl; try reflexivity.
     destruct p1_2; simpl; try reflexivity.
     destruct d; simpl; try reflexivity.
     destruct l; simpl; try reflexivity.
@@ -2809,6 +2835,7 @@ Section NRAEnvOptimizer.
         ; tflatten_flatten_map_either_nil_step
         ; tmap_map_compose_step
         ; tmap_singleton_step
+        ; nth0_bag_step
         ; tapp_over_id_r_step
         ; tapp_over_env_step
         ; tapp_over_id_l_step
@@ -2904,6 +2931,7 @@ Section NRAEnvOptimizer.
         ; tflatten_flatten_map_either_nil_step_correct
         ; tmap_map_compose_step_correct
         ; tmap_singleton_step_correct
+        ; nth0_bag_step_correct
         ; tapp_over_id_r_step_correct
         ; tapp_over_env_step_correct
         ; tapp_over_id_l_step_correct
@@ -3029,6 +3057,7 @@ Section NRAEnvOptimizer.
       ; optim_step_name tproduct_empty_right_step
       ; optim_step_name tproduct_empty_left_step
       ; optim_step_name tmap_singleton_step
+      ; optim_step_name nth0_bag_step
       ; optim_step_name tmap_map_compose_step
       ; optim_step_name tflatten_coll_step
       (* only in tail *)
@@ -3128,6 +3157,7 @@ Section NRAEnvOptimizer.
       ; optim_step_name tproduct_empty_right_step
       ; optim_step_name tproduct_empty_left_step
       ; optim_step_name tmap_singleton_step
+      ; optim_step_name nth0_bag_step
       ; optim_step_name tmap_map_compose_step
       ; optim_step_name tflatten_coll_step
       (* only in tail *)
