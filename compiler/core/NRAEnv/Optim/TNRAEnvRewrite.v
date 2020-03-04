@@ -229,6 +229,24 @@ Section TNRAEnvRewrite.
     destruct (string_eqdec s s); congruence.
   Qed.
 
+  (* optimizations for Either *)
+
+  Lemma teither_app_over_aleft_arrow (q₁ q₂ q: nraenv_core) :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvUnop OpLeft q) ⇒ q₁ ◯ q.
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_aleft q₁ q₂ q)).
+    intros.
+    nraenv_core_inferer.
+  Qed.
+
+  Lemma teither_app_over_aright_arrow q₁ q₂ q :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvUnop OpRight q) ⇒ q₂ ◯ q.
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_aright q₁ q₂ q)).
+    intros.
+    nraenv_core_inferer.
+  Qed.
+
   (* Note that concat favors the right side *)
   Lemma tdot_over_concat_eq_r_arrow a (q₁ q₂:nraenv_core) :
     (q₁ ⊕ ‵[| (a, q₂) |])·a ⇒ q₂.
@@ -299,6 +317,7 @@ Section TNRAEnvRewrite.
       rewrite assoc_lookupr_drec_sort.
       trivial.
   Qed.
+
 
   (* [ a₁ : q₁; a₂ : q₂ ].a₂ ⇒ q₂ *)
 
@@ -1867,6 +1886,8 @@ Section TNRAEnvRewrite.
     apply (rewrites_typed_with_untyped _ _ (envnth0_bag q)).
     intros. nraenv_core_inferer.
     econstructor; eauto.
+    inversion H3.
+    subst.
     admit. (* XXX TODO XXX *)
   Admitted.
   (* Qed. *)
@@ -3183,6 +3204,7 @@ Section TNRAEnvRewrite.
       trivial.
   Qed.
     
+
 End TNRAEnvRewrite.
 
 (* begin hide *)
