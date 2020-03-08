@@ -2351,6 +2351,53 @@ destruct p1; simpl; try reflexivity.
 
   (* optimizations for Either *)
 
+  Definition teither_app_over_dleft_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvApp (NRAEnvEither p1 p2) (NRAEnvConst (dleft d)) => NRAEnvApp p1 (NRAEnvConst d)
+    | _ => p
+    end.
+
+  Lemma teither_app_over_dleft_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ teither_app_over_dleft_fun p.
+  Proof.
+    tprove_correctness p.
+    apply teither_app_over_dleft_arrow.
+  Qed.
+
+  Definition teither_app_over_dleft_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "either/dleft" (* name *)
+         "Simplifies the application of a either on a left value" (* description *)
+         "teither_app_over_dleft_fun" (* lemma name *)
+         teither_app_over_dleft_fun (* lemma *).
+
+  Definition teither_app_over_dleft_step_correct {model:basic_model}
+    := mkOptimizerStepModel teither_app_over_dleft_step teither_app_over_dleft_fun_correctness.
+
+
+  Definition teither_app_over_dright_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvApp (NRAEnvEither p1 p2) (NRAEnvConst (dright d)) => NRAEnvApp p2 (NRAEnvConst d)
+    | _ => p
+    end.
+
+  Lemma teither_app_over_dright_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ teither_app_over_dright_fun p.
+  Proof.
+    tprove_correctness p.
+    apply teither_app_over_dright_arrow.
+  Qed.
+
+  Definition teither_app_over_dright_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "either/dright" (* name *)
+         "Simplifies the application of a either on a right value" (* description *)
+         "teither_app_over_dright_fun" (* lemma name *)
+         teither_app_over_dright_fun (* lemma *).
+
+  Definition teither_app_over_dright_step_correct {model:basic_model}
+    := mkOptimizerStepModel teither_app_over_dright_step teither_app_over_dright_fun_correctness.
+
   Definition teither_app_over_aleft_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvApp (NRAEnvEither p1 p2) (NRAEnvUnop OpLeft p) => NRAEnvApp p1 p
@@ -2945,6 +2992,8 @@ destruct p1; simpl; try reflexivity.
         ; tmerge_concat_to_concat_step
         ; tmerge_with_concat_to_concat_step
         ; tdot_over_rec_step
+        ; teither_app_over_dleft_step
+        ; teither_app_over_dright_step
         ; teither_app_over_aleft_step
         ; teither_app_over_aright_step
         ; tnested_map_over_singletons_step
@@ -3043,6 +3092,8 @@ destruct p1; simpl; try reflexivity.
         ; tmerge_concat_to_concat_step_correct
         ; tmerge_with_concat_to_concat_step_correct
         ; tdot_over_rec_step_correct
+        ; teither_app_over_dleft_step_correct
+        ; teither_app_over_dright_step_correct
         ; teither_app_over_aleft_step_correct
         ; teither_app_over_aright_step_correct
         ; tnested_map_over_singletons_step_correct
@@ -3167,6 +3218,8 @@ destruct p1; simpl; try reflexivity.
       ; optim_step_name tmerge_concat_to_concat_step
       ; optim_step_name tmerge_with_concat_to_concat_step
       ; optim_step_name tdot_over_rec_step
+      ; optim_step_name teither_app_over_dleft_step
+      ; optim_step_name teither_app_over_dright_step
       ; optim_step_name teither_app_over_aleft_step
       ; optim_step_name teither_app_over_aright_step
       ; optim_step_name tnested_map_over_singletons_step
@@ -3267,6 +3320,8 @@ destruct p1; simpl; try reflexivity.
       ; optim_step_name tmerge_concat_to_concat_step
       ; optim_step_name tmerge_with_concat_to_concat_step
       ; optim_step_name tdot_over_rec_step
+      ; optim_step_name teither_app_over_dleft_step
+      ; optim_step_name teither_app_over_dright_step
       ; optim_step_name teither_app_over_aleft_step
       ; optim_step_name teither_app_over_aright_step
       ; optim_step_name tnested_map_over_singletons_step
