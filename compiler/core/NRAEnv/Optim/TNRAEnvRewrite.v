@@ -231,6 +231,31 @@ Section TNRAEnvRewrite.
 
   (* optimizations for Either *)
 
+  Lemma teither_app_over_dleft_arrow (q₁ q₂: nraenv_core) d :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvConst (dleft d)) ⇒ q₁ ◯ (cNRAEnvConst d).
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_dleft q₁ q₂ d)).
+    intros.
+    nraenv_core_inferer.
+    inversion H0.
+    rtype_equalizer.
+    subst.
+    nraenv_core_inferer.
+  Qed.
+
+  Lemma teither_app_over_dright_arrow q₁ q₂ d :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvConst (dright d)) ⇒ q₂ ◯ (cNRAEnvConst d).
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_dright q₁ q₂ d)).
+    intros.
+    nraenv_core_inferer.
+    inversion H0.
+    rtype_equalizer.
+    subst.
+    nraenv_core_inferer.
+  Qed.
+
+
   Lemma teither_app_over_aleft_arrow (q₁ q₂ q: nraenv_core) :
     (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvUnop OpLeft q) ⇒ q₁ ◯ q.
   Proof.
