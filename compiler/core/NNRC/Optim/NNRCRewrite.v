@@ -650,10 +650,15 @@ Section NNRCRewrite.
     destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
     assert (nnrc_core_eval h cenv ((x, d) :: env) (nnrc_to_nnrc_base e) =
             nnrc_core_eval h cenv env (nnrc_to_nnrc_base e)) as Heq.
-    - admit. (* XXX TODO XXX *)
+    - generalize (@nnrc_core_eval_remove_free_env _ h cenv nil x d env (nnrc_to_nnrc_base e)); intros.
+      simpl in H2.
+      apply H2.
+      rewrite nnrc_to_nnrc_base_free_vars_same in H.
+      assumption.
     - rewrite Heq; clear Heq.
       repeat match_destr.
-  Admitted.
+      reflexivity.
+  Qed.
 
   (* ♯flatten({ e1 ? { $t1 } : {} | $t1 ∈ { e2 } }) ≡ LET $t1 := e2 IN e1 ? { $t1 } : {} *)
 
