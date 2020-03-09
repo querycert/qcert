@@ -474,6 +474,59 @@ Section NNRCOptimizer.
   Definition tdot_of_rec_step_correct {model:basic_model}
     := mkOptimizerStepModel tdot_of_rec_step tdot_of_rec_fun_correctness.
 
+  (* Java equivalent: NOT IMPLEMENTED *)
+  Definition tnth0_bag_fun  {fruntime:foreign_runtime}(e:nnrc) :=
+    match e with
+      | (NNRCBinop OpBagNth (NNRCUnop OpBag e) (NNRCConst (dnat 0))) =>
+        NNRCUnop OpLeft e
+      | _ => e
+    end.
+
+  Lemma tnth0_bag_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tnth0_bag_fun e).
+  Proof.
+    tprove_correctness e.
+    apply tnth0_bag.
+  Qed.
+
+  Definition tnth0_bag_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "nth0/bag" (* name *)
+         "Simplify first element of a collection with one element" (* description *)
+         "tnth0_bag_fun" (* lemma name *)
+         tnth0_bag_fun (* lemma *).
+
+  Definition tnth0_bag_step_correct {model:basic_model}
+    := mkOptimizerStepModel tnth0_bag_step tnth0_bag_fun_correctness.
+
+  (* Java equivalent: NOT IMPLEMENTED *)
+  Definition tnth0_nil_fun  {fruntime:foreign_runtime}(e:nnrc) :=
+    match e with
+      | NNRCBinop OpBagNth (NNRCConst (dcoll nil)) (NNRCConst (dnat 0)) =>
+        NNRCConst dnone
+      | _ => e
+    end.
+
+  Lemma tnth0_nil_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tnth0_nil_fun e).
+  Proof.
+    tprove_correctness e.
+    apply tnth0_nil.
+    admit. (* XXX TODO XXX *)
+  (* Qed. *)
+  Admitted.
+
+  Definition tnth0_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "nth0/nil" (* name *)
+         "Simplify first element of an empty collection" (* description *)
+         "tnth0_nil_fun" (* lemma name *)
+         tnth0_nil_fun (* lemma *).
+
+  Definition tnth0_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tnth0_nil_step tnth0_nil_fun_correctness.
+
+
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tmerge_concat_to_concat_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
@@ -762,6 +815,61 @@ Section NNRCOptimizer.
   Definition tunop_over_if_const_step_correct {model:basic_model}
     := mkOptimizerStepModel tunop_over_if_const_step tunop_over_if_const_fun_correctness.
 
+
+  (* Java equivalent: NOT IMPLEMENTED *)
+  Definition tbinop_over_if_left_const_fun  {fruntime:foreign_runtime}(e:nnrc)
+    := match e with
+       | NNRCBinop op (NNRCIf e1 e2 (NNRCConst d)) e =>
+         NNRCIf e1 (NNRCBinop op e2 e) (NNRCBinop op (NNRCConst d) e)
+       | _ => e
+       end.
+
+  Lemma tbinop_over_if_left_const_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tbinop_over_if_left_const_fun e).
+  Proof.
+    tprove_correctness e.
+    apply tnnrcbinop_over_if_left_arrow.
+  Qed.
+
+  Definition tbinop_over_if_left_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "binary/if/else const" (* name *)
+         "Push binary operators through if when the else branch is a constant" (* description *)
+         "tbinop_over_if_left_const_fun" (* lemma name *)
+         tbinop_over_if_left_const_fun (* lemma *).
+
+  Definition tbinop_over_if_left_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tbinop_over_if_left_const_step tbinop_over_if_left_const_fun_correctness.
+
+
+  (* Java equivalent: NOT IMPLEMENTED *)
+  Definition tbinop_over_let_left_const_fun  {fruntime:foreign_runtime}(e:nnrc)
+    := match e with
+       | NNRCBinop op (NNRCLet x e1 e2) (NNRCConst d) =>
+         NNRCLet x e1 (NNRCBinop op e2 (NNRCConst d))
+       | _ => e
+       end.
+
+  Lemma tbinop_over_let_left_const_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tbinop_over_let_left_const_fun e).
+  Proof.
+    tprove_correctness e.
+    apply tnnrcbinop_over_let_left_arrow.
+    unfold nnrc_free_vars.
+    simpl.
+    congruence.
+  Qed.
+
+  Definition tbinop_over_let_left_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "binary/let/const" (* name *)
+         "Push binary operators through let when the right expression is a constant" (* description *)
+         "tbinop_over_let_left_const_fun" (* lemma name *)
+         tbinop_over_let_left_const_fun (* lemma *).
+
+  Definition tbinop_over_let_left_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tbinop_over_let_left_const_step tbinop_over_let_left_const_fun_correctness.
+
     (* optimizations for rproject *)
 
   (* Java equivalent: NnrcOptimizer.[same] *)
@@ -1047,6 +1155,8 @@ Section NNRCOptimizer.
           ; tsigma_to_if_step
           ; tmap_sigma_fusion_samevar_step
           ; tdot_of_rec_step
+          ; tnth0_bag_step
+          ; tnth0_nil_step
           ; tmerge_concat_to_concat_step
           ; tdot_of_concat_rec_step
           ; tinline_let_step
@@ -1055,6 +1165,8 @@ Section NNRCOptimizer.
           ; tfor_over_either_nil_step
           ; tunop_over_either_const_step
           ; tunop_over_if_const_step
+          ; tbinop_over_if_left_const_step
+          ; tbinop_over_let_left_const_step
           ; tproject_nil_step
           ; tproject_over_const_step
           ; tproject_over_rec_step
@@ -1077,6 +1189,8 @@ Section NNRCOptimizer.
           ; tsigma_to_if_step_correct
           ; tmap_sigma_fusion_samevar_step_correct
           ; tdot_of_rec_step_correct
+          ; tnth0_bag_step_correct
+          ; tnth0_nil_step_correct
           ; tmerge_concat_to_concat_step_correct
           ; tdot_of_concat_rec_step_correct
           ; tinline_let_step_correct
@@ -1085,6 +1199,8 @@ Section NNRCOptimizer.
           ; tfor_over_either_nil_step_correct
           ; tunop_over_either_const_step_correct
           ; tunop_over_if_const_step_correct
+          ; tbinop_over_if_left_const_step_correct
+          ; tbinop_over_let_left_const_step_correct
           ; tproject_nil_step_correct
           ; tproject_over_const_step_correct
           ; tproject_over_rec_step_correct
@@ -1145,11 +1261,15 @@ Section NNRCOptimizer.
         ; optim_step_name tmerge_concat_to_concat_step
         ; optim_step_name tdot_of_concat_rec_step
         ; optim_step_name tdot_of_rec_step
+        ; optim_step_name tnth0_bag_step
+        ; optim_step_name tnth0_nil_step
         ; optim_step_name tflatten_singleton_step
         ; optim_step_name tflatten_nil_step
         ; optim_step_name tfor_singleton_to_let_step
         ; optim_step_name tunop_over_either_const_step
         ; optim_step_name tunop_over_if_const_step
+        ; optim_step_name tbinop_over_if_left_const_step
+        ; optim_step_name tbinop_over_let_left_const_step
         ; optim_step_name tfor_over_either_nil_step
         ; optim_step_name tfor_over_for_step
         ; optim_step_name tfor_over_if_nil_step
