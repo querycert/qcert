@@ -740,9 +740,12 @@ Section TNNRCRewrite.
     - intros.
       inversion H0; subst; clear H0.
       inversion H7; subst; clear H7.
-      admit. (* XXX TODO XXX *)
-  (* Qed. *)
-  Admitted.
+      repeat (econstructor; eauto).
+      + generalize (@nnrc_type_remove_free_env _ τcenv nil x τ₁0 τenv e τ₂ H); intros nt.
+        simpl in nt.
+        rewrite nt.
+        trivial.
+  Qed.
 
   (* ♯flatten({ e1 ? { $t1 } : {} | $t1 ∈ { e2 } }) ≡ LET $t1 := e2 IN e1 ? { $t1 } : {} *)
 
