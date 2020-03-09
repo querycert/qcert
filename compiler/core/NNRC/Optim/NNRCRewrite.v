@@ -71,17 +71,15 @@ Section NNRCRewrite.
 
   (* nth [ ] 0 ≡ none *)
 
-  Lemma nth0_nil (e:nnrc) :
+  Lemma nth0_nil :
     nnrc_eq (NNRCBinop OpBagNth (NNRCConst (dcoll nil)) (NNRCConst (dnat 0)))
             (NNRCConst dnone).
   Proof.
     unfold nnrc_eq; intros ? ? ? ? _.
     unfold nnrc_eval.
     simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e)); [|reflexivity]; simpl.
     reflexivity.
   Qed.
-
 
   Lemma nnrc_merge_concat_to_concat s1 s2 p1 p2:
     s1 <> s2 ->
