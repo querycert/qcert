@@ -15,7 +15,6 @@
 Require Import List.
 Require Import String.
 Require Import Utils.
-Require Import Iterators.
 Require Import Bindings.
 Require Import ForeignEJson.
 Require Import EJson.

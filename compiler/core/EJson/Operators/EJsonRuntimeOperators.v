@@ -18,7 +18,6 @@ Require Import String.
 Require Import List.
 Require Import ZArith.
 Require Import Utils.
-Require Import OperatorsUtils.
 Require Import BrandRelation.
 Require Import ForeignEJson.
 Require Import EJson.
