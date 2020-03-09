@@ -1414,4 +1414,6 @@ Proof.
 Defined.
    
 Hint Resolve canon_brands_is_canon_brands.
-  
+
+Instance ToString_brands : ToString brands
+  := { toString := fun b => (String.concat " & " b)}.
