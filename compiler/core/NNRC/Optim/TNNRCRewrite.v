@@ -68,30 +68,34 @@ Section TNNRCRewrite.
                       (NNRCUnop OpLeft e).
   Proof.
     apply nnrc_rewrites_typed_with_untyped.
-    - rewrite nth0_bag; reflexivity.
+    - apply nth0_bag.
     - intros.
       unfold nnrc_type, nnrc_eval in *.
       simpl in *.
       nnrc_core_inverter.
-      admit.  (* XXX TODO XXX *)
-      (* nnrc_inverter. *)
-
-      (* unfold tdot, edot in *; simpl in * . *)
-      (* nnrc_inverter. *)
-      (* trivial. *)
-  (* Qed. *)
-  Admitted.
+      econstructor; [|eauto].
+      inversion H4.
+      rtype_equalizer; subst.
+      econstructor.
+  Qed.
 
   (* nth [ ] 0 ≡ none *)
 
-  Lemma tnth0_nil (e:nnrc) :
+  Lemma tnth0_nil :
     tnnrc_rewrites_to (NNRCBinop OpBagNth (NNRCConst (dcoll nil)) (NNRCConst (dnat 0)))
                       (NNRCConst dnone).
   Proof.
-    admit. (* XXX TODO XXX *)
-  Admitted.
-
-
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nth0_nil.
+    - intros.
+      unfold nnrc_type, nnrc_eval in *.
+      simpl in *.
+      nnrc_core_inverter.
+      inversion H4.
+      rtype_equalizer; subst.
+      repeat econstructor.
+  Qed.
+    
   (* (e₁ ⊕ [ a : e₂ ]).a ≡ e₂ *)
 
   Lemma tnnrc_dot_of_concat_rec_eq_arrow a (e1 e2:nnrc) :
@@ -734,6 +738,8 @@ Section TNNRCRewrite.
     - apply nnrcbinop_over_let_left.
       assumption.
     - intros.
+      inversion H0; subst; clear H0.
+      inversion H7; subst; clear H7.
       admit. (* XXX TODO XXX *)
   (* Qed. *)
   Admitted.
