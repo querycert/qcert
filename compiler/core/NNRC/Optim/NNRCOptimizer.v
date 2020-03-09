@@ -512,9 +512,7 @@ Section NNRCOptimizer.
   Proof.
     tprove_correctness e.
     apply tnth0_nil.
-    admit. (* XXX TODO XXX *)
-  (* Qed. *)
-  Admitted.
+  Qed.
 
   Definition tnth0_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
