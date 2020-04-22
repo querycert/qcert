@@ -592,6 +592,52 @@ Section NNRCtoNNRCMR.
         assumption.
   Qed.
 
+  Lemma remove_one_In_neq :
+    forall (A : Type) (eqdec : EquivDec.EqDec A eq)  (l1  : list A) a x,
+      a <> x -> In x l1 -> In x (remove_one a l1).
+  Proof.
+    induction l1 as [|b l1];intuition.
+    destruct H0.
+    - subst;simpl.
+      destruct (equiv_dec a x);[congruence| ].
+      left;apply eq_refl.
+    - simpl.
+      destruct (equiv_dec a b);intuition.
+  Qed.
+    
+  Lemma bminus_In_alt :
+    forall (A : Type) (eqdec : EquivDec.EqDec A eq) x (l1 l2 : list A),
+      List.In x (bminus l1 l2) -> List.In x l2.
+  Proof.
+    intros A eqdec x.
+    induction l1 as [|a1 l1];intros l.
+    - exact (fun x => x) .
+    - intros H1;assert (H2 := H1).
+      simpl in H1;apply remove_one_In in H1.
+      apply (IHl1 _ H1).
+  Qed.
+
+  Lemma bminus_In_alt_neq :
+    forall (A : Type) (eqdec : EquivDec.EqDec A eq) x (l1 l2 : list A),
+      ~ In x l1 ->
+      List.In x (bminus l1 l2) <-> List.In x l2.
+  Proof.
+    intros A eqdec x.
+    induction l1;intros l2 Hn;[intuition| ].
+    simpl in Hn.
+    split.
+    - intros H1;assert (H2 := H1).
+      intuition.
+      apply (IHl1 _ H0).
+      simpl in H1;apply remove_one_In in H1.
+      apply H1.
+    - intuition.
+      apply (IHl1 _ H1).
+      revert  H0 H.
+      intros.
+      apply (remove_one_In_neq _ _  _ _ _ H0 H).
+  Qed.
+
   Lemma unpack_closure_env_free_vars (closure_env_name: var) (free_vars_loc: list (var * dlocalization)) (k: nnrc) :
     forall x,
       let free_vars := List.map fst free_vars_loc in
@@ -600,38 +646,53 @@ Section NNRCtoNNRCMR.
   Proof.
     Opaque fresh_var.
     intros x.
-    induction free_vars.
-    - Case "free_vars = nil"%string.
+    cbv zeta.
+    induction free_vars_loc.
+    - Case "free_vars_loc = nil"%string.
       simpl.
       right.
       apply bdistinct_same_elemts.
-      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
-      (* assumption. *)
-    - Case "free_vars <> nil"%string.
+      assumption.
+    - Case "free_vars_loc <> nil"%string.
       intros Hx.
-      simpl in Hx.
-      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
-      (* destruct Hx; subst; simpl; [intuition | ]. *)
-      (* destruct (string_eqdec *)
-      (*             (fresh_var "unpack$" (closure_env_name :: nil)) *)
-      (*             (fresh_var "unpack$" (closure_env_name :: nil))); [ | congruence]. *)
-      (* rewrite in_app_iff in H. *)
-      (* destruct H; apply remove_inv in H; destruct H. *)
-      (* + rewrite in_app_iff in H. *)
-      (*   simpl in H. *)
-      (*   destruct H; [ | intuition ]. *)
-      (*   apply remove_inv in H. *)
-      (*   destruct H. *)
-      (*   dest_eqdec; simpl in H; intuition. *)
-      (* + specialize (IHfree_vars H). *)
-      (*   simpl in IHfree_vars. *)
-      (*   intuition. *)
-      (*   right. *)
-      (*   rewrite <- mult_pos_equiv_in in H1 |- *. *)
-      (*   rewrite bminus_mult in H1 |- *. *)
-      (*   rewrite mult_on_remove; trivial. *)
-  Admitted.
-
+      destruct a,d;cbn in Hx.
+      +
+      destruct (string_eqdec
+                  (fresh_var "unpackscalar$" (closure_env_name :: nil))
+                  (fresh_var "unpackscalar$" (closure_env_name :: nil))); [ | congruence].
+        simpl in Hx.
+         rewrite in_app_iff in Hx.
+         destruct Hx;[left;apply H| ].
+         destruct H.
+         -- destruct (string_eqdec v v); [ | congruence].
+            inversion H.
+         -- simpl in *.
+            apply remove_inv in H.
+            destruct H as [H H2].
+            apply IHfree_vars_loc in H.
+            simpl in H.
+            destruct H;[left;apply H| ].
+            right.
+            rewrite remove_bminus_comm.
+            apply remove_one_In_neq;[|apply H].
+            congruence.
+      +   destruct (string_eqdec
+                  (fresh_var "unpackdistributed$" (closure_env_name :: nil))
+                  (fresh_var "unpackdistributed$" (closure_env_name :: nil))); [ | congruence].
+          simpl in Hx.
+          destruct Hx;[left;apply H| ].
+          apply remove_inv in H.
+          destruct H as [H H2].
+            apply IHfree_vars_loc in H.
+            simpl in H.
+            destruct H;[left;apply H| ].
+            right.
+            simpl.
+            rewrite remove_bminus_comm.
+            apply remove_one_In_neq;[|apply H].
+            congruence.
+  Qed.
+  
   Lemma nnrcmr_of_nnrc_with_free_vars_wf (n: nnrc) (vars_loc: list (var * dlocalization)) (output: var):
     (forall x, In x (nnrc_free_vars n) -> In x (List.map fst vars_loc)) ->
     nnrcmr_well_formed (nnrcmr_of_nnrc_with_free_vars n vars_loc output).
