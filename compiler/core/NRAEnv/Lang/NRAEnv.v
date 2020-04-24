@@ -668,33 +668,33 @@ Section NRAEnv.
           apply nraenv_macro_map_env_correct; eauto.
         - inversion H; clear H; subst.          
           unfold macro_cNRAEnvFlatMap.
-          eapply sem_cNRAEnvFlatMap.
-          econstructor.
-          Unshelve.
-          admit.
-          apply H6.
-          swap 1 2.
-          (d1 := dcoll d1).
-          inversion H6;subst.
-          + econstructor.
-          unfold macro_cNRAEnvFlatMap.
-          apply IHe2 in H2.
-          econstructor.          
-          econstructor; eauto.
-          +inversion H6.
-          + 
-          + clear H2 IHe2.
-            Lemma test :
-              exists
+          
+          (* econstructor. *)
+          (* Unshelve. *)
+          (* admit. *)
+          (* apply H6. *)
+          (* swap 1 2. *)
+          (* (d1 := dcoll d1). *)
+          (* inversion H6;subst. *)
+          (* + econstructor. *)
+          (* unfold macro_cNRAEnvFlatMap. *)
+          (* apply IHe2 in H2. *)
+          (* econstructor.           *)
+          (* econstructor; eauto. *)
+          (* +inversion H6. *)
+          (* +  *)
+          (* + clear H2 IHe2. *)
+          (*   Lemma test : *)
+          (*     exists *)
 
-            induction c1.
-            econstructor.
-            inversion H6; subst.
-            econstructor; eauto.
-            specialize (IHe1 env a (dcoll c3) H3).
+          (*   induction c1. *)
+          (*   econstructor. *)
+          (*   inversion H6; subst. *)
+          (*   econstructor; eauto. *)
+          (*   specialize (IHe1 env a (dcoll c3) H3). *)
             
-          Focus 2.
-          inversion H2.
+          (* Focus 2. *)
+          (* inversion H2. *)
           admit.
         - inversion H.
         - inversion H.
