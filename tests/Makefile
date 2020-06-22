@@ -69,7 +69,7 @@ endif
 ## OQL
 OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12 13 14
 OQLWORLDNUM=1 2
-OQLSTRINGNUM=1 2 3
+OQLSTRINGNUM=0 1 2 3
 OQLEMPLOYEESNUM=1 2
 OQLTARGETS=oql nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_data imp_ejson # dnnrc_typed
 

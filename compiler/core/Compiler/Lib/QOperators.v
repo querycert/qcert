@@ -145,6 +145,11 @@ Module QOperators(runtime:CompilerRuntime).
     End ZArith.
     
     Module FloatArith.
+      Definition opfloatlt : op 
+        := BinaryOperators.OpFloatCompare BinaryOperators.FloatLt.
+      Definition opfloatle : op 
+        := BinaryOperators.OpFloatCompare BinaryOperators.FloatLe.
+
       Definition opfloatplus : op 
         := BinaryOperators.OpFloatBinary BinaryOperators.FloatPlus.
       Definition opfloatminus : op 
