@@ -13,7 +13,8 @@
  *)
 
 open Util
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
+open JSON
 
 (* Data utils for the Camp evaluator and compiler *)
 
@@ -69,7 +70,7 @@ let get_io_components (od:QData.json option) : QData.json option * QData.json op
   | Some d ->
       begin	try
 	      begin match d with
-	      | Core.Jobject r ->
+	      | Coq_jobject r ->
 	          let input = get_field_opt "input" r in
 	          let output = get_field_opt "output" r in
 	          let schema = get_field_opt "schema" r in
@@ -94,14 +95,14 @@ let check_inheritance h =
 
 let build_inheritance h =
   begin match h with
-  | Core.Jarray l ->
+  | Coq_jarray l ->
     let raw_h =
       List.map (function
-          | Core.Jobject
-              ( [(['s';'u';'b'], Core.Jstring sub); (['s';'u';'p'], Core.Jstring sup)]
-              | [(['s';'u';'p'], Core.Jstring sup); (['s';'u';'b'], Core.Jstring sub)] ) ->
+        | Coq_jobject
+            ( [(['s';'u';'b'], Coq_jstring sub); (['s';'u';'p'], Coq_jstring sup)]
+        | [(['s';'u';'p'], Coq_jstring sup); (['s';'u';'b'], Coq_jstring sub)] ) ->
             (sub, sup)
-          | _ ->
+        | _ ->
             raise (Qcert_Error "Ill-formed inheritance"))
         l
     in
@@ -112,11 +113,11 @@ let build_inheritance h =
 
 let build_brandTypes bts =
   begin match bts with
-  | Core.Jarray l ->
+  | Coq_jarray l ->
       List.map (function
-        | Core.Jobject
-            ( [(['b';'r';'a';'n';'d'], Core.Jstring brandName); (['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName)]
-        | [(['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName); (['b';'r';'a';'n';'d'], Core.Jstring brandName)] ) ->
+        | Coq_jobject
+            ( [(['b';'r';'a';'n';'d'], Coq_jstring brandName); (['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName)]
+        | [(['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName); (['b';'r';'a';'n';'d'], Coq_jstring brandName)] ) ->
             (string_of_char_list brandName, string_of_char_list typeName)
         | _ ->
             raise (Qcert_Error "Ill-formed brandTypes"))
@@ -127,11 +128,11 @@ let build_brandTypes bts =
 
 let build_typeDefs bts =
   begin match bts with
-  | Core.Jarray l ->
+  | Coq_jarray l ->
       List.map (function
-        | Core.Jobject
-            ( [(['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName); (['t';'y';'p';'e';'D';'e';'f'], typeDef)]
-        | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Core.Jstring typeName)] ) ->
+        | Coq_jobject
+            ( [(['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName); (['t';'y';'p';'e';'D';'e';'f'], typeDef)]
+        | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName)] ) ->
             (string_of_char_list typeName, typeDef)
         | _ ->
             raise (Qcert_Error "Ill-formed typeDefs"))
@@ -142,7 +143,7 @@ let build_typeDefs bts =
 
 let build_globals globals =
   begin match globals with
-  | Core.Jobject l ->
+  | Coq_jobject l ->
       List.map (function (varname, typeDef) -> (string_of_char_list varname, typeDef)) l
   | _ ->
       raise (Qcert_Error "Ill-formed globals")
@@ -152,7 +153,7 @@ let missing_inheritance_default = QData.jarray []  (* Empty array i.e., empty in
 
 let build_schema (j:QData.json) =
   begin match j with
-  | Core.Jobject r ->
+  | Coq_jobject r ->
       let inheritance = get_field_defaults "inheritance" r missing_inheritance_default in
       let brandTypes = get_field_opt "brandTypes" r in
       let typeDefs = get_field_opt "typeDefs" r in
@@ -167,7 +168,7 @@ let build_schema (j:QData.json) =
 
 let build_input h input =
   begin match input with
-  | Core.Jobject j -> List.map (fun (x,y) -> (x, QData.json_to_qdata h y)) j
+  | Coq_jobject j -> List.map (fun (x,y) -> (x, QData.json_to_qdata h y)) j
   | _ -> raise (Qcert_Error "Illed formed working memory: input")
   end
 
@@ -176,6 +177,6 @@ let build_output h output =
 
 let build_optim_config j =
   begin match QDriver.json_to_optim_config j with
-  | Core.Inl e -> raise (Qcert_Error (string_of_char_list e))
-  | Core.Inr oc -> oc
+  | Coq_inl e -> raise (Qcert_Error (string_of_char_list e))
+  | Coq_inr oc -> oc
   end

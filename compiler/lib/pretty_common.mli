@@ -14,7 +14,7 @@
 
 (** This module contains common code for pretty-printers *)
 
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
 
 (* Character sets *)
 
@@ -98,34 +98,34 @@ val pretty_data : Format.formatter -> QData.qdata -> unit
 (* Pretty qcert_type *)
 
 val pretty_rtype_aux : symbols -> Format.formatter -> QType.qtype_struct -> unit
-val pretty_annotate_annotated_rtype : bool -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a Core.type_annotation -> unit
+val pretty_annotate_annotated_rtype : bool -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a TDNNRC.type_annotation -> unit
 
 (* Pretty operators *)
 
-val pretty_unary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> Core.unary_op -> 'a -> unit
-val pretty_binary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> Core.binary_op -> 'a -> 'a -> unit
+val pretty_unary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> QOps.Unary.op -> 'a -> unit
+val pretty_binary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> QOps.Binary.op -> 'a -> 'a -> unit
 
 (* Useful for SExp support *)
-val string_of_foreign_data : Core.enhanced_data -> string
-val foreign_data_of_string : string -> Core.enhanced_data
+val string_of_foreign_data : EnhancedData.enhanced_data -> string
+val foreign_data_of_string : string -> EnhancedData.enhanced_data
 
-val string_of_foreign_unary_op : Core.enhanced_unary_op -> string
-val string_of_nat_arith_unary_op : Core.nat_arith_unary_op -> string
-val string_of_float_arith_unary_op : Core.float_arith_unary_op -> string
+val string_of_foreign_unary_op : EnhancedData.enhanced_unary_op -> string
+val string_of_nat_arith_unary_op : UnaryOperators.nat_arith_unary_op -> string
+val string_of_float_arith_unary_op : UnaryOperators.float_arith_unary_op -> string
 
-val foreign_unary_op_of_string : string -> Core.enhanced_unary_op
-val nat_arith_unary_op_of_string : string -> Core.nat_arith_unary_op
-val float_arith_unary_op_of_string : string -> Core.float_arith_unary_op
+val foreign_unary_op_of_string : string -> EnhancedData.enhanced_unary_op
+val nat_arith_unary_op_of_string : string -> UnaryOperators.nat_arith_unary_op
+val float_arith_unary_op_of_string : string -> UnaryOperators.float_arith_unary_op
 
-val string_of_foreign_binary_op : Core.enhanced_binary_op -> string
-val string_of_nat_arith_binary_op : Core.nat_arith_binary_op -> string
-val string_of_float_arith_binary_op : Core.float_arith_binary_op -> string
-val string_of_float_compare_binary_op : Core.float_compare_binary_op -> string
+val string_of_foreign_binary_op : EnhancedData.enhanced_binary_op -> string
+val string_of_nat_arith_binary_op : BinaryOperators.nat_arith_binary_op -> string
+val string_of_float_arith_binary_op : BinaryOperators.float_arith_binary_op -> string
+val string_of_float_compare_binary_op : BinaryOperators.float_compare_binary_op -> string
 
-val nat_arith_binary_op_of_string : string -> Core.nat_arith_binary_op
-val float_arith_binary_op_of_string : string -> Core.float_arith_binary_op
-val float_compare_binary_op_of_string : string -> Core.float_compare_binary_op
-val foreign_binary_op_of_string : string -> Core.enhanced_binary_op
+val foreign_binary_op_of_string : string -> EnhancedData.enhanced_binary_op
+val nat_arith_binary_op_of_string : string -> BinaryOperators.nat_arith_binary_op
+val float_arith_binary_op_of_string : string -> BinaryOperators.float_arith_binary_op
+val float_compare_binary_op_of_string : string -> BinaryOperators.float_compare_binary_op
 
-val string_of_binary_op : Core.binary_op -> string
+val string_of_binary_op : BinaryOperators.binary_op -> string
 

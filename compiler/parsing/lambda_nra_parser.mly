@@ -14,7 +14,8 @@
 
 %{
   open Util
-  open Core.EnhancedCompiler
+  open LambdaNRA
+  open EnhancedCompiler.EnhancedCompiler
 
   type lambda_or_expression =
   | ParsedLambda of QLambdaNRA.lambda_expr
@@ -39,19 +40,19 @@
     | "mapproduct" -> QLambdaNRA.lamapproduct (resolve_one_lambda a el) e0
     | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
     | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
-    | "union" -> QLambdaNRA.labinop Core.OpBagUnion e0 (resolve_one_expr a el)
+    | "union" -> QLambdaNRA.labinop OpBagUnion e0 (resolve_one_expr a el)
     | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
   let static_int e =
     begin match e with
-    | Core.LNRAConst (Core.Dnat i) -> i
+    | LNRAConst (Coq_dnat i) -> i
     | _ -> raise Not_found
     end
     
   let static_string e =
     begin match e with
-    | Core.LNRAConst (Core.Dstring s) -> s
+    | LNRAConst (Coq_dstring s) -> s
     | _ -> raise Not_found
     end
     
@@ -150,7 +151,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <Core.EnhancedCompiler.QLambdaNRA.expr> main
+%start <EnhancedCompiler.EnhancedCompiler.QLambdaNRA.expr> main
 
 %%
 

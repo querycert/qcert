@@ -15,7 +15,7 @@
 (* This module contains parsing utilities *)
 
 open Util
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
 
 open Lex_util
 open Parse_util

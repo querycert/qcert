@@ -12,9 +12,21 @@
  * limitations under the License.
  *)
 
-(** This module contains compiler output code *)
+Require Import String.
+Require Import List.
+Require Import EJsonRuntime.
+Require Import Imp.
+Require Export ImpEJson.
+Require Import WasmAstRuntime.
 
-open EnhancedCompiler.EnhancedCompiler
+Section ImpEJsontoWasmAst.
+  Section Top.
+    Context {ft:foreign_ejson}.
+    Context {fejruntime:foreign_ejson_runtime}.
 
-val output_query : Pretty_common.pretty_config -> QLang.query -> string
+    Axiom imp_ejson_to_wasm_ast : imp_ejson -> wasm_ast.
+  End Top.
+    
+End ImpEJsontoWasmAst.
 
+Extract Constant imp_ejson_to_wasm_ast => "Wasm.imp_ejson_to_wasm_ast".
