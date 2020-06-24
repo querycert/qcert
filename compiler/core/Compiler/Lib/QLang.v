@@ -38,7 +38,9 @@ Module QLang(runtime:CompilerRuntime).
     Definition nra := nra.
     Definition nraenv_core := nraenv_core.
     Definition nraenv := nraenv.
+    Definition nnrc_core := nnrc_core.
     Definition nnrc := nnrc.
+    Definition nnrs_core := nnrs_core.
     Definition nnrs := nnrs.
     Definition nnrs_imp_expr := nnrs_imp_expr.
     Definition nnrs_imp_stmt := nnrs_imp_stmt.
@@ -48,9 +50,11 @@ Module QLang(runtime:CompilerRuntime).
     Definition nnrcmr := nnrcmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
+    Definition js_ast := js_ast.
     Definition javascript := javascript.
     Definition java := java.
     Definition spark_df := spark_df.
+    Definition wasm_ast := wasm_ast.
 
     Definition language : Set := language.
 

@@ -12,7 +12,8 @@
  * limitations under the License.
  *)
 
-open Core.EnhancedCompiler
+open CompLang
+open EnhancedCompiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
@@ -96,6 +97,7 @@ let suffix_java () = ".java"
 let suffix_js_ast () = ".js_ast"
 let suffix_javascript () = ".js"
 let suffix_spark_df () = "_spark_df.scala"
+let suffix_wasm_ast () = ".wat"
 let suffix_stats () = "_stats.json"
 let suffix_error () = ".error"
 
@@ -103,32 +105,33 @@ let suffix_sdata () = ".sio"
 
 let suffix_of_language lang =
   match lang with
-  | Core.L_camp_rule -> suffix_camp_rule ()
-  | Core.L_camp -> suffix_camp ()
-  | Core.L_tech_rule -> suffix_tech_rule ()
-  | Core.L_designer_rule -> suffix_designer_rule ()
-  | Core.L_oql -> suffix_oql ()
-  | Core.L_sql -> suffix_sql ()
-  | Core.L_sqlpp -> suffix_sql ()
-  | Core.L_lambda_nra -> suffix_lambda_nra ()
-  | Core.L_nra -> suffix_nra ()
-  | Core.L_nraenv -> suffix_nraenv ()
-  | Core.L_nraenv_core -> suffix_nraenv_core ()
-  | Core.L_nnrc_core -> suffix_nnrc_core ()
-  | Core.L_nnrc -> suffix_nnrc ()
-  | Core.L_dnnrc -> suffix_dnnrc ()
-  | Core.L_dnnrc_typed -> suffix_dnnrc_typed ()
-  | Core.L_nnrs -> suffix_nnrs ()
-  | Core.L_nnrs_core -> suffix_nnrs_core ()
-  | Core.L_nnrs_imp -> suffix_nnrs_imp ()
-  | Core.L_imp_data -> suffix_imp_data ()
-  | Core.L_imp_ejson -> suffix_imp_ejson ()
-  | Core.L_nnrcmr -> suffix_nnrcmr ()
-  | Core.L_js_ast -> suffix_js_ast ()
-  | Core.L_javascript -> suffix_javascript ()
-  | Core.L_java -> suffix_java ()
-  | Core.L_spark_df -> suffix_spark_df ()
-  | Core.L_error _ -> suffix_error ()
+  | L_camp_rule -> suffix_camp_rule ()
+  | L_camp -> suffix_camp ()
+  | L_tech_rule -> suffix_tech_rule ()
+  | L_designer_rule -> suffix_designer_rule ()
+  | L_oql -> suffix_oql ()
+  | L_sql -> suffix_sql ()
+  | L_sqlpp -> suffix_sql ()
+  | L_lambda_nra -> suffix_lambda_nra ()
+  | L_nra -> suffix_nra ()
+  | L_nraenv -> suffix_nraenv ()
+  | L_nraenv_core -> suffix_nraenv_core ()
+  | L_nnrc_core -> suffix_nnrc_core ()
+  | L_nnrc -> suffix_nnrc ()
+  | L_dnnrc -> suffix_dnnrc ()
+  | L_dnnrc_typed -> suffix_dnnrc_typed ()
+  | L_nnrs -> suffix_nnrs ()
+  | L_nnrs_core -> suffix_nnrs_core ()
+  | L_nnrs_imp -> suffix_nnrs_imp ()
+  | L_imp_data -> suffix_imp_data ()
+  | L_imp_ejson -> suffix_imp_ejson ()
+  | L_nnrcmr -> suffix_nnrcmr ()
+  | L_js_ast -> suffix_js_ast ()
+  | L_javascript -> suffix_javascript ()
+  | L_java -> suffix_java ()
+  | L_spark_df -> suffix_spark_df ()
+  | L_wasm_ast -> suffix_wasm_ast ()
+  | L_error _ -> suffix_error ()
 
 (* let suffix_target conf = *)
 (*   suffix_of_language (language_of_name (conf.tlang)) *)

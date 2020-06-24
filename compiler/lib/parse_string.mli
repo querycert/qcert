@@ -14,7 +14,7 @@
 
 (* This module contains parsing utilities *)
 
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
 
 (*********************)
 (* Parse from string *)

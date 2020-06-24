@@ -12,9 +12,5 @@
  * limitations under the License.
  *)
 
-(** This module contains compiler output code *)
-
-open EnhancedCompiler.EnhancedCompiler
-
-val output_query : Pretty_common.pretty_config -> QLang.query -> string
+Require Export WasmAstRuntime.
 
