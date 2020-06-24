@@ -157,6 +157,11 @@ Section CompCorrectness.
     | Dv_spark_df_stop => True
     end.
 
+  Definition driver_correct_wasm_ast (dv: wasm_ast_driver) :=
+    match dv with
+    | Dv_wasm_ast_stop => True
+    end.
+
   Fixpoint driver_correct_dnnrc_typed {ftyping: foreign_typing} (dv: dnnrc_typed_driver) :=
     match dv with
     | Dv_dnnrc_typed_stop => True
@@ -175,6 +180,7 @@ Section CompCorrectness.
     | Dv_imp_ejson_stop => True
     | Dv_imp_ejson_optim dv => False
     | Dv_imp_ejson_to_js_ast _ dv => False /\ driver_correct_js_ast dv
+    | Dv_imp_ejson_to_wasm_ast dv => False /\ driver_correct_wasm_ast dv
     end.
 
   Definition driver_correct_imp_data (dv: imp_data_driver) :=
@@ -329,6 +335,7 @@ Section CompCorrectness.
     | Dv_javascript dv => driver_correct_javascript dv
     | Dv_java dv => driver_correct_java dv
     | Dv_spark_df dv => driver_correct_spark_df dv
+    | Dv_wasm_ast dv => driver_correct_wasm_ast dv
     | Dv_error s => True (* XXX ??? XXX *)
     end.
 
@@ -477,6 +484,7 @@ Section CompCorrectness.
       destruct i; simpl in *; try contradiction.
       elim H; intros; [rewrite <- H2; auto|contradiction].
       elim H1; intros; contradiction.
+      elim H1; intros; contradiction.
     Qed.
 
     Lemma correct_driver_succeeds_nnrs_imp:
@@ -500,6 +508,7 @@ Section CompCorrectness.
         induction i; simpl in *; intuition; subst; eauto.
         destruct i; simpl in *; try contradiction.
         elim H; intros; [rewrite <- H2; auto|contradiction].
+        elim H1; intros; try contradiction.
         elim H1; intros; try contradiction.
     Qed.
 
@@ -890,6 +899,18 @@ Section CompCorrectness.
       forall dv, driver_correct (Dv_spark_df dv) ->
                  (forall q, Forall query_not_error
                                    (compile (Dv_spark_df dv) (Q_spark_df q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; contradiction.
+    Qed.
+
+    Lemma correct_driver_succeeds_wasm_ast:
+      forall dv, driver_correct (Dv_wasm_ast dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_wasm_ast dv) (Q_wasm_ast q))).
     Proof.
       intros.
       rewrite Forall_forall; intros.

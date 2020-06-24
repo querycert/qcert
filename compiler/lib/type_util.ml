@@ -13,13 +13,16 @@
  *)
 
 open Util
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
+open ForeignTyping
+open TBrandModel
+open JSON
 
 open Data_util
 
 type schema = {
     sch_brand_model : QType.brand_model;
-    sch_foreign_typing : Core.foreign_typing;
+    sch_foreign_typing : foreign_typing;
     sch_io_schema : content_schema option;
     sch_globals : QDriver.constants_config;
   }
@@ -76,8 +79,8 @@ let lift_constant_types (bm:QType.brand_model) br glb =
   let loc = localization_of_string locs in
   let t =
     begin match loc with
-    | Core.Vlocal -> gbt
-    | Core.Vdistr ->
+    | Vlocal -> gbt
+    | Vdistr ->
 	(* XXX We to 'uncoll' here to check that the type is a collection type and extract its content -- This is an assumption of the Compiler Driver XXX *)
 	begin match QType.qtype_uncoll bm gbt with
 	| None -> raise (Qcert_Error ("Type for distributed constant " ^ vname ^ " must be a collection type"))
@@ -106,7 +109,7 @@ let process_schema mc =
 (* The functions that should be exported *)
 
 let brand_relation_of_brand_model brand_model =
-  brand_model.Core.brand_model_relation
+  brand_model.brand_model_relation
 
 let empty_schema =
   let brand_model = QType.empty_brand_model () in
@@ -132,20 +135,20 @@ let inheritance_of_schema sc =
 
 let raw_inheritance_of_schema sc =
   begin match sc.sch_io_schema with
-  | None -> Core.Jarray []
+  | None -> Coq_jarray []
   | Some (h,_,_,_) -> snd h
   end
 
 type content_sdata = (char list * char list) list
 
-let get_type bm (glob_constant:Core.constant_config) =
+let get_type bm (glob_constant:CompConfig.constant_config) =
   let br = brand_relation_of_brand_model bm in
-  begin match glob_constant.Core.constant_localization with
-  | Core.Vlocal -> glob_constant.Core.constant_type
-  | Core.Vdistr -> QType.bag br glob_constant.Core.constant_type
+  begin match glob_constant.constant_localization with
+  | Vlocal -> glob_constant.constant_type
+  | Vdistr -> QType.bag br glob_constant.constant_type
   end
 
-let get_constant_name (glob_name:char list) (globs:QDriver.constants_config) : Core.constant_config =
+let get_constant_name (glob_name:char list) (globs:QDriver.constants_config) : CompConfig.constant_config =
   begin try
     List.assoc glob_name globs
   with

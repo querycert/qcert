@@ -36,5 +36,5 @@ Extract Constant DesignerRule.designer_rule_to_camp_rule => "(fun fruntime x -> 
 
 Require EnhancedCompiler.
 
-Extraction "core" EnhancedCompiler.EnhancedCompiler.
+Separate Extraction EnhancedCompiler.EnhancedCompiler.
 

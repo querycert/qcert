@@ -342,6 +342,9 @@ MODULES = \
 	SparkDF/Lang/SparkDF \
 	SparkDF/SparkDFRuntime \
 	SparkDF/SparkDFSystem \
+	WasmAst/Lang/WasmAst \
+	WasmAst/WasmAstRuntime \
+	WasmAst/WasmAstSystem \
 	Translation/Operators/ForeignToReduceOps \
 	Translation/Operators/ForeignToJavaScriptAst \
 	Translation/Operators/ForeignToJava \
@@ -382,6 +385,7 @@ MODULES = \
 	Translation/Lang/NNRCtoJava \
 	Translation/Lang/DatatoSparkDF \
 	Translation/Lang/tDNNRCtoSparkDF \
+	Translation/Lang/ImpEJsontoWasmAst \
 	Translation/Typing/TNRAtocNNRC \
 	Translation/Typing/TcNRAEnvtocNNRC \
 	Translation/Typing/TcNNRCtoCAMP \
