@@ -453,6 +453,10 @@ Section TNNRSimp.
     - repeat match_option_in eqq1.
       invcs eqq1.
       apply Forall2_preserves_Some_snd_update_first.
+    - repeat match_option_in eqq1.
+      destruct d0; try discriminate.
+      invcs eqq1.
+      apply Forall2_preserves_Some_snd_update_first.
     - match_option_in eqq1; subst.
       + apply some_olift in eqq1.
         destruct eqq1 as [? eqq1 eqq2].

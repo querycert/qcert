@@ -138,6 +138,11 @@ Section NNRSimpUnflatten.
                   (if x == v
                    then nnrs_imp_expr_unflatten_write e v
                    else nnrs_imp_expr_unflatten_read e v)
+           | NNRSimpPush x e =>
+             lift (NNRSimpPush x)
+                  (if x == v
+                   then nnrs_imp_expr_unflatten_write e v
+                   else nnrs_imp_expr_unflatten_read e v)
            | NNRSimpLet x oe s₁ =>
              lift2 (NNRSimpLet x)
                    (nnrs_imp_expr_unflatten_read_option oe v)
@@ -167,6 +172,8 @@ Section NNRSimpUnflatten.
                nnrs_imp_stmt_read_out s₁ v
                || nnrs_imp_stmt_read_out s₂ v
              | NNRSimpAssign x e =>
+               (x <>b v) && nnrs_imp_expr_may_use e v
+             | NNRSimpPush x e =>
                (x <>b v) && nnrs_imp_expr_may_use e v
              | NNRSimpLet x oe s₁ =>
                match oe with
@@ -231,6 +238,9 @@ Section NNRSimpUnflatten.
         - Case "NNRSimpSeq"%string.
           rewrite IHs1, IHs2; eauto.
         - Case "NNRSimpAssign"%string.
+          match_destr; try tauto.
+          rewrite nnrs_imp_expr_unflatten_read_nfree_id; tauto.
+        - Case "NNRSimpPush"%string.
           match_destr; try tauto.
           rewrite nnrs_imp_expr_unflatten_read_nfree_id; tauto.
         - Case "NNRSimpLet"%string.
@@ -527,6 +537,12 @@ Section NNRSimpUnflatten.
           match_destr_in eqq; simpl.
           + eapply nnrs_imp_expr_unflatten_write_free_vars in eqq; congruence.
           + eapply nnrs_imp_expr_unflatten_read_free_vars in eqq; congruence.
+        - Case "NNRSimpPush"%string.
+          apply some_lift in eqq.
+          destruct eqq as [? eqq ?]; subst.
+          match_destr_in eqq; simpl.
+          + eapply nnrs_imp_expr_unflatten_write_free_vars in eqq; congruence.
+          + eapply nnrs_imp_expr_unflatten_read_free_vars in eqq; congruence.
         - Case "NNRSimpLet"%string.
           apply some_lift2 in eqq.
           destruct eqq as [?[? eqq1[eqq2 ?]]]; subst.
@@ -603,6 +619,10 @@ Section NNRSimpUnflatten.
             rewrite (nnrs_imp_expr_may_use_free_vars_eq eqq); trivial.
           + eapply nnrs_imp_expr_unflatten_read_free_vars in eqq.
             rewrite (nnrs_imp_expr_may_use_free_vars_eq eqq); trivial.
+        - Case "NNRSimpPush"%string.
+          apply some_lift in eqq.
+          destruct eqq as [? eqq ?]; subst.
+          match_destr_in eqq; simpl.
         - Case "NNRSimpLet"%string.
           apply some_lift2 in eqq.
           destruct eqq as [?[? eqq1[eqq2 ?]]]; subst.

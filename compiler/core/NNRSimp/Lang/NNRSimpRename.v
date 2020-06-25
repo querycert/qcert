@@ -66,6 +66,10 @@ Section NNRSimpRename.
          NNRSimpAssign
            (if v == from then to else v)
            (nnrs_imp_expr_rename e from to)
+       | NNRSimpPush v e =>
+         NNRSimpPush
+           (if v == from then to else v)
+           (nnrs_imp_expr_rename e from to)
        | NNRSimpLet v eo s₀ =>
          NNRSimpLet v 
                     (match eo with
@@ -209,6 +213,12 @@ Section NNRSimpRename.
         ; destruct (equiv_dec v1 v0)
         ; destruct (equiv_dec v' v0)
         ; try congruence.
+      - Case "NNRSimpPush"%string.
+        unfold equiv_decb.
+        destruct (equiv_dec v1 v)
+        ; destruct (equiv_dec v1 v0)
+        ; destruct (equiv_dec v' v0)
+        ; try congruence.
       - Case "NNRSimpLet"%string.
         destruct o
         ; repeat rewrite nnrs_imp_expr_rename_may_use_neq
@@ -267,6 +277,13 @@ Section NNRSimpRename.
       ; trivial.
       - Case "NNRSimpAssign"%string.
         match_destr.
+        unfold equiv_decb.
+        intuition.
+        destruct (equiv_dec v0 v)
+        ; destruct (equiv_dec v0 v')
+        ; destruct (equiv_dec v' v')
+        ; try congruence.
+      - Case "NNRSimpPush"%string.
         unfold equiv_decb.
         intuition.
         destruct (equiv_dec v0 v)
@@ -662,6 +679,9 @@ Section NNRSimpRename.
       - destruct (equiv_dec v0 v); match_destr; unfold equiv, complement in *
         ; try congruence.
         tauto.
+      - destruct (equiv_dec v0 v); match_destr; unfold equiv, complement in *
+        ; try congruence.
+        tauto.
       - f_equal.
         + destruct o; trivial. rewrite nnrs_imp_expr_rename_involutive; tauto.
         + intuition.
@@ -880,6 +900,48 @@ Section NNRSimpRename.
             destruct (string_dec v0 v'); try tauto.
             destruct (string_dec v0 v); try congruence.
             match_destr; try reflexivity.
+            ren_eval_tt.
+      - Case "NNRSimpPush"%string.
+        match_destr; try reflexivity.
+        destruct (equiv_dec v0 v); unfold equiv, complement in *.
+        + subst.
+          repeat rewrite lookup_app.
+          rewrite (lookup_nin_none _ H0).
+          rewrite (lookup_nin_none _ H).
+          simpl.
+          destruct (string_dec v' v'); try congruence.
+          destruct (string_dec v v); try congruence.
+          destruct d; try reflexivity.
+          destruct d; try reflexivity.
+          repeat rewrite update_app_nin by trivial.
+          simpl.
+          destruct (string_dec v' v'); try congruence.
+          destruct (string_dec v v); try congruence.
+          ren_eval_tt.
+        + repeat rewrite lookup_app.
+          case_eq (lookup string_dec l v0); [intros ? inn | intros nin].
+          * destruct o; try reflexivity.
+            destruct d1; try reflexivity.
+            repeat rewrite update_app_in
+              by (apply lookup_in_domain in inn; trivial).
+            simpl.
+            intros ? ? ? domeq eqq.
+            apply app_inv_head_domain in eqq
+            ; [ |rewrite domain_update_first; trivial].
+            destruct eqq as [eqq1 eqq2].
+            invcs eqq2.
+            trivial.
+          * apply lookup_none_nin in nin.
+            simpl.
+            destruct (string_dec v0 v'); try tauto.
+            destruct (string_dec v0 v); try congruence.
+            match_destr; try reflexivity.
+            destruct o; try reflexivity.
+            destruct d1; try reflexivity.
+            repeat rewrite update_app_nin by trivial.
+            simpl.
+            destruct (string_dec v0 v'); try tauto.
+            destruct (string_dec v0 v); try congruence.
             ren_eval_tt.
       - Case "NNRSimpLet"%string.
         destruct o.

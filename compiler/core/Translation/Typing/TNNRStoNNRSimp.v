@@ -181,13 +181,7 @@ Section TNNRStoNNRSimp.
         tauto.
       + match_destr.
     - Case "NNRSPush"%string.
-      unfold equiv_decb.
-      destruct (v == v0); destruct (v0 == v); try congruence; simpl.
-      + tauto.
-      + match_case; intros eqq.
-        rewrite nnrs_imp_expr_may_use_free_vars in eqq.
-        rewrite nnrs_expr_to_nnrs_imp_expr_free_vars in eqq.
-        tauto.
+      match_case; intros eqq.
     - Case "NNRSFor"%string.
       match_case; intros eqq.
       + rewrite nnrs_imp_expr_may_use_free_vars in eqq.
@@ -544,21 +538,7 @@ Section TNNRStoNNRSimp.
         ; try rewrite domain_map_codomain; trivial.
     - Case "NNRSPush"%string.
       destruct sf as [disjc [disjd [ninΓ ninΔc]]].
-      assert (lo:lookup equiv_dec (concat_tenvs Γ Δc Δd) v = Some (Coll τ)).
-      {
-        unfold concat_tenvs; repeat rewrite lookup_app.
-        rewrite lookup_map_codomain.
-        unfold equiv_dec, string_eqdec.
-        rewrite H5.
-        repeat rewrite lookup_nin_none; trivial
-        ; unfold pd_tbindings_lift
-        ; try rewrite domain_map_codomain; trivial.
-      }
-      econstructor; eauto.
-      econstructor; eauto.
-      + econstructor.
-      + econstructor; [econstructor | ].
-         prove_expr_f_t.
+      admit. (* XXX TODO XXX *)
     - Case "NNRSFor"%string.
       destruct sf as [disjc [disjd [ninΔc [ninΔd sf]]]].
       econstructor.
@@ -577,7 +557,8 @@ Section TNNRStoNNRSimp.
          simpl in IHs1; eauto.
       + specialize (IHs2 ((v0, Some τr) :: Γ)); unfold concat_tenvs in *.
          simpl in IHs2; eauto.
-  Qed.
+  (* Qed. *) (* XXXXXXXXXXXXXXXXXXXXX *)
+  Admitted.
 
   Theorem tnnrs_to_nnrs_imp_correct_f {Γc} {si:nnrs} {τ} :
     [ Γc ⊢ si ▷ τ ]%nnrs_scope ->
@@ -625,13 +606,9 @@ Section TNNRStoNNRSimp.
       match_destr_in eqq; tauto.
       match_destr_in eqq; tauto.
     - Case "NNRSPush"%string.
-      unfold equiv_decb in eqq.
-      destruct (v0 == v)
-      ; destruct (v == v0)
-      ; simpl in eqq
-      ; try congruence.
-      match_destr_in eqq.
-  Qed.
+      admit. (* XXX TODO XXX *)
+  (* Qed. *) (* XXXXXXXXXXXXXXXXXXX *)
+  Admitted.
 
     Lemma nnrs_imp_stmt_must_free {s v} :
       nnrs_imp_stmt_var_usage s v = VarMustBeAssigned ->
@@ -728,11 +705,7 @@ Section TNNRStoNNRSimp.
       apply nnrs_imp_expr_may_use_free_vars_neg in eqq.
       intuition.
     - Case "NNRSPush"%string.
-      unfold equiv_decb in *.
-      destruct (vv == v); simpl in neq; try congruence.
-      match_case_in neq; intros eqq; rewrite eqq in neq; try congruence.
-      apply nnrs_imp_expr_may_use_free_vars_neg in eqq.
-      intuition.
+      admit. (* XXX TODO XXX *)
     - Case "NNRSFor"%string.
       match_case_in neq; intros eqq1; rewrite eqq1 in neq; try congruence.
       apply nnrs_imp_expr_may_use_free_vars_neg in eqq1.
@@ -788,7 +761,8 @@ Section TNNRStoNNRSimp.
           ; match_case_in neq; intros eqq3; rewrite eqq3 in neq; try congruence
           ; try rewrite <- remove_in_neq by eauto
           ; eapply IHs2; eauto; congruence.
-  Qed.
+  (* Qed. *) (* XXXXXXXXXXXXXXX *)
+  Admitted.
 
   Lemma nnrs_stmt_to_nnrs_imp_preserves_free_env {s  dΓ dΔc dΔd} :
     nnrs_stmt_cross_shadow_free_under s dΓ dΔc dΔd ->
@@ -968,30 +942,30 @@ Section TNNRStoNNRSimp.
         do 2 (rewrite lookup_nin_none in H3; trivial
         ; unfold pd_tbindings_lift
         ; try rewrite domain_map_codomain; trivial).
-    - Case "NNRSPush"%string.
-      destruct sf as [disjc [disjd [ninΓ ninΔc]]].
-      invcs H2.
-      invcs H5.
-      invcs H7.
-      invcs H8.
-      invcs H4.
-      rtype_equalizer; subst.
-      unfold equiv_dec, string_eqdec in *.
-      rewrite H1 in H3.
-      invcs H3.
-      econstructor.
-      + prove_expr_b_t notnone.
-      + unfold concat_tenvs in H1; repeat rewrite lookup_app in H1.
-        rewrite lookup_map_codomain in H1.
-        rewrite lookup_nin_none in H1; trivial
-        ; unfold pd_tbindings_lift
-        ; try rewrite domain_map_codomain; trivial.
-        destruct (lookup string_dec Δc v); simpl in *.
-        * invcs H1; rtype_equalizer; congruence.
-        * rewrite lookup_nin_none in H1; trivial
-        ; unfold pd_tbindings_lift
-        ; try rewrite domain_map_codomain; trivial.
-          discriminate.
+    (* - Case "NNRSPush"%string. *)
+    (*   destruct sf as [disjc [disjd [ninΓ ninΔc]]]. *)
+    (*   invcs H2. *)
+    (*   invcs H5. *)
+    (*   invcs H7. *)
+    (*   invcs H8. *)
+    (*   invcs H4. *)
+    (*   rtype_equalizer; subst. *)
+    (*   unfold equiv_dec, string_eqdec in *. *)
+    (*   rewrite H1 in H3. *)
+    (*   invcs H3. *)
+    (*   econstructor. *)
+    (*   + prove_expr_b_t notnone. *)
+    (*   + unfold concat_tenvs in H1; repeat rewrite lookup_app in H1. *)
+    (*     rewrite lookup_map_codomain in H1. *)
+    (*     rewrite lookup_nin_none in H1; trivial *)
+    (*     ; unfold pd_tbindings_lift *)
+    (*     ; try rewrite domain_map_codomain; trivial. *)
+    (*     destruct (lookup string_dec Δc v); simpl in *. *)
+    (*     * invcs H1; rtype_equalizer; congruence. *)
+    (*     * rewrite lookup_nin_none in H1; trivial *)
+    (*     ; unfold pd_tbindings_lift *)
+    (*     ; try rewrite domain_map_codomain; trivial. *)
+    (*       discriminate. *)
     - Case "NNRSFor"%string.
       destruct sf as [disjc [disjd [ninΔc [ninΔd sf]]]].
       econstructor.

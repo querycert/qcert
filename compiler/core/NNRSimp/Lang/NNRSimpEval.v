@@ -93,7 +93,21 @@ Section NNRSimpEval.
            | Some d, Some _ => Some (update_first string_dec σ v (Some d))
            | _, _ => None
            end
-             
+
+         | NNRSimpPush v e =>
+           match nnrs_imp_expr_eval σc σ e, lookup string_dec σ v with
+           | Some d, Some dl_opt =>
+             match dl_opt with
+             | Some dl =>
+               match dl with
+               | dcoll l => Some (update_first string_dec σ v (Some (dcoll (l++d::nil)%list)))
+               | _ => None
+               end
+             | None => None
+             end
+           | _, _ => None
+           end
+
          | NNRSimpLet v eo s₀ =>
            let evals := (fun init =>
                            match nnrs_imp_stmt_eval σc s₀ ((v,init)::σ) with
@@ -213,6 +227,14 @@ Section NNRSimpEval.
         destruct a; simpl.
         match_destr; constructor; simpl; eauto; try congruence.
         reflexivity.
+      - Case "NNRSimpPush".
+        destruct d0; try discriminate.
+        invcs sem.
+        clear.
+        induction σ₁; simpl; trivial.
+        destruct a; simpl.
+        match_destr; constructor; simpl; eauto; try congruence.
+        reflexivity.
       - Case "NNRSimpLet".
         apply some_olift in sem.
         destruct sem as [d eqq1 eqq2 ].
@@ -259,6 +281,10 @@ Section NNRSimpEval.
         destruct sem as [σ' ? ?].
         transitivity (domain σ'); eauto.
       - Case "NNRSimpAssign".
+        invcs sem.
+        rewrite domain_update_first; trivial.
+      - Case "NNRSimpPush".
+        destruct d0; try discriminate.
         invcs sem.
         rewrite domain_update_first; trivial.
       - Case "NNRSimpLet".
@@ -417,6 +443,23 @@ Section NNRSimpEval.
           * left; congruence.
           * right; tauto.
       - Case "NNRSimpAssign"%string.
+        match_destr_in eqq.
+        match_destr_in eqq.
+        invcs eqq.
+        destruct (in_dec string_dec v (domain l)).
+        + rewrite update_app_in in H0 by trivial.
+          apply app_inv_head_domain in H0.
+          * intuition congruence.
+          * rewrite domain_update_first; eauto.
+        + rewrite update_app_nin in H0 by trivial.
+          apply app_inv_head_domain in H0; [| eauto 2].
+          destruct H0; subst.
+          rewrite lookup_update_neq; trivial.
+          destruct inn; try tauto.
+          intros; subst; congruence.
+      - Case "NNRSimpPush"%string.
+        match_destr_in eqq.
+        match_destr_in eqq.
         match_destr_in eqq.
         match_destr_in eqq.
         invcs eqq.
@@ -733,6 +776,36 @@ Section NNRSimpEval.
 
             match_destr; simpl; trivial.
             swap_t.
+        - Case "NNRSimpPush"%string.
+          rewrite nnrs_imp_expr_eval_swap by trivial.
+          match_destr; try reflexivity.
+          repeat rewrite lookup_app.
+          case_eq (lookup string_dec l v); [intros ? inn | intros nin].
+          + apply lookup_in_domain in inn.
+            destruct o; try swap_t.
+            match_destr; try reflexivity.
+            repeat rewrite update_app_in by trivial.
+            simpl; intros.
+            apply app_inv_head_domain in H0.
+            * destruct H0 as [eqq1 eqq2].
+              invcs eqq2; trivial.
+            * rewrite domain_update_first; trivial.
+          + apply lookup_none_nin in nin.
+            repeat rewrite update_app_nin by trivial.
+            simpl.
+            destruct (string_dec v v₁)
+            ; destruct (string_dec v v₂)
+            ; simpl
+            ; intros
+            ; subst
+            ; try congruence
+            ; swap_t.
+
+            admit. (* XXXXXXXXXXXXX *)
+            admit. (* XXXXXXXXXXXXX *)
+            admit. (* XXXXXXXXXXXXX *)
+
+
         - Case "NNRSimpLet"%string.
           destruct o.
           + rewrite nnrs_imp_expr_eval_swap by trivial.
@@ -765,8 +838,9 @@ Section NNRSimpEval.
           destruct d; simpl; try reflexivity.
           + specialize (IHs1 ((v, Some d)::l) σ d₁ d₂); un2p IHs1.
           + specialize (IHs2 ((v0, Some d)::l) σ d₁ d₂); un2p IHs2.
-      Qed.
-      
+      (* Qed. *)
+      Admitted. (* XXXXXXXXXXXX *)
+
     End swap.
 
     Section unused.
@@ -921,6 +995,8 @@ Section NNRSimpEval.
             ; try tauto.
             match_destr; simpl; trivial.
             unused_eval_tt.
+        - Case "NNRSimpPush"%string.
+          admit. (* XXXXXXXXXXXXXXXXXX *)
         - Case "NNRSimpLet"%string.
           destruct o.
           + rewrite nnrs_imp_expr_eval_unused by tauto.
@@ -960,7 +1036,8 @@ Section NNRSimpEval.
           destruct d0; simpl; try reflexivity.
           + specialize (IHs1 ((v0, Some d0)::l) σ d); cut2p IHs1.
           + specialize (IHs2 ((v1, Some d0)::l) σ d); cut2p IHs2.
-      Qed.
+      (* Qed. *)
+      Admitted. (* XXXXXXXXXX *)
 
     End unused.
 

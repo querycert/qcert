@@ -92,6 +92,11 @@ Section ImpDataEval.
         | (dright d) :: nil => Some d
         | _ => None
         end
+      | DataRuntimePush =>
+        match dl with
+        | (dcoll l) :: d :: nil => Some (dcoll (l++d::nil)%list)
+        | _ => None
+        end
       end.
 
     Definition imp_data_op_eval (op:imp_data_op) (dl:list imp_data_model) : option imp_data_model :=

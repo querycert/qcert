@@ -50,6 +50,8 @@ Section NNRSimp.
     | NNRSimpSkip : nnrs_imp_stmt
     | NNRSimpSeq : nnrs_imp_stmt -> nnrs_imp_stmt -> nnrs_imp_stmt                    (**r sequence ([s₁; s₂]]) *)
     | NNRSimpAssign : var -> nnrs_imp_expr -> nnrs_imp_stmt                           (**r variable assignent ([$v := e]) *)
+    (* pushes to a variable that holds a mutable collection *)
+    | NNRSimpPush : var -> nnrs_imp_expr -> nnrs_imp_stmt                             (**r push item in mutable collection ([push e in $v]) *)
     | NNRSimpLet : var -> option nnrs_imp_expr -> nnrs_imp_stmt -> nnrs_imp_stmt (**r variable declaration ([var $v := e₁?; s₂]) *)
     | NNRSimpFor : var -> nnrs_imp_expr -> nnrs_imp_stmt -> nnrs_imp_stmt             (**r for loop ([for ($v in e₁) { s₂ }]) *)
     | NNRSimpIf : nnrs_imp_expr -> nnrs_imp_stmt -> nnrs_imp_stmt -> nnrs_imp_stmt    (**r conditional ([if e₁ { s₂ } else { s₃ }]) *)
@@ -121,6 +123,8 @@ Section NNRSimp.
       | NNRSimpLet _ None s1 =>
         nnrs_imp_stmtIsCore s1
       | NNRSimpAssign _ e =>
+        nnrs_imp_exprIsCore e
+      | NNRSimpPush _ e =>
         nnrs_imp_exprIsCore e
       | NNRSimpFor _ e s1 =>
         nnrs_imp_exprIsCore e /\ nnrs_imp_stmtIsCore s1
@@ -198,6 +202,7 @@ Section NNRSimp.
           + destruct IHs2; [left|right]; intuition.
           + right; intuition.
         - apply (nnrs_imp_exprIsCore_dec n).
+        - apply (nnrs_imp_exprIsCore_dec n).
         - destruct o.
           + destruct (nnrs_imp_exprIsCore_dec n).
             * destruct IHs; [left|right]; intuition.
@@ -261,6 +266,7 @@ Tactic Notation "nnrs_imp_stmt_cases" tactic(first) ident(c) :=
   [ Case_aux c "NNRSimpSkip"%string
   | Case_aux c "NNRSimpSeq"%string
   | Case_aux c "NNRSimpAssign"%string
+  | Case_aux c "NNRSimpPush"%string
   | Case_aux c "NNRSimpLet"%string
   | Case_aux c "NNRSimpFor"%string
   | Case_aux c "NNRSimpIf"%string

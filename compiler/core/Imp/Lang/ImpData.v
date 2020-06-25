@@ -38,6 +38,7 @@ Section ImpData.
     | DataRuntimeEither : imp_data_runtime_op
     | DataRuntimeToLeft : imp_data_runtime_op
     | DataRuntimeToRight : imp_data_runtime_op
+    | DataRuntimePush
     .
 
     Definition imp_data_expr := @imp_expr imp_data_constant imp_data_op imp_data_runtime_op.
@@ -89,4 +90,5 @@ Tactic Notation "imp_data_runtime_op_cases" tactic(first) ident(c) :=
   | Case_aux c "DataRuntimeEither"%string
   | Case_aux c "DataRuntimeLeft"%string
   | Case_aux c "DataRuntimeRight"%string
+  | Case_aux c "DataRuntimePush"%string
   ].

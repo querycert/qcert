@@ -39,6 +39,7 @@ Section NNRSimpSize.
        | NNRSimpSkip => 1
        | NNRSimpSeq s₁ s₂ => S (nnrs_imp_stmt_size s₁ + nnrs_imp_stmt_size s₂)
        | NNRSimpAssign _ e => S (nnrs_imp_expr_size e)
+       | NNRSimpPush _ e => S (nnrs_imp_expr_size e)
        | NNRSimpLet v None s => S (nnrs_imp_stmt_size s)
        | NNRSimpLet v (Some e) s => S (nnrs_imp_expr_size e + nnrs_imp_stmt_size s)
        | NNRSimpFor v n₁ n₂ => S (nnrs_imp_expr_size n₁ + nnrs_imp_stmt_size n₂)

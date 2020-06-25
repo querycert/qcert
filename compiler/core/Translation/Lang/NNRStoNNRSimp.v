@@ -95,10 +95,7 @@ Section NNRStoNNRSimp.
          NNRSimpAssign v
                        (nnrs_expr_to_nnrs_imp_expr e)
        | NNRSPush v e =>
-         NNRSimpAssign v
-                       (NNRSimpBinop OpBagUnion
-                                     (NNRSimpVar v)
-                                     (NNRSimpUnop OpBag (nnrs_expr_to_nnrs_imp_expr e)))
+         NNRSimpPush v (nnrs_expr_to_nnrs_imp_expr e)
        | NNRSFor v e s₀ =>
          NNRSimpFor v
                     (nnrs_expr_to_nnrs_imp_expr e)
@@ -145,6 +142,11 @@ Section NNRStoNNRSimp.
       unfold lift2P in ceq1; repeat match_option_in ceq1; simpl; try contradiction.
       eauto.
     - Case "NNRSimpAssign"%string.
+      repeat rewrite (grouped_equiv_lookup_equiv _ _ ceq).
+      unfold var, string_eqdec.
+      repeat match_destr; simpl; trivial.
+      apply grouped_equiv_update_first; trivial.
+    - Case "NNRSimpPush"%string.
       repeat rewrite (grouped_equiv_lookup_equiv _ _ ceq).
       unfold var, string_eqdec.
       repeat match_destr; simpl; trivial.
@@ -528,17 +530,17 @@ Section NNRStoNNRSimp.
       destruct sf as [disj1 [disj2 [nin1 nin2]]].
       rewrite <- nnrs_expr_to_nnrs_imp_expr_correct.
       rewrite nnrs_expr_eval_free_env, nnrs_expr_eval_free_env_tail           by (try rewrite domain_map_codomain; tauto).
-      match_option; simpl; trivial; [ | rewrite olift2_none_r; trivial].
-      repeat rewrite lookup_app.
-      repeat rewrite (lookup_nin_none _ nin1).
+      rewrite lookup_app.
+      rewrite (lookup_nin_none _ nin1).
+      rewrite lookup_app.
       rewrite (lookup_nin_none _ nin2).
-      repeat rewrite lookup_map_codomain.
+      rewrite lookup_map_codomain.
       unfold equiv_dec, string_eqdec.
+      match_option; simpl; trivial.
       match_option; simpl; trivial.
       rewrite (update_app_nin string_dec σ) by trivial.
       rewrite map_codomain_update_first; simpl.
       rewrite update_app_nin2 by trivial.
-      unfold bunion.
       apply grouped_equiv_equiv.
     - Case "NNRSFor"%string.
       destruct sf as [disj1 [disj2 [nin1 [nin2 sf]]]].

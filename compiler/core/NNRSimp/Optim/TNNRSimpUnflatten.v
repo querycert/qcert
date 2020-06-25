@@ -279,6 +279,8 @@ Section TNNRSimpUnflatten.
           exists d'.
           split; trivial.
           rewrite update_first_update_first_neq_swap; eauto.
+      - Case "NNRSimpPush"%string.
+        admit. (* XXX TODO XXX *)
       - Case "NNRSimpLet"%string.
         apply some_lift2 in eqq.
         destruct eqq as [?[? eqq1 [eqq2 ?]] ]; subst; simpl.
@@ -648,7 +650,8 @@ Section TNNRSimpUnflatten.
             destruct IHs2 as [dd' [HH1 HH2]].
             invcs HH1.
             exists dd'; split; trivial. 
-    Qed.
+    (* Qed. *) (* XXXXXXXXXXXXXX *)
+    Admitted.
 
   End eval.
   
@@ -863,6 +866,10 @@ Section TNNRSimpUnflatten.
         + econstructor.
           * eapply nnrs_imp_expr_unflatten_read_type in e; eauto.
           * rewrite lookup_update_neq; eauto.
+      - Case "NNRSimpPush"%string.
+        apply some_lift in eqq.
+        destruct eqq as [??]; subst; simpl.
+        invcs typ.
       - Case "NNRSimpLet"%string.
         apply some_lift2 in eqq.
         destruct eqq as [?[? eqq1[eqq2 ?]]]; subst.
@@ -1028,6 +1035,8 @@ Section TNNRSimpUnflatten.
         simpl in *.
         eapply nnrs_imp_expr_unflatten_read_enrich_type; eauto.
         apply nnrs_imp_expr_may_use_free_vars; auto.
+      - Case "NNRSimpPush"%string.
+        invcs typ.
       - Case "NNRSimpLet"%string.
         apply orb_true_elim in eqq_ro.
         apply some_lift2 in eqq_un.

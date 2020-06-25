@@ -78,6 +78,9 @@ Section ImpDatatoImpEJson.
     Definition mk_to_right_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
       mk_imp_ejson_runtime_call EJsonRuntimeToRight el.
 
+    Definition mk_to_push_expr (el:list imp_ejson_expr) : imp_ejson_expr :=
+      mk_imp_ejson_runtime_call EJsonRuntimeArrayPush el.
+
     Lemma imp_data_model_to_list_comm d :
       lift (map ejson_to_data) (imp_ejson_model_to_list (data_to_ejson d)) =
       imp_data_model_to_list d.
@@ -306,6 +309,7 @@ Section ImpDatatoImpEJson.
       | DataRuntimeEither => mk_either_expr el
       | DataRuntimeToLeft => mk_to_left_expr el
       | DataRuntimeToRight => mk_to_right_expr el
+      | DataRuntimePush => mk_to_push_expr el
       end.
 
     Fixpoint imp_data_expr_to_imp_ejson (exp: imp_data_expr) : imp_ejson_expr :=
@@ -900,6 +904,16 @@ Section ImpDatatoImpEJson.
           rewrite H0 in *; clear H0.
           case_eq (string_dec s "$right"%string); intros; subst; try congruence.
           rewrite match_not_right; try reflexivity; assumption.
+        - Case "DataRuntimePush"%string.
+          destruct l; try reflexivity; simpl.
+          destruct l; simpl in *; [destruct d; congruence|].
+          destruct l; simpl in *; [|destruct d; congruence].
+          case_eq d; intros;
+            try (destruct d; simpl in *; congruence).
+          simpl.
+          rewrite map_app.
+          simpl.
+          congruence.
       }
       Transparent ejson_to_data.
     Qed.

@@ -77,6 +77,10 @@ Section NNRSimpUsage.
          else if v ==b x
               then VarMustBeAssigned
               else VarNotUsedAndNotAssigned
+       | NNRSimpPush v e =>
+         if v ==b x
+         then VarMustBeAssigned
+         else VarNotUsedAndNotAssigned
        | NNRSimpFor v e s₀ => 
          if nnrs_imp_expr_may_use e x
          then VarMayBeUsedWithoutAssignment
@@ -174,6 +178,11 @@ Section NNRSimpUsage.
         ; try rewrite nnrs_imp_expr_may_use_free_vars_neg.
         + intuition congruence.
         + unfold equiv_decb; destruct (v == x); intuition congruence.
+      - Case "NNRSimpPush"%string.
+        match_case; try congruence
+        ; try rewrite nnrs_imp_expr_may_use_free_vars
+        ; try rewrite nnrs_imp_expr_may_use_free_vars_neg.
+        unfold equiv_decb; destruct (v == x); intuition congruence.
       - Case "NNRSimpLet"%string.
         destruct o.
         + (match_case; intros eqq)
@@ -537,12 +546,24 @@ Section NNRSimpUsage.
         match_destr_in eq2; eauto.
         destruct IHs1 as [o inn]; trivial.
         generalize (nnrs_imp_stmt_eval_lookup_some_some eqq2 _ _ inn); trivial.
-      - match_destr_in eq2.
+      - Case "NNRSimpAssign"%string.
+        match_destr_in eq2.
         unfold equiv_decb in *.
         destruct (v == x); try congruence.
         match_destr_in eq1.
         unfold equiv in *; subst.
         match_option_in eq1.
+        invcs eq1.
+        apply lookup_in_domain in eqq.
+        rewrite lookup_update_eq_in; eauto.
+      - Case "NNRSimpPush"%string.
+        unfold equiv_decb in *.
+        destruct (v == x); try congruence.
+        match_destr_in eq1.
+        unfold equiv in *; subst.
+        match_option_in eq1.
+        destruct o; try discriminate.
+        destruct d0; try discriminate.
         invcs eq1.
         apply lookup_in_domain in eqq.
         rewrite lookup_update_eq_in; eauto.

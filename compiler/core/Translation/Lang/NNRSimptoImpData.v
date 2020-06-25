@@ -69,8 +69,11 @@ Section NNRSimptoImpData.
           [ nnrs_imp_stmt_to_imp_data constants s ]
       | NNRSimpAssign x e =>
         ImpStmtAssign x (nnrs_imp_expr_to_imp_data constants e)
-      (* | NNRSimpPush x e => *)
-      (*   stat_expr (array_push (expr_identifier x) (nnrs_imp_expr_to_imp_data e)) *)
+      | NNRSimpPush x e =>
+        ImpStmtAssign x
+                      (ImpExprRuntimeCall DataRuntimePush
+                                          [ ImpExprVar x;
+                                            nnrs_imp_expr_to_imp_data constants e ])
       | NNRSimpFor x e s =>
         ImpStmtFor x (nnrs_imp_expr_to_imp_data constants e) (nnrs_imp_stmt_to_imp_data constants s)
       | NNRSimpIf e s1 s2 =>
@@ -237,6 +240,8 @@ Section NNRSimptoImpData.
           apply (lookup_in_domain equiv_dec σ H).
         + unfold imp_data_expr_eval.
           intros Hn; rewrite Hn; try reflexivity.
+      - Case "NNRSimpPush"%string.
+        admit. (* XXX TODO XXX *)
       - Case "NNRSimpLet"%string.
         unfold olift.
         unfold ImpEval.imp_decls_eval in *.
@@ -438,7 +443,8 @@ Section NNRSimptoImpData.
              rewrite not_in_cons in Hbv2.
              destruct Hbv2; trivial.
              congruence.
-    Qed.
+    (* Qed. *)
+    Admitted. (* XXX TODO XXX *)
 
     Lemma nnrs_imp_to_imp_data_function_correct h (σc:bindings) (q:nnrs_imp) :
       olift id (nnrs_imp_eval h (rec_sort σc) q) =

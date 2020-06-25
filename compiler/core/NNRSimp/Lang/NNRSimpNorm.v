@@ -104,6 +104,25 @@ Section NNRSimpNorm.
         apply in_map_iff; eexists; split; eauto; simpl; eauto.
       + invcs H.
         eapply nnrs_imp_expr_eval_normalized; eauto.
+    - Case "NNRSimpPush".
+      match_case_in eqq; [intros ? eqq1 | intros eqq1]
+      ; rewrite eqq1 in eqq; try discriminate.
+      match_case_in eqq; [intros ? eqq2 | intros eqq2]
+      ; rewrite eqq2 in eqq; try discriminate.
+      destruct o; simpl in *; try discriminate.
+      destruct d0; simpl in *; try discriminate.
+      invcs eqq.
+      intuition.
+      rewrite in_map_iff in H.
+      destruct H as [[??][? inn]].
+      simpl in *; subst.
+      apply update_first_in_or in inn.
+      destruct inn.
+      + eapply Fσ.
+        apply in_map_iff; eexists; split; eauto; simpl; eauto.
+      + invcs H.
+        eapply nnrs_imp_expr_eval_normalized; eauto.
+        admit. (* XXXXX *)
     -  Case "NNRSimpLet".
        destruct o; simpl in *.
        + apply some_olift in eqq.
@@ -167,7 +186,8 @@ Section NNRSimpNorm.
       + specialize (IHs2 _ _ eqq2).
         cut_to IHs2; simpl in *; intuition.
         invcs H1; intuition.
-  Qed.
+  (* Qed. *)
+  Admitted. (* XXXXXXXXXXXX *)
   
   Lemma nnrs_imp_eval_normalized  {σc:bindings} {q:nnrs_imp} {d} :
     nnrs_imp_eval h σc q = Some d ->

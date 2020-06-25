@@ -51,6 +51,8 @@ Section NNRSimpVars.
          nnrs_imp_stmt_free_vars s₁ ++ nnrs_imp_stmt_free_vars s₂
        | NNRSimpAssign v e =>
          v::(nnrs_imp_expr_free_vars e)
+       | NNRSimpPush v e =>
+         v::(nnrs_imp_expr_free_vars e)
        | NNRSimpLet v eo s₀ =>
          match eo with
          | Some e => nnrs_imp_expr_free_vars e
@@ -71,6 +73,8 @@ Section NNRSimpVars.
          nnrs_imp_stmt_bound_vars s₁ ++ nnrs_imp_stmt_bound_vars s₂
        | NNRSimpAssign v e =>
          nil
+       | NNRSimpPush v e =>
+         nil
        | NNRSimpLet v eo s₀ =>
          v::(nnrs_imp_stmt_bound_vars s₀)
        | NNRSimpFor v e s₀ =>
@@ -88,6 +92,8 @@ Section NNRSimpVars.
          nnrs_imp_stmt_mayberead_vars s₁ ++ nnrs_imp_stmt_mayberead_vars s₂
        | NNRSimpAssign v e =>
          nnrs_imp_expr_free_vars e
+       | NNRSimpPush v e =>
+         (* v :: *) nnrs_imp_expr_free_vars e (* XXX TODO: should we add [v] to the read vars XXX *)
        | NNRSimpLet v eo s₀ =>
          match eo with
          | Some e => nnrs_imp_expr_free_vars e
@@ -107,6 +113,8 @@ Section NNRSimpVars.
        | NNRSimpSeq s₁ s₂ =>
          nnrs_imp_stmt_maybewritten_vars s₁ ++ nnrs_imp_stmt_maybewritten_vars s₂
        | NNRSimpAssign v e =>
+         v::nil
+       | NNRSimpPush v e =>
          v::nil
        | NNRSimpLet v eo s₀ =>
          remove string_eqdec v (nnrs_imp_stmt_maybewritten_vars s₀)
@@ -149,6 +157,8 @@ Section NNRSimpVars.
         apply Permutation_app; try reflexivity.
         apply Permutation_app_swap.
       - Case "NNRSimpAssign"%string.
+        apply Permutation_cons_append.
+      - Case "NNRSimpPush"%string.
         apply Permutation_cons_append.
       - Case "NNRSimpLet"%string.
         rewrite app_ass.
