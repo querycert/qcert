@@ -36,6 +36,7 @@ depends: [
   "js_of_ocaml"
   "js_of_ocaml-ppx"
   "uri"
+  "wasm" {= "1.1.1"}
   "calendar"
   "coq-coq2html" {with-doc}
 ]
