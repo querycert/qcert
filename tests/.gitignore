@@ -6,6 +6,7 @@
 *_rdd.scala
 *.error
 *.txt
+*.wat
 oql/*.json
 sql/*.json
 tech_rule/*.json

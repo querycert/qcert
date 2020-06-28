@@ -29,4 +29,4 @@ Section ImpEJsontoWasmAst.
     
 End ImpEJsontoWasmAst.
 
-Extract Constant imp_ejson_to_wasm_ast => "Wasm.imp_ejson_to_wasm_ast".
+Extract Constant imp_ejson_to_wasm_ast => "Wasm_ast.imp_ejson_to_wasm_ast".
