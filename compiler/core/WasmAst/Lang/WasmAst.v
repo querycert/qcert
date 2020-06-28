@@ -26,8 +26,8 @@ Section WasmAst.
 
 End WasmAst.
 
-Extract Constant wasm_ast => "Wasm.ast".
-Extract Constant wasm_ast_eval => "Wasm.eval".
+Extract Constant wasm_ast => "Wasm_ast.t".
+Extract Constant wasm_ast_eval => "Wasm_ast.eval".
 
 Require Import DataRuntime.
 Require Import ForeignDataToEJson.
