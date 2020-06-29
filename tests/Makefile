@@ -457,6 +457,7 @@ clean:
 	@rm -f oql/*.js
 	@rm -f oql/*.java
 	@rm -f oql/*.class
+	@rm -f oql/*.wat
 	@rm -f sql/*.json
 	@rm -f sql/*.js
 	@rm -f sql/*.java
@@ -485,3 +486,14 @@ clean:
 
 cleanall: clean
 	@rm -f *~ */*~
+
+WASMQCERT=dune exec --no-print-directory qcert --
+
+wasm:
+	@i=0 ; \
+	while [ -e oql/wasm$$i.oql ] ; do \
+		$(WASMQCERT) -quiet -source oql -target oql oql/wasm$$i.oql -schema oql/wasm.schema -eval -input oql/wasm.input && \
+		$(WASMQCERT) -source oql -target wasm_ast oql/wasm$$i.oql -schema oql/wasm.schema -eval \
+	    -input oql/wasm.input -output oql/wasm$${i}_oql.json -eval-validate ; \
+		i=$$(expr $$i + 1 ) ; \
+	done

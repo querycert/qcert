@@ -16,10 +16,14 @@ module type RUNTIME = sig
   val c_true : Ir.instr
   val c_false : Ir.instr
 
+  val dot : Ir.func
+
   val not : Ir.func
   val or_ : Ir.func
   val and_ : Ir.func
+
   val compare : Ir.cmp_op -> Ir.func
+  val equal: Ir.func
 end
 
 module Create () : RUNTIME = struct
@@ -37,6 +41,7 @@ module Create () : RUNTIME = struct
     let offset = Table.offset constants s in
     i32_const' offset
 
+  let c_null = const (Coq_cejnull)
   let c_true = const (Coq_cejbool true)
   let c_false = const (Coq_cejbool false)
 
@@ -135,9 +140,9 @@ module Create () : RUNTIME = struct
       ; (* tag equality *) i32_const' 0; eq i32
       ; if_ ~result:[i32]
          [ (* load length *) local_get a; load i32
-         ; (* init char pnt a *) local_get a; load i32; i32_const' 3; add i32; local_tee a
-         ; (* set end addr *) add i32; local_tee end_
-         ; (* init char pnt b *) local_get b; load i32; i32_const' 3; add i32; local_set b
+         ; (* init char pnt a *) local_get a; i32_const' 3; add i32; local_tee a
+         ; (* set end addr *) add i32; local_set end_
+         ; (* init char pnt b *) local_get b; i32_const' 3; add i32; local_set b
          ; loop ~result:[i32]
            [ (* break condition *) local_get a; local_get end_; i32u_cmp Ge
            ; if_ ~result:[i32]
@@ -182,6 +187,65 @@ module Create () : RUNTIME = struct
       ; if_ ~result:[i32]
           [ c_true ]
           [ c_false ]
+      ]
+
+  let eq_box =
+    func ~params:[i32; i32] ~result:[i32]
+      [ local_get 0
+      ; local_get 1
+      ; call cmp_box
+      ; i32_const' (0)
+      ; eq i32
+      ]
+
+  let equal =
+    func ~params:[i32; i32] ~result:[i32]
+      [ local_get 0
+      ; local_get 1
+      ; call eq_box
+      ; if_ ~result:[i32]
+          [ c_true ]
+          [ c_false ]
+      ]
+
+  let dot =
+    let ptr, key, last_ = 0, 1, 2 in
+    func ~params:[i32; i32] ~result:[i32] ~locals:[i32]
+      [ local_get ptr
+      ; load i32
+      ; i32_const' 6 (* object tag *)
+      ; eq i32
+      ; if_ ~result:[i32]
+          [ local_get ptr
+          ; load ~offset:4 i32
+          ; i32_const' 8
+          ; mul i32
+          ; local_get ptr
+          ; add i32
+          ; local_set last_
+          ; loop ~result:[i32]
+              [ local_get ptr
+              ; i32_const' 8
+              ; add i32
+              ; local_tee ptr
+              ; local_get last_
+              ; i32u_cmp Le
+              ; if_ ~result:[i32]
+                  [ local_get ptr
+                  ; load i32
+                  ; local_get key
+                  ; call eq_box
+                  ; if_ ~result:[i32]
+                      [ local_get ptr
+                      ; load ~offset:4 i32
+                      ; return
+                      ]
+                      [ br 2 (* jump top of loop *)]
+                  ]
+                  [ (* key not found *) c_null ]
+              ]
+          ]
+          [ (* not an object *) unreachable ]
       ]
 
   module Ctx : CONTEXT = struct
