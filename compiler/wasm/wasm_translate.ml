@@ -17,31 +17,112 @@ let op (module R : Wasm_imp_runtime.RUNTIME) op : Ir.instr list =
   | EJsonOpLe -> Ir.[call (R.compare Le)]
   | EJsonOpGt -> Ir.[call (R.compare Gt)]
   | EJsonOpGe -> Ir.[call (R.compare Ge)]
-  | EJsonOpAddString
-  | EJsonOpAddNumber
-  | EJsonOpSub
-  | EJsonOpMult
-  | EJsonOpDiv
-  | EJsonOpStrictEqual
-  | EJsonOpStrictDisequal
-  | EJsonOpArray
-  | EJsonOpArrayLength
-  | EJsonOpArrayPush
-  | EJsonOpArrayAccess
-  | EJsonOpObject _
-  | EJsonOpAccess _
-  | EJsonOpHasOwnProperty _
-  | EJsonOpMathMin
-  | EJsonOpMathMax
-  | EJsonOpMathPow
-  | EJsonOpMathExp
-  | EJsonOpMathAbs
-  | EJsonOpMathLog
-  | EJsonOpMathLog10
-  | EJsonOpMathSqrt
-  | EJsonOpMathCeil
-  | EJsonOpMathFloor
-  | EJsonOpMathTrunc -> unsupported "op"
+  | EJsonOpAddString -> unsupported "op: EJsonOpAddString"
+  | EJsonOpAddNumber -> unsupported "op: EJsonOpAddNumber"
+  | EJsonOpSub -> unsupported "op: EJsonOpSub"
+  | EJsonOpMult -> unsupported "op: EJsonOpMult"
+  | EJsonOpDiv -> unsupported "op: EJsonOpDiv"
+  | EJsonOpStrictEqual -> unsupported "op: EJsonOpStrictEqual"
+  | EJsonOpStrictDisequal -> unsupported "op: EJsonOpStrictDisequal"
+  | EJsonOpArray -> unsupported "op: EJsonOpArray"
+  | EJsonOpArrayLength -> unsupported "op: EJsonOpArrayLength"
+  | EJsonOpArrayPush -> unsupported "op: EJsonOpArrayPush"
+  | EJsonOpArrayAccess -> unsupported "op: EJsonOpArrayAccess"
+  | EJsonOpObject _ -> unsupported "op: EJsonOpObject"
+  | EJsonOpAccess _ -> unsupported "op: EJsonOpAccess"
+  | EJsonOpHasOwnProperty _ -> unsupported "op: EJsonOpHasOwnProperty"
+  | EJsonOpMathMin -> unsupported "op: EJsonOpMathMin"
+  | EJsonOpMathMax -> unsupported "op: EJsonOpMathMax"
+  | EJsonOpMathPow -> unsupported "op: EJsonOpMathPow"
+  | EJsonOpMathExp -> unsupported "op: EJsonOpMathExp"
+  | EJsonOpMathAbs -> unsupported "op: EJsonOpMathAbs"
+  | EJsonOpMathLog -> unsupported "op: EJsonOpMathLog"
+  | EJsonOpMathLog10 -> unsupported "op: EJsonOpMathLog10"
+  | EJsonOpMathSqrt -> unsupported "op: EJsonOpMathSqrt"
+  | EJsonOpMathCeil -> unsupported "op: EJsonOpMathCeil"
+  | EJsonOpMathFloor -> unsupported "op: EJsonOpMathFloor"
+  | EJsonOpMathTrunc -> unsupported "op: EJsonOpMathTrunc"
+
+let string_of_runtime_op =
+  let open EJsonRuntimeOperators in
+  function
+  (* Generic *)
+  | EJsonRuntimeEqual -> "equal"
+  | EJsonRuntimeCompare -> "compare"
+  | EJsonRuntimeToString -> "toString"
+  | EJsonRuntimeToText -> "toText"
+  (* Record *)
+  | EJsonRuntimeRecConcat -> "recConcat"
+  | EJsonRuntimeRecMerge -> "recMerge"
+  | EJsonRuntimeRecRemove-> "recRemove"
+  | EJsonRuntimeRecProject-> "recProject"
+  | EJsonRuntimeRecDot -> "recDot"
+  (* Array *)
+  | EJsonRuntimeArray -> "array"
+  | EJsonRuntimeArrayLength -> "arrayLength"
+  | EJsonRuntimeArrayPush -> "arrayPush"
+  | EJsonRuntimeArrayAccess -> "arrayAccess"
+  (* Sum *)
+  | EJsonRuntimeEither -> "either"
+  | EJsonRuntimeToLeft-> "toLeft"
+  | EJsonRuntimeToRight-> "toRight"
+  (* Brand *)
+  | EJsonRuntimeBrand -> "brand"
+  | EJsonRuntimeUnbrand -> "unbrand"
+  | EJsonRuntimeCast -> "cast"
+  (* Collection *)
+  | EJsonRuntimeDistinct -> "distinct"
+  | EJsonRuntimeSingleton -> "singleton"
+  | EJsonRuntimeFlatten -> "flatten"
+  | EJsonRuntimeUnion -> "union"
+  | EJsonRuntimeMinus -> "minus"
+  | EJsonRuntimeMin -> "min"
+  | EJsonRuntimeMax -> "max"
+  | EJsonRuntimeNth -> "nth"
+  | EJsonRuntimeCount -> "count"
+  | EJsonRuntimeContains -> "contains"
+  | EJsonRuntimeSort -> "sort"
+  | EJsonRuntimeGroupBy -> "groupBy"
+  (* String *)
+  | EJsonRuntimeLength -> "length"
+  | EJsonRuntimeSubstring -> "substring"
+  | EJsonRuntimeSubstringEnd -> "substringEnd"
+  | EJsonRuntimeStringJoin -> "stringJoin"
+  | EJsonRuntimeLike -> "like"
+  (* Integer *)
+  | EJsonRuntimeNatLt -> "natLt"
+  | EJsonRuntimeNatLe -> "natLe"
+  | EJsonRuntimeNatPlus -> "natPlus"
+  | EJsonRuntimeNatMinus -> "natMinus"
+  | EJsonRuntimeNatMult -> "natMult"
+  | EJsonRuntimeNatDiv -> "natDiv"
+  | EJsonRuntimeNatRem -> "natRem"
+  | EJsonRuntimeNatAbs -> "natAbs"
+  | EJsonRuntimeNatLog2 -> "natLog2"
+  | EJsonRuntimeNatSqrt -> "natSqrt"
+  | EJsonRuntimeNatMinPair -> "natMinPair"
+  | EJsonRuntimeNatMaxPair -> "natMaxPair"
+  | EJsonRuntimeNatMin -> "natMin"
+  | EJsonRuntimeNatMax -> "natMax"
+  | EJsonRuntimeNatSum -> "natSum"
+  | EJsonRuntimeNatArithMean -> "natArithMean"
+  | EJsonRuntimeFloatOfNat -> "floatOfNat"
+  (* Float *)
+  | EJsonRuntimeFloatSum -> "floatSum"
+  | EJsonRuntimeFloatArithMean -> "floatArithMean"
+  | EJsonRuntimeFloatMin -> "floatMin"
+  | EJsonRuntimeFloatMax -> "floatMax"
+  | EJsonRuntimeNatOfFloat -> "natOfFloat"
+  (* Foreign *)
+  | EJsonRuntimeForeign _fop -> "FOREIGN"
+
+let rt_op (module R : Wasm_imp_runtime.RUNTIME) op : Ir.instr list =
+  match (op : EJsonRuntimeOperators.ejson_runtime_op) with
+  | EJsonRuntimeEqual -> Ir.[call R.equal]
+  | EJsonRuntimeNatLt -> Ir.[call (R.compare Lt)]
+  | EJsonRuntimeNatLe -> Ir.[call (R.compare Le)]
+  | EJsonRuntimeRecDot -> Ir.[call R.dot]
+  | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
 let rec expr ctx expression : Ir.instr list =
   let module R = (val ctx.runtime) in
@@ -52,7 +133,8 @@ let rec expr ctx expression : Ir.instr list =
   | ImpExprOp (x, args) ->
     (* Put arguments on the stack, append operator *)
     (List.map (expr ctx) args |> List.concat) @ (op ctx.runtime x)
-  | ImpExprRuntimeCall (op, args) -> unsupported "expr: runtime call"
+  | ImpExprRuntimeCall (x, args) ->
+    (List.map (expr ctx) args |> List.concat) @ (rt_op ctx.runtime x)
 
 let rec statement ctx stmt : Ir.instr list =
   match (stmt : imp_ejson_stmt) with

@@ -23,6 +23,7 @@ val f64_cmp : cmp_op -> instr
 
 val eq : type_ -> instr
 val add : type_ -> instr
+val mul : type_ -> instr
 
 val i32_and : instr
 val i64_and : instr
@@ -42,10 +43,14 @@ val if_ :
   ?result: type_ list ->
   instr list -> instr list -> instr
 
-val loop: ?result: type_ list -> instr list -> instr
+val loop:
+  ?params: type_ list ->
+  ?result: type_ list -> instr list -> instr
 
 val br: int -> instr
 val br_if: int -> instr
+
+val return : instr
 
 (** {2} functions *)
 

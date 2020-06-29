@@ -282,6 +282,13 @@ module Intructions = struct
     | F32Type -> Binary (F32 F32Op.Add)
     | F64Type -> Binary (F64 F64Op.Add)
 
+  let mul ty _ =
+    match ty with
+    | I32Type -> Binary (I32 I32Op.Mul)
+    | I64Type -> Binary (I64 I64Op.Mul)
+    | F32Type -> Binary (F32 F32Op.Mul)
+    | F64Type -> Binary (F64 F64Op.Mul)
+
   let i32_and _ = Binary (I32 I32Op.And)
   let i64_and _ = Binary (I64 I64Op.And)
   let i32_or _ = Binary (I32 I32Op.Or)
@@ -297,19 +304,37 @@ module Intructions = struct
         | U32 -> Pack32, ZX
       ) pack
     in
+    let align =
+      match type_, sz with
+      | I32Type, None
+      | F32Type, None -> 2
+      | I64Type, None
+      | F64Type, None -> 3
+      | _, Some (Pack8, _) -> 0
+      | _, Some (Pack16, _) -> 1
+      | _, Some (Pack32, _) -> 2
+    in
     let offset = Int32.of_int (Option.value ~default:0 offset) in
     let _id = memory_to_spec ctx m in
-    Load {ty = type_; align=2; offset; sz}
+    Load {ty = type_; align; offset; sz}
+
+  let block_type ctx ~params ~result =
+    match params, result with
+    | [], [res] -> ValBlockType (Some res)
+    | _ ->
+      let t = func_to_spec_type ctx ~params ~result in
+      VarBlockType t
 
   let if_ ?(params=[]) ?(result=[]) then_ else_ ctx =
-    let t = func_to_spec_type ctx ~params ~result in
-    If (VarBlockType t, List.map (instr_to_spec ctx) then_, List.map (instr_to_spec ctx) else_)
+    let t = block_type ctx ~params ~result in
+    If (t, List.map (instr_to_spec ctx) then_, List.map (instr_to_spec ctx) else_)
 
-  let loop ?(result=[]) body ctx =
-    let t = func_to_spec_type ctx ~params:[] ~result in
-    Loop (VarBlockType t, List.map (instr_to_spec ctx) body)
+  let loop ?(params=[]) ?(result=[]) body ctx =
+    let t = block_type ctx ~params ~result in
+    Loop (t, List.map (instr_to_spec ctx) body)
 
   let br i _ = Br (Int32.of_int i @@ no_region)
   let br_if i _ = BrIf (Int32.of_int i @@ no_region)
+  let return _ = Return
 end
 include Intructions
