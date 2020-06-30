@@ -493,6 +493,8 @@ wasm:
 	@i=0 ; \
 	while [ -e oql/wasm$$i.oql ] ; do \
 		$(WASMQCERT) -quiet -source oql -target oql oql/wasm$$i.oql -schema oql/wasm.schema -eval -input oql/wasm.input && \
+		$(WASMQCERT) -quiet -source oql -target wasm_ast oql/wasm$$i.oql -schema oql/wasm.schema && \
+		wat2wasm oql/wasm$$i.wat -o oql/wasm$$i.wasm && \
 		$(WASMQCERT) -source oql -target wasm_ast oql/wasm$$i.oql -schema oql/wasm.schema -eval \
 	    -input oql/wasm.input -output oql/wasm$${i}_oql.json -eval-validate ; \
 		i=$$(expr $$i + 1 ) ; \

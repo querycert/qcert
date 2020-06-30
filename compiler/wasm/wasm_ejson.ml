@@ -20,11 +20,12 @@ let encode_const : cejson -> bytes = function
     Bytes.set_int64_le b 4 (Int64.bits_of_float x);
     b
   | Coq_cejstring s ->
-    let n = List.length s in
+    let s = Util.string_of_char_list s in
+    let n = String.length s in
     let b = Bytes.create (8 + n) in
     Bytes.set_int32_le b 0 (Int32.of_int 4);
     Bytes.set_int32_le b 4 (Int32.of_int n);
-    List.iteri (fun i c -> Bytes.set b (8 + i) c) s;
+    Bytes.blit_string s 0 b 8 n;
     b
   | Coq_cejbigint x -> unsupported "ejson encode: bigint"
   | Coq_cejforeign _ -> unsupported "ejson encode: foreign"
@@ -64,10 +65,12 @@ let rec write mem alloc_p =
   | Coq_ejbigint x -> write_const (Coq_cejbigint x)
   | Coq_ejarray x ->
     let elements = List.map (write mem alloc_p) x in
+    let n = List.length elements in
     let addr = addr () in
     i32 addr 0 5;
     i32 addr 4 (List.length elements);
-    List.iteri (fun i x -> i32' addr (4 * i + 4) x) elements;
+    List.iteri (fun i x -> i32' addr (4 * i + 8) x) elements;
+    Wasm.Global.store alloc_p (I32 (Int32.add (Int32.of_int (n * 4 + 8)) addr));
     addr
   | Coq_ejobject x ->
     let elements = List.map (fun (k,v) ->
@@ -75,13 +78,15 @@ let rec write mem alloc_p =
         let v = write mem alloc_p v in
         k, v
       ) x in
+    let n = List.length elements in
     let addr = addr () in
     i32 addr 0 6;
-    i32 addr 4 (List.length elements);
+    i32 addr 4 n;
     List.iteri (fun i (k,v) ->
-        i32' addr (8 * i + 4) k;
-        i32' addr (8 * i + 8) v;
+        i32' addr (8 * i + 8) k;
+        i32' addr (8 * i + 12) v;
       ) elements;
+    Wasm.Global.store alloc_p (I32 (Int32.add (Int32.of_int (n * 8 + 8)) addr));
     addr
 ;;
 
