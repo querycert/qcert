@@ -589,6 +589,7 @@ let rec nnrs_imp_stmt_to_sexp s : sexp =
   | NNRSimpLet (v, None, s) -> STerm ("NNRSimpLet", [SString (string_of_char_list v); nnrs_imp_stmt_to_sexp s])
   | NNRSimpLet (v, Some e, s) -> STerm ("NNRSimpLet", [SString (string_of_char_list v); nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s])
   | NNRSimpAssign (v, e) -> STerm ("NNRSimpAssign", [SString (string_of_char_list v); nnrs_imp_expr_to_sexp e])
+  | NNRSimpPush (v, e) -> STerm ("NNRSimpPush", [SString (string_of_char_list v); nnrs_imp_expr_to_sexp e])
   | NNRSimpFor (v, e, s) -> STerm ("NNRSimpFor", [SString (string_of_char_list v); nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s])
   | NNRSimpIf (e, s1, s2) -> STerm ("NNRSimpIf", [nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s1; nnrs_imp_stmt_to_sexp s2])
   | NNRSimpEither (e,v1,s1,v2,s2) -> STerm ("NNRSimpEither",
@@ -621,6 +622,7 @@ let rec sexp_to_nnrs_imp_stmt (se:sexp) =
   | STerm ("NNRSimpLet", [SString v; s]) -> NNRSimpLet (char_list_of_string v, None, sexp_to_nnrs_imp_stmt s)
   | STerm ("NNRSimpLet", [SString v; e; s]) -> NNRSimpLet (char_list_of_string v, Some (sexp_to_nnrs_imp_expr e), sexp_to_nnrs_imp_stmt s)
   | STerm ("NNRSimpAssign", [SString v; e]) -> NNRSimpAssign (char_list_of_string v, sexp_to_nnrs_imp_expr e)
+  | STerm ("NNRSimpPush", [SString v; e]) -> NNRSimpPush (char_list_of_string v, sexp_to_nnrs_imp_expr e)
   | STerm ("NNRSimpFor", [SString v; e; s]) -> NNRSimpFor (char_list_of_string v, sexp_to_nnrs_imp_expr e, sexp_to_nnrs_imp_stmt s)
   | STerm ("NNRSimpIf", [e; s1; s2]) -> NNRSimpIf (sexp_to_nnrs_imp_expr e, sexp_to_nnrs_imp_stmt s1, sexp_to_nnrs_imp_stmt s2)
   | STerm ("NNRSimpEither", (SString v1) :: (SString v2) :: [e;s1;s2]) ->

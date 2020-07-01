@@ -354,6 +354,10 @@ let rec pretty_nnrs_imp_stmt p sym ff stmt =
       fprintf ff "@[<hv 2>$v%s :=@;<1 0>%a@;<0 -2>@]"
         (string_of_char_list v)
         (pretty_nnrs_imp_expr 0 sym) e
+  | Core.NNRSimpPush (v, e) ->
+      fprintf ff "@[<hv 2>$v%s.push(@;<1 0>%a@;<0 -2>)@]"
+        (string_of_char_list v)
+        (pretty_nnrs_imp_expr 0 sym) e
   | Core.NNRSimpFor (v,n1,n2) ->
       fprintf ff "@[<hv 0>for (@[<hv 2>$v%s %a@;<1 0>%a@]) {@;<1 2>%a@ }@]"
         (string_of_char_list v) pretty_sym sym.sin
@@ -482,7 +486,9 @@ let pretty_imp_data_op p sym pretty_imp_expr ff (op, args) =
       (pretty_unary_op p sym pretty_imp_expr) ff u e
   | Core.DataOpBinary b, [e1;e2] ->
       (pretty_binary_op p sym pretty_imp_expr) ff b e1 e2
-  | _ -> assert false
+  | Core.DataOpUnary _, _
+  | Core.DataOpBinary _, _ ->
+    assert false
   end
 
 let pretty_imp_data_runtime p sym pretty_imp_expr ff (op, args) =
@@ -496,7 +502,14 @@ let pretty_imp_data_runtime p sym pretty_imp_expr ff (op, args) =
       fprintf ff "@[<hv 2>toLeft@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
   | Core.DataRuntimeToRight, [e] ->
       fprintf ff "@[<hv 2>toRight@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
-  | _ -> assert false
+  | Core.DataRuntimePush, [e1; e2] ->
+      fprintf ff "@[<hv 2>Push@[<hv 2>(%a,@ %a)@]@]" (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
+  | Core.DataRuntimeGroupby _, _
+  | Core.DataRuntimeEither, _
+  | Core.DataRuntimeToLeft, _
+  | Core.DataRuntimeToRight, _
+  | Core.DataRuntimePush, _ ->
+    assert false
   end
 
 let pretty_imp_data = pretty_imp pretty_imp_data_constant pretty_imp_data_op pretty_imp_data_runtime

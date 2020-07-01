@@ -38,7 +38,7 @@ Section ImpData.
     | DataRuntimeEither : imp_data_runtime_op
     | DataRuntimeToLeft : imp_data_runtime_op
     | DataRuntimeToRight : imp_data_runtime_op
-    | DataRuntimePush
+    | DataRuntimePush : imp_data_runtime_op
     .
 
     Definition imp_data_expr := @imp_expr imp_data_constant imp_data_op imp_data_runtime_op.
