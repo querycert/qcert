@@ -38,13 +38,37 @@ export class EjArray extends EjValue {
   values: Array<EjValue>
   constructor(a: Array<EjValue>) { super(); this.values = a; }
 }
+export const IdArrayEjValue = idof<Array<EjValue>>()
 export const IdEjArray = idof<EjArray>()
 
 export class EjObject extends EjValue {
   values: Map<string, EjValue>
-  constructor(a: Map<string, EjValue>) { super(); this.values = a; }
+  constructor() { super(); this.values = new Map<string, EjValue>(); }
+  set(k: string, v: EjValue): void {
+    this.values.set(k,v);
+  }
+  get(k: string): EjValue {
+    return this.values.get(k);
+  }
+  keys(): Array<string> {
+    return this.values.keys();
+  }
 }
 export const IdEjObject = idof<EjObject>()
+
+export class EjLeft extends EjValue {
+  value: EjValue
+  constructor(a: EjValue) { super(); this.value = a; }
+}
+export const IdEjLeft = idof<EjLeft>()
+
+export class EjRight extends EjValue {
+  value: EjValue
+  constructor(a: EjValue) { super(); this.value = a; }
+}
+export const IdEjRight = idof<EjRight>()
+
+// Operators
 
 export function opNot(a: EjBool): EjBool {
   return new EjBool(!a.value);
