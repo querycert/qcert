@@ -99,88 +99,99 @@ let string_of_runtime_op =
   let open EJsonRuntimeOperators in
   function
   (* Generic *)
-  | EJsonRuntimeEqual -> "equal"
-  | EJsonRuntimeCompare -> "compare"
-  | EJsonRuntimeToString -> "toString"
-  | EJsonRuntimeToText -> "toText"
+  | EJsonRuntimeEqual -> "runtimeEqual"
+  | EJsonRuntimeCompare -> "runtimeCompare"
+  | EJsonRuntimeToString -> "runtimeToString"
+  | EJsonRuntimeToText -> "runtimeToText"
   (* Record *)
-  | EJsonRuntimeRecConcat -> "recConcat"
-  | EJsonRuntimeRecMerge -> "recMerge"
-  | EJsonRuntimeRecRemove-> "recRemove"
-  | EJsonRuntimeRecProject-> "recProject"
-  | EJsonRuntimeRecDot -> "recDot"
+  | EJsonRuntimeRecConcat -> "runtimeRecConcat"
+  | EJsonRuntimeRecMerge -> "runtimeRecMerge"
+  | EJsonRuntimeRecRemove-> "runtimeRecRemove"
+  | EJsonRuntimeRecProject-> "runtimeRecProject"
+  | EJsonRuntimeRecDot -> "runtimeRecDot"
   (* Array *)
-  | EJsonRuntimeArray -> "array"
-  | EJsonRuntimeArrayLength -> "arrayLength"
-  | EJsonRuntimeArrayPush -> "arrayPush"
-  | EJsonRuntimeArrayAccess -> "arrayAccess"
+  | EJsonRuntimeArray -> "runtimeArray"
+  | EJsonRuntimeArrayLength -> "runtimeArrayLength"
+  | EJsonRuntimeArrayPush -> "runtimeArrayPush"
+  | EJsonRuntimeArrayAccess -> "runtimeArrayAccess"
   (* Sum *)
-  | EJsonRuntimeEither -> "either"
-  | EJsonRuntimeToLeft-> "toLeft"
-  | EJsonRuntimeToRight-> "toRight"
+  | EJsonRuntimeEither -> "runtimeEither"
+  | EJsonRuntimeToLeft-> "runtimeToLeft"
+  | EJsonRuntimeToRight-> "runtimeToRight"
   (* Brand *)
-  | EJsonRuntimeBrand -> "brand"
-  | EJsonRuntimeUnbrand -> "unbrand"
-  | EJsonRuntimeCast -> "cast"
+  | EJsonRuntimeBrand -> "runtimeBrand"
+  | EJsonRuntimeUnbrand -> "runtimeUnbrand"
+  | EJsonRuntimeCast -> "runtimeCast"
   (* Collection *)
-  | EJsonRuntimeDistinct -> "distinct"
-  | EJsonRuntimeSingleton -> "singleton"
-  | EJsonRuntimeFlatten -> "flatten"
-  | EJsonRuntimeUnion -> "union"
-  | EJsonRuntimeMinus -> "minus"
-  | EJsonRuntimeMin -> "min"
-  | EJsonRuntimeMax -> "max"
-  | EJsonRuntimeNth -> "nth"
-  | EJsonRuntimeCount -> "count"
-  | EJsonRuntimeContains -> "contains"
-  | EJsonRuntimeSort -> "sort"
-  | EJsonRuntimeGroupBy -> "groupBy"
+  | EJsonRuntimeDistinct -> "runtimeDistinct"
+  | EJsonRuntimeSingleton -> "runtimeSingleton"
+  | EJsonRuntimeFlatten -> "runtimeFlatten"
+  | EJsonRuntimeUnion -> "runtimeUnion"
+  | EJsonRuntimeMinus -> "runtimeMinus"
+  | EJsonRuntimeMin -> "runtimeMin"
+  | EJsonRuntimeMax -> "runtimeMax"
+  | EJsonRuntimeNth -> "runtimeNth"
+  | EJsonRuntimeCount -> "runtimeCount"
+  | EJsonRuntimeContains -> "runtimeContains"
+  | EJsonRuntimeSort -> "runtimeSort"
+  | EJsonRuntimeGroupBy -> "runtimeGroupBy"
   (* String *)
-  | EJsonRuntimeLength -> "length"
-  | EJsonRuntimeSubstring -> "substring"
-  | EJsonRuntimeSubstringEnd -> "substringEnd"
-  | EJsonRuntimeStringJoin -> "stringJoin"
-  | EJsonRuntimeLike -> "like"
+  | EJsonRuntimeLength -> "runtimeLength"
+  | EJsonRuntimeSubstring -> "runtimeSubstring"
+  | EJsonRuntimeSubstringEnd -> "runtimeSubstringEnd"
+  | EJsonRuntimeStringJoin -> "runtimeStringJoin"
+  | EJsonRuntimeLike -> "runtimeLike"
   (* Integer *)
-  | EJsonRuntimeNatLt -> "natLt"
-  | EJsonRuntimeNatLe -> "natLe"
-  | EJsonRuntimeNatPlus -> "natPlus"
-  | EJsonRuntimeNatMinus -> "natMinus"
-  | EJsonRuntimeNatMult -> "natMult"
-  | EJsonRuntimeNatDiv -> "natDiv"
-  | EJsonRuntimeNatRem -> "natRem"
-  | EJsonRuntimeNatAbs -> "natAbs"
-  | EJsonRuntimeNatLog2 -> "natLog2"
-  | EJsonRuntimeNatSqrt -> "natSqrt"
-  | EJsonRuntimeNatMinPair -> "natMinPair"
-  | EJsonRuntimeNatMaxPair -> "natMaxPair"
-  | EJsonRuntimeNatMin -> "natMin"
-  | EJsonRuntimeNatMax -> "natMax"
-  | EJsonRuntimeNatSum -> "natSum"
-  | EJsonRuntimeNatArithMean -> "natArithMean"
-  | EJsonRuntimeFloatOfNat -> "floatOfNat"
+  | EJsonRuntimeNatLt -> "runtimeNatLt"
+  | EJsonRuntimeNatLe -> "runtimeNatLe"
+  | EJsonRuntimeNatPlus -> "runtimeNatPlus"
+  | EJsonRuntimeNatMinus -> "runtimeNatMinus"
+  | EJsonRuntimeNatMult -> "runtimeNatMult"
+  | EJsonRuntimeNatDiv -> "runtimeNatDiv"
+  | EJsonRuntimeNatRem -> "runtimeNatRem"
+  | EJsonRuntimeNatAbs -> "runtimeNatAbs"
+  | EJsonRuntimeNatLog2 -> "runtimeNatLog2"
+  | EJsonRuntimeNatSqrt -> "runtimeNatSqrt"
+  | EJsonRuntimeNatMinPair -> "runtimeNatMinPair"
+  | EJsonRuntimeNatMaxPair -> "runtimeNatMaxPair"
+  | EJsonRuntimeNatMin -> "runtimeNatMin"
+  | EJsonRuntimeNatMax -> "runtimeNatMax"
+  | EJsonRuntimeNatSum -> "runtimeNatSum"
+  | EJsonRuntimeNatArithMean -> "runtimeNatArithMean"
+  | EJsonRuntimeFloatOfNat -> "runtimeFloatOfNat"
   (* Float *)
-  | EJsonRuntimeFloatSum -> "floatSum"
-  | EJsonRuntimeFloatArithMean -> "floatArithMean"
-  | EJsonRuntimeFloatMin -> "floatMin"
-  | EJsonRuntimeFloatMax -> "floatMax"
-  | EJsonRuntimeNatOfFloat -> "natOfFloat"
+  | EJsonRuntimeFloatSum -> "runtimeFloatSum"
+  | EJsonRuntimeFloatArithMean -> "runtimeFloatArithMean"
+  | EJsonRuntimeFloatMin -> "runtimeFloatMin"
+  | EJsonRuntimeFloatMax -> "runtimeFloatMax"
+  | EJsonRuntimeNatOfFloat -> "runtimeNatOfFloat"
   (* Foreign *)
   | EJsonRuntimeForeign _fop -> "FOREIGN"
 
 let rt_op ctx op : Ir.instr list =
+  let foreign params result =
+    let fname = string_of_runtime_op op in
+    let f, import = Ir.import_func ~params ~result "runtime" fname in
+    ctx.imports <- ImportSet.add import ctx.imports;
+    [ Ir.call f ]
+  in
+  let open Ir in
   match (op : EJsonRuntimeOperators.ejson_runtime_op) with
+  | EJsonRuntimeRecDot -> foreign [i32; i32] [i32]
   | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
 let const ctx c : Ir.instr list =
   (* This generates new AssemblyScript objects for each use of the constant.
    * TODO: Come up with a mechanism for reusing constants. *)
   let open Ir in
+  let foreign ~params ~result name =
+    let f, import = Ir.import_func ~params ~result "runtime" name in
+    ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+    f
+  in
   let new_ params class_ =
     let item = class_ ^ "#constructor" in
-    let f, import = Ir.import_func ~params:(i32 :: params) ~result:[i32] "runtime" item in
-    ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
-    call f
+    call (foreign ~params:(i32 :: params) ~result:[i32] item)
   in
   match (c : EJson.cejson) with
   | Coq_cejnull  ->
@@ -202,7 +213,18 @@ let const ctx c : Ir.instr list =
     ; i64_const (Int64.of_int x)
     ; new_ [i64] "EjBigInt"
     ]
-  | Coq_cejstring _ -> unsupported "const: string"
+  | Coq_cejstring x ->
+      [ i32_const' 0
+      ; new_ [] "EjStringBuilder"
+      ]
+      @ List.concat (List.map (fun c ->
+        [ i32_const' (int_of_char c)
+        ; call (foreign ~params:[i32; i32] ~result:[i32] "EjStringBuilder#append")
+        ]
+        ) x
+      )
+      @ [ call (foreign ~params:[i32] ~result:[i32] "EjStringBuilder#finalize") ]
+      (* TODO: I think we have to release the EjStringBuilder here? *)
   | Coq_cejforeign _ -> unsupported "const: foreign"
 
 let rec expr ctx expression : Ir.instr list =

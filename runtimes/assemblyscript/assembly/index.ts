@@ -22,6 +22,10 @@ export class EjNumber extends EjValue {
 }
 export const IdEjNumber = idof<EjNumber>()
 
+const c_neg1 = new EjNumber(-1);
+const c_1 = new EjNumber(1);
+const c_0 = new EjNumber(0);
+
 export class EjBigInt extends EjValue {
   value: i64
   constructor(a: i64) { super(); this.value = a; }
@@ -33,6 +37,28 @@ export class EjString extends EjValue {
   constructor(a: string) { super(); this.value = a; }
 }
 export const IdEjString = idof<EjString>()
+
+export class EjStringBuilder {
+  private buf: Array<i32>
+  private pos: i32
+  constructor() {
+    this.pos = 0;
+    this.buf = new Array<i32>(32);
+  }
+  append(val: i32): EjStringBuilder {
+    if (this.pos >= this.buf.length) {
+      this.buf = this.buf.concat(new Array(this.buf.length * 2));
+    }
+    this.buf[this.pos] = val;
+    this.pos++;
+    return this;
+  }
+  finalize(): EjString {
+    let buf = this.buf.slice(0, this.pos);
+    let str = String.fromCharCodes(buf);
+    return new EjString(str);
+  }
+}
 
 export class EjArray extends EjValue {
   values: Array<EjValue>
@@ -68,7 +94,7 @@ export class EjRight extends EjValue {
 }
 export const IdEjRight = idof<EjRight>()
 
-// Operators
+// EJson Operators
 
 export function opNot(a: EjBool): EjBool {
   return new EjBool(!a.value);
@@ -191,7 +217,7 @@ export function opObject(a: EjValue): EjObject {
 }
 
 export function opAccess(a: EjObject, k: EjString): EjValue {
-  // TODO: opAccess redundant with opRuntimeDot?
+  // TODO: opAccess redundant with runtimeRecDot?
   // TODO: opAccess: check for key not found needed?
   return a.values.get(k.value);
 }
@@ -243,4 +269,36 @@ export function opMathFloor(a: EjNumber): EjNumber {
 
 export function opMathTrunc(a: EjNumber): EjNumber {
   return new EjNumber(Math.trunc(a.value));
+}
+
+// EJson Runtime Operators
+
+// TODO: this seems to be redundant with opStrictEqual, is it?
+export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
+  return opStrictEqual(a, b);
+}
+
+function compare<T>(a: T, b: T): EjNumber {
+  if (a < b) { return c_neg1; }
+  if (a > b) { return c_1; }
+  return c_0;
+}
+
+export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
+  if (a instanceof EjNumber && b instanceof EjNumber) {
+    let aa : EjNumber = changetype<EjNumber>(a) ;
+    let bb : EjNumber = changetype<EjNumber>(b) ;
+    return compare<f64>(aa.value, bb.value);
+  }
+  if (a instanceof EjBigInt && b instanceof EjBigInt) {
+    let aa : EjBigInt = changetype<EjBigInt>(a) ;
+    let bb : EjBigInt = changetype<EjBigInt>(b) ;
+    return compare<i64>(aa.value, bb.value);
+  }
+  return unreachable();
+}
+
+// TODO: this seems to be redundant with opAccess, is it?
+export function runtimeRecDot(a: EjObject, b:EjString): EjValue {
+  return opAccess(a, b);
 }
