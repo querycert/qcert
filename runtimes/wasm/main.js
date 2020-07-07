@@ -1,4 +1,4 @@
-import {read, write} from './encoding.js';
+import {read, write} from '../assemblyscript/lib/encoding.js';
 
 async function run(input, wasm) {
   let arg = fetch(input)
