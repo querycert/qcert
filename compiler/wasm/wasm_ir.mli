@@ -93,6 +93,13 @@ val load : memory -> ?pack:pack -> ?offset:int -> type_ -> instr
 
 (** {2} module *)
 
+type import
+
+val import_func:
+  ?params: type_ list ->
+  ?result: type_ list ->
+  string -> string -> func * import
+
 type 'a export = string * 'a
 
 type module_ =
@@ -103,6 +110,7 @@ type module_ =
   ; tables: table export list
   ; data: (memory * int * string) list
   ; elems: (table * int * func) list
+  ; imports: import list
   }
 
 val module_to_spec: module_ -> Wasm.Ast.module_
