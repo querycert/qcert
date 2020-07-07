@@ -11,6 +11,8 @@ val unreachable : instr
 val nop : instr
 val i32_const : int32 -> instr
 val i32_const' : int -> instr
+val i64_const : int64 -> instr
+val f64_const : float -> instr
 
 type cmp_op = Ge | Gt | Le | Lt
 

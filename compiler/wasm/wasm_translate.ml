@@ -172,11 +172,44 @@ let rt_op ctx op : Ir.instr list =
   match (op : EJsonRuntimeOperators.ejson_runtime_op) with
   | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
+let const ctx c : Ir.instr list =
+  (* This generates new AssemblyScript objects for each use of the constant.
+   * TODO: Come up with a mechanism for reusing constants. *)
+  let open Ir in
+  let new_ params class_ =
+    let item = class_ ^ "#constructor" in
+    let f, import = Ir.import_func ~params:(i32 :: params) ~result:[i32] "runtime" item in
+    ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+    call f
+  in
+  match (c : EJson.cejson) with
+  | Coq_cejnull  ->
+    [ i32_const' 0
+    ; new_ [] "EjNull"
+    ]
+  | Coq_cejbool x ->
+    [ i32_const' 0
+    ; i32_const' (if x then 1 else 0)
+    ; new_ [i32] "EjBool"
+    ]
+  | Coq_cejnumber x ->
+    [ i32_const' 0
+    ; f64_const x
+    ; new_ [f64] "EjNumber"
+    ]
+  | Coq_cejbigint x ->
+    [ i32_const' 0
+    ; i64_const (Int64.of_int x)
+    ; new_ [i64] "EjBigInt"
+    ]
+  | Coq_cejstring _ -> unsupported "const: string"
+  | Coq_cejforeign _ -> unsupported "const: foreign"
+
 let rec expr ctx expression : Ir.instr list =
   match (expression : imp_ejson_expr) with
   | ImpExprError err -> unsupported "expr: error"
   | ImpExprVar v -> [Ir.local_get (Table.insert ctx.locals v)]
-  | ImpExprConst x -> unsupported "expr: const"
+  | ImpExprConst x -> const ctx x
   | ImpExprOp (x, args) ->
     (* Put arguments on the stack, append operator *)
     (List.map (expr ctx) args |> List.concat) @ (op ctx.ctx x)
