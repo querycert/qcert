@@ -29,9 +29,6 @@ Section OperatorsUtils.
 
   Definition string_sort := insertion_sort StringOrder.le_dec.
 
-  Instance ToString_brands : ToString brands
-    := { toString := fun b => (concat " & " b)}.
-
   Fixpoint dsum (ns:list data) : option Z
     := match ns with
          | nil => Some 0%Z

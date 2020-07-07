@@ -24,6 +24,9 @@ function toStringQ(v, quote) {
     if (v === null) {
         return 'null';
     }
+    if (typeof v === 'object' && v.$coll && v.$length) {
+        v = unboxColl(v);
+    }
     var t = typeof v;
     if (t === 'string') {
         return quote + v + quote;
@@ -52,8 +55,12 @@ function toStringQ(v, quote) {
     }
     var result2 = '';
     if (v.$class) { // branded value
+        let cl = v.$class;
+        if (typeof cl === 'object' && cl.$coll && cl.$length) {
+            cl = unboxColl(cl);
+        }
         result2 += '<';
-        result2 += v.$class;
+        result2 += cl;
         result2 += ':';
         result2 += toStringQ(v.$data, quote);
         result2 += '>';

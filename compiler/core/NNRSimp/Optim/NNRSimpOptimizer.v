@@ -411,7 +411,7 @@ Section NNRSimpOptimizer.
   Section optim_runner.
 
     (* *************************** *)
-    Definition run_nnrs_imp_optims 
+    Definition nnrs_imp_optim_top 
                {fruntime:foreign_runtime}
                {logger_e:optimizer_logger string nnrs_imp_expr}
                {logger_s:optimizer_logger string nnrs_imp_stmt}
@@ -425,16 +425,16 @@ Section NNRSimpOptimizer.
         nnrs_imp_optim_list
         opc.
 
-    Lemma run_nnrs_imp_optims_correctness
+    Lemma nnrs_imp_optim_top_correctness
           {model:basic_model}
           {logger_e:optimizer_logger string nnrs_imp_expr}
           {logger_s:optimizer_logger string nnrs_imp_stmt}
           {logger_t:optimizer_logger string nnrs_imp}
           (opc:optim_phases3_config)
           (p:nnrs_imp) :
-      tnnrs_imp_rewrites_to p (run_nnrs_imp_optims opc p).
+      tnnrs_imp_rewrites_to p (nnrs_imp_optim_top opc p).
     Proof.
-      unfold run_nnrs_imp_optims.
+      unfold nnrs_imp_optim_top.
       apply run_phases3_correctness.
       - intros.
         apply nnrs_imp_map_deep_trew_correctness; trivial.
@@ -495,23 +495,23 @@ Section NNRSimpOptimizer.
 
   End default.
   
-  Definition run_nnrs_imp_optims_default
+  Definition nnrs_imp_optim_top_default
              {fruntime:foreign_runtime}
              {logger_e:optimizer_logger string nnrs_imp_expr}
              {logger_s:optimizer_logger string nnrs_imp_stmt}
              {logger_t:optimizer_logger string nnrs_imp}
-    := run_nnrs_imp_optims default_nnrs_imp_optim_phases.
+    := nnrs_imp_optim_top default_nnrs_imp_optim_phases.
 
-  Lemma run_nnrs_imp_optims_default_correct
+  Lemma nnrs_imp_optim_top_default_correct
         {model:basic_model}
         {logger_e:optimizer_logger string nnrs_imp_expr}
         {logger_s:optimizer_logger string nnrs_imp_stmt}
         {logger_t:optimizer_logger string nnrs_imp}
         p :
-    tnnrs_imp_rewrites_to p (run_nnrs_imp_optims_default p).
+    tnnrs_imp_rewrites_to p (nnrs_imp_optim_top_default p).
   Proof.
-    unfold run_nnrs_imp_optims_default.
-    apply run_nnrs_imp_optims_correctness.
+    unfold nnrs_imp_optim_top_default.
+    apply nnrs_imp_optim_top_correctness.
   Qed.
-  
+
 End NNRSimpOptimizer.

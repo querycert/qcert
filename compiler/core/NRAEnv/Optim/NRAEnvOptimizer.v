@@ -716,6 +716,31 @@ Section NRAEnvOptimizer.
   Definition tmap_singleton_step_correct {model:basic_model}
     := mkOptimizerStepModel tmap_singleton_step tmap_singleton_fun_correctness.
 
+  (* nth 0 { P } ) ⇒ₓ left P *)
+  Definition nth0_bag_fun {fruntime:foreign_runtime} (p: nraenv) :=
+    match p with
+        NRAEnvBinop OpBagNth (NRAEnvUnop OpBag p) (NRAEnvConst (dnat 0)) => NRAEnvUnop OpLeft p
+      | _ => p
+    end.
+
+  Lemma nth0_bag_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ nth0_bag_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tenvnth0_bag_arrow.
+  Qed.
+  Hint Rewrite @nth0_bag_fun_correctness : optim_correct.
+
+  Definition nth0_bag_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "nth0bag" (* name *)
+         "Take the element of a bag of one element" (* description *)
+         "nth0_bag_fun" (* lemma name *)
+         nth0_bag_fun (* lemma *).
+
+  Definition nth0_bag_step_correct {model:basic_model}
+    := mkOptimizerStepModel nth0_bag_step nth0_bag_fun_correctness.
+
   (* p ◯ ID ⇒ₓ p *)
   Definition tapp_over_id_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1874,7 +1899,8 @@ Section NRAEnvOptimizer.
     p ⇒ₓ tappenv_over_either_nil_fun p.
   Proof.
     destruct p; simpl; try reflexivity.
-    destruct p1; simpl; try reflexivity.
+    
+destruct p1; simpl; try reflexivity.
     destruct p1_2; simpl; try reflexivity.
     destruct d; simpl; try reflexivity.
     destruct l; simpl; try reflexivity.
@@ -2321,6 +2347,105 @@ Section NRAEnvOptimizer.
 
   Definition tdot_over_rec_step_correct {model:basic_model}
     := mkOptimizerStepModel tdot_over_rec_step tdot_over_rec_fun_correctness.
+
+
+  (* optimizations for Either *)
+
+  Definition teither_app_over_dleft_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvApp (NRAEnvEither p1 p2) (NRAEnvConst (dleft d)) => NRAEnvApp p1 (NRAEnvConst d)
+    | _ => p
+    end.
+
+  Lemma teither_app_over_dleft_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ teither_app_over_dleft_fun p.
+  Proof.
+    tprove_correctness p.
+    apply teither_app_over_dleft_arrow.
+  Qed.
+
+  Definition teither_app_over_dleft_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "either/dleft" (* name *)
+         "Simplifies the application of a either on a left value" (* description *)
+         "teither_app_over_dleft_fun" (* lemma name *)
+         teither_app_over_dleft_fun (* lemma *).
+
+  Definition teither_app_over_dleft_step_correct {model:basic_model}
+    := mkOptimizerStepModel teither_app_over_dleft_step teither_app_over_dleft_fun_correctness.
+
+
+  Definition teither_app_over_dright_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvApp (NRAEnvEither p1 p2) (NRAEnvConst (dright d)) => NRAEnvApp p2 (NRAEnvConst d)
+    | _ => p
+    end.
+
+  Lemma teither_app_over_dright_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ teither_app_over_dright_fun p.
+  Proof.
+    tprove_correctness p.
+    apply teither_app_over_dright_arrow.
+  Qed.
+
+  Definition teither_app_over_dright_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "either/dright" (* name *)
+         "Simplifies the application of a either on a right value" (* description *)
+         "teither_app_over_dright_fun" (* lemma name *)
+         teither_app_over_dright_fun (* lemma *).
+
+  Definition teither_app_over_dright_step_correct {model:basic_model}
+    := mkOptimizerStepModel teither_app_over_dright_step teither_app_over_dright_fun_correctness.
+
+  Definition teither_app_over_aleft_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvApp (NRAEnvEither p1 p2) (NRAEnvUnop OpLeft p) => NRAEnvApp p1 p
+    | _ => p
+    end.
+
+  Lemma teither_app_over_aleft_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ teither_app_over_aleft_fun p.
+  Proof.
+    tprove_correctness p.
+    apply teither_app_over_aleft_arrow.
+  Qed.
+
+  Definition teither_app_over_aleft_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "either/left" (* name *)
+         "Simplifies the application of a either on a left expression" (* description *)
+         "teither_app_over_aleft_fun" (* lemma name *)
+         teither_app_over_aleft_fun (* lemma *).
+
+  Definition teither_app_over_aleft_step_correct {model:basic_model}
+    := mkOptimizerStepModel teither_app_over_aleft_step teither_app_over_aleft_fun_correctness.
+
+
+  Definition teither_app_over_aright_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvApp (NRAEnvEither p1 p2) (NRAEnvUnop OpRight p) => NRAEnvApp p2 p
+    | _ => p
+    end.
+
+  Lemma teither_app_over_aright_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ teither_app_over_aright_fun p.
+  Proof.
+    tprove_correctness p.
+    apply teither_app_over_aright_arrow.
+  Qed.
+
+  Definition teither_app_over_aright_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "either/right" (* name *)
+         "Simplifies the application of a either on a right expression" (* description *)
+         "teither_app_over_aright_fun" (* lemma name *)
+         teither_app_over_aright_fun (* lemma *).
+
+  Definition teither_app_over_aright_step_correct {model:basic_model}
+    := mkOptimizerStepModel teither_app_over_aright_step teither_app_over_aright_fun_correctness.
+
+  (* *)
 
   Definition tnested_map_over_singletons_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -2809,6 +2934,7 @@ Section NRAEnvOptimizer.
         ; tflatten_flatten_map_either_nil_step
         ; tmap_map_compose_step
         ; tmap_singleton_step
+        ; nth0_bag_step
         ; tapp_over_id_r_step
         ; tapp_over_env_step
         ; tapp_over_id_l_step
@@ -2866,6 +2992,10 @@ Section NRAEnvOptimizer.
         ; tmerge_concat_to_concat_step
         ; tmerge_with_concat_to_concat_step
         ; tdot_over_rec_step
+        ; teither_app_over_dleft_step
+        ; teither_app_over_dright_step
+        ; teither_app_over_aleft_step
+        ; teither_app_over_aright_step
         ; tnested_map_over_singletons_step
         ; tappenv_mapenv_to_map_step
         ; trproject_nil_step
@@ -2904,6 +3034,7 @@ Section NRAEnvOptimizer.
         ; tflatten_flatten_map_either_nil_step_correct
         ; tmap_map_compose_step_correct
         ; tmap_singleton_step_correct
+        ; nth0_bag_step_correct
         ; tapp_over_id_r_step_correct
         ; tapp_over_env_step_correct
         ; tapp_over_id_l_step_correct
@@ -2961,6 +3092,10 @@ Section NRAEnvOptimizer.
         ; tmerge_concat_to_concat_step_correct
         ; tmerge_with_concat_to_concat_step_correct
         ; tdot_over_rec_step_correct
+        ; teither_app_over_dleft_step_correct
+        ; teither_app_over_dright_step_correct
+        ; teither_app_over_aleft_step_correct
+        ; teither_app_over_aright_step_correct
         ; tnested_map_over_singletons_step_correct
         ; tappenv_mapenv_to_map_step_correct
         ; trproject_nil_step_correct
@@ -2997,20 +3132,20 @@ Section NRAEnvOptimizer.
     apply eq_refl.
   Qed.
 
-  Definition run_nraenv_optims 
+  Definition nraenv_optim_top
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nraenv}
              (opc:optim_phases_config)
     : nraenv -> nraenv :=
     run_phases tnraenv_map_deep nraenv_size tnraenv_optim_list opc.
 
-  Lemma run_nraenv_optims_correctness
+  Lemma nraenv_optim_top_correctness
         {model:basic_model} {logger:optimizer_logger string nraenv}
         (opc:optim_phases_config)
         (p:nraenv) :
-    tnraenv_rewrites_to p ( run_nraenv_optims opc p).
+    tnraenv_rewrites_to p (nraenv_optim_top opc p).
   Proof.
-    unfold run_nraenv_optims.
+    unfold nraenv_optim_top.
     apply run_phases_correctness.
     - intros. apply nraenv_map_deep_correctness; auto.
     - apply tnraenv_optim_list_correct.
@@ -3029,6 +3164,7 @@ Section NRAEnvOptimizer.
       ; optim_step_name tproduct_empty_right_step
       ; optim_step_name tproduct_empty_left_step
       ; optim_step_name tmap_singleton_step
+      ; optim_step_name nth0_bag_step
       ; optim_step_name tmap_map_compose_step
       ; optim_step_name tflatten_coll_step
       (* only in tail *)
@@ -3082,6 +3218,10 @@ Section NRAEnvOptimizer.
       ; optim_step_name tmerge_concat_to_concat_step
       ; optim_step_name tmerge_with_concat_to_concat_step
       ; optim_step_name tdot_over_rec_step
+      ; optim_step_name teither_app_over_dleft_step
+      ; optim_step_name teither_app_over_dright_step
+      ; optim_step_name teither_app_over_aleft_step
+      ; optim_step_name teither_app_over_aright_step
       ; optim_step_name tnested_map_over_singletons_step
       ; optim_step_name tapp_over_env_step
       ; optim_step_name tselect_over_either_nil_step
@@ -3128,6 +3268,7 @@ Section NRAEnvOptimizer.
       ; optim_step_name tproduct_empty_right_step
       ; optim_step_name tproduct_empty_left_step
       ; optim_step_name tmap_singleton_step
+      ; optim_step_name nth0_bag_step
       ; optim_step_name tmap_map_compose_step
       ; optim_step_name tflatten_coll_step
       (* only in tail *)
@@ -3179,6 +3320,10 @@ Section NRAEnvOptimizer.
       ; optim_step_name tmerge_concat_to_concat_step
       ; optim_step_name tmerge_with_concat_to_concat_step
       ; optim_step_name tdot_over_rec_step
+      ; optim_step_name teither_app_over_dleft_step
+      ; optim_step_name teither_app_over_dright_step
+      ; optim_step_name teither_app_over_aleft_step
+      ; optim_step_name teither_app_over_aright_step
       ; optim_step_name tnested_map_over_singletons_step
       ; optim_step_name tapp_over_env_step
       ; optim_step_name tappenv_mapenv_to_map_step
@@ -3221,23 +3366,23 @@ Section NRAEnvOptimizer.
   End default.
 
   Definition toptim_old_nraenv_head {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv}
-    := run_nraenv_optims (("head",nraenv_default_head_optim_list,5)::nil).
+    := nraenv_optim_top (("head",nraenv_default_head_optim_list,5)::nil).
 
   Lemma toptim_old_nraenv_head_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
     p ⇒ₓ toptim_old_nraenv_head p.
   Proof.
     unfold toptim_old_nraenv_head.
-    apply run_nraenv_optims_correctness.
+    apply nraenv_optim_top_correctness.
   Qed.
   
   Definition toptim_old_nraenv_tail {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} 
-    := run_nraenv_optims (("tail",nraenv_default_head_optim_list,15)::nil).
+    := nraenv_optim_top (("tail",nraenv_default_head_optim_list,15)::nil).
 
   Lemma toptim_old_nraenv_tail_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
     p ⇒ₓ toptim_old_nraenv_tail p.
   Proof.
     unfold toptim_old_nraenv_tail.
-    apply run_nraenv_optims_correctness.
+    apply nraenv_optim_top_correctness.
   Qed.
 
   Definition toptim_old_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} :=

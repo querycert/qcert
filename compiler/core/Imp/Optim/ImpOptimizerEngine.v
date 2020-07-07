@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-(* This includes some rewrites/simplification rules for NNRSimp *)
+(* This is an optimizer for Imp{A} *)
 
 Require Import String.
 Require Import List.

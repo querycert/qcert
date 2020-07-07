@@ -105,7 +105,9 @@
 
 %token EQUAL NEQUAL
 %token LT GT LTEQ GTEQ
+%token LTDOT GTDOT LTEQDOT GTEQDOT
 %token PLUS STAR MINUS
+%token PLUSDOT STARDOT MINUSDOT
 %token DOT ARROW COMMA SEMI COLON
 %token LPAREN RPAREN
 %token EOF
@@ -116,9 +118,9 @@
 %right COMMA
 %right AND OR
 %right EQUAL NEQUAL
-%right LT GT LTEQ GTEQ
-%right PLUS MINUS
-%right STAR
+%right LT GT LTEQ GTEQ LTDOT GTDOT LTEQDOT GTEQDOT
+%right PLUS MINUS PLUSDOT MINUSDOT
+%right STAR STARDOT
 %left DOT ARROW
 
 %start <Core.EnhancedCompiler.QOQL.program> main
@@ -197,12 +199,26 @@ expr:
     { QOQL.ounop QOps.Unary.opneg (QOQL.obinop QOps.Binary.ople e1 e2) }
 | e1 = expr GTEQ e2 = expr
     { QOQL.ounop QOps.Unary.opneg (QOQL.obinop QOps.Binary.oplt e1 e2) }
+| e1 = expr LTDOT e2 = expr
+    { QOQL.obinop QOps.Binary.FloatArith.opfloatlt e1 e2 }
+| e1 = expr LTEQDOT e2 = expr
+    { QOQL.obinop QOps.Binary.FloatArith.opfloatle e1 e2 }
+| e1 = expr GTDOT e2 = expr
+    { QOQL.ounop QOps.Unary.opneg (QOQL.obinop QOps.Binary.FloatArith.opfloatle e1 e2) }
+| e1 = expr GTEQDOT e2 = expr
+    { QOQL.ounop QOps.Unary.opneg (QOQL.obinop QOps.Binary.FloatArith.opfloatlt e1 e2) }
 | e1 = expr MINUS e2 = expr
     { QOQL.obinop QOps.Binary.ZArith.opminus e1 e2 }
 | e1 = expr PLUS e2 = expr
     { QOQL.obinop QOps.Binary.ZArith.opplus e1 e2 }
 | e1 = expr STAR e2 = expr
     { QOQL.obinop QOps.Binary.ZArith.opmult e1 e2 }
+| e1 = expr MINUSDOT e2 = expr
+    { QOQL.obinop QOps.Binary.FloatArith.opfloatminus e1 e2 }
+| e1 = expr PLUSDOT e2 = expr
+    { QOQL.obinop QOps.Binary.FloatArith.opfloatplus e1 e2 }
+| e1 = expr STARDOT e2 = expr
+    { QOQL.obinop QOps.Binary.FloatArith.opfloatmult e1 e2 }
 | e1 = expr AND e2 = expr
     { QOQL.obinop QOps.Binary.opand e1 e2 }
 | e1 = expr OR e2 = expr

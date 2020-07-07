@@ -173,6 +173,7 @@ Section CompCorrectness.
   Definition driver_correct_imp_ejson (dv: imp_ejson_driver) :=
     match dv with
     | Dv_imp_ejson_stop => True
+    | Dv_imp_ejson_optim dv => False
     | Dv_imp_ejson_to_js_ast _ dv => False /\ driver_correct_js_ast dv
     end.
 
@@ -474,6 +475,7 @@ Section CompCorrectness.
       revert q H0.
       destruct dv; simpl in *; intuition; subst; eauto.
       destruct i; simpl in *; try contradiction.
+      elim H; intros; [rewrite <- H2; auto|contradiction].
       elim H1; intros; contradiction.
     Qed.
 
@@ -497,6 +499,7 @@ Section CompCorrectness.
         revert q H0.
         induction i; simpl in *; intuition; subst; eauto.
         destruct i; simpl in *; try contradiction.
+        elim H; intros; [rewrite <- H2; auto|contradiction].
         elim H1; intros; try contradiction.
     Qed.
 
@@ -1344,10 +1347,11 @@ Section CompCorrectness.
         rewrite <- H0.
         reflexivity.
       - destruct H0; [ rewrite <- H0; reflexivity | ].
-        simpl in H0. intuition.
-        + rewrite <- H1.
-          apply imp_data_to_imp_ejson_preserves_eval.
-        + destruct i; simpl in *; try contradiction; intuition.
+        simpl in H0.
+        intuition.
+        destruct i; simpl in *; try contradiction; intuition.
+        rewrite <- H.
+        apply imp_data_to_imp_ejson_preserves_eval.
     Qed.
 
     Lemma correct_driver_preserves_eval_nnrs_imp:
@@ -1362,8 +1366,8 @@ Section CompCorrectness.
       apply (query_preserves_eval_trans (Q_nnrs_imp q) (Q_imp_data (nnrs_imp_to_imp_data s q))); intuition.
       apply (nnrs_imp_to_imp_data_preserves_eval).
       destruct i; simpl in *; intuition; subst.
-      - apply (imp_data_to_imp_ejson_preserves_eval).
-      - destruct i; simpl in *; intuition; subst.
+      destruct i; simpl in *; intuition; subst.
+      apply (imp_data_to_imp_ejson_preserves_eval).
     Qed.
 
     Lemma correct_driver_preserves_eval_nnrs:

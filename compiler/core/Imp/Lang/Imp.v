@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-(** Imp is a small imperative language *)
+(** Imp is a simple imperative intermediate language. *)
 
 Require Import String.
 Require Import List.

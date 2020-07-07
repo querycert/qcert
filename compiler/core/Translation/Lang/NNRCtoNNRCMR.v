@@ -592,6 +592,52 @@ Section NNRCtoNNRCMR.
         assumption.
   Qed.
 
+  Lemma remove_one_In_neq :
+    forall (A : Type) (eqdec : EquivDec.EqDec A eq)  (l1  : list A) a x,
+      a <> x -> In x l1 -> In x (remove_one a l1).
+  Proof.
+    induction l1 as [|b l1];intuition.
+    destruct H0.
+    - subst;simpl.
+      destruct (equiv_dec a x);[congruence| ].
+      left;apply eq_refl.
+    - simpl.
+      destruct (equiv_dec a b);intuition.
+  Qed.
+    
+  Lemma bminus_In_alt :
+    forall (A : Type) (eqdec : EquivDec.EqDec A eq) x (l1 l2 : list A),
+      List.In x (bminus l1 l2) -> List.In x l2.
+  Proof.
+    intros A eqdec x.
+    induction l1 as [|a1 l1];intros l.
+    - exact (fun x => x) .
+    - intros H1;assert (H2 := H1).
+      simpl in H1;apply remove_one_In in H1.
+      apply (IHl1 _ H1).
+  Qed.
+
+  Lemma bminus_In_alt_neq :
+    forall (A : Type) (eqdec : EquivDec.EqDec A eq) x (l1 l2 : list A),
+      ~ In x l1 ->
+      List.In x (bminus l1 l2) <-> List.In x l2.
+  Proof.
+    intros A eqdec x.
+    induction l1;intros l2 Hn;[intuition| ].
+    simpl in Hn.
+    split.
+    - intros H1;assert (H2 := H1).
+      intuition.
+      apply (IHl1 _ H0).
+      simpl in H1;apply remove_one_In in H1.
+      apply H1.
+    - intuition.
+      apply (IHl1 _ H1).
+      revert  H0 H.
+      intros.
+      apply (remove_one_In_neq _ _  _ _ _ H0 H).
+  Qed.
+
   Lemma unpack_closure_env_free_vars (closure_env_name: var) (free_vars_loc: list (var * dlocalization)) (k: nnrc) :
     forall x,
       let free_vars := List.map fst free_vars_loc in
@@ -600,143 +646,56 @@ Section NNRCtoNNRCMR.
   Proof.
     Opaque fresh_var.
     intros x.
-    induction free_vars.
-    - Case "free_vars = nil"%string.
+    cbv zeta.
+    induction free_vars_loc.
+    - Case "free_vars_loc = nil"%string.
       simpl.
       right.
       apply bdistinct_same_elemts.
-      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
-      (* assumption. *)
-    - Case "free_vars <> nil"%string.
+      assumption.
+    - Case "free_vars_loc <> nil"%string.
       intros Hx.
-      simpl in Hx.
-      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
-      (* destruct Hx; subst; simpl; [intuition | ]. *)
-      (* destruct (string_eqdec *)
-      (*             (fresh_var "unpack$" (closure_env_name :: nil)) *)
-      (*             (fresh_var "unpack$" (closure_env_name :: nil))); [ | congruence]. *)
-      (* rewrite in_app_iff in H. *)
-      (* destruct H; apply remove_inv in H; destruct H. *)
-      (* + rewrite in_app_iff in H. *)
-      (*   simpl in H. *)
-      (*   destruct H; [ | intuition ]. *)
-      (*   apply remove_inv in H. *)
-      (*   destruct H. *)
-      (*   dest_eqdec; simpl in H; intuition. *)
-      (* + specialize (IHfree_vars H). *)
-      (*   simpl in IHfree_vars. *)
-      (*   intuition. *)
-      (*   right. *)
-      (*   rewrite <- mult_pos_equiv_in in H1 |- *. *)
-      (*   rewrite bminus_mult in H1 |- *. *)
-      (*   rewrite mult_on_remove; trivial. *)
-  Admitted.
-
-  Lemma nnrcmr_of_nnrc_with_free_vars_wf (n: nnrc) (vars_loc: list (var * dlocalization)) (output: var):
-    (forall x, In x (nnrc_free_vars n) -> In x (List.map fst vars_loc)) ->
-    nnrcmr_well_formed (nnrcmr_of_nnrc_with_free_vars n vars_loc output).
-  Proof.
-    Opaque fresh_var.
-    unfold nnrcmr_well_formed.
-    intros Hvars_loc mr.
-    unfold nnrcmr_of_nnrc_with_free_vars.
-    intros Hmr.
-    admit. (* XXXXXXXXXX TODO XXXXXXXXXX *)
-    (* destruct (List.fold_right *)
-    (*           (fun (x : var) (oacc : option (list (var * dlocalization))) => *)
-    (*            olift *)
-    (*              (fun loc : dlocalization => *)
-    (*               lift *)
-    (*                 (fun acc : list (var * dlocalization) => (x, loc) :: acc) *)
-    (*                 oacc) (lookup equiv_dec vars_loc x)) *)
-    (*           (Some nil) (bdistinct (nnrc_free_vars n))); *)
-    (*   [ | apply in_nil in Hmr; *)
-    (*       contradiction ]. *)
-    (* simpl in Hmr. *)
-    (* apply in_app_or in Hmr. *)
-    (* inversion Hmr; clear Hmr. *)
-    (* - Case "pack_closure_env"%string. *)
-    (*   admit. (* XXXXXXXXX TODO XXXXXXXXXX *) *)
-    (*   (* generalize (pack_closure_env_wf inputdb (bdistinct free_vars_of_n) (really_fresh_in output (output :: avoid) n) mr). *) *)
-    (*   (* auto. *) *)
-    (* - Case "final_mr"%string. *)
-    (*   simpl in H. *)
-    (*   inversion H; try contradiction; clear H. *)
-    (*   rewrite <- H0; clear H0. *)
-    (*   unfold mr_well_formed. *)
-    (*   simpl. *)
-    (*   repeat split. *)
-    (*   + apply coll_function_no_free_vars. *)
-    (*   + intros f Hf. *)
-    (*     simpl in *. *)
-    (*     apply unpack_closure_env_free_vars in Hf; *)
-    (*       try solve [ apply bdistinct_same_elemts ]. *)
-    (*     rewrite (Hvars_loc f) in Hf. *)
-
-    (*     rewrite Hfree_vars_of_n in Hf. *)
-    (*     assert (bminus (bdistinct (nnrc_free_vars n)) (bdistinct (nnrc_free_vars n)) = nil) as Hbminus; *)
-    (*       try solve [ apply bminus_self ]. *)
-    (*     rewrite Hbminus in Hf; clear Hbminus. *)
-    (*     apply in_inv in Hf. *)
-    (*     destruct Hf; try contradiction. *)
-    (*     rewrite <- H. *)
-    (*     reflexivity. *)
-  Admitted.
+      destruct a,d;cbn in Hx.
+      +
+      destruct (string_eqdec
+                  (fresh_var "unpackscalar$" (closure_env_name :: nil))
+                  (fresh_var "unpackscalar$" (closure_env_name :: nil))); [ | congruence].
+        simpl in Hx.
+         rewrite in_app_iff in Hx.
+         destruct Hx;[left;apply H| ].
+         destruct H.
+         -- destruct (string_eqdec v v); [ | congruence].
+            inversion H.
+         -- simpl in *.
+            apply remove_inv in H.
+            destruct H as [H H2].
+            apply IHfree_vars_loc in H.
+            simpl in H.
+            destruct H;[left;apply H| ].
+            right.
+            rewrite remove_bminus_comm.
+            apply remove_one_In_neq;[|apply H].
+            congruence.
+      +   destruct (string_eqdec
+                  (fresh_var "unpackdistributed$" (closure_env_name :: nil))
+                  (fresh_var "unpackdistributed$" (closure_env_name :: nil))); [ | congruence].
+          simpl in Hx.
+          destruct Hx;[left;apply H| ].
+          apply remove_inv in H.
+          destruct H as [H H2].
+            apply IHfree_vars_loc in H.
+            simpl in H.
+            destruct H;[left;apply H| ].
+            right.
+            simpl.
+            rewrite remove_bminus_comm.
+            apply remove_one_In_neq;[|apply H].
+            congruence.
+  Qed.
+  
 
   (* Semantics correctness *)
 
-  (*
-  Lemma nnrcmr_of_nnrc_with_free_vars_correct_help
-        h env n free_vars_of_n init output avoid:
-    free_vars_of_n <> nil ->
-    In init avoid ->
-    free_vars_of_n = bdistinct (nnrc_free_vars n) ->
-    incl (domain env) avoid ->
-    incl free_vars_of_n (domain env) ->
-    lookup equiv_dec env output = None ->
-    nnrc_core_eval h env n =
-    get_result (nnrcmr_eval h (load_init_env init env) (nnrcmr_of_nnrc_with_free_vars n free_vars_of_n output avoid)).
-  Proof.
-    revert n init output avoid.
-    induction free_vars_of_n; simpl
-    ; intros n init output avoid freevars_nempty Hinit_avoid Hfree_vars_of_n Havoid Hfv Houtput
-    ; unfold nnrcmr_of_nnrc_with_free_vars.
-    - congruence.
-    - destruct free_vars_of_n.
-      unfold nnrcmr_eval. simpl.
-      assert (ainenv:In a (domain env))
-        by (specialize (Hfv a); simpl in Hfv; intuition).
-      rewrite <- env_domain_domain in ainenv.
-      apply lookup_in_domain in ainenv.
-      destruct ainenv as [ad adin].
-      rewrite (load_env_lookup _ _ _ _ adin).
-      simpl.
-      unfold mr_eval. simpl.
-    - simpl. unfold get_result.
-      unfold nnrcmr_eval. simpl.
-      assert (eqq:env_lookup (load_env init env) (really_fresh_in (output :: avoid) n) = None).
-      admit.
-      rewrite eqq.
-
-  Qed.
-      Admitted.
- *)
-
-  Lemma nnrcmr_of_nnrc_with_free_vars_correct h nnrc_env mr_env n initunit vars_loc output:
-    load_init_env_success initunit vars_loc nnrc_env mr_env ->
-    (forall x, In x (domain nnrc_env) -> In x (domain vars_loc)) ->
-    (forall x, In x (nnrc_free_vars n) -> exists d, lookup equiv_dec mr_env x = Some d) ->
-    lookup equiv_dec mr_env output = None ->
-    nnrc_core_eval h empty_cenv nnrc_env n =
-    nnrcmr_eval h mr_env (nnrcmr_of_nnrc_with_free_vars n vars_loc output).
-  Proof.
-    (* intros Hfree_vars_of_n Havoid Hfv Houtput. *)
-    (* unfold nnrcmr_of_nnrc_with_free_vars. *)
-    (* unfold nnrcmr_eval. *)
-    (* rewrite fold_left_app. *)
-    (* simpl. *)
-    admit. (* XXXXXXXXXXXXXXX *)
-  Admitted.
 
 
   (* ------------ *
@@ -798,13 +757,6 @@ Section NNRCtoNNRCMR.
        ((output::nil, (NNRCVar output)), (output, Vlocal)::nil),
      vars_loc).
 
-  Lemma nnrcmr_of_nnrc_wf (n: nnrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var):
-    nnrcmr_well_formed (fst (nnrcmr_of_nnrc n initunit vars_loc output)).
-  Proof.
-    unfold nnrcmr_of_nnrc.
-    case_eq (bdistinct (nnrc_free_vars n)).
-    admit. (* XXXX TODO XXXX *)
-  Admitted.
 
   (* Java equivalent: NnrcToNrcmr.mr_chain_distributed_of_nnrc *)
   Definition mr_chain_distributed_of_nnrc (n: nnrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var): list mr * list (var * dlocalization) :=
@@ -958,34 +910,6 @@ Section NNRCtoNNRCMR.
       simpl; omega.
   Defined.
 
-  Lemma nnrc_to_nnrcmr_chain_aux_causally_consistent (n: nnrc) (initunit: var) (vars_loc: list (var * dlocalization)) :
-    shadow_free n = true ->
-    let '(_, mr_chain, _) := nnrc_to_nnrcmr_chain_ns_aux n initunit vars_loc in
-    mr_chain_causally_consistent mr_chain = true.
-  Proof.
-    nnrc_cases (induction n) Case; simpl;
-    try solve [ unfold nnrcmr_causally_consistent; reflexivity ].
-    - Case "NNRCBinop"%string.
-      intros Hshadow_free.
-      case_eq (nnrc_to_nnrcmr_chain_ns_aux n1 initunit vars_loc).
-      intros tmp vars_loc1.
-      destruct tmp as (n1', mr_list1).
-      intros Hn1.
-      case_eq (nnrc_to_nnrcmr_chain_ns_aux n2 initunit vars_loc1).
-      intros tmp vars_loc2.
-      destruct tmp as (n2', mr_list2).
-      intros Hn2.
-      unfold nnrcmr_causally_consistent.
-      admit. (* XXXXXX TODO XXXXXXX *)
-    - Case "NNRCUnop"%string.
-      admit. (* XXXXXX TODO XXXXXXX *)
-    - Case "NNRCLet"%string.
-      admit. (* XXXXXX TODO XXXXXXX *)
-    - Case "NNRCFor"%string.
-      admit. (* XXXXXX TODO XXXXXXX *)
-    - Case "NNRCIf"%string.
-      admit. (* XXXXXX TODO XXXXXXX *)
-  Admitted.
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_mr_chain_ns *)
   Definition nnrc_to_mr_chain_ns (n: nnrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var) : list mr :=
@@ -1007,21 +931,6 @@ Section NNRCtoNNRCMR.
     let vars_loc := inputs_loc ++ List.map (fun x => (x, Vlocal)) (nnrc_bound_vars n_ns) in
     nnrc_to_nnrcmr_chain_ns n_ns initunit inputs_loc vars_loc.
 
-  (* Theorem nnrc_to_nnrcmr_chain_correct h env n initdb initunit output: *)
-  (*   (forall x d, *)
-  (*      In x (nnrc_free_vars n) -> *)
-  (*      lookup equiv_dec env x = Some (dcoll (d::nil))) -> *)
-  (*   forall d, *)
-  (*     lookup equiv_dec env output = Some (dcoll (d::nil)) -> *)
-  (*     lookup equiv_dec env output = None -> *)
-  (*     nnrc_core_eval h env n = *)
-  (*     get_result (nnrcmr_eval h env (nnrc_to_nnrcmr_chain n initdb initunit output (output::(domain env)))). *)
-  (* Proof. *)
-  (*   intros Hfree_vars_of_n Havoid Hfv Houtput. *)
-  (*   unfold nnrcmr_of_nnrc_with_free_vars. *)
-  (*   unfold nnrcmr_eval. *)
-  (*   admit. (* XXXXXXXXXXXXXXX *) *)
-  (* Qed. *)
 
 
   Definition nnrc_to_nnrcmr_no_chain (n: nnrc) (inputs_loc: list (var * dlocalization)) : nnrcmr :=
@@ -1030,28 +939,6 @@ Section NNRCtoNNRCMR.
       nil
       ((List.map fst inputs_loc, n), inputs_loc).
 
-  Lemma load_init_env_build_nnrc_env_id env initunit mr_env vars_loc :
-    load_init_env initunit vars_loc env = Some mr_env ->
-    build_nnrc_env mr_env (map fst vars_loc) vars_loc = Some ((initunit, dunit) :: env).
-  Proof.
-    intros.
-    revert env mr_env H.
-    induction vars_loc; simpl in *; intros.
-  Admitted.
-
-  Theorem nnrc_to_nnrcmr_no_chain_correct h env initunit mr_env (n:nnrc) (inputs_loc: list (var * dlocalization)) :
-      load_init_env initunit inputs_loc env = Some mr_env ->
-      nnrc_core_eval h empty_cenv env n = nnrcmr_eval h mr_env (nnrc_to_nnrcmr_no_chain n inputs_loc).
-  Proof.
-    intros.
-    unfold nnrc_to_nnrcmr_no_chain; simpl.
-    unfold nnrcmr_eval; simpl.
-    unfold mr_last_eval; simpl.
-    rewrite (load_init_env_build_nnrc_env_id env initunit mr_env inputs_loc).
-    simpl.
-    admit.
-    assumption.
-  Admitted.
 
   Section Top.
     Fixpoint nnrc_deconst (e:nnrc) : nnrc 

@@ -127,13 +127,13 @@ public class UnaryOperators {
     private static long sum_helper(JsonArray ec) {
         long acc = 0;
         for (JsonElement elem : ec) {
-            acc += elem.getAsLong();
+            acc += ((JsonObject) elem).get("$nat").getAsLong();
         }
         return acc;
     }
 
     public static JsonElement sum(JsonElement e) {
-        return new JsonPrimitive(sum_helper(e.getAsJsonArray()));
+        return rec("$nat",new JsonPrimitive(sum_helper(e.getAsJsonArray())));
     }
 	
     private static void tostring(StringBuilder sb, JsonPrimitive jp) {
@@ -297,7 +297,7 @@ public class UnaryOperators {
         if(ec.size() == 0) {
             return new JsonPrimitive(0L);
         } else {
-            return new JsonPrimitive(sum_helper(ec) / ec.size());
+            return rec("$nat",new JsonPrimitive(sum_helper(ec) / ec.size()));
         }
     }
     public static JsonElement list_min(JsonElement e) {

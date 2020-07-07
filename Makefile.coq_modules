@@ -120,6 +120,7 @@ MODULES = \
 	Translation/Model/DataToEJson \
 	Translation/Model/ForeignEJsonToJSON \
 	Translation/Model/EJsonToJSON \
+	Translation/Model/EJsonToEJsonMut \
 	Translation/Model/ForeignTypeToJSON \
 	Translation/Model/TypeToJSON \
 	Translation/Model/DTypeToJSON \
@@ -256,10 +257,11 @@ MODULES = \
 	Imp/Lang/ImpEJsonSize \
 	Imp/Lang/ImpEJsonVars \
 	Imp/Lang/ImpEJsonEval \
-	Imp/Lang/ImpEJsonRewrite \
 	Imp/ImpRuntime \
 	Imp/ImpSystem \
 	Imp/Optim/ImpOptimizerEngine \
+	Imp/Optim/ImpEJsonRewrite \
+	Imp/Optim/ImpEJsonOptimizer \
 	Imp/ImpOptim \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \

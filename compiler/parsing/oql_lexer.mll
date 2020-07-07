@@ -66,6 +66,9 @@ rule token sbuff = parse
 | "+" { PLUS }
 | "*" { STAR }
 | "-" { MINUS }
+| "+." { PLUSDOT }
+| "*." { STARDOT }
+| "-." { MINUSDOT }
 | "," { COMMA }
 | ";" { SEMI }
 | "." { DOT }
@@ -73,6 +76,10 @@ rule token sbuff = parse
 | "(" { LPAREN }
 | ")" { RPAREN }
 | ":" { COLON }
+| "<." { LTDOT }
+| ">." { GTDOT }
+| "<=." { LTEQDOT }
+| ">=." { GTEQDOT }
 | [' ' '\t']
     { token sbuff lexbuf }
 | newline

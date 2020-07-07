@@ -229,6 +229,49 @@ Section TNRAEnvRewrite.
     destruct (string_eqdec s s); congruence.
   Qed.
 
+  (* optimizations for Either *)
+
+  Lemma teither_app_over_dleft_arrow (q₁ q₂: nraenv_core) d :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvConst (dleft d)) ⇒ q₁ ◯ (cNRAEnvConst d).
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_dleft q₁ q₂ d)).
+    intros.
+    nraenv_core_inferer.
+    inversion H0.
+    rtype_equalizer.
+    subst.
+    nraenv_core_inferer.
+  Qed.
+
+  Lemma teither_app_over_dright_arrow q₁ q₂ d :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvConst (dright d)) ⇒ q₂ ◯ (cNRAEnvConst d).
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_dright q₁ q₂ d)).
+    intros.
+    nraenv_core_inferer.
+    inversion H0.
+    rtype_equalizer.
+    subst.
+    nraenv_core_inferer.
+  Qed.
+
+
+  Lemma teither_app_over_aleft_arrow (q₁ q₂ q: nraenv_core) :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvUnop OpLeft q) ⇒ q₁ ◯ q.
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_aleft q₁ q₂ q)).
+    intros.
+    nraenv_core_inferer.
+  Qed.
+
+  Lemma teither_app_over_aright_arrow q₁ q₂ q :
+    (cNRAEnvEither q₁ q₂) ◯ (cNRAEnvUnop OpRight q) ⇒ q₂ ◯ q.
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (either_app_over_aright q₁ q₂ q)).
+    intros.
+    nraenv_core_inferer.
+  Qed.
+
   (* Note that concat favors the right side *)
   Lemma tdot_over_concat_eq_r_arrow a (q₁ q₂:nraenv_core) :
     (q₁ ⊕ ‵[| (a, q₂) |])·a ⇒ q₂.
@@ -299,6 +342,7 @@ Section TNRAEnvRewrite.
       rewrite assoc_lookupr_drec_sort.
       trivial.
   Qed.
+
 
   (* [ a₁ : q₁; a₂ : q₂ ].a₂ ⇒ q₂ *)
 
@@ -1857,7 +1901,21 @@ Section TNRAEnvRewrite.
     apply (rewrites_typed_with_untyped _ _ (envmap_singleton q₁ q₂)).
     intros. nraenv_core_inferer.
   Qed.
-  
+
+  (* nth 0 { P } ) ⇒ₓ left P *)
+
+  Lemma tenvnth0_bag_arrow q :
+    cNRAEnvBinop OpBagNth (‵{| q |}) ‵ (dnat 0) ⇒
+    cNRAEnvUnop OpLeft q.
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (envnth0_bag q)).
+    intros. nraenv_core_inferer.
+    econstructor; eauto.
+    inversion H3.
+    rtype_equalizer; subst.
+    constructor.
+  Qed.
+
   (* χ⟨ q₂ ⟩(σ⟨ q₁ ⟩({ q })) ⇒ χ⟨ q₂ ◯ q ⟩(σ⟨ q₁ ◯ q ⟩({ ID })) *)
 
   Lemma tmap_full_over_select_arrow q q₁ q₂:
@@ -3170,6 +3228,7 @@ Section TNRAEnvRewrite.
       trivial.
   Qed.
     
+
 End TNRAEnvRewrite.
 
 (* begin hide *)
@@ -3210,6 +3269,14 @@ Hint Rewrite @tenvmap_into_id_arrow : tnraenv_core_optim.
 
 Hint Rewrite @tenvmap_map_compose_arrow : tnraenv_core_optim.
 Hint Rewrite @tenvmap_singleton_arrow : tnraenv_core_optim.
+
+(*
+       -- Those remove a nth
+       tenvnth0_bag : nth 0 { P } ) ⇒ₓ left P
+*)
+
+Hint Rewrite @tenvnth0_bag_arrow : tnraenv_core_optim.
+
 
 (*
        -- Those remove over flatten

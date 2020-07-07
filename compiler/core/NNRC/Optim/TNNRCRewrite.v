@@ -61,6 +61,41 @@ Section TNNRCRewrite.
       trivial.
   Qed.
 
+  (* nth [ e ] 0 ≡ left e *)
+
+  Lemma tnth0_bag (e:nnrc) :
+    tnnrc_rewrites_to (NNRCBinop OpBagNth (NNRCUnop OpBag e) (NNRCConst (dnat 0)))
+                      (NNRCUnop OpLeft e).
+  Proof.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nth0_bag.
+    - intros.
+      unfold nnrc_type, nnrc_eval in *.
+      simpl in *.
+      nnrc_core_inverter.
+      econstructor; [|eauto].
+      inversion H4.
+      rtype_equalizer; subst.
+      econstructor.
+  Qed.
+
+  (* nth [ ] 0 ≡ none *)
+
+  Lemma tnth0_nil :
+    tnnrc_rewrites_to (NNRCBinop OpBagNth (NNRCConst (dcoll nil)) (NNRCConst (dnat 0)))
+                      (NNRCConst dnone).
+  Proof.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nth0_nil.
+    - intros.
+      unfold nnrc_type, nnrc_eval in *.
+      simpl in *.
+      nnrc_core_inverter.
+      inversion H4.
+      rtype_equalizer; subst.
+      repeat econstructor.
+  Qed.
+    
   (* (e₁ ⊕ [ a : e₂ ]).a ≡ e₂ *)
 
   Lemma tnnrc_dot_of_concat_rec_eq_arrow a (e1 e2:nnrc) :
@@ -681,6 +716,36 @@ Section TNNRCRewrite.
       nnrc_inverter.
       repeat (econstructor; eauto 2).
     Qed.
+
+  Lemma tnnrcbinop_over_if_left_arrow op e1 e2 e3 e:
+    tnnrc_rewrites_to (NNRCBinop op (NNRCIf e1 e2 e3) e)
+                      (NNRCIf e1 (NNRCBinop op e2 e) (NNRCBinop op e3 e)).
+  Proof.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nnrcbinop_over_if_left.
+    - intros.
+      nnrc_inverter.
+      repeat (econstructor; eauto 2).
+  Qed.
+
+  Lemma tnnrcbinop_over_let_left_arrow op x e1 e2 e:
+    ~ In x (nnrc_free_vars e) ->
+    tnnrc_rewrites_to (NNRCBinop op (NNRCLet x e1 e2) e)
+                      (NNRCLet x e1 (NNRCBinop op e2 e)).
+  Proof.
+    intros.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nnrcbinop_over_let_left.
+      assumption.
+    - intros.
+      inversion H0; subst; clear H0.
+      inversion H7; subst; clear H7.
+      repeat (econstructor; eauto).
+      + generalize (@nnrc_type_remove_free_env _ τcenv nil x τ₁0 τenv e τ₂ H); intros nt.
+        simpl in nt.
+        rewrite nt.
+        trivial.
+  Qed.
 
   (* ♯flatten({ e1 ? { $t1 } : {} | $t1 ∈ { e2 } }) ≡ LET $t1 := e2 IN e1 ? { $t1 } : {} *)
 

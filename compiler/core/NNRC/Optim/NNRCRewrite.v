@@ -42,6 +42,7 @@ Section NNRCRewrite.
     apply nnrc_unshadow_eval.
   Qed.
 
+
   (* { a: e }.a ≡ e *)
 
   Lemma dot_of_rec a (e:nnrc) :
@@ -53,6 +54,31 @@ Section NNRCRewrite.
     destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e)); [|reflexivity]; simpl.
     unfold edot; simpl.
     destruct (string_eqdec a a); congruence.
+  Qed.
+
+  (* nth [ e ] 0 ≡ left e *)
+
+  Lemma nth0_bag (e:nnrc) :
+    nnrc_eq (NNRCBinop OpBagNth (NNRCUnop OpBag e) (NNRCConst (dnat 0)))
+            (NNRCUnop OpLeft e).
+  Proof.
+    unfold nnrc_eq; intros ? ? ? ? _.
+    unfold nnrc_eval.
+    simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e)); [|reflexivity]; simpl.
+    reflexivity.
+  Qed.
+
+  (* nth [ ] 0 ≡ none *)
+
+  Lemma nth0_nil :
+    nnrc_eq (NNRCBinop OpBagNth (NNRCConst (dcoll nil)) (NNRCConst (dnat 0)))
+            (NNRCConst dnone).
+  Proof.
+    unfold nnrc_eq; intros ? ? ? ? _.
+    unfold nnrc_eval.
+    simpl.
+    reflexivity.
   Qed.
 
   Lemma nnrc_merge_concat_to_concat s1 s2 p1 p2:
@@ -602,6 +628,36 @@ Section NNRCRewrite.
     unfold nnrc_eval; simpl.
     destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
     repeat match_destr.
+  Qed.
+
+  Lemma nnrcbinop_over_if_left op e1 e2 e3 e:
+    nnrc_eq (NNRCBinop op (NNRCIf e1 e2 e3) e)
+                (NNRCIf e1 (NNRCBinop op e2 e) (NNRCBinop op e3 e)).
+  Proof.
+    red; simpl; intros.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
+    repeat match_destr.
+  Qed.
+
+  Lemma nnrcbinop_over_let_left op x e1 e2 e:
+    ~ In x (nnrc_free_vars e) ->
+    nnrc_eq (NNRCBinop op (NNRCLet x e1 e2) e)
+                (NNRCLet x e1 (NNRCBinop op e2 e)).
+  Proof.
+    red; simpl; intros.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
+    assert (nnrc_core_eval h cenv ((x, d) :: env) (nnrc_to_nnrc_base e) =
+            nnrc_core_eval h cenv env (nnrc_to_nnrc_base e)) as Heq.
+    - generalize (@nnrc_core_eval_remove_free_env _ h cenv nil x d env (nnrc_to_nnrc_base e)); intros.
+      simpl in H2.
+      apply H2.
+      rewrite nnrc_to_nnrc_base_free_vars_same in H.
+      assumption.
+    - rewrite Heq; clear Heq.
+      repeat match_destr.
+      reflexivity.
   Qed.
 
   (* ♯flatten({ e1 ? { $t1 } : {} | $t1 ∈ { e2 } }) ≡ LET $t1 := e2 IN e1 ? { $t1 } : {} *)

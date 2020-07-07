@@ -190,6 +190,25 @@ Section NNRSimpEq.
       unfold Proper, respectful, imp_expr_eq; trivial.
     Qed.
 
+        Lemma match_eq_lemma :
+      forall A B  (l1: option  A) (l2:option  A) f (z:B),
+        l1 = l2 ->
+        match l1 with
+        | Some x => f x
+        | None => z
+        end
+        =
+        match l2 with
+        | Some x => f x
+        | None => z
+        end.
+    Proof.
+      do 3 intro.
+      intuition.
+      subst;apply eq_refl.
+    Qed.
+
+    
     Global Instance ImpExprOp_proper :
       Proper (eq ==> imp_expr_list_eq ==> imp_expr_eq) ImpExprOp.
     Proof.
@@ -197,8 +216,19 @@ Section NNRSimpEq.
       unfold imp_expr_eq; intros; subst.
       simpl.
       unfold olift; simpl.
-      admit.
-    Admitted.
+      apply match_eq_lemma.
+      rewrite 2 lift_map_map_fusion.
+      revert H0.
+      induction 1.
+      auto.
+      simpl.
+      rewrite H.
+      destruct imp_expr_eval;[|apply eq_refl].
+      unfold lift.
+      rewrite IHForall2.
+      apply eq_refl.
+    Qed.
+
 
     Global Instance ImpExprRuntimeCall_proper :
       Proper (eq ==> imp_expr_list_eq ==> imp_expr_eq) ImpExprRuntimeCall.
@@ -207,8 +237,18 @@ Section NNRSimpEq.
       unfold imp_expr_eq; intros; subst.
       simpl.
       unfold olift; simpl.
-      admit.
-    Admitted.
+      apply match_eq_lemma.
+      rewrite 2 lift_map_map_fusion.
+      revert H0.
+      induction 1.
+      auto.
+      simpl.
+      rewrite H.
+      destruct imp_expr_eval;[|apply eq_refl].
+      unfold lift.
+      rewrite IHForall2.
+      apply eq_refl.
+    Qed.
 
     Global Instance ImpStmtAssign :
       Proper (eq ==> imp_expr_eq ==> imp_stmt_eq) ImpStmtAssign.
@@ -216,7 +256,6 @@ Section NNRSimpEq.
       unfold Proper, respectful, imp_stmt_eq; intros; simpl.
       rewrite H0; subst; reflexivity.
     Qed.
-
    
     Global Instance ImpStmtIf :
       Proper (imp_expr_eq ==> imp_stmt_eq ==> imp_stmt_eq ==> imp_stmt_eq) ImpStmtIf.

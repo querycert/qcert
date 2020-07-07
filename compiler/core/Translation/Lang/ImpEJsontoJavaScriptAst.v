@@ -77,6 +77,14 @@ Section ImpEJsontoJavaScriptAst.
                (op: imp_ejson_runtime_op) (el: list expr) :=
       call_runtime (string_of_ejson_runtime_op op) el.
 
+    (* XXX For range *)
+    Definition mk_integer_plus_one
+               (e:expr) :=
+      mk_runtime_call EJsonRuntimeNatPlus [e;box_nat (expr_literal (literal_number (float_of_int 1)))].
+    Definition mk_integer_le
+               (e1 e2: expr) :=
+      mk_runtime_call EJsonRuntimeNatLe [e1;e2].
+
     Definition sortCriteria_to_js_ast (sc: string * SortDesc) :=
       let (lbl, c) := sc in
       match c with
@@ -112,7 +120,7 @@ Section ImpEJsontoJavaScriptAst.
       | EJsonOpStrictEqual => mk_binary_op binary_op_strict_equal el
       | EJsonOpStrictDisequal => mk_binary_op binary_op_strict_disequal el
       | EJsonOpArray => expr_array (List.map Some el)
-      | EJsonOpArrayLength => mk_unary_expr (fun e => box_nat (expr_member e  "length")) el
+      | EJsonOpArrayLength => mk_unary_expr (fun e => expr_member e  "length") el
       | EJsonOpArrayPush => mk_binary_expr array_push el
       | EJsonOpArrayAccess => mk_binary_expr array_get el
       | EJsonOpObject atts => mk_object atts el
@@ -120,14 +128,6 @@ Section ImpEJsontoJavaScriptAst.
       | EJsonOpHasOwnProperty att => mk_binary_expr object_hasOwnProperty (el++[expr_literal (literal_string att)])
       | EJsonOpMathMin => expr_call (expr_member (expr_identifier "Math") "min") el
       | EJsonOpMathMax => expr_call (expr_member (expr_identifier "Math") "max") el
-      | EJsonOpMathMinApply =>
-        expr_call
-          (expr_member (expr_member (expr_identifier "Math") "min") "apply")
-          (expr_identifier "Math" :: el)
-      | EJsonOpMathMaxApply =>
-        expr_call
-          (expr_member (expr_member (expr_identifier "Math") "max") "apply")
-          (expr_identifier "Math" :: el)
       | EJsonOpMathPow => expr_call (expr_member (expr_identifier "Math") "pow") el
       | EJsonOpMathExp => expr_call (expr_member (expr_identifier "Math") "exp") el
       | EJsonOpMathAbs => expr_call (expr_member (expr_identifier "Math") "abs") el
@@ -144,29 +144,15 @@ Section ImpEJsontoJavaScriptAst.
   (** Translation *)
   Section Translation.
 
-    Fixpoint ejson_to_js_ast (json: ejson) : expr :=
+    Definition cejson_to_js_ast (json: cejson) : expr :=
       match json with
-      | ejnull => expr_literal literal_null
-      | ejnumber n => expr_literal (literal_number n)
-      | ejbigint n => box_nat (expr_literal (literal_number (float_of_int n)))
-      (* XXX Could be replaced by JavaScript BigInt some fix to JsAst XXX *)
-      | ejbool b => expr_literal (literal_bool b)
-      | ejstring s => expr_literal (literal_string s)
-      | ejarray a =>
-        let a :=
-            List.map
-              (fun v => Some (ejson_to_js_ast v))
-              a
-        in
-        expr_array a
-      | ejobject o =>
-        expr_object
-          (List.map
-             (fun (prop: (string * EJson.ejson)) =>
-                let (x, v) := prop in
-                (propname_identifier x, propbody_val (ejson_to_js_ast v)))
-             o)
-      | ejforeign fd =>
+      | cejnull => expr_literal literal_null
+      | cejnumber n => expr_literal (literal_number n)
+      | cejbigint n => box_nat (expr_literal (literal_number (float_of_int n)))
+      (* XXX Could be replaced by JavaScript BigInt with some fix to JsAst XXX *)
+      | cejbool b => expr_literal (literal_bool b)
+      | cejstring s => expr_literal (literal_string s)
+      | cejforeign fd =>
         foreign_ejson_to_ajavascript_expr fd
       end.
 
@@ -174,7 +160,7 @@ Section ImpEJsontoJavaScriptAst.
       match exp with
       | ImpExprError v => mk_expr_error
       | ImpExprVar v => expr_identifier v
-      | ImpExprConst j => ejson_to_js_ast j
+      | ImpExprConst j => cejson_to_js_ast j
       | ImpExprOp op el => imp_ejson_op_to_js_ast op (map imp_ejson_expr_to_js_ast el)
       | ImpExprRuntimeCall rop el => mk_runtime_call rop (map imp_ejson_expr_to_js_ast el)
       end.
@@ -193,15 +179,24 @@ Section ImpEJsontoJavaScriptAst.
       | ImpStmtAssign x e =>
         stat_expr (expr_assign (expr_identifier x) None (imp_ejson_expr_to_js_ast e))
       | ImpStmtFor x e s =>
-        stat_for_in_let nil x None (imp_ejson_expr_to_js_ast e)
-                        (imp_ejson_stmt_to_js_ast s)
+        let c := imp_ejson_expr_to_js_ast e in
+        let prog :=
+            prog_intro strictness_true [ element_stat (imp_ejson_stmt_to_js_ast s)]
+        in
+        let f :=
+            expr_function None [x]
+                          (funcbody_intro prog (prog_to_string prog))
+        in
+        call_runtime "iterColl" [c; f]
+        (* stat_for_in_let nil x None (imp_ejson_expr_to_js_ast e) *)
+        (*                 (imp_ejson_stmt_to_js_ast s) *)
       | ImpStmtForRange x e1 e2 s =>
         stat_for_let
           nil
-          [ (x, Some (unbox_nat (imp_ejson_expr_to_js_ast e1))) ]
+          [ (x, Some (imp_ejson_expr_to_js_ast e1)) ]
           (* XXX Use binary_op_le, consistent with semantic of 'for i1 to i2 do ... done' loop *)
-          (Some (expr_binary_op (expr_identifier x) binary_op_le (unbox_nat (imp_ejson_expr_to_js_ast e2))))
-          (Some (expr_unary_op unary_op_post_incr (expr_identifier x)))
+          (Some (mk_integer_le (expr_identifier x) (imp_ejson_expr_to_js_ast e2)))
+          (Some (expr_assign (expr_identifier x) None (mk_integer_plus_one (expr_identifier x))))
           (imp_ejson_stmt_to_js_ast s)
       | ImpStmtIf e s1 s2 =>
         stat_if

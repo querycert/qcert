@@ -208,6 +208,14 @@ Section EJson.
       rewrite IHsl; reflexivity.
     Qed.
 
+    Lemma of_string_list_map_ejstring_f {A} (f:A -> string) (sl:list A) :
+      of_string_list (map (fun x => (ejstring (f x))) sl) = Some (map f sl).
+    Proof.
+      induction sl; try reflexivity; simpl.
+      unfold of_string_list in *; simpl.
+      rewrite IHsl; reflexivity.
+    Qed.
+
     Definition ejson_brands (d:list ejson) : option (list string) := of_string_list d.
 
     Lemma ejson_brands_map_ejstring b : ejson_brands (map ejstring b) = Some b.
@@ -290,4 +298,26 @@ Section EJson.
     Definition pd_jbindings := list (string * option ejson).
   End Env.
 
+  Section CEJson.
+    Inductive cejson : Set :=
+    | cejnull : cejson
+    | cejnumber : float -> cejson
+    | cejbigint : Z -> cejson
+    | cejbool : bool -> cejson
+    | cejstring : string -> cejson
+    | cejforeign : foreign_ejson_model -> cejson
+    .
+
+    Definition cejsonStringify (quotel:string) (j : cejson) : string
+      := match j with
+         | cejnull => "null"
+         | cejnumber n => toString n
+         | cejbigint n => toString n
+         | cejbool b => toString b
+         | cejstring s => stringToStringQuote quotel s
+         | cejforeign fd => toString fd
+         end.
+
+  End CEJson.
 End EJson.
+

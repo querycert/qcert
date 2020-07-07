@@ -69,7 +69,7 @@ endif
 ## OQL
 OQLPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12 13 14
 OQLWORLDNUM=1 2
-OQLSTRINGNUM=1 2 3
+OQLSTRINGNUM=0 1 2 3
 OQLEMPLOYEESNUM=1 2
 OQLTARGETS=oql nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_data imp_ejson # dnnrc_typed
 
@@ -85,6 +85,7 @@ ifneq ($(JAVASCRIPT),)
 	@$(MAKE) oql-string-tests-js
 	@$(MAKE) oql-world-tests-js
 	@$(MAKE) oql-persons-tests-js
+	@$(MAKE) oql-persons-tests-js2
 	@$(MAKE) oql-employees-tests-js
 endif
 ifneq ($(JAVA),)
@@ -164,6 +165,15 @@ oql-persons-tests-js:
                           --output oql/persons$(N).out \
                           --eval-validate \
                           --query oql/persons$(N).js || exit 1 ;)
+oql-persons-tests-js2:
+	@$(foreach N,$(OQLPERSONSNUM), \
+	       $(QCERTCOMP) -exact-path -source oql -path nraenv -path nraenv -path nnrc -path nnrc -path nnrs -path nnrs_imp -path nnrs_imp -path imp_data -path imp_ejson -path imp_ejson -path js_ast -target javascript oql/persons$(N).oql -schema oql/persons.schema -quiet; \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --input oql/persons.input \
+                          --schema oql/persons.schema \
+                          --output oql/persons$(N).out \
+                          --eval-validate \
+                          --query oql/persons$(N).js || exit 1 ;)
 
 oql-persons-tests-java:
 	@$(foreach N,$(OQLPERSONSNUM), \
@@ -204,7 +214,7 @@ oql-employees-tests-java:
                           employees$(N) || exit 1;)
 
 ## λ-NRA
-LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7 8 9 10
+LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
 LAMBDANRATARGETS=lambda_nra nraenv nnrc nnrs nnrs_imp nnrcmr nra nraenv_core nnrc_core dnnrc imp_data imp_ejson # dnnrc_typed
 
 lambda_nra-tests:

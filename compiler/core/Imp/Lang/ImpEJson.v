@@ -15,6 +15,8 @@
 (** Imp with the Json data model *)
 
 Require Import String.
+Require Import ZArith.
+Require Import Bool.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
@@ -27,7 +29,7 @@ Section ImpEJson.
 
   Section Syntax.
     Definition imp_ejson_model := ejson.
-    Definition imp_ejson_constant := ejson.
+    Definition imp_ejson_constant := cejson.
 
     (* XXX This should contain at least:
        - all JS operators/expressions used in translation from NNRSimp to JsAst
@@ -37,17 +39,43 @@ Section ImpEJson.
      *)
     Definition imp_ejson_op := ejson_op. (* See ./EJson/Operators/EJsonOperators.v *)
     Definition imp_ejson_runtime_op := ejson_runtime_op.  (* See ./EJson/Operators/EJsonRuntimeOperators.v *)
-    Definition imp_ejson_expr := @imp_expr imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
-    Definition imp_ejson_stmt := @imp_stmt imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
-    Definition imp_ejson_function := @imp_function imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
-    Definition imp_ejson := @imp imp_ejson_model imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson_expr := @imp_expr imp_ejson_constant imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson_stmt := @imp_stmt imp_ejson_constant imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson_function := @imp_function imp_ejson_constant imp_ejson_op imp_ejson_runtime_op.
+    Definition imp_ejson := @imp imp_ejson_constant imp_ejson_op imp_ejson_runtime_op.
 
   End Syntax.
 
   Section dec.
+    (** Equality is decidable for json *)
+    Lemma cejson_eq_dec : forall x y:cejson, {x=y}+{x<>y}.
+    Proof.
+      induction x; destruct y; try solve[right; inversion 1].
+      - left; trivial.
+      - destruct (float_eq_dec f f0).
+        + left; f_equal; trivial.
+        + right;intro;apply c;inversion H; reflexivity.
+      - destruct (Z.eq_dec z z0).
+        + left; f_equal; trivial.
+        + right;intro;apply n;inversion H; trivial.
+      - destruct (bool_dec b b0).
+        + left; f_equal; trivial.
+        + right;intro;apply n;inversion H; trivial. 
+      - destruct (string_dec s s0).
+        + left; f_equal; trivial.
+        + right;intro;apply n;inversion H; trivial.
+      - destruct (foreign_ejson_dec f f0).
+        + left. f_equal; apply e.
+        + right. inversion 1; congruence.
+    Defined.
+
+    (* begin hide *)
+    Global Instance cejson_eqdec : EqDec cejson eq := cejson_eq_dec.
+    (* begin hide *)
+
     Global Instance imp_ejson_constant_eqdec : EqDec imp_ejson_constant eq.
     Proof.
-      apply ejson_eqdec.
+      apply cejson_eqdec.
     Qed.
 
     Global Instance imp_ejson_op_eqdec : EqDec imp_ejson_op eq.
