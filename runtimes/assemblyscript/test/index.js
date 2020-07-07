@@ -9,6 +9,7 @@ function writeString(module, str) {
 
 describe('AssemblyScript: Ejson operators', function () {
   it('low-level write/read roundtrip', async function () {
+    // Manual read/write. Do not read as example.
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let t = new m.exports.EjBool(true);
     let f = new m.exports.EjBool(false);
@@ -26,6 +27,7 @@ describe('AssemblyScript: Ejson operators', function () {
     m.exports.__release(val_p);
   });
   it('operator PoC', async function () {
+    // Manual read/write. Do not read as example.
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let { __release, EjBool, opOr, opNot } = m.exports;
     let t = new EjBool(true);
@@ -37,6 +39,7 @@ describe('AssemblyScript: Ejson operators', function () {
     __release(res);
   });
   it('Ejson write', async function () {
+    // Manual read. Do not read as example.
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let t = enc.write(m, true);
     let f = enc.write(m, false)
@@ -51,6 +54,7 @@ describe('AssemblyScript: Ejson operators', function () {
     m.exports.__release(val_p);
   });
   it('Ejson read', async function () {
+    // Manual write. Do not read as example.
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let n = new m.exports.EjNull();
     should.equal(enc.read(m, n), null);
