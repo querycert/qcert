@@ -32,13 +32,13 @@ module Create () : RUNTIME = struct
   let memory = memory 1
   let alloc_p = global ~mutable_:true i32 [i32_const' 0]
   let table = table 10 (* TODO: make sure that this grows automatically on ir -> spec compilation *)
-  let constants = Table.create ~element_size:String.length
+  let constants = Table.create ~element_size:String.length ~initial_offset:0
 
   let load = load memory
 
   let const x : instr =
     let s = Wasm_ejson.encode_const x |> Bytes.to_string in
-    let offset = Table.offset constants s in
+    let offset = Table.insert constants s in
     i32_const' offset
 
   let c_null = const (Coq_cejnull)
