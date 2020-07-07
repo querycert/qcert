@@ -86,20 +86,20 @@ export function opOr(a: EjBool, b: EjBool): EjBool {
   return new EjBool(a.value || b.value);
 }
 
-export function opLt(a: EjNumber, b: EjNumber): EjNumber {
-  return new EjNumber(a.value < b.value);
+export function opLt(a: EjNumber, b: EjNumber): EjBool {
+  return new EjBool(a.value < b.value);
 }
 
-export function opLe(a: EjNumber, b: EjNumber): EjNumber {
-  return new EjNumber(a.value <= b.value);
+export function opLe(a: EjNumber, b: EjNumber): EjBool {
+  return new EjBool(a.value <= b.value);
 }
 
-export function opGt(a: EjNumber, b: EjNumber): EjNumber {
-  return new EjNumber(a.value > b.value);
+export function opGt(a: EjNumber, b: EjNumber): EjBool {
+  return new EjBool(a.value > b.value);
 }
 
-export function opGe(a: EjNumber, b: EjNumber): EjNumber {
-  return new EjNumber(a.value >= b.value);
+export function opGe(a: EjNumber, b: EjNumber): EjBool {
+  return new EjBool(a.value >= b.value);
 }
 
 export function opAddString(a: EjString, b: EjString): EjString {

@@ -36,6 +36,7 @@ function write(module, x) {
                   return new m.EjRight(arg);
                 }
               case '$nat' :
+                // TODO: this cannot work, right?
                 return new m.EjBigInt(x.$nat);
             }
           }
