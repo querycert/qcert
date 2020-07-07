@@ -2,46 +2,98 @@ open Wasm_util
 module Ir = Wasm_ir
 open ImpEJson
 
-type function_context =
-  { locals : char list Table.t
-  ; runtime : Wasm_imp_runtime.t
+module ImportSet = Set.Make( struct
+    type t = Ir.import
+    let compare = Stdlib.compare
+  end)
+
+type module_context =
+  { mutable imports : ImportSet.t
   }
 
-let op (module R : Wasm_imp_runtime.RUNTIME) op : Ir.instr list =
+type function_context =
+  { locals : char list Table.t
+  ; ctx: module_context
+  }
+
+let op_foreign_fn_name : imp_ejson_op -> string = function
+  | EJsonOpNot -> "opNot"
+  | EJsonOpNeg -> "opNeg"
+  | EJsonOpAnd -> "opAnd"
+  | EJsonOpOr -> "opOr"
+  | EJsonOpLt -> "opLt"
+  | EJsonOpLe -> "opLe"
+  | EJsonOpGt -> "opGt"
+  | EJsonOpGe -> "opGe"
+  | EJsonOpAddString -> "opAddString"
+  | EJsonOpAddNumber -> "opAddNumber"
+  | EJsonOpSub -> "opSub"
+  | EJsonOpMult -> "opMult"
+  | EJsonOpDiv -> "opDiv"
+  | EJsonOpStrictEqual -> "opStrictEqual"
+  | EJsonOpStrictDisequal -> "opStrictDisequal"
+  | EJsonOpArray -> "opArray"
+  | EJsonOpArrayLength -> "opArrayLength"
+  | EJsonOpArrayPush -> "opArrayPush"
+  | EJsonOpArrayAccess -> "opArrayAccess"
+  | EJsonOpObject _ -> "opObject"
+  | EJsonOpAccess _ -> "opAccess"
+  | EJsonOpHasOwnProperty _ -> "opHasOwnProperty"
+  | EJsonOpMathMin -> "opMathMin"
+  | EJsonOpMathMax -> "opMathMax"
+  | EJsonOpMathPow -> "opMathPow"
+  | EJsonOpMathExp -> "opMathExp"
+  | EJsonOpMathAbs -> "opMathAbs"
+  | EJsonOpMathLog -> "opMathLog"
+  | EJsonOpMathLog10 -> "opMathLog10"
+  | EJsonOpMathSqrt -> "opMathSqrt"
+  | EJsonOpMathCeil -> "opMathCeil"
+  | EJsonOpMathFloor -> "opMathFloor"
+  | EJsonOpMathTrunc -> "opMathTrunc"
+
+let op ctx op : Ir.instr list =
+  let foreign params result =
+    let fname = op_foreign_fn_name op in
+    let f, import = Ir.import_func ~params ~result "runtime" fname in
+    ctx.imports <- ImportSet.add import ctx.imports;
+    [ Ir.call f ]
+  in
+  let open Ir in
   match (op : imp_ejson_op) with
-  | EJsonOpNot -> [Ir.call R.not]
-  | EJsonOpNeg -> unsupported "op: neg"
-  | EJsonOpAnd -> [Ir.call R.and_]
-  | EJsonOpOr -> [Ir.call R.or_]
-  | EJsonOpLt -> Ir.[call (R.compare Lt)]
-  | EJsonOpLe -> Ir.[call (R.compare Le)]
-  | EJsonOpGt -> Ir.[call (R.compare Gt)]
-  | EJsonOpGe -> Ir.[call (R.compare Ge)]
-  | EJsonOpAddString -> unsupported "op: EJsonOpAddString"
-  | EJsonOpAddNumber -> unsupported "op: EJsonOpAddNumber"
-  | EJsonOpSub -> unsupported "op: EJsonOpSub"
-  | EJsonOpMult -> unsupported "op: EJsonOpMult"
-  | EJsonOpDiv -> unsupported "op: EJsonOpDiv"
-  | EJsonOpStrictEqual -> unsupported "op: EJsonOpStrictEqual"
-  | EJsonOpStrictDisequal -> unsupported "op: EJsonOpStrictDisequal"
-  | EJsonOpArray -> unsupported "op: EJsonOpArray"
-  | EJsonOpArrayLength -> unsupported "op: EJsonOpArrayLength"
-  | EJsonOpArrayPush -> unsupported "op: EJsonOpArrayPush"
-  | EJsonOpArrayAccess -> unsupported "op: EJsonOpArrayAccess"
-  | EJsonOpObject _ -> unsupported "op: EJsonOpObject"
-  | EJsonOpAccess _ -> unsupported "op: EJsonOpAccess"
-  | EJsonOpHasOwnProperty _ -> unsupported "op: EJsonOpHasOwnProperty"
-  | EJsonOpMathMin -> unsupported "op: EJsonOpMathMin"
-  | EJsonOpMathMax -> unsupported "op: EJsonOpMathMax"
-  | EJsonOpMathPow -> unsupported "op: EJsonOpMathPow"
-  | EJsonOpMathExp -> unsupported "op: EJsonOpMathExp"
-  | EJsonOpMathAbs -> unsupported "op: EJsonOpMathAbs"
-  | EJsonOpMathLog -> unsupported "op: EJsonOpMathLog"
-  | EJsonOpMathLog10 -> unsupported "op: EJsonOpMathLog10"
-  | EJsonOpMathSqrt -> unsupported "op: EJsonOpMathSqrt"
-  | EJsonOpMathCeil -> unsupported "op: EJsonOpMathCeil"
-  | EJsonOpMathFloor -> unsupported "op: EJsonOpMathFloor"
-  | EJsonOpMathTrunc -> unsupported "op: EJsonOpMathTrunc"
+  | EJsonOpNot -> foreign [i32] [i32]
+  | EJsonOpNeg -> foreign [i32] [i32]
+  | EJsonOpAnd -> foreign [i32; i32] [i32]
+  | EJsonOpOr -> foreign [i32; i32] [i32]
+  | EJsonOpLt -> foreign [i32; i32] [i32]
+  | EJsonOpLe -> foreign [i32; i32] [i32]
+  | EJsonOpGt -> foreign [i32; i32] [i32]
+  | EJsonOpGe -> foreign [i32; i32] [i32]
+  | EJsonOpAddString -> foreign [i32; i32] [i32]
+  | EJsonOpAddNumber -> foreign [i32; i32] [i32]
+  | EJsonOpSub -> foreign [i32; i32] [i32]
+  | EJsonOpMult -> foreign [i32; i32] [i32]
+  | EJsonOpDiv -> foreign [i32; i32] [i32]
+  | EJsonOpStrictEqual -> foreign [i32; i32] [i32]
+  | EJsonOpStrictDisequal -> foreign [i32; i32] [i32]
+  | EJsonOpArray -> foreign [i32] [i32]
+  | EJsonOpArrayLength -> foreign [i32] [i32]
+  | EJsonOpArrayPush -> foreign [i32; i32] [i32]
+  | EJsonOpArrayAccess -> foreign [i32; i32] [i32]
+  (* TODO: (WASM IR in coq) get rid of the following three constructor arguments *)
+  | EJsonOpObject _ -> foreign [i32] [i32]
+  | EJsonOpAccess _ -> foreign [i32; i32] [i32]
+  | EJsonOpHasOwnProperty _ -> foreign [i32; i32] [i32]
+  | EJsonOpMathMin -> foreign [i32; i32] [i32]
+  | EJsonOpMathMax -> foreign [i32; i32] [i32]
+  | EJsonOpMathPow -> foreign [i32; i32] [i32]
+  | EJsonOpMathExp -> foreign [i32] [i32]
+  | EJsonOpMathAbs -> foreign [i32] [i32]
+  | EJsonOpMathLog -> foreign [i32] [i32]
+  | EJsonOpMathLog10 -> foreign [i32] [i32]
+  | EJsonOpMathSqrt -> foreign [i32] [i32]
+  | EJsonOpMathCeil -> foreign [i32] [i32]
+  | EJsonOpMathFloor -> foreign [i32] [i32]
+  | EJsonOpMathTrunc -> foreign [i32] [i32]
 
 let string_of_runtime_op =
   let open EJsonRuntimeOperators in
@@ -116,25 +168,20 @@ let string_of_runtime_op =
   (* Foreign *)
   | EJsonRuntimeForeign _fop -> "FOREIGN"
 
-let rt_op (module R : Wasm_imp_runtime.RUNTIME) op : Ir.instr list =
+let rt_op ctx op : Ir.instr list =
   match (op : EJsonRuntimeOperators.ejson_runtime_op) with
-  | EJsonRuntimeEqual -> Ir.[call R.equal]
-  | EJsonRuntimeNatLt -> Ir.[call (R.compare Lt)]
-  | EJsonRuntimeNatLe -> Ir.[call (R.compare Le)]
-  | EJsonRuntimeRecDot -> Ir.[call R.dot]
   | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
 let rec expr ctx expression : Ir.instr list =
-  let module R = (val ctx.runtime) in
   match (expression : imp_ejson_expr) with
   | ImpExprError err -> unsupported "expr: error"
-  | ImpExprVar v -> [Ir.local_get (Table.offset ctx.locals v)]
-  | ImpExprConst x -> [R.const x]
+  | ImpExprVar v -> [Ir.local_get (Table.insert ctx.locals v)]
+  | ImpExprConst x -> unsupported "expr: const"
   | ImpExprOp (x, args) ->
     (* Put arguments on the stack, append operator *)
-    (List.map (expr ctx) args |> List.concat) @ (op ctx.runtime x)
+    (List.map (expr ctx) args |> List.concat) @ (op ctx.ctx x)
   | ImpExprRuntimeCall (x, args) ->
-    (List.map (expr ctx) args |> List.concat) @ (rt_op ctx.runtime x)
+    (List.map (expr ctx) args |> List.concat) @ (rt_op ctx.ctx x)
 
 let rec statement ctx stmt : Ir.instr list =
   match (stmt : imp_ejson_stmt) with
@@ -142,7 +189,7 @@ let rec statement ctx stmt : Ir.instr list =
     (* TODO: This assumes that variable names are unique which is not true in general. *)
     let defs =
       List.map (fun (var, value) ->
-          let id = Table.offset ctx.locals var in
+          let id = Table.insert ctx.locals var in
           match value with
           | Some x ->  expr ctx x @ [ Ir.local_set id ]
           | None -> []
@@ -151,47 +198,42 @@ let rec statement ctx stmt : Ir.instr list =
     let body = List.map (statement ctx) stmts in
     List.concat (defs @ body)
   | ImpStmtAssign (var, x) ->
-    expr ctx x @ [ Ir.local_set (Table.offset ctx.locals var) ]
+    expr ctx x @ [ Ir.local_set (Table.insert ctx.locals var) ]
   | ImpStmtFor _ -> unsupported "statement: for"
   | ImpStmtForRange _ -> unsupported "statement: for range"
   | ImpStmtIf _ -> unsupported "statement: if"
 
-let function_  runtime fn : Ir.func =
+let function_  ctx fn : Ir.func =
   let Imp.ImpFun (arg, stmt, ret) = fn in
-  let locals = Table.create ~element_size:(fun _ -> 1) in
-  let ctx = {locals; runtime } in
-  let l_arg = Table.offset locals arg in
+  let locals = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0 in
+  let ctx = {locals; ctx } in
+  let l_arg = Table.insert locals arg in
   let () = assert (l_arg = 0) in
   let body =
     statement ctx stmt @
-    Ir.[ local_get (Table.offset locals ret) ]
+    Ir.[ local_get (Table.insert locals ret) ]
   in
   let locals = List.init (Table.size locals - 1) (fun _ -> Ir.i32) in
   Ir.(func ~params:[i32] ~result:[i32] ~locals body)
 
-let f_start (module R : Wasm_imp_runtime.RUNTIME) =
-  let size = Table.size R.Ctx.constants in
+let f_start =
   let open Ir in
-  func [ i32_const' size; global_set R.Ctx.alloc_p ]
+  func []
 
 let imp functions : Wasm.Ast.module_ =
-  let runtime = Wasm_imp_runtime.create () in
+  let ctx = { imports = ImportSet.empty } in
   let funcs =
     match functions with
-    | [ _name, fn ] -> ["main", function_ runtime fn]
+    | [ _name, fn ] -> ["main", function_ ctx fn]
     | _ -> failwith "Wasm_translate.imp: single function expected"
-  and f_start = f_start runtime
-  in
-  let module R = (val runtime) in
-  let data =
-    List.fold_left (fun acc (_, el) -> acc ^ el) "" (Table.elements R.Ctx.constants)
   in
   Ir.module_to_spec
     { Ir.start = Some (f_start)
-    ; globals = ["alloc_p", R.Ctx.alloc_p]
-    ; memories = ["memory", R.Ctx.memory]
+    ; globals = []
+    ; memories = []
     ; tables = []
     ; funcs
-    ; data = [ R.Ctx.memory, 0, data ]
-    ; elems = List.map (fun (a,b) -> R.Ctx.table, a, b) R.Ctx.elems
+    ; data = []
+    ; elems = []
+    ; imports = ImportSet.elements ctx.imports
     }

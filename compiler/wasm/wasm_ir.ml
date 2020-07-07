@@ -13,16 +13,24 @@ type context =
   ; g : global Table.t
   ; tab : table Table.t
   ; m : memory Table.t
+  ; i : import Table.t
   }
 
 and instr = context -> Wasm.Ast.instr'
 
-and func =
+and func_type =
   { params : type_ list
-  ; result : type_ list
-  ; locals : type_ list
-  ; body : instr list
+  ; result: type_ list
   }
+
+and func_def =
+  { locals: type_ list
+  ; body: instr list
+  }
+
+and func =
+  | FuncDef of (func_type * func_def)
+  | FuncImport of (func_type * string * string)
 
 and table =
   { t_id: int
@@ -43,8 +51,14 @@ and memory =
   ; m_max_size: int option
   }
 
+and import = (func_type * string * string)
+
 let func ?(params=[]) ?(result=[]) ?(locals=[]) body =
-  { params; locals; result; body}
+  FuncDef ({ params; result}, {locals; body})
+
+let import_func ?(params=[]) ?(result=[]) a b =
+  let import = ({ params; result}, a, b) in
+  FuncImport import, import
 
 let table =
   let cnt = ref 0 in
@@ -80,6 +94,7 @@ type module_ =
   ; tables: table export list
   ; data : (memory * int * string) list
   ; elems: (table * int * func) list
+  ; imports: import list
   }
 
 module Wasm = struct
@@ -95,41 +110,66 @@ open (struct
   let no_region = Wasm.Source.no_region
 end)
 
-let func_to_spec_type (ctx: context) ~params ~result =
-  let t = Wasm.FuncType (params, result) @@ no_region in
-  let id = Table.offset ctx.ty t in
+let identify (type a) (idx : a Table.t) (x : a) =
+  let id = Table.insert idx x in
   Int32.of_int id @@ no_region
 
-let identify (type a) (idx : a Table.t) (x : a) =
-  let id = Table.offset idx x in
+let func_type_to_spec (ctx: context) ~params ~result =
+  let t = Wasm.FuncType (params, result) @@ no_region in
+  identify ctx.ty t
+
+let lookup (type a) (idx : a Table.t) (x : a) =
+  let id =
+    match Table.lookup idx x with
+    | Some x -> x
+    | None -> raise Not_found
+  in
   Int32.of_int id @@ no_region
 
 let table_to_spec (ctx: context) = identify ctx.tab
 let memory_to_spec (ctx: context) = identify ctx.m
 let global_to_spec (ctx: context) = identify ctx.g
 
-let rec func_to_spec (ctx: context) {params; locals; result; body} =
-  let f =
-    let open Wasm in
-    { ftype = func_to_spec_type ctx ~params ~result
-    ; locals
-    ; body = List.map (instr_to_spec ctx) body
-    } @@ no_region
-  in
-  let id = Table.offset ctx.f f in
-  Int32.of_int id @@ no_region
+let rec func_to_spec (ctx: context) func =
+  match func with
+  | FuncDef ({params; result}, {locals; body}) ->
+    let f =
+      let open Wasm in
+      { ftype = func_type_to_spec ctx ~params ~result
+      ; locals
+      ; body = List.map (instr_to_spec ctx) body
+      } @@ no_region
+    in
+    identify ctx.f f
+  | FuncImport x -> lookup ctx.i x
 
 and instr_to_spec (ctx: context) (instr: instr) =
   instr ctx @@ no_region
 
 let module_to_spec (m: module_) =
+  let func_imports = Table.create ~initial_offset:0 ~element_size:(fun _ -> 1) in
+  let () = List.iter (fun x -> ignore(identify func_imports x)) m.imports in
+  let n_funcs = Table.size func_imports in
   let ctx =
-    { f = Table.create ~element_size:(fun _ -> 1)
-    ; g = Table.create ~element_size:(fun _ -> 1)
-    ; m = Table.create ~element_size:(fun _ -> 1)
-    ; ty = Table.create ~element_size:(fun _ -> 1)
-    ; tab = Table.create ~element_size:(fun _ -> 1)
+    { f = Table.create ~element_size:(fun _ -> 1) ~initial_offset:n_funcs
+    ; g = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0
+    ; m = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0
+    ; ty = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0
+    ; tab = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0
+    ; i = func_imports
     }
+  in
+  let imports =
+    List.map (fun (_, ({params; result}, a, b)) ->
+        let t = func_type_to_spec ctx ~params ~result in
+        let open Wasm in
+        {
+          module_name = Utf8.decode a;
+          item_name= Utf8.decode b;
+          idesc= FuncImport t @@ no_region;
+        } @@ no_region
+      )
+      (Table.elements ctx.i)
   in
   let f_exports = List.map (fun (name, fn) ->
       let open Wasm in
@@ -202,7 +242,7 @@ let module_to_spec (m: module_) =
   ; elems
   ; memories
   ; data
-  ; imports = []
+  ; imports
   } @@ no_region
 
 type cmp_op = Ge | Gt | Le | Lt
@@ -223,7 +263,7 @@ module Intructions = struct
   let call x ctx = Call (func_to_spec ctx x)
   let call_indirect ?(params=[]) ?(result=[]) x ctx =
     let _ = table_to_spec ctx x in
-    let t = func_to_spec_type ctx ~params ~result in
+    let t = func_type_to_spec ctx ~params ~result in
     CallIndirect (t)
 
   let eq ty _ =
@@ -322,7 +362,7 @@ module Intructions = struct
     match params, result with
     | [], [res] -> ValBlockType (Some res)
     | _ ->
-      let t = func_to_spec_type ctx ~params ~result in
+      let t = func_type_to_spec ctx ~params ~result in
       VarBlockType t
 
   let if_ ?(params=[]) ?(result=[]) then_ else_ ctx =
