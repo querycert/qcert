@@ -31,14 +31,14 @@ common_steps: &common_steps
           opam init --disable-sandboxing -j 1 -n -y
           sed -i "s/^jobs: [0-9]*/jobs: $NJOBS/g" ~/.opam/config
           eval $(opam env)
-          opam switch create 4.07.1 || true
-          opam switch set 4.07.1
+          opam switch create 4.09.1 || true
+          opam switch set 4.09.1
           opam repo add coq-released https://coq.inria.fr/opam/released || true
           opam update || true
     - run:
         name: "Install OCaml deps"
         command: |
-          opam install -y --jobs=2 dune menhir base64 js_of_ocaml js_of_ocaml-ppx re calendar uri
+          opam install -y --jobs=2 dune menhir base64 js_of_ocaml js_of_ocaml-ppx re calendar uri wasm
     - run:
         name: "Install Coq deps"
         command: |
@@ -69,12 +69,12 @@ common_steps: &common_steps
 
 version: 2
 jobs:
-  4.07.1:
+  4.09.1:
     docker:
     - image: circleci/openjdk:8-jdk
     environment:
       - TERM: dumb
-      - OCAML_VERSION: "4.07.x"
+      - OCAML_VERSION: "4.09.x"
       - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
       - NJOBS: 2
       - NPM_CONFIG_PREFIX: "~/.npm-global"
@@ -84,4 +84,4 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - 4.07.1
+      - 4.09.1
