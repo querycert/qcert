@@ -39,7 +39,7 @@ common_steps: &common_steps
     - run:
         name: "Install OCaml deps"
         command: |
-          opam install -y --jobs=2 dune menhir base64 js_of_ocaml js_of_ocaml-ppx re calendar uri
+          opam install -y --jobs=2 dune menhir base64 js_of_ocaml js_of_ocaml-ppx re calendar uri wasm
     - run:
         name: "Install Coq deps"
         command: |
