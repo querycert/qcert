@@ -252,6 +252,7 @@ module Intructions = struct
   open Wasm
 
   let nop _ = Nop
+  let drop _ = Drop
   let unreachable _ = Unreachable
   let i32_const x _ = Const (I32 x @@ no_region)
   let i32_const' x = i32_const (Int32.of_int x)
@@ -267,6 +268,9 @@ module Intructions = struct
     let _ = table_to_spec ctx x in
     let t = func_type_to_spec ctx ~params ~result in
     CallIndirect (t)
+
+  let i32_eqz _ = Test (I32 I32Op.Eqz)
+  let i64_eqz _ = Test (I64 I64Op.Eqz)
 
   let eq ty _ =
     match ty with
@@ -317,6 +321,13 @@ module Intructions = struct
     | Le -> Compare (F64 F64Op.Le)
     | Lt -> Compare (F64 F64Op.Lt)
 
+  let sub ty _ =
+    match ty with
+    | I32Type -> Binary (I32 I32Op.Sub)
+    | I64Type -> Binary (I64 I64Op.Sub)
+    | F32Type -> Binary (F32 F32Op.Sub)
+    | F64Type -> Binary (F64 F64Op.Sub)
+
   let add ty _ =
     match ty with
     | I32Type -> Binary (I32 I32Op.Add)
@@ -359,6 +370,30 @@ module Intructions = struct
     let offset = Int32.of_int (Option.value ~default:0 offset) in
     let _id = memory_to_spec ctx m in
     Load {ty = type_; align; offset; sz}
+
+  let store m ?pack ?offset type_ ctx =
+    let sz = Option.map (function
+        | S8 -> Pack8
+        | S16 -> Pack16
+        | S32 -> Pack32
+        | U8 -> Pack8
+        | U16 -> Pack16
+        | U32 -> Pack32
+      ) pack
+    in
+    let align =
+      match type_, sz with
+      | I32Type, None
+      | F32Type, None -> 2
+      | I64Type, None
+      | F64Type, None -> 3
+      | _, Some (Pack8) -> 0
+      | _, Some (Pack16) -> 1
+      | _, Some (Pack32) -> 2
+    in
+    let offset = Int32.of_int (Option.value ~default:0 offset) in
+    let _id = memory_to_spec ctx m in
+    Store {ty = type_; align; offset; sz}
 
   let block_type ctx ~params ~result =
     match params, result with
