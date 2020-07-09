@@ -38,24 +38,19 @@ export class EjString extends EjValue {
 }
 export const IdEjString = idof<EjString>()
 
-export class EjStringBuilder {
-  private buf: Array<i32>
+export class EjStringBuilderUTF8 {
+  private buf: Uint8Array
   private pos: i32
-  constructor() {
+  constructor(n: i32) {
     this.pos = 0;
-    this.buf = new Array<i32>(32);
+    this.buf = new Uint8Array(n);
   }
-  append(val: i32): EjStringBuilder {
-    if (this.pos >= this.buf.length) {
-      this.buf = this.buf.concat(new Array(this.buf.length * 2));
-    }
+  putByte(val: u8): void {
     this.buf[this.pos] = val;
     this.pos++;
-    return this;
   }
   finalize(): EjString {
-    let buf = this.buf.slice(0, this.pos);
-    let str = String.fromCharCodes(buf);
+    let str = String.UTF8.decode(this.buf.buffer);
     return new EjString(str);
   }
 }
