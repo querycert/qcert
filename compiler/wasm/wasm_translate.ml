@@ -9,6 +9,8 @@ module ImportSet = Set.Make( struct
 
 type module_context =
   { mutable imports : ImportSet.t
+  ; memory: Ir.memory
+  ; constants: EJson.cejson Table.t
   }
 
 type function_context =
@@ -180,52 +182,178 @@ let rt_op ctx op : Ir.instr list =
   | EJsonRuntimeRecDot -> foreign [i32; i32] [i32]
   | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
-let const ctx c : Ir.instr list =
-  (* This generates new AssemblyScript objects for each use of the constant.
-   * TODO: Come up with a mechanism for reusing constants. *)
-  let open Ir in
-  let foreign ~params ~result name =
-    let f, import = Ir.import_func ~params ~result "runtime" name in
-    ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
-    f
-  in
-  let new_ params class_ =
-    let item = class_ ^ "#constructor" in
-    call (foreign ~params:(i32 :: params) ~result:[i32] item)
-  in
-  match (c : EJson.cejson) with
-  | Coq_cejnull  ->
-    [ i32_const' 0
-    ; new_ [] "EjNull"
-    ]
-  | Coq_cejbool x ->
-    [ i32_const' 0
-    ; i32_const' (if x then 1 else 0)
-    ; new_ [i32] "EjBool"
-    ]
-  | Coq_cejnumber x ->
-    [ i32_const' 0
-    ; f64_const x
-    ; new_ [f64] "EjNumber"
-    ]
-  | Coq_cejbigint x ->
-    [ i32_const' 0
-    ; i64_const (Int64.of_int x)
-    ; new_ [i64] "EjBigInt"
-    ]
-  | Coq_cejstring x ->
-      [ i32_const' 0
-      ; new_ [] "EjStringBuilder"
+module Constants = struct
+  let encode_const : EJson.cejson -> bytes = function
+    | Coq_cejnull ->
+      let b = Bytes.create 8 in
+      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
+      Bytes.set_int32_le b 4 (Int32.of_int 0); (* type: null *)
+      b
+    | Coq_cejbool false ->
+      let b = Bytes.create 8 in
+      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
+      Bytes.set_int32_le b 4 (Int32.of_int 1); (* type: false *)
+      b
+    | Coq_cejbool true ->
+      let b = Bytes.create 8 in
+      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
+      Bytes.set_int32_le b 4 (Int32.of_int 2); (* type: true *)
+      b
+    | Coq_cejnumber x ->
+      let b = Bytes.create 16 in
+      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
+      Bytes.set_int32_le b 4 (Int32.of_int 3); (* type: number *)
+      Bytes.set_int64_le b 8 (Int64.bits_of_float x); (* value *)
+      b
+    | Coq_cejbigint x ->
+      let b = Bytes.create 16 in
+      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
+      Bytes.set_int32_le b 4 (Int32.of_int 4); (* type: bigint *)
+      Bytes.set_int64_le b 8 (Int64.of_int x); (* value *)
+      b
+    | Coq_cejstring s ->
+      let s = Util.string_of_char_list s in
+      let n = String.length s in
+      let b = Bytes.create (12 + n) in
+      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
+      Bytes.set_int32_le b 4 (Int32.of_int 5); (* type: string *)
+      Bytes.set_int32_le b 8 (Int32.of_int n); (* length *)
+      Bytes.blit_string s 0 b 12 n; (* value *)
+      b
+    | Coq_cejforeign _ -> unsupported "ejson encode: foreign"
+
+  let alloc_const ctx : Ir.func =
+    let open Ir in
+    let foreign ~params ~result name =
+      let f, import = Ir.import_func ~params ~result "runtime" name in
+      ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+      f
+    in
+    let new_ params class_ =
+      let item = class_ ^ "#constructor" in
+      call (foreign ~params:(i32 :: params) ~result:[i32] item)
+    in
+    let local_ptr, tag, n, foreign_ptr = 0, 1, 2, 3 in
+    func ~params:[i32] ~result:[i32] ~locals:[i32; i32; i32]
+      [ local_get local_ptr
+      ; load ctx.ctx.memory ~offset:4 i32
+      ; local_tee tag
+      ; i32_eqz (* null *)
+      ; if_
+          [ i32_const' 0
+          ; new_ [] "EjNull"
+          ; return
+          ] []
+      ; local_get tag
+      ; i32_const' 1 (* false *)
+      ; eq i32
+      ; if_
+          [ i32_const' 0
+          ; i32_const' 0
+          ; new_ [i32] "EjBool"
+          ; return
+          ] []
+      ; local_get tag
+      ; i32_const' 2 (* true *)
+      ; eq i32
+      ; if_
+          [ i32_const' 0
+          ; i32_const' 1
+          ; new_ [i32] "EjBool"
+          ; return
+          ] []
+      ; local_get tag
+      ; i32_const' 3 (* number *)
+      ; eq i32
+      ; if_
+          [ i32_const' 0
+          ; local_get local_ptr
+          ; load ctx.ctx.memory ~offset:8 f64
+          ; new_ [f64] "EjNumber"
+          ; return
+          ] []
+      ; local_get tag
+      ; i32_const' 4 (* bigint *)
+      ; eq i32
+      ; if_
+          [ i32_const' 0
+          ; local_get local_ptr
+          ; load ctx.ctx.memory ~offset:8 i64
+          ; new_ [i64] "EjBigInt"
+          ; return
+          ] []
+      ; local_get tag
+      ; i32_const' 5 (* string *)
+      ; eq i32
+      ; if_
+          [ i32_const' 0
+          ; new_ [] "EjStringBuilder"
+          ; local_set foreign_ptr
+          (* load length / characters to be processed *)
+          ; local_get local_ptr
+          ; load ctx.ctx.memory ~offset:8 i32
+          ; local_set n
+          (* initialize moving pointer *)
+          ; local_get local_ptr
+          ; i32_const' 12
+          ; add i32
+          ; local_set local_ptr
+          ; loop (* over characters and append *)
+            [ local_get n
+            ; i32_eqz
+            ; if_
+              [ local_get foreign_ptr (* for release *)
+              ; local_get foreign_ptr (* for finalize *)
+              ; call (foreign ~params:[i32] ~result:[i32] "EjStringBuilder#finalize")
+              ; local_set foreign_ptr (* for return *)
+              ; call (foreign ~params:[i32] ~result:[] "__release")
+              ; local_get foreign_ptr
+              ; return
+              ] []
+            ; local_get n
+            ; i32_const' 1
+            ; sub i32
+            ; local_set n
+            ; local_get foreign_ptr
+            ; local_get local_ptr
+            ; load ctx.ctx.memory ~pack:U8 i32
+            ; call (foreign ~params:[i32; i32] ~result:[i32] "EjStringBuilder#append")
+            ; drop
+            ; local_get local_ptr
+            ; i32_const' 1
+            ; add i32
+            ; local_set local_ptr
+            ; br 0 (* repeat *)
+            ]
+          ] []
+      ; unreachable
       ]
-      @ List.concat (List.map (fun c ->
-        [ i32_const' (int_of_char c)
-        ; call (foreign ~params:[i32; i32] ~result:[i32] "EjStringBuilder#append")
-        ]
-        ) x
-      )
-      @ [ call (foreign ~params:[i32] ~result:[i32] "EjStringBuilder#finalize") ]
-      (* TODO: I think we have to release the EjStringBuilder here? *)
-  | Coq_cejforeign _ -> unsupported "const: foreign"
+
+  let get_const ctx : Ir.func =
+    let open Ir in
+    let local_ptr, foreign_ptr = 0, 1 in
+    func ~params:[i32] ~result:[i32] ~locals:[i32]
+      [ local_get local_ptr
+      ; load ctx.ctx.memory i32
+      ; local_tee foreign_ptr
+      ; i32_eqz
+      ; if_
+          [ local_get local_ptr
+          ; local_get local_ptr
+          ; call (alloc_const ctx)
+          ; local_tee foreign_ptr
+          ; store ctx.ctx.memory i32
+          ] []
+      ; local_get foreign_ptr
+      ]
+end
+
+let const ctx c : Ir.instr list =
+  let offset = Table.insert ctx.ctx.constants c in
+  let open Ir in
+  [ i32_const' offset
+  ; call (Constants.get_const ctx)
+  ]
 
 let rec expr ctx expression : Ir.instr list =
   match (expression : imp_ejson_expr) with
@@ -276,11 +404,23 @@ let f_start =
   func []
 
 let imp functions : Wasm.Ast.module_ =
-  let ctx = { imports = ImportSet.empty } in
+  let ctx =
+    { imports = ImportSet.empty
+    ; memory = Ir.memory 1
+    ; constants = Table.create ~initial_offset:0 ~element_size:(fun x ->
+          Constants.encode_const x |> Bytes.length)
+    }
+  in
   let funcs =
     match functions with
     | [ _name, fn ] -> ["main", function_ ctx fn]
     | _ -> failwith "Wasm_translate.imp: single function expected"
+  in
+  let data =
+    Table.elements ctx.constants
+    |> List.map (fun (i, c) ->
+        let s = Constants.encode_const c
+        in ctx.memory, i, Bytes.to_string s)
   in
   Ir.module_to_spec
     { Ir.start = Some (f_start)
@@ -288,7 +428,7 @@ let imp functions : Wasm.Ast.module_ =
     ; memories = []
     ; tables = []
     ; funcs
-    ; data = []
+    ; data
     ; elems = []
     ; imports = ImportSet.elements ctx.imports
     }
