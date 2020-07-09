@@ -286,13 +286,15 @@ module Constants = struct
       ; i32_const' 5 (* string *)
       ; eq i32
       ; if_
-          [ i32_const' 0
-          ; new_ [] "EjStringBuilder"
-          ; local_set foreign_ptr
-          (* load length / characters to be processed *)
-          ; local_get local_ptr
+          [ (* load length / characters to be processed *)
+            local_get local_ptr
           ; load ctx.ctx.memory ~offset:8 i32
           ; local_set n
+          (* initialize buffer in runtime *)
+          ; i32_const' 0
+          ; local_get n
+          ; new_ [i32] "EjStringBuilderUTF8"
+          ; local_set foreign_ptr
           (* initialize moving pointer *)
           ; local_get local_ptr
           ; i32_const' 12
@@ -304,7 +306,7 @@ module Constants = struct
             ; if_
               [ local_get foreign_ptr (* for release *)
               ; local_get foreign_ptr (* for finalize *)
-              ; call (foreign ~params:[i32] ~result:[i32] "EjStringBuilder#finalize")
+              ; call (foreign ~params:[i32] ~result:[i32] "EjStringBuilderUTF8#finalize")
               ; local_set foreign_ptr (* for return *)
               ; call (foreign ~params:[i32] ~result:[] "__release")
               ; local_get foreign_ptr
@@ -316,9 +318,9 @@ module Constants = struct
             ; local_set n
             ; local_get foreign_ptr
             ; local_get local_ptr
+            (* TODO: speed up string constant allocation by copying words. *)
             ; load ctx.ctx.memory ~pack:U8 i32
-            ; call (foreign ~params:[i32; i32] ~result:[i32] "EjStringBuilder#append")
-            ; drop
+            ; call (foreign ~params:[i32; i32] ~result:[] "EjStringBuilderUTF8#putByte")
             ; local_get local_ptr
             ; i32_const' 1
             ; add i32
