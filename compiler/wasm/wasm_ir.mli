@@ -9,6 +9,7 @@ type instr
 
 val unreachable : instr
 val nop : instr
+val drop : instr
 val i32_const : int32 -> instr
 val i32_const' : int -> instr
 val i64_const : int64 -> instr
@@ -23,8 +24,12 @@ val i64u_cmp : cmp_op -> instr
 val f32_cmp : cmp_op -> instr
 val f64_cmp : cmp_op -> instr
 
+val i32_eqz : instr
+val i64_eqz : instr
+
 val eq : type_ -> instr
 val add : type_ -> instr
+val sub : type_ -> instr
 val mul : type_ -> instr
 
 val i32_and : instr
@@ -92,6 +97,7 @@ val memory: ?max_size:int -> int -> memory
 type pack = S8 | S16 | S32 | U8 | U16 | U32
 
 val load : memory -> ?pack:pack -> ?offset:int -> type_ -> instr
+val store : memory -> ?pack:pack -> ?offset:int -> type_ -> instr
 
 (** {2} module *)
 
