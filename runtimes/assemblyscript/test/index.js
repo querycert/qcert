@@ -1,11 +1,36 @@
 const loader = require("@assemblyscript/loader");
 const should = require('chai').should();
+const assert = require('chai').assert;
 const fs = require('fs');
 const enc = require('../lib/encoding.js');
 
 function writeString(module, str) {
   return m.exports.__retain(m.exports.__allocString(aStr));
 }
+
+const values = [
+  null,
+  Math.PI,
+  1,
+  0,
+  true,
+  false,
+  "",
+  "Hello World!",
+  "hello world!",
+  {'$left': 1},
+  {'$right': 1},
+  // {'$nat': "1"},
+  // {'$nat': "1000"},
+  [],
+  [1],
+  ["", ""],
+  ["", null],
+  {},
+  {a : null},
+  {a : false},
+  {a : [], b: 0}
+]
 
 describe('AssemblyScript: Ejson operators', function () {
   it('low-level write/read roundtrip', async function () {
@@ -98,5 +123,32 @@ describe('AssemblyScript: Ejson operators', function () {
     enc.read(m, enc.write(m, o0)).should.deep.equal(o0);
     enc.read(m, enc.write(m, o1)).should.deep.equal(o1);
     enc.read(m, enc.write(m, o2)).should.deep.equal(o2);
+  });
+  it('runtimeEqual', async function () {
+    let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
+    let ptra = values.map(x => enc.write(m, x));
+    let ptrb = values.map(x => enc.write(m, x));
+    let str = JSON.stringify;
+    for(let i = 0; i < ptra.length; i++) {
+      for(let j = 0; j < ptrb.length; j++) {
+        assert((i == j) == enc.read(m, m.exports.runtimeEqual(ptra[i], ptrb[j])),
+        `Unexpected result on ${str(values[i])} == ${str(values[j])}`);
+      }
+    }
+  });
+  it('runtimeCompare', async function () {
+    let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
+    // let bia = enc.write(m, {'$nat': "12"});
+    // let bib = enc.write(m, {'$nat': "13"});
+    // assert(enc.read(m, m.exports.runtimeCompare(bia, bia) ==  0 ));
+    // assert(enc.read(m, m.exports.runtimeCompare(bia, bib) ==  1 ));
+    // assert(enc.read(m, m.exports.runtimeCompare(bib, bib) ==  0 ));
+    // assert(enc.read(m, m.exports.runtimeCompare(bib, bia) == -1 ));
+    let na = enc.write(m, 12);
+    let nb = enc.write(m, 13);
+    assert(enc.read(m, m.exports.runtimeCompare(na, na)) ==  0, '=');
+    assert(enc.read(m, m.exports.runtimeCompare(na, nb)) == -1, '<');
+    assert(enc.read(m, m.exports.runtimeCompare(nb, nb)) ==  0, '=');
+    assert(enc.read(m, m.exports.runtimeCompare(nb, na)) ==  1, '>');
   });
 });
