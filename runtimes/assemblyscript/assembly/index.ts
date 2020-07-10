@@ -287,6 +287,16 @@ export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
     let bb : EjBigInt = changetype<EjBigInt>(b) ;
     return aa.value == bb.value ? c_true : c_false;
   }
+  if (a instanceof EjLeft && b instanceof EjLeft) {
+    let aa : EjLeft = changetype<EjLeft>(a) ;
+    let bb : EjLeft = changetype<EjLeft>(b) ;
+    return runtimeEqual(aa.value, bb.value) ? c_true : c_false;
+  }
+  if (a instanceof EjRight && b instanceof EjRight) {
+    let aa : EjRight = changetype<EjRight>(a) ;
+    let bb : EjRight = changetype<EjRight>(b) ;
+    return runtimeEqual(aa.value, bb.value) ? c_true : c_false;
+  }
   if (a instanceof EjString && b instanceof EjString) {
     let aa : EjString = changetype<EjString>(a) ;
     let bb : EjString = changetype<EjString>(b) ;
@@ -321,7 +331,7 @@ export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
     }
     return c_true;
   }
-  return unreachable();
+  return c_false;
 }
 
 function compare<T>(a: T, b: T): EjNumber {
