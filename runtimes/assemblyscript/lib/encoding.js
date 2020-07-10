@@ -36,8 +36,9 @@ function write(module, x) {
                   return new m.EjRight(arg);
                 }
               case '$nat' :
-                // TODO: this cannot work, right?
-                return new m.EjBigInt(x.$nat);
+                // TODO: fix BigInt write
+                let n = BigInt(x.$nat);
+                return new m.EjBigInt(n);
             }
           }
           let o = new m.EjObject();
@@ -59,6 +60,7 @@ function read(module, x) {
   let { __instanceof } = module.exports;
   let m = module.exports;
   function recurse(x) {
+    // TODO: Support left/right/bigint types on read.
     if (__instanceof(x, m.IdEjNull)) {
       return null;
     }
