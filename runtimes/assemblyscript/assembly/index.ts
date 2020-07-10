@@ -268,9 +268,60 @@ export function opMathTrunc(a: EjNumber): EjNumber {
 
 // EJson Runtime Operators
 
-// TODO: this seems to be redundant with opStrictEqual, is it?
 export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
-  return opStrictEqual(a, b);
+  if (a instanceof EjNull && b instanceof EjNull) {
+    return c_true;
+  }
+  if (a instanceof EjBool && b instanceof EjBool) {
+    let aa : EjBool = changetype<EjBool>(a) ;
+    let bb : EjBool = changetype<EjBool>(b) ;
+    return aa.value == bb.value ? c_true : c_false;
+  }
+  if (a instanceof EjNumber && b instanceof EjNumber) {
+    let aa : EjNumber = changetype<EjNumber>(a) ;
+    let bb : EjNumber = changetype<EjNumber>(b) ;
+    return aa.value == bb.value ? c_true : c_false;
+  }
+  if (a instanceof EjBigInt && b instanceof EjBigInt) {
+    let aa : EjBigInt = changetype<EjBigInt>(a) ;
+    let bb : EjBigInt = changetype<EjBigInt>(b) ;
+    return aa.value == bb.value ? c_true : c_false;
+  }
+  if (a instanceof EjString && b instanceof EjString) {
+    let aa : EjString = changetype<EjString>(a) ;
+    let bb : EjString = changetype<EjString>(b) ;
+    return aa.value == bb.value ? c_true : c_false;
+  }
+  if (a instanceof EjArray && b instanceof EjArray) {
+    let aa : EjArray = changetype<EjArray>(a) ;
+    let bb : EjArray = changetype<EjArray>(b) ;
+    if (aa.values.length != bb.values.length) {
+      return c_false;
+    }
+    for (let i = 0; i < aa.values.length; i++) {
+      if (! runtimeEqual(aa.values[i], bb.values[i]).value) {
+        return c_false;
+      }
+    }
+    return c_true;
+  }
+  if (a instanceof EjObject && b instanceof EjObject) {
+    let aa : EjObject = changetype<EjObject>(a) ;
+    let bb : EjObject = changetype<EjObject>(b) ;
+    if (aa.values.size != bb.values.size) {
+      return c_false;
+    }
+    let keys = aa.values.keys();
+    for (let i = 0; i < keys.length; i++) {
+      let k = keys[i];
+      if (! bb.values.has(k) ||
+          ! runtimeEqual(aa.values[k], bb.values[k]).value ) {
+        return c_false;
+      }
+    }
+    return c_true;
+  }
+  return unreachable();
 }
 
 function compare<T>(a: T, b: T): EjNumber {
@@ -293,7 +344,38 @@ export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
   return unreachable();
 }
 
-// TODO: this seems to be redundant with opAccess, is it?
-export function runtimeRecDot(a: EjObject, b:EjString): EjValue {
-  return opAccess(a, b);
+// TODO: recConcat which argument "wins" in case of a conflict?
+export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
+  let r = new EjObject();
+  let k = a.values.keys();
+  for (let i = 0; i < k.length; i++) {
+    r.values.set(k[i], a.values.get(k[i]));
+  }
+  k = b.values.keys();
+  for (let i = 0; i < k.length; i++) {
+    r.values.set(k[i], b.values.get(k[i]));
+  }
+  return r;
+}
+
+export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
+  // TODO: runtimeRecDot redundant with opAccess?
+  // TODO: runtimeRecDot: check for key not found needed?
+  return a.values.get(k.value);
+}
+
+export function runtimeEither(a: EjValue): EjBool {
+  if (a instanceof EjLeft || a instanceof EjRight) {
+    return c_true;
+  } else {
+    return c_false;
+  }
+}
+
+export function runtimeToLeft(a: EjLeft): EjValue {
+  return a.value;
+}
+
+export function runtimeToRight(a: EjRight): EjValue {
+  return a.value;
 }
