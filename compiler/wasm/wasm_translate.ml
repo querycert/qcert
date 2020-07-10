@@ -179,7 +179,13 @@ let rt_op ctx op : Ir.instr list =
   in
   let open Ir in
   match (op : EJsonRuntimeOperators.ejson_runtime_op) with
+  | EJsonRuntimeEqual -> foreign [i32; i32] [i32]
+  | EJsonRuntimeCompare -> foreign [i32; i32] [i32]
+  | EJsonRuntimeRecConcat -> foreign [i32; i32] [i32]
   | EJsonRuntimeRecDot -> foreign [i32; i32] [i32]
+  | EJsonRuntimeEither -> foreign [i32] [i32]
+  | EJsonRuntimeToLeft -> foreign [i32] [i32]
+  | EJsonRuntimeToRight -> foreign [i32] [i32]
   | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
 module Constants = struct
