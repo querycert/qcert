@@ -19,6 +19,7 @@ open Lex_util
 open CompLang
 open EnhancedCompiler.EnhancedCompiler
 
+open Imp_ejson_parser
 
 (*****************)
 (* Generic Parse *)
@@ -58,6 +59,8 @@ let parse_oql f : QLang.oql = parse Oql_parser.main (Oql_lexer.token (string_buf
 
 let parse_lambda_nra f : QLang.lambda_nra = QLambdaNRA.latableify (parse Lambda_nra_parser.main (Lambda_nra_lexer.token (string_buff ())) f)
 
+let parse_imp_ejson f : QLang.imp_ejson = parse Imp_ejson_parser.main (Imp_ejson_lexer.token (string_buff ())) f
+
 (****************)
 (* S-Expr Parse *)
 (****************)
@@ -71,7 +74,7 @@ let parse_nnrc_sexp f : QLang.nnrc = Ast_to_sexp.sexp_to_nnrc (parse_sexp f)
 let parse_nnrs_sexp f : QLang.nnrs = Ast_to_sexp.sexp_to_nnrs (parse_sexp f)
 let parse_nnrs_imp_sexp f : QLang.nnrs_imp = Ast_to_sexp.sexp_to_nnrs_imp (parse_sexp f)
 let parse_imp_data_sexp f : QLang.imp_data = Ast_to_sexp.sexp_to_imp_data (parse_sexp f)
-let parse_imp_ejson_sexp f : QLang.imp_ejson = Ast_to_sexp.sexp_to_imp_ejson (parse_sexp f)
+(* let parse_imp_ejson_sexp f : QLang.imp_ejson = Ast_to_sexp.sexp_to_imp_ejson (parse_sexp f) *)
 let parse_nnrcmr_sexp f : QLang.nnrcmr = Ast_to_sexp.sexp_to_nnrcmr (parse_sexp f)
 
 (*******************
@@ -97,7 +100,7 @@ let parse_query l f : (string * QLang.query) =
   | L_nnrs -> ("NNRS", Q_nnrs (parse_nnrs_sexp f))
   | L_nnrs_imp -> ("NNRSimp", Q_nnrs_imp (parse_nnrs_imp_sexp f))
   | L_imp_data -> ("ImpData", Q_imp_data (parse_imp_data_sexp f))
-  | L_imp_ejson -> ("ImpEJson", Q_imp_ejson (parse_imp_ejson_sexp f))
+  | L_imp_ejson -> ("ImpEJson", Q_imp_ejson (parse_imp_ejson f))
   | L_nnrcmr -> ("NNRCMR", Q_nnrcmr (parse_nnrcmr_sexp f))
   | L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")
   | L_dnnrc_typed -> raise (Qcert_Error "No parser for typed DNNRC available")
