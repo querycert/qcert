@@ -138,17 +138,17 @@ describe('AssemblyScript: Ejson operators', function () {
   });
   it('runtimeCompare', async function () {
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
-    // let bia = enc.write(m, {'$nat': "12"});
-    // let bib = enc.write(m, {'$nat': "13"});
-    // assert(enc.read(m, m.exports.runtimeCompare(bia, bia) ==  0 ));
-    // assert(enc.read(m, m.exports.runtimeCompare(bia, bib) ==  1 ));
-    // assert(enc.read(m, m.exports.runtimeCompare(bib, bib) ==  0 ));
-    // assert(enc.read(m, m.exports.runtimeCompare(bib, bia) == -1 ));
     let na = enc.write(m, 12);
     let nb = enc.write(m, 13);
     assert(enc.read(m, m.exports.runtimeCompare(na, na)) ==  0, '=');
     assert(enc.read(m, m.exports.runtimeCompare(na, nb)) == -1, '<');
     assert(enc.read(m, m.exports.runtimeCompare(nb, nb)) ==  0, '=');
     assert(enc.read(m, m.exports.runtimeCompare(nb, na)) ==  1, '>');
+    let bia = enc.write(m, {'$nat': "12"});
+    let bib = enc.write(m, {'$nat': "13"});
+    assert(enc.read(m, m.exports.runtimeCompare(bia, bia)) ==  0, '=');
+    assert(enc.read(m, m.exports.runtimeCompare(bia, bib)) == -1, '<');
+    assert(enc.read(m, m.exports.runtimeCompare(bib, bib)) ==  0, '=');
+    assert(enc.read(m, m.exports.runtimeCompare(bib, bia)) ==  1, '>');
   });
 });
