@@ -1,9 +1,9 @@
 (ocamllex
-  (modules sexp_lexer data_lexer lambda_nra_lexer rule_lexer oql_lexer)
+  (modules sexp_lexer data_lexer lambda_nra_lexer rule_lexer oql_lexer imp_ejson_lexer)
 )
 
 (menhir
-  (modules sexp_parser data_parser lambda_nra_parser rule_parser oql_parser)
+  (modules sexp_parser data_parser lambda_nra_parser rule_parser oql_parser imp_ejson_parser)
 )
 
 (library
