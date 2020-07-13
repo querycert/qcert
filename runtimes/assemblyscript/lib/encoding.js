@@ -37,9 +37,7 @@ function write(module, x) {
                 }
               case '$nat' :
                 // TODO: implement BigInt on i64
-                // let n = BigInt(x.$nat);
-                // return new m.EjBigInt(n);
-                return new m.EjBigInt(Number(x));
+                return new m.EjBigInt(Number(x.$nat));
             }
           }
           let o = new m.EjObject();
