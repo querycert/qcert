@@ -32,6 +32,7 @@ Section ForeignEJsonRuntime.
                (dl:list ejson) : option ejson                                 
            (* ToString / ToText operators *)
            ; foreign_ejson_runtime_tostring : ejson -> string
+           ; foreign_ejson_runtime_fromstring : string -> option foreign_ejson_runtime_op
            ; foreign_ejson_runtime_totext : ejson -> string
          }.
 

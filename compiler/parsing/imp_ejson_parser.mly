@@ -24,18 +24,12 @@
   let runtime_call mname fname =
     if (mname = "Runtime")
     then
-      begin match fname with
-      | "equal" -> EJsonRuntimeEqual
-      | "compare" -> EJsonRuntimeCompare
-      | "dot" -> EJsonRuntimeRecDot
-      | "either" -> EJsonRuntimeEither
-      | "toLeft" -> EJsonRuntimeToLeft
-      | "toRight" -> EJsonRuntimeToRight
-      | _ ->
-	        raise (Qcert_Error ("Runtime call " ^ mname ^ "." ^ fname ^ " unkonwn"))
+      begin match QUtil.ejson_runtime_op_of_string (Util.char_list_of_string fname) with
+      | Some op -> op
+      | None ->raise (Qcert_Error ("Call to " ^ mname ^ "." ^ fname ^ " unkonwn"))
       end
     else
-	    raise (Qcert_Error ("Runtime call " ^ mname ^ "." ^ fname ^ " unkonwn"))
+	    raise (Qcert_Error ("Call to " ^ mname ^ "." ^ fname ^ " unkonwn"))
 %}
 
 %token <int> INT
@@ -51,7 +45,7 @@
 %token LPAREN RPAREN
 %token LCURLY RCURLY
 
-%token LET IF THEN ELSE TO DEFINE IN RETURN FOR FAILWITH
+%token LET IF THEN ELSE TO MODULE IN RETURN FOR FAILWITH
 
 %token EOF
 
@@ -64,11 +58,17 @@ main:
     { m }
 
 imodule:
-| f = ifunction
-    { [f] }
+| MODULE mname = IDENT LCURLY fs = ifunctions RCURLY
+      { fs } (* XXX module name is ignored *)
+
+ifunctions:
+|
+    { [] }
+| f = ifunction fs = ifunctions
+    { f :: fs }
 
 ifunction:
-| DEFINE fname = IDENT LPAREN aname = IDENT RPAREN RETURN rname = IDENT LCURLY s = stmt RCURLY
+| fname = IDENT LPAREN aname = IDENT RPAREN RETURN rname = IDENT LCURLY s = stmt RCURLY
     { (char_list_of_string fname,ImpFun (char_list_of_string aname,s,char_list_of_string rname)) }
 
 stmt:
