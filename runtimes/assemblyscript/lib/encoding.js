@@ -36,9 +36,10 @@ function write(module, x) {
                   return new m.EjRight(arg);
                 }
               case '$nat' :
-                // TODO: fix BigInt write
-                let n = BigInt(x.$nat);
-                return new m.EjBigInt(n);
+                // TODO: implement BigInt on i64
+                // let n = BigInt(x.$nat);
+                // return new m.EjBigInt(n);
+                return new m.EjBigInt(Number(x));
             }
           }
           let o = new m.EjObject();
@@ -71,6 +72,10 @@ function read(module, x) {
     if (__instanceof(x, m.IdEjNumber)) {
       let v = m.EjNumber.wrap(x);
       return v.value;
+    }
+    if (__instanceof(x, m.IdEjBigInt)) {
+      let v = m.EjBigInt.wrap(x);
+      return { $nat: v.value };
     }
     if (__instanceof(x, m.IdEjString)) {
       let v = m.EjString.wrap(x);
