@@ -27,8 +27,9 @@ const c_1 = new EjNumber(1);
 const c_0 = new EjNumber(0);
 
 export class EjBigInt extends EjValue {
-  value: i64
-  constructor(a: i64) { super(); this.value = a; }
+  // TODO: implement BigInt as i64 or actual natural numbers.
+  value: f64
+  constructor(a: f64) { super(); this.value = a; }
 }
 export const IdEjBigInt = idof<EjBigInt>()
 
@@ -193,7 +194,7 @@ export function opArray(a: EjValue): EjArray {
 }
 
 export function opArrayLength(a: EjArray): EjBigInt {
-  return new EjBigInt(i64(a.values.length));
+  return new EjBigInt(f64(a.values.length));
 }
 
 export function opArrayPush(a: EjArray, b: EjValue): EjArray {
@@ -349,7 +350,7 @@ export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
   if (a instanceof EjBigInt && b instanceof EjBigInt) {
     let aa : EjBigInt = changetype<EjBigInt>(a) ;
     let bb : EjBigInt = changetype<EjBigInt>(b) ;
-    return compare<i64>(aa.value, bb.value);
+    return compare<f64>(aa.value, bb.value);
   }
   return unreachable();
 }
