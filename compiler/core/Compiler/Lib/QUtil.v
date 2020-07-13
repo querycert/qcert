@@ -53,6 +53,7 @@ Module QUtil(runtime:CompilerRuntime).
   End results.
 
   Definition string_of_ejson_runtime_op := EJsonRuntimeOperators.string_of_ejson_runtime_op.
+  Definition ejson_runtime_op_of_string := EJsonRuntimeOperators.ejson_runtime_op_of_string.
 
 End QUtil.
 
