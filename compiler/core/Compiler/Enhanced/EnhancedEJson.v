@@ -75,6 +75,16 @@ Definition enhanced_foreign_ejson_runtime_op_tostring op : string :=
   | enhanced_ejson_uri sop => ejson_uri_runtime_op_tostring sop
   end.
 
+Definition enhanced_foreign_ejson_runtime_op_fromstring opname : option enhanced_foreign_ejson_runtime_op :=
+  match ejson_sql_date_runtime_op_fromstring opname with
+  | Some op =>  Some (enhanced_ejson_sql_date op)
+  | None =>
+    match ejson_uri_runtime_op_fromstring opname with
+    | Some op => Some (enhanced_ejson_uri op)
+    | None => None
+    end
+  end.
+
 Definition enhanced_ejson_sql_date_runtime_op_interp op (dl:list ejson) : option ejson :=
   match op with
   | EJsonRuntimeDateFromString =>
@@ -232,7 +242,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op :=
   end.
 
 Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _ _ _.
+  mk_foreign_ejson_runtime enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _ _ _ _.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
@@ -250,6 +260,9 @@ Defined.
 Next Obligation.
   exact (defaultEJsonToString H).
 Defined.
+Next Obligation.
+  exact (enhanced_foreign_ejson_runtime_op_fromstring H).
+Defined.  
 Next Obligation.
   exact (defaultEJsonToString H).
 Defined.
