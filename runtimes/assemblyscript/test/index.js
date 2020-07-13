@@ -151,4 +151,15 @@ describe('AssemblyScript: Ejson operators', function () {
     assert(enc.read(m, m.exports.runtimeCompare(bib, bib)) ==  0, '=');
     assert(enc.read(m, m.exports.runtimeCompare(bib, bia)) ==  1, '>');
   });
+  it('runtimeRecConcat / Dot', async function () {
+    let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
+    let { runtimeRecConcat, runtimeRecDot } = m.exports;
+    let a = enc.write(m, {a: 1});
+    let b = enc.write(m, {b: 2});
+    let ab = runtimeRecConcat(a,b);
+    let ka = enc.write(m, 'a');
+    let kb = enc.write(m, 'b');
+    assert(enc.read(m, runtimeRecDot(ab,ka)) ==  1, 'a == 1');
+    assert(enc.read(m, runtimeRecDot(ab,kb)) ==  2, 'b == 2');
+  });
 });
