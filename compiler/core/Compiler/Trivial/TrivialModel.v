@@ -111,8 +111,9 @@ Instance trivial_foreign_runtime :
        trivial_foreign_data
        trivial_foreign_operators.
 
+Definition trivial_foreign_ejson_op_fromstring (x:string) : option Empty_set := None.
 Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime trivial_foreign_ejson Empty_set _ _ _ defaultEJsonToString defaultEJsonToString.
+  mk_foreign_ejson_runtime trivial_foreign_ejson Empty_set _ _ _ defaultEJsonToString trivial_foreign_ejson_op_fromstring defaultEJsonToString.
 Next Obligation.
   intros [].
 Defined.

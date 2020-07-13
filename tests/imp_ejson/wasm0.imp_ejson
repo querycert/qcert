@@ -1,3 +1,5 @@
-define wasm0(a) return x {
-  x := 3.14;
+module main {
+  wasm0(a) return x {
+    x := 3.14;
+  }
 }

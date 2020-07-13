@@ -24,7 +24,7 @@
           ("true",TRUE);
           ("false",FALSE);
           ("let",LET);
-	        ("define",DEFINE);
+	        ("module",MODULE);
 	        ("for",FOR);
           ("to",TO);
           ("in",IN);
