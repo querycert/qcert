@@ -27,6 +27,7 @@ val parse_rule : Lexing.lexbuf -> string * QLang.camp_rule
 val parse_camp : Lexing.lexbuf -> string * QLang.camp
 
 val parse_oql : Lexing.lexbuf -> QLang.oql
+val parse_imp_ejson : Lexing.lexbuf -> QLang.imp_ejson
 
 (****************
  * S-Expr Parse *

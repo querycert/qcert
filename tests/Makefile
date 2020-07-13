@@ -450,6 +450,36 @@ designer_rule-test-tests-js:
                           --eval-validate \
                           --query designer_rule/test$(N).js || exit 1 ;)
 
+## IMPEJSON
+IMPEJSONWASMNUM=0 1
+IMPEJSONTARGETS=imp_ejson # dnnrc_typed
+
+imp_ejson-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Imp (EJSON) tests"
+	@echo "[Q*cert] "
+	@$(MAKE) imp_ejson-wasm-tests
+ifneq ($(JAVASCRIPT),)
+	@$(MAKE) imp_ejson-wasm-tests-js
+endif
+
+imp_ejson-wasm-tests:
+	$(foreach N,$(IMPEJSONWASMNUM), \
+            $(foreach T,$(IMPEJSONTARGETS), \
+	       $(QCERTCOMP) -source imp_ejson -target $(T) imp_ejson/wasm$(N).imp_ejson \
+                            -eval -input imp_ejson/wasm.input \
+                            -schema imp_ejson/wasm.schema \
+                            -eval-validate -output imp_ejson/wasm$(N).out || exit 1;))
+imp_ejson-wasm-tests-js:
+	@$(foreach N,$(IMPEJSONWASMNUM), \
+	       $(QCERTCOMP) -source imp_ejson -target javascript imp_ejson/wasm$(N).imp_ejson -schema imp_ejson/wasm.schema -quiet; \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --input imp_ejson/wasm.input \
+                          --schema imp_ejson/wasm.schema \
+                          --output imp_ejson/wasm$(N).out \
+                          --eval-validate \
+                          --query imp_ejson/wasm$(N).js || exit 1 ;)
+
 clean:
 	@rm -rf log
 	@rm -f */*.txt
@@ -483,6 +513,11 @@ clean:
 	@rm -f lambda_nra/*.js
 	@rm -f lambda_nra/*.java
 	@rm -f lambda_nra/*.class
+	@rm -f imp_ejson/*.json
+	@rm -f imp_ejson/*.js
+	@rm -f imp_ejson/*.java
+	@rm -f imp_ejson/*.class
+	@rm -f imp_ejson/*.wat
 
 cleanall: clean
 	@rm -f *~ */*~
