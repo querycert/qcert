@@ -1,0 +1,7 @@
+define wasm1(x) return y {
+  if true
+  then
+    y := Runtime.dot(x,"e");
+  else
+    y := Runtime.dot(x,"pi");
+}
