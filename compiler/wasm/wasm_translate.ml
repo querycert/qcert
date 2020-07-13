@@ -284,8 +284,8 @@ module Constants = struct
       ; if_
           [ i32_const' 0
           ; local_get local_ptr
-          ; load ctx.ctx.memory ~offset:8 i64
-          ; new_ [i64] "EjBigInt"
+          ; load ctx.ctx.memory ~offset:8 f64
+          ; new_ [f64] "EjBigInt"
           ; return
           ] []
       ; local_get tag

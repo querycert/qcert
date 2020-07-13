@@ -499,3 +499,14 @@ wasm:
 		node ../runtimes/assemblyscript/index.js ../runtimes/assemblyscript/build/untouched.wasm oql/wasm$$i.wasm oql/wasm.input oql/wasm$${i}_oql.json ; \
 		i=$$(expr $$i + 1 ) ; \
 	done
+
+wasm-persons:
+	@i=0 ; \
+	while [ -e oql/persons$$i.oql ] ; do \
+	  echo === oql/persons$$i.oql; \
+		$(WASMQCERT) -quiet -source oql -target oql oql/persons$$i.oql -schema oql/persons.schema -eval -input oql/persons.input && \
+		$(WASMQCERT) -quiet -source oql -target wasm_ast oql/persons$$i.oql -schema oql/persons.schema && \
+		wat2wasm oql/persons$$i.wat -o oql/persons$$i.wasm && \
+		node ../runtimes/assemblyscript/index.js ../runtimes/assemblyscript/build/untouched.wasm oql/persons$$i.wasm oql/persons.input oql/persons$${i}_oql.json ; \
+		i=$$(expr $$i + 1 ) ; \
+	done
