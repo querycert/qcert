@@ -2,7 +2,7 @@
 module main {
   wasm8(x) return y {
     y := 0;
-    for(i in [1,2,3,4,5,6,7,8,9,10]) {
+    for(i in Runtime.recDot(x, "integers")) {
       y := Runtime.natPlus(y,i);
     }
   }
