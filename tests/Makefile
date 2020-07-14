@@ -451,7 +451,7 @@ designer_rule-test-tests-js:
                           --query designer_rule/test$(N).js || exit 1 ;)
 
 ## IMPEJSON
-IMPEJSONWASMNUM=0 1 2 3 4 5 6 7
+IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11
 IMPEJSONTARGETS=imp_ejson # dnnrc_typed
 
 imp_ejson-tests:
@@ -471,7 +471,7 @@ imp_ejson-wasm-tests:
                             -schema imp_ejson/wasm.schema \
                             -eval-validate -output imp_ejson/wasm$(N).out || exit 1;))
 imp_ejson-wasm-tests-js:
-	@$(foreach N,$(IMPEJSONWASMNUM), \
+	$(foreach N,$(IMPEJSONWASMNUM), \
 	       $(QCERTCOMP) -source imp_ejson -target javascript imp_ejson/wasm$(N).imp_ejson -schema imp_ejson/wasm.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
                           --input imp_ejson/wasm.input \

@@ -39,11 +39,12 @@
 
 %token NULL
 %token TRUE FALSE
-%token EQUAL COLONEQUAL
+%token EQUAL COLON COLONEQUAL
 %token SEMI COMMA
 %token DOT
 %token LPAREN RPAREN
 %token LCURLY RCURLY
+%token LBRACKET RBRACKET
 %token PLUS STAR MINUS SLASH
 %token LT GT LTEQ GTEQ
 
@@ -115,6 +116,9 @@ expr:
 (* Parenthesized expression *)
 | LPAREN e = expr RPAREN
     { e }
+(* Failure *)
+| FAILWITH s = STRING
+    { ImpExprError (char_list_of_string s) }
 (* Constants *)
 | NULL
     { ImpExprConst Coq_cejnull }
@@ -128,9 +132,11 @@ expr:
     { ImpExprConst (Coq_cejbool false) }
 | s = STRING
     { ImpExprConst (Coq_cejstring (char_list_of_string s)) }
-(* Failure *)
-| FAILWITH s = STRING
-    { ImpExprError (char_list_of_string s) }
+(* Constructors *)
+| LBRACKET es = exprs RBRACKET (* Arrays *)
+    { ImpExprRuntimeCall (EJsonRuntimeArray,es) }
+| LCURLY ps = pairs RCURLY (* Object *)
+    { let (anames,es) = ps in ImpExprOp (EJsonOpObject anames,es) }
 (* Operator *)
 | e1 = expr PLUS e2 = expr
     { ImpExprOp (EJsonOpAddNumber,[e1;e2]) }
@@ -162,4 +168,13 @@ exprs:
     { e :: [] }
 | e = expr COMMA es = exprs
     { e :: es }
+
+pairs:
+| 
+    { ([],[]) }
+| aname = IDENT COLON e = expr
+    { (char_list_of_string aname :: [], e :: []) }
+| aname = IDENT COLON e = expr COMMA ps = pairs
+    { let (anames,es) = ps in
+      (char_list_of_string aname :: anames, e :: es) }
 

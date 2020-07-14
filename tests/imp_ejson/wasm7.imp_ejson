@@ -1,9 +1,9 @@
-/* Sum of all integers between 0 and nb */
+/* Sum of all integers between 1 and nb */
 module main {
   wasm7(x) return y {
     let nb := Runtime.recDot(x,"nb");
     y := 0;
-    for(i = 0 to nb) {
+    for(i = 1 to nb) {
       y := Runtime.natPlus(y,i);
     }
   }

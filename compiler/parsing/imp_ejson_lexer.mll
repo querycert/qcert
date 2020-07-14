@@ -49,13 +49,16 @@ let float = digit* (frac exp? | exp)
 rule token sbuff = parse
 | eof { EOF }
 | ":=" { COLONEQUAL }
-| "=" { EQUAL }
 | ";" { SEMI }
+| "=" { EQUAL }
+| ":" { COLON }
 | "," { COMMA }
 | "(" { LPAREN }
 | ")" { RPAREN }
 | "{" { LCURLY }
 | "}" { RCURLY }
+| "[" { LBRACKET }
+| "]" { RBRACKET }
 | "." { DOT }
 | "+" { PLUS }
 | "*" { STAR }
