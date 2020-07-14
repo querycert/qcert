@@ -1,0 +1,5 @@
+module main {
+  wasm3(x) return y {
+    y := Runtime.recDot(x,"pi");
+  }
+}
