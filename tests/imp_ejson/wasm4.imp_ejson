@@ -1,0 +1,5 @@
+module main {
+  wasm4(x) return y {
+    y := Runtime.recDot(x,"pi") < Runtime.recDot(x,"e");
+  }
+}
