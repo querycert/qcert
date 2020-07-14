@@ -82,9 +82,9 @@ let op ctx op : Ir.instr =
   | EJsonOpArrayPush -> foreign [i32; i32] [i32]
   | EJsonOpArrayAccess -> foreign [i32; i32] [i32]
   (* TODO: (WASM IR in coq) get rid of the following three constructor arguments *)
-  | EJsonOpObject _ -> foreign [i32] [i32]
-  | EJsonOpAccess _ -> foreign [i32; i32] [i32]
-  | EJsonOpHasOwnProperty _ -> foreign [i32; i32] [i32]
+  | EJsonOpObject _ -> unsupported "opObject"
+  | EJsonOpAccess _ -> unsupported "opAccess"
+  | EJsonOpHasOwnProperty _ -> unsupported "opHasOwnProperty"
   | EJsonOpMathMin -> foreign [i32; i32] [i32]
   | EJsonOpMathMax -> foreign [i32; i32] [i32]
   | EJsonOpMathPow -> foreign [i32; i32] [i32]
@@ -183,13 +183,40 @@ let rt_op ctx op : Ir.instr =
   | EJsonRuntimeCompare -> foreign [i32; i32] [i32]
   | EJsonRuntimeRecConcat -> foreign [i32; i32] [i32]
   | EJsonRuntimeRecDot -> foreign [i32; i32] [i32]
+  | EJsonRuntimeArrayLength -> foreign [i32] [i32]
   | EJsonRuntimeEither -> foreign [i32] [i32]
   | EJsonRuntimeToLeft -> foreign [i32] [i32]
   | EJsonRuntimeToRight -> foreign [i32] [i32]
   | EJsonRuntimeNatLe -> foreign [i32; i32] [i32]
   | EJsonRuntimeNatLt -> foreign [i32; i32] [i32]
   | EJsonRuntimeNatPlus -> foreign [i32; i32] [i32]
+  | EJsonRuntimeFloatOfNat -> foreign [i32] [i32]
   | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
+
+let rt_op_n_ary ctx op args: Ir.instr =
+  let foreign params result fname =
+    let f, import = Ir.import_func ~params ~result "runtime" fname in
+    ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+    Ir.call f
+  in
+  let open Ir in
+  match (op : EJsonRuntimeOperators.ejson_runtime_op) with
+  | EJsonRuntimeArray ->
+    block ~result:[i32] (
+      [ i32_const' 0
+      ; i32_const' (List.length args)
+      ; foreign [i32; i32] [i32] "EjArrayBuilder#constructor"
+      ] @
+      ( List.map (fun x ->
+            [ x
+            ; foreign [i32; i32] [i32] "EjArrayBuilder#put"
+            ]
+          ) args
+        |> List.concat ) @
+      [ foreign [i32] [i32] "EjArrayBuilder#finalize" ]
+    )
+  | _ ->
+    block ~result:[i32] (args @ [rt_op ctx.ctx op])
 
 module Constants = struct
   let encode_const : EJson.cejson -> bytes = function
@@ -375,7 +402,8 @@ let rec expr ctx expression : Ir.instr list =
     (* Put arguments on the stack, append operator *)
     (List.map (expr ctx) args |> List.concat) @ [ op ctx.ctx x ]
   | ImpExprRuntimeCall (x, args) ->
-    (List.map (expr ctx) args |> List.concat) @ [rt_op ctx.ctx x]
+    let args = List.map (fun x -> Ir.(block ~result:[i32]) (expr ctx x)) args in
+    [ rt_op_n_ary ctx x args ]
 
 let rec statement ctx stmt : Ir.instr list =
   let foreign fname params result =
