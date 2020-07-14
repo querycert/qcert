@@ -63,6 +63,30 @@ export class EjArray extends EjValue {
 export const IdArrayEjValue = idof<Array<EjValue>>()
 export const IdEjArray = idof<EjArray>()
 
+export class EjArrayBuilder {
+  private arr: Array<EjValue>
+  private pos: i32 
+  constructor(n: i32) {
+    this.pos = 0;
+    this.arr = new Array<EjValue>(n);
+  }
+  put(val: EjValue): EjArrayBuilder {
+    this.arr[this.pos] = val;
+    this.pos++;
+    return this;
+  }
+  finalize(): EjArray {
+    return new EjArray(this.arr)
+  }
+}
+export function createArray(n: i32): Array<EjValue> {
+  let arr = new Array<EjValue>(n);
+  for (let i = 0; i < arr.length; ++i) {
+    arr[i] = c_null;
+  }
+  return arr;
+}
+
 export class EjObject extends EjValue {
   values: Map<string, EjValue>
   constructor() { super(); this.values = new Map<string, EjValue>(); }
@@ -375,6 +399,10 @@ export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
   return a.values.get(k.value);
 }
 
+export function runtimeArrayLength(a: EjArray) : EjNumber {
+  return new EjNumber(a.values.length);
+}
+
 export function runtimeEither(a: EjValue): EjBool {
   if (a instanceof EjLeft || a instanceof EjRight) {
     return c_true;
@@ -401,4 +429,8 @@ export function runtimeNatLt(a: EjBigInt, b: EjBigInt): EjBool {
 
 export function runtimeNatPlus(a: EjBigInt, b: EjBigInt): EjBigInt {
   return new EjBigInt(a.value + b.value);
+}
+
+export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
+  return new EjNumber(a.value);
 }
