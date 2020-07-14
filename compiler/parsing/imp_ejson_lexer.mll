@@ -57,6 +57,14 @@ rule token sbuff = parse
 | "{" { LCURLY }
 | "}" { RCURLY }
 | "." { DOT }
+| "+" { PLUS }
+| "*" { STAR }
+| "-" { MINUS }
+| "/" { SLASH }
+| "<" { LT }
+| ">" { GT }
+| "<=" { LTEQ }
+| ">=" { GTEQ }
 | [' ' '\t']
     { token sbuff lexbuf }
 | newline
