@@ -53,12 +53,12 @@ let op_foreign_fn_name : imp_ejson_op -> string = function
   | EJsonOpMathFloor -> "opMathFloor"
   | EJsonOpMathTrunc -> "opMathTrunc"
 
-let op ctx op : Ir.instr list =
+let op ctx op : Ir.instr =
   let foreign params result =
     let fname = op_foreign_fn_name op in
     let f, import = Ir.import_func ~params ~result "runtime" fname in
     ctx.imports <- ImportSet.add import ctx.imports;
-    [ Ir.call f ]
+    Ir.call f
   in
   let open Ir in
   match (op : imp_ejson_op) with
@@ -373,7 +373,7 @@ let rec expr ctx expression : Ir.instr list =
   | ImpExprConst x -> [const ctx x]
   | ImpExprOp (x, args) ->
     (* Put arguments on the stack, append operator *)
-    (List.map (expr ctx) args |> List.concat) @ (op ctx.ctx x)
+    (List.map (expr ctx) args |> List.concat) @ [ op ctx.ctx x ]
   | ImpExprRuntimeCall (x, args) ->
     (List.map (expr ctx) args |> List.concat) @ [rt_op ctx.ctx x]
 
@@ -398,7 +398,44 @@ let rec statement ctx stmt : Ir.instr list =
     List.concat (defs @ body)
   | ImpStmtAssign (var, x) ->
     expr ctx x @ [ Ir.local_set (Table.insert ctx.locals var) ]
-  | ImpStmtFor _ -> unsupported "statement: for"
+  | ImpStmtFor (e', arr, body) ->
+    let i'   = '$' :: '%' :: 'i' :: '%' :: e' in
+    let n' = '$' :: '%' :: 'n' :: '%' :: e' in
+    let a' = '$' :: '%' :: 'a' :: '%' :: e' in
+    let i = Table.insert ctx.locals i' in
+    let e = Table.insert ctx.locals e' in
+    let n = Table.insert ctx.locals n' in
+    let a = Table.insert ctx.locals a' in
+    let low = Imp.ImpExprConst (EJson.Coq_cejbigint 0)
+    and high = Imp.ImpExprOp (EJsonOperators.EJsonOpArrayLength, [Imp.ImpExprVar a'])
+    in
+    let open Ir in
+    let get_el =
+      [ local_get a
+      ; local_get i
+      ; op ctx.ctx EJsonOpArrayAccess
+      ; local_set e
+      ]
+    in
+    ( statement ctx (ImpStmtAssign (i', low )) ) @
+    ( statement ctx (ImpStmtAssign (a', arr )) ) @
+    ( statement ctx (ImpStmtAssign (n', high)) ) @
+    [ loop
+        [ local_get i
+        ; local_get n
+        ; rt_op ctx.ctx EJsonRuntimeNatLt
+        ; foreign "EjBool#get:value" [i32] [i32]
+        ; if_
+            [ block get_el
+            ; block (statement ctx body) (* TODO: what if body modifies i? *)
+            ; local_get i
+            ; const ctx (Coq_cejbigint 1)
+            ; rt_op ctx.ctx EJsonRuntimeNatPlus
+            ; local_set i
+            ; br 1
+            ] []
+        ]
+    ]
   | ImpStmtForRange (var, low, high, body) ->
     let i = Table.insert ctx.locals var in
     let max' = '$' :: '%' :: var in
