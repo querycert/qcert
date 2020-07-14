@@ -375,6 +375,11 @@ let rec expr ctx expression : Ir.instr list =
     (List.map (expr ctx) args |> List.concat) @ (rt_op ctx.ctx x)
 
 let rec statement ctx stmt : Ir.instr list =
+  let foreign fname params result =
+    let f, import = Ir.import_func ~params ~result "runtime" fname in
+    ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+    Ir.call f
+  in
   match (stmt : imp_ejson_stmt) with
   | ImpStmtBlock (vars, stmts) ->
     (* TODO: This assumes that variable names are unique which is not true in general. *)
@@ -392,7 +397,13 @@ let rec statement ctx stmt : Ir.instr list =
     expr ctx x @ [ Ir.local_set (Table.insert ctx.locals var) ]
   | ImpStmtFor _ -> unsupported "statement: for"
   | ImpStmtForRange _ -> unsupported "statement: for range"
-  | ImpStmtIf _ -> unsupported "statement: if"
+  | ImpStmtIf (condition, then_, else_) ->
+    let open Ir in
+    (expr ctx condition) @
+    (* TODO: check that expr is a EjBool? *)
+    [ foreign "EjBool#get:value" [i32] [i32]
+    ; if_ (statement ctx then_) (statement ctx then_)
+    ]
 
 let function_  ctx fn : Ir.func =
   let Imp.ImpFun (arg, stmt, ret) = fn in
