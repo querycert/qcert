@@ -1,1 +1,1 @@
-{ "pi" : 3.14, "e" : 2.72, "greet" : "Hello World!" }
+{ "pi" : 3.14, "e" : 2.72, "greet" : "Hello World!", "nb": { "$nat": 10 } }

@@ -127,7 +127,7 @@ class QcertRunner {
         const gconf = QcertRunner.configure('oql',schema,compiledQuery,output);
         input = BoxedCollections.boxColl(input);
         if (validate) {
-            if (output) {
+            if (output !== undefined) {
                 let result = QcertRunner.executeCompiled(schema,queryFile,compiledQuery,input);
                 result = BoxedCollections.unboxColl(result);
                 return QcertRunner.validate(gconf,queryFile,'js',output,result)

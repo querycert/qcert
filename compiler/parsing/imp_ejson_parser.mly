@@ -44,10 +44,16 @@
 %token DOT
 %token LPAREN RPAREN
 %token LCURLY RCURLY
+%token PLUS STAR MINUS SLASH
+%token LT GT LTEQ GTEQ
 
 %token LET IF THEN ELSE TO MODULE IN RETURN FOR FAILWITH
 
 %token EOF
+
+%right LT GT LTEQ GTEQ
+%right PLUS MINUS
+%right STAR SLASH
 
 %start <ImpEJson.imp_ejson> main
 
@@ -68,12 +74,16 @@ ifunctions:
     { f :: fs }
 
 ifunction:
-| fname = IDENT LPAREN aname = IDENT RPAREN RETURN rname = IDENT LCURLY s = stmt RCURLY
-    { (char_list_of_string fname,ImpFun (char_list_of_string aname,s,char_list_of_string rname)) }
+| fname = IDENT LPAREN aname = IDENT RPAREN RETURN rname = IDENT b = block
+    { (char_list_of_string fname,ImpFun (char_list_of_string aname,b,char_list_of_string rname)) }
 
-stmt:
+block:
 | LCURLY ds = decls ss = stmts RCURLY
     { ImpStmtBlock (ds,ss) }
+
+stmt:
+| b = block
+    { b }
 | vname = IDENT COLONEQUAL e = expr SEMI
     { ImpStmtAssign (char_list_of_string vname,e) }
 | FOR LPAREN vname = IDENT IN e = expr RPAREN s = stmt
@@ -86,13 +96,13 @@ stmt:
 stmts:
 |
     { [] }
-| s = stmt SEMI ss = stmts
+| s = stmt ss = stmts
     { s :: ss }
 
 decls:
 |
     { [] }
-| d = decl SEMI ds = decls
+| d = decl ds = decls
     { d :: ds }
 
 decl:
@@ -121,6 +131,23 @@ expr:
 (* Failure *)
 | FAILWITH s = STRING
     { ImpExprError (char_list_of_string s) }
+(* Operator *)
+| e1 = expr PLUS e2 = expr
+    { ImpExprOp (EJsonOpAddNumber,[e1;e2]) }
+| e1 = expr MINUS e2 = expr
+    { ImpExprOp (EJsonOpSub,[e1;e2]) }
+| e1 = expr STAR e2 = expr
+    { ImpExprOp (EJsonOpMult,[e1;e2]) }
+| e1 = expr SLASH e2 = expr
+    { ImpExprOp (EJsonOpDiv,[e1;e2]) }
+| e1 = expr LT e2 = expr
+    { ImpExprOp (EJsonOpLt,[e1;e2]) }
+| e1 = expr GT e2 = expr
+    { ImpExprOp (EJsonOpGt,[e1;e2]) }
+| e1 = expr LTEQ e2 = expr
+    { ImpExprOp (EJsonOpLe,[e1;e2]) }
+| e1 = expr GTEQ e2 = expr
+    { ImpExprOp (EJsonOpGe,[e1;e2]) }
 (* Call *)
 | mname = IDENT DOT fname = IDENT LPAREN el = exprs RPAREN
     { ImpExprRuntimeCall (runtime_call mname fname,el) }

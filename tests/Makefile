@@ -451,7 +451,7 @@ designer_rule-test-tests-js:
                           --query designer_rule/test$(N).js || exit 1 ;)
 
 ## IMPEJSON
-IMPEJSONWASMNUM=0 1
+IMPEJSONWASMNUM=0 1 2 3 4 5 6 7
 IMPEJSONTARGETS=imp_ejson # dnnrc_typed
 
 imp_ejson-tests:
