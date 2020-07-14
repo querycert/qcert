@@ -263,8 +263,8 @@ export function opMathFloor(a: EjNumber): EjNumber {
   return new EjNumber(Math.floor(a.value));
 }
 
-export function opMathTrunc(a: EjNumber): EjNumber {
-  return new EjNumber(Math.trunc(a.value));
+export function opMathTrunc(a: EjNumber): EjBigInt {
+  return new EjBigInt(Math.trunc(a.value));
 }
 
 // EJson Runtime Operators
