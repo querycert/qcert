@@ -390,3 +390,15 @@ export function runtimeToLeft(a: EjLeft): EjValue {
 export function runtimeToRight(a: EjRight): EjValue {
   return a.value;
 }
+
+export function runtimeNatLe(a: EjBigInt, b: EjBigInt): EjBool {
+  return new EjBool(a.value <= b.value);
+}
+
+export function runtimeNatLt(a: EjBigInt, b: EjBigInt): EjBool {
+  return new EjBool(a.value < b.value);
+}
+
+export function runtimeNatPlus(a: EjBigInt, b: EjBigInt): EjBigInt {
+  return new EjBigInt(a.value + b.value);
+}

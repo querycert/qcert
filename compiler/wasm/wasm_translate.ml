@@ -170,12 +170,12 @@ let string_of_runtime_op =
   (* Foreign *)
   | EJsonRuntimeForeign _fop -> "FOREIGN"
 
-let rt_op ctx op : Ir.instr list =
+let rt_op ctx op : Ir.instr =
   let foreign params result =
     let fname = string_of_runtime_op op in
     let f, import = Ir.import_func ~params ~result "runtime" fname in
     ctx.imports <- ImportSet.add import ctx.imports;
-    [ Ir.call f ]
+    Ir.call f
   in
   let open Ir in
   match (op : EJsonRuntimeOperators.ejson_runtime_op) with
@@ -186,6 +186,9 @@ let rt_op ctx op : Ir.instr list =
   | EJsonRuntimeEither -> foreign [i32] [i32]
   | EJsonRuntimeToLeft -> foreign [i32] [i32]
   | EJsonRuntimeToRight -> foreign [i32] [i32]
+  | EJsonRuntimeNatLe -> foreign [i32; i32] [i32]
+  | EJsonRuntimeNatLt -> foreign [i32; i32] [i32]
+  | EJsonRuntimeNatPlus -> foreign [i32; i32] [i32]
   | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
 module Constants = struct
@@ -215,7 +218,8 @@ module Constants = struct
       let b = Bytes.create 16 in
       Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
       Bytes.set_int32_le b 4 (Int32.of_int 4); (* type: bigint *)
-      Bytes.set_int64_le b 8 (Int64.of_int x); (* value *)
+      Bytes.set_int64_le b 8 (Int64.bits_of_float (float_of_int x)); (* value *)
+      (* TODO: encode BigInt as integer type *)
       b
     | Coq_cejstring s ->
       let s = Util.string_of_char_list s in
@@ -356,23 +360,22 @@ module Constants = struct
       ]
 end
 
-let const ctx c : Ir.instr list =
+let const ctx c : Ir.instr =
   let offset = Table.insert ctx.ctx.constants c in
   let open Ir in
-  [ i32_const' offset
-  ; call (Constants.get_const ctx)
-  ]
+  block ~result:[i32]
+    [ i32_const' offset ; call (Constants.get_const ctx) ]
 
 let rec expr ctx expression : Ir.instr list =
   match (expression : imp_ejson_expr) with
   | ImpExprError err -> unsupported "expr: error"
   | ImpExprVar v -> [Ir.local_get (Table.insert ctx.locals v)]
-  | ImpExprConst x -> const ctx x
+  | ImpExprConst x -> [const ctx x]
   | ImpExprOp (x, args) ->
     (* Put arguments on the stack, append operator *)
     (List.map (expr ctx) args |> List.concat) @ (op ctx.ctx x)
   | ImpExprRuntimeCall (x, args) ->
-    (List.map (expr ctx) args |> List.concat) @ (rt_op ctx.ctx x)
+    (List.map (expr ctx) args |> List.concat) @ [rt_op ctx.ctx x]
 
 let rec statement ctx stmt : Ir.instr list =
   let foreign fname params result =
@@ -396,7 +399,28 @@ let rec statement ctx stmt : Ir.instr list =
   | ImpStmtAssign (var, x) ->
     expr ctx x @ [ Ir.local_set (Table.insert ctx.locals var) ]
   | ImpStmtFor _ -> unsupported "statement: for"
-  | ImpStmtForRange _ -> unsupported "statement: for range"
+  | ImpStmtForRange (var, low, high, body) ->
+    let i = Table.insert ctx.locals var in
+    let max' = '$' :: '%' :: var in
+    let max = Table.insert ctx.locals max' in
+    let open Ir in
+    ( statement ctx (ImpStmtAssign (var, low)) ) @
+    ( statement ctx (ImpStmtAssign (max', high)) ) @
+    [ loop
+        [ local_get i
+        ; local_get max
+        ; rt_op ctx.ctx EJsonRuntimeNatLe
+        ; foreign "EjBool#get:value" [i32] [i32]
+        ; if_
+            [ block (statement ctx body) (* TODO: what if body modifies i? *)
+            ; local_get i
+            ; const ctx (Coq_cejbigint 1)
+            ; rt_op ctx.ctx EJsonRuntimeNatPlus
+            ; local_set i
+            ; br 1
+            ] []
+        ]
+    ]
   | ImpStmtIf (condition, then_, else_) ->
     let open Ir in
     (expr ctx condition) @
@@ -415,7 +439,10 @@ let function_  ctx fn : Ir.func =
     statement ctx stmt @
     Ir.[ local_get (Table.insert locals ret) ]
   in
-  let locals = List.init (Table.size locals - 1) (fun _ -> Ir.i32) in
+  let locals =
+    (* First local is function arguments. All locals are pointers. *)
+    List.init (Table.size ctx.locals - 1) (fun _ -> Ir.i32)
+  in
   Ir.(func ~params:[i32] ~result:[i32] ~locals body)
 
 let f_start =
