@@ -522,9 +522,9 @@ clean:
 cleanall: clean
 	@rm -f *~ */*~
 
-WASMQCERT=dune exec --no-print-directory qcert --
+WASMQCERT=../_build/default/cli/ocaml/qcert.exe
 
-wasm:
+wasm-oql:
 	@i=0 ; \
 	while [ -e oql/wasm$$i.oql ] ; do \
 	  echo === oql/wasm$$i.oql; \
@@ -535,13 +535,13 @@ wasm:
 		i=$$(expr $$i + 1 ) ; \
 	done
 
-wasm-persons:
+wasm-imp:
 	@i=0 ; \
-	while [ -e oql/persons$$i.oql ] ; do \
-	  echo === oql/persons$$i.oql; \
-		$(WASMQCERT) -quiet -source oql -target oql oql/persons$$i.oql -schema oql/persons.schema -eval -input oql/persons.input && \
-		$(WASMQCERT) -quiet -source oql -target wasm_ast oql/persons$$i.oql -schema oql/persons.schema && \
-		wat2wasm oql/persons$$i.wat -o oql/persons$$i.wasm && \
-		node ../runtimes/assemblyscript/index.js ../runtimes/assemblyscript/build/untouched.wasm oql/persons$$i.wasm oql/persons.input oql/persons$${i}_oql.json ; \
+	while [ -e imp_ejson/wasm$$i.imp_ejson ] ; do \
+	  echo === imp_ejson/wasm$$i.imp_ejson; \
+		$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input && \
+		$(WASMQCERT) -quiet -source imp_ejson -target wasm_ast imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema && \
+		wat2wasm imp_ejson/wasm$$i.wat -o imp_ejson/wasm$$i.wasm && \
+		node ../runtimes/assemblyscript/index.js ../runtimes/assemblyscript/build/untouched.wasm imp_ejson/wasm$$i.wasm imp_ejson/wasm.input imp_ejson/wasm$${i}_imp_ejson.json ; \
 		i=$$(expr $$i + 1 ) ; \
 	done
