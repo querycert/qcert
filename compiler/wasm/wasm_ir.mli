@@ -50,6 +50,11 @@ val if_ :
   ?result: type_ list ->
   instr list -> instr list -> instr
 
+val block:
+  ?params: type_ list ->
+  ?result: type_ list ->
+  instr list -> instr
+
 val loop:
   ?params: type_ list ->
   ?result: type_ list -> instr list -> instr

@@ -406,6 +406,10 @@ module Intructions = struct
     let t = block_type ctx ~params ~result in
     If (t, List.map (instr_to_spec ctx) then_, List.map (instr_to_spec ctx) else_)
 
+  let block ?(params=[]) ?(result=[]) body ctx =
+    let t = block_type ctx ~params ~result in
+    Block (t, List.map (instr_to_spec ctx) body)
+
   let loop ?(params=[]) ?(result=[]) body ctx =
     let t = block_type ctx ~params ~result in
     Loop (t, List.map (instr_to_spec ctx) body)
