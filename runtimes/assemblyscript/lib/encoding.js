@@ -42,7 +42,7 @@ function write(module, x) {
           }
           let o = new m.EjObject();
           keys.forEach(function (k) {
-            let key = __retain(m.__allocString(k));
+            let key = recurse(k);
             let val = recurse(x[k]);
             o.set(key,val);
           });
@@ -87,10 +87,10 @@ function read(module, x) {
       let v = m.EjObject.wrap(x);
       let o = new Object();
       m.__getArray(v.keys())
-        .forEach(k => {
-          let val = recurse(v.get(k));
-          let key = m.__getString(k);
-          o[key] = val;
+        .forEach(remote_key => {
+          let val = recurse(v.get(remote_key));
+          let local_key = recurse(remote_key);
+          o[local_key] = val;
         });
       return o
     }
