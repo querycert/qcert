@@ -65,7 +65,7 @@ export const IdEjArray = idof<EjArray>()
 
 export class EjArrayBuilder {
   private arr: Array<EjValue>
-  private pos: i32 
+  private pos: i32
   constructor(n: i32) {
     this.pos = 0;
     this.arr = new Array<EjValue>(n);
@@ -79,25 +79,19 @@ export class EjArrayBuilder {
     return new EjArray(this.arr)
   }
 }
-export function createArray(n: i32): Array<EjValue> {
-  let arr = new Array<EjValue>(n);
-  for (let i = 0; i < arr.length; ++i) {
-    arr[i] = c_null;
-  }
-  return arr;
-}
 
 export class EjObject extends EjValue {
   values: Map<string, EjValue>
   constructor() { super(); this.values = new Map<string, EjValue>(); }
-  set(k: string, v: EjValue): void {
-    this.values.set(k,v);
+  set(k: EjString, v: EjValue): EjObject {
+    this.values.set(k.value, v);
+    return this;
   }
-  get(k: string): EjValue {
-    return this.values.get(k);
+  get(k: EjString): EjValue {
+    return this.values.get(k.value);
   }
-  keys(): Array<string> {
-    return this.values.keys();
+  keys(): Array<EjString> {
+    return this.values.keys().map<EjString>(x => new EjString(x));
   }
 }
 export const IdEjObject = idof<EjObject>()
@@ -239,7 +233,7 @@ export function opObject(a: EjValue): EjObject {
 export function opAccess(a: EjObject, k: EjString): EjValue {
   // TODO: opAccess redundant with runtimeRecDot?
   // TODO: opAccess: check for key not found needed?
-  return a.values.get(k.value);
+  return a.get(k);
 }
 
 export function opHasOwnProperty(a: EjObject, k: EjString): EjValue {
@@ -396,7 +390,7 @@ export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
 export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
   // TODO: runtimeRecDot redundant with opAccess?
   // TODO: runtimeRecDot: check for key not found needed?
-  return a.values.get(k.value);
+  return a.get(k);
 }
 
 export function runtimeArrayLength(a: EjArray) : EjNumber {
