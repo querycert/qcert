@@ -531,10 +531,6 @@ let function_  ctx fn : Ir.func =
   in
   Ir.(func ~params:[i32] ~result:[i32] ~locals body)
 
-let f_start =
-  let open Ir in
-  func []
-
 let imp functions : Wasm.Ast.module_ =
   let ctx =
     { imports = ImportSet.empty
@@ -555,7 +551,7 @@ let imp functions : Wasm.Ast.module_ =
         in ctx.memory, i, Bytes.to_string s)
   in
   Ir.module_to_spec
-    { Ir.start = Some (f_start)
+    { Ir.start = None
     ; globals = []
     ; memories = []
     ; tables = []
