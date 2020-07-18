@@ -852,8 +852,7 @@ let pretty_spark_df greek margin annot inheritance link_runtime q =
 (** Pretty WASM AST *)
 
 let pretty_wasm_ast greek margin annot inheritance link_runtime q =
-  let sexpr = Wasm.Arrange.module_ q in
-  Wasm.Sexpr.to_string 72 sexpr
+  Wasm_ast.to_string q
 
 (** Pretty Error *)
 
