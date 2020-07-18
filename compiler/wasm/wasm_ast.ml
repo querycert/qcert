@@ -8,3 +8,6 @@ let eval fe j w env =
   (* Some res *)
 
 let imp_ejson_to_wasm_ast fe fer i = Wasm_translate.imp i
+let to_string q =
+  let sexpr = Wasm.Arrange.module_ q in
+  Wasm.Sexpr.to_string 72 sexpr
