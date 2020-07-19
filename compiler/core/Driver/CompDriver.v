@@ -114,7 +114,8 @@ Section CompDriver.
   Context {fruntime:foreign_runtime}.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {ftejson:foreign_to_ejson}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {frtejson:foreign_to_ejson_runtime}.
   Context {fredop:foreign_reduce_op}.
   Context {ftoredop:foreign_to_reduce_op}.
@@ -211,14 +212,14 @@ Section CompDriver.
     Definition nnrs_imp_to_imp_data (qname: string) (q: nnrs_imp) : imp_data :=
       nnrs_imp_to_imp_data_top qname q.
 
-    Definition imp_data_to_imp_ejson (q: imp_data) : imp_ejson :=
+    Definition imp_data_to_imp_ejson (q: imp_data) : @imp_ejson foreign_ejson_model foreign_ejson_runtime_op :=
       (* Note: Obtain brand relation from brand model, baked in imp_ejson compilation *)
       imp_data_to_imp_ejson brand_relation_brands q.
 
     Definition imp_ejson_to_js_ast (cname:option string) (q: imp_ejson) : js_ast :=
       imp_ejson_to_js_ast cname q.
 
-    Definition imp_ejson_to_wasm_ast (q: imp_ejson) : wasm_ast :=
+    Definition imp_ejson_to_wasm_ast (q: @imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : wasm_ast :=
       imp_ejson_to_wasm_ast q.
 
     Local Open Scope nstring_scope.
@@ -248,7 +249,7 @@ Section CompDriver.
 
     Definition dnnrc_typed_to_spark_df
                (tenv:tdbindings) (name:string) (q:dnnrc_typed) : spark_df :=
-      @dnnrc_typed_to_spark_df_top _ _ _ _ _ bm _ unit tenv name q.
+      @dnnrc_typed_to_spark_df_top _ _ _ _ _ _ bm _ unit tenv name q.
 
   End translations.
 
@@ -275,7 +276,7 @@ Section CompDriver.
     Definition dnnrc_typed_optim (q:dnnrc_typed) : dnnrc_typed
       := dnnrc_optim_top_default q. (* XXX Should allow optimization phases and configuration *)
 
-    Definition imp_ejson_optim (q:imp_ejson) : imp_ejson
+    Definition imp_ejson_optim (q:@imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : @imp_ejson foreign_ejson_model foreign_ejson_runtime_op
       := imp_ejson_optim_top q. (* XXX TODO *)
   End optimizations.
 
@@ -738,6 +739,7 @@ Section CompDriver.
 
   (** Compilation functions*)
   Section CompDriverCompile.
+    Definition query : Type := @query ft bm fruntime foreign_ejson_model foreign_ejson_runtime_op _.
     Definition compile_javascript (dv: javascript_driver) (q: javascript) : list query :=
       let queries :=
           match dv with

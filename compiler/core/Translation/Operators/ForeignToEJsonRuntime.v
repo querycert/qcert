@@ -26,10 +26,11 @@ Section ForeignToEJsonRuntime.
 
   Class foreign_to_ejson_runtime
         {foreign_ejson_model:Set}
+        {foreign_ejson_runtime_op:Set}
         {fejson:foreign_ejson foreign_ejson_model}
         {fruntime:foreign_runtime}
-        {fetojson:foreign_to_ejson}
-        {fejsonops:foreign_ejson_runtime}
+        {fetojson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}
+        {fejsonops:foreign_ejson_runtime foreign_ejson_runtime_op}
       : Type
       := mk_foreign_to_ejson_runtime {
              foreign_to_ejson_runtime_of_unary_op
@@ -64,7 +65,8 @@ Section ForeignToEJsonRuntime.
     Context {fruntime:foreign_runtime}.
     Context {foreign_ejson_model:Set}.
     Context {fejson:foreign_ejson foreign_ejson_model}.
-    Context {fetojson:foreign_to_ejson}.
+    Context {foreign_ejson_runtime_op : Set}.
+    Context {fetojson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
 
     Ltac rewrite_string_dec_from_neq H
       :=  let d := fresh "d" in
@@ -114,12 +116,12 @@ Section ForeignToEJsonRuntime.
                      (@defaultDataToString (@foreign_runtime_data fruntime)
                                            (@snd string (@data (@foreign_runtime_data fruntime)) ab))
                      (@defaultEJsonToString foreign_ejson_model fejson
-                                            (@data_to_ejson fruntime foreign_ejson_model fejson fetojson
+                                            (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson
                                                             (@snd string (@data (@foreign_runtime_data fruntime)) ab)))) r
       ->
       @eq string (@defaultDataToString (@foreign_runtime_data fruntime) (@drec (@foreign_runtime_data fruntime) r))
           (@defaultEJsonToString foreign_ejson_model fejson
-                                 (@data_to_ejson fruntime foreign_ejson_model fejson fetojson (@drec (@foreign_runtime_data fruntime) r))).
+                                 (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson (@drec (@foreign_runtime_data fruntime) r))).
     Proof.
       intros.
       specialize (default_ejson_rec_aux1 (data_to_ejson (drec r))); intros.

@@ -23,9 +23,10 @@ Require Import ImpEJsonRewrite.
 Section ImpEJsonOptimizer.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
-  Definition imp_ejson_optim_top (q:imp_ejson) : imp_ejson :=
+  Definition imp_ejson_optim_top (q:@imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : imp_ejson :=
     imp_ejson_rewrite q.
 
   Section Correctness.

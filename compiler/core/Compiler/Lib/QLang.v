@@ -46,7 +46,7 @@ Module QLang(runtime:CompilerRuntime).
     Definition nnrs_imp_stmt := nnrs_imp_stmt.
     Definition nnrs_imp := nnrs_imp.
     Definition imp_data := imp_data.
-    Definition imp_ejson := imp_ejson.
+    Definition imp_ejson := @imp_ejson runtime.compiler_foreign_ejson_model runtime.compiler_foreign_ejson_runtime_op.
     Definition nnrcmr := nnrcmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
@@ -58,7 +58,14 @@ Module QLang(runtime:CompilerRuntime).
 
     Definition language : Set := language.
 
-    Definition query : Set := query.
+    Definition query : Set
+      := @query
+           runtime.compiler_foreign_type
+           bm
+           runtime.compiler_foreign_runtime
+           runtime.compiler_foreign_ejson_model
+           runtime.compiler_foreign_ejson_runtime_op
+           runtime.compiler_foreign_reduce_op.
 
     Definition language_of_name_case_sensitive : string -> language :=
       language_of_name_case_sensitive.
