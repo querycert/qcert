@@ -18,23 +18,26 @@ Require Import EJson.
 Require Import BrandRelation.
 
 Section WasmAst.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
 
   (** WASM programs are in AST form *)
   Parameter wasm_ast : Set.
-  Parameter wasm_ast_eval : brand_relation_t -> wasm_ast -> jbindings -> option ejson.
-
+  Parameter wasm_ast_eval : brand_relation_t -> wasm_ast -> @jbindings foreign_ejson_model -> option (@ejson foreign_ejson_model).
+  Parameter wasm_ast_to_string : wasm_ast -> nstring.
 End WasmAst.
 
 Extract Constant wasm_ast => "Wasm_ast.t".
 Extract Constant wasm_ast_eval => "Wasm_ast.eval".
+Extract Constant wasm_ast_to_string => "Wasm_ast.to_string".
 
 Require Import DataRuntime.
 Require Import ForeignDataToEJson.
 Require Import DataToEJson.
 Section Top.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {fruntime:foreign_runtime}.
-  Context {fejson:foreign_ejson}.
   Context {fdatatoejson:foreign_to_ejson}.
   (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
   Context (h:brand_relation_t).

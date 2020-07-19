@@ -26,7 +26,8 @@ Require Import ForeignToJavaScriptAst.
 Section ImpEJsontoJavaScriptAst.
   Import ListNotations.
 
-  Context {ft:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {ftjast:foreign_ejson_to_ajavascript}.
   Context {fejruntime:foreign_ejson_runtime}.
 

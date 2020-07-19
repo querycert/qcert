@@ -31,7 +31,8 @@ Require Import EJsonRuntime.
 Require Import ForeignEJsonToJSON.
 
 Section EJsontoJSON.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {ftojson:foreign_to_json}.
 
   Fixpoint json_to_ejson (j:json) : ejson :=

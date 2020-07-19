@@ -25,7 +25,8 @@ Local Open Scope string_scope.
 
 Class foreign_to_ejson
       {fruntime:foreign_runtime}
-      {fesjon:foreign_ejson}
+      {foreign_ejson_model:Set}
+      {fejson:foreign_ejson foreign_ejson_model}
   : Type
   := mk_foreign_to_ejson {
          foreign_to_ejson_runtime :> foreign_ejson_runtime
