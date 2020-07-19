@@ -56,7 +56,7 @@
 %right PLUS MINUS
 %right STAR SLASH
 
-%start <ImpEJson.imp_ejson> main
+%start <EnhancedRuntime.EnhancedRuntime.compiler_foreign_ejson_model ImpEJson.imp_ejson> main
 
 %%
 

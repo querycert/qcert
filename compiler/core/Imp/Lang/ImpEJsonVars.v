@@ -19,9 +19,8 @@ Require Import ImpEJson.
 Require Import ImpVars.
 
 Section ImpEJsonVars.
-
-
-  Context {ftoejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {fejruntime:foreign_ejson_runtime}.
 
   Definition imp_ejson_expr_free_vars (e:imp_ejson_expr) : list var :=

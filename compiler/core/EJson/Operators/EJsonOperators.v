@@ -72,9 +72,10 @@ Section EJsonOperators.
   .
 
   Section Evaluation.
-    Context {fejson:foreign_ejson}.
+    Context {foreign_ejson_model:Set}.
+    Context {fejson:foreign_ejson foreign_ejson_model}.
 
-    Definition ejson_op_eval (op:ejson_op) (j:list ejson) : option ejson :=
+    Definition ejson_op_eval (op:ejson_op) (j:list (@ejson foreign_ejson_model)) : option ejson :=
       match op with
       | EJsonOpNot =>
         match j with

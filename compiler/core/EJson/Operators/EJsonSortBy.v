@@ -25,9 +25,10 @@ Require Import ForeignEJson.
 Require Import EJson.
 
 Section EJsonSortBy.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
 
-  Definition ejson_get_criteria (j:ejson) (sc:ejson) : option sdata :=
+  Definition ejson_get_criteria (j:@ejson foreign_ejson_model) (sc:@ejson foreign_ejson_model) : option sdata :=
     match sc with
     | ejobject (("asc"%string, ejstring att)::nil)
     | ejobject (("desc"%string, ejstring att)::nil) => (* XXX IGNORES sort kind (asc|desc) XXX *)
@@ -65,7 +66,7 @@ Section EJsonSortBy.
     end.
 
   (* Example *)
-  Definition mkperson (name:string) (age:Z) (zip:Z) (company:string) :=
+  Definition mkperson (name:string) (age:Z) (zip:Z) (company:string) : @ejson foreign_ejson_model :=
     ejobject (("name", ejstring name)
                 :: ("age", ejbigint age)
                 :: ("zip", ejbigint zip)

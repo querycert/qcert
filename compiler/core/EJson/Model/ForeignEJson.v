@@ -18,10 +18,9 @@ Require Import JSON.
 
 Section ForeignEJson.
   
-  Class foreign_ejson : Type
+  Class foreign_ejson (foreign_ejson_model : Set) : Type
     := mk_foreign_ejson {
-           foreign_ejson_model : Set
-           ; foreign_ejson_dec :> EqDec foreign_ejson_model eq
+           foreign_ejson_dec :> EqDec foreign_ejson_model eq
            ; foreign_ejson_normalized (a : foreign_ejson_model) : Prop
            ; foreign_ejson_normalize (a : foreign_ejson_model) : foreign_ejson_model
            ; foreign_ejson_normalize_normalizes (a : foreign_ejson_model) : foreign_ejson_normalized (foreign_ejson_normalize a)

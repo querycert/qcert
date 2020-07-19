@@ -28,7 +28,8 @@ Require Import ForeignEJsonRuntime.
 Section EJsonRuntimeOperators.
   Local Open Scope string.
 
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {fejruntime:foreign_ejson_runtime}.
 
   Section Syntax.
@@ -255,7 +256,7 @@ Section EJsonRuntimeOperators.
       | _ => lift EJsonRuntimeForeign (foreign_ejson_runtime_fromstring opname)
       end.
 
-  Fixpoint defaultEJsonToString (j:ejson) : string
+  Fixpoint defaultEJsonToString (j:@ejson foreign_ejson_model) : string
     := match j with
        | ejnull => "unit"%string
        | ejbigint n => toString n

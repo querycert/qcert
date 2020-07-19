@@ -33,7 +33,7 @@ Local Open Scope list_scope.
 
 Definition enhanced_ejson : Set := enhanced_data.
 
-Program Instance enhanced_foreign_ejson : foreign_ejson
+Program Instance enhanced_foreign_ejson : foreign_ejson enhanced_ejson
   := mk_foreign_ejson enhanced_ejson _ _ _ _ _ _.
 Next Obligation.
   red.
@@ -215,7 +215,7 @@ Definition enhanced_ejson_sql_date_runtime_op_interp op (dl:list ejson) : option
          end) dl
   end.
 
-Definition enhanced_ejson_uri_runtime_op_interp op (dl:list ejson) : option ejson :=
+Definition enhanced_ejson_uri_runtime_op_interp op (dl:list (@ejson enhanced_ejson)) : option ejson :=
   match op with
   | EJsonRuntimeUriEncode =>
     apply_unary
@@ -242,7 +242,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op :=
   end.
 
 Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _ _ _ _.
+  mk_foreign_ejson_runtime enhanced_ejson enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _ _ _ _.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
