@@ -25,8 +25,7 @@ Require Import Imp.
 
 Section ImpEJson.
   Context {foreign_ejson_model:Set}.
-  Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_runtime_op : Set}.
 
   Section Syntax.
     Definition imp_ejson_model := @ejson foreign_ejson_model.
@@ -39,7 +38,8 @@ Section ImpEJson.
        imp_ejson_runtime_op constructors names are in the JS Qcert runtime
      *)
     Definition imp_ejson_op := ejson_op. (* See ./EJson/Operators/EJsonOperators.v *)
-    Definition imp_ejson_runtime_op := ejson_runtime_op.  (* See ./EJson/Operators/EJsonRuntimeOperators.v *)
+    Definition imp_ejson_runtime_op := @ejson_runtime_op foreign_ejson_runtime_op.  (* See ./EJson/Operators/EJsonRuntimeOperators.v *)
+
     Definition imp_ejson_expr := @imp_expr imp_ejson_constant imp_ejson_op imp_ejson_runtime_op.
     Definition imp_ejson_stmt := @imp_stmt imp_ejson_constant imp_ejson_op imp_ejson_runtime_op.
     Definition imp_ejson_function := @imp_function imp_ejson_constant imp_ejson_op imp_ejson_runtime_op.
@@ -48,6 +48,8 @@ Section ImpEJson.
   End Syntax.
 
   Section dec.
+    Context {fejson:foreign_ejson foreign_ejson_model}.
+    Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
     (** Equality is decidable for json *)
     Lemma cejson_eq_dec : forall x y:@cejson foreign_ejson_model, {x=y}+{x<>y}.
     Proof.

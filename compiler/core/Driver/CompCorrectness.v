@@ -114,7 +114,8 @@ Section CompCorrectness.
   Context {fruntime:foreign_runtime}.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {ftejson:foreign_to_ejson}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {frtejson:foreign_to_ejson_runtime}.
   Context {fredop:foreign_reduce_op}.
   Context {ftoredop:foreign_to_reduce_op}.
@@ -126,7 +127,7 @@ Section CompCorrectness.
   Context {nnrs_imp_stmt_logger:optimizer_logger string nnrs_imp_stmt}.
   Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
   Context {imp_data_logger:optimizer_logger string imp_data}.
-  Context {imp_ejson_logger:optimizer_logger string imp_ejson}.
+  Context {imp_ejson_logger:optimizer_logger string (@imp_ejson foreign_ejson_model foreign_ejson_runtime_op)}.
   Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base _ (type_annotation unit) dataframe)}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
@@ -342,8 +343,9 @@ Section CompCorrectness.
 
   Section eval_preserved.
 
+    Definition Q_error1 := @Q_error ft bm fruntime foreign_ejson_model foreign_ejson_runtime_op _.
     Lemma error_msg_to_false s1 :
-      (forall s : string, Q_error s1 :: nil <> Q_error s :: nil) -> False.
+      (forall s : string, Q_error1 s1 :: nil <> Q_error1 s :: nil) -> False.
     Proof.
       intros.
       specialize (H s1).
@@ -424,6 +426,7 @@ Section CompCorrectness.
         unfold equal_outputs; simpl; auto
       end.
 
+    Definition query : Type := @query fruntime foreign_ejson_model foreign_ejson_runtime_op _ ft bm.
     Definition query_not_error (q:query) :=
       match q with
       | Q_error _ => False

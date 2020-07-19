@@ -21,15 +21,16 @@ Require Import ImpVars.
 Section ImpEJsonVars.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
-  Definition imp_ejson_expr_free_vars (e:imp_ejson_expr) : list var :=
+  Definition imp_ejson_expr_free_vars (e:@imp_ejson_expr foreign_ejson_model foreign_ejson_runtime_op) : list var :=
     imp_expr_free_vars e.
 
-  Definition imp_ejson_stmt_free_vars (stmt:imp_ejson_stmt) : list var :=
+  Definition imp_ejson_stmt_free_vars (stmt:@imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op) : list var :=
     imp_stmt_free_vars stmt.
 
-  Definition imp_ejson_stmt_bound_vars (stmt:imp_ejson_stmt) : list var :=
+  Definition imp_ejson_stmt_bound_vars (stmt:@imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op) : list var :=
     imp_stmt_bound_vars stmt.
 
 

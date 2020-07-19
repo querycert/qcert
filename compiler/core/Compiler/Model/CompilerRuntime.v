@@ -42,7 +42,8 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_runtime : foreign_runtime.
   Axiom compiler_foreign_ejson_model : Set.
   Axiom compiler_foreign_ejson : foreign_ejson compiler_foreign_ejson_model.
-  Axiom compiler_foreign_to_ejson : foreign_to_ejson.
+  Axiom compiler_foreign_ejson_runtime_op : Set.
+  Axiom compiler_foreign_to_ejson : foreign_to_ejson compiler_foreign_ejson_model compiler_foreign_ejson_runtime_op.
   Axiom compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
   Axiom compiler_foreign_to_json : foreign_to_json.
   Axiom compiler_foreign_to_java : foreign_to_java.

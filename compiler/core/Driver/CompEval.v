@@ -64,7 +64,8 @@ Section CompEval.
   Context {fruntime:foreign_runtime}.   (* Necessary for Everything *)
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {ftejson:foreign_to_ejson}.   (* Necessary for ImpJson evaluation *)
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
@@ -172,6 +173,7 @@ Section CompEval.
       | Some d => Ev_out_returned d
       end.
 
+    Definition query : Type := @query ft bm fruntime foreign_ejson_model foreign_ejson_runtime_op _.
     Definition eval_query (q:query) (ev_in:eval_input) : eval_output :=
       match q with
       | Q_camp_rule q => lift_output (eval_camp_rule q (lift_input ev_in))

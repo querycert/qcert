@@ -29,7 +29,8 @@ Section ImpEJsontoJavaScriptAst.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {ftjast:foreign_ejson_to_ajavascript}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
   Section Util.
     Definition scope l := stat_block l. (* XXX TODO XXX *)
