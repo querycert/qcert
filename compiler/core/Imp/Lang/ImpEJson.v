@@ -24,12 +24,13 @@ Require Import EJsonRuntime.
 Require Import Imp.
 
 Section ImpEJson.
-  Context {ftoejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {fejruntime:foreign_ejson_runtime}.
 
   Section Syntax.
-    Definition imp_ejson_model := ejson.
-    Definition imp_ejson_constant := cejson.
+    Definition imp_ejson_model := @ejson foreign_ejson_model.
+    Definition imp_ejson_constant := @cejson foreign_ejson_model.
 
     (* XXX This should contain at least:
        - all JS operators/expressions used in translation from NNRSimp to JsAst
@@ -48,7 +49,7 @@ Section ImpEJson.
 
   Section dec.
     (** Equality is decidable for json *)
-    Lemma cejson_eq_dec : forall x y:cejson, {x=y}+{x<>y}.
+    Lemma cejson_eq_dec : forall x y:@cejson foreign_ejson_model, {x=y}+{x<>y}.
     Proof.
       induction x; destruct y; try solve[right; inversion 1].
       - left; trivial.

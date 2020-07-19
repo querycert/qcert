@@ -21,7 +21,8 @@ Require Import ImpEJsonRewrite.
 
 (* XXX This is a temporary place-holder, includes only for loop rewrites *)
 Section ImpEJsonOptimizer.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {fejruntime:foreign_ejson_runtime}.
 
   Definition imp_ejson_optim_top (q:imp_ejson) : imp_ejson :=

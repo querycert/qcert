@@ -1,5 +1,5 @@
 type t = Wasm.Ast.module_
-let eval fe j w env =
+let eval j w env =
   Wasm.Valid.check_module w;
   failwith "Evaluation not supported"
   (* let inst = Wasm_engine.init w in *)

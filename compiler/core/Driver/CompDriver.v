@@ -112,7 +112,8 @@ Section CompDriver.
   (* Context *)
   Context {ft:foreign_type}.
   Context {fruntime:foreign_runtime}.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {ftejson:foreign_to_ejson}.
   Context {frtejson:foreign_to_ejson_runtime}.
   Context {fredop:foreign_reduce_op}.
@@ -247,7 +248,7 @@ Section CompDriver.
 
     Definition dnnrc_typed_to_spark_df
                (tenv:tdbindings) (name:string) (q:dnnrc_typed) : spark_df :=
-      @dnnrc_typed_to_spark_df_top _ _ _ _ bm _ unit tenv name q.
+      @dnnrc_typed_to_spark_df_top _ _ _ _ _ bm _ unit tenv name q.
 
   End translations.
 

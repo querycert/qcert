@@ -21,7 +21,8 @@ Require Import EJson.
 
 Section ForeignEJsonRuntime.
   Class foreign_ejson_runtime
-        {fejson:foreign_ejson}
+        {foreign_ejson_model:Set}
+        {fejson:foreign_ejson foreign_ejson_model}
   : Type
     := mk_foreign_ejson_runtime {
            foreign_ejson_runtime_op : Set
@@ -29,11 +30,11 @@ Section ForeignEJsonRuntime.
            ; foreign_ejson_runtime_op_tostring :> ToString foreign_ejson_runtime_op
            ; foreign_ejson_runtime_op_interp 
                (f:foreign_ejson_runtime_op)
-               (dl:list ejson) : option ejson                                 
+               (dl:list (@ejson foreign_ejson_model)) : option (@ejson foreign_ejson_model)
            (* ToString / ToText operators *)
-           ; foreign_ejson_runtime_tostring : ejson -> string
+           ; foreign_ejson_runtime_tostring : (@ejson foreign_ejson_model) -> string
            ; foreign_ejson_runtime_fromstring : string -> option foreign_ejson_runtime_op
-           ; foreign_ejson_runtime_totext : ejson -> string
+           ; foreign_ejson_runtime_totext : (@ejson foreign_ejson_model) -> string
          }.
 
 End ForeignEJsonRuntime.

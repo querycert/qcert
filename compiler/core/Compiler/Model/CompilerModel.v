@@ -39,7 +39,8 @@ Require Import NNRSimp.
 Module Type CompilerModel.
   Declare Instance compiler_basic_model : basic_model.
   Declare Instance compiler_model_foreign_runtime : foreign_runtime.
-  Declare Instance compiler_model_foreign_ejson : foreign_ejson.
+  Axiom compiler_model_foreign_ejson_model : Set.
+  Declare Instance compiler_model_foreign_ejson : foreign_ejson compiler_model_foreign_ejson_model.
   Declare Instance compiler_model_foreign_to_ejson : foreign_to_ejson.
   Declare Instance compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
   Declare Instance compiler_model_foreign_to_json : foreign_to_json.
@@ -64,7 +65,9 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := basic_model_foreign_type.
   Definition compiler_foreign_runtime : foreign_runtime
     := model.compiler_model_foreign_runtime.
-  Definition compiler_foreign_ejson : foreign_ejson
+  Definition compiler_foreign_ejson_model : Set
+    := model.compiler_model_foreign_ejson_model.
+  Definition compiler_foreign_ejson : foreign_ejson compiler_foreign_ejson_model
     := model.compiler_model_foreign_ejson.
   Definition compiler_foreign_to_ejson : foreign_to_ejson
     := model.compiler_model_foreign_to_ejson.
