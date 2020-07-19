@@ -21,7 +21,8 @@ Require Import WasmAstRuntime.
 
 Section ImpEJsontoWasmAst.
   Section Top.
-    Context {ft:foreign_ejson}.
+    Context {foreign_ejson_model:Set}.
+    Context {fejson:foreign_ejson foreign_ejson_model}.
     Context {fejruntime:foreign_ejson_runtime}.
 
     Axiom imp_ejson_to_wasm_ast : imp_ejson -> wasm_ast.

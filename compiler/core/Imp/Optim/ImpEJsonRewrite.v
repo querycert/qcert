@@ -28,7 +28,8 @@ Require Import ImpEJsonEval.
 Section ImpEJsonRewrite.
   Import ListNotations.
 
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {fejruntime:foreign_ejson_runtime}.
 
   Definition imp_ejson_rewrite (q:imp_ejson) : imp_ejson := q.

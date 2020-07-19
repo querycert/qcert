@@ -130,7 +130,9 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_runtime.
   Definition compiler_foreign_to_java : foreign_to_java
     := enhanced_foreign_to_java.
-  Definition compiler_foreign_ejson : foreign_ejson
+  Definition compiler_foreign_ejson_model : Set
+    := enhanced_ejson.
+  Definition compiler_foreign_ejson : foreign_ejson compiler_foreign_ejson_model
     := enhanced_foreign_ejson.
   Definition compiler_foreign_to_ejson : foreign_to_ejson
     := enhanced_foreign_to_ejson.

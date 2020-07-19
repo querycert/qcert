@@ -27,7 +27,8 @@ Require Import ForeignEJson.
 Require Import Utils.
 
 Section EJson.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
 
   Unset Elimination Schemes.
 

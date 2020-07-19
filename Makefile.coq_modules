@@ -457,4 +457,4 @@ MODULES = \
 	Tests/SQLTest \
 	Tests/LambdaNRATest \
 	Tests/CompilerTest \
-	Tests/HelloWorld \
+	Tests/HelloWorld

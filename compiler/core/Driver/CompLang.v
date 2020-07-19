@@ -282,7 +282,8 @@ Section CompLang.
     Context {bm:brand_model}.
 
     Context {fr:foreign_runtime}.
-    Context {fejson:foreign_ejson}.
+    Context {foreign_ejson_model:Set}.
+    Context {fejson:foreign_ejson foreign_ejson_model}.
     Context {fejruntime:foreign_ejson_runtime}.
     Context {fredop:foreign_reduce_op}.
 
