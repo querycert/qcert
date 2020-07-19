@@ -31,19 +31,20 @@ Section ImpDatatoImpEJson.
   Context {fruntime:foreign_runtime}.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {ftejson:foreign_to_ejson}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fetojson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
   Context {fejtoruntime:foreign_to_ejson_runtime}.
 
   Context (h:brand_relation_t). (* We need a brand relation for the Q*cert side *)
 
   Section Util.
-    Definition mk_imp_ejson_expr_error msg : imp_ejson_expr :=
+    Definition mk_imp_ejson_expr_error msg : @imp_ejson_expr foreign_ejson_model foreign_ejson_runtime_op :=
       ImpExprError msg. (* XXX Error should eval to None if we want to prove stuffs! *)
-    Definition mk_imp_ejson_op op el : imp_ejson_expr := ImpExprOp op el.
-    Definition mk_imp_ejson_runtime_call op el : imp_ejson_expr := ImpExprRuntimeCall op el.
+    Definition mk_imp_ejson_op op el : @imp_ejson_expr foreign_ejson_model foreign_ejson_runtime_op := ImpExprOp op el.
+    Definition mk_imp_ejson_runtime_call op el : @imp_ejson_expr foreign_ejson_model foreign_ejson_runtime_op := ImpExprRuntimeCall op el.
 
-    Definition mk_string s : imp_ejson_expr := ImpExprConst (cejstring s).
+    Definition mk_string s : @imp_ejson_expr foreign_ejson_model foreign_ejson_runtime_op := ImpExprConst (cejstring s).
     Definition mk_left e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$left"%string]) [ e ].
     Definition mk_right e : imp_ejson_expr := mk_imp_ejson_op (EJsonOpObject ["$right"%string]) [ e ].
 
@@ -465,7 +466,7 @@ Section ImpDatatoImpEJson.
       unfold lift; simpl in *.
       destruct (@lift_map (prod string SortDesc) (@imp_ejson_model foreign_ejson_model)
               (fun x : prod string SortDesc =>
-               @imp_ejson_expr_eval foreign_ejson_model fejson fejruntime h (@lift_pd_bindings fruntime foreign_ejson_model fejson ftejson σ)
+               @imp_ejson_expr_eval foreign_ejson_model fejson foreign_ejson_runtime_op fejruntime h (@lift_pd_bindings fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson σ)
                  (ejson_to_expr (@sortCriteria_to_ejson foreign_ejson_model x))) s);
         simpl; try congruence.
       rewrite eval_ejson_to_expr_sort_criteria_correct; simpl.
@@ -1123,25 +1124,25 @@ Section ImpDatatoImpEJson.
           unfold imp_ejson_constant in *.
           Set Printing All.
           assert ((@fold_left (option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model)))
-              (@ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_model fejson fejruntime))
+              (@ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_runtime_op))
               (fun (c : option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model)))
-                 (s : @ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_model fejson fejruntime))
+                 (s : @ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_runtime_op))
                =>
                match c return (option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model))) with
-               | Some σ' => @imp_ejson_stmt_eval foreign_ejson_model fejson fejruntime h s σ'
+               | Some σ' => @imp_ejson_stmt_eval foreign_ejson_model fejson foreign_ejson_runtime_op fejruntime h s σ'
                | None => @None (@ImpEval.pd_rbindings (@ejson foreign_ejson_model))
                end)
-              (@map (@imp_data_stmt fruntime) (@imp_ejson_stmt foreign_ejson_model fejson fejruntime) imp_data_stmt_to_imp_ejson sl)
+              (@map (@imp_data_stmt fruntime) (@imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op) imp_data_stmt_to_imp_ejson sl)
               (@None (list (prod string (option (@ejson foreign_ejson_model))))))
               =
               (@fold_left (option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model)))
-       (@ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_model fejson fejruntime))
+       (@ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_runtime_op))
        (fun (c : option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model)))
-          (s : @ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_model fejson fejruntime)) =>
+          (s : @ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_runtime_op)) =>
         match c return (option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model))) with
-        | Some σ' => @imp_ejson_stmt_eval foreign_ejson_model fejson fejruntime h s σ'
+        | Some σ' => @imp_ejson_stmt_eval foreign_ejson_model fejson  foreign_ejson_runtime_op fejruntime h s σ'
         | None => @None (@ImpEval.pd_rbindings (@ejson foreign_ejson_model))
-        end) (@map (@imp_data_stmt fruntime) (@imp_ejson_stmt foreign_ejson_model fejson fejruntime) imp_data_stmt_to_imp_ejson sl)
+        end) (@map (@imp_data_stmt fruntime) (@imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op) imp_data_stmt_to_imp_ejson sl)
        (@None (@ImpEval.pd_rbindings (@ejson foreign_ejson_model))))
 ) by reflexivity.
           rewrite <- H; clear H.
@@ -1245,15 +1246,15 @@ Section ImpDatatoImpEJson.
         induction l; try reflexivity; simpl; intros.
         specialize (IHstmt ((v, Some a) :: σ)); simpl in IHstmt.
         Set Printing All.
-        assert (@imp_ejson_stmt_eval foreign_ejson_model fejson _ h (imp_data_stmt_to_imp_ejson stmt)
+        assert (@imp_ejson_stmt_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h (imp_data_stmt_to_imp_ejson stmt)
         (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
            (@pair var (option (@imp_ejson_model foreign_ejson_model)) v
-              (@Some (@imp_ejson_model foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson ftejson a)))
+              (@Some (@imp_ejson_model foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson a)))
            (lift_pd_bindings σ)) =
-                (@imp_ejson_stmt_eval foreign_ejson_model fejson _ h (imp_data_stmt_to_imp_ejson stmt)
+                (@imp_ejson_stmt_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h (imp_data_stmt_to_imp_ejson stmt)
                 (@cons (prod string (option (@ejson foreign_ejson_model)))
                    (@pair string (option (@ejson foreign_ejson_model)) v
-                      (@Some (@ejson foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson ftejson a)))
+                      (@Some (@ejson foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson a)))
                    (lift_pd_bindings σ)))) by reflexivity.
         rewrite <- H in IHstmt; clear H.
         rewrite <- IHstmt; clear IHstmt.
@@ -1299,12 +1300,12 @@ Section ImpDatatoImpEJson.
         revert σ z.
         induction n; try reflexivity; simpl; intros.
         specialize (IHstmt ((v, Some (imp_data_Z_to_data z)) :: σ)); simpl in IHstmt.
-        assert ((@imp_ejson_stmt_eval foreign_ejson_model fejson _ h (imp_data_stmt_to_imp_ejson stmt)
+        assert ((@imp_ejson_stmt_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h (imp_data_stmt_to_imp_ejson stmt)
                 (@cons (prod string (option (@ejson foreign_ejson_model)))
                    (@pair string (option (@ejson foreign_ejson_model)) v
                       (@Some (@ejson foreign_ejson_model) (@ejbigint foreign_ejson_model z)))
                    (lift_pd_bindings σ)))
-                  = (@imp_ejson_stmt_eval foreign_ejson_model fejson _ h (imp_data_stmt_to_imp_ejson stmt)
+                  = (@imp_ejson_stmt_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h (imp_data_stmt_to_imp_ejson stmt)
         (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
            (@pair var (option (@imp_ejson_model foreign_ejson_model)) v
               (@Some (@imp_ejson_model foreign_ejson_model)
@@ -1366,7 +1367,7 @@ reflexivity.
            (@imp_ejson_model_to_Z foreign_ejson_model)
            (@imp_ejson_model_to_list foreign_ejson_model)
            (@imp_ejson_Z_to_data foreign_ejson_model)
-           (@imp_ejson_runtime_eval foreign_ejson_model fejson _ h)
+           (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h)
            (@imp_ejson_op_eval foreign_ejson_model)
            (imp_data_stmt_to_imp_ejson i)
            (@cons (prod string (option (@ejson foreign_ejson_model)))
@@ -1374,7 +1375,7 @@ reflexivity.
                  (@None (@ejson foreign_ejson_model)))
               (@cons (prod string (option (@ejson foreign_ejson_model)))
                  (@pair string (option (@ejson foreign_ejson_model)) v
-                    (@Some (@ejson foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson ftejson d)))
+                    (@Some (@ejson foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson d)))
                  (@nil (prod string (option (@ejson foreign_ejson_model)))))))
              = @ImpEval.imp_stmt_eval (@imp_ejson_model foreign_ejson_model) (@imp_ejson_constant foreign_ejson_model) imp_ejson_op imp_ejson_runtime_op
           (@imp_ejson_model_normalize foreign_ejson_model)
@@ -1382,7 +1383,7 @@ reflexivity.
           (@imp_ejson_model_to_Z foreign_ejson_model)
           (@imp_ejson_model_to_list foreign_ejson_model)
           (@imp_ejson_Z_to_data foreign_ejson_model)
-          (@imp_ejson_runtime_eval foreign_ejson_model fejson _ h)
+          (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h)
           (@imp_ejson_op_eval foreign_ejson_model)
           (imp_data_stmt_to_imp_ejson i)
           (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
@@ -1390,7 +1391,7 @@ reflexivity.
                 (@None (@imp_ejson_model foreign_ejson_model)))
              (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
                 (@pair var (option (@imp_ejson_model foreign_ejson_model)) v
-                   (@Some (@imp_ejson_model foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson ftejson d)))
+                   (@Some (@imp_ejson_model foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson d)))
                 (@nil (prod var (option (@imp_ejson_model foreign_ejson_model))))))) by reflexivity.
       rewrite <- H0; clear H0.
       rewrite <- H; clear H.
@@ -1423,7 +1424,7 @@ reflexivity.
            (@imp_ejson_model_to_Z foreign_ejson_model)
            (@imp_ejson_model_to_list foreign_ejson_model)
            (@imp_ejson_Z_to_data foreign_ejson_model)
-           (@imp_ejson_runtime_eval foreign_ejson_model fejson _ h)
+           (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h)
            (@imp_ejson_op_eval foreign_ejson_model)
            (imp_data_stmt_to_imp_ejson i)
            (@cons (prod string (option (@ejson foreign_ejson_model)))
@@ -1431,7 +1432,7 @@ reflexivity.
                  (@None (@ejson foreign_ejson_model)))
               (@cons (prod string (option (@ejson foreign_ejson_model)))
                  (@pair string (option (@ejson foreign_ejson_model)) v
-                    (@Some (@ejson foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson ftejson d)))
+                    (@Some (@ejson foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson d)))
                  (@nil (prod string (option (@ejson foreign_ejson_model)))))))
              = @ImpEval.imp_stmt_eval (@imp_ejson_model foreign_ejson_model) (@imp_ejson_constant foreign_ejson_model) imp_ejson_op imp_ejson_runtime_op
           (@imp_ejson_model_normalize foreign_ejson_model)
@@ -1439,7 +1440,7 @@ reflexivity.
           (@imp_ejson_model_to_Z foreign_ejson_model)
           (@imp_ejson_model_to_list foreign_ejson_model)
           (@imp_ejson_Z_to_data foreign_ejson_model)
-          (@imp_ejson_runtime_eval foreign_ejson_model fejson _ h)
+          (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h)
           (@imp_ejson_op_eval foreign_ejson_model)
           (imp_data_stmt_to_imp_ejson i)
           (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
@@ -1447,7 +1448,7 @@ reflexivity.
                 (@None (@imp_ejson_model foreign_ejson_model)))
              (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
                 (@pair var (option (@imp_ejson_model foreign_ejson_model)) v
-                   (@Some (@imp_ejson_model foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson ftejson d)))
+                   (@Some (@imp_ejson_model foreign_ejson_model) (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson d)))
                 (@nil (prod var (option (@imp_ejson_model foreign_ejson_model))))))) by reflexivity.
       rewrite <- H0; clear H0.
       rewrite <- H; clear H.

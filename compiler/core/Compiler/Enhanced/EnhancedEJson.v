@@ -241,8 +241,8 @@ Definition enhanced_foreign_ejson_runtime_op_interp op :=
     enhanced_ejson_uri_runtime_op_interp sop
   end.
 
-Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime enhanced_ejson enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _ _ _ _.
+Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime _ :=
+  mk_foreign_ejson_runtime enhanced_foreign_ejson_runtime_op enhanced_ejson enhanced_foreign_ejson _ _ _ _ _ _.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).

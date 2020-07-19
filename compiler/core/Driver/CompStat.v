@@ -60,7 +60,8 @@ Section CompStat.
   Context {fruntime:foreign_runtime}.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {ftejson:foreign_to_ejson}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {bm:brand_model}.
   Context {nraenv_core_logger:optimizer_logger string nraenv_core}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
@@ -115,7 +116,7 @@ Section CompStat.
       (("nnrcmr_length", dnat (Z_of_nat (List.length q.(mr_chain))))
          :: nil).
 
-  Definition stat_imp_ejson (q: imp_ejson) : data :=
+  Definition stat_imp_ejson (q: @imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : data :=
     drec
       (("imp_ejson_size", dnat (Z_of_nat (imp_ejson_size q)))
          :: nil).
