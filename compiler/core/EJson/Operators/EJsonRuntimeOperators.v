@@ -30,7 +30,7 @@ Section EJsonRuntimeOperators.
 
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_runtime_op : Set}.
 
   Section Syntax.
     Inductive ejson_runtime_op :=
@@ -106,6 +106,8 @@ Section EJsonRuntimeOperators.
     .
 
   End Syntax.
+
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
   Section Util.
     Local Open Scope string.

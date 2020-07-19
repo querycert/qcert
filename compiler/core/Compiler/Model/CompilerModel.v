@@ -41,7 +41,8 @@ Module Type CompilerModel.
   Declare Instance compiler_model_foreign_runtime : foreign_runtime.
   Axiom compiler_model_foreign_ejson_model : Set.
   Declare Instance compiler_model_foreign_ejson : foreign_ejson compiler_model_foreign_ejson_model.
-  Declare Instance compiler_model_foreign_to_ejson : foreign_to_ejson.
+  Axiom compiler_model_foreign_ejson_runtime_op : Set.
+  Declare Instance compiler_model_foreign_to_ejson : foreign_to_ejson compiler_model_foreign_ejson_model compiler_model_foreign_ejson_runtime_op.
   Declare Instance compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
   Declare Instance compiler_model_foreign_to_json : foreign_to_json.
   Declare Instance compiler_model_foreign_to_java : foreign_to_java.
@@ -69,7 +70,9 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := model.compiler_model_foreign_ejson_model.
   Definition compiler_foreign_ejson : foreign_ejson compiler_foreign_ejson_model
     := model.compiler_model_foreign_ejson.
-  Definition compiler_foreign_to_ejson : foreign_to_ejson
+  Definition compiler_foreign_ejson_runtime_op : Set
+    := model.compiler_model_foreign_ejson_runtime_op.
+  Definition compiler_foreign_to_ejson : foreign_to_ejson compiler_foreign_ejson_model compiler_foreign_ejson_runtime_op
     := model.compiler_model_foreign_to_ejson.
   Definition compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime
     := model.compiler_model_foreign_to_ejson_runtime.

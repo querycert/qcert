@@ -39,7 +39,8 @@ Section tDNNRCtoSparkDF.
   Context {fruntime:foreign_runtime}.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {fdatatoejson:foreign_to_ejson}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fdatatoejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {h:brand_relation_t}.
   Context {ftype:foreign_type}.
   Context {m:brand_model}.

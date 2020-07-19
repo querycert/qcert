@@ -415,7 +415,7 @@ let rt_op_n_ary ctx op args: Ir.instr =
     block ~result:[i32] (args @ [rt_op ctx.ctx op])
 
 let rec expr ctx expression : Ir.instr list =
-  match (expression : 'a imp_ejson_expr) with
+  match (expression : ('a,'b) imp_ejson_expr) with
   | ImpExprError err -> unsupported "expr: error"
   | ImpExprVar v -> [Ir.local_get (Table.insert ctx.locals v)]
   | ImpExprConst x -> [const ctx x]
@@ -432,7 +432,7 @@ let rec statement ctx stmt : Ir.instr list =
     ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
     Ir.call f
   in
-  match (stmt : 'a imp_ejson_stmt) with
+  match (stmt : ('a,'b) imp_ejson_stmt) with
   | ImpStmtBlock (vars, stmts) ->
     (* TODO: This assumes that variable names are unique which is not true in general. *)
     let defs =

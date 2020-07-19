@@ -30,11 +30,12 @@ Section ImpEJsonRewrite.
 
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
-  Definition imp_ejson_rewrite (q:imp_ejson) : imp_ejson := q.
+  Definition imp_ejson_rewrite (q:@imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : imp_ejson := q.
 
-  Lemma imp_ejson_rewrite_correct h (j : ejson) (q:imp_ejson) :
+  Lemma imp_ejson_rewrite_correct h (j:ejson) (q:imp_ejson) :
     imp_ejson_eval h q j =
     imp_ejson_eval h (imp_ejson_rewrite q) j.
   Proof. reflexivity. Qed.

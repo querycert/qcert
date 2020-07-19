@@ -284,7 +284,8 @@ Section CompLang.
     Context {fr:foreign_runtime}.
     Context {foreign_ejson_model:Set}.
     Context {fejson:foreign_ejson foreign_ejson_model}.
-    Context {fejruntime:foreign_ejson_runtime}.
+    Context {foreign_ejson_runtime_op : Set}.
+    Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
     Context {fredop:foreign_reduce_op}.
 
     Definition camp_rule := camp_rule.
@@ -308,7 +309,7 @@ Section CompLang.
     Definition imp_data_expr := imp_data_expr.
     Definition imp_data_stmt := imp_data_stmt.
     Definition imp_data := imp_data.
-    Definition imp_ejson := imp_ejson.
+    Definition imp_ejson := @imp_ejson foreign_ejson_model foreign_ejson_runtime_op.
     Definition nnrcmr := nnrcmr.
     Definition dnnrc := dnnrc.
     Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.

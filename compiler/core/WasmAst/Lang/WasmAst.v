@@ -38,7 +38,8 @@ Section Top.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
   Context {fruntime:foreign_runtime}.
-  Context {fdatatoejson:foreign_to_ejson}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fdatatoejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
   Context (h:brand_relation_t).
   Definition wasm_ast_eval_top (cenv: bindings) (q:wasm_ast) : option data :=
