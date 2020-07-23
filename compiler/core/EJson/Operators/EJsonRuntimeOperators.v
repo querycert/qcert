@@ -55,7 +55,6 @@ Section EJsonRuntimeOperators.
     | EJsonRuntimeToLeft: ejson_runtime_op
     | EJsonRuntimeToRight: ejson_runtime_op
     (* Brand *)
-    | EJsonRuntimeBrand : ejson_runtime_op
     | EJsonRuntimeUnbrand : ejson_runtime_op
     | EJsonRuntimeCast : ejson_runtime_op
     (* Collection *)
@@ -135,7 +134,6 @@ Section EJsonRuntimeOperators.
       | EJsonRuntimeToLeft=> "toLeft"
       | EJsonRuntimeToRight=> "toRight"
       (* Brand *)
-      | EJsonRuntimeBrand => "brand"
       | EJsonRuntimeUnbrand => "unbrand"
       | EJsonRuntimeCast => "cast"
       (* Collection *)
@@ -208,7 +206,6 @@ Section EJsonRuntimeOperators.
       | "toLeft" => Some EJsonRuntimeToLeft
       | "toRight" => Some EJsonRuntimeToRight
       (* Brand *)
-      | "brand" => Some EJsonRuntimeBrand
       | "unbrand" => Some EJsonRuntimeUnbrand
       | "cast" => Some EJsonRuntimeCast
       (* Collection *)
@@ -495,20 +492,6 @@ Section EJsonRuntimeOperators.
              | _ => None
              end) dl
       (* Brand *)
-      | EJsonRuntimeBrand =>
-        apply_binary
-          (fun d1 d2 =>
-             match d1 with
-             | ejarray bls =>
-               let ob := of_string_list bls in
-               lift (fun b =>
-                       ejobject
-                         (("$class"%string, ejarray (map ejstring b))
-                            ::("$data"%string, d2)
-                            ::nil)) ob
-             | _ => None
-             end
-          ) dl
       | EJsonRuntimeUnbrand =>
         apply_unary
           (fun d =>

@@ -317,7 +317,6 @@ let string_of_runtime_op =
   | EJsonRuntimeToLeft-> "runtimeToLeft"
   | EJsonRuntimeToRight-> "runtimeToRight"
   (* Brand *)
-  | EJsonRuntimeBrand -> "runtimeBrand"
   | EJsonRuntimeUnbrand -> "runtimeUnbrand"
   | EJsonRuntimeCast -> "runtimeCast"
   (* Collection *)
