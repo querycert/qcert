@@ -233,9 +233,6 @@ function getRight(v) {
 }
 
 /* Brand */
-function brand(b,v) {
-    return { '$class' : b, '$data' : v };
-}
 function unbrand(v) {
     if (typeof v === 'object' && Object.prototype.hasOwnProperty.call(v,'$class') && Object.prototype.hasOwnProperty.call(v,'$data')) {
         return v.$data;
