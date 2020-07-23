@@ -195,7 +195,7 @@ Section ImpDatatoImpEJson.
         | OpLeft => mk_left e
         | OpRight => mk_right e
         | OpBrand b =>
-          mk_imp_ejson_runtime_call EJsonRuntimeBrand [ brands_to_ejson_expr (canon_brands h b); e ]
+          mk_object [ ("$class"%string, brands_to_ejson_expr (canon_brands h b)); ("$data"%string, e) ]
         | OpUnbrand => mk_imp_ejson_runtime_call EJsonRuntimeUnbrand el
         | OpCast b =>
           mk_imp_ejson_runtime_call EJsonRuntimeCast [ brands_to_ejson_expr b; e ]
@@ -552,7 +552,6 @@ Section ImpDatatoImpEJson.
         destruct d; simpl; trivial.
       - Case "OpBrand"%string.
         rewrite eval_ejson_to_expr_string_array_correct; simpl.
-        rewrite of_string_list_map_ejstring; simpl.
         reflexivity.
       - Case "OpBrand"%string. (* XXX None case *)
         rewrite eval_ejson_to_expr_string_array_correct; simpl.
