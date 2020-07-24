@@ -1,7 +1,7 @@
 open Wasm_util
 open EJson
 
-let cejson_to_bytes : cejson -> bytes =
+let cejson_to_bytes : _ cejson -> bytes =
   let open Bytes in
   function
   | Coq_cejnull ->
