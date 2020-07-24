@@ -41,6 +41,7 @@
  *)
 open EJson
 
-val cejson_to_bytes: cejson -> bytes
-val ejson_to_bytes: ejson -> bytes
-val ejson_of_bytes: bytes -> ejson
+(** We do not support foreign data yet *)
+val cejson_to_bytes: _ cejson -> bytes
+val ejson_to_bytes: _ ejson -> bytes
+val ejson_of_bytes: bytes -> _ ejson
