@@ -94,6 +94,14 @@ function read(module, x) {
         });
       return o
     }
+    if (__instanceof(x, m.IdEjLeft)) {
+      let v = m.EjLeft.wrap(x);
+      return {$left: recurse(v.value)};
+    }
+    if (__instanceof(x, m.IdEjRight)) {
+      let v = m.EjRight.wrap(x);
+      return {$right: recurse(v.value)};
+    }
     throw new Error('encoding.js:read(): cannot read value of unsupported type');
   }
   return recurse(x);
