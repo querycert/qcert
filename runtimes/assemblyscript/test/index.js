@@ -175,3 +175,26 @@ describe('AssemblyScript: Ejson operators', function () {
     assert(enc.read(m, runtimeToRight(r)) == 1, 'toRight');
   });
 });
+
+describe('AssemblyScript: EJson encoding', function () {
+  it('roundtrips', async function () {
+    let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
+    let { ejson_to_bytes, ejson_of_bytes } = m.exports;
+    function t(x, label) {
+      assert.deepEqual(enc.read(m, ejson_of_bytes(ejson_to_bytes(enc.write(m,x)))), x , label);
+    }
+    t(null, 'null');
+    t(true, 'true');
+    t(false, 'false');
+    t(3.14, '3.14');
+    t({$nat: 42}, '{$nat: 42}');
+    t({$left: true}, '{$left: true}');
+    t({$right: true}, '{$right: true}');
+    t('', 'empty string');
+    t('Hello World!', 'Hello World!');
+    t([], 'empty array');
+    t([1,2,3,null,false,true], 'non-empty array');
+    t({}, 'empty object');
+    t({a: 1, b: 2, '!': null}, 'non-empty object');
+  });
+});
