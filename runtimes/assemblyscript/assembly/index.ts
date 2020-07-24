@@ -1,3 +1,7 @@
+/////////////////////////
+// EJson Data Encoding //
+/////////////////////////
+
 class EjValue {}
 
 export class EjNull extends EjValue {
@@ -108,7 +112,212 @@ export class EjRight extends EjValue {
 }
 export const IdEjRight = idof<EjRight>()
 
-// EJson Operators
+/////////////////////////
+// EJson Serialization //
+/////////////////////////
+
+class BytesBuilder {
+  segments: Array<ArrayBuffer>
+  size: i32
+
+  constructor() { this.segments = []; this.size = 0; }
+
+  append(s: ArrayBuffer): void {
+    this.segments.push(s);
+    this.size += s.byteLength;
+  }
+
+  finalize(): ArrayBuffer {
+    let b = new ArrayBuffer(this.size);
+    let p : i32 = 0;
+    let v = Uint8Array.wrap(b);
+    for (let i = 0; i < this.segments.length; i++) {
+      let s = Uint8Array.wrap(this.segments[i]);
+      // this is byte-by-byte copy. Could be much faster when copying words.
+      for (let j = 0; j < s.length; j++) {
+        v[p] = s[j];
+        p++;
+      }
+    }
+    return b;
+  }
+}
+
+function ejson_to_bytes_(b: BytesBuilder, x:EjValue): void {
+  if (x instanceof EjNull) {
+    let s = new ArrayBuffer(1);
+    Uint8Array.wrap(s)[0] = 0; // tag
+    b.append(s);
+    return;
+  }
+  if (x instanceof EjBool) {
+    let xx : EjBool = changetype<EjBool>(x) ;
+    let s = new ArrayBuffer(1);
+    Uint8Array.wrap(s)[0] = xx.value ? 2 : 1; // tag
+    b.append(s);
+    return;
+  }
+  if (x instanceof EjNumber) {
+    let xx : EjNumber = changetype<EjNumber>(x) ;
+    let s = new ArrayBuffer(9);
+    let v = new DataView(s);
+    v.setUint8(0, 3);
+    v.setFloat64(1, xx.value, true);
+    b.append(s);
+    return;
+  }
+  if (x instanceof EjBigInt) {
+    let xx : EjBigInt = changetype<EjBigInt>(x) ;
+    let s = new ArrayBuffer(9);
+    let v = new DataView(s);
+    v.setUint8(0, 4); // tag
+    v.setFloat64(1, xx.value, true);
+    b.append(s);
+    return;
+  }
+  if (x instanceof EjString) {
+    let xx : EjString = changetype<EjString>(x) ;
+    let utf8 = String.UTF8.encode(xx.value);
+    let s = new Uint8Array(5);
+    let v = new DataView(s.buffer);
+    s[0] = 5; // tag
+    v.setUint32(1, utf8.byteLength, true);
+    b.append(s.buffer);
+    b.append(utf8);
+    return;
+  }
+  if (x instanceof EjArray) {
+    let xx : EjArray = changetype<EjArray>(x) ;
+    let s = new Uint8Array(5);
+    let v = new DataView(s.buffer);
+    s[0] = 6; // tag
+    v.setUint32(1, xx.values.length, true);
+    b.append(s.buffer);
+    for (let i = 0; i < xx.values.length; i++) {
+      ejson_to_bytes_(b, xx.values[i]);
+    }
+    return;
+  }
+  if (x instanceof EjObject) {
+    let xx : EjObject = changetype<EjObject>(x) ;
+    let s = new Uint8Array(5);
+    let v = new DataView(s.buffer);
+    s[0] = 7; // tag
+    v.setUint32(1, xx.values.size, true);
+    b.append(s.buffer);
+    let keys = xx.values.keys();
+    for (let i = 0; i < xx.values.size; i++) {
+      let k = keys[i];
+      // write key as utf8 string with byte length prefix
+      let utf8 = String.UTF8.encode(k);
+      let s = new Uint8Array(4);
+      let v = new DataView(s.buffer);
+      v.setUint32(0, utf8.byteLength, true);
+      b.append(s.buffer);
+      b.append(utf8);
+      // write value
+      ejson_to_bytes_(b, xx.values.get(k));
+    }
+    return;
+  }
+  if (x instanceof EjLeft) {
+    let xx : EjLeft = changetype<EjLeft>(x) ;
+    let s = new Uint8Array(1);
+    s[0] = 8; // tag
+    b.append(s.buffer);
+    // write value
+    ejson_to_bytes_(b, xx.value);
+    return;
+  }
+  if (x instanceof EjRight) {
+    let xx : EjRight = changetype<EjRight>(x) ;
+    let s = new Uint8Array(1);
+    s[0] = 9; // tag
+    b.append(s.buffer);
+    // write value
+    ejson_to_bytes_(b, xx.value);
+    return;
+  }
+  unreachable();
+}
+
+export function ejson_to_bytes(x: EjValue): ArrayBuffer {
+  let b = new BytesBuilder();
+  ejson_to_bytes_(b, x);
+  return b.finalize();
+}
+
+class MovingPointer {
+  value: i32
+  constructor(x: i32) { this.value = x }
+  advance(by: i32): i32 {
+    let r = this.value;
+    this.value += by;
+    return r;
+  }
+}
+
+function ejson_of_bytes_(p: MovingPointer, b:ArrayBuffer): EjValue {
+  // switch tag
+  switch(Uint8Array.wrap(b, p.advance(1), 1)[0]) {
+    case 0:
+      return c_null;
+    case 1:
+      return c_false;
+    case 2:
+      return c_true;
+    case 3: {
+      let v = new DataView(b, p.advance(8), 8);
+      return new EjNumber(v.getFloat64(0, true));
+    }
+    case 4: {
+      let v = new DataView(b, p.advance(8), 8);
+      return new EjBigInt(v.getFloat64(0, true));
+    }
+    case 5: {
+      let v = new DataView(b, p.advance(4), 4);
+      let len = v.getUint32(0, true);
+      // ArrayBuffer is a pointer
+      let str = String.UTF8.decodeUnsafe(changetype<i32>(b) + p.advance(len), len);
+      return new EjString(str);
+    }
+    case 6: {
+      let v = new DataView(b, p.advance(4), 4)
+      let len = v.getUint32(0, true);
+      let arr = new Array<EjValue>(len);
+      for (let i=<u32>0; i < len; i++) {
+        arr[i] = ejson_of_bytes_(p, b);
+      }
+      return new EjArray(arr);
+    }
+    case 7: {
+      let v = new DataView(b, p.advance(4), 4)
+      let len = v.getUint32(0, true);
+      let obj = new EjObject();
+      for (let i=<u32>0; i < len; i++) {
+        let v = new DataView(b, p.advance(4), 4);
+        let key_len = v.getUint32(0, true);
+        let key = String.UTF8.decodeUnsafe(changetype<i32>(b) + p.advance(key_len), key_len);
+        let val = ejson_of_bytes_(p, b);
+        obj.set(new EjString(key), val);
+      }
+      return obj;
+    }
+    case 8:
+      return new EjLeft(ejson_of_bytes_(p, b));
+    case 9:
+      return new EjRight(ejson_of_bytes_(p, b));
+  }
+  return unreachable();
+}
+
+export function ejson_of_bytes(b: ArrayBuffer): EjValue {
+  return ejson_of_bytes_(new MovingPointer(0), b);
+}
+
+/////////////////////
+// EJson Operators //
+/////////////////////
 
 export function opNot(a: EjBool): EjBool {
   return new EjBool(!a.value);
@@ -285,7 +494,9 @@ export function opMathTrunc(a: EjNumber): EjBigInt {
   return new EjBigInt(Math.trunc(a.value));
 }
 
-// EJson Runtime Operators
+/////////////////////////////
+// EJson Runtime Operators //
+/////////////////////////////
 
 export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
   if (a instanceof EjNull && b instanceof EjNull) {
