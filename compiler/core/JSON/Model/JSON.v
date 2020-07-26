@@ -17,7 +17,6 @@ Require Import Ascii.
 Require Import String.
 Require Import ZArith.
 Require Import Bool.
-Require Import JsAst.JsNumber.
 Require Import Float.
 Require Import ToString.
 Require Import CoqLibAdd.
@@ -42,7 +41,7 @@ Section JSON.
   (** Induction principles used as backbone for inductive proofs on json *)
   Definition json_rect (P : json -> Type)
              (fnull : P jnull)
-             (fnumber : forall n : number, P (jnumber n))
+             (fnumber : forall n : float, P (jnumber n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forallt P c -> P (jarray c))
@@ -68,7 +67,7 @@ Section JSON.
 
   Definition json_ind (P : json -> Prop)
              (fnull : P jnull)
-             (fnumber : forall n : number, P (jnumber n))
+             (fnumber : forall n : float, P (jnumber n))
              (fbool : forall b : bool, P (jbool b))
              (fstring : forall s : string, P (jstring s))
              (farray : forall c : list json, Forall P c -> P (jarray c))
@@ -96,7 +95,7 @@ Section JSON.
 
   Lemma jsonInd2 (P : json -> Prop)
         (f : P jnull)
-        (f0 : forall n : number, P (jnumber n))
+        (f0 : forall n : float, P (jnumber n))
         (f1 : forall b : bool, P (jbool b))
         (f2 : forall s : string, P (jstring s))
         (f3 : forall c : list json, (forall x, In x c -> P x) -> P (jarray c))

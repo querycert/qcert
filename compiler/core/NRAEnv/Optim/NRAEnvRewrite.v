@@ -12,6 +12,7 @@
  * limitations under the License.
  *)
 
+Require Import BinNums.
 Require Import List.
 Require Import String.
 Require Import ListSet.
@@ -127,7 +128,7 @@ Section ROptimEnv.
 
   (* nth 0 { P } ) ⇒ₓ left P *)
   Lemma envnth0_bag (p: nraenv_core) :
-    cNRAEnvBinop OpBagNth (‵{| p |}) ‵ (dnat 0) ≡ₑ
+    cNRAEnvBinop OpBagNth (‵{| p |}) ‵ (dnat Z0) ≡ₑ
     cNRAEnvUnop OpLeft p.
   Proof.
     unfold nraenv_core_eq; intros ? ? _ ? _ ? _; simpl.

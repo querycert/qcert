@@ -12,6 +12,7 @@
  * limitations under the License.
  *)
 
+Require Import BinInt.
 Require Import String.
 Require Import List.
 Require Import Qcert.Driver.CompLang.

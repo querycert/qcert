@@ -17,7 +17,6 @@ Require Import Ascii.
 Require Import String.
 Require Import ZArith.
 Require Import Bool.
-Require Import JsAst.JsNumber.
 Require Import Float.
 Require Import ToString.
 Require Import CoqLibAdd.

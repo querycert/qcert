@@ -1306,7 +1306,7 @@ Section TNNRSimp.
   End sem.
   
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrs_imp_expr_type_lookup_equiv_prop {m:basic_model} :
+  Global Instance nnrs_imp_expr_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrs_imp_expr_type.
   Proof.
     cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrs_imp_expr_type);
@@ -1394,7 +1394,7 @@ Section TNNRSimp.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply H0.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
     - Case "NNRSimpLet"%string.
       simpl in leo.
       econstructor; intuition eauto.
@@ -1402,7 +1402,7 @@ Section TNNRSimp.
       unfold lookup_equiv_on in *; simpl; intros.
       match_destr.
       apply leo.
-      apply remove_in_neq; tauto.
+      now apply remove_in_neq.
     - Case "NNRSimpFor"%string.
       apply lookup_equiv_on_dom_app in leo.
       econstructor; intuition eauto.
@@ -1411,7 +1411,7 @@ Section TNNRSimp.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply H0.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
     - Case "NNRSimpIf"%string.
       apply lookup_equiv_on_dom_app in leo.
       destruct leo as [leo1 leo2].
@@ -1430,12 +1430,12 @@ Section TNNRSimp.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply leo2.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
       + eapply IHs2; eauto.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply leo3.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
   Qed.
 
   Lemma nnrs_imp_expr_type_has_free_vars {Γc Γ e τ} :

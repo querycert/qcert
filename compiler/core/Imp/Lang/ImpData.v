@@ -26,14 +26,14 @@ Section ImpData.
   Section Syntax.
 
     Definition imp_data_model := data.
-    Definition imp_data_constant := data.
+    Definition imp_data_constant : Set := data.
 
-    Inductive imp_data_op :=
+    Inductive imp_data_op : Set :=
     | DataOpUnary : unary_op -> imp_data_op
     | DataOpBinary : binary_op -> imp_data_op
     .
 
-    Inductive imp_data_runtime_op :=
+    Inductive imp_data_runtime_op : Set :=
     | DataRuntimeGroupby : string -> list string -> imp_data_runtime_op
     | DataRuntimeEither : imp_data_runtime_op
     | DataRuntimeToLeft : imp_data_runtime_op

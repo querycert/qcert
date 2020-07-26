@@ -21,9 +21,9 @@ Require Import Imp.
 
 Section ImpSize.
 
-  Context {Model: Type}.
-  Context {Op: Type}.
-  Context {Runtime: Type}.
+  Context {Model: Set}.
+  Context {Op: Set}.
+  Context {Runtime: Set}.
 
   Definition imp_expr := @Imp.imp_expr Model Op Runtime.
   Definition imp_stmt := @Imp.imp_stmt Model Op Runtime.

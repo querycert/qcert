@@ -25,6 +25,7 @@ Require Import EquivDec.
 Require Import Program.
 Require Import Bool.
 Require Import String.
+Require Import BinNums.
 Require Import List.
 Require Import ListSet.
 Require Import Utils.
@@ -1905,7 +1906,7 @@ Section TNRAEnvRewrite.
   (* nth 0 { P } ) ⇒ₓ left P *)
 
   Lemma tenvnth0_bag_arrow q :
-    cNRAEnvBinop OpBagNth (‵{| q |}) ‵ (dnat 0) ⇒
+    cNRAEnvBinop OpBagNth (‵{| q |}) ‵ (dnat Z0) ⇒
     cNRAEnvUnop OpLeft q.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (envnth0_bag q)).

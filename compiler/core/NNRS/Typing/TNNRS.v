@@ -805,7 +805,7 @@ Section TNNRS.
   End sem.
   
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrs_expr_type_lookup_equiv_prop {m:basic_model} :
+  Global Instance nnrs_expr_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrs_expr_type.
   Proof.
     cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrs_expr_type);

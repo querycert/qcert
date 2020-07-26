@@ -128,7 +128,12 @@ let qcert_string_of_float f =
 
 let string_of_enhanced_float f = char_list_of_string (string_of_float f)
 let string_of_enhanced_string s = char_list_of_string ("S\"" ^ s ^ "\"")
-	
+
+let float_sign f =
+  match Float.classify_float f with
+  | FP_normal -> if 0. < f then 1. else -1.
+  | _ -> f
+
 (**********************************)
 (* Timing function for CompStat   *)
 (**********************************)

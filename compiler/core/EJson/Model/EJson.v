@@ -17,7 +17,6 @@ Require Import Ascii.
 Require Import String.
 Require Import ZArith.
 Require Import Bool.
-Require Import JsAst.JsNumber.
 Require Import Float.
 Require Import ToString.
 Require Import CoqLibAdd.
@@ -48,7 +47,7 @@ Section EJson.
   (** Induction principles used as backbone for inductive proofs on json *)
   Definition ejson_rect (P : ejson -> Type)
              (fnull : P ejnull)
-             (fnumber : forall n : number, P (ejnumber n))
+             (fnumber : forall n : float, P (ejnumber n))
              (fbigint : forall n : Z, P (ejbigint n))
              (fbool : forall b : bool, P (ejbool b))
              (fstring : forall s : string, P (ejstring s))
@@ -78,7 +77,7 @@ Section EJson.
 
   Definition ejson_ind (P : ejson -> Prop)
              (fnull : P ejnull)
-             (fnumber : forall n : number, P (ejnumber n))
+             (fnumber : forall n : float, P (ejnumber n))
              (fbigint : forall n : Z, P (ejbigint n))
              (fbool : forall b : bool, P (ejbool b))
              (fstring : forall s : string, P (ejstring s))
@@ -110,7 +109,7 @@ Section EJson.
 
   Lemma ejsonInd2 (P : ejson -> Prop)
         (f : P ejnull)
-        (f0 : forall n : number, P (ejnumber n))
+        (f0 : forall n : float, P (ejnumber n))
         (f1 : forall n : Z, P (ejbigint n))
         (f2 : forall b : bool, P (ejbool b))
         (f3 : forall s : string, P (ejstring s))

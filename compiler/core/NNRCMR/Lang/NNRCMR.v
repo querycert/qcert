@@ -282,7 +282,7 @@ Section NNRCMR.
     | RedSingleton => (mr.(mr_output), Vlocal)
     end.
 
-  Definition map_well_localized map d :=
+  Definition map_well_localized map (d:ddata) :=
     match map, d with
     | MapDist _, Ddistr _ => True
     | MapDistFlatten _, Ddistr _ => True

@@ -21,6 +21,7 @@
 Require Import String.
 Require Import List.
 Require Import Bool.
+Require Import BinInt.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
@@ -37,6 +38,7 @@ Require Import cNNRCShadow.
 Require Import NNRC.
 Require Import NNRCEq.
 Require Import NNRCShadow.
+
 
 Section Stratify.
   
@@ -298,7 +300,8 @@ Section Stratify.
     Local Open Scope nnrc_scope.
     Local Open Scope string_scope.
 
-    Example nnrc1 := (‵abs ‵ (dnat 3) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3)).
+
+    Example nnrc1 := ((‵abs ‵ (dnat 3) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
     (* Eval vm_compute in (stratify nnrc1).  *)
 
     Example nnrc2 := NNRCLet "x" nnrc1 (NNRCVar "x").
@@ -1922,10 +1925,3 @@ Section Stratify.
   End Core.
   
 End Stratify.
-
-(* 
- *** Local Variables: ***
- *** coq-load-path: (("../../../coq" "Qcert")) ***
- *** End: ***
- *)
-

@@ -31,15 +31,15 @@ Require Import Utils.
 Section Imp.
 
   Section Syntax.
-    Context {Constant: Type}.
-    Context {Op: Type}.
-    Context {Runtime: Type}.
+    Context {Constant: Set}.
+    Context {Op: Set}.
+    Context {Runtime: Set}.
 
     Definition var := string.
 
     Unset Elimination Schemes.
   
-    Inductive imp_expr :=
+    Inductive imp_expr : Set :=
     | ImpExprError : string -> imp_expr                          (**r raises an error *)
     | ImpExprVar : var -> imp_expr                               (**r local variable lookup ([$v])*)
     | ImpExprConst : Constant -> imp_expr                        (**r constant data ([d]) *)
@@ -187,23 +187,23 @@ Section Imp.
           try solve [apply binary_op_eqdec | apply unary_op_eqdec
                      | apply Constant_eqdec | apply Op_eqdec | apply Runtime_eqdec | apply string_eqdec].
         - revert l; induction el; intros; destruct l; simpl in *; try solve[right ;inversion 1].
-          left; reflexivity.
-          inversion X; subst; clear X.
-          elim (X0 i); intros; subst; clear X0.
-          + specialize (IHel X1); clear X1.
-            elim (IHel l); intros; clear IHel.
-            * subst; left; reflexivity.
+          + left; reflexivity.
+          + inversion H; subst; clear H.
+            elim (H2 i); intros; subst; clear H2.
+            * specialize (IHel H3); clear H3.
+              elim (IHel l); intros; clear IHel.
+              -- subst; left; reflexivity.
+              -- right; congruence.
             * right; congruence.
-          + right; congruence.
         - revert l; induction el; intros; destruct l; simpl in *; try solve[right ;inversion 1].
-          left; reflexivity.
-          inversion X; subst; clear X.
-          elim (X0 i); intros; subst; clear X0.
-          + specialize (IHel X1); clear X1.
-            elim (IHel l); intros; clear IHel.
-            * subst; left; reflexivity.
+          +  left; reflexivity.
+          + inversion H; subst; clear H.
+            elim (H2 i); intros; subst; clear H2.
+            * specialize (IHel H3); clear H3.
+              elim (IHel l); intros; clear IHel.
+              -- subst; left; reflexivity.
+              -- right; congruence.
             * right; congruence.
-          + right; congruence.
       Defined.
 
       Global Instance imp_stmt_eqdec : EqDec imp_stmt eq.
@@ -214,14 +214,14 @@ Section Imp.
         - subst; clear l.
           revert l0; induction sl; intros; destruct l0; simpl in *; try solve[right ;inversion 1].
           left; reflexivity.
-          inversion X; subst; clear X.
-          elim (X0 i); intros; subst; clear X0.
-          + specialize (IHsl X1); clear X1.
+          inversion H; subst; clear H.
+          elim (H2 i); intros; subst; clear H2.
+          + specialize (IHsl H3); clear H3.
             elim (IHsl l0); intros; clear IHsl.
             * subst; left; reflexivity.
             * right; congruence.
           + right; congruence.
-        - clear X.
+        - clear H.
           revert l; induction el; intros; destruct l; simpl in *; try solve[right ;inversion 1].
           left; reflexivity.
           destruct a; simpl in *; destruct o; simpl in *;

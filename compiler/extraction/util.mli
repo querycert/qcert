@@ -63,6 +63,7 @@ val qcert_string_of_float : float -> string
 val string_of_enhanced_float : float -> char list
 val string_of_enhanced_string : string -> char list
 
+val float_sign : float -> float
 (* Timing function for CompStat   *)
 
 val time : ('a -> 'b) -> 'a -> char list * 'b
