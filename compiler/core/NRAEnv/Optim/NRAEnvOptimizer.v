@@ -18,6 +18,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Program.
 Require Import String.
+Require Import BinNums.
 Require Import List.
 Require Import ListSet.
 Require Import Utils.
@@ -719,7 +720,7 @@ Section NRAEnvOptimizer.
   (* nth 0 { P } ) ⇒ₓ left P *)
   Definition nth0_bag_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        NRAEnvBinop OpBagNth (NRAEnvUnop OpBag p) (NRAEnvConst (dnat 0)) => NRAEnvUnop OpLeft p
+        NRAEnvBinop OpBagNth (NRAEnvUnop OpBag p) (NRAEnvConst (dnat Z0)) => NRAEnvUnop OpLeft p
       | _ => p
     end.
 

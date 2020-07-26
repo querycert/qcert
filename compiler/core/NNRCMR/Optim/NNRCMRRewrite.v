@@ -220,7 +220,7 @@ Section NNRCMRRewrite.
   (* Scalar Map *)
 
   Definition is_scalar_map map :=
-    match map with
+    match (map:map_fun) with
     | MapScalar _ => true
     | _ => false
     end.
@@ -264,7 +264,7 @@ Section NNRCMRRewrite.
 
   
   (* Java equivalent: MROptimizer.is_flatten_collect *)
-  Definition is_flatten_collect red :=
+  Definition is_flatten_collect (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect reduce => is_flatten_function reduce
@@ -275,7 +275,7 @@ Section NNRCMRRewrite.
   (* Id Reduce *)
 
   (* Java equivalent: MROptimizer.is_id_reduce *)  
-  Definition is_id_reduce red :=
+  Definition is_id_reduce (red:reduce_fun) :=
     match red with
     | RedId => true
     | RedCollect reduce => false
@@ -293,7 +293,7 @@ Section NNRCMRRewrite.
   (* Collect Reduce *)
 
   (* Java equivalent: MROptimizer.is_id_collect *)  
-  Definition is_id_collect red :=
+  Definition is_id_collect (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect reduce => is_id_function reduce
@@ -319,7 +319,7 @@ Section NNRCMRRewrite.
 
   (* singleton *)
   (* Java equivalent: MROptimizer.is_singleton_reduce *)
-  Definition is_singleton_reduce red :=
+  Definition is_singleton_reduce (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect _ => false
@@ -338,7 +338,7 @@ Section NNRCMRRewrite.
 
 
   (* uncoll reduce *)
-  Definition is_uncoll_collect red :=
+  Definition is_uncoll_collect (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect reduce => is_uncoll_function_arg reduce
@@ -346,7 +346,7 @@ Section NNRCMRRewrite.
     | RedSingleton => false
     end.
 
-  Definition suppress_uncoll_in_collect_reduce red :=
+  Definition suppress_uncoll_in_collect_reduce (red:reduce_fun) :=
     match red with
     | RedId => None
     | RedCollect f =>

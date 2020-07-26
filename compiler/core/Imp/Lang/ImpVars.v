@@ -35,9 +35,9 @@ Section ImpVars.
   (* Context {fruntime:foreign_runtime}. *)
   (* Context (h:brand_relation_t). *)
 
-  Context {Constant: Type}.
-  Context {Op: Type}.
-  Context {Runtime: Type}.
+  Context {Constant: Set}.
+  Context {Op: Set}.
+  Context {Runtime: Set}.
 
 
   Fixpoint imp_expr_free_vars (e:@imp_expr Constant Op Runtime) : list var

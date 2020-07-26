@@ -15,6 +15,7 @@
 (* This includes some rewrites/simplification rules for the Nested relational calculus *)
 
 Require Import String.
+Require Import BinInt.
 Require Import List.
 Require Import ListSet.
 Require Import Arith.

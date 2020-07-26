@@ -354,7 +354,7 @@ Section ListAdd.
         + right. now inversion_clear 1.
     Defined.
 
-    Global Instance Forall_perm {A P} : Proper ((@Permutation A) ==> iff) (@Forall A P).
+    Global Instance Forall_perm {P} : Proper ((@Permutation A) ==> iff) (@Forall A P).
     Proof.
       intros ? ? perm.
       repeat rewrite Forall_forall.

@@ -15,6 +15,7 @@
 Require Import EquivDec.
 Require Import List.
 Require Import String.
+Require Import Ascii.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import EJsonRuntime.
@@ -69,7 +70,6 @@ Section ForeignToEJsonRuntime.
           destruct (string_dec_from_neq H) as [d neq]
           ; repeat rewrite neq in *
           ; clear d neq.
-
 
     Lemma map_tostring_comm1 r :
       map

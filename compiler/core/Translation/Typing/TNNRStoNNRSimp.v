@@ -618,7 +618,7 @@ Section TNNRStoNNRSimp.
     - Case "NNRSLetMut"%string.
       unfold equiv_decb in *.
       destruct (v0 == v); try discriminate.
-      match_destr_in eqq; tauto.
+      match_destr_in eqq; auto.
     - Case "NNRSAssign"%string.
       unfold equiv_decb in *.
       destruct (v0 == v); try discriminate.
@@ -892,7 +892,7 @@ Section TNNRStoNNRSimp.
         match_destr.
         apply notnone; rewrite in_app_iff.
         right.
-        apply remove_in_neq; tauto.
+        apply remove_in_neq; auto.
     - Case "NNRSLetMut"%string.
       destruct sf as [ninΓ [ninΔc [ninΔd [sf1 sf2]]]].
       invcs H3.
@@ -911,7 +911,7 @@ Section TNNRStoNNRSimp.
             match_destr.
             apply notnone; rewrite in_app_iff.
             right.
-            apply remove_in_neq; tauto.
+            apply remove_in_neq; auto.
         }
       + { eapply type_NNRSLetMutNotUsed.
           + eapply IHs1; eauto.
@@ -1000,7 +1000,7 @@ Section TNNRStoNNRSimp.
         match_destr.
         apply notnone; rewrite in_app_iff.
         right.
-        apply remove_in_neq; tauto.
+        apply remove_in_neq; auto.
     - Case "NNRSIf"%string.
       destruct sf as [disjc [disjd [sf1 sf2]]].
       econstructor.
@@ -1017,12 +1017,12 @@ Section TNNRStoNNRSimp.
         match_destr.
         apply notnone; repeat rewrite in_app_iff.
         right; left.
-        apply remove_in_neq; tauto.
+        apply remove_in_neq; auto.
       + eapply IHs2; eauto; intros; simpl.
         match_destr.
         apply notnone; repeat rewrite in_app_iff.
         right; right.
-        apply remove_in_neq; tauto.
+        apply remove_in_neq; auto.
   Qed.
 
   Theorem tnnrs_to_nnrs_imp_correct_b {Γc} {si:nnrs} {τ} :

@@ -1356,7 +1356,7 @@ Section brands_lattice.
 
   Context {br:brand_relation}.
   
-  Global Instance brands_lattice : Lattice brands (equiv_brands brand_relation_brands)
+  #[refine] Global Instance brands_lattice : Lattice brands (equiv_brands brand_relation_brands)
     := { meet:=brand_meet brand_relation_brands;
          join:=brand_join brand_relation_brands
        }.

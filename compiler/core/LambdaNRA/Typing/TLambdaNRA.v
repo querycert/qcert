@@ -312,7 +312,7 @@ Section TLambdaNRA.
     Qed.
 
     (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrc_type_lookup_equiv_prop {m:basic_model} :
+  Global Instance nnrc_type_lookup_equiv_prop :
     Proper (assoc_lookupr_equiv ==> eq ==> assoc_lookupr_equiv ==> eq ==> iff) lambda_nra_type.
   Proof.
     cut (Proper (assoc_lookupr_equiv ==> eq ==> assoc_lookupr_equiv ==> eq ==> impl) lambda_nra_type);

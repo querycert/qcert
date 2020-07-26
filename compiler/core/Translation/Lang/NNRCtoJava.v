@@ -14,6 +14,7 @@
 
 Require Import List.
 Require Import String.
+Require Import BinInt.
 Require Import Ascii.
 Require Import Peano_dec.
 Require Import EquivDec.

@@ -22,6 +22,7 @@ Require Import String.
 Require Import List.
 Require Import Permutation.
 Require Import ListSet.
+Require Import BinInt.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
@@ -1607,8 +1608,6 @@ Section NNRSCrossShadow.
           match_destr.
           destruct p as [[??]?].
           destruct p; trivial.
-          unfold var in *.
-          apply (IHl p0 m m0 domσ domψc domψd).
         + destruct d; trivial.
           revert σ ψc ψd domσ domψc domψd c0.
           induction l

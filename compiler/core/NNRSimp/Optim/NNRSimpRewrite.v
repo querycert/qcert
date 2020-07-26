@@ -399,8 +399,7 @@ Section NNRSimpRewrite.
            apply olift_ext; intros.
            generalize (nnrs_imp_expr_eval_unused h σc nil σ n)
            ; simpl; intros HH2.
-           repeat rewrite HH2 by tauto.
-           trivial.
+           repeat rewrite HH2; auto.
          }
          rewrite olift_commute.
          case_eq (nnrs_imp_expr_eval h σc σ n); simpl; trivial
