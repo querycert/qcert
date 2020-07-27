@@ -58,9 +58,12 @@ let ejson_to_bytes x =
     append b;
     List.iter f x
   | Coq_ejobject x ->
-    let b = create 5 in
-    set_uint8 b 0 7;
-    set_int32_le b 1 (List.length x |> Int32.of_int);
+    ( (* scope b *)
+      let b = create 5 in
+      set_uint8 b 0 7;
+      set_int32_le b 1 (List.length x |> Int32.of_int);
+      append b
+    );
     List.iter (fun (k, v) ->
         let k = Util.string_of_char_list k in
         let n = String.length k in
