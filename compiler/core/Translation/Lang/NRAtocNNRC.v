@@ -14,7 +14,7 @@
 
 Require Import String.
 Require Import List.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Compare_dec.
 Require Import Program.
@@ -26,7 +26,9 @@ Require Import NNRC NNRCSize.
 
 Section NRAtocNNRC.
   Context {fruntime:foreign_runtime}.
-
+  Import ListNotations.
+  Local Open Scope list_scope.
+  
   (** Translation from NRA to Named Nested Relational Calculus *)
 
   Fixpoint nra_to_nnrc_core (op:nra) (var:var) : nnrc :=
@@ -159,7 +161,7 @@ Section NRAtocNNRC.
       rewrite (map_sem_correct h op1 cenv l env); try reflexivity; intros.
       auto.
     - Case "NRAMapProduct"%string.
-      generalize (fresh_var2_distinct  "tmc$" "tmc$" [vid]).
+      generalize (fresh_var2_distinct  "tmc$" "tmc$" (vid::nil)).
       simpl; intros dis.
       repeat (dest_eqdec; try congruence).
       rewrite (IHop2 did env vid H).
@@ -172,7 +174,7 @@ Section NRAtocNNRC.
       unfold omap_product in *; simpl.
       unfold oncoll_map_concat in *.
       rewrite <- IHl; clear IHl.
-      rewrite (IHop1 a (((fresh_var "tmc$" [vid], a)) :: env) (fresh_var "tmc$" [vid])) at 1; clear IHop1; trivial.
+      rewrite (IHop1 a (((fresh_var "tmc$" (vid::nil), a)) :: env) (fresh_var "tmc$" (vid::nil))) at 1; clear IHop1; trivial.
       destruct (h ⊢ op1 @ₐ a ⊣ cenv); try reflexivity.
       destruct d; try reflexivity.
       unfold omap_concat, orecconcat, rec_concat_sort.
@@ -254,7 +256,7 @@ Section NRAtocNNRC.
       case_eq (h ⊢ op1 @ₐ did ⊣ cenv); intros; try reflexivity.
       repeat (dest_eqdec; try congruence).
       simpl.
-      destruct (data_eq_dec d (dcoll [])); subst; simpl.
+      destruct (data_eq_dec d (dcoll nil)); subst; simpl.
       + rewrite (IHop2 did); trivial.
         simpl; match_destr.
         elim (fresh_var_fresh1 _ _ _ e0).
@@ -300,23 +302,23 @@ Section NRAtocNNRC.
     Proof.
       revert v.
       induction op; simpl in *; intros; trivial.
-      - omega.
-      - omega.
-      - omega.
-      - specialize (IHop1 v); specialize (IHop2 v); omega.
-      - specialize (IHop v); omega.
+      - lia.
+      - lia.
+      - lia.
+      - specialize (IHop1 v); specialize (IHop2 v); lia.
+      - specialize (IHop v); lia.
       - generalize (IHop1 (fresh_var "tmap$" [v]));
           generalize (IHop2 (fresh_var "tmap$" [v])).
-        specialize (IHop1 v); specialize (IHop2 v); omega.
+        specialize (IHop1 v); specialize (IHop2 v); lia.
       - generalize (IHop1 (fresh_var "tmc$" [v])); generalize (IHop2 v).
-        specialize (IHop1 v); specialize (IHop2 v); omega.
-      - specialize (IHop1 v); specialize (IHop2 v); omega.
+        specialize (IHop1 v); specialize (IHop2 v); lia.
+      - specialize (IHop1 v); specialize (IHop2 v); lia.
       - generalize (IHop1 (fresh_var "tsel$" [v])); generalize (IHop2 v).
-        specialize (IHop1 v); specialize (IHop2 v); omega.
-      - specialize (IHop1 v); specialize (IHop2 v); omega.
-      - specialize (IHop1 v); specialize (IHop2 v); omega.
-      - specialize (IHop1 v); specialize (IHop2 v); omega.
-      - specialize (IHop2 v); specialize (IHop1 (fresh_var "tapp$" [v])); omega.
+        specialize (IHop1 v); specialize (IHop2 v); lia.
+      - specialize (IHop1 v); specialize (IHop2 v); lia.
+      - specialize (IHop1 v); specialize (IHop2 v); lia.
+      - specialize (IHop1 v); specialize (IHop2 v); lia.
+      - specialize (IHop2 v); specialize (IHop1 (fresh_var "tapp$" [v])); lia.
     Qed.
 
   End Size.

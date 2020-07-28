@@ -26,6 +26,9 @@ Require Import NNRSSem.
 Require Import NNRSSemEval.
 Require Import NNRSVars.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNNRS.
   (** Typing rules for NNRS *)
   Context {m:basic_model}.

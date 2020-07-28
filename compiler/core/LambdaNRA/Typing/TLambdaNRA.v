@@ -22,6 +22,9 @@ Require Import Utils.
 Require Import DataSystem.
 Require Import LambdaNRA.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TLambdaNRA.
   (** Typing for LambdaNRA *)
   Section typ.

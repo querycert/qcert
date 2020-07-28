@@ -97,7 +97,7 @@ Section CAMPUtil.
 
   (** Accumulates successful evaluation, but propagating match failure to the top *)
   
-  Fixpoint enforce_successes {A:Type} (os:list (presult A)) : presult (list A)
+  Definition enforce_successes {A:Type} (os:list (presult A)) : presult (list A)
     := match os with
        | nil => Success nil
        | (TerminalError)::xs => TerminalError
@@ -172,7 +172,7 @@ Section CAMPUtil.
          | (Success_debug a)::xs => liftpr_debug (cons a) (gather_successes_debug xs)
          end.
 
-    Fixpoint enforce_successes_debug {A:Type} (os:list (presult_debug A)) : presult_debug (list A)
+    Definition enforce_successes_debug {A:Type} (os:list (presult_debug A)) : presult_debug (list A)
       := match os with
          | nil => Success_debug nil
          | (TerminalError_debug s loc)::xs => TerminalError_debug s loc

@@ -23,6 +23,7 @@ Require Import NNRCRuntime.
 Require Import NNRCMRRuntime.
 Require Import ForeignToReduceOps.
 
+Import ListNotations.
 Local Open Scope list_scope.
 
 Section NNRCMRtoNNRC.
@@ -47,7 +48,7 @@ Section NNRCMRtoNNRC.
        let xn = en in
        e
    *)
-  Fixpoint gen_apply_fun_n (f: list var * nnrc)  (eff: list (var * dlocalization)) : option nnrc :=
+  Definition gen_apply_fun_n (f: list var * nnrc)  (eff: list (var * dlocalization)) : option nnrc :=
     let (form, e) := f in
     lift (List.fold_right
             (fun t k =>

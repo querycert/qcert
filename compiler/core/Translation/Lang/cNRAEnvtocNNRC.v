@@ -15,7 +15,7 @@
 Require Import String.
 Require Import List.
 Require Import EquivDec.
-Require Import Omega.
+Require Import Lia.
 Require Import Compare_dec.
 Require Import Utils.
 Require Import DataRuntime.
@@ -610,24 +610,24 @@ Section cNRAEnvtocNNRC.
       Transparent fresh_var2.
       revert vid venv.
       induction op; simpl in *; intros; trivial.
-      - omega.
-      - omega.
-      - omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop vid venv); omega.
+      - lia.
+      - lia.
+      - lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop vid venv); lia.
       - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
-          specialize (IHop2 vid venv); omega.
+          specialize (IHop2 vid venv); lia.
       - repeat match_destr.
-        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
-      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
-      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - omega.
-      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
-      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
+        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); lia.
+      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); lia.
+      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - lia.
+      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); lia.
+      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); lia.
     Qed.
 
   End size.

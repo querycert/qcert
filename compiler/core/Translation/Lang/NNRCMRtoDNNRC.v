@@ -54,7 +54,7 @@ Section NNRCMRtoDNNRC.
        let xn = en in
        e
    *)
-  Fixpoint gen_apply_fun_n (annot:A) (f: list var * nnrc)  (eff: list (var * dlocalization)) : option (@dnnrc_base _ A plug_type) :=
+  Definition gen_apply_fun_n (annot:A) (f: list var * nnrc)  (eff: list (var * dlocalization)) : option (@dnnrc_base _ A plug_type) :=
     let (form, e) := f in
     match zip form eff with
     | Some l =>

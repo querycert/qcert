@@ -23,6 +23,9 @@ Require Import NRASugar.
 Require Import NRAExt.
 Require Import TNRA.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNRAUtil.
   Context {m:basic_model}.
   Context (τconstants:tbindings).

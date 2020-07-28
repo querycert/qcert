@@ -13,7 +13,7 @@
  *)
 
 Require Import List.
-Require Import Omega.
+Require Import Lia.
 Require Import DataSystem.
 Require Import Dataframe.
 
@@ -51,12 +51,12 @@ Section DataframeSize.
 
   Lemma column_size_nzero (c:column) : column_size c <> 0.
   Proof.
-    induction c; simpl; omega.
+    induction c; simpl; lia.
   Qed.
 
     Lemma dataframe_size_nzero (d:dataframe) : dataframe_size d <> 0.
   Proof.
-    induction d; simpl; omega.
+    induction d; simpl; lia.
   Qed.
 
 End DataframeSize.

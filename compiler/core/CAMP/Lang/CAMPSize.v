@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-Require Import Omega.
+Require Import Lia.
 Require Import DataRuntime.
 Require Import CAMP.
 
@@ -38,7 +38,7 @@ Section CAMPSize.
 
   Lemma camp_size_nzero (a:camp) : camp_size a <> 0.
   Proof.
-    induction a; simpl; omega.
+    induction a; simpl; lia.
   Qed.
 
 End CAMPSize.

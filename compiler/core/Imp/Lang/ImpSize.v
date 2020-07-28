@@ -13,7 +13,7 @@
  *)
 
 Require Import String.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
@@ -67,7 +67,7 @@ Section ImpSize.
       | ImpFun args s ret => imp_stmt_size s
       end.
 
-    Fixpoint imp_size (q: imp) : nat :=
+    Definition imp_size (q: imp) : nat :=
       match q with
       | ImpLib l =>
         List.fold_left
@@ -78,12 +78,12 @@ Section ImpSize.
 
     Lemma imp_expr_size_nzero (e:imp_expr) : imp_expr_size e <> 0.
     Proof.
-      induction e; simpl; try omega.
+      induction e; simpl; try lia.
     Qed.
 
     Lemma imp_stmt_size_nzero (s:imp_stmt) : imp_stmt_size s <> 0.
     Proof.
-      induction s; simpl; try destruct o; try omega.
+      induction s; simpl; try destruct o; try lia.
     Qed.
 
     Corollary imp_function_size_nzero (q:imp_function) : imp_function_size q <> 0.
@@ -94,7 +94,7 @@ Section ImpSize.
 
     (* Corollary imp_size_nzero (q:imp) : imp_size q <> 0. *)
     (* Proof. *)
-    (*   induction q; simpl; try destruct o; try omega. *)
+    (*   induction q; simpl; try destruct o; try lia. *)
     (*   apply imp_stmt_size_nzero. *)
     (* Qed. *)
 

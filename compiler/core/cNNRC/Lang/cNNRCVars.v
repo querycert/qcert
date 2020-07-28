@@ -652,7 +652,7 @@ Section cNNRCVars.
   End core.
   
   Section FreeVars.
-    Fixpoint nnrc_free_variables (q:nnrc) : list var := nnrc_free_vars q.
+    Definition nnrc_free_variables (q:nnrc) : list var := nnrc_free_vars q.
   End FreeVars.
 
 End cNNRCVars.

@@ -27,7 +27,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Equivalence.
 Require Import RelationClasses.
-Require Import Omega.
+Require Import Lia.
 Require Import CoqLibAdd.
 Require Import Lift.
 Require Import ListAdd.

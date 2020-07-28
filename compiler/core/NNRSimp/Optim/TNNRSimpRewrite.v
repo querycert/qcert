@@ -31,6 +31,9 @@ Require Import NNRSimpRewrite.
 Require Import NNRSimpUnflatten.
 Require Import TNNRSimpUnflatten.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNNRSimpRewrite.
   Local Open Scope nnrs_imp.
 

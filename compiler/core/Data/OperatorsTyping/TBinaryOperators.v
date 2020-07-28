@@ -626,7 +626,7 @@ Section TBinaryOperators.
           unfold rec_concat_sort.
           qeauto.
         * congruence.
-      + exists (dcoll []); split; try reflexivity;
+      + exists (dcoll nil); split; try reflexivity;
         apply dtcoll; apply Forall_nil.
     - Case "type_OpAnd"%string.
       dependent induction H; dependent induction H0; simpl.
@@ -733,7 +733,7 @@ Section TBinaryOperators.
         destruct (lift_map (ondstring (fun x2 : string => x2)) dl); try congruence.
         simpl.
         exists (dstring match l with
-                  | [] => x0
+                  | nil => x0
                   | _ :: _ => x0 ++ s ++ String.concat s l
                         end).
         qauto.
@@ -754,7 +754,7 @@ Section TBinaryOperators.
 
   Lemma tdot_rec_concat_sort_neq {A} (l:list (string*A)) a b xv :
        a <> b ->
-       tdot (rec_concat_sort l [(a, xv)]) b = 
+       tdot (rec_concat_sort l ((a, xv)::nil)) b = 
        tdot (rec_sort l) b.
    Proof.
      unfold tdot, edot; intros.
@@ -765,7 +765,7 @@ Section TBinaryOperators.
 
   Lemma tdot_rec_concat_sort_eq {A} (l : list (string * A)) a b :
                ~ In a (domain l) ->
-               tdot (rec_concat_sort l [(a, b)]) a = Some b.
+               tdot (rec_concat_sort l ((a, b)::nil)) a = Some b.
   Proof.
     unfold tdot.
     apply (@assoc_lookupr_insertion_sort_fresh string ODT_string).

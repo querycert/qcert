@@ -13,7 +13,7 @@
  *)
 
 Require Import String.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
@@ -35,7 +35,7 @@ Section ImpDataSize.
   Definition imp_data_function_size (q:imp_data_function) : nat :=
     imp_function_size q.
 
-  Fixpoint imp_data_size (q: imp_data) : nat :=
+  Definition imp_data_size (q: imp_data) : nat :=
     imp_size q.
 
 End ImpDataSize.

@@ -29,6 +29,9 @@ Require Import NNRSimpRuntime.
 Require Import NNRSCrossShadow.
 Require Import Fresh.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section NNRStoNNRSimp.
 
   Context {fruntime:foreign_runtime}.

@@ -23,7 +23,7 @@ Require Import EquivDec.
 Require Import Program.
 Require Import Arith.
 Require Import NPeano.
-Require Import Omega.
+Require Import Lia.
 Require Import List.
 Require Import Utils.
 Require Import DataRuntime.
@@ -51,7 +51,7 @@ Section NRARewriteContext.
   
   Lemma lt_nat_compat (x y:nat) : ~ x < y -> ~ y < x -> x = y.
   Proof.
-    omega.
+    lia.
   Qed.
 
   Lemma insertion_sort_equivlist_nat l l':

@@ -23,7 +23,7 @@ Require Import Morphisms.
 Require Import Setoid.
 Require Import EquivDec.
 Require Import RelationClasses.
-Require Import Omega.
+Require Import Lia.
 Require Import CoqLibAdd.
 Require Import ListAdd.
 Require Import SortingAdd.
@@ -104,7 +104,7 @@ Section Sublist.
       - intros; apply sublist_nil_r in H; subst; auto.
       - inversion 1; subst; simpl; intros.
         + f_equal; auto with arith.
-        + apply sublist_length in H2. omega.
+        + apply sublist_length in H2. lia.
     Qed.
 
     Global Instance sublist_antisymm : Antisymmetric (list A) eq sublist.
@@ -113,7 +113,7 @@ Section Sublist.
       apply (sublist_length_eq sub1).
       apply sublist_length in sub1.
       apply sublist_length in sub2.
-      omega.
+      lia.
     Qed.
 
     Global Instance sublist_part : PartialOrder eq sublist.

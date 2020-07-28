@@ -16,6 +16,7 @@ Require Import List.
 Require Import String.
 Require Import Permutation.
 Require Import ZArith.
+Require Import Lia.
 
 (* Common *)
 Require Import Utils.
@@ -366,7 +367,7 @@ Section CompConfig.
           repeat rewrite float_roundtrip.
           rewrite Nat2Z.id.
           match_case; intros.
-          omega.
+          lia.
         Qed.
 
         Lemma optim_phase3_config_to_json_to_optim_phase3_config
@@ -378,7 +379,7 @@ Section CompConfig.
           repeat rewrite float_roundtrip.
           rewrite Nat2Z.id.
           match_case; intros.
-          omega.
+          lia.
         Qed.
 
         Lemma optim_config_of_language_to_json_to_optim_config_of_language

@@ -22,6 +22,9 @@ Require Import Utils.
 Require Import DataSystem.
 Require Import cNNRC.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TcNNRC.
   (** Typing rules for cNNRC *)
   Context {m:basic_model}.

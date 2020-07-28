@@ -63,8 +63,8 @@ Section UPropag.
     intros.
     generalize (compare_either n n1); intro.
     elim H; intro; clear H.
-    - rewrite min_l; omega.
-    - rewrite min_r. omega.
+    - rewrite min_l; lia.
+    - rewrite min_r. lia.
       assumption.
   Qed.
 
@@ -151,8 +151,8 @@ Section UPropag.
     intros.
     generalize (compare_either n n0); intro.
     elim H; intro; clear H.
-    rewrite min_l; omega.
-    rewrite min_r; omega.
+    rewrite min_l; lia.
+    rewrite min_r; lia.
   Qed.
 
   (* P9. (S+dS)-T =b (S-T)+(dS-(T-S)) *)
@@ -169,7 +169,7 @@ Section UPropag.
     generalize (mult t a).
     generalize (mult ds a).
     intros.
-    omega.
+    lia.
   Qed.
 
   (* P10. S-(T+dT) =b (S-T)-dT *)
@@ -199,15 +199,15 @@ Section UPropag.
     generalize (mult ds a).
     intros.
     assert ((n1 <= n0) \/ (n0 <= n1)).
-    omega.
+    lia.
     elim H; intro; clear H.
-    rewrite min_l;[rewrite min_l;[omega|assumption]|omega].
+    rewrite min_l;[rewrite min_l;[lia|assumption]|lia].
     generalize (compare_either (n1 - n) n0); intro.
     elim H; intro; clear H.
     rewrite min_l.
-    rewrite min_r;[omega|assumption].
+    rewrite min_r;[lia|assumption].
     assumption.
-    rewrite min_r;[rewrite min_r;[omega|assumption]|assumption].
+    rewrite min_r;[rewrite min_r;[lia|assumption]|assumption].
   Qed.
 
   (* P11'. S min (T-dT) =b (S min T)-(dT-(T-S)) *)
@@ -237,16 +237,16 @@ Section UPropag.
     generalize (mult ds a) as ndS.
     intros.
     generalize (compare_either nT nS); intro; elim H; intro; clear H.
-    rewrite min_r; try omega.
-    rewrite min_r; try omega.
-    rewrite min_r; omega.
+    rewrite min_r; try lia.
+    rewrite min_r; try lia.
+    rewrite min_r; lia.
     generalize (compare_either (ndS+nS) nT); intro; elim H; intro; clear H.
     - rewrite min_l; try assumption.
-      rewrite min_l; try omega.
-      rewrite min_l; omega.
+      rewrite min_l; try lia.
+      rewrite min_l; lia.
     - rewrite min_r; try assumption.
-      rewrite min_r; try omega.
-      rewrite min_l; omega.
+      rewrite min_r; try lia.
+      rewrite min_l; lia.
   Qed.
 
   (* P12'. S min (T+dT) =b (S min T)+(dT min (S-T)) *)
@@ -279,16 +279,16 @@ Section UPropag.
     generalize (mult ds a) as ndS.
     intros.
     generalize (compare_either nS nT); intro; elim H; intro; clear H.
-    rewrite max_r; try omega.
+    rewrite max_r; try lia.
     rewrite max_r; try assumption.
-    rewrite min_r; omega.
+    rewrite min_r; lia.
     generalize (compare_either nS (nT+ndS)); intro; elim H; intro; clear H.
-    - rewrite max_r; try omega.
+    - rewrite max_r; try lia.
       rewrite max_l; try assumption.
-      rewrite min_r; try omega.
-    - rewrite max_l; try omega.
+      rewrite min_r; try lia.
+    - rewrite max_l; try lia.
       rewrite max_l; try assumption.
-      rewrite min_l; omega.
+      rewrite min_l; lia.
   Qed.
 
   (* P13'. S max (T-dT) =b (S max T)-(dT min (T-S)) *)
@@ -318,13 +318,13 @@ Section UPropag.
     generalize (mult ds a) as ndS.
     intros.
     generalize (compare_either nT nS); intro; elim H; intro; clear H.
-    rewrite max_l; try omega.
-    rewrite max_l; omega.
+    rewrite max_l; try lia.
+    rewrite max_l; lia.
     generalize (compare_either (ndS+nS) nT); intro; elim H; intro; clear H.
     - rewrite max_r; try assumption.
-      rewrite max_r; omega.
+      rewrite max_r; lia.
     - rewrite max_l; try assumption.
-      rewrite max_r; omega.
+      rewrite max_r; lia.
   Qed.
 
   (* P14. (S+dS) max T =b (S max T)+(dS-(T-S)) *)
@@ -352,19 +352,19 @@ Section UPropag.
     generalize (mult s a) as nS; intro.
     generalize (mult ds a) as ndS; intro.
     generalize (compare_either nS ndS); intro; elim H; intro; clear H.
-    - assert (nS - ndS = 0); try omega.
+    - assert (nS - ndS = 0); try lia.
       assert (min ndS nS = nS); try (apply min_r;assumption).
       rewrite H; rewrite H1; simpl.
-      assert ((nS <= 1) \/ (1 <= nS)); try omega.
+      assert ((nS <= 1) \/ (1 <= nS)); try lia.
     - assert (min ndS nS = ndS); try (apply min_l;assumption); rewrite H.
-      assert (((nS - ndS) <= 1) \/ (1 <= (nS - ndS))); try omega.
-      assert ((nS <= 1) \/ (1 <= nS)); try omega.
-      assert ((ndS <= 1) \/ (1 <= ndS)); try omega.
+      assert (((nS - ndS) <= 1) \/ (1 <= (nS - ndS))); try lia.
+      assert ((nS <= 1) \/ (1 <= nS)); try lia.
+      assert ((ndS <= 1) \/ (1 <= ndS)); try lia.
 
       Ltac tme := 
         (rewrite min_l by assumption; tme) ||
         (rewrite min_r by assumption; tme) ||
-        omega.
+        lia.
 
       elim H1; elim H2; elim H3; intros; clear H1 H2 H3; tme.
       
@@ -393,12 +393,12 @@ Section UPropag.
     - auto.
     - assert (mult s a >= 1).
       apply bdistinct_exactly_one_back_diff.
-      omega.
+      lia.
       revert H.
       generalize (mult s a) as ns.
       intros.
       rewrite Max.max_idempotent.
-      omega.
+      lia.
   Qed.
 
   (* P18. (S - dS) x T =b (S x T) - (ds x T)*)

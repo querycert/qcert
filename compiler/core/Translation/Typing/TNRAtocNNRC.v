@@ -23,6 +23,9 @@ Require Import NRASystem.
 Require Import cNNRCSystem.
 Require Import NRAtocNNRC.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNRAtocNNRC.
   (** Type preservation for the translation from NRA to NNRC *)
 

@@ -1397,7 +1397,7 @@ Section NNRCMRRewrite.
       mrl.(mr_last).
 
   (* Java equivalent: MROptimizer.mr_chain_cleanup *)
-  Fixpoint mr_chain_cleanup l (to_keep: list var) :=
+  Definition mr_chain_cleanup l (to_keep: list var) :=
     let (to_keep', res) :=
         List.fold_right
           (fun r (acc: list var * list mr) =>

@@ -73,7 +73,7 @@ Section Result.
              end)
         end.
     
-    Fixpoint lift_failure_map {A B E:Type} (f: A -> Result B E) (al:list A) : Result (list B) E :=
+    Definition lift_failure_map {A B E:Type} (f: A -> Result B E) (al:list A) : Result (list B) E :=
       let init_bl := Success _ _ nil in
       let proc_one (a:A) (acc:Result (list B) E) : Result (list B) E :=
           lift_failure_in_two
