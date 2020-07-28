@@ -140,20 +140,20 @@ Section TNNRCStratify.
         type_substs Γc Γ sdefs τdefs
         /\ nnrc_type Γc (rev τdefs ++ Γ) n τ.
   Proof.
-    Hint Constructors nnrc_core_type.
+    Hint Constructors nnrc_core_type : qcert.
     unfold nnrc_type.
     revert required_kind bound_vars n sdefs.
     induction e; simpl; intros required_kind bound_vars n sdefs inclb eqq Γc Γ τ typ.
     - invcs eqq.
       (* add this case to the nnrc_core_inverter Ltac *)
       invcs typ.
-      simpl; exists nil; simpl; eauto.
+      simpl; exists nil; simpl; qeauto.
     - invcs eqq.
       nnrc_core_inverter.
-      simpl; exists nil; simpl; eauto.
+      simpl; exists nil; simpl; qeauto.
     - invcs eqq.
       nnrc_core_inverter.
-      simpl; exists nil; simpl; eauto.
+      simpl; exists nil; simpl; qeauto.
     - match_case_in eqq; intros ? ? eqq1; rewrite eqq1 in eqq.
       match_case_in eqq; intros ? ? eqq2; rewrite eqq2 in eqq.
       invcs eqq.
@@ -162,7 +162,7 @@ Section TNNRCStratify.
       destruct (IHe1 _ _ _ _ inclb1 eqq1 _ _ _ H5)
         as [τdefs1 [typdefs1 typn1]].
       assert (inclb2':incl (nnrc_free_vars e2) (domain l ++ bound_vars))
-        by (unfold incl in *; intros; rewrite in_app_iff; eauto).
+        by (unfold incl in *; intros; rewrite in_app_iff; qeauto).
       assert (type2':nnrc_core_type Γc (rev τdefs1 ++ Γ) (nnrc_to_nnrc_base e2) τ₂).
       {
         apply (nnrc_core_type_remove_disjoint_env nil (rev τdefs1) Γ); simpl; trivial.
@@ -182,7 +182,7 @@ Section TNNRCStratify.
       + apply type_substs_app; trivial.
       + rewrite rev_app_distr.
         rewrite app_ass.
-        econstructor; eauto.
+        econstructor; qeauto.
         apply (nnrc_core_type_remove_disjoint_env nil (rev τdefs2 )(rev τdefs1 ++ Γ)); simpl; trivial.
         rewrite domain_rev.
         rewrite disjoint_rev_l.
@@ -201,7 +201,7 @@ Section TNNRCStratify.
       destruct (IHe _ _ _ _ inclb eqq1 _ _ _ H4)
         as [τdefs1 [typdefs1 typn1]].
       exists τdefs1.
-      eauto.
+      qeauto.
     - apply incl_app_iff in inclb; destruct inclb as [inclb1 inclb2].
       apply incl_remove in inclb2.
       nnrc_core_inverter.
@@ -224,7 +224,7 @@ Section TNNRCStratify.
         as [τdefs1 [typdefs1 typn1]].
       apply (stratify1_aux_preserves_types_fw eqq τdefs1); simpl; trivial.
       unfold nnrc_type in *; simpl.
-      econstructor; eauto.
+      econstructor; qeauto.
       case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2; rewrite eqq2 in eqq.
       destruct (IHe2 _ _ _ _ inclb2 eqq2 _ _ _ H5)
         as [τdefs2 [typdefs2 typn2]].
@@ -251,7 +251,7 @@ Section TNNRCStratify.
         as [τdefs1 [typdefs1 typn1]].
       apply (stratify1_aux_preserves_types_fw eqq τdefs1); simpl; trivial.
       unfold nnrc_type in *; simpl.
-      econstructor; eauto.
+      econstructor; qeauto.
       + case_eq (stratify_aux e2 nnrcStmt bound_vars); intros ? ? eqq2; rewrite eqq2 in eqq.
         destruct (IHe2 _ _ _ _ inclb2 eqq2 _ _ _ H5)
           as [τdefs2 [typdefs2 typn2]].
@@ -298,7 +298,7 @@ Section TNNRCStratify.
         as [τdefs1 [typdefs1 typn1]].
       apply (stratify1_aux_preserves_types_fw eqq τdefs1); simpl; trivial.
       unfold nnrc_type in *; simpl.
-      econstructor; eauto.
+      econstructor; qeauto.
       + case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2; rewrite eqq2 in eqq.
         destruct (IHe2 _ _ _ _ inclb2 eqq2 _ _ _ H7)
           as [τdefs2 [typdefs2 typn2]].
@@ -357,7 +357,7 @@ Section TNNRCStratify.
     case_eq (stratify_aux e required_kind bound_vars); intros ? ? eqq.
     destruct (stratify_aux_preserves_types_fw _ _ _ _ _ inclb eqq _ _ _ typ)
       as [? [typs typn]].
-    eapply mk_expr_from_vars_preserves_types_fw; eauto.
+    eapply mk_expr_from_vars_preserves_types_fw; qeauto.
   Qed.
 
   Theorem stratify_preserves_types_fw
@@ -378,7 +378,7 @@ Section TNNRCStratify.
   Proof.
     revert Γ sdefs2 τdefs1 τdefs2.
     induction sdefs1; simpl; intros Γ sdefs2 τdefs1 τdefs2 ts1 ts2.
-    - match_destr; simpl in *; eauto.
+    - match_destr; simpl in *; qeauto.
     - destruct a.
       match_destr; simpl in *; try discriminate.
       destruct p.
@@ -444,7 +444,7 @@ Section TNNRCStratify.
         invcs H2.
         intuition.
       + rewrite <- domain_length, deq, domain_length; trivial.
-    - eauto.
+    - qeauto.
   Qed.
 
   Lemma mk_expr_from_vars_preserves_types_bk
@@ -458,7 +458,7 @@ Section TNNRCStratify.
     unfold mk_expr_from_vars.
     revert n Γ.
     induction sdefs; simpl; intros n Γ typ.
-    - exists nil; simpl; eauto.
+    - exists nil; simpl; qeauto.
     - destruct a; unfold nnrc_type in *; simpl in *.
       invcs typ.
       specialize (IHsdefs _ _ H5).
@@ -479,19 +479,19 @@ Section TNNRCStratify.
         nnrc_type Γc (rev τdefs ++ Γ) n τ ->
         nnrc_type Γc Γ e τ.
   Proof.
-    Hint Constructors nnrc_core_type.
+    Hint Constructors nnrc_core_type : qcert.
     unfold nnrc_type.
     revert required_kind bound_vars n sdefs.
     induction e; simpl; intros required_kind bound_vars n sdefs inclb eqq Γc Γ τdefs typs τ typn.
     - invcs eqq.
       destruct τdefs; simpl in *; try contradiction.
-      eauto.
+      qeauto.
     - invcs eqq.
       destruct τdefs; simpl in *; try contradiction.
-      eauto.
+      qeauto.
     - invcs eqq.
       destruct τdefs; simpl in *; try contradiction.
-      eauto.
+      qeauto.
     - match_case_in eqq; intros ? ? eqq1; rewrite eqq1 in eqq.
       match_case_in eqq; intros ? ? eqq2; rewrite eqq2 in eqq.
       invcs eqq.
@@ -502,7 +502,7 @@ Section TNNRCStratify.
       destruct typs as [τdefs1 [τdefs2 [? [typs1 typs2]]]]; subst.
       repeat rewrite rev_app_distr in *.
       repeat rewrite app_ass in *.
-      econstructor; eauto.
+      econstructor; qeauto.
       + apply (IHe1 _ _ _ _ inclb1 eqq1 _ _ _ typs1 τ₁).
         apply (nnrc_core_type_remove_disjoint_env nil (rev τdefs2) (rev τdefs1 ++ Γ)); simpl; trivial.
         rewrite domain_rev.
@@ -532,7 +532,7 @@ Section TNNRCStratify.
       invcs eqq.
       simpl in *.
       nnrc_core_inverter.
-      econstructor; eauto.
+      econstructor; qeauto.
     - apply incl_app_iff in inclb; destruct inclb as [inclb1 inclb2].
       apply incl_remove in inclb2.
       destruct (stratify1_aux_preserves_types_bk eqq _ _ _ _ typs typn)
@@ -551,7 +551,7 @@ Section TNNRCStratify.
       case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2
       ; rewrite eqq2 in *.
       simpl in *.
-      eauto.
+      qeauto.
     - match_case_in eqq; intros ? ? eqq1; rewrite eqq1 in eqq.
       apply incl_app_iff in inclb; destruct inclb as [inclb1 inclb2].
       apply incl_remove in inclb2.
@@ -559,13 +559,13 @@ Section TNNRCStratify.
         as [τdefs2 [typs' typn']]; simpl; trivial.
       unfold nnrc_type in *; simpl in *.
       invcs typn'.
-      econstructor; [eauto | ].
+      econstructor; [qeauto | ].
       destruct (mk_expr_from_vars_preserves_types_bk H5)
         as [τdefs1 [ts1 tp1]].
       case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2
       ; rewrite eqq2 in *.
       simpl in *.
-      apply (nnrc_core_type_remove_almost_disjoint_env ((v, τ₁)::nil) (rev τdefs2) Γ); simpl; eauto.
+      apply (nnrc_core_type_remove_almost_disjoint_env ((v, τ₁)::nil) (rev τdefs2) Γ); simpl; qeauto.
       intros x inn1 inn2.
       rewrite domain_rev, <- in_rev in inn1.
       rewrite <- nnrc_to_nnrc_base_free_vars_same in inn2.
@@ -582,13 +582,13 @@ Section TNNRCStratify.
         as [τdefs2 [typs' typn']]; simpl; trivial.
       unfold nnrc_type in *; simpl in *.
       invcs typn'.
-      econstructor; [eauto | | ].
+      econstructor; [qeauto | | ].
       + destruct (mk_expr_from_vars_preserves_types_bk H5)
           as [τdefs1 [ts1 tp1]].
         case_eq (stratify_aux e2 nnrcStmt bound_vars); intros ? ? eqq2
         ; rewrite eqq2 in *.
         simpl in *.
-        apply (nnrc_core_type_remove_almost_disjoint_env nil (rev τdefs2) Γ); simpl; eauto.
+        apply (nnrc_core_type_remove_almost_disjoint_env nil (rev τdefs2) Γ); simpl; qeauto.
         intros x inn1 inn2.
         rewrite domain_rev, <- in_rev in inn1.
         rewrite <- nnrc_to_nnrc_base_free_vars_same in inn2.
@@ -603,7 +603,7 @@ Section TNNRCStratify.
         case_eq (stratify_aux e3 nnrcStmt bound_vars); intros ? ? eqq3
         ; rewrite eqq3 in *.
         simpl in *.
-        apply (nnrc_core_type_remove_almost_disjoint_env nil (rev τdefs2) Γ); simpl; eauto.
+        apply (nnrc_core_type_remove_almost_disjoint_env nil (rev τdefs2) Γ); simpl; qeauto.
         intros x inn1 inn2.
         rewrite domain_rev, <- in_rev in inn1.
         rewrite <- nnrc_to_nnrc_base_free_vars_same in inn2.
@@ -622,13 +622,13 @@ Section TNNRCStratify.
         as [τdefs2 [typs' typn']]; simpl; trivial.
       unfold nnrc_type in *; simpl in *.
       invcs typn'.
-      econstructor; [eauto | | ].
+      econstructor; [qeauto | | ].
       + destruct (mk_expr_from_vars_preserves_types_bk H7)
           as [τdefs1 [ts1 tp1]].
         case_eq (stratify_aux e2 nnrcStmt (v::bound_vars)); intros ? ? eqq2
         ; rewrite eqq2 in *.
         simpl in *.
-        apply (nnrc_core_type_remove_almost_disjoint_env ((v, τl)::nil) (rev τdefs2) Γ); simpl; eauto.
+        apply (nnrc_core_type_remove_almost_disjoint_env ((v, τl)::nil) (rev τdefs2) Γ); simpl; qeauto.
         intros x inn1 inn2.
         rewrite domain_rev, <- in_rev in inn1.
         rewrite <- nnrc_to_nnrc_base_free_vars_same in inn2.
@@ -643,7 +643,7 @@ Section TNNRCStratify.
         case_eq (stratify_aux e3 nnrcStmt (v0::bound_vars)); intros ? ? eqq3
         ; rewrite eqq3 in *.
         simpl in *.
-        apply (nnrc_core_type_remove_almost_disjoint_env ((v0,τr)::nil) (rev τdefs2) Γ); simpl; eauto.
+        apply (nnrc_core_type_remove_almost_disjoint_env ((v0,τr)::nil) (rev τdefs2) Γ); simpl; qeauto.
         intros x inn1 inn2.
         rewrite domain_rev, <- in_rev in inn1.
         rewrite <- nnrc_to_nnrc_base_free_vars_same in inn2.
@@ -660,7 +660,7 @@ Section TNNRCStratify.
       destruct typn' as [? [? [? [? [subl type]]]]]; subst.
       cut (nnrc_type Γc Γ (NNRCGroupBy s l e) (GroupBy_type s l x x0 x1)); trivial.
       apply type_NNRCGroupBy; trivial.
-      unfold nnrc_type; eauto.
+      unfold nnrc_type; qeauto.
   Qed.
 
   Lemma mk_expr_from_vars_stratify_aux_preserves_types_bk
@@ -674,7 +674,7 @@ Section TNNRCStratify.
     destruct (mk_expr_from_vars_preserves_types_bk typ)
       as [τdefs1 [ts1 tp1]].
     case_eq (stratify_aux e required_kind bound_vars); intros ? ? eqq; rewrite eqq in *.
-    eapply stratify_aux_preserves_types_bk; eauto.
+    eapply stratify_aux_preserves_types_bk; qeauto.
   Qed.
 
   Theorem stratify_preserves_types_bk
@@ -684,7 +684,7 @@ Section TNNRCStratify.
   Proof.
     unfold stratify.
     intros typ.
-    eapply mk_expr_from_vars_stratify_aux_preserves_types_bk; eauto.
+    eapply mk_expr_from_vars_stratify_aux_preserves_types_bk; qeauto.
     reflexivity.
   Qed.
 
@@ -696,14 +696,9 @@ Section TNNRCStratify.
   Proof.
     split; intros.
     - apply stratify_preserves_types_fw; trivial.
-    - eapply stratify_preserves_types_bk; eauto.
+    - eapply stratify_preserves_types_bk; qeauto.
   Qed.
   
 End TNNRCStratify.
 
-(* 
- *** Local Variables: ***
- *** coq-load-path: (("../../../coq" "Qcert")) ***
- *** End: ***
- *)
 

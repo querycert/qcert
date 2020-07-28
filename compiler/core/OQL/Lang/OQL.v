@@ -19,6 +19,8 @@ Require Import EquivDec.
 Require Import Utils.
 Require Import DataRuntime.
 
+Declare Scope oql_scope.
+
 Section OQL.
   Context {fruntime:foreign_runtime}.
 

@@ -121,7 +121,7 @@ Section DNNRCBaseEq.
 
   (* DNNRCFor *)
 
-  Hint Resolve data_normalized_dcoll_in.
+  Hint Resolve data_normalized_dcoll_in : qcert.
 
   Global Instance dfor_proper : Proper (eq ==> eq ==> dnnrc_base_eq ==> dnnrc_base_eq ==> dnnrc_base_eq) DNNRCFor.
   Proof.

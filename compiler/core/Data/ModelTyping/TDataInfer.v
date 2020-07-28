@@ -192,10 +192,10 @@ Section TDataInfer.
     infer_data_type d = Some τ ->
     d ▹ τ.
   Proof.
-    Hint Constructors data_type Forall Forallt.
+    Hint Constructors data_type Forall Forallt : qcert.
     revert τ.
     induction d; simpl; 
-    try solve[inversion 1; subst; eauto 2].
+    try solve[inversion 1; subst; eauto 2 with qcert].
     - intros τ eqs. apply some_lift in eqs.
       destruct eqs as [t ? ?]; subst τ.
       constructor.
@@ -232,11 +232,11 @@ Section TDataInfer.
     - intros τ eqs.
       apply some_lift in eqs.
       destruct eqs as [t ? ?]; subst τ.
-      eauto.
+      qeauto.
     - intros τ eqs.
       apply some_lift in eqs.
       destruct eqs as [t ? ?]; subst τ.
-      eauto.
+      qeauto.
     - intros τ eqs.
       case_option_in eqs
       ; match_case_in eqs; intros ? re1; rewrite re1 in eqs
@@ -245,7 +245,7 @@ Section TDataInfer.
       ; try discriminate.
       invcs eqs.
       constructor; trivial.
-      + eauto.
+      + qeauto.
       + rewrite Forall_forall.
         intros ? inn τ look.
         specialize (IHd _ eqs0).
@@ -256,12 +256,12 @@ Section TDataInfer.
       + invcs eqs.
         constructor.
         constructor; trivial.
-        eauto.
+        qeauto.
     -intros τ eqs.
      apply some_lift in eqs.
      destruct eqs as [t ? ?]; subst τ.
      apply foreign_data_typing_infer_correct in e.
-     eauto.
+     qeauto.
   Qed.
 
   Theorem infer_data_type_least {d τ₁ τ₂} : 
@@ -269,15 +269,15 @@ Section TDataInfer.
     d ▹τ₂ ->
     τ₁ <: τ₂.
   Proof.
-    Hint Constructors subtype.
+    Hint Constructors subtype : qcert.
     revert τ₁ τ₂.
     induction d; simpl;
       try solve[inversion 1; subst; intros; destruct (istop τ₂); subst; trivial; dtype_inverter; trivial
-               | intros; invcs H; invcs H0; auto 2].
+               | intros; invcs H; invcs H0; auto 2 with qcert].
     - intros τ₁ τ₂ eqs ht.
       apply some_lift in eqs.
       destruct eqs as [? eqs' ?]; subst.
-      destruct (istop τ₂); subst; trivial.
+      destruct (istop τ₂); subst; qtrivial.
       destruct (data_type_dcoll_inv e ht) as [τ₂' ?]; subst.
       constructor.
       clear e.
@@ -285,7 +285,7 @@ Section TDataInfer.
       rtype_equalizer.
       subst.
       revert x H H2 eqs'; clear.
-      induction c; simpl; intros τ fl1 fl2 eqs; invcs eqs; trivial.
+      induction c; simpl; intros τ fl1 fl2 eqs; invcs eqs; qtrivial.
       unfold lift2 in H0.
       case_option_in H0; try discriminate.
       case_option_in H0; try discriminate.
@@ -299,7 +299,7 @@ Section TDataInfer.
       case_option_in eqs; try discriminate.
       destruct (RecMaybe_some_pf eqs) as [pf ?]; subst.
       clear eqs; rename eqs0 into eqs.
-      invcs ht; trivial.
+      invcs ht; qtrivial.
       constructor.
       + intros s τ look.
         apply lookup_in in look.
@@ -340,29 +340,29 @@ Section TDataInfer.
     - intros τ₁ τ₂ eqs ht.
       apply some_lift in eqs.
       destruct eqs as [? eqs' ?]; subst.
-      destruct (istop τ₂); subst; trivial.
+      destruct (istop τ₂); subst; qtrivial.
       destruct (data_type_dleft_inv e ht) as [τ₂' [? ?]]; subst.
       clear e.
       invcs ht; rtype_equalizer.
       subst.
-      eauto.
+      qeauto.
     - intros τ₁ τ₂ eqs ht.
       apply some_lift in eqs.
       destruct eqs as [? eqs' ?]; subst.
-      destruct (istop τ₂); subst; trivial.
+      destruct (istop τ₂); subst; qtrivial.
       destruct (data_type_dright_inv e ht) as [τ₂' [? ?]]; subst.
       clear e.
       invcs ht; rtype_equalizer.
       subst.
-      eauto.
+      qeauto.
     - intros τ₁ τ₂ eqs ht.
       match_destr_in eqs.
       case_option_in eqs; try discriminate.
       match_destr_in eqs.
       + invcs eqs.
-        destruct (istop τ₂); subst; trivial.
-        invcs ht; trivial.
-        eauto.
+        destruct (istop τ₂); subst; qtrivial.
+        invcs ht; qtrivial.
+        qeauto.
       + invcs eqs.
         cut (τ₂ = ⊤); [intros; subst; reflexivity | ].
         invcs ht; trivial.
@@ -371,7 +371,7 @@ Section TDataInfer.
         clear.
         (*        unfold brands_type. *)
         rewrite brands_type_alt.
-        induction b; simpl; trivial; intros.
+        induction b; simpl; qtrivial; intros.
         invcs H3.
         specialize (IHb H2 IHd eqs0).
         rewrite fold_right_app.
@@ -387,7 +387,7 @@ Section TDataInfer.
     - intros τ₁ τ₂ eqs ht.
      apply some_lift in eqs.
      destruct eqs as [t ? ?]; subst.
-     invcs ht; trivial.
+     invcs ht; qtrivial.
      constructor.
      eapply foreign_data_typing_infer_least; eauto.
   Qed.

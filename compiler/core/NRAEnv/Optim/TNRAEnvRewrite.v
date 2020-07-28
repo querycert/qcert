@@ -51,7 +51,7 @@ Section TNRAEnvRewrite.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     intuition; nraenv_core_inferer. generalize envand_comm; intros.
     unfold nraenv_core_eq in H.
-    simpl in H. apply H; eauto.
+    simpl in H. apply H; qeauto.
   Qed.
 
   Lemma tand_comm {τc τenv τin} (q₁ q₂ ql qr: m ⊧ τin ⇝ Bool ⊣ τc;τenv) :
@@ -146,7 +146,7 @@ Section TNRAEnvRewrite.
     - econstructor. elim H0; clear H0; intros. assumption.
       elim H0; clear H0; intros.
       assert ((q ⊗ ‵[||]) ▷ τin >=> Coll (Rec Closed τ₃ pf3) ⊣ τc;τenv).
-      econstructor; eauto; try econstructor; eauto.
+      econstructor; qeauto; try econstructor; eauto.
       apply dtrec_full; simpl; assumption.
       input_well_typed.
       dependent induction τout.
@@ -159,8 +159,8 @@ Section TNRAEnvRewrite.
               q ▷ τin >=> Rec Open τ₃ pf3 ⊣ τc;τenv ).
       inversion H0. rtype_equalizer; subst.
       inversion H6; clear H6; intros. subst.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       inversion H4. subst.
       rewrite merge_bindings_nil_r in H.
       rewrite sort_sorted_is_id in H; try assumption.
@@ -208,7 +208,7 @@ Section TNRAEnvRewrite.
       inversion H; clear H; subst;
       simpl in *;
       destruct (is_list_sorted_ext StringOrder.lt_dec _ pf3 pf2);
-      split; [econstructor; eauto | 
+      split; [econstructor; qeauto | 
     intros;
         input_well_typed;
         dtype_inverter;
@@ -811,8 +811,8 @@ Section TNRAEnvRewrite.
     assert (q ▷ τin >=> Coll τ ⊣ τc;τenv) by nraenv_core_inferer.
     assert (q₁ ▷ τ >=> Bool ⊣ τc;τenv) by nraenv_core_inferer.
     assert (q₂ ▷ τ >=> Bool ⊣ τc;τenv) by nraenv_core_inferer.
-    assert (σ⟨ q₁ ∧ q₂ ⟩( q ) ▷ τin >=> Coll τ ⊣ τc;τenv) by eauto.
-    assert (σ⟨ q₂ ∧ q₁ ⟩( q ) ▷ τin >=> Coll τ ⊣ τc;τenv) by eauto.
+    assert (σ⟨ q₁ ∧ q₂ ⟩( q ) ▷ τin >=> Coll τ ⊣ τc;τenv) by qeauto.
+    assert (σ⟨ q₂ ∧ q₁ ⟩( q ) ▷ τin >=> Coll τ ⊣ τc;τenv) by qeauto.
     rewrite (tselect_and (exist _ q H1)
                          (exist _ (σ⟨ q₁ ⟩( σ⟨ q₂ ⟩( q ))) H0)
                          (exist _ (σ⟨ q₂ ∧ q₁ ⟩( q )) H5)
@@ -821,8 +821,8 @@ Section TNRAEnvRewrite.
                          (exist _ (σ⟨ q₂ ⟩( σ⟨ q₁ ⟩( q ))) H)
                          (exist _ (σ⟨ q₁ ∧ q₂ ⟩( q )) H4)
                          (exist _ q₂ H3) (exist _ q₁ H2)); try assumption; try reflexivity.
-    assert (q₁ ∧ q₂ ▷ τ >=> Bool ⊣ τc;τenv) by eauto.
-    assert (q₂ ∧ q₁ ▷ τ >=> Bool ⊣ τc;τenv) by eauto.
+    assert (q₁ ∧ q₂ ▷ τ >=> Bool ⊣ τc;τenv) by qeauto.
+    assert (q₂ ∧ q₁ ▷ τ >=> Bool ⊣ τc;τenv) by qeauto.
     rewrite (tselect_and_comm
                (exist _ q H1)
                (exist _ (σ⟨q₂ ∧ q₁ ⟩( q )) H5)
@@ -920,7 +920,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     input_well_typed.
     dtype_inverter.
@@ -1034,7 +1034,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     input_well_typed.
     dtype_inverter.
     autorewrite with alg.
@@ -1699,7 +1699,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     input_well_typed; simpl.
     dtype_inverter; simpl.
@@ -1925,7 +1925,7 @@ Section TNRAEnvRewrite.
     apply (rewrites_typed_with_untyped _ _ (map_full_over_select_id q₂ q₁ q)).
     intros.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
   Qed.
 
   Lemma tmap_over_map_split p₁ p₂ p₃ :
@@ -1948,8 +1948,8 @@ Section TNRAEnvRewrite.
       apply (merge_idem _ τ₂ _ pf1 pf4); assumption.
       rewrite H0 in H; inversion H.
       nraenv_core_inferer.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       assert (Rec Closed τ₃ pf2 = Rec Closed τ₃ pf3).
       apply rtype_fequal; reflexivity.
       rewrite <- H1; assumption.
@@ -1975,8 +1975,8 @@ Section TNRAEnvRewrite.
         apply (merge_idem _ τ₂ _ pf1 pf4); assumption.
         rewrite H0 in H; inversion H.
         nraenv_core_inferer.
-        econstructor; eauto.
-        econstructor; eauto.
+        econstructor; qeauto.
+        econstructor; qeauto.
         assert (Rec Open τ₃ pf2 = Rec Open τ₃ pf3).
         apply rtype_fequal; reflexivity.
         rewrite <- H1; assumption.
@@ -2028,7 +2028,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     input_well_typed.
     reflexivity.
@@ -2041,7 +2041,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     input_well_typed; reflexivity.
   Qed.
 
@@ -2081,7 +2081,7 @@ Section TNRAEnvRewrite.
     intros.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     input_well_typed; reflexivity.
   Qed.
 
@@ -2158,7 +2158,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     input_well_typed.
     reflexivity.
@@ -2171,7 +2171,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     input_well_typed; reflexivity.
   Qed.
 
@@ -2183,8 +2183,8 @@ Section TNRAEnvRewrite.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
     assert (q₁ ▷ τin >=> τout ⊣ τc;τenv)
-           by (eapply tnraenv_core_ignores_id_swap; eauto).
-    econstructor; eauto.
+           by (eapply tnraenv_core_ignores_id_swap; qeauto).
+    econstructor; qeauto.
     intros.
     input_well_typed.
     rewrite (nraenv_core_ignores_id_swap q₁ H _ _ env x dout) in eout1.
@@ -2239,7 +2239,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     input_well_typed.
     reflexivity.
   Qed.
@@ -2253,8 +2253,8 @@ Section TNRAEnvRewrite.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_map q q₁ q₂ H)).
     intros; nraenv_core_inferer.
-    econstructor; eauto.
-    econstructor; eauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
     apply (tnraenv_core_ignores_id_swap q H _ _ _ τenv' τenv H3).
   Qed.
 
@@ -2266,9 +2266,9 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; simpl; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
-    - econstructor; eauto.
-      econstructor; eauto.
+    econstructor; qeauto.
+    - econstructor; qeauto.
+      econstructor; qeauto.
       apply (tnraenv_core_ignores_env_swap q₁ H _ _ _ _ _ H2).
     - intros.
       destruct (brand_relation_brands ⊢ₑ q₂ @ₑ x ⊣ c;x); try reflexivity; simpl.
@@ -2291,8 +2291,8 @@ Section TNRAEnvRewrite.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_select q q₁ q₂ H)).
     intros; nraenv_core_inferer.
-    econstructor; eauto.
-    econstructor; eauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
     apply (tnraenv_core_ignores_id_swap q H _ _ _ _ _ H3).
   Qed.
     
@@ -2303,7 +2303,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     input_well_typed; reflexivity.
   Qed.
@@ -2315,8 +2315,8 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
-    - repeat econstructor; eauto.
+    econstructor; qeauto.
+    - repeat econstructor; qeauto.
       apply (tnraenv_core_ignores_id_swap q H _ τin τ1 τenv' τenv H3).
     - intros.
       input_well_typed; simpl.
@@ -2332,7 +2332,7 @@ Section TNRAEnvRewrite.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_app_ie p1 p2 p3 H)).
     intros; nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     apply (tnraenv_core_ignores_env_swap p3 H _ _ _ _ _ H8).
   Qed.
     
@@ -2343,8 +2343,8 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
-    - econstructor; eauto.
+    econstructor; qeauto.
+    - econstructor; qeauto.
       apply (tnraenv_core_ignores_id_swap q₁ H _ τ1 τin τout τenv' H8).
     - intros.
       input_well_typed; simpl.
@@ -2361,7 +2361,7 @@ Section TNRAEnvRewrite.
     nraenv_core_inferer.
     assert (q₁ ▷ τin >=> τout ⊣ τc;τenv)
       by apply (tnraenv_core_ignores_env_swap q₁ H _ τin τout τenv' τenv H7).
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     input_well_typed.
     rewrite (nraenv_core_ignores_env_swap q₁ H _ _ env dout x) in eout1.
@@ -2379,14 +2379,14 @@ Section TNRAEnvRewrite.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_env_merge_l q₁ q H)); intros.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     assert (q₁ ▷ τin >=> Rec Closed τ₂0 pf2 ⊣ τc;τenv)
       by apply (tnraenv_core_ignores_env_swap q₁ H _ τin (Rec Closed τ₂0 pf2) (Rec Closed τ₁0 pf1) τenv H10).
-    eauto.
-    econstructor; eauto.
+    qeauto.
+    econstructor; qeauto.
     assert (q₁ ▷ τin >=> Rec Open τ₂0 pf2 ⊣ τc;τenv)
       by apply (tnraenv_core_ignores_env_swap q₁ H _ τin (Rec Open τ₂0 pf2) (Rec Open τ₁0 pf1) τenv H10).
-    eauto.
+    qeauto.
   Qed.
 
   (* Needs to be worked on, generalized ... *)
@@ -2405,8 +2405,8 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
-    - repeat econstructor; eauto.
+    econstructor; qeauto.
+    - repeat econstructor; qeauto.
       apply (tnraenv_core_ignores_env_swap q₁ H _ τ₁ Bool τ₂ τenv H6).
     - intros.
       input_well_typed.
@@ -2449,7 +2449,7 @@ Section TNRAEnvRewrite.
     intros. nraenv_core_inferer.
     generalize (tnraenv_core_ignores_id_swap _ ig τc).
     econstructor;
-      (econstructor; [| eassumption]; eauto). 
+      (econstructor; [| eassumption]; qeauto). 
   Qed.
 
   (**********
@@ -2463,7 +2463,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     input_well_typed; simpl.
     dtype_inverter.
@@ -2476,7 +2476,7 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     destruct (brand_relation_brands ⊢ₑ q₂ @ₑ x ⊣ c;env); try reflexivity; simpl.
     destruct (brand_relation_brands ⊢ₑ q₁ @ₑ x ⊣ c;d); reflexivity.
@@ -2490,8 +2490,8 @@ Section TNRAEnvRewrite.
   Proof.
     intros.
     unfold tnraenv_core_rewrites_to; simpl; intros.
-    nraenv_core_inferer; econstructor; eauto.
-    - repeat econstructor; eauto.
+    nraenv_core_inferer; econstructor; qeauto.
+    - repeat econstructor; qeauto.
       apply (tnraenv_core_ignores_id_swap q₁ H _ τin τenv0 τ₂ τenv0); assumption.
     - intros.
       input_well_typed.
@@ -2528,17 +2528,17 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     - assert (is_list_sorted ODT_lt_dec (domain τ₃) = true)
         by (unfold merge_bindings in *;
              destruct (Compat.compatible τ₁0 [x]); try discriminate;
             inversion H3;
             apply (@rec_concat_sort_sorted string ODT_string _ τ₁0 [x] (rec_concat_sort τ₁0 [x])); reflexivity).
       rename H into pf3.
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       destruct τenv0; subst.
       destruct x0; try discriminate.
       assert (Rec Closed τ₃ pf3 = (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) (Rec₀ k srl) e)).
@@ -2548,7 +2548,7 @@ Section TNRAEnvRewrite.
       destruct x; simpl in *.
       assert (tdot τ₃ s = Some s0) by (apply (edot_merge_bindings τ₁0 τ₃ s s0); assumption).
       apply type_OpDot; assumption.
-      econstructor; eauto.
+      econstructor; qeauto.
       assert (Rec Closed τ₃ pf3 = τenv0)
       by (apply rtype_fequal; simpl in *; assumption).
       rewrite <- H in *.
@@ -2578,18 +2578,18 @@ Section TNRAEnvRewrite.
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
-    econstructor; eauto.
+    econstructor; qeauto.
     - assert (is_list_sorted ODT_lt_dec (domain τ₃) = true)
         by (unfold merge_bindings in *;
              destruct (Compat.compatible τ₁0 [x]); try discriminate;
             inversion H3;
             apply (@rec_concat_sort_sorted string ODT_string _ τ₁0 [x] (rec_concat_sort τ₁0 [x])); reflexivity).
       rename H into pf3.
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       destruct τenv0; subst.
       destruct x0; try discriminate.
       assert (Rec Closed τ₃ pf3 = (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) (Rec₀ k srl) e))
@@ -2598,7 +2598,7 @@ Section TNRAEnvRewrite.
       destruct x; simpl in *.
       assert (tdot τ₃ s = Some s0) by (apply (edot_merge_bindings τ₁0 τ₃ s s0); assumption).
       apply type_OpDot; assumption.
-      econstructor; eauto.
+      econstructor; qeauto.
       assert (Rec Closed τ₃ pf3 = τenv0)
       by (apply rtype_fequal; simpl in *; assumption).
       rewrite <- H in *.
@@ -2648,8 +2648,8 @@ Section TNRAEnvRewrite.
     nraenv_core_inferer.
     split.
     econstructor.
-    3: econstructor; [| eauto]; eauto.
-    2: econstructor; [|eauto]; econstructor.
+    3: econstructor; [| qeauto]; qeauto.
+    2: econstructor; [|qeauto]; econstructor.
     + econstructor.
       unfold rec_concat_sort.
       rewrite rproject_rec_sort_commute, rproject_app.
@@ -2714,7 +2714,7 @@ Section TNRAEnvRewrite.
     - apply rproject_over_rec_in; trivial.
     - intros.
       nraenv_core_inferer.
-      econstructor; eauto.
+      econstructor; qeauto.
       destruct (@in_dec string string_dec
               s sl); [| intuition].
       econstructor.
@@ -2730,11 +2730,11 @@ Section TNRAEnvRewrite.
     - apply rproject_over_rec_nin; trivial.
     - intros.
       nraenv_core_inferer.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       destruct (@in_dec string string_dec
                         s sl); [| intuition]; [intuition | ].
-      simpl. econstructor; eauto.
+      simpl. econstructor; qeauto.
   Qed.
       
   Lemma trproject_over_concat_rec_r_nin sl s p₁ p₂ :
@@ -2744,7 +2744,7 @@ Section TNRAEnvRewrite.
     red; simpl; intros.
     nraenv_core_inferer.
     split.
-    - econstructor; [ | eauto].
+    - econstructor; [ | qeauto].
       revert pf2.
       unfold rec_concat_sort.
       rewrite rproject_rec_sort_commute, rproject_app.
@@ -2788,7 +2788,7 @@ Section TNRAEnvRewrite.
     red; intros.
     nraenv_core_inferer.
     split.
-    - econstructor; [ | eauto].
+    - econstructor; [ | qeauto].
       revert pf2.
       unfold rec_concat_sort.
       rewrite rproject_rec_sort_commute, rproject_app.
@@ -2837,8 +2837,8 @@ Section TNRAEnvRewrite.
       reflexivity.
     - intros.
       nraenv_core_inferer.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       unfold rec_concat_sort.
       rewrite rproject_rec_sort_commute, rproject_app.
       simpl.
@@ -2846,8 +2846,8 @@ Section TNRAEnvRewrite.
       destruct (in_dec string_dec s1 sl); [| intuition ].
       reflexivity.
       Grab Existential Variables.
-      solve[eauto].
-      solve[eauto].
+      solve[qeauto].
+      solve[qeauto].
   Qed.
 
   Lemma trproject_over_rproject sl1 sl2 p :
@@ -2859,7 +2859,7 @@ Section TNRAEnvRewrite.
       nraenv_core_inferer.
       generalize pf3.
       rewrite (rproject_rproject τ1 sl1 sl2).
-      econstructor; eauto.
+      econstructor; qeauto.
       econstructor.
       apply sublist_set_inter.
       trivial.
@@ -2872,7 +2872,7 @@ Section TNRAEnvRewrite.
     - apply rproject_over_either.
     - intros.
       nraenv_core_inferer.
-      econstructor; eauto.
+      econstructor; qeauto.
   Qed.
 
   (****************
@@ -2939,7 +2939,7 @@ Section TNRAEnvRewrite.
        red; simpl; trivial.
     - intros.
       nraenv_core_inferer.
-      repeat (econstructor; simpl; eauto).
+      repeat (econstructor; simpl; qeauto).
   Qed.
 
   Lemma tcount_over_flat_map_either_nil_map p₁ p₂ p₃ :
@@ -2970,7 +2970,7 @@ Section TNRAEnvRewrite.
       inversion H2; rtype_equalizer; subst.
       nraenv_core_inferer.
       econstructor.
-      2: (repeat econstructor; simpl; eauto).
+      2: (repeat econstructor; simpl; qeauto).
       econstructor.
     - intros.
       nraenv_core_inferer.

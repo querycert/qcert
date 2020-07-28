@@ -138,7 +138,7 @@ Section NRAtocNNRC.
     nnrc_core_eval h cenv env (nra_to_nnrc_core op vid) = h ⊢ op @ₐ did ⊣ cenv.
   Proof.
     Opaque fresh_var.
-    Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
+    Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct : qcert.
     revert did env vid.
     nra_cases (induction op) Case; intros; simpl.
     - Case "NRAGetConstant"%string.

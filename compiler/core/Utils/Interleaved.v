@@ -724,7 +724,7 @@ Section close_enough.
     - apply is_interleaved_disjoint_update_first; trivial.
   Qed.
 
-  Hint Resolve disjoint_nil_l disjoint_nil_r.
+  Hint Resolve disjoint_nil_l disjoint_nil_r : qcert.
   
   Lemma close_enough_lists_cons {A B} {dec:EqDec A eq} (a:(A*B)) l1 l2 : 
     close_enough_lists l1 l2 ->
@@ -757,7 +757,7 @@ Section close_enough.
       + constructor; trivial.
         rewrite Forall_map.
         revert nin; apply Forall_impl; intros.
-        apply disjoint_cons1; trivial.
+        apply disjoint_cons1; trivial with qcert.
       + econstructor; eauto.
         apply is_interleaved_cons_nil in isl1; trivial.
       + econstructor; eauto.

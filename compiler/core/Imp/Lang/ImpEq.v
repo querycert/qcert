@@ -278,9 +278,9 @@ Section NNRSimpEq.
   
 End NNRSimpEq.
 
-Notation "X ≡ᵉ Y" := (imp_expr_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ᵉ Y" := (imp_expr_eq X Y) (at level 90) : imp_scope. (* ≡ = \equiv *)
 
-Notation "X ≡ˢ Y" := (imp_stmt_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ˢ Y" := (imp_stmt_eq X Y) (at level 90) : imp_scope. (* ≡ = \equiv *)
 
-Notation "X ≡ˢⁱ Y" := (imp_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ˢⁱ Y" := (imp_eq X Y) (at level 90) : imp_scope. (* ≡ = \equiv *)
 

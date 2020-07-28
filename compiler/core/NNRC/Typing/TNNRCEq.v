@@ -55,7 +55,7 @@ Section TNNRCEq.
     apply bindings_type_Forall_normalized.
   Qed.
 
-  Hint Resolve data_normalized_bindings_type_map.
+  Hint Resolve data_normalized_bindings_type_map : qcert.
   
   Lemma nnrc_rewrites_typed_with_untyped (e1 e2:nnrc) :
     e1 ≡ᶜ e2 ->
@@ -67,16 +67,16 @@ Section TNNRCEq.
     intros.
     unfold tnnrc_rewrites_to; simpl; intros.
     split; auto 2; intros.
-    apply H; eauto.
+    apply H; qeauto.
   Qed.
 
   (****************
    * Proper stuff *
    ****************)
 
-  Hint Constructors nnrc_core_type.
-  Hint Constructors unary_op_type.
-  Hint Constructors binary_op_type.
+  Hint Constructors nnrc_core_type : qcert.
+  Hint Constructors unary_op_type : qcert.
+  Hint Constructors binary_op_type : qcert.
 
   Global Instance tnnrc_rewrites_to_pre : PreOrder tnnrc_rewrites_to.
   Proof.
@@ -287,7 +287,7 @@ Section TNNRCEq.
     destruct (H3 _ _ _ H12).
     clear H H1 H3.
     simpl.
-    split; [eauto | ]; intros.
+    split; [qeauto | ]; intros.
     rewrite H2; trivial.
     destruct (@typed_nnrc_core_yields_typed_data _ _ _ _ _ _ _ H H1 H0) as [?[??]].
     rewrite H3.
@@ -325,5 +325,5 @@ Section TNNRCEq.
 
 End TNNRCEq.
 
-Notation "e1 ⇒ᶜ e2" := (tnnrc_rewrites_to e1 e2) (at level 80).
+Notation "e1 ⇒ᶜ e2" := (tnnrc_rewrites_to e1 e2) (at level 80) : nnrc_scope.
 

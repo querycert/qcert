@@ -42,7 +42,7 @@ Section TDBindings.
                       (fst xy1) = (fst xy2)
                   /\ ddata_type (snd xy1) (snd xy2)) b t.
 
-  Hint Resolve ddata_dtype_normalized.
+  Hint Resolve ddata_dtype_normalized : qcert.
   Lemma dbindings_type_Forall_normalized c τc :
     dbindings_type c τc ->
     Forall
@@ -131,5 +131,5 @@ Section TDBindings.
 
 End TDBindings.
 
-Hint Resolve dbindings_type_Forall_normalized.
+Hint Resolve dbindings_type_Forall_normalized : qcert.
 

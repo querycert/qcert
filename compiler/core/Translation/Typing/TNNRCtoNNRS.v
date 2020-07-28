@@ -76,33 +76,33 @@ Section TNNRCtoNNRS.
         nnrc_type Γc Γ e τ <-> [ Γc ; pd_tbindings_lift Γ  ⊢ ei ▷ τ ].
     Proof.
       unfold nnrc_type.
-      Hint Constructors nnrc_core_type.
-      Hint Constructors nnrs_expr_type.
+      Hint Constructors nnrc_core_type : qcert.
+      Hint Constructors nnrs_expr_type : qcert.
       
       revert ei.
       induction e; simpl; intros ei eqq Γc Γ τ; try discriminate.
       - invcs eqq.
-        split; intros typ; invcs typ; eauto.
+        split; intros typ; invcs typ; qeauto.
       - invcs eqq.
-        split; intros typ; invcs typ; eauto.
+        split; intros typ; invcs typ; qeauto.
         + constructor.
           rewrite lookup_pd_tbindings_lift.
           rewrite H1; simpl; trivial.
         + rewrite lookup_pd_tbindings_lift in H1.
           apply some_lift in H1.
           destruct H1 as [? ? eqq1]; invcs eqq1.
-          eauto.
-      - invcs eqq; split; intros typ; invcs typ; eauto.
+          qeauto.
+      - invcs eqq; split; intros typ; invcs typ; qeauto.
       - apply some_lift2 in eqq.
         destruct eqq as [? [??[??]]]; subst.
         split; intros typ; invcs typ
-        ; (econstructor; eauto 2
-           ; [eapply IHe1 | eapply IHe2]; eauto).        
+        ; (econstructor; eauto 2 with qcert
+           ; [eapply IHe1 | eapply IHe2]; qeauto).        
       - apply some_lift in eqq.
         destruct eqq as [? ? ?]; subst.
         split; intros typ; invcs typ
-        ; (econstructor; eauto 2
-           ; eapply IHe; eauto).        
+        ; (econstructor; eauto 2 with qcert
+           ; eapply IHe; qeauto).        
       - apply some_lift in eqq.
         destruct eqq as [? ? ?]; subst.
         split; intros typ.
@@ -158,13 +158,13 @@ Section TNNRCtoNNRS.
           [ Γc ; pd_tbindings_lift Γ , (add_term_mc term τ Δc) , (add_term_md term τ Δd) ⊢ si ].
     Proof.
       unfold nnrc_type.
-      Hint Resolve terminate_type.
-      Hint Constructors nnrc_core_type.
-      Hint Constructors nnrs_expr_type.
+      Hint Resolve terminate_type : qcert.
+      Hint Constructors nnrc_core_type : qcert.
+      Hint Constructors nnrs_expr_type : qcert.
       intros eqq Γc.
       revert fvs term si eqq.
       induction s; simpl; intros fvs term si eqq Γ τ typ Δc Δd
-      ; repeat match_option_in eqq; invcs eqq; try solve [invcs typ; eauto 3].
+      ; repeat match_option_in eqq; invcs eqq; try solve [invcs typ; eauto 3 with qcert].
       - invcs typ.
         apply terminate_type.
         econstructor.
@@ -266,23 +266,23 @@ Section TNNRCtoNNRS.
         nnrc_type Γc Γ s τ.
     Proof.
       unfold nnrc_type.
-      Hint Resolve terminate_type.
-      Hint Constructors nnrc_core_type.
-      Hint Constructors nnrs_expr_type.
+      Hint Resolve terminate_type : qcert.
+      Hint Constructors nnrc_core_type : qcert.
+      Hint Constructors nnrs_expr_type : qcert.
       intros eqq Γc.
       revert fvs term si eqq.
       nnrc_cases (induction s) Case
       ; simpl; intros fvs term si eqq Γ τ Δc Δd typ
       ; repeat match_option_in eqq; invcs eqq
       ; try apply terminate_type_add_term_inv in typ
-      ; try solve [invcs typ; eauto 3].
+      ; try solve [invcs typ; eauto 3 with qcert].
       - Case "NNRCVar"%string.
         invcs typ.
         rewrite lookup_pd_tbindings_lift in H1; simpl in H1.
         apply some_lift in H1.
         destruct H1 as [? ? eqq].
         invcs eqq.
-        eauto.
+        qeauto.
       - Case "NNRCBinop"%string.
         apply some_lift2 in eqq0.
         destruct eqq0 as [? [? eqq1 [eqq2 ?]]]; subst.

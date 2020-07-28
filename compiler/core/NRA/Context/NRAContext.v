@@ -33,6 +33,8 @@ Require Import DataRuntime.
 Require Import NRA.
 Require Import NRAEq.
 
+Declare Scope nra_ctxt_scope.
+
 Section NRAContext.
   Local Open Scope nra_scope.
 
@@ -721,9 +723,9 @@ Section NRAContext.
        apply Nat.lt_strorder.
      - specialize (H (rec_sort ps)).
        cut_to H.
-       + Hint Resolve rec_sort_perm.
-         rewrite ac_substs_perm with (c:=c1) (ps2:=(rec_sort ps)); auto.
-         rewrite ac_substs_perm with (c:=c2) (ps2:=(rec_sort ps)); auto.
+       + Hint Resolve rec_sort_perm : qcert.
+         rewrite ac_substs_perm with (c:=c1) (ps2:=(rec_sort ps)); qauto.
+         rewrite ac_substs_perm with (c:=c2) (ps2:=(rec_sort ps)); qauto.
        + apply (@rec_sort_pf nat ODT_nat).
        + rewrite drec_sort_equiv_domain. trivial.
    Qed.

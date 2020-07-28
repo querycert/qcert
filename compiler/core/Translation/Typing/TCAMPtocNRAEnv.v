@@ -27,7 +27,7 @@ Section TCAMPtocNRAEnv.
   Local Open Scope list_scope.
   Local Open Scope camp_scope.
 
-  Hint Constructors nraenv_core_type unary_op_type binary_op_type.
+  Hint Constructors nraenv_core_type unary_op_type binary_op_type : qcert.
 
   Context {m:basic_model}.
 
@@ -35,54 +35,54 @@ Section TCAMPtocNRAEnv.
     [τc&Γ] |= p ; τin ~> τout ->
     nraenv_core_of_camp p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
   Proof.
-    Hint Resolve data_type_drec_nil.
+    Hint Resolve data_type_drec_nil : qcert.
     revert Γ pf τin τout.
     induction p; simpl; inversion 1; subst.
     (* PTconst *)
     - unfold nraenv_match.
-      eauto.
+      qeauto.
     (* PTunop *)
-    - eauto. 
+    - qeauto. 
     (* PTbinop *)
     - econstructor.
-      + eapply (@type_cNRAEnvBinop m _ (Rec Closed Γ pf) (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))). eauto.
+      + eapply (@type_cNRAEnvBinop m _ (Rec Closed Γ pf) (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))). qeauto.
         apply (@type_cNRAEnvUnop m _ (Rec Closed Γ pf) (Rec Closed (("a1", τ₂₁) :: ("a2", τ₂₂) :: nil) eq_refl) (Rec Closed (("a1", τ₂₁) :: ("a2", τ₂₂) :: nil) eq_refl)).
         econstructor; reflexivity.
-        eauto.
+        qeauto.
         apply (@type_cNRAEnvUnop m _ (Rec Closed Γ pf) (Rec Closed (("a1", τ₂₁) :: ("a2", τ₂₂) :: nil) eq_refl) (Rec Closed (("a1", τ₂₁) :: ("a2", τ₂₂) :: nil) eq_refl)).
         econstructor; reflexivity.
-        econstructor; eauto.
-      + econstructor; eauto.
+        econstructor; qeauto.
+      + econstructor; qeauto.
     (* PTmap *)
-    - econstructor; eauto.
+    - econstructor; qeauto.
     (* PTassert *)
-    - repeat econstructor; eauto.
+    - repeat econstructor; qeauto.
     (* PTorElse *)
-    - eauto.
+    - qeauto.
     (* PTit *)
-    - econstructor; eauto.
+    - econstructor; qeauto.
     (* PTletIt *)
-    - econstructor; eauto.
+    - econstructor; qeauto.
     (* PTgetconstant *)
-    - repeat (econstructor; eauto).
+    - repeat (econstructor; qeauto).
     (* PTenv *)
     - rewrite (is_list_sorted_ext _ _ pf pf0).
-      repeat (econstructor; eauto).
+      repeat (econstructor; qeauto).
     (* PTletEnv *)
-    - econstructor; eauto.
-      econstructor; eauto.
+    - econstructor; qeauto.
+      econstructor; qeauto.
       assert (Γeq:Γ'' = rec_concat_sort Γ Γ')
         by (unfold merge_bindings in *; 
              destruct (Compat.compatible Γ Γ'); congruence).
       generalize (merge_bindings_sorted H4). subst. 
       intros.
-      econstructor; eauto.
+      econstructor; qeauto.
     (* PTEither *)
-    - repeat (econstructor; eauto).
+    - repeat (econstructor; qeauto).
     (* PTEither *)
-    - repeat (econstructor; eauto).
+    - repeat (econstructor; qeauto).
     Grab Existential Variables.
-    eauto. eauto. eauto.
+    qeauto. qeauto. qeauto.
   Qed.
 
   (** Some corollaries of the main Lemma *)
@@ -92,7 +92,7 @@ Section TCAMPtocNRAEnv.
     nraenv_core_of_camp_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
   Proof.
     intros.
-    repeat (econstructor; eauto).
+    repeat (econstructor; qeauto).
   Qed.
     
   Theorem alg_of_camp_top_type_preserve p τc τin τout :

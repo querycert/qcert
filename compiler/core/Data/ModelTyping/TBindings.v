@@ -76,7 +76,7 @@ Section TBindings.
     apply bindings_type_app; trivial.
   Qed.
   
-  Hint Resolve data_type_normalized.
+  Hint Resolve data_type_normalized : qcert.
   Lemma bindings_type_Forall_normalized c τc :
     bindings_type c τc ->
     Forall
@@ -85,10 +85,10 @@ Section TBindings.
   Proof.
     induction 1; trivial.
     intuition.
-    eauto.
+    qeauto.
   Qed.
 
 End TBindings.
 
-Hint Resolve bindings_type_Forall_normalized.
+Hint Resolve bindings_type_Forall_normalized : qcert.
 

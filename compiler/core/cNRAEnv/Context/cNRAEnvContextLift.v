@@ -193,8 +193,8 @@ Section cNRAEnvContext.
               | [H: data_normalized _ (dright _) |- _ ] => inversion H; clear H; try subst
               end.
 
-  Hint Resolve nraenv_core_eval_normalized.
-  Hint Resolve data_normalized_dcoll_in.
+  Hint Resolve nraenv_core_eval_normalized : qcert.
+  Hint Resolve data_normalized_dcoll_in : qcert.
 
   Instance aeu_Binop_proper h c env :
     Proper
@@ -226,7 +226,7 @@ Section cNRAEnvContext.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
-    goal_eq_simpler; eauto.
+    goal_eq_simpler; qeauto.
   Qed.
 
   Instance aeu_MapProduct_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
@@ -237,7 +237,7 @@ Section cNRAEnvContext.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
-    goal_eq_simpler; eauto.
+    goal_eq_simpler; qeauto.
   Qed.
 
   Instance aeu_Product_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
@@ -248,7 +248,7 @@ Section cNRAEnvContext.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0 by trivial.
-    goal_eq_simpler; eauto.
+    goal_eq_simpler; qeauto.
   Qed.
 
   Instance aeu_Select_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env):
@@ -259,8 +259,8 @@ Section cNRAEnvContext.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
-    goal_eq_simpler; eauto.
-    rewrite H; eauto.
+    goal_eq_simpler; qeauto.
+    rewrite H; qeauto.
   Qed.
 
   Instance aeu_Default_proper h c env :
@@ -281,7 +281,7 @@ Section cNRAEnvContext.
                        nraenv_core_eq_under h c env) cNRAEnvEither.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
-    match_destr; dn_inverter; eauto.
+    match_destr; dn_inverter; qeauto.
   Qed.
 
   Instance aeu_EitherConcat_proper h c env :
@@ -292,8 +292,8 @@ Section cNRAEnvContext.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
-    goal_eq_simpler; eauto.
-    rewrite H; eauto.
+    goal_eq_simpler; qeauto.
+    rewrite H; qeauto.
   Qed.
 
   Instance aeu_App_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
@@ -304,7 +304,7 @@ Section cNRAEnvContext.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
-    goal_eq_simpler; eauto.
+    goal_eq_simpler; qeauto.
   Qed.
   
   Instance aec_under_refl h c env : Reflexive (nraenv_core_ctxt_equiv_under h c env).

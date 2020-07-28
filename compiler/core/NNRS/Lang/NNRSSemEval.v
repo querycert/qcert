@@ -42,6 +42,8 @@ Section NNRSSemEval.
   Local Open Scope nnrs.
   Local Open Scope string.
 
+  Hint Constructors nnrs_expr_sem : qcert.
+          
   Lemma nnrs_expr_sem_eval σc σ e d :
     [ h , σc ; σ ⊢ e ⇓ d ] <-> nnrs_expr_eval h σc σ e = Some d.
   Proof.
@@ -62,20 +64,19 @@ Section NNRSSemEval.
           simpl; rewrite H5; simpl; trivial.
       }
     - {
-        Hint Constructors nnrs_expr_sem.
-        nnrs_expr_cases (induction e) Case; intros σ d₀ sem; invcs sem; simpl; trivial; eauto 3.
+        nnrs_expr_cases (induction e) Case; intros σ d₀ sem; invcs sem; simpl; trivial; eauto 3 with qcert.
         - Case "NNRSVar".
           apply some_olift in H0.
           destruct H0 as [??]; unfold id in *; subst.
-          eauto.
+          qeauto.
         - Case "NNRSBinop".
           apply some_olift2 in H0.
           destruct H0 as [?[?? [??]]].
-          eauto.
+          qeauto.
         - Case "NNRSUnop".
           apply some_olift in H0.
           destruct H0 as [??]; unfold id in *; subst.
-          eauto.
+          qeauto.
         - Case "NNRSGroupBy".
           match_case_in H0;
             [intros ? eqq | intros eqq]; rewrite eqq in H0;
@@ -84,7 +85,7 @@ Section NNRSSemEval.
           apply some_olift in H0.
           destruct H0 as [??]; unfold id in *; subst.
           invcs e1.
-          eauto.
+          qeauto.
       }
   Qed.
 
@@ -155,53 +156,53 @@ Section NNRSSemEval.
           simpl; trivial.
       }
     - {
-        Hint Constructors nnrs_stmt_sem.
-        Hint Constructors nnrs_stmt_sem_iter.
-        Hint Resolve nnrs_stmt_sem_env_cons_same.
-        Hint Resolve nnrs_stmt_sem_mcenv_cons_same.
+        Hint Constructors nnrs_stmt_sem : qcert.
+        Hint Constructors nnrs_stmt_sem_iter : qcert.
+        Hint Resolve nnrs_stmt_sem_env_cons_same : qcert.
+        Hint Resolve nnrs_stmt_sem_mcenv_cons_same : qcert.
 
         nnrs_stmt_cases (induction s) Case; simpl; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; repeat destr sem.
         - Case "NNRSSeq".
-          eauto.
+          qeauto.
         - Case "NNRSLet".
           invcs sem.
           apply nnrs_expr_sem_eval in eqq.
-          eauto.
+          qeauto.
         - Case "NNRSLetMut".
           invcs sem.
           apply IHs1 in eqq.
           apply nnrs_stmt_sem_mdenv_cons_same in eqq.
-          eauto.
+          qeauto.
         - Case "NNRSLetMutColl".
           invcs sem.
           apply IHs1 in eqq.
           apply nnrs_stmt_sem_mcenv_cons_same in eqq.
-          eauto.
+          qeauto.
         - Case "NNRSAssign".
           invcs sem.
           apply nnrs_expr_sem_eval in eqq.
-          eauto.
+          qeauto.
         - Case "NNRSPush".
           invcs sem.
           apply nnrs_expr_sem_eval in eqq.
-          eauto.
+          qeauto.
         - Case "NNRSFor".
           destruct d; try discriminate.
           apply nnrs_expr_sem_eval in eqq.
           econstructor; eauto.
           clear eqq.
           revert σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem.
-          induction l; intros σ₁  ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; invcs sem; eauto 1.
+          induction l; intros σ₁  ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; invcs sem; eauto 1 with qcert.
           repeat destr H0.
-          eauto.
+          qeauto.
         - Case "NNRSIf".
           apply nnrs_expr_sem_eval in eqq.
           destruct d; try discriminate.
-          destruct b; eauto.
+          destruct b; qeauto.
         - Case "NNRSEither".
           apply nnrs_expr_sem_eval in eqq.
           destruct d; try discriminate;
-            repeat destr sem; invcs sem; eauto.
+            repeat destr sem; invcs sem; qeauto.
       }
   Qed.
 

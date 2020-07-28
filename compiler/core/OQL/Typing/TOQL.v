@@ -31,7 +31,7 @@ Section TOQL.
     Section constt.
       Context (τconstants:tbindings).
 
-      Hint Resolve bindings_type_has_type.
+      Hint Resolve bindings_type_has_type : qcert.
 
       Inductive oql_expr_type : tbindings -> oql_expr -> rtype -> Prop :=
       | OTConst {τ} tenv c :

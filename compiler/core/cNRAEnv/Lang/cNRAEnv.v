@@ -42,6 +42,8 @@ Require Import Utils.
 Require Import DataRuntime.
 Require Import NRARuntime.
 
+Declare Scope nraenv_core_scope.
+
 Section cNRAEnv.
   Context {fruntime:foreign_runtime}.
 
@@ -1416,7 +1418,6 @@ Section cNRAEnv.
   
 End cNRAEnv.
 
-(* Delimit Scope nraenv_core_scope with nraenv_core. *)
 Delimit Scope nraenv_core_scope with nraenv_core.
 
 Notation "h ⊢ₑ op @ₑ x ⊣ c ; env " := (nraenv_core_eval h c op env x) (at level 10) : nraenv_core_scope.
@@ -1475,9 +1476,9 @@ Section RcNRAEnv2.
     data_normalized h d ->
     data_normalized h o.
   Proof.
-    Hint Resolve dnrec_sort_content.
+    Hint Resolve dnrec_sort_content : qcert.
     rewrite unfold_env_nra_sort; intros.
-    eauto.
+    qeauto.
   Qed.
 
   Section Top.
@@ -1571,7 +1572,7 @@ Notation "r1 ◯ r2" := (cNRAEnvApp r1 r2) (right associativity, at level 60): n
 Notation "r1 ◯ₑ r2" := (cNRAEnvAppEnv r1 r2) (right associativity, at level 60): nraenv_core_scope.           (* ◯ = \bigcirc *)
 Notation "χᵉ⟨ p ⟩" := (cNRAEnvMapEnv p) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
 
-Hint Resolve nraenv_core_eval_normalized.
+Hint Resolve nraenv_core_eval_normalized : qcert.
 
 Tactic Notation "nraenv_core_cases" tactic(first) ident(c) :=
   first;

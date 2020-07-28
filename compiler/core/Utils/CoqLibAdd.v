@@ -33,6 +33,12 @@ Require Import Znat.
 Require Import Recdef.
 Require Import Compare_dec.
 
+Create HintDb qcert.
+
+Ltac qauto := auto with qcert.
+Ltac qeauto := eauto with qcert.
+Ltac qtrivial := trivial with qcert.
+
 Section CoqLibAdd.
 
   (** * Properties of Booleans *)
@@ -312,7 +318,9 @@ Section CoqLibAdd.
       Forallt_nil : Forallt P nil
     | Forallt_cons : forall (x : A) (l : list A),
         P x -> Forallt P l -> Forallt P (x :: l).
-    
+
+    Hint Constructors Forallt : qcert.
+
     Lemma list_Forallt_eq_dec {A:Type}:
       forall (c l: list A),
         Forallt (fun x : A => forall y : A, {x = y} + {x <> y}) c -> {c = l} + {c <> l}.
@@ -333,19 +341,19 @@ Section CoqLibAdd.
     Lemma forallt_impl {A} {P1 P2:A->Type} {l:list A} :
       Forallt P1 l -> Forallt (fun x => P1 x -> P2 x) l -> Forallt P2 l.
     Proof.
-      Hint Constructors Forallt.
-      induction l; trivial.
+      induction l; trivial with qcert.
       inversion 1; inversion 1; subst.
-      auto.
+      auto with qcert.
     Defined.
 
     Lemma forallt_weaken {A} P : (forall x:A, P x) -> forall l, Forallt P l.
     Proof.
-      Hint Constructors Forallt.
       intros.
-      induction l. apply Forallt_nil.
-      apply Forallt_cons. apply (X a).
-      trivial.
+      induction l.
+      - apply Forallt_nil.
+      - apply Forallt_cons.
+        + apply (X a).
+        + trivial.
     Defined.
 
     Lemma Forallt_inv: forall A P (a:A) l, Forallt P (a :: l) -> P a.

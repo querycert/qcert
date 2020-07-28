@@ -47,6 +47,8 @@ Section NativeString.
 
 End NativeString.
 
+Declare Scope nstring_scope.
+
 Notation "^ e" := (nstring_quote e) (left associativity, at level 40) : nstring_scope.
 Notation "& e" := (nstring_unquote e) (left associativity, at level 40) : nstring_scope.
 Notation "e1 +++ e2" := (nstring_append e1 e2) (right associativity, at level 70): nstring_scope.

@@ -29,7 +29,7 @@ Section RConsistentSubtype.
   Context {ftype:foreign_type}.
   Context {br:brand_relation}.
 
-Hint Constructors subtype.
+Hint Constructors subtype : qcert.
 
 Section rtype_join_meet.
   
@@ -136,35 +136,35 @@ Proof.
       * subst. simpl in H.
         simpl in awf',bwf'. repeat rewrite andb_true_iff in awf',bwf'.
         intuition.
-       destruct (to_Rec k ((s0,r) :: rl1) awf).
-       destruct (to_Rec k2 ((s0,r0):: rl2) bwf).
-       rewrite H8, H12 in H0.
-
-       generalize (Rec_subtype_cons_inv H0); intros [pf' [pf'' subinv]].
-       specialize (IHrl1 rl2 H6 awf'' bwf'').
-       simpl in H3.
-       f_equal.
-       f_equal.
-       apply  (H3 H9 _ H2).
-       apply Rec_subtype_cons_eq in H0.
-       destruct r; destruct r0; simpl.
-       eapply subtype_ext; eauto.
-       etransitivity; [|eapply IHrl1].
-       apply (@map_rtype_join₀_lookup_none2 ftype br).
-       apply lookup_nin_none.
-       intro inn.
-       unfold domain in inn; rewrite map_map in inn.
-       simpl in inn.
-       rewrite (map_eq (g:=fst)) in inn by (rewrite Forall_forall; trivial).
-       generalize x; intros isl;
-       apply is_list_sorted_NoDup in isl; [|eapply StringOrder.lt_strorder].
-       inversion isl; subst. intuition.
-       eapply subtype_ext; eauto.
-       inversion subinv; subst; rtype_equalizer.
-       subst; eauto.       
-       subst; eauto.
-       intuition; subst.
-       eapply (SRec_closed_equiv_domain subinv); trivial.
+        destruct (to_Rec k ((s0,r) :: rl1) awf).
+        destruct (to_Rec k2 ((s0,r0):: rl2) bwf).
+        rewrite H8, H12 in H0.
+        
+        generalize (Rec_subtype_cons_inv H0); intros [pf' [pf'' subinv]].
+        specialize (IHrl1 rl2 H6 awf'' bwf'').
+        simpl in H3.
+        f_equal.
+        -- f_equal.
+           apply  (H3 H9 _ H2).
+           apply Rec_subtype_cons_eq in H0.
+           destruct r; destruct r0; simpl.
+           eapply subtype_ext; eauto.
+        -- etransitivity; [|eapply IHrl1].
+           ++ apply (@map_rtype_join₀_lookup_none2 ftype br).
+              apply lookup_nin_none.
+              intro inn.
+              unfold domain in inn; rewrite map_map in inn.
+              simpl in inn.
+              rewrite (map_eq (g:=fst)) in inn by (rewrite Forall_forall; trivial).
+              generalize x; intros isl;
+                apply is_list_sorted_NoDup in isl; [|eapply StringOrder.lt_strorder].
+              inversion isl; subst. intuition.
+           ++ eapply subtype_ext; eauto.
+           ++ inversion subinv; subst; rtype_equalizer.
+              ** subst; qeauto.
+              ** subst; qeauto.
+           ++ intuition; subst.
+              eapply (SRec_closed_equiv_domain subinv); trivial.
      * generalize (H4 s0 r0); simpl.
        destruct (string_dec s0 s0);  [|intuition].
        destruct (string_dec s0 s);  [congruence|].
@@ -343,8 +343,8 @@ Proof.
               (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                  (fst x, proj1_sig (snd x))) rl2)); intros eqq.
              rewrite eqq.
-             generalize awf; simpl; rewrite andb_true_iff; intuition eauto 2.
-          - generalize awf; simpl; rewrite andb_true_iff; intuition eauto 2. 
+             generalize awf; simpl; rewrite andb_true_iff; intuition eauto 2 with qcert.
+          - generalize awf; simpl; rewrite andb_true_iff; intuition eauto 2 with qcert. 
           - intros s.
             {
               case_eq ( lookup string_dec
@@ -496,10 +496,10 @@ Proof.
        generalize x; intros isl;
        apply is_list_sorted_NoDup in isl; [|eapply StringOrder.lt_strorder].
        inversion isl; subst. intuition.
-       eapply subtype_ext; eauto.
+       eapply subtype_ext; qeauto.
        inversion subinv; subst; rtype_equalizer.
-       subst; eauto.       
-       subst; eauto.
+       subst; qeauto.       
+       subst; qeauto.
        intuition; subst.
        eapply (SRec_closed_equiv_domain subinv); trivial.
      * generalize (H4 s0 r0); simpl.
@@ -676,8 +676,8 @@ Proof.
               (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                  (fst x, proj1_sig (snd x))) rl2)); intros eqq.
              rewrite eqq.
-             generalize bwf; simpl; rewrite andb_true_iff; intuition eauto 2.
-          - generalize bwf; simpl; rewrite andb_true_iff; intuition eauto 2. 
+             generalize bwf; simpl; rewrite andb_true_iff; intuition eauto 2 with qcert.
+          - generalize bwf; simpl; rewrite andb_true_iff; intuition eauto 2 with qcert. 
           - intros s.
             {
               case_eq ( lookup string_dec
@@ -910,7 +910,7 @@ Lemma consistent_rtype_join_meet2:
   forall a b,  (rtype_join a b = b -> subtype a b)
                /\ (rtype_meet a b = a -> subtype a b).
 Proof.
-  Hint Resolve STop₀ SBottom₀ SColl₀.
+  Hint Resolve STop₀ SBottom₀ SColl₀ : qcert.
   destruct a as [a awf]; destruct b as [b bwf].
   unfold rtype_join, rtype_meet; simpl.
 
@@ -932,9 +932,9 @@ Proof.
                      intuition;
                      inversion H;
                      destruct b; try discriminate;
-                     eapply subtype_ext; eauto 3].
+                     eapply subtype_ext; eauto 3 with qcert].
   - intuition; simpl in *; inversion H; destruct b; try discriminate;
-      try solve [eapply subtype_ext; eauto];
+      try solve [eapply subtype_ext; qeauto];
       simpl in *;
         inversion H;
       repeat rewrite Coll_canon;
@@ -942,7 +942,7 @@ Proof.
       destruct (IHa awf b bwf) as [pf1 [pf2 [pf3 pf4]]];
       intuition.
   - repeat split.
-    + destruct b; unfold rtype_join₀; simpl; fold rtype_join₀; inversion 1; eauto 2.
+    + destruct b; unfold rtype_join₀; simpl; fold rtype_join₀; inversion 1; eauto 2 with qcert.
       clear H0.
       apply SRec₀;
         [| intros rc; apply record_kind_rtype_join_closed_inv in rc; intuition; congruence].
@@ -989,7 +989,7 @@ Proof.
     intros.
     rewrite (map_rtype_join₀_commutative Closed Closed (ftype:=ftype) (br:=br)) in eqsrl; auto.
     eauto.
-    + destruct b; unfold rtype_meet₀; simpl; fold rtype_meet₀; inversion 1; eauto 2.
+    + destruct b; unfold rtype_meet₀; simpl; fold rtype_meet₀; inversion 1; eauto 2 with qcert.
       clear H2.
     match_destr_in H0.
     inversion H0; clear H0.
@@ -997,10 +997,10 @@ Proof.
     + { intros s τ pfτ los.
         assert (ndr:NoDup (domain r))
                by (generalize awf bwf; simpl; repeat rewrite andb_true_iff; intros [??] [??];
-                   intuition eauto 2).
+                   intuition eauto 2 with qcert).
         assert (ndsrl:NoDup (domain srl))
                by (generalize awf bwf; simpl; repeat rewrite andb_true_iff; intros [??] [??];
-                   intuition eauto 2).
+                   intuition eauto 2 with qcert).
         case_eq (lookup string_dec r s).
         - intros τ2 lors.
           generalize lors; intros lors'.
@@ -1035,7 +1035,7 @@ Proof.
       destruct k; simpl in *; [ discriminate | ].
       rewrite r0; intuition.
     }
-    + destruct b; unfold rtype_join₀; simpl; fold rtype_join₀; inversion 1; eauto 2.
+    + destruct b; unfold rtype_join₀; simpl; fold rtype_join₀; inversion 1; eauto 2 with qcert.
       clear H0.
       apply SRec₀;
         [| intros rc; apply record_kind_rtype_join_closed_inv in rc; intuition; congruence].
@@ -1075,7 +1075,7 @@ Proof.
         apply eqq1 in inn.
         apply lookup_none_nin in r0'in.
         intuition.
-    + destruct b; unfold rtype_meet₀; simpl; fold rtype_meet₀; inversion 1; eauto 2.
+    + destruct b; unfold rtype_meet₀; simpl; fold rtype_meet₀; inversion 1; eauto 2 with qcert.
       clear H2.
     match_destr_in H0.
     inversion H0; clear H0.
@@ -1083,10 +1083,10 @@ Proof.
     + { intros s τ pfτ los.
         assert (ndr:NoDup (domain r))
                by (generalize awf bwf; simpl; repeat rewrite andb_true_iff; intros [??] [??];
-                   intuition eauto 2).
+                   intuition eauto 2 with qcert).
         assert (ndsrl:NoDup (domain srl))
                by (generalize awf bwf; simpl; repeat rewrite andb_true_iff; intros [??] [??];
-                   intuition eauto 2).
+                   intuition eauto 2 with qcert).
         case_eq (lookup string_dec srl s).
         - intros τ2 lors.
           generalize lors; intros lors'.
@@ -1122,7 +1122,7 @@ Proof.
       rewrite r0; intuition.
     }
   - simpl. intros.
-    destruct b; repeat split; try discriminate; eauto 2.
+    destruct b; repeat split; try discriminate; eauto 2 with qcert.
     + intros.
       destruct (Either₀_wf_inv awf) as [a1wf a2wf].
       destruct (Either₀_wf_inv bwf) as [b1wf b2wf].
@@ -1168,7 +1168,7 @@ Proof.
       * destruct (IHa2 a2wf _ b2wf) as [Hpf1 [Hpf2 [Hpf3 Hpf4]]].
         intuition.
   - simpl. intros.
-    destruct b; unfold rtype_meet₀, rtype_join₀; simpl; fold rtype_meet₀; fold rtype_join₀; repeat split; try discriminate; eauto 2.
+    destruct b; unfold rtype_meet₀, rtype_join₀; simpl; fold rtype_meet₀; fold rtype_join₀; repeat split; try discriminate; eauto 2 with qcert.
     + intros.
       destruct (Arrow₀_wf_inv awf) as [a1wf a2wf].
       destruct (Arrow₀_wf_inv bwf) as [b1wf b2wf].
@@ -1218,7 +1218,7 @@ Proof.
       * destruct (IHa2 a2wf _ b2wf) as [Hpf1 [Hpf2 [Hpf3 Hpf4]]].
         intuition.
   - simpl; intros.
-    destruct b0; unfold rtype_meet₀, rtype_join₀; simpl; fold rtype_meet₀; fold rtype_join₀; repeat split; try discriminate; eauto 2.
+    destruct b0; unfold rtype_meet₀, rtype_join₀; simpl; fold rtype_meet₀; fold rtype_join₀; repeat split; try discriminate; eauto 2 with qcert.
     + inversion 1.
       repeat rewrite brand_ext.
        apply SBrand.
@@ -1240,7 +1240,7 @@ Proof.
        apply brand_meet_consistent_can; trivial.
        apply wf_rtype₀_Brand₀; trivial.
   - simpl; intros.
-    destruct b; unfold rtype_meet₀, rtype_join₀; simpl; fold rtype_meet₀; fold rtype_join₀; repeat split; try discriminate; eauto 2.
+    destruct b; unfold rtype_meet₀, rtype_join₀; simpl; fold rtype_meet₀; fold rtype_join₀; repeat split; try discriminate; eauto 2 with qcert.
     + inversion 1.
       repeat rewrite Foreign_canon.
       apply SForeign.
@@ -1301,7 +1301,7 @@ Qed.
 
 Theorem consistent_rtype_join: forall a b, subtype a b <-> rtype_join a b = b.
 Proof.
-  Hint Resolve consistent_rtype_join1 consistent_rtype_join2.
+  Hint Resolve consistent_rtype_join1 consistent_rtype_join2 : qcert.
   intuition.
 Qed.
 
@@ -1337,7 +1337,7 @@ Qed.
  
   Theorem consistent_rtype_meet : forall a b, subtype a b <-> rtype_meet a b = a.
   Proof.
-    Hint Resolve consistent_rtype_meet1 consistent_rtype_meet2.
+    Hint Resolve consistent_rtype_meet1 consistent_rtype_meet2 : qcert.
     intuition.
   Qed.
   

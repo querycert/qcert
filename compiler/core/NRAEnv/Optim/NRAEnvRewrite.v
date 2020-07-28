@@ -34,14 +34,14 @@ Section ROptimEnv.
 
   (* Pulls equivalences from core algebra *)
 
-  Hint Resolve dnrec_sort_content.
+  Hint Resolve dnrec_sort_content : qcert.
   Lemma pull_nra_opt (p1 p2:nraenv_core) :
     (nra_of_nraenv_core p1) ≡ₐ (nra_of_nraenv_core p2) ->
     p1 ≡ₑ p2.
   Proof.
     unfold nra_eq, nraenv_core_eq; intros.
     repeat rewrite unfold_env_nra_sort.
-    rewrite H; eauto.
+    rewrite H; qeauto.
   Qed.
 
   (* P1 ∧ P2 ≡ P2 ∧ P1 *)

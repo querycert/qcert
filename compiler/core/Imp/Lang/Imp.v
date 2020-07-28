@@ -28,6 +28,7 @@ Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
 
+Declare Scope imp_scope.
 Section Imp.
 
   Section Syntax.
@@ -287,5 +288,4 @@ Tactic Notation "imp_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "ImpLib"%string].
 
-
-Delimit Scope imp with imp_scope.
+Delimit Scope imp_scope with imp.

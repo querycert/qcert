@@ -333,6 +333,8 @@ Section RType.
        explicit pattern matching (it can still be written as a call to
        this induction principle) *)
 
+    Hint Constructors Forallt : qcert.
+
     Theorem rtype_rect (P : rtype -> Type)
             (ftop : P ⊤)
             (fbottom : P ⊥)
@@ -352,7 +354,6 @@ Section RType.
       :
       forall (τ:rtype), P τ.
     Proof.
-      Hint Constructors Forallt.
       destruct τ as [τ₀ wfτ].
       revert wfτ. (* ftop fbottom funit fnat fbool fstring fcol frec. *)
       unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec, Either, Arrow in *.
@@ -392,9 +393,9 @@ Section RType.
                      rewrite dreq; rewrite andb_true_iff in wfτ; intuition.
                      assert (pff:Forallt (fun ab : string * rtype => P (snd ab)) srl).
                      revert X. rewrite <- srleq. clear.
-                     induction srl; simpl; eauto.
+                     induction srl; simpl; eauto with qcert.
                      destruct a; destruct r; simpl.
-                     inversion 1; subst; eauto.
+                     inversion 1; subst; eauto with qcert.
                      specialize (frec k srl pfs pff).
                      destruct srleq.
                      erewrite (rtype_ext); eapply frec.
@@ -435,7 +436,6 @@ Section RType.
             (fforeign : forall ft, P (Foreign ft)) :
       forall (τ:rtype), P τ.
     Proof.
-      Hint Constructors Forallt.
       destruct τ as [τ₀ wfτ].
       revert wfτ. (* ftop fbottom funit fnat fbool fstring fcol frec. *)
       unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec in *.

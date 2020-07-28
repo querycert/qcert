@@ -51,7 +51,7 @@ Section TNRAEnv.
       unfold GroupBy_type, nraenv_type.
       simpl; intros subl typ.
       unfold macro_cNRAEnvGroupBy.
-      repeat (econstructor; try eassumption; trivial).
+      repeat (econstructor; try eassumption; qtrivial).
       Unshelve.
       - simpl; reflexivity.
       - apply (is_list_sorted_sublist pf).
@@ -178,9 +178,9 @@ Notation "Op @▷ₓ d ⊣ C ; e" := (tnraenv_eval C Op e d) (at level 70).
 
 (* Used to prove type portion of typed directed rewrites *)
 
-Hint Unfold nraenv_type.
-Hint Constructors unary_op_type.
-Hint Constructors binary_op_type.
+Hint Unfold nraenv_type : qcert.
+Hint Constructors unary_op_type : qcert.
+Hint Constructors binary_op_type : qcert.
 
 (* inverts, then tries and solve *)
 Ltac nraenv_inferer :=
