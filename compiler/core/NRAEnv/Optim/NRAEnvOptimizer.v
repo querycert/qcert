@@ -30,6 +30,9 @@ Require Import OptimizerLogger.
 Require Import NRAEnvRewrite.
 Require Import TNRAEnvRewrite.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section NRAEnvOptimizer.
   Open Scope nraenv_scope.
   

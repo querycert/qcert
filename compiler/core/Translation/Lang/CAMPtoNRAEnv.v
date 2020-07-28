@@ -14,7 +14,7 @@
 
 Require Import String.
 Require Import List.
-Require Import Omega.
+Require Import Lia.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import NRARuntime.
@@ -159,7 +159,7 @@ Section CAMPtoNRAEnv.
     Lemma camp_trans_size p :
       nraenv_size (nraenv_of_camp p) <= 13 * camp_size p.
     Proof.
-      induction p; simpl; omega.
+      induction p; simpl; lia.
     Qed.
 
   End size.

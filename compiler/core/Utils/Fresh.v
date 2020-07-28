@@ -21,7 +21,7 @@ Require Import Permutation.
 Require Import Arith Min.
 Require Import EquivDec.
 Require Import Morphisms.
-Require Import Omega.
+Require Import Lia.
 Require Import CoqLibAdd.
 Require Import ListAdd.
 Require Import StringAdd.
@@ -66,9 +66,9 @@ Section Fresh.
     induction bound; simpl; intros.
     - discriminate.
     - match_destr_in H.
-      + inversion H; subst; omega.
+      + inversion H; subst; lia.
       + specialize (IHbound (S init) _ H).
-        omega.
+        lia.
   Qed.
 
   Lemma find_bounded_S_seq f bound init :

@@ -18,7 +18,7 @@ Require Import Arith.
 Require Import Min.
 Require Import Max.
 Require Import ZArith.
-Require Import Omega.
+Require Import Lia.
 Require Import Permutation.
 Require Import Equivalence.
 Require Import Morphisms.
@@ -799,7 +799,7 @@ Section Bag.
     intros.
     assert ((mult l x) <> 0). 
     apply bdistinct_exactly_one_back; assumption.
-    omega.
+    lia.
   Qed.
 
   Lemma exist_or_zero:
@@ -859,7 +859,7 @@ Section Bag.
   Proof.
     split.
     - (* Case "->" *)
-      induction l; simpl; try omega.
+      induction l; simpl; try lia.
       case (equiv_dec x a).
       + intros Hx.
         rewrite Hx in *; clear Hx.
@@ -913,7 +913,7 @@ Section Bag.
     match_case; intros.
     constructor; trivial.
     rewrite <- mult_pos_equiv_in.
-    omega.
+    lia.
   Qed.
 
   Lemma NoDup_bdistinct {l:list A} :
@@ -924,7 +924,7 @@ Section Bag.
     rewrite IHl by trivial.
     rewrite <- mult_pos_equiv_in in H2.
     match_case.
-    intros; omega.
+    intros; lia.
   Qed.
 
   Lemma bdistinct_idem {l:list A} :
@@ -955,7 +955,7 @@ Section Bag.
     induction l; simpl; trivial.
     match_case; simpl; rewrite IHl; trivial; intros.
     assert (inn:In a (bdistinct l))
-      by (apply mult_pos_equiv_in; omega).
+      by (apply mult_pos_equiv_in; lia).
     destruct (in_split _ _ inn) as [t1 [t2 teq]].
     rewrite teq.
     assert (perm:Permutation (t1 ++ a :: t2) (a::t1++ t2))
@@ -1107,11 +1107,11 @@ Section Bag.
     elim (H n n0); intro; clear H.
     rewrite a in *; clear a.
     assert (n0 <= (S n0)); auto.
-    rewrite (min_l n0 (S n0) H); omega.
+    rewrite (min_l n0 (S n0) H); lia.
     generalize (compare_either n0 (S n)); intro.
     elim H; intro; clear H.
-    - rewrite min_l; try assumption; omega.
-    - rewrite min_r; try assumption; omega.
+    - rewrite min_l; try assumption; lia.
+    - rewrite min_r; try assumption; lia.
   Qed.    
 
   Lemma minus_max:
@@ -1123,11 +1123,11 @@ Section Bag.
     elim (H n n0); intro; clear H.
     rewrite a in *; clear a.
     assert (n0 <= (S n0)); auto.
-    rewrite (max_r n0 (S n0) H); omega.
+    rewrite (max_r n0 (S n0) H); lia.
     generalize (compare_either n0 (S n)); intro.
     elim H; intro; clear H.
-    - rewrite max_r; try assumption; omega.
-    - rewrite max_l; try assumption; omega.
+    - rewrite max_r; try assumption; lia.
+    - rewrite max_l; try assumption; lia.
   Qed.
 
   Lemma bmin_mult:
@@ -1286,7 +1286,7 @@ Section Bag.
       apply min_one_yields_one; assumption.
       generalize (compare_either (n+n0) 1); intro; elim H; intros; clear H.
       rewrite min_r; try reflexivity.
-      omega.
+      lia.
       rewrite <- plus_n_Sm.
       simpl.
       rewrite min_r.
@@ -1423,8 +1423,8 @@ Section Bag.
     generalize (mult dQp a) as ndQp; intro.
     generalize (compare_either nQ ndQm); intro.
     elim H; intro; clear H.
-    - rewrite min_l; try assumption; omega.
-    - rewrite min_r; try assumption; omega.
+    - rewrite min_l; try assumption; lia.
+    - rewrite min_r; try assumption; lia.
   Qed.
 
   Lemma theorem2_b:
@@ -1441,8 +1441,8 @@ Section Bag.
     generalize (mult dQp a) as ndQp; intro.
     generalize (compare_either nQ ndQm); intro.
     elim H; intro; clear H.
-    - rewrite min_l; try assumption; omega.
-    - rewrite min_r; try assumption; omega.
+    - rewrite min_l; try assumption; lia.
+    - rewrite min_r; try assumption; lia.
   Qed.
 
   Lemma theorem2_c:
@@ -1465,15 +1465,15 @@ Section Bag.
       rewrite H.
       generalize (compare_either nQ ndQp); intro.
       elim H1; intros; clear H1.
-      + rewrite min_l; omega.
-      + rewrite min_r; omega.
+      + rewrite min_l; lia.
+      + rewrite min_r; lia.
     - assert (min nQ ndQm = ndQm).
       rewrite min_r; [reflexivity|assumption].
       rewrite H.
       generalize (compare_either ndQm ndQp); intro.
       elim H1; intros; clear H1.
-      + rewrite min_l; omega.
-      + rewrite min_r; omega.
+      + rewrite min_l; lia.
+      + rewrite min_r; lia.
   Qed.
 
   Lemma remove_one_bminus r s a:

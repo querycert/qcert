@@ -22,6 +22,9 @@ Require Import Utils.
 Require Import DataSystem.
 Require Import DNNRCBase.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TDNNRCBase.
 
   Context {m:basic_model}.

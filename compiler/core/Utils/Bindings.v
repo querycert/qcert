@@ -2297,4 +2297,4 @@ Section RecRemove.
 
 End RecRemove.
 
-Hint Resolve @merge_bindings_sorted : qcert.
+Hint Resolve merge_bindings_sorted : qcert.

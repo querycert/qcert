@@ -17,6 +17,7 @@ lists. *)
 
 Require Import List.
 Require Import ListSet.
+Require Import Arith.Compare_dec.
 Require Import Bool.
 Require Import Permutation.
 Require Import Morphisms.
@@ -24,7 +25,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Equivalence.
 Require Import RelationClasses.
-Require Import Omega.
+Require Import Lia.
 Require Import CoqLibAdd.
 Require Import Lift.
 Require Import Program.Basics.
@@ -64,7 +65,7 @@ Section ListAdd.
       assert (pm:Datatypes.length l1 + Datatypes.length l2' - Datatypes.length l2' =
                  Datatypes.length l1' + Datatypes.length l2' - Datatypes.length l2').
       { rewrite eqq1; trivial. }
-      repeat rewrite Nat.add_sub in pm; trivial.
+      lia.
     Qed.
 
     Lemma length_app_other_head {l1 l2 l1' l2' : list A} :
@@ -75,7 +76,7 @@ Section ListAdd.
       intros eqqs.
       apply length_app_other_tail.
       repeat rewrite app_length in *.
-      rewrite plus_comm, eqqs, plus_comm; trivial.
+      lia.
     Qed.
 
     Lemma app_inv_head_length {l1 l2 l1' l2' : list A} :
@@ -400,7 +401,7 @@ Section ListAdd.
       apply filter_length.
       auto with arith.
       assert ((length (x :: l)) <> (length (filter p l))).
-      omega.
+      lia.
       unfold not in *; intro.
       apply H0.
       apply eq_means_same_length.
@@ -2065,7 +2066,7 @@ Section ListAdd.
       revert init.
       induction bound; simpl; intuition.
       specialize (IHbound (S init) x H0).
-      omega.
+      lia.
     Qed.
     
     Lemma seq_NoDup init bound :
@@ -2077,7 +2078,7 @@ Section ListAdd.
       - econstructor; eauto.
         intro inn.
         apply seq_ge in inn.
-        omega.
+        lia.
     Qed.
 
     Lemma seq_plus a b c : seq a (b+c) = seq a b ++ seq (a+b) c.
@@ -2097,8 +2098,7 @@ Section ListAdd.
       x = y.
     Proof.
       intros nlt eq1 eq2.
-      assert (n2eq:n2 = n1 + (n2 - n1))
-        by (rewrite le_plus_minus_r; auto with arith).
+      assert (n2eq:n2 = n1 + (n2 - n1)) by lia.
       rewrite n2eq in eq2.
       rewrite seq_plus, find_app, eq1 in eq2.
       congruence.

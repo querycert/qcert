@@ -33,6 +33,9 @@ Require Import DataSystem.
 Require Import cNRAEnvSystem.
 Require Import NRAEnvRewrite.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNRAEnvRewrite.
 
   Local Open Scope nraenv_core_scope.

@@ -24,6 +24,9 @@ Require Import cNRAEnv.
 Require Import cNRAEnvEq.
 Require Import NRASystem.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TcNRAEnv.
   Local Open Scope nraenv_core_scope.
   

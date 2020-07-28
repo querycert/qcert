@@ -26,7 +26,10 @@ Require Import DataSystem.
 Require Import cNNRCSystem.
 Require Import CAMPSystem.
 Require Import cNNRCtoCAMP.
-  
+
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TcNNRCtoCAMP.
 
   (** Auxiliary definitions and lemmas *)

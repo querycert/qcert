@@ -19,7 +19,7 @@ Require Import Bool.
 Require Import List.
 Require Import String.
 Require Import Sumbool.
-Require Import Omega.
+Require Import Lia.
 Require Import Permutation.
 Require Import Morphisms.
 Require Import Setoid.
@@ -590,7 +590,7 @@ Section CoqLibAdd.
     Lemma compare_either (n1 n2:nat):
       (n1 <= n2) \/ (n2 <= n1).
     Proof.
-      omega.
+      lia.
     Qed.
     
     Lemma min_one_yields_one:
@@ -610,19 +610,19 @@ Section CoqLibAdd.
       simpl in *.
       rewrite (IHl (f a + 0)); simpl.
       rewrite (IHl (f a + x0)); simpl.
-      omega.
+      lia.
     Qed.
     
     Lemma fold_left_arith_dist2 {A} (x0 n0:nat) (l:list A) (f:A -> nat):
       fold_left (fun (x:nat) (y:A) => n0 * (f y) + x) l x0 =
       n0 * (fold_left (fun (x:nat) (y:A) => (f y) + x) l 0) + x0.
     Proof.
-      revert x0; induction l; simpl; intros; try omega.
+      revert x0; induction l; simpl; intros; try lia.
       rewrite (IHl (n0 * f a + x0)); simpl.
       rewrite (fold_left_arith_dist1 (f a + 0)).
       rewrite mult_plus_distr_l.
       rewrite mult_plus_distr_l.
-      omega.
+      lia.
     Qed.
 
     Lemma fold_left_arith_dist3 {A} (x0 n0:nat) (l:list A) (f:A -> nat):
@@ -630,7 +630,7 @@ Section CoqLibAdd.
       n0 * (fold_left (fun (x:nat) (y:A) => x + (f y)) l 0) + x0.
     Proof.
       generalize 0.
-      revert x0; induction l; simpl; intros; try omega.
+      revert x0; induction l; simpl; intros; try lia.
       assert (f a + n = n + f a) by apply plus_comm.
       rewrite H; clear H.
       rewrite (IHl x0 (n + f a)); reflexivity.

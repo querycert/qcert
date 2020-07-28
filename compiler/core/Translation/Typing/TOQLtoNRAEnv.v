@@ -15,7 +15,7 @@
 Require Import String.
 Require Import List.
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.

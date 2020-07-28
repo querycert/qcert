@@ -28,6 +28,9 @@ Require Import NNRSimpEval.
 Require Import NNRSimpSem.
 Require Import NNRSimpSemEval.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNNRSimp.
 
   (** Typing rules for NNRSimp *)

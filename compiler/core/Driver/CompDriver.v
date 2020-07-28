@@ -546,7 +546,7 @@ Section CompDriver.
     | Dv_imp_ejson_to_js_ast _ dv => 1 + driver_length_js_ast dv
     end.
 
-  Fixpoint driver_length_imp_data (dv: imp_data_driver) :=
+  Definition driver_length_imp_data (dv: imp_data_driver) :=
     match dv with
     | Dv_imp_data_stop => 1
     | Dv_imp_data_to_imp_ejson dv => 1 + driver_length_imp_ejson dv

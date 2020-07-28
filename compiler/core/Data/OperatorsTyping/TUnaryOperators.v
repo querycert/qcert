@@ -235,7 +235,7 @@ Section TUnaryOperators.
   
   (* TODO: move this stuff *)
   Definition canon_brands_alt {br:brand_relation} (b:brands) :=
-    fold_right meet [] (map (fun x => x::nil) b).
+    fold_right meet nil (map (fun x => x::nil) b).
 
   Lemma canon_brands_alt_is_canon {br:brand_relation} (b:brands) :
     is_canon_brands brand_relation_brands (canon_brands_alt b).
@@ -249,10 +249,10 @@ Section TUnaryOperators.
   Lemma canon_brands_fold_right_hoist {br:brand_relation} (l:list brands) :
     fold_right
       (fun a b : brands => canon_brands brand_relation_brands (a ++ b))
-      [] l =
+      nil l =
     canon_brands brand_relation_brands
                  (fold_right (fun a b : brands => (a ++ b))
-                             [] l).
+                             nil l).
   Proof.
     induction l; simpl.
     - reflexivity.
@@ -292,7 +292,7 @@ Section TUnaryOperators.
       exists (dbool (negb b)).
       split; [reflexivity|apply dtbool].
     - Case "type_OpRec"%string.
-      exists (drec [(s,d1)]).
+      exists (drec ((s,d1)::nil)).
       split; [reflexivity|apply dtrec_full].
       apply Forall2_cons.
       split; [reflexivity|assumption].
@@ -318,7 +318,7 @@ Section TUnaryOperators.
       clear H0 pf1.
       apply (rproject_well_typed τ rl); try assumption.
     - Case "type_OpBag"%string.
-      exists (dcoll [d1]); split; try
+      exists (dcoll (d1::nil)); split; try
       reflexivity.  apply dtcoll; apply Forall_forall; intros.  elim H0;
       intros.  rewrite <- H1; assumption.  contradiction.
     - Case "type_OpSingleton"%string.
@@ -332,7 +332,7 @@ Section TUnaryOperators.
       rewrite Forall_forall in *.
       unfold oflatten.
       induction dl; simpl in *.
-      exists (dcoll []).
+      exists (dcoll nil).
       split; try reflexivity.
       apply dtcoll; apply Forall_nil.
       assert (forall x : data, In x dl -> data_type x r) by

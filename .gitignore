@@ -25,3 +25,5 @@ log/
 *.glob
 *.aux
 .DS_Store
+*.lia.cache
+.Makefile.coq.d

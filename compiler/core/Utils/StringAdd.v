@@ -24,7 +24,7 @@ Require Import Min.
 Require Import Equivalence.
 Require Import EquivDec.
 Require Import Compare_dec.
-Require Import Omega.
+Require Import Lia.
 Require Import CoqLibAdd.
 
 (** * Total order on characters *)
@@ -47,7 +47,7 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
       repeat match goal with 
              | [H:Nat.compare _ _ = Lt |- _ ] => apply nat_compare_lt in H
              | [|- Nat.compare _ _ = Lt ] => apply nat_compare_lt
-             end; omega.
+             end; lia.
   Qed.
 
   Lemma lt_compat : Proper (eq ==> eq ==> iff) lt.
@@ -362,7 +362,7 @@ Section Prefix.
       f_equal.
       f_equal.
       f_equal.
-      omega.
+      lia.
     - rewrite IHl.
       match_case.
   Qed.
@@ -373,7 +373,7 @@ Section Prefix.
   Proof.
     revert s n m.
     induction l; destruct s; destruct n; destruct m; simpl; trivial;
-      try omega; intuition.
+      try lia; intuition.
     match_destr; intuition.
   Qed.
 
@@ -383,7 +383,7 @@ Section Prefix.
     rewrite substring_bounded.
     rewrite <- (substring_all l) at 3.
     apply substring_le_prefix.
-    replace (String.length l - 0) with (String.length l) by omega.
+    replace (String.length l - 0) with (String.length l) by lia.
     apply le_min_r.
   Qed.
 
@@ -398,7 +398,7 @@ Section Prefix.
     - exists (append pre y).
       rewrite string_length_append.
       replace ((String.length pre + String.length y - String.length pre))
-        with (String.length y) by omega.
+        with (String.length y) by lia.
       rewrite substring_append_cancel.
       split; trivial.
       apply filter_In.
@@ -411,7 +411,7 @@ Section Prefix.
       subst.
       rewrite string_length_append.
       replace ((String.length pre + String.length x0 - String.length pre))
-        with (String.length x0) by omega.
+        with (String.length x0) by lia.
       rewrite substring_append_cancel.
       trivial.
   Qed.

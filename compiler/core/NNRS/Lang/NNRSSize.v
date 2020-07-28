@@ -13,7 +13,7 @@
  *)
 
 Require Import String.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
@@ -52,12 +52,12 @@ Section NNRSSize.
 
     Lemma nnrs_expr_size_nzero (n:nnrs_expr) : nnrs_expr_size n <> 0.
     Proof.
-      induction n; simpl; omega.
+      induction n; simpl; lia.
     Qed.
 
     Lemma nnrs_stmt_size_nzero (n:nnrs_stmt) : nnrs_stmt_size n <> 0.
     Proof.
-      induction n; simpl; omega.
+      induction n; simpl; lia.
     Qed.
 
     Corollary nnrs_size_nzero (q:nnrs) : nnrs_size q <> 0.

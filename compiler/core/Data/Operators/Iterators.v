@@ -418,7 +418,7 @@ Section Iterators.
 
     Lemma oflatten_lift_cons_dcoll a l:
       olift oflatten
-            (lift (fun t' : list data => dcoll [a] :: t') l) =
+            (lift (fun t' : list data => dcoll (a::nil) :: t') l) =
       lift (fun t' => a::t') (olift oflatten l).
     Proof.
       destruct l; simpl; try reflexivity.

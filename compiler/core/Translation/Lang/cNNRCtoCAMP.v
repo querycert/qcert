@@ -15,13 +15,14 @@
 Require Import String.
 Require Import Bool.
 Require Import List.
+Require Import BinInt.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Morphisms.
 Require Import Datatypes.
 Require Import Permutation.
 Require Import Eqdep_dec.
-Require Import Omega.
+Require Import Lia.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import CAMPRuntime.
@@ -215,7 +216,7 @@ Section cNNRCtoCAMP.
       unfold liftpr in *. 
       destruct (gather_successes (map f l)); auto.
       inversion H; subst.
-      specialize (IHl _ (eq_refl _)). simpl; omega.
+      specialize (IHl _ (eq_refl _)). simpl; lia.
   Qed.
 
   Lemma gather_successes_not_recoverable {A:Type} (l:list (presult A)) : 
@@ -236,7 +237,7 @@ Section cNNRCtoCAMP.
     inversion H0.
     assert (S (bcount l1) = (bcount l2)).
     apply of_nat_inv; assumption.
-    omega.
+    lia.
   Qed.
 
   Lemma camp_eval_mapall_cons h cenv p bind a l :
@@ -1991,7 +1992,7 @@ Section cNNRCtoCAMP.
     Lemma nnrcToCamp_ns_let_size n : 
       camp_size (nnrcToCamp_ns_let n) <= 25 * nnrc_size n.
     Proof.
-      induction n; simpl; try omega.
+      induction n; simpl; try lia.
     Qed.
 
     Theorem nnrcToCamp_let_size avoid n : 

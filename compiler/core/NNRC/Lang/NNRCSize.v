@@ -13,7 +13,7 @@
  *)
 
 Require Import String.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
@@ -41,7 +41,7 @@ Section NNRCSize.
 
   Lemma nnrc_size_nzero (n:nnrc) : nnrc_size n <> 0.
   Proof.
-    induction n; simpl; omega.
+    induction n; simpl; lia.
   Qed.
 
   Lemma nnrc_rename_lazy_size n x1 x2:

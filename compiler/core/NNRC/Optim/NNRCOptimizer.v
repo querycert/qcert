@@ -34,6 +34,9 @@ Require Import TNNRCRewrite.
 Require Import OptimizerLogger.
 Require Import OptimizerStep.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section NNRCOptimizer.
   Local Open Scope nnrc_scope.
   Local Open Scope string.

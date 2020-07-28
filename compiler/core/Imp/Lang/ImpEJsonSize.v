@@ -13,7 +13,7 @@
  *)
 
 Require Import String.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
@@ -36,7 +36,7 @@ Section ImpEJsonSize.
   Definition imp_ejson_function_size (q:imp_ejson_function) : nat :=
     imp_function_size q.
 
-  Fixpoint imp_ejson_size (q: imp_ejson) : nat :=
+  Definition imp_ejson_size (q: imp_ejson) : nat :=
     imp_size q.
 
 End ImpEJsonSize.
