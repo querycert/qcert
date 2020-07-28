@@ -15,12 +15,6 @@
 /* JavaScript runtime for core operators */
 
 /* Utilities */
-function mustBeArray(obj) {
-    if (Array.isArray(obj)) {
-        return;
-    }
-    throw new Error('Expected an array but got: ' + JSON.stringify(obj));
-}
 function boxNat(v) {
     return { '$nat': v };
 }
@@ -87,15 +81,15 @@ function compare(v1, v2) {
     if (t1 === 'object' && v1 !== null) {
         if (isNat(v1)) { t1 = 'number'; v1 = unboxNat(v1); }
         if (isBoxColl(v1)) {
-	          t1 = 'collection'; v1 = unboxColl(v1).slice(0, collLength(v1));
+	          v1 = unboxColl(v1).slice(0, collLength(v1));
 	      }
     };
     if (t2 === 'object' && v2 !== null) {
         if (isNat(v2)) { t2 = 'number'; v2 = unboxNat(v2); }
         if (isBoxColl(v2)) {
-	    t2 = 'collection'; v2 = unboxColl(v2).slice(0, collLength(v2));
-	}
-    };
+	          v2 = unboxColl(v2).slice(0, collLength(v2));
+	      }
+    }
     if (t1 != t2) {
         return t1 < t2 ? -1 : +1;
     }
@@ -250,9 +244,7 @@ function unbrand(v) {
 }
 function cast(brands,v) {
     var brandsUnbox = isBoxColl(brands) ? unboxColl(brands) : brands;
-    mustBeArray(brandsUnbox);
     var type = isBoxColl(v.$class) ? unboxColl(v.$class) : v.$class;
-    mustBeArray(type);
     if (brandsUnbox.length === 1 && brandsUnbox[0] === 'Any') { /* cast to top of inheritance is built-in */
         return boxLeft(v);
     }
@@ -318,7 +310,9 @@ function union(b1, b2) {
     if (content1.length !== collLength(b1)) {
 	      content1 = content1.slice(0, collLength(b1));
     }
-    content1.push(...content2);
+    for (let i = 0; i < content2.length; i++) {
+        content1.push(content2[i]);
+    }
     var result = boxColl(content1);
     return result;
 }
@@ -543,7 +537,6 @@ function natMax(b) {
     return boxNat(Math.max.apply(Math,numbers));
 }
 function natArithMean(b) {
-    var content = unboxColl(b);
     var len = collLength(b);
     if (len === 0) {
         return boxNat(0);
