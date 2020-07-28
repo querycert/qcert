@@ -22,6 +22,7 @@ Require Import Utils.
 Require Import DataRuntime.
 Require Import cNRAEnv.
 
+Declare Scope dnnrc_scope.
 Section DNNRCBase.
   Context {fruntime:foreign_runtime}.
   

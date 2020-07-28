@@ -90,7 +90,7 @@ Section NRAEq.
     rewrite H0, H1 by trivial.
     case_eq (h ⊢ y1 @ₐ x2 ⊣ c); case_eq (h ⊢ y0 @ₐ x2 ⊣ c); simpl; trivial.
     intros.
-    rewrite (H h); eauto.
+    rewrite (H h); qeauto.
   Qed.
 
   (* NRAUnop *)
@@ -100,10 +100,10 @@ Section NRAEq.
     intros; simpl.
     rewrite (H0 h c dn_c x1) by trivial.
     case_eq (h ⊢ y0 @ₐ x1 ⊣ c); simpl; trivial; intros.
-    rewrite (H h); eauto.
+    rewrite (H h); qeauto.
   Qed.
     
-  Hint Resolve data_normalized_dcoll_in.
+  Hint Resolve data_normalized_dcoll_in : qcert.
 
   (* NRAMap *)
   Global Instance proper_NRAMap : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAMap.
@@ -115,7 +115,7 @@ Section NRAEq.
     destruct d; try reflexivity.
     simpl; f_equal.
     apply lift_map_ext.
-    eauto.
+    qeauto.
   Qed.
 
   (* NRAMapProduct *)
@@ -129,7 +129,7 @@ Section NRAEq.
     apply olift_ext; inversion 1; subst; intros.
     simpl. f_equal.
     apply omap_product_ext; intros.
-    eauto.
+    qeauto.
   Qed.
 
   (* NRAProduct *)
@@ -154,7 +154,7 @@ Section NRAEq.
     f_equal.
     apply lift_filter_ext; intros.
     rewrite H; trivial.
-    eauto.
+    qeauto.
   Qed.
 
   (* NRADefault *)
@@ -185,7 +185,7 @@ Section NRAEq.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
     rewrite (H0 h c dn_c x1) by trivial. case_eq (h ⊢ y0 @ₐ x1 ⊣ c); intros; simpl; trivial.
-    rewrite (H h c dn_c d); eauto.
+    rewrite (H h c dn_c d); qeauto.
   Qed.
 
 End NRAEq.

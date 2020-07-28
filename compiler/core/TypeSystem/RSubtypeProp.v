@@ -42,16 +42,16 @@ Section RSubtypeProp.
            | [H: ⊤ <: ?z |- _] => apply top_subtype in H; subst
            end.
 
+  Hint Constructors subtype : qcert.
   Instance subtype_trans : Transitive subtype.
   Proof.
-    Hint Constructors subtype.
     red.
     intros x y.
     revert x.
-    induction y using rtype_rect; intros x z sub1 sub2; inversion sub1; subst; simpl_type; eauto.
-    - inversion sub2; subst; eauto.
-      rtype_equalizer. subst; eauto.
-    - inversion sub2; subst; eauto.
+    induction y using rtype_rect; intros x z sub1 sub2; inversion sub1; subst; simpl_type; eauto with qcert.
+    - inversion sub2; subst; eauto with qcert.
+      rtype_equalizer. subst; eauto with qcert.
+    - inversion sub2; subst; qeauto.
       rtype_equalizer. subst.
       constructor.
       + intros s' r' lsr'.
@@ -62,25 +62,25 @@ Section RSubtypeProp.
         simpl; intros P; eapply P; eauto.
         apply (lookup_in string_dec); trivial.
       + intuition.
-    - inversion sub2; subst; eauto.
-      rtype_equalizer. subst. eauto.
+    - inversion sub2; subst; qeauto.
+      rtype_equalizer. subst. qeauto.
     - rtype_equalizer. subst.
-      inversion sub2; subst; trivial.
+      inversion sub2; subst; trivial with qcert.
       rtype_equalizer. subst.
-      econstructor; eauto.
-    - inversion sub2; subst; trivial.
+      econstructor; qeauto.
+    - inversion sub2; subst; trivial with qcert.
       apply canon_equiv in H; apply canon_equiv in H0.
       rewrite H in H1.
       rewrite H0 in H2.
       constructor; etransitivity; eassumption.
-    - invcs sub2; trivial.
+    - invcs sub2; qtrivial.
       econstructor.
       transitivity ft; trivial.
   Qed.
 
   Global Instance subtype_pre : PreOrder subtype.
   Proof.
-    constructor; eauto.
+    constructor; qeauto.
     apply subtype_trans.
   Qed.
 
@@ -89,7 +89,7 @@ Section RSubtypeProp.
   Proof.
     apply SRec_open; intros.
     simpl.
-    case_eq (string_dec s0 s); [intros ? ?; subst | eauto].
+    case_eq (string_dec s0 s); [intros ? ?; subst | qeauto].
     assert False; [|intuition].
     rewrite domain_cons in pf.
     apply is_list_sorted_NoDup in pf; [|apply StringOrder.lt_strorder].
@@ -248,10 +248,10 @@ Section RSubtypeProp.
         * erewrite (Rec_pr_irrel _ _ pf'12).
           erewrite (Rec_pr_irrel _ _ (is_list_sorted_cons_inv ODT_lt_dec pf)).
           eauto.
-        * inversion sub'1; rtype_equalizer; subst; eauto.
-        * inversion sub'1; rtype_equalizer; subst; eauto.
-        * inversion sub'2; rtype_equalizer; subst; eauto.
-        * inversion sub'2; rtype_equalizer; subst; eauto.
+        * inversion sub'1; rtype_equalizer; subst; qeauto.
+        * inversion sub'1; rtype_equalizer; subst; qeauto.
+        * inversion sub'2; rtype_equalizer; subst; qeauto.
+        * inversion sub'2; rtype_equalizer; subst; qeauto.
     - inversion sub2; subst; trivial;
         rtype_equalizer; subst; trivial.
       subst. f_equal; eauto.

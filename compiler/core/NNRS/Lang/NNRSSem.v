@@ -80,7 +80,7 @@ Section NNRSSem.
         [ σ ⊢ NNRSGroupBy g sl e ⇓ (dcoll d₂) ]
 
     where
-    "[ σ ⊢ e ⇓ d ]" := (nnrs_expr_sem σ e d) : nnrs
+    "[ σ ⊢ e ⇓ d ]" := (nnrs_expr_sem σ e d) : nnrs_scope
     .
 
     Reserved Notation  "[ s₁ , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]".
@@ -150,19 +150,19 @@ Section NNRSSem.
              [ s, σ₂ , ψc₂ , ψd₂ ⇓[v<-dl] σ₃, ψc₃, ψd₃] ->
              [ s, σ₁ , ψc₁ , ψd₁ ⇓[v<-d::dl] σ₃, ψc₃, ψd₃]
     where
-    "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs
-                                                                                                  and "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs.
+    "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope
+                                                                                                  and "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope.
 
-    Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs.
-    Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs.
+    Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope.
+    Notation "[ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope.
 
   End Denotation.
 
   Reserved Notation "[ σc ⊢ q ⇓ d  ]".
 
-  Notation "[ σc ; σ ⊢ e ⇓ d ]" := (nnrs_expr_sem σc σ e d) : nnrs.
-  Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs.
-  Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs.
+  Notation "[ σc ; σ ⊢ e ⇓ d ]" := (nnrs_expr_sem σc σ e d) : nnrs_scope.
+  Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope.
+  Notation "[ σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope.
 
   Inductive nnrs_sem : bindings -> nnrs -> option data -> Prop
     :=
@@ -170,18 +170,18 @@ Section NNRSSem.
         [ σc ⊢ (fst q), nil , nil, ((snd q),None)::nil ⇓ nil, nil, ((snd q), o)::nil ] ->
         [ σc ⊢ q ⇓ o  ]
   where
-  "[ σc ⊢ q ⇓ o  ]" := (nnrs_sem σc q o ) : nnrs.
+  "[ σc ⊢ q ⇓ o  ]" := (nnrs_sem σc q o ) : nnrs_scope.
 
   Definition nnrs_sem_top (σc:bindings) (q:nnrs) (d:data) : Prop
     := [ (rec_sort σc) ⊢ q ⇓ Some d  ].
 
-  Notation "[ σc ⊢ q ⇓ d  ]" := (nnrs_sem σc q d ) : nnrs.
+  Notation "[ σc ⊢ q ⇓ d  ]" := (nnrs_sem σc q d ) : nnrs_scope.
 
   Section Core.
     Program Definition nnrs_core_sem σc (q:nnrs_core) (d:option data) : Prop
       := nnrs_sem σc q d.
 
-    Notation "[ σc ⊢ q ⇓ᶜ d  ]" := (nnrs_core_sem σc q d ) : nnrs.
+    Notation "[ σc ⊢ q ⇓ᶜ d  ]" := (nnrs_core_sem σc q d ) : nnrs_scope.
 
     Definition nnrs_core_sem_top (σc:bindings) (q:nnrs_core) (d:data) : Prop
       := [ (rec_sort σc) ⊢ q ⇓ᶜ Some d  ].
@@ -364,12 +364,12 @@ Section NNRSSem.
 
 End NNRSSem.
 
-Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrs_expr_sem h σc σ e d) : nnrs.
-Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs.
-Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter h σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs.
-Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrs_sem h σc q d ) : nnrs.
+Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrs_expr_sem h σc σ e d) : nnrs_scope.
+Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓ σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope.
+Notation "[ h , σc ⊢ s , σ₁ , ψc₁ , ψd₁ ⇓[ v <- dl ] σ₂ , ψc₂ , ψd₂ ]" := (nnrs_stmt_sem_iter h σc v dl s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ ) : nnrs_scope.
+Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrs_sem h σc q d ) : nnrs_scope.
 
-Notation "[ h , σc ⊢ q ⇓ᶜ d  ]" := (nnrs_core_sem h σc q d ) : nnrs.
+Notation "[ h , σc ⊢ q ⇓ᶜ d  ]" := (nnrs_core_sem h σc q d ) : nnrs_scope.
 
 Arguments nnrs_stmt_sem_env_stack {fruntime h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.
 Arguments nnrs_stmt_sem_mcenv_stack {fruntime h σc s σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂}.

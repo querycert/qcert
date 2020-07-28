@@ -31,6 +31,8 @@ Require Import Decidable.
 Require Import Utils.
 Require Import DataRuntime.
 
+Declare Scope nnrs_scope.
+
 Section NNRS.
   Section Syntax.
 
@@ -283,4 +285,4 @@ Tactic Notation "nnrs_stmt_cases" tactic(first) ident(c) :=
   | Case_aux c "NNRSIf"%string
   | Case_aux c "NNRSEither"%string].
 
-Delimit Scope nnrs with nnrs_scope.
+Delimit Scope nnrs_scope with nnrs.

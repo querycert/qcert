@@ -30,7 +30,7 @@ Section BindingsNat.
 
 End BindingsNat.
 
-Hint Unfold rec_sort rec_concat_sort.
-Hint Resolve drec_sort_sorted drec_concat_sort_sorted.
-Hint Resolve is_list_sorted_NoDup_strlt.
+Hint Unfold rec_sort rec_concat_sort : qcert.
+Hint Resolve drec_sort_sorted drec_concat_sort_sorted : qcert.
+Hint Resolve is_list_sorted_NoDup_strlt : qcert.
 

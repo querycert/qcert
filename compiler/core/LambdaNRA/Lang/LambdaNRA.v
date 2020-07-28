@@ -304,7 +304,7 @@ Section LambdaNRA.
                 apply Forall_app.
                 * invcs H4; trivial.
                 * invcs H8; trivial.
-              + eauto.
+              + qeauto.
           }
           apply Forall_sorted.
           apply Forall_app; trivial.
@@ -344,7 +344,7 @@ Section LambdaNRA.
                 apply Forall_app.
                 * invcs H4; trivial.
                 * invcs H8; trivial.
-              + eauto.
+              + qeauto.
           }
           trivial.
           trivial.

@@ -129,12 +129,13 @@ Section BinaryOperatorsSem.
     | OpForeignBinary fb => foreign_operators_binary_interp h fb d1 d2
     end.
 
+  Hint Constructors data_normalized Forall : qcert.
+
   Lemma binary_op_eval_normalized {b d1 d2 o} :
     binary_op_eval b d1 d2 = Some o ->
     data_normalized h d1 -> data_normalized h d2 ->
     data_normalized h o.
   Proof.
-    Hint Constructors data_normalized Forall.
     destruct b; simpl; intros;
       try solve [
             unfold rondcoll2 in *;
@@ -155,9 +156,9 @@ Section BinaryOperatorsSem.
       apply data_normalized_rec_sort_app; trivial.
     - do 2 match_destr_in H.
       unfold merge_bindings in H.
-      destruct (Compat.compatible l l0); inversion H; eauto 2.
+      destruct (Compat.compatible l l0); inversion H; qeauto.
       constructor. constructor; trivial.
-      apply data_normalized_rec_concat_sort; trivial.
+      apply data_normalized_rec_concat_sort; qtrivial.
     - do 2 match_destr_in H.
       destruct z; simpl in *; try discriminate.
       + destruct l; simpl in *.
@@ -177,11 +178,11 @@ Section BinaryOperatorsSem.
         * inversion H; subst; repeat constructor.
       + inversion H; subst; repeat constructor.
     - destruct d2; simpl in *; try discriminate.
-      match_destr_in H; inversion H; eauto.
+      match_destr_in H; inversion H; qeauto.
     - destruct d1; destruct d2; simpl in *; try discriminate.
       unfold lifted_join in H.
       apply some_lift in H; destruct H; subst.
-      eauto.
+      qeauto.
     - eapply foreign_operators_binary_normalized; eauto.
   Qed.
   

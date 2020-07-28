@@ -34,8 +34,8 @@ Section TNNRSRename.
   Context {m:basic_model}.
   Local Open Scope nnrs.
 
-  Hint Constructors nnrs_expr_type.
-  Hint Constructors nnrs_stmt_type.
+  Hint Constructors nnrs_expr_type : qcert.
+  Hint Constructors nnrs_stmt_type : qcert.
 
 
   Lemma nnrs_stmt_must_assign_rename_env s v v1 v2 :
@@ -105,7 +105,7 @@ Section TNNRSRename.
     ; intros τo ??? typ
     ; invcs typ
     ; repeat rewrite in_app_iff in *
-    ; eauto 3.
+    ; eauto 3 with qcert.
     - econstructor.
       repeat rewrite lookup_app in *.
       destruct (equiv_dec v0 v); unfold equiv, complement in *
@@ -160,7 +160,7 @@ Section TNNRSRename.
     [ Γc ; (l++(v,τ)::Γ) , Δc , Δd  ⊢ s ] ->
     [ Γc ; (l++(v',τ)::Γ) , Δc , Δd  ⊢ nnrs_stmt_rename_env s v v' ].
   Proof.
-    Hint Resolve nnrs_expr_type_rename_env_in.
+    Hint Resolve nnrs_expr_type_rename_env_in : qcert.
 
     revert l Γ Δc Δd τ
     ; nnrs_stmt_cases (induction s) Case
@@ -169,18 +169,18 @@ Section TNNRSRename.
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ.
     - Case "NNRSSeq"%string.
-      intuition eauto.
+      intuition qeauto.
     - Case "NNRSLet"%string.
       match_destr; unfold equiv, complement in *.
       + subst.
-        econstructor; eauto.
+        econstructor; qeauto.
         apply (nnrs_stmt_type_unused_remove_env Γc ((v,Some τ0)::l)) in H6
         ; simpl; try tauto.
         apply (nnrs_stmt_type_unused_add_env Γc ((v,Some τ0)::l))
         ; simpl; trivial.
         intuition.
         destruct (remove_nin_inv H2); eauto.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         specialize (IHs ((v0, Some τ0) :: l)); simpl in IHs.
         eapply IHs; eauto
         ; intuition.
@@ -230,10 +230,10 @@ Section TNNRSRename.
         eapply IHs2; intuition.
         destruct (remove_nin_inv H1); eauto.
     - Case "NNRSAssign"%string.
-      eauto.
+      qeauto.
     - Case "NNRSPush"%string.
-      eauto.
-    - econstructor; eauto.
+      qeauto.
+    - econstructor; qeauto.
       match_destr; unfold equiv, complement in *.
       + subst.
         apply (nnrs_stmt_type_unused_remove_env Γc ((v, Some τ0) :: l)) in H6
@@ -245,9 +245,9 @@ Section TNNRSRename.
         eapply IHs; intuition.
         destruct (remove_nin_inv H1); eauto.
     - Case "NNRSIf"%string.
-      econstructor; intuition eauto.
+      econstructor; intuition qeauto.
     - Case "NNRSEither"%string.
-      econstructor; eauto.
+      econstructor; qeauto.
       + match_destr; unfold equiv, complement in *.
         * subst.
           apply (nnrs_stmt_type_unused_remove_env Γc ((v,Some τl)::l)) in H8
@@ -289,7 +289,7 @@ Section TNNRSRename.
     ; repeat rewrite in_app_iff in nine
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ
-    ; intuition eauto.
+    ; intuition qeauto.
     - Case "NNRSLetMut"%string.
       match_destr; unfold equiv, complement in *.
       + subst.
@@ -352,7 +352,7 @@ Section TNNRSRename.
     ; repeat rewrite in_app_iff in nine
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ
-    ; intuition eauto.
+    ; intuition qeauto.
     - Case "NNRSLetMut"%string.
       econstructor; intuition eauto.
       apply nnrs_stmt_must_assign_rename_mc; trivial.
@@ -407,7 +407,7 @@ Section TNNRSRename.
     ; intros τo ??? typ
     ; invcs typ
     ; repeat rewrite in_app_iff in *
-    ; eauto 3.
+    ; eauto 3 with qcert.
     - econstructor.
       repeat rewrite lookup_app in *.
       destruct (equiv_dec v0 v); unfold equiv, complement in *
@@ -439,7 +439,7 @@ Section TNNRSRename.
     [ Γc ; (l++(v',τ)::Γ) , Δc , Δd  ⊢ nnrs_stmt_rename_env s v v' ] ->
     [ Γc ; (l++(v,τ)::Γ) , Δc , Δd  ⊢ s ].
   Proof.
-    Hint Resolve nnrs_expr_type_rename_env_in_inv.
+    Hint Resolve nnrs_expr_type_rename_env_in_inv : qcert.
 
     revert l Γ Δc Δd τ
     ; nnrs_stmt_cases (induction s) Case
@@ -448,18 +448,18 @@ Section TNNRSRename.
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ.
     - Case "NNRSSeq"%string.
-      intuition eauto.
+      intuition qeauto.
     - Case "NNRSLet"%string.
       match_destr_in H6; unfold equiv, complement in *.
       + subst.
-        econstructor; eauto.
+        econstructor; qeauto.
         apply (nnrs_stmt_type_unused_add_env Γc ((v,Some τ0)::l))
         ; simpl; try tauto.
         apply (nnrs_stmt_type_unused_remove_env Γc ((v,Some τ0)::l)) in H6
         ; simpl; try tauto.
         intuition.
         destruct (remove_nin_inv H2); eauto.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         specialize (IHs ((v0, Some τ0) :: l)); simpl in IHs.
         eapply IHs; eauto
         ; intuition.
@@ -512,10 +512,10 @@ Section TNNRSRename.
         eapply IHs2; intuition.
         destruct (remove_nin_inv H1); eauto.
     - Case "NNRSAssign"%string.
-      eauto.
+      qeauto.
     - Case "NNRSPush"%string.
-      eauto.
-    - econstructor; eauto.
+      qeauto.
+    - econstructor; qeauto.
       match_destr_in H6; unfold equiv, complement in *.
       + subst.
         apply (nnrs_stmt_type_unused_add_env Γc ((v,  Some τ0) :: l));
@@ -528,9 +528,9 @@ Section TNNRSRename.
         eapply IHs; intuition.
         destruct (remove_nin_inv H1); eauto.
     - Case "NNRSIf"%string.
-      econstructor; intuition eauto.
+      econstructor; intuition qeauto.
     - Case "NNRSEither"%string.
-      econstructor; eauto.
+      econstructor; qeauto.
       + match_destr_in H8; unfold equiv, complement in *.
         * subst.
           apply (nnrs_stmt_type_unused_remove_env Γc ((v,Some τl)::l)) in H8
@@ -571,7 +571,7 @@ Section TNNRSRename.
     ; repeat rewrite in_app_iff in nine
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ
-    ; intuition eauto.
+    ; intuition qeauto.
     - Case "NNRSLetMut"%string.
       match_destr_in H6; unfold equiv, complement in *.
       + subst.
@@ -636,7 +636,7 @@ Section TNNRSRename.
     ; repeat rewrite in_app_iff in nine
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ
-    ; intuition eauto.
+    ; intuition qeauto.
     - Case "NNRSLetMut"%string.
       econstructor; intuition eauto.
       eapply nnrs_stmt_must_assign_rename_mc; eauto.

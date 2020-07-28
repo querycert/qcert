@@ -34,7 +34,7 @@ Section cNRAEnvEq.
 
   (* Equivalence for environment-enabled algebra *)
   
-  Hint Resolve dnrec_sort_content.
+  Hint Resolve dnrec_sort_content : qcert.
 
   Definition nraenv_core_eq (op1 op2:nraenv_core) : Prop :=
     forall
@@ -58,7 +58,7 @@ Section cNRAEnvEq.
       intros. rewrite (H h c dn_c env dn_env x0) by trivial; rewrite (H0 h c dn_c env dn_env x0) by trivial; reflexivity.
   Qed.
 
-  Hint Resolve dnrec_sort.
+  Hint Resolve dnrec_sort : qcert.
     
   (* all the extended nraebraic constructors are proper wrt. equivalence *)
 
@@ -104,8 +104,8 @@ Section cNRAEnvEq.
     specialize (H2 H4).
     simpl in H2.
     apply (H2 h (rec_sort c)).
-    eauto.
-    eauto.
+    qeauto.
+    qeauto.
   Qed.
 
   (* cNRAEnvUnop *)
@@ -126,11 +126,11 @@ Section cNRAEnvEq.
     intros; reflexivity.
     specialize (H1 H2).
     apply (H1 h).
-    eauto.
-    eauto.
+    qeauto.
+    qeauto.
   Qed.
 
-  Hint Resolve data_normalized_dcoll_in.
+  Hint Resolve data_normalized_dcoll_in : qcert.
 
   (* cNRAEnvMap *)
   Global Instance proper_cNRAEnvMap : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvMap.
@@ -141,7 +141,7 @@ Section cNRAEnvEq.
     case_eq (nra_eval h (rec_sort c) (nra_of_nraenv_core y0) (nra_context_data env x1)); simpl; trivial.
     destruct d; try reflexivity; simpl; intros.
     f_equal. apply lift_map_ext; intros.
-    apply H; eauto.
+    apply H; qeauto.
   Qed.
 
   (* cNRAEnvMapProduct *)
@@ -153,7 +153,7 @@ Section cNRAEnvEq.
     destruct d; try reflexivity; simpl; intros.
     f_equal.
     apply omap_product_ext; intros.
-    apply H; eauto.
+    apply H; qeauto.
   Qed.
 
   (* cNRAEnvProduct *)
@@ -179,7 +179,7 @@ Section cNRAEnvEq.
                h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c))
       by (intros; reflexivity).
     specialize (H1 H2 (nra_of_nraenv_core y0) (nra_of_nraenv_core y0) H3).
-    apply (H1 h); eauto.      
+    apply (H1 h); qeauto.      
   Qed.
 
   (* cNRAEnvSelect *)
@@ -191,7 +191,7 @@ Section cNRAEnvEq.
     destruct d; try reflexivity; simpl.
     f_equal.
     apply lift_filter_ext; intros.
-    rewrite H; eauto.
+    rewrite H; qeauto.
   Qed.
 
   (* cNRAEnvDefault *)
@@ -219,7 +219,7 @@ Section cNRAEnvEq.
                h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c)).
     intros; reflexivity.
     specialize (H1 H3).
-    apply (H1 h); eauto.
+    apply (H1 h); qeauto.
   Qed.
 
   (* cNRAEnvEither *)
@@ -242,7 +242,7 @@ Section cNRAEnvEq.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     rewrite H0 by trivial.
     case_eq (h ⊢ₑ y0 @ₑ x1 ⊣ c;env); intros; trivial; simpl.
-    eauto.
+    qeauto.
   Qed.
 
   (* cNRAEnvGetConstant *)
@@ -265,7 +265,7 @@ Section cNRAEnvEq.
     unfold Proper, respectful, nraenv_core_eq; intros; simpl.
     rewrite H0 by trivial.
     case_eq (h ⊢ₑ y0 @ₑ x1 ⊣ c;env); intros; simpl; trivial.
-    apply H; eauto.
+    apply H; qeauto.
   Qed.
 
   (* cNRAEnvMapEnv *)
@@ -275,7 +275,7 @@ Section cNRAEnvEq.
     destruct env; try reflexivity; simpl.
     f_equal.
     apply lift_map_ext; intros.
-    eauto.
+    qeauto.
   Qed.
 
   Lemma nraenv_core_of_nra_proper : Proper (nra_eq ==> nraenv_core_eq) nraenv_core_of_nra.
@@ -334,7 +334,7 @@ Section cNRAEnvEq.
     intros.
     specialize (H h c dn_c (nra_context_data env x0)).
     repeat rewrite <- unfold_env_nra in H by trivial.
-    auto.
+    qauto.
   Qed.
 
   Definition nraenv_core_always_ensures (P:data->Prop) (q:nraenv_core) :=

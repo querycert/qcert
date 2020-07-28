@@ -25,7 +25,7 @@ Require Import cNNRCShadow.
 Require Import TcNNRC.
   
 Section TcNNRCShadow.
-  Hint Constructors nnrc_core_type.
+  Hint Constructors nnrc_core_type : qcert.
 
   Context {m:basic_model}.
 
@@ -42,9 +42,9 @@ Section TcNNRCShadow.
     (nnrc_core_type τcenv (l ++ (v,x)::l') e τ <-> nnrc_core_type τcenv (l ++ l') e τ).
   Proof.
     split; revert l v x l' τ H;
-      induction e; simpl; inversion 2; subst; intuition; eauto 3.
+      induction e; simpl; inversion 2; subst; intuition; eauto 3 with qcert.
     - constructor. erewrite <- lookup_remove_nin; eauto.
-    - apply nin_app_or in H. intuition. eauto.
+    - apply nin_app_or in H. intuition. qeauto.
     - apply nin_app_or in H. intuition.
       econstructor; eauto.
       destruct (equiv_dec v v0); unfold Equivalence.equiv in *; subst.
@@ -58,7 +58,7 @@ Section TcNNRCShadow.
       + eapply (IHe2 ((v, τ₁) :: l)); eauto. 
         intro; elim H2; apply remove_in_neq; eauto.
     - apply nin_app_or in H; destruct H as [? HH]; apply nin_app_or in HH.
-      intuition. eauto.
+      intuition. qeauto.
     - apply nin_app_or in H. destruct H as [neq1 neq2].
       apply nin_app_or in neq2. destruct neq2 as [neq2 neq3].
       econstructor; eauto.
@@ -71,7 +71,7 @@ Section TcNNRCShadow.
         * eapply (IHe3 ((v0, τr) :: l)); eauto.
           rewrite <- remove_in_neq in neq3; intuition.
     - constructor. erewrite lookup_remove_nin; eauto.
-    - apply nin_app_or in H. intuition. eauto.
+    - apply nin_app_or in H. intuition. qeauto.
     - apply nin_app_or in H. intuition.
       econstructor; eauto.
       destruct (equiv_dec v v0); unfold Equivalence.equiv in *; subst.
@@ -170,11 +170,11 @@ Section TcNNRCShadow.
     - intuition.
       constructor.
       destruct (string_dec v v₀); simpl; subst; intuition; inversion H; subst; simpl in *; repeat dest_eqdec; intuition.
-    - inversion 1; subst. eauto.
+    - inversion 1; subst. qeauto.
     - inversion 1; subst.
       rewrite nin_app_or in nfree, nbound.
-      intuition; eauto.
-    - inversion 1; subst. eauto.
+      intuition; qeauto.
+    - inversion 1; subst. qeauto.
     - inversion 1; subst.
       rewrite nin_app_or in nfree. intuition.
       apply nin_app_or in H3. intuition.
@@ -208,7 +208,7 @@ Section TcNNRCShadow.
     - inversion 1; subst.
       apply nin_app_or in nfree; destruct nfree as [? HH]; apply nin_app_or in HH.
       apply nin_app_or in nbound; destruct nbound as [? HHH]; apply nin_app_or in HHH.
-      intuition; eauto.
+      intuition; qeauto.
     - intro HH; inversion HH; subst; clear HH.
       apply not_or in nbound; destruct nbound as [nb1 nb2].
       apply not_or in nb2; destruct nb2 as [nb2 nb3].
@@ -248,11 +248,11 @@ Section TcNNRCShadow.
         inversion H; subst; simpl in *; repeat dest_eqdec; intuition;
           inversion H4; subst; constructor; simpl;
             repeat dest_eqdec; intuition.
-    - inversion 1; subst. eauto.
+    - inversion 1; subst. qeauto.
     - inversion 1; subst.
       rewrite nin_app_or in nfree, nbound.
-      intuition; eauto.
-    - inversion 1; subst. eauto.
+      intuition; qeauto.
+    - inversion 1; subst. qeauto.
     - inversion 1; subst.
       rewrite nin_app_or in nfree. intuition.
       apply nin_app_or in H3. intuition.
@@ -329,11 +329,11 @@ Section TcNNRCShadow.
         intros typ; inversion typ; clear typ; subst;
           unfold equiv_dec in *; simpl in * .
     - Case "NNRCGetConstant"%string.
-      eauto.
+      qeauto.
     - Case "NNRCVar"%string.
       match_destr.
       + congruence.
-      + auto.
+      + qauto.
     - Case "NNRCConst"%string.
       econstructor; trivial.
     - Case "NNRCBinop"%string.
@@ -432,8 +432,8 @@ Section TcNNRCShadow.
   Theorem nnrc_core_unshadow_type {τcenv} sep renamer avoid Γ n τ :
     nnrc_core_type τcenv Γ n τ <-> nnrc_core_type τcenv Γ (unshadow sep renamer avoid n) τ.
   Proof.
-    Hint Resolve really_fresh_from_free  really_fresh_from_bound.
-    split; revert Γ τ; induction n; simpl in *; inversion 1; subst; eauto; simpl.
+    Hint Resolve really_fresh_from_free  really_fresh_from_bound : qcert.
+    split; revert Γ τ; induction n; simpl in *; inversion 1; subst; qeauto; simpl.
     - econstructor; [eauto|..].
       apply nnrc_core_type_rename_pick_subst.
       eauto.

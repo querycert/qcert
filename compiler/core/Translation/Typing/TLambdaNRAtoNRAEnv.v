@@ -37,45 +37,45 @@ Section TLambdaNRAtoNRAEnv.
     ; invcs lnt
       ; autorewrite with lambda_nra lambda_nra_to_nraenv
       ; simpl.
-    - econstructor; eauto.
-    - econstructor; eauto.
-    - econstructor; eauto.
+    - econstructor; qeauto.
+    - econstructor; qeauto.
+    - econstructor; qeauto.
     - econstructor. fold nraenv_to_nraenv_core.
-      + eauto.
+      + qeauto.
       + apply IHe1; trivial.
       + apply IHe2; trivial.
     - econstructor; fold nraenv_to_nraenv_core.
-      + eauto.
+      + qeauto.
       + apply IHe; trivial.
     - econstructor; fold nraenv_to_nraenv_core
       ; [ | apply IHe2; eassumption].
       econstructor.
-      + econstructor; [ | eauto | eauto ]; eauto.
+      + econstructor; [ | qeauto | qeauto ]; qeauto.
       + apply TLLambda_inv in H1.
-        eapply IHe1; eauto.
+        eapply IHe1; qeauto.
     - econstructor; fold nraenv_to_nraenv_core
       ; [ | apply IHe2; eassumption | reflexivity].
       econstructor.
-      + econstructor; [ | eauto | eauto ]; eauto.
+      + econstructor; [ | qeauto | qeauto ]; qeauto.
       + apply TLLambda_inv in H1.
-        eapply IHe1; eauto.
+        eapply IHe1; qeauto.
     - econstructor; fold nraenv_to_nraenv_core.
-      + apply IHe1; eauto.
-      + apply IHe2; eauto.
+      + apply IHe1; qeauto.
+      + apply IHe2; qeauto.
       + reflexivity.
     - econstructor; fold nraenv_to_nraenv_core
       ; [ | apply IHe2; eassumption].
       econstructor.
-      + econstructor; [ | eauto | eauto ]; eauto.
+      + econstructor; [ | qeauto | qeauto ]; qeauto.
       + apply TLLambda_inv in H1.
-        eapply IHe1; eauto.
+        eapply IHe1; qeauto.
     Grab Existential Variables.
-    solve[eauto].
-    solve[eauto].
-    solve[eauto].
-    solve[eauto].
-    solve[eauto].
-    solve[eauto].
+    solve[qeauto].
+    solve[qeauto].
+    solve[qeauto].
+    solve[qeauto].
+    solve[qeauto].
+    solve[qeauto].
   Qed.
 
   Lemma tlambda_nra_ignores_input_type {τcenv} {Γrec} {τ₁ τ₂ τ} (e:lambda_nra) :
@@ -87,9 +87,9 @@ Section TLambdaNRAtoNRAEnv.
     ; invcs lnt
     ; autorewrite with lambda_nra lambda_nra_to_nraenv
     ; simpl
-    ; econstructor; fold nraenv_to_nraenv_core in *; eauto
-    ; try solve [eapply IHe; eauto | eapply IHe1; eauto | eapply IHe2; eauto].
-    - invcs H5; eauto.
+    ; econstructor; fold nraenv_to_nraenv_core in *; qeauto
+    ; try solve [eapply IHe; qeauto | eapply IHe1; qeauto | eapply IHe2; qeauto].
+    - invcs H5; qeauto.
   Qed.
   
   Theorem tlambda_nra_sem_correct_back
@@ -102,7 +102,7 @@ Section TLambdaNRAtoNRAEnv.
     ; invcs lnt
     ; autorewrite with lambda_nra lambda_nra_to_nraenv
     ; simpl
-    ; econstructor; fold nraenv_to_nraenv_core in *; eauto.
+    ; econstructor; fold nraenv_to_nraenv_core in *; qeauto.
     - invcs H5.
       invcs H1; rtype_equalizer; subst.
       trivial.

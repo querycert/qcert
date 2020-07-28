@@ -102,10 +102,10 @@ Section TNNRS.
         [ Γ ⊢ e ▷ Coll (Rec k τl pf) ] ->
         [ Γ ⊢ NNRSGroupBy g sl e ▷ GroupBy_type g sl k τl pf ]
     where
-    "[ Γ ⊢ e ▷ τ ]" := (nnrs_expr_type Γ e τ) : nnrs
+    "[ Γ ⊢ e ▷ τ ]" := (nnrs_expr_type Γ e τ) : nnrs_scope
     .
 
-    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrs_expr_type Γ e τ) : nnrs.
+    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrs_expr_type Γ e τ) : nnrs_scope.
 
     (* Observation: all the contexts are stacklike in their domain,
        and there is no reason to allow strong updates, since there is a phase
@@ -189,14 +189,14 @@ Section TNNRS.
         [  (x₂,Some τr)::Γ , Δc , Δd  ⊢ s₂ ]  ->
         [  Γ , Δc , Δd  ⊢ NNRSEither e x₁ s₁ x₂ s₂ ]
     where
-    "[ Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γ Δc  Δd s) : nnrs
+    "[ Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γ Δc  Δd s) : nnrs_scope
     .
 
-    Notation "[ Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γ Δc  Δd s) : nnrs.
+    Notation "[ Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γ Δc  Δd s) : nnrs_scope.
   End typ.
 
-  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_expr_type Γc Γ e τ) : nnrs.
-  Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γc Γ Δc  Δd s) : nnrs.
+  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_expr_type Γc Γ e τ) : nnrs_scope.
+  Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γc Γ Δc  Δd s) : nnrs_scope.
 
   Local Open Scope nnrs.
   
@@ -204,7 +204,7 @@ Section TNNRS.
     := let (s, ret) := si in
        [ Γc ; nil , nil , (ret, τ)::nil  ⊢ s ].
 
-  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_type Γc si τ) : nnrs.
+  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_type Γc si τ) : nnrs_scope.
 
   
   Lemma typed_nnrs_expr_yields_typed_data {σc Γc} {σ Γ} {e τ} :
@@ -823,7 +823,7 @@ Section TNNRS.
   Global Instance nnrs_stmt_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> iff) nnrs_stmt_type.
   Proof.
-    Hint Constructors nnrs_stmt_type.
+    Hint Constructors nnrs_stmt_type : qcert.
     
     cut (Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> impl) nnrs_stmt_type)
     ; unfold Proper, respectful, iff, impl; intros; subst;
@@ -860,8 +860,8 @@ Section TNNRS.
   Section unused.
     Local Open Scope nnrs.
 
-    Hint Constructors nnrs_expr_type.
-    Hint Constructors nnrs_stmt_type.
+    Hint Constructors nnrs_expr_type : qcert.
+    Hint Constructors nnrs_stmt_type : qcert.
 
     Section remove.
       
@@ -876,7 +876,7 @@ Section TNNRS.
         ; simpl; intros ll Γ τo inn typ
         ; invcs typ
         ; repeat rewrite in_app_iff in inn
-        ; eauto 3.
+        ; eauto 3 with qcert.
         - Case "NNRSVar"%string.
           econstructor.
           repeat rewrite lookup_app in *
@@ -896,7 +896,7 @@ Section TNNRS.
         [  Γc ; l++(v,τ)::Γ , Δc , Δd  ⊢ s ] ->
         [  Γc ; l++Γ , Δc , Δd  ⊢ s ].
       Proof.
-        Hint Resolve nnrs_expr_type_unused_remove_env.
+        Hint Resolve nnrs_expr_type_unused_remove_env : qcert.
         revert l Γ Δc Δd τ.
         nnrs_stmt_cases (induction s) Case
         ; simpl; intros l Γ Δc Δd τ inn typ
@@ -930,9 +930,9 @@ Section TNNRS.
             eapply IHs2; eauto.
             intuition; destruct (remove_nin_inv H1); eauto.
         - Case "NNRSAssign"%string.        
-          eauto.
+          qeauto.
         - Case "NNRSPush"%string.
-          eauto.
+          qeauto.
         - Case "NNRSFor"%string.
           econstructor.
           + eapply nnrs_expr_type_unused_remove_env;[|eauto]; tauto.
@@ -940,7 +940,7 @@ Section TNNRS.
             eapply IHs; eauto.
             intuition; destruct (remove_nin_inv H1); eauto.
         - Case "NNRSIf"%string.
-          econstructor; intuition eauto.
+          econstructor; intuition qeauto.
         - Case "NNRSEither"%string.
           econstructor.
           + eapply nnrs_expr_type_unused_remove_env;[|eauto]; tauto.
@@ -1035,7 +1035,7 @@ Section TNNRS.
         ; simpl; intros ll Γ τo inn typ
         ; invcs typ
         ; repeat rewrite in_app_iff in inn
-        ; eauto 3.
+        ; eauto 3 with qcert.
         - Case "NNRSVar"%string.
           econstructor.
           repeat rewrite lookup_app in *
@@ -1055,7 +1055,7 @@ Section TNNRS.
         [  Γc ; l++Γ , Δc , Δd  ⊢ s ] ->
         [  Γc ; l++(v,τ)::Γ , Δc , Δd  ⊢ s ].
       Proof.
-        Hint Resolve nnrs_expr_type_unused_add_env.
+        Hint Resolve nnrs_expr_type_unused_add_env : qcert.
         revert l Γ Δc Δd τ.
         nnrs_stmt_cases (induction s) Case
         ; simpl; intros l Γ Δc Δd τ inn typ
@@ -1089,9 +1089,9 @@ Section TNNRS.
             eapply IHs2; eauto.
             intuition; destruct (remove_nin_inv H1); eauto.
         - Case "NNRSAssign"%string.        
-          eauto.
+          qeauto.
         - Case "NNRSPush"%string.
-          eauto.
+          qeauto.
         - Case "NNRSFor"%string.
           econstructor.
           + eapply nnrs_expr_type_unused_add_env;[|eauto]; tauto.
@@ -1099,7 +1099,7 @@ Section TNNRS.
             eapply IHs; eauto.
             intuition; destruct (remove_nin_inv H1); eauto.
         - Case "NNRSIf"%string.
-          econstructor; intuition eauto.
+          econstructor; intuition qeauto.
         - Case "NNRSEither"%string.
           econstructor.
           + eapply nnrs_expr_type_unused_add_env;[|eauto]; tauto.
@@ -1213,10 +1213,10 @@ Section TNNRS.
     forall τ',
       [Γc; l1++(v, Some τ') :: Γ ⊢ e ▷ τ].
   Proof.
-    Hint Constructors nnrs_expr_type.
+    Hint Constructors nnrs_expr_type : qcert.
     revert τ.
     induction e; intros τ typ nin τ'
-    ; invcs typ; eauto.
+    ; invcs typ; qeauto.
     econstructor.
     repeat rewrite lookup_app in *.
     match_destr; simpl in *.
@@ -1230,13 +1230,13 @@ Section TNNRS.
     forall τ,
       [Γc; l1++(v, Some τ) :: Γ, Δc, Δd ⊢ s].
   Proof.
-    Hint Constructors nnrs_stmt_type.
+    Hint Constructors nnrs_stmt_type : qcert.
     revert l1 Γ Δc Δd.
     nnrs_stmt_cases (induction s) Case
     ; simpl; intros l1 Γ Δc Δd typ nin τ
     ; invcs typ.
     - Case "NNRSSeq"%string.
-      eauto.
+      qeauto.
     - Case "NNRSLet"%string.
       econstructor.
       + apply nnrs_expr_type_env_in_none_some; eauto.
@@ -1331,6 +1331,6 @@ Section TNNRS.
 
 End TNNRS.
 
-Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_expr_type Γc Γ e τ) : nnrs.
-Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γc Γ Δc  Δd s) : nnrs.
-Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_type Γc si τ) : nnrs.
+Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_expr_type Γc Γ e τ) : nnrs_scope.
+Notation "[ Γc ; Γ , Δc , Δd  ⊢ s ]" := (nnrs_stmt_type Γc Γ Δc  Δd s) : nnrs_scope.
+Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_type Γc si τ) : nnrs_scope.

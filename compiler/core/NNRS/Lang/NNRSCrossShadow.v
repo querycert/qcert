@@ -1772,10 +1772,10 @@ Section NNRSCrossShadow.
            nnrs_stmt_cross_shadow_free_under_free_env_mdenv
            nnrs_stmt_cross_shadow_free_under_bound_env_mdenv
            nnrs_stmt_cross_shadow_free_under_free_mcenv_mdenv
-           nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv.
+           nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv : qcert.
       
       intros cs.
-      apply nnrs_stmt_uncross_shadow_under_alt_id; eauto.
+      apply nnrs_stmt_uncross_shadow_under_alt_id; qeauto.
     Qed.
 
     Theorem nnrs_uncross_shadow_id sep (s:nnrs) :

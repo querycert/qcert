@@ -36,7 +36,7 @@ Section TNNRSimpRewrite.
 
   Context {m:basic_model}.
 
-  Hint Immediate type_NNRSimpSkip.
+  Hint Immediate type_NNRSimpSkip : qcert.
 
   Lemma distinct_nil_trew :
     NNRSimpUnop OpDistinct (‵{||}) ⇒ᵉ ‵{||}.
@@ -56,7 +56,7 @@ Section TNNRSimpRewrite.
     - apply for_nil_eq.
     - red; simpl; intros.
       repeat (match_destr; simpl; trivial).
-    - eauto.
+    - qeauto.
   Qed.
 
   (* {} ∪ e = e *)

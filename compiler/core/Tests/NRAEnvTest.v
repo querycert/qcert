@@ -18,6 +18,8 @@ Require Import List.
 Require Import Utils.
 Require Import DataRuntime.
 
+Declare Scope data_scope.
+
 Delimit Scope data_scope with data.
 
 Notation "⊥" := (dunit) : data_scope. (* null value *)

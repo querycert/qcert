@@ -63,20 +63,20 @@ Section NNRSimpSemEval.
           simpl; rewrite H5; simpl; trivial.
       }
     - {
-        Hint Constructors nnrs_imp_expr_sem.
-        nnrs_imp_expr_cases (induction e) Case; intros σ d₀ sem; invcs sem; simpl; trivial; eauto 3.
+        Hint Constructors nnrs_imp_expr_sem : qcert.
+        nnrs_imp_expr_cases (induction e) Case; intros σ d₀ sem; invcs sem; simpl; trivial; eauto 3 with qcert.
         - Case "NNRSimpVar".
           apply some_olift in H0.
           destruct H0 as [??]; unfold id in *; subst.
-          eauto.
+          qeauto.
         - Case "NNRSimpBinop".
           apply some_olift2 in H0.
           destruct H0 as [?[?? [??]]].
-          eauto.
+          qeauto.
         - Case "NNRSimpUnop".
           apply some_olift in H0.
           destruct H0 as [??]; unfold id in *; subst.
-          eauto.
+          qeauto.
         - Case "NNRSimpGroupBy".
           match_case_in H0;
             [intros ? eqq | intros eqq]; rewrite eqq in H0;
@@ -85,7 +85,7 @@ Section NNRSimpSemEval.
           apply some_olift in H0.
           destruct H0 as [??]; unfold id in *; subst.
           invcs e1.
-          eauto.
+          qeauto.
       }
   Qed.
 
@@ -151,22 +151,22 @@ Section NNRSimpSemEval.
           simpl; trivial.
       }
     - {
-        Hint Constructors nnrs_imp_stmt_sem.
-        Hint Constructors nnrs_imp_stmt_sem_iter.
-        Hint Resolve nnrs_imp_stmt_sem_env_cons_same.
+        Hint Constructors nnrs_imp_stmt_sem : qcert.
+        Hint Constructors nnrs_imp_stmt_sem_iter : qcert.
+        Hint Resolve nnrs_imp_stmt_sem_env_cons_same : qcert.
 
         nnrs_imp_stmt_cases (induction s) Case; simpl; intros σ₁ σ₂ sem; repeat destr sem.
         - Case "NNRSimpSkip".
-          invcs sem; eauto.
+          invcs sem; qeauto.
         - Case "NNRSimpSeq".
           apply some_olift in sem.
           destruct sem as [???].
-          eauto.
+          qeauto.
         - Case "NNRSimpAssign".
           invcs sem.
           apply nnrs_imp_expr_sem_eval in eqq.
           apply lookup_in_domain in eqq0.
-          eauto.
+          qeauto.
         - Case "NNRSimpLet".
           apply some_olift in sem.
           destruct sem as [? eqq1 eqq2].
@@ -177,27 +177,27 @@ Section NNRSimpSemEval.
           destruct p.
           invcs eqq2.
           apply nnrs_imp_expr_sem_eval in eqq1.
-          eauto.
+          qeauto.
         - Case "NNRSimpLet".
           invcs sem.
-          eauto.
+          qeauto.
         - Case "NNRSimpFor".
           destruct d; try discriminate.
           apply nnrs_imp_expr_sem_eval in eqq.
           econstructor; eauto.
           clear eqq.
           revert σ₁ σ₂ sem.
-          induction l; intros σ₁ σ₂ sem; invcs sem; eauto 1.
+          induction l; intros σ₁ σ₂ sem; invcs sem; eauto 1 with qcert.
           repeat destr H0.
-          eauto.
+          qeauto.
         - Case "NNRSimpIf".
           apply nnrs_imp_expr_sem_eval in eqq.
           destruct d; try discriminate.
-          destruct b; eauto.
+          destruct b; qeauto.
         - Case "NNRSimpEither".
           apply nnrs_imp_expr_sem_eval in eqq.
           destruct d; try discriminate;
-            repeat destr sem; invcs sem; eauto.
+            repeat destr sem; invcs sem; qeauto.
       }
   Qed.
 

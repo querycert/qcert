@@ -38,7 +38,9 @@ Require Import Morphisms.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import CAMPUtil.
-  
+
+Declare Scope camp_scope.
+
 Section CAMP.
   Local Open Scope string.
 

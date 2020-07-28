@@ -683,7 +683,7 @@ Section NNRStoNNRSimp.
         trivial.
       + match_option_in HH; try contradiction.
     - apply all_disjoint3_iff; simpl.
-      eauto.
+      qeauto.
   Qed.
 
   Theorem nnrs_to_nnrs_imp_top_correct (sep:string) (s:nnrs) :

@@ -140,10 +140,11 @@ Section Assoc.
       destruct (dec x a); subst; intuition.
     Qed.
 
+    Hint Constructors NoDup : qcert.
+    
     Lemma NoDup_domain_NoDup {l} : NoDup (domain l) -> NoDup l.
     Proof.
-      Hint Constructors NoDup.
-      induction l; simpl; intros; trivial.
+      induction l; simpl; intros; trivial with qcert.
       inversion H; subst.
       constructor; auto.
       intro ina; apply H2.
@@ -246,16 +247,17 @@ Section Assoc.
     Qed.
 
     (* TODO: this should just replace in_lookup *)      
+    Hint Resolve in_dom_lookup_strong in_dom : qcert.
     Lemma in_lookup_strong :  forall {l} {a:A} {b0:B}, In (a,b0) l -> {v | lookup l a = Some v}.
     Proof.
-      Hint Resolve in_dom_lookup_strong in_dom.
-      intros. eauto.
+      intros. eauto with qcert.
     Qed.
+
+    Hint Resolve in_dom_lookup in_dom : qcert.
 
     Lemma in_lookup :  forall {l} {a:A} {b0:B}, In (a,b0) l -> exists v, lookup l a = Some v.
     Proof.
-      Hint Resolve in_dom_lookup in_dom.
-      intros. eauto.
+      intros. eauto with qcert.
     Qed.
 
     Lemma in_lookup_nodup : forall {l} {a:A} {b:B}, NoDup (domain l) -> In (a,b) l -> lookup l a = Some b.
@@ -1024,12 +1026,12 @@ Section Assoc.
       inversion H; subst; auto.
   Qed.
 
-  Hint Resolve NoDup_app_inv.
+  Hint Resolve NoDup_app_inv : qcert.
 
   Lemma NoDup_app_inv2 {A:Type} {a b:list A} : NoDup (a++b) -> NoDup b.
   Proof.
     rewrite Permutation_app_comm.
-    eauto.
+    eauto with qcert.
   Qed.
 
   Lemma domain_length  {A B:Type} (l:list (A*B)) :
@@ -1081,12 +1083,13 @@ Section Assoc.
           dl' else x::dl'
       end.
 
+    Hint Constructors NoDup : qcert.
+
     Lemma bdistinct_domain_NoDup {A B} {dec:EqDec A eq} (l:list (A*B)) :
       NoDup (domain (bdistinct_domain l)).
     Proof.
-      Hint Constructors NoDup.
       induction l; simpl.
-      - eauto.
+      - eauto with qcert.
       - case_eq (existsb (fun z : A * B => fst a ==b fst z) (bdistinct_domain l)).
         + trivial.
         + intros; constructor; trivial.

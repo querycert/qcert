@@ -52,17 +52,17 @@ Section TNRAEq.
       intros; rewrite (H x0 c dt_x dt_c); rewrite (H0 x0 c dt_x dt_c); reflexivity.
   Qed.
 
-  Notation "t1 ⇝ t2 ⊣ τc" := (typed_nra τc t1 t2) (at level 80).                        (* ≡ = \equiv *)
-  Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80).                             (* ≡ = \equiv *)
+  Notation "t1 ⇝ t2 ⊣ τc" := (typed_nra τc t1 t2) (at level 80) : nra_scope.                        (* ≡ = \equiv *)
+  Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80) : nra_scope.                             (* ≡ = \equiv *)
 
-  Hint Resolve data_type_normalized.
-  Hint Resolve bindings_type_Forall_normalized.
+  Hint Resolve data_type_normalized : qcert.
+  Hint Resolve bindings_type_Forall_normalized : qcert.
 
   Lemma nra_eq_impl_tnra_eq {τc} {τin τout} (op1 op2: τin ⇝ τout ⊣ τc) :
     `op1 ≡ₐ `op2 -> op1 ≡τ op2.
   Proof.
     unfold tnra_eq, nra_eq; intros.
-    eapply H; eauto.
+    eapply H; eauto with qcert.
   Qed.
 
   Lemma nra_eq_pf_irrel {op} {τc} {τin τout} (pf1 pf2: op ▷ τin >=> τout ⊣ τc) :
@@ -81,14 +81,14 @@ Section TNRAEq.
                                          (dt_c:bindings_type c τc),
                                      brand_relation_brands ⊢ op1 @ₐ x ⊣ c = brand_relation_brands ⊢ op2 @ₐ x ⊣ c).
   
-  Notation "A ↦ₐ B ⊣ C ⊧ op1 ⇒ op2" := (@tnra_rewrites_to C A B op1 op2) (at level 80).
+  Notation "A ↦ₐ B ⊣ C ⊧ op1 ⇒ op2" := (@tnra_rewrites_to C A B op1 op2) (at level 80) : nra_scope.
 
   Lemma rewrites_typed_and_untyped {τc} {τin τout} (op1 op2:nra):
     (op1 ▷ τin >=> τout ⊣ τc -> op2 ▷ τin >=> τout ⊣ τc) -> op1 ≡ₐ op2 -> τin ↦ₐ τout ⊣ τc ⊧ op1 ⇒ op2.
   Proof.
     intros.
     unfold tnra_rewrites_to; simpl; intros.
-    split; eauto.
+    split; eauto with qcert.
   Qed.
 
   Lemma tnra_rewrites_eq_is_typed_eq {τc} {τin τout:rtype} (op1 op2:typed_nra τc τin τout):
@@ -113,9 +113,9 @@ Section TNRAEq.
 
 End TNRAEq.
 
-Notation "m ⊢ₐ A ↦ B ⊣ C ⊧ op1 ⇒ op2" := (@tnra_rewrites_to m C A B op1 op2) (at level 80).
+Notation "m ⊢ₐ A ↦ B ⊣ C ⊧ op1 ⇒ op2" := (@tnra_rewrites_to m C A B op1 op2) (at level 80) : nra_scope.
 
-Notation "t1 ⇝ t2 ⊣ tc" := (typed_nra tc t1 t2) (at level 80).
-Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80).                             (* ≡ = \equiv *)
-Notation "X ≡τ' Y" := (tnra_eq (exist _ _ X) (exist _ _ Y)) (at level 80).    (* ≡ = \equiv *)
+Notation "t1 ⇝ t2 ⊣ tc" := (typed_nra tc t1 t2) (at level 80) : nra_scope.
+Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80) : nra_scope.                             (* ≡ = \equiv *)
+Notation "X ≡τ' Y" := (tnra_eq (exist _ _ X) (exist _ _ Y)) (at level 80) : nra_scope.    (* ≡ = \equiv *)
 

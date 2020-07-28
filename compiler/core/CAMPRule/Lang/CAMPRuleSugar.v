@@ -18,7 +18,7 @@ Require Import Utils.
 Require Import DataRuntime.
 Require Export CAMPSugar.
 Require Export CAMPRule.
-  
+
 Section CAMPRuleSugar.
   (* This file defines derived patterns, notations, and concepts *)
   Local Open Scope camp_scope.

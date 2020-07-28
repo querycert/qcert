@@ -593,11 +593,11 @@ Proof.
             by (eapply is_list_sorted_cons_inv; eauto).
       { destruct k; simpl in IHr, compat.
         - specialize (IHr Open srl); simpl in IHr.
-          destruct IHr as [rs rwf]; trivial.
+          destruct IHr as [rs rwf]; qtrivial.
           unfold rec_concat_sort in rwf.
           apply forallb_rec_sort_inv in rwf.
           + rewrite forallb_app in rwf; intuition.
-          + apply NoDup_map_rtype_meet₀_lookup_diff; eauto.
+          + apply NoDup_map_rtype_meet₀_lookup_diff; eauto with qcert.
         - destruct k0; simpl in IHr, compat. 
           + inversion compat; subst.
             * destruct srl; simpl in H0; inversion H0.
@@ -617,13 +617,13 @@ Proof.
                     [ | eapply StringOrder.lt_strorder ].
                   simpl in sr_sort. inversion sr_sort; subst.
                   trivial.
-                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto.
+                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto with qcert.
               }
             * destruct (IHr Open srl); trivial.
               { unfold rec_concat_sort in H1.
                 apply forallb_rec_sort_inv in H1.
                 - rewrite forallb_app in H1; intuition.
-                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto.
+                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto with qcert.
               }
           + destruct srl; simpl in compat; inversion compat.
             destruct p; subst. simpl in H.
@@ -642,7 +642,7 @@ Proof.
                     [ | eapply StringOrder.lt_strorder ].
                   simpl in sr_sort. inversion sr_sort; subst.
                   trivial.
-                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto.
+                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto with qcert.
               }
       }
     + simpl; rewrite wfr0; simpl.
@@ -654,7 +654,7 @@ Proof.
           unfold rec_concat_sort in rwf.
           apply forallb_rec_sort_inv in rwf.
           + rewrite forallb_app in rwf; intuition.
-          + apply NoDup_map_rtype_meet₀_lookup_diff; eauto.
+          + apply NoDup_map_rtype_meet₀_lookup_diff; eauto with qcert.
         - destruct k0; simpl in IHr, compat. 
           + inversion compat; subst.
             * destruct srl; simpl in H0; inversion H0.
@@ -664,7 +664,7 @@ Proof.
               { unfold rec_concat_sort in H1.
                 apply forallb_rec_sort_inv in H1.
                 - rewrite forallb_app in H1; intuition.
-                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto.
+                - apply NoDup_map_rtype_meet₀_lookup_diff; eauto with qcert.
               }
           + assert (ins:In s (s::domain r)) by (simpl; intuition).
              rewrite <- compat in ins.
@@ -964,7 +964,10 @@ Proof.
   apply rtype_meet₀_idempotent; trivial.
 Qed.
 
-Lemma map_rtype_join₀_idempotent k {rl1} :
+Hint Resolve rtype_join₀_idempotent : qcert.
+Hint Constructors Forallt : qcert.
+
+  Lemma map_rtype_join₀_idempotent k {rl1} :
   forall (wf1 : wf_rtype₀ (Rec₀ k rl1) = true),
        (fix map_rtype_join₀ (l1 l2 : list (string * rtype₀)) {struct l1} :
            list (string * rtype₀) :=
@@ -978,11 +981,9 @@ Lemma map_rtype_join₀_idempotent k {rl1} :
            end) rl1 rl1
        = rl1.
 Proof.
-  Hint Resolve rtype_join₀_idempotent.
-  Hint Constructors Forallt.
   intros; apply (map_rtype_join₀_idempotent' k); auto.
   clear wf1.
-  induction rl1; simpl; auto.
+  induction rl1; simpl; qauto.
 Qed.
   
  Lemma map_rtype_join₀_commutative' k₁ k₂ {rl1 rl2} :
@@ -1198,15 +1199,15 @@ Proof.
       unfold rec_concat_sort.
       simpl in *; rewrite andb_true_iff in *.
       apply drec_sort_perm_eq.
-      { apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2. }
+      { apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2 with qcert. }
       apply NoDup_Permutation.
-      { apply NoDup_domain_NoDup; apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2. }
-      { apply NoDup_domain_NoDup; apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2. }
+      { apply NoDup_domain_NoDup; apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2 with qcert. }
+      { apply NoDup_domain_NoDup; apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2 with qcert. }
       clear r0.
       destruct x.
       {
       split; (intros inn; apply (in_lookup_nodup string_dec) in inn;
-       [ | apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2]);
+       [ | apply NoDup_map_rtype_meet₀_lookup_diff; intuition; eauto 2 with qcert]);
       rewrite lookup_app in inn;
       (match_case_in inn; [intros ? eqq | intros eqq]);
       rewrite eqq in inn.
@@ -1370,11 +1371,11 @@ Qed.
                end
            end) rl2 rl1.
 Proof.
-  Hint Resolve rtype_join₀_commutative.
-  Hint Constructors Forallt.
-  intros; apply (@map_rtype_join₀_commutative' Closed Closed); auto.
+  Hint Resolve rtype_join₀_commutative : qcert.
+  Hint Constructors Forallt : qcert.
+  intros; apply (@map_rtype_join₀_commutative' Closed Closed); qauto.
   clear wf1 wf2.
-  induction rl1; simpl; auto.
+  induction rl1; simpl; qauto.
 Qed.
 
 
@@ -1479,7 +1480,7 @@ Lemma map_rtype_join₀_domain_sublist a b :
                 end
             end) a b)) (domain a).
 Proof.
-  induction a; simpl; auto 1.
+  induction a; simpl; auto 1 with qcert.
   destruct a. destruct (lookup string_dec b s); simpl.
   - apply sublist_cons; auto.
   - apply sublist_skip; auto.
@@ -1789,7 +1790,7 @@ Proof.
               apply (is_list_sorted_NoDup ODT_lt_dec).
               eapply is_list_sorted_Sorted_iff.
               eapply insertion_sort_Sorted.
-            - eauto 2.
+            - eauto 2 with qcert.
           }
           apply (NoDup_domain_lookups_Permutation string_dec).
           {
@@ -1799,11 +1800,11 @@ Proof.
               apply (is_list_sorted_NoDup ODT_lt_dec).
               eapply is_list_sorted_Sorted_iff.
               eapply insertion_sort_Sorted.
-            - eauto 2.
+            - eauto 2 with qcert.
           }
           {
             apply NoDup_map_rtype_meet₀_lookup_diff.
-            - eauto 2.
+            - eauto 2 with qcert.
             - rewrite domain_map_rtype_meet₀_diff.
               unfold rec_concat_sort; rewrite domain_rec_sort.
               apply (is_list_sorted_NoDup ODT_lt_dec).
@@ -1816,19 +1817,19 @@ Proof.
             simpl in *. 
             repeat rewrite lookup_app.
             Ltac lsimp :=
-              try (rewrite map_rtype_meet₀_domain_rec_concat_sort by eauto 2);
+              try (rewrite map_rtype_meet₀_domain_rec_concat_sort by eauto 2 with qcert);
               try rewrite lookup_app.
             Ltac lsn t1
-              := rewrite (map_rtype_meet₀_some_none (τ₁:=t1)); trivial;
+              := rewrite (map_rtype_meet₀_some_none (τ₁:=t1)); qtrivial;
                  lsimp.
             Ltac ln 
               := rewrite (map_rtype_meet₀_none); trivial;
                  lsimp.
             Ltac lmm t1 t2
-              := rewrite (map_rtype_meet₀_rtype_meets (τ₁:=t1) (τ₂:=t2)); trivial;
+              := rewrite (map_rtype_meet₀_rtype_meets (τ₁:=t1) (τ₂:=t2)); qtrivial;
                  lsimp.
-            Ltac ldn1 := rewrite lookup_diff_none1; trivial; lsimp.
-            Ltac ldn2 := rewrite lookup_diff_none2; trivial; lsimp.
+            Ltac ldn1 := rewrite lookup_diff_none1; qtrivial; lsimp.
+            Ltac ldn2 := rewrite lookup_diff_none2; qtrivial; lsimp.
 
             case_eq (lookup string_dec r s); [intros τr inr| intros ninr];
             (case_eq (lookup string_dec srl s); [intros τs ins| intros nins];
@@ -2333,22 +2334,22 @@ Fixpoint map_rtype_join l1 l2 :=
 
 Lemma map_rtype_join_sublist_l l₁ l₂ : sublist (domain (map_rtype_join l₁ l₂)) (domain l₁).
 Proof.
-  Hint Constructors sublist.
-  induction l₁; simpl; auto 1.
+  Hint Constructors sublist : qcert.
+  induction l₁; simpl; auto 1 with qcert.
   destruct a.
-  destruct (lookup string_dec l₂ s); simpl; auto.
+  destruct (lookup string_dec l₂ s); simpl; auto with qcert.
 Qed.
 
 Lemma map_rtype_join_is_sorted l₁ l₂ :
   is_list_sorted ODT_lt_dec (domain l₁) = true
   -> is_list_sorted ODT_lt_dec (domain (map_rtype_join l₁ l₂)) = true.
 Proof.
-  Hint Constructors StronglySorted.
+  Hint Constructors StronglySorted : qcert.
   repeat rewrite sorted_StronglySorted by apply StringOrder.lt_strorder.
   induction l₁; simpl; trivial.
   destruct a; simpl.
   case_eq l₁; intros; subst. 
-  -  simpl in *; destruct (lookup string_dec l₂ s); simpl; auto 1.
+  -  simpl in *; destruct (lookup string_dec l₂ s); simpl; auto 1 with qcert.
   - inversion H0; subst.
     specialize (IHl₁ H2).
     destruct p. unfold fst in *.
@@ -2646,10 +2647,10 @@ Qed.
 
   Lemma map_rtype_meet_sublist_l l₁ l₂ : sublist (domain (map_rtype_meet l₁ l₂)) (domain l₁).
 Proof.
-  Hint Constructors sublist.
-  induction l₁; simpl; auto 1.
+  Hint Constructors sublist : qcert.
+  induction l₁; simpl; auto 1 with qcert.
   destruct a.
-  destruct (lookup string_dec l₂ s); simpl; auto.
+  destruct (lookup string_dec l₂ s); simpl; qauto.
 Qed.
 
 Lemma map_rtype_meet_eq

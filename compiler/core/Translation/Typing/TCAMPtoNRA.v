@@ -95,8 +95,8 @@ Section TCAMPtoNRA.
     - reflexivity.
   Qed.
 
-  Hint Constructors nra_type unary_op_type binary_op_type.
-  Hint Resolve ATdot ATnra_match ATnra_data.
+  Hint Constructors nra_type unary_op_type binary_op_type : qcert.
+  Hint Resolve ATdot ATnra_match ATnra_data : qcert.
   
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
@@ -110,10 +110,10 @@ Section TCAMPtoNRA.
                τin >=> Coll (Rec Closed τrem pf2) ⊣ τc.
   Proof.
     intros; subst.
-    econstructor; eauto.
+    econstructor; qeauto.
     Grab Existential Variables.
     eauto.
-    unfold rec_concat_sort; eauto.
+    unfold rec_concat_sort; qeauto.
   Qed.
 
   Lemma Coll_proj1 τ :
@@ -151,25 +151,25 @@ Section TCAMPtoNRA.
     camp_type τc Γ p τin τout ->
     nra_of_camp p ▷ (nra_context_type (Rec Closed Γ pf) τin) >=> Coll τout ⊣ τc.
   Proof.
-    Hint Resolve data_type_drec_nil.
+    Hint Resolve data_type_drec_nil : qcert.
     revert τc Γ pf τin τout.
     induction p; simpl; inversion 1; subst.
     (* PTconst *)
-    - eauto.
+    - qeauto.
     (* PTunop *)
-    - eauto. 
+    - qeauto. 
     (* PTbinop *)
     - econstructor.
-      + eapply (@type_NRABinop m τc (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))); eauto.
-      + econstructor; eauto.
+      + eapply (@type_NRABinop m τc (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))); qeauto.
+      + econstructor; qeauto.
     (* PTmap *)
-    - econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
+    - econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       eapply ATunnest_two.
-      + econstructor; eauto.
-         econstructor; eauto.
-         econstructor; eauto.
+      + econstructor; qeauto.
+         econstructor; qeauto.
+         econstructor; qeauto.
          eapply ATdot; eauto.
          * econstructor; eauto.
          * reflexivity.
@@ -178,29 +178,28 @@ Section TCAMPtoNRA.
     (* PTassert *)
     - repeat econstructor; eauto.
     (* PTorElse *)
-    - eauto.
+    - qeauto.
     (* PTit *)
-    - eauto.
+    - qeauto.
     (* PTletIt *)
-    - econstructor; eauto.
-      econstructor; eauto.
+    - econstructor; qeauto.
+      econstructor; qeauto.
       eapply ATunnest_two.
-      + econstructor; eauto.
-         econstructor; eauto.
-         econstructor; eauto.
-         eapply ATdot; eauto.
+      + econstructor; qeauto.
+         econstructor; qeauto.
+         econstructor; qeauto.
+         eapply ATdot; qeauto.
          econstructor.
-         reflexivity.
       + reflexivity.
       + reflexivity.
     (* PTgetconstant *)
-    - repeat (econstructor; eauto).
+    - repeat (econstructor; qeauto).
     (* PTenv *)
     - rewrite (is_list_sorted_ext _ _ pf pf0).
-      repeat (econstructor; eauto).
+      repeat (econstructor; qeauto).
     (* PTletEnv *)
-    - econstructor; eauto.
-      econstructor; eauto.
+    - econstructor; qeauto.
+      econstructor; qeauto.
       + assert (Γeq:Γ'' = rec_concat_sort Γ Γ')
                   by (unfold merge_bindings in *; 
                        destruct (Compat.compatible Γ Γ'); congruence).
@@ -210,33 +209,33 @@ Section TCAMPtoNRA.
          * econstructor.
            2: {
            eapply ATunnest_two.
-           econstructor; eauto. econstructor; eauto.
-           econstructor. reflexivity. reflexivity.
+           econstructor; qeauto. econstructor; qeauto.
+           econstructor. 
            }
            simpl.
-           econstructor; eauto.
+           econstructor; qeauto.
            simpl.
-           econstructor; eauto; try (
+           econstructor; qeauto; try (
                                     econstructor; [|econstructor]; econstructor; reflexivity).
-           econstructor; eauto.
+           econstructor; qeauto.
            eapply type_NRABinop.
            eapply type_OpRecMerge_closed.
            eauto.
-           econstructor; eauto.
-           econstructor; eauto.
-           unfold tdot, edot; simpl. eauto.
-           econstructor; eauto.
-           econstructor; eauto. reflexivity.
+           econstructor; qeauto.
+           econstructor; qeauto.
+           unfold tdot, edot; simpl. qeauto.
+           econstructor; qeauto.
+           econstructor; qeauto. reflexivity.
          * reflexivity.
          * reflexivity.
     (* PTEither *)
-    - repeat (econstructor; eauto).
+    - repeat (econstructor; qeauto).
     (* PTEitherConcat *)
-    - repeat (econstructor; eauto).
+    - repeat (econstructor; qeauto).
       Grab Existential Variables.
-      eauto. eauto. eauto. eauto. eauto. 
-      eauto. eauto. eauto. eauto. eauto. 
-      eauto. eauto. eauto. eauto. eauto.
+      qeauto. qeauto. qeauto. qeauto. qeauto. 
+      qeauto. qeauto. qeauto. qeauto. qeauto. 
+      qeauto. qeauto. qeauto. qeauto. qeauto.
   Qed.
 
   Lemma nra_of_camp_type_preserve τc Γ pf p τin τout :
@@ -255,12 +254,12 @@ Section TCAMPtoNRA.
     nra_of_camp p ▷ (nra_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout ⊣ τc ->
     nra_of_camp_top p ▷ τin >=> Coll τout ⊣ τc.
   Proof.
-    Hint Resolve normalize_normalizes.
-    Hint Resolve normalize_preserves_type.
+    Hint Resolve normalize_normalizes : qcert.
+    Hint Resolve normalize_preserves_type : qcert.
     intros.
-    econstructor; [eauto | ].
-    econstructor; [eauto | ].
-    econstructor; [eauto | ].
+    econstructor; [qeauto | ].
+    econstructor; [qeauto | ].
+    econstructor; [qeauto | ].
     econstructor.
     - apply (type_OpRecConcat (τ₁:=("PBIND", (Rec Closed nil eq_refl))::nil) (τ₂:=(("PDATA",τin)::nil))).
       econstructor.
@@ -270,7 +269,7 @@ Section TCAMPtoNRA.
         simpl.
         * apply bindings_type_has_type.
           econstructor.
-    - econstructor; [ | eauto 2].
+    - econstructor; [ | eauto 2 with qcert].
       econstructor.
     Grab Existential Variables.
     eauto. eauto.
@@ -286,7 +285,7 @@ Section TCAMPtoNRA.
     eapply nra_of_camp_type_preserve; eauto.
   Qed.
 
-  Hint Constructors camp_type.
+  Hint Constructors camp_type : qcert.
 
   (** Section dedicated to the reverse direction for type preservation *)
 

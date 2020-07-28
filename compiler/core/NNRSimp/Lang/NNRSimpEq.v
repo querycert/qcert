@@ -159,7 +159,7 @@ Section NNRSimpEq.
         apply some_lift in eqq.
         destruct eqq as [???]; subst.
         intuition.
-        invcs H2; eauto.
+        invcs H2; qeauto.
       - rewrite H0; trivial; simpl.
         intuition; try discriminate.
     Qed.
@@ -231,9 +231,9 @@ Section NNRSimpEq.
   
 End NNRSimpEq.
 
-Notation "X ≡ᵉ Y" := (nnrs_imp_expr_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ᵉ Y" := (nnrs_imp_expr_eq X Y) (at level 90) : nnrs_imp_scope. (* ≡ = \equiv *)
 
-Notation "X ≡ˢ Y" := (nnrs_imp_stmt_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ˢ Y" := (nnrs_imp_stmt_eq X Y) (at level 90) : nnrs_imp_scope. (* ≡ = \equiv *)
 
-Notation "X ≡ˢⁱ Y" := (nnrs_imp_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ˢⁱ Y" := (nnrs_imp_eq X Y) (at level 90) : nnrs_imp_scope. (* ≡ = \equiv *)
 

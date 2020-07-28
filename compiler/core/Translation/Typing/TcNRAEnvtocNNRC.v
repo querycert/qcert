@@ -93,35 +93,35 @@ Section TcNRAEnvtocNNRC.
       apply (@type_cNNRCFor m _ τ); [apply (IHnraenv_core_type2 vid venv tenv )|idtac]; trivial.
       apply type_cNNRCIf.
       + apply IHnraenv_core_type1; simpl; trivial; match_destr; elim_fresh e.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         econstructor. simpl.
         match_destr; intuition.
       + econstructor. simpl. repeat econstructor.
     (* cNRAEnvDefault *)
-    - econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
+    - econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       + simpl. match_destr; congruence.
-      + econstructor. econstructor; eauto.
-        econstructor; eauto.
-        econstructor; eauto.
+      + econstructor. econstructor; qeauto.
+        econstructor; qeauto.
+        econstructor; qeauto.
         eapply Forall_nil.
       + apply IHnraenv_core_type2; simpl; trivial; match_destr; elim_fresh e.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         simpl; match_destr; elim_fresh e.
     (* cNRAEnvEither *)
     - econstructor.
-      + econstructor; eauto.
+      + econstructor; qeauto.
       + eapply IHnraenv_core_type1; simpl; trivial; match_destr; try elim_fresh e.
       + eapply IHnraenv_core_type2; simpl; trivial; match_destr; try elim_fresh e.
     (* cNRAEnvEitherConcat *)
-    - econstructor; [eauto | ].
+    - econstructor; [qeauto | ].
       econstructor.
       + eapply IHnraenv_core_type1; simpl; trivial; match_destr; try elim_fresh e.
-      + econstructor; [eauto | ].
-        econstructor; eauto.
-        econstructor; eauto.
+      + econstructor; [qeauto | ].
+        econstructor; qeauto.
+        econstructor; qeauto.
         simpl.
         match_destr; try congruence.
         econstructor. simpl.
@@ -129,7 +129,7 @@ Section TcNRAEnvtocNNRC.
         * symmetry in e; elim_fresh e.
         * match_destr; try congruence.
       + econstructor; [econstructor | ].
-        econstructor. econstructor. eauto.
+        econstructor. econstructor. qeauto.
         * econstructor; simpl.
           match_destr; try congruence.
         * econstructor; simpl.
@@ -138,7 +138,7 @@ Section TcNRAEnvtocNNRC.
             - match_destr; try congruence.
           }
     (* cNRAEnvApp *)
-    - repeat (econstructor; eauto 2).
+    - repeat (econstructor; eauto 2 with qcert).
       apply IHnraenv_core_type2; simpl; trivial.
       + simpl; match_destr; intuition.
       + simpl; match_destr.
@@ -146,10 +146,10 @@ Section TcNRAEnvtocNNRC.
     (* cNRAEnvEnv *)
     - apply type_cNNRCVar; assumption.
     (* cNRAEnvAppEnv *)
-    - repeat (econstructor; eauto 2).
+    - repeat (econstructor; eauto 2 with qcert).
       apply IHnraenv_core_type2; simpl; trivial; match_destr; elim_fresh e.
     (* cNRAEnvMapEnv *)
-    - repeat econstructor; eauto 2.
+    - repeat econstructor; eauto 2 with qcert.
       apply IHnraenv_core_type; simpl; trivial; match_destr; elim_fresh e.
   Qed.
 
@@ -161,7 +161,7 @@ Section TcNRAEnvtocNNRC.
     nnrc_core_type τconstants tenv (nraenv_core_to_nnrc_core op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τconstants;τenv).
   Proof.
-    Hint Constructors nraenv_core_type.
+    Hint Constructors nraenv_core_type : qcert.
     intros.
     revert τin τenv τout vid venv tenv H H0 H1.
     nraenv_core_cases (induction op) Case; simpl; intros; inversion H1; subst.
@@ -169,13 +169,13 @@ Section TcNRAEnvtocNNRC.
       econstructor.
       eauto.
     - Case "cNRAEnvID"%string.
-      rewrite H in H4; inversion H4; subst. eauto.
+      rewrite H in H4; inversion H4; subst. qeauto.
     - Case "cNRAEnvConst"%string.
-      eauto.
+      qeauto.
     - Case "cNRAEnvBinop"%string.
-      eauto. 
+      qeauto. 
     - Case "cNRAEnvUnop"%string.
-      eauto.
+      qeauto.
     - Case "cNRAEnvMap"%string.
       econstructor; eauto 2.
       eapply (IHop1 _ _ _ (fresh_var "tmap$" [vid; venv])
@@ -305,7 +305,7 @@ Section TcNRAEnvtocNNRC.
       eapply (IHop1 _ _ _ (fresh_var "tapp$" [vid; venv]) venv ((fresh_var "tapp$" [vid; venv], τ₁) :: tenv)); simpl; trivial;
         try (match_destr; try elim_fresh e).
     - Case "cNRAEnvEnv"%string.
-      rewrite H0 in H4; inversion H4; subst; eauto.
+      rewrite H0 in H4; inversion H4; subst; qeauto.
     - Case "cNRAEnvAppEnv"%string.
       inversion H; subst; clear H.
       econstructor; eauto 2.
@@ -331,8 +331,8 @@ Section TcNRAEnvtocNNRC.
     nnrc_core_type τconstants tenv (nraenv_core_to_nnrc_core op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τconstants;τenv).
   Proof.
-    Hint Resolve tnraenv_sem_correct tnraenv_sem_correct_back.
-    intuition; eauto.
+    Hint Resolve tnraenv_sem_correct tnraenv_sem_correct_back : qcert.
+    intuition; qeauto.
   Qed.
 
 End TcNRAEnvtocNNRC.

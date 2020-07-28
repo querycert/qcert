@@ -59,7 +59,7 @@ Section TNRARewrite.
       inversion H3; clear H3; subst.
       eapply type_NRABinop; try eauto.
       eapply type_OpAnd; assumption.
-    - intros; rewrite and_comm; eauto.
+    - intros; rewrite and_comm; qeauto.
   Qed.
 
   (* σ{P1}(σ{P2}(P3)) == σ{P2 ∧ P1}(P3)) *)
@@ -162,7 +162,7 @@ Section TNRARewrite.
     assert ((σ⟨ ` op2 ∧ ` op1 ⟩( ` op)) ≡ₐ (σ⟨ ` op1 ∧ ` op2 ⟩( ` op))).
     rewrite (H1 (`op1) (`op2)).
     reflexivity.
-    rewrite H2 by eauto.
+    rewrite H2 by qeauto.
     reflexivity.
     apply (proj2_sig op).
     apply (proj2_sig op2).

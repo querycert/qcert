@@ -1858,7 +1858,7 @@ Section CompDriver.
   Proof.
     unfold Transitive.
     intros dv'' dv' dv H_dv''_dv' H_dv'_dv.
-    induction 0.
+    induction H_dv'_dv.
     - rewrite H in *; clear H.
       assumption.
     - apply (is_postfix_plus_one dv'' dv config lang);

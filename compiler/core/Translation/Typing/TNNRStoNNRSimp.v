@@ -49,9 +49,9 @@ Section TNNRStoNNRSimp.
 
   Lemma tnnrs_expr_to_nnrs_expr_correct_f:
     forall Γc Γ (e:nnrs_expr) (τ:rtype),
-      ([ Γc ; Γ  ⊢ e ▷ τ ])%nnrs_scope -> [ Γc ; pd_tbindings_lift Γ  ⊢ (nnrs_expr_to_nnrs_imp_expr e) ▷ τ ]%nnrs_imp_scope.
+      ([ Γc ; Γ  ⊢ e ▷ τ ])%nnrs -> [ Γc ; pd_tbindings_lift Γ  ⊢ (nnrs_expr_to_nnrs_imp_expr e) ▷ τ ]%nnrs_imp.
   Proof.
-    Hint Constructors nnrs_imp_expr_type.
+    Hint Constructors nnrs_imp_expr_type : qcert.
     intros Γc Γ e.
     revert Γ.
     induction e
@@ -67,9 +67,9 @@ Section TNNRStoNNRSimp.
   Lemma tnnrs_expr_to_nnrs_expr_correct_b:
     forall Γc Γ (e:nnrs_expr) (τ:rtype),
       (forall x, In x (nnrs_expr_free_vars e) -> lookup equiv_dec Γ x <> Some None) ->
-      [ Γc ; pd_tbindings_lift Γ  ⊢ (nnrs_expr_to_nnrs_imp_expr e) ▷ τ ]%nnrs_imp_scope -> ([ Γc ; Γ  ⊢ e ▷ τ ])%nnrs_scope.
+      [ Γc ; pd_tbindings_lift Γ  ⊢ (nnrs_expr_to_nnrs_imp_expr e) ▷ τ ]%nnrs_imp -> ([ Γc ; Γ  ⊢ e ▷ τ ])%nnrs.
   Proof.
-    Hint Constructors nnrs_expr_type.
+    Hint Constructors nnrs_expr_type : qcert.
     intros Γc Γ e.
     revert Γ.
     induction e
@@ -116,10 +116,10 @@ Section TNNRStoNNRSimp.
 
   (* Move this to TNNRS *)
   Lemma nnrs_expr_type_lookup_on_equiv {Γc Γ₁ e τ} :
-    ([ Γc ; Γ₁  ⊢ e ▷ τ ])%nnrs_scope ->
+    ([ Γc ; Γ₁  ⊢ e ▷ τ ])%nnrs ->
     forall Γ₂,
       lookup_equiv_on (nnrs_expr_free_vars e) Γ₁ Γ₂ ->
-      ([ Γc ; Γ₂  ⊢ e ▷ τ ])%nnrs_scope.
+      ([ Γc ; Γ₂  ⊢ e ▷ τ ])%nnrs.
   Proof.
     revert Γ₁ τ.
     induction e; intros Γ₁ τ typ Γ₂ leo
@@ -385,7 +385,7 @@ Section TNNRStoNNRSimp.
   Qed.
   
   Lemma nnrs_stmt_unused_tenv_free_env {Γc Γ Δc Δd s} :
-    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs_scope ->
+    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs ->
     forall x, 
       lookup equiv_dec Γ x = Some None ->
       ~ In x (nnrs_stmt_free_env_vars s).
@@ -452,15 +452,15 @@ Section TNNRStoNNRSimp.
   Lemma tnnrs_stmt_to_nnrs_imp_correct_f
         {Γc:tbindings} {Γ:TNNRS.pd_tbindings}
         (Δc:TNNRS.mc_tbindings) (Δd:TNNRS.md_tbindings) s :
-    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs_scope ->
+    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs ->
     nnrs_stmt_cross_shadow_free_under s (domain Γ) (domain Δc) (domain Δd)->
-    [ Γc ; concat_tenvs Γ Δc Δd ⊢  nnrs_stmt_to_nnrs_imp_stmt s ]%nnrs_imp_scope.
+    [ Γc ; concat_tenvs Γ Δc Δd ⊢  nnrs_stmt_to_nnrs_imp_stmt s ]%nnrs_imp.
   Proof.
 
     Ltac prove_expr_f_t
          := match goal with
-            | [H: [ _ ; _ ⊢ ?e ▷ _ ]%nnrs_scope |-
-               [ _ ; _ ⊢ nnrs_expr_to_nnrs_imp_expr ?e ▷ _ ] %nnrs_imp_scope ] =>
+            | [H: [ _ ; _ ⊢ ?e ▷ _ ]%nnrs |-
+               [ _ ; _ ⊢ nnrs_expr_to_nnrs_imp_expr ?e ▷ _ ] %nnrs_imp ] =>
               apply tnnrs_expr_to_nnrs_expr_correct_f in H
               ; apply (nnrs_imp_expr_type_lookup_equiv_on H)
               ; rewrite nnrs_expr_to_nnrs_imp_expr_free_vars
@@ -476,7 +476,7 @@ Section TNNRStoNNRSimp.
                 end
             end.
     
-    Hint Constructors nnrs_imp_stmt_type.
+    Hint Constructors nnrs_imp_stmt_type : qcert.
     revert Γ Δc Δd.
     nnrs_stmt_cases (induction s) Case
     ; simpl; intros Γ Δc Δd typ sf
@@ -554,8 +554,8 @@ Section TNNRStoNNRSimp.
         ; unfold pd_tbindings_lift
         ; try rewrite domain_map_codomain; trivial.
       }
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       + econstructor.
       + econstructor; [econstructor | ].
          prove_expr_f_t.
@@ -580,9 +580,9 @@ Section TNNRStoNNRSimp.
   Qed.
 
   Theorem tnnrs_to_nnrs_imp_correct_f {Γc} {si:nnrs} {τ} :
-    [ Γc ⊢ si ▷ τ ]%nnrs_scope ->
+    [ Γc ⊢ si ▷ τ ]%nnrs ->
     nnrs_cross_shadow_free si ->
-    [ Γc ⊢ nnrs_to_nnrs_imp si ▷ τ ]%nnrs_imp_scope.
+    [ Γc ⊢ nnrs_to_nnrs_imp si ▷ τ ]%nnrs_imp.
   Proof.
     destruct si; simpl.
     intros typ sf.
@@ -598,9 +598,9 @@ Section TNNRStoNNRSimp.
   Qed.
   
   Theorem tnnrs_to_nnrs_imp_top_correct_f {Γc} {si:nnrs} {τ} :
-    [ Γc ⊢ si ▷ τ ]%nnrs_scope ->
+    [ Γc ⊢ si ▷ τ ]%nnrs ->
     forall sep,
-      [ Γc ⊢ nnrs_to_nnrs_imp_top sep si ▷ τ ]%nnrs_imp_scope.
+      [ Γc ⊢ nnrs_to_nnrs_imp_top sep si ▷ τ ]%nnrs_imp.
   Proof.
     intros typ sep.
     apply tnnrs_to_nnrs_imp_correct_f.
@@ -663,7 +663,7 @@ Section TNNRStoNNRSimp.
     Qed.
 
     Lemma nnrs_stmt_to_nnrs_imp_free_md_free {Γc Γ Δc Δd s} :
-    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs_scope -> forall v,
+    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs -> forall v,
     ~ In v (nnrs_stmt_free_mdenv_vars s) ->
     nnrs_imp_stmt_var_usage (nnrs_stmt_to_nnrs_imp_stmt s) v <>
     VarMayBeUsedWithoutAssignment ->
@@ -845,16 +845,16 @@ Section TNNRStoNNRSimp.
   Lemma tnnrs_stmt_to_nnrs_imp_correct_b
         (Γc:tbindings) (Γ:TNNRS.pd_tbindings)
         (Δc:TNNRS.mc_tbindings) (Δd:TNNRS.md_tbindings) s :
-    [ Γc ; concat_tenvs Γ Δc Δd ⊢  nnrs_stmt_to_nnrs_imp_stmt s ]%nnrs_imp_scope ->
+    [ Γc ; concat_tenvs Γ Δc Δd ⊢  nnrs_stmt_to_nnrs_imp_stmt s ]%nnrs_imp ->
     nnrs_stmt_cross_shadow_free_under s (domain Γ) (domain Δc) (domain Δd) ->
     (forall x : var, In x (nnrs_stmt_free_env_vars s) -> lookup equiv_dec Γ x <> Some None) ->
-    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs_scope.
+    [ Γc ; Γ , Δc , Δd ⊢ s ]%nnrs.
   Proof.
 
     Ltac prove_expr_b_t notnone
       := match goal with
-        | [H: [ _ ; _ ⊢ nnrs_expr_to_nnrs_imp_expr ?e ▷ _ ] %nnrs_imp_scope |-
-           [ _ ; _ ⊢ ?e ▷ _ ]%nnrs_scope ] => 
+        | [H: [ _ ; _ ⊢ nnrs_expr_to_nnrs_imp_expr ?e ▷ _ ] %nnrs_imp |-
+           [ _ ; _ ⊢ ?e ▷ _ ]%nnrs ] => 
         apply tnnrs_expr_to_nnrs_expr_correct_b
         ; [ eauto; try (intros; apply notnone; rewrite in_app_iff; tauto)
           | apply (nnrs_imp_expr_type_lookup_equiv_on H)
@@ -871,7 +871,7 @@ Section TNNRStoNNRSimp.
               end]
         end.
     
-    Hint Constructors nnrs_stmt_type.
+    Hint Constructors nnrs_stmt_type : qcert.
     revert Γ Δc Δd.
     nnrs_stmt_cases (induction s) Case
     ; simpl
@@ -1026,9 +1026,9 @@ Section TNNRStoNNRSimp.
   Qed.
 
   Theorem tnnrs_to_nnrs_imp_correct_b {Γc} {si:nnrs} {τ} :
-    [ Γc ⊢ nnrs_to_nnrs_imp si ▷ τ ]%nnrs_imp_scope ->
+    [ Γc ⊢ nnrs_to_nnrs_imp si ▷ τ ]%nnrs_imp ->
     nnrs_cross_shadow_free si ->
-    [ Γc ⊢ si ▷ τ ]%nnrs_scope.
+    [ Γc ⊢ si ▷ τ ]%nnrs.
   Proof.
     destruct si; simpl.
     intros [neq typ] sf.
@@ -1037,8 +1037,8 @@ Section TNNRStoNNRSimp.
   Qed.    
   
   Theorem tnnrs_to_nnrs_imp_top_correct_b {Γc} {si:nnrs} {τ} {sep}:
-    [ Γc ⊢ nnrs_to_nnrs_imp_top sep si ▷ τ ]%nnrs_imp_scope ->
-    [ Γc ⊢ si ▷ τ ]%nnrs_scope.
+    [ Γc ⊢ nnrs_to_nnrs_imp_top sep si ▷ τ ]%nnrs_imp ->
+    [ Γc ⊢ si ▷ τ ]%nnrs.
   Proof.
     unfold nnrs_to_nnrs_imp_top.
     intros typ.
@@ -1048,8 +1048,8 @@ Section TNNRStoNNRSimp.
   Qed.
 
   Theorem tnnrs_to_nnrs_imp_top_correct Γc (si:nnrs) τ sep:
-    [ Γc ⊢ si ▷ τ ]%nnrs_scope <->
-    [ Γc ⊢ nnrs_to_nnrs_imp_top sep si ▷ τ ]%nnrs_imp_scope.
+    [ Γc ⊢ si ▷ τ ]%nnrs <->
+    [ Γc ⊢ nnrs_to_nnrs_imp_top sep si ▷ τ ]%nnrs_imp.
   Proof.
     split; intros.
     - eapply tnnrs_to_nnrs_imp_top_correct_f; eauto.
@@ -1059,25 +1059,25 @@ Section TNNRStoNNRSimp.
   Section core.
 
     Program Lemma tnnrs_core_to_nnrs_imp_core_top_correct_f {Γc} {si:nnrs_core} {τ} :
-      [ Γc ⊢ si ▷ τ ]%nnrs_scope ->
+      [ Γc ⊢ si ▷ τ ]%nnrs ->
       forall sep,
-        [ Γc ⊢ nnrs_core_to_nnrs_imp_core_top sep si ▷ τ ]%nnrs_imp_scope.
+        [ Γc ⊢ nnrs_core_to_nnrs_imp_core_top sep si ▷ τ ]%nnrs_imp.
     Proof.
       intros typ sep.
       apply tnnrs_to_nnrs_imp_top_correct_f; trivial.
     Qed.
 
     Program Lemma tnnrs_core_to_nnrs_imp_core_top_correct_b {Γc} {si:nnrs_core} {τ} {sep} :
-      [ Γc ⊢ nnrs_core_to_nnrs_imp_core_top sep si ▷ τ ]%nnrs_imp_scope ->
-      [ Γc ⊢ si ▷ τ ]%nnrs_scope.
+      [ Γc ⊢ nnrs_core_to_nnrs_imp_core_top sep si ▷ τ ]%nnrs_imp ->
+      [ Γc ⊢ si ▷ τ ]%nnrs.
     Proof.
       intros typ.
       apply tnnrs_to_nnrs_imp_top_correct_b in typ; eauto.
     Qed.
 
     Program Theorem tnnrs_core_to_nnrs_imp_core_top_correct Γc (si:nnrs_core) τ sep :
-      [ Γc ⊢ si ▷ τ ]%nnrs_scope <->
-        [ Γc ⊢ nnrs_core_to_nnrs_imp_core_top sep si ▷ τ ]%nnrs_imp_scope.
+      [ Γc ⊢ si ▷ τ ]%nnrs <->
+        [ Γc ⊢ nnrs_core_to_nnrs_imp_core_top sep si ▷ τ ]%nnrs_imp.
     Proof.
       split; intros.
       - eapply tnnrs_core_to_nnrs_imp_core_top_correct_f; eauto.
