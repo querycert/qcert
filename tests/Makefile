@@ -537,15 +537,22 @@ wasm-oql:
 		i=$$(expr $$i + 1 ) ; \
 	done
 
-# wasm-imp: export OCAMLRUNPARAM=b
-wasm-imp:
+wasm-imp-spec:
 	@i=0 ; \
 	while [ -e imp_ejson/wasm$$i.imp_ejson ] ; do \
 	  echo === imp_ejson/wasm$$i.imp_ejson; \
 		$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input && \
 		WASM_RUNTIME="../runtimes/assemblyscript/build/untouched.wasm" $(WASMQCERT) -source imp_ejson -target wasm_ast imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input -output imp_ejson/wasm$$i.out -eval-validate ; \
-		# $(WASMQCERT) -quiet -source imp_ejson -target wasm_ast imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema && \
-		# wat2wasm imp_ejson/wasm$$i.wat -o imp_ejson/wasm$$i.wasm && \
-		# node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm imp_ejson/wasm$$i.wasm imp_ejson/wasm.input imp_ejson/wasm$${i}_imp_ejson.json ; \
+		i=$$(expr $$i + 1 ) ; \
+	done
+
+wasm-imp:
+	@i=0 ; \
+	while [ -e imp_ejson/wasm$$i.imp_ejson ] ; do \
+	  echo === imp_ejson/wasm$$i.imp_ejson; \
+		$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input && \
+		$(WASMQCERT) -quiet -source imp_ejson -target wasm_ast imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema && \
+		wat2wasm imp_ejson/wasm$$i.wat -o imp_ejson/wasm$$i.wasm && \
+		node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm imp_ejson/wasm$$i.wasm imp_ejson/wasm.input imp_ejson/wasm$${i}_imp_ejson.json ; \
 		i=$$(expr $$i + 1 ) ; \
 	done

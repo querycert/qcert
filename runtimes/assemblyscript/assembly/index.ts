@@ -241,6 +241,14 @@ function ejson_to_bytes_(b: BytesBuilder, x:EjValue): void {
   unreachable();
 }
 
+export function alloc_bytes(n: i32): ArrayBuffer {
+  return new ArrayBuffer(((n + 7) >> 3) << 3);
+}
+
+export function bytes_set_i64(b: ArrayBuffer, offset: i32, value: i64): void {
+  Int64Array.wrap(b)[offset >> 3] = value;
+}
+
 export function ejson_to_bytes(x: EjValue): ArrayBuffer {
   let b = new BytesBuilder();
   ejson_to_bytes_(b, x);

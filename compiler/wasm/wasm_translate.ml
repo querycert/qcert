@@ -19,46 +19,18 @@ type 'a function_context =
   }
 
 module Constants = struct
-  let encode_const : 'a EJson.cejson -> bytes = function
-    | Coq_cejnull ->
-      let b = Bytes.create 8 in
-      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
-      Bytes.set_int32_le b 4 (Int32.of_int 0); (* type: null *)
-      b
-    | Coq_cejbool false ->
-      let b = Bytes.create 8 in
-      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
-      Bytes.set_int32_le b 4 (Int32.of_int 1); (* type: false *)
-      b
-    | Coq_cejbool true ->
-      let b = Bytes.create 8 in
-      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
-      Bytes.set_int32_le b 4 (Int32.of_int 2); (* type: true *)
-      b
-    | Coq_cejnumber x ->
-      let b = Bytes.create 16 in
-      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
-      Bytes.set_int32_le b 4 (Int32.of_int 3); (* type: number *)
-      Bytes.set_int64_le b 8 (Int64.bits_of_float x); (* value *)
-      b
-    | Coq_cejbigint x ->
-      let b = Bytes.create 16 in
-      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
-      Bytes.set_int32_le b 4 (Int32.of_int 4); (* type: bigint *)
-      Bytes.set_int64_le b 8 (Int64.bits_of_float (float_of_int x)); (* value *)
-      (* TODO: encode BigInt as integer type *)
-      b
-    | Coq_cejstring s ->
-      let s = Util.string_of_char_list s in
-      let n = String.length s in
-      let b = Bytes.create (12 + n) in
-      Bytes.set_int32_le b 0 (Int32.of_int 0); (* ptr after allocation *)
-      Bytes.set_int32_le b 4 (Int32.of_int 5); (* type: string *)
-      Bytes.set_int32_le b 8 (Int32.of_int n); (* length *)
-      Bytes.blit_string s 0 b 12 n; (* value *)
-      b
-    | Coq_cejforeign _ -> unsupported "ejson encode: foreign"
+  let encode x =
+    let raw = Wasm_binary_ejson.cejson_to_bytes x in
+    let n = Bytes.length raw in
+    let b = Bytes.create ((((n + 7) lsr 3) lsl 3) + 8) in
+    Bytes.set_int32_le b 0 Int32.zero (* initialize foreign ptr *);
+    Bytes.set_int32_le b 4 (Int32.of_int n) (* set length *);
+    Bytes.set_int64_le b (Bytes.length b - 8) Int64.zero (* pad with zeroes *);
+    Bytes.blit raw 0 b 8 n; (* write actual binary constant *)
+    b
 
+  (* Copy constant (bytes) in 8 byte chunks and parse on runtime side. *)
+  (* Copies 0-7 bytes too much, thus we pad with zeroes in [encode]. *)
   let alloc_const ctx : Ir.func =
     let open Ir in
     let foreign ~params ~result name =
@@ -66,106 +38,49 @@ module Constants = struct
       ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
       f
     in
-    let new_ params class_ =
-      let item = class_ ^ "#constructor" in
-      call (foreign ~params:(i32 :: params) ~result:[i32] item)
-    in
-    let local_ptr, tag, n, foreign_ptr = 0, 1, 2, 3 in
-    func ~params:[i32] ~result:[i32] ~locals:[i32; i32; i32]
+    (* local_ptr: pointer to start of constant in local memory
+     * local_mov: pointer to current position in local memory
+     * buf_ptr: pointer to start of buffer in remote memory
+     * buf_mov: pointer to current position in remote buffer
+     * foreign_ptr: pointer to constant in remote memory
+     * n: bytes still to be copied
+     *)
+    let local_ptr, local_mov, buf_ptr, buf_mov, foreign_ptr, n  = 0, 1, 2, 3, 4, 5 in
+    func ~params:[i32] ~result:[i32] ~locals:[i32; i32; i32; i32; i32]
       [ local_get local_ptr
       ; load ctx.ctx.memory ~offset:4 i32
-      ; local_tee tag
-      ; i32_eqz (* null *)
-      ; if_
-          [ i32_const' 0
-          ; new_ [] "EjNull"
-          ; return
-          ] []
-      ; local_get tag
-      ; i32_const' 1 (* false *)
-      ; eq i32
-      ; if_
-          [ i32_const' 0
-          ; i32_const' 0
-          ; new_ [i32] "EjBool"
-          ; return
-          ] []
-      ; local_get tag
-      ; i32_const' 2 (* true *)
-      ; eq i32
-      ; if_
-          [ i32_const' 0
-          ; i32_const' 1
-          ; new_ [i32] "EjBool"
-          ; return
-          ] []
-      ; local_get tag
-      ; i32_const' 3 (* number *)
-      ; eq i32
-      ; if_
-          [ i32_const' 0
-          ; local_get local_ptr
-          ; load ctx.ctx.memory ~offset:8 f64
-          ; new_ [f64] "EjNumber"
-          ; return
-          ] []
-      ; local_get tag
-      ; i32_const' 4 (* bigint *)
-      ; eq i32
-      ; if_
-          [ i32_const' 0
-          ; local_get local_ptr
-          ; load ctx.ctx.memory ~offset:8 f64
-          ; new_ [f64] "EjBigInt"
-          ; return
-          ] []
-      ; local_get tag
-      ; i32_const' 5 (* string *)
-      ; eq i32
-      ; if_
-          [ (* load length / characters to be processed *)
-            local_get local_ptr
-          ; load ctx.ctx.memory ~offset:8 i32
-          ; local_set n
-          (* initialize buffer in runtime *)
-          ; i32_const' 0
-          ; local_get n
-          ; new_ [i32] "EjStringBuilderUTF8"
-          ; local_set foreign_ptr
-          (* initialize moving pointer *)
-          ; local_get local_ptr
-          ; i32_const' 12
-          ; add i32
-          ; local_set local_ptr
-          ; loop (* over characters and append *)
-            [ local_get n
-            ; i32_eqz
-            ; if_
-              [ local_get foreign_ptr (* for release *)
-              ; local_get foreign_ptr (* for finalize *)
-              ; call (foreign ~params:[i32] ~result:[i32] "EjStringBuilderUTF8#finalize")
-              ; local_set foreign_ptr (* for return *)
-              ; call (foreign ~params:[i32] ~result:[] "__release")
-              ; local_get foreign_ptr
-              ; return
-              ] []
-            ; local_get n
-            ; i32_const' 1
-            ; sub i32
+      ; local_tee n (* n = byte length of constant *)
+      ; call (foreign ~params:[i32] ~result:[i32] "alloc_bytes")
+      ; local_set buf_ptr
+      ; i32_const' 0 ; local_set buf_mov (* buf_mov = 0 *)
+      ; local_get local_ptr ; i32_const' 8 ; add i32
+      ; local_set local_mov (* local_mov = local_ptr + 8 *)
+      ; loop
+        [ local_get n
+        ; i32_const' 0
+        ; i32s_cmp Gt
+        ; if_ (* n > 0 *)
+            [ local_get buf_ptr
+            ; local_get buf_mov
+            ; local_get local_mov
+            ; load ctx.ctx.memory i64
+            ; call (foreign ~params:[i32; i32; i64] ~result:[] "bytes_set_i64")
+            ; local_get buf_mov ; i32_const' 8 ; add i32 (* buf_mov += 8 *)
+            ; local_set buf_mov
+            ; local_get local_mov ; i32_const' 8 ; add i32 (* local_mov += 8 *)
+            ; local_set local_mov
+            ; local_get n; i32_const' 8; sub i32 (* n -= 8 *)
             ; local_set n
-            ; local_get foreign_ptr
-            ; local_get local_ptr
-            (* TODO: speed up string constant allocation by copying words. *)
-            ; load ctx.ctx.memory ~pack:U8 i32
-            ; call (foreign ~params:[i32; i32] ~result:[] "EjStringBuilderUTF8#putByte")
-            ; local_get local_ptr
-            ; i32_const' 1
-            ; add i32
-            ; local_set local_ptr
-            ; br 0 (* repeat *)
+            ; br 1 (* repeat loop *)
             ]
-          ] []
-      ; unreachable
+            []
+        ]
+      ; local_get buf_ptr
+      ; call (foreign ~params:[i32] ~result:[i32] "ejson_of_bytes")
+      ; local_set foreign_ptr
+      ; local_get buf_ptr
+      ; call (foreign ~params:[i32] ~result:[] "__release")
+      ; local_get foreign_ptr
       ]
 
   let get_const ctx : Ir.func =
@@ -175,7 +90,7 @@ module Constants = struct
       [ local_get local_ptr
       ; load ctx.ctx.memory i32
       ; local_tee foreign_ptr
-      ; i32_eqz
+      ; i32_eqz (* foreign_ptr = null: constant not yet allocated in runtime *)
       ; if_
           [ local_get local_ptr
           ; local_get local_ptr
@@ -535,7 +450,7 @@ let imp functions : Wasm.Ast.module_ =
     { imports = ImportSet.empty
     ; memory = Ir.memory 1
     ; constants = Table.create ~initial_offset:0 ~element_size:(fun x ->
-          Constants.encode_const x |> Bytes.length)
+          Constants.encode x |> Bytes.length)
     }
   in
   let funcs =
@@ -546,7 +461,7 @@ let imp functions : Wasm.Ast.module_ =
   let data =
     Table.elements ctx.constants
     |> List.map (fun (i, c) ->
-        let s = Constants.encode_const c
+        let s = Constants.encode c
         in ctx.memory, i, Bytes.to_string s)
   in
   Ir.module_to_spec

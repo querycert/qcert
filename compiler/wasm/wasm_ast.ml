@@ -42,7 +42,8 @@ let eval j module_ env =
         if import.it.module_name <> (Wasm.Utf8.decode "runtime") then
           failwith "cannot satisfy import from unknown module";
         match Wasm.Instance.export rt import.it.item_name with
-        | None -> failwith "cannot satisfy import of unknown function"
+        | None -> failwith ("cannot satisfy import of function " ^
+                            (Wasm.Utf8.encode import.it.item_name))
         | Some export ->
           let is = Wasm.Instance.extern_type_of export
           and should = Wasm.Ast.import_type module_ import
