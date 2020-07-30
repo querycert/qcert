@@ -1,5 +1,5 @@
 common_cache_key: &common_cache_key
-  key: dependency-cache-{{ checksum "../ocaml-version" }}-{{ checksum ".circleci/config.yml" }}
+  key: dependency-cache-{{ checksum "../ocaml-version" }}-{{ checksum "../coq-version" }}-{{ checksum ".circleci/config.yml" }}
 
 common_steps: &common_steps
   steps:
@@ -13,7 +13,9 @@ common_steps: &common_steps
     - checkout
     - run:
         name: "Note OCAML_VERSION for cache"
-        command: echo $OCAML_VERSION > ../ocaml-version
+        command: |
+          echo $OCAML_VERSION > ../ocaml-version
+          echo $COQ_VERSION > ../coq-version
     - restore_cache:
         <<: *common_cache_key
     - run:
@@ -43,7 +45,7 @@ common_steps: &common_steps
     - run:
         name: "Install Coq deps"
         command: |
-          opam install -y -v coq.8.11.2 coq-jsast.2.0.0
+          opam install -y -v coq.$COQ_VERSION coq-jsast.2.0.0
         no_output_timeout: 30m
     - save_cache:
         <<: *common_cache_key
@@ -70,22 +72,46 @@ common_steps: &common_steps
 
 version: 2
 jobs:
-  4.09.1:
+  4.09_8.11:
     docker:
     - image: circleci/openjdk:8-jdk
     environment:
       - TERM: dumb
       - OCAML_VERSION: "4.09.1"
+      - COQ_VERSION: "8.11.2"
       - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
       - NJOBS: 2
       - NPM_CONFIG_PREFIX: "~/.npm-global"
     <<: *common_steps
-  4.10.0:
+  4.10_8.11:
     docker:
     - image: circleci/openjdk:8-jdk
     environment:
       - TERM: dumb
       - OCAML_VERSION: "4.10.0"
+      - COQ_VERSION: "8.11.2"
+      - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      - NJOBS: 2
+      - NPM_CONFIG_PREFIX: "~/.npm-global"
+    <<: *common_steps
+  4.09_8.12:
+    docker:
+    - image: circleci/openjdk:8-jdk
+    environment:
+      - TERM: dumb
+      - OCAML_VERSION: "4.09.1"
+      - COQ_VERSION: "8.12.0"
+      - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      - NJOBS: 2
+      - NPM_CONFIG_PREFIX: "~/.npm-global"
+    <<: *common_steps
+  4.10_8.12:
+    docker:
+    - image: circleci/openjdk:8-jdk
+    environment:
+      - TERM: dumb
+      - OCAML_VERSION: "4.10.0"
+      - COQ_VERSION: "8.12.0"
       - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
       - NJOBS: 2
       - NPM_CONFIG_PREFIX: "~/.npm-global"
@@ -95,5 +121,7 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - 4.09.1
-      - 4.10.0
+      - 4.09_8.11
+      - 4.10_8.11
+      - 4.09_8.12
+      - 4.10_8.12
