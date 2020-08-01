@@ -36,8 +36,7 @@ function write(module, x) {
                   return new m.EjRight(arg);
                 }
               case '$nat' :
-                // TODO: implement BigInt on i64
-                return new m.EjBigInt(Number(x.$nat));
+                return m.ejBigInt_of_f64(Number(x.$nat));
             }
           }
           let o = new m.EjObject();
@@ -59,7 +58,6 @@ function read(module, x) {
   let { __instanceof } = module.exports;
   let m = module.exports;
   function recurse(x) {
-    // TODO: Support left/right/bigint types on read.
     if (__instanceof(x, m.IdEjNull)) {
       return null;
     }
@@ -72,7 +70,7 @@ function read(module, x) {
       return v.value;
     }
     if (__instanceof(x, m.IdEjBigInt)) {
-      let v = m.EjBigInt.wrap(x);
+      let v = m.EjNumber.wrap(m.runtimeFloatOfNat(x));
       return { $nat: v.value };
     }
     if (__instanceof(x, m.IdEjString)) {

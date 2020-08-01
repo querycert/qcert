@@ -24,7 +24,7 @@ let cejson_to_bytes : _ cejson -> bytes =
   | Coq_cejbigint x ->
     let b = create 9 in
     set_uint8 b 0 4;
-    set_int64_le b 1 (Int64.bits_of_float (float_of_int x));
+    set_int64_le b 1 (Int64.of_int x);
     b
   | Coq_cejstring s ->
     let s = Util.string_of_char_list s in
@@ -106,7 +106,7 @@ let ejson_of_bytes b =
       let x = get_int64_le b (p 8) |> Int64.float_of_bits in
       Coq_ejnumber x
     | 4 ->
-      let x = get_int64_le b (p 8) |> Int64.float_of_bits |> int_of_float in
+      let x = get_int64_le b (p 8) |> Int64.to_int in
       Coq_ejbigint x
     | 5 ->
       let n = get_int32_le b (p 4) |> Int32.to_int in
