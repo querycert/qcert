@@ -2,6 +2,8 @@ open Wasm_util
 module Ir = Wasm_ir
 open ImpEJson
 
+let brands_lvar = '$' :: 'b' :: 'r' :: 'a' :: 'n' :: 'd' :: 's' :: ['%']
+
 module ImportSet = Set.Make( struct
     type t = Ir.import
     let compare = Stdlib.compare
@@ -433,17 +435,17 @@ let function_  ctx fn : Ir.func =
   let Imp.ImpFun (arg, stmt, ret) = fn in
   let locals = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0 in
   let ctx = {locals; ctx } in
-  let l_arg = Table.insert locals arg in
-  let () = assert (l_arg = 0) in
+  let () = assert (Table.insert locals brands_lvar = 0) in
+  let () = assert (Table.insert locals arg = 1) in
   let body =
     statement ctx stmt @
     Ir.[ local_get (Table.insert locals ret) ]
   in
   let locals =
-    (* First local is function arguments. All locals are pointers. *)
+    (* First two locals are function arguments. All locals are pointers. *)
     List.init (Table.size ctx.locals - 1) (fun _ -> Ir.i32)
   in
-  Ir.(func ~params:[i32] ~result:[i32] ~locals body)
+  Ir.(func ~params:[i32; i32] ~result:[i32] ~locals body)
 
 let imp functions : Wasm.Ast.module_ =
   let ctx =
