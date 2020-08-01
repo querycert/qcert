@@ -31,11 +31,14 @@ const c_1 = new EjNumber(1);
 const c_0 = new EjNumber(0);
 
 export class EjBigInt extends EjValue {
-  // TODO: implement BigInt as i64 or actual natural numbers.
-  value: f64
-  constructor(a: f64) { super(); this.value = a; }
+  value: i64
+  constructor(a: i64) { super(); this.value = a; }
 }
 export const IdEjBigInt = idof<EjBigInt>()
+export function ejBigInt_of_f64(x: f64) : EjBigInt {
+  let i = I64.parseInt(Math.trunc(x).toString());
+  return new EjBigInt(i);
+}
 
 export class EjString extends EjValue {
   value: string
@@ -171,7 +174,7 @@ function ejson_to_bytes_(b: BytesBuilder, x:EjValue): void {
     let s = new ArrayBuffer(9);
     let v = new DataView(s);
     v.setUint8(0, 4); // tag
-    v.setFloat64(1, xx.value, true);
+    v.setInt64(1, xx.value, true);
     b.append(s);
     return;
   }
@@ -280,7 +283,7 @@ function ejson_of_bytes_(p: MovingPointer, b:ArrayBuffer): EjValue {
     }
     case 4: {
       let v = new DataView(b, p.advance(8), 8);
-      return new EjBigInt(v.getFloat64(0, true));
+      return new EjBigInt(v.getInt64(0, true));
     }
     case 5: {
       let v = new DataView(b, p.advance(4), 4);
@@ -429,7 +432,7 @@ export function opArray(a: EjValue): EjArray {
 }
 
 export function opArrayLength(a: EjArray): EjBigInt {
-  return new EjBigInt(f64(a.values.length));
+  return new EjBigInt(a.values.length);
 }
 
 export function opArrayPush(a: EjArray, b: EjValue): EjArray {
@@ -498,8 +501,8 @@ export function opMathFloor(a: EjNumber): EjNumber {
   return new EjNumber(Math.floor(a.value));
 }
 
-export function opMathTrunc(a: EjNumber): EjBigInt {
-  return new EjBigInt(Math.trunc(a.value));
+export function opMathTrunc(a: EjNumber): EjNumber {
+  return new EjNumber(Math.trunc(a.value));
 }
 
 /////////////////////////////
@@ -587,7 +590,7 @@ export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
   if (a instanceof EjBigInt && b instanceof EjBigInt) {
     let aa : EjBigInt = changetype<EjBigInt>(a) ;
     let bb : EjBigInt = changetype<EjBigInt>(b) ;
-    return compare<f64>(aa.value, bb.value);
+    return compare<i64>(aa.value, bb.value);
   }
   return unreachable();
 }
@@ -612,8 +615,8 @@ export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
   return a.get(k);
 }
 
-export function runtimeArrayLength(a: EjArray) : EjNumber {
-  return new EjNumber(a.values.length);
+export function runtimeArrayLength(a: EjArray) : EjBigInt {
+  return new EjBigInt(a.values.length);
 }
 
 export function runtimeEither(a: EjValue): EjBool {
@@ -645,5 +648,7 @@ export function runtimeNatPlus(a: EjBigInt, b: EjBigInt): EjBigInt {
 }
 
 export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
-  return new EjNumber(a.value);
+  let s : string = a.value.toString();
+  let x : f64 = F64.parseFloat(s);
+  return new EjNumber(x);
 }
