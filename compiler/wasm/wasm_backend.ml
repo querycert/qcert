@@ -5,8 +5,8 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
 
   open ImpEJson
 
-  (** [eval brand_hierarchy wasm_module environment *)
-  val eval : (char list * char list) list -> Wasm.Ast.module_
+  (** [eval brand_hierarchy wasm_module fn_name environment *)
+  val eval : (char list * char list) list -> Wasm.Ast.module_ -> char list
     -> (char list * 'a ejson) list -> ('a ejson) option
 
   val imp_ejson_to_wasm_ast : ('a,'b) imp_ejson -> Wasm.Ast.module_
@@ -53,7 +53,7 @@ end = struct
       | Some rt ->
         failwith (Printf.sprintf "WASM_RUNTIME=%s is not a file" rt)
 
-    let eval brand_relations module_ env =
+    let eval brand_relations module_ fn env =
       let rt = Eval.init (runtime ()) [ExternFunc abort] in
       let () = Valid.check_module module_ in
       let mod_ =
@@ -113,18 +113,24 @@ end = struct
         | _ -> failwith "invalid runtime: type of ejson_of_bytes"
       in
       let main =
-        match Instance.export mod_ (Utf8.decode "main") with
+        let fn = Util.string_of_char_list fn in
+        match Instance.export mod_ (Utf8.decode fn) with
         | Some (ExternFunc f) -> f
-        | _ -> failwith "module should export main function"
+        | _ ->
+          let msg =
+            Printf.sprintf
+              "module does not export function %s which should be run" fn
+          in
+          failwith msg
       and argument_ptr = write_ejson (Coq_ejobject env)
-      and relatations_ptr =
+      and relations_ptr =
         let x = List.map (fun (a, b) -> a, Coq_ejstring b) brand_relations in
         write_ejson (Coq_ejobject x)
       in
       let result_ptr =
-        match Eval.invoke main [I32 relatations_ptr; I32 argument_ptr] with
+        match Eval.invoke main [I32 relations_ptr; I32 argument_ptr] with
         | [I32 x] -> x
-        | _ -> failwith "invalid module: return value of main"
+        | _ -> failwith "invalid module: return value of evaluated function"
       in
       let result =
         let bin_ptr =
@@ -592,7 +598,7 @@ end = struct
       in
       Ir.(func ~params:[i32; i32] ~result:[i32] ~locals body)
 
-    let imp functions : Wasm.Ast.module_ =
+    let imp lib : Wasm.Ast.module_ =
       let ctx =
         { imports = ImportSet.empty
         ; memory = Ir.memory 1
@@ -600,10 +606,9 @@ end = struct
               Constants.encode x |> Bytes.length)
         }
       in
-      let funcs =
-        match functions with
-        | [ _name, fn ] -> ["main", function_ ctx fn]
-        | _ -> failwith "Wasm_translate.imp: single function expected"
+      let funcs = List.map (fun (name, fn) ->
+          Util.string_of_char_list name, function_ ctx fn
+        ) lib
       in
       let data =
         Table.elements ctx.constants
