@@ -124,8 +124,10 @@ end = struct
           failwith msg
       and argument_ptr = write_ejson (Coq_ejobject env)
       and relations_ptr =
-        let x = List.map (fun (a, b) -> a, Coq_ejstring b) brand_relations in
-        write_ejson (Coq_ejobject x)
+        let x = List.map (fun (sub, sup) ->
+            Coq_ejarray [Coq_ejstring sub; Coq_ejstring sup]
+          ) brand_relations in
+        write_ejson (Coq_ejarray x)
       in
       let result_ptr =
         match Eval.invoke main [I32 relations_ptr; I32 argument_ptr] with
@@ -433,7 +435,7 @@ end = struct
       (* Foreign *)
       | EJsonRuntimeForeign _fop -> "FOREIGN"
 
-    let rt_op ctx op : Ir.instr =
+    let rt_op_trivial ctx op : Ir.instr =
       let foreign params result =
         let fname = string_of_runtime_op op in
         let f, import = Ir.import_func ~params ~result "runtime" fname in
@@ -450,13 +452,15 @@ end = struct
       | EJsonRuntimeEither -> foreign [i32] [i32]
       | EJsonRuntimeToLeft -> foreign [i32] [i32]
       | EJsonRuntimeToRight -> foreign [i32] [i32]
+      | EJsonRuntimeUnbrand -> foreign [i32] [i32]
+      | EJsonRuntimeCast -> foreign [i32; i32; i32] [i32]
       | EJsonRuntimeNatLe -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatLt -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatPlus -> foreign [i32; i32] [i32]
       | EJsonRuntimeFloatOfNat -> foreign [i32] [i32]
       | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
-    let rt_op_n_ary ctx op args: Ir.instr =
+    let rt_op ctx op args: Ir.instr =
       let foreign params result fname =
         let f, import = Ir.import_func ~params ~result "runtime" fname in
         ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
@@ -478,8 +482,12 @@ end = struct
             |> List.concat ) @
           [ foreign [i32] [i32] "EjArrayBuilder#finalize" ]
         )
+      | EJsonRuntimeCast ->
+        (* insert brand hierachy as first argument *)
+        let brands = Table.insert ctx.locals brands_lvar in
+        block ~result:[i32] (local_get brands :: args @ [rt_op_trivial ctx.ctx op])
       | _ ->
-        block ~result:[i32] (args @ [rt_op ctx.ctx op])
+        block ~result:[i32] (args @ [rt_op_trivial ctx.ctx op])
 
     let rec expr ctx expression : Ir.instr list =
       match (expression : ('a,'b) imp_ejson_expr) with
@@ -491,7 +499,7 @@ end = struct
         [ op_n_ary ctx x args ]
       | ImpExprRuntimeCall (x, args) ->
         let args = List.map (fun x -> Ir.(block ~result:[i32]) (expr ctx x)) args in
-        [ rt_op_n_ary ctx x args ]
+        [ rt_op ctx x args ]
 
     let rec statement ctx stmt : Ir.instr list =
       let foreign fname params result =
@@ -539,14 +547,14 @@ end = struct
         [ loop
             [ local_get i
             ; local_get n
-            ; rt_op ctx.ctx EJsonRuntimeNatLt
+            ; rt_op_trivial ctx.ctx EJsonRuntimeNatLt
             ; foreign "EjBool#get:value" [i32] [i32]
             ; if_
                 [ block get_el
                 ; block (statement ctx body) (* TODO: what if body modifies i? *)
                 ; local_get i
                 ; const ctx (Coq_cejbigint 1)
-                ; rt_op ctx.ctx EJsonRuntimeNatPlus
+                ; rt_op_trivial ctx.ctx EJsonRuntimeNatPlus
                 ; local_set i
                 ; br 1
                 ] []
@@ -562,13 +570,13 @@ end = struct
         [ loop
             [ local_get i
             ; local_get max
-            ; rt_op ctx.ctx EJsonRuntimeNatLe
+            ; rt_op_trivial ctx.ctx EJsonRuntimeNatLe
             ; foreign "EjBool#get:value" [i32] [i32]
             ; if_
                 [ block (statement ctx body) (* TODO: what if body modifies i? *)
                 ; local_get i
                 ; const ctx (Coq_cejbigint 1)
-                ; rt_op ctx.ctx EJsonRuntimeNatPlus
+                ; rt_op_trivial ctx.ctx EJsonRuntimeNatPlus
                 ; local_set i
                 ; br 1
                 ] []
