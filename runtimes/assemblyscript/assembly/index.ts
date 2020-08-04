@@ -4,6 +4,14 @@
 
 class EjValue {}
 
+function cast<T>(x : EjValue): T {
+  if (x instanceof T) {
+    let r : T = changetype<T>(x);
+    return r;
+  }
+  return unreachable();
+}
+
 export class EjNull extends EjValue {
   constructor() { super(); }
 }
@@ -90,6 +98,9 @@ export class EjArrayBuilder {
 export class EjObject extends EjValue {
   values: Map<string, EjValue>
   constructor() { super(); this.values = new Map<string, EjValue>(); }
+  has(k: EjString): bool {
+    return this.values.has(k.value);
+  }
   set(k: EjString, v: EjValue): EjObject {
     this.values.set(k.value, v);
     return this;
@@ -102,18 +113,6 @@ export class EjObject extends EjValue {
   }
 }
 export const IdEjObject = idof<EjObject>()
-
-export class EjLeft extends EjValue {
-  value: EjValue
-  constructor(a: EjValue) { super(); this.value = a; }
-}
-export const IdEjLeft = idof<EjLeft>()
-
-export class EjRight extends EjValue {
-  value: EjValue
-  constructor(a: EjValue) { super(); this.value = a; }
-}
-export const IdEjRight = idof<EjRight>()
 
 /////////////////////////
 // EJson Serialization //
@@ -223,24 +222,6 @@ function ejson_to_bytes_(b: BytesBuilder, x:EjValue): void {
     }
     return;
   }
-  if (x instanceof EjLeft) {
-    let xx : EjLeft = changetype<EjLeft>(x) ;
-    let s = new Uint8Array(1);
-    s[0] = 8; // tag
-    b.append(s.buffer);
-    // write value
-    ejson_to_bytes_(b, xx.value);
-    return;
-  }
-  if (x instanceof EjRight) {
-    let xx : EjRight = changetype<EjRight>(x) ;
-    let s = new Uint8Array(1);
-    s[0] = 9; // tag
-    b.append(s.buffer);
-    // write value
-    ejson_to_bytes_(b, xx.value);
-    return;
-  }
   unreachable();
 }
 
@@ -314,10 +295,6 @@ function ejson_of_bytes_(p: MovingPointer, b:ArrayBuffer): EjValue {
       }
       return obj;
     }
-    case 8:
-      return new EjLeft(ejson_of_bytes_(p, b));
-    case 9:
-      return new EjRight(ejson_of_bytes_(p, b));
   }
   return unreachable();
 }
@@ -528,16 +505,6 @@ export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
     let bb : EjBigInt = changetype<EjBigInt>(b) ;
     return aa.value == bb.value ? c_true : c_false;
   }
-  if (a instanceof EjLeft && b instanceof EjLeft) {
-    let aa : EjLeft = changetype<EjLeft>(a) ;
-    let bb : EjLeft = changetype<EjLeft>(b) ;
-    return runtimeEqual(aa.value, bb.value) ? c_true : c_false;
-  }
-  if (a instanceof EjRight && b instanceof EjRight) {
-    let aa : EjRight = changetype<EjRight>(a) ;
-    let bb : EjRight = changetype<EjRight>(b) ;
-    return runtimeEqual(aa.value, bb.value) ? c_true : c_false;
-  }
   if (a instanceof EjString && b instanceof EjString) {
     let aa : EjString = changetype<EjString>(a) ;
     let bb : EjString = changetype<EjString>(b) ;
@@ -572,7 +539,7 @@ export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
     }
     return c_true;
   }
-  return c_false;
+  return unreachable();
 }
 
 function compare<T>(a: T, b: T): EjNumber {
@@ -619,20 +586,89 @@ export function runtimeArrayLength(a: EjArray) : EjBigInt {
   return new EjBigInt(a.values.length);
 }
 
-export function runtimeEither(a: EjValue): EjBool {
-  if (a instanceof EjLeft || a instanceof EjRight) {
+function ejObject(l: Array<Array<EjValue>>): EjObject {
+  let obj = new EjObject();
+  for (let i=0; i < l.length; i++) {
+    obj.set(<EjString>l[i][0], l[i][1]);
+  }
+  return obj
+}
+
+const c_$left = new EjString("$left")
+const c_$right = new EjString("$right")
+
+function ejLeft(v: EjValue): EjObject {
+  return ejObject([[c_$left, v]]);
+}
+
+function ejRight(v: EjValue): EjObject {
+  return ejObject([[c_$right, v]]);
+}
+
+export function runtimeEither(a: EjObject): EjBool {
+  if (a.has(c_$left)){
     return c_true;
-  } else {
+  }
+  if (a.has(c_$right)) {
     return c_false;
   }
+  return unreachable();
 }
 
-export function runtimeToLeft(a: EjLeft): EjValue {
-  return a.value;
+export function runtimeToLeft(a: EjObject): EjValue {
+  return runtimeRecDot(a, c_$left);
 }
 
-export function runtimeToRight(a: EjRight): EjValue {
-  return a.value;
+export function runtimeToRight(a: EjObject): EjValue {
+  return runtimeRecDot(a, c_$right);
+}
+
+const c_$data = new EjString("$data")
+const c_$class = new EjString("$class")
+const c_none = ejRight(c_null)
+
+export function runtimeUnbrand(a: EjObject): EjValue {
+  return runtimeRecDot(a, c_$data);
+}
+
+export function runtimeCast(hierarchy: EjArray, brands: EjArray, x: EjObject) : EjValue {
+  let from_brands = cast<EjArray>(runtimeRecDot(x, c_$class)).values;
+  let to_brands = brands.values;
+  let pairs = hierarchy.values;
+  for (let i = 0; i < to_brands.length; i++) {
+    let to_brand = cast<EjString>(to_brands[i]).value;
+    let to_brand_ok = false;
+    for (let j = 0; j < from_brands.length; j++) {
+      let from_brand = cast<EjString>(from_brands[j]).value;
+      if (to_brand == from_brand) {
+        to_brand_ok = true;
+        // break j loop
+        j = I32.MAX_VALUE - 1;
+      } else {
+        for (let k = 0; k < pairs.length; k++) {
+          let pair = cast<EjArray>(pairs[k]).values;
+          assert(pair.length == 2);
+          let sub = cast<EjString>(pair[0]).value;
+          let sup = cast<EjString>(pair[1]).value;
+          if (from_brand == sub && to_brand == sup) {
+            to_brand_ok = true;
+            // break j loop
+            j = I32.MAX_VALUE - 1;
+            k = I32.MAX_VALUE - 1;
+          }
+        }
+      }
+    }
+    if (!to_brand_ok) {
+      return c_none;
+    }
+  }
+  // return re-branded object
+  return ejLeft(
+    ejObject(
+      [[c_$class, brands],
+       [c_$data, runtimeRecDot(x, c_$data)
+    ]]));
 }
 
 export function runtimeNatLe(a: EjBigInt, b: EjBigInt): EjBool {
