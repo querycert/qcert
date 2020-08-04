@@ -1,0 +1,23 @@
+/* cast objects */
+module main {
+  wasm12(x) return y {
+    let a0 := { $class: ["Address"], $data: { city : "xy" }};
+    let a1 := { $class: ["USAddress"], $data: { city : "NY", zip : 10001 }};
+    let p0 := { $class: ["Person"], $data: { name: "donald" }} ;
+    let y :=
+    /* valid casts */
+      [[ Runtime.cast(["Address"], a0)
+       , Runtime.cast(["USAddress"], a1)
+       , Runtime.cast(["Address"], a1)
+       , Runtime.cast(["Object"], a0)
+       , Runtime.cast(["Object"], a1)
+       , Runtime.cast(["Object"], p0)
+       ]
+    /* invalid casts */
+      ,[ Runtime.cast(["Address"], p0)
+       , Runtime.cast(["Person"], a0)
+       , Runtime.cast(["Person"], a1)
+       , Runtime.cast(["USAddress"], a0)
+      ]];
+  }
+}

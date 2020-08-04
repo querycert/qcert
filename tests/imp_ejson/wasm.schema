@@ -1,5 +1,21 @@
 {
-    "brandTypes" :[],
-    "typeDefs" :[],
-    "globals" : {}
+  "inheritance": [
+    {"sub":"Address", "sup":"Object"},
+    {"sub":"USAddress", "sup":"Object"},
+    {"sub":"USAddress", "sup":"Address"},
+    {"sub":"Person", "sup":"Object"}
+  ],
+  "brandTypes" : [
+    {"brand":"Object", "typeName":"Object"},
+    {"brand":"Address", "typeName":"Address"},
+    {"brand":"USAddress", "typeName":"USAddress"},
+    {"brand":"Person", "typeName":"Person"}
+  ],
+  "typeDefs" : [
+    {"typeName":"Object", "typeDef":{}},
+    {"typeName":"Person", "typeDef":{"name":"String"}},
+    {"typeName":"Address", "typeDef":{"street":"String"}},
+    {"typeName":"USAddress", "typeDef":{"street":"String", "zip":"Nat"}}
+  ],
+  "globals" : {}
 }
