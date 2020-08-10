@@ -2,7 +2,8 @@ const loader = require("@assemblyscript/loader");
 const should = require('chai').should();
 const assert = require('chai').assert;
 const fs = require('fs');
-const enc = require('../lib/encoding.js');
+const enc = require('../lib/runtime_encoding.js');
+const bin = require('../lib/binary_encoding.js');
 
 function writeString(module, str) {
   return m.exports.__retain(m.exports.__allocString(aStr));
@@ -63,7 +64,7 @@ describe('AssemblyScript: Ejson operators', function () {
     EjBool.wrap(res).value.should.equal(0);
     __release(res);
   });
-  it('Ejson write', async function () {
+  it('runtime encoding write', async function () {
     // Manual read. Do not read as example.
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let t = enc.write(m, true);
@@ -78,7 +79,7 @@ describe('AssemblyScript: Ejson operators', function () {
     m.exports.__getString(val_p).should.equal("Hello World!");
     m.exports.__release(val_p);
   });
-  it('Ejson read', async function () {
+  it('runtime encoding read', async function () {
     // Manual write. Do not read as example.
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let n = new m.exports.EjNull();
@@ -99,7 +100,7 @@ describe('AssemblyScript: Ejson operators', function () {
     m.exports.__getString(val_p).should.equal("Hello World!");
     m.exports.__release(val_p);
   });
-  it('Ejson read/write roundtrip', async function () {
+  it('runtime encoding read/write roundtrip', async function () {
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let t = enc.write(m, true);
     let f = enc.write(m, false)
@@ -174,8 +175,8 @@ describe('AssemblyScript: Ejson operators', function () {
   });
 });
 
-describe('AssemblyScript: EJson encoding', function () {
-  it('roundtrips', async function () {
+describe('AssemblyScript: EJson encodings', function () {
+  it('js -> runtime -> binary -> runtime -> js', async function () {
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let { ejson_to_bytes, ejson_of_bytes } = m.exports;
     function t(x, label) {
@@ -194,5 +195,31 @@ describe('AssemblyScript: EJson encoding', function () {
     t([1,2,3,null,false,true], 'non-empty array');
     t({}, 'empty object');
     t({a: 1, b: 2, '!': null}, 'non-empty object');
+  });
+  it('js -> binary -> runtime -> js', async function () {
+    let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
+    let { __alloc, ejson_to_bytes, ejson_of_bytes, memory } = m.exports;
+    function t(x, label) {
+      let x_bin = Buffer.from(bin.ejson_to_bytes(x));
+      let x_bin_ptr = __alloc(x_bin.byteLength, 0);
+      x_bin.copy(Buffer.from(memory.buffer, x_bin_ptr));
+      let x_ptr = ejson_of_bytes(x_bin_ptr);
+      assert.deepEqual(enc.read(m, x_ptr), x, label);
+    }
+    t(null, 'null');
+    t(true, 'true');
+    t(false, 'false');
+    t(3.14, '3.14');
+    t({$nat: 42}, '{$nat: 42}');
+    t('', 'empty string');
+    t([], 'empty array');
+    t([1,2,3,null,false,true], 'non-empty array');
+    t({}, 'empty object');
+    t('Hello World!', 'Hello World!');
+    t({a: 1, b: 2, '!': null}, 'non-empty object');
+    t({}, 'empty object');
+    t({a: 1, b: 2, '!': null}, 'non-empty object');
+    t({$left: true}, '{$left: true}');
+    t({$right: true}, '{$right: true}');
   });
 });
