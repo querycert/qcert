@@ -25,16 +25,6 @@ function write(module, x) {
           let keys = Object.getOwnPropertyNames(x);
           if ( keys.length === 1 ) {
             switch (keys[0]) {
-              case '$left' :
-                {
-                  let arg = recurse(x.$left);
-                  return new m.EjLeft(arg);
-                }
-              case '$right' :
-                {
-                  let arg = recurse(x.$right);
-                  return new m.EjRight(arg);
-                }
               case '$nat' :
                 return m.ejBigInt_of_f64(Number(x.$nat));
             }
