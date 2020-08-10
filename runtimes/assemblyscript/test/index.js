@@ -165,14 +165,12 @@ describe('AssemblyScript: Ejson operators', function () {
   it('runtimeEither / ToLeft / ToRight', async function () {
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
     let { runtimeEither, runtimeToLeft, runtimeToRight } = m.exports;
-    let a = enc.write(m, {a: 1});
     let l = enc.write(m, {$left: 1});
-    let r = enc.write(m, {$right: 1});
-    assert(! enc.read(m, runtimeEither(a)), 'not either');
+    let r = enc.write(m, {$right: 2});
     assert(enc.read(m, runtimeEither(l)), 'either / left');
-    assert(enc.read(m, runtimeEither(r)), 'either / right');
-    assert(enc.read(m, runtimeToLeft(r)) == 1, 'toLeft');
-    assert(enc.read(m, runtimeToRight(r)) == 1, 'toRight');
+    assert(! enc.read(m, runtimeEither(r)), 'either / right');
+    assert(enc.read(m, runtimeToLeft(l)) == 1, 'toLeft');
+    assert(enc.read(m, runtimeToRight(r)) == 2, 'toRight');
   });
 });
 

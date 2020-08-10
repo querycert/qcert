@@ -539,7 +539,7 @@ export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
     }
     return c_true;
   }
-  return unreachable();
+  return c_false;
 }
 
 function compare<T>(a: T, b: T): EjNumber {
