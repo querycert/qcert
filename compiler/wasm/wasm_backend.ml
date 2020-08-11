@@ -80,14 +80,6 @@ end = struct
         match Instance.export rt (Utf8.decode "__retain") with
         | Some (ExternFunc f) -> f
         | _ -> failwith "runtime module should export __retain function"
-      and rt_ejson_to_bytes =
-        match Instance.export rt (Utf8.decode "ejson_to_bytes") with
-        | Some (ExternFunc f) -> f
-        | _ -> failwith "runtime module should export ejson_to_bytes function"
-      and rt_ejson_of_bytes =
-        match Instance.export rt (Utf8.decode "ejson_of_bytes") with
-        | Some (ExternFunc f) -> f
-        | _ -> failwith "runtime module should export ejson_of_bytes function"
       and rt_mem =
         match Instance.export rt (Utf8.decode "memory") with
         | Some (ExternMemory x) -> x
@@ -96,11 +88,11 @@ end = struct
       let write_ejson x =
         let bin = Encoding.ejson_to_bytes x in
         let n = Bytes.length bin in
+        let x =
+          Eval.invoke rt_alloc [I32 (Int32.of_int n); I32 (Int32.zero)]
+          |> Eval.invoke rt_retain
+        in
         let bin_ptr =
-          let x =
-            Eval.invoke rt_alloc [I32 (Int32.of_int n); I32 (Int32.zero)]
-            |> Eval.invoke rt_retain
-          in
           match x with
           | [I32 x] -> x
           | _ -> failwith "invalid runtime: type of __alloc or __retain"
@@ -108,9 +100,7 @@ end = struct
         let () =
           Memory.store_bytes rt_mem (Int64.of_int32 bin_ptr) (Bytes.to_string bin)
         in
-        match Eval.invoke rt_ejson_of_bytes [I32 bin_ptr] with
-        | [I32 x] -> x
-        | _ -> failwith "invalid runtime: type of ejson_of_bytes"
+        bin_ptr
       in
       let main =
         let fn = Util.string_of_char_list fn in
@@ -135,18 +125,13 @@ end = struct
         | _ -> failwith "invalid module: return value of evaluated function"
       in
       let result =
-        let bin_ptr =
-          match Eval.invoke rt_ejson_to_bytes [I32 result_ptr] with
-          | [I32 x] -> x
-          | _ -> failwith "invalid runtime: type of ejson_to_bytes"
-        in
         let n =
-          match Memory.load_value rt_mem Int64.(sub (of_int32 bin_ptr) (of_int 4))
+          match Memory.load_value rt_mem Int64.(sub (of_int32 result_ptr) (of_int 4))
                   Int32.zero Types.I32Type with
           | I32 x -> Int32.to_int x
           | _ -> failwith "could not read length of result"
         in
-        Memory.load_bytes rt_mem (Int64.of_int32 bin_ptr) n
+        Memory.load_bytes rt_mem (Int64.of_int32 result_ptr) n
         |> Bytes.of_string
         |> Encoding.ejson_of_bytes
       in
@@ -596,9 +581,32 @@ end = struct
       let ctx = {locals; ctx } in
       let () = assert (Table.insert locals brands_lvar = 0) in
       let () = assert (Table.insert locals arg = 1) in
-      let body =
+      let raw_body =
+        (* the compiled function with argument and result being
+         * runtime ejson values *)
         statement ctx stmt @
         Ir.[ local_get (Table.insert locals ret) ]
+      in
+      let body =
+        (* wrap function such that argument and result are binary ejson values *)
+        let foreign fname params result =
+          let f, import = Ir.import_func ~params ~result "runtime" fname in
+          ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+          Ir.call f
+        in
+        let open Ir in
+        [ local_get 0 (* arg to __release *)
+        ; local_get 0
+        ; foreign "ejson_of_bytes" [i32] [i32]
+        ; local_set 0
+        ; foreign "__release" [i32] [] (* release binary value *)
+        ; local_get 1 (* arg to __release *)
+        ; local_get 1
+        ; foreign "ejson_of_bytes" [i32] [i32]
+        ; local_set 1
+        ; foreign "__release" [i32] [] (* release binary value *)
+        ] @ raw_body @
+        [ foreign "ejson_to_bytes" [i32] [i32] ]
       in
       let locals =
         (* First two locals are function arguments. All locals are pointers. *)
