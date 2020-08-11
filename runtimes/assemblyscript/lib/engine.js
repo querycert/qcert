@@ -1,7 +1,6 @@
 'use strict';
 
 const loader = require("@assemblyscript/loader");
-const enc = require('./runtime_encoding.js');
 const bin = require('./binary_encoding.js');
 
 function write(mod, value) {
@@ -14,13 +13,20 @@ function write(mod, value) {
   return value_ptr;
 }
 
+function read(mod, ptr) {
+  let { memory, ejson_to_bytes } = mod.exports;
+  let bytes_ptr = ejson_to_bytes(ptr); // ejson --runtime--> binary
+  let value = bin.ejson_of_bytes(memory.buffer, bytes_ptr); // binary --JS--> ejson
+  return value;
+}
+
 async function invoke(runtime, module, hierarchy, arg) {
   let rt = await loader.instantiate(runtime);
   let m = await loader.instantiate(module, { runtime: rt.instance.exports });
-  let hierarchy_ptr = write(rt, hierarchy); // uses binary encoding
-  let arg_ptr = write(rt, arg); // uses binary encoding
+  let hierarchy_ptr = write(rt, hierarchy);
+  let arg_ptr = write(rt, arg);
   let res_ptr = m.exports.qcert_main(hierarchy_ptr, arg_ptr);
-  let res = enc.read(rt, res_ptr); // not using binary encoding (TODO)
+  let res = read(rt, res_ptr);
   return res;
 }
 

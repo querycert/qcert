@@ -139,6 +139,97 @@ function ejson_to_bytes(x) {
   return b.finalize();
 }
 
-module.exports = { ejson_to_bytes };
+class MovingPointer {
+  // value: number
 
-/* TODO: ejson_of_bytes
+  // expects
+  // x: number
+  constructor(x) { this.value = x }
+
+  // expects
+  // by: number
+  // returns number: post-increment
+  advance(by) {
+    let r = this.value;
+    this.value += by;
+    return r;
+  }
+}
+
+// expects
+// b: ArrayBuffer
+// offset: number
+// len: number
+// return string decoded from ArrayBuffer using utf8
+function string_of_bytes(b, offset, len) {
+  let utf8 = Buffer.from(b, offset, len);
+  return utf8.toString();
+}
+
+// expects
+// p: MovingPointer
+// b: ArrayBuffer
+// returns EJson
+function ejson_of_bytes_(p, b) {
+  // switch tag
+  switch((new Uint8Array(b, p.advance(1), 1))[0]) {
+    case 0:
+      return null;
+    case 1:
+      return false;
+    case 2:
+      return true;
+    case 3: {
+      let v = new DataView(b, p.advance(8), 8);
+      return v.getFloat64(0, true);
+    }
+    case 4: {
+      let v = new DataView(b, p.advance(8), 8);
+      let x = v.getBigInt64(0, true);
+      if (x <= Number.MAX_SAFE_INTEGER && x >= Number.MIN_SAFE_INTEGER) {
+        return {$nat: Number(x.toString())};
+      } else {
+        return {$nat: x.toString()};
+      }
+    }
+    case 5: {
+      let v = new DataView(b, p.advance(4), 4);
+      let len = v.getUint32(0, true);
+      let str = string_of_bytes(b, p.advance(len), len);
+      return str;
+    }
+    case 6: {
+      let v = new DataView(b, p.advance(4), 4)
+      let len = v.getUint32(0, true);
+      let arr = [];
+      for (let i=0; i < len; i++) {
+        arr.push(ejson_of_bytes_(p, b));
+      }
+      return arr;
+    }
+    case 7: {
+      let v = new DataView(b, p.advance(4), 4)
+      let len = v.getUint32(0, true);
+      let obj = {};
+      for (let i=0; i < len; i++) {
+        let v = new DataView(b, p.advance(4), 4);
+        let key_len = v.getUint32(0, true);
+        let key = string_of_bytes(b, p.advance(key_len), key_len);
+        let val = ejson_of_bytes_(p, b);
+        obj[key] = val;
+      }
+      return obj;
+    }
+  }
+  throw new Error('ejson_of_bytes: malformed input');
+}
+
+// expects
+// b: ArrayBuffer
+// offset: number
+// returns EJson decoded from b starting at offset
+function ejson_of_bytes(b, offset) {
+  return ejson_of_bytes_(new MovingPointer(offset), b);
+}
+
+module.exports = { ejson_to_bytes, ejson_of_bytes };
