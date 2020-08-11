@@ -198,13 +198,59 @@ describe('AssemblyScript: EJson encodings', function () {
   });
   it('js -> binary -> runtime -> js', async function () {
     let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
-    let { __alloc, ejson_to_bytes, ejson_of_bytes, memory } = m.exports;
+    let { __alloc, ejson_of_bytes, memory } = m.exports;
     function t(x, label) {
       let x_bin = Buffer.from(bin.ejson_to_bytes(x));
       let x_bin_ptr = __alloc(x_bin.byteLength, 0);
       x_bin.copy(Buffer.from(memory.buffer, x_bin_ptr));
       let x_ptr = ejson_of_bytes(x_bin_ptr);
       assert.deepEqual(enc.read(m, x_ptr), x, label);
+    }
+    t(null, 'null');
+    t(true, 'true');
+    t(false, 'false');
+    t(3.14, '3.14');
+    t({$nat: 42}, '{$nat: 42}');
+    t('', 'empty string');
+    t([], 'empty array');
+    t([1,2,3,null,false,true], 'non-empty array');
+    t({}, 'empty object');
+    t('Hello World!', 'Hello World!');
+    t({a: 1, b: 2, '!': null}, 'non-empty object');
+    t({}, 'empty object');
+    t({a: 1, b: 2, '!': null}, 'non-empty object');
+    t({$left: true}, '{$left: true}');
+    t({$right: true}, '{$right: true}');
+  });
+  it('js -> runtime -> binary -> js', async function () {
+    let m = await loader.instantiate(fs.readFileSync("build/untouched.wasm"));
+    let { __alloc, ejson_to_bytes, memory } = m.exports;
+    function t(x, label) {
+      let x_bin_ptr = ejson_to_bytes(enc.write(m,x));
+      let x_from_bin = bin.ejson_of_bytes(memory.buffer, x_bin_ptr);
+      assert.deepEqual(x, x_from_bin, label);
+    }
+    t(null, 'null');
+    t(true, 'true');
+    t(false, 'false');
+    t(3.14, '3.14');
+    t({$nat: 42}, '{$nat: 42}');
+    t('', 'empty string');
+    t([], 'empty array');
+    t([1,2,3,null,false,true], 'non-empty array');
+    t({}, 'empty object');
+    t('Hello World!', 'Hello World!');
+    t({a: 1, b: 2, '!': null}, 'non-empty object');
+    t({}, 'empty object');
+    t({a: 1, b: 2, '!': null}, 'non-empty object');
+    t({$left: true}, '{$left: true}');
+    t({$right: true}, '{$right: true}');
+  });
+  it('js -> binary -> js', async function () {
+    function t(x, label) {
+      let x_bin = bin.ejson_to_bytes(x);
+      let y = bin.ejson_of_bytes(x_bin, 0);
+      assert.deepEqual(x, y, label);
     }
     t(null, 'null');
     t(true, 'true');
