@@ -106,6 +106,12 @@ export class EjObject extends EjValue {
     return this;
   }
   get(k: EjString): EjValue {
+    // redundant debugging code unreachable
+    // for a valid combination of engine, runtime, and compiled ergo
+    if (! this.has(k)) {
+      throw new Error("EjObject misses key '" + k.value + "'");
+    }
+    // actual code
     return this.values.get(k.value);
   }
   keys(): Array<EjString> {
