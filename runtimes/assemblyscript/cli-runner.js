@@ -18,7 +18,7 @@ async function main(runtime, module, schema, input, expected) {
   let exp = JSON.parse(fs.readFileSync(expected));
   console.log("expected:");
   console.log(JSON.stringify(exp, null, 2));
-  let res = await engine.invoke(rt, mod, hierarchy, arg);
+  let res = await engine.invoke(rt, mod, "qcert_main", hierarchy, arg);
   console.log("output:");
   console.log(JSON.stringify(res, null, 2));
 }
