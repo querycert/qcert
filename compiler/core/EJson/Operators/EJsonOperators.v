@@ -20,7 +20,7 @@ Require Import String.
 Require Import List.
 Require Import ZArith.
 Require Import Utils.
-Require Import Float.
+Require Import FloatAdd.
 Require Import ListAdd.
 Require Import Lift.
 Require Import Assoc.
