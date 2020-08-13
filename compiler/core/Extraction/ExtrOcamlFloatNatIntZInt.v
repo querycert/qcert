@@ -19,7 +19,7 @@ operations on floating point numbers. *)
 int *)
 
 Require Import JsAst.JsNumber.
-Require Import Float.
+Require Import FloatAdd.
 Require Import EquivDec.
 Require Import Extraction.
 
