@@ -19,8 +19,8 @@ MODULES = \
 	Utils/ListAdd \
 	Utils/StringAdd \
 	Utils/SortingAdd \
+	Utils/FloatAdd \
 	Utils/NativeString \
-	Utils/Float \
 	Utils/Lattice \
 	Utils/Monoid \
 	Utils/Assoc \
