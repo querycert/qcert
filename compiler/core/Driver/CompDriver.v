@@ -220,7 +220,7 @@ Section CompDriver.
       imp_ejson_to_js_ast cname q.
 
     Definition imp_ejson_to_wasm_ast (q: @imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : wasm_ast :=
-      imp_ejson_to_wasm_ast q.
+      imp_ejson_to_wasm_ast brand_relation_brands q.
 
     Local Open Scope nstring_scope.
     Definition js_ast_to_javascript (q: js_ast) : javascript := js_ast_to_js_top q.
