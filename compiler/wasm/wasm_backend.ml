@@ -9,7 +9,7 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   val eval : (char list * char list) list -> Wasm.Ast.module_ -> char list
     -> (char list * 'a ejson) list -> ('a ejson) option
 
-  val imp_ejson_to_wasm_ast : ('a,'b) imp_ejson -> Wasm.Ast.module_
+  val imp_ejson_to_wasm_ast : (char list * char list) list -> ('a,'b) imp_ejson -> Wasm.Ast.module_
 end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)
@@ -648,7 +648,7 @@ end = struct
 
   let eval = Eval.eval
 
-  let imp_ejson_to_wasm_ast = Translate.imp
+  let imp_ejson_to_wasm_ast hierarchy = Translate.imp (* XXX Fix here - JS *)
 
   let to_string q =
     let sexpr = Arrange.module_ q in
