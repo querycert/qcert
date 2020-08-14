@@ -15,8 +15,8 @@ include Wasm_backend.Make(struct
 
 let main = Util.char_list_of_string "qcert_main"
 
-let imp_ejson_to_wasm_ast = function
-  | [ _, fn ] -> imp_ejson_to_wasm_ast [ main, fn ]
+let imp_ejson_to_wasm_ast hierarchy = function
+  | [ _, fn ] -> imp_ejson_to_wasm_ast hierarchy [ main, fn ]
   | _ -> failwith "Wasm_ast.imp_ejson_to_wasm_ast: single function expected"
 
 let eval hierarchy module_ env = eval hierarchy module_ main env

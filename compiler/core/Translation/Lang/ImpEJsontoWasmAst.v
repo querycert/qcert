@@ -14,6 +14,7 @@
 
 Require Import String.
 Require Import List.
+Require Import BrandRelation.
 Require Import EJsonRuntime.
 Require Import Imp.
 Require Export ImpEJson.
@@ -24,9 +25,9 @@ Section ImpEJsontoWasmAst.
     Context {foreign_ejson_model:Set}.
     Context {foreign_ejson_runtime_op : Set}.
 
-    Axiom imp_ejson_to_wasm_ast : @imp_ejson foreign_ejson_model foreign_ejson_runtime_op -> wasm_ast.
+    Axiom imp_ejson_to_wasm_ast : brand_relation_t -> @imp_ejson foreign_ejson_model foreign_ejson_runtime_op -> wasm_ast.
   End Top.
-    
+
 End ImpEJsontoWasmAst.
 
 Extract Constant imp_ejson_to_wasm_ast => "Wasm_ast.imp_ejson_to_wasm_ast".
