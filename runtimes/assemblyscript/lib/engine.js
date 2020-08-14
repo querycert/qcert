@@ -17,12 +17,11 @@ function read(mod, ptr) {
   return value;
 }
 
-async function invoke(runtime, module, fn_name, hierarchy, arg) {
+async function invoke(runtime, module, fn_name, arg) {
   let rt = await loader.instantiate(runtime);
   let m = await loader.instantiate(module, { runtime: rt.instance.exports });
-  let hierarchy_ptr = write(rt, hierarchy);
   let arg_ptr = write(rt, arg);
-  let res_ptr = m.exports[fn_name](hierarchy_ptr, arg_ptr);
+  let res_ptr = m.exports[fn_name](arg_ptr);
   let res = read(rt, res_ptr);
   return res;
 }

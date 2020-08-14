@@ -1,18 +1,40 @@
 open Wasm
 
+(** list of (sub, sup) brand relation *)
+type brand_hierarchy = (char list * char list) list
+
 module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   val to_string : Wasm.Ast.module_ -> string
 
   open ImpEJson
 
   (** [eval brand_hierarchy wasm_module fn_name environment *)
-  val eval : (char list * char list) list -> Wasm.Ast.module_ -> char list
+  val eval : brand_hierarchy -> Wasm.Ast.module_ -> char list
     -> (char list * 'a ejson) list -> ('a ejson) option
+  (* TODO remove brand hierarchy arg from wasm eval.
+   * It's already compiled into the module and ignored during eval.
+   *)
 
-  val imp_ejson_to_wasm_ast : (char list * char list) list -> ('a,'b) imp_ejson -> Wasm.Ast.module_
+  val imp_ejson_to_wasm_ast : brand_hierarchy -> ('a,'b) imp_ejson -> Wasm.Ast.module_
 end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)
+
+  let ejson_of_cejson = function
+    | Coq_cejnull -> Coq_ejnull
+    | Coq_cejbool x -> Coq_ejbool x
+    | Coq_cejnumber x -> Coq_ejnumber x
+    | Coq_cejbigint x -> Coq_ejbigint x
+    | Coq_cejstring x -> Coq_ejstring x
+    | Coq_cejforeign x -> Coq_ejforeign x
+
+  let ejson_of_brand_relations h =
+    let x =
+      List.map (fun (sub, sup) ->
+          Coq_ejarray [Coq_ejstring sub; Coq_ejstring sup]
+        ) h
+    in
+    Coq_ejarray x
 
   module Eval = struct
     (* assemblyscript error handler imported by runtime *)
@@ -53,7 +75,7 @@ end = struct
       | Some rt ->
         failwith (Printf.sprintf "WASM_RUNTIME=%s is not a file" rt)
 
-    let eval brand_relations module_ fn env =
+    let eval _brand_relations module_ fn env =
       let rt = Eval.init (runtime ()) [ExternFunc abort] in
       let () = Valid.check_module module_ in
       let mod_ =
@@ -113,14 +135,9 @@ end = struct
           in
           failwith msg
       and argument_ptr = write_ejson (Coq_ejobject env)
-      and relations_ptr =
-        let x = List.map (fun (sub, sup) ->
-            Coq_ejarray [Coq_ejstring sub; Coq_ejstring sup]
-          ) brand_relations in
-        write_ejson (Coq_ejarray x)
       in
       let result_ptr =
-        match Eval.invoke main [I32 relations_ptr; I32 argument_ptr] with
+        match Eval.invoke main [I32 argument_ptr] with
         | [I32 x] -> x
         | _ -> failwith "invalid module: return value of evaluated function"
       in
@@ -142,8 +159,6 @@ end = struct
     open Wasm_util
     module Ir = Wasm_ir
 
-    let brands_lvar = '$' :: 'b' :: 'r' :: 'a' :: 'n' :: 'd' :: 's' :: ['%']
-
     module ImportSet = Set.Make( struct
         type t = Ir.import
         let compare = Stdlib.compare
@@ -152,7 +167,8 @@ end = struct
     type 'a module_context =
       { mutable imports : ImportSet.t
       ; memory: Ir.memory
-      ; constants: ('a cejson) Table.t
+      ; constants: ('a ejson) Table.t
+      ; brand_hierarchy : Ir.instr
       }
 
     type 'a function_context =
@@ -162,7 +178,7 @@ end = struct
 
     module Constants = struct
       let encode x =
-        let raw = Encoding.cejson_to_bytes x in
+        let raw = Encoding.ejson_to_bytes x in
         let n = Bytes.length raw in
         let b = Bytes.create ((((n + 7) lsr 3) lsl 3) + 8) in
         Bytes.set_int32_le b 0 Int32.zero (* initialize foreign ptr *);
@@ -173,11 +189,11 @@ end = struct
 
       (* Copy constant (bytes) in 8 byte chunks and parse on runtime side. *)
       (* Copies 0-7 bytes too much, thus we pad with zeroes in [encode]. *)
-      let alloc_const ctx : Ir.func =
+      let alloc_const (ctx: _ module_context) : Ir.func =
         let open Ir in
         let foreign ~params ~result name =
           let f, import = Ir.import_func ~params ~result "runtime" name in
-          ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+          ctx.imports <- ImportSet.add import ctx.imports;
           f
         in
         (* local_ptr: pointer to start of constant in local memory
@@ -190,7 +206,7 @@ end = struct
         let local_ptr, local_mov, buf_ptr, buf_mov, foreign_ptr, n  = 0, 1, 2, 3, 4, 5 in
         func ~params:[i32] ~result:[i32] ~locals:[i32; i32; i32; i32; i32]
           [ local_get local_ptr
-          ; load ctx.ctx.memory ~offset:4 i32
+          ; load ctx.memory ~offset:4 i32
           ; local_tee n (* n = byte length of constant *)
           ; call (foreign ~params:[i32] ~result:[i32] "alloc_bytes")
           ; local_set buf_ptr
@@ -205,7 +221,7 @@ end = struct
                   [ local_get buf_ptr
                   ; local_get buf_mov
                   ; local_get local_mov
-                  ; load ctx.ctx.memory i64
+                  ; load ctx.memory i64
                   ; call (foreign ~params:[i32; i32; i64] ~result:[] "bytes_set_i64")
                   ; local_get buf_mov ; i32_const' 8 ; add i32 (* buf_mov += 8 *)
                   ; local_set buf_mov
@@ -230,7 +246,7 @@ end = struct
         let local_ptr, foreign_ptr = 0, 1 in
         func ~params:[i32] ~result:[i32] ~locals:[i32]
           [ local_get local_ptr
-          ; load ctx.ctx.memory i32
+          ; load ctx.memory i32
           ; local_tee foreign_ptr
           ; i32_eqz (* foreign_ptr = null: constant not yet allocated in runtime *)
           ; if_
@@ -238,14 +254,14 @@ end = struct
               ; local_get local_ptr
               ; call (alloc_const ctx)
               ; local_tee foreign_ptr
-              ; store ctx.ctx.memory i32
+              ; store ctx.memory i32
               ] []
           ; local_get foreign_ptr
           ]
     end
 
     let const ctx c : Ir.instr =
-      let offset = Table.insert ctx.ctx.constants c in
+      let offset = Table.insert ctx.constants c in
       let open Ir in
       block ~result:[i32]
         [ i32_const' offset ; call (Constants.get_const ctx) ]
@@ -341,7 +357,7 @@ end = struct
           ; foreign [i32] [i32] "EjObject#constructor"
           ] @
           ( List.map (fun (k, v) ->
-                [ const ctx (Coq_cejstring k)
+                [ const ctx.ctx (Coq_ejstring k)
                 ; v
                 ; foreign [i32; i32; i32] [i32] "EjObject#set"
                 ]
@@ -469,8 +485,7 @@ end = struct
         )
       | EJsonRuntimeCast ->
         (* insert brand hierachy as first argument *)
-        let brands = Table.insert ctx.locals brands_lvar in
-        block ~result:[i32] (local_get brands :: args @ [rt_op_trivial ctx.ctx op])
+        block ~result:[i32] (ctx.ctx.brand_hierarchy :: args @ [rt_op_trivial ctx.ctx op])
       | _ ->
         block ~result:[i32] (args @ [rt_op_trivial ctx.ctx op])
 
@@ -478,7 +493,7 @@ end = struct
       match (expression : ('a,'b) imp_ejson_expr) with
       | ImpExprError err -> unsupported "expr: error"
       | ImpExprVar v -> [Ir.local_get (Table.insert ctx.locals v)]
-      | ImpExprConst x -> [const ctx x]
+      | ImpExprConst x -> [const ctx.ctx (ejson_of_cejson x)]
       | ImpExprOp (x, args) ->
         let args = List.map (fun x -> Ir.(block ~result:[i32]) (expr ctx x)) args in
         [ op_n_ary ctx x args ]
@@ -538,7 +553,7 @@ end = struct
                 [ block get_el
                 ; block (statement ctx body) (* TODO: what if body modifies i? *)
                 ; local_get i
-                ; const ctx (Coq_cejbigint 1)
+                ; const ctx.ctx (Coq_ejbigint 1)
                 ; rt_op_trivial ctx.ctx EJsonRuntimeNatPlus
                 ; local_set i
                 ; br 1
@@ -560,7 +575,7 @@ end = struct
             ; if_
                 [ block (statement ctx body) (* TODO: what if body modifies i? *)
                 ; local_get i
-                ; const ctx (Coq_cejbigint 1)
+                ; const ctx.ctx (Coq_ejbigint 1)
                 ; rt_op_trivial ctx.ctx EJsonRuntimeNatPlus
                 ; local_set i
                 ; br 1
@@ -579,8 +594,7 @@ end = struct
       let ImpFun (arg, stmt, ret) = fn in
       let locals = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0 in
       let ctx = {locals; ctx } in
-      let () = assert (Table.insert locals brands_lvar = 0) in
-      let () = assert (Table.insert locals arg = 1) in
+      let () = assert (Table.insert locals arg = 0) in
       let raw_body =
         (* the compiled function with argument and result being
          * runtime ejson values *)
@@ -600,27 +614,30 @@ end = struct
         ; foreign "ejson_of_bytes" [i32] [i32]
         ; local_set 0
         ; foreign "__release" [i32] [] (* release binary value *)
-        ; local_get 1 (* arg to __release *)
-        ; local_get 1
-        ; foreign "ejson_of_bytes" [i32] [i32]
-        ; local_set 1
-        ; foreign "__release" [i32] [] (* release binary value *)
         ] @ raw_body @
         [ foreign "ejson_to_bytes" [i32] [i32] ]
       in
       let locals =
-        (* First two locals are function arguments. All locals are pointers. *)
+        (* First local is the function argument. All locals are pointers. *)
         List.init (Table.size ctx.locals - 1) (fun _ -> Ir.i32)
       in
-      Ir.(func ~params:[i32; i32] ~result:[i32] ~locals body)
+      Ir.(func ~params:[i32] ~result:[i32] ~locals body)
 
-    let imp lib : Wasm.Ast.module_ =
+    let imp hierarchy lib : Wasm.Ast.module_ =
       let ctx =
         { imports = ImportSet.empty
         ; memory = Ir.memory 1
-        ; constants = Table.create ~initial_offset:0 ~element_size:(fun x ->
+        ; constants =
+            Table.create ~initial_offset:0 ~element_size:(fun x ->
               Constants.encode x |> Bytes.length)
+        ; brand_hierarchy =
+            Ir.unreachable (* this will be overwritten on the next lines *)
         }
+      in
+      let ctx =
+        (* compile brand hierarchy as first constant in module *)
+        let relations = ejson_of_brand_relations hierarchy in
+        { ctx with brand_hierarchy = const ctx relations }
       in
       let funcs = List.map (fun (name, fn) ->
           Util.string_of_char_list name, function_ ctx fn
@@ -648,7 +665,7 @@ end = struct
 
   let eval = Eval.eval
 
-  let imp_ejson_to_wasm_ast hierarchy = Translate.imp (* XXX Fix here - JS *)
+  let imp_ejson_to_wasm_ast = Translate.imp
 
   let to_string q =
     let sexpr = Arrange.module_ q in
