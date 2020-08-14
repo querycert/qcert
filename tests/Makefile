@@ -533,7 +533,7 @@ wasm-oql:
 		$(WASMQCERT) -quiet -source oql -target oql oql/wasm$$i.oql -schema oql/wasm.schema -eval -input oql/wasm.input && \
 		$(WASMQCERT) -quiet -source oql -target wasm_ast oql/wasm$$i.oql -schema oql/wasm.schema && \
 		wat2wasm oql/wasm$$i.wat -o oql/wasm$$i.wasm && \
-		node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm oql/wasm$$i.wasm oql/wasm.schema oql/wasm.input oql/wasm$${i}_oql.json ; \
+		node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm oql/wasm$$i.wasm oql/wasm.input oql/wasm$${i}_oql.json ; \
 		i=$$(expr $$i + 1 ) ; \
 	done
 
@@ -553,6 +553,6 @@ wasm-imp:
 		$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input && \
 		$(WASMQCERT) -quiet -source imp_ejson -target wasm_ast imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema && \
 		wat2wasm imp_ejson/wasm$$i.wat -o imp_ejson/wasm$$i.wasm && \
-		node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm imp_ejson/wasm$$i.wasm imp_ejson/wasm.schema imp_ejson/wasm.input imp_ejson/wasm$${i}_imp_ejson.json ; \
+		node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm imp_ejson/wasm$$i.wasm imp_ejson/wasm.input imp_ejson/wasm$${i}_imp_ejson.json ; \
 		i=$$(expr $$i + 1 ) ; \
 	done
