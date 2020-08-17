@@ -20,19 +20,17 @@ Require Import DataRuntime.
 Require Import ForeignDataToEJson.
 Require Import DataToEJson.
 
-Section WasmAst.
+Section Wasm.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
 
-  (** WASM programs are in AST form *)
-  Parameter wasm_ast : Set.
-  Parameter wasm_ast_eval : wasm_ast -> @jbindings foreign_ejson_model -> option (@ejson foreign_ejson_model).
-  Parameter wasm_ast_to_string : wasm_ast -> nstring.
-End WasmAst.
+  (** WASM binary *)
+  Parameter wasm : Set.
+  Parameter wasm_eval : wasm -> @jbindings foreign_ejson_model -> option (@ejson foreign_ejson_model).
+End Wasm.
 
-Extract Constant wasm_ast => "Wasm_ast.t".
-Extract Constant wasm_ast_eval => "Wasm_ast.eval".
-Extract Constant wasm_ast_to_string => "Wasm_ast.to_string".
+Extract Constant wasm => "string".
+Extract Constant wasm_eval => "(fun q -> fun env -> failwith (""Cannot evaluate binary Wasm""))".
 
 Section Top.
   Context {foreign_ejson_model:Set}.
@@ -41,8 +39,7 @@ Section Top.
   Context {foreign_ejson_runtime_op : Set}.
   Context {fdatatoejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
-
-  Definition wasm_ast_eval_top (cenv: bindings) (q:wasm_ast) : option data :=
+  Definition wasm_eval_top (cenv: bindings) (q:wasm) : option data :=
     let jenv := List.map (fun xy => (fst xy, data_to_ejson(snd xy))) cenv in
-    lift ejson_to_data (wasm_ast_eval q jenv).
+    lift ejson_to_data (wasm_eval q jenv).
 End Top.

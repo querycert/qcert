@@ -854,6 +854,9 @@ let pretty_spark_df greek margin annot inheritance link_runtime q =
 let pretty_wasm_ast greek margin annot inheritance link_runtime q =
   Wasm_ast.to_string q
 
+let pretty_wasm greek margin annot inheritance link_runtime q =
+  q
+
 (** Pretty Error *)
 
 let pretty_error greek margin annot inheritance link_runtime q =

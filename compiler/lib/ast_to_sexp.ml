@@ -1840,6 +1840,8 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
       raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_wasm_ast ->
       raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | L_wasm ->
+      raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_error err ->
       raise (Qcert_Error ("sexp_to_query: "^(string_of_char_list err)))
   end
@@ -1880,6 +1882,8 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_spark_df _ ->
       SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_wasm_ast _ ->
+      SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | Q_wasm _ ->
       SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_error err ->
       SString ("query_to_sexp: "^(string_of_char_list err))

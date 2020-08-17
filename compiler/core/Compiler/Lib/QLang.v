@@ -55,6 +55,7 @@ Module QLang(runtime:CompilerRuntime).
     Definition java := java.
     Definition spark_df := spark_df.
     Definition wasm_ast := wasm_ast.
+    Definition wasm := wasm.
 
     Definition language : Set := language.
 
