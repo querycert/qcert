@@ -107,6 +107,7 @@ let parse_query l f : (string * QLang.query) =
   | L_java -> raise (Qcert_Error "No parser for Java available")
   | L_spark_df -> raise (Qcert_Error "No parser for Spark (Dataframe) available")
   | L_wasm_ast -> raise (Qcert_Error "No parser for WASM (Ast) available")
+  | L_wasm -> raise (Qcert_Error "No parser for WASM (Binary) available")
   | L_error err ->
       let err = string_of_char_list err in
       raise (Qcert_Error ("No parser for Error language available: "^err))

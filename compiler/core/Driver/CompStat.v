@@ -45,6 +45,7 @@ Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
 Require Import WasmAst.
+Require Import WasmBinary.
 
 Require Import OptimizerLogger.
 Require Import CompLang.
@@ -79,6 +80,11 @@ Section CompStat.
   Definition stat_spark_df (q: spark_df) : data :=
     drec
       (("spark_df_stat", dstring "no stat available")
+         :: nil).
+
+  Definition stat_wasm (q: wasm) : data :=
+    drec
+      (("wasm_stat", dstring "no stat available") (* TODO *)
          :: nil).
 
   Definition stat_wasm_ast (q: wasm_ast) : data :=
@@ -221,6 +227,11 @@ Section CompStat.
   Definition stat_tree_spark_df (q: spark_df) : data :=
     drec
       (("spark_df", stat_spark_df q)
+         :: nil).
+
+  Definition stat_tree_wasm (q: wasm) : data :=
+    drec
+      (("wasm", stat_wasm q)
          :: nil).
 
   Definition stat_tree_wasm_ast (q: wasm_ast) : data :=
@@ -469,6 +480,7 @@ Section CompStat.
         | Q_java q => stat_java q
         | Q_spark_df q => stat_spark_df q
         | Q_wasm_ast q => stat_wasm_ast q
+        | Q_wasm q => stat_wasm q
         | Q_error q => stat_error q
         end
     in
@@ -503,6 +515,7 @@ Section CompStat.
         | Q_java q => stat_tree_java q
         | Q_spark_df q => stat_tree_spark_df q
         | Q_wasm_ast q => stat_tree_wasm_ast q
+        | Q_wasm q => stat_tree_wasm q
         | Q_error q => stat_tree_error q
         end
     in

@@ -9,7 +9,7 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   open ImpEJson
 
   (** [eval brand_hierarchy wasm_module fn_name environment *)
-  val eval : brand_hierarchy -> Wasm.Ast.module_ -> char list
+  val eval : Wasm.Ast.module_ -> char list
     -> (char list * 'a ejson) list -> ('a ejson) option
   (* TODO remove brand hierarchy arg from wasm eval.
    * It's already compiled into the module and ignored during eval.
@@ -75,7 +75,7 @@ end = struct
       | Some rt ->
         failwith (Printf.sprintf "WASM_RUNTIME=%s is not a file" rt)
 
-    let eval _brand_relations module_ fn env =
+    let eval module_ fn env =
       let rt = Eval.init (runtime ()) [ExternFunc abort] in
       let () = Valid.check_module module_ in
       let mod_ =

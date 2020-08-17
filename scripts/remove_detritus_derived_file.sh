@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -a WHITELIST=(".vo" ".glob" ".v.d" ".aux")
+declare -a WHITELIST=(".vo" ".vos" ".vok" ".glob" ".v.d" ".aux")
 
 for FILE in "$@"
 do
@@ -16,4 +16,4 @@ do
 	    fi
 	fi
     done
-done     
+done

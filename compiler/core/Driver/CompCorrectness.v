@@ -159,8 +159,14 @@ Section CompCorrectness.
     | Dv_spark_df_stop => True
     end.
 
+  Definition driver_correct_wasm (dv: wasm_driver) :=
+    match dv with
+    | Dv_wasm_stop => True
+    end.
+
   Definition driver_correct_wasm_ast (dv: wasm_ast_driver) :=
     match dv with
+    | Dv_wasm_ast_to_wasm dv => False /\ driver_correct_wasm dv
     | Dv_wasm_ast_stop => True
     end.
 
@@ -338,6 +344,7 @@ Section CompCorrectness.
     | Dv_java dv => driver_correct_java dv
     | Dv_spark_df dv => driver_correct_spark_df dv
     | Dv_wasm_ast dv => driver_correct_wasm_ast dv
+    | Dv_wasm dv => driver_correct_wasm dv
     | Dv_error s => True (* XXX ??? XXX *)
     end.
 
@@ -911,6 +918,18 @@ Section CompCorrectness.
       destruct dv; simpl in *; contradiction.
     Qed.
 
+    Lemma correct_driver_succeeds_wasm:
+      forall dv, driver_correct (Dv_wasm dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_wasm dv) (Q_wasm q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; contradiction.
+    Qed.
+
     Lemma correct_driver_succeeds_wasm_ast:
       forall dv, driver_correct (Dv_wasm_ast dv) ->
                  (forall q, Forall query_not_error
@@ -920,7 +939,8 @@ Section CompCorrectness.
       rewrite Forall_forall; intros.
       simpl in H0.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
-      destruct dv; simpl in *; contradiction.
+      destruct dv; simpl in *; [ | contradiction ].
+      elim H; intros; contradiction.
     Qed.
 
     Lemma correct_driver_succeeds_dnnrc:

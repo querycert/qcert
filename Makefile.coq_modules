@@ -345,6 +345,9 @@ MODULES = \
 	WasmAst/Lang/WasmAst \
 	WasmAst/WasmAstRuntime \
 	WasmAst/WasmAstSystem \
+	WasmBinary/Lang/WasmBinary \
+	WasmBinary/WasmBinaryRuntime \
+	WasmBinary/WasmBinarySystem \
 	Translation/Operators/ForeignToReduceOps \
 	Translation/Operators/ForeignToJavaScriptAst \
 	Translation/Operators/ForeignToJava \
@@ -386,6 +389,7 @@ MODULES = \
 	Translation/Lang/DatatoSparkDF \
 	Translation/Lang/tDNNRCtoSparkDF \
 	Translation/Lang/ImpEJsontoWasmAst \
+	Translation/Lang/WasmAsttoWasmBinary \
 	Translation/Typing/TNRAtocNNRC \
 	Translation/Typing/TcNRAEnvtocNNRC \
 	Translation/Typing/TcNNRCtoCAMP \

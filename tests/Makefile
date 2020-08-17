@@ -542,6 +542,7 @@ wasm-imp-spec:
 	while [ -e imp_ejson/wasm$$i.imp_ejson ] ; do \
 	  echo === imp_ejson/wasm$$i.imp_ejson; \
 		$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input && \
+		$(WASMQCERT) -source imp_ejson -target wasm imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema && \
 		WASM_RUNTIME="../runtimes/assemblyscript/build/untouched.wasm" $(WASMQCERT) -source imp_ejson -target wasm_ast imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input -output imp_ejson/wasm$$i.out -eval-validate ; \
 		i=$$(expr $$i + 1 ) ; \
 	done

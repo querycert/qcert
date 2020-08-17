@@ -98,6 +98,7 @@ let suffix_js_ast () = ".js_ast"
 let suffix_javascript () = ".js"
 let suffix_spark_df () = "_spark_df.scala"
 let suffix_wasm_ast () = ".wat"
+let suffix_wasm () = ".wasm"
 let suffix_stats () = "_stats.json"
 let suffix_error () = ".error"
 
@@ -131,6 +132,7 @@ let suffix_of_language lang =
   | L_java -> suffix_java ()
   | L_spark_df -> suffix_spark_df ()
   | L_wasm_ast -> suffix_wasm_ast ()
+  | L_wasm -> suffix_wasm ()
   | L_error _ -> suffix_error ()
 
 (* let suffix_target conf = *)
