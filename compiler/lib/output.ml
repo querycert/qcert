@@ -47,6 +47,7 @@ let output_query pconf q =
   | Q_java q -> pretty_query pconf pretty_java q
   | Q_spark_df q -> pretty_query pconf pretty_spark_df q
   | Q_wasm_ast q -> pretty_query pconf pretty_wasm_ast q
+  | Q_wasm q -> pretty_query pconf pretty_wasm q
   | Q_error q -> pretty_query pconf pretty_error q
   end
 

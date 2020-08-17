@@ -19,4 +19,4 @@ let imp_ejson_to_wasm_ast hierarchy = function
   | [ _, fn ] -> imp_ejson_to_wasm_ast hierarchy [ main, fn ]
   | _ -> failwith "Wasm_ast.imp_ejson_to_wasm_ast: single function expected"
 
-let eval hierarchy module_ env = eval hierarchy module_ main env
+let eval module_ env = eval module_ main env

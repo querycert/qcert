@@ -45,6 +45,7 @@ Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
 Require Import WasmAst.
+Require Import WasmBinary.
 
 (* Foreign Support *)
 Require Import ForeignDataToEJson.
@@ -150,7 +151,11 @@ Section CompEval.
 
     (* Language: wasm_ast *)
     Definition eval_wasm_ast (q:wasm_ast) (cenv: bindings) : option data :=
-      WasmAst.wasm_ast_eval_top h cenv q.
+      WasmAst.wasm_ast_eval_top cenv q.
+
+    (* Language: wasm *)
+    Definition eval_wasm (q:wasm) (cenv: bindings) : option data :=
+      WasmBinary.wasm_eval_top cenv q.
 
   End EvalFunctions.
 
@@ -202,6 +207,7 @@ Section CompEval.
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_wasm_ast q => lift_output (eval_wasm_ast q (lift_input ev_in))
+      | Q_wasm q => lift_output (eval_wasm q (lift_input ev_in))
       | Q_error err => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       end.
 
@@ -233,6 +239,7 @@ Section CompEval.
       | Q_java _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_wasm_ast _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_wasm _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       end.
 

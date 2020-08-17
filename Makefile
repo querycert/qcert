@@ -370,10 +370,10 @@ docs:
 ## Misc
 
 clean_detritus:
-	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 scripts/remove_detritus_derived_file.sh
+	@find . \( -name '*.vo' -or -name '*.vos' -or -name '*.vok' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 scripts/remove_detritus_derived_file.sh
 
 remove_all_derived:
-	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
+	@find . \( -name '*.vo' -or -name '*.vos' -or -name '*.vok' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
 
 Makefile.coq: Makefile Makefile.coq_modules $(FILES)
 	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq

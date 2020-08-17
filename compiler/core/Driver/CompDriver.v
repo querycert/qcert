@@ -45,6 +45,7 @@ Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
 Require Import WasmAst.
+Require Import WasmBinary.
 
 (* Translations *)
 Require Import OQLtoNRAEnv.
@@ -81,6 +82,7 @@ Require Import NNRCMRtoDNNRC.
 Require Import DNNRCtotDNNRC.
 Require Import tDNNRCtoSparkDF.
 Require Import ImpEJsontoWasmAst.
+Require Import WasmAsttoWasmBinary.
 
 (* Optimizers *)
 Require Import NRAEnvOptim.
@@ -222,6 +224,9 @@ Section CompDriver.
     Definition imp_ejson_to_wasm_ast (q: @imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : wasm_ast :=
       imp_ejson_to_wasm_ast brand_relation_brands q.
 
+    Definition wasm_ast_to_wasm (q: wasm_ast) : wasm :=
+      wasm_ast_to_wasm q.
+
     Local Open Scope nstring_scope.
     Definition js_ast_to_javascript (q: js_ast) : javascript := js_ast_to_js_top q.
 
@@ -306,7 +311,11 @@ Section CompDriver.
     | Dv_dnnrc_to_dnnrc_typed : tdbindings -> dnnrc_typed_driver -> dnnrc_driver
   .
 
+  Inductive wasm_driver : Set :=
+  | Dv_wasm_stop : wasm_driver.
+
   Inductive wasm_ast_driver : Set :=
+  | Dv_wasm_ast_to_wasm : wasm_driver -> wasm_ast_driver
   | Dv_wasm_ast_stop : wasm_ast_driver.
 
   Inductive imp_ejson_driver : Set :=
@@ -462,8 +471,8 @@ Section CompDriver.
   | Dv_java : java_driver -> driver
   | Dv_spark_df : spark_df_driver -> driver
   | Dv_wasm_ast : wasm_ast_driver -> driver
+  | Dv_wasm : wasm_driver -> driver
   | Dv_error : string -> driver.
-
 
   Tactic Notation "driver_cases" tactic(first) ident(c) :=
     first;
@@ -492,6 +501,7 @@ Section CompDriver.
     | Case_aux c "Dv_java"%string
     | Case_aux c "Dv_spark_df"%string
     | Case_aux c "Dv_wasm_ast"%string
+    | Case_aux c "Dv_wasm"%string
     | Case_aux c "Dv_error"%string ].
 
 
@@ -526,6 +536,7 @@ Section CompDriver.
     | Dv_java _ => L_java
     | Dv_spark_df _ => L_spark_df
     | Dv_wasm_ast _ => L_wasm_ast
+    | Dv_wasm _ => L_wasm
     | Dv_error err => L_error ("language of "++err)
     end.
 
@@ -553,9 +564,15 @@ Section CompDriver.
     | Dv_spark_df_stop => 1
     end.
 
+  Definition driver_length_wasm (dv: wasm_driver) :=
+    match dv with
+    | Dv_wasm_stop => 1
+    end.
+
   Definition driver_length_wasm_ast (dv: wasm_ast_driver) :=
     match dv with
     | Dv_wasm_ast_stop => 1
+    | Dv_wasm_ast_to_wasm dv => 1 + driver_length_wasm dv
     end.
 
   Fixpoint driver_length_imp_ejson (dv: imp_ejson_driver) :=
@@ -732,6 +749,7 @@ Section CompDriver.
     | Dv_java dv => driver_length_java dv
     | Dv_spark_df dv => driver_length_spark_df dv
     | Dv_wasm_ast dv => driver_length_wasm_ast dv
+    | Dv_wasm dv => driver_length_wasm dv
     | Dv_error s => 1
     end.
 
@@ -775,10 +793,21 @@ Section CompDriver.
       in
       (Q_spark_df q) :: queries.
 
+    Definition compile_wasm (dv: wasm_driver) (q: wasm) : list query :=
+      let queries :=
+          match dv with
+          | Dv_wasm_stop => nil
+          end
+      in
+      (Q_wasm q) :: queries.
+
     Definition compile_wasm_ast (dv: wasm_ast_driver) (q: wasm_ast) : list query :=
       let queries :=
           match dv with
           | Dv_wasm_ast_stop => nil
+          | Dv_wasm_ast_to_wasm dv =>
+            let q := wasm_ast_to_wasm q in
+            compile_wasm dv q
           end
       in
       (Q_wasm_ast q) :: queries.
@@ -1111,6 +1140,7 @@ Section CompDriver.
       | (Dv_java dv, Q_java q) => compile_java dv q
       | (Dv_spark_df dv, Q_spark_df q) => compile_spark_df dv q
       | (Dv_wasm_ast dv, Q_wasm_ast q) => compile_wasm_ast dv q
+      | (Dv_wasm dv, Q_wasm q) => compile_wasm dv q
       | (Dv_error s, _) => (Q_error ("[Driver Error]" ++ s)) :: nil
       | (_, _) => (Q_error "incompatible query and driver") :: nil
       end.
@@ -1148,7 +1178,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1180,7 +1211,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1212,7 +1244,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1244,7 +1277,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1276,7 +1310,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1308,7 +1343,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1340,7 +1376,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1372,7 +1409,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1404,7 +1442,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1436,7 +1475,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1468,7 +1508,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1500,7 +1541,8 @@ Section CompDriver.
       | Dv_nraenv_core _
       | Dv_dnnrc_typed _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1532,7 +1574,8 @@ Section CompDriver.
       | Dv_nraenv_core _
       | Dv_dnnrc_typed _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1564,7 +1607,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
         Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
         Dv_error ("Cannot compile to error ("++err++")")
@@ -1596,7 +1640,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1628,7 +1673,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1662,7 +1708,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1697,7 +1744,8 @@ Section CompDriver.
       | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_df _ =>
+      | Dv_spark_df _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1729,7 +1777,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1762,7 +1811,8 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1796,7 +1846,8 @@ Section CompDriver.
       | Dv_js_ast _
       | Dv_javascript _
       | Dv_java _
-      | Dv_wasm_ast _ =>
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1829,6 +1880,41 @@ Section CompDriver.
       | Dv_spark_df _
       | Dv_dnnrc_typed _
       | Dv_java _
+      | Dv_wasm_ast _
+      | Dv_wasm _ =>
+          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
+      end
+    | L_wasm_ast =>
+      match dv with
+      | Dv_wasm dv =>
+        Dv_wasm_ast (Dv_wasm_ast_to_wasm dv)
+      | Dv_camp _
+      | Dv_nraenv_core _
+      | Dv_nraenv _
+      | Dv_nra _
+      | Dv_camp_rule _
+      | Dv_tech_rule _
+      | Dv_designer_rule _
+      | Dv_oql _
+      | Dv_sql _
+      | Dv_sqlpp _
+      | Dv_lambda_nra _
+      | Dv_nnrc_core _
+      | Dv_nnrc _
+      | Dv_nnrs_core _
+      | Dv_nnrs _
+      | Dv_nnrs_imp _
+      | Dv_imp_data _
+      | Dv_nnrcmr _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
+      | Dv_javascript _
+      | Dv_java _
+      | Dv_spark_df _
+      | Dv_imp_ejson _
+      | Dv_js_ast _
       | Dv_wasm_ast _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1837,7 +1923,7 @@ Section CompDriver.
     | L_javascript
     | L_java
     | L_spark_df
-    | L_wasm_ast =>
+    | L_wasm =>
       Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
     | L_error err =>
       Dv_error ("No compilation from error ("++err++")")
@@ -1871,6 +1957,7 @@ Section CompDriver.
     | L_java => Dv_java Dv_java_stop
     | L_spark_df => Dv_spark_df Dv_spark_df_stop
     | L_wasm_ast => Dv_wasm_ast Dv_wasm_ast_stop
+    | L_wasm => Dv_wasm Dv_wasm_stop
     | L_error err => Dv_error ("No driver for error: "++err)
     end.
 
@@ -2045,6 +2132,8 @@ Section CompDriver.
     | Dv_java (Dv_java_stop) => (L_java, None)
     | Dv_spark_df (Dv_spark_df_stop) => (L_spark_df, None)
     | Dv_wasm_ast (Dv_wasm_ast_stop) => (L_wasm_ast, None)
+    | Dv_wasm_ast (Dv_wasm_ast_to_wasm dv) => (L_wasm_ast, Some (Dv_wasm dv))
+    | Dv_wasm (Dv_wasm_stop) => (L_wasm, None)
     | Dv_error err => (L_error err, None)
     end.
 
@@ -2107,11 +2196,30 @@ Section CompDriver.
     reflexivity.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_wasm_ast:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_wasm_ast dv))) (Dv_wasm_ast dv)).
+  Lemma target_language_of_driver_is_postfix_wasm:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_wasm dv))) (Dv_wasm dv)).
   Proof.
     destruct dv.
     reflexivity.
+  Qed.
+
+  Lemma target_language_of_driver_is_postfix_wasm_ast:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_wasm_ast dv))) (Dv_wasm_ast dv)).
+  Proof.
+    destruct dv; simpl;
+      try reflexivity
+    ; rewrite target_language_of_driver_equation
+    ; simpl.
+    - eapply is_postfix_plus_one with
+               (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 None
+                 EmptyString
+                 nil
+                 EmptyString
+                 nil) (lang:=L_wasm_ast)
+      ; [eapply target_language_of_driver_is_postfix_wasm | | ]; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_dnnrc_typed:
@@ -2596,6 +2704,7 @@ Section CompDriver.
          target_language_of_driver_is_postfix_javascript
          target_language_of_driver_is_postfix_java
          target_language_of_driver_is_postfix_spark_df
+         target_language_of_driver_is_postfix_wasm
          target_language_of_driver_is_postfix_wasm_ast
          target_language_of_driver_is_postfix_dnnrc_typed
          target_language_of_driver_is_postfix_dnnrc
@@ -2803,6 +2912,21 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_camp_rule, L_wasm =>
+        L_camp_rule
+          :: L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_camp_rule, L_java =>
         L_camp_rule
           :: L_camp
@@ -3004,6 +3128,22 @@ Section CompDriver.
           :: L_imp_data
           :: L_imp_ejson
           :: L_wasm_ast
+          :: nil
+      | L_tech_rule, L_wasm =>
+        L_tech_rule
+          :: L_camp_rule
+          :: L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
           :: nil
       | L_tech_rule, L_java =>
         L_tech_rule
@@ -3218,6 +3358,22 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_designer_rule, L_wasm =>
+        L_designer_rule
+          :: L_camp_rule
+          :: L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_designer_rule, L_java =>
         L_designer_rule
           :: L_camp_rule
@@ -3408,6 +3564,20 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_camp, L_wasm =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_camp, L_java =>
         L_camp
           :: L_nraenv
@@ -3588,6 +3758,20 @@ Section CompDriver.
           :: L_imp_data
           :: L_imp_ejson
           :: L_wasm_ast
+          :: nil
+      | L_oql, L_wasm =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
           :: nil
       | L_oql, L_java =>
         L_oql
@@ -3771,6 +3955,20 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_sql, L_wasm =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_sql, L_java =>
         L_sql
           :: L_nraenv
@@ -3952,6 +4150,20 @@ Section CompDriver.
           :: L_imp_data
           :: L_imp_ejson
           :: L_wasm_ast
+          :: nil
+      | L_sqlpp, L_wasm =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
           :: nil
       | L_sqlpp, L_java =>
         L_sqlpp
@@ -4135,6 +4347,20 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_lambda_nra, L_wasm =>
+        L_lambda_nra
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_lambda_nra, L_java =>
         L_lambda_nra
           :: L_nraenv
@@ -4308,6 +4534,21 @@ Section CompDriver.
           :: L_imp_data
           :: L_imp_ejson
           :: L_wasm_ast
+          :: nil
+      | L_nra, L_wasm =>
+        L_nra
+          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
           :: nil
       | L_nra, L_java =>
         L_nra
@@ -4489,6 +4730,20 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nraenv_core, L_wasm =>
+        L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_nraenv_core, L_java =>
         L_nraenv_core
           :: L_nraenv
@@ -4660,6 +4915,19 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nraenv, L_wasm =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_nraenv, L_java =>
         L_nraenv
           :: L_nraenv
@@ -4811,6 +5079,18 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nnrc_core, L_wasm =>
+        L_nnrc_core
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_nnrc_core, L_java =>
         L_nnrc_core
           :: L_nnrc
@@ -4958,6 +5238,17 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nnrc, L_wasm =>
+        L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_nnrc, L_java =>
         L_nnrc
           :: L_nnrc
@@ -5081,6 +5372,15 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nnrs, L_wasm =>
+        L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       (* From nnrs_core *)
       | L_nnrs_core, L_nnrs_core =>
         L_nnrs_core
@@ -5138,6 +5438,16 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nnrs_core, L_wasm =>
+        L_nnrs_core
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       (* From nnrs_imp: *)
       | L_nnrs_imp, L_nnrs_imp =>
         L_nnrs_imp
@@ -5176,6 +5486,14 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nnrs_imp, L_wasm =>
+        L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       (* From imp_data: *)
       | L_imp_data, L_imp_data =>
         L_imp_data
@@ -5200,6 +5518,12 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_imp_data, L_wasm =>
+        L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       (* From imp_ejson: *)
       | L_imp_ejson, L_imp_ejson =>
         L_imp_ejson
@@ -5216,6 +5540,11 @@ Section CompDriver.
       | L_imp_ejson, L_wasm_ast =>
         L_imp_ejson
           :: L_wasm_ast
+          :: nil
+      | L_imp_ejson, L_wasm =>
+        L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
           :: nil
       (* From nnrcmr: *)
       | L_nnrcmr, L_nnrcmr =>
@@ -5336,6 +5665,19 @@ Section CompDriver.
           :: L_imp_ejson
           :: L_wasm_ast
           :: nil
+      | L_nnrcmr, L_wasm =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrs
+          :: L_nnrs_imp
+          :: L_nnrs_imp
+          :: L_imp_data
+          :: L_imp_ejson
+          :: L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_nnrcmr, L_java =>
         L_nnrcmr
           :: L_nnrcmr
@@ -5422,8 +5764,15 @@ Section CompDriver.
       | L_spark_df, L_spark_df =>
         L_spark_df :: nil
       (* From wasm_ast *)
+      | L_wasm_ast, L_wasm =>
+        L_wasm_ast
+          :: L_wasm
+          :: nil
       | L_wasm_ast, L_wasm_ast =>
         L_wasm_ast :: nil
+      (* From wasm *)
+      | L_wasm, L_wasm =>
+        L_wasm :: nil
       | _, _ =>
         let err :=
             "No default path defined from "++(name_of_language source)++" to "++(name_of_language target)
@@ -5524,6 +5873,15 @@ Section CompDriver.
     Qed.
 
     Hint Resolve exists_path_from_source_target_completeness_js_ast : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_wasm :
+        (forall dv,
+            exists_path_from_source_target L_wasm (target_language_of_driver (Dv_wasm dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_wasm : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_wasm_ast :
         (forall dv,
