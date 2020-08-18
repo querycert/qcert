@@ -45,19 +45,11 @@ val local_tee : int -> instr
 
 (** {2} control structure *)
 
-val if_ :
-  ?params: type_ list ->
-  ?result: type_ list ->
-  instr list -> instr list -> instr
+val if_ : ?result: type_ list -> instr list -> instr list -> instr
 
-val block:
-  ?params: type_ list ->
-  ?result: type_ list ->
-  instr list -> instr
+val block: ?result: type_ list -> instr list -> instr
 
-val loop:
-  ?params: type_ list ->
-  ?result: type_ list -> instr list -> instr
+val loop: ?result: type_ list -> instr list -> instr
 
 val br: int -> instr
 val br_if: int -> instr

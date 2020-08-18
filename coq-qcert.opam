@@ -32,7 +32,7 @@ depends: [
   "menhir"
   "base64"
   "uri"
-  "wasm" {= "1.1.1"}
+  "wasm" {= "1.0.1"}
   "calendar"
 ]
 

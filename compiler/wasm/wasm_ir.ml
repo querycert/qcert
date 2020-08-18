@@ -229,7 +229,7 @@ let module_to_spec (m: module_) =
     List.map (fun (_, t) ->
         { Wasm.ttype = TableType ({ min = Int32.of_int t.t_min_size
                                   ; max= Option.map Int32.of_int t.t_max_size
-                                  }, FuncRefType)
+                                  }, AnyFuncType )
         } @@ no_region
       ) (Table.elements ctx.tab)
   in
@@ -258,11 +258,11 @@ module Intructions = struct
   let i32_const' x = i32_const (Int32.of_int x)
   let f64_const x _ = Const (F64 (F64.of_float x) @@ no_region)
   let i64_const x _ = Const (I64 x @@ no_region)
-  let local_get i _ = LocalGet (Int32.of_int i @@ no_region)
-  let local_set i _ = LocalSet (Int32.of_int i @@ no_region)
-  let local_tee i _ = LocalTee (Int32.of_int i @@ no_region)
-  let global_get x ctx = GlobalGet (global_to_spec ctx x)
-  let global_set x ctx = GlobalSet (global_to_spec ctx x)
+  let local_get i _ = GetLocal (Int32.of_int i @@ no_region)
+  let local_set i _ = SetLocal (Int32.of_int i @@ no_region)
+  let local_tee i _ = TeeLocal (Int32.of_int i @@ no_region)
+  let global_get x ctx = GetLocal (global_to_spec ctx x)
+  let global_set x ctx = SetLocal (global_to_spec ctx x)
   let call x ctx = Call (func_to_spec ctx x)
   let call_indirect ?(params=[]) ?(result=[]) x ctx =
     let _ = table_to_spec ctx x in
@@ -348,13 +348,14 @@ module Intructions = struct
   let i64_or _ = Binary (I64 I64Op.Or)
 
   let load m ?pack ?offset type_ ctx =
+    let open Memory in
     let sz = Option.map (function
-        | S8 -> Pack8, SX
-        | S16 -> Pack16, SX
-        | S32 -> Pack32, SX
-        | U8 -> Pack8, ZX
-        | U16 -> Pack16, ZX
-        | U32 -> Pack32, ZX
+        | S8 -> Mem8, SX
+        | S16 -> Mem16, SX
+        | S32 -> Mem32, SX
+        | U8 -> Mem8, ZX
+        | U16 -> Mem16, ZX
+        | U32 -> Mem32, ZX
       ) pack
     in
     let align =
@@ -363,22 +364,23 @@ module Intructions = struct
       | F32Type, None -> 2
       | I64Type, None
       | F64Type, None -> 3
-      | _, Some (Pack8, _) -> 0
-      | _, Some (Pack16, _) -> 1
-      | _, Some (Pack32, _) -> 2
+      | _, Some (Mem8, _) -> 0
+      | _, Some (Mem16, _) -> 1
+      | _, Some (Mem32, _) -> 2
     in
     let offset = Int32.of_int (Option.value ~default:0 offset) in
     let _id = memory_to_spec ctx m in
     Load {ty = type_; align; offset; sz}
 
   let store m ?pack ?offset type_ ctx =
+    let open Memory in
     let sz = Option.map (function
-        | S8 -> Pack8
-        | S16 -> Pack16
-        | S32 -> Pack32
-        | U8 -> Pack8
-        | U16 -> Pack16
-        | U32 -> Pack32
+        | S8 -> Mem8
+        | S16 -> Mem16
+        | S32 -> Mem32
+        | U8 -> Mem8
+        | U16 -> Mem16
+        | U32 -> Mem32
       ) pack
     in
     let align =
@@ -387,32 +389,22 @@ module Intructions = struct
       | F32Type, None -> 2
       | I64Type, None
       | F64Type, None -> 3
-      | _, Some (Pack8) -> 0
-      | _, Some (Pack16) -> 1
-      | _, Some (Pack32) -> 2
+      | _, Some (Mem8) -> 0
+      | _, Some (Mem16) -> 1
+      | _, Some (Mem32) -> 2
     in
     let offset = Int32.of_int (Option.value ~default:0 offset) in
     let _id = memory_to_spec ctx m in
     Store {ty = type_; align; offset; sz}
 
-  let block_type ctx ~params ~result =
-    match params, result with
-    | [], [res] -> ValBlockType (Some res)
-    | _ ->
-      let t = func_type_to_spec ctx ~params ~result in
-      VarBlockType t
+  let if_ ?(result=[]) then_ else_ ctx =
+    If (result, List.map (instr_to_spec ctx) then_, List.map (instr_to_spec ctx) else_)
 
-  let if_ ?(params=[]) ?(result=[]) then_ else_ ctx =
-    let t = block_type ctx ~params ~result in
-    If (t, List.map (instr_to_spec ctx) then_, List.map (instr_to_spec ctx) else_)
+  let block ?(result=[]) body ctx =
+    Block (result, List.map (instr_to_spec ctx) body)
 
-  let block ?(params=[]) ?(result=[]) body ctx =
-    let t = block_type ctx ~params ~result in
-    Block (t, List.map (instr_to_spec ctx) body)
-
-  let loop ?(params=[]) ?(result=[]) body ctx =
-    let t = block_type ctx ~params ~result in
-    Loop (t, List.map (instr_to_spec ctx) body)
+  let loop ?(result=[]) body ctx =
+    Loop (result, List.map (instr_to_spec ctx) body)
 
   let br i _ = Br (Int32.of_int i @@ no_region)
   let br_if i _ = BrIf (Int32.of_int i @@ no_region)
