@@ -8,12 +8,8 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
 
   open ImpEJson
 
-  (** [eval brand_hierarchy wasm_module fn_name environment *)
-  val eval : Wasm.Ast.module_ -> char list
-    -> (char list * 'a ejson) list -> ('a ejson) option
-  (* TODO remove brand hierarchy arg from wasm eval.
-   * It's already compiled into the module and ignored during eval.
-   *)
+  (** [eval wasm_module fn_name environment *)
+  val eval : Wasm.Ast.module_ -> char list -> (char list * 'a ejson) list -> ('a ejson) option
 
   val imp_ejson_to_wasm_ast : brand_hierarchy -> ('a,'b) imp_ejson -> Wasm.Ast.module_
 end = struct
