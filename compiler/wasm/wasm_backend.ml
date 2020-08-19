@@ -581,9 +581,8 @@ end = struct
       | ImpStmtIf (condition, then_, else_) ->
         let open Ir in
         (expr ctx condition) @
-        (* TODO: check that expr is a EjBool? *)
         [ foreign "EjBool#get:value" [i32] [i32]
-        ; if_ (statement ctx then_) (statement ctx then_)
+        ; if_ (statement ctx then_) (statement ctx else_)
         ]
 
     let function_  ctx fn : Ir.func =
