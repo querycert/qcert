@@ -549,8 +549,8 @@ export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
 }
 
 function compare<T>(a: T, b: T): EjNumber {
-  if (a < b) { return c_neg1; }
-  if (a > b) { return c_1; }
+  if (a < b) { return c_1; }
+  if (a > b) { return c_neg1; }
   return c_0;
 }
 
