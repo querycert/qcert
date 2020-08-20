@@ -455,6 +455,7 @@ end = struct
       | EJsonRuntimeNatLt -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatPlus -> foreign [i32; i32] [i32]
       | EJsonRuntimeFloatOfNat -> foreign [i32] [i32]
+      | EJsonRuntimeNatOfFloat -> foreign [i32] [i32]
       | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
 
     let rt_op ctx op args: Ir.instr =
