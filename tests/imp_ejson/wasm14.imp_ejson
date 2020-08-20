@@ -1,4 +1,4 @@
-/* cast objects */
+/* block scoping */
 module main {
   wasm14(x) return y {
     let a := 1;
