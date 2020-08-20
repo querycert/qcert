@@ -4,7 +4,7 @@ module main {
     let a0 := { $class: ["Address"], $data: { city : "xy" }};
     let a1 := { $class: ["USAddress"], $data: { city : "NY", zip : 10001 }};
     let p0 := { $class: ["Person"], $data: { name: "donald" }} ;
-    let y :=
+    y :=
     /* valid casts */
       [[ Runtime.cast(["Address"], a0)
        , Runtime.cast(["USAddress"], a1)

@@ -661,7 +661,9 @@ end = struct
 
   let eval = Eval.eval
 
-  let imp_ejson_to_wasm_ast = Translate.imp
+  module Imp_scoping = Wasm_imp_scoping.Make(ImpEJson)
+
+  let imp_ejson_to_wasm_ast h imp = Translate.imp h (Imp_scoping.apply imp)
 
   let to_string q =
     let sexpr = Arrange.module_ q in
