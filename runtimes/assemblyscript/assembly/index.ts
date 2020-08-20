@@ -697,6 +697,6 @@ export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
 
 export function runtimeNatOfFloat(a: EjNumber): EjBigInt {
   let x : f64 = trunc(a.value);
-  let i : i64 = x as i64;
+  let i : i64 = <i64>x;
   return new EjBigInt(i);
 }
