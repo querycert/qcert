@@ -19,8 +19,12 @@ async function main(runtime, module, input, expected) {
     console.log("output:");
     console.log(JSON.stringify(res, null, 2));
   } catch(err) {
-    console.log("error output:");
-    console.log(err);
+    console.log("output:");
+    let res = {
+      "error": "Eval failed",
+      "message": err.message
+    };
+    console.log(JSON.stringify(res, null,2));
   }
 }
 
