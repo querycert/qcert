@@ -17,18 +17,15 @@ async function main(runtime, module, input, expected) {
   let res;
   try {
     res = await engine.invoke(rt, mod, "qcert_main", arg);
-    console.log("output:");
-    console.log(JSON.stringify(res, null, 2));
   } catch(err) {
-    let res = {
+    console.log("error:");
+    console.log(err);
+    res = {
       "error": "Eval failed"
     };
-    console.log("output:");
-    console.log(JSON.stringify(res, null, 2));
-    console.log("error:");
-    console.log(err.message);
-    console.log(err.stack);
   }
+  console.log("output:");
+  console.log(JSON.stringify(res, null, 2));
 }
 
 const rt = process.argv[2];
