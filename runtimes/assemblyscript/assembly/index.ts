@@ -669,12 +669,7 @@ export function runtimeCast(hierarchy: EjArray, brands: EjArray, x: EjObject) : 
       return c_none;
     }
   }
-  // return re-branded object
-  return ejLeft(
-    ejObject(
-      [[c_$class, brands],
-       [c_$data, runtimeRecDot(x, c_$data)
-    ]]));
+  return ejLeft(x);
 }
 
 export function runtimeNatLe(a: EjBigInt, b: EjBigInt): EjBool {
