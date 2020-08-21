@@ -14,18 +14,17 @@ async function main(runtime, module, input, expected) {
   let exp = JSON.parse(fs.readFileSync(expected));
   console.log("expected:");
   console.log(JSON.stringify(exp, null, 2));
+  let res;
   try {
-    let res = await engine.invoke(rt, mod, "qcert_main", arg);
-    console.log("output:");
-    console.log(JSON.stringify(res, null, 2));
+    res = await engine.invoke(rt, mod, "qcert_main", arg);
   } catch(err) {
-    console.log("output:");
     let res = {
       "error": "Eval failed",
       "message": err.message
     };
-    console.log(JSON.stringify(res, null,2));
   }
+  console.log("output:");
+  console.log(JSON.stringify(res, null, 2));
 }
 
 const rt = process.argv[2];
