@@ -526,16 +526,6 @@ cleanall: clean
 
 WASMQCERT=../_build/default/cli/ocaml/qcert.exe
 
-wasm-oql:
-	@i=0 ; \
-	while [ -e oql/wasm$$i.oql ] ; do \
-	  echo === oql/wasm$$i.oql; \
-		$(WASMQCERT) -quiet -source oql -target oql oql/wasm$$i.oql -schema oql/wasm.schema -eval -input oql/wasm.input && \
-		$(WASMQCERT) -quiet -source oql -target wasm oql/wasm$$i.oql -schema oql/wasm.schema && \
-		node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm oql/wasm$$i.wasm oql/wasm.input oql/wasm$${i}_oql.json ; \
-		i=$$(expr $$i + 1 ) ; \
-	done
-
 # reuse input
 imp_ejson/wasm%.input: imp_ejson/wasm.input
 	@cp $< $@
