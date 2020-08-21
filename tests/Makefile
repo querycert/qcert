@@ -536,22 +536,40 @@ wasm-oql:
 		i=$$(expr $$i + 1 ) ; \
 	done
 
-wasm-imp-spec:
-	@i=0 ; \
-	while [ -e imp_ejson/wasm$$i.imp_ejson ] ; do \
-	  echo === imp_ejson/wasm$$i.imp_ejson; \
-		$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input && \
-		$(WASMQCERT) -source imp_ejson -target wasm imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema && \
-		WASM_RUNTIME="../runtimes/assemblyscript/build/untouched.wasm" $(WASMQCERT) -source imp_ejson -target wasm_ast imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input -output imp_ejson/wasm$$i.out -eval-validate ; \
-		i=$$(expr $$i + 1 ) ; \
-	done
+# reuse input
+imp_ejson/wasm%.input: imp_ejson/wasm.input
+	@cp $< $@
 
-wasm-imp:
-	@i=0 ; \
-	while [ -e imp_ejson/wasm$$i.imp_ejson ] ; do \
-	  echo === imp_ejson/wasm$$i.imp_ejson; \
-		$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema -eval -input imp_ejson/wasm.input && \
-		$(WASMQCERT) -quiet -source imp_ejson -target wasm imp_ejson/wasm$$i.imp_ejson -schema imp_ejson/wasm.schema && \
-		node ../runtimes/assemblyscript/cli-runner.js ../runtimes/assemblyscript/build/untouched.wasm imp_ejson/wasm$$i.wasm imp_ejson/wasm.input imp_ejson/wasm$${i}_imp_ejson.json ; \
-		i=$$(expr $$i + 1 ) ; \
-	done
+# reuse schema
+imp_ejson/wasm%.schema: imp_ejson/wasm.schema
+	@cp $< $@
+
+# derive expected output from imp eval
+imp_ejson/%_imp_ejson.json: imp_ejson/%.imp_ejson imp_ejson/%.input
+	@$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson $< -schema imp_ejson/wasm.schema -eval -input imp_ejson/$*.input
+
+# run single test on spec interpreter
+imp_ejson/%.imp_ejson.test.spec: export WASM_RUNTIME=../runtimes/assemblyscript/build/untouched.wasm
+imp_ejson/%.imp_ejson.test.spec: imp_ejson/%.imp_ejson imp_ejson/%_imp_ejson.json imp_ejson/%.input imp_ejson/%.schema
+	@$(WASMQCERT) -source imp_ejson -target wasm_ast -eval -eval-validate \
+		-schema imp_ejson/$*.schema \
+		-input imp_ejson/$*.input -output imp_ejson/$*_imp_ejson.json \
+		$<
+
+# run all imp_ejson tests on spec interpreter
+wasm-imp-spec: $(patsubst %.imp_ejson, %.imp_ejson.test.spec, $(wildcard imp_ejson/*.imp_ejson))
+
+# compile to wasm
+imp_ejson/%.wasm: imp_ejson/%.imp_ejson imp_ejson/%.schema
+	@$(WASMQCERT) -quiet -source imp_ejson -target wasm -schema imp_ejson/$*.schema $<
+
+# run single test on node
+imp_ejson/%.imp_ejson.run.node: imp_ejson/%.wasm imp_ejson/%_imp_ejson.json imp_ejson/%.input
+	@node ../runtimes/assemblyscript/cli-runner.js \
+		../runtimes/assemblyscript/build/untouched.wasm \
+		imp_ejson/$*.wasm \
+		imp_ejson/$*.input \
+		imp_ejson/$*_imp_ejson.json
+
+# run all imp_ejson tests on node
+wasm-imp-node: $(patsubst %.imp_ejson, %.imp_ejson.run.node, $(wildcard imp_ejson/*.imp_ejson))
