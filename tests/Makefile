@@ -539,7 +539,6 @@ imp_ejson/%_imp_ejson.json: imp_ejson/%.imp_ejson imp_ejson/%.input
 	@$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson $< -schema imp_ejson/wasm.schema -eval -input imp_ejson/$*.input
 
 # run single test on spec interpreter
-imp_ejson/%.imp_ejson.test.spec: export WASM_RUNTIME=../runtimes/assemblyscript/build/untouched.wasm
 imp_ejson/%.imp_ejson.test.spec: imp_ejson/%.imp_ejson imp_ejson/%_imp_ejson.json imp_ejson/%.input imp_ejson/%.schema
 	@$(WASMQCERT) -source imp_ejson -target wasm_ast -eval -eval-validate \
 		-schema imp_ejson/$*.schema \

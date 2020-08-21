@@ -8,6 +8,8 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
 
   open ImpEJson
 
+  val runtime: Wasm.Ast.module_
+
   (** [eval wasm_module fn_name environment *)
   val eval : Wasm.Ast.module_ -> char list -> (char list * 'a ejson) list -> ('a ejson) option
 
@@ -15,6 +17,11 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
 end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)
+
+  let runtime =
+    let m = Decode.decode "runtime.wasm" Wasm_runtime.runtime_wasm in
+    let () = Valid.check_module m in
+    m
 
   let ejson_of_cejson = function
     | Coq_cejnull -> Coq_ejnull
@@ -46,33 +53,8 @@ end = struct
       in
       Func.alloc_host Types.(FuncType ([I32Type; I32Type; I32Type; I32Type], [])) f
 
-    (* load Wasm runtime from file specified in WASM_RUNTIME env *)
-    let runtime () =
-      match Sys.getenv_opt "WASM_RUNTIME" with
-      | Some rt when Sys.file_exists rt ->
-        let ic = open_in rt in
-        let bs =
-          let rec read acc =
-            match input_line ic with
-            | l -> read (l :: acc)
-            | exception End_of_file ->
-              List.rev acc |> String.concat "\n"
-          in
-          read []
-        in
-        let m = Decode.decode rt bs in
-        let () =
-          try Valid.check_module m
-          with _ -> failwith "WASM_RUNTIME does not pass validation"
-        in
-        m
-      | None ->
-        failwith "WASM_RUNTIME environment variable is missing"
-      | Some rt ->
-        failwith (Printf.sprintf "WASM_RUNTIME=%s is not a file" rt)
-
     let eval module_ fn env =
-      let rt = Eval.init (runtime ()) [ExternFunc abort] in
+      let rt = Eval.init runtime [ExternFunc abort] in
       let () = Valid.check_module module_ in
       let mod_ =
         let imports = List.map (fun (import : Ast.import) ->

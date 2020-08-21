@@ -18,3 +18,17 @@
 (copy_files parsing/*.{mll,mly})
 (copy_files# lib/*.{ml,mli})
 
+(rule
+  (target wasm_runtime.ml)
+  (deps ../runtimes/assemblyscript/build/untouched.wasm)
+  (action
+    (with-stdout-to
+      wasm_runtime.ml
+      (progn (copy ../runtimes/assemblyscript/build/untouched.wasm runtime.wasm)
+             (echo "let runtime_wasm = \"")
+             (run ../tools/binary_to_string.exe runtime.wasm)
+             (echo "\"")
+      )
+    )
+  )
+)
