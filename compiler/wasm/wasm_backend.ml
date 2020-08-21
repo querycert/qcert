@@ -448,6 +448,7 @@ end = struct
       | EJsonRuntimeArrayLength -> foreign [i32] [i32]
       | EJsonRuntimeUnion -> foreign [i32; i32] [i32]
       | EJsonRuntimeDistinct -> foreign [i32] [i32]
+      | EJsonRuntimeFlatten -> foreign [i32] [i32]
       | EJsonRuntimeEither -> foreign [i32] [i32]
       | EJsonRuntimeToLeft -> foreign [i32] [i32]
       | EJsonRuntimeToRight -> foreign [i32] [i32]

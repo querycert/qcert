@@ -610,6 +610,19 @@ export function runtimeDistinct(a: EjArray) : EjArray {
   return new EjArray(result);
 }
 
+export function runtimeFlatten(a: EjArray) : EjArray {
+  let result = new Array<EjValue>(0);
+  let content = a.values;
+  for (let iOuter=0, nOuter=content.length; iOuter<nOuter; iOuter=iOuter+1) {
+    let aInner = changetype<EjArray>(content[iOuter]);
+    let aInnerContent = aInner.values;
+    for (let iInner=0, nInner=aInnerContent.length; iInner<nInner; iInner = iInner+1) {
+      result.push(aInnerContent[iInner]);
+    }
+  }
+  return new EjArray(result);
+}
+
 function ejObject(l: Array<Array<EjValue>>): EjObject {
   let obj = new EjObject();
   for (let i=0; i < l.length; i++) {
