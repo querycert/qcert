@@ -659,7 +659,9 @@ end = struct
 
   (* Satisfy public interface *)
 
-  let eval = Eval.eval
+  let eval module_ fn_name arg =
+    try Eval.eval module_ fn_name arg
+    with _ -> None
 
   module Imp_scoping = Wasm_imp_scoping.Make(ImpEJson)
 
