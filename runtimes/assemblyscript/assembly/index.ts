@@ -592,6 +592,24 @@ export function runtimeArrayLength(a: EjArray) : EjBigInt {
   return new EjBigInt(a.values.length);
 }
 
+export function runtimeUnion(a: EjArray, b: EjArray) : EjArray {
+  return new EjArray(a.values.concat(b.values));
+}
+
+export function runtimeDistinct(a: EjArray) : EjArray {
+  let result = new Array<EjValue>(0);
+  let content = a.values;
+  for (let i=0; i < content.length; i=i+1) {
+    let v = content[i];
+    let dup = false;
+    for (let j=i+1; j < content.length; j=j+1) {
+      if (runtimeEqual(v,content[j]).value) { dup = true; break; }
+    }
+    if (!(dup)) { result.push(v); } else { dup = false; }
+  }
+  return new EjArray(result);
+}
+
 function ejObject(l: Array<Array<EjValue>>): EjObject {
   let obj = new EjObject();
   for (let i=0; i < l.length; i++) {
