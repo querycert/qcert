@@ -28,8 +28,8 @@ all:
 	@$(MAKE) install-local
 
 build: 
-	@$(MAKE) qcert-compiler
 	@$(MAKE) MAKEFLAGS= qcert-runtimes
+	@$(MAKE) qcert-compiler
 	@$(MAKE) MAKEFLAGS= qcert-cli
 
 clean: Makefile.coq remove_all_derived
@@ -51,6 +51,7 @@ cleanmost: Makefile.coq
 	- @rm -f *~
 
 cleanall: Makefile.coq remove_all_derived
+	- @$(MAKE) cleanall-runtimes
 	- @$(MAKE) cleanall-qcert-compiler
 	- @$(MAKE) cleanmost
 
@@ -245,6 +246,9 @@ qcert-runtimes:
 ifneq ($(JAVASCRIPT),)
 	@$(MAKE) javascript-runtime
 endif
+ifneq ($(JAVASCRIPT),)
+	@$(MAKE) assemblyscript-runtime
+endif
 ifneq ($(JAVA),)
 	@$(MAKE) java-runtime
 endif
@@ -257,6 +261,12 @@ javascript-runtime:
 	@echo "[Q*cert] JavaScript runtime"
 	@echo "[Q*cert] "
 	@$(MAKE) -C runtimes/javascript
+
+assemblyscript-runtime:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] WebAssembly runtime"
+	@echo "[Q*cert] "
+	@$(MAKE) -C runtimes/assemblyscript
 
 java-runtime:
 	@echo "[Q*cert] "
@@ -272,6 +282,7 @@ spark2-runtime:
 
 clean-runtimes:
 	- @$(MAKE) -C runtimes/javascript clean
+	- @$(MAKE) -C runtimes/assemblyscript clean
 	- @$(MAKE) -C runtimes/java clean
 	- @$(MAKE) -C runtimes/spark2 clean
 	- @rm -rf bin/lib
@@ -279,6 +290,7 @@ clean-runtimes:
 
 cleanall-runtimes:
 	- @$(MAKE) -C runtimes/javascript cleanall
+	- @$(MAKE) -C runtimes/assemblyscript cleanall
 	- @$(MAKE) -C runtimes/java cleanall
 	- @$(MAKE) -C runtimes/spark2 cleanall
 	- @rm -rf bin/lib
