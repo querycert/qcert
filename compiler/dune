@@ -19,15 +19,25 @@
 (copy_files# lib/*.{ml,mli})
 
 (rule
-  (target wasm_runtime.ml)
-  (deps ../runtimes/assemblyscript/build/untouched.wasm)
+  (target runtime.wasm)
+  (deps (source_tree ../runtimes/assemblyscript))
   (action
-    (with-stdout-to
-      wasm_runtime.ml
-      (progn (copy ../runtimes/assemblyscript/build/untouched.wasm runtime.wasm)
-             (echo "let runtime_wasm = \"")
+    (progn
+      (system "cd ../../../runtimes/assemblyscript && npm run asbuild:untouched")
+      (copy ../runtimes/assemblyscript/build/untouched.wasm runtime.wasm)
+    )
+  )
+)
+
+(rule
+  (target wasm_runtime.ml)
+  (deps runtime.wasm)
+  (mode (promote (into generated)))
+  (action
+    (with-stdout-to wasm_runtime.ml
+      (progn (echo "let runtime_wasm = \"")
              (run ../tools/binary_to_string.exe runtime.wasm)
-             (echo "\"")
+             (echo "\"\n")
       )
     )
   )
