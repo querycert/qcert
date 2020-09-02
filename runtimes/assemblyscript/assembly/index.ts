@@ -595,9 +595,9 @@ export function runtimeArrayLength(a: EjArray) : EjBigInt {
 export function runtimeArrayAccess(a: EjArray, b: EjBigInt): EjValue {
   let index = b.value;
   if (b.value < 0 || b.value > a.values.length) {
-    return c_none;
+    throw new Error("runtimeArrayAccess: out of bounds");
   } else {
-    return ejLeft(a.values[i32(b.value)]);
+    return a.values[i32(b.value)];
   }
 }
 
