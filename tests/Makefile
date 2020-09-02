@@ -41,6 +41,7 @@ tests:
 	@$(MAKE) oql-tests
 	@$(MAKE) lambda_nra-tests
 	@$(MAKE) camp-tests
+	@$(MAKE) imp_ejson-tests
 ifneq ($(JAVA),)
 ifneq ($(SQL),)
 	@$(MAKE) sql-tests
@@ -64,6 +65,7 @@ endif
 	tech_rule-test-tests tech_rule-test-tests-js tech_rule-test-tests-java \
 	designer_rule-tests \
 	designer_rule-test-tests \
+	imp_ejson-tests \
 	clean
 
 ## OQL
@@ -237,7 +239,7 @@ lambda_nra-persons-tests:
                             -schema lambda_nra/persons.schema \
                             -eval-validate -output lambda_nra/persons$(N).out || exit 1;))
 lambda_nra-persons-tests-js:
-	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
+	$(foreach N,$(LAMBDANRAPERSONSNUM), \
 	       $(QCERTCOMP) -source lambda_nra -target javascript lambda_nra/persons$(N).lnra -schema lambda_nra/persons.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
                           --input lambda_nra/persons.input \
@@ -450,8 +452,8 @@ designer_rule-test-tests-js:
                           --eval-validate \
                           --query designer_rule/test$(N).js || exit 1 ;)
 
-## IMPEJSON
-IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11
+## IMPEJSON # 13 is failure in javascript (different block scoping between Imp and JS)
+IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 14 16 17 18
 IMPEJSONTARGETS=imp_ejson # dnnrc_typed
 
 imp_ejson-tests:
@@ -536,7 +538,7 @@ imp_ejson/wasm%.schema: imp_ejson/wasm.schema
 
 # derive expected output from imp eval
 imp_ejson/%_imp_ejson.json: imp_ejson/%.imp_ejson imp_ejson/%.input
-	@$(WASMQCERT) -quiet -source imp_ejson -target imp_ejson $< -schema imp_ejson/wasm.schema -eval -input imp_ejson/$*.input
+	@$(WASMQCERT) -quiet -source imp_ejson -path imp_ejson -target imp_ejson $< -schema imp_ejson/wasm.schema -eval -input imp_ejson/$*.input
 
 # run single test on spec interpreter
 imp_ejson/%.imp_ejson.test.spec: imp_ejson/%.imp_ejson imp_ejson/%_imp_ejson.json imp_ejson/%.input imp_ejson/%.schema
@@ -554,6 +556,7 @@ imp_ejson/%.wasm: imp_ejson/%.imp_ejson imp_ejson/%.schema
 
 # run single test on node
 imp_ejson/%.imp_ejson.run.node: imp_ejson/%.wasm imp_ejson/%_imp_ejson.json imp_ejson/%.input
+	@echo imp_ejson/$*.imp_ejson.run.node
 	@node ../runtimes/assemblyscript/cli-runner.js \
 		../runtimes/assemblyscript/build/untouched.wasm \
 		imp_ejson/$*.wasm \
