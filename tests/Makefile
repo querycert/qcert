@@ -30,8 +30,8 @@ JAVARUN=java
 NODERUN=node
 
 #
-QCERTCOMP=../bin/qcert
-QCERTEVAL=../bin/qcert -eval
+QCERTCOMP=../_build/default/cli/ocaml/qcert.exe
+QCERTEVAL=../_build/default/cli/ocaml/qcert.exe -eval
 
 # Default target just builds the code
 all:
@@ -454,7 +454,7 @@ designer_rule-test-tests-js:
 
 ## IMPEJSON # 13 is failure in javascript (different block scoping between Imp and JS)
 IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 14 16 17 18
-IMPEJSONTARGETS=imp_ejson # dnnrc_typed
+IMPEJSONTARGETS=imp_ejson wasm_ast # dnnrc_typed
 
 imp_ejson-tests:
 	@echo "[Q*cert] "
@@ -526,8 +526,6 @@ clean:
 cleanall: clean
 	@rm -f *~ */*~
 
-WASMQCERT=../_build/default/cli/ocaml/qcert.exe
-
 # reuse input
 imp_ejson/wasm%.input: imp_ejson/wasm.input
 	@cp $< $@
@@ -538,11 +536,11 @@ imp_ejson/wasm%.schema: imp_ejson/wasm.schema
 
 # derive expected output from imp eval
 imp_ejson/%_imp_ejson.json: imp_ejson/%.imp_ejson imp_ejson/%.input
-	@$(WASMQCERT) -quiet -source imp_ejson -path imp_ejson -target imp_ejson $< -schema imp_ejson/wasm.schema -eval -input imp_ejson/$*.input
+	@$(QCERTCOMP) -quiet -source imp_ejson -path imp_ejson -target imp_ejson $< -schema imp_ejson/wasm.schema -eval -input imp_ejson/$*.input
 
 # run single test on spec interpreter
 imp_ejson/%.imp_ejson.test.spec: imp_ejson/%.imp_ejson imp_ejson/%_imp_ejson.json imp_ejson/%.input imp_ejson/%.schema
-	@$(WASMQCERT) -source imp_ejson -target wasm_ast -eval -eval-validate \
+	@$(QCERTCOMP) -source imp_ejson -target wasm_ast -eval -eval-validate \
 		-schema imp_ejson/$*.schema \
 		-input imp_ejson/$*.input -output imp_ejson/$*_imp_ejson.json \
 		$<
@@ -552,7 +550,7 @@ wasm-imp-spec: $(patsubst %.imp_ejson, %.imp_ejson.test.spec, $(wildcard imp_ejs
 
 # compile to wasm
 imp_ejson/%.wasm: imp_ejson/%.imp_ejson imp_ejson/%.schema
-	@$(WASMQCERT) -quiet -source imp_ejson -target wasm -schema imp_ejson/$*.schema $<
+	@$(QCERTCOMP) -quiet -source imp_ejson -target wasm -schema imp_ejson/$*.schema $<
 
 # run single test on node
 imp_ejson/%.imp_ejson.run.node: imp_ejson/%.wasm imp_ejson/%_imp_ejson.json imp_ejson/%.input
