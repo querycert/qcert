@@ -592,6 +592,15 @@ export function runtimeArrayLength(a: EjArray) : EjBigInt {
   return new EjBigInt(a.values.length);
 }
 
+export function runtimeArrayAccess(a: EjArray, b: EjBigInt): EjValue {
+  let index = b.value;
+  if (b.value < 0 || b.value > a.values.length) {
+    return c_none;
+  } else {
+    return ejLeft(a.values[i32(b.value)]);
+  }
+}
+
 export function runtimeUnion(a: EjArray, b: EjArray) : EjArray {
   return new EjArray(a.values.concat(b.values));
 }
@@ -713,6 +722,10 @@ export function runtimeNatLt(a: EjBigInt, b: EjBigInt): EjBool {
 
 export function runtimeNatPlus(a: EjBigInt, b: EjBigInt): EjBigInt {
   return new EjBigInt(a.value + b.value);
+}
+
+export function runtimeNatMinus(a: EjBigInt, b: EjBigInt): EjBigInt {
+  return new EjBigInt(a.value - b.value);
 }
 
 export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
