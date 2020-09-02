@@ -60,7 +60,8 @@ function sub_brand(b1,b2) {
     var bsub=null;
     var bsup=null;
     var inheritanceUnbox = isBoxColl(inheritance)?unboxColl(inheritance):inheritance;
-    for (var i=0; i<inheritanceUnbox.length; i=i+1) {
+    var length = inheritanceUnbox.length;
+    for (var i=0; i<length; i=i+1) {
         bsub = inheritanceUnbox[i].sub;
         bsup = inheritanceUnbox[i].sup;
         if ((b1 === bsub) && (b2 === bsup)) { return true; }
@@ -307,7 +308,8 @@ function union(b1, b2) {
     if (content1.length !== collLength(b1)) {
 	      content1 = content1.slice(0, collLength(b1));
     }
-    for (let i = 0; i < content2.length; i++) {
+    var length2 = content2.length;
+    for (let i = 0; i < length2; i++) {
         content1.push(content2[i]);
     }
     var result = boxColl(content1);
