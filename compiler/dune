@@ -20,11 +20,13 @@
 
 (rule
   (target runtime.wasm)
-  (deps (source_tree ../runtimes/assemblyscript))
+  (deps ../runtimes/assemblyscript/assembly/index.ts)
+  (mode (promote (into wasm)))
   (action
     (progn
       (system "cd ../../../runtimes/assemblyscript && npm run asbuild:untouched")
-      (copy ../runtimes/assemblyscript/build/untouched.wasm runtime.wasm)
+      (with-stdout-to runtime.wasm
+        (system "cat ../../../runtimes/assemblyscript/build/untouched.wasm"))
     )
   )
 )
@@ -32,7 +34,6 @@
 (rule
   (target wasm_runtime.ml)
   (deps runtime.wasm)
-  (mode (promote (into generated)))
   (action
     (with-stdout-to wasm_runtime.ml
       (progn (echo "let runtime_wasm = \"")
