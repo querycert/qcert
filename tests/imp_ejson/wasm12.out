@@ -1,0 +1,9 @@
+[
+    [ { "$left": { "$class": ["Address"], "$data": { "city": "xy" } } },
+      { "$left": { "$class": ["USAddress"], "$data": { "city" : "NY" , "zip" : { "$nat" : 10001 } } } },
+      { "$left": { "$class": ["USAddress"], "$data": { "city" : "NY", "zip" : { "$nat" : 10001 } } } },
+      { "$left": { "$class": ["Address"], "$data": { "city" : "xy" } } },
+      { "$left": { "$class": ["USAddress"], "$data": { "city" : "NY", "zip" : { "$nat" : 10001 } } } },
+      { "$left": { "$class": ["Person"], "$data" : { "name" : "donald" } } } ],
+    [ { "$right": null },  { "$right": null }, { "$right": null }, { "$right": null } ]
+]
