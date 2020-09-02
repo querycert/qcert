@@ -261,6 +261,7 @@ MODULES = \
 	Imp/ImpSystem \
 	Imp/Optim/ImpOptimizerEngine \
 	Imp/Optim/ImpEJsonRewrite \
+	Imp/Optim/ImpEJsonBlockRewrite \
 	Imp/Optim/ImpEJsonOptimizer \
 	Imp/ImpOptim \
 	NNRCMR/Lang/ForeignReduceOps \
