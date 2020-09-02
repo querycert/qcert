@@ -454,7 +454,7 @@ designer_rule-test-tests-js:
 
 ## IMPEJSON # 13 is failure in javascript (different block scoping between Imp and JS)
 IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 14 16 17 18
-IMPEJSONTARGETS=imp_ejson wasm_ast # dnnrc_typed
+IMPEJSONTARGETS=imp_ejson #wasm_ast # dnnrc_typed
 
 imp_ejson-tests:
 	@echo "[Q*cert] "
