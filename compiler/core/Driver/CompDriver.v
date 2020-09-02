@@ -2895,6 +2895,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -2910,6 +2911,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_camp_rule, L_wasm =>
@@ -2923,6 +2925,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -2990,6 +2993,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_camp_rule, L_js_ast =>
         L_camp_rule
@@ -3002,6 +3006,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -3111,6 +3116,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3127,6 +3133,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_tech_rule, L_wasm =>
@@ -3141,6 +3148,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -3214,6 +3222,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_tech_rule, L_js_ast =>
         L_tech_rule
@@ -3227,6 +3236,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -3340,6 +3350,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3356,6 +3367,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_designer_rule, L_wasm =>
@@ -3370,6 +3382,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -3443,6 +3456,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_designer_rule, L_js_ast =>
         L_designer_rule
@@ -3456,6 +3470,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -3548,6 +3563,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3562,6 +3578,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_camp, L_wasm =>
@@ -3574,6 +3591,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -3635,6 +3653,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_camp, L_js_ast =>
         L_camp
@@ -3646,6 +3665,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -3743,6 +3763,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3757,6 +3778,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_oql, L_wasm =>
@@ -3769,6 +3791,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -3830,6 +3853,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_oql, L_js_ast =>
         L_oql
@@ -3841,6 +3865,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -3939,6 +3964,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -3953,6 +3979,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_sql, L_wasm =>
@@ -3965,6 +3992,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -4026,6 +4054,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_sql, L_js_ast =>
         L_sql
@@ -4037,6 +4066,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -4135,6 +4165,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4149,6 +4180,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_sqlpp, L_wasm =>
@@ -4161,6 +4193,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -4222,6 +4255,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_sqlpp, L_js_ast =>
         L_sqlpp
@@ -4233,6 +4267,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -4331,6 +4366,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4345,6 +4381,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_lambda_nra, L_wasm =>
@@ -4357,6 +4394,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -4418,6 +4456,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_lambda_nra, L_js_ast =>
         L_lambda_nra
@@ -4429,6 +4468,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -4518,6 +4558,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4533,6 +4574,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nra, L_wasm =>
@@ -4546,6 +4588,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -4613,6 +4656,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nra, L_js_ast =>
         L_nra
@@ -4625,6 +4669,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -4714,6 +4759,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4728,6 +4774,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nraenv_core, L_wasm =>
@@ -4740,6 +4787,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -4801,6 +4849,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nraenv_core, L_js_ast =>
         L_nraenv_core
@@ -4812,6 +4861,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -4900,6 +4950,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -4913,6 +4964,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nraenv, L_wasm =>
@@ -4924,6 +4976,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -4979,6 +5032,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nraenv, L_js_ast =>
         L_nraenv
@@ -4989,6 +5043,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -5065,6 +5120,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -5077,6 +5133,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nnrc_core, L_wasm =>
@@ -5087,6 +5144,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -5136,6 +5194,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nnrc_core, L_js_ast =>
         L_nnrc_core
@@ -5145,6 +5204,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -5225,6 +5285,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
           :: nil
@@ -5236,6 +5297,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nnrc, L_wasm =>
@@ -5245,6 +5307,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -5288,6 +5351,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nnrc, L_js_ast =>
         L_nnrc
@@ -5296,6 +5360,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -5346,12 +5411,14 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nnrs, L_js_ast =>
         L_nnrs
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -5360,6 +5427,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
@@ -5370,6 +5438,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nnrs, L_wasm =>
@@ -5377,6 +5446,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -5409,6 +5479,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nnrs_core, L_js_ast =>
         L_nnrs_core
@@ -5416,6 +5487,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -5425,6 +5497,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
@@ -5436,6 +5509,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nnrs_core, L_wasm =>
@@ -5444,6 +5518,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -5463,11 +5538,13 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nnrs_imp, L_js_ast =>
         L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -5475,6 +5552,7 @@ Section CompDriver.
         L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
@@ -5484,12 +5562,14 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nnrs_imp, L_wasm =>
         L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -5501,14 +5581,17 @@ Section CompDriver.
       | L_imp_data, L_imp_ejson =>
         L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_imp_data, L_js_ast =>
         L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
       | L_imp_data, L_javascript =>
         L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
@@ -5516,10 +5599,12 @@ Section CompDriver.
       | L_imp_data, L_wasm_ast =>
         L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_imp_data, L_wasm =>
         L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
@@ -5539,10 +5624,12 @@ Section CompDriver.
           :: nil
       | L_imp_ejson, L_wasm_ast =>
         L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_imp_ejson, L_wasm =>
         L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
           :: nil
@@ -5627,6 +5714,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: nil
       | L_nnrcmr, L_js_ast =>
         L_nnrcmr
@@ -5637,6 +5725,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: nil
@@ -5649,6 +5738,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_js_ast
           :: L_javascript
@@ -5663,6 +5753,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_imp_data
           :: L_imp_ejson
+          :: L_imp_ejson
           :: L_wasm_ast
           :: nil
       | L_nnrcmr, L_wasm =>
@@ -5674,6 +5765,7 @@ Section CompDriver.
           :: L_nnrs_imp
           :: L_nnrs_imp
           :: L_imp_data
+          :: L_imp_ejson
           :: L_imp_ejson
           :: L_wasm_ast
           :: L_wasm
