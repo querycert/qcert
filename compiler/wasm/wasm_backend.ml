@@ -428,6 +428,7 @@ end = struct
       | EJsonRuntimeRecConcat -> foreign [i32; i32] [i32]
       | EJsonRuntimeRecDot -> foreign [i32; i32] [i32]
       | EJsonRuntimeArrayLength -> foreign [i32] [i32]
+      | EJsonRuntimeArrayAccess -> foreign [i32; i32] [i32]
       | EJsonRuntimeUnion -> foreign [i32; i32] [i32]
       | EJsonRuntimeDistinct -> foreign [i32] [i32]
       | EJsonRuntimeFlatten -> foreign [i32] [i32]
@@ -439,6 +440,7 @@ end = struct
       | EJsonRuntimeNatLe -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatLt -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatPlus -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatMinus -> foreign [i32; i32] [i32]
       | EJsonRuntimeFloatOfNat -> foreign [i32] [i32]
       | EJsonRuntimeNatOfFloat -> foreign [i32] [i32]
       | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
