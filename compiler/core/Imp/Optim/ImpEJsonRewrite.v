@@ -54,6 +54,16 @@ Section ImpEJsonRewrite.
       | ImpStmtAssign v e =>
         ImpStmtAssign v e
       | ImpStmtFor v e s =>
+        (**
+              for(v in e) do s done
+              (i,src) fresh in v::s
+              ============================
+              { let src = e;
+                for(i = 0 to length(e)-1) do
+                  { let v = src[i];
+                    s }
+                done }
+         *)
         let avoid := v :: imp_ejson_stmt_free_vars stmt in
         let i_id := fresh_var "i" avoid in
         let avoid := i_id :: avoid in
@@ -402,22 +412,27 @@ Section ImpEJsonRewrite.
 
     Lemma imp_ejson_stmt_for_rewrite_correct h (σ : pd_jbindings) (stmt:imp_ejson_stmt) :
         imp_ejson_stmt_eval h stmt σ =
-        imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite stmt)  σ.
+        imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite stmt) σ.
     Proof.
-      generalize σ.
-      imp_stmt_cases (induction stmt) Case; intros; simpl.
+      revert σ.
+      imp_stmt_cases (induction stmt) Case; intros.
       - Case "ImpStmtBlock"%string.
-        unfold ImpEval.imp_decls_erase.
-        assert ((map imp_ejson_stmt_for_rewrite sl) = sl) as Heq;
-          [ | rewrite Heq; reflexivity].
-        induction sl; trivial.
-        simpl.
-        inversion H.
-        rewrite (IHsl H3).
-        admit.
+        simpl; f_equal.
+        destruct (@ImpEval.imp_decls_eval (@imp_ejson_model foreign_ejson_model)
+             (@imp_ejson_constant foreign_ejson_model) imp_ejson_op
+             (@imp_ejson_runtime_op foreign_ejson_runtime_op) (@imp_ejson_model_normalize foreign_ejson_model)
+             (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op fejruntime h)
+             (@imp_ejson_op_eval foreign_ejson_model) σ el); try reflexivity; simpl.
+        revert p; induction sl; intros; simpl; trivial; simpl.
+        inversion H; clear H; subst.
+        specialize (IHsl H3); clear H3.
+        rewrite <- H2.
+        destruct (imp_ejson_stmt_eval h a p); simpl; [apply IHsl|].
+        clear IHsl; induction sl; auto.
       - Case "ImpStmtAssign"%string.
         reflexivity.
       - Case "ImpStmtFor"%string.
+        simpl in *.
         unfold ImpEval.imp_decls_eval.
         unfold olift.
         simpl.
@@ -458,7 +473,7 @@ Set Printing Depth 100.
         case i; simpl; try reflexivity.
         intros l.
         rewrite number_iterations.
-        generalize σ0; clear σ0.
+        revert σ.
         induction l; [ simpl; reflexivity | ].
         intros.
         simpl.
@@ -519,7 +534,7 @@ Set Printing Depth 100.
                                     (@remove string string_eqdec v
                                        (@imp_ejson_stmt_free_vars foreign_ejson_model foreign_ejson_runtime_op stmt))))))
                         (@Some (@imp_ejson_model foreign_ejson_model) (@ejarray foreign_ejson_model (@cons (@ejson foreign_ejson_model) a l))))
-                     σ0))))).
+                     σ))))).
         rewrite (imp_ejson_stmt_eval_env_simpl _ _
                    ((v, Some a)
                     :: (fresh_var "i"
@@ -535,38 +550,40 @@ Set Printing Depth 100.
                          :: ImpVars.imp_expr_free_vars e ++
                             remove string_eqdec v (imp_ejson_stmt_free_vars stmt)))
                    (Some (ejarray (a :: l)))
-                   σ0);
+                   σ);
           [ | admit ].
         rewrite (imp_ejson_stmt_eval_env_simpl _ _
                    ((v, Some a) :: [])
                    (fresh_var "i"
                      (v :: ImpVars.imp_expr_free_vars e ++ remove string_eqdec v (imp_ejson_stmt_free_vars stmt)))
                    (Some (imp_ejson_Z_to_data 0))
-                   σ0);
+                   σ);
           [ | admit ].
         simpl.
         unfold var.
         unfold imp_ejson_model.
-        case (imp_ejson_stmt_eval h stmt ((v, Some a) :: σ0)); [ | simpl; reflexivity].
+        case (imp_ejson_stmt_eval h stmt ((v, Some a) :: σ)); [ | simpl; reflexivity].
         intros σ'.
-        clear i a σ0 σ.
+        clear i a σ.
         match_destr.
         rewrite IHl; clear IHl.
         unfold olift.
         simpl.
         admit.
       - Case "ImpStmtForRange"%string.
+        simpl.
         repeat match_destr.
         generalize (ImpEval.nb_iter z z0).
         intros.
         clear z0.
-        generalize z σ0.
+        revert z σ.
         induction n; intros; try reflexivity.
         rewrite <- IHstmt.
         repeat match_destr.
       - Case "ImpStmtIf"%string.
-        rewrite <- (IHstmt1 σ0).
-        rewrite <- (IHstmt2 σ0).
+        simpl.
+        rewrite <- (IHstmt1 σ).
+        rewrite <- (IHstmt2 σ).
         reflexivity.
     Admitted.
 
