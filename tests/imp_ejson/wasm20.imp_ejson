@@ -1,0 +1,9 @@
+/* union */
+module main {
+  wasm20(x) return y {
+    let input := [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
+    for(i = 1 to 10) {
+      y := Runtime.arrayAccess(input,Runtime.natMinus(i,1));
+    }
+  }
+}
