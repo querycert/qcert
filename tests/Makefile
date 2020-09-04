@@ -484,6 +484,10 @@ designer_rule-test-tests-js:
                           --query designer_rule/test$(N).js || exit 1 ;)
 
 ## IMPEJSON
+IMPEJSONTARGETS=imp_ejson wasm_ast # dnnrc_typed
+IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 17 18 19 20 21
+# TODO 15 seems to be an error representation issue
+
 imp_ejson-tests:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Imp (EJSON) tests"
@@ -493,10 +497,6 @@ ifneq ($(JAVASCRIPT),)
 	@$(MAKE) imp_ejson-js-tests
 	# @$(MAKE) imp_ejson-wasm-node-tests # TODO. Improve test and enable
 endif
-
-IMPEJSONTARGETS=imp_ejson wasm_ast # dnnrc_typed
-IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 17 18
-# TODO 15 seems to be an error representation issue
 
 # imp_ejson -> wasm ; run on spec interpreter
 imp_ejson-wasm-spec-tests:
