@@ -32,6 +32,11 @@ Definition any : brands := nil.
 
 Definition brand_relation_t := list (string*string).
 
+Lemma brand_eq_dec : EqDec brand eq.
+Proof.
+  repeat red. apply string_dec.
+Defined.
+
 Section brand_relation_types.
   Context  (brand_relation_brands:brand_relation_t).
 
