@@ -18,6 +18,8 @@ build: [
   [make "configure"]
   [make "-j" jobs name]
   ["dune" "build" "-j" jobs "-p" name]
+  [make "docs"] {with-doc}
+
 ]
 install: [
   [make "install-coqdev"]
@@ -33,6 +35,7 @@ depends: [
   "base64"
   "uri"
   "calendar"
+  "coq-coq2html" {with-doc}
 ]
 
 tags: [ "keyword:databases" "keyword:queries" "keyword:relational" "keyword:compiler" "date:2020-07-24" "logpath:Qcert" ]
