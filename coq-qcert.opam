@@ -19,7 +19,7 @@ build: [
   [make "-j" jobs name]
   ["dune" "build" "-j" jobs "-p" name]
   [make "docs"] {with-doc}
-
+  [make "test"] {with-test}
 ]
 install: [
   [make "install-coqdev"]
