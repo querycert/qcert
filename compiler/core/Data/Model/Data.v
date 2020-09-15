@@ -156,11 +156,6 @@ Section Data.
       intros. apply (H (x,y)). trivial.
   Qed.
 
-  Lemma brand_eq_dec : EqDec brand eq.
-  Proof.
-    repeat red. apply string_dec.
-  Defined.
-
   (** Equality is decidable for data *)
   Lemma data_eq_dec : forall x y:data, {x=y}+{x<>y}.
   Proof.
