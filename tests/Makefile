@@ -452,35 +452,80 @@ designer_rule-test-tests-js:
                           --eval-validate \
                           --query designer_rule/test$(N).js || exit 1 ;)
 
-## IMPEJSON # 13 is failure in javascript (different block scoping between Imp and JS)
-IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 14 16 17 18
-IMPEJSONTARGETS=imp_ejson #wasm_ast # dnnrc_typed
-
+## IMPEJSON
 imp_ejson-tests:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Imp (EJSON) tests"
 	@echo "[Q*cert] "
-	@$(MAKE) imp_ejson-wasm-tests
+	@$(MAKE) imp_ejson-wasm-spec-tests
 ifneq ($(JAVASCRIPT),)
-	@$(MAKE) imp_ejson-wasm-tests-js
+	@$(MAKE) imp_ejson-js-tests
+	# @$(MAKE) imp_ejson-wasm-node-tests # TODO. Improve test and enable
 endif
 
-imp_ejson-wasm-tests:
+IMPEJSONTARGETS=imp_ejson wasm_ast # dnnrc_typed
+IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 17 18
+# TODO 15 seems to be an error representation issue
+
+# imp_ejson -> wasm ; run on spec interpreter
+imp_ejson-wasm-spec-tests:
 	$(foreach N,$(IMPEJSONWASMNUM), \
             $(foreach T,$(IMPEJSONTARGETS), \
 	       $(QCERTCOMP) -source imp_ejson -target $(T) imp_ejson/wasm$(N).imp_ejson \
                             -eval -input imp_ejson/wasm.input \
                             -schema imp_ejson/wasm.schema \
                             -eval-validate -output imp_ejson/wasm$(N).out || exit 1;))
-imp_ejson-wasm-tests-js:
-	$(foreach N,$(IMPEJSONWASMNUM), \
+
+IMPEJSONWASMALTNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+# TODO. Why does this run 15?
+imp_ejson-wasm-spec-alt-tests:
+	$(foreach N,$(IMPEJSONWASMALTNUM), \
+				 $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+				 		-source imp_ejson -path imp_ejson -target imp_ejson \
+						-quiet \
+						-schema imp_ejson/wasm.schema \
+						-eval -input imp_ejson/wasm.input && \
+		     $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+				 		-source imp_ejson -target wasm_ast \
+				 		-eval -eval-validate \
+				 		-schema imp_ejson/wasm.schema \
+		     		-input imp_ejson/wasm.input \
+				 		-output imp_ejson/wasm$(N)_imp_ejson.json || exit 1; )
+
+IMPEJSONJSNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 14 16 17 18
+# 13 is failure in javascript (different block scoping between Imp and JS)
+# TODO 15 throws exception
+
+# imp_ejson -> javascript ; run on node
+imp_ejson-js-tests:
+	$(foreach N,$(IMPEJSONJSNUM), \
 	       $(QCERTCOMP) -source imp_ejson -target javascript imp_ejson/wasm$(N).imp_ejson -schema imp_ejson/wasm.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
                           --input imp_ejson/wasm.input \
                           --schema imp_ejson/wasm.schema \
                           --output imp_ejson/wasm$(N).out \
                           --eval-validate \
-                          --query imp_ejson/wasm$(N).js || exit 1 ;)
+                          --query imp_ejson/wasm$(N).js || exit 1; )
+
+IMPEJSONWASMNODENUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+
+# imp_ejson -> wasm ; run on node
+imp_ejson-wasm-node-tests:
+	$(foreach N,$(IMPEJSONWASMNODENUM), \
+				 $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+				 		-source imp_ejson -path imp_ejson -target imp_ejson \
+						-quiet \
+						-schema imp_ejson/wasm.schema \
+						-eval -input imp_ejson/wasm.input && \
+	       $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+						-quiet \
+						-source imp_ejson -target wasm \
+						-schema imp_ejson/wasm.schema && \
+				 $(NODERUN) ../runtimes/assemblyscript/cli-runner.js \
+				 		../runtimes/assemblyscript/build/untouched.wasm \
+						imp_ejson/wasm$(N).wasm \
+						imp_ejson/wasm.input \
+						imp_ejson/wasm$(N)_imp_ejson.json || exit 1; )
 
 clean:
 	@rm -rf log
@@ -525,41 +570,3 @@ clean:
 
 cleanall: clean
 	@rm -f *~ */*~
-
-# reuse input
-imp_ejson/wasm%.input: imp_ejson/wasm.input
-	@cp $< $@
-
-# reuse schema
-imp_ejson/wasm%.schema: imp_ejson/wasm.schema
-	@cp $< $@
-
-# derive expected output from imp eval
-imp_ejson/%_imp_ejson.json: imp_ejson/%.imp_ejson imp_ejson/%.input
-	@$(QCERTCOMP) -quiet -source imp_ejson -path imp_ejson -target imp_ejson $< -schema imp_ejson/wasm.schema -eval -input imp_ejson/$*.input
-
-# run single test on spec interpreter
-imp_ejson/%.imp_ejson.test.spec: imp_ejson/%.imp_ejson imp_ejson/%_imp_ejson.json imp_ejson/%.input imp_ejson/%.schema
-	@$(QCERTCOMP) -source imp_ejson -target wasm_ast -eval -eval-validate \
-		-schema imp_ejson/$*.schema \
-		-input imp_ejson/$*.input -output imp_ejson/$*_imp_ejson.json \
-		$<
-
-# run all imp_ejson tests on spec interpreter
-wasm-imp-spec: $(patsubst %.imp_ejson, %.imp_ejson.test.spec, $(wildcard imp_ejson/*.imp_ejson))
-
-# compile to wasm
-imp_ejson/%.wasm: imp_ejson/%.imp_ejson imp_ejson/%.schema
-	@$(QCERTCOMP) -quiet -source imp_ejson -target wasm -schema imp_ejson/$*.schema $<
-
-# run single test on node
-imp_ejson/%.imp_ejson.run.node: imp_ejson/%.wasm imp_ejson/%_imp_ejson.json imp_ejson/%.input
-	@echo imp_ejson/$*.imp_ejson.run.node
-	@node ../runtimes/assemblyscript/cli-runner.js \
-		../runtimes/assemblyscript/build/untouched.wasm \
-		imp_ejson/$*.wasm \
-		imp_ejson/$*.input \
-		imp_ejson/$*_imp_ejson.json
-
-# run all imp_ejson tests on node
-wasm-imp-node: $(patsubst %.imp_ejson, %.imp_ejson.run.node, $(wildcard imp_ejson/*.imp_ejson))
