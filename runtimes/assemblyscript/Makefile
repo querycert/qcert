@@ -14,7 +14,7 @@
 
 ############# Shouldn't have to be changed after this
 all:
-	npm install
+	npm ci
 	npm run asbuild
 
 clean:
