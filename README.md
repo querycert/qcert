@@ -48,6 +48,13 @@ $ opam repo add coq-released https://coq.inria.fr/opam/released
 $ opam install . --deps-only
 ```
 
+*Warning:* It seems that coq and/or the Q\*cert build process does not like opam local switches.
+If you want to use a separate opam switch for Q\*cert, we recommend creating a new named global switch *before* executing the above steps.
+
+```
+$ opam switch create qcert 4.09.1
+```
+
 #### Java (Recommended)
 
 Parsers for SQL, SQL++, and ODM rules, the Q\*cert runtime for the Java compilation target, as well as utilities for running compiled queries are written in Java and require a Java 8 compiler.
