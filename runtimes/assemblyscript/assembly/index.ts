@@ -54,6 +54,7 @@ export class EjString extends EjValue {
 }
 export const IdEjString = idof<EjString>()
 
+// TODO: is this still in use or does everything go via the binary encoding of EjValue?
 export class EjStringBuilderUTF8 {
   private buf: Uint8Array
   private pos: i32
@@ -78,6 +79,7 @@ export class EjArray extends EjValue {
 export const IdArrayEjValue = idof<Array<EjValue>>()
 export const IdEjArray = idof<EjArray>()
 
+// TODO: is this still in use or does everything go via the binary encoding of EjValue?
 export class EjArrayBuilder {
   private arr: Array<EjValue>
   private pos: i32
@@ -106,9 +108,9 @@ export class EjObject extends EjValue {
     return this;
   }
   get(k: EjString): EjValue {
-    // redundant debugging code unreachable
-    // for a valid combination of engine, runtime, and compiled ergo
+    // redundant safety check
     if (! this.has(k)) {
+      // unreachable for valid engine, runtime, and compiled ergo
       throw new Error("EjObject misses key '" + k.value + "'");
     }
     // actual code
@@ -124,17 +126,27 @@ export const IdEjObject = idof<EjObject>()
 // EJson Serialization //
 /////////////////////////
 
+// We use a prefix-encoded binary representation of EjValue for IO.
+
+///////////////////////////////////////////////
+// EJson Serialization // EjValue --> binary //
+///////////////////////////////////////////////
+
+// BytesBuilder helps me to construct long ArrayBuffers.
+// ArrayBuffers are binary strings.
 class BytesBuilder {
   segments: Array<ArrayBuffer>
   size: i32
 
   constructor() { this.segments = []; this.size = 0; }
 
+  // virtually append an ArrayBuffer segment
   append(s: ArrayBuffer): void {
     this.segments.push(s);
     this.size += s.byteLength;
   }
 
+  // concatenate all segments
   finalize(): ArrayBuffer {
     let b = new ArrayBuffer(this.size);
     let p : i32 = 0;
@@ -151,6 +163,8 @@ class BytesBuilder {
   }
 }
 
+// Append EjValue x to BytesBuilder b
+// Core of EjValue --> binary
 function ejson_to_bytes_(b: BytesBuilder, x:EjValue): void {
   if (x instanceof EjNull) {
     let s = new ArrayBuffer(1);
@@ -231,20 +245,19 @@ function ejson_to_bytes_(b: BytesBuilder, x:EjValue): void {
   unreachable();
 }
 
-export function alloc_bytes(n: i32): ArrayBuffer {
-  return new ArrayBuffer(((n + 7) >> 3) << 3);
-}
-
-export function bytes_set_i64(b: ArrayBuffer, offset: i32, value: i64): void {
-  Int64Array.wrap(b)[offset >> 3] = value;
-}
-
+// Convert EjValue x to (binary) ArrayBuffer
 export function ejson_to_bytes(x: EjValue): ArrayBuffer {
   let b = new BytesBuilder();
   ejson_to_bytes_(b, x);
   return b.finalize();
 }
 
+///////////////////////////////////////////////
+// EJson Serialization // binary --> EjValue //
+///////////////////////////////////////////////
+
+// This iterator helps me to consume a long ArrayBuffer.
+// The ArrayBuffer holds the binary EjValue.
 class MovingPointer {
   value: i32
   constructor(x: i32) { this.value = x }
@@ -255,6 +268,8 @@ class MovingPointer {
   }
 }
 
+// Read EjValue from ArrayBuffer b at Pointer p.
+// Core of binary --> EjValue
 function ejson_of_bytes_(p: MovingPointer, b:ArrayBuffer): EjValue {
   // switch tag
   switch(Uint8Array.wrap(b, p.advance(1), 1)[0]) {
@@ -307,6 +322,25 @@ function ejson_of_bytes_(p: MovingPointer, b:ArrayBuffer): EjValue {
 
 export function ejson_of_bytes(b: ArrayBuffer): EjValue {
   return ejson_of_bytes_(new MovingPointer(0), b);
+}
+
+///////////////////////////////////////////////////
+// IO: Constants provided by the compiled module //
+///////////////////////////////////////////////////
+
+// Compiled wasm modules have their constants stored in their memory in the
+// format described above.
+// Compiled wasm modules operate on pointers into the runtime's memory.
+// Before using a constant, the compiled module has to copy the constant to
+// the runtime's memory. It does so using the following two functions and
+// ejson_of_bytes.
+
+export function alloc_bytes(n: i32): ArrayBuffer {
+  return new ArrayBuffer(((n + 7) >> 3) << 3);
+}
+
+export function bytes_set_i64(b: ArrayBuffer, offset: i32, value: i64): void {
+  Int64Array.wrap(b)[offset >> 3] = value;
 }
 
 /////////////////////
