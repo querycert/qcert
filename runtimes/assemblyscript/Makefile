@@ -13,9 +13,19 @@
 #
 
 ############# Shouldn't have to be changed after this
-all:
+
+.PHONY: all deps build test clean cleanall
+
+all: deps build test
+
+deps:
 	npm ci
+
+build:
 	npm run asbuild
+
+test:
+	npm test
 
 clean:
 	-rm -rf build
