@@ -1,5 +1,7 @@
 'use strict';
 
+// Write javascript-world EJson value to wasm runtime.
+// Return EjValue-pointer in runtime memory.
 function write(module, x) {
   let { __retain } = module.exports;
   let m = module.exports;
@@ -44,6 +46,8 @@ function write(module, x) {
   return recurse(x);
 }
 
+// Read from EjValue-pointer in wasm runtime memory.
+// Return javascript-world EJson value.
 function read(module, x) {
   let { __instanceof } = module.exports;
   let m = module.exports;
