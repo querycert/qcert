@@ -428,6 +428,7 @@ export function opStrictDisEqual(a: EjValue, b: EjValue): EjBool {
 
 export function opArray(a: EjValue): EjArray {
   // TODO: opArray
+  // TODO: redundant with runtimeArray which is handled in the compiled module?
   return unreachable();
 }
 
@@ -436,7 +437,7 @@ export function opArrayLength(a: EjArray): EjBigInt {
 }
 
 export function opArrayPush(a: EjArray, b: EjValue): EjArray {
-  // TODO: opArrayPush: should we mutate the array?;
+  // TODO: opArrayPush: avoid cloning the array on each push.
   return new EjArray(a.values.concat([b]));
 }
 
