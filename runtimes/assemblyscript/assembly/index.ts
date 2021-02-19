@@ -54,24 +54,6 @@ export class EjString extends EjValue {
 }
 export const IdEjString = idof<EjString>()
 
-// TODO: is this still in use or does everything go via the binary encoding of EjValue?
-export class EjStringBuilderUTF8 {
-  private buf: Uint8Array
-  private pos: i32
-  constructor(n: i32) {
-    this.pos = 0;
-    this.buf = new Uint8Array(n);
-  }
-  putByte(val: u8): void {
-    this.buf[this.pos] = val;
-    this.pos++;
-  }
-  finalize(): EjString {
-    let str = String.UTF8.decode(this.buf.buffer);
-    return new EjString(str);
-  }
-}
-
 export class EjArray extends EjValue {
   values: Array<EjValue>
   constructor(a: Array<EjValue>) { super(); this.values = a; }
@@ -79,7 +61,8 @@ export class EjArray extends EjValue {
 export const IdArrayEjValue = idof<Array<EjValue>>()
 export const IdEjArray = idof<EjArray>()
 
-// TODO: is this still in use or does everything go via the binary encoding of EjValue?
+// ImpEJson's n-ary runtimeArray operator constructs EjArrays at runtime
+// The compiled wasm module relies on the following helper to do this.
 export class EjArrayBuilder {
   private arr: Array<EjValue>
   private pos: i32
