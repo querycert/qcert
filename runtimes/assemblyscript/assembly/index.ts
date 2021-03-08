@@ -426,11 +426,10 @@ export function opStrictDisEqual(a: EjValue, b: EjValue): EjBool {
   return unreachable();
 }
 
-export function opArray(a: EjValue): EjArray {
-  // TODO: opArray
-  // TODO: redundant with runtimeArray which is handled in the compiled module?
-  return unreachable();
-}
+// n-ary, compiled
+// export function opArray(a: EjValue): EjArray {
+//   return unreachable();
+// }
 
 export function opArrayLength(a: EjArray): EjBigInt {
   return new EjBigInt(a.values.length);
@@ -442,18 +441,22 @@ export function opArrayPush(a: EjArray, b: EjValue): EjArray {
 }
 
 export function opArrayAccess(a: EjArray, b: EjBigInt): EjValue {
-  // TODO: opArrayAccess: should we check out of bound and i32 overflow?
-  return a.values[i32(b.value)];
+  // TODO: opArrayAccess do we need out of bound check?
+  let index = b.value;
+  if (b.value < 0 || b.value > a.values.length) {
+    throw new Error("runtimeArrayAccess: out of bounds");
+  } else {
+    return a.values[i32(b.value)];
+  }
 }
 
-export function opObject(a: EjValue): EjObject {
-  // TODO: opObject
-  return unreachable();
-}
+// n-ary, compiled
+// export function opObject(a: EjValue): EjObject {
+//   return unreachable();
+// }
 
 export function opAccess(a: EjObject, k: EjString): EjValue {
-  // TODO: opAccess redundant with runtimeRecDot?
-  // TODO: opAccess: check for key not found needed?
+  // TODO: opAccess: check for key not found?
   return a.get(k);
 }
 
@@ -470,12 +473,12 @@ export function opMathMax(a: EjNumber, b: EjNumber): EjNumber {
   return new EjNumber(Math.max(a.value, b.value));
 }
 
-export function opMathExp(a: EjNumber): EjNumber {
-  return new EjNumber(Math.exp(a.value));
-}
-
 export function opMathPow(a: EjNumber, b: EjNumber): EjNumber {
   return new EjNumber(Math.pow(a.value, b.value));
+}
+
+export function opMathExp(a: EjNumber): EjNumber {
+  return new EjNumber(Math.exp(a.value));
 }
 
 export function opMathAbs(a: EjNumber): EjNumber {
@@ -586,6 +589,16 @@ export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
   return unreachable();
 }
 
+export function runtimeToString(a: EjValue): EjString {
+  // TODO: runtimeToString
+  return unreachable();
+}
+
+export function runtimeToText(a: EjValue): EjString {
+  // TODO: runtimeToText
+  return unreachable();
+}
+
 // TODO: recConcat which argument "wins" in case of a conflict?
 export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
   let r = new EjObject();
@@ -600,54 +613,40 @@ export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
   return r;
 }
 
-export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
-  // TODO: runtimeRecDot redundant with opAccess?
-  // TODO: runtimeRecDot: check for key not found needed?
-  return a.get(k);
+export function runtimeRecMerge(a: EjObject, b:EjObject): EjObject {
+  // TODO: runtimeRecMerge
+  return unreachable();
 }
+
+export function runtimeRecRemove(a: EjObject, b:EjString): EjObject {
+  // TODO: runtimeRecRemove
+  return unreachable();
+}
+
+export function runtimeRecProject(a: EjObject, b:EjArray): EjObject {
+  // TODO: runtimeRecProject
+  return unreachable();
+}
+
+export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
+  return opAccess(a, k);
+}
+
+// n-ary, compiled
+// export function runtimeArray(): EjArray {
+//   return unreachable();
+// }
 
 export function runtimeArrayLength(a: EjArray) : EjBigInt {
   return new EjBigInt(a.values.length);
 }
 
+export function runtimeArrayPush(a: EjArray, b: EjValue) : EjArray {
+  return opArrayPush(a, b);
+}
+
 export function runtimeArrayAccess(a: EjArray, b: EjBigInt): EjValue {
-  let index = b.value;
-  if (b.value < 0 || b.value > a.values.length) {
-    throw new Error("runtimeArrayAccess: out of bounds");
-  } else {
-    return a.values[i32(b.value)];
-  }
-}
-
-export function runtimeUnion(a: EjArray, b: EjArray) : EjArray {
-  return new EjArray(a.values.concat(b.values));
-}
-
-export function runtimeDistinct(a: EjArray) : EjArray {
-  let result = new Array<EjValue>(0);
-  let content = a.values;
-  for (let i=0; i < content.length; i=i+1) {
-    let v = content[i];
-    let dup = false;
-    for (let j=i+1; j < content.length; j=j+1) {
-      if (runtimeEqual(v,content[j]).value) { dup = true; break; }
-    }
-    if (!(dup)) { result.push(v); } else { dup = false; }
-  }
-  return new EjArray(result);
-}
-
-export function runtimeFlatten(a: EjArray) : EjArray {
-  let result = new Array<EjValue>(0);
-  let content = a.values;
-  for (let iOuter=0, nOuter=content.length; iOuter<nOuter; iOuter=iOuter+1) {
-    let aInner = changetype<EjArray>(content[iOuter]);
-    let aInnerContent = aInner.values;
-    for (let iInner=0, nInner=aInnerContent.length; iInner<nInner; iInner = iInner+1) {
-      result.push(aInnerContent[iInner]);
-    }
-  }
-  return new EjArray(result);
+  return opArrayAccess(a, b);
 }
 
 function ejObject(l: Array<Array<EjValue>>): EjObject {
@@ -730,12 +729,117 @@ export function runtimeCast(hierarchy: EjArray, brands: EjArray, x: EjObject) : 
   return ejLeft(x);
 }
 
-export function runtimeNatLe(a: EjBigInt, b: EjBigInt): EjBool {
-  return new EjBool(a.value <= b.value);
+export function runtimeDistinct(a: EjArray) : EjArray {
+  let result = new Array<EjValue>(0);
+  let content = a.values;
+  for (let i=0; i < content.length; i=i+1) {
+    let v = content[i];
+    let dup = false;
+    for (let j=i+1; j < content.length; j=j+1) {
+      if (runtimeEqual(v,content[j]).value) { dup = true; break; }
+    }
+    if (!(dup)) { result.push(v); } else { dup = false; }
+  }
+  return new EjArray(result);
+}
+
+export function runtimeSingleton(a: EjArray) : EjObject {
+  if (a.values.length == 1) {
+    return ejLeft(a.values[0]);
+  } else {
+    return ejRight(c_null);
+  }
+}
+
+export function runtimeFlatten(a: EjArray) : EjArray {
+  let result = new Array<EjValue>(0);
+  let content = a.values;
+  for (let iOuter=0, nOuter=content.length; iOuter<nOuter; iOuter=iOuter+1) {
+    let aInner = changetype<EjArray>(content[iOuter]);
+    let aInnerContent = aInner.values;
+    for (let iInner=0, nInner=aInnerContent.length; iInner<nInner; iInner = iInner+1) {
+      result.push(aInnerContent[iInner]);
+    }
+  }
+  return new EjArray(result);
+}
+
+export function runtimeUnion(a: EjArray, b: EjArray) : EjArray {
+  return new EjArray(a.values.concat(b.values));
+}
+
+export function runtimeMinus(a: EjArray, b: EjArray) : EjArray {
+  // TODO: runtimeMinus
+  return unreachable();
+}
+
+export function runtimeMin(a: EjArray, b: EjArray) : EjArray {
+  // TODO: runtimeMin
+  return unreachable();
+}
+
+export function runtimeMax(a: EjArray, b: EjArray) : EjArray {
+  // TODO: runtimeMax
+  return unreachable();
+}
+
+export function runtimeNth(a: EjArray, b: EjBigInt) : EjArray {
+  // TODO: runtimeNth
+  return unreachable();
+}
+
+export function runtimeCount(a: EjArray) : EjArray {
+  // TODO: runtimeCount
+  return unreachable();
+}
+
+export function runtimeContains(a: EjValue, b: EjArray) : EjBool {
+  // TODO: runtimeContains
+  return unreachable();
+}
+
+export function runtimeSort(a: EjArray, b: EjNull) : EjArray {
+  // TODO: runtimeSort
+  return unreachable();
+}
+
+export function runtimeGroupBy(a: EjArray, b: EjNull, c:EjNull) : EjArray {
+  // TODO: runtimeGroupBy
+  return unreachable();
+}
+
+export function runtimeLength(a: EjString) : EjBigInt {
+  // TODO: runtimeLength
+  // return EjBigInt(a.value.length);
+  return unreachable();
+}
+
+export function runtimeSubString(a: EjString, start: EjBigInt, len:EjBigInt) : EjString {
+  // TODO: runtimeSubString
+  return unreachable();
+}
+
+export function runtimeSubStringEnd(a: EjString, start: EjBigInt) : EjString {
+  // TODO: runtimeSubStringEnd
+  return unreachable();
+}
+
+export function runtimeStringJoin(sep: EjString, a: EjArray): EjString {
+  // TODO: runtimeStringJoin
+  return unreachable();
+}
+
+export function runtimeStringLike(reg: EjString, target:EjString): EjBool {
+  // TODO: runtimeStringLike
+  return unreachable();
 }
 
 export function runtimeNatLt(a: EjBigInt, b: EjBigInt): EjBool {
   return new EjBool(a.value < b.value);
+}
+
+export function runtimeNatLe(a: EjBigInt, b: EjBigInt): EjBool {
+  return new EjBool(a.value <= b.value);
 }
 
 export function runtimeNatPlus(a: EjBigInt, b: EjBigInt): EjBigInt {
@@ -746,14 +850,106 @@ export function runtimeNatMinus(a: EjBigInt, b: EjBigInt): EjBigInt {
   return new EjBigInt(a.value - b.value);
 }
 
+export function runtimeNatMult(a: EjBigInt, b: EjBigInt): EjBigInt {
+  return new EjBigInt(a.value * b.value);
+}
+
+export function runtimeNatDiv(a: EjBigInt, b: EjBigInt): EjBigInt {
+  return new EjBigInt(a.value / b.value);
+}
+
+export function runtimeNatRem(a: EjBigInt, b: EjBigInt): EjBigInt {
+  return new EjBigInt(a.value % b.value);
+}
+
+export function runtimeNatAbs(a: EjBigInt): EjBigInt {
+  if (a.value < 0) {
+    return new EjBigInt(-a.value);
+  } else {
+    return a;
+  }
+}
+
+export function runtimeNatLog2(a: EjBigInt): EjBigInt {
+  // TODO runtimeNatLog2
+  return unreachable();
+}
+
+export function runtimeNatSqrt(a: EjBigInt): EjBigInt {
+  // TODO runtimeNatSqrt
+  return unreachable();
+}
+
+export function runtimeNatMinPair(a: EjBigInt, b: EjBigInt): EjBigInt {
+  if (a.value < b.value) {
+    return a;
+  } else {
+    return b;
+  }
+}
+
+export function runtimeNatMaxPair(a: EjBigInt, b: EjBigInt): EjBigInt {
+  if (a.value < b.value) {
+    return b;
+  } else {
+    return a;
+  }
+}
+
+export function runtimeNatSum(a: EjArray): EjBigInt {
+  // TODO runtimeNatSum
+  return unreachable();
+}
+
+export function runtimeNatMin(a: EjArray): EjBigInt {
+  // TODO runtimeNatMin
+  return unreachable();
+}
+
+export function runtimeNatMax(a: EjArray): EjBigInt {
+  // TODO runtimeNatMax
+  return unreachable();
+}
+
+export function runtimeNatArithMean(a: EjArray): EjBigInt {
+  // TODO runtimeNatArithMean
+  return unreachable();
+}
+
 export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
+  // TODO runtimeFloatOfNat : smarter conversion possible?
   let s : string = a.value.toString();
   let x : f64 = F64.parseFloat(s);
   return new EjNumber(x);
+}
+
+export function runtimeFloatSum(a: EjArray): EjNumber {
+  // TODO runtimeFloatSum
+  return unreachable();
+}
+
+export function runtimeFloatArithMean(a: EjArray): EjNumber {
+  // TODO runtimeFloatArithMean
+  return unreachable();
+}
+
+export function runtimeFloatMin(a: EjArray): EjNumber {
+  // TODO runtimeFloatMin
+  return unreachable();
+}
+
+export function runtimeFloatMax(a: EjArray): EjNumber {
+  // TODO runtimeFloatMax
+  return unreachable();
 }
 
 export function runtimeNatOfFloat(a: EjNumber): EjBigInt {
   let x : f64 = trunc(a.value);
   let i : i64 = <i64>x;
   return new EjBigInt(i);
+}
+
+export function runtimeForeign(): EjNull  {
+  // TODO runtimeForeign
+  return unreachable();
 }
