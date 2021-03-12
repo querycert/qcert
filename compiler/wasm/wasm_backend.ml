@@ -49,7 +49,7 @@ end = struct
             Printf.sprintf "Runtime error in Assemblyscript position %s:%s"
               (Int32.to_string line) (Int32.to_string column)
           )
-        | _ -> assert false
+        | _ -> failwith "wasm_backend.ml: malformed abort"
       in
       Func.alloc_host Types.(FuncType ([I32Type; I32Type; I32Type; I32Type], [])) f
 
@@ -131,6 +131,19 @@ end = struct
         |> Encoding.ejson_of_bytes
       in
       Some result
+
+    let eval module_ fn env =
+      let s = Util.char_list_of_string in
+      let error msg =
+        Some (Coq_ejobject [s "error", Coq_ejstring (s msg)])
+      in
+      try eval module_ fn env with
+      | Failure msg ->
+          let msg = Printf.sprintf "Wasm Eval Failure: %s\n%!" msg in
+          error msg
+      | e ->
+          let msg = Printexc.to_string e in
+          error msg
   end
 
   module Translate = struct
