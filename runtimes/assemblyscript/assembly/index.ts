@@ -9,7 +9,7 @@ function cast<T>(x : EjValue): T {
     let r : T = changetype<T>(x);
     return r;
   }
-  return unreachable();
+  throw new Error('invalid cast');
 }
 
 export class EjNull extends EjValue {
@@ -225,7 +225,7 @@ function ejson_to_bytes_(b: BytesBuilder, x:EjValue): void {
     }
     return;
   }
-  unreachable();
+  throw new Error ('ejson_to_bytes_: unsupported value')
 }
 
 // Convert EjValue x to (binary) ArrayBuffer
@@ -300,7 +300,7 @@ function ejson_of_bytes_(p: MovingPointer, b:ArrayBuffer): EjValue {
       return obj;
     }
   }
-  return unreachable();
+  throw new Error('ejson_of_bytes_: unsupported tag')
 }
 
 export function ejson_of_bytes(b: ArrayBuffer): EjValue {
@@ -401,7 +401,7 @@ export function opStrictEqual(a: EjValue, b: EjValue): EjBool {
     let bb : EjString = changetype<EjString>(b) ;
     return aa.value == bb.value ? c_true : c_false;
   }
-  return unreachable();
+  throw new Error('opStrictEqual: invalid arguments');
 }
 
 export function opStrictDisEqual(a: EjValue, b: EjValue): EjBool {
@@ -423,13 +423,11 @@ export function opStrictDisEqual(a: EjValue, b: EjValue): EjBool {
     let bb : EjString = changetype<EjString>(b) ;
     return aa.value != bb.value ? c_true : c_false;
   }
-  return unreachable();
+  throw new Error('opStrictDisEqual: invalid arguments');
 }
 
 // n-ary, compiled
-// export function opArray(a: EjValue): EjArray {
-//   return unreachable();
-// }
+// export function opArray(a: EjValue): EjArray {}
 
 export function opArrayLength(a: EjArray): EjBigInt {
   return new EjBigInt(a.values.length);
@@ -451,9 +449,7 @@ export function opArrayAccess(a: EjArray, b: EjBigInt): EjValue {
 }
 
 // n-ary, compiled
-// export function opObject(a: EjValue): EjObject {
-//   return unreachable();
-// }
+// export function opObject(a: EjValue): EjObject {}
 
 export function opAccess(a: EjObject, k: EjString): EjValue {
   // TODO: opAccess: check for key not found?
@@ -461,8 +457,7 @@ export function opAccess(a: EjObject, k: EjString): EjValue {
 }
 
 export function opHasOwnProperty(a: EjObject, k: EjString): EjValue {
-  // TODO: opHasOwnProperty
-  return unreachable();
+  throw new Error('opHasOwnProperty: not implemented');
 }
 
 export function opMathMin(a: EjNumber, b: EjNumber): EjNumber {
@@ -586,17 +581,15 @@ export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
     let bb : EjBigInt = changetype<EjBigInt>(b) ;
     return compare<i64>(aa.value, bb.value);
   }
-  return unreachable();
+  throw new Error('runtimeCompare: invalid arguments');
 }
 
 export function runtimeToString(a: EjValue): EjString {
-  // TODO: runtimeToString
-  return unreachable();
+  throw new Error('runtimeToString: not implemented');
 }
 
 export function runtimeToText(a: EjValue): EjString {
-  // TODO: runtimeToText
-  return unreachable();
+  throw new Error('runtimeToText: not implemented');
 }
 
 // TODO: recConcat which argument "wins" in case of a conflict?
@@ -614,18 +607,15 @@ export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
 }
 
 export function runtimeRecMerge(a: EjObject, b:EjObject): EjObject {
-  // TODO: runtimeRecMerge
-  return unreachable();
+  throw new Error('runtimeRecMerge: not implemented');
 }
 
 export function runtimeRecRemove(a: EjObject, b:EjString): EjObject {
-  // TODO: runtimeRecRemove
-  return unreachable();
+  throw new Error('runtimeRecRemove: not implemented');
 }
 
 export function runtimeRecProject(a: EjObject, b:EjArray): EjObject {
-  // TODO: runtimeRecProject
-  return unreachable();
+  throw new Error('runtimeRecProject: not implemented');
 }
 
 export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
@@ -633,9 +623,7 @@ export function runtimeRecDot(a: EjObject, k:EjString): EjValue {
 }
 
 // n-ary, compiled
-// export function runtimeArray(): EjArray {
-//   return unreachable();
-// }
+// export function runtimeArray(): EjArray {}
 
 export function runtimeArrayLength(a: EjArray) : EjBigInt {
   return new EjBigInt(a.values.length);
@@ -675,7 +663,7 @@ export function runtimeEither(a: EjObject): EjBool {
   if (a.has(c_$right)) {
     return c_false;
   }
-  return unreachable();
+  throw new Error('runtimeEither: invalid arguments');
 }
 
 export function runtimeToLeft(a: EjObject): EjValue {
@@ -769,69 +757,55 @@ export function runtimeUnion(a: EjArray, b: EjArray) : EjArray {
 }
 
 export function runtimeMinus(a: EjArray, b: EjArray) : EjArray {
-  // TODO: runtimeMinus
-  return unreachable();
+  throw new Error('runtimeMinus: not implemented');
 }
 
 export function runtimeMin(a: EjArray, b: EjArray) : EjArray {
-  // TODO: runtimeMin
-  return unreachable();
+  throw new Error('runtimeMin: not implemented');
 }
 
 export function runtimeMax(a: EjArray, b: EjArray) : EjArray {
-  // TODO: runtimeMax
-  return unreachable();
+  throw new Error('runtimeMax: not implemented');
 }
 
 export function runtimeNth(a: EjArray, b: EjBigInt) : EjArray {
-  // TODO: runtimeNth
-  return unreachable();
+  throw new Error('runtimeNth: not implemented');
 }
 
 export function runtimeCount(a: EjArray) : EjArray {
-  // TODO: runtimeCount
-  return unreachable();
+  throw new Error('runtimeCount: not implemented');
 }
 
 export function runtimeContains(a: EjValue, b: EjArray) : EjBool {
-  // TODO: runtimeContains
-  return unreachable();
+  throw new Error('runtimeContains: not implemented');
 }
 
 export function runtimeSort(a: EjArray, b: EjNull) : EjArray {
-  // TODO: runtimeSort
-  return unreachable();
+  throw new Error('runtimeSort: not implemented');
 }
 
 export function runtimeGroupBy(a: EjArray, b: EjNull, c:EjNull) : EjArray {
-  // TODO: runtimeGroupBy
-  return unreachable();
+  throw new Error('runtimeGroupBy: not implemented');
 }
 
 export function runtimeLength(a: EjString) : EjBigInt {
-  // TODO: runtimeLength
-  // return EjBigInt(a.value.length);
-  return unreachable();
+  throw new Error('runtimeLength: not implemented');
 }
 
 export function runtimeSubstring(a: EjString, start: EjBigInt, len:EjBigInt) : EjString {
-  // TODO: runtimeSubstring
-  return unreachable();
+  throw new Error('runtimeSubstring: not implemented');
 }
 
 export function runtimeSubstringEnd(a: EjString, start: EjBigInt) : EjString {
-  // TODO: runtimeSubstringEnd
-  return unreachable();
+  throw new Error('runtimeSubstringEnd: not implemented');
 }
 
 export function runtimeStringJoin(sep: EjString, a: EjArray): EjString {
-  // TODO: runtimeStringJoin
-  return unreachable();
+  throw new Error('runtimeStringJoin: not implemented');
 }
 
 export function runtimeLike(reg: EjString, target:EjString): EjBool {
-  // TODO: runtimeLike
-  return unreachable();
+  throw new Error('runtimeLike: not implemented');
 }
 
 export function runtimeNatLt(a: EjBigInt, b: EjBigInt): EjBool {
@@ -871,13 +845,11 @@ export function runtimeNatAbs(a: EjBigInt): EjBigInt {
 }
 
 export function runtimeNatLog2(a: EjBigInt): EjBigInt {
-  // TODO runtimeNatLog2
-  return unreachable();
+  throw new Error('runtimeNatLog2: not implemented');
 }
 
 export function runtimeNatSqrt(a: EjBigInt): EjBigInt {
-  // TODO runtimeNatSqrt
-  return unreachable();
+  throw new Error('runtimeNatSqrt: not implemented');
 }
 
 export function runtimeNatMinPair(a: EjBigInt, b: EjBigInt): EjBigInt {
@@ -897,23 +869,19 @@ export function runtimeNatMaxPair(a: EjBigInt, b: EjBigInt): EjBigInt {
 }
 
 export function runtimeNatSum(a: EjArray): EjBigInt {
-  // TODO runtimeNatSum
-  return unreachable();
+  throw new Error('runtimeNatSum: not implemented');
 }
 
 export function runtimeNatMin(a: EjArray): EjBigInt {
-  // TODO runtimeNatMin
-  return unreachable();
+  throw new Error('runtimeNatMin: not implemented');
 }
 
 export function runtimeNatMax(a: EjArray): EjBigInt {
-  // TODO runtimeNatMax
-  return unreachable();
+  throw new Error('runtimeNatMax: not implemented');
 }
 
 export function runtimeNatArithMean(a: EjArray): EjBigInt {
-  // TODO runtimeNatArithMean
-  return unreachable();
+  throw new Error('runtimeNatArithMean: not implemented');
 }
 
 export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
@@ -924,23 +892,19 @@ export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
 }
 
 export function runtimeFloatSum(a: EjArray): EjNumber {
-  // TODO runtimeFloatSum
-  return unreachable();
+  throw new Error('runtimeFloatSum: not implemented');
 }
 
 export function runtimeFloatArithMean(a: EjArray): EjNumber {
-  // TODO runtimeFloatArithMean
-  return unreachable();
+  throw new Error('runtimeFloatArithMean: not implemented');
 }
 
 export function runtimeFloatMin(a: EjArray): EjNumber {
-  // TODO runtimeFloatMin
-  return unreachable();
+  throw new Error('runtimeFloatMin: not implemented');
 }
 
 export function runtimeFloatMax(a: EjArray): EjNumber {
-  // TODO runtimeFloatMax
-  return unreachable();
+  throw new Error('runtimeFloatMax: not implemented');
 }
 
 export function runtimeNatOfFloat(a: EjNumber): EjBigInt {
@@ -950,6 +914,5 @@ export function runtimeNatOfFloat(a: EjNumber): EjBigInt {
 }
 
 export function runtimeForeign(): EjNull  {
-  // TODO runtimeForeign
-  return unreachable();
+  throw new Error('runtimeForeign: not implemented');
 }
