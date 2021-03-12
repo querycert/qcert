@@ -814,13 +814,13 @@ export function runtimeLength(a: EjString) : EjBigInt {
   return unreachable();
 }
 
-export function runtimeSubString(a: EjString, start: EjBigInt, len:EjBigInt) : EjString {
-  // TODO: runtimeSubString
+export function runtimeSubstring(a: EjString, start: EjBigInt, len:EjBigInt) : EjString {
+  // TODO: runtimeSubstring
   return unreachable();
 }
 
-export function runtimeSubStringEnd(a: EjString, start: EjBigInt) : EjString {
-  // TODO: runtimeSubStringEnd
+export function runtimeSubstringEnd(a: EjString, start: EjBigInt) : EjString {
+  // TODO: runtimeSubstringEnd
   return unreachable();
 }
 
@@ -829,8 +829,8 @@ export function runtimeStringJoin(sep: EjString, a: EjArray): EjString {
   return unreachable();
 }
 
-export function runtimeStringLike(reg: EjString, target:EjString): EjBool {
-  // TODO: runtimeStringLike
+export function runtimeLike(reg: EjString, target:EjString): EjBool {
+  // TODO: runtimeLike
   return unreachable();
 }
 
