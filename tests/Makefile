@@ -98,12 +98,6 @@ ifneq ($(JAVA),)
 	@$(MAKE) oql-employees-tests-java
 endif
 
-oql-tests-wasm:
-	@$(MAKE) oql-string-tests-wasm
-	@$(MAKE) oql-world-tests-wasm
-	@$(MAKE) oql-persons-tests-wasm
-	@$(MAKE) oql-employees-tests-wasm
-
 oql-string-tests:
 	$(foreach N,$(OQLSTRINGNUM), \
             $(foreach T,$(OQLTARGETS), \
@@ -120,10 +114,6 @@ oql-string-tests-js:
                           --output oql/string$(N).out \
                           --eval-validate \
                           --query oql/string$(N).js || exit 1 ;)
-oql-string-tests-wasm:
-	# compiliation-only test
-	@$(foreach N,$(OQLSTRINGNUM), \
-	       $(QCERTCOMP) -source oql -target wasm_ast oql/string$(N).oql -schema oql/string.schema -quiet;)
 oql-string-tests-java:
 	@$(foreach N,$(OQLSTRINGNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/string$(N).oql \
@@ -150,10 +140,6 @@ oql-world-tests-js:
                           --output oql/world$(N).out \
                           --eval-validate \
                           --query oql/world$(N).js || exit 1 ;)
-oql-world-tests-wasm:
-	# compiliation-only test
-	@$(foreach N,$(OQLWORLDNUM), \
-	       $(QCERTCOMP) -source oql -target wasm_ast oql/world$(N).oql -schema oql/world.schema -quiet;)
 oql-world-tests-java:
 	@$(foreach N,$(OQLWORLDNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/world$(N).oql \
@@ -181,10 +167,6 @@ oql-persons-tests-js:
                           --output oql/persons$(N).out \
                           --eval-validate \
                           --query oql/persons$(N).js || exit 1 ;)
-oql-persons-tests-wasm:
-	# compilation-only test
-	@$(foreach N,$(OQLPERSONSNUM), \
-	       $(QCERTCOMP) -source oql -target wasm_ast oql/persons$(N).oql -schema oql/persons.schema -quiet; )
 oql-persons-tests-js2:
 	@$(foreach N,$(OQLPERSONSNUM), \
 	       $(QCERTCOMP) -exact-path -source oql -path nraenv -path nraenv -path nnrc -path nnrc -path nnrs -path nnrs_imp -path nnrs_imp -path imp_data -path imp_ejson -path imp_ejson -path js_ast -target javascript oql/persons$(N).oql -schema oql/persons.schema -quiet; \
@@ -222,10 +204,6 @@ oql-employees-tests-js:
                           --output oql/employees$(N).out \
                           --eval-validate \
                           --query oql/employees$(N).js || exit 1 ;)
-oql-employees-tests-wasm:
-	# compilation-only test
-	@$(foreach N,$(OQLEMPLOYEESNUM), \
-	       $(QCERTCOMP) -source oql -target wasm_ast oql/employees$(N).oql -schema oql/employees.schema -quiet; )
 oql-employees-tests-java:
 	@$(foreach N,$(OQLEMPLOYEESNUM), \
 	       $(QCERTCOMP) -source oql -target java oql/employees$(N).oql \
@@ -236,6 +214,37 @@ oql-employees-tests-java:
                           -schema oql/employees.schema \
                           -output oql/employees$(N).out \
                           employees$(N) || exit 1;)
+## OQL
+OQLWASMPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12 # 13 14
+OQLWASMWORLDNUM=1 2
+OQLWASMSTRINGNUM=0 1 2 3
+OQLWASMEMPLOYEESNUM=1 2
+
+oql-tests-wasm:
+	@$(MAKE) oql-string-tests-wasm
+	@$(MAKE) oql-world-tests-wasm
+	@$(MAKE) oql-persons-tests-wasm
+	@$(MAKE) oql-employees-tests-wasm
+
+oql-string-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMSTRINGNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/string$(N).oql -schema oql/string.schema -quiet || exit 1; )
+
+oql-world-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMWORLDNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/world$(N).oql -schema oql/world.schema -quiet || exit 1;)
+
+oql-persons-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMPERSONSNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/persons$(N).oql -schema oql/persons.schema -quiet || exit 1; )
+
+oql-employees-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMEMPLOYEESNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/employees$(N).oql -schema oql/employees.schema -quiet || exit 1; )
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
