@@ -40,21 +40,57 @@ end = struct
     Coq_ejarray x
 
   module Eval = struct
+    exception Wasm_runtime of { msg: string; pos: string }
+
     (* assemblyscript error handler imported by runtime *)
-    let abort =
+    let abort mem_ref =
+      let read_string ptr =
+        let ptr = Int64.of_int32 ptr in
+        match !mem_ref with
+        | None -> failwith "wasm_backend.ml:abort: invalid mem_ref"
+        | Some mem ->
+          let size =
+            match Memory.load_value mem (Int64.sub ptr (Int64.of_int 4)) Int32.zero I32Type with
+            | I32 x -> Int32.to_int x
+            | _ -> failwith "wasm_backend.ml:abort: invalid load"
+            | exception Wasm.Memory.Bounds ->
+              let msg =
+                Printf.sprintf
+                  "wasm_backend.ml:abort: bounds %Li/%i"
+                  ptr
+                  (Int64.to_int Memory.page_size * Int32.to_int (Memory.size mem))
+              in
+              failwith msg
+          in
+          (* assemblyscript string is utf-16 *)
+          let utf16 = Memory.load_bytes mem ptr size in
+          (* we abuse that utf16 and utf8 overlap on the least significant byte *)
+          let buf = Bytes.create (size / 2) in
+          String.iteri (fun i c ->
+              if i mod 2 = 0 then
+                let c =
+                  (* filter for printable characters *)
+                  if Char.code c < 32 || Char.code c > 126 then '_' else c
+                in
+                Bytes.set buf (i / 2) c
+            ) utf16;
+          Bytes.to_string buf
+      in
       let f = function
-        | Values.[I32 _msg; I32 _file; I32 line; I32 column] ->
-          failwith (
-            (* TODO read strings from runtime memory *)
-            Printf.sprintf "Runtime error in Assemblyscript position %s:%s"
-              (Int32.to_string line) (Int32.to_string column)
-          )
-        | _ -> failwith "wasm_backend.ml: malformed abort"
+        | Values.[I32 msg ; I32 _file; I32 line; I32 column] ->
+            let msg = read_string msg
+            and pos =
+              Printf.sprintf "runtime.ts:%s:%s"
+                (Int32.to_string line)
+                (Int32.to_string column)
+            in raise (Wasm_runtime { msg; pos })
+        | _ -> failwith "wasm_backend.ml:abort: malformed arguments"
       in
       Func.alloc_host Types.(FuncType ([I32Type; I32Type; I32Type; I32Type], [])) f
 
     let eval module_ fn env =
-      let rt = Eval.init runtime [ExternFunc abort] in
+      let mem_ref = ref None in
+      let rt = Eval.init runtime [ExternFunc (abort mem_ref)] in
       let () = Valid.check_module module_ in
       let mod_ =
         let imports = List.map (fun (import : Ast.import) ->
@@ -82,7 +118,9 @@ end = struct
         | _ -> failwith "runtime module should export __retain function"
       and rt_mem =
         match Instance.export rt (Utf8.decode "memory") with
-        | Some (ExternMemory x) -> x
+        | Some (ExternMemory x) ->
+            mem_ref := Some x;
+            x
         | _ -> failwith "runtime module should export its memory"
       in
       let write_ejson x =
@@ -138,12 +176,12 @@ end = struct
         Some (Coq_ejobject [s "error", Coq_ejstring (s msg)])
       in
       try eval module_ fn env with
-      | Failure msg ->
-          let msg = Printf.sprintf "Wasm Eval Failure: %s\n%!" msg in
-          error msg
+      | Wasm_runtime {msg; pos} ->
+        let msg = Printf.sprintf "Assemblyscript Error in %s: %s" pos msg in
+        error msg
       | e ->
-          let msg = Printexc.to_string e in
-          error msg
+        let msg = Printexc.to_string e in
+        error msg
   end
 
   module Translate = struct
