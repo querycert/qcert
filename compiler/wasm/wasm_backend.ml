@@ -307,6 +307,9 @@ end = struct
       | EJsonOpArrayLength -> foreign [i32] [i32]
       | EJsonOpArrayPush -> foreign [i32; i32] [i32]
       | EJsonOpArrayAccess -> foreign [i32; i32] [i32]
+      | EJsonOpObject _ -> failwith "non-trivial op OpObject"
+      | EJsonOpAccess _ -> failwith "non-trivial op OpAccess"
+      | EJsonOpHasOwnProperty _ -> failwith "non-trivial op OpHasOwnProperty"
       | EJsonOpMathMin -> foreign [i32; i32] [i32]
       | EJsonOpMathMax -> foreign [i32; i32] [i32]
       | EJsonOpMathPow -> foreign [i32; i32] [i32]
@@ -318,7 +321,6 @@ end = struct
       | EJsonOpMathCeil -> foreign [i32] [i32]
       | EJsonOpMathFloor -> foreign [i32] [i32]
       | EJsonOpMathTrunc -> foreign [i32] [i32]
-      | _  -> unsupported (op_foreign_fn_name op)
 
     let op_n_ary ctx op args : Ir.instr =
       let foreign params result fname =
@@ -412,7 +414,7 @@ end = struct
       | EJsonRuntimeFloatMax -> "runtimeFloatMax"
       | EJsonRuntimeNatOfFloat -> "runtimeNatOfFloat"
       (* Foreign *)
-      | EJsonRuntimeForeign _fop -> "FOREIGN"
+      | EJsonRuntimeForeign _fop -> "runtimeForeign"
 
     let rt_op_trivial ctx op : Ir.instr =
       let foreign params result =
@@ -425,25 +427,62 @@ end = struct
       match (op : 'a ejson_runtime_op) with
       | EJsonRuntimeEqual -> foreign [i32; i32] [i32]
       | EJsonRuntimeCompare -> foreign [i32; i32] [i32]
+      | EJsonRuntimeToString -> foreign [i32] [i32]
+      | EJsonRuntimeToText -> foreign [i32] [i32]
       | EJsonRuntimeRecConcat -> foreign [i32; i32] [i32]
+      | EJsonRuntimeRecMerge -> foreign [i32; i32] [i32]
+      | EJsonRuntimeRecRemove -> foreign [i32; i32] [i32]
+      | EJsonRuntimeRecProject -> foreign [i32; i32] [i32]
       | EJsonRuntimeRecDot -> foreign [i32; i32] [i32]
+      | EJsonRuntimeArray -> failwith "non-trivial op RuntimeArray"
       | EJsonRuntimeArrayLength -> foreign [i32] [i32]
+      | EJsonRuntimeArrayPush -> foreign [i32; i32] [i32]
       | EJsonRuntimeArrayAccess -> foreign [i32; i32] [i32]
-      | EJsonRuntimeUnion -> foreign [i32; i32] [i32]
-      | EJsonRuntimeDistinct -> foreign [i32] [i32]
-      | EJsonRuntimeFlatten -> foreign [i32] [i32]
       | EJsonRuntimeEither -> foreign [i32] [i32]
       | EJsonRuntimeToLeft -> foreign [i32] [i32]
       | EJsonRuntimeToRight -> foreign [i32] [i32]
       | EJsonRuntimeUnbrand -> foreign [i32] [i32]
       | EJsonRuntimeCast -> foreign [i32; i32; i32] [i32]
-      | EJsonRuntimeNatLe -> foreign [i32; i32] [i32]
+      | EJsonRuntimeDistinct -> foreign [i32] [i32]
+      | EJsonRuntimeSingleton -> foreign [i32] [i32]
+      | EJsonRuntimeFlatten -> foreign [i32] [i32]
+      | EJsonRuntimeUnion -> foreign [i32; i32] [i32]
+      | EJsonRuntimeMinus -> foreign [i32; i32] [i32]
+      | EJsonRuntimeMin -> foreign [i32; i32] [i32]
+      | EJsonRuntimeMax -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNth -> foreign [i32; i32] [i32]
+      | EJsonRuntimeCount -> foreign [i32] [i32]
+      | EJsonRuntimeContains -> foreign [i32; i32] [i32]
+      | EJsonRuntimeSort -> foreign [i32; i32] [i32]
+      | EJsonRuntimeGroupBy -> foreign [i32; i32; i32] [i32]
+      | EJsonRuntimeLength -> foreign [i32] [i32]
+      | EJsonRuntimeSubstring -> foreign [i32; i32; i32] [i32]
+      | EJsonRuntimeSubstringEnd -> foreign [i32; i32] [i32]
+      | EJsonRuntimeStringJoin -> foreign [i32; i32] [i32]
+      | EJsonRuntimeLike -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatLt -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatLe -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatPlus -> foreign [i32; i32] [i32]
       | EJsonRuntimeNatMinus -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatMult -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatDiv -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatRem -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatAbs -> foreign [i32] [i32]
+      | EJsonRuntimeNatLog2 -> foreign [i32] [i32]
+      | EJsonRuntimeNatSqrt -> foreign [i32] [i32]
+      | EJsonRuntimeNatMinPair -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatMaxPair -> foreign [i32; i32] [i32]
+      | EJsonRuntimeNatSum -> foreign [i32] [i32]
+      | EJsonRuntimeNatMin -> foreign [i32] [i32]
+      | EJsonRuntimeNatMax -> foreign [i32] [i32]
+      | EJsonRuntimeNatArithMean -> foreign [i32] [i32]
       | EJsonRuntimeFloatOfNat -> foreign [i32] [i32]
+      | EJsonRuntimeFloatSum -> foreign [i32] [i32]
+      | EJsonRuntimeFloatArithMean -> foreign [i32] [i32]
+      | EJsonRuntimeFloatMin -> foreign [i32] [i32]
+      | EJsonRuntimeFloatMax -> foreign [i32] [i32]
       | EJsonRuntimeNatOfFloat -> foreign [i32] [i32]
-      | _ -> unsupported ("runtime op: " ^ (string_of_runtime_op op))
+      | EJsonRuntimeForeign _fop -> failwith "non-trivial op RuntimeForeign"
 
     let rt_op ctx op args: Ir.instr =
       let foreign params result fname =
