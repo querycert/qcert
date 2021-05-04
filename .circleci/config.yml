@@ -63,6 +63,7 @@ common_steps: &common_steps
     - run:
         name: 'Testing'
         command:  |
+          eval $(opam env)
           make test
     # Save test results
     - store_test_results:
