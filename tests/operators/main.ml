@@ -39,9 +39,11 @@ let ejson_to_string ejson =
   JSON.jsonStringify [] json
   |> Util.string
 
-let test_fn fn =
-  let env = [['x'], Coq_ejnumber 42. ]
-  and imp_ejson : _ imp_ejson = [['f'], fn]
+let ejson_eq =
+  ejson_eq_dec EnhancedEJson.enhanced_foreign_ejson
+
+let test_fn env fn =
+  let imp_ejson : _ imp_ejson = [['f'], fn]
   in
   let imp = match imp_eval imp_ejson env with
     | Some x -> x
@@ -51,7 +53,7 @@ let test_fn fn =
     | Some x -> x
     | None -> failwith "wasm eval failed"
   in
-  if (wasm <> imp) then (
+  if (not (ejson_eq wasm imp)) then (
     print_string ("imp:  ");
     print_endline (ejson_to_string imp);
     print_string ("wasm: ");
@@ -59,41 +61,58 @@ let test_fn fn =
     failwith "wasm and imp differ"
   )
 
-let test_op_1 op args =
-  let x = ['x'] and y = ['y'] in
-  let stmt =
-    ImpStmtAssign(y, ImpExprOp (op, args))
+let test_expr_1 expr op args =
+  let varname i =  Util.char_list_of_string ("arg" ^ (string_of_int i)) in
+  let return = Util.char_list_of_string "return"
+  and env = List.mapi (fun i ejson -> varname i, ejson) args
+  and args = List.mapi (fun i _ ->
+      ImpExprRuntimeCall (
+        EJsonRuntimeRecDot,
+        [ ImpExprVar ['x']
+        ; ImpExprConst (Coq_cejstring (varname i))
+        ])) args
   in
-  test_fn (ImpFun (x, stmt, y))
-
-let test_op op args =
-  List.iter (fun args -> test_op_1 op args) args
-
-let test_rtop_1 op args =
-  let x = ['x'] and y = ['y'] in
   let stmt =
-    ImpStmtAssign(y, ImpExprRuntimeCall (op, args))
+    ImpStmtAssign(return, expr op args)
   in
-  test_fn (ImpFun (x, stmt, y))
+  test_fn env (ImpFun (['x'], stmt, return))
 
-let test_rtop op args =
-  List.iter (fun args -> test_rtop_1 op args) args
+let test_expr expr op args =
+  List.iter (fun args -> test_expr_1 expr op args) args
 
-module Const = struct
-  let number x = ImpExprConst (Coq_cejnumber x)
-  let bigint x = ImpExprConst (Coq_cejbigint x)
+let test_op = test_expr (fun op args -> ImpExprOp (op, args))
+let test_rtop = test_expr (fun op args -> ImpExprRuntimeCall (op, args))
+
+module Arg = struct
+  let null = Coq_ejnull
+  let bool x = Coq_ejbool x
+  let num x = Coq_ejnumber x
+  let int x = Coq_ejbigint x
+  let str x = Coq_ejstring (Util.char_list_of_string x)
+  let arr x = Coq_ejarray x
+  let obj x =
+    Coq_ejobject (List.map (fun (k, v) -> Util.char_list_of_string k, v) x)
 end
 
 let _ =
-  let open Const in
+  let open Arg in
   test_op
     EJsonOpAddNumber
-    [ [number 41.; number 1.]
-    ; [number (-1.); number 1e32]
-    ; [number (-1.); number Float.infinity]
+    [ [num 41.; num 1.]
+    ; [num (-1.); num 1e32]
+    ; [num (-1.); num Float.infinity]
+    ];
+  test_rtop
+    EJsonRuntimeRecConcat
+    [ [ obj [ "a", null ] ; obj [ "b", null ] ]
+    (* ; [ obj [ "a", null; "c", null ] ; obj [ "b", null; "d", null ] ] *)
+    ; [ obj [ "a", bool false ] ; obj [ "a", bool true ] ]
+    ; [ obj [] ; obj [ "a", null ] ]
+    ; [ obj [ "a", null ] ; obj [] ]
+    ; [ obj [] ; obj [] ]
     ];
   test_rtop
     EJsonRuntimeNatPlus
-    [ [bigint 41; bigint 1]
-    ; [bigint 43; bigint (-1)]
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
     ]
