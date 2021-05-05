@@ -675,8 +675,23 @@ export function runtimeRecRemove(a: EjObject, b:EjString): EjObject {
   return r;
 }
 
+// Remove all keys not listed in b.
+// Preserve order of keys.
 export function runtimeRecProject(a: EjObject, b:EjArray): EjObject {
-  throw new Error('runtimeRecProject: not implemented');
+  let keep = new Map<string, i32>();
+  for(let i = 0; i < b.values.length; i++) {
+    let str = cast<EjString>(b.values[i]);
+    keep.set(str.value, 42);
+  }
+  let r = new EjObject();
+  let v = a.values;
+  let k = v.keys();
+  for (let i = 0; i < k.length; i++) {
+    if (keep.has(k[i])) {
+      r.values.set(k[i], v.get(k[i]));
+    }
+  }
+  return r;
 }
 
 export function runtimeRecDot(a: EjObject, k:EjString): EjValue {

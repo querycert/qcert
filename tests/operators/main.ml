@@ -160,6 +160,17 @@ let _ =
     ; [ obj []; str "c" ]
     ];
   test_rtop
+    EJsonRuntimeRecProject
+    [ [ obj ["a", null]; arr [str "a"] ]
+    ; [ obj ["a", null]; arr [str "a"; str "b"] ]
+    ; [ obj ["a", null]; arr [str "b"] ]
+    ; [ obj ["a", null; "b", null; "c", null]; arr [str "b"; str "a"] ]
+    ; [ obj ["b", null; "c", null; "a", null]; arr [str "a"; str "b"] ]
+    ; [ obj []; arr [] ]
+    ; [ obj ["a", null]; arr [] ]
+    ; [ obj []; arr [str "b"] ]
+    ];
+  test_rtop
     EJsonRuntimeNatPlus
     [ [int 41; int 1]
     ; [int 43; int (-1)]
