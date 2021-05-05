@@ -42,20 +42,6 @@ let ejson_to_string ejson =
 let ejson_eq =
   ejson_eq_dec EnhancedEJson.enhanced_foreign_ejson
 
-(* sort keys of objects recursively
- * TODO: probably something like this exists somewhere already ?! *)
-let rec ejson_normalize = function
-  | Coq_ejobject bindings ->
-    let bindings =
-      List.sort (fun (a, _) (b, _) -> compare a b) bindings
-      |> List.map (fun (k, v) -> k, ejson_normalize v)
-    in Coq_ejobject bindings
-  | Coq_ejarray entries ->
-    let entries =
-      List.map ejson_normalize entries
-    in Coq_ejarray entries
-  | x -> x
-
 let failed = ref false
 
 let test_fn fail env fn =
@@ -71,10 +57,6 @@ let test_fn fail env fn =
   | None, _ -> fail "imp eval failed"
   | Some _, None -> fail "wasm eval failed"
   | Some imp, Some wasm ->
-    (* TODO: @jeromesimeon, does imp maintain the normalization invariant
-     * during evaluation?  Normalizing once after evaluation might not be
-     * equivalent in longer programs. *)
-    let wasm = ejson_normalize wasm in
     if (not (ejson_eq wasm imp)) then (
       fail "wasm and imp differ";
       print_string ("imp:  ");
@@ -169,6 +151,13 @@ let _ =
     ; [ obj [] ; obj [ "a", null ] ]
     ; [ obj [ "a", null ] ; obj [] ]
     ; [ obj [] ; obj [] ]
+    ];
+  test_rtop
+    EJsonRuntimeRecRemove
+    [ [ obj ["a", null]; str "a" ]
+    ; [ obj ["b", null; "a", bool false]; str "a" ]
+    ; [ obj ["b", null; "a", bool false]; str "c" ]
+    ; [ obj []; str "c" ]
     ];
   test_rtop
     EJsonRuntimeNatPlus
