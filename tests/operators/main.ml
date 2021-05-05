@@ -133,6 +133,12 @@ let _ =
     [ [ arr [bool true]; int 0 ]
     ; [ arr [int 0; int 1]; int 1 ]
     ];
+  test_op
+    EJsonOpArrayLength
+    [ [ arr [bool true; bool false] ]
+    ; [ arr [null] ]
+    ; [ arr [] ]
+    ];
   test_rtop
     EJsonRuntimeEqual
     [ [ bool false; bool true ]
@@ -209,6 +215,12 @@ let _ =
     [ [ arr [bool true]; int 0 ]
     ; [ arr [bool true]; int (-1) ]
     ; [ arr [bool true]; int 1 ]
+    ];
+  test_rtop
+    EJsonRuntimeCount
+    [ [ arr [bool true; bool false] ]
+    ; [ arr [null] ]
+    ; [ arr [] ]
     ];
   test_rtop
     EJsonRuntimeNatPlus
