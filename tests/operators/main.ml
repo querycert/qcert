@@ -128,6 +128,11 @@ let _ =
     ; [num (-1.); num 1e32]
     ; [num (-1.); num Float.infinity]
     ];
+  test_op (* imp eval fails on out of bounds *)
+    EJsonOpArrayAccess
+    [ [ arr [bool true]; int 0 ]
+    ; [ arr [int 0; int 1]; int 1 ]
+    ];
   test_rtop
     EJsonRuntimeEqual
     [ [ bool false; bool true ]
@@ -198,6 +203,12 @@ let _ =
     ; [ arr []; arr [null] ]
     ; [ arr [null]; arr [] ]
     ; [ arr []; arr [] ]
+    ];
+  test_rtop
+    EJsonRuntimeNth
+    [ [ arr [bool true]; int 0 ]
+    ; [ arr [bool true]; int (-1) ]
+    ; [ arr [bool true]; int 1 ]
     ];
   test_rtop
     EJsonRuntimeNatPlus
