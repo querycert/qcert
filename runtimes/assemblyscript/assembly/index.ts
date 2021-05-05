@@ -592,7 +592,6 @@ export function runtimeToText(a: EjValue): EjString {
   throw new Error('runtimeToText: not implemented');
 }
 
-// TODO: recConcat which argument "wins" in case of a conflict?
 export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
   let r = new EjObject();
   let k = a.values.keys();
