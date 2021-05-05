@@ -14,6 +14,9 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   val eval : Wasm.Ast.module_ -> char list -> (char list * 'a ejson) list -> ('a ejson) option
 
   val imp_ejson_to_wasm_ast : brand_hierarchy -> ('a,'b) imp_ejson -> Wasm.Ast.module_
+
+  val string_of_operator: imp_ejson_op -> string
+  val string_of_runtime_operator: 'a imp_ejson_runtime_op -> string
 end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)
@@ -295,7 +298,8 @@ end = struct
       block ~result:[i32]
         [ i32_const' offset ; call (Constants.get_const ctx) ]
 
-    let op_foreign_fn_name : imp_ejson_op -> string = function
+    (* must align with function names in the runtime module *)
+    let string_of_op = function
       | EJsonOpNot -> "opNot"
       | EJsonOpNeg -> "opNeg"
       | EJsonOpAnd -> "opAnd"
@@ -332,7 +336,7 @@ end = struct
 
     let op_trivial ctx op : Ir.instr =
       let foreign params result =
-        let fname = op_foreign_fn_name op in
+        let fname = string_of_op op in
         let f, import = Ir.import_func ~params ~result "runtime" fname in
         ctx.imports <- ImportSet.add import ctx.imports;
         Ir.call f
@@ -397,6 +401,7 @@ end = struct
         )
       | _ -> block ~result:[i32] (args @ [op_trivial ctx.ctx op])
 
+    (* must align with function names in the runtime module *)
     let string_of_runtime_op = function
       (* Generic *)
       | EJsonRuntimeEqual -> "runtimeEqual"
@@ -747,4 +752,7 @@ end = struct
   let to_string q =
     let sexpr = Arrange.module_ q in
     Sexpr.to_string 72 sexpr
+
+  let string_of_operator = Translate.string_of_op
+  let string_of_runtime_operator = Translate.string_of_runtime_op
 end
