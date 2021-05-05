@@ -129,6 +129,11 @@ let _ =
     ; [num (-1.); num Float.infinity]
     ];
   test_rtop
+    EJsonRuntimeEqual
+    [ [ bool false; bool true ]
+    ; [ bool true; bool true]
+    ];
+  test_rtop
     EJsonRuntimeRecConcat
     [ [ obj [ "a", null ] ; obj [ "b", null ] ]
     ; [ obj [ "b", null ; "a", null ] ; obj [] ]
@@ -169,6 +174,30 @@ let _ =
     ; [ obj []; arr [] ]
     ; [ obj ["a", null]; arr [] ]
     ; [ obj []; arr [str "b"] ]
+    ];
+  test_rtop
+    EJsonRuntimeSingleton
+    [ [ arr [null] ]
+    ; [ arr [null; null] ]
+    ; [ arr [] ]
+    ];
+  test_rtop
+    EJsonRuntimeUnion
+    [ [ arr [null]; arr [null; bool true] ]
+    ; [ arr []; arr [null] ]
+    ; [ arr [null]; arr [] ]
+    ; [ arr []; arr [] ]
+    ];
+  test_rtop
+    EJsonRuntimeMinus
+    [ [ arr [null]; arr [null; bool true] ]
+    ; [ arr [bool true; bool false]; arr [bool true; bool false] ]
+    ; [ arr [bool true; bool false]; arr [bool true] ]
+    ; [ arr [bool true; bool false]; arr [bool false] ]
+    ; [ arr [bool true; bool false]; arr [] ]
+    ; [ arr []; arr [null] ]
+    ; [ arr [null]; arr [] ]
+    ; [ arr []; arr [] ]
     ];
   test_rtop
     EJsonRuntimeNatPlus
