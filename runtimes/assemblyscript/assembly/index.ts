@@ -60,6 +60,7 @@ export class EjArray extends EjValue {
 }
 export const IdArrayEjValue = idof<Array<EjValue>>()
 export const IdEjArray = idof<EjArray>()
+const c_empty_array = new EjArray([])
 
 // ImpEJson's n-ary runtimeArray operator constructs EjArrays at runtime
 // The compiled wasm module relies on the following helper to do this.
@@ -605,8 +606,26 @@ export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
   return r;
 }
 
-export function runtimeRecMerge(a: EjObject, b:EjObject): EjObject {
-  throw new Error('runtimeRecMerge: not implemented');
+// Variation of runtimeRecConcat, that checks equality of duplicate keys
+// Returns empty array for merge conflict.
+// TODO: @jeromesimeon, is this interpretion correct?
+export function runtimeRecMerge(a: EjObject, b:EjObject): EjArray {
+  let r = new EjObject();
+  let va = a.values;
+  let vb = b.values;
+  let ka = va.keys();
+  let kb = vb.keys();
+  for (let i = 0; i < ka.length; i++) {
+    let k = ka[i];
+    if (vb.has(k) && !runtimeEqual(va.get(k), vb.get(k)).value) {
+      return c_empty_array;
+    }
+    r.values.set(ka[i], va.get(ka[i]));
+  }
+  for (let i = 0; i < kb.length; i++) {
+    r.values.set(kb[i], vb.get(kb[i]));
+  }
+  return new EjArray([r]);
 }
 
 export function runtimeRecRemove(a: EjObject, b:EjString): EjObject {
