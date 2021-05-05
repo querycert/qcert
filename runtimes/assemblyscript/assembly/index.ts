@@ -818,10 +818,10 @@ export function runtimeSingleton(a: EjArray) : EjObject {
 export function runtimeFlatten(a: EjArray) : EjArray {
   let result = new Array<EjValue>(0);
   let content = a.values;
-  for (let iOuter=0, nOuter=content.length; iOuter<nOuter; iOuter=iOuter+1) {
+  for (let iOuter=0; iOuter < content.length; iOuter++) {
     let aInner = changetype<EjArray>(content[iOuter]);
     let aInnerContent = aInner.values;
-    for (let iInner=0, nInner=aInnerContent.length; iInner<nInner; iInner = iInner+1) {
+    for (let iInner=0; iInner < aInnerContent.length; iInner = iInner+1) {
       result.push(aInnerContent[iInner]);
     }
   }
@@ -832,8 +832,25 @@ export function runtimeUnion(a: EjArray, b: EjArray) : EjArray {
   return new EjArray(a.values.concat(b.values));
 }
 
+// Remove elements of b from a.
+// TODO: runtimeMinus, can we improve complexity?
 export function runtimeMinus(a: EjArray, b: EjArray) : EjArray {
-  throw new Error('runtimeMinus: not implemented');
+  let result = new Array<EjValue>();
+  let before = a.values;
+  let remove = b.values;
+  for (let i=0; i < before.length; i++) {
+    let keep = true;
+    for (let j=0; j < remove.length; j++) {
+      if (runtimeEqual(before[i], remove[j]).value) {
+        keep = false;
+        break;
+      }
+    }
+    if (keep) {
+      result.push(before[i]);
+    }
+  }
+  return new EjArray(result);
 }
 
 export function runtimeMin(a: EjArray, b: EjArray) : EjArray {
