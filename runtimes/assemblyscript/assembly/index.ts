@@ -439,14 +439,9 @@ export function opArrayPush(a: EjArray, b: EjValue): EjArray {
   return new EjArray(a.values.concat([b]));
 }
 
+// Crashes on out of bound like imp eval.
 export function opArrayAccess(a: EjArray, b: EjBigInt): EjValue {
-  // TODO: opArrayAccess do we need out of bound check?
-  let index = b.value;
-  if (b.value < 0 || b.value > a.values.length) {
-    throw new Error("runtimeArrayAccess: out of bounds");
-  } else {
-    return a.values[i32(b.value)];
-  }
+  return a.values[i32(b.value)];
 }
 
 // n-ary, compiled
@@ -861,8 +856,11 @@ export function runtimeMax(a: EjArray, b: EjArray) : EjArray {
   throw new Error('runtimeMax: not implemented');
 }
 
-export function runtimeNth(a: EjArray, b: EjBigInt) : EjArray {
-  throw new Error('runtimeNth: not implemented');
+export function runtimeNth(a: EjArray, b: EjBigInt) : EjObject {
+  let arr = a.values;
+  let i = b.value;
+  if (i < 0 || i >= arr.length) return c_none;
+  return ejLeft(arr[i32(i)]);
 }
 
 export function runtimeCount(a: EjArray) : EjArray {
