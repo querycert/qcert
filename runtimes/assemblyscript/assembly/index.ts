@@ -593,43 +593,86 @@ export function runtimeToText(a: EjValue): EjString {
   throw new Error('runtimeToText: not implemented');
 }
 
+// Merges two objects. First argument is preferred in case of key conflict.
+// Returned object has sorted keys.
 export function runtimeRecConcat(a: EjObject, b:EjObject): EjObject {
   let r = new EjObject();
-  let k = a.values.keys();
-  for (let i = 0; i < k.length; i++) {
-    r.values.set(k[i], a.values.get(k[i]));
+  let va = a.values;
+  let vb = b.values;
+  let ka = va.keys().sort();
+  let kb = vb.keys().sort();
+  let ia = 0, ib= 0;
+  while (ia < ka.length && ib < kb.length) {
+    if (ka[ia] < kb[ib]) {
+      r.values.set(ka[ia], va.get(ka[ia]));
+      ia++;
+    } else if (ka[ia] > kb[ib]) {
+      r.values.set(kb[ib], vb.get(kb[ib]));
+      ib++;
+    } else {
+      r.values.set(ka[ia], vb.get(ka[ia]));
+      ia++;
+      ib++;
+    }
   }
-  k = b.values.keys();
-  for (let i = 0; i < k.length; i++) {
-    r.values.set(k[i], b.values.get(k[i]));
+  while (ia < ka.length) {
+      r.values.set(ka[ia], va.get(ka[ia]));
+      ia++;
+  }
+  while (ib < kb.length) {
+      r.values.set(kb[ib], vb.get(kb[ib]));
+      ib++;
   }
   return r;
 }
 
-// Variation of runtimeRecConcat, that checks equality of duplicate keys
-// Returns empty array for merge conflict.
-// TODO: @jeromesimeon, is this interpretion correct?
+// Variation of runtimeRecConcat which checks equality of duplicate keys
+// Returns empty array on merge conflict.
+// Returned object has sorted keys.
 export function runtimeRecMerge(a: EjObject, b:EjObject): EjArray {
   let r = new EjObject();
   let va = a.values;
   let vb = b.values;
-  let ka = va.keys();
-  let kb = vb.keys();
-  for (let i = 0; i < ka.length; i++) {
-    let k = ka[i];
-    if (vb.has(k) && !runtimeEqual(va.get(k), vb.get(k)).value) {
-      return c_empty_array;
+  let ka = va.keys().sort();
+  let kb = vb.keys().sort();
+  let ia = 0, ib= 0;
+  while (ia < ka.length && ib < kb.length) {
+    if (ka[ia] < kb[ib]) {
+      r.values.set(ka[ia], va.get(ka[ia]));
+      ia++;
+    } else if (ka[ia] > kb[ib]) {
+      r.values.set(kb[ib], vb.get(kb[ib]));
+      ib++;
+    } else {
+      if (!runtimeEqual(va.get(ka[ia]), vb.get(ka[ia])).value) {
+        return c_empty_array;
+      }
+      r.values.set(ka[ia], vb.get(ka[ia]));
+      ia++;
+      ib++;
     }
-    r.values.set(ka[i], va.get(ka[i]));
   }
-  for (let i = 0; i < kb.length; i++) {
-    r.values.set(kb[i], vb.get(kb[i]));
+  while (ia < ka.length) {
+      r.values.set(ka[ia], va.get(ka[ia]));
+      ia++;
+  }
+  while (ib < kb.length) {
+      r.values.set(kb[ib], vb.get(kb[ib]));
+      ib++;
   }
   return new EjArray([r]);
 }
 
 export function runtimeRecRemove(a: EjObject, b:EjString): EjObject {
-  throw new Error('runtimeRecRemove: not implemented');
+  let r = new EjObject();
+  let v = a.values;
+  let k = v.keys();
+  for (let i = 0; i < k.length; i++) {
+    if (b.value != k[i]) {
+      r.values.set(k[i], v.get(k[i]));
+    }
+  }
+  return r;
 }
 
 export function runtimeRecProject(a: EjObject, b:EjArray): EjObject {
