@@ -42,27 +42,38 @@ let ejson_to_string ejson =
 let ejson_eq =
   ejson_eq_dec EnhancedEJson.enhanced_foreign_ejson
 
-let test_fn env fn =
-  let imp_ejson : _ imp_ejson = [['f'], fn]
-  in
-  let imp = match imp_eval imp_ejson env with
-    | Some x -> x
-    | None -> failwith "imp eval failed"
-  in
-  let wasm = match wasm_eval imp_ejson env with
-    | Some x -> x
-    | None -> failwith "wasm eval failed"
-  in
-  if (not (ejson_eq wasm imp)) then (
-    print_string ("imp:  ");
-    print_endline (ejson_to_string imp);
-    print_string ("wasm: ");
-    print_endline (ejson_to_string wasm);
-    failwith "wasm and imp differ"
-  )
+let failed = ref false
 
-let test_expr_1 expr op args =
-  let varname i =  Util.char_list_of_string ("arg" ^ (string_of_int i)) in
+let test_fn fail env fn =
+  let imp_ejson : _ imp_ejson = [['f'], fn] in
+  let fail message =
+    print_endline "";
+    fail ();
+    print_string ("FAILED: ");
+    print_endline message;
+    failed := true
+  in
+  match imp_eval imp_ejson env, wasm_eval imp_ejson env with
+  | None, _ -> fail "imp eval failed"
+  | Some _, None -> fail "wasm eval failed"
+  | Some imp, Some wasm ->
+    if (not (ejson_eq wasm imp)) then (
+      fail "wasm and imp differ";
+      print_string ("imp:  ");
+      print_endline (ejson_to_string imp);
+      print_string ("wasm: ");
+      print_endline (ejson_to_string wasm);
+    )
+
+let test_expr_1 fail expr op args =
+  let varname i =  Util.char_list_of_string ("arg" ^ (string_of_int i))
+  and fail () =
+    fail ();
+    print_endline "arguments: ";
+    List.iter (fun arg ->
+        print_string "  ";
+        print_endline (ejson_to_string arg)) args
+  in
   let return = Util.char_list_of_string "return"
   and env = List.mapi (fun i ejson -> varname i, ejson) args
   and args = List.mapi (fun i _ ->
@@ -75,13 +86,28 @@ let test_expr_1 expr op args =
   let stmt =
     ImpStmtAssign(return, expr op args)
   in
-  test_fn env (ImpFun (['x'], stmt, return))
+  test_fn fail env (ImpFun (['x'], stmt, return))
 
-let test_expr expr op args =
-  List.iter (fun args -> test_expr_1 expr op args) args
+let test_expr fail expr op args =
+  List.iter (fun args -> test_expr_1 fail expr op args) args
 
-let test_op = test_expr (fun op args -> ImpExprOp (op, args))
-let test_rtop = test_expr (fun op args -> ImpExprRuntimeCall (op, args))
+let test_op op =
+  test_expr
+    (fun () ->
+       print_string "operator: ";
+       print_endline (Wasm_backend.string_of_operator op)
+    )
+    (fun op args -> ImpExprOp (op, args))
+    op
+
+let test_rtop op =
+  test_expr
+    (fun () ->
+       print_string "operator: ";
+       print_endline (Wasm_backend.string_of_runtime_operator op);
+    )
+    (fun op args -> ImpExprRuntimeCall (op, args))
+    op
 
 module Arg = struct
   let null = Coq_ejnull
@@ -105,6 +131,8 @@ let _ =
   test_rtop
     EJsonRuntimeRecConcat
     [ [ obj [ "a", null ] ; obj [ "b", null ] ]
+    (* ; [ obj [ "b", null ; "a", null ] ; obj [] ] *)
+    (* ; [ obj [ "b", null ] ; obj [ "a", null ] ] *)
     (* ; [ obj [ "a", null; "c", null ] ; obj [ "b", null; "d", null ] ] *)
     ; [ obj [ "a", bool false ] ; obj [ "a", bool true ] ]
     ; [ obj [] ; obj [ "a", null ] ]
@@ -116,3 +144,6 @@ let _ =
     [ [int 41; int 1]
     ; [int 43; int (-1)]
     ]
+
+let _ =
+  if !failed then exit 1
