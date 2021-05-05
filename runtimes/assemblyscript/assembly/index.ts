@@ -863,8 +863,9 @@ export function runtimeNth(a: EjArray, b: EjBigInt) : EjObject {
   return ejLeft(arr[i32(i)]);
 }
 
-export function runtimeCount(a: EjArray) : EjArray {
-  throw new Error('runtimeCount: not implemented');
+// TODO: runtimeCount redundant with opArrayLength
+export function runtimeCount(a: EjArray) : EjBigInt {
+  return opArrayLength(a);
 }
 
 export function runtimeContains(a: EjValue, b: EjArray) : EjBool {
