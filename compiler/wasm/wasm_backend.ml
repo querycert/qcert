@@ -11,12 +11,16 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   val runtime: Wasm.Ast.module_
 
   (** [eval wasm_module fn_name environment *)
-  val eval : Wasm.Ast.module_ -> char list -> (char list * 'a ejson) list -> ('a ejson) option
+  val eval :
+    Wasm.Ast.module_ -> char list -> (char list * foreign_model ejson) list ->
+    foreign_model ejson option
 
-  val imp_ejson_to_wasm_ast : brand_hierarchy -> ('a,'b) imp_ejson -> Wasm.Ast.module_
+  val imp_ejson_to_wasm_ast :
+    brand_hierarchy -> (foreign_model, foreign_runtime_op) imp_ejson ->
+    Wasm.Ast.module_
 
   val string_of_operator: imp_ejson_op -> string
-  val string_of_runtime_operator: 'a imp_ejson_runtime_op -> string
+  val string_of_runtime_operator: foreign_runtime_op imp_ejson_runtime_op -> string
 end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)

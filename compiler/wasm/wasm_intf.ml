@@ -173,4 +173,10 @@ module type IMP_EJSON = sig
   type ('foreign_ejson_model, 'foreign_ejson_runtime_op) imp_ejson =
     ('foreign_ejson_model imp_ejson_constant, imp_ejson_op,
      'foreign_ejson_runtime_op imp_ejson_runtime_op) imp
+
+
+  (* Foreign *)
+
+  type foreign_model
+  type foreign_runtime_op
 end
