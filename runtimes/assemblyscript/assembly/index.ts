@@ -753,6 +753,8 @@ export function runtimeUnbrand(a: EjObject): EjValue {
   return runtimeRecDot(a, c_$data);
 }
 
+// this is a binary imp ejson operator
+// hierarchy is added by the compiler
 export function runtimeCast(hierarchy: EjArray, brands: EjArray, x: EjObject) : EjValue {
   let from_brands = cast<EjArray>(runtimeRecDot(x, c_$class)).values;
   let to_brands = brands.values;
