@@ -580,8 +580,55 @@ export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
   throw new Error('runtimeCompare: invalid arguments');
 }
 
+function ejValueToString(a: EjValue): string {
+  if (a instanceof EjNull) {
+    return "unit";
+  }
+  if (a instanceof EjBool) {
+    let aa : EjBool = changetype<EjBool>(a) ;
+    return aa.value ? "true" : "false";
+  }
+  if (a instanceof EjNumber) {
+    let aa : EjNumber = changetype<EjNumber>(a) ;
+    return aa.value.toString();
+  }
+  if (a instanceof EjBigInt) {
+    let aa : EjBigInt = changetype<EjBigInt>(a) ;
+    return aa.value.toString();
+  }
+  if (a instanceof EjString) {
+    let aa : EjString = changetype<EjString>(a) ;
+    return aa.value;
+  }
+  if (a instanceof EjArray) {
+    let aa : EjArray = changetype<EjArray>(a) ;
+    let s : string = "[";
+    for (let i = 0; i < aa.values.length - 1; i++) {
+       s += ejValueToString(aa.values[i]) + ", " ;
+    }
+    if (aa.values.length > 0) {
+      s += ejValueToString(aa.values[aa.values.length - 1]);
+    }
+    return s + "]";
+  }
+  if (a instanceof EjObject) {
+    let aa : EjObject = changetype<EjObject>(a) ;
+    let keys = aa.values.keys();
+    let s : string = "{";
+    let n = keys.length;
+    for (let i = 0; i < n - 1; i++) {
+       s += keys[i] + "->" + ejValueToString(aa.values[keys[i]]) + ", " ;
+    }
+    if (n > 0) {
+      s += keys[n - 1] + "->" + ejValueToString(aa.values[keys[n - 1]]);
+    }
+    return s + "}";
+  }
+  throw new Error('ejValueToString: unknown value');
+}
+// wrap assemblyscript string into EjString
 export function runtimeToString(a: EjValue): EjString {
-  throw new Error('runtimeToString: not implemented');
+  return new EjString(ejValueToString(a));
 }
 
 export function runtimeToText(a: EjValue): EjString {

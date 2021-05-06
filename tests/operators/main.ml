@@ -156,6 +156,24 @@ let _ =
     ; [ bool true; bool true]
     ];
   test_rtop
+    EJsonRuntimeToString
+    [ [ null ]
+    ; [ bool true ]
+    ; [ bool false ]
+    ; [ num 3.14 ]
+    ; [ int 42 ]
+    ; [ str "hello world" ]
+    ; [ str "utf8: α ☻ works" ]
+    ; [ arr []]
+    ; [ arr [null]]
+    ; [ arr [null; null]]
+    ; [ arr (List.init 42 (fun _ -> null))]
+    ; [ obj [] ]
+    ; [ obj ["a", null] ]
+    ; [ obj ["a", null; "b", null] ]
+    ; [ obj (List.init 21 (fun i -> ("v" ^ (string_of_int i), null))) ]
+    ];
+  test_rtop
     EJsonRuntimeRecConcat
     [ [ obj [ "a", null ] ; obj [ "b", null ] ]
     ; [ obj [ "b", null ; "a", null ] ; obj [] ]
