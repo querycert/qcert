@@ -9,19 +9,25 @@ module ImpEJson = struct
 end
 open ImpEJson
 
-let imp_eval (imp_ejson : _ imp_ejson) ?(brands=[]) env : _ ejson option =
+let brands = ref []
+let add_brand_relation sub sup =
+  brands := ( Util.char_list_of_string sub
+            , Util.char_list_of_string sup
+            ) :: !brands
+
+let imp_eval (imp_ejson : _ imp_ejson) env : _ ejson option =
   let open ImpEJsonEval in
   let open EnhancedEJson in
   imp_ejson_eval_top_on_ejson
     enhanced_foreign_ejson
     enhanced_foreign_ejson_runtime
-    brands env imp_ejson
+    !brands env imp_ejson
 
 module Wasm_backend = Wasm_backend.Make(ImpEJson)
 
-let wasm_eval (imp_ejson : _ imp_ejson) ?(brands=[]) env : _ ejson option =
+let wasm_eval (imp_ejson : _ imp_ejson) env : _ ejson option =
   let wasm_ast =
-    Wasm_backend.imp_ejson_to_wasm_ast brands imp_ejson
+    Wasm_backend.imp_ejson_to_wasm_ast !brands imp_ejson
   in
   Wasm_backend.eval wasm_ast ['f'] env
 
@@ -44,11 +50,11 @@ let ejson_eq =
 
 let failed = ref false
 
-let test_fn fail env fn =
+let test_fn ?(verbose=false) info env fn =
   let imp_ejson : _ imp_ejson = [['f'], fn] in
   let fail message =
     print_endline "";
-    fail ();
+    info ();
     print_string ("FAILED: ");
     print_endline message;
     failed := true
@@ -63,12 +69,17 @@ let test_fn fail env fn =
       print_endline (ejson_to_string imp);
       print_string ("wasm: ");
       print_endline (ejson_to_string wasm);
+    ) else if verbose then (
+      print_endline "";
+      info ();
+      print_string "result: ";
+      print_endline (ejson_to_string imp)
     )
 
-let test_expr_1 fail expr op args =
+let test_expr_1 ?verbose info expr op args =
   let varname i =  Util.char_list_of_string ("arg" ^ (string_of_int i))
-  and fail () =
-    fail ();
+  and info () =
+    info ();
     print_endline "arguments: ";
     List.iter (fun arg ->
         print_string "  ";
@@ -86,13 +97,13 @@ let test_expr_1 fail expr op args =
   let stmt =
     ImpStmtAssign(return, expr op args)
   in
-  test_fn fail env (ImpFun (['x'], stmt, return))
+  test_fn ?verbose info env (ImpFun (['x'], stmt, return))
 
-let test_expr fail expr op args =
-  List.iter (fun args -> test_expr_1 fail expr op args) args
+let test_expr ?verbose info expr op args =
+  List.iter (fun args -> test_expr_1 ?verbose info expr op args) args
 
-let test_op op =
-  test_expr
+let test_op ?verbose op =
+  test_expr ?verbose
     (fun () ->
        print_string "operator: ";
        print_endline (Wasm_backend.string_of_operator op)
@@ -100,8 +111,8 @@ let test_op op =
     (fun op args -> ImpExprOp (op, args))
     op
 
-let test_rtop op =
-  test_expr
+let test_rtop ?verbose op =
+  test_expr ?verbose
     (fun () ->
        print_string "operator: ";
        print_endline (Wasm_backend.string_of_runtime_operator op);
@@ -185,6 +196,39 @@ let _ =
     ; [ obj []; arr [] ]
     ; [ obj ["a", null]; arr [] ]
     ; [ obj []; arr [str "b"] ]
+    ];
+  test_rtop
+    EJsonRuntimeUnbrand
+    [ [ obj ["$class", arr [str "brand0"]; "$data", int 42 ] ]
+    ];
+  add_brand_relation "/a" "/";
+  add_brand_relation "/a/a" "/a";
+  add_brand_relation "/a/a" "/";
+  add_brand_relation "/b" "/";
+  add_brand_relation "/b/b" "/b";
+  add_brand_relation "/b/b" "/";
+  test_rtop (* ~verbose:true *)
+    EJsonRuntimeCast
+    [ [ arr [ str "/" ] (* target brand *)
+      ; obj [ "$class", arr [str "/"] (* brands *)
+            ; "$data", int 42 ]
+      ]
+    ; [ arr [ str "/" ] (* target brand *)
+      ; obj [ "$class", arr [str "/a"] (* brands *)
+            ; "$data", int 42 ]
+      ]
+    ; [ arr [ str "/" ] (* target brand *)
+      ; obj [ "$class", arr [str "/a/a"] (* brands *)
+            ; "$data", int 42 ]
+      ]
+    ; [ arr [ str "/a"; str "/b" ] (* target brand *)
+      ; obj [ "$class", arr [str "/a/a"; str "/b/b"] (* brands *)
+            ; "$data", int 42 ]
+      ]
+    ; [ arr [ str "/a"; str "/b" ] (* target brand *)
+      ; obj [ "$class", arr [str "/"; str "/b/b"] (* brands *)
+            ; "$data", int 42 ]
+      ]
     ];
   test_rtop
     EJsonRuntimeSingleton
