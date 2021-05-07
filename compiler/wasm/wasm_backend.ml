@@ -359,9 +359,9 @@ end = struct
       | EJsonOpArrayLength -> foreign [i32] [i32]
       | EJsonOpArrayPush -> foreign [i32; i32] [i32]
       | EJsonOpArrayAccess -> foreign [i32; i32] [i32]
-      | EJsonOpObject _ -> failwith "non-trivial op OpObject"
-      | EJsonOpAccess _ -> failwith "non-trivial op OpAccess"
-      | EJsonOpHasOwnProperty _ -> failwith "non-trivial op OpHasOwnProperty"
+      | EJsonOpObject _ -> failwith "EJsonOpObject is compiled below"
+      | EJsonOpAccess _ -> foreign [i32; i32] [i32]
+      | EJsonOpHasOwnProperty _ -> foreign [i32; i32] [i32]
       | EJsonOpMathMin -> foreign [i32; i32] [i32]
       | EJsonOpMathMax -> foreign [i32; i32] [i32]
       | EJsonOpMathPow -> foreign [i32; i32] [i32]
@@ -395,6 +395,16 @@ end = struct
                 ]
               ) bindings
             |> List.concat )
+        )
+      | EJsonOpAccess key ->
+        block ~result:[i32] (
+          args @ [ const ctx.ctx (Coq_ejstring key)
+                 ; op_trivial ctx.ctx (EJsonOpAccess []) ]
+        )
+      | EJsonOpHasOwnProperty key ->
+        block ~result:[i32] (
+          args @ [ const ctx.ctx (Coq_ejstring key)
+                 ; op_trivial ctx.ctx (EJsonOpHasOwnProperty []) ]
         )
       | _ -> block ~result:[i32] (args @ [op_trivial ctx.ctx op])
 
