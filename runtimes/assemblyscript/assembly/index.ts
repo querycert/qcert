@@ -435,6 +435,7 @@ export function opArrayLength(a: EjArray): EjBigInt {
 }
 
 export function opArrayPush(a: EjArray, b: EjValue): EjArray {
+  // concat creates new array
   // TODO: opArrayPush: avoid cloning the array on each push.
   return new EjArray(a.values.concat([b]));
 }
@@ -447,13 +448,13 @@ export function opArrayAccess(a: EjArray, b: EjBigInt): EjValue {
 // n-ary, compiled
 // export function opObject(a: EjValue): EjObject {}
 
+// Crashes on missing key like imp eval
 export function opAccess(a: EjObject, k: EjString): EjValue {
-  // TODO: opAccess: check for key not found?
   return a.get(k);
 }
 
-export function opHasOwnProperty(a: EjObject, k: EjString): EjValue {
-  throw new Error('opHasOwnProperty: not implemented');
+export function opHasOwnProperty(a: EjObject, k: EjString): EjBool {
+  return (a.values.has(k.value)) ? c_true : c_false;
 }
 
 export function opMathMin(a: EjNumber, b: EjNumber): EjNumber {
