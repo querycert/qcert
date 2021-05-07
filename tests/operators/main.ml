@@ -139,11 +139,6 @@ let _ =
     ; [num (-1.); num 1e32]
     ; [num (-1.); num Float.infinity]
     ];
-  test_op (* imp eval fails on out of bounds *)
-    EJsonOpArrayAccess
-    [ [ arr [bool true]; int 0 ]
-    ; [ arr [int 0; int 1]; int 1 ]
-    ];
   test_op
     EJsonOpArrayLength
     [ [ arr [bool true; bool false] ]
@@ -296,6 +291,38 @@ let _ =
     ; [ obj []; arr [] ]
     ; [ obj ["a", null]; arr [] ]
     ; [ obj []; arr [str "b"] ]
+    ];
+  test_rtop
+    EJsonRuntimeRecDot
+    [ [ obj ["a", null]; str "a" ]
+    ; [ obj ["a", int 0; "b", int 1; "c", int 2]; str "a" ]
+    ; [ obj ["b", int 0; "a", int 1; "c", int 2]; str "a" ]
+    (* ; [ obj []; str "a"] invalid / missing key *)
+    ];
+  test_rtop
+    EJsonRuntimeArray
+    [ [ int 1; null; int 3 ]
+    ; []
+    ; [ null ]
+    ];
+  test_rtop
+    EJsonRuntimeArrayLength
+    [ [ arr [bool true; bool false] ]
+    ; [ arr [null] ]
+    ; [ arr [] ]
+    ];
+  test_rtop
+    EJsonRuntimeArrayPush
+    [ [ arr []; null ]
+    ; [ arr [int 0]; int 1 ]
+    ];
+  test_rtop
+    EJsonRuntimeArrayAccess
+    [ [ arr [null]; int 0 ]
+    ; [ arr [int 0; int 1; int 2]; int 0 ]
+    ; [ arr [int 0; int 1; int 2]; int 1 ]
+    ; [ arr [int 0; int 1; int 2]; int 2 ]
+    (* ; [ arr [null]; int 1 ] (* invalid / out of bounds *) *)
     ];
   test_rtop
     EJsonRuntimeUnbrand
