@@ -14,7 +14,7 @@
       (system "npm install") ; happens in dune's _build directory
       (system "npm run asbuild")
       (system "npm test")
-      (copy build/untouched.wasm runtime.wasm))))
+      (system "cp build/untouched.wasm runtime.wasm"))))
 
 (rule
   (target stringified.ml)
