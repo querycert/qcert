@@ -140,6 +140,12 @@ let _ =
     ; [num (-1.); num Float.infinity]
     ];
   test_op
+    EJsonOpArray
+    [ []
+    ; [null]
+    ; [null; null; null]
+    ];
+  test_op
     EJsonOpArrayLength
     [ [ arr [bool true; bool false] ]
     ; [ arr [null] ]
@@ -157,6 +163,19 @@ let _ =
     ; [ arr [int 0; int 1; int 2]; int 1 ]
     ; [ arr [int 0; int 1; int 2]; int 2 ]
     (* ; [ arr [null]; int 1 ] invalid / out of bounds *)
+    ];
+  test_op
+    (EJsonOpObject [])
+    [ []
+    ];
+  test_op
+    (EJsonOpObject [['a']])
+    [ [null]
+    ];
+  test_op
+    (EJsonOpObject [['a']; ['b']])
+    [ [null; null]
+    ; [int 1; bool true]
     ];
   test_op
     (EJsonOpAccess ['a'])
