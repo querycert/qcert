@@ -178,6 +178,60 @@ let _ =
     ; [ obj ["b", int 0; "c", int 2] ]
     ; [ obj []]
     ];
+  List.iter (fun op ->
+      test_op op
+        [ [ num 42.; num 0. ]
+        ; [ num 0.; num 42. ]
+        ; [ num (-1.); num 1. ]
+        (* ; [ num Float.nan; num Float.nan ] nan <> nan *)
+        ; [ num 2.; num 1024. ]
+        ; [ num 1e32; num 43. ]
+        ; [ num Float.infinity; num Float.neg_infinity ]
+        ])
+    [ EJsonOpMathMin
+    ; EJsonOpMathMax
+    ; EJsonOpMathPow
+    ];
+  List.iter (fun op ->
+      test_op op
+        [ [ num 42. ]
+        ; [ num 0.2 ]
+        ; [ num 1. ]
+        (* ; [ num Float.nan ] (* nan <> nan *) *)
+        ; [ num 3.14 ]
+        ; [ num 1e32 ]
+        ; [ num Float.infinity ]
+        ])
+    [ EJsonOpMathExp
+    ; EJsonOpMathAbs
+    ; EJsonOpMathLog
+    ; EJsonOpMathLog10
+    ; EJsonOpMathCeil
+    ; EJsonOpMathFloor
+    ];
+  List.iter (fun op ->
+      test_op op
+        [ [ num (-42.) ]
+        ; [ num (-0.2) ]
+        ; [ num (-1.) ]
+        ; [ num (-3.14) ]
+        ; [ num 1e32 ]
+        ; [ num Float.neg_infinity ]
+        ])
+    [ EJsonOpMathExp
+    ; EJsonOpMathAbs
+    ; EJsonOpMathCeil
+    ; EJsonOpMathFloor
+    ];
+  test_op
+    EJsonOpMathTrunc
+    [ [ num 1.1 ]
+    ; [ num 10000.7 ]
+    ; [ num (-1.)]
+    ; [ num (-3.14)]
+    ; [ num (-3.94)]
+    ; [ num (-1000000.94)]
+    ];
   test_rtop
     EJsonRuntimeEqual
     [ [ bool false; bool true ]
