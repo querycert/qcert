@@ -355,11 +355,11 @@ end = struct
       | EJsonOpDiv -> foreign [i32; i32] [i32]
       | EJsonOpStrictEqual -> foreign [i32; i32] [i32]
       | EJsonOpStrictDisequal -> foreign [i32; i32] [i32]
-      | EJsonOpArray -> foreign [i32] [i32]
+      | EJsonOpArray -> failwith "n-ary EJsonOpArray is compiled below"
       | EJsonOpArrayLength -> foreign [i32] [i32]
       | EJsonOpArrayPush -> foreign [i32; i32] [i32]
       | EJsonOpArrayAccess -> foreign [i32; i32] [i32]
-      | EJsonOpObject _ -> failwith "EJsonOpObject is compiled below"
+      | EJsonOpObject _ -> failwith "n-ary EJsonOpObject is compiled below"
       | EJsonOpAccess _ -> foreign [i32; i32] [i32]
       | EJsonOpHasOwnProperty _ -> foreign [i32; i32] [i32]
       | EJsonOpMathMin -> foreign [i32; i32] [i32]
@@ -395,6 +395,20 @@ end = struct
                 ]
               ) bindings
             |> List.concat )
+        )
+      | EJsonOpArray ->
+        block ~result:[i32] (
+          [ i32_const' 0
+          ; i32_const' (List.length args)
+          ; foreign [i32; i32] [i32] "EjArrayBuilder#constructor"
+          ] @
+          ( List.map (fun x ->
+                [ x
+                ; foreign [i32; i32] [i32] "EjArrayBuilder#put"
+                ]
+              ) args
+            |> List.concat ) @
+          [ foreign [i32] [i32] "EjArrayBuilder#finalize" ]
         )
       | EJsonOpAccess key ->
         block ~result:[i32] (
@@ -497,7 +511,7 @@ end = struct
       | EJsonRuntimeRecRemove -> foreign [i32; i32] [i32]
       | EJsonRuntimeRecProject -> foreign [i32; i32] [i32]
       | EJsonRuntimeRecDot -> foreign [i32; i32] [i32]
-      | EJsonRuntimeArray -> failwith "non-trivial op RuntimeArray"
+      | EJsonRuntimeArray -> failwith "n-ary RuntimeArray is compiled below"
       | EJsonRuntimeArrayLength -> foreign [i32] [i32]
       | EJsonRuntimeArrayPush -> foreign [i32; i32] [i32]
       | EJsonRuntimeArrayAccess -> foreign [i32; i32] [i32]
@@ -548,27 +562,9 @@ end = struct
       | EJsonRuntimeForeign _fop -> failwith "non-trivial op RuntimeForeign"
 
     let rt_op ctx op args: Ir.instr =
-      let foreign params result fname =
-        let f, import = Ir.import_func ~params ~result "runtime" fname in
-        ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
-        Ir.call f
-      in
       let open Ir in
       match (op : 'a ejson_runtime_op) with
-      | EJsonRuntimeArray ->
-        block ~result:[i32] (
-          [ i32_const' 0
-          ; i32_const' (List.length args)
-          ; foreign [i32; i32] [i32] "EjArrayBuilder#constructor"
-          ] @
-          ( List.map (fun x ->
-                [ x
-                ; foreign [i32; i32] [i32] "EjArrayBuilder#put"
-                ]
-              ) args
-            |> List.concat ) @
-          [ foreign [i32] [i32] "EjArrayBuilder#finalize" ]
-        )
+      | EJsonRuntimeArray -> op_n_ary ctx EJsonOpArray args
       | EJsonRuntimeCast ->
         (* insert brand hierachy as first argument *)
         block ~result:[i32] (ctx.ctx.brand_hierarchy :: args @ [rt_op_trivial ctx.ctx op])
