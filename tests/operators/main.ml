@@ -150,6 +150,34 @@ let _ =
     ; [ arr [null] ]
     ; [ arr [] ]
     ];
+  test_op
+    EJsonOpArrayPush
+    [ [ arr []; null ]
+    ; [ arr [int 0]; int 1 ]
+    ];
+  test_op
+    EJsonOpArrayAccess
+    [ [ arr [null]; int 0 ]
+    ; [ arr [int 0; int 1; int 2]; int 0 ]
+    ; [ arr [int 0; int 1; int 2]; int 1 ]
+    ; [ arr [int 0; int 1; int 2]; int 2 ]
+    (* ; [ arr [null]; int 1 ] invalid / out of bounds *)
+    ];
+  test_op
+    (EJsonOpAccess ['a'])
+    [ [ obj ["a", null] ]
+    ; [ obj ["a", int 0; "b", int 1; "c", int 2] ]
+    ; [ obj ["b", int 0; "a", int 1; "c", int 2] ]
+    (* ; [ obj []] invalid / missing key *)
+    ];
+  test_op
+    (EJsonOpHasOwnProperty ['a'])
+    [ [ obj ["a", null] ]
+    ; [ obj ["a", int 0; "b", int 1; "c", int 2] ]
+    ; [ obj ["b", int 0; "a", int 1; "c", int 2] ]
+    ; [ obj ["b", int 0; "c", int 2] ]
+    ; [ obj []]
+    ];
   test_rtop
     EJsonRuntimeEqual
     [ [ bool false; bool true ]
