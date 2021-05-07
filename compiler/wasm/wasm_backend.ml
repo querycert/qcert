@@ -21,10 +21,7 @@ end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)
 
-  let runtime =
-    let m = Decode.decode "runtime.wasm" Wasm_runtime.runtime_wasm in
-    let () = Valid.check_module m in
-    m
+  let runtime = Lazy.force Assemblyscript.Runtime.wasm_ast
 
   let ejson_of_cejson = function
     | Coq_cejnull -> Coq_ejnull

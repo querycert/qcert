@@ -38,7 +38,6 @@ all:
 	@$(MAKE) tests
 
 tests:
-	@$(MAKE) dune
 	@$(MAKE) oql-tests
 	@$(MAKE) lambda_nra-tests
 	@$(MAKE) camp-tests
@@ -51,10 +50,6 @@ ifneq ($(JRULES),)
 	@$(MAKE) tech_rule-tests
 endif
 endif
-
-.PHONY: dune
-dune:
-	dune runtest
 
 .PHONY: oql-tests \
 	oql-world-tests oql-world-tests-js oql-world-tests-java \
