@@ -1,0 +1,3 @@
+(tests
+  (names force_wasm_ast)
+  (libraries coq-qcert.assemblyscript))

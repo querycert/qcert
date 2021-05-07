@@ -1,0 +1,27 @@
+(library
+  (name assemblyscript)
+  (public_name coq-qcert.assemblyscript)
+  (libraries wasm))
+
+(rule ; not evaluated for package release (-p flag)
+  (target runtime.wasm)
+  (deps
+    (:npm package.json package-lock.json)
+    (:asm (source_tree assembly) (source_tree lib) (source_tree test_js)))
+  (mode promote)
+  (action
+    (progn
+      (system "npm install") ; happens in dune's _build directory
+      (system "npm run asbuild")
+      (system "npm test")
+      (copy build/untouched.wasm runtime.wasm))))
+
+(rule
+  (target stringified.ml)
+  (deps runtime.wasm)
+  (action
+    (with-stdout-to
+      stringified.ml
+      (progn (echo "let runtime = \"")
+             (run tools/binary_to_string.exe runtime.wasm)
+             (echo "\"\n")))))

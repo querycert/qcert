@@ -9,7 +9,7 @@
 (library
  (name qcert_lib)
  (public_name coq-qcert)
- (libraries base64 uri calendar wasm)
+ (libraries base64 uri calendar wasm coq-qcert.assemblyscript)
 )
 
 (copy_files util/*.{ml,mli})
@@ -17,29 +17,3 @@
 (copy_files extraction/*.{ml,mli})
 (copy_files parsing/*.{mll,mly})
 (copy_files# lib/*.{ml,mli})
-
-(rule
-  (target runtime.wasm)
-  (deps ../runtimes/assemblyscript/assembly/index.ts)
-  (mode (promote (into wasm)))
-  (action
-    (progn
-      (system "cd ../../../runtimes/assemblyscript && npm run asbuild:untouched")
-      (with-stdout-to runtime.wasm
-        (system "cat ../../../runtimes/assemblyscript/build/untouched.wasm"))
-    )
-  )
-)
-
-(rule
-  (target wasm_runtime.ml)
-  (deps runtime.wasm)
-  (action
-    (with-stdout-to wasm_runtime.ml
-      (progn (echo "let runtime_wasm = \"")
-             (run ../tools/binary_to_string.exe runtime.wasm)
-             (echo "\"\n")
-      )
-    )
-  )
-)
