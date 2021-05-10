@@ -1,1 +1,1 @@
-let _ = Lazy.force Assemblyscript.Runtime.wasm_ast
+let _ = Lazy.force Assemblyscript_runtime.wasm_ast

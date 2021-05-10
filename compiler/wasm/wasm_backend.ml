@@ -21,7 +21,7 @@ end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)
 
-  let runtime = Lazy.force Assemblyscript.Runtime.wasm_ast
+  let runtime = Lazy.force Assemblyscript_runtime.wasm_ast
 
   let ejson_of_cejson = function
     | Coq_cejnull -> Coq_ejnull

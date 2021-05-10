@@ -1,6 +1,6 @@
 (library
-  (name assemblyscript)
-  (public_name coq-qcert.assemblyscript)
+  (name assemblyscript_runtime)
+  (public_name coq-qcert.runtime.assemblyscript)
   (libraries wasm))
 
 (rule ; not evaluated for package release (-p flag)
