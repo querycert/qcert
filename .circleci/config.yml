@@ -29,7 +29,7 @@ common_steps: &common_steps
           echo "OCaml: " $OCAML_VERSION
           sudo curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh > install.sh
           echo | sudo sh install.sh
-          opam init --disable-sandboxing --jobs=1 --no-setup --yes --compiler=$OCAML_VERSION
+          opam init --disable-sandboxing --jobs=$NJOBS --no-setup --yes --compiler=$OCAML_VERSION
           sed -i "s/^jobs: [0-9]*/jobs: $NJOBS/g" ~/.opam/config
           eval $(opam env)
           opam repo add coq-released https://coq.inria.fr/opam/released || true
