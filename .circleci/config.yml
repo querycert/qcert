@@ -37,13 +37,8 @@ common_steps: &common_steps
           opam repo add coq-released https://coq.inria.fr/opam/released || true
           opam update || true
     - run:
-        name: "Install OCaml deps"
-        command: |
-          opam install -y --jobs=2 dune menhir base64 js_of_ocaml js_of_ocaml-ppx re calendar uri
-    - run:
-        name: "Install Coq deps"
-        command: |
-          opam install -y -v coq.8.11.2 coq-jsast.2.0.0
+        name: "Install OPAM deps"
+        command: opam install . --deps-only --yes
         no_output_timeout: 30m
     - save_cache:
         <<: *common_cache_key
