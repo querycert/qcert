@@ -30,7 +30,7 @@ opam install coq-qcert
 
 To build Q\*cert from the source, you will need:
 
-- OCaml 4.08.0 or later (http://ocaml.org/) along with the following libraries:
+- OCaml 4.09.1 or later (http://ocaml.org/) along with the following libraries:
   - dune, a build system (https://dune.build)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
@@ -45,8 +45,7 @@ An easy way to get set up on most platforms is to use the OCaml package manager 
 
 ```
 $ opam repo add coq-released https://coq.inria.fr/opam/released
-$ opam install dune menhir base64 js_of_ocaml js_of_ocaml-ppx calendar uri
-$ opam install coq.8.11.2 coq-jsast
+$ opam install . --deps-only
 ```
 
 #### Java (Recommended)
