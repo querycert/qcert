@@ -26,10 +26,10 @@ install: [
 ]
 remove: ["rm" "-R" "%{lib}%/coq/user-contrib/Qcert"]
 depends: [
-  "ocaml" {>= "4.08.0"}
+  "ocaml" {>= "4.09.1"}
   "ocamlfind"
   "dune"
-  "coq" {>= "8.11.2" }
+  "coq" {= "8.11.2" }
   "coq-jsast" {>= "2.0.0"}
   "menhir"
   "base64"
