@@ -33,6 +33,8 @@ depends: [
   "coq-jsast" {>= "2.0.0"}
   "menhir"
   "base64"
+  "js_of_ocaml"
+  "js_of_ocaml-ppx"
   "uri"
   "calendar"
   "coq-coq2html" {with-doc}
