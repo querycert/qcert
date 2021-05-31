@@ -542,6 +542,31 @@ let _ =
     ; [int (-1)]
     ];
   test_rtop
+    EJsonRuntimeNatLog2
+    [ [int 1]
+    ; [int 0]
+    (* ; [int (-41)] (* Imp returns 0 *) *)
+    ; [int 43]
+    ; [int (1 lsl 20)]
+    ; [int (1 lsl 61)]
+    (* ; [int (-1)] (* Imp returns 0 *) *)
+    (* ; [int max_int] (* Wasm off by one *) *)
+    (* ; [int min_int] (* Imp returns 0 *) *)
+    ];
+  test_rtop
+    EJsonRuntimeNatSqrt
+    [ [int (-41)]
+    ; [int 1]
+    ; [int 0]
+    ; [int 43]
+    ; [int (-1)]
+    ; [int 16]
+    ; [int (-49)]
+    (* ; [int max_int] (* wasm and imp differ slightly *) *)
+    ; [int (max_int / 2)]
+    ; [int min_int]
+    ];
+  test_rtop
     EJsonRuntimeNatMinPair
     [ [int 41; int 1]
     ; [int 43; int (-1)]
