@@ -492,10 +492,91 @@ let _ =
     ; [ str "/"; arr [str "a"; str "b"; str "c"] ]
     ];
   test_rtop
+    EJsonRuntimeNatLt
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ];
+  test_rtop
+    EJsonRuntimeNatLe
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ];
+  test_rtop
     EJsonRuntimeNatPlus
     [ [int 41; int 1]
     ; [int 43; int (-1)]
-    ]
+    ];
+  test_rtop
+    EJsonRuntimeNatMinus
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ];
+  test_rtop
+    EJsonRuntimeNatMult
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ; [int (-43); int (-1)]
+    ; [int (-43); int 2]
+    ];
+  test_rtop
+    EJsonRuntimeNatDiv
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ; [int 43; int 0]
+    ; [int 43; int 2]
+    ; [int 64; int 16]
+    ];
+  test_rtop
+    EJsonRuntimeNatRem
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ; [int 43; int 0]
+    ; [int 43; int 2]
+    ; [int 64; int 16]
+    ];
+  test_rtop
+    EJsonRuntimeNatAbs
+    [ [int (-41)]
+    ; [int 1]
+    ; [int 43]
+    ; [int (-1)]
+    ];
+  test_rtop
+    EJsonRuntimeNatMinPair
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ; [int 43; int 0]
+    ; [int 43; int 2]
+    ; [int 64; int 16]
+    ];
+  test_rtop
+    EJsonRuntimeNatMaxPair
+    [ [int 41; int 1]
+    ; [int 43; int (-1)]
+    ; [int 43; int 0]
+    ; [int 43; int 2]
+    ; [int 64; int 16]
+    ];
+  test_rtop
+    EJsonRuntimeFloatOfNat
+    [ [int 42]
+    ; [int 0]
+    ; [int (-1)]
+    ; [int max_int]
+    ; [int min_int]
+    ; [int (min_int + 1)]
+    ];
+  test_rtop
+    EJsonRuntimeNatOfFloat
+    [ [num 42.]
+    ; [num 0.]
+    ; [num (-0.5)]
+    ; [num 0.5]
+    ; [num 0.9]
+    ; [num max_float]
+    ; [num min_float]
+    ];
+  ()
 
 let _ =
   if !failed then exit 1
