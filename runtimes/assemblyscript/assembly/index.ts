@@ -1129,19 +1129,40 @@ export function runtimeNatMaxPair(a: EjBigInt, b: EjBigInt): EjBigInt {
 }
 
 export function runtimeNatSum(a: EjArray): EjBigInt {
-  throw new Error('runtimeNatSum: not implemented');
+  let acc : i64 = 0;
+  for (let i=0; i < a.values.length; i++) {
+    acc += cast<EjBigInt>(a.values[i]).value;
+  }
+  return new EjBigInt(acc);
 }
 
 export function runtimeNatMin(a: EjArray): EjBigInt {
-  throw new Error('runtimeNatMin: not implemented');
+  if (a.values.length < 1) { return c_i0 };
+  let acc = cast<EjBigInt>(a.values[0]).value;
+  for (let i=1; i < a.values.length; i++) {
+    let v = cast<EjBigInt>(a.values[i]).value;
+    acc = v < acc ? v : acc;
+  }
+  return new EjBigInt(acc);
 }
 
 export function runtimeNatMax(a: EjArray): EjBigInt {
-  throw new Error('runtimeNatMax: not implemented');
+  if (a.values.length < 1) { return c_i0 };
+  let acc = cast<EjBigInt>(a.values[0]).value;
+  for (let i=1; i < a.values.length; i++) {
+    let v = cast<EjBigInt>(a.values[i]).value;
+    acc = v > acc ? v : acc;
+  }
+  return new EjBigInt(acc);
 }
 
 export function runtimeNatArithMean(a: EjArray): EjBigInt {
-  throw new Error('runtimeNatArithMean: not implemented');
+  if (a.values.length < 1) { return c_i0 };
+  let acc : i64 = 0;
+  for (let i=0; i < a.values.length; i++) {
+    acc += cast<EjBigInt>(a.values[i]).value;
+  }
+  return new EjBigInt(acc / a.values.length);
 }
 
 export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
