@@ -583,6 +583,49 @@ let _ =
     ; [int 64; int 16]
     ];
   test_rtop
+    EJsonRuntimeNatSum
+    [ [arr [int 0]]
+    ; [arr []]
+    ; [arr (List.init 42 (fun i -> int i))]
+    ; [arr (List.init 42 (fun i -> int (-i)))]
+    ; [arr [int min_int; int max_int]]
+    ; [arr [int min_int; int (-1)]]
+    ; [arr [int max_int; int 1]]
+    ];
+  test_rtop
+    EJsonRuntimeNatMin
+    [ [arr [int 0]]
+    ; [arr []]
+    ; [arr (List.init 42 (fun i -> int i))]
+    ; [arr (List.init 42 (fun i -> int (-i)))]
+    ; [arr [int min_int; int max_int]]
+    ; [arr [int min_int; int (-1)]]
+    ; [arr [int max_int; int 1]]
+    ];
+  test_rtop
+    EJsonRuntimeNatMax
+    [ [arr [int 0]]
+    ; [arr []]
+    ; [arr (List.init 42 (fun i -> int i))]
+    ; [arr (List.init 42 (fun i -> int (-i)))]
+    ; [arr [int min_int; int max_int]]
+    ; [arr [int min_int; int (-1)]]
+    ; [arr [int max_int; int 1]]
+    ];
+  test_rtop
+    EJsonRuntimeNatArithMean
+    [ [arr [int 0]]
+    ; [arr []]
+    ; [arr [int 1; int 1]]
+    ; [arr [int 1; int 2]]
+    ; [arr [int 1; int 3]]
+    ; [arr (List.init 42 (fun i -> int i))]
+    ; [arr (List.init 42 (fun i -> int (-i)))]
+    ; [arr [int min_int; int max_int]]
+    ; [arr [int min_int]]
+    ; [arr [int max_int]]
+    ];
+  test_rtop
     EJsonRuntimeFloatOfNat
     [ [int 42]
     ; [int 0]
