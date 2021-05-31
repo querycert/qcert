@@ -443,6 +443,55 @@ let _ =
     ; [ arr [] ]
     ];
   test_rtop
+    EJsonRuntimeContains
+    [ [ null; arr [] ]
+    ; [ null; arr [null] ]
+    ; [ null; arr [bool true] ]
+    ; [ bool true; arr [bool true; bool false] ]
+    ; [ bool false; arr [bool true; null] ]
+    ; [ int 0; arr [int 0; int 1; int 2] ]
+    ; [ int 1; arr [int 0; int 1; int 2] ]
+    ; [ int 2; arr [int 0; int 1; int 2] ]
+    ; [ int 3; arr [int 0; int 1; int 2] ]
+    ];
+  test_rtop
+    EJsonRuntimeLength
+    [ [ str "" ]
+    ; [ str "a" ]
+    ; [ str "abcc" ]
+    (* ; [ str "abccᵤ" ] *) (* Coq uses char list, JS/Wasm use UTF16. *)
+    ];
+  test_rtop
+    EJsonRuntimeSubstring (* string, start, target length *)
+    [ [ str "" ; int 0; int 0 ]
+    ; [ str "" ; int 1; int 1 ]
+    ; [ str "" ; int 1; int (-1) ]
+    ; [ str "0" ; int 0; int 1 ]
+    ; [ str "0" ; int 0; int 0 ]
+    ; [ str "0" ; int 0; int (-1) ]
+    ; [ str "012345" ; int 0; int 3 ]
+    ; [ str "012345" ; int 2; int 3 ]
+    ; [ str "012345" ; int 0; int 6 ]
+    ];
+  test_rtop
+    EJsonRuntimeSubstringEnd
+    [ [ str "" ; int 0]
+    ; [ str "" ; int 1]
+    ; [ str "0" ; int 0]
+    ; [ str "012345" ; int 0]
+    ; [ str "012345" ; int 2]
+    ; [ str "012345" ; int 5]
+    ; [ str "012345" ; int 6]
+    ];
+  test_rtop
+    EJsonRuntimeStringJoin (* sep, string array *)
+    [ [ str ""; arr [] ]
+    ; [ str "_"; arr [] ]
+    ; [ str "_"; arr [str "-"] ]
+    ; [ str "_"; arr [str "-"; str "-"] ]
+    ; [ str "/"; arr [str "a"; str "b"; str "c"] ]
+    ];
+  test_rtop
     EJsonRuntimeNatPlus
     [ [int 41; int 1]
     ; [int 43; int (-1)]
