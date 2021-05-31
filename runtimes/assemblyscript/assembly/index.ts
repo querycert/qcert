@@ -1095,11 +1095,21 @@ export function runtimeNatAbs(a: EjBigInt): EjBigInt {
 }
 
 export function runtimeNatLog2(a: EjBigInt): EjBigInt {
-  throw new Error('runtimeNatLog2: not implemented');
+  // Comment from JS runtime: Default Z.log2 is log_inf, biggest integer lower than log2
+  if (a.value < 1) {
+    return c_i0;
+  } else {
+    return new EjBigInt(<i64>Math.floor(Math.log2(<f64>a.value)));
+  }
 }
 
 export function runtimeNatSqrt(a: EjBigInt): EjBigInt {
-  throw new Error('runtimeNatSqrt: not implemented');
+  // Comment from JS runtime: See Z.sqrt biggest integer lower than sqrt
+  if (a.value < 0) {
+    return c_i0;
+  } else {
+    return new EjBigInt(<i64>Math.floor(Math.sqrt(<f64>a.value)));
+  }
 }
 
 export function runtimeNatMinPair(a: EjBigInt, b: EjBigInt): EjBigInt {
