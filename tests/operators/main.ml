@@ -635,6 +635,58 @@ let _ =
     ; [int (min_int + 1)]
     ];
   test_rtop
+    EJsonRuntimeFloatSum
+    [ [arr [num 0.]]
+    ; [arr []]
+    ; [arr [num 1.; num 1.]]
+    ; [arr [num 1.; num 2.]]
+    ; [arr [num 1.; num 3.]]
+    ; [arr (List.init 42 (fun i -> num (float_of_int i)))]
+    ; [arr (List.init 42 (fun i -> num (1. /. (float_of_int (-i)))))]
+    ; [arr [num min_float; num max_float]]
+    ; [arr [num min_float; num (-1.)]]
+    ; [arr [num max_float; num 1.]]
+    ];
+  test_rtop
+    EJsonRuntimeFloatArithMean
+    [ [arr [num 0.]]
+    ; [arr []]
+    ; [arr [num 1.; num 1.]]
+    ; [arr [num 1.; num 2.]]
+    ; [arr [num 1.; num 3.]]
+    ; [arr (List.init 42 (fun i -> num (float_of_int i)))]
+    ; [arr (List.init 42 (fun i -> num (1. /. (float_of_int (-i)))))]
+    ; [arr [num min_float; num max_float]]
+    ; [arr [num min_float; num (-1.)]]
+    ; [arr [num max_float; num 1.]]
+    ];
+  test_rtop
+    EJsonRuntimeFloatMin
+    [ [arr [num 0.]]
+    ; [arr []]
+    ; [arr [num 1.; num 1.]]
+    ; [arr [num 1.; num 2.]]
+    ; [arr [num 1.; num 3.]]
+    ; [arr (List.init 42 (fun i -> num (float_of_int i)))]
+    ; [arr (List.init 42 (fun i -> num (1. /. (float_of_int (-i)))))]
+    ; [arr [num min_float; num max_float]]
+    ; [arr [num min_float; num (-1.)]]
+    ; [arr [num max_float; num 1.]]
+    ];
+  test_rtop
+    EJsonRuntimeFloatMax
+    [ [arr [num 0.]]
+    ; [arr []]
+    ; [arr [num 1.; num 1.]]
+    ; [arr [num 1.; num 2.]]
+    ; [arr [num 1.; num 3.]]
+    ; [arr (List.init 42 (fun i -> num (float_of_int i)))]
+    ; [arr (List.init 42 (fun i -> num (1. /. (float_of_int (-i)))))]
+    ; [arr [num min_float; num max_float]]
+    ; [arr [num min_float; num (-1.)]]
+    ; [arr [num max_float; num 1.]]
+    ];
+  test_rtop
     EJsonRuntimeNatOfFloat
     [ [num 42.]
     ; [num 0.]

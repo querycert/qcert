@@ -37,6 +37,8 @@ export const IdEjNumber = idof<EjNumber>()
 const c_neg1 = new EjNumber(-1);
 const c_1 = new EjNumber(1);
 const c_0 = new EjNumber(0);
+const c_inf = new EjNumber(F64.POSITIVE_INFINITY);
+const c_neginf = new EjNumber(F64.NEGATIVE_INFINITY);
 
 export class EjBigInt extends EjValue {
   value: i64
@@ -1170,19 +1172,40 @@ export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
 }
 
 export function runtimeFloatSum(a: EjArray): EjNumber {
-  throw new Error('runtimeFloatSum: not implemented');
+  let acc : f64 = 0;
+  for (let i=0; i < a.values.length; i++) {
+    acc += cast<EjNumber>(a.values[i]).value;
+  }
+  return new EjNumber(acc);
 }
 
 export function runtimeFloatArithMean(a: EjArray): EjNumber {
-  throw new Error('runtimeFloatArithMean: not implemented');
+  if (a.values.length < 1) { return c_0 };
+  let acc : f64 = 0;
+  for (let i=0; i < a.values.length; i++) {
+    acc += cast<EjNumber>(a.values[i]).value;
+  }
+  return new EjNumber(acc / a.values.length);
 }
 
 export function runtimeFloatMin(a: EjArray): EjNumber {
-  throw new Error('runtimeFloatMin: not implemented');
+  if (a.values.length < 1) { return c_inf };
+  let acc = cast<EjNumber>(a.values[0]).value;
+  for (let i=1; i < a.values.length; i++) {
+    let v = cast<EjNumber>(a.values[i]).value;
+    acc = v < acc ? v : acc;
+  }
+  return new EjNumber(acc);
 }
 
 export function runtimeFloatMax(a: EjArray): EjNumber {
-  throw new Error('runtimeFloatMax: not implemented');
+  if (a.values.length < 1) { return c_neginf };
+  let acc = cast<EjNumber>(a.values[0]).value;
+  for (let i=1; i < a.values.length; i++) {
+    let v = cast<EjNumber>(a.values[i]).value;
+    acc = v > acc ? v : acc;
+  }
+  return new EjNumber(acc);
 }
 
 export function runtimeNatOfFloat(a: EjNumber): EjBigInt {
