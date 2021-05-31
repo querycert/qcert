@@ -41,6 +41,14 @@ const c_0 = new EjNumber(0);
 export class EjBigInt extends EjValue {
   value: i64
   constructor(a: i64) { super(); this.value = a; }
+
+  safe_to_i32() : i32 {
+    if (this.value > I32.MAX_VALUE || this.value < I32.MIN_VALUE) {
+      throw new Error("EjBigInt: cannot convert to i32");
+    } else {
+      return <i32>this.value;
+    }
+  }
 }
 export const IdEjBigInt = idof<EjBigInt>()
 export function ejBigInt_of_f64(x: f64) : EjBigInt {
@@ -53,6 +61,7 @@ export class EjString extends EjValue {
   constructor(a: string) { super(); this.value = a; }
 }
 export const IdEjString = idof<EjString>()
+const c_empty_string = new EjString("")
 
 export class EjArray extends EjValue {
   values: Array<EjValue>
@@ -505,60 +514,64 @@ export function opMathTrunc(a: EjNumber): EjNumber {
 // EJson Runtime Operators //
 /////////////////////////////
 
-export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
+function equal(a: EjValue, b: EjValue): boolean {
   if (a instanceof EjNull && b instanceof EjNull) {
-    return c_true;
+    return true;
   }
   if (a instanceof EjBool && b instanceof EjBool) {
     let aa : EjBool = changetype<EjBool>(a) ;
     let bb : EjBool = changetype<EjBool>(b) ;
-    return aa.value == bb.value ? c_true : c_false;
+    return aa.value == bb.value ? true : false;
   }
   if (a instanceof EjNumber && b instanceof EjNumber) {
     let aa : EjNumber = changetype<EjNumber>(a) ;
     let bb : EjNumber = changetype<EjNumber>(b) ;
-    return aa.value == bb.value ? c_true : c_false;
+    return aa.value == bb.value ? true : false;
   }
   if (a instanceof EjBigInt && b instanceof EjBigInt) {
     let aa : EjBigInt = changetype<EjBigInt>(a) ;
     let bb : EjBigInt = changetype<EjBigInt>(b) ;
-    return aa.value == bb.value ? c_true : c_false;
+    return aa.value == bb.value ? true : false;
   }
   if (a instanceof EjString && b instanceof EjString) {
     let aa : EjString = changetype<EjString>(a) ;
     let bb : EjString = changetype<EjString>(b) ;
-    return aa.value == bb.value ? c_true : c_false;
+    return aa.value == bb.value ? true : false;
   }
   if (a instanceof EjArray && b instanceof EjArray) {
     let aa : EjArray = changetype<EjArray>(a) ;
     let bb : EjArray = changetype<EjArray>(b) ;
     if (aa.values.length != bb.values.length) {
-      return c_false;
+      return false;
     }
     for (let i = 0; i < aa.values.length; i++) {
       if (! runtimeEqual(aa.values[i], bb.values[i]).value) {
-        return c_false;
+        return false;
       }
     }
-    return c_true;
+    return true;
   }
   if (a instanceof EjObject && b instanceof EjObject) {
     let aa : EjObject = changetype<EjObject>(a) ;
     let bb : EjObject = changetype<EjObject>(b) ;
     if (aa.values.size != bb.values.size) {
-      return c_false;
+      return false;
     }
     let keys = aa.values.keys();
     for (let i = 0; i < keys.length; i++) {
       let k = keys[i];
       if (! bb.values.has(k) ||
           ! runtimeEqual(aa.values[k], bb.values[k]).value ) {
-        return c_false;
+        return false;
       }
     }
-    return c_true;
+    return true;
   }
-  return c_false;
+  return false;
+}
+
+export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
+  return equal(a, b) ? c_true : c_false;
 }
 
 // This is actually a compare negative.
@@ -998,7 +1011,10 @@ export function runtimeCount(a: EjArray) : EjBigInt {
 }
 
 export function runtimeContains(a: EjValue, b: EjArray) : EjBool {
-  throw new Error('runtimeContains: not implemented');
+  for (let i=0; i < b.values.length; i++) {
+    if (equal(a, b.values[i])) { return c_true; }
+  }
+  return c_false;
 }
 
 export function runtimeSort(a: EjArray, b: EjNull) : EjArray {
@@ -1010,19 +1026,29 @@ export function runtimeGroupBy(a: EjArray, b: EjNull, c:EjNull) : EjArray {
 }
 
 export function runtimeLength(a: EjString) : EjBigInt {
-  throw new Error('runtimeLength: not implemented');
+  return new EjBigInt(a.value.length);
 }
 
 export function runtimeSubstring(a: EjString, start: EjBigInt, len:EjBigInt) : EjString {
-  throw new Error('runtimeSubstring: not implemented');
+  let istart = start.safe_to_i32();
+  let iend = istart + len.safe_to_i32();
+  return new EjString(a.value.substring(istart, iend));
 }
 
 export function runtimeSubstringEnd(a: EjString, start: EjBigInt) : EjString {
-  throw new Error('runtimeSubstringEnd: not implemented');
+  return new EjString(a.value.substring(start.safe_to_i32()));
 }
 
 export function runtimeStringJoin(sep: EjString, a: EjArray): EjString {
-  throw new Error('runtimeStringJoin: not implemented');
+  let v = a.values;
+  if (v.length < 1) { return c_empty_string; }
+  let i = 0;
+  let r = cast<EjString>(v[i++]).value;
+  while (i < v.length) {
+    r += sep.value;
+    r += cast<EjString>(v[i++]).value;
+  }
+  return new EjString(r);
 }
 
 export function runtimeLike(reg: EjString, target:EjString): EjBool {
