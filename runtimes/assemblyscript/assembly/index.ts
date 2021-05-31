@@ -55,6 +55,7 @@ export function ejBigInt_of_f64(x: f64) : EjBigInt {
   let i = I64.parseInt(Math.trunc(x).toString());
   return new EjBigInt(i);
 }
+const c_i0 = new EjBigInt(0);
 
 export class EjString extends EjValue {
   value: string
@@ -1076,10 +1077,12 @@ export function runtimeNatMult(a: EjBigInt, b: EjBigInt): EjBigInt {
 }
 
 export function runtimeNatDiv(a: EjBigInt, b: EjBigInt): EjBigInt {
+  if (b.value == 0) { return c_i0 };
   return new EjBigInt(a.value / b.value);
 }
 
 export function runtimeNatRem(a: EjBigInt, b: EjBigInt): EjBigInt {
+  if (b.value == 0) { return a };
   return new EjBigInt(a.value % b.value);
 }
 
@@ -1132,10 +1135,7 @@ export function runtimeNatArithMean(a: EjArray): EjBigInt {
 }
 
 export function runtimeFloatOfNat(a: EjBigInt): EjNumber {
-  // TODO runtimeFloatOfNat : smarter conversion possible?
-  let s : string = a.value.toString();
-  let x : f64 = F64.parseFloat(s);
-  return new EjNumber(x);
+  return new EjNumber(<f64>a.value);
 }
 
 export function runtimeFloatSum(a: EjArray): EjNumber {
@@ -1156,10 +1156,12 @@ export function runtimeFloatMax(a: EjArray): EjNumber {
 
 export function runtimeNatOfFloat(a: EjNumber): EjBigInt {
   let x : f64 = trunc(a.value);
-  let i : i64 = <i64>x;
-  return new EjBigInt(i);
+  if (F64.isSafeInteger(x)) {
+    return new EjBigInt(<i64>x);
+  } else {
+    return c_i0;
+  }
 }
 
-export function runtimeForeign(): EjNull  {
-  throw new Error('runtimeForeign: not implemented');
-}
+// n-ary, foreign, compiled
+// export function runtimeForeign(): EjValue
