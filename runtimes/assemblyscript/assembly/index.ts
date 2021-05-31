@@ -561,24 +561,65 @@ export function runtimeEqual(a: EjValue, b: EjValue): EjBool {
   return c_false;
 }
 
-function compare<T>(a: T, b: T): EjNumber {
-  if (a < b) { return c_1; }
-  if (a > b) { return c_neg1; }
-  return c_0;
+// This is actually a compare negative.
+// We call it compare to be compatible with the coq-extracted code
+// https://github.com/querycert/qcert/issues/144
+function compare_base<T>(a: T, b: T): i32 {
+  if (a < b) { return 1 ; }
+  if (a > b) { return -1 ; }
+  return 0;
 }
 
-export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
+function type_id(a: EjValue): u32 {
+  if( a instanceof EjNull ) { return idof<EjNull>(); }
+  if( a instanceof EjBool ) { return idof<EjBool>(); }
+  if( a instanceof EjNumber ) { return idof<EjNumber>(); }
+  if( a instanceof EjBigInt ) { return idof<EjBigInt>(); }
+  if( a instanceof EjString ) { return idof<EjString>(); }
+  if( a instanceof EjArray ) { return idof<EjArray>(); }
+  if( a instanceof EjObject ) { return idof<EjObject>(); }
+  throw new Error('type_id: unknown type');
+}
+
+// This is actually a compare negative.
+// We call it compare to be compatible with the coq-extracted code
+// https://github.com/querycert/qcert/issues/144
+function compare(a: EjValue, b: EjValue): i32 {
+  if (a instanceof EjNull && b instanceof EjNull) {
+    return 0;
+  }
+  if (a instanceof EjBool && b instanceof EjBool) {
+    let aa : EjBool = changetype<EjBool>(a) ;
+    let bb : EjBool = changetype<EjBool>(b) ;
+    return compare_base<bool>(aa.value, bb.value);
+  }
   if (a instanceof EjNumber && b instanceof EjNumber) {
     let aa : EjNumber = changetype<EjNumber>(a) ;
     let bb : EjNumber = changetype<EjNumber>(b) ;
-    return compare<f64>(aa.value, bb.value);
+    return compare_base<f64>(aa.value, bb.value);
   }
   if (a instanceof EjBigInt && b instanceof EjBigInt) {
     let aa : EjBigInt = changetype<EjBigInt>(a) ;
     let bb : EjBigInt = changetype<EjBigInt>(b) ;
-    return compare<i64>(aa.value, bb.value);
+    return compare_base<i64>(aa.value, bb.value);
   }
-  throw new Error('runtimeCompare: invalid arguments');
+  if (a instanceof EjString && b instanceof EjString) {
+    throw new Error("compare: does not support String");
+  }
+  if (a instanceof EjArray && b instanceof EjArray) {
+    throw new Error("compare: does not support Array");
+  }
+  if (a instanceof EjObject && b instanceof EjObject) {
+    throw new Error("compare: does not support Object");
+  }
+  return compare_base<u32>(type_id(a), type_id(b));
+}
+
+export function runtimeCompare(a: EjValue, b: EjValue): EjNumber {
+  let c = compare(a, b);
+  if (c < 0) { return c_neg1; }
+  if (c > 0) { return c_1; }
+  return c_0;
 }
 
 function ejValueToString(a: EjValue): string {
@@ -873,6 +914,7 @@ export function runtimeFlatten(a: EjArray) : EjArray {
   return new EjArray(result);
 }
 
+// List concatenation / SQL Union
 export function runtimeUnion(a: EjArray, b: EjArray) : EjArray {
   return new EjArray(a.values.concat(b.values));
 }
@@ -898,12 +940,49 @@ export function runtimeMinus(a: EjArray, b: EjArray) : EjArray {
   return new EjArray(result);
 }
 
+// set intersection
 export function runtimeMin(a: EjArray, b: EjArray) : EjArray {
-  throw new Error('runtimeMin: not implemented');
+  let av = a.values.slice();
+  let bv = b.values.slice();
+  av.sort(compare);
+  bv.sort(compare);
+  let ai = 0;
+  let bi = 0;
+  let result = new Array<EjValue>();
+  while (ai < av.length && bi < bv.length) {
+    let c = compare(av[ai], bv[bi]);
+    if (c > 0) { bi++; }
+    else if (c < 0) { ai++; }
+    else {
+      result.push(av[ai++]);
+    }
+  }
+  return new EjArray(result);
 }
 
+// set union
 export function runtimeMax(a: EjArray, b: EjArray) : EjArray {
-  throw new Error('runtimeMax: not implemented');
+  let av = a.values.slice();
+  let bv = b.values.slice();
+  av.sort(compare);
+  bv.sort(compare);
+  let ai = 0;
+  let bi = 0;
+  let result = new Array<EjValue>();
+  while (ai < av.length && bi < bv.length) {
+    let c = compare(av[ai], bv[bi]);
+    if (c > 0) {
+      result.push(bv[bi++]);
+    } else if (c < 0) {
+      result.push(av[ai++]);
+    } else {
+      result.push(av[ai++]);
+      bi++;
+    }
+  }
+  while (ai < av.length) { result.push(av[ai++]); }
+  while (bi < bv.length) { result.push(bv[bi++]); }
+  return new EjArray(result);
 }
 
 export function runtimeNth(a: EjArray, b: EjBigInt) : EjObject {

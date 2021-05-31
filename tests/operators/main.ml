@@ -50,7 +50,7 @@ let ejson_eq =
 
 let failed = ref false
 
-let test_fn ?(verbose=false) info env fn =
+let test_fn ?(fixup=fun x -> x) ?(verbose=false) info env fn =
   let imp_ejson : _ imp_ejson = [['f'], fn] in
   let fail message =
     print_endline "";
@@ -63,7 +63,7 @@ let test_fn ?(verbose=false) info env fn =
   | None, _ -> fail "imp eval failed"
   | Some _, None -> fail "wasm eval failed"
   | Some imp, Some wasm ->
-    if (not (ejson_eq wasm imp)) then (
+    if (not (ejson_eq (fixup wasm) (fixup imp))) then (
       fail "wasm and imp differ";
       print_string ("imp:  ");
       print_endline (ejson_to_string imp);
@@ -76,7 +76,7 @@ let test_fn ?(verbose=false) info env fn =
       print_endline (ejson_to_string imp)
     )
 
-let test_expr_1 ?verbose info expr op args =
+let test_expr_1 ?fixup ?verbose info expr op args =
   let varname i =  Util.char_list_of_string ("arg" ^ (string_of_int i))
   and info () =
     info ();
@@ -97,10 +97,10 @@ let test_expr_1 ?verbose info expr op args =
   let stmt =
     ImpStmtAssign(return, expr op args)
   in
-  test_fn ?verbose info env (ImpFun (['x'], stmt, return))
+  test_fn ?fixup ?verbose info env (ImpFun (['x'], stmt, return))
 
-let test_expr ?verbose info expr op args =
-  List.iter (fun args -> test_expr_1 ?verbose info expr op args) args
+let test_expr ?fixup ?verbose info expr op args =
+  List.iter (fun args -> test_expr_1 ?fixup ?verbose info expr op args) args
 
 let test_op ?verbose op =
   test_expr ?verbose
@@ -111,8 +111,8 @@ let test_op ?verbose op =
     (fun op args -> ImpExprOp (op, args))
     op
 
-let test_rtop ?verbose op =
-  test_expr ?verbose
+let test_rtop ?fixup ?verbose op =
+  test_expr ?fixup ?verbose
     (fun () ->
        print_string "operator: ";
        print_endline (Wasm_backend.string_of_runtime_operator op);
@@ -383,14 +383,14 @@ let _ =
     ; [ arr [] ]
     ];
   test_rtop
-    EJsonRuntimeUnion
+    EJsonRuntimeUnion (* Array Concatenation *)
     [ [ arr [null]; arr [null; bool true] ]
     ; [ arr []; arr [null] ]
     ; [ arr [null]; arr [] ]
     ; [ arr []; arr [] ]
     ];
   test_rtop
-    EJsonRuntimeMinus
+    EJsonRuntimeMinus (* Set Minus *)
     [ [ arr [null]; arr [null; bool true] ]
     ; [ arr [bool true; bool false]; arr [bool true; bool false] ]
     ; [ arr [bool true; bool false]; arr [bool true] ]
@@ -399,6 +399,36 @@ let _ =
     ; [ arr []; arr [null] ]
     ; [ arr [null]; arr [] ]
     ; [ arr []; arr [] ]
+    ];
+  let sort_array (x : _ ejson) =
+      match x with
+      | Coq_ejarray z -> Coq_ejarray (List.sort compare z)
+      | z -> z
+  in
+  (* ImpEJson eval does not sort the arrays.
+   * JS runtime and WASM runtime do sort the arrays. *)
+  test_rtop ~fixup:sort_array
+    EJsonRuntimeMin (* Set Intersection *)
+    [ [arr []; arr []]
+    ; [arr [bool true]; arr [bool true]]
+    ; [arr [bool true]; arr [bool false]]
+    ; [arr [bool false]; arr [bool true]]
+    ; [arr [bool true]; arr [bool true; bool false]]
+    ; [arr [bool true; bool false]; arr [bool true; null]]
+    ; [arr [int 1; int 2]; arr [int 1; int 2]]
+    ];
+  (* ImpEJson eval does not sort the arrays.
+   * JS runtime and WASM runtime do sort the arrays. *)
+  test_rtop ~fixup:sort_array
+    EJsonRuntimeMax (* Set Union *)
+    [ [arr []; arr []]
+    ; [arr [bool true]; arr [bool true]]
+    ; [arr [bool true]; arr [bool false]]
+    ; [arr [bool false]; arr [bool true]]
+    ; [arr [bool true]; arr [bool true; bool false]]
+    ; [arr [bool true; bool false]; arr [bool true]]
+    ; [arr [bool true; bool false]; arr [bool true; null]]
+    ; [arr [int 3; int 2; int 1]; arr [int 6; int 2; int 1; int 0]]
     ];
   test_rtop
     EJsonRuntimeNth
