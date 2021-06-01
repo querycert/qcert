@@ -620,13 +620,35 @@ function compare(a: EjValue, b: EjValue): i32 {
     return compare_base<i64>(aa.value, bb.value);
   }
   if (a instanceof EjString && b instanceof EjString) {
-    throw new Error("compare: does not support String");
+    let aa : EjString = changetype<EjString>(a) ;
+    let bb : EjString = changetype<EjString>(b) ;
+    return compare_base<string>(aa.value, bb.value);
   }
   if (a instanceof EjArray && b instanceof EjArray) {
-    throw new Error("compare: does not support Array");
+    let va = changetype<EjArray>(a).values.slice() ;
+    let vb = changetype<EjArray>(b).values.slice() ;
+    let i = 0;
+    while (i < va.length && i < vb.length) {
+      let c = compare(va[i], vb[i]);
+      if (c != 0) { return c; };
+      i++;
+    }
+    return compare_base<i32>(va.length, vb.length);
   }
   if (a instanceof EjObject && b instanceof EjObject) {
-    throw new Error("compare: does not support Object");
+    let oa = changetype<EjObject>(a).values ;
+    let ob = changetype<EjObject>(b).values ;
+    let ka = oa.keys().sort();
+    let kb = ob.keys().sort();
+    let i = 0
+    while (i < ka.length && i < kb.length) {
+      let c = compare_base<string>(ka[i], kb[i]);
+      if (c != 0) { return c; };
+      c = compare(oa[ka[i]], ob[kb[i]]);
+      if (c != 0) { return c; };
+      i++;
+    }
+    return compare_base<i32>(ka.length, kb.length);
   }
   return compare_base<u32>(type_id(a), type_id(b));
 }
