@@ -131,6 +131,11 @@ module Arg = struct
     Coq_ejobject (List.map (fun (k, v) -> Util.char_list_of_string k, v) x)
 end
 
+let sort_array (x : _ ejson) =
+  match x with
+  | Coq_ejarray z -> Coq_ejarray (List.sort compare z)
+  | z -> z
+
 let _ =
   let open Arg in
   test_op
@@ -241,16 +246,52 @@ let _ =
     EJsonOpMathTrunc
     [ [ num 1.1 ]
     ; [ num 10000.7 ]
-    ; [ num (-1.)]
-    ; [ num (-3.14)]
-    ; [ num (-3.94)]
-    ; [ num (-1000000.94)]
+    ; [ num (-1.) ]
+    ; [ num (-3.14) ]
+    ; [ num (-3.94) ]
+    ; [ num (-1000000.94) ]
+    ];
+  let compare_values =
+    [ null; bool true; bool false
+    ; int 0; int 1; num 0.; num 1.
+    ; str "hello world"
+    ; str ""
+    ; arr [ null ]
+    ; arr [bool false]
+    ; arr []
+    ; obj [ "a" , null ]
+    ; obj [ "a" , bool true ]
+    ]
+  in
+  let compare_pairs =
+    List.map (fun a ->
+        List.map (fun b ->
+            [ a; b ]
+          ) compare_values
+      ) compare_values
+    |> List.concat
+  in
+  test_rtop EJsonRuntimeEqual compare_pairs;
+  test_rtop EJsonRuntimeEqual
+    [ [ arr [int 0; int 1]; arr [int 1; int 0] ]
     ];
   test_rtop
-    EJsonRuntimeEqual
-    [ [ bool false; bool true ]
-    ; [ bool true; bool true]
+    EJsonRuntimeCompare (* Wasm and JS compare support arguments of different
+                           type.  This is used to speed up set operations.
+                           Coq/Imp implements set operations naively and only
+                           compares integers and numbers. *)
+    [ [ int 0; int 1]
+    ; [ int 1; int 0]
+    ; [ int 1; int 1]
+    ; [ num 0.; num 1.]
+    ; [ num 1.; num 0.]
+    ; [ num 1.; num 1.]
     ];
+  test_rtop ~fixup:sort_array
+    EJsonRuntimeMax (* ... we trigger the wasm compare on heterogeneous types
+                       using set union. *)
+    (List.map (fun x -> [arr x; arr (List.rev x)]) compare_pairs)
+  ;
   test_rtop
     EJsonRuntimeToString
     [ [ null ]
@@ -316,7 +357,7 @@ let _ =
     [ [ obj ["a", null]; str "a" ]
     ; [ obj ["a", int 0; "b", int 1; "c", int 2]; str "a" ]
     ; [ obj ["b", int 0; "a", int 1; "c", int 2]; str "a" ]
-    (* ; [ obj []; str "a"] invalid / missing key *)
+      (* ; [ obj []; str "a"] invalid / missing key *)
     ];
   test_rtop
     EJsonRuntimeArray
@@ -341,7 +382,7 @@ let _ =
     ; [ arr [int 0; int 1; int 2]; int 0 ]
     ; [ arr [int 0; int 1; int 2]; int 1 ]
     ; [ arr [int 0; int 1; int 2]; int 2 ]
-    (* ; [ arr [null]; int 1 ] (* invalid / out of bounds *) *)
+      (* ; [ arr [null]; int 1 ] (* invalid / out of bounds *) *)
     ];
   test_rtop
     EJsonRuntimeUnbrand
@@ -400,11 +441,6 @@ let _ =
     ; [ arr [null]; arr [] ]
     ; [ arr []; arr [] ]
     ];
-  let sort_array (x : _ ejson) =
-      match x with
-      | Coq_ejarray z -> Coq_ejarray (List.sort compare z)
-      | z -> z
-  in
   (* ImpEJson eval does not sort the arrays.
    * JS runtime and WASM runtime do sort the arrays. *)
   test_rtop ~fixup:sort_array
@@ -459,7 +495,7 @@ let _ =
     [ [ str "" ]
     ; [ str "a" ]
     ; [ str "abcc" ]
-    (* ; [ str "abccᵤ" ] *) (* Coq uses char list, JS/Wasm use UTF16. *)
+      (* ; [ str "abccᵤ" ] *) (* Coq uses char list, JS/Wasm use UTF16. *)
     ];
   test_rtop
     EJsonRuntimeSubstring (* string, start, target length *)
@@ -549,9 +585,9 @@ let _ =
     ; [int 43]
     ; [int (1 lsl 20)]
     ; [int (1 lsl 61)]
-    (* ; [int (-1)] (* Imp returns 0 *) *)
-    (* ; [int max_int] (* Wasm off by one *) *)
-    (* ; [int min_int] (* Imp returns 0 *) *)
+      (* ; [int (-1)] (* Imp returns 0 *) *)
+      (* ; [int max_int] (* Wasm off by one *) *)
+      (* ; [int min_int] (* Imp returns 0 *) *)
     ];
   test_rtop
     EJsonRuntimeNatSqrt
