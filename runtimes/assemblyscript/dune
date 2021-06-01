@@ -3,6 +3,8 @@
   (public_name coq-qcert.runtime.assemblyscript)
   (libraries wasm))
 
+(dirs :standard \ node_modules) ;; do not copy node_modules to _build
+
 (rule ; not evaluated for package release (-p flag)
   (target runtime.wasm)
   (deps
