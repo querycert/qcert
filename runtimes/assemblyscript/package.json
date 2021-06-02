@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "assemblyscript": "^0.12.5",
+    "assemblyscript-regex": "^1.6.3",
     "chai": "^4.2.0",
     "mocha": "^8.0.1"
   }

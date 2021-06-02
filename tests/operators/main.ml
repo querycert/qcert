@@ -528,6 +528,16 @@ let _ =
     ; [ str "/"; arr [str "a"; str "b"; str "c"] ]
     ];
   test_rtop
+    EJsonRuntimeLike
+    [ [ str "abc"; str "abc" ]
+    ; [ str "b"; str "abc" ]
+    ; [ str "%b%"; str "abc" ]
+    ; [ str "_b_"; str "abc" ]
+    ; [ str "_"; str "abc" ]
+    ; [ str "%"; str "abc" ]
+    ; [ str ".*"; str "abc" ]
+    ];
+  test_rtop
     EJsonRuntimeNatLt
     [ [int 41; int 1]
     ; [int 43; int (-1)]
