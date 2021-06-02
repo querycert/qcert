@@ -13,7 +13,8 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   (** [eval wasm_module fn_name environment *)
   val eval : Wasm.Ast.module_ -> char list -> (char list * 'a ejson) list -> ('a ejson) option
 
-  val imp_ejson_to_wasm_ast : brand_hierarchy -> ('a,'b) imp_ejson -> Wasm.Ast.module_
+  (* XXX In ('a -> string), string is really ForeignWSON.foreign_wson *)
+  val imp_ejson_to_wasm_ast : brand_hierarchy -> ('a -> string) -> ('a,'b) imp_ejson -> Wasm.Ast.module_
 
   val string_of_operator: imp_ejson_op -> string
   val string_of_runtime_operator: 'a imp_ejson_runtime_op -> string
@@ -750,7 +751,7 @@ end = struct
 
   module Imp_scoping = Wasm_imp_scoping.Make(ImpEJson)
 
-  let imp_ejson_to_wasm_ast h imp = Translate.imp h (Imp_scoping.apply imp)
+  let imp_ejson_to_wasm_ast h foreigndatamap imp = Translate.imp h (Imp_scoping.apply imp)
 
   let to_string q =
     let sexpr = Arrange.module_ q in

@@ -30,6 +30,7 @@ Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
 Require Import ForeignEJsonToJSON.
+Require Import ForeignEJsonToWSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignEJsonRuntime.
@@ -54,6 +55,7 @@ Require Export EnhancedData.
 Require Export EnhancedEJson.
 Require Export EnhancedDataToEJson.
 Require Export EnhancedEJsonToJSON.
+Require Export EnhancedEJsonToWSON.
 Require Export EnhancedToJava.
 Require Export EnhancedToJavascriptAst.
 Require Export EnhancedReduceOps.
@@ -94,6 +96,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_ejson_runtime_op.
   Definition compiler_model_foreign_to_ejson : foreign_to_ejson compiler_model_foreign_ejson_model compiler_model_foreign_ejson_runtime_op
     := enhanced_foreign_to_ejson.
+  Definition compiler_model_foreign_to_wson : foreign_to_wson compiler_model_foreign_ejson_model
+    := enhanced_foreign_to_wson.
   Definition compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime
     := enhanced_foreign_to_ejson_runtime.
   Definition compiler_model_foreign_to_json : foreign_to_json
