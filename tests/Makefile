@@ -485,7 +485,7 @@ designer_rule-test-tests-js:
 
 ## IMPEJSON
 IMPEJSONTARGETS=imp_ejson wasm_ast # dnnrc_typed
-IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 17 18 19 20 21
+IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 17 18 19 20 21 22
 # TODO 15 seems to be an error representation issue
 
 imp_ejson-tests:
