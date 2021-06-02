@@ -252,14 +252,12 @@ let _ =
     ; [ num (-1000000.94) ]
     ];
   let compare_values =
-    [ null; bool true; bool false
-    ; int 0; int 1; num 0.; num 1.
+    [ null
+    ; bool false
+    ; int 1
+    ; num 1.
     ; str "hello world"
-    ; str ""
-    ; arr [ null ]
     ; arr [bool false]
-    ; arr []
-    ; obj [ "a" , null ]
     ; obj [ "a" , bool true ]
     ]
   in
@@ -273,7 +271,13 @@ let _ =
   in
   test_rtop EJsonRuntimeEqual compare_pairs;
   test_rtop EJsonRuntimeEqual
-    [ [ arr [int 0; int 1]; arr [int 1; int 0] ]
+    [ [ bool true; bool false ]
+    ; [ int 0; int 1 ]
+    ; [ num 0.; num 1. ]
+    ; [ str "abc"; str "abC" ]
+    ; [ obj [ "a", bool true; "b", bool false ]
+      ; obj [ "b", bool false; "a", bool true ] ]
+    ; [ arr [int 0; int 1]; arr [int 1; int 0] ]
     ];
   test_rtop
     EJsonRuntimeCompare (* Wasm and JS compare support arguments of different
@@ -465,6 +469,9 @@ let _ =
     ; [arr [bool true; bool false]; arr [bool true]]
     ; [arr [bool true; bool false]; arr [bool true; null]]
     ; [arr [int 3; int 2; int 1]; arr [int 6; int 2; int 1; int 0]]
+    ; [arr [ obj [ "a", bool true; "b", bool false ] ]
+      (* Imp does not recognize these two objects as equal! *)
+      ;arr [ obj [ "b", bool false; "a", bool true ] ] ]
     ];
   test_rtop
     EJsonRuntimeNth
