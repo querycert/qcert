@@ -550,7 +550,7 @@ function equal(a: EjValue, b: EjValue): boolean {
       return false;
     }
     for (let i = 0; i < aa.values.length; i++) {
-      if (! runtimeEqual(aa.values[i], bb.values[i]).value) {
+      if (!equal(aa.values[i], bb.values[i])) {
         return false;
       }
     }
@@ -562,13 +562,15 @@ function equal(a: EjValue, b: EjValue): boolean {
     if (aa.values.size != bb.values.size) {
       return false;
     }
-    let keys = aa.values.keys();
-    for (let i = 0; i < keys.length; i++) {
-      let k = keys[i];
-      if (! bb.values.has(k) ||
-          ! runtimeEqual(aa.values[k], bb.values[k]).value ) {
+    let ka = aa.values.keys();
+    let kb = bb.values.keys();
+    let i = 0;
+    if (ka.length != kb.length) { return false; }
+    while (i < ka.length) {
+      if (ka[i] != kb[i] || !equal(aa.values[ka[i]], bb.values[ka[i]])) {
         return false;
       }
+      i++;
     }
     return true;
   }
@@ -627,8 +629,8 @@ function compare(a: EjValue, b: EjValue): i32 {
     return compare_base<string>(aa.value, bb.value);
   }
   if (a instanceof EjArray && b instanceof EjArray) {
-    let va = changetype<EjArray>(a).values.slice() ;
-    let vb = changetype<EjArray>(b).values.slice() ;
+    let va = changetype<EjArray>(a).values.slice() ; // js runtime sorts the array?!
+    let vb = changetype<EjArray>(b).values.slice() ; // js runtime sorts the array?!
     let i = 0;
     while (i < va.length && i < vb.length) {
       let c = compare(va[i], vb[i]);
@@ -640,8 +642,8 @@ function compare(a: EjValue, b: EjValue): i32 {
   if (a instanceof EjObject && b instanceof EjObject) {
     let oa = changetype<EjObject>(a).values ;
     let ob = changetype<EjObject>(b).values ;
-    let ka = oa.keys().sort();
-    let kb = ob.keys().sort();
+    let ka = oa.keys(); // js runtime sorts the keys
+    let kb = ob.keys(); // js runtime sorts the keys
     let i = 0
     while (i < ka.length && i < kb.length) {
       let c = compare_base<string>(ka[i], kb[i]);
