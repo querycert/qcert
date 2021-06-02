@@ -19,6 +19,7 @@ Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
 Require Import ForeignEJsonToJSON.
+Require Import ForeignEJsonToWSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
@@ -43,6 +44,7 @@ Module Type CompilerModel.
   Declare Instance compiler_model_foreign_ejson : foreign_ejson compiler_model_foreign_ejson_model.
   Axiom compiler_model_foreign_ejson_runtime_op : Set.
   Declare Instance compiler_model_foreign_to_ejson : foreign_to_ejson compiler_model_foreign_ejson_model compiler_model_foreign_ejson_runtime_op.
+  Declare Instance compiler_model_foreign_to_wson : foreign_to_wson compiler_model_foreign_ejson_model.
   Declare Instance compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
   Declare Instance compiler_model_foreign_to_json : foreign_to_json.
   Declare Instance compiler_model_foreign_to_java : foreign_to_java.
@@ -74,6 +76,8 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := model.compiler_model_foreign_ejson_runtime_op.
   Definition compiler_foreign_to_ejson : foreign_to_ejson compiler_foreign_ejson_model compiler_foreign_ejson_runtime_op
     := model.compiler_model_foreign_to_ejson.
+  Definition compiler_foreign_to_wson : foreign_to_wson compiler_foreign_ejson_model
+    := model.compiler_model_foreign_to_wson.
   Definition compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime
     := model.compiler_model_foreign_to_ejson_runtime.
   Definition compiler_foreign_to_json : foreign_to_json

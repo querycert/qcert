@@ -91,6 +91,7 @@ Require Import OptimizerLogger.
 (* Foreign Datatypes Support *)
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
+Require Import ForeignEJsonToWSON.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignToJava.
@@ -114,6 +115,7 @@ Section CompCorrectness.
   Context {fruntime:foreign_runtime}.
   Context {foreign_ejson_model:Set}.
   Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {ftowson:foreign_to_wson foreign_ejson_model}.
   Context {foreign_ejson_runtime_op : Set}.
   Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {frtejson:foreign_to_ejson_runtime}.

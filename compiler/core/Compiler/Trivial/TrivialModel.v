@@ -25,6 +25,7 @@ Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
 Require Import ForeignEJsonToJSON.
+Require Import ForeignEJsonToWSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignEJsonRuntime.
 Require Import ForeignReduceOps.
@@ -341,6 +342,12 @@ Next Obligation.
   destruct fd. 
 Defined.
 
+Program Instance trivial_foreign_to_wson : foreign_to_wson _
+  := mk_foreign_to_wson trivial_foreign_ejson_model _.
+Next Obligation.
+  destruct j.
+Defined.
+
 Program Instance trivial_foreign_reduce_op
         {fdata:foreign_data}:
   foreign_reduce_op
@@ -380,6 +387,8 @@ Module TrivialRuntime <: CompilerRuntime.
     := trivial_foreign_ejson_runtime_op.
   Definition compiler_foreign_to_ejson : foreign_to_ejson compiler_foreign_ejson_model compiler_foreign_ejson_runtime_op
     := trivial_foreign_to_ejson.
+  Definition compiler_foreign_to_wson : foreign_to_wson compiler_foreign_ejson_model
+    := trivial_foreign_to_wson.
   Definition compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime
     := trivial_foreign_to_ejson_runtime.
   Definition compiler_foreign_to_json : foreign_to_json
@@ -430,6 +439,8 @@ Module TrivialModel(bm:CompilerBrandModel(TrivialForeignType)) <: CompilerModel.
     := trivial_foreign_ejson_model.
   Definition compiler_model_foreign_ejson : foreign_ejson compiler_model_foreign_ejson_model
     := trivial_foreign_ejson.
+  Definition compiler_model_foreign_to_wson : foreign_to_wson compiler_model_foreign_ejson_model
+    := trivial_foreign_to_wson.
   Definition compiler_model_foreign_ejson_runtime_op : Set
     := trivial_foreign_ejson_runtime_op.
   Definition compiler_model_foreign_to_ejson : foreign_to_ejson compiler_model_foreign_ejson_model compiler_model_foreign_ejson_runtime_op
