@@ -1,3 +1,5 @@
+import { RegExp } from "assemblyscript-regex";
+
 /////////////////////////
 // EJson Data Encoding //
 /////////////////////////
@@ -1076,8 +1078,36 @@ export function runtimeStringJoin(sep: EjString, a: EjArray): EjString {
   return new EjString(r);
 }
 
-export function runtimeLike(reg: EjString, target:EjString): EjBool {
-  throw new Error('runtimeLike: not implemented');
+export function runtimeLike(pattern: EjString, target:EjString): EjBool {
+  // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions?redirectlocale=en-US&redirectslug=JavaScript%2FGu#escaping
+  // function escapeRegExp(string) {
+  //   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+  // }
+  // escape special characters in pattern
+  let pat = pattern.value
+    .replace(".", "\\.")
+    .replace("*", "\\*")
+    .replace("+", "\\+")
+    .replace("?", "\\?")
+    .replace("^", "\\^")
+    .replace("$", "\\$")
+    .replace("{", "\\{")
+    .replace("}", "\\}")
+    .replace("(", "\\(")
+    .replace(")", "\\)")
+    .replace("|", "\\|")
+    .replace("[", "\\[")
+    .replace("]", "\\]")
+    .replace("\\", "\\\\");
+  // translate SQL wildcards to regexp
+  pat = pat
+    .replaceAll("_", ".")
+    .replaceAll("%", ".*");
+  // build RegExp
+  // TODO: we probably want to cache it
+  let re = new RegExp("^" + pat + "$", 'sm');
+  // apply RegExp
+  return re.test(target.value) ? c_true : c_false;
 }
 
 export function runtimeNatLt(a: EjBigInt, b: EjBigInt): EjBool {
