@@ -12,23 +12,15 @@
  * limitations under the License.
  *)
 
-Require Import String.
-Require Import List.
-Require Import BrandRelation.
-Require Import EJsonRuntime.
-Require Import Imp.
-Require Export ImpEJson.
-Require Import WasmAstRuntime.
+Require Import ForeignEJson.
 Require Import ForeignWSON.
 
-Section ImpEJsontoWasmAst.
-  Section Top.
-    Context {foreign_ejson_model : Set}.
-    Context {foreign_ejson_runtime_op : Set}.
+Local Open Scope string_scope.
 
-    Axiom imp_ejson_to_wasm_ast : brand_relation_t -> (foreign_ejson_model -> foreign_wson) -> @imp_ejson foreign_ejson_model foreign_ejson_runtime_op -> wasm_ast.
-  End Top.
-
-End ImpEJsontoWasmAst.
-
-Extract Constant imp_ejson_to_wasm_ast => "Wasm_ast.imp_ejson_to_wasm_ast".
+Class foreign_to_wson
+      (foreign_ejson_model:Set)
+  : Type
+  := mk_foreign_to_wson {
+         foreign_to_wson_from_ejson
+           (j:foreign_ejson_model) : foreign_wson
+       }.

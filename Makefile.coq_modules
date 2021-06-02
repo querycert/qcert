@@ -63,6 +63,9 @@ MODULES = \
 	JSON/Model/JSONNorm \
 	JSON/JSONRuntime \
 	JSON/JSONSystem \
+	WSON/Model/ForeignWSON \
+	WSON/WSONRuntime \
+	WSON/WSONSystem \
 	EJson/Model/ForeignEJson \
 	EJson/Model/EJson \
 	EJson/Model/EJsonNorm \
@@ -120,6 +123,7 @@ MODULES = \
 	Translation/Model/DataToEJson \
 	Translation/Model/ForeignEJsonToJSON \
 	Translation/Model/EJsonToJSON \
+	Translation/Model/ForeignEJsonToWSON \
 	Translation/Model/EJsonToEJsonMut \
 	Translation/Model/ForeignTypeToJSON \
 	Translation/Model/TypeToJSON \
@@ -435,6 +439,7 @@ MODULES = \
 	Compiler/Enhanced/EnhancedEJson \
 	Compiler/Enhanced/EnhancedDataToEJson \
 	Compiler/Enhanced/EnhancedEJsonToJSON \
+	Compiler/Enhanced/EnhancedEJsonToWSON \
 	Compiler/Enhanced/EnhancedToJava \
 	Compiler/Enhanced/EnhancedToJavascriptAst \
 	Compiler/Enhanced/EnhancedReduceOps \

@@ -21,6 +21,7 @@ log/
 *.vo
 *.vos
 *.vok
+*.vio
 *.v.d
 *.glob
 *.aux

@@ -12,23 +12,21 @@
  * limitations under the License.
  *)
 
-Require Import String.
-Require Import List.
-Require Import BrandRelation.
-Require Import EJsonRuntime.
-Require Import Imp.
-Require Export ImpEJson.
-Require Import WasmAstRuntime.
+Require Import EquivDec.
+Require Import RelationClasses.
+Require Import Equivalence.
 Require Import ForeignWSON.
+Require Import ForeignEJsonToWSON.
 
-Section ImpEJsontoWasmAst.
-  Section Top.
-    Context {foreign_ejson_model : Set}.
-    Context {foreign_ejson_runtime_op : Set}.
+Require Import EnhancedEJson.
 
-    Axiom imp_ejson_to_wasm_ast : brand_relation_t -> (foreign_ejson_model -> foreign_wson) -> @imp_ejson foreign_ejson_model foreign_ejson_runtime_op -> wasm_ast.
-  End Top.
+Parameter enhanced_foreign_to_wson_from_ejson : enhanced_ejson -> foreign_wson.
 
-End ImpEJsontoWasmAst.
+Extract Constant enhanced_foreign_to_wson_from_ejson => "Wasm_enhanced.foreign_ejson_to_wasm".
 
-Extract Constant imp_ejson_to_wasm_ast => "Wasm_ast.imp_ejson_to_wasm_ast".
+Program Instance enhanced_foreign_to_wson : foreign_to_wson _ :=
+  mk_foreign_to_wson enhanced_ejson _.
+Next Obligation.
+  apply enhanced_foreign_to_wson_from_ejson.
+  exact j.
+Defined.
