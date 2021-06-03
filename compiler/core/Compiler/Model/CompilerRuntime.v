@@ -17,6 +17,7 @@ Require Import EJsonRuntime.
 Require Import DataRuntime.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignToWasmAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
 Require Import ForeignEJsonToWSON.
@@ -48,6 +49,7 @@ Module Type CompilerRuntime.
   Declare Instance compiler_foreign_to_json : foreign_to_json.
   Declare Instance compiler_foreign_to_java : foreign_to_java.
   Declare Instance compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
+  Declare Instance compiler_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_foreign_ejson_runtime_op.
   Declare Instance compiler_foreign_to_scala : foreign_to_scala.
   Declare Instance compiler_foreign_type_to_JSON : foreign_type_to_JSON.
   Declare Instance compiler_foreign_reduce_op : foreign_reduce_op.

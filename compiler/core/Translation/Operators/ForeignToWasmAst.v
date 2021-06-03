@@ -12,5 +12,12 @@
  * limitations under the License.
  *)
 
-Require Export ForeignWSON.
-Require Export ForeignWSONRuntime.
+Require Import ForeignWSONRuntime.
+
+Class foreign_to_wasm_ast
+      (foreign_ejson_runtime_op:Set)
+  : Type
+  := mk_foreign_to_wasm_ast {
+         foreign_to_wasm_ast_op
+           (j:foreign_ejson_runtime_op) : foreign_wson_runtime_op
+       }.

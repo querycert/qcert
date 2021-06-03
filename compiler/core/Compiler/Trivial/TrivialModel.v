@@ -21,6 +21,7 @@ Require Import EJsonSystem.
 Require Import ForeignEJson.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignToWasmAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
@@ -28,6 +29,7 @@ Require Import ForeignEJsonToJSON.
 Require Import ForeignEJsonToWSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignEJsonRuntime.
+Require Import ForeignWSONRuntime.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
@@ -323,6 +325,13 @@ Next Obligation.
   destruct fe.
 Defined.
 
+Program Instance trivial_foreign_to_wasm_ast :
+  @foreign_to_wasm_ast trivial_foreign_ejson_runtime_op
+  := mk_foreign_to_wasm_ast trivial_foreign_ejson_runtime_op _.
+Next Obligation.
+  destruct j.
+Defined.
+
 Local Open Scope nstring_scope.
 Program Instance trivial_foreign_to_scala :
   @foreign_to_scala trivial_foreign_runtime trivial_foreign_type
@@ -397,6 +406,8 @@ Module TrivialRuntime <: CompilerRuntime.
     := trivial_foreign_to_java.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := trivial_foreign_ejson_to_ajavascript.
+  Definition compiler_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_foreign_ejson_runtime_op
+    := trivial_foreign_to_wasm_ast.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := trivial_foreign_to_scala.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
@@ -453,6 +464,8 @@ Module TrivialModel(bm:CompilerBrandModel(TrivialForeignType)) <: CompilerModel.
     := trivial_foreign_to_java.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := trivial_foreign_ejson_to_ajavascript.
+  Definition compiler_model_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_model_foreign_ejson_runtime_op
+    := trivial_foreign_to_wasm_ast.
   Definition compiler_model_foreign_to_scala : foreign_to_scala
     := trivial_foreign_to_scala.
   Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON

@@ -27,9 +27,11 @@ module Wasm_backend = Wasm_backend.Make(ImpEJson)
 
 let foreign_ejson_to_wson ej =
   failwith ("This should convert foreign data to WASM")
+let foreign_to_wasm_op ej =
+  failwith ("This should convert foreign op to WASM")
 let wasm_eval (imp_ejson : _ imp_ejson) env : _ ejson option =
   let wasm_ast =
-    Wasm_backend.imp_ejson_to_wasm_ast !brands foreign_ejson_to_wson imp_ejson
+    Wasm_backend.imp_ejson_to_wasm_ast foreign_to_wasm_op (* foreign_ejson_to_wson *) !brands imp_ejson
   in
   Wasm_backend.eval wasm_ast ['f'] env
 
