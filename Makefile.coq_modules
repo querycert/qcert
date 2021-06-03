@@ -64,6 +64,7 @@ MODULES = \
 	JSON/JSONRuntime \
 	JSON/JSONSystem \
 	WSON/Model/ForeignWSON \
+	WSON/Operators/ForeignWSONRuntime \
 	WSON/WSONRuntime \
 	WSON/WSONSystem \
 	EJson/Model/ForeignEJson \
@@ -359,6 +360,7 @@ MODULES = \
 	Translation/Operators/ForeignToScala \
 	Translation/Operators/ForeignToSpark \
 	Translation/Operators/ForeignToEJsonRuntime \
+	Translation/Operators/ForeignToWasmAst \
 	Translation/Lang/NRAtocNNRC \
 	Translation/Lang/cNRAEnvtocNNRC \
 	Translation/Lang/cNRAEnvtoNRA \
@@ -442,6 +444,7 @@ MODULES = \
 	Compiler/Enhanced/EnhancedEJsonToWSON \
 	Compiler/Enhanced/EnhancedToJava \
 	Compiler/Enhanced/EnhancedToJavascriptAst \
+	Compiler/Enhanced/EnhancedToWasmAst \
 	Compiler/Enhanced/EnhancedReduceOps \
 	Compiler/Enhanced/EnhancedToReduceOps \
 	Compiler/Enhanced/EnhancedToSpark \

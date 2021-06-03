@@ -24,6 +24,7 @@ Require Import EJsonSystem.
 Require Import DataSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignToWasmAst.
 Require Import ForeignToScala.
 Require Import ForeignEJson.
 Require Import ForeignWSON.
@@ -57,6 +58,7 @@ Require Import EnhancedEJsonToJSON.
 Require Import EnhancedEJsonToWSON.
 Require Import EnhancedToJava.
 Require Import EnhancedToJavascriptAst.
+Require Import EnhancedToWasmAst.
 Require Import EnhancedReduceOps.
 Require Import EnhancedToReduceOps.
 Require Import EnhancedToSpark.
@@ -149,6 +151,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_json.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
+  Definition compiler_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_foreign_ejson_runtime_op
+    := enhanced_foreign_to_wasm_ast.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON

@@ -15,18 +15,19 @@
 Require Import EquivDec.
 Require Import RelationClasses.
 Require Import Equivalence.
-Require Import ForeignWSON.
-Require Import ForeignEJsonToWSON.
+Require Import ForeignEJson.
+Require Import ForeignWSONRuntime.
+Require Import ForeignToWasmAst.
 
 Require Import EnhancedEJson.
 
-Parameter enhanced_foreign_to_wson_from_ejson : enhanced_ejson -> foreign_wson.
+Parameter enhanced_foreign_to_wasm_op : enhanced_foreign_ejson_runtime_op -> foreign_wson_runtime_op.
 
-Extract Constant enhanced_foreign_to_wson_from_ejson => "Wasm_enhanced.foreign_ejson_to_wson".
+Extract Constant enhanced_foreign_to_wasm_op => "Wasm_enhanced.foreign_ejson_to_wasm_op".
 
-Program Instance enhanced_foreign_to_wson : foreign_to_wson _ :=
-  mk_foreign_to_wson enhanced_ejson _.
+Program Instance enhanced_foreign_to_wasm_ast : @foreign_to_wasm_ast enhanced_foreign_ejson_runtime_op :=
+  mk_foreign_to_wasm_ast enhanced_foreign_ejson_runtime_op _.
 Next Obligation.
-  apply enhanced_foreign_to_wson_from_ejson.
+  apply enhanced_foreign_to_wasm_op.
   exact j.
 Defined.
