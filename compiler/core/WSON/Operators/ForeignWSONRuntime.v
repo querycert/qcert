@@ -12,5 +12,11 @@
  * limitations under the License.
  *)
 
-Require Export ForeignWSON.
-Require Export ForeignWSONRuntime.
+Require Import Utils.
+
+Section ForeignWSONRuntime.
+  (* WASM foreign operators *)
+  Parameter foreign_wson_runtime_op : Set.
+End ForeignWSONRuntime.
+
+Extract Constant foreign_wson_runtime_op => "string".

@@ -20,13 +20,18 @@ Require Import Imp.
 Require Export ImpEJson.
 Require Import WasmAstRuntime.
 Require Import ForeignWSON.
+Require Import ForeignWSONRuntime.
+Require Import ForeignToWasmAst.
 
 Section ImpEJsontoWasmAst.
   Section Top.
     Context {foreign_ejson_model : Set}.
     Context {foreign_ejson_runtime_op : Set}.
 
-    Axiom imp_ejson_to_wasm_ast : brand_relation_t -> (foreign_ejson_model -> foreign_wson) -> @imp_ejson foreign_ejson_model foreign_ejson_runtime_op -> wasm_ast.
+    Axiom imp_ejson_to_wasm_ast :
+      (foreign_ejson_runtime_op -> foreign_wson_runtime_op) ->
+      (* (foreign_ejson_model -> foreign_wson) -> *) (* XXX Commented out for now *)
+      brand_relation_t -> @imp_ejson foreign_ejson_model foreign_ejson_runtime_op -> wasm_ast.
   End Top.
 
 End ImpEJsontoWasmAst.

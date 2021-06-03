@@ -25,6 +25,7 @@ Require Import EJsonSystem.
 Require Import DataSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignToWasmAst.
 Require Import ForeignToScala.
 Require Import ForeignEJson.
 Require Import ForeignDataToEJson.
@@ -58,6 +59,7 @@ Require Export EnhancedEJsonToJSON.
 Require Export EnhancedEJsonToWSON.
 Require Export EnhancedToJava.
 Require Export EnhancedToJavascriptAst.
+Require Export EnhancedToWasmAst.
 Require Export EnhancedReduceOps.
 Require Export EnhancedToReduceOps.
 Require Export EnhancedToSpark.
@@ -106,6 +108,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_java.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
+  Definition compiler_model_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_model_foreign_ejson_runtime_op
+    := enhanced_foreign_to_wasm_ast.
   Definition compiler_model_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
   Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
