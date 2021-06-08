@@ -119,7 +119,7 @@ let test_rtop ?fixup ?verbose op =
   test_expr ?fixup ?verbose
     (fun () ->
        print_string "operator: ";
-       print_endline (Wasm_backend.string_of_runtime_operator op);
+       print_endline (Wasm_backend.string_of_runtime_operator (fun _ -> failwith "no foreign operators tested") op);
     )
     (fun op args -> ImpExprRuntimeCall (op, args))
     op
