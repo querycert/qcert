@@ -13,10 +13,10 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   (** [eval wasm_module fn_name environment *)
   val eval : Wasm.Ast.module_ -> char list -> (char list * 'a ejson) list -> ('a ejson) option
 
-  val imp_ejson_to_wasm_ast : ('b -> string) -> brand_hierarchy -> ('a,'b) imp_ejson -> Wasm.Ast.module_
+  val imp_ejson_to_wasm_ast : ('b -> string) -> brand_hierarchy -> ('a, 'b) imp_ejson -> Wasm.Ast.module_
 
   val string_of_operator: imp_ejson_op -> string
-  val string_of_runtime_operator: 'a imp_ejson_runtime_op -> string
+  val string_of_runtime_operator: ('a -> string) -> 'a imp_ejson_runtime_op -> string
 end = struct
   open ImpEJson
   module Encoding = Wasm_binary_ejson.Make(ImpEJson)
@@ -423,7 +423,7 @@ end = struct
       | _ -> block ~result:[i32] (args @ [op_trivial ctx.ctx op])
 
     (* must align with function names in the runtime module *)
-    let string_of_runtime_op = function
+    let string_of_runtime_op fopmap = function
       (* Generic *)
       | EJsonRuntimeEqual -> "runtimeEqual"
       | EJsonRuntimeCompare -> "runtimeCompare"
@@ -491,11 +491,11 @@ end = struct
       | EJsonRuntimeFloatMax -> "runtimeFloatMax"
       | EJsonRuntimeNatOfFloat -> "runtimeNatOfFloat"
       (* Foreign *)
-      | EJsonRuntimeForeign _fop -> "runtimeForeign"
+      | EJsonRuntimeForeign fop -> "runtimeForeign|" ^ (fopmap fop)
 
-    let rt_op_trivial ctx op : Ir.instr =
+    let rt_op_trivial fopmap ctx op : Ir.instr =
       let foreign params result =
-        let fname = string_of_runtime_op op in
+        let fname = string_of_runtime_op fopmap op in
         let f, import = Ir.import_func ~params ~result "runtime" fname in
         ctx.imports <- ImportSet.add import ctx.imports;
         Ir.call f
@@ -559,19 +559,35 @@ end = struct
       | EJsonRuntimeFloatMin -> foreign [i32] [i32]
       | EJsonRuntimeFloatMax -> foreign [i32] [i32]
       | EJsonRuntimeNatOfFloat -> foreign [i32] [i32]
-      | EJsonRuntimeForeign _fop -> failwith "non-trivial op RuntimeForeign"
+      | EJsonRuntimeForeign _fop -> failwith "n-ary RuntimeForeign is compiled below"
 
-    let rt_op ctx op args: Ir.instr =
+    let rt_op fopmap ctx op args: Ir.instr =
       let open Ir in
       match (op : 'a ejson_runtime_op) with
       | EJsonRuntimeArray -> op_n_ary ctx EJsonOpArray args
       | EJsonRuntimeCast ->
-        (* insert brand hierachy as first argument *)
-        block ~result:[i32] (ctx.ctx.brand_hierarchy :: args @ [rt_op_trivial ctx.ctx op])
+        (* insert brand hierarchy as first argument *)
+        block ~result:[i32] (ctx.ctx.brand_hierarchy :: args @ [rt_op_trivial fopmap ctx.ctx op])
+      | EJsonRuntimeForeign fop ->
+        let fname = fopmap fop
+        and params = List.map (fun _ -> i32) args
+        and result = [i32]
+        in
+        (* TODO consider to return first part of import name (here "foreign")
+         * from fopmap.  It might be useful to implement some foreign operators
+         * directly in the assemblyscript runtime.  Others could be linked at
+         * runtime, enabling cross-module/language/contract calls.  E.g. a
+         * first PoC might call into existing ImpEJson and JS implementations
+         * of date/time.
+         *)
+        let f, import = Ir.import_func ~params ~result "foreign" fname in
+        ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
+        block ~result:[i32] (args @ [Ir.call f])
       | _ ->
-        block ~result:[i32] (args @ [rt_op_trivial ctx.ctx op])
+        block ~result:[i32] (args @ [rt_op_trivial fopmap ctx.ctx op])
 
-    let rec expr ctx expression : Ir.instr list =
+    let rec expr fopmap ctx expression : Ir.instr list =
+      let expr = expr fopmap in
       match (expression : ('a,'b) imp_ejson_expr) with
       | ImpExprError err -> unsupported "expr: error"
       | ImpExprVar v -> [Ir.local_get (Table.insert ctx.locals v)]
@@ -581,9 +597,10 @@ end = struct
         [ op_n_ary ctx x args ]
       | ImpExprRuntimeCall (x, args) ->
         let args = List.map (fun x -> Ir.(block ~result:[i32]) (expr ctx x)) args in
-        [ rt_op ctx x args ]
+        [ rt_op fopmap ctx x args ]
 
-    let rec statement ctx stmt : Ir.instr list =
+    let rec statement fopmap ctx stmt : Ir.instr list =
+      let statement = statement fopmap in
       let foreign fname params result =
         let f, import = Ir.import_func ~params ~result "runtime" fname in
         ctx.ctx.imports <- ImportSet.add import ctx.ctx.imports;
@@ -596,14 +613,14 @@ end = struct
           List.map (fun (var, value) ->
               let id = Table.insert ctx.locals var in
               match value with
-              | Some x ->  expr ctx x @ [ Ir.local_set id ]
+              | Some x ->  expr fopmap ctx x @ [ Ir.local_set id ]
               | None -> []
             ) vars
         in
         let body = List.map (statement ctx) stmts in
         List.concat (defs @ body)
       | ImpStmtAssign (var, x) ->
-        expr ctx x @ [ Ir.local_set (Table.insert ctx.locals var) ]
+        expr fopmap ctx x @ [ Ir.local_set (Table.insert ctx.locals var) ]
       | ImpStmtFor (e', arr, body) ->
         let i'   = '$' :: '%' :: 'i' :: '%' :: e' in
         let n' = '$' :: '%' :: 'n' :: '%' :: e' in
@@ -629,14 +646,14 @@ end = struct
         [ loop
             [ local_get i
             ; local_get n
-            ; rt_op_trivial ctx.ctx EJsonRuntimeNatLt
+            ; rt_op_trivial fopmap ctx.ctx EJsonRuntimeNatLt
             ; foreign "EjBool#get:value" [i32] [i32]
             ; if_
                 [ block get_el
                 ; block (statement ctx body) (* TODO: what if body modifies i? *)
                 ; local_get i
                 ; const ctx.ctx (Coq_ejbigint 1)
-                ; rt_op_trivial ctx.ctx EJsonRuntimeNatPlus
+                ; rt_op_trivial fopmap ctx.ctx EJsonRuntimeNatPlus
                 ; local_set i
                 ; br 1
                 ] []
@@ -652,13 +669,13 @@ end = struct
         [ loop
             [ local_get i
             ; local_get max
-            ; rt_op_trivial ctx.ctx EJsonRuntimeNatLe
+            ; rt_op_trivial fopmap ctx.ctx EJsonRuntimeNatLe
             ; foreign "EjBool#get:value" [i32] [i32]
             ; if_
                 [ block (statement ctx body) (* TODO: what if body modifies i? *)
                 ; local_get i
                 ; const ctx.ctx (Coq_ejbigint 1)
-                ; rt_op_trivial ctx.ctx EJsonRuntimeNatPlus
+                ; rt_op_trivial fopmap ctx.ctx EJsonRuntimeNatPlus
                 ; local_set i
                 ; br 1
                 ] []
@@ -666,12 +683,12 @@ end = struct
         ]
       | ImpStmtIf (condition, then_, else_) ->
         let open Ir in
-        (expr ctx condition) @
+        (expr fopmap ctx condition) @
         [ foreign "EjBool#get:value" [i32] [i32]
         ; if_ (statement ctx then_) (statement ctx else_)
         ]
 
-    let function_  ctx fn : Ir.func =
+    let function_  fopmap ctx fn : Ir.func =
       let ImpFun (arg, stmt, ret) = fn in
       let locals = Table.create ~element_size:(fun _ -> 1) ~initial_offset:0 in
       let ctx = {locals; ctx } in
@@ -679,7 +696,7 @@ end = struct
       let raw_body =
         (* the compiled function with argument and result being
          * runtime ejson values *)
-        statement ctx stmt @
+        statement fopmap ctx stmt @
         Ir.[ local_get (Table.insert locals ret) ]
       in
       let body =
@@ -704,7 +721,7 @@ end = struct
       in
       Ir.(func ~params:[i32] ~result:[i32] ~locals body)
 
-    let imp hierarchy lib : Wasm.Ast.module_ =
+    let imp fopmap hierarchy lib : Wasm.Ast.module_ =
       let ctx =
         { imports = ImportSet.empty
         ; memory = Ir.memory 1
@@ -721,7 +738,7 @@ end = struct
         { ctx with brand_hierarchy = const ctx relations }
       in
       let funcs = List.map (fun (name, fn) ->
-          Util.string_of_char_list name, function_ ctx fn
+          Util.string_of_char_list name, function_ fopmap ctx fn
         ) lib
       in
       let data =
@@ -750,7 +767,7 @@ end = struct
 
   module Imp_scoping = Wasm_imp_scoping.Make(ImpEJson)
 
-  let imp_ejson_to_wasm_ast fopmap h imp = Translate.imp h (Imp_scoping.apply imp)
+  let imp_ejson_to_wasm_ast fopmap h imp = Translate.imp fopmap h (Imp_scoping.apply imp)
 
   let to_string q =
     let sexpr = Arrange.module_ q in
