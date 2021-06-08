@@ -20,7 +20,9 @@ Require Import ForeignEJson.
 Require Import EJson.
 
 Section EJsonGroupBy.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+
   Import ListNotations.
 
   (* Alternate semantics, using nested loop -- closer to NRC encoding of group by *)
@@ -35,7 +37,7 @@ Section EJsonGroupBy.
      while the other works when the key computation has been split in two
      phases. which one to use depends on the group-by algorithm *)
 
-  Definition ejson_key_is_eq_r (eval_key: ejson -> option ejson) (d1 d2:ejson) : option bool :=
+  Definition ejson_key_is_eq_r (eval_key: @ejson foreign_ejson_model -> option ejson) (d1 d2:@ejson foreign_ejson_model) : option bool :=
     olift2 (fun x y => if ejson_eq_dec x y then Some true else Some false)
            (eval_key d1)
            (Some d2).
@@ -48,7 +50,7 @@ Section EJsonGroupBy.
     let keys := lift bdistinct dupkeys in
     olift (lift_map (fun k => olift (fun group => Some (k, group)) (ejson_group_of_key eval_key k l))) keys.
 
-  Definition ejson_group_to_partitions (g:string) (group: ejson * list ejson) : option ejson :=
+  Definition ejson_group_to_partitions (g:string) (group: @ejson foreign_ejson_model * list ejson) : option ejson :=
     match ejson_is_record (fst group) with
     | Some keys =>
       Some (ejobject (rec_concat_sort keys [(g, ejarray (snd group))]))

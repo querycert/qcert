@@ -14,7 +14,7 @@
 
 %{
   open Util
-  open Core.EnhancedCompiler
+  open EnhancedCompiler.EnhancedCompiler
 %}
 %token NULL TRUE FALSE
 %token <int> INT
@@ -25,7 +25,7 @@
 %token LBRACKET RBRACKET
 %token EOF
   
-%start <Core.EnhancedCompiler.QData.json> main
+%start <EnhancedCompiler.EnhancedCompiler.QData.json> main
 %%
 
 main:

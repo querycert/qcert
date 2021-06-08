@@ -24,11 +24,13 @@ Require Import ForeignEJsonRuntime.
 Local Open Scope string_scope.
 
 Class foreign_to_ejson
+      (foreign_ejson_model:Set)
+      (foreign_ejson_runtime_op:Set)
+      {fejson:foreign_ejson foreign_ejson_model}
       {fruntime:foreign_runtime}
-      {fesjon:foreign_ejson}
   : Type
   := mk_foreign_to_ejson {
-         foreign_to_ejson_runtime :> foreign_ejson_runtime
+         foreign_to_ejson_runtime :> foreign_ejson_runtime foreign_ejson_runtime_op
          ; foreign_to_ejson_to_data
              (j:foreign_ejson_model) : foreign_data_model
          ; foreign_to_ejson_from_data

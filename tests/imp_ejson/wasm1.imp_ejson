@@ -1,0 +1,9 @@
+module main {
+  wasm1(x) return y {
+    if true
+    then
+      y := Runtime.recDot(x,"e");
+    else
+      y := Runtime.recDot(x,"pi");
+  }
+}

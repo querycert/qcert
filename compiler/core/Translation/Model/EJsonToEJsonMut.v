@@ -85,11 +85,12 @@ Section EJsonToEJsonMut.
 
   End ListToNth.
 
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
 
   Section toEJson.
     (* EJson to Data *)
-    Fixpoint ejson_mut_to_ejson (j:ejson) : ejson :=
+    Fixpoint ejson_mut_to_ejson (j:@ejson foreign_ejson_model) : ejson :=
       match j with
       | ejnull => ejnull
       | ejnumber n => ejnumber n
@@ -110,7 +111,7 @@ Section EJsonToEJsonMut.
   End toEJson.
 
   Section toEJsonMut.
-    Fixpoint ejson_to_ejson_mut (d:ejson) : ejson :=
+    Fixpoint ejson_to_ejson_mut (d:@ejson foreign_ejson_model) : ejson :=
       match d with
       | ejnull => ejnull
       | ejbigint n => ejbigint n

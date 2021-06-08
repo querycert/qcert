@@ -17,8 +17,10 @@ Require Import EJsonRuntime.
 Require Import DataRuntime.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignToWasmAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
+Require Import ForeignEJsonToWSON.
 Require Import ForeignToEJsonRuntime.
 Require Import ForeignEJsonToJSON.
 Require Import ForeignTypeToJSON.
@@ -38,12 +40,16 @@ Require Import NNRSimp.
 Module Type CompilerRuntime.
   Declare Instance compiler_foreign_type : foreign_type.
   Declare Instance compiler_foreign_runtime : foreign_runtime.
-  Declare Instance compiler_foreign_ejson : foreign_ejson.
-  Declare Instance compiler_foreign_to_ejson : foreign_to_ejson.
+  Axiom compiler_foreign_ejson_model : Set.
+  Declare Instance compiler_foreign_ejson : foreign_ejson compiler_foreign_ejson_model.
+  Axiom compiler_foreign_ejson_runtime_op : Set.
+  Declare Instance compiler_foreign_to_ejson : foreign_to_ejson compiler_foreign_ejson_model compiler_foreign_ejson_runtime_op.
+  Declare Instance compiler_foreign_to_wson : foreign_to_wson compiler_foreign_ejson_model.
   Declare Instance compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
   Declare Instance compiler_foreign_to_json : foreign_to_json.
   Declare Instance compiler_foreign_to_java : foreign_to_java.
   Declare Instance compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
+  Declare Instance compiler_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_foreign_ejson_runtime_op.
   Declare Instance compiler_foreign_to_scala : foreign_to_scala.
   Declare Instance compiler_foreign_type_to_JSON : foreign_type_to_JSON.
   Declare Instance compiler_foreign_reduce_op : foreign_reduce_op.

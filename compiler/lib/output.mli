@@ -14,7 +14,7 @@
 
 (** This module contains compiler output code *)
 
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
 
 val output_query : Pretty_common.pretty_config -> QLang.query -> string
 

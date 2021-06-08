@@ -15,7 +15,8 @@
 (* This module contains parsing utilities *)
 
 open Util
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
+open CompLang
 
 open Lex_util
 open Parse_util
@@ -75,9 +76,9 @@ let parse_designer_rule_from_string s : QLang.designer_rule =
 
 let parse_query_from_string l s : string * QLang.query =
   begin match l with
-  | Core.L_sql -> ("SQL", Core.Q_sql (Ast_to_sexp.sexp_to_sql(parse_sexp_from_string (Java_service.main "parseSQL" s))))
-  | Core.L_sqlpp -> ("SQLPP", Core.Q_sqlpp (Ast_to_sexp.sexp_to_sqlpp(parse_sexp_from_string (Java_service.main "parseSQLPP" s))))
-  | Core.L_tech_rule -> ("TechRule", Core.Q_tech_rule (parse_tech_rule_from_string s))
-  | Core.L_designer_rule -> ("DesignerRule", Core.Q_designer_rule (parse_designer_rule_from_string s))
+  | L_sql -> ("SQL", Q_sql (Ast_to_sexp.sexp_to_sql(parse_sexp_from_string (Java_service.main "parseSQL" s))))
+  | L_sqlpp -> ("SQLPP", Q_sqlpp (Ast_to_sexp.sexp_to_sqlpp(parse_sexp_from_string (Java_service.main "parseSQLPP" s))))
+  | L_tech_rule -> ("TechRule", Q_tech_rule (parse_tech_rule_from_string s))
+  | L_designer_rule -> ("DesignerRule", Q_designer_rule (parse_designer_rule_from_string s))
   | _ ->  parse_string (parse_query l) s
   end

@@ -19,8 +19,8 @@ MODULES = \
 	Utils/ListAdd \
 	Utils/StringAdd \
 	Utils/SortingAdd \
+	Utils/FloatAdd \
 	Utils/NativeString \
-	Utils/Float \
 	Utils/Lattice \
 	Utils/Monoid \
 	Utils/Assoc \
@@ -63,6 +63,10 @@ MODULES = \
 	JSON/Model/JSONNorm \
 	JSON/JSONRuntime \
 	JSON/JSONSystem \
+	WSON/Model/ForeignWSON \
+	WSON/Operators/ForeignWSONRuntime \
+	WSON/WSONRuntime \
+	WSON/WSONSystem \
 	EJson/Model/ForeignEJson \
 	EJson/Model/EJson \
 	EJson/Model/EJsonNorm \
@@ -120,6 +124,7 @@ MODULES = \
 	Translation/Model/DataToEJson \
 	Translation/Model/ForeignEJsonToJSON \
 	Translation/Model/EJsonToJSON \
+	Translation/Model/ForeignEJsonToWSON \
 	Translation/Model/EJsonToEJsonMut \
 	Translation/Model/ForeignTypeToJSON \
 	Translation/Model/TypeToJSON \
@@ -261,6 +266,7 @@ MODULES = \
 	Imp/ImpSystem \
 	Imp/Optim/ImpOptimizerEngine \
 	Imp/Optim/ImpEJsonRewrite \
+	Imp/Optim/ImpEJsonBlockRewrite \
 	Imp/Optim/ImpEJsonOptimizer \
 	Imp/ImpOptim \
 	NNRCMR/Lang/ForeignReduceOps \
@@ -342,12 +348,19 @@ MODULES = \
 	SparkDF/Lang/SparkDF \
 	SparkDF/SparkDFRuntime \
 	SparkDF/SparkDFSystem \
+	WasmAst/Lang/WasmAst \
+	WasmAst/WasmAstRuntime \
+	WasmAst/WasmAstSystem \
+	WasmBinary/Lang/WasmBinary \
+	WasmBinary/WasmBinaryRuntime \
+	WasmBinary/WasmBinarySystem \
 	Translation/Operators/ForeignToReduceOps \
 	Translation/Operators/ForeignToJavaScriptAst \
 	Translation/Operators/ForeignToJava \
 	Translation/Operators/ForeignToScala \
 	Translation/Operators/ForeignToSpark \
 	Translation/Operators/ForeignToEJsonRuntime \
+	Translation/Operators/ForeignToWasmAst \
 	Translation/Lang/NRAtocNNRC \
 	Translation/Lang/cNRAEnvtocNNRC \
 	Translation/Lang/cNRAEnvtoNRA \
@@ -382,6 +395,8 @@ MODULES = \
 	Translation/Lang/NNRCtoJava \
 	Translation/Lang/DatatoSparkDF \
 	Translation/Lang/tDNNRCtoSparkDF \
+	Translation/Lang/ImpEJsontoWasmAst \
+	Translation/Lang/WasmAsttoWasmBinary \
 	Translation/Typing/TNRAtocNNRC \
 	Translation/Typing/TcNRAEnvtocNNRC \
 	Translation/Typing/TcNNRCtoCAMP \
@@ -426,8 +441,10 @@ MODULES = \
 	Compiler/Enhanced/EnhancedEJson \
 	Compiler/Enhanced/EnhancedDataToEJson \
 	Compiler/Enhanced/EnhancedEJsonToJSON \
+	Compiler/Enhanced/EnhancedEJsonToWSON \
 	Compiler/Enhanced/EnhancedToJava \
 	Compiler/Enhanced/EnhancedToJavascriptAst \
+	Compiler/Enhanced/EnhancedToWasmAst \
 	Compiler/Enhanced/EnhancedReduceOps \
 	Compiler/Enhanced/EnhancedToReduceOps \
 	Compiler/Enhanced/EnhancedToSpark \
@@ -453,4 +470,4 @@ MODULES = \
 	Tests/SQLTest \
 	Tests/LambdaNRATest \
 	Tests/CompilerTest \
-	Tests/HelloWorld \
+	Tests/HelloWorld

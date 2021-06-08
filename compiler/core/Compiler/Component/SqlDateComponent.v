@@ -309,5 +309,26 @@ Section SqlDateOperators.
       | EJsonRuntimePeriodBetween => "periodBetween"
       end.
 
+    Definition ejson_sql_date_runtime_op_fromstring opname : option ejson_sql_date_runtime_op :=
+      match opname with
+      | "dateFromString" => Some EJsonRuntimeDateFromString
+      | "dateGetYear" => Some EJsonRuntimeDateGetYear
+      | "dateGetMonth" => Some EJsonRuntimeDateGetMonth
+      | "dateGetDay" => Some EJsonRuntimeDateGetDay
+      | "dateNe" => Some EJsonRuntimeDateNe
+      | "dateLt" => Some EJsonRuntimeDateLt
+      | "dateLe" => Some EJsonRuntimeDateLe
+      | "dateGt" => Some EJsonRuntimeDateGt
+      | "dateGe" => Some EJsonRuntimeDateGe
+      | "dateSetYear" => Some EJsonRuntimeDateSetYear
+      | "dateSetMonth" => Some EJsonRuntimeDateSetMonth
+      | "dateSetDay" => Some EJsonRuntimeDateSetDay
+      | "periodFromString" => Some EJsonRuntimePeriodFromString
+      | "periodPlus" => Some EJsonRuntimePeriodPlus
+      | "periodMinus" => Some EJsonRuntimePeriodMinus
+      | "periodBetween" => Some EJsonRuntimePeriodBetween
+      | _ => None
+      end.
+
   End toEJson.
 End SqlDateOperators.

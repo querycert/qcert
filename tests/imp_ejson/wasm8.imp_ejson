@@ -1,0 +1,9 @@
+/* Sum of all integers in an array */
+module main {
+  wasm8(x) return y {
+    y := 0;
+    for(i in Runtime.recDot(x, "integers")) {
+      y := Runtime.natPlus(y,i);
+    }
+  }
+}

@@ -1,0 +1,5 @@
+module main {
+  wasm5(x) return y {
+    y := Runtime.recDot(x,"greet");
+  }
+}

@@ -26,7 +26,8 @@ Require Import ForeignEJson.
 Require Import EJson.
 
 Section EJsonNorm.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
 
   Fixpoint normalize_ejson (d:ejson) : ejson :=
     match d with

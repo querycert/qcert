@@ -45,8 +45,15 @@ An easy way to get set up on most platforms is to use the OCaml package manager 
 
 ```
 $ opam repo add coq-released https://coq.inria.fr/opam/released
-$ opam install dune menhir base64 js_of_ocaml js_of_ocaml-ppx calendar uri
+$ opam install dune menhir base64 js_of_ocaml js_of_ocaml-ppx calendar uri wasm.1.0.1
 $ opam install coq.8.11.2 coq-jsast
+```
+
+*Warning:* It seems that coq and/or the Q\*cert build process does not like opam local switches.
+If you want to use a separate opam switch for Q\*cert, we recommend creating a new named global switch *before* executing the above steps.
+
+```
+$ opam switch create qcert 4.09.1
 ```
 
 #### Java (Recommended)

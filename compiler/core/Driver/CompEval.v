@@ -44,6 +44,8 @@ Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
+Require Import WasmAst.
+Require Import WasmBinary.
 
 (* Foreign Support *)
 Require Import ForeignDataToEJson.
@@ -61,8 +63,10 @@ Section CompEval.
   (* Context *)
 
   Context {fruntime:foreign_runtime}.   (* Necessary for Everything *)
-  Context {fejson:foreign_ejson}.       (* Necessary for ImpJson evaluation *)
-  Context {ftejson:foreign_to_ejson}.   (* Necessary for ImpJson evaluation *)
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
@@ -145,6 +149,14 @@ Section CompEval.
     Definition eval_dnnrc_typed (q:dnnrc_typed) (cenv: dbindings) : option data :=
       tDNNRC.dnnrc_typed_eval_top h q cenv.
 
+    (* Language: wasm_ast *)
+    Definition eval_wasm_ast (q:wasm_ast) (cenv: bindings) : option data :=
+      WasmAst.wasm_ast_eval_top cenv q.
+
+    (* Language: wasm *)
+    Definition eval_wasm (q:wasm) (cenv: bindings) : option data :=
+      WasmBinary.wasm_eval_top cenv q.
+
   End EvalFunctions.
 
   Section EvalDriver.
@@ -166,6 +178,7 @@ Section CompEval.
       | Some d => Ev_out_returned d
       end.
 
+    Definition query : Type := @query ft bm fruntime foreign_ejson_model foreign_ejson_runtime_op _.
     Definition eval_query (q:query) (ev_in:eval_input) : eval_output :=
       match q with
       | Q_camp_rule q => lift_output (eval_camp_rule q (lift_input ev_in))
@@ -193,6 +206,8 @@ Section CompEval.
       | Q_javascript _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_wasm_ast q => lift_output (eval_wasm_ast q (lift_input ev_in))
+      | Q_wasm q => lift_output (eval_wasm q (lift_input ev_in))
       | Q_error err => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       end.
 
@@ -223,6 +238,8 @@ Section CompEval.
       | Q_javascript _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_df _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_wasm_ast _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_wasm _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       end.
 

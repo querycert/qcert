@@ -44,6 +44,8 @@ Require Import JavaScriptAstRuntime.
 Require Import JavaScriptRuntime.
 Require Import JavaRuntime.
 Require Import SparkDFRuntime.
+Require Import WasmAst.
+Require Import WasmBinary.
 
 Require Import OptimizerLogger.
 Require Import CompLang.
@@ -57,8 +59,10 @@ Section CompStat.
 
   Context {ft:foreign_type}.
   Context {fruntime:foreign_runtime}.
-  Context {fejson:foreign_ejson}.
-  Context {ftejson:foreign_to_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {bm:brand_model}.
   Context {nraenv_core_logger:optimizer_logger string nraenv_core}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
@@ -76,6 +80,16 @@ Section CompStat.
   Definition stat_spark_df (q: spark_df) : data :=
     drec
       (("spark_df_stat", dstring "no stat available")
+         :: nil).
+
+  Definition stat_wasm (q: wasm) : data :=
+    drec
+      (("wasm_stat", dstring "no stat available") (* TODO *)
+         :: nil).
+
+  Definition stat_wasm_ast (q: wasm_ast) : data :=
+    drec
+      (("wasm_ast_stat", dstring "no stat available") (* TODO *)
          :: nil).
 
   Definition stat_java (q: java) : data :=
@@ -108,7 +122,7 @@ Section CompStat.
       (("nnrcmr_length", dnat (Z_of_nat (List.length q.(mr_chain))))
          :: nil).
 
-  Definition stat_imp_ejson (q: imp_ejson) : data :=
+  Definition stat_imp_ejson (q: @imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : data :=
     drec
       (("imp_ejson_size", dnat (Z_of_nat (imp_ejson_size q)))
          :: nil).
@@ -213,6 +227,16 @@ Section CompStat.
   Definition stat_tree_spark_df (q: spark_df) : data :=
     drec
       (("spark_df", stat_spark_df q)
+         :: nil).
+
+  Definition stat_tree_wasm (q: wasm) : data :=
+    drec
+      (("wasm", stat_wasm q)
+         :: nil).
+
+  Definition stat_tree_wasm_ast (q: wasm_ast) : data :=
+    drec
+      (("wasm_ast", stat_wasm_ast q)
          :: nil).
 
   Definition stat_tree_java (q: java) : data :=
@@ -455,6 +479,8 @@ Section CompStat.
         | Q_javascript q => stat_javascript q
         | Q_java q => stat_java q
         | Q_spark_df q => stat_spark_df q
+        | Q_wasm_ast q => stat_wasm_ast q
+        | Q_wasm q => stat_wasm q
         | Q_error q => stat_error q
         end
     in
@@ -488,6 +514,8 @@ Section CompStat.
         | Q_javascript q => stat_tree_javascript q
         | Q_java q => stat_tree_java q
         | Q_spark_df q => stat_tree_spark_df q
+        | Q_wasm_ast q => stat_tree_wasm_ast q
+        | Q_wasm q => stat_tree_wasm q
         | Q_error q => stat_tree_error q
         end
     in

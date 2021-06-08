@@ -17,7 +17,8 @@ open Js_of_ocaml
 open Qcert_lib
 
 open Util
-open Core.EnhancedCompiler
+open CompLang
+open EnhancedCompiler.EnhancedCompiler
 open Compiler_util
 open Config
 
@@ -55,8 +56,8 @@ let global_config_of_json j =
   let gconf =
     { gconf_qname = None;
       gconf_class_name = None;
-      gconf_source = Core.L_camp_rule;
-      gconf_target = Core.L_javascript;
+      gconf_source = L_camp_rule;
+      gconf_target = L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
@@ -183,10 +184,10 @@ let json_of_exported_languages exported_languages =
     end
   in
   object%js
-    val frontend = Js.def (wrap_all wrap exported_languages.Core.frontend)
-    val core = Js.def (wrap_all wrap exported_languages.Core.coreend)
-    val distributed = Js.def (wrap_all wrap exported_languages.Core.distrend)
-    val backend =  Js.def (wrap_all wrap exported_languages.Core.backend)
+    val frontend = Js.def (wrap_all wrap exported_languages.frontend)
+    val core = Js.def (wrap_all wrap exported_languages.coreend)
+    val distributed = Js.def (wrap_all wrap exported_languages.distrend)
+    val backend =  Js.def (wrap_all wrap exported_languages.backend)
   end
 let language_specs () =
   let exported_languages = QLang.export_language_descriptions  in
@@ -204,12 +205,12 @@ let json_of_source_to_target_path j =
 
 let rec unsafe_json_to_js (j:QData.json) =
   match j with
-  | Core.Jnull -> Js.Unsafe.inject (Js.null)
-  | Core.Jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
-  | Core.Jbool b -> Js.Unsafe.inject (Js.bool b)
-  | Core.Jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
-  | Core.Jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
-  | Core.Jobject l ->
+  | Coq_jnull -> Js.Unsafe.inject (Js.null)
+  | Coq_jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
+  | Coq_jbool b -> Js.Unsafe.inject (Js.bool b)
+  | Coq_jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
+  | Coq_jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
+  | Coq_jobject l ->
      Js.Unsafe.inject (Js.Unsafe.obj (Array.of_list (List.map (fun (str,y) -> ((string_of_char_list str, unsafe_json_to_js y))) l)))
   
 

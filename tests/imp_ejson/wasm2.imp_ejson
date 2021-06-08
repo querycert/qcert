@@ -1,0 +1,5 @@
+module main {
+  wasm2(x) return y {
+    y := 3.14 < 4.5;
+  }
+}

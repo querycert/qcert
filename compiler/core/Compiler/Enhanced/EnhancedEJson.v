@@ -33,7 +33,7 @@ Local Open Scope list_scope.
 
 Definition enhanced_ejson : Set := enhanced_data.
 
-Program Instance enhanced_foreign_ejson : foreign_ejson
+Program Instance enhanced_foreign_ejson : foreign_ejson enhanced_ejson
   := mk_foreign_ejson enhanced_ejson _ _ _ _ _ _.
 Next Obligation.
   red.
@@ -73,6 +73,16 @@ Definition enhanced_foreign_ejson_runtime_op_tostring op : string :=
   match op with
   | enhanced_ejson_sql_date sop => ejson_sql_date_runtime_op_tostring sop
   | enhanced_ejson_uri sop => ejson_uri_runtime_op_tostring sop
+  end.
+
+Definition enhanced_foreign_ejson_runtime_op_fromstring opname : option enhanced_foreign_ejson_runtime_op :=
+  match ejson_sql_date_runtime_op_fromstring opname with
+  | Some op =>  Some (enhanced_ejson_sql_date op)
+  | None =>
+    match ejson_uri_runtime_op_fromstring opname with
+    | Some op => Some (enhanced_ejson_uri op)
+    | None => None
+    end
   end.
 
 Definition enhanced_ejson_sql_date_runtime_op_interp op (dl:list ejson) : option ejson :=
@@ -205,7 +215,7 @@ Definition enhanced_ejson_sql_date_runtime_op_interp op (dl:list ejson) : option
          end) dl
   end.
 
-Definition enhanced_ejson_uri_runtime_op_interp op (dl:list ejson) : option ejson :=
+Definition enhanced_ejson_uri_runtime_op_interp op (dl:list (@ejson enhanced_ejson)) : option ejson :=
   match op with
   | EJsonRuntimeUriEncode =>
     apply_unary
@@ -231,8 +241,8 @@ Definition enhanced_foreign_ejson_runtime_op_interp op :=
     enhanced_ejson_uri_runtime_op_interp sop
   end.
 
-Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime enhanced_foreign_ejson enhanced_foreign_ejson_runtime_op _ _ _ _ _.
+Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime _ :=
+  mk_foreign_ejson_runtime enhanced_foreign_ejson_runtime_op enhanced_ejson enhanced_foreign_ejson _ _ _ _ _ _.
 Next Obligation.
   red; unfold equiv; intros.
   change ({x = y} + {x <> y}).
@@ -250,6 +260,9 @@ Defined.
 Next Obligation.
   exact (defaultEJsonToString H).
 Defined.
+Next Obligation.
+  exact (enhanced_foreign_ejson_runtime_op_fromstring H).
+Defined.  
 Next Obligation.
   exact (defaultEJsonToString H).
 Defined.

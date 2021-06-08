@@ -1,0 +1,11 @@
+/* constructs things */
+module main {
+  wasm10(x) return y {
+    let input := { a : [1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0], b: { c : "Hello World!" } };
+    y := 0.0;
+    for(i in Runtime.recDot(input,"a")) {
+      y := y + i;
+    }
+    y := y / Runtime.floatOfNat(Runtime.arrayLength(Runtime.recDot(input,"a")));
+  }
+}

@@ -81,5 +81,12 @@ Section UriOperators.
       | EJsonRuntimeUriDecode => "uriDecode"
       end.
 
+    Definition ejson_uri_runtime_op_fromstring opname : option ejson_uri_runtime_op :=
+      match opname with
+      | "uriEncode" => Some EJsonRuntimeUriEncode
+      | "uriDecode" => Some EJsonRuntimeUriDecode
+      | _ => None
+      end.
+
   End toEJson.
 End UriOperators.

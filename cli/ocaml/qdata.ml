@@ -18,7 +18,7 @@ open Qcert_lib
 
 open Util
 open Config
-open Core.EnhancedCompiler
+open EnhancedCompiler.EnhancedCompiler
 
 let verbose = ref false
   
@@ -43,8 +43,8 @@ let parse_args () =
   let gconf =
     { gconf_qname = None;
       gconf_class_name = None;
-      gconf_source = Core.L_camp_rule;
-      gconf_target = Core.L_javascript;
+      gconf_source = L_camp_rule;
+      gconf_target = L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;

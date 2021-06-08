@@ -1,0 +1,7 @@
+/* union */
+module main {
+  wasm17(x) return y {
+    let input := { odd : [1.0,3.0,5.0,7.0,9.0], even: [2.0,4.0,6.0,8.0,10.0] };
+    y := Runtime.union(Runtime.recDot(input,"odd"),Runtime.recDot(input,"even"));
+  }
+}

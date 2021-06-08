@@ -19,7 +19,9 @@ Require Import JavaScriptAst.
 
 Section ForeignToJavaScriptAst.
 
-  Class foreign_ejson_to_ajavascript {f:foreign_ejson} : Type
+  Class foreign_ejson_to_ajavascript
+        {foreign_ejson_model:Set}
+        {fejson:foreign_ejson foreign_ejson_model} : Type
     := mk_foreign_ejson_to_ajavascript {
            foreign_ejson_to_ajavascript_expr (fe:foreign_ejson_model) : expr (* XXX This is a JsAst expression *)
          }.

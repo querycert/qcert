@@ -1,0 +1,8 @@
+/* block scoping redeclaration */
+module main {
+  wasm13(x) return y {
+    let a := 1;
+    let a := 2;
+    y := a;
+  }
+}

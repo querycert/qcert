@@ -22,7 +22,8 @@ Require Import JSONRuntime.
 Local Open Scope string_scope.
 
 Class foreign_to_json
-      {fejson:foreign_ejson}
+      {foreign_ejson_model:Set}
+      {fejson:foreign_ejson foreign_ejson_model}
   : Type
   := mk_foreign_to_json {
          foreign_to_json_to_ejson

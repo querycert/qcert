@@ -35,6 +35,7 @@ Module QSQLPP(runtime:CompilerRuntime).
   Definition sqlpp_join_clause : Set := SQLPP.sqlpp_join_clause.
   Definition sqlpp_group_by : Set := SQLPP.sqlpp_group_by.
   Definition sqlpp_order_by : Set := SQLPP.sqlpp_order_by.
+  Definition sqlpp_order_spec : Set := SQLPP.sqlpp_order_spec.
   Definition sqlpp_when_then : Set := SQLPP.sqlpp_when_then.
   Definition sqlpp_distinct : Set := SQLPP.sqlpp_distinct.
   Definition sqlpp_project : Set := SQLPP.sqlpp_project.

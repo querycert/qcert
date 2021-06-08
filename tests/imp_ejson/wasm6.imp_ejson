@@ -1,0 +1,5 @@
+module main {
+  wasm6(x) return y {
+    y := "Hello World!";
+  }
+}

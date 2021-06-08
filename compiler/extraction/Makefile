@@ -32,7 +32,7 @@ clean:
 
 cleanall: clean
 	rm -f QcertExtraction.glob QcertExtraction.vo .QcertExtraction.aux
-	rm -rf core.ml core.mli
+	rm -rf *.ml *.mli
 	rm -rf *~
 
 .NOTPARALLEL: 

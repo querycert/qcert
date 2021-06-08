@@ -6,6 +6,8 @@
 *_rdd.scala
 *.error
 *.txt
+*.wat
+*.wasm
 oql/*.json
 sql/*.json
 tech_rule/*.json
@@ -14,6 +16,7 @@ tech_rule/*_rule.camp
 camp/*.json
 camp/*_camp.camp
 lambda_nra/*.json
+imp_ejson/*.json
 /log/
 /lib/*
 /bin/

@@ -17,7 +17,7 @@ Require Import Ascii.
 Require Import String.
 Require Import ZArith.
 Require Import Bool.
-Require Import Float.
+Require Import FloatAdd.
 Require Import ToString.
 Require Import CoqLibAdd.
 Require Import StringAdd.
