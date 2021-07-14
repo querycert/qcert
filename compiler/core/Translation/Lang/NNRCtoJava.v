@@ -297,12 +297,12 @@ Section NNRCtoJava.
            (s1 +++ (indent i) +++ ^"final JsonElement " +++ res +++ ^";" +++ eol
                +++ (indent i) +++ ^"if (RuntimeUtils.either(" +++ (from_java_json e1) +++ ^")) {" +++ eol
                +++ (indent (i+1)) +++ ^"final JsonElement " +++ vl +++ eol
-               +++ (indent (i+1)) +++ ^" = RuntimeUtils.toLeft(" +++ (from_java_json e1) +++ ^");" +++ eol
+               +++ (indent (i+1)) +++ ^" = RuntimeUtils.getLeft(" +++ (from_java_json e1) +++ ^");" +++ eol
                +++ s2
                +++ (indent (i+1)) +++ res +++ ^" = " +++ (from_java_json e2) +++ ^";" +++ eol
                +++ (indent i) +++ ^"} else {" +++ eol
                +++ (indent (i+1)) +++ ^"final JsonElement " +++ vr  +++ eol
-               +++ (indent (i+1)) +++ ^" = RuntimeUtils.toRight(" +++ (from_java_json e1) +++ ^");" +++ eol
+               +++ (indent (i+1)) +++ ^" = RuntimeUtils.getRight(" +++ (from_java_json e1) +++ ^");" +++ eol
                +++ s3
                +++ (indent (i+1)) +++ res +++ ^" = " +++ (from_java_json e3) +++ ^";" +++ eol
                +++ (indent i) +++ ^"}" +++ eol,

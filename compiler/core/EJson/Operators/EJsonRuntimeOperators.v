@@ -129,8 +129,8 @@ Section EJsonRuntimeOperators.
       | EJsonRuntimeArrayAccess => "arrayAccess"
       (* Sum *)
       | EJsonRuntimeEither => "either"
-      | EJsonRuntimeToLeft=> "toLeft"
-      | EJsonRuntimeToRight=> "toRight"
+      | EJsonRuntimeToLeft=> "getLeft"
+      | EJsonRuntimeToRight=> "getRight"
       (* Brand *)
       | EJsonRuntimeBrand => "brand"
       | EJsonRuntimeUnbrand => "unbrand"
