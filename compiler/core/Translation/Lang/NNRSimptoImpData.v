@@ -82,10 +82,10 @@ Section NNRSimptoImpData.
       (*   let e' := ImpExprVar x  in *)
       (*   ImpStmtIf *)
       (*     (ImpExprRuntimeCall DataRuntimeEither [e']) *)
-      (*     (ImpStmtBlock (* var x1 = toLeft(e); s1 *) *)
+      (*     (ImpStmtBlock (* var x1 = getLeft(e); s1 *) *)
       (*        [ (x1, Some (ImpExprRuntimeCall DataRuntimeToLeft [e'])) ] *)
       (*        [ nnrs_imp_stmt_to_imp_data s1 ]) *)
-      (*     (ImpStmtBlock (* var x2 = toRight(e); s2 *) *)
+      (*     (ImpStmtBlock (* var x2 = getRight(e); s2 *) *)
       (*        [ (x2, Some (ImpExprRuntimeCall DataRuntimeToRight [e'])) ] *)
       (*        [ nnrs_imp_stmt_to_imp_data s2 ]) *)
       | NNRSimpEither e x1 s1 x2 s2 =>
@@ -93,10 +93,10 @@ Section NNRSimptoImpData.
         let e' := nnrs_imp_expr_to_imp_data constants e in
         ImpStmtIf
           (ImpExprRuntimeCall DataRuntimeEither [e'])
-          (ImpStmtBlock (* var x1 = toLeft(e); s1 *)
+          (ImpStmtBlock (* var x1 = getLeft(e); s1 *)
              [ (x1, Some (ImpExprRuntimeCall DataRuntimeToLeft [e'])) ]
              [ nnrs_imp_stmt_to_imp_data constants s1 ])
-          (ImpStmtBlock (* var x2 = toRight(e); s2 *)
+          (ImpStmtBlock (* var x2 = getRight(e); s2 *)
              [ (x2, Some (ImpExprRuntimeCall DataRuntimeToRight [e'])) ]
              [ nnrs_imp_stmt_to_imp_data constants s2 ])
       end.

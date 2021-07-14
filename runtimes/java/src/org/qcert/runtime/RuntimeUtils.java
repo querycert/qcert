@@ -85,11 +85,11 @@ public class RuntimeUtils {
         }
     }
 
-    public static JsonElement toLeft(JsonElement obj) {
+    public static JsonElement getLeft(JsonElement obj) {
         return asRec(obj).get("$left");
     }
 
-    public static JsonElement toRight(JsonElement obj) {
+    public static JsonElement getRight(JsonElement obj) {
         return asRec(obj).get("$right");
     }
 

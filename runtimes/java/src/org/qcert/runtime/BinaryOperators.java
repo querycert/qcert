@@ -224,7 +224,7 @@ public class BinaryOperators {
 		final DataComparator comp = DataComparator.getComparator();
 		for(JsonElement elem : ec) {
 //			if (elem instanceof JsonObject) {
-//				elem = RuntimeUtils.toLeft(elem);
+//				elem = RuntimeUtils.getLeft(elem);
 //			}
 			if(comp.compare(elem, e1) == 0) {
 				return new JsonPrimitive(true);
