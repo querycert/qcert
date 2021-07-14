@@ -282,7 +282,7 @@ Section DataToEJson.
     Qed.
 
     (* Means we can do inversion on data_to_ejson *)
-    Lemma data_to_ejson_inv j1 j2:
+    Lemma data_to_ejson_inj j1 j2:
       data_to_ejson j1 = data_to_ejson j2 -> j1 = j2.
     Proof.
       intros.
@@ -296,7 +296,7 @@ Section DataToEJson.
       data_to_ejson j1 = data_to_ejson j2 <-> j1 = j2.
     Proof.
       split; intros; subst.
-      - apply data_to_ejson_inv; assumption.
+      - apply data_to_ejson_inj; assumption.
       - reflexivity.
     Qed.
   End ModelRoundTrip.
@@ -789,7 +789,7 @@ Section DataToEJson.
       case_eq (data_eqdec d d0); case_eq (ejson_eqdec (data_to_ejson d) (data_to_ejson d0)); intros.
       - reflexivity.
       - congruence.
-      - clear H; apply data_to_ejson_inv in e.
+      - clear H; apply data_to_ejson_inj in e.
         congruence.
       - reflexivity.
     Qed.
@@ -889,7 +889,7 @@ Section DataToEJson.
       - rewrite in_map_iff in H.
         elim H; clear H; intros.
         elim H; clear H; intros.
-        apply data_to_ejson_inv in H.
+        apply data_to_ejson_inj in H.
         subst; assumption.
       - apply in_map; assumption.
     Qed.
@@ -913,7 +913,7 @@ Section DataToEJson.
         destruct (EquivDec.equiv_dec (data_to_ejson d) (data_to_ejson a));
         try reflexivity; simpl.
       - rewrite e in c; congruence.
-      - apply data_to_ejson_inv in e; subst; congruence.
+      - apply data_to_ejson_inj in e; subst; congruence.
     Qed.
 
     Lemma bminus_ejson_to_data_comm l1 l2:
@@ -1014,7 +1014,7 @@ Section DataToEJson.
         case_eq (data_eq_dec d a);
           case_eq (ejson_eq_dec (data_to_ejson d) (data_to_ejson a)); intros; try congruence.
         clear H.
-        apply data_to_ejson_inv in e.
+        apply data_to_ejson_inj in e.
         subst. congruence.
       - simpl; destruct (data_to_ejson a0); try reflexivity.
       - simpl; destruct (data_to_ejson a0); try reflexivity.
