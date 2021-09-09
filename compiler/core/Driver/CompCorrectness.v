@@ -1295,7 +1295,6 @@ Section CompCorrectness.
       unfold lift_input.
       trivial_same_query.
       assumption.
-      a dmit.
     Qed.
     *)
 

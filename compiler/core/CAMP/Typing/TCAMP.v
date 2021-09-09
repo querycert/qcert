@@ -225,17 +225,6 @@ Section TCAMP.
           inversion H0; subst; rtype_equalizer.
           subst. constructor. constructor; eauto.
         * discriminate.
-    (* pgroupBy *)
-    (* 
-    - inversion tdat; subst.
-      rtype_equalizer. subst.
-      induction dl; simpl.
-      + left; econstructor; split; eauto. econstructor; eauto.
-      + inversion H2; subst.
-        specialize (IHdl (dtcoll _ _ H4) H4).
-        destruct (IHp _ _ _ _ _ tenv H1 H3) as [[dout[camp_evaleq tx]]|[s camp_evaleq]].
-        addddmit.
-        addddmit. *)
     (* passert *)
     - destruct (IHp _ _ _ _ _ tenv H1 tdat) as [[dout[camp_evaleq tx]]|camp_evaleq];
         rewrite camp_evaleq; simpl; [|eauto].

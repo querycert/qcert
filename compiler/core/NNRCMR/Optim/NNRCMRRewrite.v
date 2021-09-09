@@ -888,43 +888,6 @@ Section NNRCMRRewrite.
         try contradiction; try congruence.
   Qed.
 
-
-(* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX TODO XXXXXXXXXXXXXXXXXXXXXX *)
-
-  (* (* KindOfId+M=M *) *)
-
-  (* Definition merge_mr_kindofid mr1 mr2 := *)
-  (*   if equiv_decb mr1.(mr_output) mr2.(mr_input) && is_kindofid_mr mr1 then *)
-  (*     let mr := *)
-  (*         mkMR *)
-  (*             mr1.(mr_input) *)
-  (*             mr2.(mr_output) *)
-  (*             mr2.(mr_flat_map) *)
-  (*             mr2.(mr_reduce) *)
-  (*     in *)
-  (*     Some mr *)
-  (*   else *)
-  (*     None. *)
-
-  (* Lemma merge_mr_kindofid_correct : *)
-  (*   merge_correct_singleton merge_mr_kindofid. *)
-  (* Proof. *)
-  (*   unfold merge_correct_singleton. intros m1 m2 m3. *)
-  (*   intros Hdist1 Hdist2. intros. *)
-  (*   unfold merge_mr_kindofid in H0. *)
-  (*   unfold equiv_decb in *. *)
-  (*   dest_eqdec; simpl in *. *)
-  (*   - case_eq (is_kindofid_mr m1); intros; *)
-  (*     rewrite H1 in H0; try congruence. *)
-  (*     unfold mr_chain_eval. *)
-  (*     simpl. *)
-  (*     dest_eqdec; [ | congruence ]. *)
-  (*     a.dmit. *)
-  (*   - discriminate.  *)
-  (* Qed. *)
-
-  (* map-id + id-red = map-red *)
-
   (* Java equivalent: MROptimizer.merge_id_reduce_id_dist_map *)  
   Definition merge_id_reduce_id_dist_map mr1 mr2 :=
     if equiv_decb mr1.(mr_output) mr2.(mr_input)
@@ -1483,4 +1446,3 @@ Section NNRCMRRewrite.
     get_mr_chain_vars mrl.(mr_chain).
 
 End NNRCMRRewrite.
-
