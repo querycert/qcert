@@ -61,7 +61,7 @@ cleanall: Makefile.coq remove_all_derived
 install-coqdev:
 	@$(MAKE) -f Makefile.coq install
 
-install-local: 
+install-local:
 	@$(MAKE) install-ocaml
 ifneq ($(JAVASCRIPT),)
 	@$(MAKE) install-javascript

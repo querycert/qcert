@@ -1,31 +1,40 @@
 'use strict';
 
+const _ = require('lodash');
 const fs = require('fs');
 const engine = require('./lib/engine.js');
 
 async function main(runtime, module, input, expected) {
-  console.log("invoke:");
-  console.log({runtime, module, input, expected});
   let rt = fs.readFileSync(runtime);
   let mod = fs.readFileSync(module);
   let arg = JSON.parse(fs.readFileSync(input));
-  console.log("input:");
-  console.log(arg);
   let exp = JSON.parse(fs.readFileSync(expected));
-  console.log("expected:");
-  console.log(JSON.stringify(exp, null, 2));
   let res;
+  let err;
   try {
     res = await engine.invoke(rt, mod, "qcert_main", arg);
   } catch(err) {
-    console.log("error:");
-    console.log(err);
-    res = {
-      "error": "Eval failed"
-    };
+    err = err;
+    res = { "error": "Eval failed" }
   }
-  console.log("output:");
-  console.log(JSON.stringify(res, null, 2));
+  if (! _.isEqual(res, exp)) {
+    console.log("TEST FAILED");
+    console.log("arguments:");
+    console.log({runtime, module, input, expected});
+    console.log("input:");
+    console.log(arg);
+    console.log("expected output:");
+    console.log(JSON.stringify(exp, null, 2));
+    if (err) {
+      console.log("exception:");
+      console.log(err);
+      process.exit(2);
+    } else {
+      console.log("output:");
+      console.log(JSON.stringify(res, null, 2));
+      process.exit(1)
+    }
+  }
 }
 
 const rt = process.argv[2];
