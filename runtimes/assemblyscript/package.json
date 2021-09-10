@@ -10,13 +10,14 @@
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
     "@assemblyscript/loader": "0.0.0"
   },
   "devDependencies": {
     "assemblyscript": "^0.12.5",
     "assemblyscript-regex": "^1.6.3",
+    "lodash": "^4.17.15",
     "chai": "^4.2.0",
     "mocha": "^8.0.1"
   }

@@ -495,7 +495,7 @@ imp_ejson-tests:
 	@$(MAKE) imp_ejson-wasm-spec-tests
 ifneq ($(JAVASCRIPT),)
 	@$(MAKE) imp_ejson-js-tests
-	# @$(MAKE) imp_ejson-wasm-node-tests # TODO. Improve test and enable
+	@$(MAKE) imp_ejson-wasm-node-tests
 endif
 
 # imp_ejson -> wasm ; run on spec interpreter
@@ -538,10 +538,11 @@ imp_ejson-js-tests:
                           --eval-validate \
                           --query imp_ejson/wasm$(N).js || exit 1; )
 
-IMPEJSONWASMNODENUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+IMPEJSONWASMNODENUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
 
 # imp_ejson -> wasm ; run on node
 imp_ejson-wasm-node-tests:
+	cd ../runtimes/assemblyscript/ && npm install
 	$(foreach N,$(IMPEJSONWASMNODENUM), \
 				 $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
 				 		-source imp_ejson -path imp_ejson -target imp_ejson \
@@ -553,7 +554,7 @@ imp_ejson-wasm-node-tests:
 						-source imp_ejson -target wasm \
 						-schema imp_ejson/wasm.schema && \
 				 $(NODERUN) ../runtimes/assemblyscript/cli-runner.js \
-				 		../runtimes/assemblyscript/build/untouched.wasm \
+				 		../runtimes/assemblyscript/runtime.wasm \
 						imp_ejson/wasm$(N).wasm \
 						imp_ejson/wasm.input \
 						imp_ejson/wasm$(N)_imp_ejson.json || exit 1; )
