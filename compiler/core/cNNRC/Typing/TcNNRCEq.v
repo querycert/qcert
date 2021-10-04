@@ -56,7 +56,7 @@ Section TcNNRCEq.
     apply bindings_type_Forall_normalized.
   Qed.
 
-  Hint Resolve data_normalized_bindings_type_map.
+  Hint Resolve data_normalized_bindings_type_map : qcert.
   
   Lemma nnrc_base_rewrites_typed_with_untyped (e1 e2:nnrc) :
     e1 ≡ᶜᶜ e2 ->
@@ -69,16 +69,16 @@ Section TcNNRCEq.
     intros.
     unfold tnncr_core_rewrites_to; simpl; intros.
     split; auto 2; intros.
-    apply H; eauto.
+    apply H; qeauto.
   Qed.
 
   (****************
    * Proper stuff *
    ****************)
 
-  Hint Constructors nnrc_core_type.
-  Hint Constructors unary_op_type.
-  Hint Constructors binary_op_type.
+  Hint Constructors nnrc_core_type : qcert.
+  Hint Constructors unary_op_type : qcert.
+  Hint Constructors binary_op_type : qcert.
 
   Global Instance  tnncr_core_rewrites_to_pre : PreOrder tnncr_core_rewrites_to.
   Proof.
@@ -165,7 +165,7 @@ Section TcNNRCEq.
     inversion H2; clear H2; subst.
     specialize (H0 τenv τ₁ H8); elim H0; clear H0 H8; intros.
     specialize (H1 ((y, τ₁) :: τenv) τout H9); elim H1; clear H1 H9; intros.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros; simpl.
     rewrite (H0 cenv env H3 H4).
     case_eq (nnrc_core_eval brand_relation_brands cenv env y0); intros; try reflexivity.
@@ -210,7 +210,7 @@ Section TcNNRCEq.
     inversion H2; clear H2; subst.
     specialize (H0 τenv (Coll τ₁) H8); elim H0; clear H0 H8; intros.
     specialize (H1 ((y, τ₁) :: τenv) τ₂ H9); elim H1; clear H1 H9; intros.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros; simpl.
     rewrite (H0 cenv env H3 H4).
     case_eq (nnrc_core_eval brand_relation_brands cenv env y0); intros; try reflexivity.
@@ -244,7 +244,7 @@ Section TcNNRCEq.
     specialize (H τenv Bool H7); elim H; clear H H7; intros.
     specialize (H0 τenv τout H9); elim H0; clear H0 H9; intros.
     specialize (H1 τenv τout H10); elim H1; clear H1 H10; intros.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros; simpl.
     rewrite (H2 cenv env H5 H6). rewrite (H3 cenv env H5 H6). rewrite (H4 cenv env H5 H6).
     reflexivity.
@@ -263,7 +263,7 @@ Section TcNNRCEq.
     destruct (H3 _ _ H12).
     clear H H1 H3.
     simpl.
-    split; [eauto | ]; intros.
+    split; [qeauto | ]; intros.
     rewrite H2; trivial.
     destruct (@typed_nnrc_core_yields_typed_data _ _ _ _ _ _ _ H H1 H0) as [?[??]].
     rewrite H3.
@@ -275,5 +275,5 @@ Section TcNNRCEq.
 
 End TcNNRCEq.
 
-Notation "e1 ⇒ᶜᶜ e2" := (tnncr_core_rewrites_to e1 e2) (at level 80).
+Notation "e1 ⇒ᶜᶜ e2" := (tnncr_core_rewrites_to e1 e2) (at level 80) : nnrc_scope.
 

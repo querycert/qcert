@@ -44,6 +44,7 @@ Require Import Morphisms.
 Require Import Utils.
 Require Import DataRuntime.
 
+Declare Scope nnrc_scope.
 Section cNNRC.
   Context {fruntime:foreign_runtime}.
   

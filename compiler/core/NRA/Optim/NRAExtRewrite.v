@@ -19,10 +19,12 @@ Require Import NRAEq.
 Require Import NRAExt.
 Require Import NRAExtEq.
 Require Import NRARewrite.
+Require Import String.
 
 Section NRAExtRewrite.
   Local Open Scope nra_scope.
   Local Open Scope nraext_scope.
+  Local Open Scope string.
 
   Context {fruntime:foreign_runtime}.
 

@@ -30,7 +30,7 @@ Require Import NNRSimpRuntime.
 
 Section NNRSimpRewrite.
   Local Open Scope nnrs_imp.
-
+  
   Context {fruntime:foreign_runtime}.
 
   Lemma distinct_nil_eq :
@@ -296,7 +296,7 @@ Section NNRSimpRewrite.
       generalize (nnrs_imp_expr_eval_unused h σc nil σ source)
       ; simpl; intros HH.
       repeat rewrite HH by tauto.
-      generalize (for_map_eval h σc x₁ (NNRSimpUnop OpBag expr) tmp₁ source nil σ []); simpl; intros HH2.
+      generalize (for_map_eval h σc x₁ (NNRSimpUnop OpBag expr) tmp₁ source nil σ nil); simpl; intros HH2.
       rewrite HH in HH2 by tauto.
       rewrite HH2 by tauto; clear HH2.
       unfold var in *.
@@ -322,7 +322,7 @@ Section NNRSimpRewrite.
              (fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                 option (list (string * option data)) :=
                 match dl with
-                | [] => Some σ₁
+                | nil => Some σ₁
                 | d1 :: dl' =>
                     match
                       olift
@@ -370,7 +370,7 @@ Section NNRSimpRewrite.
                                  ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                                      option (list (string * option data)) :=
                                      match dl with
-                                     | [] => Some σ₁
+                                     | nil => Some σ₁
                                      | d :: dl' =>
                                        match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d) :: σ₁) with
                                        | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -384,7 +384,7 @@ Section NNRSimpRewrite.
                  (lift_map
                     (fun dd : data =>
                        match
-                         olift (fun d : data => Some (dcoll [d]))
+                         olift (fun d : data => Some (dcoll (d::nil)))
                                (nnrs_imp_expr_eval h σc ((tmp₁, Some dd) :: σ) expr)
                        with
                        | Some (dcoll l0) => Some l0
@@ -399,8 +399,7 @@ Section NNRSimpRewrite.
            apply olift_ext; intros.
            generalize (nnrs_imp_expr_eval_unused h σc nil σ n)
            ; simpl; intros HH2.
-           repeat rewrite HH2 by tauto.
-           trivial.
+           repeat rewrite HH2; auto.
          }
          rewrite olift_commute.
          case_eq (nnrs_imp_expr_eval h σc σ n); simpl; trivial
@@ -408,7 +407,7 @@ Section NNRSimpRewrite.
          replace (lift_map
          (fun dd : data =>
           match
-            olift (fun d0 : data => Some (dcoll [d0]))
+            olift (fun d0 : data => Some (dcoll (d0::nil)))
               (nnrs_imp_expr_eval h σc ((tmp₁, Some dd) :: σ) expr)
           with
           | Some (dcoll l0) => Some l0
@@ -416,7 +415,7 @@ Section NNRSimpRewrite.
           end) l) with
              (lift_map
          (fun dd : data =>
-            lift (fun d0 : data => [d0])
+            lift (fun d0 : data => (d0::nil))
                  (nnrs_imp_expr_eval h σc ((tmp₁, Some dd) :: σ) expr)) l).
          2: { idtac.
               apply lift_map_ext; intros.
@@ -433,7 +432,7 @@ Section NNRSimpRewrite.
            ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                option (list (string * option data)) :=
                match dl with
-               | [] => Some σ₁
+               | nil => Some σ₁
                | d0 :: dl' =>
                    match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                    | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -471,7 +470,7 @@ Section NNRSimpRewrite.
                   ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                option (list (string * option data)) :=
                match dl with
-               | [] => Some σ₁
+               | nil => Some σ₁
                | d0 :: dl' =>
                    match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                    | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -515,13 +514,13 @@ Section NNRSimpRewrite.
          olift (fun σ => (olift
               (fun σ0 : list (string * option data) =>
                match σ0 with
-               | [] => None
+               | nil => None
                | xx :: σ' => Some (xx :: (x₁, Some (dcoll x)) :: σ')
                end) (nnrs_imp_stmt_eval h σc rest σ)))
               ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                   option (list (string * option data)) :=
                   match dl with
-                  | [] => Some σ₁
+                  | nil => Some σ₁
                   | d0 :: dl' =>
                       match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                       | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -571,14 +570,14 @@ Section NNRSimpRewrite.
            (olift
               (fun σ0 : list (string * option data) =>
                  match σ0 with
-                 | [] => None
+                 | nil => None
                  | xx :: σ' => Some ((x₁, Some (dcoll x)) :: σ')
                  end)
          (olift (nnrs_imp_stmt_eval h σc rest)
               ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                   option (list (string * option data)) :=
                   match dl with
-                  | [] => Some σ₁
+                  | nil => Some σ₁
                   | d0 :: dl' =>
                       match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                       | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -596,7 +595,7 @@ Section NNRSimpRewrite.
                 destruct (((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
           option (list (string * option data)) :=
           match dl with
-          | [] => Some σ₁
+          | nil => Some σ₁
           | d0 :: dl' =>
               match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
               | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -614,7 +613,7 @@ Section NNRSimpRewrite.
                                            ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                                                option (list (string * option data)) :=
                 match dl with
-                | [] => Some σ₁
+                | nil => Some σ₁
                 | d0 :: dl' =>
                     match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                     | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -632,7 +631,7 @@ Section NNRSimpRewrite.
          ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
              option (list (string * option data)) :=
              match dl with
-             | [] => Some σ₁
+             | nil => Some σ₁
              | d0 :: dl' =>
                  match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                  | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -650,7 +649,7 @@ Section NNRSimpRewrite.
          ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
              option (list (string * option data)) :=
              match dl with
-             | [] => Some σ₁
+             | nil => Some σ₁
              | d0 :: dl' =>
                  match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                  | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -673,7 +672,7 @@ Section NNRSimpRewrite.
       ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
           option (list (string * option data)) :=
           match dl with
-          | [] => Some σ₁
+          | nil => Some σ₁
           | d1 :: dl' =>
               match
                 olift
@@ -715,7 +714,7 @@ Section NNRSimpRewrite.
       ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
           option (list (string * option data)) :=
           match dl with
-          | [] => Some σ₁
+          | nil => Some σ₁
           | d1 :: dl' =>
               match
                 olift
@@ -763,7 +762,7 @@ Section NNRSimpRewrite.
          (fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
             option (list (string * option data)) :=
             match dl with
-            | [] => Some σ₁
+            | nil => Some σ₁
             | d0 :: dl' =>
                 match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                 | Some (_ :: σ₂0) => for_fun dl' σ₂0
@@ -809,7 +808,7 @@ Section NNRSimpRewrite.
          replace (lift_map
          (fun dd : data =>
           match
-            olift (fun d0 : data => Some (dcoll [d0]))
+            olift (fun d0 : data => Some (dcoll (d0::nil)))
               (nnrs_imp_expr_eval h σc ((tmp₁, Some dd) :: σ) expr)
           with
           | Some (dcoll l0) => Some l0
@@ -817,7 +816,7 @@ Section NNRSimpRewrite.
           end) l) with
              (lift_map
          (fun dd : data =>
-            lift (fun d0 : data => [d0])
+            lift (fun d0 : data => (d0::nil))
                  (nnrs_imp_expr_eval h σc ((tmp₁, Some dd) :: σ) expr)) l).
          2: { idtac.
               apply lift_map_ext; intros.
@@ -834,7 +833,7 @@ Section NNRSimpRewrite.
            ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                option (list (string * option data)) :=
                match dl with
-               | [] => Some σ₁
+               | nil => Some σ₁
                | d0 :: dl' =>
                    match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                    | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -872,7 +871,7 @@ Section NNRSimpRewrite.
                   ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                option (list (string * option data)) :=
                match dl with
-               | [] => Some σ₁
+               | nil => Some σ₁
                | d0 :: dl' =>
                    match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                    | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -916,13 +915,13 @@ Section NNRSimpRewrite.
          olift (fun σ => (olift
               (fun σ0 : list (string * option data) =>
                match σ0 with
-               | [] => None
+               | nil => None
                | xx :: σ' => Some (xx :: (x₁, Some (dcoll x)) :: σ')
                end) (nnrs_imp_stmt_eval h σc rest σ)))
               ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                   option (list (string * option data)) :=
                   match dl with
-                  | [] => Some σ₁
+                  | nil => Some σ₁
                   | d0 :: dl' =>
                       match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                       | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -972,14 +971,14 @@ Section NNRSimpRewrite.
            (olift
               (fun σ0 : list (string * option data) =>
                  match σ0 with
-                 | [] => None
+                 | nil => None
                  | xx :: σ' => Some ((x₁, Some (dcoll x)) :: σ')
                  end)
          (olift (nnrs_imp_stmt_eval h σc rest)
               ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                   option (list (string * option data)) :=
                   match dl with
-                  | [] => Some σ₁
+                  | nil => Some σ₁
                   | d0 :: dl' =>
                       match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                       | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -997,7 +996,7 @@ Section NNRSimpRewrite.
                 destruct (((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
           option (list (string * option data)) :=
           match dl with
-          | [] => Some σ₁
+          | nil => Some σ₁
           | d0 :: dl' =>
               match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
               | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -1015,7 +1014,7 @@ Section NNRSimpRewrite.
                                            ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
                                                option (list (string * option data)) :=
                 match dl with
-                | [] => Some σ₁
+                | nil => Some σ₁
                 | d0 :: dl' =>
                     match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                     | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -1033,7 +1032,7 @@ Section NNRSimpRewrite.
          ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
              option (list (string * option data)) :=
              match dl with
-             | [] => Some σ₁
+             | nil => Some σ₁
              | d0 :: dl' =>
                  match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                  | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -1051,7 +1050,7 @@ Section NNRSimpRewrite.
          ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
              option (list (string * option data)) :=
              match dl with
-             | [] => Some σ₁
+             | nil => Some σ₁
              | d0 :: dl' =>
                  match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                  | Some (_ :: σ₂) => for_fun dl' σ₂
@@ -1074,7 +1073,7 @@ Section NNRSimpRewrite.
       ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
           option (list (string * option data)) :=
           match dl with
-          | [] => Some σ₁
+          | nil => Some σ₁
           | d1 :: dl' =>
               match
                 olift
@@ -1116,7 +1115,7 @@ Section NNRSimpRewrite.
       ((fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
           option (list (string * option data)) :=
           match dl with
-          | [] => Some σ₁
+          | nil => Some σ₁
           | d1 :: dl' =>
               match
                 olift
@@ -1164,7 +1163,7 @@ Section NNRSimpRewrite.
          (fix for_fun (dl : list data) (σ₁ : list (string * option data)) {struct dl} :
             option (list (string * option data)) :=
             match dl with
-            | [] => Some σ₁
+            | nil => Some σ₁
             | d0 :: dl' =>
                 match nnrs_imp_stmt_eval h σc body ((tmp₃, Some d0) :: σ₁) with
                 | Some (_ :: σ₂0) => for_fun dl' σ₂0

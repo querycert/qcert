@@ -493,9 +493,9 @@ let pretty_imp_data_runtime p sym pretty_imp_expr ff (op, args) =
   | Core.DataRuntimeEither, [e] ->
       fprintf ff "@[<hv 2>either@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
   | Core.DataRuntimeToLeft, [e] ->
-      fprintf ff "@[<hv 2>toLeft@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+      fprintf ff "@[<hv 2>getLeft@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
   | Core.DataRuntimeToRight, [e] ->
-      fprintf ff "@[<hv 2>toRight@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
+      fprintf ff "@[<hv 2>getRight@[<hv 2>(%a)@]@]" (pretty_imp_expr 0 sym) e
   | _ -> assert false
   end
 

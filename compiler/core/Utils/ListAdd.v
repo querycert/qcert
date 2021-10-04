@@ -17,6 +17,7 @@ lists. *)
 
 Require Import List.
 Require Import ListSet.
+Require Import Arith.Compare_dec.
 Require Import Bool.
 Require Import Permutation.
 Require Import Morphisms.
@@ -24,7 +25,7 @@ Require Import Setoid.
 Require Import EquivDec.
 Require Import Equivalence.
 Require Import RelationClasses.
-Require Import Omega.
+Require Import Lia.
 Require Import CoqLibAdd.
 Require Import Lift.
 Require Import Program.Basics.
@@ -64,7 +65,7 @@ Section ListAdd.
       assert (pm:Datatypes.length l1 + Datatypes.length l2' - Datatypes.length l2' =
                  Datatypes.length l1' + Datatypes.length l2' - Datatypes.length l2').
       { rewrite eqq1; trivial. }
-      repeat rewrite Nat.add_sub in pm; trivial.
+      lia.
     Qed.
 
     Lemma length_app_other_head {l1 l2 l1' l2' : list A} :
@@ -75,7 +76,7 @@ Section ListAdd.
       intros eqqs.
       apply length_app_other_tail.
       repeat rewrite app_length in *.
-      rewrite plus_comm, eqqs, plus_comm; trivial.
+      lia.
     Qed.
 
     Lemma app_inv_head_length {l1 l2 l1' l2' : list A} :
@@ -354,7 +355,7 @@ Section ListAdd.
         + right. now inversion_clear 1.
     Defined.
 
-    Global Instance Forall_perm {A P} : Proper ((@Permutation A) ==> iff) (@Forall A P).
+    Global Instance Forall_perm {P} : Proper ((@Permutation A) ==> iff) (@Forall A P).
     Proof.
       intros ? ? perm.
       repeat rewrite Forall_forall.
@@ -400,7 +401,7 @@ Section ListAdd.
       apply filter_length.
       auto with arith.
       assert ((length (x :: l)) <> (length (filter p l))).
-      omega.
+      lia.
       unfold not in *; intro.
       apply H0.
       apply eq_means_same_length.
@@ -618,7 +619,6 @@ Section ListAdd.
           <->
           forallb2 f l1 l2 = true.
       Proof.
-        Hint Unfold iff.
         induction l1; destruct l2; simpl; intuition;
           repeat rewrite andb_true_iff in *; firstorder.
       Qed.
@@ -626,7 +626,6 @@ Section ListAdd.
       Lemma forallb2_Forallb {A B:Type} (f:A->B->bool) :
         forall l1 l2, forallb2 f l1 l2 = true <-> Forall2 (fun x y => f x y = true) l1 l2.
       Proof.
-        Hint Constructors Forall2.
         Ltac inv := try match goal with 
                         | [H:Forall2 _ _ (_::_) |- _ ] => inversion H; clear H
                         | [H:Forall2 _ (_::_) _ |- _ ] => inversion H; clear H
@@ -660,7 +659,6 @@ Section ListAdd.
         (forall x y, In x l1 -> In y l2 -> f1 x y-> f2 x y) ->
         Forall2 f1 l1 l2 -> Forall2 f2 l1 l2.
       Proof.
-        Hint Constructors Forall2.
         intros.
         induction H0; firstorder.
       Qed.
@@ -740,7 +738,6 @@ Section ListAdd.
       Lemma Forall2_conj {A B} {f1 f2:A->B->Prop} {l1 l2} : 
         Forall2 f1 l1 l2 -> Forall2 f2 l1 l2 -> Forall2 (fun x y => f1 x y /\ f2 x y) l1 l2.
       Proof.
-        Hint Constructors Forall2.
         intros.
         induction H0; trivial.
         invcs H; firstorder.
@@ -1676,7 +1673,7 @@ Section ListAdd.
       unfold asymmetric_over; simpl; intuition.
     Qed.
 
-    Hint Resolve asymmetric_over_cons_inv.
+    Hint Resolve asymmetric_over_cons_inv : qcert.
 
     Lemma asymmetric_over_swap {A} R {a b:A} {l1} :
       asymmetric_over R (a::b::l1) ->
@@ -1693,8 +1690,8 @@ Section ListAdd.
     
     Global Instance perm_in {A} : Proper (eq ==> (@Permutation A) ==> iff) (@In A).
     Proof.
-      Hint Resolve Permutation_in Permutation_sym.
-      unfold Proper, respectful; intros; subst; intuition; eauto.
+      Hint Resolve Permutation_in Permutation_sym : qcert.
+      unfold Proper, respectful; intros; subst; intuition; eauto with qcert.
     Qed.
     
     Lemma NoDup_perm' {A:Type} {a b:list A} : NoDup a -> Permutation a b -> NoDup b.
@@ -1703,7 +1700,7 @@ Section ListAdd.
       revert nd.
       revert a b p.
       apply (Permutation_ind_bis (fun l l' => NoDup l -> NoDup l')); intuition.
-      - inversion H1; subst. constructor; eauto.
+      - inversion H1; subst. constructor; eauto with qcert.
       - inversion H1; subst. inversion H5; subst.
         rewrite H in H4,H6.
         constructor; [|constructor]; simpl in *; intuition; subst; eauto.
@@ -1712,8 +1709,8 @@ Section ListAdd.
     Global Instance NoDup_perm {A:Type} :
       Proper (@Permutation A ==> iff) (@NoDup A).
     Proof.
-      Hint Resolve NoDup_perm' Permutation_sym.
-      unfold Proper, respectful; intros; subst; intuition; eauto.
+      Hint Resolve NoDup_perm' Permutation_sym : qcert.
+      unfold Proper, respectful; intros; subst; intuition; eauto with qcert.
     Qed.
 
     Lemma NoDup_Permutation' {A : Type} (l l' : list A) :
@@ -1738,12 +1735,12 @@ Section ListAdd.
         inversion H; subst; auto.
     Qed.
     
-    Hint Resolve NoDup_app_inv.
+    Hint Resolve NoDup_app_inv : qcert.
 
     Lemma NoDup_app_inv2 {A:Type} {a b:list A} : NoDup (a++b) -> NoDup b.
     Proof.
       rewrite Permutation_app_comm.
-      eauto.
+      eauto with qcert.
     Qed.
 
     Lemma NoDup_dec {A:Type} {dec:EqDec A eq} (l:list A): {NoDup l} + {~NoDup l}.
@@ -1903,7 +1900,7 @@ Section ListAdd.
       red; inversion 2.
     Qed.
 
-    Hint Immediate disjoint_nil_l disjoint_nil_r.
+    Hint Immediate disjoint_nil_l disjoint_nil_r : qcert.
 
     Lemma disjoint_incl {A:Type} (l1 l2 l3:list A) :
       incl l3 l2 ->
@@ -2069,7 +2066,7 @@ Section ListAdd.
       revert init.
       induction bound; simpl; intuition.
       specialize (IHbound (S init) x H0).
-      omega.
+      lia.
     Qed.
     
     Lemma seq_NoDup init bound :
@@ -2081,7 +2078,7 @@ Section ListAdd.
       - econstructor; eauto.
         intro inn.
         apply seq_ge in inn.
-        omega.
+        lia.
     Qed.
 
     Lemma seq_plus a b c : seq a (b+c) = seq a b ++ seq (a+b) c.
@@ -2101,8 +2098,7 @@ Section ListAdd.
       x = y.
     Proof.
       intros nlt eq1 eq2.
-      assert (n2eq:n2 = n1 + (n2 - n1))
-        by (rewrite le_plus_minus_r; auto with arith).
+      assert (n2eq:n2 = n1 + (n2 - n1)) by lia.
       rewrite n2eq in eq2.
       rewrite seq_plus, find_app, eq1 in eq2.
       congruence.
@@ -2282,6 +2278,7 @@ Section ListAdd.
 
 End ListAdd.
 
-Hint Resolve disjoint_nil_l disjoint_nil_r.
+Hint Resolve disjoint_nil_l disjoint_nil_r : qcert.
+Hint Immediate NoDup_nil : qcert.
 
 Global Arguments remove_nin_inv {A eqdec v1 v2 l}.

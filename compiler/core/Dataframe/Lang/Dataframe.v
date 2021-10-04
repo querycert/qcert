@@ -367,7 +367,7 @@ Section Dataframe.
                 trivial.
             }
             rewrite dxdl; clear dxdl.
-            eauto.
+            qeauto.
       - apply some_lift in de.
         destruct de as [dl' de ?]; subst.
         specialize (IHds _ de).

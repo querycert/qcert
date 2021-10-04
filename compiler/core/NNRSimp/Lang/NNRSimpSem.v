@@ -76,7 +76,7 @@ Section NNRSimpSem.
         [ σ ⊢ NNRSimpGroupBy g sl e ⇓ (dcoll d₂) ]
 
     where
-    "[ σ ⊢ e ⇓ d ]" := (nnrs_imp_expr_sem σ e d) : nnrs_imp
+    "[ σ ⊢ e ⇓ d ]" := (nnrs_imp_expr_sem σ e d) : nnrs_imp_scope
     .
 
     Reserved Notation  "[ s₁ , σ₁ ⇓ σ₂  ]".
@@ -138,19 +138,19 @@ Section NNRSimpSem.
              [ s, σ₂ ⇓[v<-dl] σ₃ ] ->
              [ s, σ₁ ⇓[v<-d::dl] σ₃ ]
     where
-    "[ s , σ₁  ⇓ σ₂ ]" := (nnrs_imp_stmt_sem s σ₁ σ₂) : nnrs_imp
-                                                         and "[ s , σ₁ ⇓[ v <- dl ] σ₂  ]" := (nnrs_imp_stmt_sem_iter v dl s σ₁ σ₂ ) : nnrs_imp.
+    "[ s , σ₁  ⇓ σ₂ ]" := (nnrs_imp_stmt_sem s σ₁ σ₂) : nnrs_imp_scope
+                                                         and "[ s , σ₁ ⇓[ v <- dl ] σ₂  ]" := (nnrs_imp_stmt_sem_iter v dl s σ₁ σ₂ ) : nnrs_imp_scope.
 
-    Notation "[ s , σ₁ ⇓ σ₂ ]" := (nnrs_imp_stmt_sem s σ₁ σ₂ ) : nnrs_imp.
-    Notation "[ s , σ₁ ⇓[ v <- dl ] σ₂  ]" := (nnrs_imp_stmt_sem_iter v dl s σ₁ σ₂) : nnrs_imp.
+    Notation "[ s , σ₁ ⇓ σ₂ ]" := (nnrs_imp_stmt_sem s σ₁ σ₂ ) : nnrs_imp_scope.
+    Notation "[ s , σ₁ ⇓[ v <- dl ] σ₂  ]" := (nnrs_imp_stmt_sem_iter v dl s σ₁ σ₂) : nnrs_imp_scope.
 
   End Denotation.
 
   Reserved Notation "[ σc ⊢ q ⇓ d  ]".
 
-  Notation "[ σc ; σ ⊢ e ⇓ d ]" := (nnrs_imp_expr_sem σc σ e d) : nnrs_imp.
-  Notation "[ σc ⊢ s , σ₁ ⇓ σ₂ ]" := (nnrs_imp_stmt_sem σc s σ₁ σ₂ ) : nnrs_imp.
-  Notation "[ σc ⊢ s , σ₁ ⇓[ v <- dl ] σ₂ ]" := (nnrs_imp_stmt_sem_iter σc v dl s σ₁ σ₂) : nnrs_imp.
+  Notation "[ σc ; σ ⊢ e ⇓ d ]" := (nnrs_imp_expr_sem σc σ e d) : nnrs_imp_scope.
+  Notation "[ σc ⊢ s , σ₁ ⇓ σ₂ ]" := (nnrs_imp_stmt_sem σc s σ₁ σ₂ ) : nnrs_imp_scope.
+  Notation "[ σc ⊢ s , σ₁ ⇓[ v <- dl ] σ₂ ]" := (nnrs_imp_stmt_sem_iter σc v dl s σ₁ σ₂) : nnrs_imp_scope.
 
   Inductive nnrs_imp_sem : bindings -> nnrs_imp -> option data -> Prop
     :=
@@ -158,18 +158,18 @@ Section NNRSimpSem.
         [ σc ⊢ (fst q), ((snd q),None)::nil ⇓ ((snd q), o)::nil ] ->
         [ σc ⊢ q ⇓ o  ]
   where
-  "[ σc ⊢ q ⇓ o  ]" := (nnrs_imp_sem σc q o ) : nnrs_imp.
+  "[ σc ⊢ q ⇓ o  ]" := (nnrs_imp_sem σc q o ) : nnrs_imp_scope.
 
   Definition nnrs_imp_sem_top (σc:bindings) (q:nnrs_imp) (d:data) : Prop
     := [ (rec_sort σc) ⊢ q ⇓ Some d  ].
 
-  Notation "[ σc ⊢ q ⇓ d  ]" := (nnrs_imp_sem σc q d ) : nnrs_imp.
+  Notation "[ σc ⊢ q ⇓ d  ]" := (nnrs_imp_sem σc q d ) : nnrs_imp_scope.
 
   Section Core.
     Program Definition nnrs_imp_core_sem σc (q:nnrs_imp_core) (d:option data) : Prop
       := nnrs_imp_sem σc q d.
 
-    Notation "[ σc ⊢ q ⇓ᶜ d  ]" := (nnrs_imp_core_sem σc q d ) : nnrs_imp.
+    Notation "[ σc ⊢ q ⇓ᶜ d  ]" := (nnrs_imp_core_sem σc q d ) : nnrs_imp_scope.
 
     Definition nnrs_imp_core_sem_top (σc:bindings) (q:nnrs_imp_core) (d:data) : Prop
       := [ (rec_sort σc) ⊢ q ⇓ᶜ Some d  ].
@@ -234,12 +234,12 @@ Section NNRSimpSem.
 
 End NNRSimpSem.
 
-Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrs_imp_expr_sem h σc σ e d) : nnrs_imp.
-Notation "[ h , σc ⊢ s , σ₁ ⇓ σ₂ ]" := (nnrs_imp_stmt_sem h σc s σ₁ σ₂ ) : nnrs_imp.
-Notation "[ h , σc ⊢ s , σ₁ ⇓[ v <- dl ] σ₂ ]" := (nnrs_imp_stmt_sem_iter h σc v dl s σ₁ σ₂) : nnrs_imp.
-Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrs_imp_sem h σc q d ) : nnrs_imp.
+Notation "[ h , σc ; σ ⊢ e ⇓ d ]" := (nnrs_imp_expr_sem h σc σ e d) : nnrs_imp_scope.
+Notation "[ h , σc ⊢ s , σ₁ ⇓ σ₂ ]" := (nnrs_imp_stmt_sem h σc s σ₁ σ₂ ) : nnrs_imp_scope.
+Notation "[ h , σc ⊢ s , σ₁ ⇓[ v <- dl ] σ₂ ]" := (nnrs_imp_stmt_sem_iter h σc v dl s σ₁ σ₂) : nnrs_imp_scope.
+Notation "[ h , σc ⊢ q ⇓ d  ]" := (nnrs_imp_sem h σc q d ) : nnrs_imp_scope.
 
-Notation "[ h , σc ⊢ q ⇓ᶜ d  ]" := (nnrs_imp_core_sem h σc q d ) : nnrs_imp.
+Notation "[ h , σc ⊢ q ⇓ᶜ d  ]" := (nnrs_imp_core_sem h σc q d ) : nnrs_imp_scope.
 
 Arguments nnrs_imp_stmt_sem_env_stack {fruntime h σc s σ₁ σ₂}.
 Arguments nnrs_imp_stmt_sem_env_cons_same {fruntime h σc s v₁ od₁ σ₁ v₂ od₂ σ₂}.

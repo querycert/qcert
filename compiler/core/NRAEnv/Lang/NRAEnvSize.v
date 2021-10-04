@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-Require Import Omega.
+Require Import Lia.
 Require Import DataRuntime.
 Require Import NRAEnv.
 
@@ -49,7 +49,7 @@ Section NRAEnvSize.
 
   Lemma nraenv_size_nzero (a:nraenv) : nraenv_size a <> 0.
   Proof.
-    induction a; simpl; omega.
+    induction a; simpl; lia.
   Qed.
   
   Fixpoint nraenv_depth (a:nraenv) : nat :=

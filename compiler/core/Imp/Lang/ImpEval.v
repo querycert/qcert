@@ -24,9 +24,9 @@ Section ImpEval.
   Import ListNotations.
 
   Context {Model: Type}.
-  Context {Constant: Type}.
-  Context {Op: Type}.
-  Context {Runtime: Type}.
+  Context {Constant: Set}.
+  Context {Op: Set}.
+  Context {Runtime: Set}.
 
   Context {ConstantNormalize: Constant -> Model}.
   Context {ModelToBool: Model -> option bool}.

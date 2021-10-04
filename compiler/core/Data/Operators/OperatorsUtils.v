@@ -45,7 +45,7 @@ Section OperatorsUtils.
   Lemma Zquot_zero n :
     Z.quot n 0%Z = 0%Z.
   Proof.
-    apply Zquot.Zquot_0_r.
+    now apply Z.quot_0_r_ext.
   Qed.
     
   Definition darithmean_alt (ns:list data) : option Z

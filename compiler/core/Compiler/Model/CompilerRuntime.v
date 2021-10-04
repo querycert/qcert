@@ -35,28 +35,26 @@ Require Import DNNRC.
 Require Import tDNNRC.
 Require Import NNRSimp.
 
-Set Typeclasses Axioms Are Instances.
-
 Module Type CompilerRuntime.
-  Axiom compiler_foreign_type : foreign_type.
-  Axiom compiler_foreign_runtime : foreign_runtime.
-  Axiom compiler_foreign_ejson : foreign_ejson.
-  Axiom compiler_foreign_to_ejson : foreign_to_ejson.
-  Axiom compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
-  Axiom compiler_foreign_to_json : foreign_to_json.
-  Axiom compiler_foreign_to_java : foreign_to_java.
-  Axiom compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
-  Axiom compiler_foreign_to_scala : foreign_to_scala.
-  Axiom compiler_foreign_type_to_JSON : foreign_type_to_JSON.
-  Axiom compiler_foreign_reduce_op : foreign_reduce_op.
-  Axiom compiler_foreign_to_reduce_op : foreign_to_reduce_op.
-  Axiom compiler_foreign_to_spark : foreign_to_spark.
-  Axiom compiler_nraenv_optimizer_logger : optimizer_logger string nraenv.
-  Axiom compiler_nnrc_optimizer_logger : optimizer_logger string nnrc.
-  Axiom compiler_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
-  Axiom compiler_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
-  Axiom compiler_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
-  Axiom compiler_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
-  Axiom compiler_foreign_data_typing : foreign_data_typing.
+  Declare Instance compiler_foreign_type : foreign_type.
+  Declare Instance compiler_foreign_runtime : foreign_runtime.
+  Declare Instance compiler_foreign_ejson : foreign_ejson.
+  Declare Instance compiler_foreign_to_ejson : foreign_to_ejson.
+  Declare Instance compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
+  Declare Instance compiler_foreign_to_json : foreign_to_json.
+  Declare Instance compiler_foreign_to_java : foreign_to_java.
+  Declare Instance compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
+  Declare Instance compiler_foreign_to_scala : foreign_to_scala.
+  Declare Instance compiler_foreign_type_to_JSON : foreign_type_to_JSON.
+  Declare Instance compiler_foreign_reduce_op : foreign_reduce_op.
+  Declare Instance compiler_foreign_to_reduce_op : foreign_to_reduce_op.
+  Declare Instance compiler_foreign_to_spark : foreign_to_spark.
+  Declare Instance compiler_nraenv_optimizer_logger : optimizer_logger string nraenv.
+  Declare Instance compiler_nnrc_optimizer_logger : optimizer_logger string nnrc.
+  Declare Instance compiler_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
+  Declare Instance compiler_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
+  Declare Instance compiler_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
+  Declare Instance compiler_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
+  Declare Instance compiler_foreign_data_typing : foreign_data_typing.
 End CompilerRuntime.
 

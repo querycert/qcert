@@ -37,7 +37,7 @@ Section TCAMP.
   (** Typing for CAMP *)
 
   Context {m:basic_model}.
-  Hint Resolve bindings_type_has_type.
+  Hint Resolve bindings_type_has_type : qcert.
 
   Reserved Notation "Γ  |= p ; a ~> b" (at level 90).
 
@@ -105,7 +105,7 @@ Section TCAMP.
     apply Forall2_nil.
   Qed.
 
-  Hint Resolve data_type_drec_nil.
+  Hint Resolve data_type_drec_nil : qcert.
 
   Lemma concat_bindings_type {env₁ env₂ Γ₁ Γ₂} :
     bindings_type env₁ Γ₁ ->
@@ -225,22 +225,11 @@ Section TCAMP.
           inversion H0; subst; rtype_equalizer.
           subst. constructor. constructor; eauto.
         * discriminate.
-    (* pgroupBy *)
-    (* 
-    - inversion tdat; subst.
-      rtype_equalizer. subst.
-      induction dl; simpl.
-      + left; econstructor; split; eauto. econstructor; eauto.
-      + inversion H2; subst.
-        specialize (IHdl (dtcoll _ _ H4) H4).
-        destruct (IHp _ _ _ _ _ tenv H1 H3) as [[dout[camp_evaleq tx]]|[s camp_evaleq]].
-        addddmit.
-        addddmit. *)
     (* passert *)
     - destruct (IHp _ _ _ _ _ tenv H1 tdat) as [[dout[camp_evaleq tx]]|camp_evaleq];
         rewrite camp_evaleq; simpl; [|eauto].
       inversion tx; subst.
-      destruct b; simpl; eauto.
+      destruct b; simpl; qeauto.
     (* porElse *)
     - destruct (IHp1 _ _ _ _ _ tenv H2 tdat) as [[dout1[camp_evaleq1 tx1]]|camp_evaleq1];
         rewrite camp_evaleq1; simpl; [|eauto].
@@ -264,7 +253,7 @@ Section TCAMP.
       rewrite eqq1.
       eauto.
     (* penv *)
-    - eauto.
+    - qeauto.
     (* pletEnv *)
     - destruct (IHp1 _ _ _ _ _ tenv H1 tdat) as [[dout1[camp_evaleq1 tx1]]|camp_evaleq1];
         rewrite camp_evaleq1; simpl; [|eauto].
@@ -285,7 +274,7 @@ Section TCAMP.
       + subst; eauto.
   Qed.
 
-  Hint Constructors camp_type.
+  Hint Constructors camp_type : qcert.
 
   (** Additional lemma used in the correctness for typed translation from NNRC to CAMP *)
   Lemma camp_type_tenv_rec {τc Γ p τ₁ τ₂} :
@@ -295,9 +284,9 @@ Section TCAMP.
   Proof.
     simpl.
     intros nod tdev.
-    dependent induction tdev; simpl; eauto.
+    dependent induction tdev; simpl; qeauto.
     - rewrite <- (Rec_rewrite Closed (rec_sort_is_sorted Γ) pf (@sort_sorted_is_id string ODT_string _ Γ pf)).
-      eauto.
+      qeauto.
     - econstructor; eauto.
       unfold merge_bindings in *.      
       case_eq (Compat.compatible Γ Γ'); 
@@ -305,7 +294,7 @@ Section TCAMP.
       inversion H; subst.
       assert (perm:Permutation Γ (rec_sort Γ)) 
         by (apply rec_sort_perm; auto).
-      apply (compatible_perm_proper_l _ _ _ perm) in comp; eauto 2.
+      apply (compatible_perm_proper_l _ _ _ perm) in comp; eauto 2 with qcert.
       rewrite comp.
       f_equal.
       unfold rec_concat_sort.
@@ -317,7 +306,7 @@ Section TCAMP.
     [τc & Γ] |= p; τ₁ ~> τ₂.
   Proof.
     revert τc Γ τ₁ τ₂.
-    induction p; simpl; inversion 1; rtype_equalizer; subst; eauto.
+    induction p; simpl; inversion 1; rtype_equalizer; subst; qeauto.
     unfold tdot, edot in *.
     rewrite (assoc_lookupr_drec_sort (odt:=ODT_string)) in H2.
     econstructor. apply H2.
@@ -328,7 +317,7 @@ Section TCAMP.
     [rec_sort τc & Γ] |= p; τ₁ ~> τ₂.
   Proof.
     revert τc Γ τ₁ τ₂.
-    induction p; simpl; inversion 1; rtype_equalizer; subst; eauto.
+    induction p; simpl; inversion 1; rtype_equalizer; subst; qeauto.
     econstructor.
     unfold tdot, edot.
     rewrite (assoc_lookupr_drec_sort (odt:=ODT_string)).

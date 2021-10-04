@@ -511,7 +511,7 @@ Lemma data_type_Rec_domain {r k l pf} :
 Proof.
   revert l pf. induction r; inversion 1; rtype_equalizer; subst;
                inversion H5; subst; clear H5.
-  - apply sublist_nil_r in H3; subst; simpl; auto.
+  - apply sublist_nil_r in H3; subst; simpl; qauto.
   - simpl. intuition.
     rewrite H0.
     apply sublist_domain in H3.
@@ -845,7 +845,8 @@ Qed.
   Proof.
     apply dttop.
   Qed.
-  Hint Resolve dttop dttop'.
+  
+  Hint Resolve dttop dttop' : qcert.
 
   Lemma Forall_map {A B} P (f:A->B) l :
     Forall P (map f l) <-> Forall (fun x => P (f x)) l.
@@ -859,10 +860,10 @@ Qed.
   Lemma data_type_normalized d τ :
     d ▹ τ -> data_normalized brand_relation_brands d.
   Proof.
-    Hint Constructors data_normalized.
+    Hint Constructors data_normalized : qcert.
     revert τ.
     induction d using dataInd2; intros; try assumption; simpl in *;
-    auto 2.
+    auto 2 with qcert.
     - constructor. inversion H0; subst.
       + inversion H1; trivial.
       + revert H2; apply Forall_impl_in.
@@ -879,13 +880,13 @@ Qed.
       + apply sorted_forall_same_domain in H4.
         rewrite H4.
         trivial.
-    - inversion H; subst; trivial; eauto.
-    - inversion H; subst; trivial; eauto.
-    - inversion H; subst; trivial; constructor; eauto.
+    - inversion H; subst; trivial; qeauto.
+    - inversion H; subst; trivial; qeauto.
+    - inversion H; subst; trivial; constructor; qeauto.
     - invcs H.
       + eauto.
       + constructor.
-        eapply foreign_data_typing_normalized; eauto.
+        eapply foreign_data_typing_normalized; qeauto.
   Qed.
 
   (** Lemma showing that normalization preserves typing *)
@@ -900,7 +901,7 @@ Qed.
   Lemma dttop_weaken {d τ} : data_type d τ -> data_type d ⊤.
   Proof.
     intros H; apply data_type_normalized in H.
-    auto 2.
+    auto 2 with qcert.
   Qed.
 
 End TData.
@@ -989,8 +990,8 @@ Ltac dtype_enrich :=
       extend (dcoll_coll_in_inv H H2)
   end.
 
-Hint Immediate dttop dttop'.
-Hint Resolve dttop_weaken.
+Hint Immediate dttop dttop' : qcert.
+Hint Resolve dttop_weaken : qcert.
 
 Section subtype.
 
@@ -1084,20 +1085,20 @@ Global Instance data_type_subtype_prop
   Proof.
     unfold Proper, respectful, impl, flip.
     intros ? d ? τ₁ τ₂ sub ; subst.
-    Hint Resolve data_type_ext.
-    Hint Resolve data_type_not_bottom.
-    Hint Resolve dtrec_closed_is_open.
-    Hint Constructors data_normalized.
+    Hint Resolve data_type_ext : qcert.
+    Hint Resolve data_type_not_bottom : qcert.
+    Hint Resolve dtrec_closed_is_open : qcert.
+    Hint Constructors data_normalized : qcert.
     
     revert d τ₂ sub.
       induction τ₁ using rtype_rect;
         induction τ₂ using rtype_rect; simpl;
         try autorewrite with rtype_join;
         try solve[inversion 1; subst; intros; 
-                  try solve [intros; dtype_inverter; eauto 2
-                            | eelim data_type_not_bottom; eauto
+                  try solve [intros; dtype_inverter; eauto 2 with qcert
+                            | eelim data_type_not_bottom; qeauto
                             | unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec in *;
-                              eauto 2; try r_ext]].
+                              eauto 2 with qcert; try r_ext]].
     - clear IHτ₂. intros.
       inversion H; rtype_equalizer.
       subst.
@@ -1218,20 +1219,20 @@ Global Instance data_type_subtype_prop
           {m:brand_model} {d τ₁ τ₂}:
     d ▹ τ₁ -> d ▹ τ₂ -> d ▹ (τ₁ ⊓ τ₂).
   Proof.
-    Hint Resolve data_type_ext.
-    Hint Resolve data_type_not_bottom.
-    Hint Resolve dtrec_closed_is_open.
-    Hint Constructors data_normalized.
+    Hint Resolve data_type_ext : qcert.
+    Hint Resolve data_type_not_bottom : qcert.
+    Hint Resolve dtrec_closed_is_open : qcert.
+    Hint Constructors data_normalized : qcert.
     
     revert d τ₂.
       induction τ₁ using rtype_rect;
         induction τ₂ using rtype_rect; simpl;
         try autorewrite with rtype_meet;
         try solve[inversion 1; subst; intros; 
-                  try solve [intros; dtype_inverter_with_either; try discriminate; eauto 2
-                            | eelim data_type_not_bottom; eauto
+                  try solve [intros; dtype_inverter_with_either; try discriminate; eauto 2 with qcert
+                            | eelim data_type_not_bottom; qeauto
                             | unfold Top, Bottom, Unit, Nat, Float, Bool, String, Coll, Rec in *;
-                              eauto 2; try r_ext]].
+                              eauto 2 with qcert; try r_ext]].
     - intros; dtype_inverter.
       inversion H; clear H; subst.
       inversion H0; clear H0; subst.
@@ -1426,9 +1427,9 @@ Global Instance data_type_subtype_prop
                 apply sublist_domain in H9.
                 eapply is_list_sorted_sublist; try eapply H9; eauto.
             + rewrite domain_app, map_rtype_meet_domain.
-              apply NoDup_app; eauto 2.
+              apply NoDup_app; eauto 2 with qcert.
               * symmetry; apply lookup_diff_disjoint.
-              * apply NoDup_lookup_diff; eauto.
+              * apply NoDup_lookup_diff; qeauto.
           - intros.
             destruct k; destruct k0; simpl in H0.
             + discriminate.
@@ -1509,15 +1510,15 @@ Global Instance data_type_subtype_prop
                 d ▹ τ
            ) b).
   Proof.
-    Hint Resolve data_type_normalized.
+    Hint Resolve data_type_normalized : qcert.
     rewrite brands_type_alt.
-    induction b; simpl; [ intuition; eauto | ].
+    induction b; simpl; [ intuition; qeauto | ].
     destruct IHb as [IHb1 IHb2].
     case_eq ( lookup string_dec brand_context_types a); intros; simpl.
     - generalize (meet_data_type_iff d r (fold_right rtype_meet ⊤ (brands_type_list b))); simpl; intros eqq.
       rewrite eqq; clear eqq.
       { split; intros [dt dtf].
-        - split; [eauto | ].
+        - split; [qeauto | ].
           constructor.
           + rewrite H. intro; inversion 1; subst; trivial.
           + apply IHb1; trivial.
@@ -1526,7 +1527,7 @@ Global Instance data_type_subtype_prop
           apply IHb2; split; trivial.
       }
     - { split; [intros dt | intros [dt dtf]].
-        - split; [ eauto | ].
+        - split; [ qeauto | ].
           constructor.
           + rewrite H; intros; discriminate.
           + apply IHb1; trivial.
@@ -1596,5 +1597,4 @@ Global Instance data_type_subtype_prop
 *)
 End subtype.
 
-Hint Resolve data_type_normalized. 
-
+Hint Resolve data_type_normalized : qcert. 

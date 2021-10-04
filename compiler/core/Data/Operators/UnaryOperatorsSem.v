@@ -285,17 +285,17 @@ Section UnaryOperatorsSem.
     repeat constructor; trivial.
   Qed.
 
+  Hint Constructors data_normalized Forall : qcert.
+  Hint Resolve dnnone dnsome : qcert.
+  
   Lemma unary_op_eval_normalized {u d o} :
     unary_op_eval u d = Some o ->
     data_normalized h d ->
     data_normalized h o.
   Proof.
-    Hint Constructors data_normalized Forall.
-    Hint Resolve dnnone dnsome.
-
     unary_op_cases (destruct u) Case; simpl;
-    try solve [inversion 1; subst; eauto 3
-              | destruct d; inversion 1; subst; eauto 3].
+    try solve [inversion 1; subst; eauto 3 with qcert
+              | destruct d; inversion 1; subst; eauto 3 with qcert].
     - Case "OpDot"%string.
       destruct d; try discriminate.
       intros. eapply data_normalized_edot; eauto.
@@ -310,9 +310,9 @@ Section UnaryOperatorsSem.
     - Case "OpSingleton"%string.
       destruct d; simpl; try discriminate.
       destruct l.
-      + inversion 1. inversion 1; subst; eauto.
-      + destruct l; inversion 1; subst; eauto 2.
-        rewrite <- data_normalized_dcoll; intros [??]; eauto.
+      + inversion 1. inversion 1; subst; qeauto.
+      + destruct l; inversion 1; subst; eauto 2 with qcert.
+        rewrite <- data_normalized_dcoll; intros [??]; qeauto.
     - Case "OpFlatten"%string.
       destruct d; simpl; try discriminate.
       unfold oflatten.
@@ -340,53 +340,53 @@ Section UnaryOperatorsSem.
       inversion 1; subst; trivial.
     - Case "OpCast"%string.
       destruct d; simpl; try discriminate.
-      match_destr; inversion 1; subst; eauto.
+      match_destr; inversion 1; subst; qeauto.
     - Case "OpNatSum"%string.
       destruct d; simpl; try discriminate.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
-      eauto.
+      qeauto.
     - Case "OpNatMin"%string.
       destruct d; simpl; try discriminate.
       unfold lifted_min.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
-      eauto.
+      qeauto.
     - Case "OpNatMax"%string.
       destruct d; simpl; try discriminate.
       unfold lifted_min.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
-      eauto.
+      qeauto.
     - Case "OpNatMean"%string.
       destruct d; simpl; try discriminate.
       intros.
       apply some_lift in H.
       destruct H as [???]; subst.
-      eauto.
+      qeauto.
     - Case "OpFloatSum"%string.
       destruct d; simpl; try discriminate.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
-      eauto.
+      qeauto.
     - Case "OpFloatMean"%string.
       destruct d; simpl; try discriminate.
       intros.
       apply some_lift in H.
       destruct H as [???]; subst.
-      eauto.
+      qeauto.
     - Case "OpFloatBagMin"%string.
       destruct d; simpl; try discriminate.
       unfold lifted_min.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
-      eauto.
+      qeauto.
     - Case "OpFloatBagMax"%string.
       destruct d; simpl; try discriminate.
       unfold lifted_min.
       intros ll; apply some_lift in ll.
       destruct ll; subst.
-      eauto.
+      qeauto.
     - Case "OpForeignUnary"%string.
       intros eqq dn.
       eapply foreign_operators_unary_normalized in eqq; eauto.

@@ -23,6 +23,9 @@ Require Import NRASystem.
 Require Import cNNRCSystem.
 Require Import NRAtocNNRC.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNRAtocNNRC.
   (** Type preservation for the translation from NRA to NNRC *)
 
@@ -43,7 +46,7 @@ Section TNRAtocNNRC.
     (op ▷ τin >=> τout ⊣ τconstants) ->
     nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout.
   Proof.
-    Hint Constructors nra_type.
+    Hint Constructors nra_type : qcert.
     Opaque fresh_var.
     intros.
     revert vid tenv H.
@@ -153,20 +156,20 @@ Section TNRAtocNNRC.
     nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout ->
     (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
-    Hint Constructors nra_type.
+    Hint Constructors nra_type : qcert.
     intros.
     revert τin τout vid tenv H H0.
     nra_cases (induction op) Case; simpl; intros; inversion H0; subst.
     - Case "NRAGetConstant"%string.
       econstructor. eauto.
     - Case "NRAID"%string.
-      rewrite H in H3; inversion H3; subst. eauto.
+      rewrite H in H3; inversion H3; subst. qeauto.
     - Case "NRAConst"%string.
-      eauto.
+      qeauto.
     - Case "NRABinop"%string.
-      eauto. 
+      qeauto. 
     - Case "NRAUnop"%string.
-      eauto.
+      qeauto.
     - Case "NRAMap"%string.
       econstructor; eauto 2.
       eapply (IHop1 _ _ (fresh_var "tmap$" [vid])
@@ -300,8 +303,8 @@ Section TNRAtocNNRC.
     nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout ->
     (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
-    Hint Resolve tnra_sem_correct tnra_sem_correct_back.
-    intuition; eauto.
+    Hint Resolve tnra_sem_correct tnra_sem_correct_back : qcert.
+    intuition; qeauto.
   Qed.
 
 End TNRAtocNNRC.

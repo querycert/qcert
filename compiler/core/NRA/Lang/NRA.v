@@ -53,6 +53,8 @@ Require Import EquivDec.
 Require Import Utils.
 Require Import DataRuntime.
 
+Declare Scope nra_scope.
+
 Section NRA.
   Context {fruntime:foreign_runtime}.
   
@@ -909,7 +911,7 @@ Notation "h ⊢ Op @ₐ x ⊣ c" := (nra_eval h c Op x) (at level 10). (* \vdash
 Delimit Scope nra_scope with nra.
 
 Notation "'ID'" := (NRAID)  (at level 50) : nra_scope.
-Notation "TABLE⟨ s ⟩" := (NRAGetConstant s) (at level 50) : nra_core_scope.
+Notation "TABLE⟨ s ⟩" := (NRAGetConstant s) (at level 50) : nra_scope.
 Notation "‵‵ c" := (NRAConst (dconst c))  (at level 0) : nra_scope.                           (* ‵ = \backprime *)
 Notation "‵ c" := (NRAConst c)  (at level 0) : nra_scope.                                     (* ‵ = \backprime *)
 Notation "‵{||}" := (NRAConst (dcoll nil))  (at level 0) : nra_scope.                         (* ‵ = \backprime *)
@@ -943,7 +945,7 @@ Notation "σ⟨ p ⟩( r )" := (NRASelect p r) (at level 70) : nra_scope.       
 Notation "r1 ∥ r2" := (NRADefault r1 r2) (right associativity, at level 70): nra_scope.       (* ∥ = \parallel *)
 Notation "r1 ◯ r2" := (NRAApp r1 r2) (right associativity, at level 60): nra_scope.           (* ◯ = \bigcirc *)
 
-Hint Resolve nra_eval_normalized.
+Hint Resolve nra_eval_normalized : qcert.
 
 Tactic Notation "nra_cases" tactic(first) ident(c) :=
   first;

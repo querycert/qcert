@@ -16,7 +16,7 @@ Require Import Orders.
 Require Import Equivalence.
 Require Import EquivDec.
 Require Import Compare_dec.
-Require Import Omega.
+Require Import Lia.
 Require Import String.
 Require Import List.
 Require Import ZArith.

@@ -19,7 +19,7 @@ Require Import Bool.
 Require Import List.
 Require Import String.
 Require Import Sumbool.
-Require Import Omega.
+Require Import Lia.
 Require Import Permutation.
 Require Import Morphisms.
 Require Import Setoid.
@@ -32,6 +32,12 @@ Require Import Zdigits.
 Require Import Znat.
 Require Import Recdef.
 Require Import Compare_dec.
+
+Create HintDb qcert.
+
+Ltac qauto := auto with qcert.
+Ltac qeauto := eauto with qcert.
+Ltac qtrivial := trivial with qcert.
 
 Section CoqLibAdd.
 
@@ -312,7 +318,9 @@ Section CoqLibAdd.
       Forallt_nil : Forallt P nil
     | Forallt_cons : forall (x : A) (l : list A),
         P x -> Forallt P l -> Forallt P (x :: l).
-    
+
+    Hint Constructors Forallt : qcert.
+
     Lemma list_Forallt_eq_dec {A:Type}:
       forall (c l: list A),
         Forallt (fun x : A => forall y : A, {x = y} + {x <> y}) c -> {c = l} + {c <> l}.
@@ -333,19 +341,19 @@ Section CoqLibAdd.
     Lemma forallt_impl {A} {P1 P2:A->Type} {l:list A} :
       Forallt P1 l -> Forallt (fun x => P1 x -> P2 x) l -> Forallt P2 l.
     Proof.
-      Hint Constructors Forallt.
-      induction l; trivial.
+      induction l; trivial with qcert.
       inversion 1; inversion 1; subst.
-      auto.
+      auto with qcert.
     Defined.
 
     Lemma forallt_weaken {A} P : (forall x:A, P x) -> forall l, Forallt P l.
     Proof.
-      Hint Constructors Forallt.
       intros.
-      induction l. apply Forallt_nil.
-      apply Forallt_cons. apply (X a).
-      trivial.
+      induction l.
+      - apply Forallt_nil.
+      - apply Forallt_cons.
+        + apply (X a).
+        + trivial.
     Defined.
 
     Lemma Forallt_inv: forall A P (a:A) l, Forallt P (a :: l) -> P a.
@@ -582,7 +590,7 @@ Section CoqLibAdd.
     Lemma compare_either (n1 n2:nat):
       (n1 <= n2) \/ (n2 <= n1).
     Proof.
-      omega.
+      lia.
     Qed.
     
     Lemma min_one_yields_one:
@@ -602,19 +610,19 @@ Section CoqLibAdd.
       simpl in *.
       rewrite (IHl (f a + 0)); simpl.
       rewrite (IHl (f a + x0)); simpl.
-      omega.
+      lia.
     Qed.
     
     Lemma fold_left_arith_dist2 {A} (x0 n0:nat) (l:list A) (f:A -> nat):
       fold_left (fun (x:nat) (y:A) => n0 * (f y) + x) l x0 =
       n0 * (fold_left (fun (x:nat) (y:A) => (f y) + x) l 0) + x0.
     Proof.
-      revert x0; induction l; simpl; intros; try omega.
+      revert x0; induction l; simpl; intros; try lia.
       rewrite (IHl (n0 * f a + x0)); simpl.
       rewrite (fold_left_arith_dist1 (f a + 0)).
       rewrite mult_plus_distr_l.
       rewrite mult_plus_distr_l.
-      omega.
+      lia.
     Qed.
 
     Lemma fold_left_arith_dist3 {A} (x0 n0:nat) (l:list A) (f:A -> nat):
@@ -622,7 +630,7 @@ Section CoqLibAdd.
       n0 * (fold_left (fun (x:nat) (y:A) => x + (f y)) l 0) + x0.
     Proof.
       generalize 0.
-      revert x0; induction l; simpl; intros; try omega.
+      revert x0; induction l; simpl; intros; try lia.
       assert (f a + n = n + f a) by apply plus_comm.
       rewrite H; clear H.
       rewrite (IHl x0 (n + f a)); reflexivity.

@@ -14,6 +14,7 @@
 
 Require Import String.
 Require Import List.
+Require Import BinInt.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.

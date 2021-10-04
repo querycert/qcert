@@ -14,6 +14,7 @@
 
 Require Import String.
 Require Import List.
+Require Import BinInt.
 Require Import Arith.
 Require Import Bool.
 Require Import Program.
@@ -412,12 +413,13 @@ Section tDNNRCInfer.
   (* Small utility function which gets the final type annotation,
      removes the proof and evaluates it to get the final type result *)
   Definition unwrap_pf_compute {A} n :=
-    Eval vm_compute in
+    (* TODO: this currently causes an Anomaly "Uncaught exception Not_found." *)
+    (* Eval vm_compute in *)
     match @di_typeof A n with
     | Tlocal r => (proj1_sig r)
     | Tdistr r => (proj1_sig r)
     end.
-
+    
   (* A slightly more interesting type with records to test the group by inference *)
   (* Note "partition" is there to check that the concat order in the type inference is right,
      the new "partition" for the group in the example should shadow the one from the input *)

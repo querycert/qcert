@@ -15,6 +15,7 @@
 Require Import String.
 Require Import List.
 Require Import Bool.
+Require Import BinInt.
 Require Import Arith.
 Require Import Utils.
 Require Import EJsonRuntime.
@@ -267,7 +268,7 @@ Section ImpEJsontoJavaScriptAst.
         end.
 
     Definition imp_ejson_table_to_topdecls (cname:string) (q: list imp_ejson) : list topdecl :=
-      classdecl cname (concat (map imp_ejson_to_method q))::nil.
+      classdecl cname (List.concat (map imp_ejson_to_method q))::nil.
 
     Definition imp_ejson_table_to_class (cname:string) (q: imp_ejson) : topdecl :=
       match q with

@@ -49,6 +49,8 @@ Require Import DataRuntime.
 Require Import cNRAEnv.
 Require Import cNRAEnvEq.
 
+Declare Scope nraenv_scope.
+
 Section NRAEnv.
   Context {fruntime:foreign_runtime}.
   

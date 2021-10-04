@@ -28,6 +28,9 @@ Require Import NNRSimpEval.
 Require Import NNRSimpSem.
 Require Import NNRSimpSemEval.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNNRSimp.
 
   (** Typing rules for NNRSimp *)
@@ -110,7 +113,7 @@ Section TNNRSimp.
     apply (Forall2_In_l typ) in inn.
     destruct inn as [[??][?[? dt]]]; simpl in *; subst.
     specialize (dt _ (eq_refl _)).
-    eauto.
+    qeauto.
   Qed.
 
   Lemma pd_bindings_type_cut_down_to {σ Γ} :
@@ -157,10 +160,10 @@ Section TNNRSimp.
         [ Γ ⊢ e ▷ Coll (Rec k τl pf) ] ->
         [ Γ ⊢ NNRSimpGroupBy g sl e ▷ GroupBy_type g sl k τl pf ]
     where
-    "[ Γ ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γ e τ) : nnrs_imp
+    "[ Γ ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γ e τ) : nnrs_imp_scope
     .
 
-    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γ e τ) : nnrs_imp.
+    Notation "[ Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γ e τ) : nnrs_imp_scope.
 
     (* Observation: all the contexts are stacklike in their domain,
        and there is no reason to allow strong updates, since there is a phase
@@ -206,16 +209,16 @@ Section TNNRSimp.
         [  (x₂,τr)::Γ  ⊢ s₂ ]  ->
         [  Γ  ⊢ NNRSimpEither e x₁ s₁ x₂ s₂ ]
     where
-    "[ Γ ⊢ s ]" := (nnrs_imp_stmt_type Γ s) : nnrs_imp
+    "[ Γ ⊢ s ]" := (nnrs_imp_stmt_type Γ s) : nnrs_imp_scope
     .
 
-    Notation "[ Γ ⊢ s ]" := (nnrs_imp_stmt_type Γ s) : nnrs_imp.
+    Notation "[ Γ ⊢ s ]" := (nnrs_imp_stmt_type Γ s) : nnrs_imp_scope.
   End typ.
 
-  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp.
-  Notation "[ Γc ; Γ  ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp.
+  Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp_scope.
+  Notation "[ Γc ; Γ  ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp_scope.
 
-  Hint Immediate type_NNRSimpSkip.
+  Hint Immediate type_NNRSimpSkip : qcert.
   Local Open Scope nnrs_imp.
   
   Definition nnrs_imp_type Γc (si:nnrs_imp) τ
@@ -223,7 +226,7 @@ Section TNNRSimp.
        nnrs_imp_stmt_var_usage s ret <> VarMayBeUsedWithoutAssignment 
        /\ [ Γc ; (ret, τ)::nil  ⊢ s ].
 
-  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_imp_type Γc si τ) : nnrs_imp.
+  Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_imp_type Γc si τ) : nnrs_imp_scope.
 
   Definition nnrs_imp_returns (si:nnrs_imp)
     := nnrs_imp_stmt_var_usage (fst si) (snd si) = VarMustBeAssigned.
@@ -1306,7 +1309,7 @@ Section TNNRSimp.
   End sem.
   
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrs_imp_expr_type_lookup_equiv_prop {m:basic_model} :
+  Global Instance nnrs_imp_expr_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrs_imp_expr_type.
   Proof.
     cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrs_imp_expr_type);
@@ -1324,7 +1327,7 @@ Section TNNRSimp.
   Global Instance nnrs_imp_stmt_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv  ==> eq ==> iff) nnrs_imp_stmt_type.
   Proof.
-    Hint Constructors nnrs_imp_stmt_type.
+    Hint Constructors nnrs_imp_stmt_type : qcert.
     
     cut (Proper (eq ==> lookup_equiv ==> eq ==> impl) nnrs_imp_stmt_type)
     ; unfold Proper, respectful, iff, impl; intros; subst;
@@ -1336,16 +1339,16 @@ Section TNNRSimp.
     rename H2 into typ.
     revert Γ₁ Γ₂ Γeqq typ.
     induction s; simpl; intros Γ₁ Γ₂ Γeqq typ
-    ; trivial
+    ; qtrivial
     ; invcs typ
     ; try solve [
-            econstructor; trivial
-            ; [try solve [rewrite <- Γeqq; eauto] | .. ]
+            econstructor; qtrivial
+            ; [try solve [rewrite <- Γeqq; qeauto] | .. ]
             ; first [eapply IHs | eapply IHs1 | eapply IHs2]
-            ; eauto; unfold lookup_equiv; simpl; intros; match_destr
+            ; qeauto; unfold lookup_equiv; simpl; intros; match_destr
           ].
-    econstructor; eauto
-    ; rewrite <- Γeqq; eauto.
+    - econstructor; eauto
+      ; rewrite <- Γeqq; eauto.
   Qed.
 
   Lemma nnrs_imp_expr_type_lookup_equiv_on {Γc Γ₁ e τ} :
@@ -1376,7 +1379,7 @@ Section TNNRSimp.
     ; intros Γ₁ typ Γ₂ leo
     ; invcs typ.
     - Case "NNRSimpSkip"%string.
-      trivial.
+      qtrivial.
     - Case "NNRSimpSeq"%string.
       apply lookup_equiv_on_dom_app in leo.
       econstructor; intuition eauto.
@@ -1394,7 +1397,7 @@ Section TNNRSimp.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply H0.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
     - Case "NNRSimpLet"%string.
       simpl in leo.
       econstructor; intuition eauto.
@@ -1402,7 +1405,7 @@ Section TNNRSimp.
       unfold lookup_equiv_on in *; simpl; intros.
       match_destr.
       apply leo.
-      apply remove_in_neq; tauto.
+      now apply remove_in_neq.
     - Case "NNRSimpFor"%string.
       apply lookup_equiv_on_dom_app in leo.
       econstructor; intuition eauto.
@@ -1411,7 +1414,7 @@ Section TNNRSimp.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply H0.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
     - Case "NNRSimpIf"%string.
       apply lookup_equiv_on_dom_app in leo.
       destruct leo as [leo1 leo2].
@@ -1430,12 +1433,12 @@ Section TNNRSimp.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply leo2.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
       + eapply IHs2; eauto.
         unfold lookup_equiv_on in *; simpl; intros.
         match_destr.
         apply leo3.
-        apply remove_in_neq; tauto.
+        now apply remove_in_neq.
   Qed.
 
   Lemma nnrs_imp_expr_type_has_free_vars {Γc Γ e τ} :
@@ -1714,6 +1717,6 @@ Section TNNRSimp.
 
 End TNNRSimp.
 
-Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp.
-Notation "[ Γc ; Γ ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp.
-Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_imp_type Γc si τ) : nnrs_imp.
+Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp_scope.
+Notation "[ Γc ; Γ ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp_scope.
+Notation "[ Γc ⊢ si ▷ τ ]" := (nnrs_imp_type Γc si τ) : nnrs_imp_scope.

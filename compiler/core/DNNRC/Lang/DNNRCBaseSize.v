@@ -13,7 +13,7 @@
  *)
 
 Require Import List.
-Require Import Omega.
+Require Import Lia.
 Require Import DataRuntime.
 Require Import DNNRCBase.
 
@@ -43,7 +43,7 @@ Section size.
 
   Lemma dnnrc_base_size_nzero (d:@dnnrc_base _ A plug_type) : dnnrc_base_size d <> 0.
   Proof.
-    induction d; simpl; omega.
+    induction d; simpl; lia.
   Qed.
 
 End size.

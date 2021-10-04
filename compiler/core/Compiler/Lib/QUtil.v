@@ -46,7 +46,7 @@ Module QUtil(runtime:CompilerRuntime).
 
   Section results.
     Definition qerror {fdata:foreign_data} : Set := DataResult.qerror.
-    Definition qresult {fdata:foreign_data} (A:Set) : Set := DataResult.qresult A.
+    Definition qresult {fdata:foreign_data} (A:Set) := DataResult.qresult A.
 
     Definition qsuccess {fdata:foreign_data} (A:Set) : A -> qresult A := DataResult.qsuccess.
     Definition qfailure {fdata:foreign_data} (A:Set) : qerror -> qresult A := DataResult.qfailure.

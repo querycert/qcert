@@ -72,9 +72,9 @@ Section TNNRSimpEq.
              nnrs_imp_eval brand_relation_brands  σc si₁
              = nnrs_imp_eval brand_relation_brands  σc si₂).
 
-  Notation "e1 ⇒ᵉ e2" := (tnnrs_imp_expr_rewrites_to e1 e2) (at level 80) : nnrs_imp.
-  Notation "s1 ⇒ˢ s2" := (tnnrs_imp_stmt_rewrites_to s1 s2) (at level 80) : nnrs_imp.
-  Notation "si1 ⇒ˢⁱ si2" := (tnnrs_imp_rewrites_to si1 si2) (at level 80) : nnrs_imp.
+  Notation "e1 ⇒ᵉ e2" := (tnnrs_imp_expr_rewrites_to e1 e2) (at level 80) : nnrs_imp_scope.
+  Notation "s1 ⇒ˢ s2" := (tnnrs_imp_stmt_rewrites_to s1 s2) (at level 80) : nnrs_imp_scope.
+  Notation "si1 ⇒ˢⁱ si2" := (tnnrs_imp_rewrites_to si1 si2) (at level 80) : nnrs_imp_scope.
 
   (* They are all preorders *)
   Global Instance tnnrs_imp_expr_rewrites_to_pre : PreOrder tnnrs_imp_expr_rewrites_to.
@@ -574,7 +574,7 @@ Section TNNRSimpEq.
 
 End TNNRSimpEq.
 
-Notation "e1 ⇒ᵉ e2" := (tnnrs_imp_expr_rewrites_to e1 e2) (at level 80) : nnrs_imp.
-Notation "s1 ⇒ˢ s2" := (tnnrs_imp_stmt_rewrites_to s1 s2) (at level 80) : nnrs_imp.
-Notation "si1 ⇒ˢⁱ si2" := (tnnrs_imp_rewrites_to si1 si2) (at level 80) : nnrs_imp.
+Notation "e1 ⇒ᵉ e2" := (tnnrs_imp_expr_rewrites_to e1 e2) (at level 80) : nnrs_imp_scope.
+Notation "s1 ⇒ˢ s2" := (tnnrs_imp_stmt_rewrites_to s1 s2) (at level 80) : nnrs_imp_scope.
+Notation "si1 ⇒ˢⁱ si2" := (tnnrs_imp_rewrites_to si1 si2) (at level 80) : nnrs_imp_scope.
 

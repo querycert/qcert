@@ -24,6 +24,9 @@ Require Import cNRAEnv.
 Require Import cNRAEnvEq.
 Require Import NRASystem.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TcNRAEnv.
   Local Open Scope nraenv_core_scope.
   
@@ -568,8 +571,8 @@ Section TcNRAEnv.
 
   (* Evaluation into single value for typed core NRAe *)
 
-  Hint Constructors nra_type unary_op_type binary_op_type.
-  Hint Resolve ATdot ATnra_data.
+  Hint Constructors nra_type unary_op_type binary_op_type : qcert.
+  Hint Resolve ATdot ATnra_data : qcert.
   (** Corrolaries of the main type soudness theorem *)
 
   Definition typed_nraenv_core_total {τc} {τenv τin τout} (op:nraenv_core) (HOpT: op ▷ τin >=> τout ⊣ τc;τenv) c (env:data) (d:data)
@@ -609,35 +612,35 @@ Section TcNRAEnv.
     - unfold nra_bind, nra_context_type.
       econstructor; eauto.
     (* cNRAEnvID *)
-    - eauto.
+    - qeauto.
     (* cNRAEnvConst *)
-    - eauto.
+    - qeauto.
     (* cNRAEnvBinop *)
-    - eauto.
+    - qeauto.
     (* cNRAEnvUnop *)
-    - eauto.
+    - qeauto.
     (* cNRAEnvMap *)
     - apply (@type_NRAMap m τc (nra_context_type τenv τin) (nra_context_type τenv τ₁) τ₂); try assumption.
       eapply ATunnest_two.
-      eapply (type_NRAUnop). eauto.
+      eapply (type_NRAUnop). qeauto.
       unfold nra_wrap_a1, nra_double.
-      eapply type_NRABinop. eauto.
-      eapply (type_NRAUnop). eauto.
-      eapply type_NRAUnop; eauto.
-      eapply type_OpDot. unfold tdot, edot; simpl. auto.
-      eapply (type_NRAUnop). eauto.
+      eapply type_NRABinop. qeauto.
+      eapply (type_NRAUnop). qeauto.
+      eapply type_NRAUnop; qeauto.
+      eapply type_OpDot. unfold tdot, edot; simpl. qauto.
+      eapply (type_NRAUnop). qeauto.
       eauto.
       unfold tdot, edot; auto.
       reflexivity.
       reflexivity.
     (* cNRAEnvMapProduct *)
     - apply (@type_NRAMap m τc (nra_context_type τenv τin) (Rec Closed (("PBIND"%string, τenv) :: ("PDATA"%string, (Rec Closed τ₁ pf1)) :: ("PDATA2"%string, (Rec Closed τ₂ pf2)) :: nil) (eq_refl _))).
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       reflexivity.
-      econstructor; eauto.
-      econstructor; eauto.
+      econstructor; qeauto.
+      econstructor; qeauto.
       reflexivity.
       apply (@type_NRAMapProduct m τc (nra_context_type τenv τin)
                           [("PBIND"%string, τenv); ("PDATA"%string, Rec Closed τ₁ pf1)]
@@ -647,90 +650,90 @@ Section TcNRAEnv.
                           (unnest_two "a1" "PDATA" (NRAUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core op2))))
                           eq_refl eq_refl
             ); try reflexivity.
-      eauto.
+      qeauto.
       unfold nra_wrap_a1.
       apply (ATunnest_two "a1" "PDATA" (NRAUnop OpBag (nra_double "PBIND" "a1" nra_bind (nra_of_nraenv_core op2))) τc (nra_context_type τenv τin) [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
       apply (@type_NRAUnop m τc (nra_context_type τenv τin) (Rec Closed [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)).
       econstructor; eauto.
       unfold nra_double, nra_bind.
       apply (@type_NRABinop m τc (nra_context_type  τenv τin) (Rec Closed [("PBIND"%string, τenv)] eq_refl) (Rec Closed [("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)); try eauto.
-        econstructor; eauto.
+        econstructor; qeauto.
 
-        econstructor; eauto.
-        econstructor; eauto.
+        econstructor; qeauto.
+        econstructor; qeauto.
     (* cNRAEnvProduct *)
-    - eauto.
+    - qeauto.
     (* cNRAEnvSelect *)
     - econstructor; eauto.
       2: { econstructor; eauto.
            eapply ATunnest_two.
-           + econstructor; eauto.
+           + econstructor; qeauto.
              unfold nra_wrap_a1, nra_double.
              eapply type_NRABinop.
              * econstructor; reflexivity.
-             * econstructor; eauto.
-               econstructor; eauto.
+             * econstructor; qeauto.
+               econstructor; qeauto.
                eapply type_OpDot; unfold tdot, edot; simpl; eauto.
-             * econstructor; eauto.
+             * econstructor; qeauto.
            + unfold tdot, edot; simpl; eauto.
            + econstructor; eauto. }
-        * econstructor; eauto.
+        * econstructor; qeauto.
           eapply type_OpDot; unfold tdot, edot; simpl; eauto.
     (* cNRAEnvDefault *)
-    - eauto.
+    - qeauto.
     (* type_cNRAEnvEither *)
     - econstructor.
       + econstructor; try reflexivity.
         * { econstructor.
-            - econstructor; eauto.
-              econstructor; eauto.
+            - econstructor; qeauto.
+              econstructor; qeauto.
               reflexivity.
-            - econstructor; eauto.
+            - econstructor; qeauto.
           }
-        * { econstructor; eauto.
-            - econstructor; eauto.
-              econstructor; eauto.
-              econstructor; eauto.
+        * { econstructor; qeauto.
+            - econstructor; qeauto.
+              econstructor; qeauto.
+              econstructor; qeauto.
             
           } 
-      + econstructor; eauto.
+      + econstructor; qeauto.
     (* cNRAEnvEitherConcat *)
-    - eauto.
+    - qeauto.
     (* cNRAEnvApp *)
     - apply (@type_NRAApp m τc (nra_context_type τenv τin) (nra_context_type τenv τ1) τ2).
       + unfold nra_context, nra_bind, nra_context_type, nra_double; simpl.
         unfold nra_wrap.
         apply (@type_NRABinop m τc (Rec Closed [("PBIND"%string, τenv); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv)::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τ1)::nil) (eq_refl _))).
-        econstructor; eauto.
-        econstructor; eauto.
-        econstructor; eauto.
-        econstructor; eauto.
-        econstructor; eauto.
+        econstructor; qeauto.
+        econstructor; qeauto.
+        econstructor; qeauto.
+        econstructor; qeauto.
+        econstructor; qeauto.
       + trivial.
     (* cNRAEnvEnv *)
-    - unfold nra_bind, nra_context_type. eauto.
+    - unfold nra_bind, nra_context_type. qeauto.
     (* cNRAEnvAppEnv *)
     - apply (@type_NRAApp m τc (nra_context_type τenv τin) (nra_context_type τenv' τin) τ2).
       + unfold nra_context, nra_bind, nra_context_type, nra_double; simpl.
         apply (@type_NRABinop m τc (Rec Closed [("PBIND"%string, τenv); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv')::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τin)::nil) (eq_refl _))).
-        econstructor; eauto.
-        do 3 (econstructor; eauto).
-        do 3 (econstructor; eauto).
+        econstructor; qeauto.
+        do 3 (econstructor; qeauto).
+        do 3 (econstructor; qeauto).
       + trivial.
     (* cNRAEnvMapEnv *)
-    - econstructor; eauto.
+    - econstructor; qeauto.
       eapply ATunnest_two.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         unfold nra_wrap_bind_a1, nra_double.
-        eapply type_NRABinop; eauto.
-        * do 3 (econstructor; eauto).
+        eapply type_NRABinop; qeauto.
+        * do 3 (econstructor; qeauto).
           reflexivity.
       + reflexivity.
       + simpl; trivial.
       Grab Existential Variables.
-      eauto. eauto. eauto. eauto. eauto. 
-      eauto. eauto. eauto. eauto. eauto.
-      eauto. eauto.
+      qeauto. qeauto. qeauto. qeauto. qeauto. 
+      qeauto. qeauto. qeauto. qeauto. qeauto.
+      qeauto. qeauto.
   Qed.
 
   Lemma fold_nra_context_type (env d: {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true}) pf :
@@ -810,26 +813,26 @@ Section TcNRAEnv.
     nra_type τc (nra_of_nraenv_core op) (Rec k [("PBIND"%string, τenv); ("PDATA"%string, τin)] pf) τout ->
     nraenv_core_type τc op τenv τin τout.
   Proof.
-    Hint Constructors nraenv_core_type.
+    Hint Constructors nraenv_core_type : qcert.
     revert k τenv τin τout pf.
     induction op; simpl; intros.
     - inversion H; clear H; subst.
       econstructor; trivial.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
-    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
+    - nra_inverter2; try tdot_inverter; qeauto.
   Qed.
   
   Theorem typed_nraenv_core_to_typed_nra_inv {τc} {τenv τin τout} (op:nraenv_core):
@@ -845,7 +848,7 @@ Section TcNRAEnv.
     nraenv_core_type τc op τenv τin τout.
   Proof.
     revert τc op τenv τin τout.
-    induction op; simpl; inversion 1; rtype_equalizer; subst; eauto.
+    induction op; simpl; inversion 1; rtype_equalizer; subst; qeauto.
     unfold tdot, edot in *.
     rewrite (assoc_lookupr_drec_sort (odt:=ODT_string)) in H1.
     econstructor. apply H1.
@@ -856,7 +859,7 @@ Section TcNRAEnv.
       nraenv_core_type (rec_sort τc) op τenv τin τout.
   Proof.
     revert τc op τenv τin τout.
-    induction op; simpl; inversion 1; rtype_equalizer; subst; eauto.
+    induction op; simpl; inversion 1; rtype_equalizer; subst; qeauto.
     econstructor.
     unfold tdot, edot.
     rewrite (assoc_lookupr_drec_sort (odt:=ODT_string)).
@@ -881,9 +884,9 @@ Notation "Op @▷ d ⊣ C ; e" := (tnraenv_core_eval C Op e d) (at level 70).
 
 (* Used to prove type portion of typed directed rewrites *)
   
-Hint Constructors nraenv_core_type.
-Hint Constructors unary_op_type.
-Hint Constructors binary_op_type.
+Hint Constructors nraenv_core_type : qcert.
+Hint Constructors unary_op_type : qcert.
+Hint Constructors binary_op_type : qcert.
 
 Ltac nraenv_core_inverter := 
   match goal with
@@ -943,7 +946,7 @@ Ltac nraenv_core_inverter :=
   end; try rtype_equalizer; try assumption; try subst; simpl in *; try nraenv_core_inverter.
 
 (* inverts, then tries and solve *)
-Ltac nraenv_core_inferer := try nraenv_core_inverter; subst; try eauto.
+Ltac nraenv_core_inferer := try nraenv_core_inverter; subst; try qeauto.
 
 (* simplifies when a goal evaluates an expression over well-typed data *)
 

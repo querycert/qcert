@@ -12,6 +12,7 @@
  * limitations under the License.
  *)
 
+Require Import BinNums.
 Require Import List.
 Require Import String.
 Require Import ListSet.
@@ -33,14 +34,14 @@ Section ROptimEnv.
 
   (* Pulls equivalences from core algebra *)
 
-  Hint Resolve dnrec_sort_content.
+  Hint Resolve dnrec_sort_content : qcert.
   Lemma pull_nra_opt (p1 p2:nraenv_core) :
     (nra_of_nraenv_core p1) ≡ₐ (nra_of_nraenv_core p2) ->
     p1 ≡ₑ p2.
   Proof.
     unfold nra_eq, nraenv_core_eq; intros.
     repeat rewrite unfold_env_nra_sort.
-    rewrite H; eauto.
+    rewrite H; qeauto.
   Qed.
 
   (* P1 ∧ P2 ≡ P2 ∧ P1 *)
@@ -127,7 +128,7 @@ Section ROptimEnv.
 
   (* nth 0 { P } ) ⇒ₓ left P *)
   Lemma envnth0_bag (p: nraenv_core) :
-    cNRAEnvBinop OpBagNth (‵{| p |}) ‵ (dnat 0) ≡ₑ
+    cNRAEnvBinop OpBagNth (‵{| p |}) ‵ (dnat Z0) ≡ₑ
     cNRAEnvUnop OpLeft p.
   Proof.
     unfold nraenv_core_eq; intros ? ? _ ? _ ? _; simpl.

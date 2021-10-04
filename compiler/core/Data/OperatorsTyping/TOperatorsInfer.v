@@ -204,10 +204,10 @@ Section TOperatorsInfer.
       infer_binary_op_type b τ₁ τ₂ = Some τout ->
       binary_op_type b τ₁ τ₂ τout.
     Proof.
-      Hint Constructors binary_op_type.
-      Hint Resolve infer_concat_trec infer_merge_tmerge.
+      Hint Constructors binary_op_type : qcert.
+      Hint Resolve infer_concat_trec infer_merge_tmerge : qcert.
       binary_op_cases (case_eq b) Case; intros; simpl in *; destructer;
-        try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
+        try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3 with qcert.
       - constructor; apply foreign_operators_typing_binary_infer_correct;
         apply H0.
     Qed.
@@ -428,12 +428,12 @@ Section TOperatorsInfer.
       is_list_sorted ODT_lt_dec (domain l) = true ->
       is_list_sorted ODT_lt_dec (domain (rremove l s)) = true.
     Proof.
-      Hint Resolve Forall_rremove.
+      Hint Resolve Forall_rremove : qcert.
       repeat rewrite sorted_StronglySorted by apply StringOrder.lt_strorder.
       induction l; simpl; try constructor.
       inversion 1; subst.
       destruct (string_dec s (fst a)); simpl; auto.
-      constructor; auto.
+      constructor; qauto.
     Qed.
 
     Lemma infer_dot_tunrec {s} {τ₁ τout} :
@@ -493,12 +493,11 @@ Section TOperatorsInfer.
       infer_unary_op_type u τ₁ = Some τout ->
       unary_op_type u τ₁ τout.
     Proof.
-      Hint Constructors unary_op_type.
+      Hint Constructors unary_op_type : qcert.
       Hint Resolve infer_dot_tunrec infer_recremove_tunrec infer_recproject_tunrec
-           infer_orderby_tunrec infer_singleton_tsingleton.
+           infer_orderby_tunrec infer_singleton_tsingleton : qcert.
       unary_op_cases (case_eq u) Case; intros; simpl in *; destructer; unfold olift in *; try autorewrite with type_canon in *; destructer;
-        try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
-      - constructor.
+        try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3 with qcert.
       - constructor; apply foreign_operators_typing_unary_infer_correct;
         apply H0.
     Qed.

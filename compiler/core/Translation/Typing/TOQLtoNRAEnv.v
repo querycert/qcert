@@ -15,7 +15,7 @@
 Require Import String.
 Require Import List.
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
@@ -32,20 +32,20 @@ Section TOQLtoNRAEnv.
       nraenv_type τconstant (oql_to_nraenv_expr (domain τdefls) e) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
     Proof.
       unfold nraenv_type; simpl.
-      Hint Constructors nraenv_core_type.
+      Hint Constructors nraenv_core_type : qcert.
       revert τconstant τdefls pfd τenv pfe τout.
-      induction e; simpl; intros τconstant τdefls pfd τenv pfe τout ot; invcs ot; eauto 4.
+      induction e; simpl; intros τconstant τdefls pfd τenv pfe τout ot; invcs ot; eauto 4 with qcert.
       - unfold lookup_table.
           unfold tdot, edot, rec_concat_sort in *.
           rewrite assoc_lookupr_drec_sort in H1.
           rewrite (assoc_lookupr_app τconstant τdefls _ ODT_eqdec) in H1.
         match_destr; simpl; intros.
-        + econstructor; [ | eauto].
+        + econstructor; [ | qeauto].
           apply in_dom_lookupr with (dec:=ODT_eqdec) in i.
           destruct i as [? ?].
           match_case_in H1; [intros ? eqq | intros eqq]; rewrite eqq in H1.
           * invcs H1.
-            eauto.
+            qeauto.
           * congruence.
         + constructor.
           apply assoc_lookupr_nin_none with (dec:=ODT_eqdec) in n.
@@ -57,25 +57,25 @@ Section TOQLtoNRAEnv.
       nraenv_type τconstant (oql_to_nraenv_query_program (domain τdefls) oq) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
     Proof.
       unfold nraenv_type; simpl.
-      Hint Constructors nraenv_core_type.
+      Hint Constructors nraenv_core_type : qcert.
       revert τdefls pfd τenv pfe τout.
       induction oq; simpl; intros τdefls pfd τenv pfe τout ot; invcs ot.
       - econstructor.
-        + econstructor; eauto.
-          econstructor; eauto.
+        + econstructor; qeauto.
+          econstructor; qeauto.
           apply oql_to_nraenv_expr_type_preserve_f; eauto.
         + specialize (IHoq (rec_concat_sort τdefls ((s, τ₁) :: nil))).
           assert (eqls:equivlist (s :: domain τdefls) (domain (rec_concat_sort τdefls ((s, τ₁) :: nil))))
             by (rewrite rec_concat_sort_domain_app_commutatuve_equiv; simpl; reflexivity).
           rewrite eqls.
           apply IHoq; trivial.
-      - econstructor; eauto.
+      - econstructor; qeauto.
         rewrite <- domain_rremove; trivial.
         auto.
       - apply oql_to_nraenv_expr_type_preserve_f; trivial.
         Grab Existential Variables.
         solve[apply is_sorted_rremove; trivial].
-        solve[eauto].
+        solve[qeauto].
         solve[simpl; trivial].
     Qed.
 

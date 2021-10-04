@@ -31,9 +31,9 @@ Section ImpOptimizerEngine.
   Local Open Scope imp.
   Local Open Scope string.
 
-  Context {Constant: Type}.
-  Context {Op: Type}.
-  Context {Runtime: Type}.
+  Context {Constant: Set}.
+  Context {Op: Set}.
+  Context {Runtime: Set}.
 
   Section map.
     Fixpoint imp_expr_map_deep

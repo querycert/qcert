@@ -58,14 +58,14 @@ Section TNRAEnvEq.
   Notation "t1 ⇝ₓ t2 ⊣ τc ; tenv" := (typed_nraenv τc tenv t1 t2) (at level 80).
   Notation "X ≡τₓ Y" := (tnraenv_eq X Y) (at level 80).               (* ≡ = \equiv *)
 
-  Hint Resolve data_type_normalized.
-  Hint Resolve bindings_type_Forall_normalized.
+  Hint Resolve data_type_normalized : qcert.
+  Hint Resolve bindings_type_Forall_normalized : qcert.
 
   Lemma nraenv_eq_impl_tnraenv_eq {m:basic_model} {τc τenv τin τout} (op1 op2: τin ⇝ₓ τout ⊣ τc;τenv) :
     `op1 ≡ₓ `op2 -> op1 ≡τₓ op2.
   Proof.
     unfold tnraenv_eq, nraenv_eq; intros.
-    eapply H; eauto.
+    eapply H; qeauto.
   Qed.
 
   Lemma nraenv_eq_pf_irrel {m:basic_model} {op} {τin τout τc τenv} (pf1 pf2: op ▷ₓ τin >=> τout ⊣ τc;τenv) :
@@ -99,7 +99,7 @@ Section TNRAEnvEq.
   Proof.
     intros.
     unfold tnraenv_rewrites_to; simpl; intros.
-    split; eauto.
+    split; qeauto.
   Qed.
 
   (* Rewrite implies type-based equivalence! *)

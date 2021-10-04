@@ -96,6 +96,8 @@ Qed.
   (** This follows trivially from the consistency of join and subtype.
       However, this version should have better computational properties.*)
 
+  Hint Constructors subtype : qcert.
+  
   Lemma subtype_both_dec x y :
     (prod ({subtype x y} + {~ subtype x y}) ({subtype y x} + {~ subtype y x})).
   Proof.
@@ -103,22 +105,21 @@ Qed.
             | [H:(@eq bool ?x ?x) |- _ ] => generalize (UIP_refl_dec bool_dec H); intro; subst H
           end.
     destruct x.
-    Hint Constructors subtype.
     revert y; induction x
     ; intros y; destruct y as [y pfy]; destruct y; constructor;
-    try solve[right; inversion 1 | left; simpl in *; repeat simp; eauto ].
+    try solve[right; inversion 1 | left; simpl in *; repeat simp; eauto with qcert ].
     - destruct (IHx e (exist _ y pfy)) as [[?|?]_].
       + left. repeat rewrite (Coll_canon).
-        auto.
+        auto with qcert.
       + right. intro ss; apply n. inversion ss; subst.
-         * erewrite (rtype_ext); eauto.
+         * erewrite (rtype_ext); eauto with qcert.
          * destruct r1; destruct r2; simpl in *.
            erewrite (rtype_ext e); erewrite (rtype_ext pfy); eauto.
     - destruct (IHx e (exist _ y pfy)) as [_[?|?]].
       + left. repeat rewrite (Coll_canon).
-        auto.
+        auto with qcert.
       + right. intro ss; apply n. inversion ss; subst.
-         * erewrite (rtype_ext); eauto.
+         * erewrite (rtype_ext); eauto with qcert.
          * destruct r1; destruct r2; simpl in *.
            erewrite (rtype_ext e); erewrite (rtype_ext pfy); eauto.
     - rename srl into srl0; rename r into srl.
@@ -197,7 +198,7 @@ Qed.
              unfold domain; repeat rewrite map_map.
              simpl.
              auto.
-        * right; inversion 1; apply n; rtype_equalizer; subst; eauto.
+        * right; inversion 1; apply n; rtype_equalizer; subst; eauto with qcert.
           intros.
           rewrite <- (lookup_map_some' _ _ _ pf') in H1.
           destruct (H4 _ _ H1) as [? [??]].
@@ -291,7 +292,7 @@ Qed.
                  simpl.
                  auto.
           } 
-        * right; inversion 1; apply n; rtype_equalizer; subst; eauto.
+        * right; inversion 1; apply n; rtype_equalizer; subst; eauto with qcert.
           intros.
           rewrite <- (lookup_map_some' _ _ _ pf') in H1.
           destruct (H4 _ _ H1) as [? [??]].
@@ -306,26 +307,26 @@ Qed.
         * left.
           rewrite (Either_canon _ _ _ pfl1 pfr1).
           rewrite (Either_canon _ _ _ pfl2 pfr2).
-          eauto.
+          eauto with qcert.
         * right; inversion 1; subst.
-            apply n. rewrite (rtype_ext pfr1 pfr2). eauto.
+            apply n. rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
             rewrite (Either_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Either_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             inversion H; rtype_equalizer; subst.
-              rewrite (rtype_ext pfr1 pfr2). eauto.
+              rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
               subst.
               rewrite (rtype_ext pfr1 (proj2_sig r1)).
               rewrite (rtype_ext pfr2 (proj2_sig r2)).
               destruct r1; destruct r2. simpl in *.
               trivial.
       + right; inversion 1; subst.
-         apply n. rewrite (rtype_ext pfl1 pfl2). eauto.
+         apply n. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
             rewrite (Either_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Either_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             inversion H. rtype_equalizer.
-              subst. rewrite (rtype_ext pfl1 pfl2). eauto.
+              subst. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
 
             subst.
             rewrite (rtype_ext pfl1 (proj2_sig l1)).
@@ -339,14 +340,14 @@ Qed.
         * left.
           rewrite (Either_canon _ _ _ pfl1 pfr1).
           rewrite (Either_canon _ _ _ pfl2 pfr2).
-          eauto.
+          eauto with qcert.
         * right; inversion 1; subst.
-            apply n. rewrite (rtype_ext pfr1 pfr2). eauto.
+            apply n. rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
             rewrite (Either_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Either_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             { inversion H; rtype_equalizer; subst.
-              - rewrite (rtype_ext pfr1 pfr2). eauto.
+              - rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
               - subst.
               rewrite (rtype_ext pfr2 (proj2_sig r1)).
               rewrite (rtype_ext pfr1 (proj2_sig r2)).
@@ -354,12 +355,12 @@ Qed.
               trivial.
             } 
       + right; inversion 1; subst.
-         apply n. rewrite (rtype_ext pfl1 pfl2). eauto.
+         apply n. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
             rewrite (Either_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Either_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             inversion H. rtype_equalizer.
-              subst. rewrite (rtype_ext pfl1 pfl2). eauto.
+              subst. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
 
             subst.
             rewrite (rtype_ext pfl2 (proj2_sig l1)).
@@ -375,24 +376,24 @@ Qed.
           rewrite (Arrow_canon _ _ _ pfl2 pfr2).
           econstructor; eauto.
         * right; inversion 1; subst.
-            apply n. rewrite (rtype_ext pfr1 pfr2). eauto.
+            apply n. rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
             rewrite (Arrow_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Arrow_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             inversion H; rtype_equalizer; subst.
-              rewrite (rtype_ext pfr1 pfr2). eauto.
+              rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
               subst.
               rewrite (rtype_ext pfr1 (proj2_sig out1)).
               rewrite (rtype_ext pfr2 (proj2_sig out2)).
               destruct out1; destruct out2. simpl in *.
               trivial.
       + right; inversion 1; subst.
-         apply n. rewrite (rtype_ext pfl1 pfl2). eauto.
+         apply n. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
             rewrite (Arrow_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Arrow_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             inversion H. rtype_equalizer.
-            subst. rewrite (rtype_ext pfl1 pfl2). eauto.
+            subst. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
             rtype_equalizer.
             subst.
             rewrite (rtype_ext pfl1 (proj2_sig in1)).
@@ -408,24 +409,24 @@ Qed.
           rewrite (Arrow_canon _ _ _ pfl2 pfr2).
           econstructor; eauto.
         * right; inversion 1; subst.
-            apply n. rewrite (rtype_ext pfr1 pfr2). eauto.
+            apply n. rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
             rewrite (Arrow_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Arrow_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             inversion H; rtype_equalizer; subst.
-              rewrite (rtype_ext pfr1 pfr2). eauto.
+              rewrite (rtype_ext pfr1 pfr2). eauto with qcert.
               subst.
               rewrite (rtype_ext pfr1 (proj2_sig out2)).
               rewrite (rtype_ext pfr2 (proj2_sig out1)).
               destruct out1; destruct out2. simpl in *.
               trivial.
       + right; inversion 1; subst.
-         apply n. rewrite (rtype_ext pfl1 pfl2). eauto.
+         apply n. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
             rewrite (Arrow_canon _ _ _ pfl1 pfr1) in H.
             rewrite (Arrow_canon _ _ _ pfl2 pfr2) in H.
             apply n.
             inversion H. rtype_equalizer.
-            subst. rewrite (rtype_ext pfl1 pfl2). eauto.
+            subst. rewrite (rtype_ext pfl1 pfl2). eauto with qcert.
             rtype_equalizer.
             subst.
             rewrite (rtype_ext pfl1 (proj2_sig in2)).
@@ -433,14 +434,14 @@ Qed.
             destruct in1; destruct in2. simpl in *.
               trivial.
     - destruct (sub_brands_dec brand_relation_brands b b0).
-      + left; repeat rewrite Brand_canon; eauto.
+      + left; repeat rewrite Brand_canon; eauto with qcert.
       + right. inversion 1; subst; eauto 2.
         * intuition.
         * apply n.
           repeat rewrite (canon_brands_equiv).
           trivial.
     - destruct (sub_brands_dec brand_relation_brands b0 b).
-      + left; repeat rewrite Brand_canon; eauto.
+      + left; repeat rewrite Brand_canon; eauto with qcert.
       + right. inversion 1; subst; eauto 2.
         * intuition.
         * apply n.

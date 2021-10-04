@@ -16,7 +16,7 @@ Require Import String.
 Require Import List.
 Require Import EquivDec.
 Require Import Compare_dec.
-Require Import Omega.
+Require Import Lia.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import NRAEnvRuntime.
@@ -265,15 +265,15 @@ Section NRAEnvtoNNRC.
     nnrc_core_eval h cenv env (nnrc_to_nnrc_base (nraenv_to_nnrc op vid venv))
     = nnrc_core_eval h cenv env (nraenv_core_to_nnrc_core (nraenv_to_nraenv_core op) vid venv).
   Proof.
-    Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq.
-    Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq.
-    Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq.
+    Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq : qcert.
+    Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq : qcert.
+    Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq : qcert.
     revert vid venv cenv env; induction op; intros
     ; simpl nraenv_to_nraenv_core
     ; simpl nraenv_core_to_nnrc_core
     ; simpl nnrc_to_nnrc_base
     ; simpl nraenv_to_nnrc
-    ; eauto 8.
+    ; eauto 8 with qcert.
     - apply nnrc_core_eval_group_by_eq; auto.
     - apply unnest_from_nraenv_and_nraenv_core_eq; auto.
   Qed.
@@ -647,32 +647,32 @@ Section NRAEnvtoNNRC.
       Transparent fresh_var2.
       revert vid venv.
       induction op; simpl in *; intros; trivial.
-      - omega.
-      - omega.
-      - omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop vid venv); omega.
+      - lia.
+      - lia.
+      - lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop vid venv); lia.
       - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
-          specialize (IHop2 vid venv); omega.
+          specialize (IHop2 vid venv); lia.
       - repeat match_destr.
-        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
-      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
-      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - omega.
-      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
-      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
+        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); lia.
+      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); lia.
+      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - lia.
+      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); lia.
+      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); lia.
       - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
-          specialize (IHop2 vid venv); omega.
+          specialize (IHop2 vid venv); lia.
       - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv);
-          specialize (IHop2 vid venv); specialize (IHop3 vid venv); try omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop vid venv); omega.
-      - specialize (IHop vid venv); omega.
-      - specialize (IHop vid venv); omega.
+          specialize (IHop2 vid venv); specialize (IHop3 vid venv); try lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop vid venv); lia.
+      - specialize (IHop vid venv); lia.
+      - specialize (IHop vid venv); lia.
     Qed.
 
   End size.

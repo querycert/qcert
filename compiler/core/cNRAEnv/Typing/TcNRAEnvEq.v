@@ -56,14 +56,14 @@ Section TcNRAEnvEq.
   Notation "t1 ⇝ₑ t2 ⊣ τc ; tenv" := (typed_nraenv_core τc tenv t1 t2) (at level 80).
   Notation "X ≡τₑ Y" := (tnraenv_core_eq X Y) (at level 80).               (* ≡ = \equiv *)
 
-  Hint Resolve data_type_normalized.
-  Hint Resolve bindings_type_Forall_normalized.
+  Hint Resolve data_type_normalized : qcert.
+  Hint Resolve bindings_type_Forall_normalized : qcert.
 
   Lemma nraenv_core_eq_impl_tnraenv_core_eq {m:basic_model} {τc τenv τin τout} (op1 op2: τin ⇝ₑ τout ⊣ τc;τenv) :
     `op1 ≡ₑ `op2 -> op1 ≡τₑ op2.
   Proof.
     unfold tnraenv_core_eq, nraenv_core_eq; intros.
-    eapply H; eauto.
+    eapply H; qeauto.
   Qed.
 
   Lemma nraenv_core_eq_pf_irrel {m:basic_model} {op} {τin τout τc τenv} (pf1 pf2: op ▷ τin >=> τout ⊣ τc;τenv) :
@@ -97,7 +97,7 @@ Section TcNRAEnvEq.
   Proof.
     intros.
     unfold tnraenv_core_rewrites_to; simpl; intros.
-    split; eauto.
+    split; qeauto.
   Qed.
 
   (* Rewrite implies type-based equivalence! *)
@@ -164,7 +164,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin τ₁ H9); elim H0; clear H0 H9; intros.
     specialize (H1 τc τenv τin τ₂ H10); elim H1; clear H1 H10; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H0 x2 c env dt_x dt_c dt_env); rewrite (H2 x2 c env dt_x dt_c dt_env); reflexivity.
   Qed.
   
@@ -176,7 +176,7 @@ Section TcNRAEnvEq.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin τ H8); elim H0; clear H0 H8; intros.
-    econstructor; eauto.
+    econstructor; qeauto.
     intros.
     rewrite (H0 x c env dt_x dt_c dt_env); reflexivity.
   Qed.
@@ -190,7 +190,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin (Coll τ₁) H8); elim H0; clear H0 H8; intros.
     specialize (H τc τenv τ₁ τ₂ H4); elim H; clear H H4; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H1 x1 c env dt_x dt_c dt_env).
     input_well_typed.
     dtype_inverter.
@@ -215,7 +215,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin (Coll (Rec Closed τ₁ pf1)) H5); elim H0; clear H0 H5; intros.
     specialize (H τc τenv (Rec Closed τ₁ pf1) (Coll (Rec Closed τ₂ pf2)) H4); elim H; clear H H4; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H1 x1 c env dt_x dt_c dt_env).
     input_well_typed.
     dtype_inverter.
@@ -259,7 +259,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin (Coll (Rec Closed τ₂ pf2)) H5); elim H0; clear H0 H5; intros.
     specialize (H τc τenv τin (Coll (Rec Closed τ₁ pf1)) H4); elim H; clear H H4; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H1 x1 c env dt_x dt_c dt_env).
     rewrite (H2 x1 c env dt_x dt_c dt_env).
     reflexivity.
@@ -274,7 +274,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin (Coll τ) H8); elim H0; clear H0 H8; intros.
     specialize (H τc τenv τ Bool H4); elim H; clear H H4; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H1 x1 c env dt_x dt_c dt_env).
     input_well_typed.
     dtype_inverter.
@@ -294,7 +294,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin (Coll τ) H8); elim H0; clear H0 H8; intros.
     specialize (H τc τenv τin (Coll τ) H4); elim H; clear H H4; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H2 x1 c env dt_x dt_c dt_env).
     rewrite (H1 x1 c env dt_x dt_c dt_env).
     reflexivity.
@@ -308,7 +308,7 @@ Section TcNRAEnvEq.
     inversion H1; subst.
     specialize (H0  _ _ _ _ H8); elim H0; clear H0 H8; intros.
     specialize (H _ _ _ _ H4); elim H; intros.
-    econstructor; eauto; intros. simpl.
+    econstructor; qeauto; intros. simpl.
     inversion dt_x; rtype_equalizer.
     - subst; eauto.
     - subst; eauto.
@@ -322,7 +322,7 @@ Section TcNRAEnvEq.
     inversion H1; clear H1; subst.
     specialize (H0 _ _ _ _ H5); elim H0; clear H0 H5; intros.
     specialize (H _ _ _ _ H4); elim H; clear H H4; intros.
-    econstructor; eauto; intros. simpl.
+    econstructor; qeauto; intros. simpl.
     rewrite H1, H2; trivial.
   Qed.
   
@@ -335,7 +335,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin τ1 H4); elim H0; clear H0 H4; intros.
     specialize (H τc τenv τ1 τout H8); elim H; clear H H8; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H1 x1 c env dt_x dt_c dt_env).
     input_well_typed.
     rewrite (H2 dout c env τout0 dt_c dt_env).
@@ -360,7 +360,7 @@ Section TcNRAEnvEq.
     nraenv_core_inferer.
     specialize (H0 τc τenv τin τenv' H4); elim H0; clear H0 H4; intros.
     specialize (H τc τenv' τin τout H8); elim H; clear H H8; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     rewrite (H1 x1 c env dt_x dt_c dt_env).
     input_well_typed.                           
     rewrite (H2 x1 c dout dt_x dt_c τout0).
@@ -375,7 +375,7 @@ Section TcNRAEnvEq.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
     specialize (H τc τenv0 τin τ₂ H2); elim H; clear H H2; intros.
-    econstructor; eauto; intros.
+    econstructor; qeauto; intros.
     dtype_inverter.
     f_equal.
     apply lift_map_ext; intros.

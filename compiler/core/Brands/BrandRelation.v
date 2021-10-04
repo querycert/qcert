@@ -32,6 +32,11 @@ Definition any : brands := nil.
 
 Definition brand_relation_t := list (string*string).
 
+Lemma brand_eq_dec : EqDec brand eq.
+Proof.
+  repeat red. apply string_dec.
+Defined.
+
 Section brand_relation_types.
   Context  (brand_relation_brands:brand_relation_t).
 
@@ -1356,7 +1361,7 @@ Section brands_lattice.
 
   Context {br:brand_relation}.
   
-  Global Instance brands_lattice : Lattice brands (equiv_brands brand_relation_brands)
+  #[refine] Global Instance brands_lattice : Lattice brands (equiv_brands brand_relation_brands)
     := { meet:=brand_meet brand_relation_brands;
          join:=brand_join brand_relation_brands
        }.
@@ -1413,7 +1418,7 @@ Proof.
     apply c. reflexivity.
 Defined.
    
-Hint Resolve canon_brands_is_canon_brands.
+Hint Resolve canon_brands_is_canon_brands : qcert.
 
 Instance ToString_brands : ToString brands
   := { toString := fun b => (String.concat " & " b)}.

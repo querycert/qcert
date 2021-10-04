@@ -19,7 +19,11 @@ log/
 *~
 .#*
 *.vo
+*.vos
+*.vok
 *.v.d
 *.glob
 *.aux
 .DS_Store
+*.lia.cache
+.Makefile.coq.d

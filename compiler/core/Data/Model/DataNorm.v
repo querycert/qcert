@@ -107,7 +107,7 @@ Section DataNorm.
         reflexivity.
     - constructor; trivial.
     - constructor; trivial.
-    - constructor; trivial.
+    - constructor; qtrivial.
     - constructor.
       apply foreign_data_normalize_normalizes.
   Qed.
@@ -195,9 +195,9 @@ Section DataNorm.
     data_normalized (drec (rec_sort (l1 ++ l2))).
   Proof.
     inversion 1; inversion 1; subst.
-    constructor; eauto 1.
+    constructor; eauto 1 with qcert.
     apply Forall_sorted.
-    apply Forall_app; trivial.
+    apply Forall_app; qtrivial.
   Qed.
 
   Lemma data_normalized_rec_concat_sort l1 l2 :
@@ -235,7 +235,7 @@ Section DataNorm.
     Forall (fun d : string * data => data_normalized (snd d)) c ->
     data_normalized (drec (rec_sort c)).
   Proof.
-    intros F; econstructor; trivial.
+    intros F; econstructor; trivial with qcert.
     apply Forall_sorted; trivial.
   Qed.
 

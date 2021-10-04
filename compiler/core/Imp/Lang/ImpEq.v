@@ -32,9 +32,9 @@ Section NNRSimpEq.
   Local Open Scope imp_scope.
 
   Context {Model: Type}.
-  Context {Constant: Type}.
-  Context {Op: Type}.
-  Context {Runtime: Type}.
+  Context {Constant: Set}.
+  Context {Op: Set}.
+  Context {Runtime: Set}.
 
   Context {ConstantNormalize: Constant -> Model}.
   Context {ModelToBool: Model -> option bool}.
@@ -278,9 +278,9 @@ Section NNRSimpEq.
   
 End NNRSimpEq.
 
-Notation "X ≡ᵉ Y" := (imp_expr_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ᵉ Y" := (imp_expr_eq X Y) (at level 90) : imp_scope. (* ≡ = \equiv *)
 
-Notation "X ≡ˢ Y" := (imp_stmt_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ˢ Y" := (imp_stmt_eq X Y) (at level 90) : imp_scope. (* ≡ = \equiv *)
 
-Notation "X ≡ˢⁱ Y" := (imp_eq X Y) (at level 90) : nnrs_imp. (* ≡ = \equiv *)
+Notation "X ≡ˢⁱ Y" := (imp_eq X Y) (at level 90) : imp_scope. (* ≡ = \equiv *)
 

@@ -235,7 +235,7 @@ Section TUnaryOperators.
   
   (* TODO: move this stuff *)
   Definition canon_brands_alt {br:brand_relation} (b:brands) :=
-    fold_right meet [] (map (fun x => x::nil) b).
+    fold_right meet nil (map (fun x => x::nil) b).
 
   Lemma canon_brands_alt_is_canon {br:brand_relation} (b:brands) :
     is_canon_brands brand_relation_brands (canon_brands_alt b).
@@ -249,10 +249,10 @@ Section TUnaryOperators.
   Lemma canon_brands_fold_right_hoist {br:brand_relation} (l:list brands) :
     fold_right
       (fun a b : brands => canon_brands brand_relation_brands (a ++ b))
-      [] l =
+      nil l =
     canon_brands brand_relation_brands
                  (fold_right (fun a b : brands => (a ++ b))
-                             [] l).
+                             nil l).
   Proof.
     induction l; simpl.
     - reflexivity.
@@ -281,8 +281,8 @@ Section TUnaryOperators.
     (d1 ▹ τ₁) -> (unary_op_type u τ₁ τout) ->
     (exists x, unary_op_eval brand_relation_brands u d1 = Some x /\ x ▹ τout).
   Proof.
-    Hint Resolve dtsome dtnone.
-    Hint Constructors data_type.
+    Hint Resolve dtsome dtnone : qcert.
+    Hint Constructors data_type : qcert.
     intros.
     unary_op_type_cases (dependent induction H0) Case; simpl.
     - Case "type_OpIdentity"%string.
@@ -292,7 +292,7 @@ Section TUnaryOperators.
       exists (dbool (negb b)).
       split; [reflexivity|apply dtbool].
     - Case "type_OpRec"%string.
-      exists (drec [(s,d1)]).
+      exists (drec ((s,d1)::nil)).
       split; [reflexivity|apply dtrec_full].
       apply Forall2_cons.
       split; [reflexivity|assumption].
@@ -302,7 +302,7 @@ Section TUnaryOperators.
       unfold tdot in *.
       unfold edot in *.
       apply (Forall2_lookupr_some H1).
-      eapply assoc_lookupr_nodup_sublist; eauto.
+      eapply assoc_lookupr_nodup_sublist; qeauto.
     - Case "type_OpRecRemove"%string.
       dependent induction H; rtype_equalizer. subst.
       exists (drec (rremove dl s)); split; try reflexivity.
@@ -318,21 +318,21 @@ Section TUnaryOperators.
       clear H0 pf1.
       apply (rproject_well_typed τ rl); try assumption.
     - Case "type_OpBag"%string.
-      exists (dcoll [d1]); split; try
+      exists (dcoll (d1::nil)); split; try
       reflexivity.  apply dtcoll; apply Forall_forall; intros.  elim H0;
       intros.  rewrite <- H1; assumption.  contradiction.
     - Case "type_OpSingleton"%string.
       inversion H; rtype_equalizer.
       subst.
-      repeat (destruct dl; eauto).
+      repeat (destruct dl; qeauto).
       inversion H2; subst.
-      eauto.
+      qeauto.
     - Case "type_OpFlatten"%string.
       dependent induction H.
       rewrite Forall_forall in *.
       unfold oflatten.
       induction dl; simpl in *.
-      exists (dcoll []).
+      exists (dcoll nil).
       split; try reflexivity.
       apply dtcoll; apply Forall_nil.
       assert (forall x : data, In x dl -> data_type x r) by
@@ -389,26 +389,26 @@ Section TUnaryOperators.
       exists (dnat (Z_of_nat (bcount dl))).
       split; [reflexivity|apply dtnat].
     - Case "type_OpToString"%string.
-      eauto.
+      qeauto.
     - Case "type_OpToText"%string.
-      eauto.
+      qeauto.
     - Case "type_OpLength"%string.
       dtype_inverter.
-      eauto.
+      qeauto.
     - Case "type_OpSubstring"%string.
       dtype_inverter.
-      eauto.
+      qeauto.
     - Case "type_OpLike"%string.
       dtype_inverter.
-      eauto.
+      qeauto.
     - Case "type_OpLeft"%string.
-      eauto.
+      qeauto.
     - Case "type_OpRight"%string.
-      eauto.
+      qeauto.
     - Case "type_OpBrand"%string.
       eexists; split; try reflexivity.
       apply dtbrand'.
-      + eauto.
+      + qeauto.
       + rewrite brands_type_of_canon; trivial.
       + rewrite canon_brands_equiv; reflexivity.
     - Case "type_OpUnbrand"%string.
@@ -420,27 +420,27 @@ Section TUnaryOperators.
       trivial.
     - Case "type_OpCast"%string.
       inversion H; subst.
-      match_destr; [| eauto].
+      match_destr; [| qeauto].
       econstructor; split; try reflexivity.
       constructor. 
-      econstructor; eauto.
+      econstructor; qeauto.
     - Case "type_OpNatUnary"%string.
       dependent induction H; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpNatSum"%string.
-      dependent induction H. revert r x H. induction dl; simpl; [eauto|intros].
+      dependent induction H. revert r x H. induction dl; simpl; [qeauto|intros].
       inversion H; subst. destruct (IHdl r x H3) as [x0 [x0eq x0d]].
       destruct H2; try solve[simpl in x; discriminate].
       simpl in *.
       destruct (some_lift x0eq); subst.
-      rewrite e. simpl. eauto.
+      rewrite e. simpl. qeauto.
     - Case "type_OpNatMin"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
       induction dl. rewrite Forall_forall in H.
       unfold lifted_min; simpl.
-      exists (dnat 0). auto.
+      exists (dnat 0). qauto.
       inversion H. subst.
       specialize (IHdl H3).
       elim IHdl; clear IHdl; intros.
@@ -456,14 +456,14 @@ Section TUnaryOperators.
       destruct (lift_map (ondnat (fun x3 : Z => x3)) dl); try congruence.
       simpl.
       exists (dnat (fold_right (fun x3 y : Z => Z.min x3 y) x1 l)).
-      split; [reflexivity|auto].
+      split; [reflexivity|qauto].
     - Case "type_OpNatMax"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
       induction dl. rewrite Forall_forall in H.
       unfold lifted_max; simpl.
-      exists (dnat 0). auto.
+      exists (dnat 0). qauto.
       inversion H. subst.
       specialize (IHdl H3).
       elim IHdl; clear IHdl; intros.
@@ -479,15 +479,15 @@ Section TUnaryOperators.
       destruct (lift_map (ondnat (fun x3 : Z => x3)) dl); try congruence.
       simpl.
       exists (dnat (fold_right (fun x3 y : Z => Z.max x3 y) x1 l)).
-      split; [reflexivity|auto].
+      split; [reflexivity|qauto].
     - Case "type_OpNatMean"%string.
       assert(dsum_pf:exists x : data, lift dnat (lift_oncoll dsum d1) = Some x /\ x ▹ Nat).
-      {dependent induction H. revert r x H. induction dl; simpl; [eauto|intros].
+      {dependent induction H. revert r x H. induction dl; simpl; [qeauto|intros].
       inversion H; subst. destruct (IHdl r x H3) as [x0 [x0eq x0d]].
       destruct H2; try solve[simpl in x; discriminate].
       simpl in *.
       destruct (some_lift x0eq); subst.
-      rewrite e. simpl. eauto.
+      rewrite e. simpl. qeauto.
       }
       destruct dsum_pf as [x [xeq xtyp]].
       dtype_inverter.
@@ -496,7 +496,7 @@ Section TUnaryOperators.
       simpl in eqq1.
       inversion eqq2; clear eqq2; subst.
       destruct (is_nil_dec d1); simpl.
-      + subst; simpl; eauto.
+      + subst; simpl; qeauto.
       + exists (dnat (Z.quot x (Z_of_nat (length d1)))).
          split; [ | constructor ].
          unfold darithmean.
@@ -504,18 +504,18 @@ Section TUnaryOperators.
          destruct d1; simpl; congruence.
     - Case "type_OpFloatOfNat"%string.
       dependent induction H; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpFloatUnary"%string.
       dependent induction H; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpFloatTruncate"%string.
       dependent induction H; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpFloatSum"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
-      induction dl; unfold lifted_fsum; simpl; [eauto|intros].
+      induction dl; unfold lifted_fsum; simpl; [qeauto|intros].
       inversion H; subst.
       destruct (IHdl H3) as [x0 [x0eq x0d]].
       inversion H2.
@@ -526,12 +526,12 @@ Section TUnaryOperators.
       simpl.
       unfold lifted_fbag in *; simpl.
       destruct (some_lift e0); subst.
-      rewrite e1; simpl; eauto.
+      rewrite e1; simpl; qeauto.
     - Case "type_OpFloatMean"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
-      induction dl; unfold lifted_farithmean; simpl; [eauto|intros].
+      induction dl; unfold lifted_farithmean; simpl; [qeauto|intros].
       inversion H; subst.
       destruct (IHdl H3) as [x0 [x0eq x0d]].
       inversion H2.
@@ -542,12 +542,12 @@ Section TUnaryOperators.
       simpl.
       unfold lifted_fbag in *; simpl.
       destruct (some_lift e0); subst.
-      rewrite e1; simpl; eauto.
+      rewrite e1; simpl; qeauto.
     - Case "type_OpFloatBagMin"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
-      induction dl; unfold lifted_fmin; simpl; [eauto|intros].
+      induction dl; unfold lifted_fmin; simpl; [qeauto|intros].
       inversion H; subst.
       destruct (IHdl H3) as [x0 [x0eq x0d]].
       inversion H2.
@@ -558,12 +558,12 @@ Section TUnaryOperators.
       simpl.
       unfold lifted_fbag in *; simpl.
       destruct (some_lift e0); subst.
-      rewrite e1; simpl; eauto.
+      rewrite e1; simpl; qeauto.
     - Case "type_OpFloatBagMax"%string.
       dependent induction H.
       destruct r.
       destruct x0; simpl in x; try congruence.
-      induction dl; unfold lifted_fmax; simpl; [eauto|intros].
+      induction dl; unfold lifted_fmax; simpl; [qeauto|intros].
       inversion H; subst.
       destruct (IHdl H3) as [x0 [x0eq x0d]].
       inversion H2.
@@ -574,7 +574,7 @@ Section TUnaryOperators.
       simpl.
       unfold lifted_fbag in *; simpl.
       destruct (some_lift e0); subst.
-      rewrite e1; simpl; eauto.
+      rewrite e1; simpl; qeauto.
     - Case "type_OpForeignUnary"%string.
       eapply foreign_operators_typing_unary_sound; eauto.
   Qed.

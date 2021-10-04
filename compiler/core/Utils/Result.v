@@ -16,31 +16,31 @@ Require Import List.
 
 Section Result.
   Section definition.
-    Context (A: Type). (**r Type of success *)
-    Context (E: Type). (**r Type of failure *)
+    Context (A: Set). (**r Type of success *)
+    Context (E: Set). (**r Type of failure *)
 
-    Inductive Result : Type :=
+    Inductive Result : Set :=
     | Success : A -> Result
     | Failure : E -> Result.
   End definition.
 
   Section operations.
-    Definition lift_failure {A B E:Type} (f:A -> Result B E) : (Result A E -> Result B E) :=
+    Definition lift_failure {A B E:Set} (f:A -> Result B E) : (Result A E -> Result B E) :=
       fun r =>
         match r with
         | Success _ _ a => f a
         | Failure _ _ e => Failure _ _ e
         end.
 
-    Definition lift_failure_in {A B E:Type} (f: A -> B) : (Result A E -> Result B E) :=
+    Definition lift_failure_in {A B E:Set} (f: A -> B) : (Result A E -> Result B E) :=
         fun r =>
           lift_failure (fun a :A  => Success _ _ (f a)) r.
 
-    Definition raise_failure {A B E:Type} (f:A -> B) (e:E) : (Result A E -> Result B E) :=
+    Definition raise_failure {A B E:Set} (f:A -> B) (e:E) : (Result A E -> Result B E) :=
       fun r =>
         Failure _ _ e.
 
-    Definition lift_failure_in_two {A B C E:Type} (f:A -> B -> C)
+    Definition lift_failure_in_two {A B C E:Set} (f:A -> B -> C)
       : (Result A E -> Result B E -> Result C E) :=
       fun a =>
         match a with
@@ -54,7 +54,7 @@ Section Result.
              end)
         end.
     
-    Definition lift_failure_in_three {A B C D E:Type} (f:A -> B -> C -> D)
+    Definition lift_failure_in_three {A B C D E:Set} (f:A -> B -> C -> D)
       : (Result A E -> Result B E -> Result C E -> Result D E) :=
       fun a =>
         match a with
@@ -73,7 +73,7 @@ Section Result.
              end)
         end.
     
-    Fixpoint lift_failure_map {A B E:Type} (f: A -> Result B E) (al:list A) : Result (list B) E :=
+    Definition lift_failure_map {A B E:Set} (f: A -> Result B E) (al:list A) : Result (list B) E :=
       let init_bl := Success _ _ nil in
       let proc_one (a:A) (acc:Result (list B) E) : Result (list B) E :=
           lift_failure_in_two
@@ -83,13 +83,13 @@ Section Result.
       in
       fold_right proc_one init_bl al.
 
-    Definition result_of_option {A E:Type} (a:option A) (e:E) : Result A E :=
+    Definition result_of_option {A E:Set} (a:option A) (e:E) : Result A E :=
       match a with
       | Some a => Success _ _ a
       | None => Failure _ _ e
       end.
 
-    Definition option_of_result {A E:Type} (r:Result A E) : option A :=
+    Definition option_of_result {A E:Set} (r:Result A E) : option A :=
       match r with
       | Failure _ _ _ => None
       | Success _ _ a => Some a

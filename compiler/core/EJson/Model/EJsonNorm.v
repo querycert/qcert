@@ -174,7 +174,7 @@ Section EJsonNorm.
     ejson_normalized (ejobject (rec_sort (l1 ++ l2))).
   Proof.
     inversion 1; inversion 1; subst.
-    constructor; eauto 1.
+    constructor; eauto 1 with qcert.
     apply Forall_sorted.
     apply Forall_app; trivial.
   Qed.
@@ -214,7 +214,7 @@ Section EJsonNorm.
     Forall (fun d : string * ejson => ejson_normalized (snd d)) c ->
     ejson_normalized (ejobject (rec_sort c)).
   Proof.
-    intros F; econstructor; trivial.
+    intros F; econstructor; trivial with qcert.
     apply Forall_sorted; trivial.
   Qed.
 

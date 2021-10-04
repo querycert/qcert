@@ -26,7 +26,10 @@ Require Import DataSystem.
 Require Import cNNRCSystem.
 Require Import CAMPSystem.
 Require Import cNNRCtoCAMP.
-  
+
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TcNNRCtoCAMP.
 
   (** Auxiliary definitions and lemmas *)
@@ -40,19 +43,19 @@ Section TcNNRCtoCAMP.
     [τc&Γ] |= p ; τ₁ ~> τ₂ ->
     [τc&Γ] |= pdot (loop_var s) p ; (Rec k (nnrc_to_camp_env Γ₁) pf) ~> τ₂.
   Proof.
-    Hint Constructors camp_type.
+    Hint Constructors camp_type : qcert.
     unfold pdot; intros.
     eapply PTletIt; eauto.
-    eapply PTunop; eauto.
+    eapply PTunop; qeauto.
     constructor.
     rewrite <- env_lookup_edot; eauto.
   Qed.
 
-  Hint Resolve merge_bindings_nil_r.
-  Hint Resolve PTdot.
+  Hint Resolve merge_bindings_nil_r : qcert.
+  Hint Resolve PTdot : qcert.
 
-  Hint Resolve sorted_rec_nil.
-  Hint Constructors camp_type.
+  Hint Resolve sorted_rec_nil : qcert.
+  Hint Constructors camp_type : qcert.
 
   Lemma wf_env_same_domain {env tenv} v :
     bindings_type env tenv -> (In v (domain env) <-> In v (domain tenv)).
@@ -90,7 +93,7 @@ Section TcNNRCtoCAMP.
     NoDup (@domain _ B Γ) <-> 
     NoDup (domain (nnrc_to_camp_env Γ)).
   Proof.
-    Hint Constructors NoDup.
+    Hint Constructors NoDup : qcert.
     unfold nnrc_to_camp_env, domain.
     rewrite map_map; simpl.
     induction Γ; simpl; intuition.
@@ -107,7 +110,7 @@ Section TcNNRCtoCAMP.
        eauto.
   Qed.
 
-  Hint Constructors unary_op_type binary_op_type data_type.
+  Hint Constructors unary_op_type binary_op_type data_type : qcert.
 
   Lemma is_list_sorted_nnrc_to_camp_env_nodup {B} {tenv} :
     is_list_sorted ODT_lt_dec (@domain _ B (nnrc_to_camp_env tenv)) = true ->
@@ -119,7 +122,7 @@ Section TcNNRCtoCAMP.
     eapply StringOrder.lt_strorder.
   Qed.
 
-  Hint Resolve is_list_sorted_nnrc_to_camp_env_nodup.
+  Hint Resolve is_list_sorted_nnrc_to_camp_env_nodup : qcert.
 
   (* TODO: move to Assoc *)
   Lemma lookup_incl_perm_nodup {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
@@ -366,13 +369,13 @@ Section TcNNRCtoCAMP.
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
     revert Γ τout; induction n; intros;
-      inversion H2; subst; try solve [econstructor; eauto 3].
+      inversion H2; subst; try solve [econstructor; eauto 3 with qcert].
     - simpl in H0, H1. simpt; econstructor; eauto.
     - simpl. 
       simpl in H, H0, H1. simpt. 
-      econstructor; eauto.
+      econstructor; qeauto.
       eapply PTletEnv.
-      + econstructor; eauto. 
+      + econstructor; qeauto. 
       + rewrite merge_bindings_single_nin; eauto.
         rewrite <- loop_var_in_nnrc_to_camp_env; intuition.
       + rewrite rec_concat_sort_concats.
@@ -383,17 +386,17 @@ Section TcNNRCtoCAMP.
         assert (nd:NoDup (domain ((loop_var v, τ₁) :: nnrc_to_camp_env Γ))).
         * simpl. constructor.
           rewrite <- nnrc_to_camp_in; trivial.
-          apply -> (@nnrc_to_camp_nodup rtype); auto.
+          apply -> (@nnrc_to_camp_nodup rtype); qauto.
         * rewrite <- (drec_sort_perm_eq _ _ nd perm).
           replace ((loop_var v, τ₁) :: nnrc_to_camp_env Γ) 
           with (nnrc_to_camp_env ((v, τ₁) :: Γ)) by reflexivity.
           destruct (rec_sort_nnrc_to_camp_env_pullback ((v, τ₁) :: Γ)) 
             as [Γ' [eq' perm']].
-          apply nnrc_to_camp_nodup; auto.
+          apply nnrc_to_camp_nodup; qauto.
           rewrite eq'.
           destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); intuition.
-          eapply IHn2; eauto.
-          rewrite <- eq'. eauto.
+          eapply IHn2; qeauto.
+          rewrite <- eq'. qeauto.
           intros.
           apply nnrc_to_camp_in in H5.
           rewrite <- eq' in H5.
@@ -408,10 +411,10 @@ Section TcNNRCtoCAMP.
             intuition.
     - simpl.
       simpl in H, H0, H1. simpt. 
-      econstructor; eauto.
-      eapply PTmapall; eauto.
+      econstructor; qeauto.
+      eapply PTmapall; qeauto.
       eapply PTletEnv.
-      + econstructor; eauto. 
+      + econstructor; qeauto. 
       + rewrite merge_bindings_single_nin; eauto.
          rewrite <- loop_var_in_nnrc_to_camp_env; intuition.
       + rewrite rec_concat_sort_concats.
@@ -422,7 +425,7 @@ Section TcNNRCtoCAMP.
         assert (nd:NoDup (domain ((loop_var v, τ₁) :: nnrc_to_camp_env Γ))).
         * simpl. constructor.
           rewrite <- nnrc_to_camp_in; trivial.
-          apply -> (@nnrc_to_camp_nodup rtype); auto.
+          apply -> (@nnrc_to_camp_nodup rtype); qauto.
         * rewrite <- (drec_sort_perm_eq _ _ nd perm).
           replace ((loop_var v, τ₁) :: nnrc_to_camp_env Γ) 
           with (nnrc_to_camp_env ((v, τ₁) :: Γ)) by reflexivity.
@@ -433,7 +436,7 @@ Section TcNNRCtoCAMP.
           destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); intuition.
           eapply IHn2; eauto.
           rewrite <- eq'.
-          eauto.
+          qeauto.
           intros.
           apply nnrc_to_camp_in in H5.
           rewrite <- eq' in H5.
@@ -450,23 +453,23 @@ Section TcNNRCtoCAMP.
       eapply PTorElse.
       + eapply PTletEnv.
         * eapply PTassert.
-          eapply PTbinop; eauto.
-          econstructor; simpl; eauto.
+          eapply PTbinop; qeauto.
+          econstructor; simpl; qeauto.
         * rewrite merge_bindings_nil_r. reflexivity.
-        * eapply camp_type_tenv_rec; eauto.
+        * eapply camp_type_tenv_rec; qeauto.
       + eapply PTletEnv.
         * eapply PTassert.
-          eapply PTunop; eauto.
+          eapply PTunop; qeauto.
         * rewrite merge_bindings_nil_r. reflexivity.
-        * eapply camp_type_tenv_rec; eauto.
+        * eapply camp_type_tenv_rec; qeauto.
     - simpl in *.
       apply in_in_cons_cons_app_app_false in H1.
       destruct H1 as [?[?[?[??]]]].
       repeat rewrite andb_true_iff in H0; destruct H0 as [[[[??]?]?]?].
       match_destr_in H0. match_destr_in H7.
-      eapply PTletIt; [eauto | ].
+      eapply PTletIt; [qeauto | ].
       eapply PTorElse.
-      + eapply PTletIt; [eauto | ].
+      + eapply PTletIt; [qeauto | ].
         eapply PTletEnv.
         * repeat econstructor.
         * rewrite merge_bindings_single_nin. reflexivity.
@@ -475,7 +478,7 @@ Section TcNNRCtoCAMP.
         * assert (nd:NoDup (domain ((loop_var v, τl) :: nnrc_to_camp_env Γ))).
           simpl; constructor.
           rewrite <- loop_var_in_nnrc_to_camp_env; trivial.
-          apply -> (@nnrc_to_camp_nodup rtype); auto.
+          apply -> (@nnrc_to_camp_nodup rtype); qauto.
           assert (perm:Permutation 
                          ((loop_var v, τl) :: nnrc_to_camp_env Γ)
                          (nnrc_to_camp_env Γ ++ [(loop_var v, τl)]))
@@ -485,19 +488,19 @@ Section TcNNRCtoCAMP.
           with (nnrc_to_camp_env ((v, τl) :: Γ)) by reflexivity.
           destruct (rec_sort_nnrc_to_camp_env_pullback ((v, τl) :: Γ)) 
             as [Γ' [eq' perm']].
-          apply nnrc_to_camp_nodup. auto.
+          apply nnrc_to_camp_nodup. qauto.
           rewrite eq'.
           apply IHn2; trivial.
-          rewrite <- eq'; eauto; reflexivity.
+          rewrite <- eq'; qeauto; reflexivity.
           intros ? inn.
           symmetry in perm'.
           generalize (Permutation_in _ (dom_perm _ _ perm') inn); simpl; intros [inn'|inn']; subst; eauto.
           apply (nnrc_core_type_context_perm _ _ _ perm'); trivial.
           simpl.
-          constructor; auto.
+          constructor; qauto.
           simpl.
           intros ? [?|?]; subst; eauto.
-      + eapply PTletIt; [eauto | ].
+      + eapply PTletIt; [qeauto | ].
         eapply PTletEnv.
         * repeat econstructor.
         * rewrite merge_bindings_single_nin. reflexivity.
@@ -507,7 +510,7 @@ Section TcNNRCtoCAMP.
           assert (nd:NoDup (domain ((loop_var v0, τr) :: nnrc_to_camp_env Γ))).
           simpl; constructor.
           rewrite <- loop_var_in_nnrc_to_camp_env; trivial.
-          apply -> (@nnrc_to_camp_nodup rtype); auto.
+          apply -> (@nnrc_to_camp_nodup rtype); qauto.
           assert (perm:Permutation 
                          ((loop_var v0, τr) :: nnrc_to_camp_env Γ)
                          (nnrc_to_camp_env Γ ++ [(loop_var v0, τr)]))
@@ -517,15 +520,15 @@ Section TcNNRCtoCAMP.
           with (nnrc_to_camp_env ((v0, τr) :: Γ)) by reflexivity.
           destruct (rec_sort_nnrc_to_camp_env_pullback ((v0, τr) :: Γ)) 
             as [Γ' [eq' perm']].
-          apply nnrc_to_camp_nodup; auto.
+          apply nnrc_to_camp_nodup; qauto.
           rewrite eq'.
           apply IHn3; trivial.
-          rewrite <- eq'; eauto; reflexivity.
+          rewrite <- eq'; qeauto; reflexivity.
           intros ? inn.
           symmetry in perm'.
           generalize (Permutation_in _ (dom_perm _ _ perm') inn); simpl; intros [inn'|inn']; subst; eauto.
           apply (nnrc_core_type_context_perm _ _ _ perm'); trivial.
-          simpl; constructor; auto.
+          simpl; constructor; qauto.
           simpl.
           intros ? [?|?]; subst; eauto.
           Grab Existential Variables.
@@ -575,8 +578,8 @@ Section TcNNRCtoCAMP.
      @domain_app 
   : fresh_bindings.
 
-  Hint Resolve StringOrder.lt_strorder.
-  Hint Resolve is_list_sorted_NoDup.
+  Hint Resolve StringOrder.lt_strorder : qcert.
+  Hint Resolve is_list_sorted_NoDup : qcert.
 
   Hint Rewrite 
        @rec_concat_sort_concats 
@@ -606,8 +609,8 @@ Section TcNNRCtoCAMP.
     ([τc&b] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂) ->
     [τc&(rec_concat_sort b ((let_var x, xv)::nil))] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂.
   Proof.
-    Hint Resolve loop_let_var_distinct.
-    Hint Resolve rec_concat_sort_sorted.
+    Hint Resolve loop_let_var_distinct : qcert.
+    Hint Resolve rec_concat_sort_sorted : qcert.
     intro Hiscore.
     revert Hiscore b x xv τ₁ τ₂.
     induction n; intros; trivial; simpl in H1;
@@ -616,11 +619,11 @@ Section TcNNRCtoCAMP.
     - simpl in *. t. econstructor; eauto.
     - simpl in *.
       t.
-      repeat econstructor; eauto.
-      rewrite tdot_rec_concat_sort_neq; [idtac|eauto].
-      rewrite sort_sorted_is_id; eauto.
-    - simpl in *; t; eauto.
-    - simpl in *; simpt;  t; eauto.
+      repeat econstructor; qeauto.
+      rewrite tdot_rec_concat_sort_neq; [idtac|qeauto].
+      rewrite sort_sorted_is_id; qeauto.
+    - simpl in *; t; qeauto.
+    - simpl in *; simpt;  t; qeauto.
     - simpl in *.
       inversion H6; subst.
       econstructor; [idtac|eauto].
@@ -632,7 +635,7 @@ Section TcNNRCtoCAMP.
       econstructor; eauto.
       destruct x0; simpl in *. subst.
       econstructor.
-      + econstructor; eauto.
+      + econstructor; qeauto.
       + rewrite merge_bindings_single_nin; [reflexivity|idtac].
         autorewrite with simpr.
         simpl; subst; intuition.
@@ -645,7 +648,7 @@ Section TcNNRCtoCAMP.
         apply perm_swap.
         erewrite drec_sort_perm_eq; try eapply perm.
         rewrite <- rec_sort_rec_sort_app1.
-        eapply IHn2; eauto 2.
+        eapply IHn2; eauto 2 with qcert.
         * autorewrite with fresh_bindings.
           simpl.
           autorewrite with fresh_bindings.
@@ -673,11 +676,11 @@ Section TcNNRCtoCAMP.
     - elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt; t.
-      econstructor; eauto.
-      eapply PTmapall; eauto.
+      econstructor; qeauto.
+      eapply PTmapall; qeauto.
       destruct x0; simpl in *. subst.
       econstructor.
-      + econstructor; eauto.
+      + econstructor; qeauto.
       + rewrite merge_bindings_single_nin; [reflexivity|idtac].
         autorewrite with simpr.
         simpl; subst; intuition.
@@ -690,7 +693,7 @@ Section TcNNRCtoCAMP.
         apply perm_swap.
         erewrite drec_sort_perm_eq; try eapply perm.
         rewrite <- rec_sort_rec_sort_app1.
-        eapply IHn2; eauto 2.
+        eapply IHn2; eauto 2 with qcert.
         * autorewrite with fresh_bindings.
           simpl.
           autorewrite with fresh_bindings.
@@ -720,9 +723,9 @@ Section TcNNRCtoCAMP.
       elim Hiscore; clear Hiscore; intros Hcore2 Hcore3;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2); specialize (IHn3 Hcore3).
       simpt; t.
-      econstructor; eauto.
+      econstructor; qeauto.
       + inversion H35; subst.
-        econstructor. eauto.
+        econstructor. qeauto.
         rewrite merge_bindings_nil_r.
         rewrite drec_sort_drec_sort_concat.
         reflexivity.
@@ -730,7 +733,7 @@ Section TcNNRCtoCAMP.
         assert (rec_sort b = b) by (eapply rec_sorted_id; eauto).
         unfold rec_sort in *. rewrite <- H6; assumption.
       + inversion H35; subst.
-        econstructor. eauto.
+        econstructor. qeauto.
         rewrite merge_bindings_nil_r.
         rewrite drec_sort_drec_sort_concat.
         reflexivity.
@@ -767,7 +770,7 @@ Section TcNNRCtoCAMP.
       rtype_equalizer. subst.
       econstructor; [eauto | ].
       econstructor.
-      + econstructor; [eauto | ]; simpl.
+      + econstructor; [qeauto | ]; simpl.
         econstructor.
         * simpl. repeat econstructor.
         * rewrite merge_bindings_single_nin; try reflexivity.
@@ -812,7 +815,7 @@ Section TcNNRCtoCAMP.
               simpl.
               constructor; trivial.
           }
-      + econstructor; [eauto | ]; simpl.
+      + econstructor; [qeauto | ]; simpl.
         econstructor.
         * simpl. repeat econstructor.
         * rewrite merge_bindings_single_nin; try reflexivity.
@@ -865,11 +868,11 @@ Section TcNNRCtoCAMP.
      Grab Existential Variables.
      eauto.
      eauto.
+     qeauto.
+     qeauto.
      eauto.
      eauto.
-     eauto.
-     eauto.
-     eauto.
+     qeauto.
   Qed.
 
   Lemma nnrc_to_camp_ns_let_type_equiv n τc Γ τout :
@@ -891,8 +894,8 @@ Section TcNNRCtoCAMP.
     - eauto.
     - eauto.
     - eauto.
-    - rewrite map_app in ninb; apply in_in_app_false in ninb; intuition; eauto.
-    - intuition; eauto.
+    - rewrite map_app in ninb; apply in_in_app_false in ninb; intuition; qeauto.
+    - intuition; qeauto.
     - simpl in Hiscore; elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       rewrite map_app in ninb; apply in_in_cons_app_false in ninb; intuition.
@@ -902,9 +905,9 @@ Section TcNNRCtoCAMP.
       subst.
       econstructor; eauto.
       econstructor.
-      + econstructor; eauto.
+      + econstructor; qeauto.
       + eassumption.
-      + eapply IHn2; eauto.
+      + eapply IHn2; qeauto.
          * intros ? inn1 inn2.
            repeat defresh.
            assert (inn1': In (let_var x) (domain (Γ ++ [(loop_var v, s0)])))
@@ -931,13 +934,13 @@ Section TcNNRCtoCAMP.
       subst.
       econstructor; eauto.
       econstructor.
-      + econstructor; eauto.
-         econstructor; eauto.
+      + econstructor; qeauto.
+         econstructor; qeauto.
          econstructor.
-         econstructor; eauto.
+         econstructor; qeauto.
          eauto.
          inversion H15; subst.
-         eapply IHn2; eauto 2.
+         eapply IHn2; eauto 2 with qcert.
          * unfold mapall_let in H1. 
             autorewrite with fresh_bindings in H1.
             intuition.
@@ -996,7 +999,7 @@ Section TcNNRCtoCAMP.
       t.
       rewrite sort_sorted_is_id in H24,H28,H33,H37 by eauto.
       econstructor.
-      + eauto.
+      + qeauto.
       + rewrite merge_bindings_single_nin.
         reflexivity.
         intro inn.
@@ -1004,12 +1007,12 @@ Section TcNNRCtoCAMP.
         reflexivity.
       + econstructor.
         * econstructor.
-          econstructor; eauto.
-          econstructor; eauto.
-          econstructor; eauto.
-          econstructor; eauto.
-          econstructor; eauto.
-          econstructor; eauto.
+          econstructor; qeauto.
+          econstructor; qeauto.
+          econstructor; qeauto.
+          econstructor; qeauto.
+          econstructor; qeauto.
+          econstructor; qeauto.
           inversion H32; clear H32; subst.
           inversion H41; clear H41; subst.
           apply tdot_rec_concat_sort_eq.
@@ -1019,7 +1022,7 @@ Section TcNNRCtoCAMP.
           rewrite merge_bindings_nil_r.
           rewrite drec_sort_drec_sort_concat.
           reflexivity.
-          eapply IHn2; eauto.
+          eapply IHn2; qeauto.
           
           rewrite
             rec_concat_sort_concats,
@@ -1048,7 +1051,7 @@ Section TcNNRCtoCAMP.
           rewrite fresh_let_var_as_let in eqq.
           eapply loop_let_var_distinct; eauto.
           
-          eapply nnrcToCamp_ns_type_ignored_let_binding; eauto.
+          eapply nnrcToCamp_ns_type_ignored_let_binding; qeauto.
           apply fresh_bindings_let_to_naive; trivial.
           
           intros inn. apply let_vars_let_to_naive in inn.
@@ -1060,8 +1063,8 @@ Section TcNNRCtoCAMP.
           
           intros inn; eapply H8; eauto.
           reflexivity.
-        * econstructor; [eauto|..].
-          repeat (econstructor; eauto).
+        * econstructor; [qeauto|..].
+          repeat (econstructor; qeauto).
           inversion H41.
           apply tdot_rec_concat_sort_eq.
           intro inn.
@@ -1071,7 +1074,7 @@ Section TcNNRCtoCAMP.
           rewrite merge_bindings_nil_r.
           rewrite drec_sort_drec_sort_concat.
           reflexivity.
-          eapply IHn3; eauto.
+          eapply IHn3; qeauto.
           
           unfold rec_concat_sort.
           rewrite fresh_bindings_domain_drec_sort,
@@ -1099,7 +1102,7 @@ Section TcNNRCtoCAMP.
           rewrite fresh_let_var_as_let in eqq.
           eapply loop_let_var_distinct; eauto.
           
-          eapply nnrcToCamp_ns_type_ignored_let_binding; eauto.
+          eapply nnrcToCamp_ns_type_ignored_let_binding; qeauto.
           apply fresh_bindings_let_to_naive; trivial.
           
           intros inn. apply let_vars_let_to_naive in inn.
@@ -1140,9 +1143,9 @@ Section TcNNRCtoCAMP.
       destruct p.
       inversion H21; clear H21; rtype_equalizer.
       subst.
-      econstructor; [eauto | ].
+      econstructor; [qeauto | ].
       econstructor.
-      + econstructor; [eauto | ].
+      + econstructor; [qeauto | ].
         econstructor.
         * repeat econstructor.
         * rewrite <- H22. reflexivity.
@@ -1150,18 +1153,18 @@ Section TcNNRCtoCAMP.
           match_case_in H22; intros comcamp;
           rewrite comcamp in H22; try discriminate.
           inversion H22; clear H22; subst.
-          { apply IHn2; trivial.
+          { apply IHn2; qtrivial.
             - unfold rec_concat_sort.
               autorewrite with fresh_bindings.
               simpl. autorewrite with fresh_bindings.
-              auto.
+              qauto.
             - unfold rec_concat_sort. intros ? inn.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
               simpl in inn. destruct inn as [?|[?|?]]; subst; eauto.
               rewrite in_map_iff. intros [? [injj ?]]; apply loop_var_inj in injj.
               subst; eauto.
           } 
-      + econstructor; [eauto | ].
+      + econstructor; [qeauto | ].
         econstructor.
         * repeat econstructor.
         * rewrite <- H24. reflexivity.
@@ -1169,11 +1172,11 @@ Section TcNNRCtoCAMP.
           match_case_in H24; intros comcamp;
           rewrite comcamp in H24; try discriminate.
           inversion H24; clear H24; subst.
-          { apply IHn3; trivial.
+          { apply IHn3; qtrivial.
             - unfold rec_concat_sort.
               autorewrite with fresh_bindings.
               simpl. autorewrite with fresh_bindings.
-              auto.
+              qauto.
             - unfold rec_concat_sort; intros ? inn.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
               simpl in inn. destruct inn as [?|[?|?]]; subst; eauto.
@@ -1184,13 +1187,13 @@ Section TcNNRCtoCAMP.
       Grab Existential Variables.
       solve[eauto].
       solve[eauto].
-      solve[eauto].
+      solve[qeauto].
       solve[eauto].    
+      solve[qeauto].
       solve[eauto].
       solve[eauto].
-      solve[eauto].
-      solve[eauto].
-      solve[eauto].
+      solve[qeauto].
+      solve[qeauto].
       solve[eauto].
       solve[eauto].
       solve[eauto].
@@ -1270,7 +1273,7 @@ Section TcNNRCtoCAMP.
     - t.
       econstructor.
       unfold tdot in H4.
-      rewrite env_lookup_edot; eauto.
+      rewrite env_lookup_edot; qeauto.
     - econstructor; eauto.
     - simpl in *; simpt. econstructor; eauto.
     - simpl in *; simpt. econstructor; eauto.
@@ -1281,16 +1284,16 @@ Section TcNNRCtoCAMP.
       destruct x0; destruct x; simpl in *; subst.
       eapply type_cNNRCLet; eauto.
       destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s2) :: Γ)) 
-        as [g' [grec gperm]]; simpl; [econstructor; eauto|idtac].
+        as [g' [grec gperm]]; simpl; [econstructor; qeauto|idtac].
       symmetry in gperm.
       assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
         by (intros ? inn1 inn2; apply dom_perm in gperm;
             apply (Permutation_in _ gperm) in inn1;
             simpl in inn1; destruct inn1; subst; eauto).
-      apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
-      + simpl; econstructor; eauto.
-      + eapply IHn2; trivial;
-          unfold rtype; rewrite <- grec; eauto.
+      apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; qtrivial.
+      + simpl; econstructor; qeauto.
+      + eapply IHn2; qtrivial;
+          unfold rtype; rewrite <- grec; qeauto.
          * repeat defresh. 
             unfold rec_concat_sort in H20.
             simpl nnrc_to_camp_env.
@@ -1298,8 +1301,8 @@ Section TcNNRCtoCAMP.
                             ((loop_var v, s2) :: nnrc_to_camp_env Γ) 
                             (nnrc_to_camp_env Γ ++ [(loop_var v, s2)]))
               by (rewrite Permutation_app_comm; simpl; reflexivity).
-              erewrite drec_sort_perm_eq; try eapply perm; eauto.
-              simpl. econstructor; eauto.
+              erewrite drec_sort_perm_eq; try eapply perm; qeauto.
+              simpl. econstructor; qeauto.
               intros inn1.
               apply nnrc_to_camp_in in inn1.
               intuition.
@@ -1310,15 +1313,15 @@ Section TcNNRCtoCAMP.
       destruct x0; destruct x; simpl in *; subst.
       eapply type_cNNRCFor; eauto.
       destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s2) :: Γ)) 
-        as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
+        as [g' [grec gperm]]; [simpl; econstructor; qeauto|idtac].
       symmetry in gperm.
       assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
         by (intros ? inn1 inn2; apply dom_perm in gperm;
             apply (Permutation_in _ gperm) in inn1;
             simpl in inn1; destruct inn1; subst; eauto).
       apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
-      + simpl; econstructor; eauto.
-      + eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
+      + simpl; econstructor; qeauto.
+      + eapply IHn2; unfold rtype; trivial; rewrite <- grec; qeauto.
         unfold merge_bindings in H14.
         destruct (Compat.compatible (nnrc_to_camp_env Γ) [(loop_var v, s2)]);
             [idtac|discriminate].
@@ -1329,8 +1332,8 @@ Section TcNNRCtoCAMP.
                             ((loop_var v, s2) :: nnrc_to_camp_env Γ) 
                             (nnrc_to_camp_env Γ ++ [(loop_var v, s2)]))
                    by (rewrite Permutation_app_comm; simpl; reflexivity).
-            erewrite drec_sort_perm_eq; try eapply perm; eauto 2.
-            simpl. econstructor; eauto.
+            erewrite drec_sort_perm_eq; try eapply perm; eauto 2 with qcert.
+            simpl. econstructor; qeauto.
             intros inn1.
             apply nnrc_to_camp_in in inn1.
             intuition.
@@ -1359,42 +1362,42 @@ Section TcNNRCtoCAMP.
       inversion H25; clear H25; subst.
       econstructor; [eauto | .. ].
       + destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s4) :: Γ)) 
-          as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
+          as [g' [grec gperm]]; [simpl; econstructor; qeauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
           by (intros ? inn1 inn2; apply dom_perm in gperm;
               apply (Permutation_in _ gperm) in inn1;
               simpl in inn1; destruct inn1; subst; eauto).
         apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
-        simpl; econstructor; eauto.
-        eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
+        simpl; econstructor; qeauto.
+        eapply IHn2; unfold rtype; trivial; rewrite <- grec; qeauto.
         * unfold rec_concat_sort in H32.
           assert (perm: Permutation 
                           ((loop_var v, s4) :: nnrc_to_camp_env Γ) 
                           (nnrc_to_camp_env Γ ++ [(loop_var v, s4)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto.
-            simpl. econstructor; eauto.
+            simpl. econstructor; qeauto.
             intros inn1.
             apply nnrc_to_camp_in in inn1.
             intuition.
       + destruct (rec_sort_nnrc_to_camp_env_pullback ((v0, s6) :: Γ)) 
-          as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
+          as [g' [grec gperm]]; [simpl; econstructor; qeauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n3) -> False) 
           by (intros ? inn1 inn2; apply dom_perm in gperm;
               apply (Permutation_in _ gperm) in inn1;
               simpl in inn1; destruct inn1; subst; eauto).
         apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
-        simpl; econstructor; eauto.
-        eapply IHn3; unfold rtype; trivial; rewrite <- grec; eauto.
+        simpl; econstructor; qeauto.
+        eapply IHn3; unfold rtype; trivial; rewrite <- grec; qeauto.
         * unfold rec_concat_sort in H29.
           assert (perm: Permutation 
                           ((loop_var v0, s6) :: nnrc_to_camp_env Γ) 
                           (nnrc_to_camp_env Γ ++ [(loop_var v0, s6)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
-            erewrite drec_sort_perm_eq; try eapply perm; eauto.
-            simpl. econstructor; eauto.
+            erewrite drec_sort_perm_eq; try eapply perm; qeauto.
+            simpl. econstructor; qeauto.
             intros inn1.
             apply nnrc_to_camp_in in inn1.
             intuition.
@@ -1421,16 +1424,16 @@ Section TcNNRCtoCAMP.
     unfold mapall_let; intros.
     autorewrite with fresh_bindings in H0; intuition. 
     specialize (H0 _ (eq_refl _)).
-    repeat econstructor; eauto.
+    repeat econstructor; qeauto.
     - rewrite merge_bindings_single_nin; [reflexivity|trivial].
-    - rewrite tdot_rec_concat_sort_eq; eauto.
+    - rewrite tdot_rec_concat_sort_eq; qeauto.
     - rewrite drec_sort_drec_sort_concat.
-      rewrite tdot_rec_concat_sort_eq; eauto.
+      rewrite tdot_rec_concat_sort_eq; qeauto.
       Grab Existential Variables.
-      eauto.
-      eauto.
-      eauto.
-      eauto.
+      qeauto.
+      qeauto.
+      qeauto.
+      qeauto.
   Qed.
 
   Lemma PTmapall_let_inv τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : camp} :
@@ -1473,7 +1476,7 @@ Section TcNNRCtoCAMP.
     t. subst. eauto.
   Qed.
 
-  Hint Resolve merge_bindings_sorted.
+  Hint Resolve merge_bindings_sorted : qcert.
 
   Lemma nnrcToCamp_ns_type_weaken_let_binding τc b x xv τ₁ τ₂ n :
     nnrcIsCore n ->
@@ -1488,9 +1491,9 @@ Section TcNNRCtoCAMP.
                          ((let_var x, xv)::nil))] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂ ->
                                                                         [τc&b] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂.
   Proof.
-    Hint Resolve loop_let_var_distinct.
-    Hint Resolve rec_concat_sort_sorted.
-    Hint Resolve drec_concat_sort_sorted.
+    Hint Resolve loop_let_var_distinct : qcert.
+    Hint Resolve rec_concat_sort_sorted : qcert.
+    Hint Resolve drec_concat_sort_sorted : qcert.
 
     intro Hiscore.
     revert Hiscore b x xv τ₁ τ₂.
@@ -1500,12 +1503,12 @@ Section TcNNRCtoCAMP.
     - simpl in *. t. econstructor; eauto.
     - simpl in *.
       t.
-      repeat econstructor; eauto.
-      rewrite tdot_rec_concat_sort_neq in H7; [idtac|eauto].
+      repeat econstructor; qeauto.
+      rewrite tdot_rec_concat_sort_neq in H7; [idtac|qeauto].
       rewrite sort_sorted_is_id in H7; eauto.
-    - simpl in *; t; eauto.
-    - simpl in *; simpt;  t; eauto.
-    - simpl in *; simpt;  t; eauto.
+    - simpl in *; t; qeauto.
+    - simpl in *; simpt;  t; qeauto.
+    - simpl in *; simpt;  t; qeauto.
     - simpl in Hiscore;
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
@@ -1513,11 +1516,10 @@ Section TcNNRCtoCAMP.
       econstructor; eauto.
       destruct x0; simpl in *; subst.
       econstructor.
-      + econstructor; eauto.
+      + econstructor; qeauto.
       + rewrite merge_bindings_single_nin; [reflexivity|idtac].
         eauto.
-      + eapply IHn2; eauto 2;  unfold rec_concat_sort.
-        * apply (drec_sort_sorted (odt:=ODT_string)).
+      + eapply IHn2; eauto 2 with qcert;  unfold rec_concat_sort.
         * autorewrite with fresh_bindings.
           simpl.
           autorewrite with fresh_bindings.
@@ -1532,7 +1534,7 @@ Section TcNNRCtoCAMP.
           apply in_map_iff in inn2.
           destruct inn2 as [? [? ?]].
           apply loop_var_inj in H11; subst. eauto.
-        * eauto.
+        * qeauto.
         * intros inn.
           rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
           simpl in inn. intuition.
@@ -1555,19 +1557,18 @@ Section TcNNRCtoCAMP.
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt; t.
-      eapply PTmapall_inv in H20; eauto 2.
+      eapply PTmapall_inv in H20; eauto 2 with qcert.
       destruct H20 as [?[?[?[??]]]]; subst.
       econstructor; eauto.
-      eapply PTmapall; eauto.
+      eapply PTmapall; qeauto.
       econstructor.
-      + econstructor; eauto.
+      + econstructor; qeauto.
       + rewrite merge_bindings_single_nin; [reflexivity|idtac].
         eauto.
-      + t. 
+      + t.
         destruct x0; simpl in *; subst.
         intuition.
-        eapply IHn2; eauto 2;  unfold rec_concat_sort.
-        * apply (drec_sort_sorted (odt:=ODT_string)).
+        eapply IHn2; eauto 2 with qcert; unfold rec_concat_sort.
         * autorewrite with fresh_bindings.
           simpl.
           autorewrite with fresh_bindings.
@@ -1581,7 +1582,7 @@ Section TcNNRCtoCAMP.
           subst.
           apply in_map_iff in inn2.
           destruct inn2 as [? [? ?]].
-          apply loop_var_inj in H12; subst. eauto.
+          apply loop_var_inj in H12; subst. qeauto.
         * intros inn.
           repeat rewrite in_app_iff in H11; simpl in H11.
           intuition.
@@ -1611,14 +1612,14 @@ Section TcNNRCtoCAMP.
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2); specialize (IHn3 Hcore3).
       simpl in *. simpt; t.
       unfold rec_concat_sort in *.
-      rewrite sort_sorted_is_id in H27,H31 by auto.
+      rewrite sort_sorted_is_id in H27,H31 by qauto.
       econstructor.
-      + econstructor; [eauto|..].
+      + econstructor; [qeauto|..].
         rewrite merge_bindings_nil_r. reflexivity.
         inversion H35; subst.
         rewrite sort_sorted_is_id by auto.
         eauto.
-      + econstructor; [eauto|..].
+      + econstructor; [qeauto|..].
         rewrite merge_bindings_nil_r. reflexivity.
         inversion H35; subst.
         rewrite sort_sorted_is_id by auto.
@@ -1642,12 +1643,12 @@ Section TcNNRCtoCAMP.
       apply not_or in GG1.
       destruct GG1 as [??].
       econstructor.
-      + econstructor; [eauto|idtac].
+      + econstructor; [qeauto|idtac].
         econstructor.
         * repeat econstructor.
         * rewrite merge_bindings_single_nin; try reflexivity.
           eauto.
-        * { eapply IHn2; trivial.
+        * { eapply IHn2; qtrivial.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
             - unfold rec_concat_sort.
               autorewrite with fresh_bindings; simpl.
@@ -1658,7 +1659,7 @@ Section TcNNRCtoCAMP.
               destruct inn as [?|[?|?]]; subst; eauto 2.
               rewrite in_map_iff.
               intros [?[injj ?]]; apply loop_var_inj in injj; subst; eauto.
-            - eauto.
+            - qeauto.
             - eauto.
             - unfold rec_concat_sort. intros inn.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
@@ -1680,15 +1681,15 @@ Section TcNNRCtoCAMP.
                 - repeat rewrite in_app_iff; simpl.
                   intros [?|[?|?]]; eauto 2.
                 - rewrite Permutation_app_comm; simpl.
-                  auto.
+                  qauto.
               }
           } 
-      + econstructor; [eauto|idtac].
+      + econstructor; [qeauto|idtac].
         econstructor.
         * repeat econstructor.
         * rewrite merge_bindings_single_nin; try reflexivity.
           eauto.
-        * { eapply IHn3; trivial.
+        * { eapply IHn3; qtrivial.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
             - unfold rec_concat_sort.
               autorewrite with fresh_bindings; simpl.
@@ -1698,7 +1699,7 @@ Section TcNNRCtoCAMP.
               simpl in inn.
               destruct inn as [?|[?|?]]; subst; eauto 2.
               rewrite in_map_iff. intros [?[injj ?]]; apply loop_var_inj in injj; subst; eauto.
-            - eauto.
+            - qeauto.
             - eauto.
             - unfold rec_concat_sort. intros inn.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
@@ -1719,16 +1720,16 @@ Section TcNNRCtoCAMP.
                 - repeat rewrite in_app_iff; simpl.
                   intros [?|[?|?]]; eauto 2.
                 - rewrite Permutation_app_comm; simpl.
-                  auto.
+                  qauto.
               }
           }
           Grab Existential Variables.
           eauto.
           eauto.
-          eauto.
-          eauto.
-          eauto.
-          eauto.
+          qeauto.
+          qeauto.
+          qeauto.
+          qeauto.
           eauto.
   Qed.
 
@@ -1759,11 +1760,11 @@ Section TcNNRCtoCAMP.
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       inversion 1; subst; simpl in freshb, shf, ninb;
       autorewrite with fresh_bindings in freshb;
-      simpt; t; eauto.
+      simpt; t; qeauto.
     - specialize (IHn Hiscore).
       inversion 1; subst; simpl in freshb, shf, ninb;
       autorewrite with fresh_bindings in freshb;
-      simpt; t; eauto.
+      simpt; t; qeauto.
     - simpl in Hiscore;
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
@@ -1772,7 +1773,7 @@ Section TcNNRCtoCAMP.
       simpt; t; eauto.
       destruct x; destruct x0; simpl in *; subst.
       repeat econstructor; eauto.
-      eapply IHn2; eauto.
+      eapply IHn2; qeauto.
       * repeat defresh.
         unfold rec_concat_sort.
         autorewrite with fresh_bindings.
@@ -1833,7 +1834,7 @@ Section TcNNRCtoCAMP.
                 apply loop_var_inj in H16; subst.
                 eauto.
           }            
-        * eauto 2.
+        * eauto 2 with qcert.
         * econstructor.
           { econstructor.
             - econstructor.
@@ -1870,10 +1871,10 @@ Section TcNNRCtoCAMP.
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2); specialize (IHn3 Hcore3).
       inversion 1; subst; simpl in freshb, shf, ninb;
       autorewrite with fresh_bindings in freshb;
-      simpt; t; eauto.
+      simpt; t; qeauto.
       specialize (H9 _ (eq_refl _)).
       destruct x; destruct x0; simpl in *; subst.
-      rewrite sort_sorted_is_id in H26,H30,H39,H43 by eauto.
+      rewrite sort_sorted_is_id in H26,H30,H39,H43 by qeauto.
       inversion H22; subst.
       inversion H33; subst.
       t.
@@ -1884,9 +1885,9 @@ Section TcNNRCtoCAMP.
       rewrite tdot_rec_concat_sort_eq in H2 by eauto.
       t.
       econstructor.
-      + econstructor; [eauto|..].
+      + econstructor; [qeauto|..].
         rewrite merge_bindings_nil_r. rewrite sort_sorted_is_id by eauto. reflexivity.
-        eapply nnrcToCamp_ns_type_weaken_let_binding; eauto.
+        eapply nnrcToCamp_ns_type_weaken_let_binding; qeauto.
         * apply fresh_bindings_let_to_naive; auto.
         * intro inn.
           apply (fresh_let_var_fresh "if$" (let_vars (nnrcToCamp_ns_let n1) ++
@@ -1920,10 +1921,10 @@ Section TcNNRCtoCAMP.
           intuition; subst; eauto.
           apply in_map_iff in inn2.
           destruct inn2 as [? [??]]. eapply loop_let_var_distinct; eauto.
-      + econstructor; [eauto|..].
+      + econstructor; [qeauto|..].
         rewrite merge_bindings_nil_r.
         rewrite sort_sorted_is_id by eauto. reflexivity.
-        eapply nnrcToCamp_ns_type_weaken_let_binding; eauto 3.
+        eapply nnrcToCamp_ns_type_weaken_let_binding; eauto 3 with qcert.
         * apply fresh_bindings_let_to_naive; auto.
         * intro inn.
           apply (fresh_let_var_fresh "if$" (let_vars (nnrcToCamp_ns_let n1) ++
@@ -1965,9 +1966,9 @@ Section TcNNRCtoCAMP.
       autorewrite with fresh_bindings in freshb;
       simpt; t; eauto.
       destruct x; destruct x0; destruct x1; destruct x2; simpl in *; subst.
-      econstructor; [eauto | ].
+      econstructor; [qeauto | ].
       econstructor.
-      + econstructor; [eauto | ].
+      + econstructor; [qeauto | ].
         econstructor.
         * repeat econstructor.
         * eauto.
@@ -1985,7 +1986,7 @@ Section TcNNRCtoCAMP.
               rewrite in_map_iff.
               intros [?[injj ?]]; apply loop_var_inj in injj; subst; eauto.
           }
-      + econstructor; [eauto | ].
+      + econstructor; [qeauto | ].
         econstructor.
         * repeat econstructor.
         * eauto.
@@ -2007,11 +2008,11 @@ Section TcNNRCtoCAMP.
       Grab Existential Variables.
       eauto.
       eauto.
+      qeauto.
       eauto.
+      qeauto.
       eauto.
-      eauto.
-      eauto.
-      eauto.
+      qeauto.
       eauto.
   Qed.
 
@@ -2026,7 +2027,7 @@ Section TcNNRCtoCAMP.
     generalize (unshadow_simpl_preserve_core (domain Γ) n Hiscore); intros.
     unfold cNNRCShadow.unshadow_simpl in *.
     eapply nnrc_core_unshadow_type.
-    eapply (nnrc_to_camp_ns_type_preserve_back); trivial.
+    eapply (nnrc_to_camp_ns_type_preserve_back); qtrivial.
     - apply unshadow_preserve_core; assumption.
     - apply unshadow_shadow_free.
     - apply unshadow_avoid.
@@ -2069,9 +2070,9 @@ Section TcNNRCtoCAMP.
     (nnrc_core_type τc Γ n τout <->
     [τc&(nnrc_to_camp_env Γ)]  |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout).
    Proof.
-     Hint Resolve nnrc_to_camp_let_type_preserve.
-     Hint Resolve nnrc_to_camp_let_type_preserve_back.
-     intuition; eauto.
+     Hint Resolve nnrc_to_camp_let_type_preserve : qcert.
+     Hint Resolve nnrc_to_camp_let_type_preserve_back : qcert.
+     intuition; qeauto.
    Qed.
 
 End TcNNRCtoCAMP.

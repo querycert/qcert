@@ -15,7 +15,7 @@
 Require Import String.
 Require Import List.
 Require Import EquivDec.
-Require Import Omega.
+Require Import Lia.
 Require Import Compare_dec.
 Require Import Utils.
 Require Import DataRuntime.
@@ -163,7 +163,7 @@ Section cNRAEnvtocNNRC.
     nnrc_core_eval h cenv env (nraenv_core_to_nnrc_core op vid venv) = h ⊢ₑ op @ₑ did ⊣ cenv;denv.
   Proof.
     Opaque fresh_var.
-    Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
+    Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct : qcert.
     revert did denv env vid venv.
     nraenv_core_cases (induction op) Case; intros; simpl.
     - Case "cNRAEnvGetConstant"%string.
@@ -196,7 +196,7 @@ Section cNRAEnvtocNNRC.
       unfold omap_product in *; simpl.
       unfold oncoll_map_concat in *.
       rewrite <- IHl; clear IHl.
-      rewrite (IHop1 a denv) at 1; clear IHop1; try assumption; simpl; auto 3.
+      rewrite (IHop1 a denv) at 1; clear IHop1; try assumption; simpl; auto 3 with qcert.
       + destruct (h ⊢ₑ op1 @ₑ a ⊣ cenv;denv); try reflexivity; simpl.
         destruct d; try reflexivity.
         unfold omap_concat, orecconcat, rec_concat_sort.
@@ -214,7 +214,7 @@ Section cNRAEnvtocNNRC.
         destruct o; try reflexivity.
         rewrite oflatten_through_match.
         reflexivity.
-      +match_destr; unfold Equivalence.equiv in *.
+      + match_destr; unfold Equivalence.equiv in *.
        prove_fresh_nin.
       + match_destr; unfold Equivalence.equiv in *.
         elim (fresh_var_fresh2 _ _ _ _ e1).
@@ -335,7 +335,7 @@ Section cNRAEnvtocNNRC.
     - Case "cNRAEnvAppEnv"%string.
       rewrite (IHop2 did denv env vid venv H); trivial.
       case (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); intros; trivial.
-      rewrite (IHop1 did d); simpl; try reflexivity; trivial; simpl.
+      rewrite (IHop1 did d); simpl; try reflexivity; qtrivial; simpl.
       + match_destr.
         elim (fresh_var_fresh1 _ _ _ e).
       + match_destr.
@@ -347,7 +347,7 @@ Section cNRAEnvtocNNRC.
       f_equal.
       apply lift_map_ext; intros.
       specialize (IHop did x ((fresh_var "tmape$" (vid :: venv :: nil), x) :: env) vid (fresh_var "tmape$" (vid :: venv :: nil))).
-      rewrite <- IHop; trivial; simpl.
+      rewrite <- IHop; qtrivial; simpl.
       + match_destr.
         elim (fresh_var_fresh1 _ _ _ e).
       + match_destr.
@@ -561,19 +561,22 @@ Section cNRAEnvtocNNRC.
         auto.
     Qed.
 
-    Hint Resolve nraenv_core_to_nnrc_core_is_core.
+    Hint Resolve nraenv_core_to_nnrc_core_is_core : qcert.
 
     Lemma nraenv_core_to_nnrc_base_top_is_core (q:nraenv_core) :
       nnrcIsCore (nraenv_core_to_nnrc_base_top q).
     Proof.
       simpl.
-      auto.
+      qauto.
     Qed.
 
-    Hint Resolve nraenv_core_to_nnrc_base_top_is_core.
+    Hint Resolve nraenv_core_to_nnrc_base_top_is_core : qcert.
 
     Program Definition nraenv_core_to_nnrc_core_top (q:nraenv_core) : nnrc_core :=
       exist _ (nraenv_core_to_nnrc_base_top q) _.
+    Next Obligation.
+      qauto.
+    Defined.
     
     Theorem nraenv_core_to_nnrc_core_top_correct (q:nraenv_core) (env:bindings) :
       nnrc_core_eval_top h (nraenv_core_to_nnrc_core_top q) env = nraenv_core_eval_top h q env.
@@ -607,24 +610,24 @@ Section cNRAEnvtocNNRC.
       Transparent fresh_var2.
       revert vid venv.
       induction op; simpl in *; intros; trivial.
-      - omega.
-      - omega.
-      - omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop vid venv); omega.
+      - lia.
+      - lia.
+      - lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop vid venv); lia.
       - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
-          specialize (IHop2 vid venv); omega.
+          specialize (IHop2 vid venv); lia.
       - repeat match_destr.
-        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
-      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
-      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-      - omega.
-      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
-      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
+        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); lia.
+      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); lia.
+      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); lia.
+      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); lia.
+      - lia.
+      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); lia.
+      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); lia.
     Qed.
 
   End size.

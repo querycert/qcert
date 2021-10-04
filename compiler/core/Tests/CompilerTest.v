@@ -160,7 +160,7 @@ Section CompilerUntypedTest.
     Proof.
       simpl.
       apply (@dtbrand' _ _ _ CPModel).
-      - eauto.
+      - qeauto.
       - rewrite (@canon_brands_singleton (@brand_model_relation _ CPModel)).
         rewrite brands_type_singleton. simpl.
         apply (@dtrec_full _ _ _ CPModel).
@@ -198,44 +198,44 @@ Section CompilerUntypedTest.
   Lemma Example1'_wt τ :
     TCAMP.camp_type tinp1 nil Example1' τ tout1.
   Proof.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
-    econstructor; eauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
     rewrite brands_type_singleton. simpl.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
-    repeat econstructor; eauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
+    repeat econstructor; qeauto.
     Grab Existential Variables.
-    eauto. eauto. eauto. eauto. eauto.
+    qeauto. qeauto. qeauto. qeauto. qeauto.
   Qed.
 
   (*
@@ -259,15 +259,15 @@ Section CompilerUntypedTest.
     unfold algopt5, camp_to_nraenv_core.
     unfold CAMPtocNRAEnv.camp_to_nraenv_core_top.
     unfold CAMPtocNRAEnv.nraenv_core_of_camp.
-    econstructor; eauto.
-    econstructor; eauto.
+    econstructor; qeauto.
+    econstructor; qeauto.
     2: {
     apply (@nraenv_core_of_camp_type_preserve).
     apply Example1'_wt.
     }
-    repeat econstructor; eauto.
+    repeat econstructor; qeauto.
     Grab Existential Variables.
-    eauto.
+    qeauto.
   Qed.
 
 End CompilerTypedTest.

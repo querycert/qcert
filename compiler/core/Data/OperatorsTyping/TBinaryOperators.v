@@ -475,7 +475,7 @@ Section TBinaryOperators.
     constructor.
     - simpl; split; trivial.
       match_destr.
-      match_case; intros; eauto 2.
+      match_case; intros; eauto 2 with qcert.
       apply lookup_in in H2.
       destruct (Forall2_In_r H3 (sublist_In H1 _ H2)) as [[??] [?[??]]].
       simpl in *; subst.
@@ -486,7 +486,7 @@ Section TBinaryOperators.
          unfold equiv in *; subst.
          apply assoc_lookupr_in in H4.
          assert (nd:NoDup (domain x0)).
-         (rewrite (sorted_forall_same_domain H3); eauto 2).
+         (rewrite (sorted_forall_same_domain H3); eauto 2 with qcert).
          generalize (nodup_in_eq nd H4 H6); intros; subst.
          trivial.
       + apply assoc_lookupr_none_nin in H4. apply in_dom in H6.
@@ -521,14 +521,14 @@ Section TBinaryOperators.
     exists (mapTopNotSub (domain t1) t2 rl).  
     exists (mapTopNotSub (domain t2) t1 rl0).
     intuition.
-    - apply mapTopNotSub_compatible; eauto.
+    - apply mapTopNotSub_compatible; qeauto.
     - apply mapTopNotSub_sublist_same; trivial.
     - apply mapTopNotSub_sublist_same; trivial.
     - eapply Forall2_compat_mapTopNotSub; eauto.
     - eapply Forall2_compat_mapTopNotSub;
         try eapply H4; eauto.
       + unfold compatible in *. apply compatible_true_sym in H6; trivial.
-         rewrite (sorted_forall_same_domain H5); eauto.
+         rewrite (sorted_forall_same_domain H5); qeauto.
   Qed.                 
 
   Lemma sorted_sublists_sorted_concat (τ₁ τ₂ rl rl0:list (string*rtype)):
@@ -556,7 +556,7 @@ Section TBinaryOperators.
     (d1 ▹ τ₁) -> (d2 ▹ τ₂) -> (binary_op_type  b τ₁ τ₂ τout) ->
     (exists x, binary_op_eval brand_relation_brands b d1 d2 = Some x /\ x ▹ τout).
   Proof.
-    Hint Constructors data_type.
+    Hint Constructors data_type : qcert.
     intros.
     binary_op_type_cases (dependent induction H1) Case; simpl.
     - Case "type_OpEqual"%string.
@@ -590,7 +590,7 @@ Section TBinaryOperators.
       destruct (Compat.compatible τ₁ τ₂); try discriminate.
       inversion H1; clear H1; subst.
       destruct (Compat.compatible x x0);
-        (eexists; split; [reflexivity|]); eauto.
+        (eexists; split; [reflexivity|]); qeauto.
       econstructor. econstructor; eauto.
       apply dtrec_full.
       unfold rec_concat_sort.
@@ -620,13 +620,13 @@ Section TBinaryOperators.
           rewrite (sorted_forall_same_domain H9); trivial.
           (* need a lemma about strengthening here *)
           apply (@dtrec_open _ _ _ _ (rec_sort (x ++ x0)) (rec_sort (rl' ++ rl0'))); try assumption.
-          eauto.
+          qeauto.
           apply sorted_sublists_sorted_concat; trivial.
           apply rec_concat_with_drec_concat_well_typed; try assumption.
           unfold rec_concat_sort.
-          eauto.
+          qeauto.
         * congruence.
-      + exists (dcoll []); split; try reflexivity;
+      + exists (dcoll nil); split; try reflexivity;
         apply dtcoll; apply Forall_nil.
     - Case "type_OpAnd"%string.
       dependent induction H; dependent induction H0; simpl.
@@ -712,7 +712,7 @@ Section TBinaryOperators.
         apply dtbool.
     - Case "type_OpStringConcat"%string.
       dependent induction H; dependent induction H0; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpStringJoin"%string.
       dependent induction H; dependent induction H0; simpl.
       rtype_equalizer; subst.
@@ -721,7 +721,7 @@ Section TBinaryOperators.
       unfold lifted_join; simpl.
       induction dl; simpl in *.
       + rewrite Forall_forall in H; simpl in *.
-        exists (dstring ""); eauto.
+        exists (dstring ""); qeauto.
       + inversion H; subst.
         specialize (IHdl H3).
         elim IHdl; clear IHdl; intros.
@@ -733,19 +733,19 @@ Section TBinaryOperators.
         destruct (lift_map (ondstring (fun x2 : string => x2)) dl); try congruence.
         simpl.
         exists (dstring match l with
-                  | [] => x0
+                  | nil => x0
                   | _ :: _ => x0 ++ s ++ String.concat s l
                         end).
-        auto.
+        qauto.
     - Case "type_OpNatBinary"%string.
       dependent induction H; dependent induction H0; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpFloatBinary"%string.
       dependent induction H; dependent induction H0; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpFloatCompare"%string.
       dependent induction H; dependent induction H0; simpl.
-      eauto.
+      qeauto.
     - Case "type_OpForeignBinary"%string.
       eapply foreign_operators_typing_binary_sound; eauto.
   Qed.
@@ -754,7 +754,7 @@ Section TBinaryOperators.
 
   Lemma tdot_rec_concat_sort_neq {A} (l:list (string*A)) a b xv :
        a <> b ->
-       tdot (rec_concat_sort l [(a, xv)]) b = 
+       tdot (rec_concat_sort l ((a, xv)::nil)) b = 
        tdot (rec_sort l) b.
    Proof.
      unfold tdot, edot; intros.
@@ -765,7 +765,7 @@ Section TBinaryOperators.
 
   Lemma tdot_rec_concat_sort_eq {A} (l : list (string * A)) a b :
                ~ In a (domain l) ->
-               tdot (rec_concat_sort l [(a, b)]) a = Some b.
+               tdot (rec_concat_sort l ((a, b)::nil)) a = Some b.
   Proof.
     unfold tdot.
     apply (@assoc_lookupr_insertion_sort_fresh string ODT_string).

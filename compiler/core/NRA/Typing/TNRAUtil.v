@@ -23,6 +23,9 @@ Require Import NRASugar.
 Require Import NRAExt.
 Require Import TNRA.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TNRAUtil.
   Context {m:basic_model}.
   Context (τconstants:tbindings).
@@ -87,8 +90,8 @@ Section TNRAUtil.
     apply ATnra_data_inv'.
   Qed.
 
-  Hint Constructors nra_type unary_op_type binary_op_type.
-  Hint Resolve ATdot ATnra_data.
+  Hint Constructors nra_type unary_op_type binary_op_type : qcert.
+  Hint Resolve ATdot ATnra_data : qcert.
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
    *)
@@ -118,10 +121,10 @@ Section TNRAUtil.
                τin >=> Coll (Rec Closed τrem pf2) ⊣ τc.
   Proof.
     intros; subst.
-    econstructor; eauto.
+    econstructor; qeauto.
     Grab Existential Variables.
-    eauto.
-    unfold rec_concat_sort. eauto.
+    qeauto.
+    unfold rec_concat_sort. qeauto.
   Qed.
 
   Lemma ATRecEither s τc τl τr pf1 pf2:
@@ -130,7 +133,7 @@ Section TNRAUtil.
                 (Rec Closed ((s,τl)::nil) pf1)
                 (Rec Closed ((s,τr)::nil) pf2)).
   Proof.
-    econstructor; eauto.
+    econstructor; qeauto.
   Qed.
   
 Ltac nra_inverter := 

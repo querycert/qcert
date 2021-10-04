@@ -14,7 +14,7 @@
 
 Require Import String.
 Require Import List.
-Require Import Omega.
+Require Import Lia.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import NRARuntime.
@@ -385,7 +385,7 @@ Section CAMPtoNRA.
     Lemma camp_trans_size p :
       nra_size (nra_of_camp p) <= 41 * camp_size p.
     Proof.
-      induction p; simpl; omega.
+      induction p; simpl; lia.
     Qed.
 
   End size.

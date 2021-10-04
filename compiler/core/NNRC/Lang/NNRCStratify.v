@@ -21,6 +21,7 @@
 Require Import String.
 Require Import List.
 Require Import Bool.
+Require Import BinInt.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
@@ -37,6 +38,7 @@ Require Import cNNRCShadow.
 Require Import NNRC.
 Require Import NNRCEq.
 Require Import NNRCShadow.
+
 
 Section Stratify.
   
@@ -143,15 +145,15 @@ Section Stratify.
     Lemma stratifiedLevel_spec_lifts k e :
       stratifiedLevel_spec k e -> stratifiedLevel_spec nnrcStmt e.
     Proof.
-      Hint Constructors stratifiedLevel_spec.
-      destruct k; eauto.
+      Hint Constructors stratifiedLevel_spec : qcert.
+      destruct k; qeauto.
     Qed.
 
     Lemma stratifiedLevel_spec_lifte k e :
       stratifiedLevel_spec nnrcExpr e -> stratifiedLevel_spec k e.
     Proof.
-      Hint Constructors stratifiedLevel_spec.
-      destruct k; eauto.
+      Hint Constructors stratifiedLevel_spec : qcert.
+      destruct k; qeauto.
     Qed.
 
     Lemma stratifiedLevel_spec_stratified k (e:nnrc) :
@@ -164,11 +166,11 @@ Section Stratify.
     Lemma stratifiedLevel_correct k e:
       stratifiedLevel k e <-> stratifiedLevel_spec k e.
     Proof.
-      Hint Constructors stratifiedLevel_spec.
-      Hint Resolve stratifiedLevel_spec_lifts stratifiedLevel_spec_lifte.
+      Hint Constructors stratifiedLevel_spec : qcert.
+      Hint Resolve stratifiedLevel_spec_lifts stratifiedLevel_spec_lifte : qcert.
       split; revert k.
-      - induction e; simpl; destruct k; simpl; intros; intuition (eauto; try discriminate).
-      - induction e; simpl; intros k; intros HH; invcs HH; simpl; eauto 3;
+      - induction e; simpl; destruct k; simpl; intros; intuition (qeauto; try discriminate).
+      - induction e; simpl; intros k; intros HH; invcs HH; simpl; eauto 3 with qcert;
           try (invcs H; eauto); intuition eauto.
     Qed.
 
@@ -298,7 +300,8 @@ Section Stratify.
     Local Open Scope nnrc_scope.
     Local Open Scope string_scope.
 
-    Example nnrc1 := (‵abs ‵ (dnat 3) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3)).
+
+    Example nnrc1 := ((‵abs ‵ (dnat 3) ‵+ ‵(dnat 5)) ‵+ ((‵(dnat 4) ‵+ ‵(dnat 7)) ‵+‵`(dnat  3))).
     (* Eval vm_compute in (stratify nnrc1).  *)
 
     Example nnrc2 := NNRCLet "x" nnrc1 (NNRCVar "x").
@@ -385,7 +388,7 @@ Section Stratify.
       stratifiedLevel required_level n /\
       Forall (stratifiedLevel nnrcStmt) (codomain sdefs).
     Proof.
-      Hint Resolve Forall_nil Forall_app.
+      Hint Resolve Forall_nil Forall_app : qcert.
       revert required_level bound_vars n sdefs.
       induction e; intros required_level bound_vars n sdefs eqq
       ; invcs eqq; simpl in *; eauto 2; simpl.
@@ -395,7 +398,7 @@ Section Stratify.
         rewrite codomain_app.
         destruct (IHe1 _ _ _ _ eqq1).
         destruct (IHe2 _ _ _ _ eqq2).
-        intuition eauto.
+        intuition qeauto.
       - match_case_in H0;  intros ? ? eqq1; rewrite eqq1 in *; simpl in *.
         invcs H0; simpl in *.
         destruct (IHe _ _ _ _ eqq1).
@@ -1822,7 +1825,6 @@ Section Stratify.
       nnrcIsCore e <->
       nnrcIsCore n /\ Forall nnrcIsCore (codomain sdefs).
     Proof.
-      Hint Resolve Forall_nil.
       revert required_level bound_vars n sdefs.
       induction e; intros required_level bound_vars n sdefs eqq1
       ; simpl in *; invcs eqq1; simpl.
@@ -1922,10 +1924,3 @@ Section Stratify.
   End Core.
   
 End Stratify.
-
-(* 
- *** Local Variables: ***
- *** coq-load-path: (("../../../coq" "Qcert")) ***
- *** End: ***
- *)
-

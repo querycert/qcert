@@ -99,5 +99,4 @@ Section NRASugar.
   
 End NRASugar.
 
-Hint Resolve data_normalized_nra_context_data.  
-
+Hint Resolve data_normalized_nra_context_data : qcert.

@@ -36,22 +36,22 @@ Section TNNRSimpRename.
 
   Context {m:basic_model}.
 
-  Hint Constructors nnrs_imp_expr_type.
-  Hint Constructors nnrs_imp_stmt_type.
+  Hint Constructors nnrs_imp_expr_type : qcert.
+  Hint Constructors nnrs_imp_stmt_type : qcert.
 
   Lemma nnrs_imp_expr_type_rename_in_f Γc l Γ e (v v':var) τ (τo:rtype) :
     ~ In v (domain l) ->
     ~ In v' (domain l) ->
     ~ In v' (nnrs_imp_expr_free_vars e) ->
     [ Γc ; (l++(v,τ)::Γ)  ⊢ e ▷ τo ] ->
-    [ Γc ; (l++(v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp_scope.
+    [ Γc ; (l++(v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp.
   Proof.
     revert τo.
     nnrs_imp_expr_cases (induction e) Case; simpl; trivial
     ; intros τo ??? typ
     ; invcs typ
     ; repeat rewrite in_app_iff in *
-    ; eauto 3.
+    ; eauto 3 with qcert.
     -  Case "NNRSimpVar"%string.
        econstructor.
        repeat rewrite lookup_app in *.
@@ -79,7 +79,7 @@ Section TNNRSimpRename.
   Lemma nnrs_imp_expr_type_rename_f Γc Γ e (v v':var) τ (τo:rtype) :
     ~ In v' (nnrs_imp_expr_free_vars e) ->
     [ Γc ; ((v,τ)::Γ)  ⊢ e ▷ τo ] ->
-    [ Γc ; ((v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp_scope.
+    [ Γc ; ((v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp.
   Proof.
     intros.
     apply (nnrs_imp_expr_type_rename_in_f Γc nil Γ); simpl; tauto.
@@ -93,7 +93,7 @@ Section TNNRSimpRename.
     [ Γc ; (l++(v,τ)::Γ)   ⊢ s ] ->
     [ Γc ; (l++(v',τ)::Γ) ⊢ nnrs_imp_stmt_rename s v v' ].
   Proof.
-    Hint Resolve nnrs_imp_expr_type_rename_in_f.
+    Hint Resolve nnrs_imp_expr_type_rename_in_f : qcert.
 
     revert l Γ τ
     ; nnrs_imp_stmt_cases (induction s) Case
@@ -102,19 +102,19 @@ Section TNNRSimpRename.
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ.
     - Case "NNRSimpSkip"%string.
-      eauto.
+      qeauto.
     - Case "NNRSimpSeq"%string.
-      intuition eauto.
+      intuition qeauto.
     - Case "NNRSimpAssign"%string.
       match_destr; unfold equiv, complement in *.
       + subst.
-        econstructor; eauto.
+        econstructor; qeauto.
         repeat rewrite lookup_app in *.
         repeat rewrite lookup_nin_none in * by trivial.
         simpl in *.
         match_destr_in H3; try contradiction.
         match_destr; try contradiction.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         repeat rewrite lookup_app in *.
         simpl in *.
         match_destr_in H3; try contradiction.
@@ -123,16 +123,16 @@ Section TNNRSimpRename.
     - Case "NNRSimpLet"%string.
       match_destr; unfold equiv, complement in *.
       + subst.
-        econstructor; eauto.
+        econstructor; qeauto.
         apply (nnrs_imp_stmt_type_unused_remove Γc ((v,τ0)::l)) in H4
         ; simpl; try tauto.
         apply (nnrs_imp_stmt_type_unused_add Γc ((v, τ0)::l))
         ; simpl; trivial.
         intuition.
         destruct (remove_nin_inv H3); eauto.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         specialize (IHs ((v0, τ0) :: l)); simpl in IHs.
-        eapply IHs; eauto
+        eapply IHs; qeauto
         ; intuition.
         destruct (remove_nin_inv H1); eauto.
     - Case "NNRSimpLet"%string.
@@ -154,22 +154,22 @@ Section TNNRSimpRename.
     - Case "NNRSimpFor"%string.
       match_destr; unfold equiv, complement in *.
       + subst.
-        econstructor; eauto.
+        econstructor; qeauto.
         apply (nnrs_imp_stmt_type_unused_remove Γc ((v,τ0)::l)) in H4
         ; simpl; try tauto.
         apply (nnrs_imp_stmt_type_unused_add Γc ((v, τ0)::l))
         ; simpl; trivial.
         intuition.
         destruct (remove_nin_inv H3); eauto.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         specialize (IHs ((v0, τ0) :: l)); simpl in IHs.
         eapply IHs; eauto
         ; intuition.
         destruct (remove_nin_inv H1); eauto.
     - Case "NNRSimpIf"%string.
-      econstructor; intuition eauto.
+      econstructor; intuition qeauto.
     - Case "NNRSimpEither"%string.
-      econstructor; eauto.
+      econstructor; qeauto.
       + match_destr; unfold equiv, complement in *.
         * subst.
           apply (nnrs_imp_stmt_type_unused_remove Γc ((v,τl)::l)) in H6
@@ -210,7 +210,7 @@ Section TNNRSimpRename.
     ~ In v (domain l) ->
     ~ In v' (domain l) ->
     ~ In v' (nnrs_imp_expr_free_vars e) ->
-    [ Γc ; (l++(v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp_scope ->
+    [ Γc ; (l++(v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp ->
     [ Γc ; (l++(v,τ)::Γ)  ⊢ e ▷ τo ].
   Proof.
     revert τo.
@@ -218,7 +218,7 @@ Section TNNRSimpRename.
     ; intros τo ??? typ
     ; invcs typ
     ; repeat rewrite in_app_iff in *
-    ; eauto 3.
+    ; eauto 3 with qcert.
     - Case "NNRSimpVar"%string.
       econstructor.
       repeat rewrite lookup_app in *.
@@ -245,7 +245,7 @@ Section TNNRSimpRename.
 
   Lemma nnrs_imp_expr_type_rename_b Γc Γ e (v v':var) τ (τo:rtype) :
     ~ In v' (nnrs_imp_expr_free_vars e) ->
-    [ Γc ; ((v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp_scope ->
+    [ Γc ; ((v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp ->
     [ Γc ; ((v,τ)::Γ)  ⊢ e ▷ τo ].
   Proof.
     intros.
@@ -260,7 +260,7 @@ Section TNNRSimpRename.
     [ Γc ; (l++(v',τ)::Γ) ⊢ nnrs_imp_stmt_rename s v v' ] ->
     [ Γc ; (l++(v,τ)::Γ)   ⊢ s ].
   Proof.
-    Hint Resolve nnrs_imp_expr_type_rename_in_b.
+    Hint Resolve nnrs_imp_expr_type_rename_in_b : qcert.
 
     revert l Γ τ
     ; nnrs_imp_stmt_cases (induction s) Case
@@ -269,20 +269,20 @@ Section TNNRSimpRename.
     ; repeat rewrite in_app_iff in ninb
     ; invcs typ.
     - Case "NNRSimpSkip"%string.
-      eauto.
+      qeauto.
     - Case "NNRSimpSeq"%string.
-      intuition eauto.
+      intuition qeauto.
     - Case "NNRSimpAssign"%string.
       match_destr_in H3; unfold equiv, complement in *.
       + subst.
-        econstructor; eauto.
+        econstructor; qeauto.
         repeat rewrite lookup_app in *.
         repeat rewrite lookup_nin_none in * by trivial.
         simpl in *.
         match_destr_in H3; try contradiction.
         invcs H3.
         match_destr; try contradiction.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         repeat rewrite lookup_app in *.
         simpl in *.
         match_destr_in H3; try contradiction.
@@ -292,7 +292,7 @@ Section TNNRSimpRename.
     - Case "NNRSimpLet"%string.
       destruct o; try discriminate.
       invcs H0.
-      econstructor; eauto.
+      econstructor; qeauto.
       match_destr_in H4; unfold equiv, complement in *.
       + subst.
         apply (nnrs_imp_stmt_type_unused_add Γc ((v, τ0)::l))
@@ -325,22 +325,22 @@ Section TNNRSimpRename.
     - Case "NNRSimpFor"%string.
       match_destr_in H4; unfold equiv, complement in *.
       + subst.
-        econstructor; eauto.
+        econstructor; qeauto.
         apply (nnrs_imp_stmt_type_unused_add Γc ((v, τ0)::l))
         ; simpl; try tauto.
         apply (nnrs_imp_stmt_type_unused_remove Γc ((v,τ0)::l)) in H4
         ; simpl; try tauto.
         intuition.
         destruct (remove_nin_inv H3); eauto.
-      + econstructor; eauto.
+      + econstructor; qeauto.
         specialize (IHs ((v0, τ0) :: l)); simpl in IHs.
         eapply IHs; eauto
         ; intuition.
         destruct (remove_nin_inv H1); eauto.
     - Case "NNRSimpIf"%string.
-      econstructor; intuition eauto.
+      econstructor; intuition qeauto.
     - Case "NNRSimpEither"%string.
-      econstructor; eauto.
+      econstructor; qeauto.
       + match_destr_in H6; unfold equiv, complement in *.
         * subst.
           apply (nnrs_imp_stmt_type_unused_add Γc ((v,τl)::l))
@@ -381,7 +381,7 @@ Section TNNRSimpRename.
     ~ In v (domain l) ->
     ~ In v' (domain l) ->
     ~ In v' (nnrs_imp_expr_free_vars e) ->
-    [ Γc ; (l++(v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp_scope <->
+    [ Γc ; (l++(v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp <->
     [ Γc ; (l++(v,τ)::Γ)  ⊢ e ▷ τo ].
   Proof.
     intros; split; intros.
@@ -391,7 +391,7 @@ Section TNNRSimpRename.
 
   Corollary nnrs_imp_expr_type_rename Γc Γ e (v v':var) τ (τo:rtype) :
     ~ In v' (nnrs_imp_expr_free_vars e) ->
-    [ Γc ; ((v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp_scope <->
+    [ Γc ; ((v',τ)::Γ)  ⊢ nnrs_imp_expr_rename e v v' ▷ τo ]%nnrs_imp <->
     [ Γc ; ((v,τ)::Γ)  ⊢ e ▷ τo ].
   Proof.
     intros; split; intros.

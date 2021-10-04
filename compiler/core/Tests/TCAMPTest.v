@@ -72,7 +72,7 @@ Section TCAMPTest.
   Lemma R1typed :
     TCAMPRule.camp_rule_type (Brand (singleton "Entity")) (Coll String) R1.
   Proof.
-    Hint Resolve TCAMPSugar.PTCast.
+    Hint Resolve TCAMPSugar.PTCast : qcert.
     
     unfold R1.
     unfold TCAMPRule.camp_rule_type; simpl.

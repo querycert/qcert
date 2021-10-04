@@ -22,6 +22,9 @@ Require Import Utils.
 Require Import DataSystem.
 Require Import cNNRC.
 
+Import ListNotations.
+Local Open Scope list_scope.
+
 Section TcNNRC.
   (** Typing rules for cNNRC *)
   Context {m:basic_model}.
@@ -192,7 +195,7 @@ Section TcNNRC.
   Qed.
 
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrc_core_type_lookup_equiv_prop {m:basic_model} :
+  Global Instance nnrc_core_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_core_type.
   Proof.
     cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrc_core_type);

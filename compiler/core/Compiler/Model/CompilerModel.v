@@ -36,29 +36,27 @@ Require Import DNNRC.
 Require Import tDNNRC.
 Require Import NNRSimp.
 
-Set Typeclasses Axioms Are Instances.
-
 Module Type CompilerModel.
-  Axiom compiler_basic_model : basic_model.
-  Axiom compiler_model_foreign_runtime : foreign_runtime.
-  Axiom compiler_model_foreign_ejson : foreign_ejson.
-  Axiom compiler_model_foreign_to_ejson : foreign_to_ejson.
-  Axiom compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
-  Axiom compiler_model_foreign_to_json : foreign_to_json.
-  Axiom compiler_model_foreign_to_java : foreign_to_java.
-  Axiom compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
-  Axiom compiler_model_foreign_to_scala : foreign_to_scala.
-  Axiom compiler_model_foreign_type_to_JSON : foreign_type_to_JSON.
-  Axiom compiler_model_foreign_reduce_op : foreign_reduce_op.
-  Axiom compiler_model_foreign_to_reduce_op : foreign_to_reduce_op.
-  Axiom compiler_model_foreign_to_spark : foreign_to_spark.
-  Axiom compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
-  Axiom compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
-  Axiom compiler_model_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
-  Axiom compiler_model_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
-  Axiom compiler_model_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
-  Axiom compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
-  Axiom compiler_model_foreign_data_typing : foreign_data_typing.
+  Declare Instance compiler_basic_model : basic_model.
+  Declare Instance compiler_model_foreign_runtime : foreign_runtime.
+  Declare Instance compiler_model_foreign_ejson : foreign_ejson.
+  Declare Instance compiler_model_foreign_to_ejson : foreign_to_ejson.
+  Declare Instance compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
+  Declare Instance compiler_model_foreign_to_json : foreign_to_json.
+  Declare Instance compiler_model_foreign_to_java : foreign_to_java.
+  Declare Instance compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
+  Declare Instance compiler_model_foreign_to_scala : foreign_to_scala.
+  Declare Instance compiler_model_foreign_type_to_JSON : foreign_type_to_JSON.
+  Declare Instance compiler_model_foreign_reduce_op : foreign_reduce_op.
+  Declare Instance compiler_model_foreign_to_reduce_op : foreign_to_reduce_op.
+  Declare Instance compiler_model_foreign_to_spark : foreign_to_spark.
+  Declare Instance compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
+  Declare Instance compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
+  Declare Instance compiler_model_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
+  Declare Instance compiler_model_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
+  Declare Instance compiler_model_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
+  Declare Instance compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
+  Declare Instance compiler_model_foreign_data_typing : foreign_data_typing.
 End CompilerModel.
 
 Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
@@ -106,9 +104,9 @@ End CompilerModelRuntime.
 
 (* Useful utility module functors that create a CompilerModel *)
 Module Type CompilerForeignType.
-  Axiom compiler_foreign_type : foreign_type.
+  Declare Instance compiler_foreign_type : foreign_type.
 End CompilerForeignType.
 Module Type CompilerBrandModel(ftype:CompilerForeignType).
-  Axiom compiler_brand_model : brand_model.
+  Declare Instance compiler_brand_model : brand_model.
 End CompilerBrandModel.
 

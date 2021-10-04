@@ -681,7 +681,7 @@ Section ImpDatatoImpEJson.
           destruct (ejson_eq_dec (data_to_ejson d) (data_to_ejson d0));
           try reflexivity; subst.
         + congruence.
-        + apply data_to_ejson_inv in e; congruence.
+        + apply data_to_ejson_inj in e; congruence.
       - Case "OpRecConcat"%string.
         apply rconcat_key_encode_comm.
       - Case "OpRecMerge"%string.

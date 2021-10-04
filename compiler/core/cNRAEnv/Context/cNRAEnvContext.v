@@ -33,6 +33,8 @@ Require Import DataRuntime.
 Require Import cNRAEnv.
 Require Import cNRAEnvEq.
 
+Declare Scope nraenv_core_ctxt_scope.
+
 Section cNRAEnvContext.
   Local Open Scope nraenv_core_scope.
 
@@ -803,9 +805,9 @@ Section cNRAEnvContext.
        apply Nat.lt_strorder.
      - specialize (H (rec_sort ps)).
        cut_to H.
-       + Hint Resolve rec_sort_perm.
-         rewrite aec_substs_perm with (c:=c1) (ps2:=(rec_sort ps)); auto.
-         rewrite aec_substs_perm with (c:=c2) (ps2:=(rec_sort ps)); auto.
+       + Hint Resolve rec_sort_perm : qcert.
+         rewrite aec_substs_perm with (c:=c1) (ps2:=(rec_sort ps)); qauto.
+         rewrite aec_substs_perm with (c:=c2) (ps2:=(rec_sort ps)); qauto.
        + apply (@rec_sort_pf nat ODT_nat).
        + rewrite drec_sort_equiv_domain. trivial.
    Qed.

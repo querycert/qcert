@@ -159,7 +159,7 @@ Section JSONNorm.
     json_normalized (jobject (rec_sort (l1 ++ l2))).
   Proof.
     inversion 1; inversion 1; subst.
-    constructor; eauto 1.
+    constructor; eauto 1 with qcert.
     apply Forall_sorted.
     apply Forall_app; trivial.
   Qed.
@@ -199,7 +199,7 @@ Section JSONNorm.
     Forall (fun d : string * json => json_normalized (snd d)) c ->
     json_normalized (jobject (rec_sort c)).
   Proof.
-    intros F; econstructor; trivial.
+    intros F; econstructor; trivial with qcert.
     apply Forall_sorted; trivial.
   Qed.
 

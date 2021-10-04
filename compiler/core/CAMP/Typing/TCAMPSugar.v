@@ -24,7 +24,7 @@ Require Export TCAMP.
 Section TCAMPSugar.
   Local Open Scope camp_scope.
 
-  Hint Constructors camp_type.
+  Hint Constructors camp_type : qcert.
 
   Context {m:basic_model}.
 
@@ -48,7 +48,7 @@ Section TCAMPSugar.
     econstructor.
     + repeat econstructor; eauto.
     + rewrite merge_bindings_nil_r; eauto.
-    + simpl. apply camp_type_tenv_rec; eauto.
+    + simpl. apply camp_type_tenv_rec; qeauto.
       Grab Existential Variables.
       eauto.
   Qed.

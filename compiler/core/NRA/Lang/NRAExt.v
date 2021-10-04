@@ -24,6 +24,8 @@ Require Import Utils.
 Require Import DataRuntime.
 Require Import NRA.
 
+Declare Scope nraext_scope.
+
 Section NRAExt.
   (* Algebra *)
 
@@ -229,7 +231,7 @@ Delimit Scope nraext_scope with nraext.
 Notation "h ⊢ EOp @ₓ x ⊣ c" := (nraext_eval h c EOp x) (at level 10): nraext_scope.
 
 Notation "'ID'" := (xNRAID)  (at level 50) : nraext_scope.                                           (* ◇ = \Diamond *)
-Notation "CGET⟨ s ⟩" := (xNRAGetConstant s) (at level 50) : nraext_core_scope.
+Notation "CGET⟨ s ⟩" := (xNRAGetConstant s) (at level 50) : nraext_scope.
 
 Notation "‵‵ c" := (xNRAConst (dconst c))  (at level 0) : nraext_scope.                           (* ‵ = \backprime *)
 Notation "‵ c" := (xNRAConst c)  (at level 0) : nraext_scope.                                     (* ‵ = \backprime *)

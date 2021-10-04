@@ -217,8 +217,7 @@ Section UDelta.
       elim (rmap (update Δ₀) l); intros; congruence.
       rewrite H.
       destruct (rmap (update Δ₀) l); reflexivity.
-    - addddmit.  (* still need work on record update – no easy corresponding query *)
-    - simpl. addddmit.  (* still need work on compose – possibly showing an intermediate lemma that does substitute with AID. *)
+      (* TODO *)
   Qed.
    *)
 

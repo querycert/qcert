@@ -22,6 +22,7 @@ Require Import String.
 Require Import List.
 Require Import Permutation.
 Require Import ListSet.
+Require Import BinInt.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
@@ -1607,8 +1608,6 @@ Section NNRSCrossShadow.
           match_destr.
           destruct p as [[??]?].
           destruct p; trivial.
-          unfold var in *.
-          apply (IHl p0 m m0 domσ domψc domψd).
         + destruct d; trivial.
           revert σ ψc ψd domσ domψc domψd c0.
           induction l
@@ -1773,10 +1772,10 @@ Section NNRSCrossShadow.
            nnrs_stmt_cross_shadow_free_under_free_env_mdenv
            nnrs_stmt_cross_shadow_free_under_bound_env_mdenv
            nnrs_stmt_cross_shadow_free_under_free_mcenv_mdenv
-           nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv.
+           nnrs_stmt_cross_shadow_free_under_bound_mcenv_mdenv : qcert.
       
       intros cs.
-      apply nnrs_stmt_uncross_shadow_under_alt_id; eauto.
+      apply nnrs_stmt_uncross_shadow_under_alt_id; qeauto.
     Qed.
 
     Theorem nnrs_uncross_shadow_id sep (s:nnrs) :

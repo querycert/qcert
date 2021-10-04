@@ -12,7 +12,10 @@
  * limitations under the License.
  *)
 
+Declare Scope data_scope.
+
 Require Export ForeignRuntime.
 Require Export BrandRelation.
 Require Export DataModel.
 Require Export Operators.
+

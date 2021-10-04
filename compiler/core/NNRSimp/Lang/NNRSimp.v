@@ -30,7 +30,9 @@ Require Import EquivDec.
 Require Import Decidable.
 Require Import Utils.
 Require Import DataRuntime.
-  
+
+Declare Scope nnrs_imp_scope.
+
 Section NNRSimp.
 
   Section Syntax.
@@ -266,43 +268,43 @@ Tactic Notation "nnrs_imp_stmt_cases" tactic(first) ident(c) :=
   | Case_aux c "NNRSimpIf"%string
   | Case_aux c "NNRSimpEither"%string].
 
-Delimit Scope nnrs_imp with nnrs_imp_scope.
+Delimit Scope nnrs_imp_scope with nnrs_imp.
 
 (* begin hide *)
-Notation "‵‵ c" := (NNRSimpConst (dconst c))  (at level 0) : nnrs_imp.                           (* ‵ = \backprime *)
-Notation "‵ c" := (NNRSimpConst c)  (at level 0) : nnrs_imp.                                     (* ‵ = \backprime *)
-Notation "‵{||}" := (NNRSimpConst (dcoll nil))  (at level 0) : nnrs_imp.                         (* ‵ = \backprime *)
-Notation "‵[||]" := (NNRSimpConst (drec nil)) (at level 50) : nnrs_imp.                          (* ‵ = \backprime *)
+Notation "‵‵ c" := (NNRSimpConst (dconst c))  (at level 0) : nnrs_imp_scope.                           (* ‵ = \backprime *)
+Notation "‵ c" := (NNRSimpConst c)  (at level 0) : nnrs_imp_scope.                                     (* ‵ = \backprime *)
+Notation "‵{||}" := (NNRSimpConst (dcoll nil))  (at level 0) : nnrs_imp_scope.                         (* ‵ = \backprime *)
+Notation "‵[||]" := (NNRSimpConst (drec nil)) (at level 50) : nnrs_imp_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (NNRSimpBinop OpAnd r1 r2) (right associativity, at level 65): nnrs_imp.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (NNRSimpBinop OpOr r1 r2) (right associativity, at level 70): nnrs_imp.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (NNRSimpBinop OpEqual r1 r2) (right associativity, at level 70): nnrs_imp.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (NNRSimpBinop OpLe r1 r2) (no associativity, at level 70): nnrs_imp.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (NNRSimpBinop OpBagUnion r1 r2) (right associativity, at level 70): nnrs_imp.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (NNRSimpBinop OpBagDiff r1 r2) (right associativity, at level 70): nnrs_imp.  (* − = \minus *)
-Notation "r1 ⋂min r2" := (NNRSimpBinop OpBagMin r1 r2) (right associativity, at level 70): nnrs_imp. (* ♯ = \sharp *)
-Notation "r1 ⋃max r2" := (NNRSimpBinop OpBagMax r1 r2) (right associativity, at level 70): nnrs_imp. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((NNRSimpBinop OpRecConcat) p r) (at level 70) : nnrs_imp.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((NNRSimpBinop OpRecMerge) p r) (at level 70) : nnrs_imp.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (NNRSimpBinop OpAnd r1 r2) (right associativity, at level 65): nnrs_imp_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (NNRSimpBinop OpOr r1 r2) (right associativity, at level 70): nnrs_imp_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (NNRSimpBinop OpEqual r1 r2) (right associativity, at level 70): nnrs_imp_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (NNRSimpBinop OpLe r1 r2) (no associativity, at level 70): nnrs_imp_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (NNRSimpBinop OpBagUnion r1 r2) (right associativity, at level 70): nnrs_imp_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (NNRSimpBinop OpBagDiff r1 r2) (right associativity, at level 70): nnrs_imp_scope.  (* − = \minus *)
+Notation "r1 ⋂min r2" := (NNRSimpBinop OpBagMin r1 r2) (right associativity, at level 70): nnrs_imp_scope. (* ♯ = \sharp *)
+Notation "r1 ⋃max r2" := (NNRSimpBinop OpBagMax r1 r2) (right associativity, at level 70): nnrs_imp_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((NNRSimpBinop OpRecConcat) p r) (at level 70) : nnrs_imp_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((NNRSimpBinop OpRecMerge) p r) (at level 70) : nnrs_imp_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (NNRSimpUnop OpNeg r1) (right associativity, at level 70): nnrs_imp.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (NNRSimpUnop OpDistinct r1) (right associativity, at level 70): nnrs_imp.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (NNRSimpUnop OpCount r1) (right associativity, at level 70): nnrs_imp. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (NNRSimpUnop OpFlatten d) (at level 50) : nnrs_imp.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((NNRSimpUnop OpBag) d)  (at level 50) : nnrs_imp.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((NNRSimpUnop (OpRec s)) r) (at level 50) : nnrs_imp.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((NNRSimpUnop (OpRecRemove s1)) r) (at level 50) : nnrs_imp.          (* ¬ = \neg and π = \pi *)
-Notation "π[ s1 ]( r )" := ((NNRSimpUnop (OpRecProject s1)) r) (at level 50) : nnrs_imp.          (* π = \pi *)
-Notation "p · r" := ((NNRSimpUnop (OpDot r)) p) (left associativity, at level 40): nnrs_imp.      (* · = \cdot *)
+Notation "¬( r1 )" := (NNRSimpUnop OpNeg r1) (right associativity, at level 70): nnrs_imp_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (NNRSimpUnop OpDistinct r1) (right associativity, at level 70): nnrs_imp_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (NNRSimpUnop OpCount r1) (right associativity, at level 70): nnrs_imp_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (NNRSimpUnop OpFlatten d) (at level 50) : nnrs_imp_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((NNRSimpUnop OpBag) d)  (at level 50) : nnrs_imp_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((NNRSimpUnop (OpRec s)) r) (at level 50) : nnrs_imp_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((NNRSimpUnop (OpRecRemove s1)) r) (at level 50) : nnrs_imp_scope.          (* ¬ = \neg and π = \pi *)
+Notation "π[ s1 ]( r )" := ((NNRSimpUnop (OpRecProject s1)) r) (at level 50) : nnrs_imp_scope.          (* π = \pi *)
+Notation "p · r" := ((NNRSimpUnop (OpDot r)) p) (left associativity, at level 40): nnrs_imp_scope.      (* · = \cdot *)
 
 (*
-Notation "'$$' v" := (NNRSimpGetConstant v%string) (at level 50, format "'$$' v") : nnrs_imp.
-Notation "'$' v" := (NNRSimpVar v%string) (at level 50, format "'$' v") : nnrs_imp.
-Notation "{| e1 | '$' x ∈ e2 |}" := (NNRSimpFor x%string e2 e1) (at level 50, format "{|  e1  '/ ' |  '$' x  ∈  e2  |}") : nnrs_imp.   (* ∈ = \in *)
-Notation "'let' '$' x ':=' e2 'in' e1" := (NNRSimpLet x%string e2 e1) (at level 50, format "'[hv' 'let'  '$' x  ':='  '[' e2 ']'  '/' 'in'  '[' e1 ']' ']'") : nnrs_imp.
-Notation "e1 ? e2 : e3" := (NNRSimpIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  e2 '/' :  e3 ']'") : nnrs_imp.
+Notation "'$$' v" := (NNRSimpGetConstant v%string) (at level 50, format "'$$' v") : nnrs_imp_scope.
+Notation "'$' v" := (NNRSimpVar v%string) (at level 50, format "'$' v") : nnrs_imp_scope.
+Notation "{| e1 | '$' x ∈ e2 |}" := (NNRSimpFor x%string e2 e1) (at level 50, format "{|  e1  '/ ' |  '$' x  ∈  e2  |}") : nnrs_imp_scope.   (* ∈ = \in *)
+Notation "'let' '$' x ':=' e2 'in' e1" := (NNRSimpLet x%string e2 e1) (at level 50, format "'[hv' 'let'  '$' x  ':='  '[' e2 ']'  '/' 'in'  '[' e1 ']' ']'") : nnrs_imp_scope.
+Notation "e1 ? e2 : e3" := (NNRSimpIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  e2 '/' :  e3 ']'") : nnrs_imp_scope.
  *)
 
-Notation "r1 ‵+ r2" := (NNRSimpBinop (OpNatBinary NatPlus) r1 r2) (right associativity, at level 65): nnrs_imp.
-Notation "r1 ‵* r2" := (NNRSimpBinop (OpNatBinary NatMult) r1 r2) (right associativity, at level 65): nnrs_imp.
-Notation "‵abs r" := (NNRSimpUnop (OpNatUnary NatAbs) r) (right associativity, at level 64): nnrs_imp.
+Notation "r1 ‵+ r2" := (NNRSimpBinop (OpNatBinary NatPlus) r1 r2) (right associativity, at level 65): nnrs_imp_scope.
+Notation "r1 ‵* r2" := (NNRSimpBinop (OpNatBinary NatMult) r1 r2) (right associativity, at level 65): nnrs_imp_scope.
+Notation "‵abs r" := (NNRSimpUnop (OpNatUnary NatAbs) r) (right associativity, at level 64): nnrs_imp_scope.

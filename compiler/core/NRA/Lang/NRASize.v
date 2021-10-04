@@ -12,7 +12,7 @@
  * limitations under the License.
  *)
 
-Require Import Omega.
+Require Import Lia.
 Require Import DataRuntime.
 Require Import NRA.
 
@@ -38,7 +38,7 @@ Section NRASize.
 
   Lemma nra_size_nzero (a:nra) : nra_size a <> 0.
   Proof.
-    induction a; simpl; omega.
+    induction a; simpl; lia.
   Qed.
 
   Fixpoint nra_depth (a:nra) : nat :=

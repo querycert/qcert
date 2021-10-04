@@ -220,7 +220,7 @@ Section NNRCMRRewrite.
   (* Scalar Map *)
 
   Definition is_scalar_map map :=
-    match map with
+    match (map:map_fun) with
     | MapScalar _ => true
     | _ => false
     end.
@@ -264,7 +264,7 @@ Section NNRCMRRewrite.
 
   
   (* Java equivalent: MROptimizer.is_flatten_collect *)
-  Definition is_flatten_collect red :=
+  Definition is_flatten_collect (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect reduce => is_flatten_function reduce
@@ -275,7 +275,7 @@ Section NNRCMRRewrite.
   (* Id Reduce *)
 
   (* Java equivalent: MROptimizer.is_id_reduce *)  
-  Definition is_id_reduce red :=
+  Definition is_id_reduce (red:reduce_fun) :=
     match red with
     | RedId => true
     | RedCollect reduce => false
@@ -293,7 +293,7 @@ Section NNRCMRRewrite.
   (* Collect Reduce *)
 
   (* Java equivalent: MROptimizer.is_id_collect *)  
-  Definition is_id_collect red :=
+  Definition is_id_collect (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect reduce => is_id_function reduce
@@ -319,7 +319,7 @@ Section NNRCMRRewrite.
 
   (* singleton *)
   (* Java equivalent: MROptimizer.is_singleton_reduce *)
-  Definition is_singleton_reduce red :=
+  Definition is_singleton_reduce (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect _ => false
@@ -338,7 +338,7 @@ Section NNRCMRRewrite.
 
 
   (* uncoll reduce *)
-  Definition is_uncoll_collect red :=
+  Definition is_uncoll_collect (red:reduce_fun) :=
     match red with
     | RedId => false
     | RedCollect reduce => is_uncoll_function_arg reduce
@@ -346,7 +346,7 @@ Section NNRCMRRewrite.
     | RedSingleton => false
     end.
 
-  Definition suppress_uncoll_in_collect_reduce red :=
+  Definition suppress_uncoll_in_collect_reduce (red:reduce_fun) :=
     match red with
     | RedId => None
     | RedCollect f =>
@@ -888,43 +888,6 @@ Section NNRCMRRewrite.
         try contradiction; try congruence.
   Qed.
 
-
-(* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX TODO XXXXXXXXXXXXXXXXXXXXXX *)
-
-  (* (* KindOfId+M=M *) *)
-
-  (* Definition merge_mr_kindofid mr1 mr2 := *)
-  (*   if equiv_decb mr1.(mr_output) mr2.(mr_input) && is_kindofid_mr mr1 then *)
-  (*     let mr := *)
-  (*         mkMR *)
-  (*             mr1.(mr_input) *)
-  (*             mr2.(mr_output) *)
-  (*             mr2.(mr_flat_map) *)
-  (*             mr2.(mr_reduce) *)
-  (*     in *)
-  (*     Some mr *)
-  (*   else *)
-  (*     None. *)
-
-  (* Lemma merge_mr_kindofid_correct : *)
-  (*   merge_correct_singleton merge_mr_kindofid. *)
-  (* Proof. *)
-  (*   unfold merge_correct_singleton. intros m1 m2 m3. *)
-  (*   intros Hdist1 Hdist2. intros. *)
-  (*   unfold merge_mr_kindofid in H0. *)
-  (*   unfold equiv_decb in *. *)
-  (*   dest_eqdec; simpl in *. *)
-  (*   - case_eq (is_kindofid_mr m1); intros; *)
-  (*     rewrite H1 in H0; try congruence. *)
-  (*     unfold mr_chain_eval. *)
-  (*     simpl. *)
-  (*     dest_eqdec; [ | congruence ]. *)
-  (*     a.dmit. *)
-  (*   - discriminate.  *)
-  (* Qed. *)
-
-  (* map-id + id-red = map-red *)
-
   (* Java equivalent: MROptimizer.merge_id_reduce_id_dist_map *)  
   Definition merge_id_reduce_id_dist_map mr1 mr2 :=
     if equiv_decb mr1.(mr_output) mr2.(mr_input)
@@ -1397,7 +1360,7 @@ Section NNRCMRRewrite.
       mrl.(mr_last).
 
   (* Java equivalent: MROptimizer.mr_chain_cleanup *)
-  Fixpoint mr_chain_cleanup l (to_keep: list var) :=
+  Definition mr_chain_cleanup l (to_keep: list var) :=
     let (to_keep', res) :=
         List.fold_right
           (fun r (acc: list var * list mr) =>
@@ -1483,4 +1446,3 @@ Section NNRCMRRewrite.
     get_mr_chain_vars mrl.(mr_chain).
 
 End NNRCMRRewrite.
-

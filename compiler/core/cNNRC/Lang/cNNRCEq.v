@@ -84,7 +84,7 @@ Section cNNRCEq.
     intros; simpl; rewrite H0 by trivial; rewrite H1 by trivial; clear H0 H1.
     case_eq (nnrc_core_eval h cenv env y0);
       case_eq (nnrc_core_eval h cenv env y1); intros; simpl; trivial.
-    rewrite (H h); eauto.
+    rewrite (H h); qeauto.
   Qed.
 
   (* NNRCUnop *)
@@ -94,7 +94,7 @@ Section cNNRCEq.
     unfold Proper, respectful, nnrc_core_eq.
     intros; simpl; rewrite H0 by trivial; clear H0.
     case_eq (nnrc_core_eval h cenv env y0); simpl; trivial; intros.
-    rewrite (H h); eauto.
+    rewrite (H h); qeauto.
   Qed.
     
   (* NNRCLet *)
@@ -106,12 +106,12 @@ Section cNNRCEq.
     case_eq (nnrc_core_eval h cenv env y0); simpl; trivial; intros.
     rewrite H; clear H.
     rewrite H1; eauto.
-    constructor; eauto.
+    constructor; qeauto.
   Qed.
 
   (* NNRCFor *)
 
-    Hint Resolve data_normalized_dcoll_in.
+    Hint Resolve data_normalized_dcoll_in : qcert.
 
   Global Instance proper_cNNRCFor : Proper (eq ==> nnrc_core_eq ==> nnrc_core_eq ==> nnrc_core_eq) NNRCFor.
   Proof.
@@ -121,7 +121,7 @@ Section cNNRCEq.
     destruct d; try reflexivity; simpl.
     f_equal.
     apply lift_map_ext; intros.
-    apply H1; simpl; eauto.
+    apply H1; simpl; qeauto.
   Qed.
 
   (* NNRCIf *)
@@ -132,7 +132,7 @@ Section cNNRCEq.
     intros; simpl. rewrite H by trivial; clear H.
     case_eq (nnrc_core_eval h cenv env y); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
-    destruct b; eauto.
+    destruct b; qeauto.
   Qed.
 
   (* NNRCEither *)
@@ -142,12 +142,12 @@ Section cNNRCEq.
     intros; simpl. subst.
     rewrite H by trivial.
     match_case; intros ? eqq1. match_destr.
-    - assert (dn:data_normalized h (dleft d)) by eauto.
+    - assert (dn:data_normalized h (dleft d)) by qeauto.
       inversion dn; subst.
       apply H1; simpl; eauto.
-    - assert (dn:data_normalized h (dright d)) by eauto.
+    - assert (dn:data_normalized h (dright d)) by qeauto.
       inversion dn; subst.
-      apply H3; simpl; eauto.
+      apply H3; simpl; qeauto.
   Qed.
 
   (* NNRCGroupBy *)

@@ -14,6 +14,7 @@
 
 Require Import Arith.
 Require Import ZArith.
+Require Import Lia.
 Require Import String.
 Require Import List.
 Require Import EquivDec.
@@ -885,29 +886,29 @@ Section NNRCtoNNRCMR.
       (n, nil, vars_loc) (* XXX TODO? To check with Louis *)
     end.
   Next Obligation.
-      simpl; omega.
+      simpl; lia.
   Defined.
   Next Obligation.
-      simpl; omega.
+      simpl; lia.
   Defined.
   Next Obligation.
-      simpl; omega.
+      simpl; lia.
   Defined.
   Next Obligation.
-      simpl; omega.
+      simpl; lia.
   Defined.
   Next Obligation.
     rewrite nnrc_rename_lazy_size.
-    simpl; omega.
+    simpl; lia.
   Defined.
   Next Obligation.
-      simpl; omega.
+      simpl; lia.
   Defined.
   Next Obligation.
-      simpl; omega.
+      simpl; lia.
   Defined.
   Next Obligation.
-      simpl; omega.
+      simpl; lia.
   Defined.
 
 

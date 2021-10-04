@@ -17,6 +17,7 @@
 Require Import String.
 Require Import List.
 Require Import ListSet.
+Require Import BinInt.
 Require Import Arith.
 Require Import Equivalence.
 Require Import Morphisms.
@@ -32,6 +33,9 @@ Require Import NNRCRewrite.
 Require Import TNNRCRewrite.
 Require Import OptimizerLogger.
 Require Import OptimizerStep.
+
+Import ListNotations.
+Local Open Scope list_scope.
 
 Section NNRCOptimizer.
   Local Open Scope nnrc_scope.
