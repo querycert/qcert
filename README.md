@@ -34,7 +34,7 @@ To build Q\*cert from the source, you will need:
   - dune, a build system (https://dune.build)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
-  - js\_of\_ocaml, a compiler from OCaml to JavaScript
+  - js\_of\_ocaml (along with the library js\_of\_ocaml-ppx), a compiler from OCaml to JavaScript
   - re, a pure OCaml library for regular expressions
   - calendar, a library for manipulating date and time
   - uri, a library for processing URIs
