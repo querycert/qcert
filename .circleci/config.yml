@@ -6,7 +6,7 @@ common_steps: &common_steps
     - run:
         name: "Install npm"
         command: |
-          curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+          curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
           sudo apt-get install -y nodejs
           mkdir -p ~/.npm-global
           npm config set prefix $NPM_CONFIG_PREFIX
@@ -32,12 +32,14 @@ common_steps: &common_steps
           opam init --disable-sandboxing --jobs=$NJOBS --no-setup --yes --compiler=$OCAML_VERSION
           sed -i "s/^jobs: [0-9]*/jobs: $NJOBS/g" ~/.opam/config
           eval $(opam env)
+          opam switch create $OCAML_VERSION || true
+          opam switch set $OCAML_VERSION
           opam repo add coq-released https://coq.inria.fr/opam/released || true
           opam update || true
     - run:
         name: "Install OPAM deps"
-        command: opam install . --deps-only --yes
-        no_output_timeout: 30m
+        command: opam install . --deps-only --jobs=$NJOBS --yes
+        no_output_timeout: 45m
     - save_cache:
         <<: *common_cache_key
         paths:
