@@ -30,27 +30,6 @@ type dnnrc_logger_token_type = string
 (* Data types *)
 (**************)
 
-(* Data type conversions between Coq and OCaml *)
-
-let string_of_char_list l =
-  let b = Bytes.create (List.length l) in
-  let i = ref 0 in
-  List.iter (fun c -> Bytes.set b !i c; incr i) l;
-  Bytes.to_string b
-
-let char_list_of_string s =
-  let rec exp i l =
-    if i < 0 then l else exp (i - 1) (s.[i] :: l) in
-  exp (String.length s - 1) []
-
-let string = string_of_char_list
-
-let flat_map_string f s =
-  let sl = ref [] in
-  String.iter (fun c -> sl := (f c) :: !sl) s;
-  let sl' = List.rev !sl in
-  String.concat "" sl'
-
 (* coq Z's are now replaced by native OCaml ints, but here is the way to get things back to coq Z's:
 
 open BinNums
@@ -126,8 +105,8 @@ let qcert_string_of_float f =
   | '.' -> ocaml_string ^ "0"
   | _ -> ocaml_string
 
-let string_of_enhanced_float f = char_list_of_string (string_of_float f)
-let string_of_enhanced_string s = char_list_of_string ("S\"" ^ s ^ "\"")
+let string_of_enhanced_float f = string_of_float f
+let string_of_enhanced_string s = "S\"" ^ s ^ "\""
 
 let float_sign f =
   match Float.classify_float f with
@@ -143,7 +122,7 @@ let time f x =
   let v = f x in
   let stop = Sys.time() in
   let t = string_of_float (stop -. start) in
-  (char_list_of_string t, v)
+  (t, v)
 
 (* String manipulation *)    
 

@@ -86,49 +86,49 @@ End Test.
 
 Extract Constant OPTIMIZER_LOGGER_nraenv_token_type => "Util.nraenv_logger_token_type".
 Extract Constant OPTIMIZER_LOGGER_nraenv_startPass =>
-"(fun name input -> Logger.nraenv_log_startPass (Util.string_of_char_list name) input)".
+"(fun name input -> Logger.nraenv_log_startPass name input)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_step =>
-"(fun token name input output -> Logger.nraenv_log_step token (Util.string_of_char_list name) input output)".
+"(fun token name input output -> Logger.nraenv_log_step token name input output)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_endPass =>
 "(fun token output -> Logger.nraenv_log_endPass token output)".
 
 Extract Constant OPTIMIZER_LOGGER_nnrc_token_type => "Util.nnrc_logger_token_type".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_startPass =>
-"(fun name input -> Logger.nnrc_log_startPass (Util.string_of_char_list name) input)".
+"(fun name input -> Logger.nnrc_log_startPass name input)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_step =>
-"(fun token name input output -> Logger.nnrc_log_step token (Util.string_of_char_list name) input output)".
+"(fun token name input output -> Logger.nnrc_log_step token name input output)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_endPass =>
 "(fun token output -> Logger.nnrc_log_endPass token output)".
 
 Extract Constant OPTIMIZER_LOGGER_nnrs_imp_expr_token_type => "Util.nnrs_imp_expr_logger_token_type".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_startPass =>
-"(fun name input -> Logger.nnrs_imp_expr_log_startPass (Util.string_of_char_list name) input)".
+"(fun name input -> Logger.nnrs_imp_expr_log_startPass name input)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_step =>
-"(fun token name input output -> Logger.nnrs_imp_expr_log_step token (Util.string_of_char_list name) input output)".
+"(fun token name input output -> Logger.nnrs_imp_expr_log_step token name input output)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_expr_endPass =>
 "(fun token output -> Logger.nnrs_imp_expr_log_endPass token output)".
 
 Extract Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_token_type => "Util.nnrs_imp_stmt_logger_token_type".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_startPass =>
-"(fun name input -> Logger.nnrs_imp_stmt_log_startPass (Util.string_of_char_list name) input)".
+"(fun name input -> Logger.nnrs_imp_stmt_log_startPass name input)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_step =>
-"(fun token name input output -> Logger.nnrs_imp_stmt_log_step token (Util.string_of_char_list name) input output)".
+"(fun token name input output -> Logger.nnrs_imp_stmt_log_step token name input output)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_stmt_endPass =>
 "(fun token output -> Logger.nnrs_imp_stmt_log_endPass token output)".
 
 Extract Constant OPTIMIZER_LOGGER_nnrs_imp_token_type => "Util.nnrs_imp_logger_token_type".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_startPass =>
-"(fun name input -> Logger.nnrs_imp_log_startPass (Util.string_of_char_list name) input)".
+"(fun name input -> Logger.nnrs_imp_log_startPass name input)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_step =>
-"(fun token name input output -> Logger.nnrs_imp_log_step token (Util.string_of_char_list name) input output)".
+"(fun token name input output -> Logger.nnrs_imp_log_step token name input output)".
 Extract Inlined Constant OPTIMIZER_LOGGER_nnrs_imp_endPass =>
 "(fun token output -> Logger.nnrs_imp_log_endPass token output)".
 
 Extract Constant OPTIMIZER_LOGGER_dnnrc_token_type => "Util.dnnrc_logger_token_type".
 Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_startPass =>
-"(fun name input -> Logger.dnnrc_log_startPass (Util.string_of_char_list name) input)".
+"(fun name input -> Logger.dnnrc_log_startPass name input)".
 Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_step =>
-"(fun token name input output -> Logger.dnnrc_log_step token (Util.string_of_char_list name) input output)".
+"(fun token name input output -> Logger.dnnrc_log_step token name input output)".
 Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_endPass =>
 "(fun token output -> Logger.dnnrc_log_endPass token output)".
 

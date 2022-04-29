@@ -178,9 +178,9 @@ let json_of_exported_languages exported_languages =
   let wrap x =
     let ((((_,id),_),lab),desc) = x in
     object%js
-      val langid = Js.string (string_of_char_list id)
-      val label = Js.string (string_of_char_list lab)
-      val description = Js.string (string_of_char_list desc)
+      val langid = Js.string id
+      val label = Js.string lab
+      val description = Js.string desc
     end
   in
   object%js
@@ -208,10 +208,10 @@ let rec unsafe_json_to_js (j:QData.json) =
   | Coq_jnull -> Js.Unsafe.inject (Js.null)
   | Coq_jnumber n -> Js.Unsafe.inject (Js.number_of_float n)
   | Coq_jbool b -> Js.Unsafe.inject (Js.bool b)
-  | Coq_jstring str -> Js.Unsafe.inject (Js.string (string_of_char_list str))
+  | Coq_jstring str -> Js.Unsafe.inject (Js.string str)
   | Coq_jarray a -> Js.Unsafe.inject (wrap_all unsafe_json_to_js a)
   | Coq_jobject l ->
-     Js.Unsafe.inject (Js.Unsafe.obj (Array.of_list (List.map (fun (str,y) -> ((string_of_char_list str, unsafe_json_to_js y))) l)))
+     Js.Unsafe.inject (Js.Unsafe.obj (Array.of_list (List.map (fun (str,y) -> ((str, unsafe_json_to_js y))) l)))
   
 
 let json_of_optim_list() = unsafe_json_to_js QDriver.optim_config_list_to_json

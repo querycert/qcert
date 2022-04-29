@@ -29,7 +29,6 @@ Require Import EnhancedReduceOps.
 Import ListNotations.
 Local Open Scope list_scope.
 Local Open Scope string_scope.
-Local Open Scope nstring_scope.
 
 Definition enhanced_to_reduce_op (uop:unary_op) : option NNRCMR.reduce_op :=
   match uop with

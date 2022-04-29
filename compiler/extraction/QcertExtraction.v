@@ -18,14 +18,14 @@
 
 Require Extraction.
 Extraction Language OCaml.
-Require Import ExtrOcamlBasic ExtrOcamlString ExtrOcamlNatInt ExtrOcamlZInt.
+Require Import ExtrOcamlBasic ExtrOcamlNativeString ExtrOcamlNatInt ExtrOcamlZInt.
 Require Import ExtrOcamlFloatNatIntZInt.
 Extraction Blacklist String List.
 
 Require Import Digits.
 Require Import TechRule DesignerRule.
 
-Extract Constant Digits.nat_to_string10 => "(fun x -> Util.char_list_of_string (string_of_int x))".
+Extract Constant Digits.nat_to_string10 => "(fun x -> string_of_int x)".
 
 Extract Constant TechRule.tech_rule => "camp_rule".
 Extract Constant DesignerRule.designer_rule => "camp_rule".

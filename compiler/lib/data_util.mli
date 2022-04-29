@@ -32,10 +32,10 @@ type io_globals = QData.json
 type rtype_content = QData.json
 type vrtype_content = QData.json
 
-type content_input = (char list * QData.qdata) list
+type content_input = (string * QData.qdata) list
 type content_output = QData.qdata
 
-type content_inheritance = (char list * char list) list
+type content_inheritance = (string * string) list
 type full_content_inheritance = (content_inheritance * io_inheritance)
 type content_brandTypes = (string * string) list
 type content_typeDefs = (string * rtype_content) list

@@ -51,8 +51,8 @@ Extract Inductive PrimFloat.float_comparison =>
 Extract Inlined Constant float_max_value => "Float.max_float".
 Extract Inlined Constant float_min_value => "Float.min_value".
 
-Extract Inlined Constant float_from_string => "(fun x -> float_of_string (Util.string_of_char_list x))".
-Extract Inlined Constant float_to_string => "(fun x -> Util.char_list_of_string (Util.qcert_string_of_float x))".
+Extract Inlined Constant float_from_string => "(fun x -> float_of_string x)".
+Extract Inlined Constant float_to_string => "(fun x -> Util.qcert_string_of_float x)".
 
 Extract Inlined Constant float_neg => "(fun x -> Float.neg x)".
 
@@ -95,4 +95,4 @@ Extract Inlined Constant float_of_int => "(fun x -> float_of_int x)".
 
 Extract Inlined Constant float_truncate => "(fun x -> truncate x)".
 
-Extract Inlined Constant JsNumber.to_string => "(fun x -> Util.char_list_of_string (Util.qcert_string_of_float x))".
+Extract Inlined Constant JsNumber.to_string => "(fun x -> Util.qcert_string_of_float x)".

@@ -13,7 +13,7 @@ include Wasm_backend.Make(struct
  * We patch the generic translate and eval functions accordingly.
  *)
 
-let main = Util.char_list_of_string "qcert_main"
+let main = "qcert_main"
 
 let imp_ejson_to_wasm_ast fopmap (* fdatamap*)  hierarchy = function
   | [ _, fn ] -> imp_ejson_to_wasm_ast fopmap hierarchy [ main, fn ]

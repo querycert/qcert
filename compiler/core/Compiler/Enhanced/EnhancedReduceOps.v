@@ -27,7 +27,6 @@ Require Import EnhancedData.
 Import ListNotations.
 Local Open Scope list_scope.
 Local Open Scope string_scope.
-Local Open Scope nstring_scope.
 
 Inductive enhanced_numeric_type :=
 | enhanced_numeric_int

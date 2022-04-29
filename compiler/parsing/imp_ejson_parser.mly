@@ -24,7 +24,7 @@
   let runtime_call mname fname =
     if (mname = "Runtime")
     then
-      begin match QUtil.ejson_runtime_op_of_string (Util.char_list_of_string fname) with
+      begin match QUtil.ejson_runtime_op_of_string fname with
       | Some op -> op
       | None ->raise (Qcert_Error ("Call to " ^ mname ^ "." ^ fname ^ " unkonwn"))
       end
@@ -76,7 +76,7 @@ ifunctions:
 
 ifunction:
 | fname = IDENT LPAREN aname = IDENT RPAREN RETURN rname = IDENT b = block
-    { (char_list_of_string fname,ImpFun (char_list_of_string aname,b,char_list_of_string rname)) }
+    { (fname,ImpFun (aname,b,rname)) }
 
 block:
 | LCURLY ds = decls ss = stmts RCURLY
@@ -86,11 +86,11 @@ stmt:
 | b = block
     { b }
 | vname = IDENT COLONEQUAL e = expr SEMI
-    { ImpStmtAssign (char_list_of_string vname,e) }
+    { ImpStmtAssign (vname,e) }
 | FOR LPAREN vname = IDENT IN e = expr RPAREN s = stmt
-    { ImpStmtFor (char_list_of_string vname,e,s) }
+    { ImpStmtFor (vname,e,s) }
 | FOR LPAREN vname = IDENT EQUAL e1 = expr TO e2 = expr RPAREN s = stmt
-    { ImpStmtForRange (char_list_of_string vname,e1,e2,s) }
+    { ImpStmtForRange (vname,e1,e2,s) }
 | IF e = expr THEN s1 = stmt ELSE s2 = stmt
     { ImpStmtIf (e,s1,s2) }
 
@@ -108,9 +108,9 @@ decls:
 
 decl:
 | LET vname = IDENT SEMI
-    { (char_list_of_string vname, None) }
+    { (vname, None) }
 | LET vname = IDENT COLONEQUAL e = expr SEMI
-    { (char_list_of_string vname, Some e) }
+    { (vname, Some e) }
 
 expr:
 (* Parenthesized expression *)
@@ -118,7 +118,7 @@ expr:
     { e }
 (* Failure *)
 | FAILWITH s = STRING
-    { ImpExprError (char_list_of_string s) }
+    { ImpExprError s }
 (* Constants *)
 | NULL
     { ImpExprConst Coq_cejnull }
@@ -131,7 +131,7 @@ expr:
 | FALSE
     { ImpExprConst (Coq_cejbool false) }
 | s = STRING
-    { ImpExprConst (Coq_cejstring (char_list_of_string s)) }
+    { ImpExprConst (Coq_cejstring s) }
 (* Constructors *)
 | LBRACKET es = exprs RBRACKET (* Arrays *)
     { ImpExprRuntimeCall (EJsonRuntimeArray,es) }
@@ -159,7 +159,7 @@ expr:
     { ImpExprRuntimeCall (runtime_call mname fname,el) }
 (* Expressions *)
 | vname = IDENT
-    { ImpExprVar  (char_list_of_string vname) }
+    { ImpExprVar vname }
 
 exprs:
 | 
@@ -173,8 +173,8 @@ pairs:
 | 
     { ([],[]) }
 | aname = IDENT COLON e = expr
-    { (char_list_of_string aname :: [], e :: []) }
+    { (aname :: [], e :: []) }
 | aname = IDENT COLON e = expr COMMA ps = pairs
     { let (anames,es) = ps in
-      (char_list_of_string aname :: anames, e :: es) }
+      (aname :: anames, e :: es) }
 

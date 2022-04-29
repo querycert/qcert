@@ -12,11 +12,11 @@
  * limitations under the License.
  *)
 
-Require Import NativeString.
+Require Import String.
 
 Section JavaScript.
   (** Javascript programs are in serialized form *)
-  Definition javascript := nstring.
+  Definition javascript := string.
   Definition js := javascript. (* Just an alias *)
   
 End JavaScript.

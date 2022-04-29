@@ -21,9 +21,9 @@ open EnhancedCompiler.EnhancedCompiler
 
 let qcert_error_of_qerror e =
   begin match e with
- | CompilationError cl -> "[CompilationError] " ^ (string_of_char_list cl)
- | TypeError cl -> "[TypeError] " ^ (string_of_char_list cl)
- | UserError d -> "[UserError] " ^ (string_of_char_list (QData.qdataStringify [] d))
+ | CompilationError cl -> "[CompilationError] " ^ cl
+ | TypeError cl -> "[TypeError] " ^ cl
+ | UserError d -> "[UserError] " ^ (QData.qdataStringify "" d)
   end
 
 let lift_qerror f x =
@@ -39,39 +39,34 @@ let lift_qerror_as_option f x =
   end
 
 let language_of_name name =
-  let name =
-    char_list_of_string (String.lowercase_ascii name)
-  in
+  let name = String.lowercase_ascii name in
   begin match QLang.language_of_name_case_sensitive name with
-  | L_error err -> raise (Qcert_Error ("Unknown language: "^(string err)))
+  | L_error err -> raise (Qcert_Error ("Unknown language: " ^ err))
   | lang -> lang
   end
 
 let name_of_language lang =
-  let name = QLang.name_of_language lang in
-  string name
-
+  QLang.name_of_language lang
 
 let name_of_query (q: QLang.query) =
-  let name = QLang.name_of_query (QType.empty_brand_model ()) q in
-  string name
+  QLang.name_of_query (QType.empty_brand_model ()) q
 
 let driver_no_error dv =
   begin match dv with
-  | Dv_error err -> raise (Qcert_Error (string err))
+  | Dv_error err -> raise (Qcert_Error err)
   | _ -> ()
   end
 
 let language_no_error lang =
   begin match lang with
-  | L_error err -> raise (Qcert_Error (string err))
+  | L_error err -> raise (Qcert_Error err)
   | _ -> ()
   end
 
 let query_no_error q =
   begin match q with
   | Q_error err ->
-      Format.eprintf "[Compilation error] %s@." (string err)
+      Format.eprintf "[Compilation error] %s@." err
   | _ -> ()
   end
 
@@ -89,7 +84,7 @@ let string_of_path sep path =
   Format.pp_print_flush str_ff ();
   Buffer.contents buff
 
-let qcert_version = Util.string_of_char_list QUtil.qcert_version
+let qcert_version = QUtil.qcert_version
 
 let get_version () =
   print_endline ("Q*cert compiler version " ^ qcert_version);

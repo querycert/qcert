@@ -16,10 +16,8 @@ Require Import String.
 Require Import StringAdd.
 Require Import List.
 Require Import Ascii.
-Require Import NativeString.
 
 Local Open Scope string_scope.
-Local Open Scope nstring_scope.
 Import ListNotations.
 
 Section EmitUtil.
@@ -27,27 +25,18 @@ Section EmitUtil.
     Definition eol_newline : string := String (Ascii.ascii_of_nat 10) EmptyString.
     Definition eol_backn : string := "\n".
 
-    Definition neol_newline : nstring := ^eol_newline.
-    Definition neol_backn : nstring := ^eol_backn.
-
     Definition quotel_double : string := """".
     Definition quotel_backdouble : string := "\""".
 
-    Definition nquotel_double : nstring := ^quotel_double.
-    Definition nquotel_backdouble : nstring := ^quotel_backdouble.
-
     (* Java equivalent: JavaScriptBackend.indent *)
-    Fixpoint indent (i : nat) : nstring :=
+    Fixpoint indent (i : nat) : string :=
       match i with
-      | 0 => ^EmptyString
-      | S j => ^"  " +++ (indent j)
+      | 0 => EmptyString
+      | S j => "  " ++ (indent j)
       end.
 
     Definition string_bracket (open s close:string) : string :=
       append open (append s close).
-
-    Definition nstring_bracket (open s close:nstring) : nstring :=
-      nstring_append open (nstring_append s close).
 
   End Whitespace.
 

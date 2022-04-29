@@ -163,20 +163,20 @@ camp:
 | PRIGHT
     { QCAMP.pright }
 | PGETCONSTANT s = STRING
-    { QCAMP.pgetConstant (char_list_of_string s) }
+    { QCAMP.pgetConstant s }
 (* Macros pattern *)
 | PNOW
     { QCAMP.pnow }
 | PACCEPT
     { QCAMP.pconst (QData.drec []) }
 | LOOKUP s = STRING
-    { QCAMP.lookup (char_list_of_string s) }
+    { QCAMP.lookup s }
  | v = STRING IS p = camp %prec UIS
-    { QCAMP.pIS (char_list_of_string v) p }
+    { QCAMP.pIS v p }
 | WITHVAR s = STRING p = camp %prec UWITHVAR
-    { QCAMP.withVar (char_list_of_string s) p }
+    { QCAMP.withVar s p }
 | PVARWITH s = STRING p = camp %prec UWITHVAR
-    { QCAMP.pvarwith (char_list_of_string s) p }
+    { QCAMP.pvarwith s p }
 | TOSTRING p = camp
     { QCAMP.toString p }
 | PBINOPRED b = bop LBRACKET pl = camplist RBRACKET
@@ -188,20 +188,20 @@ camp:
 | DASHTICK c = const
     { (QCAMP.pconst c) }
 | s = STRING BANGDASHARROW p = camp
-    { QCAMP.pbdot (char_list_of_string s) p }
+    { QCAMP.pbdot s p }
 | PBDOT s = STRING p = camp %prec PBDOT
-    { QCAMP.pbdot (char_list_of_string s) p }
+    { QCAMP.pbdot s p }
 | PBSOMEDOT s = STRING p = camp %prec PBSOMEDOT
-    { QCAMP.pbsomedot (char_list_of_string s) p }
+    { QCAMP.pbsomedot s p }
 | PSOME
     { QCAMP.pleft }
 | PNULL
     { QCAMP.pnull }
 (* INSTANCEOF, FETCH, and MATCHES temporarily have hacks because of signature changes in RuleSugar.v.  TODO fix this *)
 | n = STRING INSTANCEOF LBRACKET t = stringlist RBRACKET WHERE p = camp %prec UINSTANCE
-    { QCAMPRule.instanceOf (char_list_of_string n) t p }
+    { QCAMPRule.instanceOf n t p }
 | p = camp TEMPVAR t = STRING FETCH LBRACKET e = stringlist RBRACKET KEY a = STRING DO pcont = camp %prec UFETCH
-    { QCAMPRule.fetchRef e (char_list_of_string a) (char_list_of_string t) p pcont }
+    { QCAMPRule.fetchRef e a t p pcont }
 | MATCHES LBRACKET t = stringlist RBRACKET WHERE p = camp %prec UINSTANCE
     { QCAMPRule.matches t p }
 | AGGREGATE r = rule_rule DO u = uop OVER p = camp FLATTEN f = INT
@@ -220,7 +220,7 @@ data:
 | DNAT i = INT
     { QData.dnat (coq_Z_of_int i) }
 | DSTRING s = STRING
-    { QData.dstring (char_list_of_string s) }
+    { QData.dstring s }
 | DCOLL LBRACKET dl = datalist RBRACKET
     { QData.dcoll dl }
 | DREC LBRACKET rl = reclist RBRACKET
@@ -250,7 +250,7 @@ reclist:
 
 recatt:
 | LPAREN a = STRING COMMA d = data RPAREN
-    { (char_list_of_string a, d) }
+    { (a, d) }
     
 camplist:
 | p = camp
@@ -260,9 +260,9 @@ camplist:
 
 stringlist:
 | s = STRING
-    { (char_list_of_string s) :: [] }
+    { s :: [] }
 | s = STRING SEMI v = stringlist
-    { (char_list_of_string s) :: v }
+    { s :: v }
 
 const:
 | i = INT
@@ -270,7 +270,7 @@ const:
 | f = FLOAT
     { QData.dfloat f }
 | s = STRING
-    { QData.dstring (char_list_of_string s) }
+    { QData.dstring s }
 | TRUE
     { QData.dbool true }
 | FALSE
@@ -399,7 +399,7 @@ uop:
 | ASUBSTRING LPAREN s = INT COMMA len = INT RPAREN
   { QOps.Unary.opsubstring s (Some len) }
 | ALIKE LPAREN s = STRING RPAREN
-  { QOps.Unary.oplike (char_list_of_string s) }
+  { QOps.Unary.oplike s }
 | ANUMMIN
     { QOps.Unary.opnatmin }
 | ANUMMAX
@@ -417,9 +417,9 @@ uop:
 | LPAREN ARECPROJECT LBRACKET s = stringlist RBRACKET RPAREN
     { QOps.Unary.oprecproject s }
 | LPAREN AREC s = STRING RPAREN
-    { QOps.Unary.oprec (char_list_of_string s) }
+    { QOps.Unary.oprec s }
 | LPAREN ADOT s = STRING RPAREN
-    { QOps.Unary.opdot (char_list_of_string s) }
+    { QOps.Unary.opdot s }
 | AUNBRAND
     { QOps.Unary.opunbrand }
 | ASINGLETON

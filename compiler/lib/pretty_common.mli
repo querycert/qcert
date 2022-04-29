@@ -89,7 +89,7 @@ val pretty_sym : Format.formatter -> (string*int) -> unit
 
 type 'a pretty_fun = int -> symbols -> Format.formatter -> 'a -> unit
 val pretty_infix_exp : int -> int -> symbols -> 'a pretty_fun -> (string*int) -> Format.formatter -> 'a -> 'a -> unit
-val pretty_squared_names : symbols -> Format.formatter -> (char list) list -> unit
+val pretty_squared_names : symbols -> Format.formatter -> string list -> unit
 
 (* Pretty data *)
 

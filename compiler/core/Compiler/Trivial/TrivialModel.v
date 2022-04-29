@@ -332,14 +332,13 @@ Next Obligation.
   destruct j.
 Defined.
 
-Local Open Scope nstring_scope.
 Program Instance trivial_foreign_to_scala :
   @foreign_to_scala trivial_foreign_runtime trivial_foreign_type
   := mk_foreign_to_scala
        trivial_foreign_runtime trivial_foreign_type
        _ _.
 Next Obligation.
-  exact (^"TRIVIAL MODEL DOES NOT SUPPORT FOREIGN TYPES"%string).
+  exact ("TRIVIAL MODEL DOES NOT SUPPORT FOREIGN TYPES"%string).
 Defined.
 
 Program Instance trivial_foreign_type_to_JSON : foreign_type_to_JSON

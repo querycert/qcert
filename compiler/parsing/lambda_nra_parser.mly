@@ -165,7 +165,7 @@ query:
 
 lambda_expr:
 | v = IDENT EQUALGT e = expr
-    { QLambdaNRA.lalambda (char_list_of_string v) e }
+    { QLambdaNRA.lalambda v e }
 
 expr:
 (* Parenthesized expression *)
@@ -179,19 +179,19 @@ expr:
 | f = FLOAT
     { QLambdaNRA.laconst (QData.dfloat f) }
 | s = STRING
-    { QLambdaNRA.laconst (QData.dstring (char_list_of_string s)) }
+    { QLambdaNRA.laconst (QData.dstring s) }
 (* Call *)
 | fn = IDENT LPAREN el = exprlist RPAREN
     { resolve_call fn el }
 (* Expressions *)
 | v = IDENT
-    { QLambdaNRA.lavar (char_list_of_string v) }
+    { QLambdaNRA.lavar v }
 | e = expr DOT a = IDENT LCURLY le = lambda_expr RCURLY
     { resolve_nra_operator a [ParsedLambda le] e }
 | e = expr DOT a = IDENT
-    { QLambdaNRA.ladot (char_list_of_string a) e }
+    { QLambdaNRA.ladot a e }
 | e = expr ARROW a = IDENT
-    { QLambdaNRA.laarrow (char_list_of_string a) e }
+    { QLambdaNRA.laarrow a e }
 | STRUCT LPAREN r = reclist RPAREN
     { QLambdaNRA.lastruct r }
 | e = expr DOT a = IDENT LPAREN el=params RPAREN
@@ -238,7 +238,7 @@ reclist:
 
 recatt:
 | a = IDENT COLON e = expr
-    { (char_list_of_string a, e) }
+    { (a, e) }
     
 params:
 | e = expr

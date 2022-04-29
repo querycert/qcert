@@ -192,7 +192,6 @@ End SqlDateModel.
 
 Section SqlDateOperators.
   Local Open Scope string.
-  Local Open Scope nstring_scope.
 
   Inductive sql_date_unary_op :=
   | uop_sql_date_get_component : sql_date_component -> sql_date_unary_op
@@ -235,36 +234,36 @@ Section SqlDateOperators.
   End toString.
 
   Section toJava.
-    Definition cname : nstring := ^"SqlDateComponent".
+    Definition cname : string := "SqlDateComponent".
 
-    Definition sql_date_component_to_java_string (part:sql_date_component): nstring :=
-      cname +++ ^"." +++ (^sql_date_component_tostring part).
+    Definition sql_date_component_to_java_string (part:sql_date_component): string :=
+      cname ++ "." ++ (sql_date_component_tostring part).
 
     Definition sql_date_to_java_unary_op
-               (indent:nat) (eol:nstring)
-               (quotel:nstring) (fu:sql_date_unary_op)
+               (indent:nat) (eol:string)
+               (quotel:string) (fu:sql_date_unary_op)
                (d:java_json) : java_json :=
       match fu with
       | uop_sql_date_get_component part =>
-        mk_java_unary_op1_foreign cname (^"sql_date_get_component") (sql_date_component_to_java_string part) d
-      | uop_sql_date_from_string => mk_java_unary_op0_foreign cname (^"sql_date_from_string") d
-      | uop_sql_date_period_from_string => mk_java_unary_op0_foreign cname (^"sql_date_period_from_string") d
+        mk_java_unary_op1_foreign cname "sql_date_get_component" (sql_date_component_to_java_string part) d
+      | uop_sql_date_from_string => mk_java_unary_op0_foreign cname "sql_date_from_string" d
+      | uop_sql_date_period_from_string => mk_java_unary_op0_foreign cname "sql_date_period_from_string" d
       end.
 
     Definition sql_date_to_java_binary_op
-               (indent:nat) (eol:nstring)
-               (quotel:nstring) (fb:sql_date_binary_op)
+               (indent:nat) (eol:string)
+               (quotel:string) (fb:sql_date_binary_op)
                (d1 d2:java_json) : java_json :=
       match fb with
-      | bop_sql_date_plus => mk_java_binary_op0_foreign cname (^"sql_date_plus") d1 d2
-      | bop_sql_date_minus => mk_java_binary_op0_foreign cname (^"sql_date_minus") d1 d2
-      | bop_sql_date_ne =>  mk_java_binary_op0_foreign cname (^"sql_date_ne") d1 d2
-      | bop_sql_date_lt =>  mk_java_binary_op0_foreign cname (^"sql_date_lt") d1 d2
-      | bop_sql_date_le =>  mk_java_binary_op0_foreign cname (^"sql_date_le") d1 d2
-      | bop_sql_date_gt =>  mk_java_binary_op0_foreign cname (^"sql_date_gt") d1 d2
-      | bop_sql_date_ge => mk_java_binary_op0_foreign cname (^"sql_date_ge") d1 d2
-      | bop_sql_date_period_between => mk_java_binary_op0_foreign cname (^"sql_date_period_between") d1 d2
-      | bop_sql_date_set_component part => mk_java_binary_opn_foreign cname (^"sql_date_set_component") [sql_date_component_to_java_string part] d1 d2
+      | bop_sql_date_plus => mk_java_binary_op0_foreign cname "sql_date_plus" d1 d2
+      | bop_sql_date_minus => mk_java_binary_op0_foreign cname "sql_date_minus" d1 d2
+      | bop_sql_date_ne =>  mk_java_binary_op0_foreign cname "sql_date_ne" d1 d2
+      | bop_sql_date_lt =>  mk_java_binary_op0_foreign cname "sql_date_lt" d1 d2
+      | bop_sql_date_le =>  mk_java_binary_op0_foreign cname "sql_date_le" d1 d2
+      | bop_sql_date_gt =>  mk_java_binary_op0_foreign cname "sql_date_gt" d1 d2
+      | bop_sql_date_ge => mk_java_binary_op0_foreign cname "sql_date_ge" d1 d2
+      | bop_sql_date_period_between => mk_java_binary_op0_foreign cname "sql_date_period_between" d1 d2
+      | bop_sql_date_set_component part => mk_java_binary_opn_foreign cname "sql_date_set_component" [sql_date_component_to_java_string part] d1 d2
       end.
 
   End toJava.

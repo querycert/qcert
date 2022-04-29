@@ -40,7 +40,7 @@ json:
 | f = FLOAT
     { QData.jnumber f }
 | s = STRING
-    { QData.jstring (char_list_of_string s) }
+    { QData.jstring s }
 | TRUE
     { QData.jbool true }
 | FALSE
@@ -62,7 +62,7 @@ jobject:
 
 attribute:
 | s = STRING COLON d = json
-    { ((char_list_of_string s), d) }
+    { (s, d) }
 
 jarray:
 | d = json

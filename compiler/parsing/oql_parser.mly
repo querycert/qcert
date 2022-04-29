@@ -134,9 +134,9 @@ main:
 
 program:
 | DEFINE v = IDENT AS e = query SEMI p = program 
-  { QOQL.define (char_list_of_string v) e p  }
+  { QOQL.define v e p  }
 | UNDEFINE v = IDENT SEMI p = program 
-  { QOQL.undefine (char_list_of_string v) p  }
+  { QOQL.undefine v p  }
 | e = query
   { QOQL.query e }
 
@@ -161,7 +161,7 @@ expr:
 | f = FLOAT
     { QOQL.oconst (QData.dfloat f) }
 | s = STRING
-    { QOQL.oconst (QData.dstring (char_list_of_string s)) }
+    { QOQL.oconst (QData.dstring s) }
 (* Select from where ... *)
 | SELECT e = expr FROM fc = from_clause 
     { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue QOQL.onoorder }
@@ -176,15 +176,15 @@ expr:
     { resolve_call fn el }
 (* Expressions *)
 | v = IDENT
-    { QOQL.ovar (char_list_of_string v) }
+    { QOQL.ovar v }
 | e = expr DOT a = IDENT
-    { QOQL.odot (char_list_of_string a) e }
+    { QOQL.odot a e }
 | e = expr ARROW a = IDENT
-    { QOQL.oarrow (char_list_of_string a) e }
+    { QOQL.oarrow a e }
 | STRUCT LPAREN r = reclist RPAREN
     { QOQL.ostruct r }
 | NEW a = IDENT LPAREN r = reclist RPAREN  (* XXX Spec does not use `new` *)
-    { QOQL.onew (char_list_of_string a) r }
+    { QOQL.onew a r }
 | BAG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.opbag e }
 (* Binary operators *)
@@ -236,13 +236,13 @@ exprlist:
 
 from_clause:
 | v = IDENT IN e = expr
-    { (QOQL.oin (char_list_of_string v) e) :: [] }
+    { (QOQL.oin v e) :: [] }
 | v = IDENT AS c = qname IN e = expr
-    { (QOQL.oincast (char_list_of_string v) (char_list_of_string c) e) :: [] }
+    { (QOQL.oincast v c e) :: [] }
 | v = IDENT IN e = expr COMMA fr = from_clause
-    { (QOQL.oin (char_list_of_string v) e) :: fr }
+    { (QOQL.oin v e) :: fr }
 | v = IDENT AS c = qname IN e = expr COMMA fr = from_clause
-    { (QOQL.oincast (char_list_of_string v) (char_list_of_string c) e) :: fr }
+    { (QOQL.oincast v c e) :: fr }
 
 qname:
 | i = IDENT
@@ -260,5 +260,5 @@ reclist:
 
 recatt:
 | a = IDENT COLON e = expr
-    { (char_list_of_string a, e) }
+    { (a, e) }
     

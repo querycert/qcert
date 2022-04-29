@@ -12,6 +12,7 @@
  * limitations under the License.
  *)
 
+Require Import String.
 Require Import Utils.
 Require Import ForeignEJson.
 Require Import EJson.
@@ -27,7 +28,7 @@ Section WasmAst.
   (** WASM programs are in AST form *)
   Parameter wasm_ast : Set.
   Parameter wasm_ast_eval : wasm_ast -> @jbindings foreign_ejson_model -> option (@ejson foreign_ejson_model).
-  Parameter wasm_ast_to_string : wasm_ast -> nstring.
+  Parameter wasm_ast_to_string : wasm_ast -> string.
 End WasmAst.
 
 Extract Constant wasm_ast => "Wasm_ast.t".

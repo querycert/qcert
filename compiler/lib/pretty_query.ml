@@ -105,7 +105,7 @@ let rec pretty_nra_aux p sym ff a =
 	      (pretty_nra_aux p sym) a2
   | NRAEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
   | NRAApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
-  | NRAGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (string_of_char_list s) pretty_sym sym.rfloor
+  | NRAGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor s pretty_sym sym.rfloor
   end
     
 (* resets precedence back to 0 *)
@@ -153,7 +153,7 @@ let rec pretty_nraenv_aux p sym ff a =
 	      (pretty_nraenv_aux p sym) a2
   | NRAEnvEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nraenv_aux sym.sqlrarrow ff a1 a2
   | NRAEnvApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nraenv_aux sym.circ ff a1 a2
-  | NRAEnvGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (string_of_char_list s) pretty_sym sym.rfloor
+  | NRAEnvGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor s pretty_sym sym.rfloor
   | NRAEnvEnv -> fprintf ff "%s" "ENV"
   | NRAEnvAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
   | NRAEnvMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
@@ -211,20 +211,20 @@ let pretty_nraenv_core greek margin annot inheritance link_runtime q =
 
 let rec pretty_nnrc_aux p sym ff n =
   begin match n with
-  | NNRCGetConstant v -> fprintf ff "$$%s"  (string_of_char_list v)
-  | NNRCVar v -> fprintf ff "$v%s"  (string_of_char_list v)
+  | NNRCGetConstant v -> fprintf ff "$$%s" v
+  | NNRCVar v -> fprintf ff "$v%s"  v
   | NNRCConst d -> fprintf ff "%a" pretty_data d
   | NNRCBinop (b,n1,n2) -> (pretty_binary_op p sym pretty_nnrc_aux) ff b n1 n2
   | NNRCUnop (u,n1) -> (pretty_unary_op p sym pretty_nnrc_aux) ff u n1
   | NNRCLet (v,n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
-	      (string_of_char_list v)
+	      v
 	      (pretty_nnrc_aux p sym) n1
 	      (pretty_nnrc_aux p sym) n2
   | NNRCFor (v,n1,n2) ->
       fprintf ff "@[<hv 0>{ @[<hv 0>%a@]@;<1 0>@[<hv 2>| $v%s %a@ %a@] }@]"
 	      (pretty_nnrc_aux 0 sym) n2
-	      (string_of_char_list v) pretty_sym sym.sin
+	      v pretty_sym sym.sin
 	      (pretty_nnrc_aux 0 sym) n1
   | NNRCIf (n1,n2,n3) ->
       fprintf ff "@[<hv 0>@[<hv 2>if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
@@ -234,8 +234,8 @@ let rec pretty_nnrc_aux p sym ff n =
   | NNRCEither (n0,v1,n1,v2,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	      (pretty_nnrc_aux p sym) n0
-	      (string_of_char_list v1) (pretty_nnrc_aux p sym) n1
-	      (string_of_char_list v2) (pretty_nnrc_aux p sym) n2
+	      v1 (pretty_nnrc_aux p sym) n1
+	      v2 (pretty_nnrc_aux p sym) n2
   | NNRCGroupBy (g,atts,n1) ->
       fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrc_aux 0 sym) n1
   end
@@ -258,8 +258,8 @@ let pretty_nnrc_core greek margin annot inheritance link_runtime q =
 
 let rec pretty_nnrs_expr p sym ff e =
   begin match e with
-  | NNRSGetConstant v -> fprintf ff "$$%s"  (string_of_char_list v)
-  | NNRSVar v -> fprintf ff "$v%s"  (string_of_char_list v)
+  | NNRSGetConstant v -> fprintf ff "$$%s" v
+  | NNRSVar v -> fprintf ff "$v%s" v
   | NNRSConst d -> fprintf ff "%a" pretty_data d
   | NNRSBinop (b,n1,n2) -> (pretty_binary_op p sym pretty_nnrs_expr) ff b n1 n2
   | NNRSUnop (u,n1) -> (pretty_unary_op p sym pretty_nnrs_expr) ff u n1
@@ -275,30 +275,30 @@ let rec pretty_nnrs_stmt p sym ff stmt =
         (pretty_nnrs_stmt 0 sym) s2
   | NNRSLet (v,n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_expr p sym) n1
         (pretty_nnrs_stmt p sym) n2
   | NNRSLetMut (v, s1, s2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s from {%a} @]@;<1 0>@[<hv 2>in@ @[<hv 2>%a@]@]@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_stmt p sym) s1
         (pretty_nnrs_stmt p sym) s2
   | NNRSLetMutColl (v, s1, s2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let_coll $v%s from {%a} @]@;<1 0>@[<hv 2>in@ @[<hv 2>%a@]@]@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_stmt p sym) s1
         (pretty_nnrs_stmt p sym) s2
   | NNRSPush (v, e) ->
       fprintf ff "@[<hv 2>push(@,$v%s,@;<1 0>%a@;<0 -2>)@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_expr 0 sym) e
   | NNRSAssign (v, e) ->
       fprintf ff "@[<hv 2>$v%s :=@;<1 0>%a@;<0 -2>)@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_expr 0 sym) e
   | NNRSFor (v,n1,n2) ->
       fprintf ff "@[<hv 0>for (@[<hv 2>$v%s %a@;<1 0>%a@]) {@;<1 2>%a@ }@]"
-        (string_of_char_list v) pretty_sym sym.sin
+        v pretty_sym sym.sin
         (pretty_nnrs_expr 0 sym) n1
         (pretty_nnrs_stmt 0 sym) n2
   | NNRSIf (n1,n2,n3) ->
@@ -309,14 +309,14 @@ let rec pretty_nnrs_stmt p sym ff stmt =
   | NNRSEither (n0,v1,n1,v2,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
         (pretty_nnrs_expr p sym) n0
-        (string_of_char_list v1) (pretty_nnrs_stmt p sym) n1
-        (string_of_char_list v2) (pretty_nnrs_stmt p sym) n2
+        v1 (pretty_nnrs_stmt p sym) n1
+        v2 (pretty_nnrs_stmt p sym) n2
   end
 
 let pretty_nnrs_aux p sym ff ((s, ret): nnrs) =
   fprintf ff "@[<hv 0>%a;@;<1 0>return $v%s@]@]"
     (pretty_nnrs_stmt 0 sym) s
-    (string_of_char_list ret)
+    ret
 
 
 let pretty_nnrs greek margin annot inheritance link_runtime q =
@@ -337,8 +337,8 @@ let pretty_nnrs_core greek margin annot inheritance link_runtime q =
 
 let rec pretty_nnrs_imp_expr p sym ff e =
   begin match e with
-  | NNRSimpGetConstant v -> fprintf ff "$$%s"  (string_of_char_list v)
-  | NNRSimpVar v -> fprintf ff "$v%s"  (string_of_char_list v)
+  | NNRSimpGetConstant v -> fprintf ff "$$%s"  v
+  | NNRSimpVar v -> fprintf ff "$v%s"  v
   | NNRSimpConst d -> fprintf ff "%a" pretty_data d
   | NNRSimpBinop (b,n1,n2) -> (pretty_binary_op p sym pretty_nnrs_imp_expr) ff b n1 n2
   | NNRSimpUnop (u,n1) -> (pretty_unary_op p sym pretty_nnrs_imp_expr) ff u n1
@@ -356,20 +356,20 @@ let rec pretty_nnrs_imp_stmt p sym ff stmt =
         (pretty_nnrs_imp_stmt 0 sym) s2
   | NNRSimpLet (v,None,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s@]@;<1 0>@[<hv 2>in@ %a@]@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_imp_stmt p sym) n2
   | NNRSimpLet (v,Some n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_imp_expr p sym) n1
         (pretty_nnrs_imp_stmt p sym) n2
   | NNRSimpAssign (v, e) ->
       fprintf ff "@[<hv 2>$v%s :=@;<1 0>%a@;<0 -2>@]"
-        (string_of_char_list v)
+        v
         (pretty_nnrs_imp_expr 0 sym) e
   | NNRSimpFor (v,n1,n2) ->
       fprintf ff "@[<hv 0>for (@[<hv 2>$v%s %a@;<1 0>%a@]) {@;<1 2>%a@ }@]"
-        (string_of_char_list v) pretty_sym sym.sin
+        v pretty_sym sym.sin
         (pretty_nnrs_imp_expr 0 sym) n1
         (pretty_nnrs_imp_stmt 0 sym) n2
   | NNRSimpIf (n1,n2,n3) ->
@@ -380,14 +380,14 @@ let rec pretty_nnrs_imp_stmt p sym ff stmt =
   | NNRSimpEither (n0,v1,n1,v2,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
         (pretty_nnrs_imp_expr p sym) n0
-        (string_of_char_list v1) (pretty_nnrs_imp_stmt p sym) n1
-        (string_of_char_list v2) (pretty_nnrs_imp_stmt p sym) n2
+        v1 (pretty_nnrs_imp_stmt p sym) n1
+        v2 (pretty_nnrs_imp_stmt p sym) n2
   end
 
 let pretty_nnrs_imp_aux p sym ff ((s, ret): nnrs_imp) =
   fprintf ff "@[<hv 0>%a;@;<1 0>return $v%s@]@]"
     (pretty_nnrs_imp_stmt 0 sym) s
-    (string_of_char_list ret)
+    ret
 
 let pretty_nnrs_imp greek margin annot inheritance link_runtime q =
   let ff = str_formatter in
@@ -403,11 +403,11 @@ let pretty_nnrs_imp greek margin annot inheritance link_runtime q =
 let pretty_imp_expr pretty_constant pretty_op pretty_runtime p sym ff e =
   let rec pretty_imp_expr p sym ff e =
     begin match e with
-    | ImpExprVar v -> fprintf ff "%s"  (string_of_char_list v)
+    | ImpExprVar v -> fprintf ff "%s"  v
     | ImpExprConst d -> fprintf ff "%a" pretty_constant d
     | ImpExprOp (op,args) -> (pretty_op p sym pretty_imp_expr) ff (op, args)
     | ImpExprRuntimeCall (op,args) -> (pretty_runtime p sym pretty_imp_expr) ff (op, args)
-    | ImpExprError msg -> fprintf ff "error %s"  (string_of_char_list msg)
+    | ImpExprError msg -> fprintf ff "error %s"  msg
     end
   in
   pretty_imp_expr p sym ff e
@@ -418,10 +418,10 @@ let pretty_imp_stmt pretty_constant pretty_op pretty_runtime p sym ff stmt =
     begin match e_opt with
     | None ->
         fprintf ff "@[<hv 0>@[<hv 2>let %s;@]@]"
-          (string_of_char_list v)
+          v
     | Some e ->
         fprintf ff "@[<hv 0>@[<hv 2>let %s =@ %a;@]@]"
-          (string_of_char_list v)
+          v
           (pretty_imp_expr p sym) e
     end
   in
@@ -433,16 +433,16 @@ let pretty_imp_stmt pretty_constant pretty_op pretty_runtime p sym ff stmt =
           (pp_print_list ~pp_sep:(fun ff () -> fprintf ff "@;<1 0>") (pretty_imp_stmt p sym)) stmts
     | ImpStmtAssign (v, e) ->
         fprintf ff "@[<hv 2>%s =@;<1 0>%a;@;<0 -2>@]"
-          (string_of_char_list v)
+          v
           (pretty_imp_expr 0 sym) e
     | ImpStmtFor (v,e,s) ->
         fprintf ff "@[<hv 0>for (@[<hv 2>%s %a@;<1 0>%a@]) {@;<1 2>%a@ }@]"
-          (string_of_char_list v) pretty_sym sym.sin
+          v pretty_sym sym.sin
           (pretty_imp_expr 0 sym) e
           (pretty_imp_stmt 0 sym) s
     | ImpStmtForRange (v,e1,e2,s) ->
         fprintf ff "@[<hv 0>for (@[<hv 2>%s =@;<1 0>%a to@;<1 0>%a@]) {@;<1 2>%a@ }@]"
-          (string_of_char_list v)
+          v
           (pretty_imp_expr 0 sym) e1
           (pretty_imp_expr 0 sym) e2
           (pretty_imp_stmt 0 sym) s
@@ -464,7 +464,7 @@ let pretty_imp_return pretty_constant pretty_op pretty_runtime p sym ff ret =
 let pretty_imp_function pretty_constant pretty_op pretty_runtime p sym ff f =
   let ImpFun (arg, body, ret) = f in
   fprintf ff "@[<hv 0>function (%a) {@;<1 2>%a@;<1 2>%a@ }@]"
-    (fun ff v -> fprintf ff "%s" (string_of_char_list v)) arg
+    (fun ff v -> fprintf ff "%s" v) arg
     (pretty_imp_stmt pretty_constant pretty_op pretty_runtime p sym) body
     (pretty_imp_return pretty_constant pretty_op pretty_runtime p sym) ret
 
@@ -472,7 +472,7 @@ let pretty_imp_aux pretty_constant pretty_op pretty_runtime p sym ff ((* ImpLib 
   List.iter
     (fun (f, def) ->
       fprintf ff "@[<hv 0>@[<hv 2>define %s as@ %a@]@;<0 0>@]"
-        (string_of_char_list f)
+        f
         (pretty_imp_function pretty_constant pretty_op pretty_runtime p sym) def)
     l
 
@@ -518,7 +518,7 @@ let pretty_imp_data = pretty_imp pretty_imp_data_constant pretty_imp_data_op pre
 
 let pretty_imp_ejson_constant ff d =
   fprintf ff "%s"
-    (string_of_char_list (QData.cejson_to_string d))
+    (QData.cejson_to_string d)
 
 let pretty_imp_ejson_op p sym pretty_imp_expr ff (op, args) =
   begin match op, args with
@@ -578,21 +578,21 @@ let pretty_imp_ejson_op p sym pretty_imp_expr ff (op, args) =
       fprintf ff "@[<hv 2>@[<hv 2>(%a)@]@[<hv 2>[%a]@]@]"
         (pretty_imp_expr 0 sym) e1 (pretty_imp_expr 0 sym) e2
   | EJsonOpObject fields, args ->
-      let field_arg_list = List.map2 (fun x y -> (string_of_char_list x, y)) fields args in
+      let field_arg_list = List.map2 (fun x y -> (x, y)) fields args in
       fprintf ff "@[<hv 2>[@[<hv 2>%a@]@]@]"
         (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>")
            (fun ff (f,e) -> fprintf ff "@[<hv 2>'%s': %a@]" f (pretty_imp_expr 0 sym) e))
         field_arg_list
   | EJsonOpAccess field, [ e ] ->
-      fprintf ff "@[<hv 2>@[<hv 2>(%a)['%s']@]@]" (pretty_imp_expr 0 sym) e (string_of_char_list field)
+      fprintf ff "@[<hv 2>@[<hv 2>(%a)['%s']@]@]" (pretty_imp_expr 0 sym) e field
   | EJsonOpHasOwnProperty field, [ e ] ->
-      fprintf ff "@[<hv 2>@[<hv 2>(%a).hasOwnProperty('%s')@]@]" (pretty_imp_expr 0 sym) e (string_of_char_list field)
+      fprintf ff "@[<hv 2>@[<hv 2>(%a).hasOwnProperty('%s')@]@]" (pretty_imp_expr 0 sym) e field
   | _ -> assert false
   end
 
 let pretty_imp_ejson_runtime p sym pretty_imp_expr ff (op, args) =
   fprintf ff "@[<hv 2>%s(@[<hv 2>%a@])@]"
-    (string_of_char_list (QUtil.string_of_ejson_runtime_op op))
+    (QUtil.string_of_ejson_runtime_op op)
     (pp_print_list ~pp_sep:(fun ff () -> fprintf ff ",@;<1 0>") (pretty_imp_expr 0 sym)) args
 
 let pretty_imp_ejson = pretty_imp pretty_imp_ejson_constant pretty_imp_ejson_op pretty_imp_ejson_runtime
@@ -601,7 +601,7 @@ let pretty_imp_ejson = pretty_imp pretty_imp_ejson_constant pretty_imp_ejson_op 
 
 let pretty_fun sym ff (x, n) =
   fprintf ff "@[fun ($v%s) ->@ %a@]"
-    (string_of_char_list x)
+    x
     (pretty_nnrc_aux 0 sym) n
 
 let pretty_default_fun sym ff n =
@@ -637,9 +637,9 @@ let pretty_nnrcmr_job_aux sym ff mr =
     end
   in
   fprintf ff "@[<hv 0>input = $v%s : %s;@\n"
-    (string_of_char_list mr.mr_input) input_loc;
+    mr.mr_input input_loc;
   fprintf ff "output = $v%s : %s;@\n"
-    (string_of_char_list mr.mr_output) output_loc;
+    mr.mr_output output_loc;
   begin match mr.mr_map with
   | MapDist f -> fprintf ff "map(@[%a@]);" (pretty_fun sym) f
   | MapDistFlatten f -> fprintf ff "flatMap(@[%a@]);" (pretty_fun sym) f
@@ -678,12 +678,12 @@ let rec pretty_list pp sep ff l =
 let pretty_mr_last sym ff mr_last =
   let ((params, n), args) = mr_last in
   let pretty_param ff x =
-    fprintf ff "%s" (string_of_char_list x)
+    fprintf ff "%s" x
   in
   let pretty_arg ff (x, loc) =
     begin match loc with
-    | Vlocal ->  fprintf ff "(%s: Scalar)" (string_of_char_list x)
-    | Vdistr ->  fprintf ff "(%s: Distributed)" (string_of_char_list x)
+    | Vlocal ->  fprintf ff "(%s: Scalar)" x
+    | Vdistr ->  fprintf ff "(%s: Distributed)" x
     end
   in
   fprintf ff "@[(fun (%a) => %a) (%a)@]"
@@ -708,8 +708,8 @@ let pretty_nnrcmr greek margin annot inheritance link_runtime mr_chain =
 
 let rec pretty_dnnrc_aux ann plug p sym ff n =
   begin match n with
-  | DNNRCGetConstant (a, v) -> fprintf ff "%a$%s" ann a (string_of_char_list v)
-  | DNNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (string_of_char_list v)
+  | DNNRCGetConstant (a, v) -> fprintf ff "%a$%s" ann a v
+  | DNNRCVar (a, v) -> fprintf ff "%a$v%s" ann a v
   | DNNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
   | DNNRCBinop (a, b,n1,n2) ->
       fprintf ff "%a(" ann a
@@ -722,14 +722,14 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
   | DNNRCLet (a,v,n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>%a let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
 	      ann a
-	      (string_of_char_list v)
+	      v
 	      (pretty_dnnrc_aux ann plug p sym) n1
 	      (pretty_dnnrc_aux ann plug p sym) n2
   | DNNRCFor (a,v,n1,n2) ->
       fprintf ff "@[<hv 0>%a{ @[<hv 0>%a@]@;<1 0>@[<hv 2>| $v%s %a@ %a@] }@]"
 	      ann a
 	      (pretty_dnnrc_aux ann plug 0 sym) n2
-	      (string_of_char_list v) pretty_sym sym.sin
+	      v pretty_sym sym.sin
 	      (pretty_dnnrc_aux ann plug 0 sym) n1
   | DNNRCIf (a,n1,n2,n3) ->
       fprintf ff "@[<hv 0>@[<hv 2>%a if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
@@ -741,8 +741,8 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
       fprintf ff "@[<hv 0>@[<hv 2>%a match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	      ann a
 	      (pretty_dnnrc_aux ann plug p sym) n0
-	      (string_of_char_list v1) (pretty_dnnrc_aux ann plug p sym) n1
-	      (string_of_char_list v2) (pretty_dnnrc_aux ann plug p sym) n2
+	      v1 (pretty_dnnrc_aux ann plug p sym) n1
+	      v2 (pretty_dnnrc_aux ann plug p sym) n2
   | DNNRCCollect (a,n1) ->
       fprintf ff "@[%a%s[@[%a@]]@]"
 	      ann a
@@ -756,7 +756,7 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
   | DNNRCAlg (a,body,arglist) ->
       fprintf ff "@[%adataframe(@[fun $%a => @] %a)@[(%a)@]@]"
 	      ann a
-        (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map (fun x -> (string_of_char_list (fst x))) arglist)
+        (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map fst arglist)
         plug body
 	      (pretty_list (pretty_dnnrc_aux ann plug p sym) ",") (List.map snd arglist)
   | DNNRCGroupBy (a,g,atts,n1) ->
@@ -777,7 +777,7 @@ let pretty_annotate_ignore ff a = ()
 (* Pretty Spark IR *)
 let rec pretty_column_aux p sym ff col =
   begin match col with
-  | CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle (string_of_char_list v) pretty_sym sym.rangle
+  | CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle v pretty_sym sym.rangle
   | CDot (v,c) -> pretty_unary_op p sym pretty_column_aux ff (OpDot v) c
   | CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
   | CPlus (c1,c2) -> pretty_binary_op p sym pretty_column_aux ff (OpNatBinary NatPlus) c1 c2
@@ -791,17 +791,17 @@ let rec pretty_column_aux p sym ff col =
   end
 
 let pretty_named_column_aux p sym ff (name, col) =
-  fprintf ff "%s%@%a" (string_of_char_list name) (pretty_column_aux p sym) col
+  fprintf ff "%s%@%a" name (pretty_column_aux p sym) col
 
 let rec pretty_dataframe_aux p sym ff ds =
   begin match ds with
-  | DSVar v -> fprintf ff "$%s" (string_of_char_list v)
+  | DSVar v -> fprintf ff "$%s" v
   | DSSelect (cl,ds1) -> fprintf ff "@[select %a @[<hv 2>from %a@] @]"
 				(pretty_list (pretty_named_column_aux p sym) ",") cl (pretty_dataframe_aux p sym) ds1
   | DSFilter (c,ds1) -> fprintf ff "@[filter %a @[<hv 2>from %a@] @]"
 				(pretty_column_aux p sym) c (pretty_dataframe_aux p sym) ds1
   | DSCartesian (ds1,ds2) ->  pretty_binary_op p sym pretty_dataframe_aux ff OpRecConcat ds1 ds2
-  | DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (string_of_char_list s) (pretty_dataframe_aux p sym) ds
+  | DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" s (pretty_dataframe_aux p sym) ds
   end
 
 let pretty_plug_dataframe greek ff a =
@@ -860,5 +860,5 @@ let pretty_wasm greek margin annot inheritance link_runtime q =
 (** Pretty Error *)
 
 let pretty_error greek margin annot inheritance link_runtime q =
-  "Error: "^(string_of_char_list q)
+  "Error: " ^ q
 

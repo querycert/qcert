@@ -13,6 +13,6 @@
  *)
 
 (* Encoding/Decoding *)
-val encode : char list -> char list
-val decode : char list -> char list
+val encode : string -> string
+val decode : string -> string
 

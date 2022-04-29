@@ -21,16 +21,16 @@ let undefined_error op =
 (** Interval *)
 type period = Date.Period.t
 let period_eq (d1:period) (d2:period) : bool = Date.Period.equal d1 d2
-let period_to_string (x:period) : char list = Util.char_list_of_string "_" (* XXX To be figured out *)
-let period_from_string (x:char list) : period = undefined_error "period_from_string"
+let period_to_string (x:period) : string = "_" (* XXX To be figured out *)
+let period_from_string (x:string) : period = undefined_error "period_from_string"
     
 (** Date *)
 type date = Date.t
 
-let date_to_string (d:date) : char list = Util.char_list_of_string (Printer.Date.sprint "%Y-%-m-%-d" d)
-let date_from_string (x:char list) : date =
+let date_to_string (d:date) : string = Printer.Date.sprint "%Y-%-m-%-d" d
+let date_from_string (x:string) : date =
   begin try
-    Printer.Date.from_fstring "%Y-%m-%d" (Util.string_of_char_list x)
+    Printer.Date.from_fstring "%Y-%m-%d" x
   with
   | _ -> Date.make 1 1 1
   end

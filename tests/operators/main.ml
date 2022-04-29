@@ -11,8 +11,8 @@ open ImpEJson
 
 let brands = ref []
 let add_brand_relation sub sup =
-  brands := ( Util.char_list_of_string sub
-            , Util.char_list_of_string sup
+  brands := ( sub
+            , sup
             ) :: !brands
 
 let imp_eval (imp_ejson : _ imp_ejson) env : _ ejson option =
@@ -33,7 +33,7 @@ let wasm_eval (imp_ejson : _ imp_ejson) env : _ ejson option =
   let wasm_ast =
     Wasm_backend.imp_ejson_to_wasm_ast foreign_to_wasm_op (* foreign_ejson_to_wson *) !brands imp_ejson
   in
-  Wasm_backend.eval wasm_ast ['f'] env
+  Wasm_backend.eval wasm_ast "f" env
 
 open ImpEJson
 
@@ -46,8 +46,7 @@ let ejson_to_string ejson =
       enhanced_foreign_to_json
       ejson
   in
-  JSON.jsonStringify [] json
-  |> Util.string
+  JSON.jsonStringify "" json
 
 let ejson_eq =
   ejson_eq_dec EnhancedEJson.enhanced_foreign_ejson
@@ -55,7 +54,7 @@ let ejson_eq =
 let failed = ref false
 
 let test_fn ?(fixup=fun x -> x) ?(verbose=false) info env fn =
-  let imp_ejson : _ imp_ejson = [['f'], fn] in
+  let imp_ejson : _ imp_ejson = ["f", fn] in
   let fail message =
     print_endline "";
     info ();
@@ -81,7 +80,7 @@ let test_fn ?(fixup=fun x -> x) ?(verbose=false) info env fn =
     )
 
 let test_expr_1 ?fixup ?verbose info expr op args =
-  let varname i =  Util.char_list_of_string ("arg" ^ (string_of_int i))
+  let varname i =  "arg" ^ (string_of_int i)
   and info () =
     info ();
     print_endline "arguments: ";
@@ -89,19 +88,19 @@ let test_expr_1 ?fixup ?verbose info expr op args =
         print_string "  ";
         print_endline (ejson_to_string arg)) args
   in
-  let return = Util.char_list_of_string "return"
+  let return = "return"
   and env = List.mapi (fun i ejson -> varname i, ejson) args
   and args = List.mapi (fun i _ ->
       ImpExprRuntimeCall (
         EJsonRuntimeRecDot,
-        [ ImpExprVar ['x']
+        [ ImpExprVar "x"
         ; ImpExprConst (Coq_cejstring (varname i))
         ])) args
   in
   let stmt =
     ImpStmtAssign(return, expr op args)
   in
-  test_fn ?fixup ?verbose info env (ImpFun (['x'], stmt, return))
+  test_fn ?fixup ?verbose info env (ImpFun ("x", stmt, return))
 
 let test_expr ?fixup ?verbose info expr op args =
   List.iter (fun args -> test_expr_1 ?fixup ?verbose info expr op args) args
@@ -129,10 +128,9 @@ module Arg = struct
   let bool x = Coq_ejbool x
   let num x = Coq_ejnumber x
   let int x = Coq_ejbigint x
-  let str x = Coq_ejstring (Util.char_list_of_string x)
+  let str x = Coq_ejstring x
   let arr x = Coq_ejarray x
-  let obj x =
-    Coq_ejobject (List.map (fun (k, v) -> Util.char_list_of_string k, v) x)
+  let obj x = Coq_ejobject x
 end
 
 let sort_array (x : _ ejson) =
@@ -178,23 +176,23 @@ let _ =
     [ []
     ];
   test_op
-    (EJsonOpObject [['a']])
+    (EJsonOpObject ["a"])
     [ [null]
     ];
   test_op
-    (EJsonOpObject [['a']; ['b']])
+    (EJsonOpObject ["a"; "b"])
     [ [null; null]
     ; [int 1; bool true]
     ];
   test_op
-    (EJsonOpAccess ['a'])
+    (EJsonOpAccess "a")
     [ [ obj ["a", null] ]
     ; [ obj ["a", int 0; "b", int 1; "c", int 2] ]
     ; [ obj ["b", int 0; "a", int 1; "c", int 2] ]
     (* ; [ obj []] invalid / missing key *)
     ];
   test_op
-    (EJsonOpHasOwnProperty ['a'])
+    (EJsonOpHasOwnProperty "a")
     [ [ obj ["a", null] ]
     ; [ obj ["a", int 0; "b", int 1; "c", int 2] ]
     ; [ obj ["b", int 0; "a", int 1; "c", int 2] ]
@@ -506,7 +504,7 @@ let _ =
     [ [ str "" ]
     ; [ str "a" ]
     ; [ str "abcc" ]
-      (* ; [ str "abccᵤ" ] *) (* Coq uses char list, JS/Wasm use UTF16. *)
+      (* ; [ str "abccᵤ" ] *) (* Coq uses string, JS/Wasm use UTF16. *)
     ];
   test_rtop
     EJsonRuntimeSubstring (* string, start, target length *)

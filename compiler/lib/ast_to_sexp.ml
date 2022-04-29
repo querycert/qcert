@@ -32,9 +32,9 @@ open EnhancedCompiler.EnhancedCompiler
  * AST <-> Sexp *
  ****************)
 
-let coq_string_to_sstring (cl:char list) : sexp =
-  SString (string_of_char_list cl)
-let dbrands_to_sexp (bs:(char list) list) : sexp list =
+let coq_string_to_sstring (cl:string) : sexp =
+  SString cl
+let dbrands_to_sexp (bs:(string) list) : sexp list =
   List.map coq_string_to_sstring bs
 let coq_string_list_to_sstring_list = dbrands_to_sexp
 
@@ -46,19 +46,19 @@ let coq_sort_desc_to_sstring x =
 let coq_string_list_to_sstring_list_with_order l =
   List.concat (List.map (fun x -> [coq_string_to_sstring (fst x);coq_sort_desc_to_sstring (snd x)]) l)
 
-let sstring_to_coq_string (se:sexp) : char list =
+let sstring_to_coq_string (se:sexp) : string =
   begin match se with
-  | SString s -> char_list_of_string s
+  | SString s -> s
   | _ -> raise (Qcert_Error "Not well-formed S-expr for Coq string")
   end
-let sexp_to_dbrands (bs:sexp list) : (char list) list =
+let sexp_to_dbrands (bs:sexp list) : (string) list =
   List.map sstring_to_coq_string bs
 let sstring_list_to_coq_string_list = sexp_to_dbrands
 let rec sstring_list_with_order_to_coq_string_list sl =
   begin match sl with
   | [] -> []
-  | SString att :: SString "asc" :: sl' -> (char_list_of_string att, Ascending) :: (sstring_list_with_order_to_coq_string_list sl')
-  | SString att :: SString "desc" :: sl' -> (char_list_of_string att, Descending) :: (sstring_list_with_order_to_coq_string_list sl')
+  | SString att :: SString "asc" :: sl' -> (att, Ascending) :: (sstring_list_with_order_to_coq_string_list sl')
+  | SString att :: SString "desc" :: sl' -> (att, Descending) :: (sstring_list_with_order_to_coq_string_list sl')
   | _ -> raise (Qcert_Error "Not well-formed S-expr for Coq orderBy")
   end
 
@@ -76,7 +76,7 @@ let rec data_to_sexp (d : QData.qdata) : sexp =
   | Coq_dnat n -> SInt n
   | Coq_dfloat f -> SFloat f
   | Coq_dbool b -> SBool b
-  | Coq_dstring s -> SString (string_of_char_list s)
+  | Coq_dstring s -> SString s
   | Coq_dcoll dl -> STerm ("dcoll", List.map data_to_sexp dl)
   | Coq_drec adl -> STerm ("drec", List.map drec_to_sexp adl)
   | Coq_dleft d -> STerm ("dleft", data_to_sexp d :: [])
@@ -84,8 +84,8 @@ let rec data_to_sexp (d : QData.qdata) : sexp =
   | Coq_dbrand (bs,d) -> STerm ("dbrand", (STerm ("brands", dbrands_to_sexp bs)) :: (STerm ("value", (data_to_sexp d) :: [])) :: [])
   | Coq_dforeign fdt -> foreign_data_to_sexp (Obj.magic fdt)
   end
-and drec_to_sexp (ad : char list * QData.qdata) : sexp =
-  STerm ("datt", (SString (string_of_char_list (fst ad))) :: (data_to_sexp (snd ad)) :: [])
+and drec_to_sexp (ad : string * QData.qdata) : sexp =
+  STerm ("datt", (SString (fst ad)) :: (data_to_sexp (snd ad)) :: [])
 
 let rec sexp_to_data (se:sexp) : QData.qdata =
   begin match se with
@@ -93,7 +93,7 @@ let rec sexp_to_data (se:sexp) : QData.qdata =
   | SBool b -> Coq_dbool b
   | SInt n -> Coq_dnat n
   | SFloat f -> Coq_dfloat f
-  | SString s -> Coq_dstring (char_list_of_string s)
+  | SString s -> Coq_dstring s
   | STerm ("dcoll", sel) ->
       Coq_dcoll (List.map sexp_to_data sel)
   | STerm ("drec", asel) ->
@@ -109,10 +109,10 @@ let rec sexp_to_data (se:sexp) : QData.qdata =
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr with name " ^ t))
   end
-and sexp_to_drec (sel:sexp) : (char list * QData.qdata) =
+and sexp_to_drec (sel:sexp) : (string * QData.qdata) =
   begin match sel with
   | STerm ("datt", (SString s) :: se :: []) ->
-      (char_list_of_string s, sexp_to_data se)
+      (s, sexp_to_data se)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside drec")
   end
@@ -464,38 +464,38 @@ let rec sexp_to_nraenv (se : sexp) : QLang.nraenv_core =
 
 let rec nnrc_to_sexp (n : QLang.nnrc) : sexp =
   begin match n with
-  | NNRCGetConstant v -> STerm ("NNRCGetConstant", [SString (string_of_char_list v)])
-  | NNRCVar v -> STerm ("NNRCVar", [SString (string_of_char_list v)])
+  | NNRCGetConstant v -> STerm ("NNRCGetConstant", [SString v])
+  | NNRCVar v -> STerm ("NNRCVar", [SString v])
   | NNRCConst d -> STerm ("NNRCConst", [data_to_sexp d])
   | NNRCBinop (b, n1, n2) -> STerm ("NNRCBinop", (binary_op_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
   | NNRCUnop (u, n1) -> STerm ("NNRCUnop", (unary_op_to_sexp u) :: [nnrc_to_sexp n1])
-  | NNRCLet (v, n1, n2) -> STerm ("NNRCLet", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
-  | NNRCFor (v, n1, n2) -> STerm ("NNRCFor", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NNRCLet (v, n1, n2) -> STerm ("NNRCLet", (SString v) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NNRCFor (v, n1, n2) -> STerm ("NNRCFor", (SString v) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
   | NNRCIf (n1, n2, n3) -> STerm ("NNRCIf", [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
   | NNRCEither (n1,v1,n2,v2,n3) -> STerm ("NNRCEither",
-					 (SString (string_of_char_list v1))
-					 :: (SString (string_of_char_list v2))
+					 (SString v1)
+					 :: (SString v2)
 					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
   | NNRCGroupBy (g,sl,n1) -> STerm ("NNRCGroupBy",
-				    (SString (string_of_char_list g))
+				    (SString g)
 				    :: (STerm ("keys",coq_string_list_to_sstring_list sl))
 				    :: [nnrc_to_sexp n1])
   end
 
 let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
   begin match se with
-  | STerm ("NNRCGetConstant", [SString v]) -> NNRCGetConstant (char_list_of_string v)
-  | STerm ("NNRCVar", [SString v]) -> NNRCVar (char_list_of_string v)
+  | STerm ("NNRCGetConstant", [SString v]) -> NNRCGetConstant v
+  | STerm ("NNRCVar", [SString v]) -> NNRCVar v
   | STerm ("NNRCConst", [d]) -> NNRCConst (sexp_to_data d)
   | STerm ("NNRCBinop", b :: [n1;n2]) -> NNRCBinop (sexp_to_binary_op b, sexp_to_nnrc n1, sexp_to_nnrc n2)
   | STerm ("NNRCUnop", u :: [n1]) -> NNRCUnop (sexp_to_unary_op u, sexp_to_nnrc n1)
-  | STerm ("NNRCLet", (SString v) :: [n1;n2]) -> NNRCLet (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
-  | STerm ("NNRCFor", (SString v) :: [n1;n2]) -> NNRCFor (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NNRCLet", (SString v) :: [n1;n2]) -> NNRCLet (v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NNRCFor", (SString v) :: [n1;n2]) -> NNRCFor (v, sexp_to_nnrc n1, sexp_to_nnrc n2)
   | STerm ("NNRCIf", [n1;n2;n3]) -> NNRCIf (sexp_to_nnrc n1, sexp_to_nnrc n2, sexp_to_nnrc n3)
   | STerm ("NNRCEither", (SString v1) :: (SString v2) :: [n1;n2;n3]) ->
-      NNRCEither (sexp_to_nnrc n1,char_list_of_string v1,sexp_to_nnrc n2,char_list_of_string v2,sexp_to_nnrc n3)
+      NNRCEither (sexp_to_nnrc n1,v1,sexp_to_nnrc n2,v2,sexp_to_nnrc n3)
   | STerm ("NNRCGroupBy", (SString v1) :: (STerm ("keys", v2)) :: [n1]) ->
-      NNRCGroupBy (char_list_of_string v1,sstring_list_to_coq_string_list v2,sexp_to_nnrc n1)
+      NNRCGroupBy (v1,sstring_list_to_coq_string_list v2,sexp_to_nnrc n1)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside nnrc with name " ^ t))
   | _ ->
@@ -506,13 +506,13 @@ let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
 
 let rec nnrs_expr_to_sexp e : sexp =
   match e with
-  | NNRSGetConstant v -> STerm ("NNRSGetConstant", [SString (string_of_char_list v)])
-  | NNRSVar v -> STerm ("NNRSVar", [SString (string_of_char_list v)])
+  | NNRSGetConstant v -> STerm ("NNRSGetConstant", [SString v])
+  | NNRSVar v -> STerm ("NNRSVar", [SString v])
   | NNRSConst d -> STerm ("NNRSConst", [data_to_sexp d])
   | NNRSBinop (b, n1, n2) -> STerm ("NNRSBinop", (binary_op_to_sexp b) :: [nnrs_expr_to_sexp n1;nnrs_expr_to_sexp n2])
   | NNRSUnop (u, n1) -> STerm ("NNRSUnop", (unary_op_to_sexp u) :: [nnrs_expr_to_sexp n1])
   | NNRSGroupBy (g,sl,n1) -> STerm ("NNRSGroupBy",
-                                 (SString (string_of_char_list g))
+                                 (SString g)
                                  :: (STerm ("keys",coq_string_list_to_sstring_list sl))
                                  :: [nnrs_expr_to_sexp n1])
 
@@ -520,31 +520,31 @@ let rec nnrs_stmt_to_sexp s : sexp =
   match s with
   | NNRSSeq (s1, s2) ->
     STerm ("NNRSSeq", [ nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
-  | NNRSLet (v, e, s) -> STerm ("NNRSLet", [SString (string_of_char_list v); nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s])
-  | NNRSLetMut (v, s1, s2) -> STerm ("NNRSLetMut", [SString (string_of_char_list v); nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
-  | NNRSLetMutColl (v, s1, s2) -> STerm ("NNRSLetMutColl", [SString (string_of_char_list v); nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
-  | NNRSAssign (v, e) -> STerm ("NNRSAssign", [SString (string_of_char_list v); nnrs_expr_to_sexp e])
-  | NNRSPush (v, e) -> STerm ("NNRSPush", [SString (string_of_char_list v); nnrs_expr_to_sexp e])
-  | NNRSFor (v, e, s) -> STerm ("NNRSFor", [SString (string_of_char_list v); nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s])
+  | NNRSLet (v, e, s) -> STerm ("NNRSLet", [SString v; nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s])
+  | NNRSLetMut (v, s1, s2) -> STerm ("NNRSLetMut", [SString v; nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
+  | NNRSLetMutColl (v, s1, s2) -> STerm ("NNRSLetMutColl", [SString v; nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
+  | NNRSAssign (v, e) -> STerm ("NNRSAssign", [SString v; nnrs_expr_to_sexp e])
+  | NNRSPush (v, e) -> STerm ("NNRSPush", [SString v; nnrs_expr_to_sexp e])
+  | NNRSFor (v, e, s) -> STerm ("NNRSFor", [SString v; nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s])
   | NNRSIf (e, s1, s2) -> STerm ("NNRSIf", [nnrs_expr_to_sexp e; nnrs_stmt_to_sexp s1; nnrs_stmt_to_sexp s2])
   | NNRSEither (e,v1,s1,v2,s2) -> STerm ("NNRSEither",
-                                      (SString (string_of_char_list v1))
-                                   :: (SString (string_of_char_list v2))
+                                      (SString v1)
+                                   :: (SString v2)
                                    :: [nnrs_expr_to_sexp e;nnrs_stmt_to_sexp s1;nnrs_stmt_to_sexp s2])
 
 let nnrs_to_sexp ((n, ret) : QLang.nnrs) : sexp =
-  STerm ("NNRS", [nnrs_stmt_to_sexp n; SString (string_of_char_list ret)])
+  STerm ("NNRS", [nnrs_stmt_to_sexp n; SString ret])
 
 
 let rec sexp_to_nnrs_expr (se:sexp) =
   match se with
-  | STerm ("NNRSGetConstant", [SString v]) -> NNRSGetConstant (char_list_of_string v)
-  | STerm ("NNRSVar", [SString v]) -> NNRSVar (char_list_of_string v)
+  | STerm ("NNRSGetConstant", [SString v]) -> NNRSGetConstant v
+  | STerm ("NNRSVar", [SString v]) -> NNRSVar v
   | STerm ("NNRSConst", [d]) -> NNRSConst (sexp_to_data d)
   | STerm ("NNRSBinop", b :: [n1;n2]) -> NNRSBinop (sexp_to_binary_op b, sexp_to_nnrs_expr n1, sexp_to_nnrs_expr n2)
   | STerm ("NNRSUnop", u :: [n1]) -> NNRSUnop (sexp_to_unary_op u, sexp_to_nnrs_expr n1)
   | STerm ("NNRSGroupBy", (SString v1) :: (STerm ("keys", v2)) :: [n1]) ->
-      NNRSGroupBy (char_list_of_string v1,sstring_list_to_coq_string_list v2,sexp_to_nnrs_expr n1)
+      NNRSGroupBy (v1,sstring_list_to_coq_string_list v2,sexp_to_nnrs_expr n1)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside nnrs_expr with name " ^ t))
   | _ ->
@@ -553,15 +553,15 @@ let rec sexp_to_nnrs_expr (se:sexp) =
 let rec sexp_to_nnrs_stmt (se:sexp) =
   match se with
   | STerm ("NNRSSeq", [s1; s2]) -> NNRSSeq (sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s1)
-  | STerm ("NNRSLet", [SString v; e; s]) -> NNRSLet (char_list_of_string v, (sexp_to_nnrs_expr e), sexp_to_nnrs_stmt s)
-  | STerm ("NNRSLetMut", [SString v; s1; s2]) -> NNRSLetMut (char_list_of_string v, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
-  | STerm ("NNRSLetMutColl", [SString v; s1; s2]) -> NNRSLetMutColl (char_list_of_string v, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
-  | STerm ("NNRSAssign", [SString v; e]) -> NNRSAssign (char_list_of_string v, sexp_to_nnrs_expr e)
-  | STerm ("NNRSPush", [SString v; e]) -> NNRSPush (char_list_of_string v, sexp_to_nnrs_expr e)
-  | STerm ("NNRSFor", [SString v; e; s]) -> NNRSFor (char_list_of_string v, sexp_to_nnrs_expr e, sexp_to_nnrs_stmt s)
+  | STerm ("NNRSLet", [SString v; e; s]) -> NNRSLet (v, (sexp_to_nnrs_expr e), sexp_to_nnrs_stmt s)
+  | STerm ("NNRSLetMut", [SString v; s1; s2]) -> NNRSLetMut (v, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
+  | STerm ("NNRSLetMutColl", [SString v; s1; s2]) -> NNRSLetMutColl (v, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
+  | STerm ("NNRSAssign", [SString v; e]) -> NNRSAssign (v, sexp_to_nnrs_expr e)
+  | STerm ("NNRSPush", [SString v; e]) -> NNRSPush (v, sexp_to_nnrs_expr e)
+  | STerm ("NNRSFor", [SString v; e; s]) -> NNRSFor (v, sexp_to_nnrs_expr e, sexp_to_nnrs_stmt s)
   | STerm ("NNRSIf", [e; s1; s2]) -> NNRSIf (sexp_to_nnrs_expr e, sexp_to_nnrs_stmt s1, sexp_to_nnrs_stmt s2)
   | STerm ("NNRSEither", (SString v1) :: (SString v2) :: [e;s1;s2]) ->
-      NNRSEither (sexp_to_nnrs_expr e,char_list_of_string v1,sexp_to_nnrs_stmt s1,char_list_of_string v2,sexp_to_nnrs_stmt s2)
+      NNRSEither (sexp_to_nnrs_expr e,v1,sexp_to_nnrs_stmt s1,v2,sexp_to_nnrs_stmt s2)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside nnrs_stmt with name " ^ t))
   | _ ->
@@ -570,7 +570,7 @@ let rec sexp_to_nnrs_stmt (se:sexp) =
 let sexp_to_nnrs (se:sexp) : QLang.nnrs =
   match se with
   | STerm ("NNRS", [s; SString ret]) ->
-    (sexp_to_nnrs_stmt s, char_list_of_string ret)
+    (sexp_to_nnrs_stmt s, ret)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside nnrs")
 
@@ -578,13 +578,13 @@ let sexp_to_nnrs (se:sexp) : QLang.nnrs =
 
 let rec nnrs_imp_expr_to_sexp e : sexp =
   match e with
-  | NNRSimpGetConstant v -> STerm ("NNRSimpGetConstant", [SString (string_of_char_list v)])
-  | NNRSimpVar v -> STerm ("NNRSimpVar", [SString (string_of_char_list v)])
+  | NNRSimpGetConstant v -> STerm ("NNRSimpGetConstant", [SString v])
+  | NNRSimpVar v -> STerm ("NNRSimpVar", [SString v])
   | NNRSimpConst d -> STerm ("NNRSimpConst", [data_to_sexp d])
   | NNRSimpBinop (b, n1, n2) -> STerm ("NNRSimpBinop", (binary_op_to_sexp b) :: [nnrs_imp_expr_to_sexp n1;nnrs_imp_expr_to_sexp n2])
   | NNRSimpUnop (u, n1) -> STerm ("NNRSimpUnop", (unary_op_to_sexp u) :: [nnrs_imp_expr_to_sexp n1])
   | NNRSimpGroupBy (g,sl,n1) -> STerm ("NNRSimpGroupBy",
-                                 (SString (string_of_char_list g))
+                                 (SString g)
                                  :: (STerm ("keys",coq_string_list_to_sstring_list sl))
                                  :: [nnrs_imp_expr_to_sexp n1])
 
@@ -594,29 +594,29 @@ let rec nnrs_imp_stmt_to_sexp s : sexp =
     STerm ("NNRSimpSkip", [])
   | NNRSimpSeq (s1, s2) ->
     STerm ("NNRSimpSeq", [ nnrs_imp_stmt_to_sexp s1; nnrs_imp_stmt_to_sexp s2])
-  | NNRSimpLet (v, None, s) -> STerm ("NNRSimpLet", [SString (string_of_char_list v); nnrs_imp_stmt_to_sexp s])
-  | NNRSimpLet (v, Some e, s) -> STerm ("NNRSimpLet", [SString (string_of_char_list v); nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s])
-  | NNRSimpAssign (v, e) -> STerm ("NNRSimpAssign", [SString (string_of_char_list v); nnrs_imp_expr_to_sexp e])
-  | NNRSimpFor (v, e, s) -> STerm ("NNRSimpFor", [SString (string_of_char_list v); nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s])
+  | NNRSimpLet (v, None, s) -> STerm ("NNRSimpLet", [SString v; nnrs_imp_stmt_to_sexp s])
+  | NNRSimpLet (v, Some e, s) -> STerm ("NNRSimpLet", [SString v; nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s])
+  | NNRSimpAssign (v, e) -> STerm ("NNRSimpAssign", [SString v; nnrs_imp_expr_to_sexp e])
+  | NNRSimpFor (v, e, s) -> STerm ("NNRSimpFor", [SString v; nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s])
   | NNRSimpIf (e, s1, s2) -> STerm ("NNRSimpIf", [nnrs_imp_expr_to_sexp e; nnrs_imp_stmt_to_sexp s1; nnrs_imp_stmt_to_sexp s2])
   | NNRSimpEither (e,v1,s1,v2,s2) -> STerm ("NNRSimpEither",
-                                      (SString (string_of_char_list v1))
-                                   :: (SString (string_of_char_list v2))
+                                      (SString v1)
+                                   :: (SString v2)
                                    :: [nnrs_imp_expr_to_sexp e;nnrs_imp_stmt_to_sexp s1;nnrs_imp_stmt_to_sexp s2])
 
 let nnrs_imp_to_sexp ((n, ret) : QLang.nnrs_imp) : sexp =
-  STerm ("NNRSimp", [nnrs_imp_stmt_to_sexp n; SString (string_of_char_list ret)])
+  STerm ("NNRSimp", [nnrs_imp_stmt_to_sexp n; SString ret])
 
 
 let rec sexp_to_nnrs_imp_expr (se:sexp) =
   match se with
-  | STerm ("NNRSimpGetConstant", [SString v]) -> NNRSimpGetConstant (char_list_of_string v)
-  | STerm ("NNRSimpVar", [SString v]) -> NNRSimpVar (char_list_of_string v)
+  | STerm ("NNRSimpGetConstant", [SString v]) -> NNRSimpGetConstant v
+  | STerm ("NNRSimpVar", [SString v]) -> NNRSimpVar v
   | STerm ("NNRSimpConst", [d]) -> NNRSimpConst (sexp_to_data d)
   | STerm ("NNRSimpBinop", b :: [n1;n2]) -> NNRSimpBinop (sexp_to_binary_op b, sexp_to_nnrs_imp_expr n1, sexp_to_nnrs_imp_expr n2)
   | STerm ("NNRSimpUnop", u :: [n1]) -> NNRSimpUnop (sexp_to_unary_op u, sexp_to_nnrs_imp_expr n1)
   | STerm ("NNRSimpGroupBy", (SString v1) :: (STerm ("keys", v2)) :: [n1]) ->
-      NNRSimpGroupBy (char_list_of_string v1,sstring_list_to_coq_string_list v2,sexp_to_nnrs_imp_expr n1)
+      NNRSimpGroupBy (v1,sstring_list_to_coq_string_list v2,sexp_to_nnrs_imp_expr n1)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside nnrs_imp_expr with name " ^ t))
   | _ ->
@@ -626,13 +626,13 @@ let rec sexp_to_nnrs_imp_stmt (se:sexp) =
   match se with
   | STerm ("NNRSimpSkip", []) -> NNRSimpSkip
   | STerm ("NNRSimpSeq", [s1; s2]) -> NNRSimpSeq (sexp_to_nnrs_imp_stmt s1, sexp_to_nnrs_imp_stmt s1)
-  | STerm ("NNRSimpLet", [SString v; s]) -> NNRSimpLet (char_list_of_string v, None, sexp_to_nnrs_imp_stmt s)
-  | STerm ("NNRSimpLet", [SString v; e; s]) -> NNRSimpLet (char_list_of_string v, Some (sexp_to_nnrs_imp_expr e), sexp_to_nnrs_imp_stmt s)
-  | STerm ("NNRSimpAssign", [SString v; e]) -> NNRSimpAssign (char_list_of_string v, sexp_to_nnrs_imp_expr e)
-  | STerm ("NNRSimpFor", [SString v; e; s]) -> NNRSimpFor (char_list_of_string v, sexp_to_nnrs_imp_expr e, sexp_to_nnrs_imp_stmt s)
+  | STerm ("NNRSimpLet", [SString v; s]) -> NNRSimpLet (v, None, sexp_to_nnrs_imp_stmt s)
+  | STerm ("NNRSimpLet", [SString v; e; s]) -> NNRSimpLet (v, Some (sexp_to_nnrs_imp_expr e), sexp_to_nnrs_imp_stmt s)
+  | STerm ("NNRSimpAssign", [SString v; e]) -> NNRSimpAssign (v, sexp_to_nnrs_imp_expr e)
+  | STerm ("NNRSimpFor", [SString v; e; s]) -> NNRSimpFor (v, sexp_to_nnrs_imp_expr e, sexp_to_nnrs_imp_stmt s)
   | STerm ("NNRSimpIf", [e; s1; s2]) -> NNRSimpIf (sexp_to_nnrs_imp_expr e, sexp_to_nnrs_imp_stmt s1, sexp_to_nnrs_imp_stmt s2)
   | STerm ("NNRSimpEither", (SString v1) :: (SString v2) :: [e;s1;s2]) ->
-      NNRSimpEither (sexp_to_nnrs_imp_expr e,char_list_of_string v1,sexp_to_nnrs_imp_stmt s1,char_list_of_string v2,sexp_to_nnrs_imp_stmt s2)
+      NNRSimpEither (sexp_to_nnrs_imp_expr e,v1,sexp_to_nnrs_imp_stmt s1,v2,sexp_to_nnrs_imp_stmt s2)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside nnrs_imp_stmt with name " ^ t))
   | _ ->
@@ -641,7 +641,7 @@ let rec sexp_to_nnrs_imp_stmt (se:sexp) =
 let sexp_to_nnrs_imp (se:sexp) : QLang.nnrs_imp =
   match se with
   | STerm ("NNRSimp", [s; SString ret]) ->
-    (sexp_to_nnrs_imp_stmt s, char_list_of_string ret)
+    (sexp_to_nnrs_imp_stmt s, ret)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside nnrs_imp")
 
@@ -650,19 +650,19 @@ let sexp_to_nnrs_imp (se:sexp) : QLang.nnrs_imp =
 let imp_expr_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp e : sexp =
   let rec imp_expr_to_sexp e : sexp =
     match e with
-    | ImpExprVar v -> STerm ("ImpExprVar", [SString (string_of_char_list v)])
+    | ImpExprVar v -> STerm ("ImpExprVar", [SString v])
     | ImpExprConst d -> STerm ("ImpExprConst", [data_to_sexp d])
     | ImpExprOp (op, args) -> STerm ("ImpExprOp", (op_to_sexp op) :: List.map imp_expr_to_sexp args)
     | ImpExprRuntimeCall (op, args) -> STerm ("ImpExprRuntimeCall", (runtime_op_to_sexp op) :: List.map imp_expr_to_sexp args)
-    | ImpExprError msg -> STerm ("ImpExprError", [SString (string_of_char_list msg)])
+    | ImpExprError msg -> STerm ("ImpExprError", [SString msg])
   in
   imp_expr_to_sexp e
 
 let imp_var_decl_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp v =
   let imp_expr_to_sexp e = imp_expr_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp e in
   begin match v with
-  | (vn, None) -> STerm ("ImpStmtBlockVar", [SString (string_of_char_list vn)])
-  | (vn, Some e) -> STerm ("ImpStmtBlockVar", [SString (string_of_char_list vn);imp_expr_to_sexp e])
+  | (vn, None) -> STerm ("ImpStmtBlockVar", [SString vn])
+  | (vn, Some e) -> STerm ("ImpStmtBlockVar", [SString vn;imp_expr_to_sexp e])
   end
 
 let rec imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s : sexp =
@@ -673,24 +673,24 @@ let rec imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s : sexp =
         STerm ("ImpStmtBlock",
                (List.map (imp_var_decl_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp) vl) @
                (List.map imp_stmt_to_sexp sl))
-    | ImpStmtAssign (v, e) -> STerm ("ImpStmtAssign", [SString (string_of_char_list v); imp_expr_to_sexp e])
-    | ImpStmtFor (v, e, s) -> STerm ("ImpStmtFor", [SString (string_of_char_list v); imp_expr_to_sexp e; imp_stmt_to_sexp s])
-    | ImpStmtForRange (v, e1, e2, s) -> STerm ("ImpStmtForRange", [SString (string_of_char_list v); imp_expr_to_sexp e1; imp_expr_to_sexp e2; imp_stmt_to_sexp s])
+    | ImpStmtAssign (v, e) -> STerm ("ImpStmtAssign", [SString v; imp_expr_to_sexp e])
+    | ImpStmtFor (v, e, s) -> STerm ("ImpStmtFor", [SString v; imp_expr_to_sexp e; imp_stmt_to_sexp s])
+    | ImpStmtForRange (v, e1, e2, s) -> STerm ("ImpStmtForRange", [SString v; imp_expr_to_sexp e1; imp_expr_to_sexp e2; imp_stmt_to_sexp s])
     | ImpStmtIf (e, s1, s2) -> STerm ("ImpStmtIf", [imp_expr_to_sexp e; imp_stmt_to_sexp s1; imp_stmt_to_sexp s2])
   in
   imp_stmt_to_sexp s
 
 let imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp (ImpFun(var, s, ret)) : sexp =
-  STerm ("ImpFun", [STerm ("ImpFunArgs", [SString (string_of_char_list var)]);
+  STerm ("ImpFun", [STerm ("ImpFunArgs", [SString var]);
                     imp_stmt_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp s;
-                    STerm ("ImpFunReturn", [SString (string_of_char_list ret)])])
+                    STerm ("ImpFunReturn", [SString ret])])
 
 let rec imp_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp ((* ImpLib *) l) : sexp =
   STerm
     ("ImpLib",
      List.map
        (fun (f, def) ->
-          STerm ("ImpDef", [SString (string_of_char_list f);
+          STerm ("ImpDef", [SString f;
                             imp_function_to_sexp data_to_sexp op_to_sexp runtime_op_to_sexp def ]))
        l)
 
@@ -737,13 +737,13 @@ let sexp_to_imp_ejson (se:sexp) =
 
 let sexp_to_var (se:sexp) : var =
   begin match se with
-  | SString v -> char_list_of_string v
+  | SString v -> v
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside var")
   end
 
 let var_list_to_sexp (vl:var list) : sexp list =
-  List.map (fun v -> (SString (string_of_char_list v))) vl
+  List.map (fun v -> (SString v)) vl
 
 let sexp_to_var_list (sel:sexp list) =
   List.map sexp_to_var sel
@@ -853,8 +853,8 @@ let sexp_to_reduce_fun (se:sexp) =
 
 let mr_to_sexp (mr:mr) : sexp =
   STerm ("mr",
-	 (STerm ("mr_input", (SString (string_of_char_list mr.mr_input))::[]))
-	 :: (STerm ("mr_output", (SString (string_of_char_list mr.mr_output))::[]))
+	 (STerm ("mr_input", (SString mr.mr_input)::[]))
+	 :: (STerm ("mr_output", (SString mr.mr_output)::[]))
 	 :: (map_fun_to_sexp mr.mr_map)
 	 :: (reduce_fun_to_sexp mr.mr_reduce)
 	 :: [])
@@ -868,10 +868,10 @@ let sexp_to_mr (se:sexp) : mr =
 	   :: reduce
 	   :: [])
     ->
-      { mr_input = char_list_of_string input;
-	mr_output = char_list_of_string output;
-	mr_map = sexp_to_map_fun map;
-	mr_reduce = sexp_to_reduce_fun reduce }
+      { mr_input = input;
+	      mr_output = output;
+	      mr_map = sexp_to_map_fun map;
+	      mr_reduce = sexp_to_reduce_fun reduce }
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside mr")
   end
@@ -898,12 +898,12 @@ let sexp_to_loc (se:sexp) =
   end
 
 let var_loc_to_sexp (v,l) =
-  STerm ("var_loc", (SString (string_of_char_list v))::(loc_to_sexp l)::[])
+  STerm ("var_loc", (SString v)::(loc_to_sexp l)::[])
     
 let sexp_to_var_loc (se:sexp) =
   begin match se with
   | STerm ("var_loc", (SString v)::l::[]) ->
-      (char_list_of_string v, sexp_to_loc l)
+      (v, sexp_to_loc l)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside var-dlocalization pair")
   end
@@ -1019,7 +1019,7 @@ and sexp_to_sql_selects selects =
   | (STerm ("function", _) as expr) :: selects'
   | (STerm ("multiply", _) as expr) :: selects'
   | (STerm ("divide", _) as expr) :: selects' ->
-      (QSQL.sql_select_expr (char_list_of_string "") (sexp_to_sql_expr expr))
+      (QSQL.sql_select_expr "" (sexp_to_sql_expr expr))
       :: (sexp_to_sql_selects selects')
   | STerm (sterm, _) :: _ ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL select: " ^ sterm))
@@ -1107,7 +1107,7 @@ and sexp_to_sql_orders orders =
 and sexp_to_sql_expr expr =
   begin match expr with
   | SString s ->
-      QSQL.sql_expr_const (Coq_dstring (char_list_of_string s))
+      QSQL.sql_expr_const (Coq_dstring s)
   | SFloat f ->
       QSQL.sql_expr_const (Coq_dfloat f)
   | SInt i ->
@@ -1123,16 +1123,16 @@ and sexp_to_sql_expr expr =
 	(sexp_to_sql_expr expr1)
   | STerm ("literal",[SString "date"; SString sdate]) ->
       QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Coq_enhanced_unary_sql_date_op Coq_uop_sql_date_from_string)))
-	(QSQL.sql_expr_const (Coq_dstring (char_list_of_string sdate)))
+	      (QSQL.sql_expr_const (Coq_dstring sdate))
   | STerm ("period",[SString speriod; STerm ("year",[])]) ->
       QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Coq_enhanced_unary_sql_date_op Coq_uop_sql_date_period_from_string)))
-	(QSQL.sql_expr_const (Coq_dstring (char_list_of_string (speriod ^ "-YEAR"))))
+	(QSQL.sql_expr_const (Coq_dstring (speriod ^ "-YEAR")))
   | STerm ("period",[SString speriod; STerm ("month",[])]) ->
       QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Coq_enhanced_unary_sql_date_op Coq_uop_sql_date_period_from_string)))
-	(QSQL.sql_expr_const (Coq_dstring (char_list_of_string (speriod ^ "-MONTH"))))
+	(QSQL.sql_expr_const (Coq_dstring (speriod ^ "-MONTH")))
   | STerm ("period",[SString speriod; STerm ("day",[])]) ->
       QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Coq_enhanced_unary_sql_date_op Coq_uop_sql_date_period_from_string)))
-	(QSQL.sql_expr_const (Coq_dstring (char_list_of_string (speriod ^ "-DAY"))))
+	(QSQL.sql_expr_const (Coq_dstring (speriod ^ "-DAY")))
   | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
       QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
@@ -1201,7 +1201,7 @@ and sexp_to_sql_const_list const_list =
   begin match const_list with
   | [] -> []
   | (SString s) :: const_list' ->
-      (Coq_dstring (char_list_of_string s)) :: (sexp_to_sql_const_list const_list')
+      (Coq_dstring s) :: (sexp_to_sql_const_list const_list')
   | (SFloat f) :: const_list' ->
       (Coq_dfloat f) :: (sexp_to_sql_const_list const_list')
   | (SInt i) :: const_list' ->
@@ -1269,11 +1269,11 @@ let rec sexp_to_sql_statement (stmt : sexp)  =
   (* Bypass for 'with' at the beginning of the query -- treated as a view *)
   | STerm ("query",((STerm ("with",[STerm ("as",[SString tname]);view_query]))::rest)) ->
       let rest_stmt = sexp_to_sql_statement (STerm ("query",rest)) in
-      (QSQL.sql_create_view (char_list_of_string tname) (sexp_to_sql_query view_query))::rest_stmt
+      (QSQL.sql_create_view tname (sexp_to_sql_query view_query))::rest_stmt
   | STerm ("query",_) -> [QSQL.sql_run_query (sexp_to_sql_query stmt)]
   | STerm ("createView", [SString name; query]) ->
-     [QSQL.sql_create_view (char_list_of_string name) (sexp_to_sql_query query)]
-  | STerm ("dropView",[SString name]) -> [QSQL.sql_drop_view (char_list_of_string name)]
+     [QSQL.sql_create_view name (sexp_to_sql_query query)]
+  | STerm ("dropView",[SString name]) -> [QSQL.sql_drop_view name]
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL statement: " ^ sterm))
   | _ ->
@@ -1374,10 +1374,10 @@ and sqlpp_whenthen_to_sexp (whenthen : QSQLPP.sqlpp_when_then) : sexp =
   | SPWhenThen (whenexp, thenexp) -> STerm("WhenThen", [sqlpp_expr_to_sexp whenexp; sqlpp_expr_to_sexp thenexp])
   end
 
-and sqlpp_var_in_to_sexp (var_in : (char list * QSQLPP.sqlpp_expr)) : sexp =
+and sqlpp_var_in_to_sexp (var_in : (string * QSQLPP.sqlpp_expr)) : sexp =
   STerm("VarIn", [coq_string_to_sstring (fst var_in); sqlpp_expr_to_sexp (snd var_in)])
 	
-and sqlpp_field_to_sexp (field : (char list * QSQLPP.sqlpp_expr)) : sexp =
+and sqlpp_field_to_sexp (field : (string * QSQLPP.sqlpp_expr)) : sexp =
   STerm("Field", [coq_string_to_sstring (fst field) ; sqlpp_expr_to_sexp (snd field)])
 	
 and sqlpp_select_to_sexp (stmt : QSQLPP.sqlpp_select_statement) : sexp =
@@ -1391,7 +1391,7 @@ and sqlpp_select_to_sexp (stmt : QSQLPP.sqlpp_select_statement) : sexp =
 							     STerm("Ordering", [])::[])
   end
 
-and sqlpp_let_to_sexp (l : (char list * QSQLPP.sqlpp_expr)) : sexp =
+and sqlpp_let_to_sexp (l : (string * QSQLPP.sqlpp_expr)) : sexp =
   STerm("Let", [coq_string_to_sstring (fst l); sqlpp_expr_to_sexp (snd l)])
 	
 and sqlpp_select_block_to_sexp (block : QSQLPP.sqlpp_select_block) : sexp =
@@ -1468,18 +1468,18 @@ and sqlpp_group_to_sexp (clause : QSQLPP.sqlpp_group_by) : sexp =
       STerm("GroupBy", [])
   end
 	
-and sqlpp_group_as_to_sexp (aspart : (char list * ((char list * char list) list)))	: sexp =
+and sqlpp_group_as_to_sexp (aspart : (string * ((string * string) list)))	: sexp =
   begin match aspart with
   | (name , renames) ->
       STerm("GroupAs", coq_string_to_sstring name :: (List.map sqlpp_rename_to_sexp renames))
   end
 
-and sqlpp_rename_to_sexp (rename : (char list * char list)) : sexp =
+and sqlpp_rename_to_sexp (rename : (string * string)) : sexp =
   begin match rename with
   | (var , varref) -> STerm("Rename", [coq_string_to_sstring var; coq_string_to_sstring varref])
   end
 
-and sqlpp_group_key_to_sexp (key : (QSQLPP.sqlpp_expr * char list option)) : sexp =
+and sqlpp_group_key_to_sexp (key : (QSQLPP.sqlpp_expr * string option)) : sexp =
   begin match key with
   | (expr, Some name) -> STerm("Key", [sqlpp_expr_to_sexp expr; STerm("as", [coq_string_to_sstring name])])
   | (expr, None) -> STerm("Key", [sqlpp_expr_to_sexp expr])
@@ -1592,7 +1592,7 @@ let rec sexp_to_sqlpp_expr (stmt : sexp)  =
   | STerm("IndexAny", [prim]) ->
       QSQLPP.sqlpp_sqlpp_index_any (sexp_to_sqlpp_expr prim)
   | SString s ->
-      QSQLPP.sqlpp_sqlpp_literal (Coq_dstring (char_list_of_string s))
+      QSQLPP.sqlpp_sqlpp_literal (Coq_dstring s)
   | SFloat f ->
       QSQLPP.sqlpp_sqlpp_literal (Coq_dfloat f)
   | SInt i ->
@@ -1626,14 +1626,14 @@ and sexp_to_sqlpp_when_then (se : sexp) : QSQLPP.sqlpp_when_then =
       raise (Qcert_Error "Non STerm node found where WhenThen node expected in SQL++ case expression")
   end
 
-and sexp_to_sqlpp_binding (se : sexp) : (char list * SQLPP.sqlpp_expr) =
+and sexp_to_sqlpp_binding (se : sexp) : (string * SQLPP.sqlpp_expr) =
   begin match se with
   | STerm ("VarIn", [s;expr]) -> (sstring_to_coq_string s, sexp_to_sqlpp_expr expr)				
   | _ ->
       raise (Qcert_Error "VarIn node not found where expected in SQL++ quantified expression")
   end
 
-and sexp_to_sqlpp_field (se : sexp) : (char list * SQLPP.sqlpp_expr) =
+and sexp_to_sqlpp_field (se : sexp) : (string * SQLPP.sqlpp_expr) =
   begin match se with
   | STerm ("Field", [name;value]) -> (sstring_to_coq_string name, sexp_to_sqlpp_expr value)
   | _ ->
@@ -1649,7 +1649,7 @@ and sexp_to_sqlpp_select_body (sl : sexp list) =
       raise (Qcert_Error "Not well-formed S-expr list in SQL++ select statement")
   end
 
-and sexp_to_sqlpp_let (se : sexp) : (char list * SQLPP.sqlpp_expr) =
+and sexp_to_sqlpp_let (se : sexp) : (string * SQLPP.sqlpp_expr) =
   begin match se with	
   | STerm("Let", [s;expr]) -> (sstring_to_coq_string s, sexp_to_sqlpp_expr expr)
   | _ ->
@@ -1843,7 +1843,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_wasm ->
       raise (Qcert_Error ("sexp to "^(Compiler_util.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_error err ->
-      raise (Qcert_Error ("sexp_to_query: "^(string_of_char_list err)))
+      raise (Qcert_Error ("sexp_to_query: "^ err))
   end
 
 let query_to_sexp (q: QLang.query) : sexp =
@@ -1886,5 +1886,5 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_wasm _ ->
       SString ((Compiler_util.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_error err ->
-      SString ("query_to_sexp: "^(string_of_char_list err))
+      SString ("query_to_sexp: " ^ err)
   end
