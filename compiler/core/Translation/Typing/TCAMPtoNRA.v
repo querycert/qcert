@@ -111,9 +111,9 @@ Section TCAMPtoNRA.
   Proof.
     intros; subst.
     econstructor; qeauto.
-    Grab Existential Variables.
-    eauto.
+    Unshelve.
     unfold rec_concat_sort; qeauto.
+    eauto.
   Qed.
 
   Lemma Coll_proj1 τ :
@@ -232,7 +232,7 @@ Section TCAMPtoNRA.
     - repeat (econstructor; qeauto).
     (* PTEitherConcat *)
     - repeat (econstructor; qeauto).
-      Grab Existential Variables.
+      Unshelve.
       qeauto. qeauto. qeauto. qeauto. qeauto. 
       qeauto. qeauto. qeauto. qeauto. qeauto. 
       qeauto. qeauto. qeauto. qeauto. qeauto.
@@ -271,7 +271,7 @@ Section TCAMPtoNRA.
           econstructor.
     - econstructor; [ | eauto 2 with qcert].
       econstructor.
-    Grab Existential Variables.
+    Unshelve.
     eauto. eauto.
   Qed.
     

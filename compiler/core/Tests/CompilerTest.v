@@ -234,7 +234,7 @@ Section CompilerUntypedTest.
     repeat econstructor; qeauto.
     repeat econstructor; qeauto.
     repeat econstructor; qeauto.
-    Grab Existential Variables.
+    Unshelve.
     qeauto. qeauto. qeauto. qeauto. qeauto.
   Qed.
 
@@ -266,7 +266,7 @@ Section CompilerUntypedTest.
     apply Example1'_wt.
     }
     repeat econstructor; qeauto.
-    Grab Existential Variables.
+    Unshelve.
     qeauto.
   Qed.
 

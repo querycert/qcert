@@ -287,7 +287,7 @@ Section EJson.
         if (string_dec s1 "$left") then Some (Some j', None)
         else if (string_dec s1 "$right") then Some (None, Some j')
              else None
-      | ejobject r => None
+      | ejobject _ => None
       | _ => None
       end.
 

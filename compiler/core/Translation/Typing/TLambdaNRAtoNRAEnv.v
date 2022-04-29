@@ -69,7 +69,7 @@ Section TLambdaNRAtoNRAEnv.
       + econstructor; [ | qeauto | qeauto ]; qeauto.
       + apply TLLambda_inv in H1.
         eapply IHe1; qeauto.
-    Grab Existential Variables.
+    Unshelve.
     solve[qeauto].
     solve[qeauto].
     solve[qeauto].

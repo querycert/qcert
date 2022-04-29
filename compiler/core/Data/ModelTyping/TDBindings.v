@@ -131,5 +131,5 @@ Section TDBindings.
 
 End TDBindings.
 
-Hint Resolve dbindings_type_Forall_normalized : qcert.
+Global Hint Resolve dbindings_type_Forall_normalized : qcert.
 

@@ -73,10 +73,10 @@ Section TOQLtoNRAEnv.
         rewrite <- domain_rremove; trivial.
         auto.
       - apply oql_to_nraenv_expr_type_preserve_f; trivial.
-        Grab Existential Variables.
-        solve[apply is_sorted_rremove; trivial].
-        solve[qeauto].
+        Unshelve.
         solve[simpl; trivial].
+        solve[qeauto].
+        solve[apply is_sorted_rremove; trivial].
     Qed.
 
     Theorem oql_to_nraenv_type_preserve_f τconstant oq τout :

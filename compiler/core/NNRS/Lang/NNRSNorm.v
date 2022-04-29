@@ -255,8 +255,8 @@ Section NNRSNorm.
   
 End NNRSNorm.
 
-Hint Resolve nnrs_expr_eval_normalized : qcert.
-Hint Resolve nnrs_stmt_eval_normalized : qcert.
+Global Hint Resolve nnrs_expr_eval_normalized : qcert.
+Global Hint Resolve nnrs_stmt_eval_normalized : qcert.
 
 Arguments nnrs_expr_eval_normalized {fruntime h σc σ e o}.
 Arguments nnrs_stmt_eval_normalized {fruntime h σc σ ψc ψd s σ' ψc' ψd'}.

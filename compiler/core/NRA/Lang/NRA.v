@@ -945,7 +945,7 @@ Notation "σ⟨ p ⟩( r )" := (NRASelect p r) (at level 70) : nra_scope.       
 Notation "r1 ∥ r2" := (NRADefault r1 r2) (right associativity, at level 70): nra_scope.       (* ∥ = \parallel *)
 Notation "r1 ◯ r2" := (NRAApp r1 r2) (right associativity, at level 60): nra_scope.           (* ◯ = \bigcirc *)
 
-Hint Resolve nra_eval_normalized : qcert.
+Global Hint Resolve nra_eval_normalized : qcert.
 
 Tactic Notation "nra_cases" tactic(first) ident(c) :=
   first;

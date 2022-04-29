@@ -122,7 +122,7 @@ Section TNRAUtil.
   Proof.
     intros; subst.
     econstructor; qeauto.
-    Grab Existential Variables.
+    Unshelve.
     qeauto.
     unfold rec_concat_sort. qeauto.
   Qed.

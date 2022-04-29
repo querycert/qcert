@@ -990,8 +990,8 @@ Ltac dtype_enrich :=
       extend (dcoll_coll_in_inv H H2)
   end.
 
-Hint Immediate dttop dttop' : qcert.
-Hint Resolve dttop_weaken : qcert.
+Global Hint Immediate dttop dttop' : qcert.
+Global Hint Resolve dttop_weaken : qcert.
 
 Section subtype.
 
@@ -1597,4 +1597,4 @@ Global Instance data_type_subtype_prop
 *)
 End subtype.
 
-Hint Resolve data_type_normalized : qcert. 
+Global Hint Resolve data_type_normalized : qcert. 

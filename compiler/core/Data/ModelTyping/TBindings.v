@@ -90,5 +90,5 @@ Section TBindings.
 
 End TBindings.
 
-Hint Resolve bindings_type_Forall_normalized : qcert.
+Global Hint Resolve bindings_type_Forall_normalized : qcert.
 

@@ -29,14 +29,14 @@ depends: [
   "ocaml" {>= "4.09.1"}
   "ocamlfind"
   "dune"
-  "coq" {= "8.11.2" }
+  "coq" {>= "8.11.2" }
   "coq-jsast" {>= "2.0.0"}
   "menhir"
   "base64"
   "js_of_ocaml"
   "js_of_ocaml-ppx"
   "uri"
-  "wasm" {= "1.0.1"}
+  "wasm" {= "1.1.1"}
   "calendar"
   "coq-coq2html" {with-doc}
 ]

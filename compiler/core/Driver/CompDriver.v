@@ -5902,7 +5902,7 @@ Section CompDriver.
     Definition exists_path_from_source_target source target
       := match get_path_from_source_target source target with
          | L_error _ :: nil => False
-         | path => True
+         | _ => True
          end.
 
     Lemma exists_path_from_source_target_refl

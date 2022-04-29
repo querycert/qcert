@@ -531,7 +531,7 @@ Section TcNNRCtoCAMP.
           simpl; constructor; qauto.
           simpl.
           intros ? [?|?]; subst; eauto.
-          Grab Existential Variables.
+          Unshelve.
           eauto. eauto. eauto. eauto.
           eauto. eauto. eauto.
   Qed.
@@ -865,14 +865,14 @@ Section TcNNRCtoCAMP.
               simpl.
               constructor; trivial.
           }
-     Grab Existential Variables.
-     eauto.
-     eauto.
-     qeauto.
+     Unshelve.
      qeauto.
      eauto.
      eauto.
      qeauto.
+     qeauto.
+     eauto.
+     eauto.
   Qed.
 
   Lemma nnrc_to_camp_ns_let_type_equiv n τc Γ τout :
@@ -1184,18 +1184,18 @@ Section TcNNRCtoCAMP.
               subst; eauto.
           }
     - contradiction. (* GroupBy Case -- nnrcIsCore is False *)
-      Grab Existential Variables.
+      Unshelve.
+      solve[eauto].
+      solve[eauto].
       solve[eauto].
       solve[eauto].
       solve[qeauto].
+      solve[qeauto].
+      solve[eauto].    
       solve[eauto].    
       solve[qeauto].
       solve[eauto].
-      solve[eauto].
       solve[qeauto].
-      solve[qeauto].
-      solve[eauto].
-      solve[eauto].
       solve[eauto].
       solve[eauto].
   Qed.
@@ -1429,7 +1429,7 @@ Section TcNNRCtoCAMP.
     - rewrite tdot_rec_concat_sort_eq; qeauto.
     - rewrite drec_sort_drec_sort_concat.
       rewrite tdot_rec_concat_sort_eq; qeauto.
-      Grab Existential Variables.
+      Unshelve.
       qeauto.
       qeauto.
       qeauto.
@@ -1723,13 +1723,13 @@ Section TcNNRCtoCAMP.
                   qauto.
               }
           }
-          Grab Existential Variables.
+          Unshelve.
           eauto.
+          qeauto.
+          qeauto.
+          qeauto.
+          qeauto.
           eauto.
-          qeauto.
-          qeauto.
-          qeauto.
-          qeauto.
           eauto.
   Qed.
 
@@ -2005,14 +2005,14 @@ Section TcNNRCtoCAMP.
               intros [?[injj ?]]; apply loop_var_inj in injj; subst; eauto.
           }
     - simpl in Hiscore; contradiction.  (* GroupBy Case -- nnrcIsCore is False *)
-      Grab Existential Variables.
-      eauto.
-      eauto.
-      qeauto.
+      Unshelve.
       eauto.
       qeauto.
       eauto.
       qeauto.
+      eauto.
+      qeauto.
+      eauto.
       eauto.
   Qed.
 

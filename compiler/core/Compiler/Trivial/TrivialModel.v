@@ -188,7 +188,7 @@ Program Instance trivial_foreign_type : foreign_type
 Next Obligation.
   econstructor;
     intros [].
-  Grab Existential Variables.
+  Unshelve.
   solve [intros []].
   solve [intros []].
 Defined.
