@@ -26,8 +26,8 @@ Section ForeigntoScala.
     := mk_foreign_to_scala {
            foreign_to_scala_unary_op
              (fu:foreign_operators_unary)
-             (d:nstring) : nstring
-           ; foreign_to_scala_spark_datatype (ft: foreign_type_type) : nstring
+             (d:string) : string
+           ; foreign_to_scala_spark_datatype (ft: foreign_type_type) : string
          }.
 
 End ForeigntoScala.

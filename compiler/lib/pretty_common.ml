@@ -182,8 +182,8 @@ let pretty_sym ff sym =
 let rec pretty_names ff nl =
   begin match nl with
     [] -> ()
-  | n :: [] -> fprintf ff "%s" (string_of_char_list n)
-  | n :: nl' -> fprintf ff "%s,@ %a" (string_of_char_list n) pretty_names nl'
+  | n :: [] -> fprintf ff "%s" n
+  | n :: nl' -> fprintf ff "%s,@ %a" n pretty_names nl'
   end
 
 let pretty_squared_names sym ff nl =
@@ -216,7 +216,7 @@ let rec pretty_data ff (d:Data.data) =
   | Coq_dfloat f -> fprintf ff "%f" f
   | Coq_dbool true -> fprintf ff "true"
   | Coq_dbool false -> fprintf ff "false"
-  | Coq_dstring s -> fprintf ff "\"%s\"" (string_of_char_list s)
+  | Coq_dstring s -> fprintf ff "\"%s\"" s
   | Coq_dcoll dl -> fprintf ff "{@[<hv 0>%a@]}" pretty_coll dl
   | Coq_drec rl -> fprintf ff "[@[<hv 0>%a@]]" pretty_rec rl
   | Coq_dleft d -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@]" pretty_data d
@@ -236,8 +236,8 @@ and pretty_coll ff dl =
 and pretty_rec ff rl =
   match rl with
     [] -> ()
-  | (ra,rd) :: [] -> fprintf ff "%s : %a" (string_of_char_list ra) pretty_data rd
-  | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" (string_of_char_list ra) pretty_data rd pretty_rec rl'
+  | (ra,rd) :: [] -> fprintf ff "%s : %a" ra pretty_data rd
+  | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" ra pretty_data rd pretty_rec rl'
 
 (** Pretty rtype *)
 
@@ -262,8 +262,8 @@ let rec pretty_rtype_aux sym ff rt =
 and pretty_rec_type sym ff rl =
   match rl with
     [] -> ()
-  | (ra,rd) :: [] -> fprintf ff "%s : %a" (string_of_char_list ra) (pretty_rtype_aux sym) rd
-  | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" (string_of_char_list ra) (pretty_rtype_aux sym) rd (pretty_rec_type sym) rl'
+  | (ra,rd) :: [] -> fprintf ff "%s : %a" ra (pretty_rtype_aux sym) rd
+  | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" ra (pretty_rtype_aux sym) rd (pretty_rec_type sym) rl'
 
 let pretty_drtype_aux sym ff drt =
   match drt with
@@ -436,11 +436,11 @@ let pretty_unary_op p sym callb ff u a =
   (* resets precedence back to 0 *)
   | OpBrand brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "brand" (pretty_squared_names sym) brands (callb 0 sym) a
   (* resets precedence back to 0 *)
-  | OpRec att -> fprintf ff "@[<hv 2>[ %s :@ %a ]@]" (string_of_char_list att) (callb 0 sym) a
+  | OpRec att -> fprintf ff "@[<hv 2>[ %s :@ %a ]@]" att (callb 0 sym) a
   | OpDot att ->
       if p > 23
-      then fprintf ff "@[<hv 0>(%a.%s)@]" (callb 23 sym) a (string_of_char_list att)
-      else fprintf ff "@[<hv 0>%a.%s@]" (callb 23 sym) a (string_of_char_list att)
+      then fprintf ff "@[<hv 0>(%a.%s)@]" (callb 23 sym) a att
+      else fprintf ff "@[<hv 0>%a.%s@]" (callb 23 sym) a att
   (* resets precedence back to 0 *)
   | OpRecRemove att ->
       fprintf ff "@[<hv 0>%a%a%a(%a)@]" pretty_sym sym.neg pretty_sym sym.pi (pretty_squared_names sym) [att] (callb 0 sym) a
@@ -455,7 +455,7 @@ let pretty_unary_op p sym callb ff u a =
   | OpLength -> pretty_unary_exp sym callb "length" ff a
   | OpSubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
   | OpSubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
-  | OpLike n1 -> pretty_unary_exp sym callb ("like["^(string_of_char_list n1)^"]") ff a
+  | OpLike n1 -> pretty_unary_exp sym callb ("like[" ^ n1 ^ "]") ff a
   (* resets precedence back to 0 *)
   | OpCast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
   | OpUnbrand ->

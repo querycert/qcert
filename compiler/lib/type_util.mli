@@ -27,9 +27,9 @@ type schema = {
 
 val empty_schema : schema
 val schema_of_io_json : QData.json -> schema
-val inheritance_of_schema : schema -> (char list * char list) list
+val inheritance_of_schema : schema -> (string * string) list
 val raw_inheritance_of_schema : schema -> QData.json
 
-type content_sdata = (char list * char list) list
+type content_sdata = (string * string) list
 val content_sdata_of_data : schema -> content_input -> content_sdata
 

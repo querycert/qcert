@@ -229,7 +229,6 @@ Section CompDriver.
     Definition wasm_ast_to_wasm (q: wasm_ast) : wasm :=
       wasm_ast_to_wasm q.
 
-    Local Open Scope nstring_scope.
     Definition js_ast_to_javascript (q: js_ast) : javascript := js_ast_to_js_top q.
 
     (* Java equivalent: NnrcToNnrcmr.convert *)

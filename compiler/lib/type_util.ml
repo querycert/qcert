@@ -35,19 +35,19 @@ let lookup_brand_type (brand_type:string) type_defs =
   with
   | Not_found -> raise (Failure ("Type: " ^ brand_type ^ " not found in type defs list"))
 
-let rtype_content_to_rtype (br: (char list * char list) list) (j:rtype_content) =
+let rtype_content_to_rtype (br: (string * string) list) (j:rtype_content) =
   match QType.json_to_rtype_with_fail br j with
-  | None -> raise (Failure ("type parsing failed for JSON:" ^ (string_of_char_list (QData.jsonStringify ['"'] j))))
+  | None -> raise (Failure ("type parsing failed for JSON:" ^ (QData.jsonStringify "\"" j)))
   | Some t -> t
 
-let rtype_content_to_vrtype (br: (char list * char list) list) (j:vrtype_content) =
+let rtype_content_to_vrtype (br: (string * string) list) (j:vrtype_content) =
   begin match QType.json_to_vrtype_with_fail br j with
-  | None -> raise (Failure ("global type parsing failed for JSON:" ^ (string_of_char_list (QData.jsonStringify ['"'] j))))
+  | None -> raise (Failure ("global type parsing failed for JSON:" ^ (QData.jsonStringify "\"" j)))
   | Some t -> t
   end
 
-let make_brand_context (br: (char list * char list) list) brand_types (type_defs : (string * rtype_content) list) =
-  List.map (fun (x,y) -> (char_list_of_string x, rtype_content_to_rtype br (lookup_brand_type y type_defs))) brand_types
+let make_brand_context (br: (string * string) list) brand_types (type_defs : (string * rtype_content) list) =
+  List.map (fun (x,y) -> (x, rtype_content_to_rtype br (lookup_brand_type y type_defs))) brand_types
 
 let content_schema_to_model (mc: content_schema) : QType.brand_model =
   let (h, brand_types, type_defs, _) = mc in
@@ -66,11 +66,11 @@ let content_schema_to_model (mc: content_schema) : QType.brand_model =
   let brand_context = make_brand_context (fst h) brand_types type_defs in
   Compiler_util.lift_qerror (QType.make_brand_model (fst h)) brand_context
 
-let localization_of_string (x:char list) =
-  begin match string_of_char_list x with
+let localization_of_string (x:string) =
+  begin match x with
   | "local" -> QLang.vlocal
   | "distr" -> QLang.vdistr
-  | _ -> raise (Qcert_Error ("global localization parsing failed for: " ^ (string_of_char_list x)))
+  | _ -> raise (Qcert_Error ("global localization parsing failed for: " ^ x))
   end
 
 let lift_constant_types (bm:QType.brand_model) br glb =
@@ -88,7 +88,7 @@ let lift_constant_types (bm:QType.brand_model) br glb =
 	end
     end
   in
-  (char_list_of_string vname, QDriver.mk_constant_config bm loc t None)
+  (vname, QDriver.mk_constant_config bm loc t None)
     
 let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDriver.constants_config =
   let (h, _, _, globals) = mc in
@@ -99,7 +99,7 @@ let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDri
     end
   in
   List.map (lift_constant_types bm (fst h)) globals
-(*  List.map (fun (x,y) -> let (z,k) =  in (char_list_of_string x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals *)
+(*  List.map (fun (x,y) -> let (z,k) =  in (x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals *)
 
 let process_schema mc =
   let bm = content_schema_to_model mc in
@@ -139,7 +139,7 @@ let raw_inheritance_of_schema sc =
   | Some (h,_,_,_) -> snd h
   end
 
-type content_sdata = (char list * char list) list
+type content_sdata = (string * string) list
 
 let get_type bm (glob_constant:CompConfig.constant_config) =
   let br = brand_relation_of_brand_model bm in
@@ -148,12 +148,12 @@ let get_type bm (glob_constant:CompConfig.constant_config) =
   | Vdistr -> QType.bag br glob_constant.constant_type
   end
 
-let get_constant_name (glob_name:char list) (globs:QDriver.constants_config) : CompConfig.constant_config =
+let get_constant_name (glob_name:string) (globs:QDriver.constants_config) : CompConfig.constant_config =
   begin try
     List.assoc glob_name globs
   with
   | _ ->
-      raise (Failure ("No type declared for constant: " ^ (string_of_char_list glob_name)))
+      raise (Failure ("No type declared for constant: " ^ glob_name))
   end
 
 let proc_glob bm (globs:QDriver.constants_config) globd =
@@ -162,7 +162,7 @@ let proc_glob bm (globs:QDriver.constants_config) globd =
   let glob_type = get_type bm glob in
   begin match QType.data_to_sjson bm glob_data glob_type with
   | Some sdata -> (glob_name,sdata)
-  | None -> raise (Failure ("Could not process sdata for constant: " ^ (string_of_char_list glob_name)))
+  | None -> raise (Failure ("Could not process sdata for constant: " ^ glob_name))
   end
   
 let content_sdata_of_data (sc:schema) (data:Data_util.content_input) =

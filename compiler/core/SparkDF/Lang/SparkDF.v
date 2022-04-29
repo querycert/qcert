@@ -12,11 +12,11 @@
  * limitations under the License.
  *)
 
-Require Import NativeString.
+Require Import String.
 
 Section SparkDF.
   (** Spark (Dataframe API) programs are in serialized form *)
-  Definition spark_df := nstring.
+  Definition spark_df := string.
   
 End SparkDF.
 

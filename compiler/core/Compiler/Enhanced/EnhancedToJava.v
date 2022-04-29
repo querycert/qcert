@@ -21,19 +21,17 @@ Require Import SqlDateComponent.
 Require Import UriComponent.
 Require Import EnhancedData.
 
-Local Open Scope nstring_scope.
-
 (* XXX TODO: fix me *)
 Definition enhanced_to_java_data
-           (quotel:nstring) (fd:enhanced_data) : java_json
+           (quotel:string) (fd:enhanced_data) : java_json
   := match fd with
-     | enhancedsqldate tp => mk_java_json (^@toString _ sql_date_foreign_data.(@foreign_data_tostring) tp)
-     | enhancedsqldateperiod tp => mk_java_json (^@toString _ sql_date_period_foreign_data.(@foreign_data_tostring ) tp)
+     | enhancedsqldate tp => mk_java_json (@toString _ sql_date_foreign_data.(@foreign_data_tostring) tp)
+     | enhancedsqldateperiod tp => mk_java_json (@toString _ sql_date_period_foreign_data.(@foreign_data_tostring ) tp)
      end.
 
 Definition enhanced_to_java_unary_op
-           (indent:nat) (eol:nstring)
-           (quotel:nstring) (fu:enhanced_unary_op)
+           (indent:nat) (eol:string)
+           (quotel:string) (fu:enhanced_unary_op)
            (d:java_json) : java_json
   := match fu with
      | enhanced_unary_sql_date_op op =>
@@ -43,8 +41,8 @@ Definition enhanced_to_java_unary_op
      end.
 
 Definition enhanced_to_java_binary_op
-           (indent:nat) (eol:nstring)
-           (quotel:nstring) (fb:enhanced_binary_op)
+           (indent:nat) (eol:string)
+           (quotel:string) (fb:enhanced_binary_op)
            (d1 d2:java_json) : java_json
   := match fb with
      | enhanced_binary_sql_date_op op =>

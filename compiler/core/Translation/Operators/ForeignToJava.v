@@ -24,14 +24,14 @@ Section ForeigntoJava.
   Class foreign_to_java {fruntime:foreign_runtime}: Type
     := mk_foreign_to_java {
            foreign_to_java_data
-             (quotel:nstring) (fd:foreign_data_model) : java_json
+             (quotel:string) (fd:foreign_data_model) : java_json
            ; foreign_to_java_unary_op
-               (indent:nat) (eol:nstring)
-               (quotel:nstring) (fu:foreign_operators_unary)
+               (indent:nat) (eol:string)
+               (quotel:string) (fu:foreign_operators_unary)
                (d:java_json) : java_json
            ; foreign_to_java_binary_op
-               (indent:nat) (eol:nstring)
-               (quotel:nstring) (fb:foreign_operators_binary)
+               (indent:nat) (eol:string)
+               (quotel:string) (fb:foreign_operators_binary)
                (d1 d2:java_json) : java_json
          }.
       

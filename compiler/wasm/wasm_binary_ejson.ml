@@ -79,7 +79,7 @@ end = struct
       set_int64_le b 1 (Int64.of_int x);
       b
     | Coq_cejstring s ->
-      let s = Util.string_of_char_list s in
+      let s = s in
       let n = String.length s in
       let b = create (5 + n) in
       set_uint8 b 0 5;
@@ -117,7 +117,7 @@ end = struct
           append b
         );
         List.iter (fun (k, v) ->
-            let k = Util.string_of_char_list k in
+            let k = k in
             let n = String.length k in
             let b = create (n + 4) in
             set_int32_le b 0 (Int32.of_int n);
@@ -162,7 +162,7 @@ end = struct
         Coq_ejbigint x
       | 5 ->
         let n = get_int32_le b (p 4) |> Int32.to_int in
-        Coq_ejstring (sub_string b (p n) n |> Util.char_list_of_string)
+        Coq_ejstring (sub_string b (p n) n)
       | 6 ->
         let n =
           get_int32_le b (p 4)
@@ -176,7 +176,7 @@ end = struct
         in
         Coq_ejobject (List.init n (fun _ ->
             let n = get_int32_le b (p 4) |> Int32.to_int in
-            let key = sub_string b (p n) n |> Util.char_list_of_string in
+            let key = sub_string b (p n) n in
             key, f ()
           ))
       | _ -> failwith "ejson_of_bytes: unknown tag"

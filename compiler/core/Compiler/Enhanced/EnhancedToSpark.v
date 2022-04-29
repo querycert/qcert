@@ -32,26 +32,25 @@ Require Import EnhancedReduceOps.
 Import ListNotations.
 Local Open Scope list_scope.
 Local Open Scope string_scope.
-Local Open Scope nstring_scope.
 
 Definition enhanced_to_spark_reduce_op
            (rop:enhanced_reduce_op)
-           (scala_endl quotel:nstring) : nstring
+           (scala_endl quotel:string) : string
   := match rop with
-     | RedOpCount => ^".count().toString()"
-     | RedOpSum enhanced_numeric_int => ^".aggregate(0)(_ + _.toInt, _ + _).toString()"
-     | RedOpSum enhanced_numeric_float => ^".aggregate(0.0)(_ + _.toDouble, _ + _).toString()"
-     | RedOpMin enhanced_numeric_int => ^".aggregate(Int.MaxValue)(((x, y) => Math.min(x, y.toInt)), Math.min).toString()"
-     | RedOpMin enhanced_numeric_float => ^".aggregate(Double.MaxValue)(((x, y) => Math.min(x, y.toDouble)), Math.min).toString()"
+     | RedOpCount => ".count().toString()"
+     | RedOpSum enhanced_numeric_int => ".aggregate(0)(_ + _.toInt, _ + _).toString()"
+     | RedOpSum enhanced_numeric_float => ".aggregate(0.0)(_ + _.toDouble, _ + _).toString()"
+     | RedOpMin enhanced_numeric_int => ".aggregate(Int.MaxValue)(((x, y) => Math.min(x, y.toInt)), Math.min).toString()"
+     | RedOpMin enhanced_numeric_float => ".aggregate(Double.MaxValue)(((x, y) => Math.min(x, y.toDouble)), Math.min).toString()"
      | RedOpMax enhanced_numeric_int =>
-       ^".aggregate(Int.MinValue)(((x, y) => Math.max(x, y.toInt)), Math.max).toString()"
+       ".aggregate(Int.MinValue)(((x, y) => Math.max(x, y.toInt)), Math.max).toString()"
      | RedOpMax enhanced_numeric_float =>
-       ^".aggregate(Double.MinValue)(((x, y) => Math.max(x, y.toDouble)), Math.max).toString()"
+       ".aggregate(Double.MinValue)(((x, y) => Math.max(x, y.toDouble)), Math.max).toString()"
      | RedOpStats _ =>
-       ^".aggregate("""")(statsReduce, statsRereduce).toString()" +++ scala_endl +++
-                     ^"  sc.parallelize(Array(res))"
+       ".aggregate("""")(statsReduce, statsRereduce).toString()" ++ scala_endl ++
+                     "  sc.parallelize(Array(res))"
      | RedOpArithMean _ => (* assert false *)
-       ^".arithmean /* ArithMean must be removed before code generation */"
+       ".arithmean /* ArithMean must be removed before code generation */"
      end.
 
 (* Java equivalent: MROptimizer.min_max_to_stats *)

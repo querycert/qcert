@@ -109,6 +109,5 @@ let parse_query l f : (string * QLang.query) =
   | L_wasm_ast -> raise (Qcert_Error "No parser for WASM (Ast) available")
   | L_wasm -> raise (Qcert_Error "No parser for WASM (Binary) available")
   | L_error err ->
-      let err = string_of_char_list err in
-      raise (Qcert_Error ("No parser for Error language available: "^err))
+      raise (Qcert_Error ("No parser for Error language available: " ^ err))
   end

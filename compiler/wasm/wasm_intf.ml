@@ -7,9 +7,9 @@ module type IMP_EJSON = sig
     | Coq_ejnumber of float
     | Coq_ejbigint of int
     | Coq_ejbool of bool
-    | Coq_ejstring of char list
+    | Coq_ejstring of string
     | Coq_ejarray of 'foreign_ejson_model ejson list
-    | Coq_ejobject of (char list * 'foreign_ejson_model ejson) list
+    | Coq_ejobject of (string * 'foreign_ejson_model ejson) list
     | Coq_ejforeign of 'foreign_ejson_model
 
   type 'foreign_ejson_model cejson =
@@ -17,7 +17,7 @@ module type IMP_EJSON = sig
     | Coq_cejnumber of float
     | Coq_cejbigint of int
     | Coq_cejbool of bool
-    | Coq_cejstring of char list
+    | Coq_cejstring of string
     | Coq_cejforeign of 'foreign_ejson_model
 
   (* EJsonOperators *)
@@ -42,9 +42,9 @@ module type IMP_EJSON = sig
     | EJsonOpArrayLength
     | EJsonOpArrayPush
     | EJsonOpArrayAccess
-    | EJsonOpObject of char list list
-    | EJsonOpAccess of char list
-    | EJsonOpHasOwnProperty of char list
+    | EJsonOpObject of string list
+    | EJsonOpAccess of string
+    | EJsonOpHasOwnProperty of string
     | EJsonOpMathMin
     | EJsonOpMathMax
     | EJsonOpMathPow
@@ -121,10 +121,10 @@ module type IMP_EJSON = sig
 
   (* Imp *)
 
-  type var = char list
+  type var = string
 
   type ('constant, 'op, 'runtime) imp_expr =
-    | ImpExprError of char list
+    | ImpExprError of string
     | ImpExprVar of var
     | ImpExprConst of 'constant
     | ImpExprOp of 'op * ('constant, 'op, 'runtime) imp_expr list
@@ -145,7 +145,7 @@ module type IMP_EJSON = sig
     | ImpFun of var * ('constant, 'op, 'runtime) imp_stmt * var
 
   type ('constant, 'op, 'runtime) imp =
-    (char list * ('constant, 'op, 'runtime) imp_function) list
+    (string * ('constant, 'op, 'runtime) imp_function) list
 
   (* ImpEJson *)
 

@@ -28,7 +28,7 @@ Section ForeigntoSpark.
   := mk_foreign_to_spark {
          foreign_to_spark_reduce_op
            (rop:foreign_reduce_op_type)
-           (scala_endl quotel:nstring) : nstring
+           (scala_endl quotel:string) : string
          ; foreign_to_spark_prepare_nnrcmr :
              nnrcmr -> nnrcmr
        }.

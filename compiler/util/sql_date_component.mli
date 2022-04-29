@@ -15,14 +15,14 @@
 (** Interval *)
 type period
 val period_eq : period -> period -> bool
-val period_to_string : period -> char list
-val period_from_string : char list -> period
+val period_to_string : period -> string
+val period_from_string : string -> period
 
 (** Date *)
 type date
 
-val date_to_string : date -> char list
-val date_from_string : char list -> date
+val date_to_string : date -> string
+val date_from_string : string -> date
 val date_from_parts : int -> int -> int -> date
 
 (** Comparisons *)

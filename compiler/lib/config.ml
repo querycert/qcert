@@ -137,16 +137,16 @@ let driver_conf_of_global_conf gconf qname cname =
   let qcname =
     begin match cname with
     | None -> None
-    | Some cn -> Some (char_list_of_string cn)
+    | Some cn -> Some cn
     end
   in
   let constants_config = gconf.gconf_schema.Type_util.sch_globals in
-  { comp_qname = char_list_of_string qname;
-    comp_qname_lowercase = char_list_of_string (String.lowercase_ascii (gconf.gconf_prefix ^ qname));
+  { comp_qname = qname;
+    comp_qname_lowercase = String.lowercase_ascii (gconf.gconf_prefix ^ qname);
     comp_class_name = qcname;
-    comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
+    comp_mr_vinit = gconf.gconf_mr_vinit;
     comp_constants = constants_config;
-    comp_java_imports = char_list_of_string gconf.gconf_java_imports;
+    comp_java_imports = gconf.gconf_java_imports;
     comp_optim_config = gconf.gconf_optim_config; }
 
 (* Util *)

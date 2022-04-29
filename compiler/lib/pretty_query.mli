@@ -49,7 +49,7 @@ val pretty_java : QLang.java pretty_fun
 val pretty_spark_df : QLang.spark_df pretty_fun
 val pretty_wasm_ast : QLang.wasm_ast pretty_fun
 val pretty_wasm : QLang.wasm pretty_fun
-val pretty_error : (char list) pretty_fun
+val pretty_error : string pretty_fun
 
 val pretty_query : pretty_config -> 'a pretty_fun -> 'a -> string
 

@@ -12,8 +12,6 @@
  * limitations under the License.
  *)
 
-let encode x =
-  Util.char_list_of_string (Uri.pct_encode ~component:`Scheme (Util.string_of_char_list x))
-let decode x =
-  Util.char_list_of_string (Uri.pct_decode (Util.string_of_char_list x))
+let encode x = Uri.pct_encode ~component:`Scheme x
+let decode x = Uri.pct_decode x
 

@@ -1,7 +1,7 @@
 open Wasm
 
 (** list of (sub, sup) brand relation *)
-type brand_hierarchy = (char list * char list) list
+type brand_hierarchy = (string * string) list
 
 module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   val to_string : Wasm.Ast.module_ -> string
@@ -11,7 +11,7 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   val runtime: Wasm.Ast.module_
 
   (** [eval wasm_module fn_name environment *)
-  val eval : Wasm.Ast.module_ -> char list -> (char list * 'a ejson) list -> ('a ejson) option
+  val eval : Wasm.Ast.module_ -> string -> (string * 'a ejson) list -> ('a ejson) option
 
   val imp_ejson_to_wasm_ast : ('b -> string) -> brand_hierarchy -> ('a, 'b) imp_ejson -> Wasm.Ast.module_
 
@@ -141,7 +141,6 @@ end = struct
         bin_ptr
       in
       let main =
-        let fn = Util.string_of_char_list fn in
         match Instance.export mod_ (Utf8.decode fn) with
         | Some (ExternFunc f) -> f
         | _ ->
@@ -171,9 +170,8 @@ end = struct
       Some result
 
     let eval module_ fn env =
-      let s = Util.char_list_of_string in
       let error msg =
-        Some (Coq_ejobject [s "error", Coq_ejstring (s msg)])
+        Some (Coq_ejobject [("error", Coq_ejstring msg)])
       in
       try eval module_ fn env with
       | Wasm_runtime {msg; pos} ->
@@ -201,7 +199,7 @@ end = struct
       }
 
     type 'a function_context =
-      { locals : char list Table.t
+      { locals : string Table.t
       ; ctx: ('a module_context)
       }
 
@@ -413,12 +411,12 @@ end = struct
       | EJsonOpAccess key ->
         block ~result:[i32] (
           args @ [ const ctx.ctx (Coq_ejstring key)
-                 ; op_trivial ctx.ctx (EJsonOpAccess []) ]
+                 ; op_trivial ctx.ctx (EJsonOpAccess "") ]
         )
       | EJsonOpHasOwnProperty key ->
         block ~result:[i32] (
           args @ [ const ctx.ctx (Coq_ejstring key)
-                 ; op_trivial ctx.ctx (EJsonOpHasOwnProperty []) ]
+                 ; op_trivial ctx.ctx (EJsonOpHasOwnProperty "") ]
         )
       | _ -> block ~result:[i32] (args @ [op_trivial ctx.ctx op])
 
@@ -622,9 +620,9 @@ end = struct
       | ImpStmtAssign (var, x) ->
         expr fopmap ctx x @ [ Ir.local_set (Table.insert ctx.locals var) ]
       | ImpStmtFor (e', arr, body) ->
-        let i'   = '$' :: '%' :: 'i' :: '%' :: e' in
-        let n' = '$' :: '%' :: 'n' :: '%' :: e' in
-        let a' = '$' :: '%' :: 'a' :: '%' :: e' in
+        let i'   = "$%i%e" in
+        let n' = "$%n%e" in
+        let a' = "$%a%e" in
         let i = Table.insert ctx.locals i' in
         let e = Table.insert ctx.locals e' in
         let n = Table.insert ctx.locals n' in
@@ -661,7 +659,7 @@ end = struct
         ]
       | ImpStmtForRange (var, low, high, body) ->
         let i = Table.insert ctx.locals var in
-        let max' = '$' :: '%' :: var in
+        let max' = "$%" ^ var in
         let max = Table.insert ctx.locals max' in
         let open Ir in
         ( statement ctx (ImpStmtAssign (var, low)) ) @
@@ -738,7 +736,7 @@ end = struct
         { ctx with brand_hierarchy = const ctx relations }
       in
       let funcs = List.map (fun (name, fn) ->
-          Util.string_of_char_list name, function_ fopmap ctx fn
+          name, function_ fopmap ctx fn
         ) lib
       in
       let data =

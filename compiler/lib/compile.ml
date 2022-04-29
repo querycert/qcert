@@ -131,8 +131,8 @@ let emit_sexpr_string (schema: Type_util.schema) dir file_name q =
 let emit_one_sio file_name dir one_sdata =
   let (const_name,const_sio) = one_sdata in
   let fpref = Filename.chop_extension file_name in
-  let fout = outname (target_f dir (fpref^"."^(string_of_char_list const_name))) ".sio" in
-  { res_file = fout; res_lang = "sio"; res_content = string_of_char_list const_sio; }
+  let fout = outname (target_f dir (fpref^"." ^ const_name)) ".sio" in
+  { res_file = fout; res_lang = "sio"; res_content = const_sio; }
 
 let emit_sio (ev_input:Data_util.content_input) (schema: Type_util.schema) (file_name:string) dir =
   let sdata = Type_util.content_sdata_of_data schema ev_input in
@@ -140,7 +140,7 @@ let emit_sio (ev_input:Data_util.content_input) (schema: Type_util.schema) (file
 
 (* Eval *)
 
-let lift_data_to_ddata globals (var:char list * QData.qdata) =
+let lift_data_to_ddata globals (var:string * QData.qdata) =
   let vname = fst var in
   let data = snd var in
   let loc =
@@ -153,7 +153,7 @@ let lift_data_to_ddata globals (var:char list * QData.qdata) =
   | Vdistr ->
       begin match QData.ddistr data with
       | Some dd -> (vname,dd)
-      | None -> raise  (Qcert_Error ("Distributed variable " ^ (string_of_char_list vname) ^ " should be initialized with an input collection"))
+      | None -> raise  (Qcert_Error ("Distributed variable " ^ vname ^ " should be initialized with an input collection"))
       end
   end
 
@@ -168,13 +168,13 @@ let get_dist (dd:QData.qddata) =
 let get_value (dd:QData.qddata) =
   begin match dd with
   | Ddistr d ->
-      string_of_char_list (QData.qdataStringify (char_list_of_string "\"") (QData.dcoll d))
+      QData.qdataStringify "\"" (QData.dcoll d)
   | Dlocal d ->
-      string_of_char_list (QData.qdataStringify (char_list_of_string "\"") d)
+      QData.qdataStringify "\"" d
   end
     
-let print_input_var (v:char list * QData.qddata) =
-  Printf.printf "Var: %s is %s and has value:\n" (string_of_char_list (fst v)) (get_dist (snd v));
+let print_input_var (v:string * QData.qddata) =
+  Printf.printf "Var: %s is %s and has value:\n" (fst v) (get_dist (snd v));
   Printf.printf "%s\n" (get_value (snd v))
     
 let print_input ev_input =
@@ -195,13 +195,13 @@ let eval_string (validate:bool) (debug:bool) (quiet:bool) (ev_input:Data_util.co
   let ev_data =
     begin match ev_output with
     | Ev_out_unsupported msg ->
-        QData.drec [(char_list_of_string "error", QData.dstring msg)]
+        QData.drec [("error", QData.dstring msg)]
     | Ev_out_failed ->
-        QData.drec [(char_list_of_string "error", QData.dstring (char_list_of_string "Eval failed"))]
+        QData.drec [("error", QData.dstring "Eval failed")]
     | Ev_out_returned d ->
         d
     | Ev_out_returned_debug s ->
-        QData.drec [(char_list_of_string "debug", QData.dstring s)]
+        QData.drec [("debug", QData.dstring s)]
     end
   in
   let queryname = Filename.chop_extension file_name in
@@ -210,7 +210,7 @@ let eval_string (validate:bool) (debug:bool) (quiet:bool) (ev_input:Data_util.co
     then Check_util.validate_result quiet queryname language_name expected_output (Some ev_data)
     else true
   in
-  let s = string_of_char_list (QData.qdataStringify (char_list_of_string "\"") ev_data) in
+  let s = QData.qdataStringify "\"" ev_data in
   let fpref = queryname in
   let fpost = language_name in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".json" in
@@ -220,18 +220,18 @@ let eval_string (validate:bool) (debug:bool) (quiet:bool) (ev_input:Data_util.co
 
 let stat_query (schema: Type_util.schema) q =
   let brand_model = schema.Type_util.sch_brand_model in
-  string (QStat.json_stat_of_query brand_model q)
+  QStat.json_stat_of_query brand_model q
 
 (* Stats tree *)
 
 let stat_tree_query (schema: Type_util.schema) dir file_name q =
-  let name = char_list_of_string (Filename.chop_extension file_name) in
+  let name = Filename.chop_extension file_name in
   let brand_model = schema.Type_util.sch_brand_model in
   let language_name = Compiler_util.name_of_language (QLang.language_of_query brand_model q) in
   let stats = QStat.json_stat_tree_of_query brand_model name q in
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_stats.json" in
-  { res_file = fout; res_lang = language_name; res_content = string stats; }
+  { res_file = fout; res_lang = language_name; res_content = stats; }
 
 (* Optim config *)
 let json_of_optim_config (optim_config:optim_config) =
@@ -247,7 +247,7 @@ let emit_optim_config optim_config dir file_name =
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_optim.json" in
   let optims_data = json_of_optim_config optim_config in
-  let optims = string_of_char_list (QData.json_to_string optims_data) in
+  let optims = QData.json_to_string optims_data in
   { res_file = fout; res_lang = "json"; res_content = optims; }
     
 (* Main *)

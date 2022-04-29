@@ -32,10 +32,6 @@ type dnnrc_logger_token_type = string
 
 (* Data type conversions between Coq and OCaml *)
 
-val string_of_char_list : char list -> string
-val string : char list -> string
-val char_list_of_string : string -> char list
-val flat_map_string : (char -> string) -> string -> string
 val coq_Z_of_int : int -> int
 
 (*******)
@@ -60,13 +56,13 @@ val outname : string -> string -> string
 (**********************************)
 
 val qcert_string_of_float : float -> string
-val string_of_enhanced_float : float -> char list
-val string_of_enhanced_string : string -> char list
+val string_of_enhanced_float : float -> string
+val string_of_enhanced_string : string -> string
 
 val float_sign : float -> float
 (* Timing function for CompStat   *)
 
-val time : ('a -> 'b) -> 'a -> char list * 'b
+val time : ('a -> 'b) -> 'a -> string * 'b
 
 
 (* String Manipulation *)

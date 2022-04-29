@@ -28,7 +28,6 @@ Require Import EnhancedToSpark.
 Import ListNotations.
 Local Open Scope list_scope.
 Local Open Scope string_scope.
-Local Open Scope nstring_scope.
 
 (** Foreign typing, used to build the basic_model *)
 

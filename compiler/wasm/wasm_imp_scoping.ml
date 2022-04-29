@@ -3,7 +3,7 @@ module Make (ImpEJson: Wasm_intf.IMP_EJSON) : sig
   val apply: ('a, 'b) imp_ejson -> ('a, 'b) imp_ejson
 end = struct
   open ImpEJson
-  type var_name = char list
+  type var_name = string
 
   type scope =
     { map: (var_name * var_name) list
@@ -13,7 +13,7 @@ end = struct
   let empty_scope = { map = []; size = 0 }
 
   let fresh_var scope name =
-    let name' = Util.char_list_of_string ("var" ^ Int.to_string scope.size) in
+    let name' = "var" ^ Int.to_string scope.size in
     { map = (name, name') :: scope.map
     ; size = scope.size + 1
     }, name'

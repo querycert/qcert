@@ -32,10 +32,10 @@ type io_globals = QData.json
 type rtype_content = QData.json
 type vrtype_content = QData.json
 
-type content_input = (char list * QData.qdata) list
+type content_input = (string * QData.qdata) list
 type content_output = QData.qdata
 
-type content_inheritance = (char list * char list) list
+type content_inheritance = (string * string) list
 type full_content_inheritance = (content_inheritance * io_inheritance)
 type content_brandTypes = (string * string) list
 type content_typeDefs = (string * rtype_content) list
@@ -53,14 +53,14 @@ type optim_language =
 
 let get_field_opt name r =
   begin try
-    Some (List.assoc (char_list_of_string name) r)
+    Some (List.assoc name r)
   with
   | Not_found -> None
   end
 
 let get_field_defaults name r d =
   begin try
-    List.assoc (char_list_of_string name) r
+    List.assoc name r
   with
   | Not_found -> d
   end
@@ -99,8 +99,8 @@ let build_inheritance h =
     let raw_h =
       List.map (function
         | Coq_jobject
-            ( [(['s';'u';'b'], Coq_jstring sub); (['s';'u';'p'], Coq_jstring sup)]
-        | [(['s';'u';'p'], Coq_jstring sup); (['s';'u';'b'], Coq_jstring sub)] ) ->
+            ( [("sub", Coq_jstring sub); ("sup", Coq_jstring sup)]
+        | [("sup", Coq_jstring sup); ("sub", Coq_jstring sub)] ) ->
             (sub, sup)
         | _ ->
             raise (Qcert_Error "Ill-formed inheritance"))
@@ -116,9 +116,9 @@ let build_brandTypes bts =
   | Coq_jarray l ->
       List.map (function
         | Coq_jobject
-            ( [(['b';'r';'a';'n';'d'], Coq_jstring brandName); (['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName)]
-        | [(['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName); (['b';'r';'a';'n';'d'], Coq_jstring brandName)] ) ->
-            (string_of_char_list brandName, string_of_char_list typeName)
+            ( [("brand", Coq_jstring brandName); ("typeName", Coq_jstring typeName)]
+        | [("typeName", Coq_jstring typeName); ("brand", Coq_jstring brandName)] ) ->
+            (brandName, typeName)
         | _ ->
             raise (Qcert_Error "Ill-formed brandTypes"))
         l
@@ -131,9 +131,9 @@ let build_typeDefs bts =
   | Coq_jarray l ->
       List.map (function
         | Coq_jobject
-            ( [(['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName); (['t';'y';'p';'e';'D';'e';'f'], typeDef)]
-        | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Coq_jstring typeName)] ) ->
-            (string_of_char_list typeName, typeDef)
+            ( [("typeName", Coq_jstring typeName); ("typeDef", typeDef)]
+        | [("typeDef", typeDef); ("typeName", Coq_jstring typeName)] ) ->
+            (typeName, typeDef)
         | _ ->
             raise (Qcert_Error "Ill-formed typeDefs"))
         l
@@ -144,7 +144,7 @@ let build_typeDefs bts =
 let build_globals globals =
   begin match globals with
   | Coq_jobject l ->
-      List.map (function (varname, typeDef) -> (string_of_char_list varname, typeDef)) l
+      List.map (function (varname, typeDef) -> (varname, typeDef)) l
   | _ ->
       raise (Qcert_Error "Ill-formed globals")
   end
@@ -177,6 +177,6 @@ let build_output h output =
 
 let build_optim_config j =
   begin match QDriver.json_to_optim_config j with
-  | Coq_inl e -> raise (Qcert_Error (string_of_char_list e))
+  | Coq_inl e -> raise (Qcert_Error e)
   | Coq_inr oc -> oc
   end
