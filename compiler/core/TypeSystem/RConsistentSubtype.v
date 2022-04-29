@@ -889,7 +889,7 @@ Proof.
       congruence.
     + apply consistent_meet in H2.
       congruence.
-      Grab Existential Variables.
+      Unshelve.
       solve[eauto].
       solve[eauto].
 Qed.
@@ -1261,7 +1261,7 @@ Proof.
       apply SForeign.
       apply consistent_meet.
       congruence.
-      Grab Existential Variables.
+      Unshelve.
        solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
        solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].
        solve[eauto]. solve[eauto]. solve[eauto]. solve[eauto].

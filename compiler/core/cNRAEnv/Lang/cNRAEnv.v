@@ -1572,7 +1572,7 @@ Notation "r1 ◯ r2" := (cNRAEnvApp r1 r2) (right associativity, at level 60): n
 Notation "r1 ◯ₑ r2" := (cNRAEnvAppEnv r1 r2) (right associativity, at level 60): nraenv_core_scope.           (* ◯ = \bigcirc *)
 Notation "χᵉ⟨ p ⟩" := (cNRAEnvMapEnv p) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
 
-Hint Resolve nraenv_core_eval_normalized : qcert.
+Global Hint Resolve nraenv_core_eval_normalized : qcert.
 
 Tactic Notation "nraenv_core_cases" tactic(first) ident(c) :=
   first;

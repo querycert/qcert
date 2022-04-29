@@ -837,4 +837,4 @@ Section Sublist.
 
 End Sublist.
 
-Hint Immediate sublist_nil_l : qcert.
+Global Hint Immediate sublist_nil_l : qcert.

@@ -189,7 +189,7 @@ Section TNRAEnvRewrite.
       rewrite sort_sorted_is_id. reflexivity.
       assert (domain dl = domain rl) by (apply sorted_forall_same_domain; assumption).
       rewrite H0; assumption.
-      Grab Existential Variables.
+      Unshelve.
       eauto.
   Qed.
 
@@ -417,7 +417,7 @@ Section TNRAEnvRewrite.
     intros.
     nraenv_core_inferer.
     repeat (econstructor; eauto).
-    Grab Existential Variables.
+    Unshelve.
     eauto. eauto.
   Qed.
 
@@ -550,7 +550,7 @@ Section TNRAEnvRewrite.
     simpl in H2.
     inversion H2.
     repeat (econstructor; eauto).
-    Grab Existential Variables.
+    Unshelve.
     eauto. eauto.
   Qed.
     
@@ -641,7 +641,7 @@ Section TNRAEnvRewrite.
           assert (s = s1).
           apply lt_contr1; assumption.
           congruence.
-          Grab Existential Variables.
+          Unshelve.
           eauto. eauto. eauto. eauto.
   Qed.
 
@@ -2682,13 +2682,13 @@ Section TNRAEnvRewrite.
       rewrite <- (rec_sort_rproject_remove_in s) by (simpl; intuition).
       simpl.
       destruct (in_dec string_dec s sl); simpl; intuition.
-      Grab Existential Variables.
+      Unshelve.
+      { simpl; trivial. }
       { eapply is_list_sorted_sublist.
          - eapply pf0.
          - apply sublist_domain.
            apply sublist_rproject.
       }
-      { simpl; trivial. }
   Qed.
 
    Lemma trproject_over_const sl l :
@@ -2848,7 +2848,7 @@ Section TNRAEnvRewrite.
       destruct (in_dec string_dec s sl); [| intuition ].
       destruct (in_dec string_dec s1 sl); [| intuition ].
       reflexivity.
-      Grab Existential Variables.
+      Unshelve.
       solve[qeauto].
       solve[qeauto].
   Qed.

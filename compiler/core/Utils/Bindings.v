@@ -1750,9 +1750,9 @@ Section Edot.
     
 End Edot.
 
-Hint Unfold rec_sort rec_concat_sort : qcert.
-Hint Resolve drec_sort_sorted drec_concat_sort_sorted : qcert.
-Hint Resolve is_list_sorted_NoDup_strlt : qcert.
+Global Hint Unfold rec_sort rec_concat_sort : qcert.
+Global Hint Resolve drec_sort_sorted drec_concat_sort_sorted : qcert.
+Global Hint Resolve is_list_sorted_NoDup_strlt : qcert.
 
 Section MergeBindings.
   (* Merge record stuff *)
@@ -2297,4 +2297,4 @@ Section RecRemove.
 
 End RecRemove.
 
-Hint Resolve merge_bindings_sorted : qcert.
+Global Hint Resolve merge_bindings_sorted : qcert.

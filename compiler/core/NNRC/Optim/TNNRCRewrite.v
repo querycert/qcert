@@ -173,7 +173,7 @@ Section TNNRCRewrite.
         unfold merge_bindings in H2.
         match_destr_in H2.
         injection H2; trivial.
-     Grab Existential Variables.
+     Unshelve.
      solve[eauto].   
      solve[eauto].
   Qed.
@@ -1192,13 +1192,13 @@ Section TNNRCRewrite.
       rewrite <- (rec_sort_rproject_remove_in s) by (simpl; intuition).
       simpl.
       destruct (in_dec string_dec s sl); simpl; intuition.
-      Grab Existential Variables.
+      Unshelve.
+      { simpl; trivial. }
       { eapply is_list_sorted_sublist.
          - eapply pf0.
          - apply sublist_domain.
            apply sublist_rproject.
       }
-      { simpl; trivial. }
   Qed.
 
    Lemma tnnrcproject_over_const sl l :
@@ -1369,7 +1369,7 @@ Section TNNRCRewrite.
       destruct (in_dec string_dec s sl); [| intuition ].
       destruct (in_dec string_dec s1 sl); [| intuition ].
       reflexivity.
-      Grab Existential Variables.
+      Unshelve.
       solve[eauto].
       solve[eauto].
   Qed.

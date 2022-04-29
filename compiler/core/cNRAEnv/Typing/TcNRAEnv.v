@@ -703,12 +703,7 @@ Section TcNRAEnv.
     - apply (@type_NRAApp m τc (nra_context_type τenv τin) (nra_context_type τenv τ1) τ2).
       + unfold nra_context, nra_bind, nra_context_type, nra_double; simpl.
         unfold nra_wrap.
-        apply (@type_NRABinop m τc (Rec Closed [("PBIND"%string, τenv); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv)::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τ1)::nil) (eq_refl _))).
-        econstructor; qeauto.
-        econstructor; qeauto.
-        econstructor; qeauto.
-        econstructor; qeauto.
-        econstructor; qeauto.
+        apply (@type_NRABinop m τc (Rec Closed [("PBIND"%string, τenv); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv)::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τ1)::nil) (eq_refl _))); repeat (econstructor; qeauto).
       + trivial.
     (* cNRAEnvEnv *)
     - unfold nra_bind, nra_context_type. qeauto.
@@ -730,7 +725,7 @@ Section TcNRAEnv.
           reflexivity.
       + reflexivity.
       + simpl; trivial.
-      Grab Existential Variables.
+      Unshelve.
       qeauto. qeauto. qeauto. qeauto. qeauto. 
       qeauto. qeauto. qeauto. qeauto. qeauto.
       qeauto. qeauto.
@@ -884,9 +879,9 @@ Notation "Op @▷ d ⊣ C ; e" := (tnraenv_core_eval C Op e d) (at level 70).
 
 (* Used to prove type portion of typed directed rewrites *)
   
-Hint Constructors nraenv_core_type : qcert.
-Hint Constructors unary_op_type : qcert.
-Hint Constructors binary_op_type : qcert.
+Global Hint Constructors nraenv_core_type : qcert.
+Global Hint Constructors unary_op_type : qcert.
+Global Hint Constructors binary_op_type : qcert.
 
 Ltac nraenv_core_inverter := 
   match goal with

@@ -105,5 +105,5 @@ Section cNNRCNorm.
 
 End cNNRCNorm.
 
-Hint Resolve nnrc_core_eval_normalized : qcert.
+Global Hint Resolve nnrc_core_eval_normalized : qcert.
 
