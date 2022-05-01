@@ -95,8 +95,8 @@ Section TCAMPtoNRA.
     - reflexivity.
   Qed.
 
-  Hint Constructors nra_type unary_op_type binary_op_type : qcert.
-  Hint Resolve ATdot ATnra_match ATnra_data : qcert.
+  Local Hint Constructors nra_type unary_op_type binary_op_type : qcert.
+  Local Hint Resolve ATdot ATnra_match ATnra_data : qcert.
   
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
@@ -151,7 +151,7 @@ Section TCAMPtoNRA.
     camp_type τc Γ p τin τout ->
     nra_of_camp p ▷ (nra_context_type (Rec Closed Γ pf) τin) >=> Coll τout ⊣ τc.
   Proof.
-    Hint Resolve data_type_drec_nil : qcert.
+    Local Hint Resolve data_type_drec_nil : qcert.
     revert τc Γ pf τin τout.
     induction p; simpl; inversion 1; subst.
     (* PTconst *)
@@ -254,8 +254,8 @@ Section TCAMPtoNRA.
     nra_of_camp p ▷ (nra_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout ⊣ τc ->
     nra_of_camp_top p ▷ τin >=> Coll τout ⊣ τc.
   Proof.
-    Hint Resolve normalize_normalizes : qcert.
-    Hint Resolve normalize_preserves_type : qcert.
+    Local Hint Resolve normalize_normalizes : qcert.
+    Local Hint Resolve normalize_preserves_type : qcert.
     intros.
     econstructor; [qeauto | ].
     econstructor; [qeauto | ].
@@ -285,7 +285,7 @@ Section TCAMPtoNRA.
     eapply nra_of_camp_type_preserve; eauto.
   Qed.
 
-  Hint Constructors camp_type : qcert.
+  Local Hint Constructors camp_type : qcert.
 
   (** Section dedicated to the reverse direction for type preservation *)
 

@@ -1646,7 +1646,7 @@ Section NNRSRename.
 
 End NNRSRename.
 
-Hint Rewrite
+Global Hint Rewrite
      @nnrs_stmt_bound_env_vars_rename_env 
      @nnrs_stmt_free_mcenv_vars_rename_env 
      @nnrs_stmt_bound_mcenv_vars_rename_env 

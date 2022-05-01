@@ -32,10 +32,10 @@ Inductive enhanced_data : Set :=
 | enhancedsqldateperiod : SQL_DATE_PERIOD -> enhanced_data
 .
 
-Existing Instance sql_date_foreign_data.
-Existing Instance sql_date_period_foreign_data.
+Global Existing Instance sql_date_foreign_data.
+Global Existing Instance sql_date_period_foreign_data.
 
-Program Instance enhanced_foreign_data : foreign_data :=
+Global Program Instance enhanced_foreign_data : foreign_data :=
   mk_foreign_data enhanced_data _ _ _ _ _ _.
 Next Obligation.
   red.
@@ -179,7 +179,7 @@ Definition enhanced_binary_op_interp
   | enhanced_binary_sql_date_op f => sql_date_binary_op_interp f d1 d2
   end.
 
-Program Instance enhanced_foreign_operators : foreign_operators
+Global Program Instance enhanced_foreign_operators : foreign_operators
   := { foreign_operators_unary := enhanced_unary_op
        ; foreign_operators_unary_interp := enhanced_unary_op_interp
        ; foreign_operators_unary_data_tostring := defaultDataToString
@@ -232,7 +232,7 @@ Next Obligation.
              invcs H3; repeat constructor).
 Qed.
 
-Instance enhanced_foreign_runtime :
+Global Instance enhanced_foreign_runtime :
   foreign_runtime
   := mk_foreign_runtime
        enhanced_foreign_data

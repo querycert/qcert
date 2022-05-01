@@ -964,8 +964,8 @@ Proof.
   apply rtype_meet₀_idempotent; trivial.
 Qed.
 
-Hint Resolve rtype_join₀_idempotent : qcert.
-Hint Constructors Forallt : qcert.
+Local Hint Resolve rtype_join₀_idempotent : qcert.
+Local Hint Constructors Forallt : qcert.
 
   Lemma map_rtype_join₀_idempotent k {rl1} :
   forall (wf1 : wf_rtype₀ (Rec₀ k rl1) = true),
@@ -1371,8 +1371,8 @@ Qed.
                end
            end) rl2 rl1.
 Proof.
-  Hint Resolve rtype_join₀_commutative : qcert.
-  Hint Constructors Forallt : qcert.
+  Local Hint Resolve rtype_join₀_commutative : qcert.
+  Local Hint Constructors Forallt : qcert.
   intros; apply (@map_rtype_join₀_commutative' Closed Closed); qauto.
   clear wf1 wf2.
   induction rl1; simpl; qauto.
@@ -2334,7 +2334,7 @@ Fixpoint map_rtype_join l1 l2 :=
 
 Lemma map_rtype_join_sublist_l l₁ l₂ : sublist (domain (map_rtype_join l₁ l₂)) (domain l₁).
 Proof.
-  Hint Constructors sublist : qcert.
+  Local Hint Constructors sublist : qcert.
   induction l₁; simpl; auto 1 with qcert.
   destruct a.
   destruct (lookup string_dec l₂ s); simpl; auto with qcert.
@@ -2344,7 +2344,7 @@ Lemma map_rtype_join_is_sorted l₁ l₂ :
   is_list_sorted ODT_lt_dec (domain l₁) = true
   -> is_list_sorted ODT_lt_dec (domain (map_rtype_join l₁ l₂)) = true.
 Proof.
-  Hint Constructors StronglySorted : qcert.
+  Local Hint Constructors StronglySorted : qcert.
   repeat rewrite sorted_StronglySorted by apply StringOrder.lt_strorder.
   induction l₁; simpl; trivial.
   destruct a; simpl.
@@ -2647,7 +2647,7 @@ Qed.
 
   Lemma map_rtype_meet_sublist_l l₁ l₂ : sublist (domain (map_rtype_meet l₁ l₂)) (domain l₁).
 Proof.
-  Hint Constructors sublist : qcert.
+  Local Hint Constructors sublist : qcert.
   induction l₁; simpl; auto 1 with qcert.
   destruct a.
   destruct (lookup string_dec l₂ s); simpl; qauto.
@@ -2819,50 +2819,50 @@ Lemma rtype_meet_Foreign_neq_r τ y: τ <> ⊤ -> (forall x, τ <> Foreign x) ->
 
 End rtype_meet_re.
 
-Hint Rewrite @rtype_join_Top_l @rtype_join_Top_r: rtype_join.
-Hint Rewrite @rtype_join_Bottom_l @rtype_join_Bottom_r: rtype_join.
-Hint Rewrite @rtype_join_Unit_eq : rtype_join.
-Hint Rewrite @rtype_join_Unit_neq_l @rtype_join_Unit_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Nat_eq : rtype_join.
-Hint Rewrite @rtype_join_Nat_neq_l @rtype_join_Nat_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Float_eq : rtype_join.
-Hint Rewrite @rtype_join_Float_neq_l @rtype_join_Float_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Bool_eq : rtype_join.
-Hint Rewrite @rtype_join_Bool_neq_l @rtype_join_Bool_neq_r using discriminate: rattype_join.
-Hint Rewrite @rtype_join_String_eq : rtype_join.
-Hint Rewrite @rtype_join_String_neq_l @rtype_join_String_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Coll_eq : rtype_join.
-Hint Rewrite @rtype_join_Coll_neq_l @rtype_join_Coll_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Rec_eq : rtype_join.
-Hint Rewrite @rtype_join_Rec_neq_l @rtype_join_Rec_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Either_eq : rtype_join.
-Hint Rewrite @rtype_join_Either_neq_l @rtype_join_Either_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Brand_eq : rtype_join.
-Hint Rewrite @rtype_join_Brand_neq_l @rtype_join_Brand_neq_r using discriminate: rtype_join.
-Hint Rewrite @rtype_join_Foreign_eq : rtype_join.
-Hint Rewrite @rtype_join_Foreign_neq_l @rtype_join_Foreign_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Top_l @rtype_join_Top_r: rtype_join.
+Global Hint Rewrite @rtype_join_Bottom_l @rtype_join_Bottom_r: rtype_join.
+Global Hint Rewrite @rtype_join_Unit_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Unit_neq_l @rtype_join_Unit_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Nat_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Nat_neq_l @rtype_join_Nat_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Float_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Float_neq_l @rtype_join_Float_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Bool_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Bool_neq_l @rtype_join_Bool_neq_r using discriminate: rattype_join.
+Global Hint Rewrite @rtype_join_String_eq : rtype_join.
+Global Hint Rewrite @rtype_join_String_neq_l @rtype_join_String_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Coll_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Coll_neq_l @rtype_join_Coll_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Rec_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Rec_neq_l @rtype_join_Rec_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Either_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Either_neq_l @rtype_join_Either_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Brand_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Brand_neq_l @rtype_join_Brand_neq_r using discriminate: rtype_join.
+Global Hint Rewrite @rtype_join_Foreign_eq : rtype_join.
+Global Hint Rewrite @rtype_join_Foreign_neq_l @rtype_join_Foreign_neq_r using discriminate: rtype_join.
 
 
-Hint Rewrite @rtype_meet_Top_l @rtype_meet_Top_r: rtype_meet.
-Hint Rewrite @rtype_meet_Bottom_l @rtype_meet_Bottom_r: rtype_meet.
-Hint Rewrite @rtype_meet_Unit_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Unit_neq_l @rtype_meet_Unit_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Nat_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Nat_neq_l @rtype_meet_Nat_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Float_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Float_neq_l @rtype_meet_Float_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Bool_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Bool_neq_l @rtype_meet_Bool_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_String_eq : rtype_meet.
-Hint Rewrite @rtype_meet_String_neq_l @rtype_meet_String_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Coll_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Coll_neq_l @rtype_meet_Coll_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Rec_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Rec_neq_l @rtype_meet_Rec_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Either_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Either_neq_l @rtype_meet_Either_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Brand_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Brand_neq_l @rtype_meet_Brand_neq_r using discriminate: rtype_meet.
-Hint Rewrite @rtype_meet_Foreign_eq : rtype_meet.
-Hint Rewrite @rtype_meet_Foreign_neq_l @rtype_meet_Foreign_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Top_l @rtype_meet_Top_r: rtype_meet.
+Global Hint Rewrite @rtype_meet_Bottom_l @rtype_meet_Bottom_r: rtype_meet.
+Global Hint Rewrite @rtype_meet_Unit_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Unit_neq_l @rtype_meet_Unit_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Nat_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Nat_neq_l @rtype_meet_Nat_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Float_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Float_neq_l @rtype_meet_Float_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Bool_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Bool_neq_l @rtype_meet_Bool_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_String_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_String_neq_l @rtype_meet_String_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Coll_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Coll_neq_l @rtype_meet_Coll_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Rec_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Rec_neq_l @rtype_meet_Rec_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Either_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Either_neq_l @rtype_meet_Either_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Brand_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Brand_neq_l @rtype_meet_Brand_neq_r using discriminate: rtype_meet.
+Global Hint Rewrite @rtype_meet_Foreign_eq : rtype_meet.
+Global Hint Rewrite @rtype_meet_Foreign_neq_l @rtype_meet_Foreign_neq_r using discriminate: rtype_meet.
 

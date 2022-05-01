@@ -889,7 +889,7 @@ Section NNRCOptimizer.
     apply tnnrcproject_nil.
   Qed.
 
-  Hint Rewrite @tproject_nil_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tproject_nil_fun_correctness : toptim_correct.
 
     Definition tproject_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -917,7 +917,7 @@ Section NNRCOptimizer.
     apply tnnrcproject_over_const.
   Qed.
 
-  Hint Rewrite @tproject_over_const_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tproject_over_const_fun_correctness : toptim_correct.
   
   Definition tproject_over_const_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -948,7 +948,7 @@ Section NNRCOptimizer.
     - apply tnnrcproject_over_rec_nin; trivial. 
   Qed.
 
-  Hint Rewrite @tproject_over_rec_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tproject_over_rec_fun_correctness : toptim_correct.
 
   Definition tproject_over_rec_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -982,7 +982,7 @@ Section NNRCOptimizer.
     - apply tnnrcproject_over_concat_rec_r_nin; trivial.
   Qed.
                   
-  Hint Rewrite @tproject_over_concat_r_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tproject_over_concat_r_fun_correctness : toptim_correct.
 
   Definition tproject_over_concat_r_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1015,7 +1015,7 @@ Section NNRCOptimizer.
     apply tnnrcproject_over_concat_rec_l_nin; trivial.
   Qed.
                   
-  Hint Rewrite @tproject_over_concat_l_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tproject_over_concat_l_fun_correctness : toptim_correct.
 
   Definition tproject_over_concat_l_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1043,7 +1043,7 @@ Section NNRCOptimizer.
     apply tnnrcproject_over_nnrcproject.
   Qed.
 
-  Hint Rewrite @tproject_over_project_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tproject_over_project_fun_correctness : toptim_correct.
 
   Definition tproject_over_project_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1071,7 +1071,7 @@ Section NNRCOptimizer.
     apply tnnrcproject_over_either.
   Qed.
 
-  Hint Rewrite @tproject_over_either_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tproject_over_either_fun_correctness : toptim_correct.
 
   Definition tproject_over_either_step {fruntime:foreign_runtime}
     := mkOptimizerStep

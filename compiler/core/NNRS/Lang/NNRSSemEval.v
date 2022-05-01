@@ -42,7 +42,7 @@ Section NNRSSemEval.
   Local Open Scope nnrs.
   Local Open Scope string.
 
-  Hint Constructors nnrs_expr_sem : qcert.
+  Local Hint Constructors nnrs_expr_sem : qcert.
           
   Lemma nnrs_expr_sem_eval σc σ e d :
     [ h , σc ; σ ⊢ e ⇓ d ] <-> nnrs_expr_eval h σc σ e = Some d.
@@ -156,10 +156,10 @@ Section NNRSSemEval.
           simpl; trivial.
       }
     - {
-        Hint Constructors nnrs_stmt_sem : qcert.
-        Hint Constructors nnrs_stmt_sem_iter : qcert.
-        Hint Resolve nnrs_stmt_sem_env_cons_same : qcert.
-        Hint Resolve nnrs_stmt_sem_mcenv_cons_same : qcert.
+        Local Hint Constructors nnrs_stmt_sem : qcert.
+        Local Hint Constructors nnrs_stmt_sem_iter : qcert.
+        Local Hint Resolve nnrs_stmt_sem_env_cons_same : qcert.
+        Local Hint Resolve nnrs_stmt_sem_mcenv_cons_same : qcert.
 
         nnrs_stmt_cases (induction s) Case; simpl; intros σ₁ ψc₁ ψd₁ σ₂ ψc₂ ψd₂ sem; repeat destr sem.
         - Case "NNRSSeq".

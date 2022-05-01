@@ -56,8 +56,8 @@ Section TcNRAEnvEq.
   Notation "t1 ⇝ₑ t2 ⊣ τc ; tenv" := (typed_nraenv_core τc tenv t1 t2) (at level 80).
   Notation "X ≡τₑ Y" := (tnraenv_core_eq X Y) (at level 80).               (* ≡ = \equiv *)
 
-  Hint Resolve data_type_normalized : qcert.
-  Hint Resolve bindings_type_Forall_normalized : qcert.
+  Local Hint Resolve data_type_normalized : qcert.
+  Local Hint Resolve bindings_type_Forall_normalized : qcert.
 
   Lemma nraenv_core_eq_impl_tnraenv_core_eq {m:basic_model} {τc τenv τin τout} (op1 op2: τin ⇝ₑ τout ⊣ τc;τenv) :
     `op1 ≡ₑ `op2 -> op1 ≡τₑ op2.

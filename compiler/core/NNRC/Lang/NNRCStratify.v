@@ -145,14 +145,14 @@ Section Stratify.
     Lemma stratifiedLevel_spec_lifts k e :
       stratifiedLevel_spec k e -> stratifiedLevel_spec nnrcStmt e.
     Proof.
-      Hint Constructors stratifiedLevel_spec : qcert.
+      Local Hint Constructors stratifiedLevel_spec : qcert.
       destruct k; qeauto.
     Qed.
 
     Lemma stratifiedLevel_spec_lifte k e :
       stratifiedLevel_spec nnrcExpr e -> stratifiedLevel_spec k e.
     Proof.
-      Hint Constructors stratifiedLevel_spec : qcert.
+      Local Hint Constructors stratifiedLevel_spec : qcert.
       destruct k; qeauto.
     Qed.
 
@@ -166,8 +166,8 @@ Section Stratify.
     Lemma stratifiedLevel_correct k e:
       stratifiedLevel k e <-> stratifiedLevel_spec k e.
     Proof.
-      Hint Constructors stratifiedLevel_spec : qcert.
-      Hint Resolve stratifiedLevel_spec_lifts stratifiedLevel_spec_lifte : qcert.
+      Local Hint Constructors stratifiedLevel_spec : qcert.
+      Local Hint Resolve stratifiedLevel_spec_lifts stratifiedLevel_spec_lifte : qcert.
       split; revert k.
       - induction e; simpl; destruct k; simpl; intros; intuition (qeauto; try discriminate).
       - induction e; simpl; intros k; intros HH; invcs HH; simpl; eauto 3 with qcert;
@@ -388,7 +388,7 @@ Section Stratify.
       stratifiedLevel required_level n /\
       Forall (stratifiedLevel nnrcStmt) (codomain sdefs).
     Proof.
-      Hint Resolve Forall_nil Forall_app : qcert.
+      Local Hint Resolve Forall_nil Forall_app : qcert.
       revert required_level bound_vars n sdefs.
       induction e; intros required_level bound_vars n sdefs eqq
       ; invcs eqq; simpl in *; eauto 2; simpl.

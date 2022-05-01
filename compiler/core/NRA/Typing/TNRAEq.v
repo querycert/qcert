@@ -55,8 +55,8 @@ Section TNRAEq.
   Notation "t1 ⇝ t2 ⊣ τc" := (typed_nra τc t1 t2) (at level 80) : nra_scope.                        (* ≡ = \equiv *)
   Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80) : nra_scope.                             (* ≡ = \equiv *)
 
-  Hint Resolve data_type_normalized : qcert.
-  Hint Resolve bindings_type_Forall_normalized : qcert.
+  Local Hint Resolve data_type_normalized : qcert.
+  Local Hint Resolve bindings_type_Forall_normalized : qcert.
 
   Lemma nra_eq_impl_tnra_eq {τc} {τin τout} (op1 op2: τin ⇝ τout ⊣ τc) :
     `op1 ≡ₐ `op2 -> op1 ≡τ op2.

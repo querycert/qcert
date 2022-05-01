@@ -51,7 +51,7 @@ Section TNNRStoNNRSimp.
     forall Γc Γ (e:nnrs_expr) (τ:rtype),
       ([ Γc ; Γ  ⊢ e ▷ τ ])%nnrs -> [ Γc ; pd_tbindings_lift Γ  ⊢ (nnrs_expr_to_nnrs_imp_expr e) ▷ τ ]%nnrs_imp.
   Proof.
-    Hint Constructors nnrs_imp_expr_type : qcert.
+    Local Hint Constructors nnrs_imp_expr_type : qcert.
     intros Γc Γ e.
     revert Γ.
     induction e
@@ -69,7 +69,7 @@ Section TNNRStoNNRSimp.
       (forall x, In x (nnrs_expr_free_vars e) -> lookup equiv_dec Γ x <> Some None) ->
       [ Γc ; pd_tbindings_lift Γ  ⊢ (nnrs_expr_to_nnrs_imp_expr e) ▷ τ ]%nnrs_imp -> ([ Γc ; Γ  ⊢ e ▷ τ ])%nnrs.
   Proof.
-    Hint Constructors nnrs_expr_type : qcert.
+    Local Hint Constructors nnrs_expr_type : qcert.
     intros Γc Γ e.
     revert Γ.
     induction e
@@ -476,7 +476,7 @@ Section TNNRStoNNRSimp.
                 end
             end.
     
-    Hint Constructors nnrs_imp_stmt_type : qcert.
+    Local Hint Constructors nnrs_imp_stmt_type : qcert.
     revert Γ Δc Δd.
     nnrs_stmt_cases (induction s) Case
     ; simpl; intros Γ Δc Δd typ sf
@@ -871,7 +871,7 @@ Section TNNRStoNNRSimp.
               end]
         end.
     
-    Hint Constructors nnrs_stmt_type : qcert.
+    Local Hint Constructors nnrs_stmt_type : qcert.
     revert Γ Δc Δd.
     nnrs_stmt_cases (induction s) Case
     ; simpl

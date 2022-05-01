@@ -33,7 +33,7 @@ Local Open Scope list_scope.
 
 Definition enhanced_ejson : Set := enhanced_data.
 
-Program Instance enhanced_foreign_ejson : foreign_ejson enhanced_ejson
+Global Program Instance enhanced_foreign_ejson : foreign_ejson enhanced_ejson
   := mk_foreign_ejson enhanced_ejson _ _ _ _ _ _.
 Next Obligation.
   red.
@@ -241,7 +241,7 @@ Definition enhanced_foreign_ejson_runtime_op_interp op :=
     enhanced_ejson_uri_runtime_op_interp sop
   end.
 
-Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime _ :=
+Global Program Instance enhanced_foreign_ejson_runtime : foreign_ejson_runtime _ :=
   mk_foreign_ejson_runtime enhanced_foreign_ejson_runtime_op enhanced_ejson enhanced_foreign_ejson _ _ _ _ _ _.
 Next Obligation.
   red; unfold equiv; intros.

@@ -90,8 +90,8 @@ Section TNRAUtil.
     apply ATnra_data_inv'.
   Qed.
 
-  Hint Constructors nra_type unary_op_type binary_op_type : qcert.
-  Hint Resolve ATdot ATnra_data : qcert.
+  Local Hint Constructors nra_type unary_op_type binary_op_type : qcert.
+  Local Hint Resolve ATdot ATnra_data : qcert.
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
    *)

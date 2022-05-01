@@ -218,7 +218,7 @@ Section TNNRSimp.
   Notation "[ Γc ; Γ  ⊢ e ▷ τ ]" := (nnrs_imp_expr_type Γc Γ e τ) : nnrs_imp_scope.
   Notation "[ Γc ; Γ  ⊢ s ]" := (nnrs_imp_stmt_type Γc Γ s) : nnrs_imp_scope.
 
-  Hint Immediate type_NNRSimpSkip : qcert.
+  Local Hint Immediate type_NNRSimpSkip : qcert.
   Local Open Scope nnrs_imp.
   
   Definition nnrs_imp_type Γc (si:nnrs_imp) τ
@@ -1327,7 +1327,7 @@ Section TNNRSimp.
   Global Instance nnrs_imp_stmt_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv  ==> eq ==> iff) nnrs_imp_stmt_type.
   Proof.
-    Hint Constructors nnrs_imp_stmt_type : qcert.
+    Local Hint Constructors nnrs_imp_stmt_type : qcert.
     
     cut (Proper (eq ==> lookup_equiv ==> eq ==> impl) nnrs_imp_stmt_type)
     ; unfold Proper, respectful, iff, impl; intros; subst;

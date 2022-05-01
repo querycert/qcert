@@ -724,7 +724,7 @@ Section close_enough.
     - apply is_interleaved_disjoint_update_first; trivial.
   Qed.
 
-  Hint Resolve disjoint_nil_l disjoint_nil_r : qcert.
+  Local Hint Resolve disjoint_nil_l disjoint_nil_r : qcert.
   
   Lemma close_enough_lists_cons {A B} {dec:EqDec A eq} (a:(A*B)) l1 l2 : 
     close_enough_lists l1 l2 ->

@@ -826,7 +826,7 @@ Section TNNRS.
   Global Instance nnrs_stmt_type_lookup_equiv_prop :
     Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> iff) nnrs_stmt_type.
   Proof.
-    Hint Constructors nnrs_stmt_type : qcert.
+    Local Hint Constructors nnrs_stmt_type : qcert.
     
     cut (Proper (eq ==> lookup_equiv ==> lookup_equiv ==> lookup_equiv ==> eq ==> impl) nnrs_stmt_type)
     ; unfold Proper, respectful, iff, impl; intros; subst;
@@ -863,8 +863,8 @@ Section TNNRS.
   Section unused.
     Local Open Scope nnrs.
 
-    Hint Constructors nnrs_expr_type : qcert.
-    Hint Constructors nnrs_stmt_type : qcert.
+    Local Hint Constructors nnrs_expr_type : qcert.
+    Local Hint Constructors nnrs_stmt_type : qcert.
 
     Section remove.
       
@@ -899,7 +899,7 @@ Section TNNRS.
         [  Γc ; l++(v,τ)::Γ , Δc , Δd  ⊢ s ] ->
         [  Γc ; l++Γ , Δc , Δd  ⊢ s ].
       Proof.
-        Hint Resolve nnrs_expr_type_unused_remove_env : qcert.
+        Local Hint Resolve nnrs_expr_type_unused_remove_env : qcert.
         revert l Γ Δc Δd τ.
         nnrs_stmt_cases (induction s) Case
         ; simpl; intros l Γ Δc Δd τ inn typ
@@ -1058,7 +1058,7 @@ Section TNNRS.
         [  Γc ; l++Γ , Δc , Δd  ⊢ s ] ->
         [  Γc ; l++(v,τ)::Γ , Δc , Δd  ⊢ s ].
       Proof.
-        Hint Resolve nnrs_expr_type_unused_add_env : qcert.
+        Local Hint Resolve nnrs_expr_type_unused_add_env : qcert.
         revert l Γ Δc Δd τ.
         nnrs_stmt_cases (induction s) Case
         ; simpl; intros l Γ Δc Δd τ inn typ
@@ -1216,7 +1216,7 @@ Section TNNRS.
     forall τ',
       [Γc; l1++(v, Some τ') :: Γ ⊢ e ▷ τ].
   Proof.
-    Hint Constructors nnrs_expr_type : qcert.
+    Local Hint Constructors nnrs_expr_type : qcert.
     revert τ.
     induction e; intros τ typ nin τ'
     ; invcs typ; qeauto.
@@ -1233,7 +1233,7 @@ Section TNNRS.
     forall τ,
       [Γc; l1++(v, Some τ) :: Γ, Δc, Δd ⊢ s].
   Proof.
-    Hint Constructors nnrs_stmt_type : qcert.
+    Local Hint Constructors nnrs_stmt_type : qcert.
     revert l1 Γ Δc Δd.
     nnrs_stmt_cases (induction s) Case
     ; simpl; intros l1 Γ Δc Δd typ nin τ

@@ -46,7 +46,7 @@ Require Import DNNRCBase.
 Require Import tDNNRC.
 Require Import Dataframe.
 
-Program Instance trivial_foreign_data : foreign_data
+Global Program Instance trivial_foreign_data : foreign_data
   := mk_foreign_data Empty_set _ _ _ _ _ _.
 Next Obligation.
   intros [].
@@ -61,7 +61,7 @@ Next Obligation.
   constructor; intros [].
 Defined.
 
-Program Instance trivial_foreign_operators:
+Global Program Instance trivial_foreign_operators:
   foreign_operators
   := mk_foreign_operators trivial_foreign_data
                           Empty_set _ _ _ _
@@ -95,7 +95,7 @@ Defined.
 
 Definition trivial_foreign_ejson_model := Empty_set.
 
-Program Instance trivial_foreign_ejson : foreign_ejson trivial_foreign_ejson_model
+Global Program Instance trivial_foreign_ejson : foreign_ejson trivial_foreign_ejson_model
   := mk_foreign_ejson Empty_set _ _ _ _ _ _.
 Next Obligation.
   intros [].
@@ -110,7 +110,7 @@ Next Obligation.
   constructor; intros [].
 Defined.
 
-Instance trivial_foreign_runtime :
+Global Instance trivial_foreign_runtime :
   foreign_runtime
   := mk_foreign_runtime
        trivial_foreign_data
@@ -119,13 +119,13 @@ Instance trivial_foreign_runtime :
 Definition trivial_foreign_ejson_op_fromstring (x:string) : option Empty_set := None.
 Definition trivial_foreign_ejson_runtime_op := Empty_set.
 
-Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime trivial_foreign_ejson_runtime_op :=
+Global Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime trivial_foreign_ejson_runtime_op :=
   mk_foreign_ejson_runtime trivial_foreign_ejson_runtime_op trivial_foreign_ejson_model _ _ _ _ defaultEJsonToString trivial_foreign_ejson_op_fromstring defaultEJsonToString.
 Next Obligation.
   exact None.
 Defined.
 
-Program Instance trivial_foreign_to_ejson : foreign_to_ejson trivial_foreign_ejson_model trivial_foreign_ejson_runtime_op
+Global Program Instance trivial_foreign_to_ejson : foreign_to_ejson trivial_foreign_ejson_model trivial_foreign_ejson_runtime_op
   := mk_foreign_to_ejson  trivial_foreign_ejson_model trivial_foreign_ejson_runtime_op trivial_foreign_ejson trivial_foreign_runtime trivial_foreign_ejson_runtime _ _ _.
 Next Obligation.
   auto.
@@ -141,7 +141,7 @@ Proof.
   reflexivity.
 Qed.
 
-Program Instance trivial_foreign_to_ejson_runtime :
+Global Program Instance trivial_foreign_to_ejson_runtime :
   foreign_to_ejson_runtime
   := mk_foreign_to_ejson_runtime
        trivial_foreign_ejson_model
@@ -174,7 +174,7 @@ Next Obligation.
   reflexivity.
 Qed.
 
-Program Instance trivial_foreign_to_json : foreign_to_json
+Global Program Instance trivial_foreign_to_json : foreign_to_json
   := mk_foreign_to_json _ trivial_foreign_ejson _ _.
 Next Obligation.
   exact None.
@@ -183,7 +183,7 @@ Next Obligation.
   destruct j.
 Defined.
 
-Program Instance trivial_foreign_type : foreign_type
+Global Program Instance trivial_foreign_type : foreign_type
   := mk_foreign_type Empty_set _ _ _ _ _ _ _.
 Next Obligation.
   econstructor;
@@ -210,7 +210,7 @@ Next Obligation.
     intros [].
 Defined.
 
-Program Instance trivial_foreign_data_typing :
+Global Program Instance trivial_foreign_data_typing :
   @foreign_data_typing trivial_foreign_data trivial_foreign_type
   := mk_foreign_data_typing
        trivial_foreign_data
@@ -232,7 +232,7 @@ Next Obligation.
   destruct d.
 Defined.
 
-Program Instance trivial_foreign_operators_typing
+Global Program Instance trivial_foreign_operators_typing
         {model:brand_model} :
   @foreign_operators_typing
     trivial_foreign_data
@@ -287,7 +287,7 @@ Next Obligation.
   destruct fb.
 Defined.
 
-Instance trivial_foreign_typing {model:brand_model}:
+Global Instance trivial_foreign_typing {model:brand_model}:
   @foreign_typing
     trivial_foreign_runtime
     trivial_foreign_type
@@ -299,7 +299,7 @@ Instance trivial_foreign_typing {model:brand_model}:
        trivial_foreign_data_typing
        trivial_foreign_operators_typing.
 
-Instance trivial_basic_model {model:brand_model} :
+Global Instance trivial_basic_model {model:brand_model} :
   basic_model
   := mk_basic_model
        trivial_foreign_runtime
@@ -307,7 +307,7 @@ Instance trivial_basic_model {model:brand_model} :
        model
        trivial_foreign_typing.
 
-Program Instance trivial_foreign_to_java :
+Global Program Instance trivial_foreign_to_java :
   @foreign_to_java trivial_foreign_runtime
   := mk_foreign_to_java
        trivial_foreign_runtime
@@ -316,7 +316,7 @@ Next Obligation.
   destruct fd.
 Defined.
 
-Program Instance trivial_foreign_ejson_to_ajavascript :
+Global Program Instance trivial_foreign_ejson_to_ajavascript :
   @foreign_ejson_to_ajavascript _ trivial_foreign_ejson
   := mk_foreign_ejson_to_ajavascript
        _ trivial_foreign_ejson
@@ -325,14 +325,14 @@ Next Obligation.
   destruct fe.
 Defined.
 
-Program Instance trivial_foreign_to_wasm_ast :
+Global Program Instance trivial_foreign_to_wasm_ast :
   @foreign_to_wasm_ast trivial_foreign_ejson_runtime_op
   := mk_foreign_to_wasm_ast trivial_foreign_ejson_runtime_op _.
 Next Obligation.
   destruct j.
 Defined.
 
-Program Instance trivial_foreign_to_scala :
+Global Program Instance trivial_foreign_to_scala :
   @foreign_to_scala trivial_foreign_runtime trivial_foreign_type
   := mk_foreign_to_scala
        trivial_foreign_runtime trivial_foreign_type
@@ -341,7 +341,7 @@ Next Obligation.
   exact ("TRIVIAL MODEL DOES NOT SUPPORT FOREIGN TYPES"%string).
 Defined.
 
-Program Instance trivial_foreign_type_to_JSON : foreign_type_to_JSON
+Global Program Instance trivial_foreign_type_to_JSON : foreign_type_to_JSON
   := mk_foreign_type_to_JSON trivial_foreign_type _ _.
 Next Obligation.
   exact None.
@@ -350,13 +350,13 @@ Next Obligation.
   destruct fd. 
 Defined.
 
-Program Instance trivial_foreign_to_wson : foreign_to_wson _
+Global Program Instance trivial_foreign_to_wson : foreign_to_wson _
   := mk_foreign_to_wson trivial_foreign_ejson_model _.
 Next Obligation.
   destruct j.
 Defined.
 
-Program Instance trivial_foreign_reduce_op
+Global Program Instance trivial_foreign_reduce_op
         {fdata:foreign_data}:
   foreign_reduce_op
   := mk_foreign_reduce_op fdata Empty_set _ _ _ _.
@@ -367,7 +367,7 @@ Next Obligation.
   destruct op. 
 Defined.
 
-Program Instance trivial_foreign_to_reduce_op :
+Global Program Instance trivial_foreign_to_reduce_op :
   foreign_to_reduce_op
   := mk_foreign_to_reduce_op trivial_foreign_runtime trivial_foreign_reduce_op _ _ _ _.
 Next Obligation.
@@ -377,10 +377,10 @@ Next Obligation.
   exact None.
 Defined.
 
-Program Instance trivial_foreign_to_spark : foreign_to_spark
+Global Program Instance trivial_foreign_to_spark : foreign_to_spark
   := mk_foreign_to_spark trivial_foreign_runtime trivial_foreign_reduce_op _ _.
 
-Existing Instance silent_optimizer_logger.
+Global Existing Instance silent_optimizer_logger.
 
 Module TrivialRuntime <: CompilerRuntime.
   Definition compiler_foreign_type : foreign_type

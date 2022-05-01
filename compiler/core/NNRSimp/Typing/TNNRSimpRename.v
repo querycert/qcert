@@ -36,8 +36,8 @@ Section TNNRSimpRename.
 
   Context {m:basic_model}.
 
-  Hint Constructors nnrs_imp_expr_type : qcert.
-  Hint Constructors nnrs_imp_stmt_type : qcert.
+  Local Hint Constructors nnrs_imp_expr_type : qcert.
+  Local Hint Constructors nnrs_imp_stmt_type : qcert.
 
   Lemma nnrs_imp_expr_type_rename_in_f Γc l Γ e (v v':var) τ (τo:rtype) :
     ~ In v (domain l) ->
@@ -93,7 +93,7 @@ Section TNNRSimpRename.
     [ Γc ; (l++(v,τ)::Γ)   ⊢ s ] ->
     [ Γc ; (l++(v',τ)::Γ) ⊢ nnrs_imp_stmt_rename s v v' ].
   Proof.
-    Hint Resolve nnrs_imp_expr_type_rename_in_f : qcert.
+    Local Hint Resolve nnrs_imp_expr_type_rename_in_f : qcert.
 
     revert l Γ τ
     ; nnrs_imp_stmt_cases (induction s) Case
@@ -260,7 +260,7 @@ Section TNNRSimpRename.
     [ Γc ; (l++(v',τ)::Γ) ⊢ nnrs_imp_stmt_rename s v v' ] ->
     [ Γc ; (l++(v,τ)::Γ)   ⊢ s ].
   Proof.
-    Hint Resolve nnrs_imp_expr_type_rename_in_b : qcert.
+    Local Hint Resolve nnrs_imp_expr_type_rename_in_b : qcert.
 
     revert l Γ τ
     ; nnrs_imp_stmt_cases (induction s) Case

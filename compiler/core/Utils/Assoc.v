@@ -140,7 +140,7 @@ Section Assoc.
       destruct (dec x a); subst; intuition.
     Qed.
 
-    Hint Constructors NoDup : qcert.
+    Local Hint Constructors NoDup : qcert.
     
     Lemma NoDup_domain_NoDup {l} : NoDup (domain l) -> NoDup l.
     Proof.
@@ -247,13 +247,13 @@ Section Assoc.
     Qed.
 
     (* TODO: this should just replace in_lookup *)      
-    Hint Resolve in_dom_lookup_strong in_dom : qcert.
+    Local Hint Resolve in_dom_lookup_strong in_dom : qcert.
     Lemma in_lookup_strong :  forall {l} {a:A} {b0:B}, In (a,b0) l -> {v | lookup l a = Some v}.
     Proof.
       intros. eauto with qcert.
     Qed.
 
-    Hint Resolve in_dom_lookup in_dom : qcert.
+    Local Hint Resolve in_dom_lookup in_dom : qcert.
 
     Lemma in_lookup :  forall {l} {a:A} {b0:B}, In (a,b0) l -> exists v, lookup l a = Some v.
     Proof.
@@ -1026,7 +1026,7 @@ Section Assoc.
       inversion H; subst; auto.
   Qed.
 
-  Hint Resolve NoDup_app_inv : qcert.
+  Local Hint Resolve NoDup_app_inv : qcert.
 
   Lemma NoDup_app_inv2 {A:Type} {a b:list A} : NoDup (a++b) -> NoDup b.
   Proof.
@@ -1083,7 +1083,7 @@ Section Assoc.
           dl' else x::dl'
       end.
 
-    Hint Constructors NoDup : qcert.
+    Local Hint Constructors NoDup : qcert.
 
     Lemma bdistinct_domain_NoDup {A B} {dec:EqDec A eq} (l:list (A*B)) :
       NoDup (domain (bdistinct_domain l)).

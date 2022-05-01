@@ -43,7 +43,7 @@ Section Sublist.
         forall x l1 l2, sublist l1 l2 -> sublist l1 (x::l2)
     .
     
-    Hint Constructors sublist : qcert.
+    Local Hint Constructors sublist : qcert.
     
     Lemma sublist_In {l1 l2:list A} :
       sublist l1 l2 -> forall x, In x l1 -> In x l2.
@@ -68,7 +68,7 @@ Section Sublist.
     Qed.
 
     
-    Hint Immediate sublist_nil_l : qcert.
+    Local Hint Immediate sublist_nil_l : qcert.
     
     Global Instance sublist_pre : PreOrder sublist.
     Proof.
@@ -136,7 +136,7 @@ Section Sublist.
         eapply sublist_In; eauto.
     Qed.
 
-    Hint Constructors sublist : qcert.
+    Local Hint Constructors sublist : qcert.
     
     Lemma sublist_app {a1 b1 a2 b2:list A}:
       sublist a1 b1 ->
@@ -181,7 +181,7 @@ Section Sublist.
     apply filter_sublist.
   Qed.
 
-  Hint Constructors sublist : qcert.
+  Local Hint Constructors sublist : qcert.
 
   Lemma sublist_map {A B} {l1 l2} (f:A->B) :
     sublist l1 l2 -> sublist (map f l1) (map f l2).
@@ -277,7 +277,7 @@ Section Sublist.
     trivial.
   Qed.
 
-  Hint Immediate sublist_nil_l : qcert.
+  Local Hint Immediate sublist_nil_l : qcert.
 
   Lemma StronglySorted_incl_sublist {A R l1 l2} `{EqDec A eq} `{StrictOrder A R} : 
     StronglySorted R l1 ->

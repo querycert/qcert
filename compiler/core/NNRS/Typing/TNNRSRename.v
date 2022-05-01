@@ -34,8 +34,8 @@ Section TNNRSRename.
   Context {m:basic_model}.
   Local Open Scope nnrs.
 
-  Hint Constructors nnrs_expr_type : qcert.
-  Hint Constructors nnrs_stmt_type : qcert.
+  Local Hint Constructors nnrs_expr_type : qcert.
+  Local Hint Constructors nnrs_stmt_type : qcert.
 
 
   Lemma nnrs_stmt_must_assign_rename_env s v v1 v2 :
@@ -160,7 +160,7 @@ Section TNNRSRename.
     [ Γc ; (l++(v,τ)::Γ) , Δc , Δd  ⊢ s ] ->
     [ Γc ; (l++(v',τ)::Γ) , Δc , Δd  ⊢ nnrs_stmt_rename_env s v v' ].
   Proof.
-    Hint Resolve nnrs_expr_type_rename_env_in : qcert.
+    Local Hint Resolve nnrs_expr_type_rename_env_in : qcert.
 
     revert l Γ Δc Δd τ
     ; nnrs_stmt_cases (induction s) Case
@@ -439,7 +439,7 @@ Section TNNRSRename.
     [ Γc ; (l++(v',τ)::Γ) , Δc , Δd  ⊢ nnrs_stmt_rename_env s v v' ] ->
     [ Γc ; (l++(v,τ)::Γ) , Δc , Δd  ⊢ s ].
   Proof.
-    Hint Resolve nnrs_expr_type_rename_env_in_inv : qcert.
+    Local Hint Resolve nnrs_expr_type_rename_env_in_inv : qcert.
 
     revert l Γ Δc Δd τ
     ; nnrs_stmt_cases (induction s) Case

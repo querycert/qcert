@@ -337,9 +337,9 @@ Section Lift.
   
 End Lift.
 
-Hint Rewrite @olift_some : alg.
-Hint Rewrite @olift2_none_r : alg.
-Hint Rewrite @olift2_somes : alg.
+Global Hint Rewrite @olift_some : alg.
+Global Hint Rewrite @olift2_none_r : alg.
+Global Hint Rewrite @olift2_somes : alg.
 
 (** * Tactics *)
 

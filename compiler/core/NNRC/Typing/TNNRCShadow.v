@@ -27,7 +27,7 @@ Require Import TcNNRC.
 Require Import TNNRC.
   
 Section TNNRCShadow.
-  Hint Constructors nnrc_core_type : qcert.
+  Local Hint Constructors nnrc_core_type : qcert.
 
   Context {m:basic_model}.
 
@@ -436,7 +436,7 @@ Section TNNRCShadow.
     nnrc_type τcenv Γ n τ <-> nnrc_type τcenv Γ (unshadow sep renamer avoid n) τ.
   Proof.
     unfold nnrc_type.
-    Hint Resolve really_fresh_from_free really_fresh_from_bound : qcert.
+    Local Hint Resolve really_fresh_from_free really_fresh_from_bound : qcert.
     split; revert Γ τ;
       induction n;
       simpl in *; unfold NNRC.nnrc_group_by in *;

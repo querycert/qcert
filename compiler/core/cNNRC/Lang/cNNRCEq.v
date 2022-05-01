@@ -111,7 +111,7 @@ Section cNNRCEq.
 
   (* NNRCFor *)
 
-    Hint Resolve data_normalized_dcoll_in : qcert.
+  Local Hint Resolve data_normalized_dcoll_in : qcert.
 
   Global Instance proper_cNNRCFor : Proper (eq ==> nnrc_core_eq ==> nnrc_core_eq ==> nnrc_core_eq) NNRCFor.
   Proof.

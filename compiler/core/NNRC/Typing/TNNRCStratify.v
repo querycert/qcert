@@ -140,7 +140,7 @@ Section TNNRCStratify.
         type_substs Γc Γ sdefs τdefs
         /\ nnrc_type Γc (rev τdefs ++ Γ) n τ.
   Proof.
-    Hint Constructors nnrc_core_type : qcert.
+    Local Hint Constructors nnrc_core_type : qcert.
     unfold nnrc_type.
     revert required_kind bound_vars n sdefs.
     induction e; simpl; intros required_kind bound_vars n sdefs inclb eqq Γc Γ τ typ.
@@ -479,7 +479,7 @@ Section TNNRCStratify.
         nnrc_type Γc (rev τdefs ++ Γ) n τ ->
         nnrc_type Γc Γ e τ.
   Proof.
-    Hint Constructors nnrc_core_type : qcert.
+    Local Hint Constructors nnrc_core_type : qcert.
     unfold nnrc_type.
     revert required_kind bound_vars n sdefs.
     induction e; simpl; intros required_kind bound_vars n sdefs inclb eqq Γc Γ τdefs typs τ typn.

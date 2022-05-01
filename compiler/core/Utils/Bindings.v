@@ -787,7 +787,7 @@ Section Bindings.
     rewrite <- IHl. apply insertion_sort_insert_equiv_domain.
   Qed.
 
-  Hint Resolve ODT_lt_strorder : qcert.
+  Local Hint Resolve ODT_lt_strorder : qcert.
   
   Lemma insertion_sort_insert_swap_neq {A} a1 (b1:A) a2 b2 l :
     ~(eq a1 a2) ->

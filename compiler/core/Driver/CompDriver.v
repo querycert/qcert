@@ -2700,7 +2700,7 @@ Section CompDriver.
       let target := target_language_of_driver dv in
       is_postfix_driver (driver_of_language target) dv.
   Proof.
-    Hint Resolve
+    Local Hint Resolve
          target_language_of_driver_is_postfix_js_ast
          target_language_of_driver_is_postfix_javascript
          target_language_of_driver_is_postfix_java
@@ -5939,7 +5939,7 @@ Section CompDriver.
     ; simpl; try reflexivity; intros.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_javascript : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_javascript : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_java :
         (forall dv,
@@ -5949,7 +5949,7 @@ Section CompDriver.
     ; simpl; try reflexivity; intros.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_java : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_java : exists_path_hints.
 
     Ltac prove_exists_path_complete
       := simpl; try reflexivity; intros
@@ -5965,7 +5965,7 @@ Section CompDriver.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_js_ast : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_js_ast : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_wasm :
         (forall dv,
@@ -5974,7 +5974,7 @@ Section CompDriver.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_wasm : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_wasm : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_wasm_ast :
         (forall dv,
@@ -5983,7 +5983,7 @@ Section CompDriver.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_wasm_ast : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_wasm_ast : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_imp_ejson :
       (forall dv,
@@ -5992,7 +5992,7 @@ Section CompDriver.
       induction dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_imp_ejson : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_imp_ejson : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_imp_data :
       (forall dv,
@@ -6001,7 +6001,7 @@ Section CompDriver.
       induction dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_imp_data : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_imp_data : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_nnrs_imp :
       (forall dv,
@@ -6010,7 +6010,7 @@ Section CompDriver.
       induction dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_nnrs_imp : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_nnrs_imp : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_nnrs :
       (forall dv,
@@ -6019,7 +6019,7 @@ Section CompDriver.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_nnrs : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_nnrs : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_nnrs_core :
       (forall dv,
@@ -6028,7 +6028,7 @@ Section CompDriver.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_nnrs_core : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_nnrs_core : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_spark_df :
       (forall dv,
@@ -6037,7 +6037,7 @@ Section CompDriver.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_spark_df : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_spark_df : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_dnnrc_typed :
       (forall dv,
@@ -6046,7 +6046,7 @@ Section CompDriver.
       induction dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_dnnrc_typed : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_dnnrc_typed : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_dnnrc :
       (forall dv,
@@ -6055,7 +6055,7 @@ Section CompDriver.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_dnnrc : exists_path_hints.
+    Local Hint Resolve exists_path_from_source_target_completeness_dnnrc : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_cnd :
         (forall dv,
@@ -6125,13 +6125,13 @@ Section CompDriver.
     apply exists_path_from_source_target_completeness_cnd.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_camp : exists_path_hints.
-  Hint Resolve exists_path_from_source_target_completeness_nra : exists_path_hints.
-  Hint Resolve exists_path_from_source_target_completeness_nraenv_core : exists_path_hints.
-  Hint Resolve exists_path_from_source_target_completeness_nraenv : exists_path_hints.
-  Hint Resolve exists_path_from_source_target_completeness_nnrc_core : exists_path_hints.
-  Hint Resolve exists_path_from_source_target_completeness_nnrc : exists_path_hints.
-  Hint Resolve exists_path_from_source_target_completeness_nnrcmr : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_camp : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_nra : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_nraenv_core : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_nraenv : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_nnrc_core : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_nnrc : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_nnrcmr : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_camp_rule :
     (forall dv,
@@ -6140,7 +6140,7 @@ Section CompDriver.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_camp_rule : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_camp_rule : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_tech_rule :
     (forall dv,
@@ -6149,7 +6149,7 @@ Section CompDriver.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_tech_rule : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_tech_rule : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_designer_rule :
     (forall dv,
@@ -6158,7 +6158,7 @@ Section CompDriver.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_designer_rule : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_designer_rule : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_oql :
     (forall dv,
@@ -6167,7 +6167,7 @@ Section CompDriver.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_oql : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_oql : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_sql :
     (forall dv,
@@ -6176,7 +6176,7 @@ Section CompDriver.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_sql : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_sql : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_sqlpp :
     (forall dv,
@@ -6185,7 +6185,7 @@ Section CompDriver.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_sqlpp : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_sqlpp : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_lambda_nra :
     (forall dv,
@@ -6194,7 +6194,7 @@ Section CompDriver.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_lambda_nra : exists_path_hints.
+  Local Hint Resolve exists_path_from_source_target_completeness_lambda_nra : exists_path_hints.
 
   Proposition get_path_from_source_target_completeness:
     forall dv,

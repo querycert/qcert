@@ -24,7 +24,7 @@ Parameter enhanced_foreign_to_wson_from_ejson : enhanced_ejson -> foreign_wson.
 
 Extract Constant enhanced_foreign_to_wson_from_ejson => "Wasm_enhanced.foreign_ejson_to_wson".
 
-Program Instance enhanced_foreign_to_wson : foreign_to_wson _ :=
+Global Program Instance enhanced_foreign_to_wson : foreign_to_wson _ :=
   mk_foreign_to_wson enhanced_ejson _.
 Next Obligation.
   apply enhanced_foreign_to_wson_from_ejson.

@@ -473,7 +473,7 @@ Proof.
   - eapply sql_date_binary_op_typing_sound; eauto.
 Qed.
 
-Instance enhanced_foreign_operators_typing
+Global Instance enhanced_foreign_operators_typing
          {model:brand_model} :
   @foreign_operators_typing
     enhanced_foreign_data
@@ -497,7 +497,7 @@ Instance enhanced_foreign_operators_typing
        ; foreign_operators_typing_binary_infer_sub := enhanced_binary_op_typing_infer_sub
      }.
 
-Instance enhanced_foreign_typing {model:brand_model}:
+Global Instance enhanced_foreign_typing {model:brand_model}:
   @foreign_typing
     enhanced_foreign_runtime
     enhanced_foreign_type

@@ -63,7 +63,7 @@ Section NNRSimpSemEval.
           simpl; rewrite H5; simpl; trivial.
       }
     - {
-        Hint Constructors nnrs_imp_expr_sem : qcert.
+        Local Hint Constructors nnrs_imp_expr_sem : qcert.
         nnrs_imp_expr_cases (induction e) Case; intros σ d₀ sem; invcs sem; simpl; trivial; eauto 3 with qcert.
         - Case "NNRSimpVar".
           apply some_olift in H0.
@@ -151,9 +151,9 @@ Section NNRSimpSemEval.
           simpl; trivial.
       }
     - {
-        Hint Constructors nnrs_imp_stmt_sem : qcert.
-        Hint Constructors nnrs_imp_stmt_sem_iter : qcert.
-        Hint Resolve nnrs_imp_stmt_sem_env_cons_same : qcert.
+        Local Hint Constructors nnrs_imp_stmt_sem : qcert.
+        Local Hint Constructors nnrs_imp_stmt_sem_iter : qcert.
+        Local Hint Resolve nnrs_imp_stmt_sem_env_cons_same : qcert.
 
         nnrs_imp_stmt_cases (induction s) Case; simpl; intros σ₁ σ₂ sem; repeat destr sem.
         - Case "NNRSimpSkip".

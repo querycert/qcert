@@ -133,7 +133,7 @@ Definition enhanced_reduce_op_interp
        v
      end.
 
-Program Instance enhanced_foreign_reduce_op : foreign_reduce_op
+Global Program Instance enhanced_foreign_reduce_op : foreign_reduce_op
   := mk_foreign_reduce_op enhanced_foreign_data enhanced_reduce_op _ _ enhanced_reduce_op_interp _.
 Next Obligation.
   red; unfold equiv, complement.

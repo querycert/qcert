@@ -333,7 +333,7 @@ Section RType.
        explicit pattern matching (it can still be written as a call to
        this induction principle) *)
 
-    Hint Constructors Forallt : qcert.
+    Local Hint Constructors Forallt : qcert.
 
     Theorem rtype_rect (P : rtype -> Type)
             (ftop : P ⊤)

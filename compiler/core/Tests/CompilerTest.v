@@ -33,7 +33,7 @@ Local Open Scope string.
 Import ListNotations.
 
 Definition CPRModel := ("MainEntity", "Entity") :: nil.
-Instance CPRModel_relation : brand_relation
+Local Instance CPRModel_relation : brand_relation
   := mkBrand_relation CPRModel (eq_refl _) (eq_refl _).
 
 Module TR := TrivialRuntime.

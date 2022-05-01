@@ -68,7 +68,7 @@ Definition enhanced_foreign_ejson_to_json (ej:enhanced_ejson) : json :=
         jstring (SQL_DATE_PERIOD_to_string fd))::nil)
   end.
 
-Program Instance enhanced_foreign_to_json : foreign_to_json
+Global Program Instance enhanced_foreign_to_json : foreign_to_json
   := mk_foreign_to_json enhanced_ejson enhanced_foreign_ejson _ _.
 Next Obligation.
   exact (enhanced_foreign_json_to_ejson fd).

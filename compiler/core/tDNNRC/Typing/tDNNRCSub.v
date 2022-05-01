@@ -136,7 +136,7 @@ Section tDNNRCSub.
       dnnrc_base_type τc tenv e τ ->
       dnnrc_base_type_sub τc tenv e τ.
     Proof.
-      Hint Constructors dnnrc_base_type_sub : qcert.
+      Local Hint Constructors dnnrc_base_type_sub : qcert.
       revert tenv τ.
       induction e; simpl; intros tenv τ dt; invcs dt; qeauto.
       - econstructor; try eassumption.

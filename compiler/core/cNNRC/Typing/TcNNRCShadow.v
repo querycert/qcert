@@ -25,7 +25,7 @@ Require Import cNNRCShadow.
 Require Import TcNNRC.
   
 Section TcNNRCShadow.
-  Hint Constructors nnrc_core_type : qcert.
+  Local Hint Constructors nnrc_core_type : qcert.
 
   Context {m:basic_model}.
 
@@ -432,7 +432,7 @@ Section TcNNRCShadow.
   Theorem nnrc_core_unshadow_type {τcenv} sep renamer avoid Γ n τ :
     nnrc_core_type τcenv Γ n τ <-> nnrc_core_type τcenv Γ (unshadow sep renamer avoid n) τ.
   Proof.
-    Hint Resolve really_fresh_from_free  really_fresh_from_bound : qcert.
+    Local Hint Resolve really_fresh_from_free  really_fresh_from_bound : qcert.
     split; revert Γ τ; induction n; simpl in *; inversion 1; subst; qeauto; simpl.
     - econstructor; [eauto|..].
       apply nnrc_core_type_rename_pick_subst.

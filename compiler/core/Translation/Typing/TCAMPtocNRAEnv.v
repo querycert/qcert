@@ -27,7 +27,7 @@ Section TCAMPtocNRAEnv.
   Local Open Scope list_scope.
   Local Open Scope camp_scope.
 
-  Hint Constructors nraenv_core_type unary_op_type binary_op_type : qcert.
+  Local Hint Constructors nraenv_core_type unary_op_type binary_op_type : qcert.
 
   Context {m:basic_model}.
 
@@ -35,7 +35,7 @@ Section TCAMPtocNRAEnv.
     [τc&Γ] |= p ; τin ~> τout ->
     nraenv_core_of_camp p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
   Proof.
-    Hint Resolve data_type_drec_nil : qcert.
+    Local Hint Resolve data_type_drec_nil : qcert.
     revert Γ pf τin τout.
     induction p; simpl; inversion 1; subst.
     (* PTconst *)

@@ -1476,7 +1476,7 @@ Section RcNRAEnv2.
     data_normalized h d ->
     data_normalized h o.
   Proof.
-    Hint Resolve dnrec_sort_content : qcert.
+    Local Hint Resolve dnrec_sort_content : qcert.
     rewrite unfold_env_nra_sort; intros.
     qeauto.
   Qed.

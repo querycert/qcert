@@ -3236,7 +3236,7 @@ Section TNRAEnvRewrite.
 End TNRAEnvRewrite.
 
 (* begin hide *)
-(* Hints for optimization tactic
+(* hints for optimization tactic
 
    Note: all of those are valid, indepently of typing
    Note: those marked with ** can be generalized with proper type
@@ -3247,14 +3247,14 @@ End TNRAEnvRewrite.
        tmerge_empty_record_arrow : p ⊗ [] ⇒ { p }
 *)
 
-Hint Rewrite @tmerge_empty_record_r_arrow : tnraenv_core_optim.
-Hint Rewrite @tmerge_empty_record_l_arrow : tnraenv_core_optim.
-Hint Rewrite @tmapenv_to_env_arrow : tnraenv_core_optim.
-Hint Rewrite @tselect_and_arrow : tnraenv_core_optim.
-Hint Rewrite @tflatten_through_appenv_arrow : tnraenv_core_optim.
-Hint Rewrite @tflatten_mapenv_coll_arrow : tnraenv_core_optim.
-Hint Rewrite @tflatten_over_double_map_arrow : tnraenv_core_optim.
-Hint Rewrite @tflatten_over_double_map_with_either_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tmerge_empty_record_r_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tmerge_empty_record_l_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tmapenv_to_env_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tselect_and_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tflatten_through_appenv_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tflatten_mapenv_coll_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tflatten_over_double_map_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tflatten_over_double_map_with_either_arrow : tnraenv_core_optim.
 
 (*
        -- Those simplify over singleton collections
@@ -3262,8 +3262,8 @@ Hint Rewrite @tflatten_over_double_map_with_either_arrow : tnraenv_core_optim.
        tenvmap_into_id : χ⟨ ID ⟩( P ) ⇒ P
 *)
 
-Hint Rewrite @tenvflatten_map_coll_arrow : tnraenv_core_optim.
-Hint Rewrite @tenvmap_into_id_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tenvflatten_map_coll_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tenvmap_into_id_arrow : tnraenv_core_optim.
 
 (*
        -- Those introduce a ◯ , but remove a χ
@@ -3271,24 +3271,23 @@ Hint Rewrite @tenvmap_into_id_arrow : tnraenv_core_optim.
        tenvmap_singleton : χ⟨ P1 ⟩( { P2 } ) ⇒ { P1 ◯ P2 }
 *)
 
-Hint Rewrite @tenvmap_map_compose_arrow : tnraenv_core_optim.
-Hint Rewrite @tenvmap_singleton_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tenvmap_map_compose_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tenvmap_singleton_arrow : tnraenv_core_optim.
 
 (*
        -- Those remove a nth
        tenvnth0_bag : nth 0 { P } ) ⇒ₓ left P
 *)
 
-Hint Rewrite @tenvnth0_bag_arrow : tnraenv_core_optim.
-
+Global Hint Rewrite @tenvnth0_bag_arrow : tnraenv_core_optim.
 
 (*
        -- Those remove over flatten
        envflatten_coll : ♯flatten( { p } ) ⇒ p
 *)
 
-Hint Rewrite @tenvflatten_coll_arrow : tnraenv_core_optim.
-Hint Rewrite @tenvflatten_nil_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tenvflatten_coll_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tenvflatten_nil_arrow : tnraenv_core_optim.
 
 (*
        -- Those push-down or remove ◯
@@ -3303,14 +3302,14 @@ Hint Rewrite @tenvflatten_nil_arrow : tnraenv_core_optim.
        app_over_binop : (q₂ ⊗b q₁) ◯ q ⇒ (q₂ ◯ q) ⊗b (q₁ ◯ q)
 *)
 
-Hint Rewrite @tapp_over_const_arrow : tnraenv_core_optim.
-Hint Rewrite @tapp_over_env_arrow : tnraenv_core_optim.
-Hint Rewrite @tapp_over_id_r_arrow : tnraenv_core_optim.
-Hint Rewrite @tapp_over_id_l_arrow : tnraenv_core_optim.
-Hint Rewrite @tapp_over_app_arrow : tnraenv_core_optim.
-Hint Rewrite @tapp_over_unop_arrow : tnraenv_core_optim.
-Hint Rewrite @tapp_over_map_arrow : tnraenv_core_optim.
-Hint Rewrite @tapp_over_select_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_const_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_env_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_id_r_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_id_l_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_app_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_unop_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_map_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tapp_over_select_arrow : tnraenv_core_optim.
 
 (*
        -- Other misc rewrites
@@ -3319,8 +3318,8 @@ Hint Rewrite @tapp_over_select_arrow : tnraenv_core_optim.
                                  ⇒ χ⟨ { ID } ⟩(♯flatten(χ⟨ ♯flatten( p1 ) ⟩( p2 )))
 *)
 
-Hint Rewrite @tproduct_singletons_arrow : tnraenv_core_optim.
-Hint Rewrite @tdouble_flatten_map_coll_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tproduct_singletons_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tdouble_flatten_map_coll_arrow : tnraenv_core_optim.
 
 (*
        -- Those handle operators on the environment
@@ -3333,39 +3332,39 @@ Hint Rewrite @tdouble_flatten_map_coll_arrow : tnraenv_core_optim.
                 ⇒ (χ⟨ENV⟩(σ⟨p1⟩(σ⟨p2⟩( ‵{| ID |}))))
 *)
 
-Hint Rewrite @tappenv_over_env_l_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_over_env_r_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_over_appenv_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_over_app_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_over_app_ie_arrow : tnraenv_core_optim.
-Hint Rewrite @tcompose_selects_in_mapenv_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_flatten_mapenv_to_map_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_over_const_arrow : tnraenv_core_optim.
-Hint Rewrite @tflip_env1_arrow : tnraenv_core_optim.
-Hint Rewrite @tflip_env2_arrow : tnraenv_core_optim.
-Hint Rewrite @tmapenv_over_singleton_arrow : tnraenv_core_optim.
-Hint Rewrite @tflip_env4_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_over_binop : tnraenv_core_optim.
-Hint Rewrite @tflip_env6_arrow : tnraenv_core_optim.
-Hint Rewrite @tmapenv_to_map_arrow : tnraenv_core_optim.
-Hint Rewrite @tmerge_concat_to_concat_arrow : tnraenv_core_optim.
-Hint Rewrite @tmerge_with_concat_to_concat_arrow : tnraenv_core_optim.
-Hint Rewrite @tappenv_mapenv_to_map_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_over_env_l_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_over_env_r_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_over_appenv_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_over_app_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_over_app_ie_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tcompose_selects_in_mapenv_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_flatten_mapenv_to_map_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_over_const_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tflip_env1_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tflip_env2_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tmapenv_over_singleton_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tflip_env4_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_over_binop : tnraenv_core_optim.
+Global Hint Rewrite @tflip_env6_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tmapenv_to_map_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tmerge_concat_to_concat_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tmerge_with_concat_to_concat_arrow : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_mapenv_to_map_arrow : tnraenv_core_optim.
 
-Hint Rewrite @tmap_over_nil : tnraenv_core_optim.
-Hint Rewrite @tselect_over_nil : tnraenv_core_optim.
-Hint Rewrite @tmap_over_either  : tnraenv_core_optim.
-Hint Rewrite @tmap_over_either_app : tnraenv_core_optim.
-Hint Rewrite @tselect_over_either : tnraenv_core_optim.
-Hint Rewrite @tselect_over_app_either : tnraenv_core_optim.
-Hint Rewrite @tappenv_through_either : tnraenv_core_optim.
-Hint Rewrite @tcount_over_map : tnraenv_core_optim.
-Hint Rewrite @tcount_over_flat_map_map : tnraenv_core_optim.
-Hint Rewrite @tcount_over_flat_map_either_nil_map : tnraenv_core_optim.
-Hint Rewrite @tcount_over_flat_map_either_nil_app_map : tnraenv_core_optim.
-Hint Rewrite @tunop_over_either : tnraenv_core_optim.
-Hint Rewrite @tunop_over_either_app : tnraenv_core_optim.
-Hint Rewrite @tflatten_flatten_map_either_nil : tnraenv_core_optim.
-Hint Rewrite @tcount_over_flat_map_either_nil_app_singleton : tnraenv_core_optim.
+Global Hint Rewrite @tmap_over_nil : tnraenv_core_optim.
+Global Hint Rewrite @tselect_over_nil : tnraenv_core_optim.
+Global Hint Rewrite @tmap_over_either  : tnraenv_core_optim.
+Global Hint Rewrite @tmap_over_either_app : tnraenv_core_optim.
+Global Hint Rewrite @tselect_over_either : tnraenv_core_optim.
+Global Hint Rewrite @tselect_over_app_either : tnraenv_core_optim.
+Global Hint Rewrite @tappenv_through_either : tnraenv_core_optim.
+Global Hint Rewrite @tcount_over_map : tnraenv_core_optim.
+Global Hint Rewrite @tcount_over_flat_map_map : tnraenv_core_optim.
+Global Hint Rewrite @tcount_over_flat_map_either_nil_map : tnraenv_core_optim.
+Global Hint Rewrite @tcount_over_flat_map_either_nil_app_map : tnraenv_core_optim.
+Global Hint Rewrite @tunop_over_either : tnraenv_core_optim.
+Global Hint Rewrite @tunop_over_either_app : tnraenv_core_optim.
+Global Hint Rewrite @tflatten_flatten_map_either_nil : tnraenv_core_optim.
+Global Hint Rewrite @tcount_over_flat_map_either_nil_app_singleton : tnraenv_core_optim.
 (* end hide *)
 

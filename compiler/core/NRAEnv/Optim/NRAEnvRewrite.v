@@ -34,7 +34,7 @@ Section ROptimEnv.
 
   (* Pulls equivalences from core algebra *)
 
-  Hint Resolve dnrec_sort_content : qcert.
+  Local Hint Resolve dnrec_sort_content : qcert.
   Lemma pull_nra_opt (p1 p2:nraenv_core) :
     (nra_of_nraenv_core p1) ≡ₐ (nra_of_nraenv_core p2) ->
     p1 ≡ₑ p2.
@@ -1804,7 +1804,7 @@ This is the first operation that
 End ROptimEnv.
 
 (* begin hide *)
-(* Hints for optimization tactic
+(* hints for optimization tactic
 
    Note: all of those are valid, indepently of typing
    Note: those marked with ** can be generalized with proper type
@@ -1819,9 +1819,9 @@ End ROptimEnv.
     Generalized into: tenvmap_into_id
 *)
 
-Hint Rewrite @envflatten_map_coll : nraenv_core_optim.
-Hint Rewrite @envmap_into_id : nraenv_core_optim.
-Hint Rewrite @envmap_into_id_flatten : nraenv_core_optim.
+Global Hint Rewrite @envflatten_map_coll : nraenv_core_optim.
+Global Hint Rewrite @envmap_into_id : nraenv_core_optim.
+Global Hint Rewrite @envmap_into_id_flatten : nraenv_core_optim.
 
 (*
        -- Those introduce a ◯ , but remove a χ
@@ -1829,15 +1829,15 @@ Hint Rewrite @envmap_into_id_flatten : nraenv_core_optim.
        envmap_singleton : χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 }
 *)
 
-Hint Rewrite @envmap_map_compose : nraenv_core_optim.
-Hint Rewrite @envmap_singleton : nraenv_core_optim.
+Global Hint Rewrite @envmap_map_compose : nraenv_core_optim.
+Global Hint Rewrite @envmap_singleton : nraenv_core_optim.
 
 (*
        -- Those remove a nth
        envnth0_bag : nth 0 { P } ) ⇒ₓ left P
 *)
 
-Hint Rewrite @envnth0_bag : nraenv_core_optim.
+Global Hint Rewrite @envnth0_bag : nraenv_core_optim.
 
 
 (*
@@ -1849,10 +1849,10 @@ Hint Rewrite @envnth0_bag : nraenv_core_optim.
     Generalized into: tenvflatten_coll
 *)
 
-Hint Rewrite @envflatten_coll_mergeconcat : nraenv_core_optim.
-Hint Rewrite @envflatten_coll_map : nraenv_core_optim.
-Hint Rewrite @envflatten_coll_flatten : nraenv_core_optim.
-Hint Rewrite @envflatten_coll_coll : nraenv_core_optim.
+Global Hint Rewrite @envflatten_coll_mergeconcat : nraenv_core_optim.
+Global Hint Rewrite @envflatten_coll_map : nraenv_core_optim.
+Global Hint Rewrite @envflatten_coll_flatten : nraenv_core_optim.
+Global Hint Rewrite @envflatten_coll_coll : nraenv_core_optim.
 
 (*
        -- Those push-down or remove ◯
@@ -1873,19 +1873,19 @@ Hint Rewrite @envflatten_coll_coll : nraenv_core_optim.
           ≡ₑ (χᵉ⟨‵{|ENV|} ⟩( ID)) ◯ₑ (χ⟨ENV ⟩( σ⟨p1 ⟩( ‵{|ID|}))) ◯ p2
 *)
 
-Hint Rewrite @app_over_id : nraenv_core_optim.
-Hint Rewrite @app_over_id_l : nraenv_core_optim.
-Hint Rewrite @app_over_app : nraenv_core_optim.           (* Not in ROptimEnvFunc *)
-Hint Rewrite @app_over_map : nraenv_core_optim.
-Hint Rewrite @app_over_select : nraenv_core_optim.
-Hint Rewrite @app_over_unop : nraenv_core_optim.
-Hint Rewrite @app_over_binop_l : nraenv_core_optim.
-Hint Rewrite @app_over_merge : nraenv_core_optim.
-Hint Rewrite @app_over_rec : nraenv_core_optim.
-Hint Rewrite @binop_over_rec_pair : nraenv_core_optim.
-Hint Rewrite @concat_id_left : nraenv_core_optim.
-Hint Rewrite @app_over_env_dot : nraenv_core_optim.
-Hint Rewrite @app_over_appenv_over_mapenv : nraenv_core_optim.
+Global Hint Rewrite @app_over_id : nraenv_core_optim.
+Global Hint Rewrite @app_over_id_l : nraenv_core_optim.
+Global Hint Rewrite @app_over_app : nraenv_core_optim.           (* Not in ROptimEnvFunc *)
+Global Hint Rewrite @app_over_map : nraenv_core_optim.
+Global Hint Rewrite @app_over_select : nraenv_core_optim.
+Global Hint Rewrite @app_over_unop : nraenv_core_optim.
+Global Hint Rewrite @app_over_binop_l : nraenv_core_optim.
+Global Hint Rewrite @app_over_merge : nraenv_core_optim.
+Global Hint Rewrite @app_over_rec : nraenv_core_optim.
+Global Hint Rewrite @binop_over_rec_pair : nraenv_core_optim.
+Global Hint Rewrite @concat_id_left : nraenv_core_optim.
+Global Hint Rewrite @app_over_env_dot : nraenv_core_optim.
+Global Hint Rewrite @app_over_appenv_over_mapenv : nraenv_core_optim.
 
 (*
        -- Other misc rewrites
@@ -1894,8 +1894,8 @@ Hint Rewrite @app_over_appenv_over_mapenv : nraenv_core_optim.
                                  ≡ χ⟨ { ID } ⟩(♯flatten(χ⟨ ♯flatten( p1 ) ⟩( p2 )))
 *)
 
-Hint Rewrite @product_singletons : nraenv_core_optim.
-Hint Rewrite @double_flatten_map_coll : nraenv_core_optim.
+Global Hint Rewrite @product_singletons : nraenv_core_optim.
+Global Hint Rewrite @double_flatten_map_coll : nraenv_core_optim.
 
 (*
        -- Those handle operators on the environment
@@ -1905,27 +1905,27 @@ Hint Rewrite @double_flatten_map_coll : nraenv_core_optim.
                                    ≡ₑ χ⟨ { ID.e } ⟩(cNRAEnvBinop AMergeConcat ENV ID)
 *)
 
-Hint Rewrite @env_appenv : nraenv_core_optim.
-Hint Rewrite @appenv_over_mapenv : nraenv_core_optim.
-Hint Rewrite @appenv_over_mapenv_coll : nraenv_core_optim.
-Hint Rewrite @appenv_over_mapenv_merge : nraenv_core_optim.
-Hint Rewrite @appenv_over_mapenv_merge2 : nraenv_core_optim.
-Hint Rewrite @compose_selects_in_mapenv : nraenv_core_optim.
-Hint Rewrite @flatten_through_appenv : nraenv_core_optim.
-Hint Rewrite @flatten_mapenv_coll : nraenv_core_optim.
+Global Hint Rewrite @env_appenv : nraenv_core_optim.
+Global Hint Rewrite @appenv_over_mapenv : nraenv_core_optim.
+Global Hint Rewrite @appenv_over_mapenv_coll : nraenv_core_optim.
+Global Hint Rewrite @appenv_over_mapenv_merge : nraenv_core_optim.
+Global Hint Rewrite @appenv_over_mapenv_merge2 : nraenv_core_optim.
+Global Hint Rewrite @compose_selects_in_mapenv : nraenv_core_optim.
+Global Hint Rewrite @flatten_through_appenv : nraenv_core_optim.
+Global Hint Rewrite @flatten_mapenv_coll : nraenv_core_optim.
 
 (* Simple optimizations for either *)
-Hint Rewrite @either_app_over_dleft : nraenv_core_optim.
-Hint Rewrite @either_app_over_dright : nraenv_core_optim.
-Hint Rewrite @either_app_over_aleft : nraenv_core_optim.
-Hint Rewrite @either_app_over_aright : nraenv_core_optim.
+Global Hint Rewrite @either_app_over_dleft : nraenv_core_optim.
+Global Hint Rewrite @either_app_over_dright : nraenv_core_optim.
+Global Hint Rewrite @either_app_over_aleft : nraenv_core_optim.
+Global Hint Rewrite @either_app_over_aright : nraenv_core_optim.
 
 (* Optimizations for rproject *)
-Hint Rewrite @rproject_over_concat : nraenv_core_optim.
-Hint Rewrite @rproject_over_rec_in : nraenv_core_optim. 
-Hint Rewrite @rproject_over_rec_nin : nraenv_core_optim. 
-Hint Rewrite @rproject_over_rproject : nraenv_core_optim. 
-Hint Rewrite @rproject_over_either  : nraenv_core_optim.
+Global Hint Rewrite @rproject_over_concat : nraenv_core_optim.
+Global Hint Rewrite @rproject_over_rec_in : nraenv_core_optim. 
+Global Hint Rewrite @rproject_over_rec_nin : nraenv_core_optim. 
+Global Hint Rewrite @rproject_over_rproject : nraenv_core_optim. 
+Global Hint Rewrite @rproject_over_either  : nraenv_core_optim.
   
 (* end hide *)
 

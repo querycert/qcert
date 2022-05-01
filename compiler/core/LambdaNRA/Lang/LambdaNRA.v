@@ -410,16 +410,16 @@ Section LambdaNRA.
 
   End LambdaNRAScope.
 
-  Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra.
+  Local Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra.
+  Local Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra.
 
   Global Instance lambda_nra_eval_lookup_equiv_prop :
     Proper (eq ==> assoc_lookupr_equiv ==> eq ==> eq) lambda_nra_eval.
@@ -473,16 +473,16 @@ Section LambdaNRA.
  
 End LambdaNRA.
 
-Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra.
+Global Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra.
+Global Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra.
 
 Tactic Notation "lambda_nra_cases" tactic(first) ident(c) :=
   first;

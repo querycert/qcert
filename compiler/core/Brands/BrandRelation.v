@@ -1420,5 +1420,5 @@ Defined.
    
 Global Hint Resolve canon_brands_is_canon_brands : qcert.
 
-Instance ToString_brands : ToString brands
+Global Instance ToString_brands : ToString brands
   := { toString := fun b => (String.concat " & " b)}.

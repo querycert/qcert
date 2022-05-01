@@ -164,7 +164,7 @@ Section TcNRAEnvtocNNRC.
     nnrc_core_type τconstants tenv (nraenv_core_to_nnrc_core op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τconstants;τenv).
   Proof.
-    Hint Constructors nraenv_core_type : qcert.
+    Local Hint Constructors nraenv_core_type : qcert.
     intros.
     revert τin τenv τout vid venv tenv H H0 H1.
     nraenv_core_cases (induction op) Case; simpl; intros; inversion H1; subst.
@@ -334,7 +334,7 @@ Section TcNRAEnvtocNNRC.
     nnrc_core_type τconstants tenv (nraenv_core_to_nnrc_core op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τconstants;τenv).
   Proof.
-    Hint Resolve tnraenv_sem_correct tnraenv_sem_correct_back : qcert.
+    Local Hint Resolve tnraenv_sem_correct tnraenv_sem_correct_back : qcert.
     intuition; qeauto.
   Qed.
 

@@ -63,11 +63,11 @@ Section LambdaNRATest.
     LNRAMap (LNRALambda "p" (LNRAUnop (OpDot "city") (LNRAUnop (OpDot "addr") (LNRAVar "p")))) P.
 
 
-Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra'.
-Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra'.
-Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra'.
-Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra'.
-Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
+  Local Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra'.
+  Local Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra'.
+  Local Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra'.
+  Local Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra'.
+  Local Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
 
   Lemma T1lr_equiv P : lambda_nra_eq (T1l P) (T1r P).
   Proof.
@@ -258,7 +258,7 @@ Require Import NRAEnvOptimizer.
 Require Import CompDriver.
 
 Definition silent_optim := silent_optimizer_logger string nraenv.
-Existing Instance silent_optim.
+Local Existing Instance silent_optim.
 
 Definition T1env : nraenv := (nraenv_of_lnra_lambda (q_to_lambda T1l)).
 (* Eval vm_compute in T1env. *)

@@ -402,7 +402,7 @@ Section cNRAEnvContext.
     destruct a; simpl; auto.
   Qed.
 
-    Hint Rewrite
+  Local Hint Rewrite
        aec_substs_Plug
        aec_substs_Binop
        aec_substs_Unop
@@ -805,7 +805,7 @@ Section cNRAEnvContext.
        apply Nat.lt_strorder.
      - specialize (H (rec_sort ps)).
        cut_to H.
-       + Hint Resolve rec_sort_perm : qcert.
+       + Local Hint Resolve rec_sort_perm : qcert.
          rewrite aec_substs_perm with (c:=c1) (ps2:=(rec_sort ps)); qauto.
          rewrite aec_substs_perm with (c:=c2) (ps2:=(rec_sort ps)); qauto.
        + apply (@rec_sort_pf nat ODT_nat).
@@ -1188,7 +1188,7 @@ Notation "$ n" := (CcNRAEnvHole n) (at level 50)  : nraenv_core_ctxt_scope.
 
 Notation "X ≡ₑ Y" := (nraenv_core_ctxt_equiv nraenv_core_eq X Y) (at level 90) : nraenv_core_ctxt_scope.
 
-  Hint Rewrite
+Global Hint Rewrite
        @aec_substs_Plug
        @aec_substs_Binop
        @aec_substs_Unop

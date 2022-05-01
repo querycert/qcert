@@ -26,7 +26,7 @@ Require Import ForeignTypeToJSON.
 Require Import EnhancedData.
 Require Import EnhancedType.
 
-Program Instance enhanced_foreign_type_to_JSON : foreign_type_to_JSON
+Global Program Instance enhanced_foreign_type_to_JSON : foreign_type_to_JSON
   := mk_foreign_type_to_JSON enhanced_foreign_type _ _.
 Next Obligation.
   exact (string_to_enhanced_type s).

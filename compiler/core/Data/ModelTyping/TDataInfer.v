@@ -192,7 +192,7 @@ Section TDataInfer.
     infer_data_type d = Some τ ->
     d ▹ τ.
   Proof.
-    Hint Constructors data_type Forall Forallt : qcert.
+    Local Hint Constructors data_type Forall Forallt : qcert.
     revert τ.
     induction d; simpl; 
     try solve[inversion 1; subst; eauto 2 with qcert].
@@ -269,7 +269,7 @@ Section TDataInfer.
     d ▹τ₂ ->
     τ₁ <: τ₂.
   Proof.
-    Hint Constructors subtype : qcert.
+    Local Hint Constructors subtype : qcert.
     revert τ₁ τ₂.
     induction d; simpl;
       try solve[inversion 1; subst; intros; destruct (istop τ₂); subst; trivial; dtype_inverter; trivial

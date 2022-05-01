@@ -35,7 +35,7 @@ Section TNNRSimpUnflatten.
 
   Context {m:basic_model}.
 
-  Hint Immediate type_NNRSimpSkip : qcert.
+  Local Hint Immediate type_NNRSimpSkip : qcert.
 
 
   Section eval.
