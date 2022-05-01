@@ -29,7 +29,7 @@ Section RConsistentSubtype.
   Context {ftype:foreign_type}.
   Context {br:brand_relation}.
 
-Hint Constructors subtype : qcert.
+Local Hint Constructors subtype : qcert.
 
 Section rtype_join_meet.
   
@@ -910,7 +910,7 @@ Lemma consistent_rtype_join_meet2:
   forall a b,  (rtype_join a b = b -> subtype a b)
                /\ (rtype_meet a b = a -> subtype a b).
 Proof.
-  Hint Resolve STop₀ SBottom₀ SColl₀ : qcert.
+  Local Hint Resolve STop₀ SBottom₀ SColl₀ : qcert.
   destruct a as [a awf]; destruct b as [b bwf].
   unfold rtype_join, rtype_meet; simpl.
 
@@ -1301,7 +1301,7 @@ Qed.
 
 Theorem consistent_rtype_join: forall a b, subtype a b <-> rtype_join a b = b.
 Proof.
-  Hint Resolve consistent_rtype_join1 consistent_rtype_join2 : qcert.
+  Local Hint Resolve consistent_rtype_join1 consistent_rtype_join2 : qcert.
   intuition.
 Qed.
 
@@ -1337,7 +1337,7 @@ Qed.
  
   Theorem consistent_rtype_meet : forall a b, subtype a b <-> rtype_meet a b = a.
   Proof.
-    Hint Resolve consistent_rtype_meet1 consistent_rtype_meet2 : qcert.
+    Local Hint Resolve consistent_rtype_meet1 consistent_rtype_meet2 : qcert.
     intuition.
   Qed.
   

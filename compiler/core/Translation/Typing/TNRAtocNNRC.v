@@ -46,7 +46,7 @@ Section TNRAtocNNRC.
     (op ▷ τin >=> τout ⊣ τconstants) ->
     nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout.
   Proof.
-    Hint Constructors nra_type : qcert.
+    Local Hint Constructors nra_type : qcert.
     Opaque fresh_var.
     intros.
     revert vid tenv H.
@@ -156,7 +156,7 @@ Section TNRAtocNNRC.
     nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout ->
     (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
-    Hint Constructors nra_type : qcert.
+    Local Hint Constructors nra_type : qcert.
     intros.
     revert τin τout vid tenv H H0.
     nra_cases (induction op) Case; simpl; intros; inversion H0; subst.
@@ -303,7 +303,7 @@ Section TNRAtocNNRC.
     nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout ->
     (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
-    Hint Resolve tnra_sem_correct tnra_sem_correct_back : qcert.
+    Local Hint Resolve tnra_sem_correct tnra_sem_correct_back : qcert.
     intuition; qeauto.
   Qed.
 

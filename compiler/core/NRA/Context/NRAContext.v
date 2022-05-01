@@ -360,7 +360,7 @@ Section NRAContext.
     destruct a; simpl; auto.
   Qed.
 
-  Hint Rewrite
+  Local Hint Rewrite
        ac_substs_Plug
        ac_substs_Binop
        ac_substs_Unop
@@ -723,7 +723,7 @@ Section NRAContext.
        apply Nat.lt_strorder.
      - specialize (H (rec_sort ps)).
        cut_to H.
-       + Hint Resolve rec_sort_perm : qcert.
+       + Local Hint Resolve rec_sort_perm : qcert.
          rewrite ac_substs_perm with (c:=c1) (ps2:=(rec_sort ps)); qauto.
          rewrite ac_substs_perm with (c:=c2) (ps2:=(rec_sort ps)); qauto.
        + apply (@rec_sort_pf nat ODT_nat).
@@ -1099,7 +1099,7 @@ Notation "$ n" := (CNRAHole n) (at level 50)  : nra_ctxt_scope.
 
 Notation "X ≡ₐ Y" := (nra_ctxt_equiv nra_eq X Y) (at level 90) : nra_ctxt_scope.
 
-  Hint Rewrite
+Global Hint Rewrite
        @ac_substs_Plug
        @ac_substs_Binop
        @ac_substs_Unop

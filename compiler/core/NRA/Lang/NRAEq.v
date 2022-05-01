@@ -103,7 +103,7 @@ Section NRAEq.
     rewrite (H h); qeauto.
   Qed.
     
-  Hint Resolve data_normalized_dcoll_in : qcert.
+  Local Hint Resolve data_normalized_dcoll_in : qcert.
 
   (* NRAMap *)
   Global Instance proper_NRAMap : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAMap.

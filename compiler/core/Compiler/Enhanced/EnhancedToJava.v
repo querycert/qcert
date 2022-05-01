@@ -49,7 +49,7 @@ Definition enhanced_to_java_binary_op
        sql_date_to_java_binary_op indent eol quotel op d1 d2
      end.
 
-Instance enhanced_foreign_to_java :
+Global Instance enhanced_foreign_to_java :
   @foreign_to_java enhanced_foreign_runtime
   := mk_foreign_to_java
        enhanced_foreign_runtime

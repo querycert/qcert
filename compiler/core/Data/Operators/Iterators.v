@@ -442,5 +442,5 @@ Section Iterators.
 
 End Iterators.
 
-Hint Rewrite @oflatten_map_dcoll_id : alg.
+Global Hint Rewrite @oflatten_map_dcoll_id : alg.
 

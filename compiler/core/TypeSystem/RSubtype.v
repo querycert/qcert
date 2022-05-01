@@ -96,7 +96,7 @@ Qed.
   (** This follows trivially from the consistency of join and subtype.
       However, this version should have better computational properties.*)
 
-  Hint Constructors subtype : qcert.
+  Local Hint Constructors subtype : qcert.
   
   Lemma subtype_both_dec x y :
     (prod ({subtype x y} + {~ subtype x y}) ({subtype y x} + {~ subtype y x})).

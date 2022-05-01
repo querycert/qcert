@@ -33,7 +33,7 @@ Require Import EnhancedEJson.
 Import ListNotations.
 Local Open Scope list_scope.
 
-Program Instance enhanced_foreign_to_ejson : foreign_to_ejson _ _ :=
+Global Program Instance enhanced_foreign_to_ejson : foreign_to_ejson _ _ :=
   mk_foreign_to_ejson enhanced_ejson enhanced_foreign_ejson_runtime_op enhanced_foreign_ejson enhanced_foreign_runtime _ _ _ _.
 Next Obligation.
   exact j. (* XXX enhanced_ejson is the same as enhanced_data *)
@@ -119,7 +119,7 @@ Proof.
   reflexivity.
 Qed.
 
-Program Instance enhanced_foreign_to_ejson_runtime : foreign_to_ejson_runtime :=
+Global Program Instance enhanced_foreign_to_ejson_runtime : foreign_to_ejson_runtime :=
   mk_foreign_to_ejson_runtime
     enhanced_ejson
     enhanced_foreign_ejson_runtime_op

@@ -70,7 +70,7 @@ Require Export EnhancedTypeToJSON.
 Require Export EnhancedRuntime.
 Require Export EnhancedTyping.
 
-Instance enhanced_basic_model {model:brand_model} :
+Global Instance enhanced_basic_model {model:brand_model} :
   basic_model
   := mk_basic_model
        enhanced_foreign_runtime

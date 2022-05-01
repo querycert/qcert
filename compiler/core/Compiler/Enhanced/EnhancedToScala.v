@@ -40,7 +40,7 @@ Definition enhanced_to_scala_spark_datatype (ft: foreign_type_type) : string :=
   (* AVI: This is obviously not correct. Where is the place I should put this? *)
   "FloatType".
 
-Instance enhanced_foreign_to_scala:
+Global Instance enhanced_foreign_to_scala:
   @foreign_to_scala enhanced_foreign_runtime _
   := mk_foreign_to_scala
        enhanced_foreign_runtime _

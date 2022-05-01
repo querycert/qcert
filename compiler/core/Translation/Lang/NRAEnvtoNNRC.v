@@ -265,9 +265,9 @@ Section NRAEnvtoNNRC.
     nnrc_core_eval h cenv env (nnrc_to_nnrc_base (nraenv_to_nnrc op vid venv))
     = nnrc_core_eval h cenv env (nraenv_core_to_nnrc_core (nraenv_to_nraenv_core op) vid venv).
   Proof.
-    Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq : qcert.
-    Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq : qcert.
-    Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq : qcert.
+    Local Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq : qcert.
+    Local Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq : qcert.
+    Local Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq : qcert.
     revert vid venv cenv env; induction op; intros
     ; simpl nraenv_to_nraenv_core
     ; simpl nraenv_core_to_nnrc_core

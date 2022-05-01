@@ -24,7 +24,7 @@ Require Export TCAMP.
 Section TCAMPSugar.
   Local Open Scope camp_scope.
 
-  Hint Constructors camp_type : qcert.
+  Local Hint Constructors camp_type : qcert.
 
   Context {m:basic_model}.
 

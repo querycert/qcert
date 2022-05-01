@@ -1673,7 +1673,7 @@ Section ListAdd.
       unfold asymmetric_over; simpl; intuition.
     Qed.
 
-    Hint Resolve asymmetric_over_cons_inv : qcert.
+    Local Hint Resolve asymmetric_over_cons_inv : qcert.
 
     Lemma asymmetric_over_swap {A} R {a b:A} {l1} :
       asymmetric_over R (a::b::l1) ->
@@ -1690,7 +1690,7 @@ Section ListAdd.
     
     Global Instance perm_in {A} : Proper (eq ==> (@Permutation A) ==> iff) (@In A).
     Proof.
-      Hint Resolve Permutation_in Permutation_sym : qcert.
+      Local Hint Resolve Permutation_in Permutation_sym : qcert.
       unfold Proper, respectful; intros; subst; intuition; eauto with qcert.
     Qed.
     
@@ -1709,7 +1709,7 @@ Section ListAdd.
     Global Instance NoDup_perm {A:Type} :
       Proper (@Permutation A ==> iff) (@NoDup A).
     Proof.
-      Hint Resolve NoDup_perm' Permutation_sym : qcert.
+      Local Hint Resolve NoDup_perm' Permutation_sym : qcert.
       unfold Proper, respectful; intros; subst; intuition; eauto with qcert.
     Qed.
 
@@ -1735,7 +1735,7 @@ Section ListAdd.
         inversion H; subst; auto.
     Qed.
     
-    Hint Resolve NoDup_app_inv : qcert.
+    Local Hint Resolve NoDup_app_inv : qcert.
 
     Lemma NoDup_app_inv2 {A:Type} {a b:list A} : NoDup (a++b) -> NoDup b.
     Proof.
@@ -1900,7 +1900,7 @@ Section ListAdd.
       red; inversion 2.
     Qed.
 
-    Hint Immediate disjoint_nil_l disjoint_nil_r : qcert.
+    Local Hint Immediate disjoint_nil_l disjoint_nil_r : qcert.
 
     Lemma disjoint_incl {A:Type} (l1 l2 l3:list A) :
       incl l3 l2 ->

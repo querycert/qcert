@@ -285,8 +285,8 @@ Section UnaryOperatorsSem.
     repeat constructor; trivial.
   Qed.
 
-  Hint Constructors data_normalized Forall : qcert.
-  Hint Resolve dnnone dnsome : qcert.
+  Local Hint Constructors data_normalized Forall : qcert.
+  Local Hint Resolve dnnone dnsome : qcert.
   
   Lemma unary_op_eval_normalized {u d o} :
     unary_op_eval u d = Some o ->

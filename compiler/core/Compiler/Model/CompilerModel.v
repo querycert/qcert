@@ -39,30 +39,30 @@ Require Import tDNNRC.
 Require Import NNRSimp.
 
 Module Type CompilerModel.
-  Declare Instance compiler_basic_model : basic_model.
-  Declare Instance compiler_model_foreign_runtime : foreign_runtime.
+  Global Declare Instance compiler_basic_model : basic_model.
+  Global Declare Instance compiler_model_foreign_runtime : foreign_runtime.
   Axiom compiler_model_foreign_ejson_model : Set.
-  Declare Instance compiler_model_foreign_ejson : foreign_ejson compiler_model_foreign_ejson_model.
+  Global Declare Instance compiler_model_foreign_ejson : foreign_ejson compiler_model_foreign_ejson_model.
   Axiom compiler_model_foreign_ejson_runtime_op : Set.
-  Declare Instance compiler_model_foreign_to_ejson : foreign_to_ejson compiler_model_foreign_ejson_model compiler_model_foreign_ejson_runtime_op.
-  Declare Instance compiler_model_foreign_to_wson : foreign_to_wson compiler_model_foreign_ejson_model.
-  Declare Instance compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
-  Declare Instance compiler_model_foreign_to_json : foreign_to_json.
-  Declare Instance compiler_model_foreign_to_java : foreign_to_java.
-  Declare Instance compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
-  Declare Instance compiler_model_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_model_foreign_ejson_runtime_op.
-  Declare Instance compiler_model_foreign_to_scala : foreign_to_scala.
-  Declare Instance compiler_model_foreign_type_to_JSON : foreign_type_to_JSON.
-  Declare Instance compiler_model_foreign_reduce_op : foreign_reduce_op.
-  Declare Instance compiler_model_foreign_to_reduce_op : foreign_to_reduce_op.
-  Declare Instance compiler_model_foreign_to_spark : foreign_to_spark.
-  Declare Instance compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
-  Declare Instance compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
-  Declare Instance compiler_model_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
-  Declare Instance compiler_model_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
-  Declare Instance compiler_model_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
-  Declare Instance compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
-  Declare Instance compiler_model_foreign_data_typing : foreign_data_typing.
+  Global Declare Instance compiler_model_foreign_to_ejson : foreign_to_ejson compiler_model_foreign_ejson_model compiler_model_foreign_ejson_runtime_op.
+  Global Declare Instance compiler_model_foreign_to_wson : foreign_to_wson compiler_model_foreign_ejson_model.
+  Global Declare Instance compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime.
+  Global Declare Instance compiler_model_foreign_to_json : foreign_to_json.
+  Global Declare Instance compiler_model_foreign_to_java : foreign_to_java.
+  Global Declare Instance compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript.
+  Global Declare Instance compiler_model_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_model_foreign_ejson_runtime_op.
+  Global Declare Instance compiler_model_foreign_to_scala : foreign_to_scala.
+  Global Declare Instance compiler_model_foreign_type_to_JSON : foreign_type_to_JSON.
+  Global Declare Instance compiler_model_foreign_reduce_op : foreign_reduce_op.
+  Global Declare Instance compiler_model_foreign_to_reduce_op : foreign_to_reduce_op.
+  Global Declare Instance compiler_model_foreign_to_spark : foreign_to_spark.
+  Global Declare Instance compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
+  Global Declare Instance compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
+  Global Declare Instance compiler_model_nnrs_imp_expr_optimizer_logger : optimizer_logger string nnrs_imp_expr.
+  Global Declare Instance compiler_model_nnrs_imp_stmt_optimizer_logger : optimizer_logger string nnrs_imp_stmt.
+  Global Declare Instance compiler_model_nnrs_imp_optimizer_logger : optimizer_logger string nnrs_imp.
+  Global Declare Instance compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_typed).
+  Global Declare Instance compiler_model_foreign_data_typing : foreign_data_typing.
 End CompilerModel.
 
 Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
@@ -118,9 +118,9 @@ End CompilerModelRuntime.
 
 (* Useful utility module functors that create a CompilerModel *)
 Module Type CompilerForeignType.
-  Declare Instance compiler_foreign_type : foreign_type.
+  Global Declare Instance compiler_foreign_type : foreign_type.
 End CompilerForeignType.
 Module Type CompilerBrandModel(ftype:CompilerForeignType).
-  Declare Instance compiler_brand_model : brand_model.
+  Global Declare Instance compiler_brand_model : brand_model.
 End CompilerBrandModel.
 

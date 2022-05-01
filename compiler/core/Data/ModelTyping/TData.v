@@ -846,7 +846,7 @@ Qed.
     apply dttop.
   Qed.
   
-  Hint Resolve dttop dttop' : qcert.
+  Local Hint Resolve dttop dttop' : qcert.
 
   Lemma Forall_map {A B} P (f:A->B) l :
     Forall P (map f l) <-> Forall (fun x => P (f x)) l.
@@ -860,7 +860,7 @@ Qed.
   Lemma data_type_normalized d τ :
     d ▹ τ -> data_normalized brand_relation_brands d.
   Proof.
-    Hint Constructors data_normalized : qcert.
+    Local Hint Constructors data_normalized : qcert.
     revert τ.
     induction d using dataInd2; intros; try assumption; simpl in *;
     auto 2 with qcert.
@@ -1085,10 +1085,10 @@ Global Instance data_type_subtype_prop
   Proof.
     unfold Proper, respectful, impl, flip.
     intros ? d ? τ₁ τ₂ sub ; subst.
-    Hint Resolve data_type_ext : qcert.
-    Hint Resolve data_type_not_bottom : qcert.
-    Hint Resolve dtrec_closed_is_open : qcert.
-    Hint Constructors data_normalized : qcert.
+    Local Hint Resolve data_type_ext : qcert.
+    Local Hint Resolve data_type_not_bottom : qcert.
+    Local Hint Resolve dtrec_closed_is_open : qcert.
+    Local Hint Constructors data_normalized : qcert.
     
     revert d τ₂ sub.
       induction τ₁ using rtype_rect;
@@ -1219,10 +1219,10 @@ Global Instance data_type_subtype_prop
           {m:brand_model} {d τ₁ τ₂}:
     d ▹ τ₁ -> d ▹ τ₂ -> d ▹ (τ₁ ⊓ τ₂).
   Proof.
-    Hint Resolve data_type_ext : qcert.
-    Hint Resolve data_type_not_bottom : qcert.
-    Hint Resolve dtrec_closed_is_open : qcert.
-    Hint Constructors data_normalized : qcert.
+    Local Hint Resolve data_type_ext : qcert.
+    Local Hint Resolve data_type_not_bottom : qcert.
+    Local Hint Resolve dtrec_closed_is_open : qcert.
+    Local Hint Constructors data_normalized : qcert.
     
     revert d τ₂.
       induction τ₁ using rtype_rect;
@@ -1510,7 +1510,7 @@ Global Instance data_type_subtype_prop
                 d ▹ τ
            ) b).
   Proof.
-    Hint Resolve data_type_normalized : qcert.
+    Local Hint Resolve data_type_normalized : qcert.
     rewrite brands_type_alt.
     induction b; simpl; [ intuition; qeauto | ].
     destruct IHb as [IHb1 IHb2].
@@ -1572,8 +1572,8 @@ Global Instance data_type_subtype_prop
   Proof.
     unfold Proper, respectful, flip, impl; intros; subst.
     revert x y H y1 H2.
-    Hint Resolve data_type_normalized.
-    Hint Constructors data_type.
+    Local Hint Resolve data_type_normalized.
+    Local Hint Constructors data_type.
     induction y0; simpl; inversion 2; subst; eauto 2.
     - constructor. revert H3. apply Forall_impl_in. intros.
       generalize (Forallt_In H _ H1 _ _ H0). eauto.

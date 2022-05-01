@@ -129,7 +129,7 @@ Section BinaryOperatorsSem.
     | OpForeignBinary fb => foreign_operators_binary_interp h fb d1 d2
     end.
 
-  Hint Constructors data_normalized Forall : qcert.
+  Local Hint Constructors data_normalized Forall : qcert.
 
   Lemma binary_op_eval_normalized {b d1 d2 o} :
     binary_op_eval b d1 d2 = Some o ->

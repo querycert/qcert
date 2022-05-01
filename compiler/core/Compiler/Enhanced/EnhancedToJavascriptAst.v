@@ -22,7 +22,7 @@ Require Import EnhancedEJson.
 Definition enhanced_ejson_to_ajavascript_expr (j:enhanced_ejson) : JsAst.JsSyntax.expr :=
   JsAst.JsSyntax.expr_literal (JsAst.JsSyntax.literal_null).
 
-Instance enhanced_foreign_ejson_to_ajavascript :
+Global Instance enhanced_foreign_ejson_to_ajavascript :
   @foreign_ejson_to_ajavascript enhanced_ejson enhanced_foreign_ejson
   := mk_foreign_ejson_to_ajavascript
        enhanced_ejson

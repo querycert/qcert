@@ -34,7 +34,7 @@ Section cNRAEnvEq.
 
   (* Equivalence for environment-enabled algebra *)
   
-  Hint Resolve dnrec_sort_content : qcert.
+  Local Hint Resolve dnrec_sort_content : qcert.
 
   Definition nraenv_core_eq (op1 op2:nraenv_core) : Prop :=
     forall
@@ -58,7 +58,7 @@ Section cNRAEnvEq.
       intros. rewrite (H h c dn_c env dn_env x0) by trivial; rewrite (H0 h c dn_c env dn_env x0) by trivial; reflexivity.
   Qed.
 
-  Hint Resolve dnrec_sort : qcert.
+  Local Hint Resolve dnrec_sort : qcert.
     
   (* all the extended nraebraic constructors are proper wrt. equivalence *)
 
@@ -130,7 +130,7 @@ Section cNRAEnvEq.
     qeauto.
   Qed.
 
-  Hint Resolve data_normalized_dcoll_in : qcert.
+  Local Hint Resolve data_normalized_dcoll_in : qcert.
 
   (* cNRAEnvMap *)
   Global Instance proper_cNRAEnvMap : Proper (nraenv_core_eq ==> nraenv_core_eq ==> nraenv_core_eq) cNRAEnvMap.

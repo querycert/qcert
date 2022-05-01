@@ -42,7 +42,7 @@ Section RSubtypeProp.
            | [H: ⊤ <: ?z |- _] => apply top_subtype in H; subst
            end.
 
-  Hint Constructors subtype : qcert.
+  Local Hint Constructors subtype : qcert.
   Instance subtype_trans : Transitive subtype.
   Proof.
     red.

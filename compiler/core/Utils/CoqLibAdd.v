@@ -319,7 +319,7 @@ Section CoqLibAdd.
     | Forallt_cons : forall (x : A) (l : list A),
         P x -> Forallt P l -> Forallt P (x :: l).
 
-    Hint Constructors Forallt : qcert.
+    Local Hint Constructors Forallt : qcert.
 
     Lemma list_Forallt_eq_dec {A:Type}:
       forall (c l: list A),

@@ -248,7 +248,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tand_comm_arrow.
   Qed.
-  Hint Rewrite @tand_comm_fun_correctness : optim_correct.
+  Local Hint Rewrite @tand_comm_fun_correctness : optim_correct.
 
   Definition tand_comm_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -275,7 +275,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tselect_and_comm_arrow.
   Qed.
-  Hint Rewrite @tselect_and_comm_fun_correctness : optim_correct.
+  Local Hint Rewrite @tselect_and_comm_fun_correctness : optim_correct.
 
   Definition tselect_and_comm_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -302,7 +302,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tselect_union_distr.
   Qed.
-  Hint Rewrite @select_union_distr_fun_correctness : optim_correct.
+  Local Hint Rewrite @select_union_distr_fun_correctness : optim_correct.
 
   Definition select_union_distr_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -329,7 +329,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tselect_and_arrow.
   Qed.
-  Hint Rewrite @tselect_and_fun_correctness : optim_correct.
+  Local Hint Rewrite @tselect_and_fun_correctness : optim_correct.
 
   Definition tselect_and_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -360,7 +360,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p. 
     apply tenvdot_from_duplicate_r_arrow.
   Qed.
-  Hint Rewrite @tdot_from_duplicate_r_fun_correctness : optim_correct.
+  Local Hint Rewrite @tdot_from_duplicate_r_fun_correctness : optim_correct.
 
   Definition tdot_from_duplicate_r_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -392,7 +392,7 @@ Section NRAEnvOptimizer.
     apply tenvdot_from_duplicate_l_arrow.
     assumption.
   Qed.
-  Hint Rewrite @tdot_from_duplicate_l_fun_correctness : optim_correct.
+  Local Hint Rewrite @tdot_from_duplicate_l_fun_correctness : optim_correct.
 
   Definition tdot_from_duplicate_l_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -417,7 +417,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tenvflatten_coll_arrow.
   Qed.
-  Hint Rewrite @tflatten_coll_fun_correctness : optim_correct.
+  Local Hint Rewrite @tflatten_coll_fun_correctness : optim_correct.
   
   Definition tflatten_coll_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -443,7 +443,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tconcat_empty_record_r_arrow.
   Qed.
-  Hint Rewrite @tconcat_empty_record_r_fun_correctness : optim_correct.
+  Local Hint Rewrite @tconcat_empty_record_r_fun_correctness : optim_correct.
 
   Definition tconcat_empty_record_r_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -469,7 +469,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tconcat_empty_record_l_arrow.
   Qed.
-  Hint Rewrite @tconcat_empty_record_l_fun_correctness : optim_correct.
+  Local Hint Rewrite @tconcat_empty_record_l_fun_correctness : optim_correct.
 
     Definition tconcat_empty_record_l_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -498,7 +498,7 @@ Section NRAEnvOptimizer.
     - apply tdot_over_concat_neq_r_arrow.
       congruence.
   Qed.
-  Hint Rewrite @tdot_over_concat_r_fun_correctness : optim_correct.
+  Local Hint Rewrite @tdot_over_concat_r_fun_correctness : optim_correct.
 
   Definition tdot_over_concat_r_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -526,7 +526,7 @@ Section NRAEnvOptimizer.
     apply tdot_over_concat_neq_l_arrow.
     congruence.
   Qed.
-  Hint Rewrite @tdot_over_concat_l_fun_correctness : optim_correct.
+  Local Hint Rewrite @tdot_over_concat_l_fun_correctness : optim_correct.
 
    Definition tdot_over_concat_l_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -552,7 +552,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tmerge_empty_record_r_arrow.
   Qed.
-  Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
+  Local Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
 
   Definition tmerge_empty_record_r_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -578,7 +578,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tmerge_empty_record_l_arrow.
   Qed.
-  Hint Rewrite @tmerge_empty_record_l_fun_correctness : optim_correct.
+  Local Hint Rewrite @tmerge_empty_record_l_fun_correctness : optim_correct.
 
   Definition tmerge_empty_record_l_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -603,7 +603,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tenvmap_into_id_arrow.
   Qed.
-  Hint Rewrite @tmap_into_id_fun_correctness : optim_correct.
+  Local Hint Rewrite @tmap_into_id_fun_correctness : optim_correct.
 
   Definition tmap_into_id_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -629,7 +629,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tenvflatten_map_coll_arrow.
   Qed.
-  Hint Rewrite @tflatten_map_coll_fun_correctness : optim_correct.
+  Local Hint Rewrite @tflatten_map_coll_fun_correctness : optim_correct.
 
   Definition tflatten_map_coll_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -658,7 +658,7 @@ Section NRAEnvOptimizer.
     apply tflatten_flatten_map_either_nil.
   Qed.
 
-  Hint Rewrite @tflatten_flatten_map_either_nil_fun_correctness : optim_correct.
+  Local Hint Rewrite @tflatten_flatten_map_either_nil_fun_correctness : optim_correct.
 
   Definition tflatten_flatten_map_either_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -683,7 +683,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tenvmap_map_compose_arrow.
   Qed.
-  Hint Rewrite @tmap_map_compose_fun_correctness : optim_correct.
+  Local Hint Rewrite @tmap_map_compose_fun_correctness : optim_correct.
 
   Definition tmap_map_compose_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -708,7 +708,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tenvmap_singleton_arrow.
   Qed.
-  Hint Rewrite @tmap_singleton_fun_correctness : optim_correct.
+  Local Hint Rewrite @tmap_singleton_fun_correctness : optim_correct.
 
   Definition tmap_singleton_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -733,7 +733,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tenvnth0_bag_arrow.
   Qed.
-  Hint Rewrite @nth0_bag_fun_correctness : optim_correct.
+  Local Hint Rewrite @nth0_bag_fun_correctness : optim_correct.
 
   Definition nth0_bag_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -758,7 +758,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_id_r_arrow.
   Qed.
-  Hint Rewrite @tapp_over_id_r_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_id_r_fun_correctness : optim_correct.
 
   Definition tapp_over_id_r_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -783,7 +783,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_env_arrow.
   Qed.
-  Hint Rewrite @tapp_over_env_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_env_fun_correctness : optim_correct.
 
   Definition tapp_over_env_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -808,7 +808,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_id_l_arrow.
   Qed.
-  Hint Rewrite @tapp_over_id_l_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_id_l_fun_correctness : optim_correct.
 
   Definition tapp_over_id_l_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -947,7 +947,7 @@ Section NRAEnvOptimizer.
     simpl.
     apply tapp_over_app_arrow.
   Qed.
-  Hint Rewrite @tapp_over_app_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_app_fun_correctness : optim_correct.
 
   Definition tapp_over_app_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -973,7 +973,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tappenv_over_appenv_arrow.
   Qed.
-  Hint Rewrite @tappenv_over_appenv_fun_correctness : optim_correct.
+  Local Hint Rewrite @tappenv_over_appenv_fun_correctness : optim_correct.
 
    Definition tappenv_over_appenv_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1018,7 +1018,7 @@ Section NRAEnvOptimizer.
       + reflexivity.
   Qed.
 
-  Hint Rewrite @tappenv_over_app_fun_correctness : optim_correct.
+  Local Hint Rewrite @tappenv_over_app_fun_correctness : optim_correct.
 
     Definition tappenv_over_app_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1079,7 +1079,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_unop_arrow.
   Qed.
-  Hint Rewrite @tapp_over_unop_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_unop_fun_correctness : optim_correct.
 
   Definition tapp_over_unop_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1178,7 +1178,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_map_arrow.
   Qed.
-  Hint Rewrite @tapp_over_map_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_map_fun_correctness : optim_correct.
 
   Definition tapp_over_map_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1205,7 +1205,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_mapconcat_arrow.
   Qed.
-  Hint Rewrite @tapp_over_mapconcat_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_mapconcat_fun_correctness : optim_correct.
 
   Definition tapp_over_mapconcat_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1232,7 +1232,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_product_arrow.
   Qed.
-  Hint Rewrite @tapp_over_product_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_product_fun_correctness : optim_correct.
 
   Definition tapp_over_product_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1329,7 +1329,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_select_arrow.
   Qed.
-  Hint Rewrite @tapp_over_select_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_select_fun_correctness : optim_correct.
 
   Definition tapp_over_select_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1355,7 +1355,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tapp_over_binop_arrow.
   Qed.
-  Hint Rewrite @tapp_over_binop_fun_correctness : optim_correct.
+  Local Hint Rewrite @tapp_over_binop_fun_correctness : optim_correct.
 
   Definition tapp_over_binop_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1383,7 +1383,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tproduct_singletons_arrow.
   Qed.
-  Hint Rewrite @tproduct_singletons_fun_correctness : optim_correct.
+  Local Hint Rewrite @tproduct_singletons_fun_correctness : optim_correct.
 
   Definition tproduct_singletons_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1408,7 +1408,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tproduct_empty_right_arrow.
   Qed.
-  Hint Rewrite @tproduct_empty_right_fun_correctness : optim_correct.
+  Local Hint Rewrite @tproduct_empty_right_fun_correctness : optim_correct.
 
   Definition tproduct_empty_right_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1433,7 +1433,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tproduct_empty_left_arrow.
   Qed.
-  Hint Rewrite @tproduct_empty_left_fun_correctness : optim_correct.
+  Local Hint Rewrite @tproduct_empty_left_fun_correctness : optim_correct.
 
   Definition tproduct_empty_left_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1461,7 +1461,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tdouble_flatten_map_coll_arrow.
   Qed.
-  Hint Rewrite @tdouble_flatten_map_coll_fun_correctness : optim_correct.
+  Local Hint Rewrite @tdouble_flatten_map_coll_fun_correctness : optim_correct.
 
     Definition tdouble_flatten_map_coll_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1488,7 +1488,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tflatten_over_double_map_arrow.
   Qed.
-  Hint Rewrite @tflatten_over_double_map_fun_correctness : optim_correct.
+  Local Hint Rewrite @tflatten_over_double_map_fun_correctness : optim_correct.
 
   Definition tflatten_over_double_map_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1526,7 +1526,7 @@ Section NRAEnvOptimizer.
     tprove_correctness p.
     apply tflatten_over_double_map_with_either_arrow.
   Qed.
-  Hint Rewrite @tflatten_over_double_map_with_either_fun_correctness : optim_correct.
+  Local Hint Rewrite @tflatten_over_double_map_with_either_fun_correctness : optim_correct.
 
   Definition tflatten_over_double_map_with_either_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1791,7 +1791,7 @@ Section NRAEnvOptimizer.
     reflexivity.
   Qed.
 
-  Hint Rewrite @tselect_over_either_nil_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tselect_over_either_nil_fun_correctness : toptim_correct.
 
   Definition tselect_over_either_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1820,7 +1820,7 @@ Section NRAEnvOptimizer.
     reflexivity.
   Qed.
 
-  Hint Rewrite @tselect_over_either_nil_app_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tselect_over_either_nil_app_fun_correctness : toptim_correct.
 
   Definition tselect_over_either_nil_app_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1849,7 +1849,7 @@ Section NRAEnvOptimizer.
     reflexivity.
   Qed.
 
-  Hint Rewrite @tmap_over_either_nil_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tmap_over_either_nil_fun_correctness : toptim_correct.
 
   Definition tmap_over_either_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1878,7 +1878,7 @@ Section NRAEnvOptimizer.
     reflexivity.
   Qed.
 
-  Hint Rewrite @tmap_over_either_nil_app_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tmap_over_either_nil_app_fun_correctness : toptim_correct.
 
   Definition tmap_over_either_nil_app_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1917,7 +1917,7 @@ destruct p1; simpl; try reflexivity.
     - apply nraenv_ignores_id_nraenv_core_eq; assumption.
   Qed.
 
-  Hint Rewrite @tappenv_over_either_nil_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tappenv_over_either_nil_fun_correctness : toptim_correct.
 
     Definition tappenv_over_either_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1943,7 +1943,7 @@ destruct p1; simpl; try reflexivity.
     apply tselect_over_flatten.
   Qed.
 
-  Hint Rewrite @tselect_over_flatten_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tselect_over_flatten_fun_correctness : toptim_correct.
 
   Definition tselect_over_flatten_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1969,7 +1969,7 @@ destruct p1; simpl; try reflexivity.
     apply tmap_over_flatten.
   Qed.
 
-  Hint Rewrite @tmap_over_flatten_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tmap_over_flatten_fun_correctness : toptim_correct.
 
   Definition tmap_over_flatten_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -1995,7 +1995,7 @@ destruct p1; simpl; try reflexivity.
     apply tmap_over_flatten_map.
   Qed.
 
-  Hint Rewrite @tmap_over_flatten_map_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tmap_over_flatten_map_fun_correctness : toptim_correct.
 
   Definition tmap_over_flatten_map_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2026,7 +2026,7 @@ destruct p1; simpl; try reflexivity.
     reflexivity.
   Qed.
                   
-  Hint Rewrite @tconcat_over_rec_eq_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tconcat_over_rec_eq_fun_correctness : toptim_correct.
 
   Definition tconcat_over_rec_eq_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2518,7 +2518,7 @@ destruct p1; simpl; try reflexivity.
     apply trproject_nil.
   Qed.
 
-  Hint Rewrite @trproject_nil_fun_correctness : toptim_correct.
+  Local Hint Rewrite @trproject_nil_fun_correctness : toptim_correct.
 
   Definition trproject_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2545,7 +2545,7 @@ destruct p1; simpl; try reflexivity.
     apply trproject_over_const.
   Qed.
 
-  Hint Rewrite @trproject_over_const_fun_correctness : toptim_correct.
+  Local Hint Rewrite @trproject_over_const_fun_correctness : toptim_correct.
 
   Definition trproject_over_const_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2575,7 +2575,7 @@ destruct p1; simpl; try reflexivity.
     - apply trproject_over_rec_nin; trivial. 
   Qed.
 
-  Hint Rewrite @trproject_over_rec_fun_correctness : toptim_correct.
+  Local Hint Rewrite @trproject_over_rec_fun_correctness : toptim_correct.
 
   Definition trproject_over_rec_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2608,7 +2608,7 @@ destruct p1; simpl; try reflexivity.
     - apply trproject_over_concat_rec_r_nin; trivial.
   Qed.
 
-  Hint Rewrite @trproject_over_concat_r_fun_correctness : toptim_correct.
+  Local Hint Rewrite @trproject_over_concat_r_fun_correctness : toptim_correct.
 
   Definition trproject_over_concat_r_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2640,7 +2640,7 @@ destruct p1; simpl; try reflexivity.
     apply trproject_over_concat_rec_l_nin; trivial.
   Qed.
 
-  Hint Rewrite @trproject_over_concat_l_fun_correctness : toptim_correct.
+  Local Hint Rewrite @trproject_over_concat_l_fun_correctness : toptim_correct.
 
   Definition trproject_over_concat_l_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2667,7 +2667,7 @@ destruct p1; simpl; try reflexivity.
     apply trproject_over_rproject.
   Qed.
 
-  Hint Rewrite @trproject_over_rproject_fun_correctness : toptim_correct.
+  Local Hint Rewrite @trproject_over_rproject_fun_correctness : toptim_correct.
 
   Definition trproject_over_rproject_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2694,7 +2694,7 @@ destruct p1; simpl; try reflexivity.
     apply trproject_over_either.
   Qed.
 
-  Hint Rewrite @trproject_over_either_fun_correctness : toptim_correct.
+  Local Hint Rewrite @trproject_over_either_fun_correctness : toptim_correct.
 
   Definition trproject_over_either_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2719,7 +2719,7 @@ destruct p1; simpl; try reflexivity.
     apply tcount_over_map.
   Qed.
 
-  Hint Rewrite @tcount_over_map_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tcount_over_map_fun_correctness : toptim_correct.
 
   Definition tcount_over_map_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2747,7 +2747,7 @@ destruct p1; simpl; try reflexivity.
     apply tcount_over_flat_map_map.
   Qed.
 
-  Hint Rewrite @tcount_over_flat_map_map_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tcount_over_flat_map_map_fun_correctness : toptim_correct.
 
   Definition tcount_over_flat_map_map_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2781,7 +2781,7 @@ destruct p1; simpl; try reflexivity.
     apply tcount_over_flat_map_either_nil_map.
   Qed.
 
-  Hint Rewrite @tcount_over_flat_map_either_nil_map_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tcount_over_flat_map_either_nil_map_fun_correctness : toptim_correct.
 
   Definition tcount_over_flat_map_either_nil_map_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2816,7 +2816,7 @@ destruct p1; simpl; try reflexivity.
     apply tcount_over_flat_map_either_nil_app_map.
   Qed.
 
-  Hint Rewrite @tcount_over_flat_map_either_nil_app_map_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tcount_over_flat_map_either_nil_app_map_fun_correctness : toptim_correct.
 
   Definition tcount_over_flat_map_either_nil_app_map_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2848,7 +2848,7 @@ destruct p1; simpl; try reflexivity.
     apply tcount_over_flat_map_either_nil_app_singleton.
   Qed.
 
-  Hint Rewrite @tcount_over_flat_map_either_nil_app_singleton_fun_correctness : toptim_correct.
+  Local Hint Rewrite @tcount_over_flat_map_either_nil_app_singleton_fun_correctness : toptim_correct.
 
   Definition tcount_over_flat_map_either_nil_app_singleton_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2876,7 +2876,7 @@ destruct p1; simpl; try reflexivity.
     tprove_correctness p.
     apply tmapconcat_over_singleton.
   Qed.
-  Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
+  Local Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
 
   Definition tmapconcat_over_singleton_step {fruntime:foreign_runtime}
     := mkOptimizerStep
@@ -2902,7 +2902,7 @@ destruct p1; simpl; try reflexivity.
     trivial.
   Qed.
 
-  Hint Rewrite @tdup_elim_fun_correctness : optim_correct.
+  Local Hint Rewrite @tdup_elim_fun_correctness : optim_correct.
 
   Definition tdup_elim_step {fruntime:foreign_runtime}
     := mkOptimizerStep

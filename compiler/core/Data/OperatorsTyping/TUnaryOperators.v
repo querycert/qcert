@@ -281,8 +281,8 @@ Section TUnaryOperators.
     (d1 ▹ τ₁) -> (unary_op_type u τ₁ τout) ->
     (exists x, unary_op_eval brand_relation_brands u d1 = Some x /\ x ▹ τout).
   Proof.
-    Hint Resolve dtsome dtnone : qcert.
-    Hint Constructors data_type : qcert.
+    Local Hint Resolve dtsome dtnone : qcert.
+    Local Hint Constructors data_type : qcert.
     intros.
     unary_op_type_cases (dependent induction H0) Case; simpl.
     - Case "type_OpIdentity"%string.

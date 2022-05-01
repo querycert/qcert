@@ -125,7 +125,7 @@ Module SortableDataOrder <: OrderedTypeFull with Definition t:=sdata.
     - rewrite StringOrder.compare_eq_iff in H; subst; reflexivity.
   Qed.
 
-  Instance lt_strorder : StrictOrder lt.
+  Global Instance lt_strorder : StrictOrder lt.
   Proof.
     split; repeat red; unfold lt, compare; intros.
     - destruct x.
@@ -289,7 +289,7 @@ Module LexicographicDataOrder <: OrderedTypeFull with Definition t:=list sdata.
     destruct (SortableDataOrder.compare a s); intuition; congruence.
   Qed.
 
-  Instance lt_strorder : StrictOrder lt.
+  Global Instance lt_strorder : StrictOrder lt.
   Proof.
     split; repeat red; unfold lt.
     - intros a H; rewrite compare_refl_eq in H. discriminate. 

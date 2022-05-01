@@ -193,8 +193,8 @@ Section cNRAEnvContext.
               | [H: data_normalized _ (dright _) |- _ ] => inversion H; clear H; try subst
               end.
 
-  Hint Resolve nraenv_core_eval_normalized : qcert.
-  Hint Resolve data_normalized_dcoll_in : qcert.
+  Local Hint Resolve nraenv_core_eval_normalized : qcert.
+  Local Hint Resolve data_normalized_dcoll_in : qcert.
 
   Instance aeu_Binop_proper h c env :
     Proper

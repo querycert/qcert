@@ -556,7 +556,7 @@ Section TBinaryOperators.
     (d1 ▹ τ₁) -> (d2 ▹ τ₂) -> (binary_op_type  b τ₁ τ₂ τout) ->
     (exists x, binary_op_eval brand_relation_brands b d1 d2 = Some x /\ x ▹ τout).
   Proof.
-    Hint Constructors data_type : qcert.
+    Local Hint Constructors data_type : qcert.
     intros.
     binary_op_type_cases (dependent induction H1) Case; simpl.
     - Case "type_OpEqual"%string.

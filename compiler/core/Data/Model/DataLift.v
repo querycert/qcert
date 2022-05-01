@@ -202,13 +202,13 @@ Section DataLift.
 
 End DataLift.
 
-Hint Rewrite @rondcoll2_dcoll : alg.
-Hint Rewrite @rondcoll_dcoll : alg.
-Hint Rewrite @ondcoll_dcoll : alg.
-Hint Rewrite @lift_oncoll_dcoll : alg.
-Hint Rewrite @olift_on_lift_dcoll : alg.
-Hint Rewrite @olift_lift_dcoll : alg.
-Hint Rewrite @lift_map_id : alg.
-Hint Rewrite @lift_map_map : alg.
-Hint Rewrite @lift_dcoll_cons : alg.
+Global Hint Rewrite @rondcoll2_dcoll : alg.
+Global Hint Rewrite @rondcoll_dcoll : alg.
+Global Hint Rewrite @ondcoll_dcoll : alg.
+Global Hint Rewrite @lift_oncoll_dcoll : alg.
+Global Hint Rewrite @olift_on_lift_dcoll : alg.
+Global Hint Rewrite @olift_lift_dcoll : alg.
+Global Hint Rewrite @lift_map_id : alg.
+Global Hint Rewrite @lift_map_map : alg.
+Global Hint Rewrite @lift_dcoll_cons : alg.
 

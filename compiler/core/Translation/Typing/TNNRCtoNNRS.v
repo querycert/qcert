@@ -76,8 +76,8 @@ Section TNNRCtoNNRS.
         nnrc_type Γc Γ e τ <-> [ Γc ; pd_tbindings_lift Γ  ⊢ ei ▷ τ ].
     Proof.
       unfold nnrc_type.
-      Hint Constructors nnrc_core_type : qcert.
-      Hint Constructors nnrs_expr_type : qcert.
+      Local Hint Constructors nnrc_core_type : qcert.
+      Local Hint Constructors nnrs_expr_type : qcert.
       
       revert ei.
       induction e; simpl; intros ei eqq Γc Γ τ; try discriminate.
@@ -158,9 +158,9 @@ Section TNNRCtoNNRS.
           [ Γc ; pd_tbindings_lift Γ , (add_term_mc term τ Δc) , (add_term_md term τ Δd) ⊢ si ].
     Proof.
       unfold nnrc_type.
-      Hint Resolve terminate_type : qcert.
-      Hint Constructors nnrc_core_type : qcert.
-      Hint Constructors nnrs_expr_type : qcert.
+      Local Hint Resolve terminate_type : qcert.
+      Local Hint Constructors nnrc_core_type : qcert.
+      Local Hint Constructors nnrs_expr_type : qcert.
       intros eqq Γc.
       revert fvs term si eqq.
       induction s; simpl; intros fvs term si eqq Γ τ typ Δc Δd
@@ -266,9 +266,9 @@ Section TNNRCtoNNRS.
         nnrc_type Γc Γ s τ.
     Proof.
       unfold nnrc_type.
-      Hint Resolve terminate_type : qcert.
-      Hint Constructors nnrc_core_type : qcert.
-      Hint Constructors nnrs_expr_type : qcert.
+      Local Hint Resolve terminate_type : qcert.
+      Local Hint Constructors nnrc_core_type : qcert.
+      Local Hint Constructors nnrs_expr_type : qcert.
       intros eqq Γc.
       revert fvs term si eqq.
       nnrc_cases (induction s) Case

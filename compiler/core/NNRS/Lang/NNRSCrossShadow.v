@@ -1760,7 +1760,7 @@ Section NNRSCrossShadow.
       nnrs_stmt_cross_shadow_free_under s σ ψc ψd ->
       nnrs_stmt_uncross_shadow_under sep s σ ψc ψd = s.
     Proof.
-      Hint Resolve nnrs_stmt_cross_shadow_free_under_alt
+      Local Hint Resolve nnrs_stmt_cross_shadow_free_under_alt
            nnrs_stmt_cross_shadow_free_under_free_mcenv_env
            nnrs_stmt_cross_shadow_free_under_bound_mcenv_env
            nnrs_stmt_cross_shadow_free_under_free_mdenv_env

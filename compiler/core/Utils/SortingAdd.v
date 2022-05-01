@@ -50,7 +50,7 @@ Section SortingAdd.
          | a::xs => insertion_sort_insert a (insertion_sort xs)
          end.
 
-    Hint Constructors LocallySorted : qcert.
+    Local Hint Constructors LocallySorted : qcert.
 
     Lemma insertion_sort_insert_Sorted a (l:list A) :
       Sorted R l -> Sorted R (insertion_sort_insert a l).
@@ -62,7 +62,7 @@ Section SortingAdd.
                end; eauto with qcert.
     Qed.
 
-    Hint Resolve insertion_sort_insert_Sorted : qcert.
+    Local Hint Resolve insertion_sort_insert_Sorted : qcert.
 
     Lemma insertion_sort_Sorted (l:list A) : Sorted R (insertion_sort l).
     Proof.
@@ -295,7 +295,7 @@ Section SortingAdd.
       intuition.
     Qed.
 
-    Hint Resolve asymmetric_over_cons_inv : qcert.
+    Local Hint Resolve asymmetric_over_cons_inv : qcert.
     
     Lemma insertion_sort_insert_in_strong {A R R_dec} {x l a} 
           (contr:asymmetric_over R (a::l)) :
@@ -333,7 +333,7 @@ Section SortingAdd.
       - intuition.
     Qed.
 
-    Hint Resolve asymmetric_asymmetric_over : qcert.
+    Local Hint Resolve asymmetric_asymmetric_over : qcert.
 
     Lemma insertion_sort_in {A R R_dec} {x l}
           (contr:forall x y,  ~R x y -> ~R y x -> x = y) :

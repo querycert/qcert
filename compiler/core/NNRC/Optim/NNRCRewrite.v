@@ -746,6 +746,6 @@ Section NNRCRewrite.
 
 End NNRCRewrite.
 
-Hint Rewrite @sigma_to_if : nnrc_rew.
-(* Hint Rewrite subst_var_preserves : nnrc_rew. *)
+Global Hint Rewrite @sigma_to_if : nnrc_rew.
+(* Global Hint Rewrite subst_var_preserves : nnrc_rew. *)
 

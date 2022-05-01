@@ -78,14 +78,14 @@ Inductive enhanced_subtype : enhanced_type -> enhanced_type -> Prop :=
 | enhanced_subtype_bottom t : enhanced_subtype enhancedBottom t
 | enhanced_subtype_refl t : enhanced_subtype t t.
 
-Instance enhanced_subtype_pre : PreOrder enhanced_subtype.
+Global Instance enhanced_subtype_pre : PreOrder enhanced_subtype.
 Proof.
   constructor; red; intros.
   - destruct x; constructor.
   - inversion H; inversion H0; subst; try constructor; congruence.
 Qed.
 
-Instance enhanced_subtype_post : PartialOrder eq enhanced_subtype.
+Global Instance enhanced_subtype_post : PartialOrder eq enhanced_subtype.
 Proof.
   intros x y; split.
   - intros; subst.
@@ -95,7 +95,7 @@ Proof.
     inversion H; inversion H0; congruence.
 Qed.
 
-#[refine] Instance enhanced_type_lattice : Lattice enhanced_type eq
+#[refine] Global Instance enhanced_type_lattice : Lattice enhanced_type eq
   := {
       join := enhanced_type_join
       ; meet := enhanced_type_meet
@@ -127,7 +127,7 @@ Proof.
       reflexivity.
 Defined.
 
-Instance enhanced_type_olattice : OLattice eq enhanced_subtype.
+Global Instance enhanced_type_olattice : OLattice eq enhanced_subtype.
 Proof.
   constructor.
   split.
@@ -136,7 +136,7 @@ Proof.
       constructor.
 Qed.
 
-Program Instance enhanced_foreign_type : foreign_type
+Global Program Instance enhanced_foreign_type : foreign_type
   := mk_foreign_type enhanced_type _ _ _ _ _ _ _.
 Next Obligation.
   red.

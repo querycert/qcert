@@ -352,7 +352,7 @@ Section cNNRCtoCAMP.
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
     isRecoverableError (camp_eval h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env)) dunit) = false.
   Proof.
-    Hint Resolve op2tpr_not_recoverable : qcert.
+    Local Hint Resolve op2tpr_not_recoverable : qcert.
     intros Hiscore.
     revert Hiscore env. induction n; intros; qtrivial.
     - simpl in *.
@@ -838,7 +838,7 @@ Section cNNRCtoCAMP.
       intuition; apply H in H1; eauto.
     Qed.
 
-    Hint Resolve in_app_or in_or_app : qcert.
+    Local Hint Resolve in_app_or in_or_app : qcert.
 
     Lemma fresh_bindings_pbinop l b p₁ p₂:
       fresh_bindings l (pbinop b p₁ p₂) <->
@@ -960,7 +960,7 @@ Section cNNRCtoCAMP.
       unfold fresh_bindings; simpl; intuition.
     Qed.
 
-    Hint Rewrite 
+    Local Hint Rewrite 
          fresh_bindings_pbinop 
          fresh_bindings_punop 
          fresh_bindings_pletIt 
@@ -1050,7 +1050,7 @@ Section cNNRCtoCAMP.
       (camp_eval h cenv (nnrcToCamp_ns n)
                  (rec_sort b) d).
     Proof.
-      Hint Resolve loop_let_var_distinct : qcert.
+      Local Hint Resolve loop_let_var_distinct : qcert.
       revert b x xv d.
       induction n; intros; trivial; simpl in H0;
         autorewrite with fresh_bindings in H0.
@@ -1586,7 +1586,7 @@ Section cNNRCtoCAMP.
       (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
       camp_eval h cenv (nnrcToCamp_ns_let n) b d = camp_eval h cenv (nnrcToCamp_ns n) b d.
     Proof.
-      Hint Resolve drec_sort_sorted fresh_bindings_let_to_naive : qcert.
+      Local Hint Resolve drec_sort_sorted fresh_bindings_let_to_naive : qcert.
 
       revert b d. 
       induction n; intros; trivial; simpl in H0;
@@ -1911,7 +1911,7 @@ Section cNNRCtoCAMP.
       = pr2op (camp_eval h cenv (nnrcToCamp_let (domain env) n)
                          (rec_sort (nnrc_to_camp_env env)) d).
     Proof.
-      Hint Resolve unshadow_avoid : qcert.
+      Local Hint Resolve unshadow_avoid : qcert.
       intro Hiscore.
       intros.
       apply nnrcToCamp_let_correct_messy; unfold unshadow_simpl; qauto.

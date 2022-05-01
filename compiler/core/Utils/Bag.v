@@ -94,7 +94,7 @@ Section Bag.
       | y::tl => if (x == y) then tl else y::(remove_one x tl)
     end.
 
-  Hint Unfold ldeqA : qcert.
+  Local Hint Unfold ldeqA : qcert.
 
   Ltac tac
     := repeat progress (intros; simpl in *; try autorewrite with bag in *; try match goal with
@@ -210,7 +210,7 @@ Section Bag.
     reflexivity.
   Qed.  
 
-  Hint Rewrite bminus_nil_to_self bminus_to_nil bminus_self bminus_naught : bag.
+  Local Hint Rewrite bminus_nil_to_self bminus_to_nil bminus_self bminus_naught : bag.
   
   Lemma bminus_cons :
     forall (a:A) (x y:list A), ((a :: x) ⊖ (a :: y)) = (x ⊖ y).
@@ -218,8 +218,8 @@ Section Bag.
     tac.
   Qed.
 
-  Hint Rewrite bminus_cons : bag.
-  Hint Rewrite app_nil_r : bag.
+  Local Hint Rewrite bminus_cons : bag.
+  Local Hint Rewrite app_nil_r : bag.
 
   Lemma bunion_bminus :
     forall (x y: list A), ((y ⊎ x) ⊖ y) = x.
@@ -290,7 +290,7 @@ Section Bag.
     trivial.
   Qed.
                                        
-  Hint Rewrite bunion_bminus remove_one_consed : bag.
+  Local Hint Rewrite bunion_bminus remove_one_consed : bag.
   
   (* not used, unfollowed thought from now... *)
   Lemma pick_an_a:
@@ -327,7 +327,7 @@ Section Bag.
     
     Notation "X ≅# Y" := (mult_equiv X Y) (at level 70) : rbag_scope.                              (* ≅ = \cong *)
 
-    Hint Unfold mult_equiv : qcert.
+    Local Hint Unfold mult_equiv : qcert.
 
     Global Instance mult_proper : Proper (ldeqA ==> eq ==> eq) mult.
     Proof.
@@ -368,7 +368,7 @@ Section Bag.
 
     Lemma groupby_noDup l : NoDup (domain (groupby l)).
     Proof.
-      Hint Constructors NoDup : qcert.
+      Local Hint Constructors NoDup : qcert.
       induction l; simpl; trivial with qcert.
       case_eq (lookup equiv_dec (groupby l) a); [intros ? ?| intros neq].
       - rewrite domain_update_first; trivial.
@@ -402,7 +402,7 @@ Section Bag.
       trivial.
     Qed.
     
-    Hint Resolve groupby_noDup : qcert.
+    Local Hint Resolve groupby_noDup : qcert.
 
     Lemma smush_groupby l : Permutation (smush (groupby l)) l.
     Proof.
@@ -1564,7 +1564,7 @@ Section NumMinMax.
 End NumMinMax.
 
 (* Post section rewrites and notations *)
-Hint Rewrite 
+Global Hint Rewrite 
      bminus_nil_to_self 
      bminus_to_nil
      bminus_self 

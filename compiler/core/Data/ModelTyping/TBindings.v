@@ -76,7 +76,7 @@ Section TBindings.
     apply bindings_type_app; trivial.
   Qed.
   
-  Hint Resolve data_type_normalized : qcert.
+  Local Hint Resolve data_type_normalized : qcert.
   Lemma bindings_type_Forall_normalized c τc :
     bindings_type c τc ->
     Forall

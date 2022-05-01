@@ -39,7 +39,7 @@ Definition enhanced_infer_type (d:enhanced_data) : option enhanced_type
      | enhancedsqldateperiod _ => Some enhancedSqlDatePeriod
      end.
 
-Program Instance enhanced_foreign_data_typing :
+Global Program Instance enhanced_foreign_data_typing :
   @foreign_data_typing enhanced_foreign_data enhanced_foreign_type
   := mk_foreign_data_typing
        enhanced_foreign_data

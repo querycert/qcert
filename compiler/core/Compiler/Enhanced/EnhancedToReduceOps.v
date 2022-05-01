@@ -75,7 +75,7 @@ Definition enhanced_of_reduce_op (rop:NNRCMR.reduce_op) : option unary_op :=
     None (* XXX TODO? XXX *)
   end.
 
-Program Instance enhanced_foreign_to_reduce_op : foreign_to_reduce_op :=
+Global Program Instance enhanced_foreign_to_reduce_op : foreign_to_reduce_op :=
   mk_foreign_to_reduce_op enhanced_foreign_runtime enhanced_foreign_reduce_op enhanced_to_reduce_op _ enhanced_of_reduce_op _.
 Next Obligation.
   unfold NNRCMR.reduce_op_eval.

@@ -177,7 +177,7 @@ Definition to_spark_nnrcmr (l: nnrcmr) :=
 Definition to_spark_nnrcmr_prepared (src:nnrcmr)
   := arithmean_free_nnrcmr src.
 
-Program Instance enhanced_foreign_to_spark : foreign_to_spark
+Global Program Instance enhanced_foreign_to_spark : foreign_to_spark
   := mk_foreign_to_spark
        enhanced_foreign_runtime
        enhanced_foreign_reduce_op

@@ -43,7 +43,7 @@ Section TcNNRCtoCAMP.
     [τc&Γ] |= p ; τ₁ ~> τ₂ ->
     [τc&Γ] |= pdot (loop_var s) p ; (Rec k (nnrc_to_camp_env Γ₁) pf) ~> τ₂.
   Proof.
-    Hint Constructors camp_type : qcert.
+    Local Hint Constructors camp_type : qcert.
     unfold pdot; intros.
     eapply PTletIt; eauto.
     eapply PTunop; qeauto.
@@ -51,11 +51,11 @@ Section TcNNRCtoCAMP.
     rewrite <- env_lookup_edot; eauto.
   Qed.
 
-  Hint Resolve merge_bindings_nil_r : qcert.
-  Hint Resolve PTdot : qcert.
+  Local Hint Resolve merge_bindings_nil_r : qcert.
+  Local Hint Resolve PTdot : qcert.
 
-  Hint Resolve sorted_rec_nil : qcert.
-  Hint Constructors camp_type : qcert.
+  Local Hint Resolve sorted_rec_nil : qcert.
+  Local Hint Constructors camp_type : qcert.
 
   Lemma wf_env_same_domain {env tenv} v :
     bindings_type env tenv -> (In v (domain env) <-> In v (domain tenv)).
@@ -93,7 +93,7 @@ Section TcNNRCtoCAMP.
     NoDup (@domain _ B Γ) <-> 
     NoDup (domain (nnrc_to_camp_env Γ)).
   Proof.
-    Hint Constructors NoDup : qcert.
+    Local Hint Constructors NoDup : qcert.
     unfold nnrc_to_camp_env, domain.
     rewrite map_map; simpl.
     induction Γ; simpl; intuition.
@@ -110,7 +110,7 @@ Section TcNNRCtoCAMP.
        eauto.
   Qed.
 
-  Hint Constructors unary_op_type binary_op_type data_type : qcert.
+  Local Hint Constructors unary_op_type binary_op_type data_type : qcert.
 
   Lemma is_list_sorted_nnrc_to_camp_env_nodup {B} {tenv} :
     is_list_sorted ODT_lt_dec (@domain _ B (nnrc_to_camp_env tenv)) = true ->
@@ -122,7 +122,7 @@ Section TcNNRCtoCAMP.
     eapply StringOrder.lt_strorder.
   Qed.
 
-  Hint Resolve is_list_sorted_nnrc_to_camp_env_nodup : qcert.
+  Local Hint Resolve is_list_sorted_nnrc_to_camp_env_nodup : qcert.
 
   (* TODO: move to Assoc *)
   Lemma lookup_incl_perm_nodup {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
@@ -559,7 +559,7 @@ Section TcNNRCtoCAMP.
     - apply nnrc_core_unshadow_type; trivial.
   Qed.
 
-  Hint Rewrite 
+  Local Hint Rewrite 
      fresh_bindings_pbinop 
      fresh_bindings_punop 
      fresh_bindings_pletIt
@@ -578,10 +578,10 @@ Section TcNNRCtoCAMP.
      @domain_app 
   : fresh_bindings.
 
-  Hint Resolve StringOrder.lt_strorder : qcert.
-  Hint Resolve is_list_sorted_NoDup : qcert.
+  Local Hint Resolve StringOrder.lt_strorder : qcert.
+  Local Hint Resolve is_list_sorted_NoDup : qcert.
 
-  Hint Rewrite 
+  Local Hint Rewrite 
        @rec_concat_sort_concats 
        @in_dom_rec_sort
        @domain_app
@@ -595,7 +595,7 @@ Section TcNNRCtoCAMP.
     eapply loop_let_var_distinct; eauto.
   Qed.
 
-  Hint Rewrite fresh_bindings_cons_loop_var : fresh_bindings.
+  Local Hint Rewrite fresh_bindings_cons_loop_var : fresh_bindings.
 
   Lemma nnrcToCamp_ns_type_ignored_let_binding τc b x xv τ₁ τ₂ n :
     nnrcIsCore n ->
@@ -609,8 +609,8 @@ Section TcNNRCtoCAMP.
     ([τc&b] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂) ->
     [τc&(rec_concat_sort b ((let_var x, xv)::nil))] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂.
   Proof.
-    Hint Resolve loop_let_var_distinct : qcert.
-    Hint Resolve rec_concat_sort_sorted : qcert.
+    Local Hint Resolve loop_let_var_distinct : qcert.
+    Local Hint Resolve rec_concat_sort_sorted : qcert.
     intro Hiscore.
     revert Hiscore b x xv τ₁ τ₂.
     induction n; intros; trivial; simpl in H1;
@@ -1476,7 +1476,7 @@ Section TcNNRCtoCAMP.
     t. subst. eauto.
   Qed.
 
-  Hint Resolve merge_bindings_sorted : qcert.
+  Local Hint Resolve merge_bindings_sorted : qcert.
 
   Lemma nnrcToCamp_ns_type_weaken_let_binding τc b x xv τ₁ τ₂ n :
     nnrcIsCore n ->
@@ -1491,9 +1491,9 @@ Section TcNNRCtoCAMP.
                          ((let_var x, xv)::nil))] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂ ->
                                                                         [τc&b] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂.
   Proof.
-    Hint Resolve loop_let_var_distinct : qcert.
-    Hint Resolve rec_concat_sort_sorted : qcert.
-    Hint Resolve drec_concat_sort_sorted : qcert.
+    Local Hint Resolve loop_let_var_distinct : qcert.
+    Local Hint Resolve rec_concat_sort_sorted : qcert.
+    Local Hint Resolve drec_concat_sort_sorted : qcert.
 
     intro Hiscore.
     revert Hiscore b x xv τ₁ τ₂.
@@ -2070,8 +2070,8 @@ Section TcNNRCtoCAMP.
     (nnrc_core_type τc Γ n τout <->
     [τc&(nnrc_to_camp_env Γ)]  |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout).
    Proof.
-     Hint Resolve nnrc_to_camp_let_type_preserve : qcert.
-     Hint Resolve nnrc_to_camp_let_type_preserve_back : qcert.
+     Local Hint Resolve nnrc_to_camp_let_type_preserve : qcert.
+     Local Hint Resolve nnrc_to_camp_let_type_preserve_back : qcert.
      intuition; qeauto.
    Qed.
 

@@ -163,7 +163,7 @@ Section cNRAEnvtocNNRC.
     nnrc_core_eval h cenv env (nraenv_core_to_nnrc_core op vid venv) = h ⊢ₑ op @ₑ did ⊣ cenv;denv.
   Proof.
     Opaque fresh_var.
-    Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct : qcert.
+    Local Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct : qcert.
     revert did denv env vid venv.
     nraenv_core_cases (induction op) Case; intros; simpl.
     - Case "cNRAEnvGetConstant"%string.
@@ -561,7 +561,7 @@ Section cNRAEnvtocNNRC.
         auto.
     Qed.
 
-    Hint Resolve nraenv_core_to_nnrc_core_is_core : qcert.
+    Local Hint Resolve nraenv_core_to_nnrc_core_is_core : qcert.
 
     Lemma nraenv_core_to_nnrc_base_top_is_core (q:nraenv_core) :
       nnrcIsCore (nraenv_core_to_nnrc_base_top q).
@@ -570,7 +570,7 @@ Section cNRAEnvtocNNRC.
       qauto.
     Qed.
 
-    Hint Resolve nraenv_core_to_nnrc_base_top_is_core : qcert.
+    Local Hint Resolve nraenv_core_to_nnrc_base_top_is_core : qcert.
 
     Program Definition nraenv_core_to_nnrc_core_top (q:nraenv_core) : nnrc_core :=
       exist _ (nraenv_core_to_nnrc_base_top q) _.

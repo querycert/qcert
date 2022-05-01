@@ -25,7 +25,7 @@ Parameter enhanced_foreign_to_wasm_op : enhanced_foreign_ejson_runtime_op -> for
 
 Extract Constant enhanced_foreign_to_wasm_op => "Wasm_enhanced.foreign_ejson_to_wasm_op".
 
-Program Instance enhanced_foreign_to_wasm_ast : @foreign_to_wasm_ast enhanced_foreign_ejson_runtime_op :=
+Global Program Instance enhanced_foreign_to_wasm_ast : @foreign_to_wasm_ast enhanced_foreign_ejson_runtime_op :=
   mk_foreign_to_wasm_ast enhanced_foreign_ejson_runtime_op _.
 Next Obligation.
   apply enhanced_foreign_to_wasm_op.

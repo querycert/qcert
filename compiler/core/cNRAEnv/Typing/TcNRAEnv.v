@@ -571,8 +571,8 @@ Section TcNRAEnv.
 
   (* Evaluation into single value for typed core NRAe *)
 
-  Hint Constructors nra_type unary_op_type binary_op_type : qcert.
-  Hint Resolve ATdot ATnra_data : qcert.
+  Local Hint Constructors nra_type unary_op_type binary_op_type : qcert.
+  Local Hint Resolve ATdot ATnra_data : qcert.
   (** Corrolaries of the main type soudness theorem *)
 
   Definition typed_nraenv_core_total {τc} {τenv τin τout} (op:nraenv_core) (HOpT: op ▷ τin >=> τout ⊣ τc;τenv) c (env:data) (d:data)
@@ -808,7 +808,7 @@ Section TcNRAEnv.
     nra_type τc (nra_of_nraenv_core op) (Rec k [("PBIND"%string, τenv); ("PDATA"%string, τin)] pf) τout ->
     nraenv_core_type τc op τenv τin τout.
   Proof.
-    Hint Constructors nraenv_core_type : qcert.
+    Local Hint Constructors nraenv_core_type : qcert.
     revert k τenv τin τout pf.
     induction op; simpl; intros.
     - inversion H; clear H; subst.

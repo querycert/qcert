@@ -37,7 +37,7 @@ Section TCAMP.
   (** Typing for CAMP *)
 
   Context {m:basic_model}.
-  Hint Resolve bindings_type_has_type : qcert.
+  Local Hint Resolve bindings_type_has_type : qcert.
 
   Reserved Notation "Γ  |= p ; a ~> b" (at level 90).
 
@@ -105,7 +105,7 @@ Section TCAMP.
     apply Forall2_nil.
   Qed.
 
-  Hint Resolve data_type_drec_nil : qcert.
+  Local Hint Resolve data_type_drec_nil : qcert.
 
   Lemma concat_bindings_type {env₁ env₂ Γ₁ Γ₂} :
     bindings_type env₁ Γ₁ ->
@@ -274,7 +274,7 @@ Section TCAMP.
       + subst; eauto.
   Qed.
 
-  Hint Constructors camp_type : qcert.
+  Local Hint Constructors camp_type : qcert.
 
   (** Additional lemma used in the correctness for typed translation from NNRC to CAMP *)
   Lemma camp_type_tenv_rec {τc Γ p τ₁ τ₂} :

@@ -56,7 +56,7 @@ Section TcNNRCEq.
     apply bindings_type_Forall_normalized.
   Qed.
 
-  Hint Resolve data_normalized_bindings_type_map : qcert.
+  Local Hint Resolve data_normalized_bindings_type_map : qcert.
   
   Lemma nnrc_base_rewrites_typed_with_untyped (e1 e2:nnrc) :
     e1 ≡ᶜᶜ e2 ->
@@ -76,9 +76,9 @@ Section TcNNRCEq.
    * Proper stuff *
    ****************)
 
-  Hint Constructors nnrc_core_type : qcert.
-  Hint Constructors unary_op_type : qcert.
-  Hint Constructors binary_op_type : qcert.
+  Local Hint Constructors nnrc_core_type : qcert.
+  Local Hint Constructors unary_op_type : qcert.
+  Local Hint Constructors binary_op_type : qcert.
 
   Global Instance  tnncr_core_rewrites_to_pre : PreOrder tnncr_core_rewrites_to.
   Proof.
