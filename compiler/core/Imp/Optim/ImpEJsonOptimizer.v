@@ -17,8 +17,8 @@ Require Import EJsonRuntime.
 Require Import Imp.
 Require Import ImpEJson.
 Require Import ImpEJsonEval.
+Require Import ImpEJsonOptimizerEngine.
 Require Import ImpEJsonRewrite.
-Require Import ImpEJsonBlockRewrite.
 
 (* XXX This is a temporary place-holder, includes only for loop rewrites *)
 Section ImpEJsonOptimizer.
@@ -27,9 +27,18 @@ Section ImpEJsonOptimizer.
   Context {foreign_ejson_runtime_op : Set}.
   Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
+  (** XXX Empty optimizations for now *)
+  Definition nooptims (q:@imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op) := q.
+  Lemma nooptims_correct h s j:
+    imp_ejson_stmt_eval h s j = imp_ejson_stmt_eval h (nooptims s) j.
+  Proof.
+    reflexivity.
+  Qed.
+
   Definition imp_ejson_optim_top (q:@imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : imp_ejson :=
     imp_ejson_block_rewrite
-      (imp_ejson_rewrite q).
+      nooptims
+      q.
 
   Section Correctness.
     Lemma imp_ejson_optim_top_correct h (σ : list (string * ejson)) (q:imp_ejson) :
@@ -38,9 +47,9 @@ Section ImpEJsonOptimizer.
     Proof.
       unfold imp_ejson_eval_top_on_ejson.
       unfold imp_ejson_optim_top.
-      rewrite imp_ejson_rewrite_correct.
-      rewrite imp_ejson_block_rewrite_correct.
+      rewrite (imp_ejson_block_rewrite_correct nooptims).
       reflexivity.
+      apply nooptims_correct.
     Qed.
       
   End Correctness.

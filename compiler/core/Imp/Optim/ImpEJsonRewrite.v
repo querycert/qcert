@@ -45,14 +45,8 @@ Section ImpEJsonRewrite.
   Section ForRewrite.
 
     (* Rewriting functional for into imperative for loop is now isolated *)
-    Fixpoint imp_ejson_stmt_for_rewrite (stmt: @imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op): imp_ejson_stmt :=
+    Definition imp_ejson_stmt_for_rewrite (stmt: @imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op): imp_ejson_stmt :=
       match stmt with
-      | ImpStmtBlock lv ls =>
-        ImpStmtBlock
-          lv
-          (map imp_ejson_stmt_for_rewrite ls)
-      | ImpStmtAssign v e =>
-        ImpStmtAssign v e
       | ImpStmtFor v e s =>
         (**
               for(v in e) do s done
@@ -80,25 +74,8 @@ Section ImpEJsonRewrite.
                                   [ ImpExprRuntimeCall EJsonRuntimeArrayLength [ src ] ; ImpExprConst (cejbigint 1) ])
               (ImpStmtBlock
                  [ (v, Some (ImpExprRuntimeCall EJsonRuntimeArrayAccess [ src; i ])) ]
-                 [ imp_ejson_stmt_for_rewrite s ]) ]
-      | ImpStmtForRange v e1 e2 s =>
-        ImpStmtForRange v e1 e2
-                        (imp_ejson_stmt_for_rewrite s)
-      | ImpStmtIf e s1 s2 =>
-        ImpStmtIf e
-                  (imp_ejson_stmt_for_rewrite s1)
-                  (imp_ejson_stmt_for_rewrite s2)
-      end.
-
-    Definition imp_ejson_function_rewrite (f:imp_function) : imp_function :=
-      match f with
-      | ImpFun v1 s v2 =>
-        ImpFun v1 (imp_ejson_stmt_for_rewrite s) v2
-      end.
-    Definition imp_ejson_rewrite (q:imp_ejson) : imp_ejson :=
-      match q with
-      | ImpLib l =>
-        ImpLib (map (fun xy => (fst xy, imp_ejson_function_rewrite (snd xy))) l)
+                 [ s ]) ]
+      | _ => stmt
       end.
   End ForRewrite.
 
@@ -415,22 +392,7 @@ Section ImpEJsonRewrite.
         imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite stmt) σ.
     Proof.
       revert σ.
-      imp_stmt_cases (induction stmt) Case; intros.
-      - Case "ImpStmtBlock"%string.
-        simpl; f_equal.
-        destruct (@ImpEval.imp_decls_eval (@imp_ejson_model foreign_ejson_model)
-             (@imp_ejson_constant foreign_ejson_model) imp_ejson_op
-             (@imp_ejson_runtime_op foreign_ejson_runtime_op) (@imp_ejson_model_normalize foreign_ejson_model)
-             (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op fejruntime h)
-             (@imp_ejson_op_eval foreign_ejson_model) σ el); try reflexivity; simpl.
-        revert p; induction sl; intros; simpl; trivial; simpl.
-        inversion H; clear H; subst.
-        specialize (IHsl H3); clear H3.
-        rewrite <- H2.
-        destruct (imp_ejson_stmt_eval h a p); simpl; [apply IHsl|].
-        clear IHsl; induction sl; auto.
-      - Case "ImpStmtAssign"%string.
-        reflexivity.
+      imp_stmt_cases (induction stmt) Case; try reflexivity; intros.
       - Case "ImpStmtFor"%string.
         simpl in *.
         unfold ImpEval.imp_decls_eval.
@@ -497,147 +459,9 @@ Set Printing Depth 100.
                           remove string_eqdec v (imp_ejson_stmt_free_vars stmt))));
           [ intro Eq; clear Eq | congruence].
         simpl.
-        rewrite <- (IHstmt ((@cons (prod string (option (@imp_ejson_model foreign_ejson_model)))
-               (@pair string (option (@imp_ejson_model foreign_ejson_model)) v (@Some (@imp_ejson_model foreign_ejson_model) a))
-               (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
-                  (@pair var (option (@imp_ejson_model foreign_ejson_model))
-                     (fresh_var
-                        (String (Ascii.Ascii true false false true false true true false) EmptyString)
-                        (@cons var v
-                           (@app var
-                              (@ImpVars.imp_expr_free_vars (@imp_ejson_constant foreign_ejson_model) imp_ejson_op
-                                 (@imp_ejson_runtime_op foreign_ejson_runtime_op) e)
-                              (@remove string string_eqdec v
-                                 (@imp_ejson_stmt_free_vars foreign_ejson_model foreign_ejson_runtime_op stmt)))))
-                     (@Some (@imp_ejson_model foreign_ejson_model) (@imp_ejson_Z_to_data foreign_ejson_model BinNums.Z0)))
-                  (@cons (prod string (option (@imp_ejson_model foreign_ejson_model)))
-                     (@pair string (option (@imp_ejson_model foreign_ejson_model))
-                        (fresh_var
-                           (String (Ascii.Ascii true true false false true true true false)
-                              (String (Ascii.Ascii false true false false true true true false)
-                                 (String (Ascii.Ascii true true false false false true true false)
-                                    EmptyString)))
-                           (@cons string
-                              (fresh_var
-                                 (String (Ascii.Ascii true false false true false true true false)
-                                    EmptyString)
-                                 (@cons var v
-                                    (@app var
-                                       (@ImpVars.imp_expr_free_vars (@imp_ejson_constant foreign_ejson_model) imp_ejson_op
-                                          (@imp_ejson_runtime_op foreign_ejson_runtime_op) e)
-                                       (@remove string string_eqdec v
-                                          (@imp_ejson_stmt_free_vars foreign_ejson_model foreign_ejson_runtime_op stmt)))))
-                              (@cons var v
-                                 (@app var
-                                    (@ImpVars.imp_expr_free_vars (@imp_ejson_constant foreign_ejson_model) imp_ejson_op
-                                       (@imp_ejson_runtime_op foreign_ejson_runtime_op) e)
-                                    (@remove string string_eqdec v
-                                       (@imp_ejson_stmt_free_vars foreign_ejson_model foreign_ejson_runtime_op stmt))))))
-                        (@Some (@imp_ejson_model foreign_ejson_model) (@ejarray foreign_ejson_model (@cons (@ejson foreign_ejson_model) a l))))
-                     σ))))).
-        rewrite (imp_ejson_stmt_eval_env_simpl _ _
-                   ((v, Some a)
-                    :: (fresh_var "i"
-                          (v
-                           :: ImpVars.imp_expr_free_vars e ++ remove string_eqdec v (imp_ejson_stmt_free_vars stmt)),
-                       Some (imp_ejson_Z_to_data 0)) :: [])
-                   (fresh_var "src"
-                     (fresh_var "i"
-                        (v
-                         :: ImpVars.imp_expr_free_vars e ++
-                            remove string_eqdec v (imp_ejson_stmt_free_vars stmt))
-                      :: v
-                         :: ImpVars.imp_expr_free_vars e ++
-                            remove string_eqdec v (imp_ejson_stmt_free_vars stmt)))
-                   (Some (ejarray (a :: l)))
-                   σ);
-          [ | admit ].
-        rewrite (imp_ejson_stmt_eval_env_simpl _ _
-                   ((v, Some a) :: [])
-                   (fresh_var "i"
-                     (v :: ImpVars.imp_expr_free_vars e ++ remove string_eqdec v (imp_ejson_stmt_free_vars stmt)))
-                   (Some (imp_ejson_Z_to_data 0))
-                   σ);
-          [ | admit ].
-        simpl.
-        unfold var.
-        unfold imp_ejson_model.
-        case (imp_ejson_stmt_eval h stmt ((v, Some a) :: σ)); [ | simpl; reflexivity].
-        intros σ'.
-        clear i a σ.
-        match_destr.
-        rewrite IHl; clear IHl.
-        unfold olift.
-        simpl.
         admit.
-      - Case "ImpStmtForRange"%string.
-        simpl.
-        repeat match_destr.
-        generalize (ImpEval.nb_iter z z0).
-        intros.
-        clear z0.
-        revert z σ.
-        induction n; intros; try reflexivity.
-        rewrite <- IHstmt.
-        repeat match_destr.
-      - Case "ImpStmtIf"%string.
-        simpl.
-        rewrite <- (IHstmt1 σ).
-        rewrite <- (IHstmt2 σ).
-        reflexivity.
     Admitted.
 
-    (* XXX Added to connect the underlying proof on Imp statements to the Imp optimizer *)
-    Lemma imp_ejson_function_rewrite_correct h (j : ejson) (f:imp_ejson_function) :
-        imp_ejson_function_eval h f j =
-        imp_ejson_function_eval h (imp_ejson_function_rewrite f) j.
-    Proof.
-      destruct f; simpl.
-      generalize (imp_ejson_stmt_for_rewrite_correct h [(v0, None); (v, Some j)] i); intros Hstmt.
-      unfold imp_ejson_stmt_eval in Hstmt.
-      assert ((@ImpEval.imp_stmt_eval (@imp_ejson_model foreign_ejson_model)
-               (@imp_ejson_constant foreign_ejson_model) imp_ejson_op
-               (@imp_ejson_runtime_op foreign_ejson_runtime_op) (@imp_ejson_model_normalize foreign_ejson_model)
-               (@imp_ejson_model_to_bool foreign_ejson_model) (@imp_ejson_model_to_Z foreign_ejson_model)
-               (@imp_ejson_model_to_list foreign_ejson_model) (@imp_ejson_Z_to_data foreign_ejson_model)
-               (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op fejruntime h)
-               (@imp_ejson_op_eval foreign_ejson_model) i
-               (@cons (prod var (option (@ejson foreign_ejson_model)))
-                  (@pair var (option (@ejson foreign_ejson_model)) v0 (@None (@ejson foreign_ejson_model)))
-                  (@cons (prod var (option (@ejson foreign_ejson_model)))
-                     (@pair var (option (@ejson foreign_ejson_model)) v (@Some (@ejson foreign_ejson_model) j))
-                     (@nil (prod var (option (@ejson foreign_ejson_model)))))))
-          = @ImpEval.imp_stmt_eval (@imp_ejson_model foreign_ejson_model) (@imp_ejson_constant foreign_ejson_model)
-        imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_runtime_op)
-        (@imp_ejson_model_normalize foreign_ejson_model) (@imp_ejson_model_to_bool foreign_ejson_model)
-        (@imp_ejson_model_to_Z foreign_ejson_model) (@imp_ejson_model_to_list foreign_ejson_model)
-        (@imp_ejson_Z_to_data foreign_ejson_model)
-        (@imp_ejson_runtime_eval foreign_ejson_model fejson foreign_ejson_runtime_op fejruntime h)
-        (@imp_ejson_op_eval foreign_ejson_model) i
-        (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
-           (@pair var (option (@imp_ejson_model foreign_ejson_model)) v0
-              (@None (@imp_ejson_model foreign_ejson_model)))
-           (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
-              (@pair var (option (@imp_ejson_model foreign_ejson_model)) v
-                 (@Some (@imp_ejson_model foreign_ejson_model) j))
-              (@nil (prod var (option (@imp_ejson_model foreign_ejson_model))))))) by reflexivity.
-      rewrite H in Hstmt; clear H.
-      rewrite Hstmt; clear Hstmt.
-      reflexivity.
-    Qed.
-
-    Lemma imp_ejson_rewrite_correct h (j : ejson) (q:imp_ejson) :
-        imp_ejson_eval h q j =
-        imp_ejson_eval h (imp_ejson_rewrite q) j.
-    Proof.
-      destruct q; destruct l; [reflexivity|].
-      destruct p; destruct l; [|reflexivity].
-      simpl.
-      generalize (imp_ejson_function_rewrite_correct h j i); intros Hfun;
-        unfold imp_ejson_function_eval in Hfun.
-      rewrite Hfun.
-      reflexivity.
-    Qed.
   End CorrectnessForRewrite.
 
 End ImpEJsonRewrite.
