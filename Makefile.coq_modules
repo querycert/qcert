@@ -328,6 +328,7 @@ MODULES = \
 	SQLPP/SQLPPRuntime \
 	SQLPP/SQLPPSystem \
 	OQL/Lang/OQL \
+	OQL/Lang/OQLSem \
 	OQL/Lang/OQLSugar \
 	OQL/Lang/OQLSize \
 	OQL/Typing/TOQL \
