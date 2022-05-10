@@ -24,8 +24,6 @@ Declare Scope oql_scope.
 Section OQL.
   Context {fruntime:foreign_runtime}.
 
-  Definition oql_env := list (string * data).
-
   Unset Elimination Schemes.
   
   Inductive oql_expr : Set :=
@@ -64,7 +62,7 @@ Section OQL.
     | OSelect e => e
     | OSelectDistinct e => e
     end.
-  
+
   Definition oin_expr (ie:oql_in_expr) : oql_expr :=
     match ie with
     | OIn _ e => e
@@ -88,8 +86,7 @@ Section OQL.
                    P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P eob -> P (OSFW e1 el OTrue (OOrderBy eob sc)))
              (fswf4 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr, forall eob : oql_expr, forall sc : SortDesc,
                    P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P ew -> P eob -> P (OSFW e1 el (OWhere ew) (OOrderBy eob sc)))
-    :=
-      fix F (e : oql_expr) : P e :=
+    := fix F (e : oql_expr) : P e :=
     match e as e0 return (P e0) with
       | OConst d => fconst d
       | OVar v => fvar v
@@ -146,8 +143,7 @@ Section OQL.
                    P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P eob -> P (OSFW e1 el OTrue (OOrderBy eob sc)))
              (fswf4 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr, forall eob : oql_expr, forall sc : SortDesc,
                    P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P ew -> P eob -> P (OSFW e1 el (OWhere ew) (OOrderBy eob sc)))
-    :=
-      fix F (e : oql_expr) : P e :=
+    := fix F (e : oql_expr) : P e :=
     match e as e0 return (P e0) with
       | OConst d => fconst d
       | OVar v => fvar v
@@ -439,125 +435,127 @@ Section OQL.
 
   (** Semantics of OQL *)
 
+  Definition oql_env := list (string * data).
+
   Context (h:brand_relation_t).
   Section sem.
-  Context (constant_env:list (string*data)).
+    Context (constant_env:list (string*data)).
 
-  Definition env_map_concat_single (a:oql_env) (xl:list oql_env) : list oql_env :=
-    map (fun x => rec_concat_sort a x) xl.
+    Definition env_map_concat_single (a:oql_env) (xl:list oql_env) : list oql_env :=
+      map (fun x => rec_concat_sort a x) xl.
 
-  Definition oenv_map_concat_single
-             (v:string)
-             (f:oql_env -> option data)
-             (a:oql_env) : option (list oql_env) :=
-    match f a with
+    Definition oenv_map_concat_single
+               (v:string)
+               (f:oql_env -> option data)
+               (a:oql_env) : option (list oql_env) :=
+      match f a with
       | Some (dcoll y) => Some (env_map_concat_single a (map (fun x => ((v,x)::nil)) y))
       | _ => None
-    end.
+      end.
 
-  Definition filter_cast (b:brands) (l:list data) :=
-    let apply_cast x :=
-        match x with
-        | dbrand b' _ =>
-          if (sub_brands_dec h b' b)
-          then Some (x :: nil)
-          else Some nil
-        | _ => None
-        end
-    in
-    lift_flat_map apply_cast l.
-
-  Definition oenv_map_concat_single_with_cast
-             (v:string)
-             (brand_name:string)
-             (f:oql_env -> option data)
-             (a:oql_env) : option (list oql_env) :=
-    match f a with
-    | Some (dcoll y) =>
-      match filter_cast (brand_name::nil) y with
-      | Some y =>
-        Some (env_map_concat_single a (map (fun x => ((v,x)::nil)) y))
-      | None => None
-      end
-    | _ => None
-    end.
-
-  Definition env_map_concat
-             (v:string)
-             (f:oql_env -> option data)
-             (d:list oql_env) : option (list oql_env) :=
-    lift_flat_map (oenv_map_concat_single v f) d.
-
-  Definition env_map_concat_cast
-             (v:string)
-             (brand_name:string)
-             (f:oql_env -> option data)
-             (d:list oql_env) : option (list oql_env) :=
-    lift_flat_map (oenv_map_concat_single_with_cast v brand_name f) d.
-
-  Fixpoint oql_expr_interp (q:oql_expr) (env:oql_env) : option data :=
-    match q with
-    | OConst d => Some (normalize_data h d)
-    | OVar n => edot env n
-    | OTable t => edot constant_env t
-    | OBinop bop q1 q2 =>
-      olift2 (fun d1 d2 => binary_op_eval h bop d1 d2)
-             (oql_expr_interp q1 env)
-             (oql_expr_interp q2 env)
-    | OUnop uop q1 =>
-      olift (fun d1 => unary_op_eval h uop d1) (oql_expr_interp q1 env)
-    | OSFW select_clause from_clause where_clause order_by_clause =>
-      let init_env := Some (env :: nil) in
-      let from_interp (envl:option (list oql_env)) (from_in_expr : oql_in_expr) :=
-          match from_in_expr with
-          | OIn in_v from_expr =>
-            match envl with
-            | None => None
-            | Some envl' =>
-              env_map_concat in_v (oql_expr_interp from_expr) envl'
-            end
-          | OInCast in_v brand_name from_expr =>
-            match envl with
-            | None => None
-            | Some envl' =>
-              env_map_concat_cast in_v brand_name (oql_expr_interp from_expr) envl'
-            end
-          end
-      in
-      let from_result := fold_left from_interp from_clause init_env in
-      let pred (where_expr:oql_expr) (x':oql_env) :=
-          match oql_expr_interp where_expr x' with
-          | Some (dbool b) => Some b
+    Definition filter_cast (b:brands) (l:list data) :=
+      let apply_cast x :=
+          match x with
+          | dbrand b' _ =>
+            if (sub_brands_dec h b' b)
+            then Some (x :: nil)
+            else Some nil
           | _ => None
           end
       in
-      let where_result :=
-          match where_clause with
-          | OTrue => from_result
-          | OWhere where_expr => olift (lift_filter (pred where_expr)) from_result
-          end
-      in
-      let order_by_result :=
-          match order_by_clause with
-          | ONoOrder => where_result
-          | OOrderBy scl e => where_result
-          end
-      in
-      let select_result :=
-          match select_clause with
-          | OSelect select_expr =>
-            olift (fun x => lift dcoll (lift_map (oql_expr_interp select_expr) x))
-                  order_by_result
-          | OSelectDistinct select_expr =>
-            let select_dup :=
-                olift (fun x => (lift_map (oql_expr_interp select_expr) x))
-                      order_by_result
-            in
-            lift (fun x => dcoll ((@bdistinct data data_eq_dec) x)) select_dup
-          end
-      in
-      select_result
-    end.
+      lift_flat_map apply_cast l.
+
+    Definition oenv_map_concat_single_with_cast
+               (v:string)
+               (brand_name:string)
+               (f:oql_env -> option data)
+               (a:oql_env) : option (list oql_env) :=
+      match f a with
+      | Some (dcoll y) =>
+        match filter_cast (brand_name::nil) y with
+        | Some y =>
+          Some (env_map_concat_single a (map (fun x => ((v,x)::nil)) y))
+        | None => None
+        end
+      | _ => None
+      end.
+
+    Definition env_map_concat
+               (v:string)
+               (f:oql_env -> option data)
+               (d:list oql_env) : option (list oql_env) :=
+      lift_flat_map (oenv_map_concat_single v f) d.
+
+    Definition env_map_concat_cast
+               (v:string)
+               (brand_name:string)
+               (f:oql_env -> option data)
+               (d:list oql_env) : option (list oql_env) :=
+      lift_flat_map (oenv_map_concat_single_with_cast v brand_name f) d.
+
+    Fixpoint oql_expr_interp (q:oql_expr) (env:oql_env) : option data :=
+      match q with
+      | OConst d => Some (normalize_data h d)
+      | OVar n => edot env n
+      | OTable t => edot constant_env t
+      | OBinop bop q1 q2 =>
+        olift2 (fun d1 d2 => binary_op_eval h bop d1 d2)
+               (oql_expr_interp q1 env)
+               (oql_expr_interp q2 env)
+      | OUnop uop q1 =>
+        olift (fun d1 => unary_op_eval h uop d1) (oql_expr_interp q1 env)
+      | OSFW select_clause from_clause where_clause order_by_clause =>
+        let init_env := Some (env :: nil) in
+        let from_interp (envl:option (list oql_env)) (from_in_expr : oql_in_expr) :=
+            match from_in_expr with
+            | OIn in_v from_expr =>
+              match envl with
+              | None => None
+              | Some envl' =>
+                env_map_concat in_v (oql_expr_interp from_expr) envl'
+              end
+            | OInCast in_v brand_name from_expr =>
+              match envl with
+              | None => None
+              | Some envl' =>
+                env_map_concat_cast in_v brand_name (oql_expr_interp from_expr) envl'
+              end
+            end
+        in
+        let from_result := fold_left from_interp from_clause init_env in
+        let pred (where_expr:oql_expr) (x':oql_env) :=
+            match oql_expr_interp where_expr x' with
+            | Some (dbool b) => Some b
+            | _ => None
+            end
+        in
+        let where_result :=
+            match where_clause with
+            | OTrue => from_result
+            | OWhere where_expr => olift (lift_filter (pred where_expr)) from_result
+            end
+        in
+        let order_by_result :=
+            match order_by_clause with
+            | ONoOrder => where_result
+            | OOrderBy scl e => where_result
+            end
+        in
+        let select_result :=
+            match select_clause with
+            | OSelect select_expr =>
+              olift (fun x => lift dcoll (lift_map (oql_expr_interp select_expr) x))
+                    order_by_result
+            | OSelectDistinct select_expr =>
+              let select_dup :=
+                  olift (fun x => (lift_map (oql_expr_interp select_expr) x))
+                        order_by_result
+              in
+              lift (fun x => dcoll ((@bdistinct data data_eq_dec) x)) select_dup
+            end
+        in
+        select_result
+      end.
 
   End sem.
 
@@ -572,13 +570,14 @@ Section OQL.
           (oql_expr_interp (rec_concat_sort constant_env defls) e env)
       | OUndefineQuery s rest =>
         oql_query_program_interp (rremove defls s) rest env
-    | OQuery e => oql_expr_interp (rec_concat_sort constant_env defls) e env
+      | OQuery e => oql_expr_interp (rec_concat_sort constant_env defls) e env
       end.
 
-  Definition oql_interp (e:oql) : option data
-    := oql_query_program_interp nil e nil.
+    Definition oql_interp (e:oql) : option data
+      := oql_query_program_interp nil e nil.
 
-  End sem2. 
+  End sem2.
+
   Section OQLScope.
 
     Fixpoint oql_free_vars (e:oql_expr) :=
