@@ -31,17 +31,19 @@ Section OQLSem.
 
     Inductive filter_cast_sem: brands -> list data -> list data -> Prop :=
     | filter_cast_sem_nil:
-        forall b, filter_cast_sem b nil nil
+        forall b, filter_cast_sem b nil nil               (**r ⇒ [b ⊢〚[]〛ᶜ ⇓ []] *)
     | filter_cast_sem_cons_success:
         forall b1 b2 d1 dl1 dl2,
-          filter_cast_sem b1 dl1 dl2 ->
-          sub_brands h b2 b1 ->
-          filter_cast_sem b1 ((dbrand b2 d1)::dl1) ((dbrand b2 d1)::dl2)
+          filter_cast_sem b2 dl1 dl2 ->                   (**r   [b₂ ⊢〚↑dl₁〛ᶜ ⇓ ↑dl₂] *)
+          sub_brands h b1 b2 ->                           (**r ∧ [b₁ <ᵇ b₂] *)
+          filter_cast_sem b2                              (**r ⇒ [b₂ ⊢〚(brand b₁ d₁)::↑dl₁〛ᶜ ⇓ (brand b₁ d₁)::↑dl₂] *)
+                          ((dbrand b1 d1)::dl1)
+                          ((dbrand b1 d1)::dl2)
     | filter_cast_sem_cons_failure:
         forall b1 b2 d1 dl1 dl2,
-          filter_cast_sem b1 dl1 dl2 ->
-          ~(sub_brands h b2 b1) ->
-          filter_cast_sem b1 ((dbrand b2 d1)::dl1) dl2
+          filter_cast_sem b2 dl1 dl2 ->                   (**r   [b₂ ⊢〚↑dl₁〛ᶜ ⇓ ↑dl₂] *)
+          ~(sub_brands h b1 b2) ->                        (**r ∧ [¬ b₁ <ᵇ b₂] *)
+          filter_cast_sem b2 ((dbrand b1 d1)::dl1) dl2    (**r ⇒ [b₂ ⊢〚(brand b₁ d₁)::↑dl₁〛ᶜ ⇓ ↑dl₂] *)
     .
 
     Lemma filter_cast_correct b l1 l2:
@@ -55,10 +57,10 @@ Section OQLSem.
         + inversion H; subst.
           unfold filter_cast; simpl.
           * unfold filter_cast in *; simpl.
-            case_eq (sub_brands_dec h b2 b); intros; [|congruence]; simpl.
+            case_eq (sub_brands_dec h b1 b); intros; [|congruence]; simpl.
             rewrite (IHl1 dl2); [reflexivity|apply H3].
           * unfold filter_cast in *; simpl.
-            case_eq (sub_brands_dec h b2 b); intros; [congruence| ]; simpl.
+            case_eq (sub_brands_dec h b1 b); intros; [congruence| ]; simpl.
             rewrite lift_id; apply (IHl1 l2 H3).
       - revert l2 H; induction l1; intros.
         + inversion H.
@@ -98,99 +100,102 @@ Section OQLSem.
     
     Inductive oql_expr_sem: oql_expr -> oql_env -> data -> Prop :=
     | sem_OConst : forall d d1 env,
-        normalize_data h d = d1 ->
-        oql_expr_sem (OConst d) env d1
+        normalize_data h d = d1 ->                                            (**r   [normalize(d) = d₁] *)
+        oql_expr_sem (OConst d) env d1                                        (**r ⇒ [Γc ; γ ⊢〚d〛⇓ d₁] *)
     | sem_OVar : forall v d env,
-        edot env v = Some d ->
-        oql_expr_sem (OVar v) env d
+        edot env v = Some d ->                                                (**r   [γ(v) = d] *)
+        oql_expr_sem (OVar v) env d                                           (**r ⇒ [Γc ; γ ⊢〚v〛⇓ d₁] *)
     | sem_OTable : forall t d env,
-        edot constant_env t = Some d ->
-        oql_expr_sem (OTable t) env d
+        edot constant_env t = Some d ->                                       (**r   [Γc(T) = d] *)
+        oql_expr_sem (OTable t) env d                                         (**r ⇒ [Γc ; γ ⊢〚T〛⇓ d] *)
     | sem_OBinop : forall bop e1 e2 d1 d2 d3 env,
-        oql_expr_sem e1 env d1 ->                       (** *)
-        oql_expr_sem e2 env d2 ->
-        binary_op_eval h bop d1 d2 = Some d3 ->         (**r ∧ [d₁ ⊠ d₂ = d₃] *)
-        oql_expr_sem (OBinop bop e1 e2) env d3
-    | sem_OUnop : forall uop e1 d1 d2 env,
-        oql_expr_sem e1 env d1 ->
-        unary_op_eval h uop d1 = Some d2 ->         (**r ∧ [d₁ ⊠ d₂ = d₃] *)
-        oql_expr_sem (OUnop uop e1) env d2
+        oql_expr_sem e1 env d1 ->                                             (**r   [Γc ; γ ⊢〚e₁〛⇓ d₁] *)
+        oql_expr_sem e2 env d2 ->                                             (**r   [Γc ; γ ⊢〚e₂〛⇓ d₂] *)
+        binary_op_eval h bop d1 d2 = Some d3 ->                               (**r ∧ [d₁ ⊠ d₂ = d₃] *)
+        oql_expr_sem (OBinop bop e1 e2) env d3                                (**r ⇒ [Γc ; γ ⊢〚e₁ ⊠ e₂〛⇓ d₃] *)
+    | sem_OUnop : forall uop e d1 d2 env,
+        oql_expr_sem e env d1 ->                                              (**r   [Γc ; γ ⊢〚e〛⇓ d₁] *)
+        unary_op_eval h uop d1 = Some d2 ->                                   (**r ∧ [⊞ d₁ = d₂] *)
+        oql_expr_sem (OUnop uop e) env d2                                     (**r ⇒ [Γc ; γ ⊢〚⊞ e〛⇓ d₂] *)
     | sem_OSFW_true_noorder select_e from_e : forall env tenv d,
-        oql_from_sem from_e (env :: nil) tenv ->
-        oql_select_sem select_e tenv d ->
-        oql_expr_sem (OSFW select_e from_e OTrue ONoOrder) env d
+        oql_from_sem from_e (env :: nil) tenv ->                              (**r   [Γc; [γ] ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₁] *)
+        oql_select_sem select_e tenv d ->                                     (**r ∧ [Γc; ↑γ₁ ⊢〚eˢ〛ˢ ⇓ d] *)
+        oql_expr_sem (OSFW select_e from_e OTrue ONoOrder) env d              (**r ⇒ [Γc; γ ⊢ SELECT eˢ FROM ↑eᶠ] *)
     | sem_OSFW_where_noorder select_e from_e where_e : forall env tenv tenv2 d,
-        oql_from_sem from_e (env :: nil) tenv ->
-        oql_where_sem where_e tenv tenv2 ->
-        oql_select_sem select_e tenv2 d ->
-        oql_expr_sem (OSFW select_e from_e (OWhere where_e) ONoOrder) env d
+        oql_from_sem from_e (env :: nil) tenv ->                              (**r   [Γc; [γ] ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₁] *)
+        oql_where_sem where_e tenv tenv2 ->                                   (**r ∧ [Γc; ↑γ₁ ⊢〚eʷ〛ʷ ⇓ ↑γ₂] *)
+        oql_select_sem select_e tenv2 d ->                                    (**r ∧ [Γc; ↑γ₂ ⊢〚eˢ〛ˢ ⇓ d] *)
+        oql_expr_sem (OSFW select_e from_e (OWhere where_e) ONoOrder) env d   (**r ⇒ [Γc; γ ⊢ SELECT eˢ FROM ↑eᶠ WHERE eʷ] *)
     | sem_OSFW_true_order select_e from_e order_e sc : forall env tenv tenv1 d,
-        oql_from_sem from_e (env :: nil) tenv ->
-        oql_order_sem order_e sc tenv tenv1 ->
-        oql_select_sem select_e tenv1 d ->
-        oql_expr_sem (OSFW select_e from_e OTrue (OOrderBy order_e sc)) env d
+        oql_from_sem from_e (env :: nil) tenv ->                              (**r   [Γc; [γ] ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₁] *)
+        oql_order_sem order_e sc tenv tenv1 ->                                (**r ∧ [Γc; ↑γ₁ ⊢〚eᵒ〛ᵒ ⇓ ↑γ₂] *)
+        oql_select_sem select_e tenv1 d ->                                    (**r ∧ [Γc; ↑γ₂ ⊢〚eˢ〛ˢ ⇓ d] *)
+        oql_expr_sem (OSFW select_e from_e OTrue (OOrderBy order_e sc)) env d (**r ⇒ [Γc; γ ⊢ SELECT eˢ FROM ↑eᶠ ORDER BY e] *)
     | sem_OSFW_where_order select_e from_e where_e order_e sc : forall env tenv tenv1 tenv2 d,
-        oql_from_sem from_e (env :: nil) tenv ->
-        oql_where_sem where_e tenv tenv1 ->
-        oql_order_sem order_e sc tenv1 tenv2 ->
-        oql_select_sem select_e tenv2 d ->
-        oql_expr_sem (OSFW select_e from_e (OWhere where_e) (OOrderBy order_e sc)) env d
+        oql_from_sem from_e (env :: nil) tenv ->                              (**r   [Γc; [γ] ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₁] *)
+        oql_where_sem where_e tenv tenv1 ->                                   (**r ∧ [Γc; ↑γ₁ ⊢〚eʷ〛ʷ ⇓ ↑γ₂] *)
+        oql_order_sem order_e sc tenv1 tenv2 ->                               (**r ∧ [Γc; ↑γ₂ ⊢〚eᵒ〛ᵒ ⇓ ↑γ₃] *)
+        oql_select_sem select_e tenv2 d ->                                    (**r ∧ [Γc; ↑γ₃ ⊢〚eˢ〛ˢ ⇓ d] *)
+        oql_expr_sem (OSFW select_e from_e (OWhere where_e)                   (**r ⇒ [Γc; γ ⊢ SELECT eˢ FROM ↑eᶠ WHERE eʷ ORDER BY eᵒ] *)
+                           (OOrderBy order_e sc)) env d
     with oql_from_sem: list oql_in_expr -> list oql_env -> list oql_env -> Prop :=
     | sem_OFrom_Nil : forall tenv,
-        oql_from_sem nil tenv tenv
+        oql_from_sem nil tenv tenv                                            (**r   [Γc; [γ] ⊢〚[]〛ᶠ ⇓ []] *)
     | sem_OFrom_In in_v e from_e : forall tenv1 tenv2 tenv3,
-        oql_from_in_sem in_v e tenv1 tenv2 ->
-        oql_from_sem from_e tenv2 tenv3 ->
-        oql_from_sem ((OIn in_v e)::from_e) tenv1 tenv3
+        oql_from_in_sem in_v e tenv1 tenv2 ->                                 (**r   [Γc; ↑γ₁; v ⊢〚e₀〛ⁱ ⇓ ↑γ₂] *)
+        oql_from_sem from_e tenv2 tenv3 ->                                    (**r ∧ [Γc; ↑γ₂ ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
+        oql_from_sem ((OIn in_v e)::from_e) tenv1 tenv3                       (**r ⇒ [Γc; ↑γ₁ ⊢〚(v IN e₀)::↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
     | sem_OFrom_InCast in_v brand_name e from_e : forall tenv1 tenv2 tenv3,
-        oql_from_in_cast_sem in_v brand_name e tenv1 tenv2 ->
-        oql_from_sem from_e tenv2 tenv3 ->
-        oql_from_sem ((OInCast in_v brand_name e)::from_e) tenv1 tenv3
+        oql_from_in_cast_sem in_v brand_name e tenv1 tenv2 ->                 (**r   [Γc; ↑γ₁; v; b ⊢〚e₀〛ᶜ ⇓ ↑γ₂] *)
+        oql_from_sem from_e tenv2 tenv3 ->                                    (**r ∧ [Γc; ↑γ₂ ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
+        oql_from_sem ((OInCast in_v brand_name e)::from_e) tenv1 tenv3        (**r ⇒ [Γc; ↑γ₁ ⊢〚(v IN e₀ AS b)::↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
     with oql_from_in_sem : string -> oql_expr -> list oql_env -> list oql_env -> Prop :=
     | oql_from_in_sem_nil v e :
-        oql_from_in_sem v e nil nil
-    | oql_from_in_sem_cons v e env1 tenv1 tenv2 tenv3 dl :
-        oql_from_in_sem v e tenv1 tenv2 ->
-        oql_expr_sem e env1 (dcoll dl) ->
-        env_map_concat_single env1 (map (fun x => ((v,x)::nil)) dl) = tenv3 ->
-        oql_from_in_sem v e (env1 :: tenv1) (tenv3 ++ tenv2)
+        oql_from_in_sem v e nil nil                                           (**r   [Γc; []; v ⊢〚e〛ⁱ ⇓ []] *)
+    | oql_from_in_sem_cons v e env tenv1 tenv2 tenv3 dl :
+        oql_from_in_sem v e tenv1 tenv2 ->                                    (**r   [Γc; ↑γ₁; v ⊢〚e〛ⁱ ⇓ ↑γ₂] *)
+        oql_expr_sem e env (dcoll dl) ->                                      (**r ∧ [Γc; γ ⊢〚e〛⇓ ↑dl] *)
+        env_map_concat_single env (map (fun x => ((v,x)::nil)) dl) = tenv3 -> (**r ∧ [↑γ₃ = mapc v ↑dl] *)
+        oql_from_in_sem v e (env :: tenv1) (tenv3 ++ tenv2)                   (**r ⇒ [Γc; γ::↑γ₁; v ⊢〚e〛ⁱ ⇓ ↑γ₃⊕↑γ₂] *)
     with oql_from_in_cast_sem : string -> string -> oql_expr -> list oql_env -> list oql_env -> Prop :=
     | oql_from_in_cast_sem_nil v brand_name e :
-        oql_from_in_cast_sem v brand_name e nil nil
-    | oql_from_in_cast_sem_cons v brand_name e env1 tenv1 tenv2 tenv3 dl1 dl2 :
-        oql_from_in_cast_sem v brand_name e tenv1 tenv2 ->
-        oql_expr_sem e env1 (dcoll dl1) ->
-        filter_cast_sem (brand_name::nil) dl1 dl2 ->
-        env_map_concat_single env1 (map (fun x => ((v,x)::nil)) dl2) = tenv3 ->
-        oql_from_in_cast_sem v brand_name e (env1 :: tenv1) (tenv3 ++ tenv2)
+        oql_from_in_cast_sem v brand_name e nil nil                           (**r   [Γc; []; v; b ⊢〚e〛ᶜ ⇓ []] *)
+    | oql_from_in_cast_sem_cons v brand_name e env tenv1 tenv2 tenv3 dl dl' :
+        oql_from_in_cast_sem v brand_name e tenv1 tenv2 ->                    (**r   [Γc; ↑γ₁; v; b ⊢〚e〛ᶜ ⇓ ↑γ₂] *)
+        oql_expr_sem e env (dcoll dl) ->                                      (**r ∧ [Γc; γ ⊢〚e〛⇓ ↑dl] *)
+        filter_cast_sem (brand_name::nil) dl dl' ->                           (**r ∧ [b₂ ⊢〚↑dl〛ᶜ ⇓ ↑dl'] *)
+        env_map_concat_single env (map (fun x => ((v,x)::nil)) dl') = tenv3 ->(**r ∧ [↑γ₃ = mapc v ↑dl'] *)
+        oql_from_in_cast_sem v brand_name e (env :: tenv1) (tenv3 ++ tenv2)   (**r ⇒ [Γc; γ::↑γ₁; v ⊢〚e〛ᶜ ⇓ ↑γ₃⊕↑γ₂] *)
     with oql_where_sem : oql_expr -> list oql_env -> list oql_env -> Prop :=
     | oql_where_sem_nil e :
-        oql_where_sem e nil nil
-    | oql_where_sem_true e env1 tenv1 tenv2 :
-        oql_where_sem e tenv1 tenv2 ->
-        oql_expr_sem e env1 (dbool true) ->
-        oql_where_sem e (env1 :: tenv1) (env1 :: tenv2)
+        oql_where_sem e nil nil                                               (**r   [Γc; [] ⊢〚e〛ʷ ⇓ []] *)
+    | oql_where_sem_true e env tenv1 tenv2 :
+        oql_where_sem e tenv1 tenv2 ->                                        (**r   [Γc; ↑γ₁ ⊢〚e〛ʷ ⇓ ↑γ₂] *)
+        oql_expr_sem e env (dbool true) ->                                    (**r ∧ [Γc; γ ⊢〚e〛⇓ true] *)
+        oql_where_sem e (env :: tenv1) (env :: tenv2)                         (**r ⇒ [Γc; γ::↑γ₁ ⊢〚e〛ʷ ⇓ γ::↑γ₂] *)
     | oql_where_sem_false e env1 tenv1 tenv2 :
-        oql_where_sem e tenv1 tenv2 ->
-        oql_expr_sem e env1 (dbool false) ->
-        oql_where_sem e (env1 :: tenv1) tenv2
+        oql_where_sem e tenv1 tenv2 ->                                        (**r   [Γc; ↑γ₁ ⊢〚e〛ʷ ⇓ ↑γ₂] *)
+        oql_expr_sem e env1 (dbool false) ->                                  (**r ∧ [Γc; γ ⊢〚e〛⇓ false] *)
+        oql_where_sem e (env1 :: tenv1) tenv2                                 (**r ⇒ [Γc; γ::↑γ₁ ⊢〚e〛ʷ ⇓ ↑γ₂] *)
     with oql_order_sem : oql_expr -> SortDesc -> list oql_env -> list oql_env -> Prop :=
-    | oql_order_sem_WEIRD e sc tenv :
-        oql_order_sem e sc tenv tenv
+    | oql_order_sem_WRONG e sc tenv :
+        oql_order_sem e sc tenv tenv                                          (**r ⇒ [Γc; ↑γ ⊢〚e〛ᵒ ⇓ ↑γ] WRONG *)
     with oql_select_sem: oql_select_expr -> list oql_env -> data -> Prop :=
     | sem_OSelect e : forall tenv dl,
-        oql_select_map_sem e tenv dl ->
-        oql_select_sem (OSelect e) tenv (dcoll dl)
-    | sem_OSelectDistinct e : forall tenv dl,
-        oql_select_map_sem e tenv dl ->
-        oql_select_sem (OSelectDistinct e) tenv (dcoll (bdistinct dl))
+        oql_select_map_sem e tenv dl ->                                       (**r   [Γc; ↑γ ⊢〚e〛ᵐ ⇓ ↑dl] *)
+        oql_select_sem (OSelect e) tenv (dcoll dl)                            (**r ⇒ [Γc; ↑γ ⊢〚e〛ˢ ⇓ {↑dl}] *)
+    | sem_OSelectDistinct e : forall tenv dl dl',
+        oql_select_map_sem e tenv dl ->                                       (**r   [Γc; ↑γ ⊢〚e〛ᵐ ⇓ ↑dl] *)
+        bdistinct dl = dl' ->                                                 (**r ∧ [↑dl' = distinct ↑dl] *)
+        oql_select_sem (OSelectDistinct e) tenv (dcoll dl')                   (**r ⇒ [Γc; ↑γ ⊢〚e〛ˢ ⇓ {↑dl'}] *)
     with oql_select_map_sem : oql_expr -> list oql_env -> list data -> Prop :=
     | oql_select_map_sem_nil e :
         oql_select_map_sem e nil nil
-    | oql_select_map_sem_cons e env1 tenv1 d1 rest:
-        oql_expr_sem e env1 d1 ->
-        oql_select_map_sem e tenv1 rest ->
-        oql_select_map_sem e (env1 :: tenv1) (d1 :: rest).
+    | oql_select_map_sem_cons e env tenv1 d dl1:
+        oql_expr_sem e env d ->                                               (**r   [Γc; γ ⊢〚e〛⇓ d] *)
+        oql_select_map_sem e tenv1 dl1 ->                                     (**r ∧ [Γc; ↑γ₁ ⊢〚e〛ᵐ ⇓ ↑dl] *)
+        oql_select_map_sem e (env :: tenv1) (d :: dl1)                        (**r ⇒ [Γc; γ::↑γ₁ ⊢〚e〛ᵐ ⇓ d::↑dl] *)
+    .
 
     Lemma oql_from_in_sem_correct in_v e tenv tenv2:
       (forall (tenv : oql_env) (d : data),
@@ -421,7 +426,7 @@ Section OQLSem.
           apply (H a (dbool false) H1).
     Qed.
 
-    Lemma oql_order_sem_correct_WEIRD e sc tenv0 tenv2:
+    Lemma oql_order_sem_correct_WRONG e sc tenv0 tenv2:
       tenv0 = tenv2 ->
       oql_order_sem e sc tenv0 tenv2.
     Proof.
@@ -476,11 +481,11 @@ Section OQLSem.
             inversion H0; subst; clear H0;
             econstructor; apply (oql_select_map_sem_correct o l l0 IHe H1).
         + econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| ]; clear H1.
-          unfold lift in H0;
+          unfold lift in H0.
             case_eq (lift_map (oql_expr_interp h constant_env o) l); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0;
-            econstructor; apply (oql_select_map_sem_correct o l l0 IHe H1).
+            econstructor; [apply (oql_select_map_sem_correct o l l0 IHe H1)|reflexivity].
       - destruct e1; simpl in *; unfold olift in H0;
           case_eq
             (fold_left
@@ -526,7 +531,7 @@ Section OQLSem.
             case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
-            econstructor; apply (oql_select_map_sem_correct o l0 l1 IHe H1).
+            econstructor; [apply (oql_select_map_sem_correct o l0 l1 IHe H1)|reflexivity].
       - destruct e1; simpl in *; unfold olift in H0;
           case_eq
             (fold_left
@@ -548,19 +553,19 @@ Section OQLSem.
                   end) el (Some (tenv :: nil))); intros;
             rewrite H1 in H0; simpl in *; try congruence.
         + econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
-          apply (oql_order_sem_correct_WEIRD e sc l l eq_refl).
+          apply (oql_order_sem_correct_WRONG e sc l l eq_refl).
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
             econstructor; apply (oql_select_map_sem_correct o l l0 IHe H1).
         + econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
-          apply (oql_order_sem_correct_WEIRD e sc l l eq_refl).
+          apply (oql_order_sem_correct_WRONG e sc l l eq_refl).
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
-            econstructor; apply (oql_select_map_sem_correct o l l0 IHe H1).
+            econstructor; [apply (oql_select_map_sem_correct o l l0 IHe H1)|reflexivity].
       - destruct e1; simpl in *; unfold olift in H0;
           case_eq
             (fold_left
@@ -589,7 +594,7 @@ Section OQLSem.
             end) l); intros; rewrite H2 in H0; simpl in H0; try congruence.
           econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | | ]; clear H1.
           apply (oql_where_sem_correct e2 l l0 IHe2 H2).
-          apply (oql_order_sem_correct_WEIRD e3 sc l0 l0 eq_refl).
+          apply (oql_order_sem_correct_WRONG e3 sc l0 l0 eq_refl).
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
             rewrite H1 in H0; try congruence;
@@ -603,12 +608,12 @@ Section OQLSem.
             end) l); intros; rewrite H2 in H0; simpl in H0; try congruence.
           econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | | ]; clear H1.
           apply (oql_where_sem_correct e2 l l0 IHe2 H2).
-          apply (oql_order_sem_correct_WEIRD e3 sc l0 l0 eq_refl).
+          apply (oql_order_sem_correct_WRONG e3 sc l0 l0 eq_refl).
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
-            econstructor; apply (oql_select_map_sem_correct o l0 l1 IHe1 H1).
+            econstructor; [apply (oql_select_map_sem_correct o l0 l1 IHe1 H1)|reflexivity].
     Qed.
 
     Lemma oql_from_in_sem_complete in_v e tenv tenv2:
@@ -644,8 +649,8 @@ Section OQLSem.
       - inversion H; subst; reflexivity.
       - inversion H; subst; clear H; simpl.
         unfold env_map_concat_cast in *; unfold oenv_map_concat_single_with_cast in *; simpl.
-        assert (oql_expr_interp h constant_env e a = Some (dcoll dl1))
-          by apply (He a (dcoll dl1) H3).
+        assert (oql_expr_interp h constant_env e a = Some (dcoll dl))
+          by apply (He a (dcoll dl) H3).
         rewrite H; simpl; clear H.
         specialize (IHtenv tenv0 H2).
         rewrite IHtenv; try reflexivity.
@@ -705,9 +710,9 @@ Section OQLSem.
       induction tenv0; simpl; intros.
       - inversion H0; reflexivity.
       - inversion H0; subst; clear H0.
-        rewrite (H a d1 H4); simpl.
+        rewrite (H a d H4); simpl.
         unfold lift.
-        rewrite (IHtenv0 rest H6).
+        rewrite (IHtenv0 dl1 H6).
         reflexivity.
     Qed.
 
@@ -735,7 +740,7 @@ Section OQLSem.
           reflexivity.
     Qed.
 
-    Lemma oql_order_sem_complete_WEIRD e sc tenv0 tenv2:
+    Lemma oql_order_sem_complete_WRONG e sc tenv0 tenv2:
       oql_order_sem e sc tenv0 tenv2 ->
       tenv0 = tenv2.
     Proof.
@@ -778,20 +783,20 @@ Section OQLSem.
       - inversion H0; subst; clear H0.
         destruct e1; inversion H9; subst; clear H9; unfold olift; simpl in *.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
-          rewrite (oql_order_sem_complete_WEIRD e sc tenv0 tenv1 H8).
+          rewrite (oql_order_sem_complete_WRONG e sc tenv0 tenv1 H8).
           rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
-          rewrite (oql_order_sem_complete_WEIRD e sc tenv0 tenv1 H8).
+          rewrite (oql_order_sem_complete_WRONG e sc tenv0 tenv1 H8).
           rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
       - inversion H0; subst; clear H0.
         destruct e1; inversion H11; subst; clear H11; unfold olift; simpl in *.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
           rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
-          rewrite (oql_order_sem_complete_WEIRD e3 sc tenv1 tenv2 H10).
+          rewrite (oql_order_sem_complete_WRONG e3 sc tenv1 tenv2 H10).
           rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
           rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
-          rewrite (oql_order_sem_complete_WEIRD e3 sc tenv1 tenv2 H10).
+          rewrite (oql_order_sem_complete_WRONG e3 sc tenv1 tenv2 H10).
           rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
     Qed.
       
