@@ -20,7 +20,7 @@ CP=cp
 
 ## Deploy documentation
 all:
-	make -C ../compiler/core documentation
+	make -C .. docs
 
 deploy:
 	$(CP) qcertsite.css $(QUERYCERTDOTIO)

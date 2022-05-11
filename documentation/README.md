@@ -35,14 +35,14 @@ Then from the top-level `qcert` direcory, do:
 
 ```
 make qcert
-make documentation
+make docs
 ```
 
-This will regenerate the `doc/html` directory
+This will regenerate the `documentation/html` directory
 
 # To update the compilation pipeline
 
-Edit the LaTeX file `doc/figure/compiler-coq.tex`, then do:
+Edit the LaTeX file `documentation/figure/compiler-coq.tex`, then do:
 
 ```
 cd figure
@@ -52,12 +52,12 @@ make
 # To re-deploy the demo and documentation
 
 To deploy the demo and new documentation to the external Q*cert Web
-site, first check that the `QUERYCERTDOTIO` in `doc/Makefile` has the
+site, first check that the `QUERYCERTDOTIO` in `documentation/Makefile` has the
 right location for your git checkout of the `querycert.github.io`
 project. By default, it's assumed to be checked out from github as a
 sibbling of the `qcert` repository.
 
-Then from the `doc` directory, do:
+Then from the `documentation` directory, do:
 ```
 make deploy
 ```
