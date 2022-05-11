@@ -391,7 +391,7 @@ Section ToString.
              (f:funcdecl)
              (i: nat) (* indentation level *)
     : string :=
-    (* XXX All methods are declare as static *)
+    (* All methods are declared as static *)
     eol ++ indent i ++ "static " ++ f.(funcdecl_name) ++ "(" ++ (comma_list f.(funcdecl_parameters)) ++ ") {" ++ eol
         ++ string_of_funcbody f.(funcdecl_body) (i+1) ++ eol ++ indent i ++ "}"
   .

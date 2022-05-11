@@ -208,7 +208,7 @@ $ cd bin; java -jar javaService.jar -server 9879
 
 Code documentation and background information, notably references for all supported languages, can be found on the Q\*cert Web site: https://querycert.github.io
 
-If you want to re-generated the documentation from the source itself, you will need to install [coq2html](https://github.com/xavierleroy/coq2html). Detailed instructions are provided in [doc/README.md](doc/README.md)
+If you want to re-generated the documentation from the source itself, you will need to install [coq2html](https://github.com/xavierleroy/coq2html). Detailed instructions are provided in [doc/README.md](documentation/README.md)
 
 ## Using Q\*cert
 
@@ -383,11 +383,6 @@ $ java -cp runtimes/java/bin:bin/*:bin/lib/*:tests/oql testing.runners.RunJava \
 ```
 
 
-### Cloudant Target
-
-TO BE WRITTEN
-
-
 ### Spark RDDs Target
 
 TO BE WRITTEN
@@ -402,6 +397,11 @@ $ make spark2-runtime
 $ cd tests/spark2/
 $ run.sh
 ```
+
+
+### WASM Target
+
+TO BE WRITTEN
 
 
 ## Caveats
