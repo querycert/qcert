@@ -47,18 +47,19 @@ Section OQLtoNRAEnv.
     | OSFW select_clause from_clause where_clause order_clause =>
       let nraenv_of_from (opacc:nraenv) (from_in_expr : oql_in_expr) :=
           match from_in_expr with
-            | OIn in_v from_expr =>
-              NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID) (oql_to_nraenv_expr from_expr)) opacc
-            | OInCast in_v brand_name from_expr =>
-              NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID)
-                                 (NRAEnvUnop OpFlatten
-                                         (NRAEnvMap
-                                            (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
+          | OIn in_v from_expr =>
+            NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID) (oql_to_nraenv_expr from_expr)) opacc
+          | OInCast in_v brand_name from_expr =>
+            NRAEnvMapProduct
+              (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID)
+                         (NRAEnvUnop OpFlatten
+                                     (NRAEnvMap
+                                        (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
                                                       (NRAEnvConst (dcoll nil)))
-                                            (NRAEnvMap (NRAEnvUnop (OpCast (brand_name::nil)) NRAEnvID)
+                                        (NRAEnvMap (NRAEnvUnop (OpCast (brand_name::nil)) NRAEnvID)
                                                    (oql_to_nraenv_expr from_expr))
-                                         )))
-                          opacc
+              )))
+              opacc
           end
       in
       let nraenv_of_from_clause :=

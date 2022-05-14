@@ -155,7 +155,7 @@ Section OQLSem.
     | oql_from_in_sem_cons v e env tenv1 tenv2 tenv3 dl :
         oql_from_in_sem v e tenv1 tenv2 ->                                    (**r   [Γc; ↑γ₁; v ⊢〚e〛ⁱ ⇓ ↑γ₂] *)
         oql_expr_sem e env (dcoll dl) ->                                      (**r ∧ [Γc; γ ⊢〚e〛⇓ ↑dl] *)
-        env_map_concat_single env (map (fun x => ((v,x)::nil)) dl) = tenv3 -> (**r ∧ [↑γ₃ = mapc v ↑dl] *)
+        env_map_concat_single env (map (fun x => ((v,x)::nil)) dl) = tenv3 -> (**r ∧ [↑γ₃ = mapc γ v ↑dl] *)
         oql_from_in_sem v e (env :: tenv1) (tenv3 ++ tenv2)                   (**r ⇒ [Γc; γ::↑γ₁; v ⊢〚e〛ⁱ ⇓ ↑γ₃⊕↑γ₂] *)
     with oql_from_in_cast_sem : string -> string -> oql_expr -> list oql_env -> list oql_env -> Prop :=
     | oql_from_in_cast_sem_nil v brand_name e :
