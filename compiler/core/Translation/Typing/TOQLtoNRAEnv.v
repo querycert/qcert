@@ -50,7 +50,8 @@ Section TOQLtoNRAEnv.
         + constructor.
           apply assoc_lookupr_nin_none with (dec:=ODT_eqdec) in n.
           rewrite n in H1; trivial.
-    Qed.
+      - admit. (* XXX To prove, new typing rules *)
+    Admitted.
 
     Lemma oql_to_nraenv_query_program_type_preserve_f τconstant τdefls pfd τenv pfe oq τout:
       oql_query_program_type τconstant τdefls τenv oq τout ->
