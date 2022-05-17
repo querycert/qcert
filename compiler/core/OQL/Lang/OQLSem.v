@@ -145,10 +145,10 @@ Section OQLSem.
         oql_from_in_sem in_v e tenv1 tenv2 ->                                 (**r   [Γc; ↑γ₁; v ⊢〚e₀〛ⁱ ⇓ ↑γ₂] *)
         oql_from_sem from_e tenv2 tenv3 ->                                    (**r ∧ [Γc; ↑γ₂ ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
         oql_from_sem ((OIn in_v e)::from_e) tenv1 tenv3                       (**r ⇒ [Γc; ↑γ₁ ⊢〚(v IN e₀)::↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
-    | sem_OFrom_InCast in_v brand_name e from_e : forall tenv1 tenv2 tenv3,
-        oql_from_in_cast_sem in_v brand_name e tenv1 tenv2 ->                 (**r   [Γc; ↑γ₁; v; b ⊢〚e₀〛ᶜ ⇓ ↑γ₂] *)
+    | sem_OFrom_InCast in_v brands e from_e : forall tenv1 tenv2 tenv3,
+        oql_from_in_cast_sem in_v brands e tenv1 tenv2 ->                 (**r   [Γc; ↑γ₁; v; b ⊢〚e₀〛ᶜ ⇓ ↑γ₂] *)
         oql_from_sem from_e tenv2 tenv3 ->                                    (**r ∧ [Γc; ↑γ₂ ⊢〚↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
-        oql_from_sem ((OInCast in_v brand_name e)::from_e) tenv1 tenv3        (**r ⇒ [Γc; ↑γ₁ ⊢〚(v IN e₀ AS b)::↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
+        oql_from_sem ((OInCast in_v brands e)::from_e) tenv1 tenv3        (**r ⇒ [Γc; ↑γ₁ ⊢〚(v IN e₀ AS b)::↑eᶠ〛ᶠ ⇓ ↑γ₃] *)
     with oql_from_in_sem : string -> oql_expr -> list oql_env -> list oql_env -> Prop :=
     | oql_from_in_sem_nil v e :
         oql_from_in_sem v e nil nil                                           (**r   [Γc; []; v ⊢〚e〛ⁱ ⇓ []] *)
@@ -157,15 +157,15 @@ Section OQLSem.
         oql_expr_sem e env (dcoll dl) ->                                      (**r ∧ [Γc; γ ⊢〚e〛⇓ ↑dl] *)
         env_map_concat_single env (map (fun x => ((v,x)::nil)) dl) = tenv3 -> (**r ∧ [↑γ₃ = mapc γ v ↑dl] *)
         oql_from_in_sem v e (env :: tenv1) (tenv3 ++ tenv2)                   (**r ⇒ [Γc; γ::↑γ₁; v ⊢〚e〛ⁱ ⇓ ↑γ₃⊕↑γ₂] *)
-    with oql_from_in_cast_sem : string -> string -> oql_expr -> list oql_env -> list oql_env -> Prop :=
-    | oql_from_in_cast_sem_nil v brand_name e :
-        oql_from_in_cast_sem v brand_name e nil nil                           (**r   [Γc; []; v; b ⊢〚e〛ᶜ ⇓ []] *)
-    | oql_from_in_cast_sem_cons v brand_name e env tenv1 tenv2 tenv3 dl dl' :
-        oql_from_in_cast_sem v brand_name e tenv1 tenv2 ->                    (**r   [Γc; ↑γ₁; v; b ⊢〚e〛ᶜ ⇓ ↑γ₂] *)
+    with oql_from_in_cast_sem : string -> list string -> oql_expr -> list oql_env -> list oql_env -> Prop :=
+    | oql_from_in_cast_sem_nil v brands e :
+        oql_from_in_cast_sem v brands e nil nil                           (**r   [Γc; []; v; b ⊢〚e〛ᶜ ⇓ []] *)
+    | oql_from_in_cast_sem_cons v brands e env tenv1 tenv2 tenv3 dl dl' :
+        oql_from_in_cast_sem v brands e tenv1 tenv2 ->                    (**r   [Γc; ↑γ₁; v; b ⊢〚e〛ᶜ ⇓ ↑γ₂] *)
         oql_expr_sem e env (dcoll dl) ->                                      (**r ∧ [Γc; γ ⊢〚e〛⇓ ↑dl] *)
-        filter_cast_sem (brand_name::nil) dl dl' ->                           (**r ∧ [b₂ ⊢〚↑dl〛ᶜ ⇓ ↑dl'] *)
+        filter_cast_sem brands dl dl' ->                           (**r ∧ [b₂ ⊢〚↑dl〛ᶜ ⇓ ↑dl'] *)
         env_map_concat_single env (map (fun x => ((v,x)::nil)) dl') = tenv3 ->(**r ∧ [↑γ₃ = mapc v ↑dl'] *)
-        oql_from_in_cast_sem v brand_name e (env :: tenv1) (tenv3 ++ tenv2)   (**r ⇒ [Γc; γ::↑γ₁; v ⊢〚e〛ᶜ ⇓ ↑γ₃⊕↑γ₂] *)
+        oql_from_in_cast_sem v brands e (env :: tenv1) (tenv3 ++ tenv2)   (**r ⇒ [Γc; γ::↑γ₁; v ⊢〚e〛ᶜ ⇓ ↑γ₃⊕↑γ₂] *)
     with oql_where_sem : oql_expr -> list oql_env -> list oql_env -> Prop :=
     | oql_where_sem_nil e :
         oql_where_sem e nil nil                                               (**r   [Γc; [] ⊢〚e〛ʷ ⇓ []] *)
@@ -240,11 +240,11 @@ Section OQLSem.
         reflexivity.
     Qed.
 
-    Lemma oql_from_in_cast_sem_correct in_v brand_name e tenv tenv2:
+    Lemma oql_from_in_cast_sem_correct in_v brands e tenv tenv2:
       (forall (tenv : oql_env) (d : data),
           oql_expr_interp h constant_env e tenv = Some d -> oql_expr_sem e tenv d) ->
-      env_map_concat_cast h in_v brand_name (oql_expr_interp h constant_env e) tenv = Some tenv2 ->
-      oql_from_in_cast_sem in_v brand_name e tenv tenv2.
+      env_map_concat_cast h in_v brands (oql_expr_interp h constant_env e) tenv = Some tenv2 ->
+      oql_from_in_cast_sem in_v brands e tenv tenv2.
     Proof.
       intros He.
       intros.
@@ -257,7 +257,7 @@ Section OQLSem.
         case_eq (oql_expr_interp h constant_env e a); intros;
           rewrite H in H1; simpl; try congruence.
         destruct d; simpl in *; try congruence.
-        case_eq (filter_cast h (brand_name :: nil) l); intros;
+        case_eq (filter_cast h brands l); intros;
           rewrite H0 in H1; simpl in *; try congruence.
         unfold lift in *.
         case_eq ((fix lift_flat_map (A B : Type) (f : A -> option (list B)) (l : list A) {struct l} :
@@ -277,7 +277,7 @@ Section OQLSem.
            (fun a : oql_env =>
             match oql_expr_interp h constant_env e a with
             | Some (dcoll y) =>
-                match filter_cast h (brand_name :: nil) y with
+                match filter_cast h brands y with
                 | Some y0 =>
                     Some (env_map_concat_single a (map (fun x : data => (in_v, x) :: nil) y0))
                 | None => None
@@ -359,13 +359,13 @@ Section OQLSem.
             apply (IHel l H0).
           * clear H3 H IHel.
             rewrite fold_left_none in H0. congruence.
-        + case_eq (env_map_concat_cast h s s0 (oql_expr_interp h constant_env o) tenv); intros;
+        + case_eq (env_map_concat_cast h s l (oql_expr_interp h constant_env o) tenv); intros;
           rewrite H in H0; simpl in *.
           * econstructor.
             apply (oql_from_in_cast_sem_correct).
             apply H3.
             apply H.
-            apply (IHel l H0).
+            apply (IHel l0 H0).
           * clear H3 H IHel.
             rewrite fold_left_none in H0. congruence.
     Qed.
@@ -696,7 +696,7 @@ Section OQLSem.
         + inversion Hforall; subst.
           specialize (IHel H3 tenv2 tenv0 H5).
           simpl in H1.
-          rewrite (oql_from_in_cast_sem_complete in_v brand_name e tenv tenv2 H1 H2).
+          rewrite (oql_from_in_cast_sem_complete in_v brands e tenv tenv2 H1 H2).
           assumption.
     Qed.
 

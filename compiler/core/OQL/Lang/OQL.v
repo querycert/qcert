@@ -38,7 +38,7 @@ Section OQL.
   | OSelectDistinct : oql_expr -> oql_select_expr
   with oql_in_expr : Set :=
   | OIn : string -> oql_expr -> oql_in_expr
-  | OInCast : string -> string -> oql_expr -> oql_in_expr
+  | OInCast : string -> list string -> oql_expr -> oql_in_expr
   with oql_where_expr : Set :=
   | OTrue : oql_where_expr
   | OWhere : oql_expr -> oql_where_expr
@@ -251,8 +251,11 @@ Section OQL.
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
-          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+        * assert ({l0 = l1} + {l0 <> l1}).
+          induction l0; decide equality; apply string_dec.
+          destruct (string_dec s s0); subst; [|right; congruence]. 
+          destruct H; subst; [|right; congruence].
+          destruct (IHel l); try (inversion e; subst; left; reflexivity).
           right; congruence.
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
@@ -264,8 +267,11 @@ Section OQL.
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
-          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+        * assert ({l0 = l1} + {l0 <> l1}).
+          induction l0; decide equality; apply string_dec.
+          destruct (string_dec s s0); subst; [|right; congruence]. 
+          destruct H; subst; [|right; congruence].
+          destruct (IHel l); try (inversion e; subst; left; reflexivity).
           right; congruence.
     - destruct o0; simpl; try (right; congruence).
       destruct (IHx0 o0); try (right; congruence); subst.
@@ -280,8 +286,11 @@ Section OQL.
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
-          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+        * assert ({l0 = l1} + {l0 <> l1}).
+          induction l0; decide equality; apply string_dec.
+          destruct (string_dec s s0); subst; [|right; congruence]. 
+          destruct H; subst; [|right; congruence].
+          destruct (IHel l); try (inversion e; subst; left; reflexivity).
           right; congruence.
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
@@ -293,8 +302,11 @@ Section OQL.
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
-          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+        * assert ({l0 = l1} + {l0 <> l1}).
+          induction l0; decide equality; apply string_dec.
+          destruct (string_dec s s0); subst; [|right; congruence]. 
+          destruct H; subst; [|right; congruence].
+          destruct (IHel l); try (inversion e; subst; left; reflexivity).
           right; congruence.
     - destruct o0; simpl; [|right; congruence].
       destruct e1; destruct o; simpl in *; try (right; congruence).
@@ -311,8 +323,11 @@ Section OQL.
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
-          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+        * assert ({l0 = l1} + {l0 <> l1}).
+          induction l0; decide equality; apply string_dec.
+          destruct (string_dec s s0); subst; [|right; congruence]. 
+          destruct H; subst; [|right; congruence].
+          destruct (IHel l); try (inversion e; subst; left; reflexivity).
           right; congruence.
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
@@ -330,9 +345,12 @@ Section OQL.
           [destruct (string_dec s s0); subst; 
            destruct (IHel l); try (inversion e; subst; left; reflexivity);
            right; congruence|
-           destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
-           destruct (IHel l); try (inversion e; subst; left; reflexivity);
-           right; congruence].
+           assert ({l0 = l1} + {l0 <> l1}) by
+               (induction l0; decide equality; apply string_dec);
+           destruct (string_dec s s0); subst; [|right; congruence];
+           destruct H; subst; [|right; congruence];
+           destruct (IHel l); try (inversion e; subst; left; reflexivity)].
+           right; congruence.
         * destruct (IHx0 o1); try (right; congruence); subst; clear IHx0.
           inversion H; subst; simpl in *.
           specialize (IHel H3); clear H.
@@ -341,9 +359,12 @@ Section OQL.
           [destruct (string_dec s s0); subst; 
            destruct (IHel l); try (inversion e; subst; left; reflexivity);
            right; congruence|
-           destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
-           destruct (IHel l); try (inversion e; subst; left; reflexivity);
-           right; congruence].
+           assert ({l0 = l1} + {l0 <> l1}) by
+               (induction l0; decide equality; apply string_dec);
+           destruct (string_dec s s0); subst; [|right; congruence];
+           destruct H; subst; [|right; congruence];
+           destruct (IHel l); try (inversion e; subst; left; reflexivity)].
+           right; congruence.
     - destruct o0; simpl; try (right; congruence).
       assert (dec1:{e1 = o} + {e1 <> o}).
       {
@@ -367,11 +388,13 @@ Section OQL.
              ; destruct (string_dec s s0); try solve [right; inversion 1; congruence]
              ; subst
              ; destruct (H0 o3); [left|right;inversion 1]; congruence.
-           - simpl in H0
-            ; destruct (string_dec s s1); try solve [right; inversion 1; congruence]
-            ; destruct (string_dec s0 s2); try solve [right; inversion 1; congruence]
-            ; subst
-            ; destruct (H0 o3); [left|right;inversion 1]; congruence.
+           - assert ({l0 = l1} + {l0 <> l1}) by
+               (induction l0; decide equality; apply string_dec).
+             simpl in H0
+             ; destruct (string_dec s s0); try solve [right; inversion 1; congruence]
+             ; destruct H1; subst; try solve [right; inversion 1; congruence]
+             ; subst
+             ; destruct (H0 o3); subst; [left|right;inversion 1]; try congruence.
          }
          destruct dec2; try solve [right; inversion 1; congruence]; subst.
          
@@ -395,8 +418,10 @@ Section OQL.
     red; destruct x; destruct y; try solve [right; congruence].
     - destruct (string_dec s s0); try solve [right; inversion 1; congruence]; subst.
       destruct (o == o0); [left|right]; congruence.
-    - destruct (string_dec s s1); try solve [right; inversion 1; congruence]; subst.
-      destruct (string_dec s0 s2); try solve [right; inversion 1; congruence]; subst.
+    - assert ({l = l0} + {l <> l0}) by
+          (induction l; decide equality; apply string_dec).
+      destruct (string_dec s s0); try solve [right; inversion 1; congruence]; subst.
+      destruct H; try solve [right; inversion 1; congruence]; subst.
       destruct (o == o0); [left|right]; congruence.
   Defined.
 
@@ -467,12 +492,12 @@ Section OQL.
 
     Definition oenv_map_concat_single_with_cast
                (v:string)
-               (brand_name:string)
+               (brands:list string)
                (f:oql_env -> option data)
                (a:oql_env) : option (list oql_env) :=
       match f a with
       | Some (dcoll y) =>
-        match filter_cast (brand_name::nil) y with
+        match filter_cast brands y with
         | Some y =>
           Some (env_map_concat_single a (map (fun x => ((v,x)::nil)) y))
         | None => None
@@ -488,10 +513,10 @@ Section OQL.
 
     Definition env_map_concat_cast
                (v:string)
-               (brand_name:string)
+               (brands:list string)
                (f:oql_env -> option data)
                (d:list oql_env) : option (list oql_env) :=
-      lift_flat_map (oenv_map_concat_single_with_cast v brand_name f) d.
+      lift_flat_map (oenv_map_concat_single_with_cast v brands f) d.
 
     Fixpoint oql_expr_interp (q:oql_expr) (env:oql_env) : option data :=
       match q with
@@ -514,11 +539,11 @@ Section OQL.
               | Some envl' =>
                 env_map_concat in_v (oql_expr_interp from_expr) envl'
               end
-            | OInCast in_v brand_name from_expr =>
+            | OInCast in_v brands from_expr =>
               match envl with
               | None => None
               | Some envl' =>
-                env_map_concat_cast in_v brand_name (oql_expr_interp from_expr) envl'
+                env_map_concat_cast in_v brands (oql_expr_interp from_expr) envl'
               end
             end
         in

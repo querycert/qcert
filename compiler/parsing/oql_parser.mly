@@ -238,11 +238,11 @@ from_clause:
 | v = IDENT IN e = expr
     { (QOQL.oin v e) :: [] }
 | v = IDENT AS c = qname IN e = expr
-    { (QOQL.oincast v c e) :: [] }
+    { (QOQL.oincast v (c::[]) e) :: [] }
 | v = IDENT IN e = expr COMMA fr = from_clause
     { (QOQL.oin v e) :: fr }
 | v = IDENT AS c = qname IN e = expr COMMA fr = from_clause
-    { (QOQL.oincast v c e) :: fr }
+    { (QOQL.oincast v (c::[]) e) :: fr }
 
 qname:
 | i = IDENT
