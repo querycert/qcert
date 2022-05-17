@@ -82,6 +82,31 @@ Section TOQL.
           oql_expr_type tenv e τ ->
           oql_select_map_expr_type tenv e τ.
 
+      (** A couple of useful lemma on typed bindings *)
+      Lemma oql_from_in_type_sorted τenv v e τenv' :
+        is_list_sorted StringOrder.lt_dec (domain τenv) = true ->
+        oql_from_in_expr_type v e τenv τenv' ->
+        is_list_sorted StringOrder.lt_dec (domain τenv') = true.
+      Proof.
+        intros.
+        inversion H0; subst.
+        apply (drec_concat_sort_sorted (odt:=ODT_string)).
+      Qed.
+
+      Lemma oql_from_type_sorted τenv el τenv' :
+        is_list_sorted StringOrder.lt_dec (domain τenv) = true ->
+        oql_from_expr_type τenv el τenv' ->
+        is_list_sorted StringOrder.lt_dec (domain τenv') = true.
+      Proof.
+        intros.
+        revert τenv H0 H.
+        induction el; intros.
+        - inversion H0; subst; assumption.
+        - inversion H0; subst; clear H0.
+          apply (IHel tenv'); try assumption.
+          apply (oql_from_in_type_sorted τenv v e); assumption.
+      Qed.
+
     End constt.
 
     Context (τconstants:tbindings).
