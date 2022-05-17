@@ -52,6 +52,35 @@ Section TOQLtoNRAEnv.
       constructor.
   Qed.
 
+  Lemma oql_to_nraenv_from_in_cast_expr_type_preserve_f τconstant τenv τenv1 tenv' τdefls e0 br v e pfe pfe0 pfd pf':
+    (forall (τconstant τdefls : list (string * rtype))
+         (pfd : is_list_sorted StringOrder.lt_dec (domain τdefls) = true) 
+         (τenv : tbindings) (pfe : is_list_sorted StringOrder.lt_dec (domain τenv) = true)
+         (τout : rtype),
+       oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout ->
+       nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e) ▷ 
+       Rec Closed τenv pfe >=> τout ⊣ τconstant; Rec Closed τdefls pfd) ->
+    (nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
+                           ⊣ τconstant; Rec Closed τdefls pfd) ->
+    (oql_from_in_cast_expr_type (rec_concat_sort τconstant τdefls) (br::nil) v e τenv1 tenv') ->
+    (nraenv_to_nraenv_core
+       (NRAEnvMapProduct
+       (NRAEnvMap (NRAEnvUnop (OpRec v) NRAEnvID)
+          (NRAEnvUnop OpFlatten
+             (NRAEnvMap (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID) (NRAEnvConst (dcoll nil)))
+                (NRAEnvMap (NRAEnvUnop (OpCast (br :: nil)) NRAEnvID)
+                   (oql_to_nraenv_expr (domain τdefls) e))))) e0)
+       ▷ Rec Closed τenv pfe >=> Coll (Rec Closed tenv' pf') ⊣ τconstant; Rec Closed τdefls pfd).
+  Proof.
+    intros.
+    inversion H1; subst; simpl.
+    repeat econstructor.
+    + apply H. apply H2.
+    + apply H0.
+      Unshelve.
+      constructor.
+  Qed.
+
   Lemma oql_to_nraenv_from_expr_type_preserve_f τconstant τenv τenv1 e0 el from_tenv τdefls pfd pfe pfe0 pfet :
     nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
   ⊣ τconstant; Rec Closed τdefls pfd ->
@@ -95,17 +124,31 @@ Section TOQLtoNRAEnv.
       apply He0.
     - inversion H0; subst; intros; clear H0.
       inversion H; subst; intros; clear H.
-      assert (is_list_sorted StringOrder.lt_dec (domain tenv') = true) by
-          (apply (oql_from_in_type_sorted (rec_concat_sort τconstant τdefls) τenv1 v e tenv');
-           try assumption).
-      apply (IHel H4 τenv tenv' from_tenv
-                  (NRAEnvMapProduct
-                     (NRAEnvMap (NRAEnvUnop (OpRec v) NRAEnvID)
-                                (oql_to_nraenv_expr (domain τdefls) e)) e0) pfe H pfet H7)
-      ; clear IHel H4.
-      simpl in H3.
-      apply (oql_to_nraenv_from_in_expr_type_preserve_f τconstant τenv τenv1 tenv'
-                  τdefls e0 v e pfe pfe0 pfd H); assumption.
+      + assert (is_list_sorted StringOrder.lt_dec (domain tenv') = true) by
+            (apply (oql_from_in_type_sorted (rec_concat_sort τconstant τdefls) τenv1 v e tenv');
+             try assumption).
+        apply (IHel H4 τenv tenv' from_tenv
+                    (NRAEnvMapProduct
+                       (NRAEnvMap (NRAEnvUnop (OpRec v) NRAEnvID)
+                                  (oql_to_nraenv_expr (domain τdefls) e)) e0) pfe H pfet H7)
+        ; clear IHel H4.
+        simpl in H3.
+        apply (oql_to_nraenv_from_in_expr_type_preserve_f τconstant τenv τenv1 tenv'
+                                                          τdefls e0 v e pfe pfe0 pfd H); assumption.
+      + assert (is_list_sorted StringOrder.lt_dec (domain tenv') = true) by
+            (apply (oql_from_in_cast_type_sorted (rec_concat_sort τconstant τdefls) τenv1 (br::nil) v e tenv');
+             try assumption).
+        apply (IHel H4 τenv tenv' from_tenv
+                    (NRAEnvMapProduct
+          (NRAEnvMap (NRAEnvUnop (OpRec v) NRAEnvID)
+             (NRAEnvUnop OpFlatten
+                (NRAEnvMap (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID) (NRAEnvConst (dcoll nil)))
+                   (NRAEnvMap (NRAEnvUnop (OpCast (br :: nil)) NRAEnvID)
+                      (oql_to_nraenv_expr (domain τdefls) e))))) e0) pfe H pfet H7)
+        ; clear IHel H4.
+        simpl in H3.
+        apply (oql_to_nraenv_from_in_cast_expr_type_preserve_f τconstant τenv τenv1 tenv'
+                                                               τdefls e0 br v e pfe pfe0 pfd H); assumption.
   Qed.
 
   Lemma oql_to_nraenv_expr_type_preserve_f τconstant τdefls pfd τenv pfe e τout:
