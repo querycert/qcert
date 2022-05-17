@@ -62,13 +62,13 @@ Section TOQLtoNRAEnv.
        Rec Closed τenv pfe >=> τout ⊣ τconstant; Rec Closed τdefls pfd) ->
     (nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
                            ⊣ τconstant; Rec Closed τdefls pfd) ->
-    (oql_from_in_cast_expr_type (rec_concat_sort τconstant τdefls) (br::nil) v e τenv1 tenv') ->
+    (oql_from_in_cast_expr_type (rec_concat_sort τconstant τdefls) br v e τenv1 tenv') ->
     (nraenv_to_nraenv_core
        (NRAEnvMapProduct
        (NRAEnvMap (NRAEnvUnop (OpRec v) NRAEnvID)
           (NRAEnvUnop OpFlatten
              (NRAEnvMap (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID) (NRAEnvConst (dcoll nil)))
-                (NRAEnvMap (NRAEnvUnop (OpCast (br :: nil)) NRAEnvID)
+                (NRAEnvMap (NRAEnvUnop (OpCast br) NRAEnvID)
                    (oql_to_nraenv_expr (domain τdefls) e))))) e0)
        ▷ Rec Closed τenv pfe >=> Coll (Rec Closed tenv' pf') ⊣ τconstant; Rec Closed τdefls pfd).
   Proof.
@@ -102,13 +102,13 @@ Section TOQLtoNRAEnv.
               NRAEnvMapProduct
                 (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID)
                            (oql_to_nraenv_expr (domain τdefls) from_expr)) opacc
-            | OInCast in_v brand_name from_expr =>
+            | OInCast in_v brands from_expr =>
               NRAEnvMapProduct
                 (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID)
                            (NRAEnvUnop OpFlatten
                                        (NRAEnvMap
                                           (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID) (NRAEnvConst (dcoll nil)))
-                                          (NRAEnvMap (NRAEnvUnop (OpCast (brand_name :: nil)) NRAEnvID)
+                                          (NRAEnvMap (NRAEnvUnop (OpCast brands) NRAEnvID)
                                                      (oql_to_nraenv_expr (domain τdefls) from_expr))))) opacc
             end) el e0) ▷ Rec Closed τenv pfe >=>
       Coll (Rec Closed from_tenv pfet) ⊣ τconstant; Rec Closed τdefls pfd.
@@ -136,14 +136,14 @@ Section TOQLtoNRAEnv.
         apply (oql_to_nraenv_from_in_expr_type_preserve_f τconstant τenv τenv1 tenv'
                                                           τdefls e0 v e pfe pfe0 pfd H); assumption.
       + assert (is_list_sorted StringOrder.lt_dec (domain tenv') = true) by
-            (apply (oql_from_in_cast_type_sorted (rec_concat_sort τconstant τdefls) τenv1 (br::nil) v e tenv');
+            (apply (oql_from_in_cast_type_sorted (rec_concat_sort τconstant τdefls) τenv1 br v e tenv');
              try assumption).
         apply (IHel H4 τenv tenv' from_tenv
                     (NRAEnvMapProduct
           (NRAEnvMap (NRAEnvUnop (OpRec v) NRAEnvID)
              (NRAEnvUnop OpFlatten
                 (NRAEnvMap (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID) (NRAEnvConst (dcoll nil)))
-                   (NRAEnvMap (NRAEnvUnop (OpCast (br :: nil)) NRAEnvID)
+                   (NRAEnvMap (NRAEnvUnop (OpCast br) NRAEnvID)
                       (oql_to_nraenv_expr (domain τdefls) e))))) e0) pfe H pfet H7)
         ; clear IHel H4.
         simpl in H3.

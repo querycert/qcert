@@ -49,14 +49,14 @@ Section OQLtoNRAEnv.
           match from_in_expr with
           | OIn in_v from_expr =>
             NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID) (oql_to_nraenv_expr from_expr)) opacc
-          | OInCast in_v brand_name from_expr =>
+          | OInCast in_v br from_expr =>
             NRAEnvMapProduct
               (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID)
                          (NRAEnvUnop OpFlatten
                                      (NRAEnvMap
                                         (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
                                                       (NRAEnvConst (dcoll nil)))
-                                        (NRAEnvMap (NRAEnvUnop (OpCast (brand_name::nil)) NRAEnvID)
+                                        (NRAEnvMap (NRAEnvUnop (OpCast br) NRAEnvID)
                                                    (oql_to_nraenv_expr from_expr))
               )))
               opacc
@@ -174,7 +174,7 @@ Section OQLtoNRAEnv.
                     | dleft _ => None
                     | dright _ => None
                     | dbrand b' _ =>
-                      if sub_brands_dec h b' (bn :: nil)
+                      if sub_brands_dec h b' bn
                       then Some (dsome x)
                       else Some dnone
                     | dforeign _ => None
@@ -192,7 +192,7 @@ Section OQLtoNRAEnv.
          | dleft _ => None
          | dright _ => None
          | dbrand b' _ =>
-           if sub_brands_dec h b' (bn :: nil)
+           if sub_brands_dec h b' bn
            then Some (x :: nil)
            else Some nil
          | dforeign _ => None
@@ -200,7 +200,7 @@ Section OQLtoNRAEnv.
   Proof.
     induction l0; [reflexivity| ]; simpl.
     destruct a; try reflexivity.
-    destruct (sub_brands_dec h b (bn :: nil)); simpl;
+    destruct (sub_brands_dec h b bn); simpl;
     rewrite <- IHl0;
       destruct ((lift_map
              (fun x : data =>
@@ -215,7 +215,7 @@ Section OQLtoNRAEnv.
               | dleft _ => None
               | dright _ => None
               | dbrand b' _ =>
-                  if sub_brands_dec h b' (bn :: nil)
+                  if sub_brands_dec h b' bn
                   then Some (dsome x)
                   else Some dnone
               | dforeign _ => None
@@ -455,7 +455,7 @@ Section OQLtoNRAEnv.
                   (NRAEnvUnop OpFlatten(
                                 NRAEnvMap (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
                                                         (NRAEnvConst (dcoll nil)))
-                                          (NRAEnvMap (NRAEnvUnop (OpCast (bn :: nil)) NRAEnvID)
+                                          (NRAEnvMap (NRAEnvUnop (OpCast bn) NRAEnvID)
                                                      (oql_to_nraenv_expr (domain defls) o))))) op) @ₓ envs
           ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv
        =
@@ -484,77 +484,11 @@ Section OQLtoNRAEnv.
       unfold filter_cast in *; simpl in *.
       autorewrite with alg; simpl.
       rewrite flatten_either_is_lift_map_either; simpl.
-      assert (@lift_flat_map (@data (@foreign_runtime_data fruntime))
-                         (@data (@foreign_runtime_data fruntime))
-                         (fun x : @data (@foreign_runtime_data fruntime) =>
-                            match
-                              x
-                              return
-                              (option (list (@data (@foreign_runtime_data fruntime))))
-                            with
-                            | dbrand b' _ =>
-                              match
-                                sub_brands_dec h b' (@cons string bn (@nil string))
-                                return
-                                (option
-                                   (list (@data (@foreign_runtime_data fruntime))))
-                              with
-                              | left _ =>
-                                @Some
-                                  (list (@data (@foreign_runtime_data fruntime)))
-                                  (@cons (@data (@foreign_runtime_data fruntime)) x
-                                         (@nil (@data (@foreign_runtime_data fruntime))))
-                              | right _ =>
-                                @Some
-                                  (list (@data (@foreign_runtime_data fruntime)))
-                                  (@nil (@data (@foreign_runtime_data fruntime)))
-                              end
-                            | _ =>
-                              None
-                            end) l0 =
-              (@lift_flat_map (@data (@foreign_runtime_data fruntime))
-                          (@data (@foreign_runtime_data fruntime))
-                          (fun x : @data (@foreign_runtime_data fruntime) =>
-                             match
-                               x
-                               return
-                               (option
-                                  (list (@data (@foreign_runtime_data fruntime))))
-                             with
-                             | dbrand b' _ =>
-                               match
-                                 sub_brands_dec h b'
-                                                (@cons brand bn (@nil brand))
-                                 return
-                                 (option
-                                    (list
-                                       (@data (@foreign_runtime_data fruntime))))
-                               with
-                               | left _ =>
-                                 @Some
-                                   (list
-                                      (@data (@foreign_runtime_data fruntime)))
-                                   (@cons
-                                      (@data (@foreign_runtime_data fruntime))
-                                      x
-                                      (@nil
-                                         (@data
-                                            (@foreign_runtime_data fruntime))))
-                               | right _ =>
-                                 @Some
-                                   (list
-                                      (@data (@foreign_runtime_data fruntime)))
-                                   (@nil
-                                      (@data (@foreign_runtime_data fruntime)))
-                               end
-                             | _ => None
-                             end) l0)) by reflexivity.
-      rewrite H; clear H.
       destruct (lift_flat_map
                   (fun x : data =>
                      match x with
                      | dbrand b' _ =>
-                       if sub_brands_dec h b' (bn :: nil)
+                       if sub_brands_dec h b' bn
                        then Some (x :: nil)
                        else Some nil
                      | _ => None
@@ -639,14 +573,14 @@ Section OQLtoNRAEnv.
               NRAEnvMapProduct
                 (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID) (oql_to_nraenv_expr (domain defls) from_expr))
                 opacc
-            | OInCast in_v brand_name from_expr =>
+            | OInCast in_v brands from_expr =>
               NRAEnvMapProduct
                 (NRAEnvMap
                    (NRAEnvUnop (OpRec in_v) NRAEnvID)
                    (NRAEnvUnop OpFlatten
                                (NRAEnvMap (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
                                                         (NRAEnvConst (dcoll nil)))
-                                          (NRAEnvMap (NRAEnvUnop (OpCast (brand_name::nil))
+                                          (NRAEnvMap (NRAEnvUnop (OpCast brands)
                                                                  NRAEnvID)
                                                      (oql_to_nraenv_expr (domain defls) from_expr)))))
                 opacc
@@ -691,7 +625,7 @@ Section OQLtoNRAEnv.
                                   (NRAEnvMap
                                      (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
                                                    (NRAEnvConst (dcoll nil)))
-                                     (NRAEnvMap (NRAEnvUnop (OpCast (s0 :: nil)) NRAEnvID)
+                                     (NRAEnvMap (NRAEnvUnop (OpCast l) NRAEnvID)
                                                 (oql_to_nraenv_expr (domain defls) o))))) (op))%nraenv).
         assert ((h ⊢ (NRAEnvMapProduct
                         (NRAEnvMap
@@ -700,20 +634,20 @@ Section OQLtoNRAEnv.
                                        (NRAEnvMap
                                           (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
                                                         (NRAEnvConst (dcoll nil)))
-                                          (NRAEnvMap (NRAEnvUnop (OpCast (s0 :: nil)) NRAEnvID)
+                                          (NRAEnvMap (NRAEnvUnop (OpCast l) NRAEnvID)
                                                      (oql_to_nraenv_expr (domain defls) o))))) (op)) @ₓ envs
                    ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv
                 =
                 lift (fun x : list (list (string * data)) => dcoll (map drec x))
                      match envs0 with
                      | Some envl' =>
-                       env_map_concat_cast h s s0 (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
+                       env_map_concat_cast h s l (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
                      | None => None
                      end)
           by (apply one_from_cast_fold_step_is_map_concat_cast; assumption).
         apply (IHel xenv (match envs0 with
                           | Some envl' =>
-                            env_map_concat_cast h s s0 (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
+                            env_map_concat_cast h s l (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
                           | None => None
                           end) envs H).
     Qed.

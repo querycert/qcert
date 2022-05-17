@@ -81,7 +81,7 @@ Section TOQL.
           oql_from_expr_type tenv' from_rest_e tenv'' ->
           oql_from_expr_type tenv (OIn v e :: from_rest_e) tenv''
       | TOFromConsInCast tenv tenv' tenv'' br v e from_rest_e:
-          oql_from_in_cast_expr_type (br::nil) v e tenv tenv' ->
+          oql_from_in_cast_expr_type br v e tenv tenv' ->
           oql_from_expr_type tenv' from_rest_e tenv'' ->
           oql_from_expr_type tenv (OInCast v br e :: from_rest_e) tenv''
       with oql_from_in_expr_type : string -> oql_expr -> tbindings -> tbindings -> Prop :=
@@ -149,7 +149,7 @@ Section TOQL.
           + apply (IHel tenv'); try assumption.
             apply (oql_from_in_type_sorted τenv v e); assumption.
           + apply (IHel tenv'); try assumption.
-            apply (oql_from_in_cast_type_sorted τenv (br::nil) v e); assumption.
+            apply (oql_from_in_cast_type_sorted τenv br v e); assumption.
       Qed.
 
     End constt.
@@ -237,8 +237,8 @@ Section TOQL.
   Lemma oql_filter_cast_sound {m:basic_model} bs br (dl:list data):
     Forall (fun d : data => d ▹ Brand bs) dl ->
     exists dl',
-      (filter_cast_sem brand_relation_brands (br::nil) dl dl'
-       /\ Forall (fun d : data => d ▹ Brand (br :: nil)) dl').
+      (filter_cast_sem brand_relation_brands br dl dl'
+       /\ Forall (fun d : data => d ▹ Brand br) dl').
   Proof.
     intros.
     induction dl; intros; simpl in *.
@@ -247,7 +247,7 @@ Section TOQL.
       elim (IHdl H3); intros; clear IHdl.
       elim H; intros; subst; clear H.
       inversion H2; intros; subst.
-      specialize (sub_brands_dec brand_relation_brands b (br :: nil)); intros.
+      specialize (sub_brands_dec brand_relation_brands b br); intros.
       elim H7; intros.
       + exists ((dbrand b d) :: x).
         split; [econstructor; assumption| ].
@@ -259,7 +259,7 @@ Section TOQL.
   Qed.
 
   Lemma oql_from_in_cast_expr_sound {m:basic_model} {τc} {tenv tenv'} c br v e l1 :
-    oql_from_in_cast_expr_type τc (br::nil) v e tenv tenv' ->
+    oql_from_in_cast_expr_type τc br v e tenv tenv' ->
     Forall (fun env => bindings_type env tenv) l1 ->
     (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
        bindings_type env τenv ->
@@ -327,7 +327,7 @@ Section TOQL.
         apply H2.
       + inversion H1; intros; subst; clear H1.
         inversion H0; intros; subst; clear H0.
-        elim (@oql_from_in_cast_expr_sound m τc τenv tenv' c s0 s o lenv H8 H H3);
+        elim (@oql_from_in_cast_expr_sound m τc τenv tenv' c l s o lenv H8 H H3);
           intros; clear H H3.
         elim H0; intros; clear H0.
         elim (IHel tenv' from_tenv x H1 H4 H9); intros.

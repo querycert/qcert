@@ -61,7 +61,7 @@ Module QOQL(runtime:CompilerRuntime).
     := OQL.OSelectDistinct.
   Definition oin : String.string -> expr -> in_expr 
     := OQL.OIn.
-  Definition oincast : String.string -> String.string -> expr -> in_expr 
+  Definition oincast : String.string -> list String.string -> expr -> in_expr 
     := OQL.OInCast.
   Definition otrue : where_expr 
     := OQL.OTrue.
