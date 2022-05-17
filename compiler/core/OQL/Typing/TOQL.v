@@ -64,12 +64,22 @@ Section TOQL.
           oql_from_in_expr_type v e tenv tenv' ->
           oql_from_expr_type tenv' from_rest_e tenv'' ->
           oql_from_expr_type tenv (OIn v e :: from_rest_e) tenv''
+      | TOFromConsInCast tenv tenv' tenv'' br v e from_rest_e:
+          oql_from_in_cast_expr_type (br::nil) v e tenv tenv' ->
+          oql_from_expr_type tenv' from_rest_e tenv'' ->
+          oql_from_expr_type tenv (OInCast v br e :: from_rest_e) tenv''
       with oql_from_in_expr_type : string -> oql_expr -> tbindings -> tbindings -> Prop :=
       | TOFromIn {τ} tenv tenv' v e:
           oql_expr_type tenv e (Coll τ) ->
           (* XXX add (v,t) to the environment with the correct scoping (right override left) *)
           rec_concat_sort tenv ((v,τ)::nil) = tenv' ->
           oql_from_in_expr_type v e tenv tenv'
+      with oql_from_in_cast_expr_type : list string -> string -> oql_expr -> tbindings -> tbindings -> Prop :=
+      | TOFromInCast br bs tenv tenv' v e:
+          oql_expr_type tenv e (Coll (Brand bs)) ->
+          (* XXX add (v,t) to the environment with the correct scoping (right override left) *)
+          rec_concat_sort tenv ((v,(Brand br))::nil) = tenv' ->
+          oql_from_in_cast_expr_type br v e tenv tenv'
       with oql_select_expr_type : tbindings -> oql_select_expr -> rtype -> Prop :=
       | TOSelect {τ} tenv e :
           oql_select_map_expr_type tenv e τ ->
@@ -93,6 +103,16 @@ Section TOQL.
         apply (drec_concat_sort_sorted (odt:=ODT_string)).
       Qed.
 
+      Lemma oql_from_in_cast_type_sorted τenv br v e τenv' :
+        is_list_sorted StringOrder.lt_dec (domain τenv) = true ->
+        oql_from_in_cast_expr_type br v e τenv τenv' ->
+        is_list_sorted StringOrder.lt_dec (domain τenv') = true.
+      Proof.
+        intros.
+        inversion H0; subst.
+        apply (drec_concat_sort_sorted (odt:=ODT_string)).
+      Qed.
+
       Lemma oql_from_type_sorted τenv el τenv' :
         is_list_sorted StringOrder.lt_dec (domain τenv) = true ->
         oql_from_expr_type τenv el τenv' ->
@@ -103,8 +123,10 @@ Section TOQL.
         induction el; intros.
         - inversion H0; subst; assumption.
         - inversion H0; subst; clear H0.
-          apply (IHel tenv'); try assumption.
-          apply (oql_from_in_type_sorted τenv v e); assumption.
+          + apply (IHel tenv'); try assumption.
+            apply (oql_from_in_type_sorted τenv v e); assumption.
+          + apply (IHel tenv'); try assumption.
+            apply (oql_from_in_cast_type_sorted τenv (br::nil) v e); assumption.
       Qed.
 
     End constt.
@@ -189,6 +211,64 @@ Section TOQL.
         apply Forall_binding_types_concat; assumption.
   Qed.
 
+  Lemma oql_filter_cast_sound {m:basic_model} bs br (dl:list data):
+    Forall (fun d : data => d ▹ Brand bs) dl ->
+    exists dl',
+      (filter_cast_sem brand_relation_brands (br::nil) dl dl'
+       /\ Forall (fun d : data => d ▹ Brand (br :: nil)) dl').
+  Proof.
+    intros.
+    induction dl; intros; simpl in *.
+    - exists nil; split; constructor.
+    - inversion H; intros; subst; clear H.
+      elim (IHdl H3); intros; clear IHdl.
+      elim H; intros; subst; clear H.
+      inversion H2; intros; subst.
+      specialize (sub_brands_dec brand_relation_brands b (br :: nil)); intros.
+      elim H7; intros.
+      + exists ((dbrand b d) :: x).
+        split; [econstructor; assumption| ].
+        constructor; try assumption.
+        constructor; try assumption.
+      + exists x.
+        split; [econstructor; assumption| ].
+        assumption.
+  Qed.
+
+  Lemma oql_from_in_cast_expr_sound {m:basic_model} {τc} {tenv tenv'} c br v e l1 :
+    oql_from_in_cast_expr_type τc (br::nil) v e tenv tenv' ->
+    Forall (fun env => bindings_type env tenv) l1 ->
+    (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
+       bindings_type env τenv ->
+       oql_expr_type τc τenv e τout ->
+       exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout) ->
+    (exists l2,
+        oql_from_in_cast_sem brand_relation_brands c v br e l1 l2 /\
+        (Forall (fun env => bindings_type env tenv') l2))
+  .
+  Proof.
+    intros.
+    induction l1.
+    - exists nil; split; constructor.
+    - inversion H; subst; clear H.
+      inversion H0; intros; subst; clear H0.
+      elim (H1 tenv (Coll (Brand bs)) a H4 H2); intros; subst; clear H1 H2.
+      elim H; intros; clear H.
+      inversion H1; subst.
+      elim (IHl1 H5); intros; subst; clear IHl1 H5.
+      elim H2; intros; subst; clear H2.
+      assert (r = Brand bs) by (apply rtype_fequal; assumption).
+      subst; clear H.
+      elim (oql_filter_cast_sound bs br dl); intros; try assumption.
+      elim H; intros; clear H.
+      exists (env_map_concat_single a (map (fun x => ((v,x)::nil)) x0) ++ x).
+      split.
+      + econstructor; [assumption|apply H0|apply H2|reflexivity].
+      + apply Forall_app; try assumption.
+        apply Forall_binding_types_concat;
+          assumption.
+  Qed.
+
   Lemma oql_from_expr_type_sound {m:basic_model} {τc} {τenv} {lenv} {from_tenv} c el:
     bindings_type c τc ->
     Forall (fun env => bindings_type env τenv) lenv ->
@@ -222,7 +302,18 @@ Section TOQL.
         econstructor.
         apply H.
         apply H2.
-      + inversion H1. (* XXX TRIVIALLY TRUE MISSING OINCAST TYPING RULES *)
+      + inversion H1; intros; subst; clear H1.
+        inversion H0; intros; subst; clear H0.
+        elim (@oql_from_in_cast_expr_sound m τc τenv tenv' c s0 s o lenv H8 H H3);
+          intros; clear H H3.
+        elim H0; intros; clear H0.
+        elim (IHel tenv' from_tenv x H1 H4 H9); intros.
+        elim H0; intros; clear H0.
+        exists x0.
+        split; [|assumption].
+        econstructor.
+        apply H.
+        apply H2.
   Qed.
 
   Lemma oql_select_map_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} {τout} c e :
