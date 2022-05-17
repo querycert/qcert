@@ -151,6 +151,44 @@ Section TOQLtoNRAEnv.
                                                                τdefls e0 br v e pfe pfe0 pfd H); assumption.
   Qed.
 
+  Lemma oql_to_nraenv_where_expr_type_preserve_f τconstant τenv τenv1 e0 e τdefls pfd pfe pfe0 :
+    (nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
+                           ⊣ τconstant; Rec Closed τdefls pfd) ->
+    (forall (τconstant τdefls : list (string * rtype))
+           (pfd : is_list_sorted StringOrder.lt_dec (domain τdefls) = true) 
+           (τenv : tbindings) (pfe : is_list_sorted StringOrder.lt_dec (domain τenv) = true)
+           (τout : rtype),
+         oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout ->
+         nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e) ▷ 
+         Rec Closed τenv pfe >=> τout ⊣ τconstant; Rec Closed τdefls pfd) ->
+    oql_where_expr_type (rec_concat_sort τconstant τdefls) τenv1 e ->
+    cNRAEnvSelect (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e)) (nraenv_to_nraenv_core e0) ▷ Rec Closed τenv pfe >=>
+      Coll (Rec Closed τenv1 pfe0) ⊣ τconstant; Rec Closed τdefls pfd.
+  Proof.
+    intros.
+    invcs H1.
+    repeat econstructor; [|apply H].
+    apply H0; assumption.
+  Qed.
+
+  Lemma oql_to_nraenv_order_expr_type_preserve_f τconstant τenv τenv1 e0 e τdefls pfd pfe pfe0 :
+    (nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
+                           ⊣ τconstant; Rec Closed τdefls pfd) ->
+    (forall (τconstant τdefls : list (string * rtype))
+           (pfd : is_list_sorted StringOrder.lt_dec (domain τdefls) = true) 
+           (τenv : tbindings) (pfe : is_list_sorted StringOrder.lt_dec (domain τenv) = true)
+           (τout : rtype),
+         oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout ->
+         nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e) ▷ 
+         Rec Closed τenv pfe >=> τout ⊣ τconstant; Rec Closed τdefls pfd) ->
+    oql_order_expr_type (rec_concat_sort τconstant τdefls) τenv1 e ->
+    nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=>
+      Coll (Rec Closed τenv1 pfe0) ⊣ τconstant; Rec Closed τdefls pfd.
+  Proof.
+    intros.
+    assumption.
+  Qed.
+
   Lemma oql_to_nraenv_expr_type_preserve_f τconstant τdefls pfd τenv pfe e τout:
     oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout ->
     nraenv_type τconstant (oql_to_nraenv_expr (domain τdefls) e) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
@@ -194,6 +232,81 @@ Section TOQLtoNRAEnv.
                  (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
           try assumption; qeauto.
         Unshelve.
+        apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
+          assumption.
+    - destruct e1.
+      + simpl in *.
+        invcs H7; econstructor; qeauto.
+        invcs H2; apply IHe; apply H0.
+        eapply oql_to_nraenv_where_expr_type_preserve_f.
+        apply (oql_to_nraenv_from_expr_type_preserve_f
+                 τconstant τenv τenv
+                 (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
+          try assumption; qeauto.
+        Unshelve.
+        assumption.
+        assumption.
+        apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
+          assumption.
+      + simpl in *.
+        invcs H7; econstructor; [econstructor| ].
+        invcs H2; econstructor; [apply IHe; apply H0| ]; try assumption.
+        eapply oql_to_nraenv_where_expr_type_preserve_f.
+        apply (oql_to_nraenv_from_expr_type_preserve_f
+                 τconstant τenv τenv
+                 (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
+          try assumption; qeauto.
+        Unshelve.
+        assumption.
+        assumption.
+        apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
+          assumption.
+    - destruct e1.
+      + simpl in *.
+        invcs H8; econstructor; qeauto.
+        invcs H2; apply IHe; apply H0.
+        apply (oql_to_nraenv_from_expr_type_preserve_f
+                 τconstant τenv τenv
+                 (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
+          try assumption; qeauto.
+        Unshelve.
+        apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
+          assumption.
+      + simpl in *.
+        invcs H8; econstructor; qeauto.
+        invcs H2; econstructor; [apply IHe; apply H0| ]; try assumption.
+        apply (oql_to_nraenv_from_expr_type_preserve_f
+                 τconstant τenv τenv
+                 (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
+          try assumption; qeauto.
+        Unshelve.
+        apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
+          assumption.
+    - destruct e1.
+      + simpl in *.
+        invcs H10; econstructor; qeauto.
+        invcs H2; apply IHe1; apply H0.
+        eapply oql_to_nraenv_where_expr_type_preserve_f.
+        apply (oql_to_nraenv_from_expr_type_preserve_f
+                 τconstant τenv τenv
+                 (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
+          try assumption; qeauto.
+        Unshelve.
+        assumption.
+        assumption.
+        apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
+          assumption.
+      + simpl in *.
+        invcs H10; econstructor; [econstructor| ].
+        invcs H2; econstructor; [apply IHe1; apply H0| ]; try assumption.
+        eapply oql_to_nraenv_where_expr_type_preserve_f.
+        apply (oql_to_nraenv_from_expr_type_preserve_f
+                 τconstant τenv τenv
+                 (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
+          try assumption; qeauto.
+        Unshelve.
+        assumption.
+        assumption.
         apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
           assumption.
   Qed.

@@ -53,10 +53,26 @@ Section TOQL.
           oql_expr_type tenv e₁ τ₁ ->
           unary_op_type u τ₁ τout ->
           oql_expr_type tenv (OUnop u e₁) τout
-      | TOSFW {τout} tenv from_tenv select_e from_e :
+      | TOSFW_true_noorder {τout} tenv from_tenv select_e from_e :
           oql_from_expr_type tenv from_e from_tenv ->
           oql_select_expr_type from_tenv select_e τout -> 
           oql_expr_type tenv (OSFW select_e from_e OTrue ONoOrder) τout
+      | TOSFW_where_noorder {τout} tenv from_tenv select_e from_e where_e :
+          oql_from_expr_type tenv from_e from_tenv ->
+          oql_where_expr_type from_tenv where_e -> 
+          oql_select_expr_type from_tenv select_e τout -> 
+          oql_expr_type tenv (OSFW select_e from_e (OWhere where_e) ONoOrder) τout
+      | TOSFW_true_order {τout} tenv from_tenv select_e from_e sc order_e :
+          oql_from_expr_type tenv from_e from_tenv ->
+          oql_order_expr_type from_tenv order_e -> 
+          oql_select_expr_type from_tenv select_e τout -> 
+          oql_expr_type tenv (OSFW select_e from_e OTrue (OOrderBy order_e sc)) τout
+      | TOSFW_where_order {τout} tenv from_tenv select_e from_e sc where_e order_e :
+          oql_from_expr_type tenv from_e from_tenv ->
+          oql_where_expr_type from_tenv where_e -> 
+          oql_order_expr_type from_tenv order_e -> 
+          oql_select_expr_type from_tenv select_e τout -> 
+          oql_expr_type tenv (OSFW select_e from_e (OWhere where_e) (OOrderBy order_e sc)) τout
       with oql_from_expr_type : tbindings -> list oql_in_expr -> tbindings -> Prop :=
       | TOFromNil tenv :
           oql_from_expr_type tenv nil tenv
@@ -71,15 +87,22 @@ Section TOQL.
       with oql_from_in_expr_type : string -> oql_expr -> tbindings -> tbindings -> Prop :=
       | TOFromIn {τ} tenv tenv' v e:
           oql_expr_type tenv e (Coll τ) ->
-          (* XXX add (v,t) to the environment with the correct scoping (right override left) *)
+          (* add (v,t) to the environment with the correct scoping (right override left) *)
           rec_concat_sort tenv ((v,τ)::nil) = tenv' ->
           oql_from_in_expr_type v e tenv tenv'
       with oql_from_in_cast_expr_type : list string -> string -> oql_expr -> tbindings -> tbindings -> Prop :=
       | TOFromInCast br bs tenv tenv' v e:
           oql_expr_type tenv e (Coll (Brand bs)) ->
-          (* XXX add (v,t) to the environment with the correct scoping (right override left) *)
+          (* add (v,t) to the environment with the correct scoping (right override left) *)
           rec_concat_sort tenv ((v,(Brand br))::nil) = tenv' ->
           oql_from_in_cast_expr_type br v e tenv tenv'
+      with oql_where_expr_type : tbindings -> oql_expr -> Prop :=
+      | TOWhere tenv e :
+          oql_expr_type tenv e Bool ->
+          oql_where_expr_type tenv e
+      with oql_order_expr_type : tbindings -> oql_expr -> Prop :=
+      | TOOrder tenv e :
+          oql_order_expr_type tenv e
       with oql_select_expr_type : tbindings -> oql_select_expr -> rtype -> Prop :=
       | TOSelect {τ} tenv e :
           oql_select_map_expr_type tenv e τ ->
@@ -340,6 +363,57 @@ Section TOQL.
       split; constructor; assumption.
   Qed.
 
+  Lemma oql_where_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} c e :
+    bindings_type c τc ->
+    Forall (fun env : list (string * data) => bindings_type env from_tenv) x ->
+    (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
+         bindings_type env τenv ->
+         oql_expr_type τc τenv e τout ->
+         exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout) ->
+    oql_where_expr_type τc from_tenv e ->
+    (exists tenv',
+        oql_where_sem brand_relation_brands c e x tenv' /\
+        (Forall (fun env => bindings_type env from_tenv) tenv')).
+  Proof.
+    intros.
+    induction x; intros; simpl in *.
+    - exists nil; split; constructor.
+    - inversion H0; intros; subst; clear H0.
+      elim (IHx H6); intros; clear IHx.
+      elim H0; intros; clear H0.
+      inversion H2; intros; subst; clear H2.
+      elim (H1 from_tenv Bool a H5 H0);
+        intros; subst; clear H1.
+      elim H2; intros; clear H2.
+      inversion H7; intros; subst.
+      destruct b; intros; simpl in *.
+      (* Condition is true *)
+      + exists (a :: x0).
+        split; constructor; assumption.
+      (* Condition is false *)
+      + exists x0.
+        split; [constructor; assumption|assumption].
+  Qed.
+
+  Lemma oql_order_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} c sc e :
+    bindings_type c τc ->
+    Forall (fun env : list (string * data) => bindings_type env from_tenv) x ->
+    (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
+         bindings_type env τenv ->
+         oql_expr_type τc τenv e τout ->
+         exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout) ->
+    oql_order_expr_type τc from_tenv e ->
+    (exists tenv',
+        oql_order_sem brand_relation_brands c e sc x tenv' /\
+        (Forall (fun env => bindings_type env from_tenv) tenv')).
+  Proof.
+    intros.
+    exists x.
+    split.
+    econstructor.
+    assumption.
+  Qed.
+
   Lemma oql_select_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} {τout} c e :
     bindings_type c τc ->
     Forall (fun env : list (string * data) => bindings_type env from_tenv) x ->
@@ -419,12 +493,57 @@ Section TOQL.
       exists (dcoll x0).
       split; [|assumption].
       econstructor;[apply H3|assumption].
-    - inversion H1.
-    - inversion H1. (* XXX TRIVIALLY TRUE MISSING TYPING RULES *)
-    - inversion H1. (* XXX TRIVIALLY TRUE MISSING TYPING RULES *)
+    - inversion H1; intros; subst; clear H1.
+      assert (Forall (fun env0 : list (string * data) => bindings_type env0 τenv) (env :: nil))
+        by (constructor; [assumption|constructor]).
+      elim (@oql_from_expr_type_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H6);
+        intros.
+      elim H2; intros; subst; clear H2.
+      elim (@oql_where_expr_type_sound _ τc from_tenv x c q Hc H4 IHq0 H8);
+        intros; subst; clear H8.
+      elim H2; intros; subst; clear H2.
+      elim (@oql_select_expr_type_sound _ τc from_tenv x0 τout c e1 Hc H7 IHq H9);
+        intros; subst.
+      elim H2; intros; subst; clear H2.
+      exists (dcoll x1).
+      split; [|assumption].
+      econstructor; [apply H3|apply H5|assumption].
+    - inversion H1; intros; subst; clear H1.
+      assert (Forall (fun env0 : list (string * data) => bindings_type env0 τenv) (env :: nil))
+        by (constructor; [assumption|constructor]).
+      elim (@oql_from_expr_type_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H8);
+        intros.
+      elim H2; intros; subst; clear H2.
+      elim (@oql_order_expr_type_sound _ τc from_tenv x c sc q Hc H4 IHq0 H9);
+        intros; subst; clear H8.
+      elim H2; intros; subst; clear H2.
+      elim (@oql_select_expr_type_sound _ τc from_tenv x0 τout c e1 Hc H6 IHq H10);
+        intros; subst.
+      elim H2; intros; subst; clear H2.
+      exists (dcoll x1).
+      split; [|assumption].
+      econstructor; [apply H3|apply H5|assumption].
+    - inversion H1; intros; subst; clear H1.
+      assert (Forall (fun env0 : list (string * data) => bindings_type env0 τenv) (env :: nil))
+        by (constructor; [assumption|constructor]).
+      elim (@oql_from_expr_type_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H9);
+        intros.
+      elim H2; intros; subst; clear H2.
+      elim (@oql_where_expr_type_sound _ τc from_tenv x c q1 Hc H4 IHq2 H10);
+        intros; subst; clear H10.
+      elim H2; intros; subst; clear H2.
+      elim (@oql_order_expr_type_sound _ τc from_tenv x0 c sc q2 Hc H6 IHq3 H11);
+        intros; subst; clear H11.
+      elim H2; intros; subst; clear H2.
+      elim (@oql_select_expr_type_sound _ τc from_tenv x1 τout c e1 Hc H8 IHq1 H12);
+        intros; subst.
+      elim H2; intros; subst; clear H2.
+      exists (dcoll x2).
+      split; [|assumption].
+      econstructor; [apply H3|apply H5|apply H7|assumption].
   Qed.
 
-  Theorem typed_oql_expr_yields_typed_data {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
+ Theorem typed_oql_expr_yields_typed_data {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
     bindings_type c τc ->
     bindings_type env τenv ->
     (oql_expr_type τc τenv q τout) ->
