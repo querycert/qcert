@@ -103,7 +103,7 @@ Section NNRCOptimizer.
      *)
     (* Java equivalent: NnrcOptimizer.rew_size *)
     (* Definition rew_size (rew: nnrc -> nnrc) (p: nnrc) :=
-    iter_cost rew NNRCSize.nnrc_size p.
+    iter_size rew NNRCSize.nnrc_size p.
      *)
     (* *************************** *)
 
@@ -602,7 +602,7 @@ Section NNRCOptimizer.
 
   (** Inlining *)
 
-  (* TODO: A better/less hacky cost function.  This will probably need many more real
+  (* TODO: A better/less hacky size function.  This will probably need many more real
      examples to tune with, as it will always contain some black-magic. *)
   (* Java equivalent: NnrcOptimizer.is_small_unop *)
   Definition is_small_unop {fruntime:foreign_runtime} (u:unary_op) :=
@@ -698,7 +698,7 @@ Section NNRCOptimizer.
     := mkOptimizerStepModel tfor_over_if_nil_step tfor_over_if_nil_fun_correctness.
 
   (* for (map) fusion *)
-    Definition tfor_over_for_fun  {fruntime:foreign_runtime}(e:nnrc)
+    Definition tloop_fusion_fun  {fruntime:foreign_runtime}(e:nnrc)
       := match e with
          | NNRCFor x (NNRCFor y source body1) body2 =>
            if (in_dec string_dec y (nnrc_free_vars body2))
@@ -711,28 +711,28 @@ Section NNRCOptimizer.
        | _ => e
        end.
 
-  Lemma tfor_over_for_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_rewrites_to e (tfor_over_for_fun e).
+  Lemma tloop_fusion_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_rewrites_to e (tloop_fusion_fun e).
   Proof.
     tprove_correctness e.
-    - rewrite <- tfor_over_for_arrow; simpl; trivial.
+    - rewrite <- tnnrcloop_fusion; simpl; trivial.
       + apply tproper_NNRCFor; try reflexivity.
         generalize (really_fresh_from_avoid nnrc_unshadow_sep v0 (nnrc_free_vars e1_2 ++ nnrc_bound_vars e1_2) e2)
         ; rewrite in_app_iff; intros inn.
          apply tnnrcfor_rename_arrow; tauto.
       + apply really_fresh_from_free.
-    - apply tfor_over_for_arrow; simpl; trivial.
+    - apply tnnrcloop_fusion; simpl; trivial.
   Qed.
 
-    Definition tfor_over_for_step {fruntime:foreign_runtime}
+  Definition tloop_fusion_step {fruntime:foreign_runtime}
     := mkOptimizerStep
          "for/for" (* name *)
          "Fuse nested loop comprehensions" (* description *)
-         "tfor_over_for_fun" (* lemma name *)
-         tfor_over_for_fun (* lemma *).
+         "tloop_fusion_fun" (* lemma name *)
+         tloop_fusion_fun (* lemma *).
 
-  Definition tfor_over_for_step_correct {model:basic_model}
-    := mkOptimizerStepModel tfor_over_for_step tfor_over_for_fun_correctness.
+  Definition tloop_fusion_step_correct {model:basic_model}
+    := mkOptimizerStepModel tloop_fusion_step tloop_fusion_fun_correctness.
 
 (* END *)  
   (* Java equivalent: NnrcOptimizer.[same] *)
@@ -1118,11 +1118,11 @@ Section NNRCOptimizer.
   Definition tcount_over_flat_for_either_either_nil_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
        | (♯count(♯flatten(NNRCFor v
-                                 ehead (NNRCEither e1 xl
-                                                  (NNRCEither e11 xll (‵{| e12|}) xrr ‵{||}) xr ‵{||}))))
+                                  ehead (NNRCEither e1 xl
+                                                    (NNRCEither e11 xll (‵{| e12|}) xrr ‵{||}) xr ‵{||}))))
          => (♯count(♯flatten(NNRCFor v
-                                    ehead (NNRCEither e1 xl
-                                                     (NNRCEither e11 xll (‵{| ‵(dunit) |}) xrr ‵{||}) xr ‵{||}))))
+                                     ehead (NNRCEither e1 xl
+                                                       (NNRCEither e11 xll (‵{| ‵(dunit) |}) xrr ‵{||}) xr ‵{||}))))
 
      | _ => e
        end.
@@ -1135,7 +1135,7 @@ Section NNRCOptimizer.
     apply tcount_over_flat_for_either_either_nil_arrow.
   Qed.
 
-    Definition tcount_over_flat_for_either_either_nil_step {fruntime:foreign_runtime}
+  Definition tcount_over_flat_for_either_either_nil_step {fruntime:foreign_runtime}
     := mkOptimizerStep
          "count/flatten/for/either/right either/right nil" (* name *)
          "Remove work that is not needed when only the bag count is needed" (* description *)
@@ -1144,7 +1144,7 @@ Section NNRCOptimizer.
 
   Definition tcount_over_flat_for_either_either_nil_step_correct {model:basic_model}
     := mkOptimizerStepModel tcount_over_flat_for_either_either_nil_step tcount_over_flat_for_either_either_nil_fun_correctness.  
-                                                            
+
   (* list of all optimizations *)
     Definition tnnrc_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrc)
       := [
@@ -1163,7 +1163,7 @@ Section NNRCOptimizer.
           ; tdot_of_concat_rec_step
           ; tinline_let_step
           ; tfor_over_if_nil_step
-          ; tfor_over_for_step
+          ; tloop_fusion_step
           ; tfor_over_either_nil_step
           ; tunop_over_either_const_step
           ; tunop_over_if_const_step
@@ -1197,7 +1197,7 @@ Section NNRCOptimizer.
           ; tdot_of_concat_rec_step_correct
           ; tinline_let_step_correct
           ; tfor_over_if_nil_step_correct
-          ; tfor_over_for_step_correct
+          ; tloop_fusion_step_correct
           ; tfor_over_either_nil_step_correct
           ; tunop_over_either_const_step_correct
           ; tunop_over_if_const_step_correct
@@ -1238,7 +1238,7 @@ Section NNRCOptimizer.
              {logger:optimizer_logger string nnrc}
              (opc:optim_phases_config)
     : nnrc -> nnrc :=
-    run_phases tnnrc_map_deep NNRCSize.nnrc_size tnnrc_optim_list opc.
+    run_phases tnnrc_map_deep nnrc_size tnnrc_optim_list opc.
 
   Lemma nnrc_optim_top_correctness
         {model:basic_model} {logger:optimizer_logger string nnrc}
@@ -1273,7 +1273,7 @@ Section NNRCOptimizer.
         ; optim_step_name tbinop_over_if_left_const_step
         ; optim_step_name tbinop_over_let_left_const_step
         ; optim_step_name tfor_over_either_nil_step
-        ; optim_step_name tfor_over_for_step
+        ; optim_step_name tloop_fusion_step
         ; optim_step_name tfor_over_if_nil_step
         ; optim_step_name tfor_nil_step
         ; optim_step_name tmerge_nil_step

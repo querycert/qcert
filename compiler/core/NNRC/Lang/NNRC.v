@@ -556,6 +556,66 @@ Section NNRC.
         reflexivity.
     Qed.
 
+    (** cNNRC evaluation is only sensitive to the environment modulo lookup. *)
+    Lemma nnrc_core_eval_lookup_equiv_on σc σ₁ σ₂ (e:nnrc) :
+      lookup_equiv_on (nnrc_free_vars e) σ₁ σ₂ ->
+      nnrc_core_eval h σc σ₁ e = 
+      nnrc_core_eval h σc σ₂ e.
+    Proof.
+      revert σ₁ σ₂.
+      induction e; simpl; intros σ₁ σ₂ eqq; trivial
+      ; try apply lookup_equiv_on_dom_app in eqq.
+      - red in eqq; simpl in eqq; rewrite eqq; tauto.
+      - erewrite IHe1, IHe2; try reflexivity; tauto.
+      - erewrite IHe; try reflexivity; tauto.
+      - destruct eqq as [eqq1 eqq2].
+        rewrite (IHe1 _ _ eqq1).
+        match_destr.
+        erewrite IHe2; try reflexivity.
+        unfold lookup_equiv_on in *.
+        intros; simpl.
+        match_destr.
+        apply eqq2; trivial.
+        apply remove_in_neq; trivial.
+      - destruct eqq as [eqq1 eqq2].
+        rewrite (IHe1 _ _ eqq1).
+        match_destr.
+        destruct d; simpl; trivial.
+        f_equal.
+        apply lift_map_ext; intros.
+        erewrite IHe2; try reflexivity.
+        unfold lookup_equiv_on in *.
+        intros; simpl.
+        match_destr.
+        apply eqq2; trivial.
+        apply remove_in_neq; trivial.
+      - destruct eqq as [eqq1 eqq2].
+        rewrite (IHe1 _ _ eqq1).
+        apply olift_ext; intros.
+        destruct a; simpl; trivial.
+        apply lookup_equiv_on_dom_app in eqq2.
+        destruct eqq2.
+        destruct b; eauto.
+      - destruct eqq as [eqq1 eqq2].
+        rewrite (IHe1 _ _ eqq1).
+        apply olift_ext; intros.
+        apply lookup_equiv_on_dom_app in eqq2.
+        destruct eqq2 as [eqq2 eqq3].
+        destruct a; simpl; trivial.
+        + erewrite IHe2; try reflexivity.
+          unfold lookup_equiv_on in *.
+          intros; simpl.
+          match_destr.
+          apply eqq2; trivial.
+          apply remove_in_neq; trivial.
+        + erewrite IHe3; try reflexivity.
+          unfold lookup_equiv_on in *.
+          intros; simpl.
+          match_destr.
+          apply eqq3; trivial.
+          apply remove_in_neq; trivial.
+    Qed.
+
   End Properties.
 
   (** * Toplevel *)

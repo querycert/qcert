@@ -408,7 +408,6 @@ Section TNNRCRewrite.
   (*  $t₁ ∉ free(e₃) ->
       { e₃ | $t₂ ∈ ♯flatten({ e₂ ? {ee} : {} | $t₁ ∈ e₁ }) }
         ≡ ♯flatten({ e₂ ? { LET $t₂ := ee IN e₃ } : {} | $t₁ ∈ e₁ }) *)
-
   Lemma tmap_sigma_fusion_arrow (v1 v2:var) ee (e1 e2 e3:nnrc) :
     ~ In v1 (nnrc_free_vars e3) ->
     tnnrc_rewrites_to
@@ -440,7 +439,6 @@ Section TNNRCRewrite.
 
   (* { e₃ | $t₂ ∈ ♯flatten({ e₂ ? {$t₁} : {} | $t₁ ∈ e₁ }) }
        ≡ ♯flatten({ e₂ ? { LET $t₂ := $t₁ IN e₃ } : {} | $t₁ ∈ e₁ }) *)
-
   Lemma tmap_sigma_fusion_samevar_arrow (v1:var) e (e1 e2 e3:nnrc) :
     tnnrc_rewrites_to
       (NNRCFor v1 
@@ -530,29 +528,6 @@ Section TNNRCRewrite.
       repeat (econstructor; eauto 2).
   Qed.
 
-  (* {$tl,$tr} ∩ free(e₀) = ∅ ->
-      { e₀ | $t ∈ (Either e₁ $tl el $tr er) } 
-        ≡ Either e₁ $tl { e₀ | $t ∈ el } $tr { e₀ | $t ∈ er} *)
-
-  Lemma tfor_over_for_arrow x y source body1 body2 :
-    ~ In y (nnrc_free_vars body2) ->
-     tnnrc_rewrites_to (NNRCFor x (NNRCFor y source body1) body2)
-            (NNRCFor y source
-                     (NNRCLet x body1 body2)).
-  Proof.
-    intros nin.
-    apply nnrc_rewrites_typed_with_untyped.
-    - apply for_over_for; trivial.
-    - intros ? ? ? typ.
-      invcs typ.
-      invcs H4.
-      rtype_equalizer; subst.
-      red; simpl.
-      repeat (econstructor; eauto 2).
-      apply (nnrc_core_type_remove_free_env ((x, τ₁) :: nil)); simpl; trivial.
-      rewrite <- nnrc_to_nnrc_base_free_vars_same; trivial.
-  Qed.
-  
   Lemma tfor_over_either_disjoint_arrow x e1 xl el xr er ebody:
     disjoint (xl::xr::nil) (nnrc_free_vars ebody) ->
     tnnrc_rewrites_to (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
@@ -1399,6 +1374,25 @@ Section TNNRCRewrite.
       repeat (econstructor; eauto 2).
   Qed.
 
+  (* { e₃ | $v₂ ∈ { e₂ | $v₁ ∈ e₁ } } ≡ { let $v₂ := e₂ in e₃ | $v₁ ∈ e₁ } *)
+  Lemma tnnrcloop_fusion (v1 v2: var) (e1 e2 e3: nnrc) :
+    ~ In v1 (nnrc_free_vars e3) ->
+    tnnrc_rewrites_to
+      (NNRCFor v2 (NNRCFor v1 e1 e2) e3)
+      (NNRCFor v1 e1
+               (NNRCLet v2 e2 e3)).
+  Proof.
+    intros.
+    apply nnrc_rewrites_typed_with_untyped.
+    - apply nnrcloop_fusion; assumption.
+    - intros.
+      nnrc_inverter.
+      fold nnrc_to_nnrc_base in *.
+      repeat (econstructor; eauto 2).
+      rewrite (@nnrc_type_remove_free_env _ τcenv ((v2, τ₁)::nil) v1 τ₁0 τenv e3 τ₂ H);
+        trivial.
+  Qed.
+    
 End TNNRCRewrite.
 
 Global Hint Rewrite @tsigma_to_if_arrow : nnrc_rew.
