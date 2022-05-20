@@ -38,7 +38,8 @@ To build Q\*cert from the source, you will need:
   - re, a pure OCaml library for regular expressions
   - calendar, a library for manipulating date and time
   - uri, a library for processing URIs
-- Coq 8.11.2 (https://coq.inria.fr/) along with the following libraries:
+  - wasm, a WebAssembly reference interpreter
+- Coq 8.15.1 or later (https://coq.inria.fr/) along with the following libraries:
   - jsast, a minimal AST for JavaScript
 
 An easy way to get set up on most platforms is to use the OCaml package manager (https://opam.ocaml.org). Once opam is installed, you can just add the corresponding libraries:
@@ -55,6 +56,12 @@ If you want to use a separate opam switch for Q\*cert, we recommend creating a n
 $ opam switch create qcert 4.09.1
 ```
 
+#### Node.js (Recommended)
+
+Execution and testing for the JavaScript compilation target, as well demo material, requires Node.js. We suggest Node.js version 10 or 12.
+
+Node.js can be installed from https://nodejs.org/en/
+
 #### Java (Recommended)
 
 Parsers for SQL, SQL++, and ODM rules, the Q\*cert runtime for the Java compilation target, as well as utilities for running compiled queries are written in Java and require a Java 8 compiler.
@@ -62,12 +69,6 @@ Parsers for SQL, SQL++, and ODM rules, the Q\*cert runtime for the Java compilat
 Building those Java components also requires a recent version of ant (and the ODM rules support has additional pre-requisites).
 
 Both the `javac` and the `ant` executables must be available from the command line.
-
-#### Node.js (Recommended)
-
-Execution and testing for the JavaScript compilation target, as well demo material, requires Node.js. We suggest Node.js version 10 or 12.
-
-Node.js can be installed from https://nodejs.org/en/
 
 #### Scala (Optional)
 
