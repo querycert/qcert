@@ -98,4 +98,4 @@ workflows:
           matrix:
             parameters:
               ocaml-version: ["4.09.1", "4.11.2"]
-              coq-version: ["8.11.2", "8.13.2", "8.15.1"]
+              coq-version: ["8.15.1"]
