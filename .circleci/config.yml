@@ -38,7 +38,7 @@ common_steps: &common_steps
           opam update || true
     - run:
         name: "Install OPAM deps"
-        command: opam install . --deps-only --jobs=$NJOBS --yes
+        command: opam install . --deps-only --jobs=$NJOBS --yes --confirm-level=unsafe-yes
         no_output_timeout: 45m
     - save_cache:
         <<: *common_cache_key
