@@ -1,5 +1,5 @@
 common_cache_key: &common_cache_key
-  key: dependency-cache-{{ checksum "../ocaml-version" }}-{{ checksum ".circleci/config.yml" }}
+  key: dependency-cache-{{ checksum "../ocaml-version" }}-{{ checksum "../coq-version" }}-{{ checksum ".circleci/config.yml" }}
 
 common_steps: &common_steps
   steps:
@@ -14,6 +14,9 @@ common_steps: &common_steps
     - run:
         name: "Note OCAML_VERSION for cache"
         command: echo $OCAML_VERSION > ../ocaml-version
+    - run:
+        name: "Note COQ_VERSION for cache"
+        command: echo $COQ_VERSION > ../coq-version
     - restore_cache:
         <<: *common_cache_key
     - run:
@@ -36,6 +39,10 @@ common_steps: &common_steps
           opam switch set $OCAML_VERSION
           opam repo add coq-released https://coq.inria.fr/opam/released || true
           opam update || true
+    - run:
+        name: "Install Coq"
+        command: opam install --jobs=$NJOBS --yes --confirm-level=unsafe-yes coq.$COQ_VERSION
+        no_output_timeout: 45m
     - run:
         name: "Install OPAM deps"
         command: opam install . --deps-only --jobs=$NJOBS --yes --confirm-level=unsafe-yes
@@ -64,54 +71,30 @@ common_steps: &common_steps
     - store_test_results:
         path: /tmp/circleci-test-results
 
-version: 2
+version: 2.1
 jobs:
-  4.09.1:
+  run:
+    parameters:
+      ocaml-version:
+        type: string
+      coq-version:
+        type: string
     docker:
     - image: circleci/openjdk:8-jdk
     environment:
       - TERM: dumb
-      - OCAML_VERSION: "4.09.1"
-      - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-      - NJOBS: 2
-      - NPM_CONFIG_PREFIX: "~/.npm-global"
-    <<: *common_steps
-  4.10.2:
-    docker:
-    - image: circleci/openjdk:8-jdk
-    environment:
-      - TERM: dumb
-      - OCAML_VERSION: "4.10.2"
-      - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-      - NJOBS: 2
-      - NPM_CONFIG_PREFIX: "~/.npm-global"
-    <<: *common_steps
-  4.11.2:
-    docker:
-    - image: circleci/openjdk:8-jdk
-    environment:
-      - TERM: dumb
-      - OCAML_VERSION: "4.11.2"
-      - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-      - NJOBS: 2
-      - NPM_CONFIG_PREFIX: "~/.npm-global"
-    <<: *common_steps
-  4.12.1:
-    docker:
-    - image: circleci/openjdk:8-jdk
-    environment:
-      - TERM: dumb
-      - OCAML_VERSION: "4.12.1"
+      - OCAML_VERSION: << parameters.ocaml-version >>
+      - COQ_VERSION: << parameters.coq-version >>
       - CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
       - NJOBS: 2
       - NPM_CONFIG_PREFIX: "~/.npm-global"
     <<: *common_steps
 
 workflows:
-  version: 2
-  build-deploy:
+  build-tests:
     jobs:
-      - 4.09.1
-      - 4.10.2
-      - 4.11.2
-      - 4.12.1
+      - run:
+          matrix:
+            parameters:
+              ocaml-version: ["4.09.1", "4.11.2"]
+              coq-version: ["8.11.2", "8.13.2", "8.15.1"]
