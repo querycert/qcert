@@ -2,9 +2,8 @@
   (name js_runtime)
   (public_name coq-qcert.runtime.js))
 
-(rule ; We promote to source dir because this file is also used from nodejs.
+(rule
   (target qcert-runtime.js)
-  (mode promote)
   (deps
     qcert-runtime-core.js
     qcert-runtime-tostring.js
