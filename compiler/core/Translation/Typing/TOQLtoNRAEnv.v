@@ -311,14 +311,14 @@ Section TOQLtoNRAEnv.
           assumption.
   Qed.
 
-  Lemma oql_to_nraenv_query_program_type_preserve_f τconstant τdefls pfd τenv pfe oq τout:
-    oql_query_program_type τconstant τdefls τenv oq τout ->
-    nraenv_type τconstant (oql_to_nraenv_query_program (domain τdefls) oq) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
+  Lemma oql_to_nraenv_query_program_type_preserve_f τconstant τdefls pfd pfe oq τout:
+    oql_query_program_type τconstant τdefls oq τout ->
+    nraenv_type τconstant (oql_to_nraenv_query_program (domain τdefls) oq) (Rec Closed τdefls pfd) (Rec Closed nil pfe) τout.
   Proof.
     unfold nraenv_type; simpl.
     Local Hint Constructors nraenv_core_type : qcert.
-    revert τdefls pfd τenv pfe τout.
-    induction oq; simpl; intros τdefls pfd τenv pfe τout ot; invcs ot.
+    revert τdefls pfd pfe τout.
+    induction oq; simpl; intros τdefls pfd pfe τout ot; invcs ot.
     - econstructor.
       + econstructor; qeauto.
         econstructor; qeauto.
@@ -345,7 +345,7 @@ Section TOQLtoNRAEnv.
   Proof.
     intros ot τenv τdata.
     unfold oql_to_nraenv, nraenv_type; simpl.
-    generalize (oql_to_nraenv_query_program_type_preserve_f τconstant nil sorted_rec_nil nil sorted_rec_nil oq τout ot); intros et.
+    generalize (oql_to_nraenv_query_program_type_preserve_f τconstant nil sorted_rec_nil sorted_rec_nil oq τout ot); intros et.
     simpl in et.
     unfold nraenv_type in et.
     econstructor; econstructor; try eassumption; repeat econstructor;

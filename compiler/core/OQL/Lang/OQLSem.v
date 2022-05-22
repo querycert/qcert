@@ -811,4 +811,104 @@ Section OQLSem.
       
   End Denotation.
 
+  Section ProgramDenotation.
+    Context (h:brand_relation_t).
+    Context (constant_env:list (string*data)).
+
+    Inductive oql_query_program_sem : list (string*data) -> oql_query_program -> data -> Prop :=
+    | sem_ODefineQuery defls s e rest d d':
+        oql_expr_sem h (rec_concat_sort constant_env defls) e nil d ->
+        oql_query_program_sem (rec_concat_sort defls ((s,d)::nil)) rest d' ->
+        oql_query_program_sem defls (ODefineQuery s e rest) d'
+    | sem_OUndefineQuery defls s rest d:
+        oql_query_program_sem (rremove defls s) rest d ->
+        oql_query_program_sem defls (OUndefineQuery s rest) d
+    | sem_OQuery defls e d:
+        oql_expr_sem h (rec_concat_sort constant_env defls) e nil d ->
+        oql_query_program_sem defls (OQuery e) d.
+
+    Lemma oql_query_program_interp_correct oq:
+      forall defls d,
+        oql_query_program_interp h constant_env defls oq = Some d ->
+        oql_query_program_sem defls oq d.
+    Proof.
+      intros.
+      revert defls d H.
+      induction oq; simpl in *; intros.
+      - unfold olift in H.
+        case_eq (oql_expr_interp h (rec_concat_sort constant_env defls) o nil); intros;
+          rewrite H0 in *; simpl in *; [|congruence].
+        econstructor.
+        rewrite <- oql_expr_interp_correct_and_complete.
+        apply H0.
+        apply IHoq; assumption.
+      - econstructor.
+        apply IHoq; assumption.
+      - econstructor.
+        rewrite <- oql_expr_interp_correct_and_complete; assumption.
+    Qed.
+
+    Lemma oql_query_program_interp_complete oq:
+      forall defls d,
+        oql_query_program_sem defls oq d ->
+        oql_query_program_interp h constant_env defls oq = Some d.
+    Proof.
+      intros.
+      revert defls d H.
+      induction oq; simpl in *; intros.
+      - inversion H; subst.
+        unfold olift.
+        rewrite <- oql_expr_interp_correct_and_complete in H5.
+        rewrite H5; simpl.
+        apply IHoq; assumption.
+      - inversion H; subst.
+        apply IHoq; assumption.
+      - inversion H; subst.
+        rewrite <- oql_expr_interp_correct_and_complete in H2; assumption.
+    Qed.
+
+    Lemma oql_query_program_interp_correct_and_complete oq:
+      forall defls d,
+        oql_query_program_interp h constant_env defls oq = Some d <->
+        oql_query_program_sem defls oq d.
+    Proof.
+      intros; split.
+      - apply oql_query_program_interp_correct.
+      - apply oql_query_program_interp_complete.
+    Qed.
+
+    Definition oql_sem (oq:oql) (d:data) : Prop := oql_query_program_sem nil oq d.
+
+    Lemma oql_interp_correct oq:
+      forall d,
+        oql_interp h constant_env oq = Some d ->
+        oql_sem oq d.
+    Proof.
+      intros.
+      apply oql_query_program_interp_correct.
+      assumption.
+    Qed.
+
+    Lemma oql_interp_complete oq:
+      forall d,
+        oql_sem oq d ->
+        oql_interp h constant_env oq = Some d.
+    Proof.
+      intros.
+      apply oql_query_program_interp_complete.
+      assumption.
+    Qed.
+
+    Lemma oql_interp_correct_and_complete oq:
+      forall d,
+        oql_interp h constant_env oq = Some d <->
+        oql_sem oq d.
+    Proof.
+      intros; split.
+      - apply oql_interp_correct.
+      - apply oql_interp_complete.
+    Qed.
+
+  End ProgramDenotation.
+
 End OQLSem.

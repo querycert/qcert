@@ -156,20 +156,20 @@ Section TOQL.
 
     Context (τconstants:tbindings).
 
-    Inductive oql_query_program_type : tbindings -> tbindings -> oql_query_program -> rtype -> Prop :=
-    | OTDefineQuery {tenv s e rest τ}  {tdefls τ₁} :
-        oql_expr_type (rec_concat_sort τconstants tdefls) tenv e τ₁ ->
-        oql_query_program_type (rec_concat_sort tdefls ((s,τ₁)::nil)) tenv rest τ ->
-        oql_query_program_type tdefls tenv (ODefineQuery s e rest) τ
-    | OTUndefineQuery {tenv s rest tdefls τ} :
-        oql_query_program_type (rremove tdefls s) tenv rest τ ->
-        oql_query_program_type tdefls tenv (OUndefineQuery s rest) τ
-    | OTQuery {tdefls tenv e τ}:
-        oql_expr_type (rec_concat_sort τconstants tdefls) tenv e τ ->
-        oql_query_program_type tdefls tenv (OQuery e) τ.
+    Inductive oql_query_program_type : tbindings -> oql_query_program -> rtype -> Prop :=
+    | OTDefineQuery {s e rest τ}  {tdefls τ₁} :
+        oql_expr_type (rec_concat_sort τconstants tdefls) nil e τ₁ ->
+        oql_query_program_type (rec_concat_sort tdefls ((s,τ₁)::nil)) rest τ ->
+        oql_query_program_type tdefls (ODefineQuery s e rest) τ
+    | OTUndefineQuery {s rest tdefls τ} :
+        oql_query_program_type (rremove tdefls s) rest τ ->
+        oql_query_program_type tdefls (OUndefineQuery s rest) τ
+    | OTQuery {tdefls e τ}:
+        oql_expr_type (rec_concat_sort τconstants tdefls) nil e τ ->
+        oql_query_program_type tdefls (OQuery e) τ.
 
     Definition oql_type (o:oql_query_program) (τ:rtype) : Prop
-      := oql_query_program_type nil nil o τ.
+      := oql_query_program_type nil o τ.
     
   End typ.
 
@@ -556,19 +556,19 @@ Section TOQL.
     rewrite oql_expr_interp_correct_and_complete; assumption.
   Qed.
 
-  Lemma typed_oql_query_program_yields_typed_data {m:basic_model} {τc τdefls} {τenv τout} c (defls env:list (string*data)) (q:oql_query_program):
+  Lemma typed_oql_query_program_yields_typed_data {m:basic_model} {τc τdefls} {τout} c (defls env:list (string*data)) (q:oql_query_program):
     bindings_type c τc ->
     bindings_type defls τdefls ->
-    bindings_type env τenv ->
-    (oql_query_program_type τc τdefls τenv q τout) ->
-    (exists x, (oql_query_program_interp brand_relation_brands c defls q env = Some x /\ (x ▹ τout))).
+    (oql_query_program_type τc τdefls q τout) ->
+    (exists x, (oql_query_program_interp brand_relation_brands c defls q = Some x /\ (x ▹ τout))).
   Proof.
     intros.
-    revert c defls env H H0 H1.
-    dependent induction H2; simpl; intros.
+    revert c defls env H H0.
+    dependent induction H1; simpl; intros.
     - assert (bt: bindings_type (rec_concat_sort c defls) (rec_concat_sort τc tdefls))
         by (apply bindings_type_rec_concat_sort; trivial).
-      destruct (typed_oql_expr_yields_typed_data _ _ e bt H3 H)
+      assert (bindings_type nil nil) by constructor.
+      destruct (typed_oql_expr_yields_typed_data _ nil e bt H3 H)
         as [d [de dt]].
       rewrite de; simpl.
       destruct (IHoql_query_program_type _ (rec_concat_sort defls ((s,d)::nil)) env H0);
@@ -580,6 +580,20 @@ Section TOQL.
       trivial.
     - eapply typed_oql_expr_yields_typed_data; eauto.
       apply bindings_type_rec_concat_sort; trivial.
+      constructor.
+  Qed.
+
+  Lemma typed_oql_query_program_sound {m:basic_model} {τc τdefls} {τout} c (defls env:list (string*data)) (q:oql_query_program):
+    bindings_type c τc ->
+    bindings_type defls τdefls ->
+    (oql_query_program_type τc τdefls q τout) ->
+    (exists x, (oql_query_program_sem brand_relation_brands c defls q x /\ (x ▹ τout))).
+  Proof.
+    intros.
+    elim (typed_oql_query_program_yields_typed_data c defls env q H H0 H1); intros.
+    elim H2; intros; clear H2.
+    exists x; split; [|assumption].
+    apply oql_query_program_interp_correct_and_complete; assumption.
   Qed.
 
   (** Main typing soundness theorem for OQL *)
@@ -594,4 +608,16 @@ Section TOQL.
     ; constructor.
   Qed.
   
+  Theorem typed_oql_sound {m:basic_model} {τc} {τout} c (q:oql_query_program):
+    bindings_type c τc ->
+    oql_type τc q τout ->
+    (exists x, (oql_sem brand_relation_brands c q x /\ (x ▹ τout))).
+  Proof.
+    intros.
+    elim (typed_oql_yields_typed_data c q H H0); intros.
+    elim H1; intros; clear H1.
+    exists x; split; [|assumption].
+    apply oql_interp_correct_and_complete; assumption.
+  Qed.
+
 End TOQL.

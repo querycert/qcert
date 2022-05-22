@@ -587,19 +587,18 @@ Section OQL.
   Section sem2.
     Context (constant_env:list (string*data)).
     Fixpoint oql_query_program_interp (defls:list (string*data))
-             (oq:oql_query_program) (env:oql_env) : option data :=
+             (oq:oql_query_program) : option data :=
       match oq with
       | ODefineQuery s e rest =>
         olift
-          (fun d => oql_query_program_interp (rec_concat_sort defls ((s,d)::nil)) rest env)
-          (oql_expr_interp (rec_concat_sort constant_env defls) e env)
-      | OUndefineQuery s rest =>
-        oql_query_program_interp (rremove defls s) rest env
-      | OQuery e => oql_expr_interp (rec_concat_sort constant_env defls) e env
+          (fun d => oql_query_program_interp (rec_concat_sort defls ((s,d)::nil)) rest)
+          (oql_expr_interp (rec_concat_sort constant_env defls) e nil)
+      | OUndefineQuery s rest => oql_query_program_interp (rremove defls s) rest
+      | OQuery e => oql_expr_interp (rec_concat_sort constant_env defls) e nil
       end.
 
     Definition oql_interp (e:oql) : option data
-      := oql_query_program_interp nil e nil.
+      := oql_query_program_interp nil e.
 
   End sem2.
 
