@@ -914,12 +914,12 @@ Section OQLtoNRAEnv.
     Qed.
 
     Lemma oql_to_nraenv_query_program_correct (defllist:list string) (oq:oql_query_program) :
-      forall (defls:oql_env) xenv env,
+      forall (defls:oql_env) xenv,
         (forall x, In x ((domain defls)++(oql_query_program_defls oq)) -> ~In x (domain xenv)) ->
-        oql_query_program_interp h constant_env defls oq env =
-        nraenv_eval h constant_env (oql_to_nraenv_query_program (domain defls) oq) (drec (rec_concat_sort xenv defls)) (drec env).
+        oql_query_program_interp h constant_env defls oq =
+        nraenv_eval h constant_env (oql_to_nraenv_query_program (domain defls) oq) (drec (rec_concat_sort xenv defls)) (drec nil).
     Proof.
-      intros. revert defls xenv env H.
+      intros. revert defls xenv H.
       induction oq; simpl; intros.
       - rewrite (oql_to_nraenv_expr_correct _ xenv).
         unfold nraenv_eval; simpl.
