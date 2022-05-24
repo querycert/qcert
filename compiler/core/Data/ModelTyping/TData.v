@@ -1297,14 +1297,14 @@ Global Instance data_type_subtype_prop
                       rewrite domain_app.
                       rewrite map_rtype_meet_domain.
                       apply Forall_app.
-                      + apply sorted_StronglySorted in pf;
+                      + apply is_list_sorted_StronglySorted in pf;
                         [ | eapply StrictOrder_Transitive ].
                         simpl in pf. inversion pf; subst.
                         trivial.
                       + eapply Forall_sublist.
                         * eapply sublist_domain.
                           eapply lookup_diff_sublist.
-                      * apply sorted_StronglySorted in pf'0;
+                      * apply is_list_sorted_StronglySorted in pf'0;
                         [ | eapply StrictOrder_Transitive ].
                         simpl in pf'0. inversion pf'0; subst.
                         trivial.
@@ -1334,14 +1334,14 @@ Global Instance data_type_subtype_prop
                       rewrite domain_app.
                       rewrite map_rtype_meet_domain.
                       apply Forall_app.
-                      + apply sorted_StronglySorted in pf;
+                      + apply is_list_sorted_StronglySorted in pf;
                         [ | eapply StrictOrder_Transitive ].
                         simpl in pf. inversion pf; subst.
                         trivial.
                       + eapply Forall_sublist.
                         * eapply sublist_domain.
                           eapply lookup_diff_sublist.
-                      * apply sorted_StronglySorted in pf'0;
+                      * apply is_list_sorted_StronglySorted in pf'0;
                         [ | eapply StrictOrder_Transitive ].
                         simpl in pf'0. inversion pf'0; subst.
                         trivial.
@@ -1380,7 +1380,7 @@ Global Instance data_type_subtype_prop
                       rewrite domain_app.
                       rewrite map_rtype_meet_domain.
                       apply Forall_app.
-                      + apply sorted_StronglySorted in pf';
+                      + apply is_list_sorted_StronglySorted in pf';
                         [ | eapply StrictOrder_Transitive ].
                         simpl in pf'. inversion pf'; subst.
                         eapply Forall_sublist; eauto.
@@ -1388,7 +1388,7 @@ Global Instance data_type_subtype_prop
                       + eapply Forall_sublist.  
                         * eapply sublist_domain.
                           eapply lookup_diff_sublist.
-                      * apply sorted_StronglySorted in pf'0;
+                      * apply is_list_sorted_StronglySorted in pf'0;
                         [ | eapply StrictOrder_Transitive ].
                         simpl in pf'0. inversion pf'0; subst.
                         trivial.

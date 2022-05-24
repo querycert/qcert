@@ -544,7 +544,7 @@ Section TBinaryOperators.
     intros.
     eapply Sorted_incl_sublist; eauto; try apply insertion_sort_Sorted.
     intros.
-    generalize (in_insertion_sort H6); intros inn.
+    generalize (in_insertion_sort _ H6); intros inn.
     apply insertion_sort_in_strong.
     - apply compatible_asymmetric_over.
       apply compatible_app_compatible; trivial.

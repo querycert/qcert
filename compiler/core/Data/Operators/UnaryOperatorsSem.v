@@ -125,7 +125,7 @@ Section UnaryOperatorsSem.
     | OpDistinct =>
       rondcoll (@bdistinct data data_eq_dec) d
     | OpOrderBy sc =>
-      data_sort sc d (* XXX Some very limited/hackish sorting XXX *)
+      data_sort (map get_criteria sc) d (* XXX Some very limited/hackish sorting XXX *)
     | OpCount =>
       lift dnat (ondcoll (fun z => Z_of_nat (bcount z)) d)
     | OpToString =>

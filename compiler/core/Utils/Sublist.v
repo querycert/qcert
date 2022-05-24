@@ -271,7 +271,7 @@ Section Sublist.
     sublist l' l ->
     is_list_sorted Rdec l' = true.
   Proof.
-    repeat rewrite sorted_StronglySorted by auto.
+    repeat rewrite is_list_sorted_StronglySorted by auto.
     intros ? sl.
     rewrite sl.
     trivial.
@@ -548,7 +548,7 @@ Section Sublist.
         * rewrite IHl2; trivial; [| eapply is_list_sorted_cons_inv; eauto].
           rewrite insertion_sort_insert_forall_lt.
           { apply sublist_cons; apply sublist_skip; reflexivity. }
-          apply sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
+          apply is_list_sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
           inversion H; subst.
           revert H5. apply Forall_impl; intros.
           rewrite <- H2; trivial.
@@ -559,7 +559,7 @@ Section Sublist.
           subst.
           rewrite insertion_sort_insert_forall_lt; [ apply sublist_cons; trivial | ].
           rewrite H1.
-          apply sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
+          apply is_list_sorted_StronglySorted in H; [| eapply StrictOrder_Transitive].
           inversion H; subst. trivial.
   Qed.
 

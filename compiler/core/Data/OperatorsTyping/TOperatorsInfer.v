@@ -429,7 +429,7 @@ Section TOperatorsInfer.
       is_list_sorted ODT_lt_dec (domain (rremove l s)) = true.
     Proof.
       Local Hint Resolve Forall_rremove : qcert.
-      repeat rewrite sorted_StronglySorted by apply StringOrder.lt_strorder.
+      repeat rewrite is_list_sorted_StronglySorted by apply StringOrder.lt_strorder.
       induction l; simpl; try constructor.
       inversion 1; subst.
       destruct (string_dec s (fst a)); simpl; auto.

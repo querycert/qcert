@@ -36,6 +36,7 @@ Require Export Result.
 Require Export ToString.
 Require Export OptimizerStep.
 Require Export OptimizerLogger.
+Require Export SortableData.
 Require Export SortingDesc.
 Require Export Apply.
 Require Export EmitUtil.

@@ -78,7 +78,7 @@ Section SortingAdd.
                  end
       end.
 
-    Lemma is_list_sorted_Sorted_iff l: 
+    Theorem is_list_sorted_Sorted_iff l: 
       is_list_sorted l = true <-> Sorted R l.
     Proof.
       induction l; simpl; intuition.
@@ -90,12 +90,20 @@ Section SortingAdd.
         destruct (R_dec a a0); eauto.
     Qed.
 
+    Corollary insertion_sort_is_list_sorted:
+      forall l, is_list_sorted (insertion_sort l) = true.
+    Proof.
+      intros.
+      rewrite is_list_sorted_Sorted_iff.
+      apply insertion_sort_Sorted.
+    Qed.
+
     Lemma is_list_sorted_ext : forall l (p1 p2:is_list_sorted l = true), p1 = p2.
     Proof.
       intros. apply eq_proofs_unicity. decide equality.
     Qed.
 
-    Lemma sorted_StronglySorted `{Transitive A R}:
+    Theorem is_list_sorted_StronglySorted `{Transitive A R}:
       forall l, is_list_sorted l = true <-> StronglySorted R l.
     Proof.
       intros.
@@ -104,6 +112,14 @@ Section SortingAdd.
       apply Sorted_StronglySorted. 
       red. apply transitivity. 
       apply StronglySorted_Sorted.
+    Qed.
+
+    Corollary insertion_sort_StronglySorted `{Transitive A R}:
+      forall l, StronglySorted R (insertion_sort l).
+    Proof.
+      intros.
+      rewrite <- is_list_sorted_StronglySorted.
+      apply insertion_sort_is_list_sorted.
     Qed.
 
     Lemma Forall_nin_irr `{Irreflexive A R}:
@@ -171,21 +187,101 @@ Section SortingAdd.
       auto.
     Qed.
 
+    Lemma in_insertion_sort_insert {x l a} :
+      In x (insertion_sort_insert a l) -> a = x \/ In x l.
+    Proof.
+      revert x a. induction l; simpl; [intuition | ].
+      intros x a0.
+      case_eq (R_dec a0 a); simpl; intros; trivial.
+      revert H0.
+      case_eq (R_dec a a0); simpl; intros; intuition.
+      destruct (IHl _ _ H2); intuition.
+    Qed.
+
+    Lemma in_insertion_sort {x l} :
+      In x (insertion_sort l) -> In x l.
+    Proof.
+      induction l; simpl; trivial.
+      intros inn. apply in_insertion_sort_insert in inn.
+      intuition.
+    Qed.
+
+    Lemma is_list_sorted_cons_Forall_lt `{Transitive A R} (a:A) :
+      forall l,
+        is_list_sorted (a :: l) = true ->
+        Forall (fun x => R a x) (insertion_sort l).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      rewrite is_list_sorted_StronglySorted in H0.
+      inversion H0.
+      subst.
+      apply (StronglySorted_cons_in H0).
+      apply in_insertion_sort; assumption.
+    Qed.
+
+    Lemma Forall_insertion_sort {P} l :
+      Forall P l -> Forall P (insertion_sort l).
+    Proof.
+      repeat rewrite Forall_forall.
+      intros fp x inx.
+      apply in_insertion_sort in inx.
+      auto.
+    Qed.
+
     Lemma insertion_sort_sorted_is_id l :
       is_list_sorted l = true ->
       insertion_sort l = l.
     Proof.
       induction l; intros; simpl in *.
-      reflexivity.
-      assert (is_list_sorted l = true).
-      destruct l; simpl in *; try reflexivity.
-      destruct (R_dec a a0); congruence.
-      specialize (IHl H0).
-      rewrite IHl; clear IHl.
-      destruct l; simpl in *; try reflexivity.
-      revert H.
-      destruct (R_dec a a0); intros; trivial.
-      destruct (R_dec a0 a); congruence.
+      - reflexivity.
+      - assert (is_list_sorted l = true).
+        destruct l; simpl in *; try reflexivity.
+        destruct (R_dec a a0); congruence.
+        specialize (IHl H0).
+        rewrite IHl; clear IHl.
+        destruct l; simpl in *; try reflexivity.
+        revert H.
+        destruct (R_dec a a0); intros; trivial.
+        destruct (R_dec a0 a); congruence.
+    Qed.
+
+    Lemma is_list_sorted_insert_sorted `{Transitive A R} a l:
+          is_list_sorted l = true -> is_list_sorted (insertion_sort_insert a l) = true.
+    Proof.
+      revert a.
+      induction l; intros.
+      - reflexivity.
+      - simpl.
+        case_eq (R_dec a0 a); intros.
+        + rewrite is_list_sorted_cons; split; assumption.
+        + case_eq (R_dec a a0); intros; [|congruence].
+          rewrite is_list_sorted_cons.
+          split.
+          * apply IHl; apply (is_list_sorted_cons_inv H0).
+          * assert (Forall (fun x => R a x) (insertion_sort l))
+              by (apply is_list_sorted_cons_Forall_lt; assumption).
+            assert (is_list_sorted l = true) by
+                apply (is_list_sorted_cons_inv H0); clear H0.
+            specialize (IHl a H4); clear IHl.
+            case_eq (insertion_sort_insert a0 l); intros; [trivial|].
+            assert (a0 = a1 \/ In a1 l)
+              by (apply (@in_insertion_sort_insert a1 l a0);
+                  rewrite H0; left; reflexivity).
+            rewrite Forall_forall in H3.
+            elim H5; intros; [subst; assumption|]; clear H5.
+            apply H3.
+            rewrite insertion_sort_sorted_is_id; assumption.
+    Qed.
+    
+    Theorem insertion_sort_sorted `{Transitive A R}:
+      forall l, is_list_sorted (insertion_sort l) = true.
+    Proof.
+      induction l; intros.
+      - reflexivity.
+      - simpl.
+        apply is_list_sorted_insert_sorted.
+        assumption.
     Qed.
 
     Lemma insertion_sort_idempotent l :
@@ -276,25 +372,6 @@ Section SortingAdd.
   (** * Properties of [In] on sorted lists *)
   
   Section In.
-    Lemma in_insertion_sort_insert {A R R_dec} {x l a} :
-      In x (@insertion_sort_insert A R R_dec a l) -> a = x \/ In x l.
-    Proof.
-      revert x a. induction l; simpl; [intuition | ].
-      intros x a0.
-      case_eq (R_dec a0 a); simpl; intros; trivial.
-      revert H0.
-      case_eq (R_dec a a0); simpl; intros; intuition.
-      destruct (IHl _ _ H2); intuition.
-    Qed.
-
-    Lemma in_insertion_sort {A R R_dec} {x l} :
-      In x (@insertion_sort A R R_dec l) -> In x l.
-    Proof.
-      induction l; simpl; trivial.
-      intros inn. apply in_insertion_sort_insert in inn.
-      intuition.
-    Qed.
-
     Local Hint Resolve asymmetric_over_cons_inv : qcert.
     
     Lemma insertion_sort_insert_in_strong {A R R_dec} {x l a} 
@@ -500,15 +577,6 @@ Section SortingAdd.
       - rewrite <- IHl, sort_insert_filter_false; trivial.
     Qed.
 
-    Lemma Forall_insertion_sort {A R R_dec} {P} l :
-      Forall P l -> Forall P (@insertion_sort A R R_dec l).
-    Proof.
-      repeat rewrite Forall_forall.
-      intros fp x inx.
-      apply in_insertion_sort in inx.
-      auto.
-    Qed.
-    
   End In.
 
   (** * Properties of [map] on sorted lists *)

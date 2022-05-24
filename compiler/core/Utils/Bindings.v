@@ -1608,7 +1608,7 @@ Section Bindings.
       case_eq (lookup ODT_eqdec (rec_sort l) x); intros.
       - apply (@lookup_some_nodup_perm _ _ _ (rec_sort l) (rev (rec_sort l))).
         + apply StronglySorted_NoDup.
-          rewrite <- (sorted_StronglySorted ODT_lt_dec).
+          rewrite <- (is_list_sorted_StronglySorted ODT_lt_dec).
           apply rec_sort_pf.
         + apply Permutation.Permutation_rev.
         + assumption.
