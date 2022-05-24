@@ -360,7 +360,7 @@ Section RSubtypeProp.
   Proof.
     inversion 1; subst; rtype_equalizer; subst; try reflexivity.
     generalize pf₁ pf₂.
-    repeat rewrite sorted_StronglySorted by eapply StrictOrder_Transitive.
+    repeat rewrite is_list_sorted_StronglySorted by eapply StrictOrder_Transitive.
     intros.
     eapply StronglySorted_incl_sublist; eauto.
     eapply SRec_closed_in_domain; eauto.

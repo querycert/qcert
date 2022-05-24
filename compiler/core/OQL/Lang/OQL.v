@@ -563,7 +563,18 @@ Section OQL.
         let order_by_result :=
             match order_by_clause with
             | ONoOrder => where_result
-            | OOrderBy scl e => where_result
+            | OOrderBy order_expr sc => where_result
+(*
+              match where_result with
+              | Some where_value =>
+                let crit1 order_expr sc env :=
+                    (*** XXX Sort direction [sc] ignored *)
+                    olift sdata_of_data (oql_expr_interp order_expr env)
+                in
+                table_sort (crit1 order_expr sc :: nil) where_value
+              | None => None
+              end
+*)
             end
         in
         let select_result :=

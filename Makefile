@@ -24,11 +24,11 @@ FILES = $(addprefix compiler/core/,$(MODULES:%=%.v))
 
 ## Full run
 all:
+	@$(MAKE) MAKEFLAGS= qcert-runtimes
 	@$(MAKE) build
 	@$(MAKE) install-local
 
 build: 
-	@$(MAKE) MAKEFLAGS= qcert-runtimes
 	@$(MAKE) qcert-compiler
 	@$(MAKE) MAKEFLAGS= qcert-cli
 

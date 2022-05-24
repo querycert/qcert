@@ -65,15 +65,14 @@ Section TSortBy.
       + right; auto.
     -  left; congruence.
   Defined.
-            
+
   Lemma order_by_has_sortable_type_sdd {τ sl a k pf1} :
     sublist (map fst sl) (domain τ) ->
     order_by_has_sortable_type τ (map fst sl) ->
-    a ▹ Rec k τ pf1 ->
-    {x | sortable_data_of_data a sl = Some x /\  snd x ▹ Rec k τ pf1}.
+    (drec a) ▹ Rec k τ pf1 ->
+    {x | fsortable_data_of_data a (map get_criteria sl) = Some x /\  (drec (snd x)) ▹ Rec k τ pf1}.
   Proof.
-    unfold sortable_data_of_data, order_by_has_sortable_type.
-    unfold get_criterias.
+    unfold fsortable_data_of_data, order_by_has_sortable_type, fget_criterias.
     induction sl; simpl; intros sub sts dt.
     - eexists; split; try reflexivity; simpl; trivial.
     - cut_to IHsl; trivial.
@@ -84,7 +83,6 @@ Section TSortBy.
         rewrite eqx.
         destruct a0.
         simpl in *.
-        dtype_inverter.
         assert (ins: In s (domain τ))
           by (apply (sublist_In sub); simpl; auto).
         unfold edot.
@@ -110,6 +108,24 @@ Section TSortBy.
       + eapply sublist_skip_l; eauto.
       + invcs sts; trivial.
   Qed.
+
+  Lemma in_sort_sortable_snd
+        (l0:list sortable_data) (l1:list sdata) (l2:list (string * data))
+        (x0:list (list (string * data))) :
+    map snd (sort_sortable_coll l0) = x0 ->
+    In (l1, l2) l0 ->
+    In l2 x0.
+  Proof.
+    intros.
+    rewrite <- (@in_sort_sortable _ (l1, l2) l0) in H0.
+    revert H H0.
+    generalize (sort_sortable_coll l0); intros.
+    rewrite <- H.
+    assert (l2 = snd (l1, l2)) by reflexivity.
+    rewrite H1.
+    apply in_map.
+    apply H0.
+  Qed.
     
   Lemma order_by_well_typed
         (d1:data) (sl:list (string * SortDesc))
@@ -117,7 +133,7 @@ Section TSortBy.
     d1 ▹ Coll (Rec k τ pf1) ->
     sublist (map fst sl) (domain τ) ->
     order_by_has_sortable_type τ (map fst sl) ->
-    exists x, data_sort sl d1 = Some x /\ x ▹ Coll (Rec k τ pf2).
+    exists x, data_sort (map get_criteria sl) d1 = Some x /\ x ▹ Coll (Rec k τ pf2).
   Proof.
     intros dt.
     dtype_inverter.
@@ -129,34 +145,53 @@ Section TSortBy.
     - eexists; split; try reflexivity.
       repeat constructor.
     - invcs dt.
+      dtype_inverter.
       specialize (IHd1 H2 sub ob).
       destruct IHd1 as [x [eqx dtx]].
       repeat (
           apply some_lift in eqx
           ; destruct eqx as [? eqx ?]; subst).
-      unfold sortable_coll_of_coll in *.
+      unfold fsortable_coll_of_coll in *.
       simpl.
       destruct (order_by_has_sortable_type_sdd sub ob H1)
         as [sd [sdeq sdt]].
+      unfold data_sort.
+      unfold lift, olift in *.
+      unfold lift in *.
+      simpl in *.
+      case_eq (lift_map (fun d : data => match d with
+                                        | drec r => Some r
+                                        | _ => None
+                                         end) d1); intros;
+      rewrite H in *; simpl in *; try congruence; clear H.
+      unfold table_sort in *.
+      unfold fsortable_coll_of_coll in *.
+      simpl.
       rewrite sdeq.
-      rewrite eqx.
-      unfold lift.
+      case_eq (lift_map
+                 (fun d : list (string * data) => fsortable_data_of_data d (map get_criteria sl)) l); intros; rewrite H in eqx; simpl in *; try congruence; clear H; simpl.
+      inversion eqx.
       eexists; split; try reflexivity.
       apply Col_inv in dtx.
       constructor.
       unfold coll_of_sortable_coll in *.
       rewrite Forall_map in dtx |- *.
-      apply Forall_insertion_sort.
       rewrite Forall_forall in dtx.
+      rewrite Forall_map.
+      assert (@insertion_sort_insert (prod (list sdata) (list (prod string (@data fdata))))
+       (@dict_field_le (list (prod string (@data fdata))))
+       (@dict_field_le_dec (list (prod string (@data fdata)))) sd
+       (@sort_sortable_coll (list (prod string (@data fdata))) l0) = insertion_sort dict_field_le_dec (sd::l0)) by reflexivity.
+      rewrite H.
+      apply Forall_insertion_sort.
       constructor.
       + revert sdt.
         clear.
-        destruct (is_list_sorted_ext ODT_lt_dec _ pf1 pf2); trivial.
+        destruct (is_list_sorted_ext StringOrder.lt_dec _ pf1 pf2); trivial.
       + rewrite Forall_forall; intros x inx.
         apply dtx.
-        apply in_sort_sortable.
-        trivial.
+        destruct x; simpl in*.
+        apply (in_sort_sortable_snd l0 l1 l2); assumption.
   Qed.
 
 End TSortBy.
-

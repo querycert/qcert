@@ -633,7 +633,7 @@ Section EJsonRuntimeOperators.
           (fun d1 d2 =>
              match d1 with
              | ejarray l1 =>
-               ejson_sort l1 d2
+               ejson_sort (map ejson_get_criteria l1) d2
              | _ => None
              end) dl
       | EJsonRuntimeGroupBy =>

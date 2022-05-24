@@ -101,9 +101,9 @@ Section RecOperators.
       is_list_sorted ODT_lt_dec (projected_subset s1 s2) = true.
     Proof.
       intros.
-      rewrite sorted_StronglySorted.
+      rewrite is_list_sorted_StronglySorted.
       apply StronglySorted_filter.
-      rewrite <- sorted_StronglySorted.
+      rewrite <- is_list_sorted_StronglySorted.
       eauto.
       apply StrictOrder_Transitive.
       apply StrictOrder_Transitive.
@@ -116,10 +116,10 @@ Section RecOperators.
     Proof.
       intros.
       apply StronglySorted_incl_sublist.
-      rewrite <- sorted_StronglySorted.
+      rewrite <- is_list_sorted_StronglySorted.
       eapply projected_subst_sorted; assumption.
       apply StrictOrder_Transitive.
-      rewrite <- sorted_StronglySorted.
+      rewrite <- is_list_sorted_StronglySorted.
       eauto.
       apply StrictOrder_Transitive.
       intros.

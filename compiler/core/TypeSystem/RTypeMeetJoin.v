@@ -2345,7 +2345,7 @@ Lemma map_rtype_join_is_sorted l₁ l₂ :
   -> is_list_sorted ODT_lt_dec (domain (map_rtype_join l₁ l₂)) = true.
 Proof.
   Local Hint Constructors StronglySorted : qcert.
-  repeat rewrite sorted_StronglySorted by apply StringOrder.lt_strorder.
+  repeat rewrite is_list_sorted_StronglySorted by apply StringOrder.lt_strorder.
   induction l₁; simpl; trivial.
   destruct a; simpl.
   case_eq l₁; intros; subst. 

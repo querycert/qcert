@@ -180,6 +180,12 @@ Section OQLSem.
     with oql_order_sem : oql_expr -> SortDesc -> list oql_env -> list oql_env -> Prop :=
     | oql_order_sem_WRONG e sc tenv :
         oql_order_sem e sc tenv tenv                                          (**r ⇒ [Γc; ↑γ ⊢〚e〛ᵒ ⇓ ↑γ] WRONG *)
+(*
+    | oql_order_sem_sorting e sc tenv1 tenv2 :
+        Permutation tenv1 tenv2 ->                                            (**r ⇒ [↑γ₂ permutation of ↑γ₁] *)
+        oql_strongly_sorted e sc tenv2 ->                                     (**r ⇒ [Γc ⊢ ↑γ₂ strongly sorted wrt e+sc] *)
+        oql_order_sem e sc tenv tenv                                          (**r ⇒ [Γc; ↑γ₁ ⊢〚e〛ᵒ ⇓ ↑γ₂] *)
+*)
     with oql_select_sem: oql_select_expr -> list oql_env -> data -> Prop :=
     | sem_OSelect e : forall tenv dl,
         oql_select_map_sem e tenv dl ->                                       (**r   [Γc; ↑γ ⊢〚e〛ᵐ ⇓ ↑dl] *)
@@ -195,8 +201,16 @@ Section OQLSem.
         oql_expr_sem e env d ->                                               (**r   [Γc; γ ⊢〚e〛⇓ d] *)
         oql_select_map_sem e tenv1 dl1 ->                                     (**r ∧ [Γc; ↑γ₁ ⊢〚e〛ᵐ ⇓ ↑dl] *)
         oql_select_map_sem e (env :: tenv1) (d :: dl1)                        (**r ⇒ [Γc; γ::↑γ₁ ⊢〚e〛ᵐ ⇓ d::↑dl] *)
+(*
+    with oql_strongly_sorted : oql_expr -> SortDesc -> list oql_env -> Prop :=
+    | oql_SSorted_nil e sc : oql_strongly_sorted e sc []
+    | oql_SSorted_cons e sc env0 tenv :
+        oql_strongly_sorted tenv -> Forall (fun x => env0) tenv -> oql_strongly_sorted (env :: tenv).
+*)
     .
 
+    (** Note: [oql_strongly_sorted] based on StronglySorted property *)
+    
     Lemma oql_from_in_sem_correct in_v e tenv tenv2:
       (forall (tenv : oql_env) (d : data),
           oql_expr_interp h constant_env e tenv = Some d -> oql_expr_sem e tenv d) ->
@@ -434,6 +448,18 @@ Section OQLSem.
       subst. econstructor.
     Qed.
 
+    (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+    Lemma table_sort_identity_WRONG e l:
+      table_sort
+        ((fun env : oql_env =>
+            match oql_expr_interp h constant_env e env with
+            | Some x' => sdata_of_data x'
+            | None => None
+            end) :: nil) l = Some l.
+    Proof.
+      admit.
+    Admitted.
+    
     Lemma oql_expr_interp_correct (e:oql_expr) :
       forall tenv d,
         oql_expr_interp h constant_env e tenv = Some d ->
@@ -554,6 +580,8 @@ Section OQLSem.
             rewrite H1 in H0; simpl in *; try congruence.
         + econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
           apply (oql_order_sem_correct_WRONG e sc l l eq_refl).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG in H0. *)
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l); intros;
             rewrite H1 in H0; try congruence;
@@ -561,6 +589,8 @@ Section OQLSem.
             econstructor; apply (oql_select_map_sem_correct o l l0 IHe H1).
         + econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
           apply (oql_order_sem_correct_WRONG e sc l l eq_refl).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG in H0. *)
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l); intros;
             rewrite H1 in H0; try congruence;
@@ -595,6 +625,8 @@ Section OQLSem.
           econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | | ]; clear H1.
           apply (oql_where_sem_correct e2 l l0 IHe2 H2).
           apply (oql_order_sem_correct_WRONG e3 sc l0 l0 eq_refl).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG in H0. *)
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
             rewrite H1 in H0; try congruence;
@@ -609,6 +641,8 @@ Section OQLSem.
           econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | | ]; clear H1.
           apply (oql_where_sem_correct e2 l l0 IHe2 H2).
           apply (oql_order_sem_correct_WRONG e3 sc l0 l0 eq_refl).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG in H0. *)
           unfold lift in H0;
             case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
             rewrite H1 in H0; try congruence;
@@ -784,19 +818,27 @@ Section OQLSem.
         destruct e1; inversion H9; subst; clear H9; unfold olift; simpl in *.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
           rewrite (oql_order_sem_complete_WRONG e sc tenv0 tenv1 H8).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG. *)
           rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
           rewrite (oql_order_sem_complete_WRONG e sc tenv0 tenv1 H8).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG. *)
           rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
       - inversion H0; subst; clear H0.
         destruct e1; inversion H11; subst; clear H11; unfold olift; simpl in *.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
           rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
           rewrite (oql_order_sem_complete_WRONG e3 sc tenv1 tenv2 H10).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG. *)
           rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
           rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
           rewrite (oql_order_sem_complete_WRONG e3 sc tenv1 tenv2 H10).
+          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
+          (* rewrite table_sort_identity_WRONG. *)
           rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
     Qed.
       
