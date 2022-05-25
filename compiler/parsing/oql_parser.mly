@@ -13,81 +13,17 @@
  *)
 
 %{
-  open Util
-  open EnhancedCompiler.EnhancedCompiler
-  open OQL
+open Util
+open EnhancedCompiler.EnhancedCompiler
+open OQL
+open Resolve_function
 
-  let static_int e =
-    begin match e with
-    | OConst (Coq_dnat i) -> i
-    | _ -> raise Not_found
-    end
-    
-  let resolve_call fname el =
-    begin match fname,el with
-    | "not", [e] ->
-	      QOQL.ounop QOps.Unary.opneg e
-    | "flatten", [e] ->
-	      QOQL.ounop QOps.Unary.opflatten e
-    | "sum", [e] ->
-	      QOQL.ounop QOps.Unary.opnatsum e
-    | "fsum", [e] ->
-	      QOQL.ounop QOps.Unary.opfloatsum e
-    | "avg", [e] ->
-	      QOQL.ounop QOps.Unary.opnatmean e
-    | "favg", [e] ->
-	      QOQL.ounop QOps.Unary.opfloatmean e
-    | "count", [e] ->
-	      QOQL.ounop QOps.Unary.opcount e
-    | "length", [e] ->
-	      QOQL.ounop QOps.Unary.oplength e
-    | "max", [e] ->
-	      QOQL.ounop QOps.Unary.opnatmax e
-    | "min", [e] ->
-	      QOQL.ounop QOps.Unary.opnatmin e
-    | "toString", [e] ->
-	      QOQL.ounop QOps.Unary.optostring e
-    | "nth", [e1;e2] ->
-	      QOQL.obinop QOps.Binary.opbagnth e1 e2
-    | "stringJoin", [e1;e2] ->
-	      QOQL.obinop QOps.Binary.opstringjoin e1 e2
-    | "substring", [e1;e2] ->
-	      let start =
-	        begin try static_int e2 with
-	        | Not_found ->
-	            raise (Qcert_Error
-		                   ("Second parameter of substring should be an integer constant"))
-	        end
-	      in
-	      QOQL.ounop (QOps.Unary.opsubstring start None) e1
-    | "substring", [e1;e2;e3] ->
-	      let start =
-	        begin try static_int e2 with
-	        | Not_found ->
-	            raise (Qcert_Error
-		                   ("Second parameter of substring should be an integer constant"))
-	        end
-	      in
-	      let len =
-	        begin try static_int e3 with
-	        | Not_found ->
-	            raise (Qcert_Error
-		                   ("Third parameter of substring should be an integer constant"))
-	        end
-	      in
-	      QOQL.ounop (QOps.Unary.opsubstring start (Some len)) e1
-    | "date", [e] ->
-        QOQL.ounop Enhanced.Ops.Unary.sql_date_from_string e
-    | "getYear", [e] ->
-        QOQL.ounop (Enhanced.Ops.Unary.sql_date_get_component Coq_sql_date_YEAR) e
-    | "encode", [e] ->
-        QOQL.ounop Enhanced.Ops.Unary.uri_encode e
-    | "decode", [e] ->
-        QOQL.ounop Enhanced.Ops.Unary.uri_decode e
-    | _, _ ->
-	      raise (Qcert_Error
-		             ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))
-    end
+let unwrap_oql_const e =
+  begin match e with
+  | OConst d -> Some d
+  | _ -> None
+  end
+let resolve_oql_call = resolve_call QOQL.ounop QOQL.obinop unwrap_oql_const
 
 %}
 
@@ -173,7 +109,7 @@ expr:
     { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere w) QOQL.onoorder }
 (* Call *)
 | fn = IDENT LPAREN el = exprlist RPAREN
-    { resolve_call fn el }
+    { resolve_oql_call fn el }
 (* Expressions *)
 | v = IDENT
     { QOQL.ovar v }

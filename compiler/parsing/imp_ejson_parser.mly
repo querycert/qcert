@@ -26,7 +26,7 @@
     then
       begin match QUtil.ejson_runtime_op_of_string fname with
       | Some op -> op
-      | None ->raise (Qcert_Error ("Call to " ^ mname ^ "." ^ fname ^ " unkonwn"))
+      | None ->raise (Qcert_Error ("Call to " ^ mname ^ "." ^ fname ^ " unknown"))
       end
     else
 	    raise (Qcert_Error ("Call to " ^ mname ^ "." ^ fname ^ " unkonwn"))
@@ -156,7 +156,7 @@ expr:
     { ImpExprOp (EJsonOpGe,[e1;e2]) }
 (* Call *)
 | mname = IDENT DOT fname = IDENT LPAREN el = exprs RPAREN
-    { ImpExprRuntimeCall (runtime_call mname fname,el) }
+    { ImpExprRuntimeCall (runtime_call mname fname, el) }
 (* Expressions *)
 | vname = IDENT
     { ImpExprVar vname }

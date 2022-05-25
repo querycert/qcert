@@ -13,119 +13,45 @@
  *)
 
 %{
-  open Util
-  open LambdaNRA
-  open EnhancedCompiler.EnhancedCompiler
+open Util
+open LambdaNRA
+open EnhancedCompiler.EnhancedCompiler
+open Resolve_function
 
-  type lambda_or_expression =
+type lambda_or_expression =
   | ParsedLambda of QLambdaNRA.lambda_expr
   | ParsedExpr of QLambdaNRA.expr
 
-  let resolve_one_lambda a el =
-    begin match el with
-    | [ParsedLambda le] -> le
-    | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " expecting one lambda"))
-    end
+let resolve_one_lambda a el =
+  begin match el with
+  | [ParsedLambda le] -> le
+  | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " expecting one lambda"))
+  end
 
-  let resolve_one_expr a el =
-    begin match el with
-    | [ParsedExpr e] -> e
-    | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " expecting one expression"))
-    end
+let resolve_one_expr a el =
+  begin match el with
+  | [ParsedExpr e] -> e
+  | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " expecting one expression"))
+  end
 
-  let resolve_nra_operator a el e0 =
-    begin match a with
-    | "map" -> QLambdaNRA.lamap (resolve_one_lambda a el) e0
-    | "flatmap" -> QLambdaNRA.laflatmap (resolve_one_lambda a el) e0
-    | "mapproduct" -> QLambdaNRA.lamapproduct (resolve_one_lambda a el) e0
-    | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
-    | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
-    | "union" -> QLambdaNRA.labinop OpBagUnion e0 (resolve_one_expr a el)
-    | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
-    end
+let resolve_nra_operator a el e0 =
+  begin match a with
+  | "map" -> QLambdaNRA.lamap (resolve_one_lambda a el) e0
+  | "flatmap" -> QLambdaNRA.laflatmap (resolve_one_lambda a el) e0
+  | "mapproduct" -> QLambdaNRA.lamapproduct (resolve_one_lambda a el) e0
+  | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
+  | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
+  | "union" -> QLambdaNRA.labinop OpBagUnion e0 (resolve_one_expr a el)
+  | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
+  end
 
-  let static_int e =
-    begin match e with
-    | LNRAConst (Coq_dnat i) -> i
-    | _ -> raise Not_found
-    end
-    
-  let static_string e =
-    begin match e with
-    | LNRAConst (Coq_dstring s) -> s
-    | _ -> raise Not_found
-    end
-    
-  let resolve_call fname el =
-    begin match fname,el with
-    | "not", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opneg e
-    | "flatten", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opflatten e
-    | "sum", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opnatsum e
-    | "fsum", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opfloatsum e
-    | "avg", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opnatmean e
-    | "favg", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opfloatmean e
-    | "count", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opcount e
-    | "length", [e] ->
-	      QLambdaNRA.launop QOps.Unary.oplength e
-    | "max", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opnatmax e
-    | "fmax", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opfloatmax e
-    | "min", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opnatmin e
-    | "fmin", [e] ->
-	      QLambdaNRA.launop QOps.Unary.opfloatmin e
-    | "toString", [e] ->
-	      QLambdaNRA.launop QOps.Unary.optostring e
-    | "nth", [e1;e2] ->
-	      QLambdaNRA.labinop QOps.Binary.opbagnth e1 e2
-    | "stringJoin", [e1;e2] ->
-	      QLambdaNRA.labinop QOps.Binary.opstringjoin e1 e2
-    | "like", [e1;e2] ->
-	      let pat =
-	        begin try static_string e1 with
-	        | Not_found ->
-	            raise (Qcert_Error
-		                   ("First parameter of like should be a string constant"))
-	        end
-	      in
-	      QLambdaNRA.launop (QOps.Unary.oplike pat) e2
-    | "substring", [e1;e2] ->
-	      let start =
-	        begin try static_int e2 with
-	        | Not_found ->
-	            raise (Qcert_Error
-		                   ("Second parameter of substring should be an integer constant"))
-	        end
-	      in
-	      QLambdaNRA.launop (QOps.Unary.opsubstring start None) e1
-    | "substring", [e1;e2;e3] ->
-	      let start =
-	        begin try static_int e2 with
-	        | Not_found ->
-	            raise (Qcert_Error
-		                   ("Second parameter of substring should be an integer constant"))
-	        end
-	      in
-	      let len =
-	        begin try static_int e3 with
-	        | Not_found ->
-	            raise (Qcert_Error
-		                   ("Third parameter of substring should be an integer constant"))
-	        end
-	      in
-	      QLambdaNRA.launop (QOps.Unary.opsubstring start (Some len)) e1
-    | _, _ ->
-	      raise (Qcert_Error
-		             ("Function " ^ fname ^ " with arity " ^ (string_of_int (List.length el)) ^ " unkonwn"))
-    end
+let unwrap_lambdanra_const e =
+  begin match e with
+  | LNRAConst d -> Some d
+  | _ -> None
+  end
+let resolve_lambdanra_call = resolve_call QLambdaNRA.launop QLambdaNRA.labinop unwrap_lambdanra_const
+
 %}
 
 %token NULL
@@ -182,7 +108,7 @@ expr:
     { QLambdaNRA.laconst (QData.dstring s) }
 (* Call *)
 | fn = IDENT LPAREN el = exprlist RPAREN
-    { resolve_call fn el }
+    { resolve_lambdanra_call fn el }
 (* Expressions *)
 | v = IDENT
     { QLambdaNRA.lavar v }
