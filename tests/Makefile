@@ -226,23 +226,19 @@ oql-tests-wasm:
 	@$(MAKE) oql-persons-tests-wasm
 	@$(MAKE) oql-employees-tests-wasm
 
-oql-string-tests-wasm:
-	# compilation-only test
+oql-string-tests-wasm:	# compilation-only test
 	@$(foreach N,$(OQLWASMSTRINGNUM), \
 	       $(QCERTCOMP) -source oql -target wasm oql/string$(N).oql -schema oql/string.schema -quiet || exit 1; )
 
-oql-world-tests-wasm:
-	# compilation-only test
+oql-world-tests-wasm:	# compilation-only test
 	@$(foreach N,$(OQLWASMWORLDNUM), \
 	       $(QCERTCOMP) -source oql -target wasm oql/world$(N).oql -schema oql/world.schema -quiet || exit 1;)
 
-oql-persons-tests-wasm:
-	# compilation-only test
+oql-persons-tests-wasm:	# compilation-only test
 	@$(foreach N,$(OQLWASMPERSONSNUM), \
 	       $(QCERTCOMP) -source oql -target wasm oql/persons$(N).oql -schema oql/persons.schema -quiet || exit 1; )
 
-oql-employees-tests-wasm:
-	# compilation-only test
+oql-employees-tests-wasm:	# compilation-only test
 	@$(foreach N,$(OQLWASMEMPLOYEESNUM), \
 	       $(QCERTCOMP) -source oql -target wasm oql/employees$(N).oql -schema oql/employees.schema -quiet || exit 1; )
 
