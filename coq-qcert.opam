@@ -30,7 +30,7 @@ depends: [
   "ocamlfind"
   "dune"
   "coq" {>= "8.15.1"}
-  "coq-jsast" {>= "2.0.0"}
+  "coq-jsast" {>= "3.0.0"}
   "menhir"
   "base64"
   "js_of_ocaml"

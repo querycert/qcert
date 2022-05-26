@@ -37,14 +37,6 @@ Section ImpEJsontoJavaScriptAst.
     Definition scope l := stat_block l. (* XXX TODO XXX *)
     Definition prog_to_string (x: prog) : string := "". (* XXX TODO: prog_to_string XXX *)
 
-    (* XXX Should be done earlier *)
-    Definition box_nat e :=
-      expr_object
-        ((propname_identifier "$nat"%string,
-          propbody_val e)::nil).
-    Definition unbox_nat e :=
-      expr_member e "$nat"%string.
-
     Definition mk_expr_error := expr_literal literal_null.
     Definition mk_unary_expr (f:expr -> expr) (el:list expr) : expr :=
       match el with
@@ -83,7 +75,7 @@ Section ImpEJsontoJavaScriptAst.
     (* XXX For range *)
     Definition mk_integer_plus_one
                (e:expr) :=
-      mk_runtime_call EJsonRuntimeNatPlus [e;box_nat (expr_literal (literal_number (float_of_int 1)))].
+      mk_runtime_call EJsonRuntimeNatPlus [e;expr_literal (literal_bigint 1)].
     Definition mk_integer_le
                (e1 e2: expr) :=
       mk_runtime_call EJsonRuntimeNatLe [e1;e2].
@@ -151,7 +143,7 @@ Section ImpEJsontoJavaScriptAst.
       match json with
       | cejnull => expr_literal literal_null
       | cejnumber n => expr_literal (literal_number n)
-      | cejbigint n => box_nat (expr_literal (literal_number (float_of_int n)))
+      | cejbigint z => expr_literal (literal_bigint z)
       (* XXX Could be replaced by JavaScript BigInt with some fix to JsAst XXX *)
       | cejbool b => expr_literal (literal_bool b)
       | cejstring s => expr_literal (literal_string s)

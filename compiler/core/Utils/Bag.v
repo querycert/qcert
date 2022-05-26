@@ -1549,14 +1549,14 @@ Section NumMinMax.
 
   Definition bnummin (l:list Z) :=
     match l with
-    | nil => 0
+    | nil => 0 (* This is a fallback *)
     | x0 :: l' =>
       fold_right (fun x y => Z.min x y) x0 l'
     end.
 
   Definition bnummax (l:list Z) :=
     match l with
-    | nil => 0
+    | nil => 0 (* This is a fallback *)
     | x0 :: l' =>
       fold_right (fun x y => Z.max x y) x0 l'
     end.

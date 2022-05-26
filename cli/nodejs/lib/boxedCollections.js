@@ -13,39 +13,46 @@
  */
 
 class BoxedCollections {
-    static boxColl(input) {
-        let result = input;
-        var t = typeof input;
-        if ({}.toString.apply(input) === '[object Array]') {
-            input.forEach(x => BoxedCollections.boxColl(x));
-            result = {
-                $coll: input,
-                $length: input.length
-            };
-        } else if (typeof input === 'object') {
-            for (var key in input) {
-                input[key] = BoxedCollections.boxColl(input[key]);
-            }
+  static boxColl(input) {
+    let result = input;
+    const t = typeof input;
+    if ({}.toString.apply(input) === '[object Array]') {
+      const coll = input.map(x => BoxedCollections.boxColl(x));
+      result = {
+        $coll: coll,
+        $length: coll.length
+      };
+    } else if (typeof input === 'object') {
+      if (Object.prototype.hasOwnProperty.call(input,'$nat')) {
+        // Cannot convert a number with decimal point to BigInt
+        result = BigInt(Math.floor(input.$nat));
+      } else {
+        for (const key in input) {
+          input[key] = BoxedCollections.boxColl(input[key]);
         }
-        return result;
+      }
     }
-    static unboxColl(input) {
-        let result = input;
-        var t = typeof input;
-        if ({}.toString.apply(input) === '[object Array]') {
-            result = input.map(x => BoxedCollections.unboxColl(x));
-        } else if (input && typeof input === 'object') {
-            if (Object.prototype.hasOwnProperty.call(input,'$coll')
-                && Object.prototype.hasOwnProperty.call(input,'$length')) {
-                result = BoxedCollections.unboxColl(input.$coll.slice(0,input.$length));
-            } else {
-                for (var key in input) {
-                    input[key] = BoxedCollections.unboxColl(input[key]);
-                }
-            }
+    return result;
+  }
+  static unboxColl(input) {
+    let result = input;
+    const t = typeof input;
+    if (input && typeof input === 'bigint') {
+      result = { $nat: Number(input) };
+    } else if ({}.toString.apply(input) === '[object Array]') {
+      result = input.map(x => BoxedCollections.unboxColl(x));
+    } else if (input && typeof input === 'object') {
+      if (Object.prototype.hasOwnProperty.call(input,'$coll')
+          && Object.prototype.hasOwnProperty.call(input,'$length')) {
+        result = BoxedCollections.unboxColl(input.$coll.slice(0,input.$length));
+      } else {
+        for (const key in input) {
+          input[key] = BoxedCollections.unboxColl(input[key]);
         }
-        return result;
+      }
     }
+    return result;
+  }
 }
 
 module.exports = BoxedCollections;

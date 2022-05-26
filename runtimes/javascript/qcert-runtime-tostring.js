@@ -38,6 +38,9 @@ function toStringQ(v, quote) {
         if (Math.floor(v) === v) { return (new Number(v)).toFixed(1); } // Make sure there is always decimal point
         else { return '' + v; }
     }
+    if (t === 'bigint') {
+        return '' + v;
+    }
     if ({}.toString.apply(v) === '[object Array]') {
         v = v.slice();
         v.sort();
@@ -49,9 +52,6 @@ function toStringQ(v, quote) {
             result += toStringQ(v[i], quote);
         }
         return result + ']';
-    }
-    if (isNat(v)) {
-        return '' + unboxNat(v);
     }
     var result2 = '';
     if (v.$class) { // branded value
