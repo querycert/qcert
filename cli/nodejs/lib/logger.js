@@ -29,96 +29,96 @@ const tsFormat = () => (new Date()).toLocaleTimeString();
  * @private
  */
 function isJSON(str) {
-    try {
-        return (JSON.parse(str) && !!str);
-    } catch (e) {
-        return false;
-    }
+  try {
+    return (JSON.parse(str) && !!str);
+  } catch (e) {
+    return false;
+  }
 }
 
 jsome.params.lintable = true;
 
 const jsonColor =  winston.format(info => {
-    const padding = info.padding && info.padding[info.level] || '';
+  const padding = info.padding && info.padding[info.level] || '';
 
-    if(info[LEVEL] === 'error' && info.stack) {
-        info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}\n${info.stack}`;
-        return info;
-    }
+  if(info[LEVEL] === 'error' && info.stack) {
+    info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}\n${info.stack}`;
+    return info;
+  }
 
-    if (info[LEVEL] === 'info' || info[LEVEL] === 'warn') {
-        if(typeof info.message === 'object') {
-            info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding}\n${jsome.getColoredString(info.message, null, 2)}`;
-        } else if(isJSON(info.message)) {
-            info[MESSAGE] =`${tsFormat()} - ${info.level}:${padding}\n${jsome.getColoredString(JSON.parse(info.message), null, 2)}`;
-        } else {
-            info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}`;
-        }
-        return info;
-    }
-
-    const stringifiedRest = jsonStringify(Object.assign({}, info, {
-        level: undefined,
-        message: undefined,
-        splat: undefined
-    }));
-
-    if (stringifiedRest !== '{}') {
-        info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message} ${stringifiedRest}`;
+  if (info[LEVEL] === 'info' || info[LEVEL] === 'warn') {
+    if(typeof info.message === 'object') {
+      info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding}\n${jsome.getColoredString(info.message, null, 2)}`;
+    } else if(isJSON(info.message)) {
+      info[MESSAGE] =`${tsFormat()} - ${info.level}:${padding}\n${jsome.getColoredString(JSON.parse(info.message), null, 2)}`;
     } else {
-        info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}`;
+      info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}`;
     }
     return info;
+  }
+
+  const stringifiedRest = jsonStringify(Object.assign({}, info, {
+    level: undefined,
+    message: undefined,
+    splat: undefined
+  }));
+
+  if (stringifiedRest !== '{}') {
+    info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message} ${stringifiedRest}`;
+  } else {
+    info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}`;
+  }
+  return info;
 
 });
 
 const enumerateErrorFormat = winston.format(info => {
-    if (info.message instanceof Error) {
-        info.message = Object.assign({
-            message: info.message.message,
-            stack: info.message.stack
-        }, info.message);
-    }
+  if (info.message instanceof Error) {
+    info.message = Object.assign({
+      message: info.message.message,
+      stack: info.message.stack
+    }, info.message);
+  }
 
-    if (info instanceof Error) {
-        return Object.assign({
-            message: info.message,
-            stack: info.stack
-        }, info);
-    }
+  if (info instanceof Error) {
+    return Object.assign({
+      message: info.message,
+      stack: info.stack
+    }, info);
+  }
 
-    return info;
+  return info;
 });
 
 let logger = winston.createLogger({
-    format: winston.format.combine(
-        winston.format.json(),
-        enumerateErrorFormat(),
-        winston.format.colorize(),
-        jsonColor(),
-    ),
-    transports: [
-        new winston.transports.Console({
-            level: 'info',
-        }),
-    ]
+  format: winston.format.combine(
+    winston.format.json(),
+    enumerateErrorFormat(),
+    winston.format.colorize(),
+    jsonColor(),
+  ),
+  transports: [
+    new winston.transports.Console({
+      level: 'info',
+    }),
+  ]
 });
 
 // Only write log files to disk if we're running in development
 // and not in a browser (webpack or browserify)
 const setupLogger = ((process,env,logDir) => {
-    if (env === 'development' && !process.browser) {
-        // Create the log directory if it does not exist
-        if (!fs.existsSync(logDir)) {
-            fs.mkdirSync(logDir);
-        }
-
-        logger.add(new winston.transports.File({
-            name: 'logs-file',
-            filename: `${logDir}/trace.log`,
-            level: 'debug'
-        }));
+  if (env === 'development' && !process.browser) {
+    // Create the log directory if it does not exist
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir);
     }
+
+    logger.add(new winston.transports.File({
+      name: 'logs-file',
+      filename: `${logDir}/trace.log`,
+      level: 'debug'
+    }));
+  }
 });
 
 const logDir = 'log';

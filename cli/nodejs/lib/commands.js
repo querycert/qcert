@@ -24,13 +24,13 @@ const QcertRunner = require('./qcertRunner');
  * @return {object} JSON object
  */
 function getJson(input) {
-    let jsonString;
-    if (input.file) {
-        jsonString = Fs.readFileSync(input.file, 'utf8');
-    } else {
-        jsonString = input.content;
-    }
-    return JSON.parse(jsonString);
+  let jsonString;
+  if (input.file) {
+    jsonString = Fs.readFileSync(input.file, 'utf8');
+  } else {
+    jsonString = input.content;
+  }
+  return JSON.parse(jsonString);
 }
 
 /**
@@ -38,42 +38,42 @@ function getJson(input) {
  * @class
  */
 class Commands {
-    /**
-     * Compile and run query
-     *
-     * @param {string} source - source language
-     * @param {string} schemaFile - schema file
-     * @param {string} queryFile - query file
-     * @param {string} inputFile - input data file
-     * @param {string} outputFile - expected result file
-     * @param {boolean} validate - validate the result
-     * @returns {object} Promise to the result of execution
-     */
-    static compile(source,schemaFile,queryFile,inputFile,outputFile,validate) {
-        const input = getJson(inputFile);
-        const sourceQuery = Fs.readFileSync(queryFile,'utf8');
-        const schema = getJson(schemaFile);
-        const output = outputFile ? getJson(outputFile) : null;
-        return QcertRunner.compileExecute(source,schema,input,queryFile,sourceQuery,output,validate);
-    }
+  /**
+   * Compile and run query
+   *
+   * @param {string} source - source language
+   * @param {string} schemaFile - schema file
+   * @param {string} queryFile - query file
+   * @param {string} inputFile - input data file
+   * @param {string} outputFile - expected result file
+   * @param {boolean} validate - validate the result
+   * @returns {object} Promise to the result of execution
+   */
+  static compile(source,schemaFile,queryFile,inputFile,outputFile,validate) {
+    const input = getJson(inputFile);
+    const sourceQuery = Fs.readFileSync(queryFile,'utf8');
+    const schema = getJson(schemaFile);
+    const output = outputFile ? getJson(outputFile) : null;
+    return QcertRunner.compileExecute(source,schema,input,queryFile,sourceQuery,output,validate);
+  }
 
-    /**
-     * Run query
-     *
-     * @param {string} schemaFile - schema file
-     * @param {string} queryFile - compiled query file
-     * @param {string} inputFile - input data file
-     * @param {string} outputFile - expected result file
-     * @param {boolean} validate - validate the result
-     * @returns {object} Promise to the result of execution
-     */
-    static execute(schemaFile,queryFile,inputFile,outputFile,validate) {
-        const input = getJson(inputFile);
-        const sourceQuery = Fs.readFileSync(queryFile,'utf8');
-        const schema = getJson(schemaFile);
-        const output = outputFile ? getJson(outputFile) : null;
-        return QcertRunner.execute(schema,input,queryFile,sourceQuery,output,validate);
-    }
+  /**
+   * Run query
+   *
+   * @param {string} schemaFile - schema file
+   * @param {string} queryFile - compiled query file
+   * @param {string} inputFile - input data file
+   * @param {string} outputFile - expected result file
+   * @param {boolean} validate - validate the result
+   * @returns {object} Promise to the result of execution
+   */
+  static execute(schemaFile,queryFile,inputFile,outputFile,validate) {
+    const input = getJson(inputFile);
+    const sourceQuery = Fs.readFileSync(queryFile,'utf8');
+    const schema = getJson(schemaFile);
+    const output = outputFile ? getJson(outputFile) : null;
+    return QcertRunner.execute(schema,input,queryFile,sourceQuery,output,validate);
+  }
 
 }
 

@@ -56,12 +56,6 @@ Section Encode.
     repeat match_destr.
   Qed.
 
-  Lemma key_encode_not_nat s : (key_encode s) <> "$nat"%string.
-  Proof.
-    destruct s; simpl; try discriminate.
-    repeat match_destr.
-  Qed.
-
   Lemma key_encode_not_left s : (key_encode s) <> "$left"%string.
   Proof.
     destruct s; simpl; try discriminate.

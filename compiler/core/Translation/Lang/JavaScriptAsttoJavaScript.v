@@ -67,6 +67,7 @@ Section ToString.
     | literal_bool false => "false"
     | literal_number n => js_quote_number n
     | literal_string s => quotel ++ js_quote_string s ++ quotel
+    | literal_bigint z => Z_to_string10 z ++ "n"
     end.
 
   Definition string_of_propname (name: propname) : string :=

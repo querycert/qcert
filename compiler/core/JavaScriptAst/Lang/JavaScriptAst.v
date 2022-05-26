@@ -15,16 +15,7 @@
 Require Export JsAst.JsSyntax.
 
 Section JavaScriptAst.
-  (* XXX Might be better folded in JsSyntax *)
-  Inductive topdecl :=
-  | strictmode : topdecl                            (** strict mode declaration *)
-  | comment : string -> topdecl                     (** comment *)
-  | elementdecl : element -> topdecl                (** Program element *)
-  | classdecl : string -> list funcdecl -> topdecl  (** Class declarations *)
-  | constdecl : string -> expr -> topdecl           (** Constant declarations *)
-  .
-
-  Definition js_ast := list topdecl.
+  Definition js_ast := module.
 
 End JavaScriptAst.
 
