@@ -1,6 +1,6 @@
 {
   "name": "qcert-runtime-js",
-  "version": "3.0.0-alpha.1",
+  "version": "3.0.0-alpha.4",
   "description": "The Q*cert compiler",
   "repository": {
     "type": "git",

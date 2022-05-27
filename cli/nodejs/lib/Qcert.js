@@ -12,36 +12,15 @@
  * limitations under the License.
  */
 
+const { stringified } = require('./util');
 const { qcertLib } = require('qcert-compiler');
 const { QcertRunner } = require('qcert-runtime-js');
 
-/* Stringify */
-function replacer(key, value) {
-  if (typeof value === 'bigint') {
-    return value.toString() + 'n';
-  }
-  return value;
-}
-
-function stringified(data) {
-  if (typeof data === 'bigint') {
-    return data.toString() + 'n';
-  }
-  return JSON.stringify(data, replacer);
-}
-
-/* Generic Node module require from string */
-function requireFromString(src, filename) {
-  const Module = module.constructor;
-  const m = new Module();
-  m._compile(src, filename);
-  return m.exports;
-}
-
 class Qcert {
   /* Build compilation configuration */
-  static configure(source,schema,sourceQuery,output) {
+  static configure(source,queryName,schema,sourceQuery,output) {
     const config = {
+      'qname' : queryName,
 		  'source' : source,
 		  'target' : 'js',
 		  'exactpath' : false,
@@ -58,8 +37,8 @@ class Qcert {
   }
 
   /* Call Q*cert compiler */
-  static compile(source,schema,sourceQuery,output) {
-    const gconf = Qcert.configure(source,schema,sourceQuery,output);
+  static compile(source,queryName,schema,sourceQuery,output) {
+    const gconf = Qcert.configure(source,queryName,schema,sourceQuery,output);
     const queryInput = {
       'gconf' : gconf,
 		  'query' : sourceQuery,
@@ -96,11 +75,12 @@ class Qcert {
 
   /* run compiled query */
   static execute(schema,input,queryFile,compiledQuery,output,validate) {
-    let result = QcertRunner.execute(schema,input,queryFile,compiledQuery);
+    const queryName = queryFile.split('/').pop().split('.')[0];
+    let result = QcertRunner.execute(schema,queryName,compiledQuery,input);
     if (validate) {
       if (output !== undefined) {
-        const gconf = Qcert.configure('oql',schema,compiledQuery,output);
-        return Qcert.validate(gconf,queryFile,'js',output,result)
+        const gconf = Qcert.configure('oql',queryName,schema,compiledQuery,output);
+        return Qcert.validate(gconf,queryName,'js',output,result)
       } else {
         throw new Error('Cannot validate result without expected result (--output option)');
       }
@@ -110,7 +90,8 @@ class Qcert {
 
   /* compile query then execute */
   static compileExecute(source,schema,input,queryFile,sourceQuery,output,validate) {
-    const compiledQuery = Qcert.compile(source,schema,sourceQuery,output);
+    const queryName = queryFile.split('/').pop().split('.')[0];
+    const compiledQuery = Qcert.compile(source,queryName,schema,sourceQuery,output);
     return Qcert.execute(schema,input,queryFile,compiledQuery.result,output,validate);
   }
 }
