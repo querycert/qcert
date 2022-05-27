@@ -73,6 +73,5 @@ let set_optim_config_file gconf file = gconf.gconf_optim_config_file <- Some fil
 let set_emit_optim_config gconf () = gconf.gconf_emit_optim_config <- true
 let set_optims gconf optims = gconf.gconf_optim_config <- optims
 
-let set_link_js_runtime gconf () = Pretty_common.set_link_js_runtime gconf.gconf_pretty_config ()
 let set_prefix gconf prefix = gconf.gconf_prefix <- prefix
 

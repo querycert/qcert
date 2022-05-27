@@ -20,4 +20,4 @@
  * @module qcert
  */
 
-module.exports.Qcert = require('./lib/Qcert').QcertRunner;
+module.exports.qcertLib = require('./lib/qcertLib');

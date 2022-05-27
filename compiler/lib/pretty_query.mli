@@ -20,7 +20,7 @@ open Pretty_common
 
 (** Pretty queries *)
 
-type 'a pretty_fun = bool -> int -> bool -> QData.json -> bool -> 'a -> string
+type 'a pretty_fun = bool -> int -> bool -> QData.json -> 'a -> string
 
 val pretty_camp_rule : QLang.camp_rule pretty_fun
 val pretty_tech_rule : QLang.tech_rule pretty_fun

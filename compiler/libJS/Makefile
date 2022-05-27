@@ -29,18 +29,18 @@ JS=js
 ## Toplevel
 all:
 	dune build $(MAIN).$(BYTECODE)
-	$(MAKE) ../../bin/$(MAIN).js
+	$(MAKE) extracted/$(MAIN).js
 
 ## JavaScript
-../../bin/$(MAIN).js: $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(BYTECODE)
+extracted/$(MAIN).js: $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(BYTECODE)
 	dune build $(MAIN).$(BYTECODE)
 	js_of_ocaml $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(BYTECODE)
-	cp $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(JS) ../../bin/$(MAIN).$(JS)
+	cp $(QCERT_HOME)/_build/default/compiler/libJS/$(MAIN).$(JS) extracted/$(MAIN).$(JS)
 
 ## Clean
 
 clean:
-	rm -f ../../bin/$(MAIN).js
+	rm -f extracted$(MAIN).js
 
 cleanall: clean
 	rm -rf *~

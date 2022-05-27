@@ -41,9 +41,6 @@ val get_margin : pretty_config -> int
 val set_inheritance : pretty_config -> QData.json -> unit
 val get_inheritance : pretty_config -> QData.json
 
-val set_link_js_runtime : pretty_config -> unit -> unit
-val link_js_runtime : pretty_config -> bool
-
 (* Pretty sym *)
 
 type symbols =

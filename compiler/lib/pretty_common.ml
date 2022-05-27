@@ -34,15 +34,13 @@ type pretty_config =
     { mutable margin : int;
       mutable charset : charkind;
       mutable type_annotations : bool;
-      mutable inheritance : QData.json;
-      mutable link_js_runtime : bool; }
+      mutable inheritance : QData.json; }
 
 let default_pretty_config () =
   { margin = 120;
     charset = Greek;
     type_annotations = false;
-    inheritance = Coq_jarray [];
-    link_js_runtime = false; }
+    inheritance = Coq_jarray []; }
 
 let set_ascii conf () = conf.charset <- Ascii
 let set_greek conf () = conf.charset <- Greek
@@ -62,9 +60,6 @@ let get_margin conf = conf.margin
 
 let set_inheritance conf h = conf.inheritance <- h
 let get_inheritance conf = conf.inheritance
-
-let set_link_js_runtime conf () = conf.link_js_runtime <- true
-let link_js_runtime conf = conf.link_js_runtime
 
 (* Charset dependent config *)
 (* Note: This should remain within the module *)

@@ -58,7 +58,7 @@ $ opam switch create qcert 4.09.1
 
 #### Node.js (Recommended)
 
-Execution and testing for the JavaScript compilation target, as well demo material, requires Node.js. We suggest Node.js version 10 or 12.
+Execution and testing for the JavaScript compilation target, as well demo material, requires Node.js version 16 or later.
 
 Node.js can be installed from https://nodejs.org/en/
 
@@ -132,7 +132,7 @@ To run the resulting JavaScript, you can use the provided node CLI.
 You will need to pass it the following: (i) the compiled query (`tests/oql/persons1.js` in our example), (ii) the schema for that query, (iii) some input data. From the command line, you can do it as follows:
 
 ```
-$ node cli/nodejs/bin/qcertRun.js execute \
+$ node cli/nodejs/bin/qcert.js execute \
        --input tests/oql/persons.input \
        --schema tests/oql/persons.schema \
        --query tests/oql/persons1.js
@@ -340,10 +340,10 @@ We welcome comments and suggestions (please use the [Q\*cert github issue tracke
 
 ### JavaScript Target
 
-To run a query compiled to JavaScript, you can call the `qcertRun` executable for Node.js. You will need to pass it three pieces of information: (i) the compiled query (`tests/oql/persons1.js` in our example), (ii) the schema for that query, (iii) some input data. From the command line, you can do it as follows:
+To run a query compiled to JavaScript, you can call the `qcert` executable for Node.js. You will need to pass it three pieces of information: (i) the compiled query (`tests/oql/persons1.js` in our example), (ii) the schema for that query, (iii) some input data. From the command line, you can do it as follows:
 
 ```
-$ node clis/nodejs/bin/qcertRun.js execute \
+$ node clis/nodejs/bin/qcert.js execute \
        --input tests/oql/persons.input \
        --schema tests/oql/persons.schema \
        --query tests/oql/persons1.js

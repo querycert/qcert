@@ -28,3 +28,5 @@ log/
 .DS_Store
 *.lia.cache
 .Makefile.coq.d
+
+node_modules

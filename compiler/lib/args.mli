@@ -48,6 +48,5 @@ val set_optim_config_file : Config.global_config -> string -> unit
 val set_emit_optim_config : Config.global_config -> unit -> unit
 val set_optims : Config.global_config -> QDriver.optim_config -> unit
 
-val set_link_js_runtime : Config.global_config -> unit -> unit
 val set_prefix : Config.global_config -> string -> unit
 
