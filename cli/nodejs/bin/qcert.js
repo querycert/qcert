@@ -18,7 +18,7 @@
 const Commands = require('../lib/commands');
 
 require('yargs')
-  .scriptName('qcertRun')
+  .scriptName('qcert')
   .demandCommand(1, '# Please specify a command')
   .recommendCommands()
   .strict()

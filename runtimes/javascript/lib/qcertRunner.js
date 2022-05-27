@@ -40,9 +40,8 @@ function requireFromString(src, filename) {
 
 class QcertRunner {
   /* Link compile query and load it as Node module */
-  static loadQuery(schema,queryFile,compiledQuery) {
+  static loadQuery(schema,queryName,compiledQuery) {
     try {
-      const queryName = queryFile.split('/').pop().split('.')[0];
       const inheritance = schema && schema.inheritance ? schema.inheritance : [];
       const inheritanceString = `const inheritance = ${stringified(inheritance)};`;
       const QcertRuntimeString = getRuntime();
@@ -57,9 +56,9 @@ class QcertRunner {
   }
 
   /* run compiled query */
-  static execute(schema,input,queryFile,compiledQuery) {
+  static execute(schema,queryName,compiledQuery,input) {
     const deserializedInput = BoxedCollections.boxColl(input);
-    const query = QcertRunner.loadQuery(schema,queryFile,compiledQuery);
+    const query = QcertRunner.loadQuery(schema,queryName,compiledQuery);
     /* This is actual execution */
     const deserializedOuput = query(input);
     const result = BoxedCollections.unboxColl(deserializedOuput);
