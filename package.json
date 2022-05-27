@@ -1,0 +1,42 @@
+{
+	"name": "qcert",
+	"version": "3.0.0",
+	"description": "The Q*cert compiler",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/querycert/qcert"
+	},
+	"contributors": [
+		{
+			"name": "Josh Auerbach",
+			"url": "https://www.researchgate.net/profile/Joshua_Auerbach2"
+		},
+		{
+			"name": "Martin Hirzel",
+			"email": "hirzel@us.ibm.com",
+			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-hirzel"
+		},
+		{
+			"name": "Louis Mandel",
+			"email": "lmandel@us.ibm.com",
+			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-lmandel"
+		},
+		{
+			"name": "Avi Shinnar",
+			"email": "shinnar@us.ibm.com",
+			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-shinnar"
+		},
+		{
+			"name": "Jerome Simeon",
+			"email": "jerome@clause.io"
+		}
+	],
+	"license": "Apache-2.0",
+	"homepage": "https://querycert.github.io/index.html",
+	"dependencies": {},
+	"workspaces": [
+		"compiler/libJS",
+		"runtimes/javascript",
+		"cli/nodejs"
+	]
+}

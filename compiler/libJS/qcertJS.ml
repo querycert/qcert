@@ -105,7 +105,6 @@ let global_config_of_json j =
   apply Args.set_output_content j##.output;
   apply Args.set_input_content j##.input;
   (* Cloudant options *)
-  Js.Optdef.iter j##.jsruntime (fun b -> if b then Args.set_link_js_runtime gconf ());
   Js.Optdef.iter j##.cld_prefix
     (fun s -> Args.set_prefix gconf (Js.to_string s));
   (* Emit options *)

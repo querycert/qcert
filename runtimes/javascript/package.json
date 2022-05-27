@@ -1,5 +1,5 @@
 {
-  "name": "qcert-cli",
+  "name": "qcert-runtime-js",
   "version": "3.0.0",
   "description": "The Q*cert compiler",
   "repository": {
@@ -14,19 +14,10 @@
     "Jerome Simeon <>"
   ],
   "main": "./index.js",
-  "types": "./types/index.d.ts",
-  "bin": {
-    "qcert": "bin/qcert.js"
-  },
   "license": "Apache-2.0",
   "homepage": "https://querycert.github.io/index.html",
   "bugs": {
     "url": "https://github.com/querycert/qcert/issues"
-  },
-  "dependencies": {
-    "qcert-runtime-js": "*",
-    "qcert-compiler": "*",
-    "yargs": "13.2.4"
   },
   "directories": {
     "lib": "lib"

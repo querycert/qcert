@@ -15,7 +15,8 @@
 'use strict';
 
 const Fs = require('fs');
-const QcertRunner = require('./qcertRunner');
+const { stringified } = require('../lib/util');
+const Qcert = require('./Qcert');
 
 /**
  * Load a file or JSON string
@@ -54,7 +55,12 @@ class Commands {
     const sourceQuery = Fs.readFileSync(queryFile,'utf8');
     const schema = getJson(schemaFile);
     const output = outputFile ? getJson(outputFile) : null;
-    return QcertRunner.compileExecute(source,schema,input,queryFile,sourceQuery,output,validate);
+    const result = Qcert.compileExecute(source,schema,input,queryFile,sourceQuery,output,validate);
+    if (validate) {
+      return result;
+    } else {
+      return stringified(result);
+    }
   }
 
   /**
@@ -72,7 +78,12 @@ class Commands {
     const sourceQuery = Fs.readFileSync(queryFile,'utf8');
     const schema = getJson(schemaFile);
     const output = outputFile ? getJson(outputFile) : null;
-    return QcertRunner.execute(schema,input,queryFile,sourceQuery,output,validate);
+    const result = Qcert.execute(schema,input,queryFile,sourceQuery,output,validate);
+    if (validate) {
+      return result;
+    } else {
+      return stringified(result);
+    }
   }
 
 }

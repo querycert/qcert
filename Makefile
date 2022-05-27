@@ -235,6 +235,9 @@ qcert-runtimes:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building runtimes"
 	@echo "[Q*cert] "
+ifneq ($(JAVASCRIPT),)
+	npm install
+endif
 ifneq ($(JAVA),)
 	@$(MAKE) java-runtime
 endif
@@ -255,12 +258,14 @@ spark2-runtime:
 	@$(MAKE) -C runtimes/spark2
 
 clean-runtimes:
+	- @rm -rf node_modules
 	- @$(MAKE) -C runtimes/java clean
 	- @$(MAKE) -C runtimes/spark2 clean
 	- @rm -rf bin/lib
 	- @rm -f bin/javaRunner.jar
 
 cleanall-runtimes:
+	- @rm -rf node_modules
 	- @$(MAKE) -C runtimes/java cleanall
 	- @$(MAKE) -C runtimes/spark2 cleanall
 	- @rm -rf bin/lib

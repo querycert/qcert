@@ -102,8 +102,6 @@ let args_list gconf =
        " Print type annotations on ILs");
       ("-margin", Stdlib.Arg.Int (Pretty_common.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
-      ("-link-js-runtime", Stdlib.Arg.Unit (Args.set_link_js_runtime gconf),
-       " Link the JavaScript runtime (only for JavaScript and Cloudant targets)");
       ("-java-imports", Stdlib.Arg.String (Args.set_java_imports gconf),
        "<imports> Additional imports for the Java runtime (only for Java target)");
       ("-vinit", Stdlib.Arg.String (Args.set_vinit gconf),

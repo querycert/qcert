@@ -16,22 +16,9 @@
 ### WARNING: This file is meant to be invoked by the qcert/Makefile documentation target, not run directly
 ###
 
-DEP_FILES=../../bin/qcertJS.js \
-	../../_build/default/runtimes/javascript/qcert-runtime.js
+all:
 
-all: copy-libs
-
-install: copy-libs
-	npm install
-
-package:
-	npm pack
-
-copy-libs: $(DEP_FILES)
-	@mkdir -p extracted
-	cp $^ extracted/
-
-.PHONY: copy-libs package
+install:
 
 clean:
 	- @rm -rf log
@@ -39,6 +26,3 @@ clean:
 	- @rm -f qcert-*.tgz
 
 cleanall: clean
-	- @rm -f ../../bin/qcertJS.js
-	- @rm -f extracted/*.js
-

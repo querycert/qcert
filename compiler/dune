@@ -10,8 +10,7 @@
  (name qcert_lib)
  (public_name coq-qcert)
  (libraries base64 uri calendar wasm
-            coq-qcert.runtime.assemblyscript
-            coq-qcert.runtime.js))
+            coq-qcert.runtime.assemblyscript))
 
 (copy_files util/*.{ml,mli})
 (copy_files wasm/*.{ml,mli})
