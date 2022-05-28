@@ -1,16 +1,22 @@
 {
-  "name": "tmp.fmkd1ly8xi",
-  "version": "0.0.1",
-  "description": "test",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha test_js -C",
-    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --debug",
-    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --optimize",
-    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  "name": "qcert-runtime-wasm",
+  "version": "3.0.0-alpha.5",
+  "description": "The Q*cert compiler WASM runtime",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/querycert/qcert.git"
   },
-  "author": "",
+  "contributors": [
+    "Josh Auerbach",
+    "Martin Hirzel",
+    "Patrik Keller",
+    "Louis Mandel",
+    "Avi Shinnar",
+    "Jerome Simeon"
+  ],
+  "main": "./index.js",
   "license": "Apache-2.0",
+  "homepage": "https://querycert.github.io/index.html",
   "dependencies": {
     "@assemblyscript/loader": "0.0.0"
   },
@@ -20,5 +26,11 @@
     "lodash": "^4.17.15",
     "chai": "^4.2.0",
     "mocha": "^8.4.0"
+  },
+  "scripts": {
+    "test": "mocha test_js -C",
+    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --optimize",
+    "build": "npm run asbuild:untouched && npm run asbuild:optimized"
   }
 }

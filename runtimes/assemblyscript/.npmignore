@@ -1,0 +1,6 @@
+node_modules
+build/*.wasm.map
+build/*.wat
+test_ml
+assemblyscript_runtime.ml
+tools
