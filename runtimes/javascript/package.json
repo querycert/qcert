@@ -1,28 +1,23 @@
 {
   "name": "qcert-runtime-js",
-  "version": "3.0.0-alpha.4",
-  "description": "The Q*cert compiler",
+  "version": "3.0.0-alpha.5",
+  "description": "The Q*cert compiler JavaScript runtime",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/querycert/qcert.git"
   },
   "contributors": [
-    "Josh Auerbach <>",
-    "Martin Hirzel <>",
-    "Louis Mandel <>",
-    "Avi Shinnar <>",
-    "Jerome Simeon <>"
+    "Josh Auerbach",
+    "Martin Hirzel",
+    "Patrik Keller",
+    "Louis Mandel",
+    "Avi Shinnar",
+    "Jerome Simeon"
   ],
   "main": "./index.js",
   "license": "Apache-2.0",
   "homepage": "https://querycert.github.io/index.html",
   "bugs": {
     "url": "https://github.com/querycert/qcert/issues"
-  },
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

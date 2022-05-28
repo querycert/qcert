@@ -56,9 +56,9 @@ If you want to use a separate opam switch for Q\*cert, we recommend creating a n
 $ opam switch create qcert 4.09.1
 ```
 
-#### Node.js (Recommended)
+#### Node.js
 
-Execution and testing for the JavaScript compilation target, as well demo material, requires Node.js version 16 or later.
+Execution and testing for the JavaScript and WASM compilation target requires Node.js version 16 or later.
 
 Node.js can be installed from https://nodejs.org/en/
 
@@ -93,7 +93,7 @@ To compile Q\*cert from the source, do:
 $ make
 ```
 
-(Note: this will take a while, you can run make faster with `make -j 8`)
+(Note: this will take a while, we recommend a parallel build with e.g., `make -j4`)
 
 If all goes well, this should:
 - Build the compiler itself (the executable `bin/qcert`)

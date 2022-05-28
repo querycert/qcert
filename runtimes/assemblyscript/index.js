@@ -1,4 +1,4 @@
-(*
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,25 +10,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *)
+ */
 
-let arg =
-  match Sys.argv with
-  | [| _; x |] -> x
-  | _ -> failwith "binary_to_string: provide file as single argument"
+'use strict';
 
-let rt =
-  if Sys.file_exists arg then arg
-  else failwith (Printf.sprintf "%s does not exist" arg)
+/**
+ * Q*cert module.
+ *
+ * @module qcert
+ */
 
-let bin =
-  let ic = open_in rt in
-  let rec read acc =
-    match input_line ic with
-    | l -> read (l :: acc)
-    | exception End_of_file ->
-      List.rev acc |> String.concat "\n"
-  in
-  read []
-
-let () = String.iter (fun c -> Printf.printf "\\x%02x" (int_of_char c)) bin
+module.exports.BinaryEncoding = require('./lib/binary_encoding');
+module.exports.RuntimeEncoding = require('./lib/runtime_encoding');
+module.exports.Engine = require('./lib/engine');

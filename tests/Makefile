@@ -83,14 +83,12 @@ oql-tests:
 	@$(MAKE) oql-world-tests
 	@$(MAKE) oql-persons-tests
 	@$(MAKE) oql-employees-tests
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) oql-string-tests-js
 	@$(MAKE) oql-world-tests-js
 	@$(MAKE) oql-persons-tests-js
 	@$(MAKE) oql-persons-tests-js2
 	@$(MAKE) oql-employees-tests-js
 	@$(MAKE) oql-tests-wasm
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) oql-string-tests-java
 	@$(MAKE) oql-world-tests-java
@@ -251,9 +249,7 @@ lambda_nra-tests:
 	@echo "[Q*cert] λ-NRA tests"
 	@echo "[Q*cert] "
 	@$(MAKE) lambda_nra-persons-tests
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) lambda_nra-persons-tests-js
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) lambda_nra-persons-tests-java
 endif
@@ -294,9 +290,7 @@ camp-tests:
 	@echo "[Q*cert] CAMP tests"
 	@echo "[Q*cert] "
 	@$(MAKE) camp-world-tests
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) camp-world-tests-js
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) camp-world-tests-java
 endif
@@ -339,10 +333,8 @@ sql-tests:
 	@echo "[Q*cert] "
 	@$(MAKE) sql-org-tests
 	@$(MAKE) sql-mini-tests
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) sql-org-tests-js
 	@$(MAKE) sql-mini-tests-js
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) sql-org-tests-java
 	@$(MAKE) sql-mini-tests-java
@@ -413,9 +405,7 @@ tech_rule-tests:
 	@echo "[Q*cert] ODM Tech Rules tests"
 	@echo "[Q*cert] "
 	@$(MAKE) tech_rule-test-tests
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) tech_rule-test-tests-js
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) tech_rule-test-tests-java
 endif
@@ -457,9 +447,7 @@ designer_rule-tests:
 	@echo "[Q*cert] ODM Designer Rules tests"
 	@echo "[Q*cert] "
 	@$(MAKE) designer_rule-test-tests
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) designer_rule-test-tests-js
-endif
 
 designer_rule-test-tests:
 	@$(foreach N,$(DESIGNERRULETESTNUM), \
@@ -489,10 +477,8 @@ imp_ejson-tests:
 	@echo "[Q*cert] Imp (EJSON) tests"
 	@echo "[Q*cert] "
 	@$(MAKE) imp_ejson-wasm-spec-tests
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) imp_ejson-js-tests
 	@$(MAKE) imp_ejson-wasm-node-tests
-endif
 
 # imp_ejson -> wasm ; run on spec interpreter
 imp_ejson-wasm-spec-tests:
@@ -538,7 +524,6 @@ IMPEJSONWASMNODENUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
 
 # imp_ejson -> wasm ; run on node
 imp_ejson-wasm-node-tests:
-	cd ../runtimes/assemblyscript/ && npm install
 	$(foreach N,$(IMPEJSONWASMNODENUM), \
 				 $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
 				 		-source imp_ejson -path imp_ejson -target imp_ejson \
@@ -550,7 +535,7 @@ imp_ejson-wasm-node-tests:
 						-source imp_ejson -target wasm \
 						-schema imp_ejson/wasm.schema && \
 				 $(NODERUN) ../runtimes/assemblyscript/cli-runner.js \
-				 		../runtimes/assemblyscript/runtime.wasm \
+				 		../runtimes/assemblyscript/build/optimized.wasm \
 						imp_ejson/wasm$(N).wasm \
 						imp_ejson/wasm.input \
 						imp_ejson/wasm$(N)_imp_ejson.json || exit 1; )

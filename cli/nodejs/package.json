@@ -1,17 +1,18 @@
 {
-  "name": "qcert-cli",
-  "version": "3.0.0-alpha.4",
+  "name": "qcert",
+  "version": "3.0.0-alpha.5",
   "description": "The Q*cert compiler",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/querycert/qcert.git"
   },
   "contributors": [
-    "Josh Auerbach <>",
-    "Martin Hirzel <>",
-    "Louis Mandel <>",
-    "Avi Shinnar <>",
-    "Jerome Simeon <>"
+    "Josh Auerbach",
+    "Martin Hirzel",
+    "Patrik Keller",
+    "Louis Mandel",
+    "Avi Shinnar",
+    "Jerome Simeon"
   ],
   "main": "./index.js",
   "types": "./types/index.d.ts",
@@ -30,8 +31,5 @@
   },
   "directories": {
     "lib": "lib"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

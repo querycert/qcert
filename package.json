@@ -1,6 +1,6 @@
 {
 	"name": "qcert",
-	"version": "3.0.0-alpha.4",
+	"version": "3.0.0-alpha.5",
 	"description": "The Q*cert compiler",
 	"repository": {
 		"type": "git",
@@ -36,6 +36,7 @@
 	"dependencies": {},
 	"workspaces": [
 		"compiler/libJS",
+		"runtimes/assemblyscript",
 		"runtimes/javascript",
 		"cli/nodejs"
 	]

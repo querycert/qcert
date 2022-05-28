@@ -1,3 +1,5 @@
+(data_only_dirs node_modules)
+
 (env
  (dev
   (flags (:standard -w -27 -w -39 -w -33 -warn-error -A)))

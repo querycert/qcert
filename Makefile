@@ -63,9 +63,7 @@ install-coqdev:
 
 install-local:
 	@$(MAKE) install-ocaml
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) install-javascript
-endif
 
 install-ocaml:
 	@$(MAKE) -C cli/ocaml install
@@ -86,9 +84,7 @@ qcert-compiler:
 	@$(MAKE) configure
 	@$(MAKE) qcert-coq
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) MAKEFLAGS= qcert-javascript
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) MAKEFLAGS= qcert-parsingJava
 endif
@@ -235,15 +231,20 @@ qcert-runtimes:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building runtimes"
 	@echo "[Q*cert] "
-ifneq ($(JAVASCRIPT),)
-	npm install
-endif
+	@$(MAKE) javascript-runtime
 ifneq ($(JAVA),)
 	@$(MAKE) java-runtime
 endif
 ifneq ($(SPARK),)
 	@$(MAKE) spark2-runtime
 endif
+
+javascript-runtime:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] JavaScript & WASM runtimes"
+	@echo "[Q*cert] "
+	npm install
+	npm run build --workspaces --if-present
 
 java-runtime:
 	@echo "[Q*cert] "
@@ -278,9 +279,7 @@ qcert-cli:
 	@echo "[Q*cert] Building CLI"
 	@echo "[Q*cert] "
 	@$(MAKE) ocaml-cli
-ifneq ($(JAVASCRIPT),)
 	@$(MAKE) javascript-cli
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) java-cli
 endif
@@ -339,6 +338,7 @@ cleanall-demo: clean-demo
 ## Tests
 
 test:
+	npm run test --workspaces --if-present
 	dune runtest
 	@$(MAKE) -C tests
 
