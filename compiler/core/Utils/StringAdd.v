@@ -40,6 +40,7 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
     Nat.compare (nat_of_ascii a) (nat_of_ascii b).
 
   Definition lt (a b:ascii) := compare a b = Lt.
+  Definition gt (a b:ascii) := compare a b = Gt.
 
   Lemma lt_strorder : StrictOrder lt.
   Proof.
@@ -50,7 +51,21 @@ Module AsciiOrder <: OrderedTypeFull with Definition t:=ascii.
              end; lia.
   Qed.
 
+  Lemma gt_strorder : StrictOrder gt.
+  Proof.
+    split; repeat red; unfold gt, compare; intros;
+      repeat match goal with 
+             | [H:Nat.compare _ _ = Gt |- _ ] => apply nat_compare_gt in H
+             | [|- Nat.compare _ _ = Gt ] => apply nat_compare_gt
+             end; lia.
+  Qed.
+
   Lemma lt_compat : Proper (eq ==> eq ==> iff) lt.
+  Proof.
+    unfold Proper, respectful, eq; intros; subst; intuition.
+  Qed.
+
+  Lemma gt_compat : Proper (eq ==> eq ==> iff) gt.
   Proof.
     unfold Proper, respectful, eq; intros; subst; intuition.
   Qed.
@@ -133,6 +148,7 @@ Module StringOrder <: OrderedTypeFull with Definition t:=string.
     end.
 
   Definition lt (a b:string) := compare a b = Lt.
+  Definition gt (a b:string) := compare a b = Gt.
 
   Lemma compare_spec :
     forall x y : t, CompareSpec (eq x y) (lt x y) (lt y x) (compare x y).
@@ -190,7 +206,29 @@ Module StringOrder <: OrderedTypeFull with Definition t:=string.
                 auto.
   Qed.
 
+  Lemma gt_transitive:
+    forall x y z : string, compare x y = Gt -> compare y z = Gt -> compare x z = Gt.
+  Proof.
+    induction x; destruct y; destruct z; simpl; eauto; try congruence.
+    intros. specialize (IHx y z).
+    generalize (@StrictOrder_Transitive _ _ (AsciiOrder.gt_strorder) a a0 a1).
+    unfold AsciiOrder.gt. intros AC.
+    case_eq (AsciiOrder.compare a a0); 
+      intros re; rewrite re in *; try congruence;
+        case_eq (AsciiOrder.compare a0 a1); 
+        intros re2; rewrite re2 in *; try congruence;
+          try rewrite AsciiOrder.compare_eq_iff in *; subst;
+            try rewrite re in*; try rewrite re2 in *;
+              try rewrite AC by trivial; 
+              try rewrite AsciiOrder.compare_refl_eq; 
+              auto.
+  Qed.
   Lemma lt_compat : Proper (eq ==> eq ==> iff) lt.
+  Proof.
+    unfold Proper, respectful, eq; intros; subst; intuition.
+  Qed.
+
+  Lemma gt_compat : Proper (eq ==> eq ==> iff) gt.
   Proof.
     unfold Proper, respectful, eq; intros; subst; intuition.
   Qed.

@@ -27,7 +27,6 @@ Require Import RelationClasses.
 Section SortingAdd.
 
   (** * Insertion sort *)
-
   Section InsertionSort.
     Context {A:Type}.
     Context {R:A->A->Prop}.
@@ -307,7 +306,7 @@ Section SortingAdd.
       induction l; simpl; intuition.
       apply insertion_sort_insert_not_nil in H; intuition.
     Qed.
-    
+
     Lemma insertion_sort_insert_swap a a0 l  `{StrictOrder A R}:
       R a a0 ->
       insertion_sort_insert a (insertion_sort_insert a0 l) = 

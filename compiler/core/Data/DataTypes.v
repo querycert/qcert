@@ -24,6 +24,7 @@ Require Export TBinaryOperators.
 Require Export TOperatorsEq.
 Require Export TOperatorsInfer.
 Require Export TOperatorsInferSub.
+Require Export TSortBy.
 Require Export TGroupBy.
 Require Export ForeignTyping.
 Require Export Schema.

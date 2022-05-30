@@ -28,7 +28,6 @@ Require Import Equivalence.
 Require Import EquivDec.
 Require Import RelationClasses.
 Require Import Orders.
-Require Import Permutation.
 Require Import CoqLibAdd.
 Require Import ListAdd.
 Require Import SortingAdd.
