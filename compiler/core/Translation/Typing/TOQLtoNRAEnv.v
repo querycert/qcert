@@ -171,8 +171,82 @@ Section TOQLtoNRAEnv.
     apply H0; assumption.
   Qed.
 
-  Lemma oql_to_nraenv_order_expr_type_preserve_f τconstant τenv τenv1 e0 e τdefls pfd pfe pfe0 :
-    (nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
+  Lemma oql_to_nraenv_order_by_nat_preserve_f τconstant τenv τenv1 sc e0 e τdefls pfd pfe pfe0 pfe1 :
+    oql_expr_type (rec_concat_sort τconstant τdefls) τenv1 e Nat ->
+    (forall (τconstant τdefls : list (string * rtype))
+         (pfd : is_list_sorted StringOrder.lt_dec (domain τdefls) = true) 
+         (τenv : tbindings) (pfe : is_list_sorted StringOrder.lt_dec (domain τenv) = true)
+         (τout : rtype),
+       oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout ->
+       nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e) ▷ 
+       Rec Closed τenv pfe >=> τout ⊣ τconstant; Rec Closed τdefls pfd) ->
+    (e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
+                           ⊣ τconstant; Rec Closed τdefls pfd) ->
+    cNRAEnvUnop (OpOrderBy (("crit"%string, sc)::nil))
+                (* Create pairs of input value + sorting criteria *)
+                (cNRAEnvMap
+                   (cNRAEnvBinop OpRecConcat
+                                 (cNRAEnvUnop (OpRec "val") cNRAEnvID)
+                                 (cNRAEnvUnop (OpRec "crit")
+                                              (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e)))) e0) ▷ Rec Closed τenv pfe >=> 
+                Coll (Rec Closed (("crit"%string, Nat)::("val"%string, Rec Closed τenv1 pfe0)::nil) pfe1) ⊣ τconstant; Rec Closed τdefls pfd.
+  Proof.
+    intros.
+    repeat econstructor.
+    - unfold edot in H2; simpl in H2; inversion H2; reflexivity.
+    - unfold rec_concat_sort; simpl.
+      econstructor.
+    - apply H0; apply H.
+    - apply H1.
+      Unshelve.
+      assumption.
+      assumption.
+      assumption.
+  Qed.
+
+  Lemma sortable_type_is_string τenv1 (sc:SortDesc) pfe0 τout :
+    edot (("crit"%string, String) :: ("val"%string, Rec Closed τenv1 pfe0) :: nil)
+         (fst ("crit"%string, sc)) = Some τout ->
+    sortable_type τout.
+  Proof.
+    intros.
+    unfold edot in H; simpl in H; inversion H; right; reflexivity.
+  Qed.
+
+  Lemma oql_to_nraenv_order_by_string_preserve_f τconstant τenv τenv1 sc e0 e τdefls pfd pfe pfe0 pfe1 :
+    oql_expr_type (rec_concat_sort τconstant τdefls) τenv1 e String ->
+    (forall (τconstant τdefls : list (string * rtype))
+         (pfd : is_list_sorted StringOrder.lt_dec (domain τdefls) = true) 
+         (τenv : tbindings) (pfe : is_list_sorted StringOrder.lt_dec (domain τenv) = true)
+         (τout : rtype),
+       oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout ->
+       nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e) ▷ 
+       Rec Closed τenv pfe >=> τout ⊣ τconstant; Rec Closed τdefls pfd) ->
+    (e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
+                           ⊣ τconstant; Rec Closed τdefls pfd) ->
+    cNRAEnvUnop (OpOrderBy (("crit"%string, sc)::nil))
+                (* Create pairs of input value + sorting criteria *)
+                (cNRAEnvMap
+                   (cNRAEnvBinop OpRecConcat
+                                 (cNRAEnvUnop (OpRec "val") cNRAEnvID)
+                                 (cNRAEnvUnop (OpRec "crit")
+                                              (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e)))) e0) ▷ Rec Closed τenv pfe >=> 
+                Coll (Rec Closed (("crit"%string, String)::("val"%string, Rec Closed τenv1 pfe0)::nil) pfe1) ⊣ τconstant; Rec Closed τdefls pfd.
+  Proof.
+    intros.
+    repeat (try (apply (sortable_type_is_string τenv1 sc pfe0); assumption); econstructor).
+    - unfold rec_concat_sort; simpl.
+      econstructor.
+    - apply H0; apply H.
+    - apply H1.
+      Unshelve.
+      assumption.
+      assumption.
+      assumption.
+  Qed.
+
+  Lemma oql_to_nraenv_order_expr_type_preserve_f τconstant τenv τenv1 sc e0 e τdefls pfd pfe pfe0 :
+    (e0 ▷ Rec Closed τenv pfe >=> Coll (Rec Closed τenv1 pfe0)
                            ⊣ τconstant; Rec Closed τdefls pfd) ->
     (forall (τconstant τdefls : list (string * rtype))
            (pfd : is_list_sorted StringOrder.lt_dec (domain τdefls) = true) 
@@ -182,11 +256,39 @@ Section TOQLtoNRAEnv.
          nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e) ▷ 
          Rec Closed τenv pfe >=> τout ⊣ τconstant; Rec Closed τdefls pfd) ->
     oql_order_expr_type (rec_concat_sort τconstant τdefls) τenv1 e ->
-    nraenv_to_nraenv_core e0 ▷ Rec Closed τenv pfe >=>
-      Coll (Rec Closed τenv1 pfe0) ⊣ τconstant; Rec Closed τdefls pfd.
+    cNRAEnvMap (cNRAEnvUnop (OpDot "val") cNRAEnvID)
+              (* Sort by sorting criteria *)
+              (cNRAEnvUnop (OpOrderBy (("crit"%string, sc)::nil))
+                          (* Create pairs of input value + sorting criteria *)
+                          (cNRAEnvMap
+                             (cNRAEnvBinop OpRecConcat
+                                          (cNRAEnvUnop (OpRec "val") cNRAEnvID)
+                                          (cNRAEnvUnop (OpRec "crit")
+                                                       (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e)))) e0)) ▷ Rec Closed τenv pfe >=>
+              Coll (Rec Closed τenv1 pfe0) ⊣ τconstant; Rec Closed τdefls pfd.
   Proof.
     intros.
-    assumption.
+    invcs H1.
+    inversion H3; clear H3; subst.
+    - econstructor.
+      2: {
+        apply oql_to_nraenv_order_by_nat_preserve_f; try assumption.
+        apply H2.
+        apply H.
+      }
+      repeat econstructor.
+      unfold tdot, edot, rec_concat_sort; simpl; repeat constructor.
+    - econstructor.
+      2: {
+        apply oql_to_nraenv_order_by_string_preserve_f; try assumption.
+        apply H2.
+        apply H.
+      }
+      repeat econstructor.
+      unfold tdot, edot, rec_concat_sort; simpl; repeat constructor.
+      Unshelve.
+      reflexivity.
+      reflexivity.
   Qed.
 
   Lemma oql_to_nraenv_expr_type_preserve_f τconstant τdefls pfd τenv pfe e τout:
@@ -265,6 +367,7 @@ Section TOQLtoNRAEnv.
       + simpl in *.
         invcs H8; econstructor; qeauto.
         invcs H2; apply IHe; apply H0.
+        eapply oql_to_nraenv_order_expr_type_preserve_f; try assumption.
         apply (oql_to_nraenv_from_expr_type_preserve_f
                  τconstant τenv τenv
                  (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
@@ -275,6 +378,7 @@ Section TOQLtoNRAEnv.
       + simpl in *.
         invcs H8; econstructor; qeauto.
         invcs H2; econstructor; [apply IHe; apply H0| ]; try assumption.
+        eapply oql_to_nraenv_order_expr_type_preserve_f; try assumption.
         apply (oql_to_nraenv_from_expr_type_preserve_f
                  τconstant τenv τenv
                  (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
@@ -286,19 +390,20 @@ Section TOQLtoNRAEnv.
       + simpl in *.
         invcs H10; econstructor; qeauto.
         invcs H2; apply IHe1; apply H0.
-        eapply oql_to_nraenv_where_expr_type_preserve_f.
+        simpl.
+        eapply oql_to_nraenv_order_expr_type_preserve_f; try assumption.
+        eapply oql_to_nraenv_where_expr_type_preserve_f; try assumption.
         apply (oql_to_nraenv_from_expr_type_preserve_f
                  τconstant τenv τenv
                  (NRAEnvUnop OpBag NRAEnvID) el from_tenv τdefls pfd pfe pfe);
           try assumption; qeauto.
         Unshelve.
-        assumption.
-        assumption.
         apply (oql_from_type_sorted (rec_concat_sort τconstant τdefls) τenv el from_tenv);
           assumption.
       + simpl in *.
         invcs H10; econstructor; [econstructor| ].
         invcs H2; econstructor; [apply IHe1; apply H0| ]; try assumption.
+        eapply oql_to_nraenv_order_expr_type_preserve_f; try assumption.
         eapply oql_to_nraenv_where_expr_type_preserve_f.
         apply (oql_to_nraenv_from_expr_type_preserve_f
                  τconstant τenv τenv

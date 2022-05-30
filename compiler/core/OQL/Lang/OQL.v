@@ -563,8 +563,7 @@ Section OQL.
         let order_by_result :=
             match order_by_clause with
             | ONoOrder => where_result
-            | OOrderBy order_expr sc => where_result
-(*
+            | OOrderBy order_expr sc =>
               match where_result with
               | Some where_value =>
                 let crit1 order_expr sc env :=
@@ -574,7 +573,6 @@ Section OQL.
                 table_sort (crit1 order_expr sc :: nil) where_value
               | None => None
               end
-*)
             end
         in
         let select_result :=

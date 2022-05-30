@@ -17,6 +17,7 @@ Require Import List.
 Require Import Arith.
 Require Import Program.
 Require Import EquivDec.
+Require Import Permutation.
 Require Import Morphisms.
 Require Import Utils.
 Require Import DataSystem.
@@ -101,7 +102,9 @@ Section TOQL.
           oql_expr_type tenv e Bool ->
           oql_where_expr_type tenv e
       with oql_order_expr_type : tbindings -> oql_expr -> Prop :=
-      | TOOrder tenv e :
+      | TOOrder tenv {τ} e :
+          oql_expr_type tenv e τ ->
+          sortable_type τ ->
           oql_order_expr_type tenv e
       with oql_select_expr_type : tbindings -> oql_select_expr -> rtype -> Prop :=
       | TOSelect {τ} tenv e :
@@ -408,11 +411,11 @@ Section TOQL.
         (Forall (fun env => bindings_type env from_tenv) tenv')).
   Proof.
     intros.
-    exists x.
-    split.
-    econstructor.
-    assumption.
-  Qed.
+    inversion H2; subst.
+    inversion H4; subst; clear H4.
+    
+    admit.
+  Admitted.
 
   Lemma oql_select_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} {τout} c e :
     bindings_type c τc ->

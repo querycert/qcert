@@ -16,6 +16,7 @@ Require Import String.
 Require Import List.
 Require Import Arith.
 Require Import EquivDec.
+Require Import Permutation.
 Require Import Utils.
 Require Import DataRuntime.
 Require Import OQL.
@@ -178,14 +179,10 @@ Section OQLSem.
         oql_expr_sem e env1 (dbool false) ->                                  (**r ∧ [Γc; γ ⊢〚e〛⇓ false] *)
         oql_where_sem e (env1 :: tenv1) tenv2                                 (**r ⇒ [Γc; γ::↑γ₁ ⊢〚e〛ʷ ⇓ ↑γ₂] *)
     with oql_order_sem : oql_expr -> SortDesc -> list oql_env -> list oql_env -> Prop :=
-    | oql_order_sem_WRONG e sc tenv :
-        oql_order_sem e sc tenv tenv                                          (**r ⇒ [Γc; ↑γ ⊢〚e〛ᵒ ⇓ ↑γ] WRONG *)
-(*
     | oql_order_sem_sorting e sc tenv1 tenv2 :
         Permutation tenv1 tenv2 ->                                            (**r ⇒ [↑γ₂ permutation of ↑γ₁] *)
         oql_strongly_sorted e sc tenv2 ->                                     (**r ⇒ [Γc ⊢ ↑γ₂ strongly sorted wrt e+sc] *)
-        oql_order_sem e sc tenv tenv                                          (**r ⇒ [Γc; ↑γ₁ ⊢〚e〛ᵒ ⇓ ↑γ₂] *)
-*)
+        oql_order_sem e sc tenv1 tenv2                                        (**r ⇒ [Γc; ↑γ₁ ⊢〚e〛ᵒ ⇓ ↑γ₂] *)
     with oql_select_sem: oql_select_expr -> list oql_env -> data -> Prop :=
     | sem_OSelect e : forall tenv dl,
         oql_select_map_sem e tenv dl ->                                       (**r   [Γc; ↑γ ⊢〚e〛ᵐ ⇓ ↑dl] *)
@@ -201,12 +198,21 @@ Section OQLSem.
         oql_expr_sem e env d ->                                               (**r   [Γc; γ ⊢〚e〛⇓ d] *)
         oql_select_map_sem e tenv1 dl1 ->                                     (**r ∧ [Γc; ↑γ₁ ⊢〚e〛ᵐ ⇓ ↑dl] *)
         oql_select_map_sem e (env :: tenv1) (d :: dl1)                        (**r ⇒ [Γc; γ::↑γ₁ ⊢〚e〛ᵐ ⇓ d::↑dl] *)
-(*
     with oql_strongly_sorted : oql_expr -> SortDesc -> list oql_env -> Prop :=
-    | oql_SSorted_nil e sc : oql_strongly_sorted e sc []
-    | oql_SSorted_cons e sc env0 tenv :
-        oql_strongly_sorted tenv -> Forall (fun x => env0) tenv -> oql_strongly_sorted (env :: tenv).
-*)
+    | oql_SSorted_nil e sc : oql_strongly_sorted e sc nil
+    | oql_SSorted_cons e sc env1 tenv :
+        oql_strongly_sorted e sc tenv ->
+        Forall (fun env2 => oql_sort_criteria e env1 env2) tenv ->
+        oql_strongly_sorted e sc (env1 :: tenv)
+    with oql_sort_criteria : oql_expr -> oql_env -> oql_env -> Prop :=
+    (* XXX This looks kind of too complicated ? This is right, though, at the moment. *)
+    | oql_sort_criteria_sem e env1 env2 d1 d2 sd1 sd2 :
+      oql_expr_sem e env1 d1 ->
+      oql_expr_sem e env2 d2 ->
+      sdata_of_data d1 = Some sd1 ->
+      sdata_of_data d2 = Some sd2 ->
+      dict_field_le (sd1::nil, d1) (sd2::nil, d2) ->
+      oql_sort_criteria e env1 env2
     .
 
     (** Note: [oql_strongly_sorted] based on StronglySorted property *)
@@ -440,25 +446,370 @@ Section OQLSem.
           apply (H a (dbool false) H1).
     Qed.
 
-    Lemma oql_order_sem_correct_WRONG e sc tenv0 tenv2:
-      tenv0 = tenv2 ->
-      oql_order_sem e sc tenv0 tenv2.
+    Lemma exists_permutation_for_input e l l' l1:
+      Permutation l l' ->
+      fsortable_coll_of_coll
+         ((fun env : oql_env =>
+           match oql_expr_interp h constant_env e env with
+           | Some x' => sdata_of_data x'
+           | None => None
+           end) :: nil) l1 = Some l ->
+      exists l1',
+        Permutation l1 l1' /\
+        fsortable_coll_of_coll
+         ((fun env : oql_env =>
+           match oql_expr_interp h constant_env e env with
+           | Some x' => sdata_of_data x'
+           | None => None
+           end) :: nil) l1' = Some l'.
+    Proof.
+      unfold fsortable_coll_of_coll.
+      revert l' l1.
+      induction l; intros; simpl in *.
+      - destruct l1; simpl in *; try congruence;[|
+        destruct (fsortable_data_of_data
+                    o ((fun env : oql_env =>
+                          match oql_expr_interp h constant_env e env with
+                          | Some x' => sdata_of_data x'
+                          | None => None
+                          end) :: nil)); simpl in H0; try congruence;
+          unfold lift in H0;
+          destruct (lift_map
+                      (fun d : oql_env =>
+                         fsortable_data_of_data
+                           d ((fun env : oql_env =>
+                                 match oql_expr_interp h constant_env e env with
+                                 | Some x' => sdata_of_data x'
+                                 | None => None
+                                 end) :: nil)) l1); try congruence].
+        apply Permutation_nil in H; subst; simpl.
+        exists nil; split; [constructor|reflexivity].
+      - destruct l1; simpl in *; try congruence.
+        case_eq (fsortable_data_of_data o
+           ((fun env : oql_env =>
+             match oql_expr_interp h constant_env e env with
+             | Some x' => sdata_of_data x'
+             | None => None
+             end) :: nil)); intros; rewrite H1 in H0; simpl in *; try congruence.
+        unfold lift in H0.
+        case_eq (lift_map
+           (fun d : oql_env =>
+            fsortable_data_of_data d
+              ((fun env : oql_env =>
+                match oql_expr_interp h constant_env e env with
+                | Some x' => sdata_of_data x'
+                | None => None
+                end) :: nil)) l1); intros; rewrite H2 in H0; simpl in *; try congruence.
+        inversion H0; subst; clear H0; simpl in *.
+        destruct l'; simpl in *; [
+          assert (~Permutation nil (a :: l)) by apply Permutation_nil_cons;
+          apply Permutation_sym in H; congruence | ].
+        inversion H; intros; subst; rename H into Hperm.
+        + elim (IHl l' l1 H3 H2); intros; clear IHl.
+          elim H; intros; clear H.
+          exists (o :: x).
+          split; [constructor; assumption| ].
+          simpl.
+          rewrite H1; unfold lift; simpl.
+          rewrite H4; reflexivity.
+        + assert (Permutation (s :: l0) (s :: l0)) by (constructor; apply Permutation_refl).
+          destruct l1; simpl in H2; try congruence.
+          case_eq (fsortable_data_of_data o0
+           ((fun env : oql_env =>
+             match oql_expr_interp h constant_env e env with
+             | Some x' => sdata_of_data x'
+             | None => None
+             end) :: nil)); intros; rewrite H0 in H2; try congruence; unfold lift in H2.
+          case_eq (lift_map
+           (fun d : oql_env =>
+            fsortable_data_of_data d
+              ((fun env : oql_env =>
+                match oql_expr_interp h constant_env e env with
+                | Some x' => sdata_of_data x'
+                | None => None
+                end) :: nil)) l1); intros; rewrite H3 in H2; try congruence.
+          inversion H2; subst; clear H2.
+          specialize (IHl (s :: l0) (o0 :: l1) H); simpl in IHl.
+          rewrite H0 in IHl; simpl in IHl; unfold lift in IHl.
+          rewrite H3 in IHl; simpl in IHl.
+          elim (IHl eq_refl); intros; clear IHl.
+          elim H2; intros; clear H2.
+          exists (o0 :: o :: l1).
+          split.
+          * apply perm_swap.
+          * simpl.
+            rewrite H0; simpl.
+            unfold lift.
+            rewrite H1; simpl.
+            rewrite H3.
+            reflexivity.
+        + admit.
+    Admitted.
+
+    Lemma exists_sort_for_input e l l1:
+      fsortable_coll_of_coll
+         ((fun env : oql_env =>
+           match oql_expr_interp h constant_env e env with
+           | Some x' => sdata_of_data x'
+           | None => None
+           end) :: nil) l1 = Some l ->
+      exists l1',
+        fsortable_coll_of_coll
+         ((fun env : oql_env =>
+           match oql_expr_interp h constant_env e env with
+           | Some x' => sdata_of_data x'
+           | None => None
+           end) :: nil) l1' = Some (dict_sort l).
     Proof.
       intros.
-      subst. econstructor.
+      elim (exists_permutation_for_input e l (dict_sort l) l1); intros; try assumption.
+      elim H0; intros.
+      exists x; assumption.
+      apply Permutation_sym.
+      apply dict_sort_permutation.
+    Qed.
+    
+    Lemma some_eval_is_sort_criteria s o0 e l x :
+      (forall x : sortable_data, In x l -> dict_field_le (s :: nil, o0) x) ->
+      lift_map
+        (fun d : oql_env =>
+           match
+             match
+               match oql_expr_interp h constant_env e d with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end
+             with
+             | Some x' => Some (x' :: nil)
+             | None => None
+             end
+           with
+           | Some a' => Some (a', d)
+           | None => None
+           end) x = Some l
+      -> (forall d,
+             In d l ->
+              exists env sd,
+                oql_expr_interp h constant_env e (snd d) = Some env /\ sdata_of_data env = Some sd /\ LexicographicDataOrder.le (s :: nil) (sd :: nil)).
+    Proof.
+      intro Hlt.
+      revert x.
+      induction l; intros; simpl in *.
+      - contradiction.
+      - destruct x; simpl in *; try congruence.
+        case_eq (match
+                    match
+                      match oql_expr_interp h constant_env e o with
+                      | Some x' => sdata_of_data x'
+                      | None => None
+                      end
+                    with
+                    | Some x' => Some (x' :: nil)
+                    | None => None
+                    end
+                  with
+                  | Some a' => Some (a', o)
+                  | None => None
+                  end); intros;
+          rewrite H1 in H; simpl in *; try congruence.
+        unfold lift in H.
+        case_eq (lift_map
+          (fun d : oql_env =>
+           match
+             match
+               match oql_expr_interp h constant_env e d with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end
+             with
+             | Some x' => Some (x' :: nil)
+             | None => None
+             end
+           with
+           | Some a' => Some (a', d)
+           | None => None
+           end) x); intros; rewrite H2 in H; simpl in H; try congruence.
+        inversion H; clear H; subst.
+        assert (forall x : sortable_data, In x l -> dict_field_le (s :: nil, o0) x).
+        intros.
+        assert (a = x0 \/ In x0 l) by (right; assumption).
+        specialize (Hlt x0 H3); assumption.
+        specialize (IHl H x H2).
+        elim H0; intros.
+        + subst.
+          case_eq (oql_expr_interp h constant_env e o); intros; rewrite H3 in H1;
+            try congruence.
+          case_eq (sdata_of_data d0); intros; rewrite H4 in H1;
+            try congruence.
+          destruct d; simpl in *.
+          inversion H1; subst; clear H1.
+          assert ((s0 :: nil, o1) = (s0 :: nil, o1) \/ In (s0 :: nil, o1) l) by (left; reflexivity).
+          specialize (Hlt (s0 :: nil, o1) H1).
+          unfold dict_field_le in Hlt; simpl in Hlt.
+          exists d0.
+          exists s0.
+          split; [assumption|split; assumption].
+        + apply IHl; assumption.
     Qed.
 
-    (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-    Lemma table_sort_identity_WRONG e l:
+    Lemma pick_d {A} (d:oql_env) (l: list (A * oql_env)) :
+      In d (map snd l) -> exists s, In (s, d) l.
+    Proof.
+      intros.
+      induction l; [contradiction| ].
+      simpl in *.
+      elim H; intros.
+      - destruct a; simpl in *; subst.
+        exists a; left; reflexivity.
+      - elim (IHl H0); intros.
+        exists x; right; assumption.
+    Qed.
+    
+    Lemma lift_Forall_coll e (s:list sdata) o l :
+      Forall (fun env2 => oql_sort_criteria e (snd (s :: nil, o)) (snd env2)) l ->
+      Forall (fun env2 : oql_env => oql_sort_criteria e (snd (s :: nil, o)) env2)
+             (coll_of_sortable_coll l).
+    Proof.
+      intros.
+      rewrite Forall_forall in H.
+      rewrite Forall_forall; intros.
+      unfold coll_of_sortable_coll in H0.
+      simpl in *.
+      elim (pick_d x l H0); intros.
+      apply (H (x0, x)); assumption.
+    Qed.
+
+    Lemma insert_sorted_is_sort_criteria e s o l x :
+      (forall (tenv : oql_env) (d : data),
+          oql_expr_interp h constant_env e tenv = Some d -> oql_expr_sem e tenv d) ->
+      match oql_expr_interp h constant_env e o with
+      | Some x' => sdata_of_data x'
+      | None => None
+      end = Some s ->
+      lift_map
+        (fun d : oql_env =>
+           match
+             match
+               match oql_expr_interp h constant_env e d with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end
+             with
+             | Some x' => Some (x' :: nil)
+             | None => None
+             end
+           with
+           | Some a' => Some (a', d)
+           | None => None
+           end) x = Some l ->
+      Forall (dict_field_le (s :: nil, o)) l ->
+      Forall (fun env2 => (oql_sort_criteria e (snd (s :: nil, o)) (snd env2))) l.
+    Proof.
+      intro IHe.
+      intros.
+      unfold coll_of_sortable_coll in *.
+      rewrite Forall_forall; intros; simpl.
+      rewrite Forall_forall in H1.
+      case_eq (oql_expr_interp h constant_env e o); intros; rewrite H3 in H; try congruence.
+      generalize (some_eval_is_sort_criteria s o e l x H1 H0); intros; clear H0.
+      elim (H4 x0 H2); intros; clear H4.
+      elim H0; intros; clear H0.
+      elim H4; intros; clear H4.
+      elim H5; intros; clear H5.
+      assert (oql_expr_sem e o d) by (apply IHe; assumption).
+      assert (oql_expr_sem e (snd x0) x1) by (apply IHe; assumption).
+      apply (oql_sort_criteria_sem e o (snd x0) d x1 s x2 H5 H7 H H4); intros.
+      assumption.
+    Qed.
+
+    Lemma sort_sortable_coll_strongly_sorted e sc l l1 :
+      (forall (tenv : oql_env) (d : data),
+          oql_expr_interp h constant_env e tenv = Some d -> oql_expr_sem e tenv d) ->
+      fsortable_coll_of_coll
+         ((fun env : oql_env =>
+           match oql_expr_interp h constant_env e env with
+           | Some x' => sdata_of_data x'
+           | None => None
+           end) :: nil) l1 = Some l ->
+      oql_strongly_sorted e sc (coll_of_sortable_coll (sort_sortable_coll l)).
+    Proof.
+      intros He.
+      intros.
+      elim (exists_sort_for_input e l l1 H); clear H l1; intros.
+      revert H.
+      unfold sort_sortable_coll.
+      generalize (dict_sort_StronglySorted l).
+      generalize (dict_sort l); clear l; intros.
+      revert x H0.
+      induction l; simpl in *; intros.
+      - constructor.
+      - inversion H; intros; subst; clear H.
+        unfold fsortable_coll_of_coll in *;
+          unfold fsortable_data_of_data in *;
+          unfold fget_criterias in *; simpl in *.
+        destruct x; simpl in *; try congruence.
+        case_eq (match oql_expr_interp h constant_env e o with
+             | Some x' => sdata_of_data x'
+             | None => None
+                 end); intros; rewrite H in *; simpl in H0; [|congruence].
+        unfold lift in H0.
+        case_eq (@lift_map (@oql_env fruntime) (@sortable_data (@oql_env fruntime))
+             (fun d : @oql_env fruntime =>
+              match
+                match
+                  match @oql_expr_interp fruntime h constant_env e d return (option sdata) with
+                  | Some x' => @sdata_of_data (@foreign_runtime_data fruntime) x'
+                  | None => @None sdata
+                  end return (option (list sdata))
+                with
+                | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
+                | None => @None (list sdata)
+                end return (option (prod (list sdata) (@oql_env fruntime)))
+              with
+              | Some a' =>
+                  @Some (prod (list sdata) (@oql_env fruntime))
+                    (@pair (list sdata) (@oql_env fruntime) a' d)
+              | None => @None (prod (list sdata) (@oql_env fruntime))
+              end) x); intros; rewrite H1 in *; simpl in *; try congruence.
+        inversion H0; intros; subst.
+        specialize (IHl H3 x H1).
+        constructor.
+        apply IHl.
+        apply (lift_Forall_coll e (s::nil)).
+        apply (insert_sorted_is_sort_criteria e s o l x He); assumption.
+    Qed.
+
+    Lemma table_sort_correct e sc l1 l2:
+      (forall (tenv : oql_env) (d : data),
+          oql_expr_interp h constant_env e tenv = Some d -> oql_expr_sem e tenv d) ->
       table_sort
         ((fun env : oql_env =>
             match oql_expr_interp h constant_env e env with
             | Some x' => sdata_of_data x'
             | None => None
-            end) :: nil) l = Some l.
+            end) :: nil) l1 = Some l2 ->
+      oql_order_sem e sc l1 l2.
     Proof.
-      admit.
-    Admitted.
+      intros He.
+      intros.
+      unfold table_sort in H.
+      unfold lift in H.
+      case_eq (fsortable_coll_of_coll
+                 ((fun env : oql_env =>
+                     match oql_expr_interp h constant_env e env with
+                     | Some x' => sdata_of_data x'
+                     | None => None
+                     end) :: nil) l1); intros; rewrite H0 in H; simpl in H; try congruence.
+      inversion H; clear H.
+      constructor.
+      - apply (sort_sortable_coll_permuation ((fun env : oql_env =>
+         match oql_expr_interp h constant_env e env with
+         | Some x' => sdata_of_data x'
+         | None => None
+         end) :: nil) l l1 H0).
+      - apply sort_sortable_coll_strongly_sorted with (l1:= l1);
+        assumption.
+    Qed.
     
     Lemma oql_expr_interp_correct (e:oql_expr) :
       forall tenv d,
@@ -578,24 +929,32 @@ Section OQLSem.
                     end
                   end) el (Some (tenv :: nil))); intros;
             rewrite H1 in H0; simpl in *; try congruence.
-        + econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
-          apply (oql_order_sem_correct_WRONG e sc l l eq_refl).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG in H0. *)
+        + case_eq (table_sort
+           ((fun env : oql_env =>
+             match oql_expr_interp h constant_env e env with
+             | Some x' => sdata_of_data x'
+             | None => None
+             end) :: nil) l); intros; rewrite H2 in H0; simpl in H0; try congruence.
+          econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
+          apply (table_sort_correct e sc l l0 IHe0 H2); clear H2.
           unfold lift in H0;
-            case_eq (lift_map (oql_expr_interp h constant_env o) l); intros;
+            case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
-            econstructor; apply (oql_select_map_sem_correct o l l0 IHe H1).
-        + econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
-          apply (oql_order_sem_correct_WRONG e sc l l eq_refl).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG in H0. *)
+            econstructor; apply (oql_select_map_sem_correct o l0 l1 IHe H1).
+        + case_eq (table_sort
+           ((fun env : oql_env =>
+             match oql_expr_interp h constant_env e env with
+             | Some x' => sdata_of_data x'
+             | None => None
+             end) :: nil) l); intros; rewrite H2 in H0; simpl in H0; try congruence.
+          econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | ]; clear H1.
+          apply (table_sort_correct e sc l l0 IHe0 H2); clear H2.
           unfold lift in H0;
-            case_eq (lift_map (oql_expr_interp h constant_env o) l); intros;
+            case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
-            econstructor; [apply (oql_select_map_sem_correct o l l0 IHe H1)|reflexivity].
+            econstructor; [apply (oql_select_map_sem_correct o l0 l1 IHe H1)|reflexivity].
       - destruct e1; simpl in *; unfold olift in H0;
           case_eq
             (fold_left
@@ -622,32 +981,40 @@ Section OQLSem.
             | Some (dbool b) => Some b
             | _ => None
             end) l); intros; rewrite H2 in H0; simpl in H0; try congruence.
+          case_eq (table_sort
+           ((fun env : oql_env =>
+             match oql_expr_interp h constant_env e3 env with
+             | Some x' => sdata_of_data x'
+             | None => None
+             end) :: nil) l0); intros; rewrite H3 in H0; simpl in H0; try congruence.
           econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | | ]; clear H1.
           apply (oql_where_sem_correct e2 l l0 IHe2 H2).
-          apply (oql_order_sem_correct_WRONG e3 sc l0 l0 eq_refl).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG in H0. *)
+          apply (table_sort_correct e3 sc l0 l1 IHe3 H3); clear H3.
           unfold lift in H0;
-            case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
+            case_eq (lift_map (oql_expr_interp h constant_env o) l1); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
-            econstructor; apply (oql_select_map_sem_correct o l0 l1 IHe1 H1).
+            econstructor; apply (oql_select_map_sem_correct o l1 l2 IHe1 H1).
         + case_eq (lift_filter
            (fun x' : oql_env =>
             match oql_expr_interp h constant_env e2 x' with
             | Some (dbool b) => Some b
             | _ => None
             end) l); intros; rewrite H2 in H0; simpl in H0; try congruence.
+          case_eq (table_sort
+           ((fun env : oql_env =>
+             match oql_expr_interp h constant_env e3 env with
+             | Some x' => sdata_of_data x'
+             | None => None
+             end) :: nil) l0); intros; rewrite H3 in H0; simpl in H0; try congruence.
           econstructor; [apply (oql_from_sem_correct el (tenv :: nil) l H H1)| | | ]; clear H1.
           apply (oql_where_sem_correct e2 l l0 IHe2 H2).
-          apply (oql_order_sem_correct_WRONG e3 sc l0 l0 eq_refl).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG in H0. *)
+          apply (table_sort_correct e3 sc l0 l1 IHe3 H3); clear H3.
           unfold lift in H0;
-            case_eq (lift_map (oql_expr_interp h constant_env o) l0); intros;
+            case_eq (lift_map (oql_expr_interp h constant_env o) l1); intros;
             rewrite H1 in H0; try congruence;
             inversion H0; subst; clear H0.
-            econstructor; [apply (oql_select_map_sem_correct o l0 l1 IHe1 H1)|reflexivity].
+            econstructor; [apply (oql_select_map_sem_correct o l1 l2 IHe1 H1)|reflexivity].
     Qed.
 
     Lemma oql_from_in_sem_complete in_v e tenv tenv2:
@@ -774,14 +1141,19 @@ Section OQLSem.
           reflexivity.
     Qed.
 
-    Lemma oql_order_sem_complete_WRONG e sc tenv0 tenv2:
-      oql_order_sem e sc tenv0 tenv2 ->
-      tenv0 = tenv2.
+    (* XXX Is that even true?!?! *)
+    Lemma table_sort_complete e sc l1 l2:
+      oql_order_sem e sc l1 l2 ->
+      table_sort
+        ((fun env : oql_env =>
+            match oql_expr_interp h constant_env e env with
+            | Some x' => sdata_of_data x'
+            | None => None
+            end) :: nil) l1 = Some l2.
     Proof.
-      intros.
-      inversion H; reflexivity.
-    Qed.
-
+      admit.
+    Admitted.
+    
     Lemma oql_expr_interp_complete (e:oql_expr) :
       forall d tenv,
         oql_expr_sem e tenv d ->
@@ -817,28 +1189,20 @@ Section OQLSem.
       - inversion H0; subst; clear H0.
         destruct e1; inversion H9; subst; clear H9; unfold olift; simpl in *.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
-          rewrite (oql_order_sem_complete_WRONG e sc tenv0 tenv1 H8).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG. *)
+          rewrite (table_sort_complete e sc tenv0 tenv1 H8).
           rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
-          rewrite (oql_order_sem_complete_WRONG e sc tenv0 tenv1 H8).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG. *)
+          rewrite (table_sort_complete e sc tenv0 tenv1 H8).
           rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
       - inversion H0; subst; clear H0.
         destruct e1; inversion H11; subst; clear H11; unfold olift; simpl in *.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
           rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
-          rewrite (oql_order_sem_complete_WRONG e3 sc tenv1 tenv2 H10).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG. *)
+          rewrite (table_sort_complete e3 sc tenv1 tenv2 H10).
           rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
         + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
           rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
-          rewrite (oql_order_sem_complete_WRONG e3 sc tenv1 tenv2 H10).
-          (** XXX WRONG! NO SEMANTIC FOR ORDERBY *)
-          (* rewrite table_sort_identity_WRONG. *)
+          rewrite (table_sort_complete e3 sc tenv1 tenv2 H10).
           rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
     Qed.
       
