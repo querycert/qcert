@@ -387,12 +387,13 @@ function contains(v, b) {
   return false;
 }
 function compareOfMultipleCriterias(scl) {
+  const criterias = unboxColl(scl);
   return function(a,b) {
-    const current_compare = 0;
-    for (let i = 0; i < scl.length; i=i+1) {
-      const sc = scl[i];
+    let current_compare = 0;
+    for (let i = 0; i < criterias.length; i=i+1) {
+      const sc = criterias[i];
       if (Object.prototype.hasOwnProperty.call(sc,'asc')) {
-        current_compare = compare(recDot(a,sc['asc']), recDot(b,sc['asc']));
+          current_compare = compare(recDot(a,sc['asc']), recDot(b,sc['asc']));
       }
       else if (Object.prototype.hasOwnProperty.call(sc,'desc')) {
         current_compare = -(compare(recDot(a,sc['asc']), recDot(b,sc['asc'])));
@@ -404,7 +405,7 @@ function compareOfMultipleCriterias(scl) {
     return current_compare;
   }
 }
-function sort(b,scl) {
+function sort(scl,b) {
   if (scl.length === 0) { return b; } // Check for no sorting criteria
   const compareFun = compareOfMultipleCriterias(scl);
   /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */

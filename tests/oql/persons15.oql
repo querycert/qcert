@@ -1,0 +1,4 @@
+/* Simple select-from-where */
+select p
+from p in Customers
+order by p->age

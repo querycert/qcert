@@ -32,7 +32,7 @@ let resolve_oql_call = resolve_call QOQL.ounop QOQL.obinop unwrap_oql_const
 %token <string> STRING
 %token <string> IDENT
 
-%token SELECT DISTINCT FROM WHERE
+%token SELECT DISTINCT FROM WHERE ORDER BY
 %token AS IN
 
 %token OR AND
@@ -51,7 +51,7 @@ let resolve_oql_call = resolve_call QOQL.ounop QOQL.obinop unwrap_oql_const
 
 %token DEFINE UNDEFINE
 
-%right FROM IN WHERE
+%right FROM IN WHERE ORDER BY
 %right COMMA
 %right AND OR
 %right EQUAL NEQUAL
@@ -101,6 +101,8 @@ expr:
 (* Select from where ... *)
 | SELECT e = expr FROM fc = from_clause 
     { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue QOQL.onoorder }
+| SELECT e = expr FROM fc = from_clause ORDER BY o = expr
+    { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue (QOQL.oorder_by o Ascending) }
 | SELECT e = expr FROM fc = from_clause WHERE w = expr
     { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) QOQL.onoorder }
 | SELECT DISTINCT e = expr FROM fc = from_clause

@@ -24,26 +24,28 @@
 	   "define", DEFINE;
  	   "undefine", UNDEFINE;
  	   (* SFW *)
-	  "select", SELECT;
-	  "distinct", DISTINCT;
-	  "from", FROM;
-	  "where", WHERE;
-	  "in", IN;
-	  "as", AS;
-	  (* Operators *)
-	  "or", OR;
-	  "and", AND;
-	  (* Constructors *)
-	  "new", NEW;
-	  "struct", STRUCT;
-	  "bag", BAG;
-	  (* Data *)
-	  "nil", NIL;
-	  "true", TRUE;
-	  "false", FALSE
-	]; tbl
+	   "select", SELECT;
+	   "distinct", DISTINCT;
+	   "from", FROM;
+	   "where", WHERE;
+     "order", ORDER;
+     "by", BY;
+	   "in", IN;
+	   "as", AS;
+	   (* Operators *)
+	   "or", OR;
+	   "and", AND;
+	   (* Constructors *)
+	   "new", NEW;
+	   "struct", STRUCT;
+	   "bag", BAG;
+	   (* Data *)
+	   "nil", NIL;
+	   "true", TRUE;
+	   "false", FALSE
+	 ]; tbl
     end
-    
+
 }
 
 let newline = ('\010' | '\013' | "\013\010")
