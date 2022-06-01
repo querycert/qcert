@@ -450,4 +450,10 @@ public class UnaryOperators {
         }
 
     }
+
+    public static JsonElement sort(Object[] sortCriterias, JsonElement e) {
+        final JsonElement[] src = RuntimeUtils.collAsArray(e.getAsJsonArray());
+        Arrays.sort(src, new SortComparator(sortCriterias));
+        return RuntimeUtils.arrayAsColl(src);
+    }
 }

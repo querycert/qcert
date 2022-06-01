@@ -15,6 +15,7 @@
 package org.qcert.runtime;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import com.google.gson.*;
 
@@ -102,6 +103,15 @@ public class RuntimeUtils {
         return arr;
     }
 
+    public static JsonArray arrayAsColl(JsonElement[] arr) {
+        JsonArray jarr = new JsonArray();
+        for (int i = 0; i < arr.length; i++) {
+            jarr.add(arr[i]);
+        }
+
+        return jarr;
+    }
+
     public static long asLong(JsonElement e) {
         if(e.isJsonObject()) {
             if (((JsonObject) e).has("$nat"))
@@ -114,5 +124,14 @@ public class RuntimeUtils {
 
     public static boolean asBoolean(JsonElement e) {
         return e.getAsBoolean();
+    }
+
+    public static Entry<String, SortDesc> sortEntry(String key, SortDesc sc) {
+        return new AbstractMap.SimpleEntry<String, SortDesc>(key, sc);
+    }
+
+    public enum SortDesc {
+        ASC,
+        DESC
     }
 }

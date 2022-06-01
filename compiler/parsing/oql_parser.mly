@@ -105,10 +105,16 @@ expr:
     { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue (QOQL.oorder_by o Ascending) }
 | SELECT e = expr FROM fc = from_clause WHERE w = expr
     { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) QOQL.onoorder }
+| SELECT e = expr FROM fc = from_clause WHERE w = expr ORDER BY o = expr
+    { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) (QOQL.oorder_by o Ascending) }
 | SELECT DISTINCT e = expr FROM fc = from_clause
     { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue QOQL.onoorder }
+| SELECT DISTINCT e = expr FROM fc = from_clause ORDER BY o = expr
+    { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue (QOQL.oorder_by o Ascending) }
 | SELECT DISTINCT e = expr FROM fc = from_clause WHERE w = expr
     { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere w) QOQL.onoorder }
+| SELECT DISTINCT e = expr FROM fc = from_clause WHERE w = expr ORDER BY o = expr
+    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere w) (QOQL.oorder_by o Ascending) }
 (* Call *)
 | fn = IDENT LPAREN el = exprlist RPAREN
     { resolve_oql_call fn el }

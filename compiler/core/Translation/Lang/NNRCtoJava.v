@@ -182,8 +182,7 @@ Section NNRCtoJava.
                      | OpFlatten => mk_java_unary_op0 "flatten" e1
                      | OpDistinct => mk_java_unary_op0 "distinct" e1
                      | OpOrderBy sl =>
-                       mk_java_unary_op1 "sort"
-                                         (mk_java_string_collection (map fst sl)) e1 (* XXX TO FIX XXX *)
+                       mk_java_unary_op1 "sort" (mk_java_sort_criterias quotel sl) e1
                      | OpCount => mk_java_unary_op0 "count" e1
                      | OpToString =>  mk_java_unary_op0 "tostring" e1
                      | OpToText =>  mk_java_unary_op0 "totext" e1

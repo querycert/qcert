@@ -114,5 +114,16 @@ Section Java.
     Definition mk_java_string_collection(s:list string) : string
       := mk_java_collection "String" (map mk_java_string s).
 
+    Definition mk_java_sort_criteria (quotel:string) (sc:SortCriteria) : string :=
+      match sc with
+      | (key, Ascending) =>
+        "RuntimeUtils.sortEntry(" ++ quotel ++ key ++ quotel ++ "," ++ "RuntimeUtils.SortDesc.ASC" ++ ")"
+      | (key, Descending) =>
+        "RuntimeUtils.sortEntry(" ++ key ++ "," ++ "RuntimeUtils.SortDesc.DESC" ++ ")"
+      end.
+    
+    Definition mk_java_sort_criterias (quotel:string) (scl:SortCriterias) : string :=
+      "new Object[]{" ++ map_concat ", " (mk_java_sort_criteria quotel) scl ++ "}".
+
   End Ast.
 End Java.
