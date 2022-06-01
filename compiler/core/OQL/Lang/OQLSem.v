@@ -464,87 +464,92 @@ Section OQLSem.
            end) :: nil) l1' = Some l'.
     Proof.
       unfold fsortable_coll_of_coll.
-      revert l' l1.
-      induction l; intros; simpl in *.
-      - destruct l1; simpl in *; try congruence;[|
-        destruct (fsortable_data_of_data
-                    o ((fun env : oql_env =>
-                          match oql_expr_interp h constant_env e env with
-                          | Some x' => sdata_of_data x'
-                          | None => None
-                          end) :: nil)); simpl in H0; try congruence;
-          unfold lift in H0;
-          destruct (lift_map
-                      (fun d : oql_env =>
-                         fsortable_data_of_data
-                           d ((fun env : oql_env =>
-                                 match oql_expr_interp h constant_env e env with
-                                 | Some x' => sdata_of_data x'
-                                 | None => None
-                                 end) :: nil)) l1); try congruence].
-        apply Permutation_nil in H; subst; simpl.
-        exists nil; split; [constructor|reflexivity].
+      intros Hperm.
+      revert l1.
+      induction Hperm; intros; simpl in *.
+      - destruct l1; simpl in *; try congruence.
+        exists nil. split; [constructor|reflexivity].
+        destruct (fsortable_data_of_data o
+          ((fun env : oql_env =>
+            match oql_expr_interp h constant_env e env with
+            | Some x' => sdata_of_data x'
+            | None => None
+            end) :: nil)); simpl in *; try congruence; unfold lift in H.
+        destruct (lift_map
+          (fun d : oql_env =>
+           fsortable_data_of_data d
+             ((fun env : oql_env =>
+               match oql_expr_interp h constant_env e env with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end) :: nil)) l1); congruence.
       - destruct l1; simpl in *; try congruence.
         case_eq (fsortable_data_of_data o
-           ((fun env : oql_env =>
-             match oql_expr_interp h constant_env e env with
-             | Some x' => sdata_of_data x'
-             | None => None
-             end) :: nil)); intros; rewrite H1 in H0; simpl in *; try congruence.
-        unfold lift in H0.
+          ((fun env : oql_env =>
+            match oql_expr_interp h constant_env e env with
+            | Some x' => sdata_of_data x'
+            | None => None
+            end) :: nil)); intros; rewrite H0 in H; try congruence; unfold lift in H.
         case_eq (lift_map
-           (fun d : oql_env =>
-            fsortable_data_of_data d
-              ((fun env : oql_env =>
-                match oql_expr_interp h constant_env e env with
-                | Some x' => sdata_of_data x'
-                | None => None
-                end) :: nil)) l1); intros; rewrite H2 in H0; simpl in *; try congruence.
-        inversion H0; subst; clear H0; simpl in *.
-        destruct l'; simpl in *; [
-          assert (~Permutation nil (a :: l)) by apply Permutation_nil_cons;
-          apply Permutation_sym in H; congruence | ].
-        inversion H; intros; subst; rename H into Hperm.
-        + elim (IHl l' l1 H3 H2); intros; clear IHl.
-          elim H; intros; clear H.
-          exists (o :: x).
-          split; [constructor; assumption| ].
-          simpl.
-          rewrite H1; unfold lift; simpl.
-          rewrite H4; reflexivity.
-        + assert (Permutation (s :: l0) (s :: l0)) by (constructor; apply Permutation_refl).
-          destruct l1; simpl in H2; try congruence.
-          case_eq (fsortable_data_of_data o0
-           ((fun env : oql_env =>
-             match oql_expr_interp h constant_env e env with
-             | Some x' => sdata_of_data x'
-             | None => None
-             end) :: nil)); intros; rewrite H0 in H2; try congruence; unfold lift in H2.
-          case_eq (lift_map
-           (fun d : oql_env =>
-            fsortable_data_of_data d
-              ((fun env : oql_env =>
-                match oql_expr_interp h constant_env e env with
-                | Some x' => sdata_of_data x'
-                | None => None
-                end) :: nil)) l1); intros; rewrite H3 in H2; try congruence.
-          inversion H2; subst; clear H2.
-          specialize (IHl (s :: l0) (o0 :: l1) H); simpl in IHl.
-          rewrite H0 in IHl; simpl in IHl; unfold lift in IHl.
-          rewrite H3 in IHl; simpl in IHl.
-          elim (IHl eq_refl); intros; clear IHl.
-          elim H2; intros; clear H2.
-          exists (o0 :: o :: l1).
-          split.
-          * apply perm_swap.
-          * simpl.
-            rewrite H0; simpl.
-            unfold lift.
-            rewrite H1; simpl.
-            rewrite H3.
-            reflexivity.
-        + admit.
-    Admitted.
+          (fun d : oql_env =>
+           fsortable_data_of_data d
+             ((fun env : oql_env =>
+               match oql_expr_interp h constant_env e env with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end) :: nil)) l1); intros; rewrite H1 in H; try congruence.
+        inversion H; subst; clear H.
+        elim (IHHperm l1 H1); intros; clear IHHperm.
+        elim H; intros; clear H.
+        exists (o :: x0).
+        split; [constructor; assumption| ].
+        simpl.
+        rewrite H0; rewrite H3; reflexivity.
+      - destruct l1; simpl in *; try congruence.
+        case_eq (fsortable_data_of_data o
+          ((fun env : oql_env =>
+            match oql_expr_interp h constant_env e env with
+            | Some x' => sdata_of_data x'
+            | None => None
+            end) :: nil)); intros; rewrite H0 in H; try congruence; unfold lift in H.
+        case_eq (lift_map
+          (fun d : oql_env =>
+           fsortable_data_of_data d
+             ((fun env : oql_env =>
+               match oql_expr_interp h constant_env e env with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end) :: nil)) l1); intros; rewrite H1 in H; try congruence.
+        destruct l1; simpl in *; try congruence.
+        case_eq (fsortable_data_of_data o0
+          ((fun env : oql_env =>
+            match oql_expr_interp h constant_env e env with
+            | Some x' => sdata_of_data x'
+            | None => None
+            end) :: nil)); intros; rewrite H2 in H1; try congruence; unfold lift in H1.
+        case_eq (lift_map
+          (fun d : oql_env =>
+           fsortable_data_of_data d
+             ((fun env : oql_env =>
+               match oql_expr_interp h constant_env e env with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end) :: nil)) l1); intros; rewrite H3 in H1; try congruence.
+        inversion H1; subst; clear H1.
+        inversion H; subst; clear H.
+        exists (o0 :: o :: l1).
+        split; [apply perm_swap| ].
+        simpl.
+        rewrite H0; rewrite H2; rewrite H3; reflexivity.
+      - elim (IHHperm1 l1 H); intros; clear IHHperm1.
+        elim H0; intros; clear H0.
+        elim (IHHperm2 x H2); intros; clear IHHperm2.
+        elim H0; intros; clear H0.
+        exists x0.
+        split.
+        + apply (Permutation_trans H1 H3).
+        + assumption.
+    Qed.
 
     Lemma exists_sort_for_input e l l1:
       fsortable_coll_of_coll
