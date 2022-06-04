@@ -206,21 +206,20 @@ Section TOQL.
       constructor.
   Qed.
   
-  Lemma oql_from_in_expr_sound {m:basic_model} {τc} {tenv tenv'} c v e l1 :
+  Lemma oql_from_in_expr_interp_sound {m:basic_model} {τc} {tenv tenv'} c v e l1 :
     oql_from_in_expr_type τc v e tenv tenv' ->
     Forall (fun env => bindings_type env tenv) l1 ->
     (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
        bindings_type env τenv ->
        oql_expr_type τc τenv e τout ->
-       exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout) ->
+       exists x : data, oql_expr_interp brand_relation_brands c e env = Some x /\ x ▹ τout) ->
     (exists l2,
-        oql_from_in_sem brand_relation_brands c v e l1 l2 /\
-        (Forall (fun env => bindings_type env tenv') l2))
-  .
+        env_map_concat v (oql_expr_interp brand_relation_brands c e) l1 = Some l2 /\
+        (Forall (fun env => bindings_type env tenv') l2)).
   Proof.
     intros.
     induction l1.
-    - exists nil; split; constructor.
+    - exists nil; split; [reflexivity|constructor].
     - inversion H; subst.
       inversion H0; intros; subst; clear H0.
       elim (H1 tenv (Coll τ) a H5 H2); intros; subst; clear H1 H2.
@@ -230,52 +229,58 @@ Section TOQL.
       elim H3; intros; subst; clear H3.
       exists (env_map_concat_single a (map (fun x => ((v,x)::nil)) dl) ++ x).
       split.
-      + econstructor; [assumption|apply H1|reflexivity].
+      + unfold env_map_concat in *; 
+        unfold oenv_map_concat_single in *; simpl.
+        rewrite H1; simpl.
+        unfold lift; rewrite H6; reflexivity.
       + apply Forall_app; try assumption.
         assert (r = τ) by (apply rtype_fequal; assumption).
         subst.
         apply Forall_binding_types_concat; assumption.
   Qed.
 
-  Lemma oql_filter_cast_sound {m:basic_model} bs br (dl:list data):
+  Lemma oql_filter_cast_interp_sound {m:basic_model} bs br (dl:list data):
     Forall (fun d : data => d ▹ Brand bs) dl ->
     exists dl',
-      (filter_cast_sem brand_relation_brands br dl dl'
+      (filter_cast brand_relation_brands br dl = Some dl'
        /\ Forall (fun d : data => d ▹ Brand br) dl').
   Proof.
     intros.
     induction dl; intros; simpl in *.
-    - exists nil; split; constructor.
+    - exists nil; split; [reflexivity|constructor].
     - inversion H; intros; subst; clear H.
       elim (IHdl H3); intros; clear IHdl.
       elim H; intros; subst; clear H.
       inversion H2; intros; subst.
-      specialize (sub_brands_dec brand_relation_brands b br); intros.
-      elim H7; intros.
+      unfold filter_cast in *; simpl.
+      destruct (sub_brands_dec brand_relation_brands b br); simpl.
       + exists ((dbrand b d) :: x).
-        split; [econstructor; assumption| ].
-        constructor; try assumption.
-        constructor; try assumption.
+        split; unfold lift.
+        * unfold filter_cast; simpl.
+          rewrite H0; reflexivity.
+        * constructor; try assumption.
+          constructor; assumption.
       + exists x.
-        split; [econstructor; assumption| ].
-        assumption.
+        split; unfold lift.
+        * rewrite H0; reflexivity.
+        * assumption.
   Qed.
 
-  Lemma oql_from_in_cast_expr_sound {m:basic_model} {τc} {tenv tenv'} c br v e l1 :
+  Lemma oql_from_in_cast_expr_interp_sound {m:basic_model} {τc} {tenv tenv'} c br v e l1 :
     oql_from_in_cast_expr_type τc br v e tenv tenv' ->
     Forall (fun env => bindings_type env tenv) l1 ->
     (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
        bindings_type env τenv ->
        oql_expr_type τc τenv e τout ->
-       exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout) ->
+       exists x : data, oql_expr_interp brand_relation_brands c e env = Some x /\ x ▹ τout) ->
     (exists l2,
-        oql_from_in_cast_sem brand_relation_brands c v br e l1 l2 /\
-        (Forall (fun env => bindings_type env tenv') l2))
-  .
+        env_map_concat_cast brand_relation_brands v br
+                            (oql_expr_interp brand_relation_brands c e) l1 = Some l2 /\
+        (Forall (fun env => bindings_type env tenv') l2)).
   Proof.
     intros.
     induction l1.
-    - exists nil; split; constructor.
+    - exists nil; split; [reflexivity|constructor].
     - inversion H; subst; clear H.
       inversion H0; intros; subst; clear H0.
       elim (H1 tenv (Coll (Brand bs)) a H4 H2); intros; subst; clear H1 H2.
@@ -285,28 +290,50 @@ Section TOQL.
       elim H2; intros; subst; clear H2.
       assert (r = Brand bs) by (apply rtype_fequal; assumption).
       subst; clear H.
-      elim (oql_filter_cast_sound bs br dl); intros; try assumption.
+      unfold env_map_concat_cast in *; simpl.
+      unfold oenv_map_concat_single_with_cast in *; simpl.
+      rewrite H0.
+      elim (oql_filter_cast_interp_sound bs br dl); intros; try assumption.
       elim H; intros; clear H.
       exists (env_map_concat_single a (map (fun x => ((v,x)::nil)) x0) ++ x).
       split.
-      + econstructor; [assumption|apply H0|apply H2|reflexivity].
+      + rewrite H2; simpl; unfold lift.
+        rewrite H5; reflexivity.
       + apply Forall_app; try assumption.
         apply Forall_binding_types_concat;
           assumption.
   Qed.
 
-  Lemma oql_from_expr_type_sound {m:basic_model} {τc} {τenv} {lenv} {from_tenv} c el:
+  Lemma oql_from_expr_interp_sound {m:basic_model} {τc} {τenv} {lenv} {from_tenv} c el:
     bindings_type c τc ->
     Forall (fun env => bindings_type env τenv) lenv ->
     Forall
-      (fun ab : oql_in_expr =>
+        (fun ab : oql_in_expr =>
          forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
-           bindings_type env τenv ->
-           oql_expr_type τc τenv (oin_expr ab) τout ->
-           (exists x : data, oql_expr_sem brand_relation_brands c (oin_expr ab) env x /\ x ▹ τout)) el ->
+         bindings_type env τenv ->
+         oql_expr_type τc τenv (oin_expr ab) τout ->
+         exists x : data,
+           oql_expr_interp brand_relation_brands c (oin_expr ab) env = Some x /\ x ▹ τout) el ->
     oql_from_expr_type τc τenv el from_tenv ->
     (exists tenv',
-        oql_from_sem brand_relation_brands c el lenv tenv' /\
+        (fold_left
+             (fun (envl : option (list oql_env)) (from_in_expr : oql_in_expr) =>
+              match from_in_expr with
+              | OIn in_v from_expr =>
+                  match envl with
+                  | Some envl' =>
+                      env_map_concat in_v (oql_expr_interp brand_relation_brands c from_expr)
+                        envl'
+                  | None => None
+                  end
+              | OInCast in_v brands from_expr =>
+                  match envl with
+                  | Some envl' =>
+                      env_map_concat_cast brand_relation_brands in_v brands
+                        (oql_expr_interp brand_relation_brands c from_expr) envl'
+                  | None => None
+                  end
+              end) el (Some lenv)) = Some tenv' /\
         (Forall (fun env => bindings_type env from_tenv) tenv')).
   Proof.
     intros Hc.
@@ -318,41 +345,39 @@ Section TOQL.
     - destruct a.
       + inversion H1; intros; subst; clear H1.
         inversion H0; intros; subst; clear H0.
-        elim (@oql_from_in_expr_sound m τc τenv tenv' c s o lenv H7 H H3);
+        simpl in H3.
+        elim (@oql_from_in_expr_interp_sound m τc τenv tenv' c s o lenv H7 H H3);
           intros; clear H H3.
         elim H0; intros; clear H0.
         elim (IHel tenv' from_tenv x H1 H4 H8); intros.
         elim H0; intros; clear H0.
         exists x0.
         split; [|assumption].
-        econstructor.
-        apply H.
-        apply H2.
+        simpl; rewrite H; simpl; assumption.
       + inversion H1; intros; subst; clear H1.
         inversion H0; intros; subst; clear H0.
-        elim (@oql_from_in_cast_expr_sound m τc τenv tenv' c l s o lenv H8 H H3);
+        elim (@oql_from_in_cast_expr_interp_sound m τc τenv tenv' c l s o lenv H8 H H3);
           intros; clear H H3.
         elim H0; intros; clear H0.
         elim (IHel tenv' from_tenv x H1 H4 H9); intros.
         elim H0; intros; clear H0.
         exists x0.
         split; [|assumption].
-        econstructor.
-        apply H.
-        apply H2.
+        simpl; rewrite H; simpl; assumption.
   Qed.
 
-  Lemma oql_select_map_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} {τout} c e :
+  Lemma oql_select_map_expr_interp_sound {m:basic_model} {τc} {from_tenv} {x} {τout} c e :
     bindings_type c τc ->
     Forall (fun env : list (string * data) => bindings_type env from_tenv) x ->
     (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
-        bindings_type env τenv ->
-        oql_expr_type τc τenv e τout ->
-        exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout)
+       bindings_type env τenv ->
+       oql_expr_type τc τenv e τout ->
+       exists x : data, oql_expr_interp brand_relation_brands c e env = Some x /\ x ▹ τout)
     ->
     oql_select_map_expr_type τc from_tenv e τout ->
     (exists dl,
-        oql_select_map_sem brand_relation_brands c e x dl /\ Forall (fun d => d ▹ τout) dl).
+        lift_map (oql_expr_interp brand_relation_brands c e) x = Some dl
+        /\ Forall (fun d => d ▹ τout) dl).
   Proof.
     induction x; simpl in *; intros.
     - exists nil; split; constructor; constructor.
@@ -363,19 +388,28 @@ Section TOQL.
       elim (H1 from_tenv τout a H5 H0); intros.
       elim H7; intros; clear H7.
       exists (x1 :: x0).
-      split; constructor; assumption.
+      split.
+      + rewrite H8; simpl; unfold lift.
+        rewrite H3; reflexivity.
+      + constructor; assumption.
   Qed.
 
-  Lemma oql_where_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} c e :
+  Lemma oql_where_expr_interp_sound {m:basic_model} {τc} {from_tenv} {x} c e :
     bindings_type c τc ->
     Forall (fun env : list (string * data) => bindings_type env from_tenv) x ->
     (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
          bindings_type env τenv ->
          oql_expr_type τc τenv e τout ->
-         exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout) ->
+         exists x : data, oql_expr_interp brand_relation_brands c e env = Some x /\ x ▹ τout) ->
     oql_where_expr_type τc from_tenv e ->
     (exists tenv',
-        oql_where_sem brand_relation_brands c e x tenv' /\
+        (olift
+             (lift_filter
+                (fun x' : oql_env =>
+                 match oql_expr_interp brand_relation_brands c e x' with
+                 | Some (dbool b) => Some b
+                 | _ => None
+                 end)) (Some x) = Some tenv') /\
         (Forall (fun env => bindings_type env from_tenv) tenv')).
   Proof.
     intros.
@@ -392,65 +426,265 @@ Section TOQL.
       destruct b; intros; simpl in *.
       (* Condition is true *)
       + exists (a :: x0).
-        split; constructor; assumption.
+        split. rewrite H1; simpl. rewrite H3; reflexivity.
+        constructor; assumption.
       (* Condition is false *)
       + exists x0.
-        split; [constructor; assumption|assumption].
+        split. rewrite H1; simpl. rewrite H3; reflexivity.
+        assumption.
   Qed.
 
-  Lemma oql_order_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} c sc e :
+  Lemma exists_sort_criteria {m:basic_model} {τ} d:
+    sortable_type τ ->
+    d ▹ τ ->
+    exists sd, sdata_of_data d = Some sd.
+  Proof.
+    intros.
+    inversion H; subst; clear H.
+    - inversion H0; subst.
+      simpl. exists (sdnat n); reflexivity.
+    - inversion H0; subst.
+      simpl. exists (sdstring s); reflexivity.
+  Qed.
+
+  Lemma fsortable_data_of_data_sound {m:basic_model} {τc} {from_tenv} {τ} c e a:
+    sortable_type τ ->
+    oql_expr_type τc from_tenv e τ ->
+    (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
+         bindings_type env τenv ->
+         oql_expr_type τc τenv e τout ->
+         exists x : data, oql_expr_interp brand_relation_brands c e env = Some x /\ x ▹ τout) ->
+    bindings_type a from_tenv ->
+    exists sd,
+      fsortable_data_of_data a
+                             ((fun env : oql_env =>
+                                 match oql_expr_interp brand_relation_brands c e env with
+                                 | Some x' => sdata_of_data x'
+                                 | None => None
+                                 end) :: nil) = Some (sd, a).
+  Proof.
+    intros.
+    elim (H1 from_tenv τ a H2 H0); intros.
+    elim H3; intros; clear H3.
+    elim (exists_sort_criteria x H H5); intros.
+    exists (x0::nil).
+    unfold fsortable_data_of_data; simpl.
+    unfold fget_criterias; simpl.
+    rewrite H4; simpl.
+    rewrite H3; simpl.
+    reflexivity.
+  Qed.
+
+  Lemma lift_map_preserves_bindings_type {m:basic_model} c e from_tenv l l1 :
+    Forall (fun env : list (string * data) => bindings_type env from_tenv) l ->
+    lift_map
+      (fun d : oql_env =>
+         fsortable_data_of_data d
+                                ((fun env : oql_env =>
+                                    match oql_expr_interp brand_relation_brands c e env with
+                                    | Some x' => sdata_of_data x'
+                                    | None => None
+                                    end) :: nil)) l = Some l1 ->
+    Forall (fun x0 : list sdata * list (string * data) => bindings_type (snd x0) from_tenv) l1.
+  Proof.
+    revert l.
+    induction l1; intros.
+    - constructor.
+    - destruct l; simpl in *; try congruence.
+      case_eq (@fsortable_data_of_data (@oql_env (@basic_model_runtime m)) l
+             (@cons (forall _ : @oql_env (@basic_model_runtime m), option sdata)
+                (fun env : @oql_env (@basic_model_runtime m) =>
+                 match
+                   @oql_expr_interp (@basic_model_runtime m)
+                     (@brand_relation_brands
+                        (@brand_model_relation (@basic_model_foreign_type m)
+                           (@basic_model_brand_model m))) c e env return (option sdata)
+                 with
+                 | Some x' => @sdata_of_data (@foreign_runtime_data (@basic_model_runtime m)) x'
+                 | None => @None sdata
+                 end) (@nil (forall _ : @oql_env (@basic_model_runtime m), option sdata)))); intros; rewrite H1 in H0; try congruence.
+      unfold lift in H0.
+      case_eq (lift_map
+           (fun d : oql_env =>
+            fsortable_data_of_data d
+              ((fun env : oql_env =>
+                match oql_expr_interp brand_relation_brands c e env with
+                | Some x' => sdata_of_data x'
+                | None => None
+                end) :: nil)) l0); intros;
+        rewrite H2 in H0; try congruence.
+      inversion H0; subst; clear H0.
+      inversion H; simpl in *; subst; clear H.
+      constructor.
+      + unfold fsortable_data_of_data in H1.
+        unfold fget_criterias in H1; simpl in H1.
+        unfold lift in H1; simpl in H1.
+        destruct (match oql_expr_interp brand_relation_brands c e l with
+           | Some x' => sdata_of_data x'
+           | None => None
+                  end); try congruence.
+        inversion H1; subst; simpl.
+        assumption.
+      + eapply IHl1.
+        apply H5.
+        assumption.
+  Qed.
+  
+  Lemma pick_a_to_be_sorted {m:basic_model} {τc} {from_tenv} {τ} c e a l l0 :
+    bindings_type c τc ->
+    sortable_type τ ->
+    oql_expr_type τc from_tenv e τ ->
+    bindings_type a from_tenv ->
+    Forall (fun env : list (string * data) => bindings_type env from_tenv) l ->
+    (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
+         bindings_type env τenv ->
+         oql_expr_type τc τenv e τout ->
+         exists x : data, oql_expr_interp brand_relation_brands c e env = Some x /\ x ▹ τout) ->
+    (table_sort
+         ((fun env : oql_env =>
+           match oql_expr_interp brand_relation_brands c e env with
+           | Some x' => sdata_of_data x'
+           | None => None
+           end) :: nil) l = Some l0) ->
+    exists tenv' : list oql_env,
+      table_sort
+        ((fun env : oql_env =>
+            match oql_expr_interp brand_relation_brands c e env with
+            | Some x' => sdata_of_data x'
+            | None => None
+            end) :: nil) (a :: l) = Some tenv' /\
+      Forall (fun env : list (string * data) => bindings_type env from_tenv) tenv'.
+  Proof.
+    intros.
+    unfold table_sort in *; simpl.
+    unfold fsortable_coll_of_coll in *; simpl.
+    elim (fsortable_data_of_data_sound c e a H0 H1 H4 H2); intros.
+    assert ( (@fsortable_data_of_data
+            (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))) a
+            (@cons (forall _ : @oql_env (@basic_model_runtime m), option sdata)
+               (fun env : @oql_env (@basic_model_runtime m) =>
+                match
+                  @oql_expr_interp (@basic_model_runtime m)
+                    (@brand_relation_brands
+                       (@brand_model_relation (@basic_model_foreign_type m)
+                          (@basic_model_brand_model m))) c e env return (option sdata)
+                with
+                | Some x' => @sdata_of_data (@foreign_runtime_data (@basic_model_runtime m)) x'
+                | None => @None sdata
+                end) (@nil (forall _ : @oql_env (@basic_model_runtime m), option sdata)))) = @fsortable_data_of_data (@oql_env (@basic_model_runtime m)) a
+                    (@cons (forall _ : @oql_env (@basic_model_runtime m), option sdata)
+                       (fun env : @oql_env (@basic_model_runtime m) =>
+                        match
+                          @oql_expr_interp (@basic_model_runtime m)
+                            (@brand_relation_brands
+                               (@brand_model_relation (@basic_model_foreign_type m)
+                                  (@basic_model_brand_model m))) c e env 
+                          return (option sdata)
+                        with
+                        | Some x' =>
+                            @sdata_of_data (@foreign_runtime_data (@basic_model_runtime m)) x'
+                        | None => @None sdata
+                        end) (@nil (forall _ : @oql_env (@basic_model_runtime m), option sdata))) ) by reflexivity.
+    rewrite H7 in H6; rewrite H6; clear H7.
+    unfold lift in *.
+    case_eq (lift_map
+             (fun d : oql_env =>
+              fsortable_data_of_data d
+                ((fun env : oql_env =>
+                  match oql_expr_interp brand_relation_brands c e env with
+                  | Some x' => sdata_of_data x'
+                  | None => None
+                  end) :: nil)) l); intros;
+      rewrite H7 in H5; try congruence.
+    simpl.
+    unfold coll_of_sortable_coll.
+    exists (map snd (insertion_sort_insert dict_field_le_dec (x, a) (sort_sortable_coll l1))).
+    split; [reflexivity| ].
+    unfold sort_sortable_coll.
+    assert (insertion_sort_insert dict_field_le_dec (x, a) (dict_sort l1) = dict_sort ((x,a)::l1)) by reflexivity.
+    rewrite H8.
+    unfold dict_sort.
+    rewrite List.Forall_map.
+    apply Forall_insertion_sort.
+    constructor; simpl. assumption.
+    apply (lift_map_preserves_bindings_type c e from_tenv l l1); assumption.
+  Qed.
+
+  Lemma oql_order_expr_interp_sound {m:basic_model} {τc} {from_tenv} {x} c e :
     bindings_type c τc ->
     Forall (fun env : list (string * data) => bindings_type env from_tenv) x ->
     (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
          bindings_type env τenv ->
          oql_expr_type τc τenv e τout ->
-         exists x : data, oql_expr_sem brand_relation_brands c e env x /\ x ▹ τout) ->
+         exists x : data, oql_expr_interp brand_relation_brands c e env = Some x /\ x ▹ τout) ->
     oql_order_expr_type τc from_tenv e ->
     (exists tenv',
-        oql_order_sem brand_relation_brands c e sc x tenv' /\
+        table_sort ((fun env => olift sdata_of_data (oql_expr_interp brand_relation_brands c e env)) :: nil) x = Some tenv' /\
         (Forall (fun env => bindings_type env from_tenv) tenv')).
   Proof.
     intros.
-    inversion H2; subst.
-    inversion H4; subst; clear H4.
-    
-    admit.
-  Admitted.
+    unfold olift; simpl in *.
+    inversion H2; intros; subst; clear H2.
+    induction x; simpl.
+    - exists nil; split; [reflexivity|constructor].
+    - rename H0 into Hb; inversion Hb; subst.
+      elim (IHx H6); intros; clear IHx.
+      elim H0; intros; clear H0.
+      elim (pick_a_to_be_sorted c e a x x0 H H4 H3 H5 H6 H1 H2); intros.
+      elim H0; intros; clear H0.
+      exists x1.
+      split; assumption.
+  Qed.
 
-  Lemma oql_select_expr_type_sound {m:basic_model} {τc} {from_tenv} {x} {τout} c e :
+  Lemma oql_select_expr_interp_sound {m:basic_model} {τc} {from_tenv} {x} {τout} c e :
     bindings_type c τc ->
     Forall (fun env : list (string * data) => bindings_type env from_tenv) x ->
     (forall (τenv : tbindings) (τout : rtype) (env : list (string * data)),
         bindings_type env τenv ->
         oql_expr_type τc τenv (oselect_expr e) τout ->
-        exists x : data, oql_expr_sem brand_relation_brands c (oselect_expr e) env x /\ x ▹ τout)
+        exists x : data,
+          oql_expr_interp brand_relation_brands c (oselect_expr e) env = Some x /\ x ▹ τout)
     ->
     oql_select_expr_type τc from_tenv e τout ->
-    (exists dl,
-        oql_select_sem brand_relation_brands c e x (dcoll dl) /\ dcoll dl ▹ τout).
+    (exists dl : list data,
+        match e with
+        | OSelect select_expr =>
+          olift
+            (fun x1 : list oql_env =>
+               lift dcoll (lift_map (oql_expr_interp brand_relation_brands c select_expr) x1))
+            (Some x)
+        | OSelectDistinct select_expr =>
+          lift (fun x1 : list data => dcoll (bdistinct x1))
+               (olift
+                  (fun x1 : list oql_env =>
+                     lift_map (oql_expr_interp brand_relation_brands c select_expr) x1)
+                  (Some x))
+        end = Some (dcoll dl) /\ (dcoll dl) ▹ τout).
   Proof.
     intros.
     inversion H2; subst; intros.
-    - elim (@oql_select_map_expr_type_sound m τc from_tenv x τ c e0 H H0 H1 H3);
+    - elim (@oql_select_map_expr_interp_sound m τc from_tenv x τ c e0 H H0 H1 H3);
         intros; subst.
       elim H4; intros; subst; clear H4.
       exists x0.
-      split; constructor; assumption.
-    - elim (@oql_select_map_expr_type_sound m τc from_tenv x τ c e0 H H0 H1 H3);
+      split.
+      + simpl; rewrite H5; reflexivity.
+      + constructor; assumption.
+    - elim (@oql_select_map_expr_interp_sound m τc from_tenv x τ c e0 H H0 H1 H3);
         intros; subst.
       elim H4; intros; subst; clear H4.
       exists (bdistinct x0).
-      split; econstructor.
-      + apply H5.
-      + reflexivity.
-      + apply bdistinct_Forall; assumption.
+      split.
+      + unfold lift; simpl.
+        rewrite H5; reflexivity.
+      + constructor; apply bdistinct_Forall; assumption.
   Qed.
 
-  Theorem typed_oql_expr_sound {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
+  Theorem typed_oql_expr_interp_sound {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
     bindings_type c τc ->
     bindings_type env τenv ->
     (oql_expr_type τc τenv q τout) ->
-    (exists x, (oql_expr_sem brand_relation_brands c q env x /\ (x ▹ τout))).
+    (exists x, (oql_expr_interp brand_relation_brands c q env = Some x /\ (x ▹ τout))).
   Proof.
     intro Hc.
     revert τenv τout env.
@@ -462,101 +696,429 @@ Section TOQL.
       unfold bindings_type in *; unfold edot in *.
       elim (Forall2_lookupr_some H H3); intros.
       elim H0; intros; subst.
-      exists x.
-      split; [constructor; unfold edot| ]; assumption.
+      exists x; assumption.
     - inversion H0; intros; subst; clear H0.
       unfold bindings_type in *; unfold edot in *.
       elim (Forall2_lookupr_some Hc H3); intros.
       elim H0; intros; subst.
       exists x.
-      split; [constructor; unfold edot| ]; assumption.
+      assumption.
     - inversion H0; intros; subst; clear H0.
       elim (IHq1 τenv τ₁ env H H5); intros; subst; clear H5.
       elim (IHq2 τenv τ₂ env H H7); intros; subst; clear H7.
       elim H0; intros; subst; clear H0.
       elim H1; intros; subst; clear H1.
       destruct (typed_binary_op_yields_typed_data _ _ _ H3 H4 H8) as [?[??]].
-      exists x1; split; [|assumption];
-        econstructor;[apply H2|apply H0|assumption].
+      exists x1; split; [|assumption].
+      rewrite H2; rewrite H0; simpl; assumption.
     - inversion H0; intros; subst; clear H0.
       elim (IHq τenv τ₁ env H H4); intros; subst; clear H4.
       elim H0; intros; subst; clear H0.
       destruct (typed_unary_op_yields_typed_data _ _ H2 H6) as [?[??]].
-      exists x0; split; [|assumption];
-        econstructor; [apply H1|assumption].
+      exists x0; split; [|assumption].
+      rewrite H1; simpl; assumption.
     - inversion H1; intros; subst; clear H1.
       assert (Forall (fun env0 : list (string * data) => bindings_type env0 τenv) (env :: nil))
         by (constructor; [assumption|constructor]).
-      elim (@oql_from_expr_type_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H5);
+      elim (@oql_from_expr_interp_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H5);
         intros.
       elim H2; intros; subst; clear H2.
-      elim (@oql_select_expr_type_sound _ τc from_tenv x τout c e1 Hc H4 IHq H7);
+      elim (@oql_select_expr_interp_sound _ τc from_tenv x τout c e1 Hc H4 IHq H7);
         intros; subst.
       elim H2; intros; subst; clear H2.
       exists (dcoll x0).
       split; [|assumption].
-      econstructor;[apply H3|assumption].
+      assert ((@fold_left (option (list (@oql_env (@basic_model_runtime m))))
+            (@oql_in_expr (@basic_model_runtime m))
+            (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+               (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+             match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+             | OIn in_v from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat (@basic_model_runtime m) in_v
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             | OInCast in_v brands from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat_cast (@basic_model_runtime m)
+                       (@brand_relation_brands
+                          (@brand_model_relation (@basic_model_foreign_type m)
+                             (@basic_model_brand_model m))) in_v brands
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             end) el
+            (@Some
+               (list (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))
+               (@cons
+                  (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m)))))
+                  env
+                  (@nil
+                     (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))))) =
+              @fold_left (option (list (@oql_env (@basic_model_runtime m))))
+                         (@oql_in_expr (@basic_model_runtime m))
+                         (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+                              (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+                            match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+                            | OIn in_v from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat (@basic_model_runtime m) in_v
+                                                (@oql_expr_interp (@basic_model_runtime m)
+                                                                  (@brand_relation_brands
+                                                                     (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                            (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            | OInCast in_v brands from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat_cast (@basic_model_runtime m)
+                                                     (@brand_relation_brands
+                                                        (@brand_model_relation (@basic_model_foreign_type m)
+                                                                               (@basic_model_brand_model m))) in_v brands
+                                                     (@oql_expr_interp (@basic_model_runtime m)
+                                                                       (@brand_relation_brands
+                                                                          (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                                 (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            end) el
+                         (@Some (list (@oql_env (@basic_model_runtime m)))
+                                (@cons (@oql_env (@basic_model_runtime m)) env
+                                       (@nil (@oql_env (@basic_model_runtime m))))))
+        by reflexivity.
+      rewrite H2 in H3; clear H2.
+      rewrite H3; simpl.
+      simpl in H6.
+      assumption.
     - inversion H1; intros; subst; clear H1.
       assert (Forall (fun env0 : list (string * data) => bindings_type env0 τenv) (env :: nil))
         by (constructor; [assumption|constructor]).
-      elim (@oql_from_expr_type_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H6);
+      elim (@oql_from_expr_interp_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H6);
         intros.
       elim H2; intros; subst; clear H2.
-      elim (@oql_where_expr_type_sound _ τc from_tenv x c q Hc H4 IHq0 H8);
+      elim (@oql_where_expr_interp_sound _ τc from_tenv x c q Hc H4 IHq0 H8);
         intros; subst; clear H8.
       elim H2; intros; subst; clear H2.
-      elim (@oql_select_expr_type_sound _ τc from_tenv x0 τout c e1 Hc H7 IHq H9);
+      elim (@oql_select_expr_interp_sound _ τc from_tenv x0 τout c e1 Hc H7 IHq H9);
         intros; subst.
       elim H2; intros; subst; clear H2.
       exists (dcoll x1).
       split; [|assumption].
-      econstructor; [apply H3|apply H5|assumption].
+      unfold olift; simpl in *.
+      assert ((@fold_left (option (list (@oql_env (@basic_model_runtime m))))
+            (@oql_in_expr (@basic_model_runtime m))
+            (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+               (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+             match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+             | OIn in_v from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat (@basic_model_runtime m) in_v
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             | OInCast in_v brands from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat_cast (@basic_model_runtime m)
+                       (@brand_relation_brands
+                          (@brand_model_relation (@basic_model_foreign_type m)
+                             (@basic_model_brand_model m))) in_v brands
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             end) el
+            (@Some
+               (list (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))
+               (@cons
+                  (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m)))))
+                  env
+                  (@nil
+                     (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))))) =
+              @fold_left (option (list (@oql_env (@basic_model_runtime m))))
+                         (@oql_in_expr (@basic_model_runtime m))
+                         (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+                              (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+                            match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+                            | OIn in_v from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat (@basic_model_runtime m) in_v
+                                                (@oql_expr_interp (@basic_model_runtime m)
+                                                                  (@brand_relation_brands
+                                                                     (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                            (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            | OInCast in_v brands from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat_cast (@basic_model_runtime m)
+                                                     (@brand_relation_brands
+                                                        (@brand_model_relation (@basic_model_foreign_type m)
+                                                                               (@basic_model_brand_model m))) in_v brands
+                                                     (@oql_expr_interp (@basic_model_runtime m)
+                                                                       (@brand_relation_brands
+                                                                          (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                                 (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            end) el
+                         (@Some (list (@oql_env (@basic_model_runtime m)))
+                                (@cons (@oql_env (@basic_model_runtime m)) env
+                                       (@nil (@oql_env (@basic_model_runtime m))))))
+        by reflexivity.
+      rewrite H2 in H3; clear H2; rewrite H3.
+      rewrite H5.
+      assumption.
     - inversion H1; intros; subst; clear H1.
       assert (Forall (fun env0 : list (string * data) => bindings_type env0 τenv) (env :: nil))
         by (constructor; [assumption|constructor]).
-      elim (@oql_from_expr_type_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H8);
+      elim (@oql_from_expr_interp_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H8);
         intros.
       elim H2; intros; subst; clear H2.
-      elim (@oql_order_expr_type_sound _ τc from_tenv x c sc q Hc H4 IHq0 H9);
+      elim (@oql_order_expr_interp_sound _ τc from_tenv x c q Hc H4 IHq0 H9);
         intros; subst; clear H8.
       elim H2; intros; subst; clear H2.
-      elim (@oql_select_expr_type_sound _ τc from_tenv x0 τout c e1 Hc H6 IHq H10);
+      elim (@oql_select_expr_interp_sound _ τc from_tenv x0 τout c e1 Hc H6 IHq H10);
         intros; subst.
       elim H2; intros; subst; clear H2.
       exists (dcoll x1).
       split; [|assumption].
-      econstructor; [apply H3|apply H5|assumption].
+      assert ((@fold_left (option (list (@oql_env (@basic_model_runtime m))))
+            (@oql_in_expr (@basic_model_runtime m))
+            (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+               (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+             match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+             | OIn in_v from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat (@basic_model_runtime m) in_v
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             | OInCast in_v brands from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat_cast (@basic_model_runtime m)
+                       (@brand_relation_brands
+                          (@brand_model_relation (@basic_model_foreign_type m)
+                             (@basic_model_brand_model m))) in_v brands
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             end) el
+            (@Some
+               (list (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))
+               (@cons
+                  (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m)))))
+                  env
+                  (@nil
+                     (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))))) =
+              @fold_left (option (list (@oql_env (@basic_model_runtime m))))
+                         (@oql_in_expr (@basic_model_runtime m))
+                         (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+                              (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+                            match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+                            | OIn in_v from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat (@basic_model_runtime m) in_v
+                                                (@oql_expr_interp (@basic_model_runtime m)
+                                                                  (@brand_relation_brands
+                                                                     (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                            (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            | OInCast in_v brands from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat_cast (@basic_model_runtime m)
+                                                     (@brand_relation_brands
+                                                        (@brand_model_relation (@basic_model_foreign_type m)
+                                                                               (@basic_model_brand_model m))) in_v brands
+                                                     (@oql_expr_interp (@basic_model_runtime m)
+                                                                       (@brand_relation_brands
+                                                                          (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                                 (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            end) el
+                         (@Some (list (@oql_env (@basic_model_runtime m)))
+                                (@cons (@oql_env (@basic_model_runtime m)) env
+                                       (@nil (@oql_env (@basic_model_runtime m))))))
+        by reflexivity.
+      rewrite H2 in H3; clear H2; rewrite H3.
+      rewrite H5; simpl.
+      assumption.
     - inversion H1; intros; subst; clear H1.
       assert (Forall (fun env0 : list (string * data) => bindings_type env0 τenv) (env :: nil))
         by (constructor; [assumption|constructor]).
-      elim (@oql_from_expr_type_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H9);
+      elim (@oql_from_expr_interp_sound _ τc τenv (env::nil) from_tenv c el Hc H1 H H9);
         intros.
       elim H2; intros; subst; clear H2.
-      elim (@oql_where_expr_type_sound _ τc from_tenv x c q1 Hc H4 IHq2 H10);
+      elim (@oql_where_expr_interp_sound _ τc from_tenv x c q1 Hc H4 IHq2 H10);
         intros; subst; clear H10.
       elim H2; intros; subst; clear H2.
-      elim (@oql_order_expr_type_sound _ τc from_tenv x0 c sc q2 Hc H6 IHq3 H11);
+      elim (@oql_order_expr_interp_sound _ τc from_tenv x0 c q2 Hc H6 IHq3 H11);
         intros; subst; clear H11.
       elim H2; intros; subst; clear H2.
-      elim (@oql_select_expr_type_sound _ τc from_tenv x1 τout c e1 Hc H8 IHq1 H12);
+      elim (@oql_select_expr_interp_sound _ τc from_tenv x1 τout c e1 Hc H8 IHq1 H12);
         intros; subst.
       elim H2; intros; subst; clear H2.
       exists (dcoll x2).
       split; [|assumption].
-      econstructor; [apply H3|apply H5|apply H7|assumption].
-  Qed.
-
- Theorem typed_oql_expr_yields_typed_data {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
-    bindings_type c τc ->
-    bindings_type env τenv ->
-    (oql_expr_type τc τenv q τout) ->
-    (exists x, (oql_expr_interp brand_relation_brands c q env = Some x /\ (x ▹ τout))).
-  Proof.
-    intros.
-    elim (@typed_oql_expr_sound _ τc τenv τout c env q H H0 H1); intros; subst.
-    elim H2; intros; clear H2; subst.
-    exists x; split; [|assumption].
-    rewrite oql_expr_interp_correct_and_complete; assumption.
+      assert ((@fold_left (option (list (@oql_env (@basic_model_runtime m))))
+            (@oql_in_expr (@basic_model_runtime m))
+            (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+               (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+             match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+             | OIn in_v from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat (@basic_model_runtime m) in_v
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             | OInCast in_v brands from_expr =>
+                 match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                 | Some envl' =>
+                     @env_map_concat_cast (@basic_model_runtime m)
+                       (@brand_relation_brands
+                          (@brand_model_relation (@basic_model_foreign_type m)
+                             (@basic_model_brand_model m))) in_v brands
+                       (@oql_expr_interp (@basic_model_runtime m)
+                          (@brand_relation_brands
+                             (@brand_model_relation (@basic_model_foreign_type m)
+                                (@basic_model_brand_model m))) c from_expr) envl'
+                 | None => @None (list (@oql_env (@basic_model_runtime m)))
+                 end
+             end) el
+            (@Some
+               (list (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))
+               (@cons
+                  (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m)))))
+                  env
+                  (@nil
+                     (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))))) =
+              @fold_left (option (list (@oql_env (@basic_model_runtime m))))
+                         (@oql_in_expr (@basic_model_runtime m))
+                         (fun (envl : option (list (@oql_env (@basic_model_runtime m))))
+                              (from_in_expr : @oql_in_expr (@basic_model_runtime m)) =>
+                            match from_in_expr return (option (list (@oql_env (@basic_model_runtime m)))) with
+                            | OIn in_v from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat (@basic_model_runtime m) in_v
+                                                (@oql_expr_interp (@basic_model_runtime m)
+                                                                  (@brand_relation_brands
+                                                                     (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                            (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            | OInCast in_v brands from_expr =>
+                              match envl return (option (list (@oql_env (@basic_model_runtime m)))) with
+                              | Some envl' =>
+                                @env_map_concat_cast (@basic_model_runtime m)
+                                                     (@brand_relation_brands
+                                                        (@brand_model_relation (@basic_model_foreign_type m)
+                                                                               (@basic_model_brand_model m))) in_v brands
+                                                     (@oql_expr_interp (@basic_model_runtime m)
+                                                                       (@brand_relation_brands
+                                                                          (@brand_model_relation (@basic_model_foreign_type m)
+                                                                                                 (@basic_model_brand_model m))) c from_expr) envl'
+                              | None => @None (list (@oql_env (@basic_model_runtime m)))
+                              end
+                            end) el
+                         (@Some (list (@oql_env (@basic_model_runtime m)))
+                                (@cons (@oql_env (@basic_model_runtime m)) env
+                                       (@nil (@oql_env (@basic_model_runtime m))))))
+        by reflexivity.
+      rewrite H2 in H3; clear H2; rewrite H3.
+      assert ((@olift (list (@oql_env (@basic_model_runtime m)))
+            (list (@oql_env (@basic_model_runtime m)))
+            (@lift_filter (@oql_env (@basic_model_runtime m))
+               (fun x' : @oql_env (@basic_model_runtime m) =>
+                match
+                  @oql_expr_interp (@basic_model_runtime m)
+                    (@brand_relation_brands
+                       (@brand_model_relation (@basic_model_foreign_type m)
+                          (@basic_model_brand_model m))) c q1 x' return (option bool)
+                with
+                | Some d =>
+                    match d return (option bool) with
+                    | dunit => @None bool
+                    | dnat _ => @None bool
+                    | dfloat _ => @None bool
+                    | dbool b => @Some bool b
+                    | dstring _ => @None bool
+                    | dcoll _ => @None bool
+                    | drec _ => @None bool
+                    | dleft _ => @None bool
+                    | dright _ => @None bool
+                    | dbrand _ _ => @None bool
+                    | dforeign _ => @None bool
+                    end
+                | None => @None bool
+                end))
+            (@Some
+               (list (list (prod string (@data (@foreign_runtime_data (@basic_model_runtime m))))))
+               x) = @olift (list (@oql_env (@basic_model_runtime m)))
+                 (list (@oql_env (@basic_model_runtime m)))
+                 (@lift_filter (@oql_env (@basic_model_runtime m))
+                    (fun x' : @oql_env (@basic_model_runtime m) =>
+                     match
+                       @oql_expr_interp (@basic_model_runtime m)
+                         (@brand_relation_brands
+                            (@brand_model_relation (@basic_model_foreign_type m)
+                               (@basic_model_brand_model m))) c q1 x' 
+                       return (option bool)
+                     with
+                     | Some d =>
+                         match d return (option bool) with
+                         | dunit => @None bool
+                         | dnat _ => @None bool
+                         | dfloat _ => @None bool
+                         | dbool b => @Some bool b
+                         | dstring _ => @None bool
+                         | dcoll _ => @None bool
+                         | drec _ => @None bool
+                         | dleft _ => @None bool
+                         | dright _ => @None bool
+                         | dbrand _ _ => @None bool
+                         | dforeign _ => @None bool
+                         end
+                     | None => @None bool
+                     end)) (@Some (list (@oql_env (@basic_model_runtime m))) x))) by reflexivity.
+      rewrite H2 in H5; clear H2; rewrite H5; simpl.
+      rewrite H7; simpl.
+      assumption.
   Qed.
 
   Lemma typed_oql_query_program_yields_typed_data {m:basic_model} {τc τdefls} {τout} c (defls env:list (string*data)) (q:oql_query_program):
@@ -571,7 +1133,7 @@ Section TOQL.
     - assert (bt: bindings_type (rec_concat_sort c defls) (rec_concat_sort τc tdefls))
         by (apply bindings_type_rec_concat_sort; trivial).
       assert (bindings_type nil nil) by constructor.
-      destruct (typed_oql_expr_yields_typed_data _ nil e bt H3 H)
+      destruct (typed_oql_expr_interp_sound _ nil e bt H3 H)
         as [d [de dt]].
       rewrite de; simpl.
       destruct (IHoql_query_program_type _ (rec_concat_sort defls ((s,d)::nil)) env H0);
@@ -581,7 +1143,7 @@ Section TOQL.
     - destruct (IHoql_query_program_type c (rremove defls s) env); eauto 2.
       apply rremove_well_typed.
       trivial.
-    - eapply typed_oql_expr_yields_typed_data; eauto.
+    - eapply typed_oql_expr_interp_sound; eauto.
       apply bindings_type_rec_concat_sort; trivial.
       constructor.
   Qed.
@@ -596,7 +1158,7 @@ Section TOQL.
     elim (typed_oql_query_program_yields_typed_data c defls env q H H0 H1); intros.
     elim H2; intros; clear H2.
     exists x; split; [|assumption].
-    apply oql_query_program_interp_correct_and_complete; assumption.
+    apply oql_query_program_interp_correct; assumption.
   Qed.
 
   (** Main typing soundness theorem for OQL *)
@@ -620,7 +1182,7 @@ Section TOQL.
     elim (typed_oql_yields_typed_data c q H H0); intros.
     elim H1; intros; clear H1.
     exists x; split; [|assumption].
-    apply oql_interp_correct_and_complete; assumption.
+    apply oql_interp_correct; assumption.
   Qed.
 
 End TOQL.

@@ -200,19 +200,19 @@ Section OQLSem.
         oql_select_map_sem e (env :: tenv1) (d :: dl1)                        (**r ⇒ [Γc; γ::↑γ₁ ⊢〚e〛ᵐ ⇓ d::↑dl] *)
     with oql_strongly_sorted : oql_expr -> SortDesc -> list oql_env -> Prop :=
     | oql_SSorted_nil e sc : oql_strongly_sorted e sc nil
-    | oql_SSorted_cons e sc env1 tenv :
+    | oql_SSorted_cons e sc env1 d1 sd1 tenv :
         oql_strongly_sorted e sc tenv ->
-        Forall (fun env2 => oql_sort_criteria e env1 env2) tenv ->
+        oql_expr_sem e env1 d1 ->
+        sdata_of_data d1 = Some sd1 ->
+        Forall (fun env2 => oql_sort_criteria e d1 (sd1::nil) env2) tenv ->
         oql_strongly_sorted e sc (env1 :: tenv)
-    with oql_sort_criteria : oql_expr -> oql_env -> oql_env -> Prop :=
+    with oql_sort_criteria : oql_expr -> data -> list sdata -> oql_env -> Prop :=
     (* XXX This looks kind of too complicated ? This is right, though, at the moment. *)
-    | oql_sort_criteria_sem e env1 env2 d1 d2 sd1 sd2 :
-      oql_expr_sem e env1 d1 ->
+    | oql_sort_criteria_sem e env2 d1 d2 sdl1 sd2 :
       oql_expr_sem e env2 d2 ->
-      sdata_of_data d1 = Some sd1 ->
       sdata_of_data d2 = Some sd2 ->
-      dict_field_le (sd1::nil, d1) (sd2::nil, d2) ->
-      oql_sort_criteria e env1 env2
+      dict_field_le (sdl1, d1) (sd2::nil, d2) ->
+      oql_sort_criteria e d1 sdl1 env2
     .
 
     (** Note: [oql_strongly_sorted] based on StronglySorted property *)
@@ -671,8 +671,8 @@ Section OQLSem.
     Qed.
     
     Lemma lift_Forall_coll e (s:list sdata) o l :
-      Forall (fun env2 => oql_sort_criteria e (snd (s :: nil, o)) (snd env2)) l ->
-      Forall (fun env2 : oql_env => oql_sort_criteria e (snd (s :: nil, o)) env2)
+      Forall (fun env2 => oql_sort_criteria e o s (snd env2)) l ->
+      Forall (fun env2 : oql_env => oql_sort_criteria e o s env2)
              (coll_of_sortable_coll l).
     Proof.
       intros.
@@ -684,10 +684,10 @@ Section OQLSem.
       apply (H (x0, x)); assumption.
     Qed.
 
-    Lemma insert_sorted_is_sort_criteria e s o l x :
+    Lemma insert_sorted_is_sort_criteria e s env1 d1 l x :
       (forall (tenv : oql_env) (d : data),
           oql_expr_interp h constant_env e tenv = Some d -> oql_expr_sem e tenv d) ->
-      match oql_expr_interp h constant_env e o with
+      match oql_expr_interp h constant_env e env1 with
       | Some x' => sdata_of_data x'
       | None => None
       end = Some s ->
@@ -707,23 +707,23 @@ Section OQLSem.
            | Some a' => Some (a', d)
            | None => None
            end) x = Some l ->
-      Forall (dict_field_le (s :: nil, o)) l ->
-      Forall (fun env2 => (oql_sort_criteria e (snd (s :: nil, o)) (snd env2))) l.
+      oql_expr_sem e env1 d1 ->
+      Forall (dict_field_le (s :: nil, env1)) l ->
+      Forall (fun env2 => (oql_sort_criteria e d1 (s :: nil) (snd env2))) l.
     Proof.
       intro IHe.
       intros.
       unfold coll_of_sortable_coll in *.
       rewrite Forall_forall; intros; simpl.
-      rewrite Forall_forall in H1.
-      case_eq (oql_expr_interp h constant_env e o); intros; rewrite H3 in H; try congruence.
-      generalize (some_eval_is_sort_criteria s o e l x H1 H0); intros; clear H0.
-      elim (H4 x0 H2); intros; clear H4.
+      rewrite Forall_forall in H2.
+      case_eq (oql_expr_interp h constant_env e env1); intros; rewrite H4 in H; try congruence.
+      generalize (some_eval_is_sort_criteria s env1 e l x H2 H0); intros; clear H0.
+      elim (H5 x0 H3); intros; clear H4.
       elim H0; intros; clear H0.
       elim H4; intros; clear H4.
-      elim H5; intros; clear H5.
-      assert (oql_expr_sem e o d) by (apply IHe; assumption).
+      elim H6; intros; clear H6.
       assert (oql_expr_sem e (snd x0) x1) by (apply IHe; assumption).
-      apply (oql_sort_criteria_sem e o (snd x0) d x1 s x2 H5 H7 H H4); intros.
+      apply (oql_sort_criteria_sem e (snd x0) d1 x1 (s::nil) x2 H6 H4); intros.
       assumption.
     Qed.
 
@@ -776,12 +776,19 @@ Section OQLSem.
                     (@pair (list sdata) (@oql_env fruntime) a' d)
               | None => @None (prod (list sdata) (@oql_env fruntime))
               end) x); intros; rewrite H1 in *; simpl in *; try congruence.
-        inversion H0; intros; subst.
+        inversion H0; intros; subst; clear H0.
         specialize (IHl H3 x H1).
-        constructor.
+        simpl.
+        case_eq (oql_expr_interp h constant_env e o);
+          intros; rewrite H0 in H; try congruence.
+        assert (oql_expr_sem e o d) by (apply He; assumption).
+        econstructor.
         apply IHl.
+        apply H2.
+        apply H.
         apply (lift_Forall_coll e (s::nil)).
-        apply (insert_sorted_is_sort_criteria e s o l x He); assumption.
+        apply (insert_sorted_is_sort_criteria e s o d l x He); try assumption.
+        rewrite H0; simpl; assumption.
     Qed.
 
     Lemma table_sort_correct e sc l1 l2:
