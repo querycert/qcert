@@ -262,9 +262,9 @@ Section TOQLtoNRAEnv.
                           (* Create pairs of input value + sorting criteria *)
                           (cNRAEnvMap
                              (cNRAEnvBinop OpRecConcat
-                                          (cNRAEnvUnop (OpRec "val") cNRAEnvID)
-                                          (cNRAEnvUnop (OpRec "crit")
-                                                       (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e)))) e0)) ▷ Rec Closed τenv pfe >=>
+                                           (cNRAEnvUnop (OpRec "val") cNRAEnvID)
+                                           (cNRAEnvUnop (OpRec "crit")
+                                                        (nraenv_to_nraenv_core (oql_to_nraenv_expr (domain τdefls) e)))) e0)) ▷ Rec Closed τenv pfe >=>
               Coll (Rec Closed τenv1 pfe0) ⊣ τconstant; Rec Closed τdefls pfd.
   Proof.
     intros.

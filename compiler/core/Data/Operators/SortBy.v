@@ -36,6 +36,20 @@ Section SortBy.
     | _ => None
     end.
   
+  Definition data_of_sdata (d:sdata) : data :=
+    match d with
+    | sdnat n => dnat n
+    | sdstring s => dstring s
+    end.
+
+  Lemma data_of_sdata_idem sd d :
+    sdata_of_data d = Some sd <-> data_of_sdata sd = d.
+  Proof.
+    split; intros.
+    - destruct sd; destruct d; simpl in *; try congruence.
+    - destruct sd; destruct d; simpl in *; try congruence.
+  Qed.
+
   Definition get_criteria (sc:SortCriteria) (r:list (string * data)) : option sdata :=
     let (att,sk) := sc in (* XXX IGNORES sort kind (asc|desc) XXX *)
     match edot r att with

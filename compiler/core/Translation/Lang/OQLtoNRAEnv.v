@@ -728,68 +728,90 @@ Section OQLtoNRAEnv.
      * Order clause correctness *
      ****************************)
 
-    Lemma test1 defls xenv e l :
-      (forall (xenv : list (string * data)) (env : oql_env),
-          oql_expr_interp h (rec_concat_sort constant_env defls) e env =
-          (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-             drec env ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core) ->
-      match
-        lift_map
-          (fun d : list (string * data) =>
+    Lemma lift_map_drec_some l0 l1:
+      lift_map (fun d : data => match d with
+                                | drec r => Some r
+                                | _ => None
+                                end) l0 = Some l1 ->
+      exists l0',
+        l0 = map drec l0'.
+    Proof.
+      revert l1.
+      induction l0; simpl; intros.
+      - inversion H; subst; exists nil; reflexivity.
+      - destruct a; simpl in *; try congruence.
+        unfold lift in *.
+        case_eq (lift_map (fun d : data => match d with
+                                      | drec r => Some r
+                                      | _ => None
+                                           end) l0); intros; rewrite H0 in H; try congruence.
+        inversion H; subst; clear H.
+        elim (IHl0 l2 H0); intros; subst.
+        exists (l :: x).
+        reflexivity.
+    Qed.
+
+    Lemma lift_map_drec_f_simpl {B} l2 (f: list (string * data) -> option B) :
+      lift_map (fun d : data => match d with
+                                | drec r => f r
+                                | _ => None
+                                end) (map drec l2) =
+      lift_map (fun r : list (string * data) => f r) l2.
+    Proof.
+      induction l2; simpl.
+      - reflexivity.
+      - rewrite IHl2; reflexivity.
+    Qed.
+
+    Lemma lift_map_drec_some_simpl l2:
+      lift_map (fun d : data => match d with
+                                | drec r => Some r
+                                | _ => None
+                                end) (map drec l2) = Some l2.
+    Proof.
+      rewrite (lift_map_drec_f_simpl l2 Some).
+      apply lift_map_id.
+    Qed.
+
+    Lemma lift_map_crit_val_inv xenv defls e l l1 :
+      lift_map
+        (fun d : list (string * data) =>
            match
              match
                (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+                  drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
              with
              | Some x' => Some (drec (("crit"%string, x') :: nil))
              | None => None
              end
            with
            | Some (drec r2) =>
-               Some
-                 (drec
-                    (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
+             Some
+               (drec
+                  (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
            | _ => None
-           end) l
-      with
-      | Some a' => Some (dcoll a')
-      | None => None
-      end
-      = None -> (@lift_map (@oql_env fruntime) (@sortable_data (@oql_env fruntime))
-            (fun d : @oql_env fruntime =>
-             match
-               @fget_criterias (@oql_env fruntime) d
-                 (@cons (forall _ : @oql_env fruntime, option sdata)
-                    (fun env0 : @oql_env fruntime =>
-                     match
-                       @oql_expr_interp fruntime h
-                         (@rec_concat_sort string ODT_string
-                            (@data (@foreign_runtime_data fruntime)) constant_env defls) e env0
-                       return (option sdata)
-                     with
-                     | Some x' => @sdata_of_data (@foreign_runtime_data fruntime) x'
-                     | None => @None sdata
-                     end) (@nil (forall _ : @oql_env fruntime, option sdata)))
-               return (option (prod (list sdata) (@oql_env fruntime)))
-             with
-             | Some a' =>
-                 @Some (prod (list sdata) (@oql_env fruntime))
-                   (@pair (list sdata) (@oql_env fruntime) a' d)
-             | None => @None (prod (list sdata) (@oql_env fruntime))
-             end) l = None).
+           end) l = Some (map drec l1) ->
+      lift_map
+        (fun d : list (string * data) =>
+           match
+             (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+           with
+           | Some r2 =>
+             Some (rec_sort (("val"%string, drec d) :: ("crit"%string, r2) :: nil))
+           | _ => None
+           end) l = Some l1.
     Proof.
-      intro Hall.
-      intros.
-      induction l; simpl in *.
-      - congruence.
-      - case_eq ((h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                    drec a ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core); intros; rewrite H0 in H; simpl in *; try congruence.
-        + rename d into ddd.
-          unfold lift in H.
-          unfold fget_criterias in *; simpl in *.
-          rewrite (Hall xenv a).
-          rewrite H0; simpl.
-          case_eq (lift_map
+      revert l1.
+      induction l; intros; simpl in *.
+      - inversion H. assert (map drec l1 = nil).
+        rewrite H1; reflexivity.
+        apply map_eq_nil in H0.
+        subst; reflexivity.
+      - destruct ((h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                     drec a ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core); simpl in *; try congruence.
+        unfold lift in *.
+        case_eq (lift_map
           (fun d : list (string * data) =>
            match
              match
@@ -806,237 +828,30 @@ Section OQLtoNRAEnv.
                     (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
            | _ => None
            end) l); intros;
-            rewrite H1 in *; try congruence.
-          specialize (IHl eq_refl).
-          destruct (match
-                       match
-                         @sdata_of_data (@foreign_runtime_data fruntime) ddd return (option (list sdata))
-                       with
-                       | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
-                       | None => @None (list sdata)
-                       end return (option (prod (list sdata) (@oql_env fruntime)))
-                     with
-                     | Some a' =>
-                       @Some (prod (list sdata) (@oql_env fruntime))
-                             (@pair (list sdata) (@oql_env fruntime) a' a)
-                     | None => @None (prod (list sdata) (@oql_env fruntime))
-                     end); try reflexivity.
-          rewrite IHl.
-          reflexivity.
-        + unfold fget_criterias; simpl.
-          rewrite (Hall xenv a).
-          rewrite H0; reflexivity.
-    Qed.
-
-    Lemma test2 f l0 l :
-      match
-        lift_map
-          (fun d : list (string * data) =>
-             match
-               match
-                 f (drec d)
-               with
-               | Some x' => Some (drec (("crit"%string, x') :: nil))
-               | None => None
-               end
-             with
-             | Some (drec r2) =>
-               Some
-                 (drec
-                    (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
-             | _ => None
-             end) l
-      with
-      | Some a' => Some (dcoll a')
-      | None => None
-      end = Some (dcoll l0) ->
-      exists l1,
-        lift_map (fun d : data => match d with
-                                  | drec r => Some r
-                                  | _ => None
-                                  end) l0 = Some l1.
-    Proof.
-      intros.
-      revert l0 H.
-      induction l; intros.
-      - simpl in *. inversion H; subst. exists nil; reflexivity.
-      - simpl in *.
-        destruct (f (drec a)); simpl in *; try congruence.
-        rename d into ddd.
-        unfold lift in *.
-        case_eq (lift_map
-            (fun d : list (string * data) =>
-             match
-               match f (drec d) with
-               | Some x' => Some (drec (("crit"%string, x') :: nil))
-               | None => None
-               end
-             with
-             | Some (drec r2) =>
-                 Some
-                   (drec
-                      (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
-             | _ => None
-             end) l); intros; rewrite H0 in H; simpl in *; try congruence.
+          rewrite H0 in *; [|congruence].
         inversion H; subst; clear H.
-        simpl.
-        rewrite H0 in IHl.
-        elim (IHl l1 eq_refl); intros.
-        rewrite H; simpl.
-        eauto.
-    Qed.
-    
-    Lemma test3 (l0:list data) (x : list (list (string * data))):
-      lift_map (fun d : data => match d with
-                                | drec r => Some r
-                                | _ => None
-                                end) l0 = Some x ->
-      exists l1,
-        map drec l1 = l0.
-    Proof.
-      intros.
-      revert x H.
-      induction l0; intros.
-      - exists nil; reflexivity.
-      - destruct a; simpl in H; try congruence.
-        unfold lift in H.
-        case_eq (lift_map (fun d : data => match d with
-                                      | drec r => Some r
-                                      | _ => None
-                                           end) l0); intros; rewrite H0 in *; try congruence.
-        elim (IHl0 l1 eq_refl); intros; clear IHl0.
-        inversion H; subst.
-        rewrite <- lift_map_map_merge in H0.
-        rewrite lift_map_map in H0.
-        inversion H0.
-        subst.
-        exists (l::x0); reflexivity.
+        destruct l1; simpl in *; try congruence.
+        inversion H2; subst; clear H2.
+        rewrite (IHl l2 eq_refl).
+        reflexivity.
     Qed.
 
-    Lemma test4 defls xenv e x0 l :
-      match
-        lift_map
-          (fun d : list (string * data) =>
-             match
-               match
-                 (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                    drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
-               with
-               | Some x' => Some (drec (("crit"%string, x') :: nil))
-               | None => None
-               end
-             with
-             | Some (drec r2) =>
-               Some
-                 (drec
-                    (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
-             | _ => None
-             end) l
-      with
-      | Some a' => Some (dcoll a')
-      | None => None
-      end = Some (dcoll (map drec x0)) -> 
-        lift_map
-          (fun d : list (string * data) =>
-             match
-               match
-                 (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                    drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
-               with
-               | Some x' => Some (("crit"%string, x') :: nil)
-               | None => None
-               end
-             with
-             | Some r2 =>
-               Some
-                 (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2))
-             | _ => None
-             end) l
-        = Some x0.
-    Proof.
-      intros.
-      case_eq (lift_map
-          (fun d : list (string * data) =>
-           match
-             match
-               (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
-             with
-             | Some x' => Some (drec (("crit"%string, x') :: nil))
-             | None => None
-             end
-           with
-           | Some (drec r2) =>
-               Some
-                 (drec
-                    (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
-           | _ => None
-           end) l); intros; rewrite H0 in H; try congruence.
-      inversion H; subst; clear H.
-      revert x0 H0.
-      induction l; intros; simpl in *.
-      - inversion H0; subst.
-        destruct x0; simpl; simpl in H1; try congruence.
-      - destruct ((h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                     drec a ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core); try congruence; simpl in *.
-        unfold lift in *.
-        case_eq (lift_map
-           (fun d : list (string * data) =>
-            match
-              match
-                (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                 drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
-              with
-              | Some x' => Some (drec (("crit"%string, x') :: nil))
-              | None => None
-              end
-            with
-            | Some (drec r2) =>
-                Some
-                  (drec
-                     (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
-            | _ => None
-            end) l); intros; simpl in *; rewrite H in H0; try congruence.
-        inversion H0; clear H0.
-        destruct x0; simpl in H2; try congruence.
-        inversion H2; clear H2; subst.
-        rewrite (IHl x0 H); reflexivity.
-    Qed.
-
-    Lemma test5 defls xenv e lll :
-      (forall (xenv : list (string * data)) (env : oql_env),
-          oql_expr_interp h (rec_concat_sort constant_env defls) e env =
-          (h ⊢ oql_to_nraenv_expr (domain defls) e @ₓ drec env ⊣ constant_env;
-          (drec (rec_concat_sort xenv defls)))%nraenv) ->
-      @lift_map (@oql_env fruntime) (@sortable_data (@oql_env fruntime))
-            (fun d : @oql_env fruntime =>
-             match
-               match
-                 match
-                   @oql_expr_interp fruntime h
-                     (@rec_concat_sort string ODT_string (@data (@foreign_runtime_data fruntime))
-                        constant_env defls) e d return (option sdata)
-                 with
-                 | Some x' => @sdata_of_data (@foreign_runtime_data fruntime) x'
-                 | None => @None sdata
-                 end return (option (list sdata))
-               with
-               | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
-               | None => @None (list sdata)
-               end return (option (prod (list sdata) (@oql_env fruntime)))
-             with
-             | Some a' =>
-                 @Some (prod (list sdata) (@oql_env fruntime))
-                   (@pair (list sdata) (@oql_env fruntime) a' d)
-             | None => @None (prod (list sdata) (@oql_env fruntime))
-             end) lll =
+    Lemma lift_map_combine_criteria xenv defls e l l1 :
       lift_map
-        (fun d : oql_env =>
+        (fun d : list (string * data) =>
+           match
+             (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+           with
+           | Some r2 => Some (rec_sort (("val"%string, drec d) :: ("crit"%string, r2) :: nil))
+           | None => None
+           end) l = Some l1 ->
+      lift_map
+        (fun d : list (string * data) =>
            match
              match
-               match (h ⊢ oql_to_nraenv_expr (domain defls) e @ₓ drec d ⊣ constant_env;
-                     (drec (rec_concat_sort xenv defls)))%nraenv with
-               | Some x' => sdata_of_data x'
+               match edot d "crit" with
+               | Some d0 => sdata_of_data d0
                | None => None
                end
              with
@@ -1046,160 +861,42 @@ Section OQLtoNRAEnv.
            with
            | Some a' => Some (a', d)
            | None => None
-           end) lll.
-    Proof.
-      intros.
-      induction lll; simpl.
-      - reflexivity.
-      - rewrite (H xenv a).
-        destruct ((h ⊢ oql_to_nraenv_expr (domain defls) e @ₓ drec a ⊣ constant_env;
-                   (drec (rec_concat_sort xenv defls)))%nraenv); try reflexivity.
-        destruct (sdata_of_data d); try reflexivity.
-        unfold lift; simpl.
-        rewrite IHlll.
-        reflexivity.
-    Qed.
-    
-    Lemma test7 s d a l :
-      lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") l = None ->
-      lift_map (fun d0 : list sdata * list (string * data) => edot (snd d0) "val")
-               (insertion_sort_insert dict_field_le_dec
-                                      (s :: nil, ("crit"%string, d) :: ("val"%string, drec a) :: nil) 
-                                      l) = None.
-    Proof.
-      intros.
-      revert l H.
-      induction l; intros; simpl in *.
-      - congruence.
-      - destruct a0; simpl in *.
-        destruct (LexicographicDataOrder.le_dec (s :: nil) l0);
-        destruct (LexicographicDataOrder.le_dec l0 (s :: nil)); simpl in *;
-        case_eq (edot l1 "val"); intros; rewrite H0 in *; try congruence; try reflexivity.
-        rewrite H; reflexivity.
-        rewrite H; reflexivity.
-        rewrite IHl. reflexivity.
-        unfold lift in H.
-        destruct (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") l); try congruence.
-    Qed.
-
-    Lemma test8 s a d l l0 :
-      lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") (dict_sort l) =
-      Some (map drec (map snd (dict_sort l0))) ->
-      lift_map (fun d0 : list sdata * list (string * data) => edot (snd d0) "val")
-               (insertion_sort_insert dict_field_le_dec
-                                      (s :: nil, ("crit"%string, d) :: ("val"%string, drec a) :: nil) 
-                                      (dict_sort l)) =
-      Some (map drec (map snd (insertion_sort_insert dict_field_le_dec
-                                                     (s :: nil, a) (dict_sort l0)))).
-    Proof.
-      rewrite map_map.
-      rewrite map_map.
-      intros.
-      revert a l0 H.
-      induction l; simpl in *; intros.
-      - inversion H; simpl in *; clear H; subst.
-        assert (map (fun x : list sdata * list (string * data) => drec (snd x)) (dict_sort l0) = nil) by auto; clear H1.
-        assert (dict_sort l0 = nil).
-        apply (map_eq_nil _ _ H); clear H.
-        assert (l0 = nil).
-        unfold dict_sort in H0.
-        apply (insertion_sort_nil dict_field_le_dec _ H0).
-        subst; reflexivity.
-      - destruct a; simpl in *.
-        rename l2 into a1.
-        destruct l0; simpl in *.
-        + case_eq (dict_sort l); intros; rewrite H0 in H; simpl in H.
-          destruct (edot a1 "val"); try congruence.
-          destruct p; simpl in *; try congruence.
-          destruct (LexicographicDataOrder.le_dec l1 l2); simpl in H; try congruence.
-          unfold lift in H.
-          destruct (edot a1 "val"); try congruence.
-          destruct (edot l3 "val"); try congruence.
-          destruct (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") l0); try congruence.
-          destruct (LexicographicDataOrder.le_dec l2 l1); simpl in H; try congruence.
-          unfold lift in H.
-          destruct (edot l3 "val"); try congruence.
-          destruct (@lift_map
-            (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-            (@data (@foreign_runtime_data fruntime))
-            (fun
-               d : prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-             =>
-             @edot (@data (@foreign_runtime_data fruntime))
-               (@snd (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))) d)
-               (String (Ascii.Ascii false true true false true true true false)
-                  (String (Ascii.Ascii true false false false false true true false)
-                     (String (Ascii.Ascii false false true true false true true false) EmptyString))))
-            (@insertion_sort_insert
-               (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-               (@dict_field_le (list (prod string (@data (@foreign_runtime_data fruntime)))))
-               (@dict_field_le_dec (list (prod string (@data (@foreign_runtime_data fruntime)))))
-               (@pair (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-                  l1 a1) l0)); try congruence.
-          destruct (edot l3 "val"); try congruence; unfold lift in H.
-          destruct (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") l0); try congruence.
-        + specialize (IHl a0 l0).
-          assert (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") (dict_sort l) =
-        Some
-          (map (fun x : list sdata * list (string * data) => drec (snd x)) (dict_sort l0))).
-          admit.
-          specialize (IHl H0); clear H0.
-          
-
-      admit.
-    Admitted.
-
-    Lemma test6 f lll x0 :
+           end) l1 = 
       lift_map
         (fun d : list (string * data) =>
-           match
-             match f d with
-             | Some x' => Some (("crit"%string, x') :: nil)
-             | None => None
-             end
-           with
-           | Some r2 =>
-             Some (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2))
-           | None => None
-           end) lll = Some x0
-      ->
-      match
-        match
-          match
-            lift_map
-              (fun d : oql_env =>
-                 match
-                   match
-                     match f d with
-                     | Some x' => sdata_of_data x'
-                     | None => None
-                     end
+           olift (fun d =>
+                    match
+                      match
+                        match edot d "crit" with
+                        | Some d0 => sdata_of_data d0
+                        | None => None
+                        end
+                      with
+                      | Some x' => Some (x' :: nil)
+                      | None => None
+                      end
+                    with
+                    | Some a' => Some (a', d)
+                    | None => None
+                    end)
+                 ((fun d =>
+                    (match
+                     (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                        drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
                    with
-                   | Some x' => Some (x' :: nil)
+                   | Some r2 => Some (rec_sort (("val"%string, drec d) :: ("crit"%string, r2) :: nil))
                    | None => None
-                   end
-                 with
-                 | Some a' => Some (a', d)
-                 | None => None
-                 end) lll
-          with
-          | Some a' => Some (dict_sort a')
-          | None => None
-          end
-        with
-        | Some a' => Some (coll_of_sortable_coll a')
-        | None => None
-        end
-      with
-      | Some a' => Some (dcoll (map drec a'))
-      | None => None
-      end =
-      match
-        match
-          match
-            match
-              lift_map
-                (fun d : list (string * data) =>
+                   end)) d)) l.
+    Proof.
+      intros.
+      rewrite (lift_map_combine (fun d : list (string * data) =>
+           match
+             (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+           with
+           | Some r2 => Some (rec_sort (("val"%string, drec d) :: ("crit"%string, r2) :: nil))
+           | None => None
+           end) (fun d : list (string * data) =>
                    match
                      match
                        match edot d "crit" with
@@ -1213,241 +910,602 @@ Section OQLtoNRAEnv.
                    with
                    | Some a' => Some (a', d)
                    | None => None
-                   end) x0
-            with
-            | Some a' => Some (dict_sort a')
-            | None => None
-            end
-          with
-          | Some a' => Some (coll_of_sortable_coll a')
-          | None => None
-          end
-        with
-        | Some a' => Some (dcoll (map drec a'))
-        | None => None
-        end
-      with
-      | Some x' =>
-        lift_oncoll
-          (fun c1 : list data =>
-             match
-               lift_map (fun din : data => match din with
-                                           | drec r => edot r "val"
-                                           | _ => None
-                                           end) c1
-             with
-             | Some a' => Some (dcoll a')
-             | None => None
-             end) x'
-      | None => None
-      end.
+                   end) l l1).
+      reflexivity.
+      assumption.
+    Qed.
+
+    Lemma lift_map_map_merge_drec l:
+      lift_map
+        (fun din : data =>
+           match din with
+           | drec r => edot r "val"
+           | _ => None
+           end) (map drec l)
+      =
+      lift_map (fun din => edot din "val") l.
+    Proof.
+      rewrite <- lift_map_map_merge.
+      reflexivity.
+    Qed.
+
+    Lemma lift_map_combine_coll_of_sortable x l0:
+      lift_map
+        (fun d : data * list (string * data) =>
+           let (d1, d2) := d in
+           lift
+             (fun sd1 : sdata =>
+                (sd1 :: nil, ("crit"%string, d1) :: ("val"%string, drec d2) :: nil))
+             (sdata_of_data d1)) x = Some l0 -> 
+      lift sort_sortable_coll
+         (lift_map
+            (fun d : data * list (string * data) =>
+             let (d1, d2) := d in
+             lift
+               (fun sd1 : sdata =>
+                (sd1 :: nil, ("crit"%string, d1) :: ("val"%string, drec d2) :: nil))
+               (sdata_of_data d1)) x) = Some (sort_sortable_coll l0).
     Proof.
       intros.
-      revert x0 H.
-      induction lll; intros; simpl.
-      - destruct x0; simpl in *; congruence.
-      - simpl in H.
-        destruct (f a); simpl in *; try congruence.
-        unfold lift in *.
-        case_eq (lift_map
-          (fun d : list (string * data) =>
+      rewrite H; reflexivity.
+    Qed.
+
+    Lemma lift_map_edot_sortable_none sss ddd aaa l0 :
+      lift_map (fun din : data =>
+                  match din with
+                  | drec r => edot r "val"
+                  | _ => None
+                  end) (map drec (coll_of_sortable_coll (sort_sortable_coll l0))) =
+      None
+      -> 
+      lift_map (fun din : data => match din with
+                                  | drec r => edot r "val"
+                                  | _ => None
+                                  end)
+               (map drec
+                    (coll_of_sortable_coll
+                       (insertion_sort_insert dict_field_le_dec
+                                              (sss :: nil, ("crit"%string, ddd) :: ("val"%string, drec aaa) :: nil)
+                                              (sort_sortable_coll l0)))) = None.
+    Proof.
+      generalize (sort_sortable_coll l0); intro l1; intros.
+      induction l1; simpl in *; [congruence| ].
+      destruct (let
+              (a0, _) as p
+               return
+                 ({dict_field_le
+                     (sss :: nil, ("crit"%string, ddd) :: ("val"%string, drec aaa) :: nil) p} +
+                  {~
+                   dict_field_le
+                     (sss :: nil, ("crit"%string, ddd) :: ("val"%string, drec aaa) :: nil) p}) :=
+              a in
+            LexicographicDataOrder.le_dec (sss :: nil) a0); simpl;
+      [rewrite H; reflexivity| ].
+      destruct (dict_field_le_dec a
+                                  (sss :: nil, ("crit"%string, ddd) :: ("val"%string, drec aaa) :: nil)); simpl; [|rewrite H; reflexivity].
+      destruct (edot (snd a) "val"); try congruence.
+      unfold lift in *.
+      case_eq (lift_map (fun din : data => match din with
+                                           | drec r => edot r "val"
+                                           | _ => None
+                                           end) (map drec (coll_of_sortable_coll l1)));
+        intros; rewrite H0 in *; [congruence| ].
+      rewrite (IHl1 eq_refl).
+      reflexivity.
+    Qed.
+
+    Lemma combine_more l0 x :
+      lift_map
+        (fun d : data * list (string * data) =>
+           let (d1, d2) := d in
+           lift
+             (fun sd1 : sdata => (sd1 :: nil, ("crit"%string, d1) :: ("val"%string, drec d2) :: nil))
+             (sdata_of_data d1)) x = Some (sort_sortable_coll l0) ->
+      lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val")
+               (sort_sortable_coll l0)
+      =
+      lift_map (fun x =>
+                  olift
+                    (fun d : list sdata * list (string * data) => edot (snd d) "val")
+                    ((fun d : data * list (string * data) =>
+                        let (d1, d2) := d in
+                        lift
+                          (fun sd1 : sdata => (sd1 :: nil, ("crit"%string, d1) :: ("val"%string, drec d2) :: nil))
+                          (sdata_of_data d1)) x)) x.
+    Proof.
+      intros.
+      rewrite (lift_map_combine
+                 (fun d : data * list (string * data) =>
+                    let (d1, d2) := d in
+                    lift
+                      (fun sd1 : sdata => (sd1 :: nil, ("crit"%string, d1) :: ("val"%string, drec d2) :: nil))
+                      (sdata_of_data d1))
+                 (fun d : list sdata * list (string * data) => edot (snd d) "val")
+                 x
+                 (sort_sortable_coll l0)).
+      reflexivity.
+      assumption.
+    Qed.
+        
+    Lemma exists_lift_map_drec defls xenv e l l0 :
+      lift_map
+        (fun d : list (string * data) =>
+           olift
+             (fun d0 : list (string * data) =>
+                match
+                  match
+                    match edot d0 "crit" with
+                    | Some d1 => sdata_of_data d1
+                    | None => None
+                    end
+                  with
+                  | Some x' => Some (x' :: nil)
+                  | None => None
+                  end
+                with
+                | Some a' => Some (a', d0)
+                | None => None
+                end)
+             match
+               (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                  drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+             with
+             | Some r2 => Some (("crit"%string, r2) :: ("val"%string, drec d) :: nil)
+             | None => None
+             end) l = Some l0 ->
+      exists l1,
+        lift_map (fun (d: (data * list (string * data))) =>
+                    let (d1, d2) := d in
+                    lift (fun sd1 =>
+                            (sd1 :: nil, ("crit"%string, d1) :: ("val"%string, drec d2) :: nil))
+                         (sdata_of_data d1)) l1 = Some l0.
+    Proof.
+      revert l0.
+      induction l; simpl in *; intros.
+      - inversion H; subst; simpl.
+        exists nil; reflexivity.
+      - case_eq (olift
+          (fun d0 : list (string * data) =>
            match
-             match f d with
-             | Some x' => Some (("crit"%string, x') :: nil)
+             match match edot d0 "crit" with
+                   | Some d1 => sdata_of_data d1
+                   | None => None
+                   end with
+             | Some x' => Some (x' :: nil)
              | None => None
              end
            with
-           | Some r2 =>
-               Some (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2))
+           | Some a' => Some (a', d0)
            | None => None
-           end) lll); intros;
-          rewrite H0 in H; simpl in H; try congruence.
-        inversion H; clear H.
-        destruct x0; try congruence.
-        inversion H2; subst; clear H2.
-        case_eq (sdata_of_data d); simpl; intros;
-          rewrite H; simpl; try reflexivity.
-        specialize (IHlll x0 H0); clear H0;
-          unfold lift in *.
+           end)
+          match
+            (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+             drec a ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+          with
+          | Some r2 => Some (("crit"%string, r2) :: ("val"%string, drec a) :: nil)
+          | None => None
+          end); intros; rewrite H0 in H; try congruence; unfold lift in H.
         case_eq (lift_map
-                  (fun d : oql_env =>
-                   match
-                     match match f d with
-                           | Some x' => sdata_of_data x'
-                           | None => None
-                           end with
-                     | Some x' => Some (x' :: nil)
-                     | None => None
-                     end
-                   with
-                   | Some a' => Some (a', d)
-                   | None => None
-                   end) lll);
-                  case_eq (lift_map
-                    (fun d : list (string * data) =>
-                     match
+          (fun d : list (string * data) =>
+           olift
+             (fun d0 : list (string * data) =>
+              match
+                match
+                  match edot d0 "crit" with
+                  | Some d1 => sdata_of_data d1
+                  | None => None
+                  end
+                with
+                | Some x' => Some (x' :: nil)
+                | None => None
+                end
+              with
+              | Some a' => Some (a', d0)
+              | None => None
+              end)
+             match
+               (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+             with
+             | Some r2 => Some (("crit"%string, r2) :: ("val"%string, drec d) :: nil)
+             | None => None
+             end) l); intros; rewrite H1 in H; try congruence.
+        inversion H; simpl in *; subst; clear H.
+        elim (IHl l1 H1); intros; clear H1 IHl.
+        unfold olift in H0.
+        destruct ((h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                     drec a ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core); try congruence; simpl in *.
+        case_eq (sdata_of_data d); intros; rewrite H1 in H0; try congruence.
+        inversion H0; subst; clear H0.
+        exists ((d, a) :: x).
+        simpl.
+        rewrite H1; simpl.
+        rewrite H; simpl; reflexivity.
+    Qed.
+
+    Lemma lift_map_on_sorted_none_insertion sss ddd aaa l0:
+      lift_map (fun r : list (string * data) => edot r "val")
+               (coll_of_sortable_coll (sort_sortable_coll l0)) = None ->
+      lift_map (fun r : list (string * data) => edot r "val")
+               (coll_of_sortable_coll
+                  (insertion_sort_insert dict_field_le_dec
+                                         (sss :: nil, ("crit"%string, ddd) :: ("val"%string, drec aaa) :: nil)
+                                         (sort_sortable_coll l0))) = None.
+    Proof.
+      generalize (sort_sortable_coll l0); clear l0;
+        unfold coll_of_sortable_coll;
+        intros.
+      rewrite <- lift_map_map_merge.
+      rewrite <- lift_map_map_merge in H.
+      induction s; simpl in *; [congruence| ].
+      destruct a; simpl.
+      destruct (LexicographicDataOrder.le_dec (sss :: nil) l); simpl in *.
+      - destruct (edot l0 "val"); try reflexivity; unfold lift in *.
+        destruct
+          (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") s);
+          try congruence.
+      - destruct (LexicographicDataOrder.le_dec l (sss :: nil)); simpl in *.
+        + destruct (edot l0 "val"); try reflexivity; unfold lift in *.
+          destruct
+            (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") s);
+            try congruence.
+          rewrite (IHs eq_refl); reflexivity.
+        + destruct (edot l0 "val"); try reflexivity; unfold lift in *.
+          destruct
+            (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") s);
+            try congruence.
+    Qed.
+
+    Lemma rewrite_lift_map_with_lifts sss aaa l0 :
+      match
+        match
+          match
+            match
+              lift_map
+                (fun xyz : list sdata * list (string * data) =>
+                   let (sd, r1) := xyz in
+                   match edot r1 "val" with
+                   | Some (drec r2) => Some (sd, r2)
+                   | _ => None
+                   end) l0
+            with
+            | Some a' => Some ((sss :: nil, aaa) :: a')
+            | None => None
+            end
+          with
+          | Some a' => Some (sort_sortable_coll a')
+          | None => None
+          end
+        with
+        | Some a' => Some (coll_of_sortable_coll a')
+        | None => None
+        end
+      with
+      | Some a' => Some (dcoll (map drec a'))
+      | None => None
+      end
+      = 
+      match
+        lift_map
+          (fun xyz : list sdata * list (string * data) =>
+             let (sd, r1) := xyz in
+             match edot r1 "val" with
+             | Some (drec r2) => Some (sd, r2)
+             | _ => None
+             end) l0
+      with
+      | Some a' => Some (dcoll (map drec (coll_of_sortable_coll (sort_sortable_coll ((sss :: nil, aaa) :: a')))))
+      | None => None
+      end.
+    Proof.
+      destruct (lift_map
+            (fun xyz : list sdata * list (string * data) =>
+             let (sd, r1) := xyz in
+             match edot r1 "val" with
+             | Some (drec r2) => Some (sd, r2)
+             | _ => None
+             end) l0); reflexivity.
+    Qed.
+
+    Lemma lift_map_some_impl_Forall2 l l':
+      lift_map
+        (fun xyz : list sdata * list (string * data) =>
+           let (sd, r1) := xyz in
+           match edot r1 "val" with
+           | Some (drec r2) => Some (sd, r2)
+           | _ => None
+           end) l = Some l' ->
+      Forall2 (fun x y => fst x = fst y /\ (edot (snd x) "val" = Some (drec (snd y)))) l l'.
+    Proof.
+      intros.
+      revert l' H.
+      induction l; simpl; intros.
+      - inversion H; subst; simpl. constructor.
+      - destruct a; simpl in *.
+        case_eq (edot l1 "val"); intros; rewrite H0 in H; try congruence.
+        destruct d; try congruence.
+        unfold lift in *.
+        case_eq (lift_map
+          (fun xyz : list sdata * list (string * data) =>
+           let (sd, r1) := xyz in
+           match edot r1 "val" with
+           | Some (drec r2) => Some (sd, r2)
+           | _ => None
+           end) l); intros; rewrite H1 in H; try congruence.
+        inversion H; subst; clear H.
+        constructor; simpl.
+        + split; [reflexivity|assumption].
+        + apply (IHl l3 H1).
+    Qed.
+
+    Lemma Forall2_lift_sort_sortable_coll l l':
+      Forall2
+        (fun x y : list sdata * list (string * data) =>
+           fst x = fst y /\ edot (snd x) "val" = Some (drec (snd y))) l l'
+      ->
+      Forall2
+        (fun x y : list sdata * list (string * data) =>
+           fst x = fst y /\ edot (snd x) "val" = Some (drec (snd y))) (sort_sortable_coll l) (sort_sortable_coll l').
+    Proof.
+      revert l'.
+      induction l; simpl; intros.
+      - inversion H; subst.
+        constructor.
+      - destruct l'; simpl in *; [inversion H| ].
+        inversion H; simpl in *; subst; clear H.
+        elim H3; intros; clear H3.
+        destruct a; destruct p; simpl in *; subst.
+        specialize (IHl l' H5); clear H5.
+        revert IHl.
+        generalize (sort_sortable_coll l); generalize (sort_sortable_coll l'); intros.
+        clear l l'.
+        rename s0 into l; rename s into l'.
+        revert l' IHl.
+        induction l; simpl; intros.
+        + inversion IHl; subst.
+          simpl; constructor; simpl.
+          split; [reflexivity|assumption].
+          constructor.
+        + destruct l'; simpl in *; [inversion IHl0| ].
+          inversion IHl0; subst.
+          destruct a; destruct s; simpl in *.
+          elim H3; intros; clear H3; subst.
+          destruct (LexicographicDataOrder.le_dec l2 l5); intros.
+          constructor; [split; [reflexivity|assumption]| ].
+          constructor; [split; [reflexivity|assumption]| ].
+          assumption.
+          destruct (LexicographicDataOrder.le_dec l5 l2); intros.
+          constructor; [split; [reflexivity|assumption]| ].
+          apply IHl; assumption.
+          constructor; [split; [reflexivity|assumption]| ].
+          assumption.
+    Qed.
+
+    Lemma lift_sort_sortable_coll_rewrite sss ddd aaa l0 :
+      match
+        match
+          match
+            lift_map
+              (fun xyz : list sdata * list (string * data) =>
+                 let (sd, r1) := xyz in
+                 match edot r1 "val" with
+                 | Some (drec r2) => Some (sd, r2)
+                 | _ => None
+                 end) l0
+          with
+          | Some a' => Some (sort_sortable_coll a')
+          | None => None
+          end
+        with
+        | Some a' => Some (coll_of_sortable_coll a')
+        | None => None
+        end
+      with
+      | Some a' => Some (dcoll (map drec a'))
+      | None => None
+      end =
+      match
+        lift_map (fun din : data => match din with
+                                    | drec r => edot r "val"
+                                    | _ => None
+                                    end)
+                 (map drec (coll_of_sortable_coll (sort_sortable_coll l0)))
+      with
+      | Some a' => Some (dcoll a')
+      | None => None
+      end ->
+      match
+        match
+          match
+            match
+              lift_map
+                (fun xyz : list sdata * list (string * data) =>
+                   let (sd, r1) := xyz in
+                   match edot r1 "val" with
+                   | Some (drec r2) => Some (sd, r2)
+                   | _ => None
+                   end) l0
+            with
+            | Some a' => Some ((sss :: nil, aaa) :: a')
+            | None => None
+            end
+          with
+          | Some a' => Some (sort_sortable_coll a')
+          | None => None
+          end
+        with
+        | Some a' => Some (coll_of_sortable_coll a')
+        | None => None
+        end
+      with
+      | Some a' => Some (dcoll (map drec a'))
+      | None => None
+      end =
+      match
+        lift_map (fun din : data => match din with
+                                    | drec r => edot r "val"
+                                    | _ => None
+                                    end)
+                 (map drec
+                      (coll_of_sortable_coll
+                         (insertion_sort_insert dict_field_le_dec
+                                                (sss :: nil, ("crit"%string, ddd) :: ("val"%string, drec aaa) :: nil)
+                                                (sort_sortable_coll l0))))
+      with
+      | Some a' => Some (dcoll a')
+      | None => None
+      end.
+    Proof.
+      intros.      
+      rewrite lift_map_drec_f_simpl.
+      rewrite lift_map_drec_f_simpl in H.
+      rewrite rewrite_lift_map_with_lifts.
+      case_eq (lift_map
+              (fun xyz : list sdata * list (string * data) =>
+               let (sd, r1) := xyz in
+               match edot r1 "val" with
+               | Some (drec r2) => Some (sd, r2)
+               | _ => None
+               end) l0); intros; rewrite H0 in *; simpl in *.
+      2: {
+        case_eq (lift_map (fun r : list (string * data) => edot r "val")
+                          (coll_of_sortable_coll (sort_sortable_coll l0)));
+        intros; rewrite H1 in *; simpl; try congruence.
+        rewrite lift_map_on_sorted_none_insertion; [reflexivity|assumption].
+      }
+      case_eq (lift_map (fun r : list (string * data) => edot r "val")
+                        (coll_of_sortable_coll (sort_sortable_coll l0))); intros;
+      rewrite H1 in H; simpl in *; try congruence.
+      inversion H; simpl in *; subst; clear H.
+      unfold coll_of_sortable_coll in *.
+      rewrite <- lift_map_map_merge in H1.
+      rewrite map_map in H1.
+      rewrite map_map.
+      specialize (lift_map_some_impl_Forall2 l0 l H0); intros; clear H0.
+      apply Forall2_lift_sort_sortable_coll in H.
+      revert H1 H.
+      generalize (sort_sortable_coll l0); generalize (sort_sortable_coll l); intros.
+      clear l l0.
+      rename s into l; rename s0 into l'.
+      revert l H H1.
+      induction l'; simpl; intros.
+      - inversion H1.
+        apply eq_sym in H2.
+        apply map_eq_nil in H2; subst; reflexivity.
+      - destruct l; simpl in *; [inversion H| ].
+        inversion H; subst; clear H.
+        elim H4; intros; clear H4.
+        destruct a; destruct s; simpl in *; subst.
+        case_eq (edot l1 "val"); intros; rewrite H in H1; try congruence.
+        unfold lift in H1.
+        case_eq (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val") l'); intros; rewrite H2 in H1; try congruence.
+        inversion H1; subst; clear H1.
+        destruct (LexicographicDataOrder.le_dec (sss :: nil) l2);
+          intros; simpl in *; unfold lift in *.
+        + rewrite H0; simpl.
+          rewrite <- lift_map_map_merge.
+          rewrite H2; reflexivity.
+        + destruct (LexicographicDataOrder.le_dec l2 (sss :: nil));
+            intros; simpl in *; unfold lift in *.
+          rewrite H0.
+          specialize (IHl' l H6 H2).
+          case_eq (lift_map (fun r : list (string * data) => edot r "val")
+             (map snd
+                (insertion_sort_insert dict_field_le_dec
+                                       (sss :: nil, ("crit"%string, ddd) :: ("val"%string, drec aaa) :: nil) l'))); intros; rewrite H1 in IHl'; try congruence.
+          rewrite H0.
+          rewrite <- lift_map_map_merge.
+          rewrite H2; reflexivity.
+    Qed.
+    
+    Lemma test defls xenv e l:
+      (forall (xenv : list (string * data)) (env : oql_env),
+      oql_expr_interp h (rec_concat_sort constant_env defls) e env =
+      (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+       drec env ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core) ->
+      lift_map
+        (fun d : oql_env =>
+           match
+             match
+               match oql_expr_interp h (rec_concat_sort constant_env defls) e d with
+               | Some x' => sdata_of_data x'
+               | None => None
+               end
+             with
+             | Some x' => Some (x' :: nil)
+             | None => None
+             end
+           with
+           | Some a' => Some (a', d)
+           | None => None
+           end) l =
+      olift (lift_map (fun (xyz: list sdata * list (string * data)) =>
+                         let (sd, r1) := xyz in
+                         match edot r1 "val"%string with
+                         | Some (drec r2) => Some (sd, r2)
+                         | _ => None
+                         end))
+            (lift_map
+               (fun d : list (string * data) =>
+                  olift
+                    (fun d0 : list (string * data) =>
                        match
-                         match edot d "crit" with
-                         | Some d0 => sdata_of_data d0
+                         match
+                           match edot d0 "crit" with
+                           | Some d1 => sdata_of_data d1
+                           | None => None
+                           end
+                         with
+                         | Some x' => Some (x' :: nil)
                          | None => None
                          end
                        with
-                       | Some x' => Some (x' :: nil)
+                       | Some a' => Some (a', d0)
                        | None => None
-                       end
-                     with
-                     | Some a' => Some (a', d)
-                     | None => None
-                     end) x0); intros; rewrite H0 in *; rewrite H1 in *;
-                    simpl in *; try congruence.
-        + unfold coll_of_sortable_coll in *.
-          repeat (rewrite <- lift_map_map_merge).
-          repeat (rewrite <- lift_map_map_merge in IHlll).
-          clear H H0 H1.
-          case_eq (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val")
-                            (dict_sort l)); intros; rewrite H in IHlll; try congruence.
-          inversion IHlll; subst; clear IHlll.
-          apply (test8 s a d) in H.
-          assert ((@lift_map
-           (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-           (@data (@foreign_runtime_data fruntime))
-           (fun
-              d0 : prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-            =>
-            @edot (@data (@foreign_runtime_data fruntime))
-              (@snd (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))) d0)
-              (String (Ascii.Ascii false true true false true true true false)
-                 (String (Ascii.Ascii true false false false false true true false)
-                    (String (Ascii.Ascii false false true true false true true false) EmptyString))))
-           (@insertion_sort_insert
-              (@sortable_data (list (prod string (@data (@foreign_runtime_data fruntime)))))
-              (@dict_field_le (list (prod string (@data (@foreign_runtime_data fruntime)))))
-              (@dict_field_le_dec (list (prod string (@data (@foreign_runtime_data fruntime)))))
-              (@pair (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-                 (@cons sdata s (@nil sdata))
-                 (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                    (@pair string (@data (@foreign_runtime_data fruntime))
-                       (String (Ascii.Ascii true true false false false true true false)
-                          (String (Ascii.Ascii false true false false true true true false)
-                             (String (Ascii.Ascii true false false true false true true false)
-                                (String (Ascii.Ascii false false true false true true true false)
-                                   EmptyString)))) d)
-                    (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                       (@pair string (@data (@foreign_runtime_data fruntime))
-                          (String (Ascii.Ascii false true true false true true true false)
-                             (String (Ascii.Ascii true false false false false true true false)
-                                (String (Ascii.Ascii false false true true false true true false)
-                                   EmptyString))) (@drec (@foreign_runtime_data fruntime) a))
-                       (@nil (prod string (@data (@foreign_runtime_data fruntime)))))))
-              (@dict_sort (list (prod string (@data (@foreign_runtime_data fruntime)))) l))) = @lift_map (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-        (@data (@foreign_runtime_data fruntime))
-        (fun d0 : prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-         =>
-         @edot (@data (@foreign_runtime_data fruntime))
-           (@snd (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))) d0)
-           (String (Ascii.Ascii false true true false true true true false)
-              (String (Ascii.Ascii true false false false false true true false)
-                 (String (Ascii.Ascii false false true true false true true false) EmptyString))))
-        (@insertion_sort_insert
-           (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-           (@dict_field_le (list (prod string (@data (@foreign_runtime_data fruntime)))))
-           (@dict_field_le_dec (list (prod string (@data (@foreign_runtime_data fruntime)))))
-           (@pair (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-              (@cons sdata s (@nil sdata))
-              (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                 (@pair string (@data (@foreign_runtime_data fruntime))
-                    (String (Ascii.Ascii true true false false false true true false)
-                       (String (Ascii.Ascii false true false false true true true false)
-                          (String (Ascii.Ascii true false false true false true true false)
-                             (String (Ascii.Ascii false false true false true true true false)
-                                EmptyString)))) d)
-                 (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                    (@pair string (@data (@foreign_runtime_data fruntime))
-                       (String (Ascii.Ascii false true true false true true true false)
-                          (String (Ascii.Ascii true false false false false true true false)
-                             (String (Ascii.Ascii false false true true false true true false)
-                                EmptyString))) (@drec (@foreign_runtime_data fruntime) a))
-                    (@nil (prod string (@data (@foreign_runtime_data fruntime)))))))
-           (@dict_sort (list (prod string (@data (@foreign_runtime_data fruntime)))) l))) by reflexivity.
-          rewrite H0 in H; clear H0.
-          rewrite H; reflexivity.
-        + unfold coll_of_sortable_coll in *.
-          repeat (rewrite <- lift_map_map_merge).
-          repeat (rewrite <- lift_map_map_merge in IHlll).
-          case_eq (lift_map (fun d : list sdata * list (string * data) => edot (snd d) "val")
-                            (dict_sort l));
-            intros; rewrite H2 in IHlll; try congruence.
-          assert (lift_map (fun d0 : list sdata * list (string * data) => edot (snd d0) "val")
-                           (insertion_sort_insert dict_field_le_dec
-                                                  (s :: nil, ("crit"%string, d) :: ("val"%string, drec a) :: nil) 
-                                                  (dict_sort l)) = None) by
-              (apply test7; assumption).
-          assert (@lift_map (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-        (@data (@foreign_runtime_data fruntime))
-        (fun d0 : prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-         =>
-         @edot (@data (@foreign_runtime_data fruntime))
-           (@snd (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))) d0)
-           (String (Ascii.Ascii false true true false true true true false)
-              (String (Ascii.Ascii true false false false false true true false)
-                 (String (Ascii.Ascii false false true true false true true false) EmptyString))))
-        (@insertion_sort_insert
-           (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-           (@dict_field_le (list (prod string (@data (@foreign_runtime_data fruntime)))))
-           (@dict_field_le_dec (list (prod string (@data (@foreign_runtime_data fruntime)))))
-           (@pair (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-              (@cons sdata s (@nil sdata))
-              (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                 (@pair string (@data (@foreign_runtime_data fruntime))
-                    (String (Ascii.Ascii true true false false false true true false)
-                       (String (Ascii.Ascii false true false false true true true false)
-                          (String (Ascii.Ascii true false false true false true true false)
-                             (String (Ascii.Ascii false false true false true true true false)
-                                EmptyString)))) d)
-                 (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                    (@pair string (@data (@foreign_runtime_data fruntime))
-                       (String (Ascii.Ascii false true true false true true true false)
-                          (String (Ascii.Ascii true false false false false true true false)
-                             (String (Ascii.Ascii false false true true false true true false)
-                                EmptyString))) (@drec (@foreign_runtime_data fruntime) a))
-                    (@nil (prod string (@data (@foreign_runtime_data fruntime)))))))
-           (@dict_sort (list (prod string (@data (@foreign_runtime_data fruntime)))) l))
-         = (@lift_map
-            (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
-            (@data (@foreign_runtime_data fruntime))
-            (fun
-               d0 : prod (list sdata)
-                      (list (prod string (@data (@foreign_runtime_data fruntime)))) =>
-             @edot (@data (@foreign_runtime_data fruntime))
-               (@snd (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))) d0)
-               (String (Ascii.Ascii false true true false true true true false)
-                  (String (Ascii.Ascii true false false false false true true false)
-                     (String (Ascii.Ascii false false true true false true true false) EmptyString))))
-            (@insertion_sort_insert
-               (@sortable_data (list (prod string (@data (@foreign_runtime_data fruntime)))))
-               (@dict_field_le (list (prod string (@data (@foreign_runtime_data fruntime)))))
-               (@dict_field_le_dec (list (prod string (@data (@foreign_runtime_data fruntime)))))
-               (@pair (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime))))
-                  (@cons sdata s (@nil sdata))
-                  (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                     (@pair string (@data (@foreign_runtime_data fruntime))
-                        (String (Ascii.Ascii true true false false false true true false)
-                           (String (Ascii.Ascii false true false false true true true false)
-                              (String (Ascii.Ascii true false false true false true true false)
-                                 (String (Ascii.Ascii false false true false true true true false)
-                                    EmptyString)))) d)
-                     (@cons (prod string (@data (@foreign_runtime_data fruntime)))
-                        (@pair string (@data (@foreign_runtime_data fruntime))
-                           (String (Ascii.Ascii false true true false true true true false)
-                              (String (Ascii.Ascii true false false false false true true false)
-                                 (String (Ascii.Ascii false false true true false true true false)
-                                    EmptyString))) (@drec (@foreign_runtime_data fruntime) a))
-                        (@nil (prod string (@data (@foreign_runtime_data fruntime)))))))
-               (@dict_sort (list (prod string (@data (@foreign_runtime_data fruntime)))) l)))) by reflexivity.
-          rewrite H4.
-          rewrite H3; reflexivity.
+                       end)
+                    match
+                      (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                         drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+                    with
+                    | Some r2 => Some (("crit"%string, r2) :: ("val"%string, drec d) :: nil)
+                    | None => None
+                    end) l).
+    Proof.
+      intros Heval.
+      induction l; intros; simpl in *; [reflexivity| ].
+      unfold lift in *; simpl in *.
+      rewrite (Heval xenv a).
+      destruct ((h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                   drec a ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core); try reflexivity; simpl in *.
+      destruct (sdata_of_data d); try reflexivity; simpl in *.
+      rewrite IHl; simpl.
+      destruct (lift_map
+        (fun d0 : list (string * data) =>
+         olift
+           (fun d1 : list (string * data) =>
+            match
+              match
+                match edot d1 "crit" with
+                | Some d2 => sdata_of_data d2
+                | None => None
+                end
+              with
+              | Some x' => Some (x' :: nil)
+              | None => None
+              end
+            with
+            | Some a' => Some (a', d1)
+            | None => None
+            end)
+           match
+             (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+              drec d0 ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+           with
+           | Some r2 => Some (("crit"%string, r2) :: ("val"%string, drec d0) :: nil)
+           | None => None
+           end) l); reflexivity.
     Qed.
-
+        
     Lemma nraenv_of_order_clause_correct defls sc
           (e:oql_expr) xenv (ol: option (list oql_env)) :
       (forall xenv (env : oql_env),
@@ -1499,66 +1557,282 @@ Section OQLtoNRAEnv.
       unfold table_sort in *; simpl in *.
       unfold fsortable_coll_of_coll in *; simpl in *.
       unfold fsortable_data_of_data in *; simpl in *.
-      case_eq (match
-                    lift_map
-                      (fun d : list (string * data) =>
+      unfold lift.
+      induction l; intros; [reflexivity|simpl].
+      rename a into aaa.
+      unfold fget_criterias in *.
+      simpl.
+      unfold nraenv_eval in *.
+      rewrite (H xenv aaa).
+      destruct ((h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                   drec aaa ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core);
+        [|reflexivity].
+      rename d into ddd.
+      unfold lift in *.
+      case_eq (lift_map
+            (fun d : list (string * data) =>
+             match
+               match
+                 (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
+                  drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+               with
+               | Some x' => Some (drec (("crit"%string, x') :: nil))
+               | None => None
+               end
+             with
+             | Some (drec r2) =>
+                 Some
+                   (drec
+                      (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
+             | _ => None
+             end) l); intros;
+        rewrite H0 in IHl; simpl in *; unfold lift in *.
+      2: {
+        case_eq (lift_map
+                   (fun d : oql_env =>
+                      match
+                        match
+                          match oql_expr_interp h (rec_concat_sort constant_env defls) e d with
+                          | Some x' => sdata_of_data x'
+                          | None => None
+                          end
+                        with
+                        | Some x' => Some (x' :: nil)
+                        | None => None
+                        end
+                      with
+                      | Some a' => Some (a', d)
+                      | None => None
+                      end) l); intros;
+          assert (@lift_map (@oql_env fruntime) (@sortable_data (@oql_env fruntime))
+                            (fun d : @oql_env fruntime =>
+                               match
+                                 match
+                                   match
+                                     @oql_expr_interp fruntime h
+                                                      (@rec_concat_sort string ODT_string
+                                                                        (@data (@foreign_runtime_data fruntime)) constant_env defls) e d
+                                     return (option sdata)
+                                   with
+                                   | Some x' => @sdata_of_data (@foreign_runtime_data fruntime) x'
+                                   | None => @None sdata
+                                   end return (option (list sdata))
+                                 with
+                                 | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
+                                 | None => @None (list sdata)
+                                 end return (option (prod (list sdata) (@oql_env fruntime)))
+                               with
+                               | Some a' =>
+                                 @Some (prod (list sdata) (@oql_env fruntime))
+                                       (@pair (list sdata) (@oql_env fruntime) a' d)
+                               | None => @None (prod (list sdata) (@oql_env fruntime))
+                               end) l = @lift_map (@oql_env fruntime) (prod (list sdata) (@oql_env fruntime))
+                                                  (fun d : @oql_env fruntime =>
+                                                     match
+                                                       match
+                                                         match
+                                                           @oql_expr_interp fruntime h
+                                                                            (@rec_concat_sort string ODT_string (@data (@foreign_runtime_data fruntime))
+                                                                                              constant_env defls) e d return (option sdata)
+                                                         with
+                                                         | Some x' => @sdata_of_data (@foreign_runtime_data fruntime) x'
+                                                         | None => @None sdata
+                                                         end return (option (list sdata))
+                                                       with
+                                                       | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
+                                                       | None => @None (list sdata)
+                                                       end return (option (prod (list sdata) (@oql_env fruntime)))
+                                                     with
+                                                     | Some a' =>
+                                                       @Some (prod (list sdata) (@oql_env fruntime))
+                                                             (@pair (list sdata) (@oql_env fruntime) a' d)
+                                                     | None => @None (prod (list sdata) (@oql_env fruntime))
+                                                     end) l) by reflexivity.
+        rewrite <- H2 in H1; rewrite H1 in IHl; simpl in *; try congruence.
+        destruct (sdata_of_data ddd); try reflexivity.
+        rewrite H2; rewrite H1; try reflexivity.
+      }
+      case_eq (lift_map
+                 (fun d : data => match d with
+                                  | drec r => Some r
+                                  | _ => None
+                                  end) l0); intros;
+        rewrite H1 in IHl; simpl in *.
+      2: {
+        destruct (sdata_of_data ddd); try reflexivity.
+        destruct (@lift_map (@oql_env fruntime) (@sortable_data (@oql_env fruntime))
+              (fun d : @oql_env fruntime =>
+               match
+                 match
+                   match
+                     @oql_expr_interp fruntime h
+                       (@rec_concat_sort string ODT_string
+                          (@data (@foreign_runtime_data fruntime)) constant_env defls) e d
+                     return (option sdata)
+                   with
+                   | Some x' => @sdata_of_data (@foreign_runtime_data fruntime) x'
+                   | None => @None sdata
+                   end return (option (list sdata))
+                 with
+                 | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
+                 | None => @None (list sdata)
+                 end return (option (prod (list sdata) (@oql_env fruntime)))
+               with
+               | Some a' =>
+                   @Some (prod (list sdata) (@oql_env fruntime))
+                     (@pair (list sdata) (@oql_env fruntime) a' d)
+               | None => @None (prod (list sdata) (@oql_env fruntime))
+               end) l); simpl in *; congruence.
+      }
+      destruct (sdata_of_data ddd); try reflexivity; simpl; rename s into sss.
+      elim (lift_map_drec_some l0 l1 H1); intros; rename x into xxx; subst.
+      rewrite lift_map_drec_some_simpl in H1; inversion H1; subst; clear H1.
+      apply lift_map_crit_val_inv in H0.
+      specialize (lift_map_combine_criteria xenv defls e l l1 H0); intros.
+      assert (@lift_map (list (prod string (@data (@foreign_runtime_data fruntime))))
+            (prod (list sdata) (list (prod string (@data (@foreign_runtime_data fruntime)))))
+            (fun d : list (prod string (@data (@foreign_runtime_data fruntime))) =>
+             match
+               match
+                 match
+                   @edot (@data (@foreign_runtime_data fruntime)) d
+                     (String (Ascii.Ascii true true false false false true true false)
+                        (String (Ascii.Ascii false true false false true true true false)
+                           (String (Ascii.Ascii true false false true false true true false)
+                              (String (Ascii.Ascii false false true false true true true false)
+                                 EmptyString)))) return (option sdata)
+                 with
+                 | Some d0 => @sdata_of_data (@foreign_runtime_data fruntime) d0
+                 | None => @None sdata
+                 end return (option (list sdata))
+               with
+               | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
+               | None => @None (list sdata)
+               end
+               return
+                 (option
+                    (prod (list sdata)
+                       (list (prod string (@data (@foreign_runtime_data fruntime))))))
+             with
+             | Some a' =>
+                 @Some
+                   (prod (list sdata)
+                      (list (prod string (@data (@foreign_runtime_data fruntime)))))
+                   (@pair (list sdata)
+                      (list (prod string (@data (@foreign_runtime_data fruntime)))) a' d)
+             | None =>
+                 @None
+                   (prod (list sdata)
+                      (list (prod string (@data (@foreign_runtime_data fruntime)))))
+             end) l1 = @lift_map (list (prod string (@data (@foreign_runtime_data fruntime))))
+                    (@sortable_data (list (prod string (@data (@foreign_runtime_data fruntime)))))
+                    (fun d : list (prod string (@data (@foreign_runtime_data fruntime))) =>
+                     match
+                       match
                          match
-                           match
-                             (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                                drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
-                           with
-                           | Some x' => Some (drec (("crit"%string, x') :: nil))
+                           @edot (@data (@foreign_runtime_data fruntime)) d
+                             (String (Ascii.Ascii true true false false false true true false)
+                                (String (Ascii.Ascii false true false false true true true false)
+                                   (String
+                                      (Ascii.Ascii true false false true false true true false)
+                                      (String
+                                         (Ascii.Ascii false false true false true true true false)
+                                         EmptyString)))) return (option sdata)
+                         with
+                         | Some d0 => @sdata_of_data (@foreign_runtime_data fruntime) d0
+                         | None => @None sdata
+                         end return (option (list sdata))
+                       with
+                       | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
+                       | None => @None (list sdata)
+                       end
+                       return
+                         (option
+                            (prod (list sdata)
+                               (list (prod string (@data (@foreign_runtime_data fruntime))))))
+                     with
+                     | Some a' =>
+                         @Some
+                           (prod (list sdata)
+                              (list (prod string (@data (@foreign_runtime_data fruntime)))))
+                           (@pair (list sdata)
+                              (list (prod string (@data (@foreign_runtime_data fruntime)))) a' d)
+                     | None =>
+                         @None
+                           (prod (list sdata)
+                              (list (prod string (@data (@foreign_runtime_data fruntime)))))
+                     end) l1) by reflexivity.
+      rewrite H2 in H1; clear H2.
+      rewrite H1 in *; simpl in *.
+      clear H1 H0.
+      unfold lift in *.
+      assert (@lift_map (@oql_env fruntime) (@sortable_data (@oql_env fruntime))
+              (fun d : @oql_env fruntime =>
+               match
+                 match
+                   match
+                     @oql_expr_interp fruntime h
+                       (@rec_concat_sort string ODT_string
+                          (@data (@foreign_runtime_data fruntime)) constant_env defls) e d
+                     return (option sdata)
+                   with
+                   | Some x' => @sdata_of_data (@foreign_runtime_data fruntime) x'
+                   | None => @None sdata
+                   end return (option (list sdata))
+                 with
+                 | Some x' => @Some (list sdata) (@cons sdata x' (@nil sdata))
+                 | None => @None (list sdata)
+                 end return (option (prod (list sdata) (@oql_env fruntime)))
+               with
+               | Some a' =>
+                   @Some (prod (list sdata) (@oql_env fruntime))
+                     (@pair (list sdata) (@oql_env fruntime) a' d)
+               | None => @None (prod (list sdata) (@oql_env fruntime))
+               end) l = lift_map
+            (fun d : oql_env =>
+             match
+               match
+                 match oql_expr_interp h (rec_concat_sort constant_env defls) e d with
+                 | Some x' => sdata_of_data x'
+                 | None => None
+                 end
+               with
+               | Some x' => Some (x' :: nil)
+               | None => None
+               end
+             with
+             | Some a' => Some (a', d)
+             | None => None
+             end) l) by reflexivity.
+      rewrite H0 in *; clear H0;
+        rewrite (test defls xenv e l); [|assumption];
+          rewrite (test defls xenv e l) in IHl; [|assumption].
+      destruct ((lift_map
+                   (fun d : list (string * data) =>
+                    olift
+                      (fun d0 : list (string * data) =>
+                       match
+                         match
+                           match edot d0 "crit" with
+                           | Some d1 => sdata_of_data d1
                            | None => None
                            end
                          with
-                         | Some (drec r2) =>
-                           Some
-                             (drec
-                                (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
-                         | _ => None
-                         end) l
-                  with
-                  | Some a' => Some (dcoll a')
-                  | None => None
-                end); intros;[
-      | unfold lift; rewrite (test1 defls xenv e l H H0); reflexivity].
-      simpl.
-      unfold data_of_table, lift.
-      unfold sort_sortable_coll in *.
-      unfold olift.
-      Set Nested Proofs Allowed.
-      rename d into ddd.
-      destruct ddd; simpl;
-        try (destruct (lift_map
-                    (fun d : list (string * data) =>
-                       match
-                         match
-                           (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ 
-                              drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
-                         with
-                         | Some x' => Some (drec (("crit"%string, x') :: nil))
+                         | Some x' => Some (x' :: nil)
                          | None => None
                          end
                        with
-                       | Some (drec r2) =>
-                         Some
-                           (drec
-                              (insertion_sort_insert rec_field_lt_dec ("val"%string, drec d) (rec_sort r2)))
-                       | _ => None
-                       end) l); congruence).
-      elim (test2 _ l0 l H0); intros.
-      rewrite H1; simpl.
-      elim (test3 l0 x H1); intros.
-      subst.
-      rewrite <- lift_map_map_merge in H1.
-      rewrite lift_map_map in H1.
-      inversion H1; subst; simpl; clear H1.
-      rewrite <- lift_map_map_merge; simpl.
-      rename l into lll.
-      apply (test4 defls xenv e x0 lll) in H0.
-      unfold fget_criterias; simpl.
-      rewrite (test5 defls xenv e lll H); clear H.
-      apply test6; assumption.
+                       | Some a' => Some (a', d0)
+                       | None => None
+                       end)
+                      match
+                        (h ⊢ₑ nraenv_to_nraenv_core (oql_to_nraenv_expr (domain defls) e) @ₑ
+                         drec d ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv_core
+                      with
+                      | Some r2 => Some (("crit"%string, r2) :: ("val"%string, drec d) :: nil)
+                      | None => None
+                      end) l)); simpl in *; try reflexivity.
+      apply lift_sort_sortable_coll_rewrite; assumption.
     Qed.
 
     (* OQL expr to NRAEnv translation is correct *)
