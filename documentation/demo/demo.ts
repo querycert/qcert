@@ -111,12 +111,8 @@ interface PuzzleSides {
         theTextArea.value = "[ Compiling query ]";
 
         const middlePath = path.slice(1,-1);
-        
-        const handler = function(resultPack: Qcert.Result) {
-            theTextArea.value = resultPack.result;
-        }
-        
-        qcertWhiskDispatch({
+
+        const input = {
             source:path[0],
             target:path[path.length-1],
             path:middlePath,
@@ -129,8 +125,11 @@ interface PuzzleSides {
             schema: schemaInput,
             eval:false,
             input:undefined,
-	    optims:JSON.stringify(optimconf) /* XXX Add optimizations here XXX */
-          }, handler); 
+	          optims:JSON.stringify(optimconf) /* XXX Add optimizations here XXX */
+        };
+        const resultPack: Qcert.Result = Qcert.compile(input);
+
+        theTextArea.value = resultPack.result;
     }
 
     // Executes when execute button is pressed.  This button shows when the execute tab shows.

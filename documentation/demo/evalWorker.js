@@ -20,7 +20,7 @@
 // is going on too long.
 
 // Get dependencies.  We put our merged runtime functions at global scope so they are available to the query
-importScripts("../../runtimes/javascript/qcert-runtime.js", "qcertWhiskDispatch.js", "../../bin/qcertJS.js");
+importScripts("../../runtimes/javascript/qcert-runtime.js", "../../bin/qcertJS.js");
 
 // Here upon receiving the activation message from the main thread.  This has two possible forms.
 // 1.  An array of Strings containing inputText, schemaText, and compiledQuery (requesting Javascript execution).
@@ -38,16 +38,13 @@ onmessage = function(e) {
 // qcert intermediate language evaluation
 function qcertEval(inputConfig) {
 	console.log("qcertEval chosen");
-	var handler = function(result) {
-		console.log("Compiler returned");
-		console.log(result);
-		postMessage(result.eval);
-		console.log("reply message posted");
+  const result = Qcert.compile(inputConfig);
+	console.log("Compiler returned");
+	console.log(result);
+	postMessage(result.eval);
+	console.log("reply message posted");
 
-		// Each spawned worker is designed to be used once
-		close();
-	}
-	qcertWhiskDispatch(inputConfig, handler);
+	close();
 }
 
 // Javascript evaluation
