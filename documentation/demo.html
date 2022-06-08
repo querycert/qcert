@@ -12,8 +12,6 @@
 
     <!-- Bootstrap core CSS -->
     <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap theme -->
-    <link href="./boostrap/css/bootstrap-theme.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="qcertsite.css" rel="stylesheet">
@@ -59,20 +57,6 @@
 	      <option value="sql">SQL</option>
 	      <option value="oql" selected="selected">OQL</option>
 	      <option value="lambda_nra">Lambda NRA</option>
-	      <!--
-	      <option>nra</option>
-	      <option>nraenv</option>
-	      <option>nnrc</option>
-	      <option>nnrcmr</option>
-	      <option>cldmr</option>
-	      <option>dnnrc</option>
-	      <option>dnnrc_typed</option>
-	      <option>js</option>
-	      <option>java</option>
-	      <option>spark_rdd</option>
-	      <option>spark_dataset</option>
-	      <option>cloudant</option>
-	      -->
 	    </select>
 	  </div>
 	  <div class="form-group">
@@ -85,17 +69,14 @@
 	      <option value="nra">NRA</option>
 	      <option value="nraenv">NRAEnv</option>
 	      <option value="nnrc">NNRC</option>
+	      <option value="nnrs">NNRS</option>
+	      <option value="nnrs_imp">NNRSimp</option>
+	      <option value="imp_data">Imp (Data)</option>
+	      <option value="imp_ejson">Imp (JSON)</option>
 	      <option value="nnrcmr">NNRCMR</option>
-	      <option value="cldmr">CldMR</option>
 	      <option value="dnnrc">DNNRC</option>
-	      <!--
-	      <option>dnnrc_typed</option>
-	      -->
 	      <option value="js" selected="selected">JavaScript</option>
 	      <option value="java">Java</option>
-	      <option value="spark_rdd">Spark (RDD)</option>
-	      <option value="spark_dataset">Spark (Datasets)</option>
-	      <option value="cloudant">Cloudant Map/Reduce</option>
 	    </select>
 	  </div>
 	</div>
@@ -131,7 +112,6 @@ where p.age = 32</textarea>
     <!-- Bootstrap Q*cert
     ================================================== -->
     <script src="./demo/qcertJS.js"></script>
-    <script src="./demo/qcertWhiskDispatch.js"></script>
     <script src="./demo/qcertScripts.js"></script>
   </body>
 </html>

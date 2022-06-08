@@ -1,0 +1,5 @@
+{
+  "globalDependencies": {
+    "fabric": "registry:dt/fabric#1.5.0+20160915014424"
+  }
+}
