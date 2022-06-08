@@ -100,6 +100,25 @@ Section LiftIterators.
       reflexivity.
     Qed.
 
+    Lemma lift_map_combine {A} {B} {C}
+          (f: A -> option B) (g: B -> option C) (l:list A) (l1: list B) :
+      lift_map f l = Some l1 ->
+      lift_map g l1 =
+      lift_map (fun x => olift g (f x)) l.
+    Proof.
+      revert l1.
+      induction l; intros; simpl in *.
+      - inversion H; subst; reflexivity.
+      - destruct (f a); simpl in *; [|congruence].
+        unfold lift in H.
+        case_eq (lift_map f l); intros;
+          rewrite H0 in H; simpl in *; [|congruence].
+        inversion H; subst; clear H.
+        simpl.
+        rewrite (IHl l0 H0).
+        reflexivity.
+    Qed.
+
     Lemma lift_map_over_app {A B} (f:A -> option B) (l1:list A) (l2:list A) :
       lift_map f (l1 ++ l2) = olift2 (fun x y => Some (x++y)) (lift_map f l1) (lift_map f l2).
     Proof.
