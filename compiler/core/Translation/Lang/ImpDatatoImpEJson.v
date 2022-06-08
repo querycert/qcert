@@ -1121,7 +1121,6 @@ Section ImpDatatoImpEJson.
           induction sl; simpl; [reflexivity|].
           clear a a0.
           unfold imp_ejson_constant in *.
-          Set Printing All.
           assert ((@fold_left (option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model)))
               (@ImpEval.imp_stmt (@cejson foreign_ejson_model) imp_ejson_op (@imp_ejson_runtime_op foreign_ejson_runtime_op))
               (fun (c : option (@ImpEval.pd_rbindings (@ejson foreign_ejson_model)))
@@ -1244,7 +1243,6 @@ Section ImpDatatoImpEJson.
         revert σ.
         induction l; try reflexivity; simpl; intros.
         specialize (IHstmt ((v, Some a) :: σ)); simpl in IHstmt.
-        Set Printing All.
         assert (@imp_ejson_stmt_eval foreign_ejson_model fejson foreign_ejson_runtime_op _ h (imp_data_stmt_to_imp_ejson stmt)
         (@cons (prod var (option (@imp_ejson_model foreign_ejson_model)))
            (@pair var (option (@imp_ejson_model foreign_ejson_model)) v
