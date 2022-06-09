@@ -30,7 +30,6 @@ deploy:
 	mkdir -p $(QUERYCERTDOTIO)/figure
 	$(CP) figure/figure.svg figure/figure.png figure/figure.pdf $(QUERYCERTDOTIO)/figure
 	$(CP) html/* $(QUERYCERTDOTIO)/html
-	$(CP) -r demo/* $(QUERYCERTDOTIO)/demo
 	@echo ""
 	@echo "To push changes to the external Web site, you still need to do:"
 	@echo "  cd $(QUERYCERTDOTIO) ; git commit -am \"Refresh to Web Site\" "
