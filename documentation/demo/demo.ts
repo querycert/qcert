@@ -1,4 +1,4 @@
-/// <reference path="./node_modules/qcert/libs/qcertJS.d.ts" />
+/// <reference path="./qcertJS.d.ts" />
 /// <reference path="./lib/fabric.d.ts" />
 
 // some types
@@ -112,7 +112,7 @@ interface PuzzleSides {
 
         const middlePath = path.slice(1,-1);
 
-        const input = {
+        const config = {
             source:path[0],
             target:path[path.length-1],
             path:middlePath,
@@ -121,11 +121,15 @@ interface PuzzleSides {
             sourcesexp:false,
             ascii:false,
             javaimports:undefined,
-            query:srcInput,
             schema: schemaInput,
             eval:false,
             input:undefined,
 	          optims:JSON.stringify(optimconf) /* XXX Add optimizations here XXX */
+        };
+        console.log(JSON.stringify(config));
+        const input = {
+            gconf: Qcert.buildConfig(config),
+            query:srcInput,
         };
         const resultPack: Qcert.Result = Qcert.compile(input);
 
@@ -137,7 +141,7 @@ interface PuzzleSides {
         const langs = getPipelineLangs();
         const optimconf = getOptimConfig();
         const path = langs.map(x => x.id);
-	const executing = getExecOutputArea();
+	      const executing = getExecOutputArea();
 
         if (worker != null) {
             executing.value = " [ A previous query is still executing and must be killed in order to execute a new one ]";
@@ -205,14 +209,15 @@ interface PuzzleSides {
         worker = null;
     }    
 
-    function setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string,optimconf:Qcert.OptimConfig[]) : Qcert.CompilerConfig {
+    function setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string,optimconf:Qcert.OptimConfig[]) : { gconf: Qcert.ConfigObject, query: string } {
         if (srcInput.length == 0) {
             const executing = getExecOutputArea();
             executing.value = noQuerySrc;
             return null;
         }
-       const middlePath = path.slice(1,-1);
-       return {source:path[0],
+        const middlePath = path.slice(1,-1);
+        const config = {
+            source:path[0],
             target:path[path.length-1],
             path:middlePath,
             exactpath:true,
@@ -220,12 +225,15 @@ interface PuzzleSides {
             sourcesexp:false,
             ascii:false,
             javaimports:undefined,
-            query:srcInput,
             schema: schemaInput,
             eval: true,
             input: dataInput,
             optims:JSON.stringify(optimconf) /* XXX Add optimizations here XXX */
-          };
+        };
+        return {
+            gconf: Qcert.buildConfig(config),
+            query: srcInput,
+        };
     }
 
     // Executes when defaults button is pushed on the optim config tab
@@ -2495,7 +2503,7 @@ class OptimPhaseTab extends CanvasDynamicTab {
 
 	getPhase():Qcert.OptimPhase {
         let optims:string[] = this.sortable.toArray();
-        console.log(optims);
+        console.log(JSON.stringify(optims));
         if (optims.length == 1 && optims[0] == optPlaceholder)
             optims = [];
 		const ret = {
@@ -2714,7 +2722,7 @@ function OptimizationsTabMakeFromConfig(canvas:fabric.Canvas, defaults:Qcert.Opt
     const optims = Qcert.optimList().optims;
 
     console.log("Setting optimization config");
-    console.log(optims);
+    console.log(JSON.stringify(optims));
     
 	const opts = {rectOptions:{fill:'#548235'}, tabOrigin:{top:yoffset}};	
 	let optimTabs:OptimizationManager[] = [];
@@ -2731,7 +2739,16 @@ function OptimizationsTabMakeFromConfig(canvas:fabric.Canvas, defaults:Qcert.Opt
 
 function getOptimConfig():Qcert.OptimConfig[] {
 	if(globalOptimTabs) {
-		return globalOptimTabs.map((x) => x.getOptimConfig());
+		  const optimConfig = globalOptimTabs.map((x) => x.getOptimConfig());
+      // XXX Hack - patch nnrs_imp optimizations for consistency with Qcert API
+      const nnrsOptims = optimConfig.filter((x) => x.language === "nnrs_imp")[0];
+      if (nnrsOptims) {
+          nnrsOptims.phases.forEach((phase) => {
+              phase.optims.expr = [];
+              phase.optims.stmt = [];
+          });
+      }
+      return optimConfig;
 	} else {
 		return [];
 	}
