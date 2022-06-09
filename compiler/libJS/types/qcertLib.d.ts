@@ -28,6 +28,8 @@ export type OptimStepDescription = {name: string, description:string, lemma:stri
 export type OptimPhase = {name: string; optims: {[key: string]: string[]}; iter: number};
 export type OptimConfig = {language: string; phases: OptimPhase[]};
 
+export type ConfigObject = {};
+
 export type CompilerConfig = {
     source:Language, /* Source language */
     target:Language, /* Target language */
@@ -37,7 +39,6 @@ export type CompilerConfig = {
     sourcesexp: boolean,  /* true if input language uses s-expression syntax */
     ascii: boolean,       /* true for ascii pp instead of greek pp */
     javaimports: string,  /* optional java imports for Java back-end */
-    query: string,        /* Input query */
     schema: string,       /* the schema */
     input: string,        /* the (JSON format) input data) */
     eval: boolean,        /* True if evaluation is to be conducted on the target language */
@@ -57,8 +58,6 @@ export type Result = {
 /**  Returns the set of languages known by the compiler, grouped into phases */
 export declare function languages(): SourceLanguageGroups;
 
-export declare function optimList():{optims:{language:{name:Language, modulebase:string}, optims:{[key: string]: OptimStepDescription[]}}[]};
-
 /**
  * Derives a default path between the arguments
  * @param args Specifies the source and target languages
@@ -67,12 +66,16 @@ export declare function optimList():{optims:{language:{name:Language, modulebase
  */
 export declare function languagesPath(args:{source:Language, target:Language}): {path: Language[]};
 
+export declare function optimList():{optims:{language:{name:Language, modulebase:string}, optims:{[key: string]: OptimStepDescription[]}}[]};
+
 /** Returns the set of default optimization phases and rewrites for each language */
 export declare function optimDefaults(): {optims: OptimConfig[]};
+
+export declare function buildConfig(conf:CompilerConfig): ConfigObject;
 
 /** Main compilation call
  * @config specifies the compilation parameters, including source,target,ascii/greek,additional java imports, and the query in source form
  * @returns Includes the intermediate representation for the target language
  */
-export declare function compile(config:CompilerConfig): Result;
+export declare function compile(config:{ query: string, gconf: ConfigObject }): Result;
 

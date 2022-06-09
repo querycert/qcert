@@ -1,37 +1,19 @@
 {
 	"name": "qcert-demo",
-	"version": "1.0.0",
+	"version": "3.0.0-alpha.5",
 	"description": "The Q*Cert compiler demo",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/querycert/qcert"
 	},
-	"contributors": [
-		{
-			"name": "Josh Auerbach",
-			"url": "https://www.researchgate.net/profile/Joshua_Auerbach2"
-		},
-		{
-			"name": "Martin Hirzel",
-			"email": "hirzel@us.ibm.com",
-			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-hirzel"
-		},
-		{
-			"name": "Louis Mandel",
-			"email": "lmandel@us.ibm.com",
-			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-lmandel"
-		},
-		{
-			"name": "Avi Shinnar",
-			"email": "shinnar@us.ibm.com",
-			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-shinnar"
-		},
-		{
-			"name": "Jerome Simeon",
-			"email": "simeon@us.ibm.com",
-			"url": "http://researcher.watson.ibm.com/researcher/view.php?person=us-simeon"
-		}
-	],
+  "contributors": [
+    "Josh Auerbach",
+    "Martin Hirzel",
+    "Patrik Keller",
+    "Louis Mandel",
+    "Avi Shinnar",
+    "Jerome Simeon"
+  ],
 	"license": "Apache-2.0",
 	"homepage": "https://querycert.github.io/index.html",
 	"scripts": {
