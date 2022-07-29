@@ -1,0 +1,2 @@
+{ "pi" : 3.14, "e" : 2.72, "greet" : "Hello World!", "nb": { "$nat": 10 },
+  "integers": [{ "$nat": 1 }, { "$nat": 1 }, { "$nat": 2 }, { "$nat": 3 }, { "$nat": 5 }] }

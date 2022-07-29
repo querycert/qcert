@@ -219,7 +219,7 @@ Section Iterators.
         case_eq (oncoll_map_concat f a); intros;
           unfold omap_product in *;
           unfold lift_flat_map in *;
-          rewrite H0 in H; simpl in ; clear H0.
+          rewrite H0 in H; simpl; clear H0.
       - rewrite H1 in H; simpl in H.
         inversion H; subst.
         exists l1; exists l0.

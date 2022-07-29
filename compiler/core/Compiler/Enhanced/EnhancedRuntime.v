@@ -24,9 +24,12 @@ Require Import EJsonSystem.
 Require Import DataSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignToWasmAst.
 Require Import ForeignToScala.
 Require Import ForeignEJson.
+Require Import ForeignWSON.
 Require Import ForeignDataToEJson.
+Require Import ForeignEJsonToWSON.
 Require Import ForeignToEJsonRuntime.
 Require Import ForeignEJsonToJSON.
 Require Import ForeignTypeToJSON.
@@ -52,8 +55,10 @@ Require Import EnhancedData.
 Require Import EnhancedEJson.
 Require Import EnhancedDataToEJson.
 Require Import EnhancedEJsonToJSON.
+Require Import EnhancedEJsonToWSON.
 Require Import EnhancedToJava.
 Require Import EnhancedToJavascriptAst.
+Require Import EnhancedToWasmAst.
 Require Import EnhancedReduceOps.
 Require Import EnhancedToReduceOps.
 Require Import EnhancedToSpark.
@@ -130,16 +135,24 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_runtime.
   Definition compiler_foreign_to_java : foreign_to_java
     := enhanced_foreign_to_java.
-  Definition compiler_foreign_ejson : foreign_ejson
+  Definition compiler_foreign_ejson_model : Set
+    := enhanced_ejson.
+  Definition compiler_foreign_ejson : foreign_ejson compiler_foreign_ejson_model
     := enhanced_foreign_ejson.
-  Definition compiler_foreign_to_ejson : foreign_to_ejson
+  Definition compiler_foreign_ejson_runtime_op : Set :=
+    enhanced_foreign_ejson_runtime_op.
+  Definition compiler_foreign_to_ejson : foreign_to_ejson compiler_foreign_ejson_model compiler_foreign_ejson_runtime_op
     := enhanced_foreign_to_ejson.
+  Definition compiler_foreign_to_wson : foreign_to_wson compiler_foreign_ejson_model
+    := enhanced_foreign_to_wson.
   Definition compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime
     := enhanced_foreign_to_ejson_runtime.
   Definition compiler_foreign_to_json : foreign_to_json
     := enhanced_foreign_to_json.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := enhanced_foreign_ejson_to_ajavascript.
+  Definition compiler_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_foreign_ejson_runtime_op
+    := enhanced_foreign_to_wasm_ast.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := enhanced_foreign_to_scala.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON

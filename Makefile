@@ -28,8 +28,8 @@ all:
 	@$(MAKE) install-local
 
 build: 
-	@$(MAKE) qcert-compiler
 	@$(MAKE) MAKEFLAGS= qcert-runtimes
+	@$(MAKE) qcert-compiler
 	@$(MAKE) MAKEFLAGS= qcert-cli
 
 clean: Makefile.coq remove_all_derived
@@ -51,6 +51,7 @@ cleanmost: Makefile.coq
 	- @rm -f *~
 
 cleanall: Makefile.coq remove_all_derived
+	- @$(MAKE) cleanall-runtimes
 	- @$(MAKE) cleanall-qcert-compiler
 	- @$(MAKE) cleanmost
 
@@ -60,7 +61,7 @@ cleanall: Makefile.coq remove_all_derived
 install-coqdev:
 	@$(MAKE) -f Makefile.coq install
 
-install-local: 
+install-local:
 	@$(MAKE) install-ocaml
 ifneq ($(JAVASCRIPT),)
 	@$(MAKE) install-javascript
@@ -112,17 +113,11 @@ cleanmost-qcert-compiler:
 
 ## Configure
 
-runtimes/javascript/qcert_runtime.ml:
-	$(MAKE) -C runtimes/javascript
-
-compiler/lib/js_runtime.ml: runtimes/javascript/qcert_runtime.ml
-	cp runtimes/javascript/qcert_runtime.ml compiler/lib/js_runtime.ml
-
 compiler/lib/static_config.ml:
 	echo "(* This file is generated *)" > compiler/lib/static_config.ml
 	echo "let qcert_home = \"$(CURDIR)\"" >> compiler/lib/static_config.ml
 
-prepare: compiler/lib/js_runtime.ml compiler/lib/static_config.ml Makefile.coq
+prepare: compiler/lib/static_config.ml Makefile.coq
 
 configure:
 	@echo "[Q*cert] "
@@ -133,8 +128,6 @@ configure:
 clean-configure:
 
 cleanall-configure:
-	$(MAKE) -C runtimes/javascript cleanall
-	rm -rf compiler/lib/js_runtime.ml
 	rm -rf compiler/lib/static_config.ml
 	rm -f compiler/.merlin compiler/*/.merlin
 
@@ -242,21 +235,12 @@ qcert-runtimes:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building runtimes"
 	@echo "[Q*cert] "
-ifneq ($(JAVASCRIPT),)
-	@$(MAKE) javascript-runtime
-endif
 ifneq ($(JAVA),)
 	@$(MAKE) java-runtime
 endif
 ifneq ($(SPARK),)
 	@$(MAKE) spark2-runtime
 endif
-
-javascript-runtime:
-	@echo "[Q*cert] "
-	@echo "[Q*cert] JavaScript runtime"
-	@echo "[Q*cert] "
-	@$(MAKE) -C runtimes/javascript
 
 java-runtime:
 	@echo "[Q*cert] "
@@ -271,14 +255,12 @@ spark2-runtime:
 	@$(MAKE) -C runtimes/spark2
 
 clean-runtimes:
-	- @$(MAKE) -C runtimes/javascript clean
 	- @$(MAKE) -C runtimes/java clean
 	- @$(MAKE) -C runtimes/spark2 clean
 	- @rm -rf bin/lib
 	- @rm -f bin/javaRunner.jar
 
 cleanall-runtimes:
-	- @$(MAKE) -C runtimes/javascript cleanall
 	- @$(MAKE) -C runtimes/java cleanall
 	- @$(MAKE) -C runtimes/spark2 cleanall
 	- @rm -rf bin/lib
@@ -336,10 +318,7 @@ demo:
 bin/qcertJS.js:
 	@$(MAKE) qcert-javascript
 
-runtimes/javascript/qcert-runtime.js:
-	@$(MAKE) javascript-runtime
-
-qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
+qcert-demo: bin/qcertJS.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling Web Demo in TypeScript"
 	@echo "[Q*cert] "
@@ -355,6 +334,7 @@ cleanall-demo: clean-demo
 ## Tests
 
 test:
+	dune runtest
 	@$(MAKE) -C tests
 
 clean-test:
@@ -370,10 +350,10 @@ docs:
 ## Misc
 
 clean_detritus:
-	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 scripts/remove_detritus_derived_file.sh
+	@find . \( -name '*.vo' -or -name '*.vos' -or -name '*.vok' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 scripts/remove_detritus_derived_file.sh
 
 remove_all_derived:
-	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
+	@find . \( -name '*.vo' -or -name '*.vos' -or -name '*.vok' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
 
 Makefile.coq: Makefile Makefile.coq_modules $(FILES)
 	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq

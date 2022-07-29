@@ -1574,6 +1574,6 @@ Hint Rewrite
      bunion_bminus 
      remove_one_consed : bag.
 
-Hint Unfold ldeqA : qcert.
-Hint Unfold mult_equiv : qcert.
+Global Hint Unfold ldeqA : qcert.
+Global Hint Unfold mult_equiv : qcert.
 

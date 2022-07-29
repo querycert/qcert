@@ -23,8 +23,10 @@ Require Import ForeignDataToEJson.
 
 Section DataToEJson.
   Context {fruntime:foreign_runtime}.
-  Context {fejson:foreign_ejson}.
-  Context {fdatatoejson:foreign_to_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fdatatoejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
 
   Lemma string_dec_from_neq {a b} (pf:a <> b) : exists pf2, string_dec a b = right pf2.
   Proof.
@@ -203,7 +205,7 @@ Section DataToEJson.
   End toEJson.
 
   Section ModelRoundTrip.
-    Lemma ejson_brands_map_ejstring b : ejson_brands (map ejstring b) = Some b.
+    Lemma ejson_brands_map_ejstring b : ejson_brands (map (@ejstring foreign_ejson_model) b) = Some b.
     Proof.
       induction b; simpl; trivial.
       now rewrite IHb.
@@ -482,7 +484,7 @@ Section DataToEJson.
       end =
       match ejson_is_record (data_to_ejson d) with
       | Some r =>
-        match match of_string_list (map ejstring (map key_encode pl)) with
+        match match of_string_list (map (@ejstring foreign_ejson_model) (map key_encode pl)) with
               | Some a' => Some (rproject r a')
               | None => None
               end with
@@ -1216,7 +1218,7 @@ Section DataToEJson.
     Qed.
 
     (** For OrderBy *)
-    Definition sortCriteria_to_ejson (sc: string * SortDesc) : ejson :=
+    Definition sortCriteria_to_ejson (sc: string * SortDesc) : (@ejson foreign_ejson_model) :=
       let (lbl, c) := sc in
       match c with
       | Ascending => ejobject (("asc"%string, ejstring (key_encode lbl))::nil)
@@ -1299,7 +1301,7 @@ Section DataToEJson.
       unfold dict_sort.
       rewrite (map_insertion_sort
                  (@dict_field_le_dec (@data (@foreign_runtime_data fruntime)))
-                 (@dict_field_le_dec (@ejson fejson))).
+                 (@dict_field_le_dec (@ejson foreign_ejson_model))).
       reflexivity.
       intros.
       split; intros;

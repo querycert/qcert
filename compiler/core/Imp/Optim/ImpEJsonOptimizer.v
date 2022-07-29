@@ -18,14 +18,18 @@ Require Import Imp.
 Require Import ImpEJson.
 Require Import ImpEJsonEval.
 Require Import ImpEJsonRewrite.
+Require Import ImpEJsonBlockRewrite.
 
 (* XXX This is a temporary place-holder, includes only for loop rewrites *)
 Section ImpEJsonOptimizer.
-  Context {fejson:foreign_ejson}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
-  Definition imp_ejson_optim_top (q:imp_ejson) : imp_ejson :=
-    imp_ejson_rewrite q.
+  Definition imp_ejson_optim_top (q:@imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : imp_ejson :=
+    imp_ejson_block_rewrite
+      (imp_ejson_rewrite q).
 
   Section Correctness.
     Lemma imp_ejson_optim_top_correct h (σ : list (string * ejson)) (q:imp_ejson) :
@@ -35,6 +39,7 @@ Section ImpEJsonOptimizer.
       unfold imp_ejson_eval_top_on_ejson.
       unfold imp_ejson_optim_top.
       rewrite imp_ejson_rewrite_correct.
+      rewrite imp_ejson_block_rewrite_correct.
       reflexivity.
     Qed.
       

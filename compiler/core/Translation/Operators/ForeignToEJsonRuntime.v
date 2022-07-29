@@ -25,10 +25,12 @@ Require Import DataToEJson.
 Section ForeignToEJsonRuntime.
 
   Class foreign_to_ejson_runtime
+        {foreign_ejson_model:Set}
+        {foreign_ejson_runtime_op:Set}
+        {fejson:foreign_ejson foreign_ejson_model}
         {fruntime:foreign_runtime}
-        {fejson:foreign_ejson}
-        {fetojson:foreign_to_ejson}
-        {fejsonops:foreign_ejson_runtime}
+        {fetojson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}
+        {fejsonops:foreign_ejson_runtime foreign_ejson_runtime_op}
       : Type
       := mk_foreign_to_ejson_runtime {
              foreign_to_ejson_runtime_of_unary_op
@@ -61,8 +63,10 @@ Section ForeignToEJsonRuntime.
 
   Section defaultToString.
     Context {fruntime:foreign_runtime}.
-    Context {fejson:foreign_ejson}.
-    Context {fetojson:foreign_to_ejson}.
+    Context {foreign_ejson_model:Set}.
+    Context {fejson:foreign_ejson foreign_ejson_model}.
+    Context {foreign_ejson_runtime_op : Set}.
+    Context {fetojson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
 
     Ltac rewrite_string_dec_from_neq H
       :=  let d := fresh "d" in
@@ -70,23 +74,6 @@ Section ForeignToEJsonRuntime.
           destruct (string_dec_from_neq H) as [d neq]
           ; repeat rewrite neq in *
           ; clear d neq.
-
-    Lemma map_tostring_comm1 r :
-      map
-        (fun '(x, y) =>
-           (stringToString (key_decode x) ++ String "-" (String ">" (defaultEJsonToString y)))%string)
-        (map (fun x : string * data => (key_encode (fst x), data_to_ejson (snd x))) r)
-      = map (fun '(x, y) => (stringToString x ++ String "-" (String ">" (defaultEJsonToString y)))%string)
-            (map (fun x : string * data => (fst x, data_to_ejson (snd x))) r).
-    Proof.
-      repeat rewrite map_map.
-      rewrite (map_eq (f:=(fun x : string * data =>
-                             (stringToString (key_decode (key_encode (fst x))) ++
-                                             String "-" (String ">" (defaultEJsonToString (data_to_ejson (snd x))))))%string) (g:=(fun x : string * data =>
-                                                                                                                                     (stringToString (fst x) ++ String "-" (String ">" (defaultEJsonToString (data_to_ejson (snd x)))))%string))); try reflexivity.
-      rewrite Forall_forall; intros.
-      rewrite key_encode_decode. reflexivity.
-    Qed.
 
     Lemma default_ejson_rec_aux1 j r :
       ejson_is_record j = Some r ->
@@ -123,10 +110,18 @@ Section ForeignToEJsonRuntime.
     Qed.
 
     Lemma default_ejson_rec_aux2 r:
-      Forall
-        (fun ab : string * data => defaultDataToString (snd ab) = defaultEJsonToString (data_to_ejson (snd ab)))
-        r ->
-      defaultDataToString (drec r) = defaultEJsonToString (data_to_ejson (drec r)).
+      @Forall (prod string (@data (@foreign_runtime_data fruntime)))
+              (fun ab : prod string (@data (@foreign_runtime_data fruntime)) =>
+                 @eq string
+                     (@defaultDataToString (@foreign_runtime_data fruntime)
+                                           (@snd string (@data (@foreign_runtime_data fruntime)) ab))
+                     (@defaultEJsonToString foreign_ejson_model fejson
+                                            (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson
+                                                            (@snd string (@data (@foreign_runtime_data fruntime)) ab)))) r
+      ->
+      @eq string (@defaultDataToString (@foreign_runtime_data fruntime) (@drec (@foreign_runtime_data fruntime) r))
+          (@defaultEJsonToString foreign_ejson_model fejson
+                                 (@data_to_ejson fruntime foreign_ejson_model fejson foreign_ejson_runtime_op fetojson (@drec (@foreign_runtime_data fruntime) r))).
     Proof.
       intros.
       specialize (default_ejson_rec_aux1 (data_to_ejson (drec r))); intros.
@@ -165,7 +160,6 @@ Section ForeignToEJsonRuntime.
         rewrite ejson_brands_map_ejstring; reflexivity.
       - simpl; rewrite Hforeign; reflexivity.
     Qed.
-
   End defaultToString.
 End ForeignToEJsonRuntime.
 

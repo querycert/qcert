@@ -23,20 +23,21 @@ Require Import ImpSize.
 Require Import ImpEJson.
 
 Section ImpEJsonSize.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
 
-  Context {ftoejson:foreign_ejson}.
-  Context {fejruntime:foreign_ejson_runtime}.
-
-  Definition imp_ejson_expr_size (e:imp_ejson_expr) : nat :=
+  Definition imp_ejson_expr_size (e:@imp_ejson_expr foreign_ejson_model foreign_ejson_runtime_op) : nat :=
     imp_expr_size e.
 
-  Definition imp_ejson_stmt_size (stmt:imp_ejson_stmt) : nat :=
+  Definition imp_ejson_stmt_size (stmt:@imp_ejson_stmt foreign_ejson_model foreign_ejson_runtime_op) : nat :=
     imp_stmt_size stmt.
 
-  Definition imp_ejson_function_size (q:imp_ejson_function) : nat :=
+  Definition imp_ejson_function_size (q:@imp_ejson_function foreign_ejson_model foreign_ejson_runtime_op) : nat :=
     imp_function_size q.
 
-  Definition imp_ejson_size (q: imp_ejson) : nat :=
+  Definition imp_ejson_size (q: @imp_ejson foreign_ejson_model foreign_ejson_runtime_op) : nat :=
     imp_size q.
 
 End ImpEJsonSize.

@@ -28,8 +28,10 @@ Require Import DataToEJson.
 Section DatatoSparkDF.
 
   Context {fruntime:foreign_runtime}.
-  Context {fejson:foreign_ejson}.
-  Context {fdatatoejson:foreign_to_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fdatatoejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {h:brand_relation_t}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.

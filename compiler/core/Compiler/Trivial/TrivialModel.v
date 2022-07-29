@@ -21,12 +21,15 @@ Require Import EJsonSystem.
 Require Import ForeignEJson.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScriptAst.
+Require Import ForeignToWasmAst.
 Require Import ForeignToScala.
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
 Require Import ForeignEJsonToJSON.
+Require Import ForeignEJsonToWSON.
 Require Import ForeignTypeToJSON.
 Require Import ForeignEJsonRuntime.
+Require Import ForeignWSONRuntime.
 Require Import ForeignReduceOps.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
@@ -90,7 +93,9 @@ Next Obligation.
   destruct op. 
 Defined.
 
-Program Instance trivial_foreign_ejson : foreign_ejson
+Definition trivial_foreign_ejson_model := Empty_set.
+
+Program Instance trivial_foreign_ejson : foreign_ejson trivial_foreign_ejson_model
   := mk_foreign_ejson Empty_set _ _ _ _ _ _.
 Next Obligation.
   intros [].
@@ -111,25 +116,27 @@ Instance trivial_foreign_runtime :
        trivial_foreign_data
        trivial_foreign_operators.
 
-Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime :=
-  mk_foreign_ejson_runtime trivial_foreign_ejson Empty_set _ _ _ defaultEJsonToString defaultEJsonToString.
-Next Obligation.
-  intros [].
-Defined.
-Next Obligation.
-  constructor.
-  intros [].
-Defined.
+Definition trivial_foreign_ejson_op_fromstring (x:string) : option Empty_set := None.
+Definition trivial_foreign_ejson_runtime_op := Empty_set.
+
+Program Instance trivial_foreign_ejson_runtime : foreign_ejson_runtime trivial_foreign_ejson_runtime_op :=
+  mk_foreign_ejson_runtime trivial_foreign_ejson_runtime_op trivial_foreign_ejson_model _ _ _ _ defaultEJsonToString trivial_foreign_ejson_op_fromstring defaultEJsonToString.
 Next Obligation.
   exact None.
 Defined.
 
-Program Instance trivial_foreign_to_ejson : foreign_to_ejson
-  := mk_foreign_to_ejson trivial_foreign_runtime trivial_foreign_ejson trivial_foreign_ejson_runtime _ _ _.
+Program Instance trivial_foreign_to_ejson : foreign_to_ejson trivial_foreign_ejson_model trivial_foreign_ejson_runtime_op
+  := mk_foreign_to_ejson  trivial_foreign_ejson_model trivial_foreign_ejson_runtime_op trivial_foreign_ejson trivial_foreign_runtime trivial_foreign_ejson_runtime _ _ _.
+Next Obligation.
+  auto.
+Defined.
+Next Obligation.
+  auto.
+Defined.
 
 Lemma trivial_foreign_data_to_string_correct:
   forall fd : foreign_data_model,
-    toString fd = toString (foreign_to_ejson_from_data fd).
+    toString fd = toString (@foreign_to_ejson_from_data trivial_foreign_ejson_model trivial_foreign_ejson_runtime_op trivial_foreign_ejson trivial_foreign_runtime (@trivial_foreign_to_ejson) fd).
 Proof.
   reflexivity.
 Qed.
@@ -137,13 +144,21 @@ Qed.
 Program Instance trivial_foreign_to_ejson_runtime :
   foreign_to_ejson_runtime
   := mk_foreign_to_ejson_runtime
-       trivial_foreign_runtime
+       trivial_foreign_ejson_model
+       trivial_foreign_ejson_runtime_op
        trivial_foreign_ejson
+       trivial_foreign_runtime
        trivial_foreign_to_ejson
        trivial_foreign_ejson_runtime
        _ _ _ _ _ _.
 Next Obligation.
   destruct uop.
+Defined.
+Next Obligation.
+  destruct uop.
+Defined.
+Next Obligation.
+  destruct bop.
 Defined.
 Next Obligation.
   destruct bop.
@@ -160,7 +175,7 @@ Next Obligation.
 Qed.
 
 Program Instance trivial_foreign_to_json : foreign_to_json
-  := mk_foreign_to_json trivial_foreign_ejson _ _.
+  := mk_foreign_to_json _ trivial_foreign_ejson _ _.
 Next Obligation.
   exact None.
 Defined.
@@ -171,12 +186,9 @@ Defined.
 Program Instance trivial_foreign_type : foreign_type
   := mk_foreign_type Empty_set _ _ _ _ _ _ _.
 Next Obligation.
-  intros []. 
-Defined.
-Next Obligation.
   econstructor;
     intros [].
-  Grab Existential Variables.
+  Unshelve.
   solve [intros []].
   solve [intros []].
 Defined.
@@ -305,12 +317,19 @@ Next Obligation.
 Defined.
 
 Program Instance trivial_foreign_ejson_to_ajavascript :
-  @foreign_ejson_to_ajavascript trivial_foreign_ejson
+  @foreign_ejson_to_ajavascript _ trivial_foreign_ejson
   := mk_foreign_ejson_to_ajavascript
-       trivial_foreign_ejson
+       _ trivial_foreign_ejson
        _.
 Next Obligation.
   destruct fe.
+Defined.
+
+Program Instance trivial_foreign_to_wasm_ast :
+  @foreign_to_wasm_ast trivial_foreign_ejson_runtime_op
+  := mk_foreign_to_wasm_ast trivial_foreign_ejson_runtime_op _.
+Next Obligation.
+  destruct j.
 Defined.
 
 Local Open Scope nstring_scope.
@@ -332,17 +351,16 @@ Next Obligation.
   destruct fd. 
 Defined.
 
+Program Instance trivial_foreign_to_wson : foreign_to_wson _
+  := mk_foreign_to_wson trivial_foreign_ejson_model _.
+Next Obligation.
+  destruct j.
+Defined.
+
 Program Instance trivial_foreign_reduce_op
         {fdata:foreign_data}:
   foreign_reduce_op
   := mk_foreign_reduce_op fdata Empty_set _ _ _ _.
-Next Obligation.
-  intros []. 
-Defined.
-Next Obligation.
-  constructor.
-  intros []. 
-Defined.
 Next Obligation.
   destruct op. 
 Defined.
@@ -370,10 +388,16 @@ Module TrivialRuntime <: CompilerRuntime.
     := trivial_foreign_type.
   Definition compiler_foreign_runtime : foreign_runtime
     := trivial_foreign_runtime.
-  Definition compiler_foreign_ejson : foreign_ejson
+  Definition compiler_foreign_ejson_model : Set
+    := trivial_foreign_ejson_model.
+  Definition compiler_foreign_ejson : foreign_ejson compiler_foreign_ejson_model
     := trivial_foreign_ejson.
-  Definition compiler_foreign_to_ejson : foreign_to_ejson
+  Definition compiler_foreign_ejson_runtime_op : Set
+    := trivial_foreign_ejson_runtime_op.
+  Definition compiler_foreign_to_ejson : foreign_to_ejson compiler_foreign_ejson_model compiler_foreign_ejson_runtime_op
     := trivial_foreign_to_ejson.
+  Definition compiler_foreign_to_wson : foreign_to_wson compiler_foreign_ejson_model
+    := trivial_foreign_to_wson.
   Definition compiler_foreign_to_ejson_runtime : foreign_to_ejson_runtime
     := trivial_foreign_to_ejson_runtime.
   Definition compiler_foreign_to_json : foreign_to_json
@@ -382,6 +406,8 @@ Module TrivialRuntime <: CompilerRuntime.
     := trivial_foreign_to_java.
   Definition compiler_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := trivial_foreign_ejson_to_ajavascript.
+  Definition compiler_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_foreign_ejson_runtime_op
+    := trivial_foreign_to_wasm_ast.
   Definition compiler_foreign_to_scala : foreign_to_scala
     := trivial_foreign_to_scala.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
@@ -420,9 +446,15 @@ Module TrivialModel(bm:CompilerBrandModel(TrivialForeignType)) <: CompilerModel.
     := @trivial_basic_model bm.compiler_brand_model.
   Definition compiler_model_foreign_runtime : foreign_runtime
     := trivial_foreign_runtime.
-  Definition compiler_model_foreign_ejson : foreign_ejson
+  Definition compiler_model_foreign_ejson_model : Set
+    := trivial_foreign_ejson_model.
+  Definition compiler_model_foreign_ejson : foreign_ejson compiler_model_foreign_ejson_model
     := trivial_foreign_ejson.
-  Definition compiler_model_foreign_to_ejson : foreign_to_ejson
+  Definition compiler_model_foreign_to_wson : foreign_to_wson compiler_model_foreign_ejson_model
+    := trivial_foreign_to_wson.
+  Definition compiler_model_foreign_ejson_runtime_op : Set
+    := trivial_foreign_ejson_runtime_op.
+  Definition compiler_model_foreign_to_ejson : foreign_to_ejson compiler_model_foreign_ejson_model compiler_model_foreign_ejson_runtime_op
     := trivial_foreign_to_ejson.
   Definition compiler_model_foreign_to_ejson_runtime : foreign_to_ejson_runtime
     := trivial_foreign_to_ejson_runtime.
@@ -432,6 +464,8 @@ Module TrivialModel(bm:CompilerBrandModel(TrivialForeignType)) <: CompilerModel.
     := trivial_foreign_to_java.
   Definition compiler_model_foreign_ejson_to_ajavascript : foreign_ejson_to_ajavascript
     := trivial_foreign_ejson_to_ajavascript.
+  Definition compiler_model_foreign_to_wasm_ast : foreign_to_wasm_ast compiler_model_foreign_ejson_runtime_op
+    := trivial_foreign_to_wasm_ast.
   Definition compiler_model_foreign_to_scala : foreign_to_scala
     := trivial_foreign_to_scala.
   Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON

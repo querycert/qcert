@@ -30,8 +30,8 @@ JAVARUN=java
 NODERUN=node
 
 #
-QCERTCOMP=../bin/qcert
-QCERTEVAL=../bin/qcert -eval
+QCERTCOMP=../_build/default/cli/ocaml/qcert.exe
+QCERTEVAL=../_build/default/cli/ocaml/qcert.exe -eval
 
 # Default target just builds the code
 all:
@@ -41,6 +41,7 @@ tests:
 	@$(MAKE) oql-tests
 	@$(MAKE) lambda_nra-tests
 	@$(MAKE) camp-tests
+	@$(MAKE) imp_ejson-tests
 ifneq ($(JAVA),)
 ifneq ($(SQL),)
 	@$(MAKE) sql-tests
@@ -64,6 +65,7 @@ endif
 	tech_rule-test-tests tech_rule-test-tests-js tech_rule-test-tests-java \
 	designer_rule-tests \
 	designer_rule-test-tests \
+	imp_ejson-tests \
 	clean
 
 ## OQL
@@ -87,6 +89,7 @@ ifneq ($(JAVASCRIPT),)
 	@$(MAKE) oql-persons-tests-js
 	@$(MAKE) oql-persons-tests-js2
 	@$(MAKE) oql-employees-tests-js
+	@$(MAKE) oql-tests-wasm
 endif
 ifneq ($(JAVA),)
 	@$(MAKE) oql-string-tests-java
@@ -121,7 +124,6 @@ oql-string-tests-java:
                           -schema oql/string.schema \
                           -output oql/string$(N).out \
                           string$(N) || exit 1;)
-
 oql-world-tests:
 	$(foreach N,$(OQLWORLDNUM), \
             $(foreach T,$(OQLTARGETS), \
@@ -212,6 +214,37 @@ oql-employees-tests-java:
                           -schema oql/employees.schema \
                           -output oql/employees$(N).out \
                           employees$(N) || exit 1;)
+## OQL
+OQLWASMPERSONSNUM=1 2 3 4 5 6 7 8 9 10 11 12 # 13 14
+OQLWASMWORLDNUM=1 2
+OQLWASMSTRINGNUM=0 1 2 3
+OQLWASMEMPLOYEESNUM=1 2
+
+oql-tests-wasm:
+	@$(MAKE) oql-string-tests-wasm
+	@$(MAKE) oql-world-tests-wasm
+	@$(MAKE) oql-persons-tests-wasm
+	@$(MAKE) oql-employees-tests-wasm
+
+oql-string-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMSTRINGNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/string$(N).oql -schema oql/string.schema -quiet || exit 1; )
+
+oql-world-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMWORLDNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/world$(N).oql -schema oql/world.schema -quiet || exit 1;)
+
+oql-persons-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMPERSONSNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/persons$(N).oql -schema oql/persons.schema -quiet || exit 1; )
+
+oql-employees-tests-wasm:
+	# compilation-only test
+	@$(foreach N,$(OQLWASMEMPLOYEESNUM), \
+	       $(QCERTCOMP) -source oql -target wasm oql/employees$(N).oql -schema oql/employees.schema -quiet || exit 1; )
 
 ## λ-NRA
 LAMBDANRAPERSONSNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
@@ -237,7 +270,7 @@ lambda_nra-persons-tests:
                             -schema lambda_nra/persons.schema \
                             -eval-validate -output lambda_nra/persons$(N).out || exit 1;))
 lambda_nra-persons-tests-js:
-	@$(foreach N,$(LAMBDANRAPERSONSNUM), \
+	$(foreach N,$(LAMBDANRAPERSONSNUM), \
 	       $(QCERTCOMP) -source lambda_nra -target javascript lambda_nra/persons$(N).lnra -schema lambda_nra/persons.schema -quiet; \
 	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
                           --input lambda_nra/persons.input \
@@ -450,6 +483,82 @@ designer_rule-test-tests-js:
                           --eval-validate \
                           --query designer_rule/test$(N).js || exit 1 ;)
 
+## IMPEJSON
+IMPEJSONTARGETS=imp_ejson wasm_ast # dnnrc_typed
+IMPEJSONWASMNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 17 18 19 20 21
+# TODO 15 seems to be an error representation issue
+
+imp_ejson-tests:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Imp (EJSON) tests"
+	@echo "[Q*cert] "
+	@$(MAKE) imp_ejson-wasm-spec-tests
+ifneq ($(JAVASCRIPT),)
+	@$(MAKE) imp_ejson-js-tests
+	@$(MAKE) imp_ejson-wasm-node-tests
+endif
+
+# imp_ejson -> wasm ; run on spec interpreter
+imp_ejson-wasm-spec-tests:
+	$(foreach N,$(IMPEJSONWASMNUM), \
+            $(foreach T,$(IMPEJSONTARGETS), \
+	       $(QCERTCOMP) -source imp_ejson -target $(T) imp_ejson/wasm$(N).imp_ejson \
+                            -eval -input imp_ejson/wasm.input \
+                            -schema imp_ejson/wasm.schema \
+                            -eval-validate -output imp_ejson/wasm$(N).out || exit 1;))
+
+IMPEJSONWASMALTNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+# TODO. Why does this run 15?
+imp_ejson-wasm-spec-alt-tests:
+	$(foreach N,$(IMPEJSONWASMALTNUM), \
+				 $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+				 		-source imp_ejson -path imp_ejson -target imp_ejson \
+						-quiet \
+						-schema imp_ejson/wasm.schema \
+						-eval -input imp_ejson/wasm.input && \
+		     $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+				 		-source imp_ejson -target wasm_ast \
+				 		-eval -eval-validate \
+				 		-schema imp_ejson/wasm.schema \
+		     		-input imp_ejson/wasm.input \
+				 		-output imp_ejson/wasm$(N)_imp_ejson.json || exit 1; )
+
+IMPEJSONJSNUM=0 1 2 3 4 5 6 7 8 9 10 11 12 14 16 17 18
+# 13 is failure in javascript (different block scoping between Imp and JS)
+# TODO 15 throws exception
+
+# imp_ejson -> javascript ; run on node
+imp_ejson-js-tests:
+	$(foreach N,$(IMPEJSONJSNUM), \
+	       $(QCERTCOMP) -source imp_ejson -target javascript imp_ejson/wasm$(N).imp_ejson -schema imp_ejson/wasm.schema -quiet; \
+	       $(NODERUN) $(NPMPATH)/qcertRun.js execute \
+                          --input imp_ejson/wasm.input \
+                          --schema imp_ejson/wasm.schema \
+                          --output imp_ejson/wasm$(N).out \
+                          --eval-validate \
+                          --query imp_ejson/wasm$(N).js || exit 1; )
+
+IMPEJSONWASMNODENUM=0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
+
+# imp_ejson -> wasm ; run on node
+imp_ejson-wasm-node-tests:
+	cd ../runtimes/assemblyscript/ && npm install
+	$(foreach N,$(IMPEJSONWASMNODENUM), \
+				 $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+				 		-source imp_ejson -path imp_ejson -target imp_ejson \
+						-quiet \
+						-schema imp_ejson/wasm.schema \
+						-eval -input imp_ejson/wasm.input && \
+	       $(QCERTCOMP) imp_ejson/wasm$(N).imp_ejson \
+						-quiet \
+						-source imp_ejson -target wasm \
+						-schema imp_ejson/wasm.schema && \
+				 $(NODERUN) ../runtimes/assemblyscript/cli-runner.js \
+				 		../runtimes/assemblyscript/runtime.wasm \
+						imp_ejson/wasm$(N).wasm \
+						imp_ejson/wasm.input \
+						imp_ejson/wasm$(N)_imp_ejson.json || exit 1; )
+
 clean:
 	@rm -rf log
 	@rm -f */*.txt
@@ -457,6 +566,8 @@ clean:
 	@rm -f oql/*.js
 	@rm -f oql/*.java
 	@rm -f oql/*.class
+	@rm -f oql/*.wat
+	@rm -f oql/*.wasm
 	@rm -f sql/*.json
 	@rm -f sql/*.js
 	@rm -f sql/*.java
@@ -482,6 +593,12 @@ clean:
 	@rm -f lambda_nra/*.js
 	@rm -f lambda_nra/*.java
 	@rm -f lambda_nra/*.class
+	@rm -f imp_ejson/*.json
+	@rm -f imp_ejson/*.js
+	@rm -f imp_ejson/*.java
+	@rm -f imp_ejson/*.class
+	@rm -f imp_ejson/*.wat
+	@rm -f imp_ejson/*.wasm
 
 cleanall: clean
 	@rm -f *~ */*~

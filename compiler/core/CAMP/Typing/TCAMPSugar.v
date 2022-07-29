@@ -49,7 +49,7 @@ Section TCAMPSugar.
     + repeat econstructor; eauto.
     + rewrite merge_bindings_nil_r; eauto.
     + simpl. apply camp_type_tenv_rec; qeauto.
-      Grab Existential Variables.
+      Unshelve.
       eauto.
   Qed.
 

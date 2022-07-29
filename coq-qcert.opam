@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "coq-qcert"
-version: "2.0.0"
+version: "3.0.0"
 synopsis: "Verified compiler for data-centric languages"
 description: """
 This is the Coq library for Q*cert, a platform for implementing and verifying data languages and compilers. It includes abstract syntax and semantics for several source query languages (OQL, SQL), for intermediate database representations (nested relational algebra and calculus), and correctness proofs for part of the compilation to JavaScript and Java.
@@ -36,6 +36,7 @@ depends: [
   "js_of_ocaml"
   "js_of_ocaml-ppx"
   "uri"
+  "wasm" {= "1.0.1"}
   "calendar"
   "coq-coq2html" {with-doc}
 ]

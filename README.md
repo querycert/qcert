@@ -34,7 +34,7 @@ To build Q\*cert from the source, you will need:
   - dune, a build system (https://dune.build)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
-  - js\_of\_ocaml, a compiler from OCaml to JavaScript
+  - js\_of\_ocaml (along with the library js\_of\_ocaml-ppx), a compiler from OCaml to JavaScript
   - re, a pure OCaml library for regular expressions
   - calendar, a library for manipulating date and time
   - uri, a library for processing URIs
@@ -46,6 +46,13 @@ An easy way to get set up on most platforms is to use the OCaml package manager 
 ```
 $ opam repo add coq-released https://coq.inria.fr/opam/released
 $ opam install . --deps-only
+```
+
+*Warning:* It seems that coq and/or the Q\*cert build process does not like opam local switches.
+If you want to use a separate opam switch for Q\*cert, we recommend creating a new named global switch *before* executing the above steps.
+
+```
+$ opam switch create qcert 4.09.1
 ```
 
 #### Java (Recommended)

@@ -25,7 +25,7 @@ Require Import Compare_dec.
 
 Require Import Qcert.Utils.Digits.
 Require Import Qcert.Utils.CoqLibAdd.
-Require Import Qcert.Utils.Float.
+Require Import Qcert.Utils.FloatAdd.
 Require Import Qcert.Utils.StringAdd.
 
 (** * Preliminaries *)

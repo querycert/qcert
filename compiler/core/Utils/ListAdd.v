@@ -2278,7 +2278,7 @@ Section ListAdd.
 
 End ListAdd.
 
-Hint Resolve disjoint_nil_l disjoint_nil_r : qcert.
-Hint Immediate NoDup_nil : qcert.
+Global Hint Resolve disjoint_nil_l disjoint_nil_r : qcert.
+Global Hint Immediate NoDup_nil : qcert.
 
-Global Arguments remove_nin_inv {A eqdec v1 v2 l}.
+Arguments remove_nin_inv {A eqdec v1 v2 l}.

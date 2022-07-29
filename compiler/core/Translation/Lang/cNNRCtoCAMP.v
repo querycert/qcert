@@ -67,7 +67,9 @@ Section cNNRCtoCAMP.
     | pletIt p₁ p₂ => let_vars p₁ ++ let_vars p₂
     | pletEnv p₁ p₂ => let_vars p₁ ++ let_vars p₂
     | penv => nil
-    | pUnbrand => nil
+    | pgetConstant _ => nil
+    | pleft => nil
+    | pright => nil
     end.
 
   (** Translation from NNRC to CAMP.

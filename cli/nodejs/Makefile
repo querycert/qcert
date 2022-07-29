@@ -17,7 +17,7 @@
 ###
 
 DEP_FILES=../../bin/qcertJS.js \
-	../../runtimes/javascript/qcert-runtime.js
+	../../_build/default/runtimes/javascript/qcert-runtime.js
 
 all: copy-libs
 

@@ -28,8 +28,9 @@ Require Import ForeignEJsonRuntime.
 Section EJsonRuntimeOperators.
   Local Open Scope string.
 
-  Context {fejson:foreign_ejson}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
 
   Section Syntax.
     Inductive ejson_runtime_op :=
@@ -54,7 +55,6 @@ Section EJsonRuntimeOperators.
     | EJsonRuntimeToLeft: ejson_runtime_op
     | EJsonRuntimeToRight: ejson_runtime_op
     (* Brand *)
-    | EJsonRuntimeBrand : ejson_runtime_op
     | EJsonRuntimeUnbrand : ejson_runtime_op
     | EJsonRuntimeCast : ejson_runtime_op
     (* Collection *)
@@ -106,6 +106,8 @@ Section EJsonRuntimeOperators.
 
   End Syntax.
 
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
+
   Section Util.
     Local Open Scope string.
 
@@ -132,7 +134,6 @@ Section EJsonRuntimeOperators.
       | EJsonRuntimeToLeft=> "getLeft"
       | EJsonRuntimeToRight=> "getRight"
       (* Brand *)
-      | EJsonRuntimeBrand => "brand"
       | EJsonRuntimeUnbrand => "unbrand"
       | EJsonRuntimeCast => "cast"
       (* Collection *)
@@ -182,7 +183,79 @@ Section EJsonRuntimeOperators.
       | EJsonRuntimeForeign fop => toString fop
       end.
 
-  Fixpoint defaultEJsonToString (j:ejson) : string
+    Definition ejson_runtime_op_of_string (opname:string) : option ejson_runtime_op :=
+      match opname with
+      (* Generic *)
+      | "equal" => Some EJsonRuntimeEqual
+      | "compare" => Some EJsonRuntimeCompare
+      | "toString" => Some EJsonRuntimeToString
+      | "toText" => Some EJsonRuntimeToText
+      (* Record *)
+      | "recConcat" => Some EJsonRuntimeRecConcat
+      | "recMerge" => Some EJsonRuntimeRecMerge
+      | "recRemove" => Some EJsonRuntimeRecRemove
+      | "recProject" => Some EJsonRuntimeRecProject
+      | "recDot" => Some EJsonRuntimeRecDot
+      (* Array *)
+      | "array" => Some EJsonRuntimeArray
+      | "arrayLength" => Some EJsonRuntimeArrayLength
+      | "arrayPush" => Some EJsonRuntimeArrayPush
+      | "arrayAccess" => Some EJsonRuntimeArrayAccess
+      (* Sum *)
+      | "either" => Some EJsonRuntimeEither
+      | "toLeft" => Some EJsonRuntimeToLeft
+      | "toRight" => Some EJsonRuntimeToRight
+      (* Brand *)
+      | "unbrand" => Some EJsonRuntimeUnbrand
+      | "cast" => Some EJsonRuntimeCast
+      (* Collection *)
+      | "distinct" => Some EJsonRuntimeDistinct
+      | "singleton" => Some EJsonRuntimeSingleton
+      | "flatten" => Some EJsonRuntimeFlatten
+      | "union" => Some EJsonRuntimeUnion
+      | "minus" => Some EJsonRuntimeMinus
+      | "min" => Some EJsonRuntimeMin
+      | "max" => Some EJsonRuntimeMax
+      | "nth" => Some EJsonRuntimeNth
+      | "count" => Some EJsonRuntimeCount
+      | "contains" => Some EJsonRuntimeContains
+      | "sort" => Some EJsonRuntimeSort
+      | "groupBy" => Some EJsonRuntimeGroupBy
+      (* String *)
+      | "length" => Some EJsonRuntimeLength
+      | "substring" => Some EJsonRuntimeSubstring
+      | "substringEnd" => Some EJsonRuntimeSubstringEnd
+      | "stringJoin" => Some EJsonRuntimeStringJoin
+      | "like" => Some EJsonRuntimeLike
+      (* Integer *)
+      | "natLt" => Some EJsonRuntimeNatLt
+      | "natLe" => Some EJsonRuntimeNatLe
+      | "natPlus" => Some EJsonRuntimeNatPlus
+      | "natMinus" => Some EJsonRuntimeNatMinus
+      | "natMult" => Some EJsonRuntimeNatMult
+      | "natDiv" => Some EJsonRuntimeNatDiv
+      | "natRem" => Some EJsonRuntimeNatRem
+      | "natAbs" => Some EJsonRuntimeNatAbs
+      | "natLog2" => Some EJsonRuntimeNatLog2
+      | "natSqrt" => Some EJsonRuntimeNatSqrt
+      | "natMinPair" => Some EJsonRuntimeNatMinPair
+      | "natMaxPair" => Some EJsonRuntimeNatMaxPair
+      | "natMin" => Some EJsonRuntimeNatMin
+      | "natMax" => Some EJsonRuntimeNatMax
+      | "natSum" => Some EJsonRuntimeNatSum
+      | "natArithMean" => Some EJsonRuntimeNatArithMean
+      | "floatOfNat" => Some EJsonRuntimeFloatOfNat
+      (* Float *)
+      | "floatSum" => Some EJsonRuntimeFloatSum
+      | "floatArithMean" => Some EJsonRuntimeFloatArithMean
+      | "floatMin" => Some EJsonRuntimeFloatMin
+      | "floatMax" => Some EJsonRuntimeFloatMax
+      | "natOfFloat" => Some EJsonRuntimeNatOfFloat
+      (* Foreign *)
+      | _ => lift EJsonRuntimeForeign (foreign_ejson_runtime_fromstring opname)
+      end.
+
+  Fixpoint defaultEJsonToString (j:@ejson foreign_ejson_model) : string
     := match j with
        | ejnull => "unit"%string
        | ejbigint n => toString n
@@ -419,20 +492,6 @@ Section EJsonRuntimeOperators.
              | _ => None
              end) dl
       (* Brand *)
-      | EJsonRuntimeBrand =>
-        apply_binary
-          (fun d1 d2 =>
-             match d1 with
-             | ejarray bls =>
-               let ob := of_string_list bls in
-               lift (fun b =>
-                       ejobject
-                         (("$class"%string, ejarray (map ejstring b))
-                            ::("$data"%string, d2)
-                            ::nil)) ob
-             | _ => None
-             end
-          ) dl
       | EJsonRuntimeUnbrand =>
         apply_unary
           (fun d =>

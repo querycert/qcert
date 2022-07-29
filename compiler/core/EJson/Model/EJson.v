@@ -17,7 +17,7 @@ Require Import Ascii.
 Require Import String.
 Require Import ZArith.
 Require Import Bool.
-Require Import Float.
+Require Import FloatAdd.
 Require Import ToString.
 Require Import CoqLibAdd.
 Require Import StringAdd.
@@ -27,7 +27,8 @@ Require Import ForeignEJson.
 Require Import Utils.
 
 Section EJson.
-  Context {fejson:foreign_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
 
   Unset Elimination Schemes.
 
@@ -286,7 +287,7 @@ Section EJson.
         if (string_dec s1 "$left") then Some (Some j', None)
         else if (string_dec s1 "$right") then Some (None, Some j')
              else None
-      | ejobject r => None
+      | ejobject _ => None
       | _ => None
       end.
 

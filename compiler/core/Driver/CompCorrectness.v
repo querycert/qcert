@@ -91,6 +91,7 @@ Require Import OptimizerLogger.
 (* Foreign Datatypes Support *)
 Require Import ForeignDataToEJson.
 Require Import ForeignToEJsonRuntime.
+Require Import ForeignToWasmAst.
 Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignToJava.
@@ -112,9 +113,12 @@ Section CompCorrectness.
   (* Context *)
   Context {ft:foreign_type}.
   Context {fruntime:foreign_runtime}.
-  Context {fejson:foreign_ejson}.
-  Context {ftejson:foreign_to_ejson}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {ftejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
   Context {frtejson:foreign_to_ejson_runtime}.
+  Context {ftowasm:foreign_to_wasm_ast foreign_ejson_runtime_op}.
   Context {fredop:foreign_reduce_op}.
   Context {ftoredop:foreign_to_reduce_op}.
   Context {bm:brand_model}.
@@ -125,7 +129,7 @@ Section CompCorrectness.
   Context {nnrs_imp_stmt_logger:optimizer_logger string nnrs_imp_stmt}.
   Context {nnrs_imp_logger:optimizer_logger string nnrs_imp}.
   Context {imp_data_logger:optimizer_logger string imp_data}.
-  Context {imp_ejson_logger:optimizer_logger string imp_ejson}.
+  Context {imp_ejson_logger:optimizer_logger string (@imp_ejson foreign_ejson_model foreign_ejson_runtime_op)}.
   Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base _ (type_annotation unit) dataframe)}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
@@ -157,6 +161,17 @@ Section CompCorrectness.
     | Dv_spark_df_stop => True
     end.
 
+  Definition driver_correct_wasm (dv: wasm_driver) :=
+    match dv with
+    | Dv_wasm_stop => True
+    end.
+
+  Definition driver_correct_wasm_ast (dv: wasm_ast_driver) :=
+    match dv with
+    | Dv_wasm_ast_to_wasm dv => False /\ driver_correct_wasm dv
+    | Dv_wasm_ast_stop => True
+    end.
+
   Fixpoint driver_correct_dnnrc_typed {ftyping: foreign_typing} (dv: dnnrc_typed_driver) :=
     match dv with
     | Dv_dnnrc_typed_stop => True
@@ -175,6 +190,7 @@ Section CompCorrectness.
     | Dv_imp_ejson_stop => True
     | Dv_imp_ejson_optim dv => False
     | Dv_imp_ejson_to_js_ast _ dv => False /\ driver_correct_js_ast dv
+    | Dv_imp_ejson_to_wasm_ast dv => False /\ driver_correct_wasm_ast dv
     end.
 
   Definition driver_correct_imp_data (dv: imp_data_driver) :=
@@ -329,13 +345,16 @@ Section CompCorrectness.
     | Dv_javascript dv => driver_correct_javascript dv
     | Dv_java dv => driver_correct_java dv
     | Dv_spark_df dv => driver_correct_spark_df dv
+    | Dv_wasm_ast dv => driver_correct_wasm_ast dv
+    | Dv_wasm dv => driver_correct_wasm dv
     | Dv_error s => True (* XXX ??? XXX *)
     end.
 
   Section eval_preserved.
 
+    Definition Q_error1 := @Q_error ft bm fruntime foreign_ejson_model foreign_ejson_runtime_op _.
     Lemma error_msg_to_false s1 :
-      (forall s : string, Q_error s1 :: nil <> Q_error s :: nil) -> False.
+      (forall s : string, Q_error1 s1 :: nil <> Q_error1 s :: nil) -> False.
     Proof.
       intros.
       specialize (H s1).
@@ -416,6 +435,7 @@ Section CompCorrectness.
         unfold equal_outputs; simpl; auto
       end.
 
+    Definition query : Type := @query fruntime foreign_ejson_model foreign_ejson_runtime_op _ ft bm.
     Definition query_not_error (q:query) :=
       match q with
       | Q_error _ => False
@@ -477,6 +497,7 @@ Section CompCorrectness.
       destruct i; simpl in *; try contradiction.
       elim H; intros; [rewrite <- H2; auto|contradiction].
       elim H1; intros; contradiction.
+      elim H1; intros; contradiction.
     Qed.
 
     Lemma correct_driver_succeeds_nnrs_imp:
@@ -500,6 +521,7 @@ Section CompCorrectness.
         induction i; simpl in *; intuition; subst; eauto.
         destruct i; simpl in *; try contradiction.
         elim H; intros; [rewrite <- H2; auto|contradiction].
+        elim H1; intros; try contradiction.
         elim H1; intros; try contradiction.
     Qed.
 
@@ -896,6 +918,31 @@ Section CompCorrectness.
       simpl in H0.
       elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
       destruct dv; simpl in *; contradiction.
+    Qed.
+
+    Lemma correct_driver_succeeds_wasm:
+      forall dv, driver_correct (Dv_wasm dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_wasm dv) (Q_wasm q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; contradiction.
+    Qed.
+
+    Lemma correct_driver_succeeds_wasm_ast:
+      forall dv, driver_correct (Dv_wasm_ast dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_wasm_ast dv) (Q_wasm_ast q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; [ | contradiction ].
+      elim H; intros; contradiction.
     Qed.
 
     Lemma correct_driver_succeeds_dnnrc:

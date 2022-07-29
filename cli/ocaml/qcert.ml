@@ -17,7 +17,8 @@ open Qcert_lib
 open Util
 open Logger
 open Config
-open Core.EnhancedCompiler
+open CompLang
+open EnhancedCompiler.EnhancedCompiler
 open Logger_to_sexp
 
 (* Command line args *)
@@ -114,30 +115,30 @@ let args_list gconf =
 let anon_args input_files f = input_files := f :: !input_files
 
 let languages =
-  [ Core.L_camp_rule;
-    Core.L_camp;
-    Core.L_tech_rule;
-    Core.L_designer_rule;
-    Core.L_oql;
-    Core.L_sql;
-    Core.L_sqlpp;
-    Core.L_lambda_nra;
-    Core.L_nra;
-    Core.L_nraenv;
-    Core.L_nraenv_core;
-    Core.L_nnrc;
-    Core.L_nnrc_core;
-    Core.L_nnrs;
-    Core.L_nnrs_core;
-    Core.L_imp_data;
-    Core.L_imp_ejson;
-    Core.L_nnrcmr;
-    Core.L_dnnrc;
-    Core.L_dnnrc_typed;
-    Core.L_js_ast;
-    Core.L_javascript;
-    Core.L_java;
-    Core.L_spark_df; ]
+  [ L_camp_rule;
+    L_camp;
+    L_tech_rule;
+    L_designer_rule;
+    L_oql;
+    L_sql;
+    L_sqlpp;
+    L_lambda_nra;
+    L_nra;
+    L_nraenv;
+    L_nraenv_core;
+    L_nnrc;
+    L_nnrc_core;
+    L_nnrs;
+    L_nnrs_core;
+    L_imp_data;
+    L_imp_ejson;
+    L_nnrcmr;
+    L_dnnrc;
+    L_dnnrc_typed;
+    L_js_ast;
+    L_javascript;
+    L_java;
+    L_spark_df; ]
 
 
 let languages_string =
@@ -156,8 +157,8 @@ let parse_args () =
   let gconf =
     { gconf_qname = None;
       gconf_class_name = None;
-      gconf_source = Core.L_camp_rule;
-      gconf_target = Core.L_javascript;
+      gconf_source = L_camp_rule;
+      gconf_target = L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;

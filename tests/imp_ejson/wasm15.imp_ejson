@@ -1,0 +1,6 @@
+/* uninitialized return */
+module main {
+  wasm15(x) return y {
+    let y := 1;
+  }
+}

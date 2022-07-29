@@ -1718,14 +1718,14 @@ Proof.
       apply lookup_in in teq2.
       revert bwf cwf teq teq2.
       clear; simpl; repeat rewrite andb_true_iff, forallb_forall.
-      intuition.
-      apply (H2 _ teq).
+      intros bwf cwf; intros; elim bwf; intros; clear bwf. 
+      apply (H0 _ teq).
     + apply lookup_in in teq.
       apply lookup_in in teq2.
       revert bwf cwf teq teq2.
       clear; simpl; repeat rewrite andb_true_iff, forallb_forall.
-      intuition.
-      apply (H3 _ teq2).
+      intros bwf cwf; intros; elim cwf; intros; clear cwf. 
+      apply (H0 _ teq2).
 Qed.
 
 Lemma rtype_join₀_meet₀_associative {a b c : rtype₀} :

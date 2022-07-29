@@ -32,14 +32,17 @@ Require Import ImpEval.
 Require Import ImpEJson.
 
 Section ImpEJsonEval.
-  Context {fejson:foreign_ejson}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
+
   (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
   Context (h:brand_relation_t).
 
   Section EvalInstantiation.
     (* Instantiate Imp for Qcert data *)
-    Definition imp_ejson_model_normalize (c:imp_ejson_constant) : imp_ejson_model :=
+    Definition imp_ejson_model_normalize (c:@imp_ejson_constant foreign_ejson_model) : @imp_ejson_model foreign_ejson_model :=
       match c with
       | cejnull => ejnull
       | cejnumber f => ejnumber f
@@ -49,31 +52,31 @@ Section ImpEJsonEval.
       | cejforeign f => ejforeign f
       end.
 
-    Definition imp_ejson_model_to_bool (d:imp_ejson_model) : option bool :=
+    Definition imp_ejson_model_to_bool (d:@imp_ejson_model foreign_ejson_model) : option bool :=
       match d with
       | ejbool b => Some b
       | _ => None
       end.
 
-    Definition imp_ejson_model_to_list (d:imp_ejson_model) : option (list imp_ejson_model) :=
+    Definition imp_ejson_model_to_list (d:@imp_ejson_model foreign_ejson_model) : option (list imp_ejson_model) :=
       match d with
       | ejarray c => Some (c)
       | _ => None
       end.
 
-    Definition imp_ejson_model_to_Z (d:imp_ejson_model) : option Z :=
+    Definition imp_ejson_model_to_Z (d:@imp_ejson_model foreign_ejson_model) : option Z :=
       match d with
       | ejbigint n => Some n
       | _ => None
       end.
 
-    Definition imp_ejson_Z_to_data (n: Z) : imp_ejson_model := ejbigint n.
+    Definition imp_ejson_Z_to_data (n: Z) : @imp_ejson_model foreign_ejson_model := ejbigint n.
 
-    Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list imp_ejson_model) : option imp_ejson_model :=
+    Definition imp_ejson_op_eval (op:imp_ejson_op) (dl:list (@imp_ejson_model foreign_ejson_model)) : option (@imp_ejson_model foreign_ejson_model) :=
       ejson_op_eval op dl. (* XXX In Common.EJson.EJsonOperators *)
 
     Definition imp_ejson_runtime_eval (op:imp_ejson_runtime_op)
-               (dl:list imp_ejson_model) : option imp_ejson_model :=
+               (dl:list (@imp_ejson_model foreign_ejson_model)) : option imp_ejson_model :=
       ejson_runtime_eval h op dl. (* XXX In Common.EJson.EJsonOperators *)
   End EvalInstantiation.
 
@@ -81,8 +84,8 @@ Section ImpEJsonEval.
   Section Evaluation.
 
     (** Evaluation takes a ImpQcert expression and an environment. It
-          returns an optional value. When [None] is returned, it
-          denotes an error. An error is always propagated. *)
+        returns an optional value. When [None] is returned, it
+        denotes an error. An error is always propagated. *)
 
     Definition imp_ejson_expr_eval
                (σ:pd_jbindings) (e:imp_ejson_expr)
@@ -111,7 +114,7 @@ Section ImpEJsonEval.
            σ el.
 
     Definition imp_ejson_decls_erase
-               (σ:option pd_jbindings) (el:list (string * option imp_ejson_expr))
+               (σ:option (@pd_jbindings foreign_ejson_model)) (el:list (string * option (@imp_ejson_expr foreign_ejson_model foreign_ejson_runtime_op)))
       : option pd_jbindings
       := imp_decls_erase σ el.
 
@@ -176,9 +179,11 @@ Require Import ForeignDataToEJson.
 Require Import DataToEJson.
 Section Top.
   Context {fruntime:foreign_runtime}.
-  Context {fejson:foreign_ejson}.
-  Context {fdatatoejson:foreign_to_ejson}.
-  Context {fejruntime:foreign_ejson_runtime}.
+  Context {foreign_ejson_model:Set}.
+  Context {fejson:foreign_ejson foreign_ejson_model}.
+  Context {foreign_ejson_runtime_op : Set}.
+  Context {fdatatoejson:foreign_to_ejson foreign_ejson_model foreign_ejson_runtime_op}.
+  Context {fejruntime:foreign_ejson_runtime foreign_ejson_runtime_op}.
   (* XXX We should try and compile the hierarchy in. Currenty it is still used in cast for sub-branding check *)
   Context (h:brand_relation_t).
   Definition imp_ejson_eval_top (cenv: bindings) (q:imp_ejson) : option data :=
