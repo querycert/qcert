@@ -573,7 +573,7 @@ Section CoqLibAdd.
       reflexivity.
       assert (exists (n3:nat), min (S n1) (S n2) = (S n3)).
       exists (min n1 n2).
-      rewrite Min.succ_min_distr; reflexivity.
+      rewrite Nat.succ_min_distr; reflexivity.
       elim H0; intros.
       congruence.
     Qed.
@@ -620,8 +620,8 @@ Section CoqLibAdd.
       revert x0; induction l; simpl; intros; try lia.
       rewrite (IHl (n0 * f a + x0)); simpl.
       rewrite (fold_left_arith_dist1 (f a + 0)).
-      rewrite mult_plus_distr_l.
-      rewrite mult_plus_distr_l.
+      rewrite Nat.mul_add_distr_l.
+      rewrite Nat.mul_add_distr_l.
       lia.
     Qed.
 
@@ -631,7 +631,7 @@ Section CoqLibAdd.
     Proof.
       generalize 0.
       revert x0; induction l; simpl; intros; try lia.
-      assert (f a + n = n + f a) by apply plus_comm.
+      assert (f a + n = n + f a) by apply Nat.add_comm.
       rewrite H; clear H.
       rewrite (IHl x0 (n + f a)); reflexivity.
     Qed.

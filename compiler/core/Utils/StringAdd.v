@@ -392,7 +392,7 @@ Section Prefix.
   Qed.
 
   Lemma substring_bounded s n l :
-    substring s n l = substring s (min n (String.length l - s)) l.
+    substring s n l = substring s (Nat.min n (String.length l - s)) l.
   Proof.
     revert s n.
     induction l; destruct s; destruct n; simpl; trivial.
@@ -422,7 +422,7 @@ Section Prefix.
     rewrite <- (substring_all l) at 3.
     apply substring_le_prefix.
     replace (String.length l - 0) with (String.length l) by lia.
-    apply le_min_r.
+    apply Nat.le_min_r.
   Qed.
 
   Lemma in_of_append pre y l :

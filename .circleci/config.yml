@@ -97,5 +97,5 @@ workflows:
       - run:
           matrix:
             parameters:
-              ocaml-version: ["4.09.1", "4.11.2"]
-              coq-version: ["8.15.1"]
+              ocaml-version: ["4.09.1", "4.12.1"]
+              coq-version: ["8.15.1", "8.16.1"]
