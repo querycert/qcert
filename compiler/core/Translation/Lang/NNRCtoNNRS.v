@@ -306,13 +306,20 @@ Section NNRCtoNNRS.
       | None => nnrs_expr_eval h σc pd e = None
       end.
     Proof.
-      destruct term; simpl; intros inn;
-        destruct (in_dom_lookup string_dec inn) as [dd eqdd];
-        rewrite eqdd
-        ; destruct (nnrs_expr_eval h σc pd e); simpl; trivial
-        ; replace string_dec with
-              (@equiv_dec string (@eq string) (@eq_equivalence string) string_eqdec) by trivial
-        ;  rewrite lookup_update_eq_in by trivial
+      destruct term; simpl; intros inn.
+      - destruct (in_dom_lookup string_dec inn) as [dd eqdd];
+          rewrite eqdd
+          ; destruct (nnrs_expr_eval h σc pd e); simpl; trivial
+          ; replace string_dec with
+                (@equiv_dec string (@eq string) (@eq_equivalence string) string_eqdec) by trivial
+          ;  rewrite lookup_update_eq_in by trivial
+          ; simpl; trivial.
+      - destruct (in_dom_lookup string_dec inn) as [dd eqdd].
+        rewrite eqdd.
+        destruct (nnrs_expr_eval h σc pd e); simpl; trivial.
+        replace string_dec with
+            (@equiv_dec string (@eq string) (@eq_equivalence string) string_eqdec) by trivial.
+        rewrite lookup_update_eq_in by trivial
         ; simpl; trivial.
       rewrite rev_app_distr; simpl; trivial.
     Qed.
@@ -657,6 +664,7 @@ Section NNRCtoNNRS.
       revert fvs term si eqsi; simpl.
       nnrc_cases (induction s) Case; intros fvs term si eqsi σ mc md inclσ inclmc inclbvars safe_term.
       - Case "NNRCGetConstant".
+        simpl in eqsi.
         invcs eqsi; simpl; intros.
         apply nnrs_stmt_eval_terminator; trivial.
       - Case "NNRCVar".
