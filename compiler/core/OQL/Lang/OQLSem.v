@@ -1153,80 +1153,6 @@ Section OQLSem.
           reflexivity.
     Qed.
 
-    (* XXX Is that even true?!?! *)
-    Lemma table_sort_complete e sc l1 l2:
-      oql_order_sem e sc l1 l2 ->
-      table_sort
-        ((fun env : oql_env =>
-            match oql_expr_interp h constant_env e env with
-            | Some x' => sdata_of_data x'
-            | None => None
-            end) :: nil) l1 = Some l2.
-    Proof.
-      admit.
-    Admitted.
-    
-    Lemma oql_expr_interp_complete (e:oql_expr) :
-      forall d tenv,
-        oql_expr_sem e tenv d ->
-        oql_expr_interp h constant_env e tenv = Some d.
-    Proof.
-      intros.
-      revert tenv d H. induction e; simpl in *; intros.
-      - inversion H; subst; reflexivity.
-      - inversion H; subst; assumption.
-      - inversion H; subst; assumption.
-      - inversion H; subst.
-        unfold olift2.
-        rewrite (IHe1 tenv d1 H3); rewrite (IHe2 tenv d2 H6); assumption.
-      - inversion H; subst.
-        unfold olift.
-        rewrite (IHe tenv d1 H2); assumption.
-      - inversion H0; subst; clear H0.
-        destruct e1; inversion H6; subst; clear H6; unfold olift; simpl in *.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H3); unfold lift.
-          rewrite (oql_select_map_sem_complete o tenv0 dl IHe H1); reflexivity.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H3); unfold lift.
-          rewrite (oql_select_map_sem_complete o tenv0 dl IHe H1); reflexivity.
-      - inversion H0; subst; clear H0.
-        destruct e1; inversion H8; subst; clear H8; unfold olift; simpl in *.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H4); unfold lift.
-          rewrite (oql_where_sem_complete e tenv0 tenv2 IHe0 H7).
-          rewrite (oql_select_map_sem_complete o tenv2 dl IHe H1).
-          reflexivity.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H4); unfold lift.
-          rewrite (oql_where_sem_complete e tenv0 tenv2 IHe0 H7).
-          rewrite (oql_select_map_sem_complete o tenv2 dl IHe H1).
-          reflexivity.
-      - inversion H0; subst; clear H0.
-        destruct e1; inversion H9; subst; clear H9; unfold olift; simpl in *.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
-          rewrite (table_sort_complete e sc tenv0 tenv1 H8).
-          rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H7); unfold lift.
-          rewrite (table_sort_complete e sc tenv0 tenv1 H8).
-          rewrite (oql_select_map_sem_complete o tenv1 dl IHe H1); reflexivity.
-      - inversion H0; subst; clear H0.
-        destruct e1; inversion H11; subst; clear H11; unfold olift; simpl in *.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
-          rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
-          rewrite (table_sort_complete e3 sc tenv1 tenv2 H10).
-          rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
-        + rewrite (oql_from_sem_complete el (tenv::nil) tenv0 H H8); unfold lift.
-          rewrite (oql_where_sem_complete e2 tenv0 tenv1 IHe2 H9).
-          rewrite (table_sort_complete e3 sc tenv1 tenv2 H10).
-          rewrite (oql_select_map_sem_complete o tenv2 dl IHe1 H1); reflexivity.
-    Qed.
-      
-    Lemma oql_expr_interp_correct_and_complete (e:oql_expr) :
-      forall tenv d,
-        oql_expr_interp h constant_env e tenv = Some d <-> oql_expr_sem e tenv d.
-    Proof.
-      intros; split.
-      - apply oql_expr_interp_correct.
-      - apply oql_expr_interp_complete.
-    Qed.
-      
   End Denotation.
 
   Section ProgramDenotation.
@@ -1257,42 +1183,13 @@ Section OQLSem.
         case_eq (oql_expr_interp h (rec_concat_sort constant_env defls) o nil); intros;
           rewrite H0 in *; simpl in *; [|congruence].
         econstructor.
-        rewrite <- oql_expr_interp_correct_and_complete.
+        apply oql_expr_interp_correct.
         apply H0.
         apply IHoq; assumption.
       - econstructor.
         apply IHoq; assumption.
       - econstructor.
-        rewrite <- oql_expr_interp_correct_and_complete; assumption.
-    Qed.
-
-    Lemma oql_query_program_interp_complete oq:
-      forall defls d,
-        oql_query_program_sem defls oq d ->
-        oql_query_program_interp h constant_env defls oq = Some d.
-    Proof.
-      intros.
-      revert defls d H.
-      induction oq; simpl in *; intros.
-      - inversion H; subst.
-        unfold olift.
-        rewrite <- oql_expr_interp_correct_and_complete in H5.
-        rewrite H5; simpl.
-        apply IHoq; assumption.
-      - inversion H; subst.
-        apply IHoq; assumption.
-      - inversion H; subst.
-        rewrite <- oql_expr_interp_correct_and_complete in H2; assumption.
-    Qed.
-
-    Lemma oql_query_program_interp_correct_and_complete oq:
-      forall defls d,
-        oql_query_program_interp h constant_env defls oq = Some d <->
-        oql_query_program_sem defls oq d.
-    Proof.
-      intros; split.
-      - apply oql_query_program_interp_correct.
-      - apply oql_query_program_interp_complete.
+        apply oql_expr_interp_correct; assumption.
     Qed.
 
     Definition oql_sem (oq:oql) (d:data) : Prop := oql_query_program_sem nil oq d.
@@ -1305,26 +1202,6 @@ Section OQLSem.
       intros.
       apply oql_query_program_interp_correct.
       assumption.
-    Qed.
-
-    Lemma oql_interp_complete oq:
-      forall d,
-        oql_sem oq d ->
-        oql_interp h constant_env oq = Some d.
-    Proof.
-      intros.
-      apply oql_query_program_interp_complete.
-      assumption.
-    Qed.
-
-    Lemma oql_interp_correct_and_complete oq:
-      forall d,
-        oql_interp h constant_env oq = Some d <->
-        oql_sem oq d.
-    Proof.
-      intros; split.
-      - apply oql_interp_correct.
-      - apply oql_interp_complete.
     Qed.
 
   End ProgramDenotation.
