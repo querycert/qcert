@@ -68,89 +68,7 @@ Section ImpEJsonRewrite.
       destruct (EquivDec.equiv_dec v v); try congruence.
     Qed.
 
-    Lemma test1 h stmt v j σ σ':
-      imp_ejson_stmt_eval h stmt
-        ((fresh_var "src" (v :: imp_ejson_stmt_free_vars stmt), j) :: σ) = Some ((fresh_var "src" (v :: imp_ejson_stmt_free_vars stmt), j) :: σ') ->
-      imp_ejson_stmt_eval h stmt σ = Some σ'.
-    Proof.
-      imp_stmt_cases (destruct stmt) Case; simpl; intros.
-      - admit.
-      - admit.
-      - admit.
-      - admit.
-      - admit.
-    Admitted.
-
-    Lemma test2 h stmt x1 v j σ:
-      imp_ejson_stmt_eval h stmt
-        (x1 :: (fresh_var "src" (v :: imp_ejson_stmt_free_vars stmt), Some j) :: σ) = None <->
-      imp_ejson_stmt_eval h stmt (x1 :: σ) = None.
-    Proof.
-      admit.
-    Admitted.
-
-    Lemma test3 h stmt v l σ σ' i0 :
-      (fix for_fun
-           (dl : list imp_ejson_model) (σ₁ : list (var * option imp_ejson_model)) {struct dl} :
-         option (list (var * option imp_ejson_model)) :=
-         match dl with
-         | [] => Some σ₁
-         | d :: dl' =>
-           match imp_ejson_stmt_eval h stmt ((v, Some d) :: σ₁) with
-           | Some (_ :: σ₂) => for_fun dl' σ₂
-           | _ => None
-           end
-         end) l σ = Some σ' ->
-      (fix for_fun
-       (dl : list imp_ejson_model) (σ₁ : list (var * option imp_ejson_model)) {struct dl} :
-         option (list (var * option imp_ejson_model)) :=
-       match dl with
-       | [] => Some σ₁
-       | d :: dl' =>
-           match imp_ejson_stmt_eval h stmt ((v, Some d) :: σ₁) with
-           | Some (_ :: σ₂) => for_fun dl' σ₂
-           | _ => None
-           end
-       end) l ((fresh_var "src" (v :: imp_ejson_stmt_free_vars stmt), Some i0) :: σ) = Some ((fresh_var "src" (v :: imp_ejson_stmt_free_vars stmt), Some i0) :: σ').
-    Proof.
-      admit.
-    Admitted.
-
-    Lemma test4 h stmt v l σ i0 :
-      (fix for_fun
-           (dl : list imp_ejson_model) (σ₁ : list (var * option imp_ejson_model)) {struct dl} :
-         option (list (var * option imp_ejson_model)) :=
-         match dl with
-         | [] => Some σ₁
-         | d :: dl' =>
-           match imp_ejson_stmt_eval h stmt ((v, Some d) :: σ₁) with
-           | Some (_ :: σ₂) => for_fun dl' σ₂
-           | _ => None
-           end
-         end) l σ = None ->
-      (fix for_fun
-       (dl : list imp_ejson_model) (σ₁ : list (var * option imp_ejson_model)) {struct dl} :
-         option (list (var * option imp_ejson_model)) :=
-       match dl with
-       | [] => Some σ₁
-       | d :: dl' =>
-           match imp_ejson_stmt_eval h stmt ((v, Some d) :: σ₁) with
-           | Some (_ :: σ₂) => for_fun dl' σ₂
-           | _ => None
-           end
-       end) l ((fresh_var "src" (v :: imp_ejson_stmt_free_vars stmt), Some i0) :: σ) = None.
-    Proof.
-      admit.
-    Admitted.
-
-    Lemma test5 h stmt v i0 i1 σ:
-      imp_ejson_stmt_eval h stmt ((v, Some i1) :: σ) = None ->
-      imp_ejson_stmt_eval h stmt
-                          ((v, Some i1) :: (fresh_var "src" (v :: imp_ejson_stmt_free_vars stmt), Some i0) :: σ) = None.
-    Proof.
-      admit.
-    Admitted.
-    
+    (**
     Lemma imp_ejson_stmt_for_let_rewrite_correct h (σ : pd_jbindings) (stmt:imp_ejson_stmt) :
         imp_ejson_stmt_eval h stmt σ =
         imp_ejson_stmt_eval h (imp_ejson_stmt_for_let_rewrite stmt) σ.
@@ -167,8 +85,8 @@ Section ImpEJsonRewrite.
       destruct o; try reflexivity.
       rewrite lookup_first_var.
       destruct (imp_ejson_model_to_list i); try reflexivity.
-      admit.
-    Admitted.
+      ...
+     *)
 
   End CorrectnessForLetRewrite.
 
@@ -236,6 +154,7 @@ Section ImpEJsonRewrite.
     Definition list_tail_n_nat {A} n (l: list A) :=
       List.rev (list_n_nat n (List.rev l)).
 
+    (**
     Lemma imp_ejson_stmt_for_rewrite_correct h (σ : pd_jbindings) (stmt:imp_ejson_stmt) :
         imp_ejson_stmt_eval h stmt σ =
         imp_ejson_stmt_eval h (imp_ejson_stmt_for_rewrite stmt) σ.
@@ -258,8 +177,8 @@ Section ImpEJsonRewrite.
       intros.
       simpl.
       unfold olift.
-      admit.
-    Admitted.
+      ...
+     *)
 
   End CorrectnessForRewrite.
 
