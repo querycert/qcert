@@ -25,9 +25,10 @@
     "url": "https://github.com/querycert/qcert/issues"
   },
   "dependencies": {
-    "qcert-runtime-js": "*",
+    "mocha": "10.2.0",
     "qcert-compiler": "*",
-    "yargs": "13.2.4"
+    "qcert-runtime-js": "*",
+    "yargs": "^13.3.2"
   },
   "directories": {
     "lib": "lib"

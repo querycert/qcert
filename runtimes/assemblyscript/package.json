@@ -23,9 +23,9 @@
   "devDependencies": {
     "assemblyscript": "^0.12.5",
     "assemblyscript-regex": "^1.6.3",
-    "lodash": "^4.17.15",
     "chai": "^4.2.0",
-    "mocha": "^8.4.0"
+    "lodash": "^4.17.15",
+    "mocha": "^10.2.0"
   },
   "scripts": {
     "test": "mocha test_js -C",
